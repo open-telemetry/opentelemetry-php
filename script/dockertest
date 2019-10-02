@@ -1,0 +1,3 @@
+#!/bin/bash                               
+docker build -t opentelemetry-php-unittests .
+docker run -it opentelemetry-php-unittests
