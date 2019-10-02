@@ -1,5 +1,5 @@
 {
-    "name": "basis-company/opentelemetry",
+    "name": "open-telemetry/opentelemetry-php",
     "type": "library",
     "license": "MIT",
     "require": {
