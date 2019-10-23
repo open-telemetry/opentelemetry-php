@@ -1,0 +1,33 @@
+{
+    "name": "open-telemetry/opentelemetry-php",
+    "type": "library",
+    "license": "Apache-2.0",
+    "require": {
+        "php": "^7.1"
+    },
+    "authors": [
+        {
+            "name": "Bob Strecansky",
+            "email": "bob.strecansky@gmail.com"
+        },
+        {
+            "name": "Dmitry Krokhin",
+            "email": "nekufa@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "OpenTelemetry\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "": "tests"
+        },
+        "classmap": ["tests"]
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.5.16",
+        "composer/xdebug-handler": "^1.3"
+    }
+}
