@@ -90,7 +90,9 @@ class ComposerStaticInit155ac583c04b46b8df9e3e75cc3f428b
     );
 
     public static $classMap = array (
-        'OpenTelemetry\\Tests\\Unit\\Tracing\\Sampler\\AlwaysSamplerTest' => __DIR__ . '/../..' . '/tests/unit/Tracing/Sampler/AlwaysSampleTest.php',
+        'AlwaysSamplerTest' => __DIR__ . '/../..' . '/tests/unit/Tracing/Sampler/AlwaysSampleSamplerTest.php',
+        'NeverSamplerTest' => __DIR__ . '/../..' . '/tests/unit/Tracing/Sampler/NeverSampleSamplerTest.php',
+        'OpenTracing\\Tests\\Unit\\Tracing\\Sampler\\QpsSamplerTest' => __DIR__ . '/../..' . '/tests/unit/Tracing/Sampler/QpsSamplerTest.php',
         'PHPUnit\\Exception' => __DIR__ . '/..' . '/phpunit/phpunit/src/Exception.php',
         'PHPUnit\\Framework\\Assert' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert.php',
         'PHPUnit\\Framework\\AssertionFailedError' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/AssertionFailedError.php',

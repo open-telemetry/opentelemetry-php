@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tracing;
 
-use OpenTelemetry\Tracing\Sampler\AlwaysSampleSampler;
 use OpenTelemetry\Tracing\Sampler\SamplerInterface;
 class Tracer
 {
@@ -16,16 +15,12 @@ class Tracer
      * @param SpanContext $context
      * @param array $options 
      */
-    public function __construct(SpanContext $context = null, array $options = [])
+    public function __construct(SpanContext $context = null, bool $shouldSample = true)
     {
-        $sampler = array_key_exists('sampler', $options)
-            ? $options['sampler']
-            : new AlwaysSampleSampler();
-        unset($options['sampler']);
-
-        print_r($sampler);
-        $context = $context ?: SpanContext::generate();
-        $this->active = $this->generateSpanInstance('tracer', $context);
+        if($shouldSample) {
+            $context = $context ?: SpanContext::generate();
+            $this->active = $this->generateSpanInstance('tracer', $context);
+        }
     }
 
     public function getActiveSpan() : Span

@@ -3,11 +3,11 @@ namespace OpenTelemetry\Tracing\Sampler;
 
 
 /**
- * This implementation of the SamplerInterface always returns true.
+ * This implementation of the SamplerInterface always returns false.
  * Example:
  * ```
- * use OpenTelemetry\Traceing\Sampler\AlwaysSampleSampler;
- * $sampler = new AlwaysSampleSampler();
+ * use OpenTelemetry\Traceing\Sampler\NeverSampleSampler;
+ * $sampler = new NeverSampleSampler();
  * ```
  */
 class NeverSampleSampler implements SamplerInterface

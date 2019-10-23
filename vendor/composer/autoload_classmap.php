@@ -6,7 +6,9 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'OpenTelemetry\\Tests\\Unit\\Tracing\\Sampler\\AlwaysSamplerTest' => $baseDir . '/tests/unit/Tracing/Sampler/AlwaysSampleTest.php',
+    'AlwaysSamplerTest' => $baseDir . '/tests/unit/Tracing/Sampler/AlwaysSampleSamplerTest.php',
+    'NeverSamplerTest' => $baseDir . '/tests/unit/Tracing/Sampler/NeverSampleSamplerTest.php',
+    'OpenTracing\\Tests\\Unit\\Tracing\\Sampler\\QpsSamplerTest' => $baseDir . '/tests/unit/Tracing/Sampler/QpsSamplerTest.php',
     'PHPUnit\\Exception' => $vendorDir . '/phpunit/phpunit/src/Exception.php',
     'PHPUnit\\Framework\\Assert' => $vendorDir . '/phpunit/phpunit/src/Framework/Assert.php',
     'PHPUnit\\Framework\\AssertionFailedError' => $vendorDir . '/phpunit/phpunit/src/Framework/AssertionFailedError.php',

@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class NeverSamplerTest extends TestCase
 {
-    public function testAlwaysSampler()
+    public function testNeverSampler()
     {
         $sampler = new NeverSampleSampler();
         $this->assertFalse($sampler->shouldSample());
