@@ -10,14 +10,13 @@ use Cache\Adapter\Common\PhpCacheItem;
 
 $client = new \Memcached();
 $client->addServer('localhost', 11211);
-$pool = new MemcachedCachePool($client);
+$cache = new MemcachedCachePool($client);
 
-$sampler = new QpsSampler($pool, [
+$sampler = new QpsSampler($cache, [
     'cacheItemClass' => PhpCacheItem::class
 ]);
 
-// If the sampler is enabled, we should start our sampling.
-if($sampler) {
+if($sampler->shouldSample()) {
     $spanContext = SpanContext::generate(); // or extract from headers
     $tracer = Builder::create()->setSpanContext($spanContext)->getTracer();
     
