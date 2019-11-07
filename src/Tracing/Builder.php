@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tracing;
 
+// todo: This is not in the spec, and it doesn't seem to add any value over using the span/tracer API
 class Builder
 {
     private $spanContext;

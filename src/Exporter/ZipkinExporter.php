@@ -15,10 +15,10 @@ class ZipkinExporter extends Exporter
     public function convertSpan(Span $span) : array
     {
         $row = [
-            'id' => $span->getSpanContext()->getSpanId(),
-            'traceId' => $span->getSpanContext()->getTraceId(),
-            'parentId' => $span->getParentSpanContext()
-                ? $span->getParentSpanContext()->getSpanId()
+            'id' => $span->getContext()->getSpanId(),
+            'traceId' => $span->getContext()->getTraceId(),
+            'parentId' => $span->getParentContext()
+                ? $span->getParentContext()->getSpanId()
                 : null,
             'localEndpoint' => $this->getEndpoint(),
             'name' => $span->getName(),

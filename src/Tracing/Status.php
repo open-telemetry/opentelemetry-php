@@ -46,6 +46,7 @@ class Status
 
     private $code;
     private $description;
+    static private $ok;
 
     public function __construct(int $code, string $description = null)
     {
@@ -55,6 +56,19 @@ class Status
         }
         if (!is_null($description)) {
             $this->description = $description;
+        }
+    }
+
+    public static function new(int $code, string $description = null) {
+        if ($code === self::OK && ($description === null || $description == self::DESCRIPTION[self::OK])) {
+            return self::$ok;
+        }
+        return new Status($code, $description);
+    }
+
+    public static function initOk() {
+        if (!self::$ok) {
+            self::$ok = new Status(self::OK);
         }
     }
 
@@ -68,8 +82,10 @@ class Status
         return $this->description;
     }
 
-    public function isOk() : bool
+    public function getIsOk() : bool
     {
         return $this->code == self::OK;
     }
 }
+
+Status::initOk();

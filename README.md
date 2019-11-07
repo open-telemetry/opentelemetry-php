@@ -55,3 +55,6 @@ To make sure the tests in this repo work as you expect, you can use the included
 
 1.)  Make sure that you have docker installed  
 2.)  Execute `./resources/test-using-docker` from your bash compatible shell.
+
+## Caveats
+The Span Links concept is not yet implemented. 
