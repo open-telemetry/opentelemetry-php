@@ -10,7 +10,7 @@ class Event
     private $timestamp;
     private $attributes = [];
 
-    public function __construct(string $name, array $attributes = [], $timestamp = null)
+    public function __construct(string $name, iterable $attributes = [], $timestamp = null)
     {
         if (is_null($timestamp)) {
             $timestamp = microtime(true);
@@ -39,7 +39,7 @@ class Event
         return $this->attributes;
     }
 
-    public function setAttributes(array $attributes) : self
+    public function setAttributes(iterable $attributes) : self
     {
         $this->attributes = [];
         foreach ($attributes as $k => $v) {

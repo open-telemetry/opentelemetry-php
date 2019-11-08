@@ -13,10 +13,10 @@ class BasisExporter extends Exporter
     public function convertSpan(Span $span) : array
     {
         return [
-            'traceId' => $span->getSpanContext()->getTraceId(),
-            'spanId' => $span->getSpanContext()->getSpanId(),
-            'parentSpanId' => $span->getParentSpanContext() 
-                ? $span->getParentSpanContext()->getSpanId()
+            'traceId' => $span->getContext()->getTraceId(),
+            'spanId' => $span->getContext()->getSpanId(),
+            'parentSpanId' => $span->getParentContext()
+                ? $span->getParentContext()->getSpanId()
                 : null,
             'body' => serialize($span),
         ];

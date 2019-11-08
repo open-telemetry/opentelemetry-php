@@ -9,16 +9,21 @@ class SpanContext
     private $traceId;
     private $spanId;
 
+    // todo: add 8 bit TraceFlags; currently has one flag "sampled"
+    // todo: add Tracestate: https://www.w3.org/TR/trace-context/#tracestate-header
+
     public static function generate()
     {
         return self::fork(bin2hex(random_bytes(16)));
     }
 
+    // This method is probably useful, but it's name is confusing
     public static function fork(string $traceId)
     {
         return self::restore($traceId, bin2hex(random_bytes(8)));
     }
 
+    // this is exactly the same as a constructor -- why is it here?
     public static function restore(string $traceId, string $spanId)
     {
         return new self($traceId, $spanId);
@@ -38,5 +43,15 @@ class SpanContext
     public function getSpanId() : string
     {
         return $this->spanId;
+    }
+
+    public function IsValid() : bool
+    {
+        ;
+    }
+
+    public function IsRemote() : bool
+    {
+        ;
     }
 }
