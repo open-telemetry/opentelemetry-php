@@ -14,10 +14,17 @@ class Span
 
     private $start;
     private $end;
-    private $status;
+    private $statusCode;
+    private $statusDescription;
 
     private $attributes = [];
     private $events = [];
+
+    // todo: missing span kind
+
+    // todo: missing links: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-links
+
+    // todo: Spec says a parent is a Span, SpanContext, or null
 
     public function __construct(string $name, SpanContext $spanContext, SpanContext $parentSpanContext = null)
     {
@@ -25,33 +32,26 @@ class Span
         $this->spanContext = $spanContext;
         $this->parentSpanContext = $parentSpanContext;
         $this->start = microtime(true);
+        $this->status = Status::OK;
+        $this->statusDescription = null;
     }
 
-    public function getSpanContext() : SpanContext
+    public function getContext(): SpanContext
     {
-        return $this->spanContext;
+        return clone $this->spanContext;
     }
 
-    public function getParentSpanContext() : ?SpanContext
+    public function getParentContext(): ?SpanContext
     {
-        return $this->parentSpanContext;
+        return $this->parentSpanContext !== null ? clone $this->parentSpanContext : null;
     }
 
-    public function setParentSpanContext(SpanContext $parentSpanContext = null) : self
-    {
-        $this->parentSpanContext = $parentSpanContext;
-        return $this;
-    }
 
-    public function end(Status $status = null) : self
+    public function end(int $statusCode = Status::OK, ?string $statusDescription = null, float $timestamp = null): self
     {
-        $this->end = microtime(true);
-        if (!$this->status && !$status) {
-            $status = new Status(Status::OK);
-        }
-        if ($status) {
-            $this->setStatus($status);
-        }
+        $this->end = $timestamp ?? microtime(true);
+        $this->statusCode = $statusCode;
+        $this->statusDescription = null;
         return $this;
     }
 
@@ -65,23 +65,21 @@ class Span
         return $this->end;
     }
 
-    public function setStatus(Status $status) : self
+    // todo: we decided setStatus did not seem necessary, and complicates the hotpath, and therefore not worth it
+    //public function setStatus(Status $status);
+
+    public function getStatus(): Status
     {
-        $this->status = $status;
-        return $this;
+        return Status::new($this->statusCode, $this->statusDescription);
     }
 
-    public function getStatus() : ?Status
-    {
-        return $this->status;
-    }
-
-    public function isRecordingEvents() : bool
+    // I think this is too simple, see: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#isrecording
+    public function isRecording(): bool
     {
         return is_null($this->end);
     }
 
-    public function getDuration() : ?float
+    public function getDuration(): ?float
     {
         if (!$this->end) {
             return null;
@@ -89,19 +87,12 @@ class Span
         return $this->end - $this->start;
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function setInterval(float $start, float $end) : self
-    {
-        $this->start = $start;
-        $this->end = $end;
-        return $this;
-    }
-
-    public function setName(string $name) : self
+    public function updateName(string $name): self
     {
         $this->name = $name;
         return $this;
@@ -115,22 +106,24 @@ class Span
         return $this->attributes[$key];
     }
 
-    public function setAttribute(string $key, $value) : self
+    public function setAttribute(string $key, $value): self
     {
-        $this->throwExceptionIfReadonly();
+        // todo: type check value:
+        // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#set-attributes
+        $this->throwIfNotRecording();
 
         $this->attributes[$key] = $value;
         return $this;
     }
 
-    public function getAttributes() : array
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
 
-    public function setAttributes(array $attributes) : self
+    public function setAttributes(iterable $attributes): self
     {
-        $this->throwExceptionIfReadonly();
+        $this->throwIfNotRecording();
 
         $this->attributes = [];
         foreach ($attributes as $k => $v) {
@@ -139,11 +132,13 @@ class Span
         return $this;
     }
 
-    public function addEvent(string $name, array $attributes = [], float $timestamp = null) : Event
+    // todo: is accepting an Iterator enough to satisfy AddLazyEvent?
+    public function addEvent(string $name, iterable $attributes = [], float $timestamp = null): Event
     {
-        $this->throwExceptionIfReadonly();
+        $this->throwIfNotRecording();
 
         $event = new Event($name, $attributes, $timestamp);
+        // todo: check that these are all Attributes
         $this->events[] = $event;
         return $event;
     }
@@ -153,9 +148,17 @@ class Span
         return $this->events;
     }
 
-    private function throwExceptionIfReadonly()
+    /* A Span is said to have a remote parent if it is the child of a Span
+     * created in another process. Each propagators' deserialization must set IsRemote to true on a parent
+     *  SpanContext so Span creation knows if the parent is remote. */
+    public function IsRemote(): bool
     {
-        if (!$this->isRecordingEvents()) {
+        ;
+    }
+
+    private function throwIfNotRecording()
+    {
+        if (!$this->isRecording()) {
             throw new Exception("Span is readonly");
         }
     }
