@@ -1,3 +1,0 @@
-#!/bin/bash
-docker build . -t opentelemetry-php-docker-tests
-docker run -it opentelemetry-php-docker-tests

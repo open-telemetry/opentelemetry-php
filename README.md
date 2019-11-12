@@ -1,7 +1,7 @@
+
 # OpenTelemetry php library
 [![Gitter](https://badges.gitter.im/open-telemetry/opentelemetry-php.svg)](https://gitter.im/open-telemetry/opentelemetry-php?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Build Status](https://travis-ci.org/open-telemetry/opentelemetry-php.svg?branch=master)](https://travis-ci.org/open-telemetry/opentelemetry-php)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/open-telemetry/opentelemetry-php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/open-telemetry/opentelemetry-php/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/open-telemetry/opentelemetry-php/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/open-telemetry/opentelemetry-php/?branch=master)
 
 - [Installation](#installation)
@@ -10,7 +10,8 @@
 
 Our meetings are held weekly on Wednesdays at 10:30am PST / 1:30pm EST.  
 Please reach out on [gitter.im](https://gitter.im/open-telemetry/community) if you'd like to be invited.  
-The public calendar invite will be shared once it becomes avaiable.  
+Meeting Agenda / Notes will be housed [here](https://docs.google.com/document/d/1WLDZGLY24rk5fRudjdQAcx_u81ZQWCF3zxiNT-sz7DI/edit?usp=sharing)
+
 
 ## Installation
 The recommended way to install the library is through [Composer](http://getcomposer.org):
@@ -51,6 +52,8 @@ $span->end(); // pass status as an optional argument
 ```
 
 ## Testing
+
+Our unit and integration tests live in the `tests/` folder.
 To make sure the tests in this repo work as you expect, you can use the included docker test wrapper:
 
 1.)  Make sure that you have docker installed  

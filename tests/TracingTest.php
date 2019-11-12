@@ -15,26 +15,26 @@ class TracingTest extends TestCase
 {
     public function testContextGenerationAndRestore()
     {
-        $spanContext = SpanContext::generate();
-        $this->assertSame(strlen($spanContext->getTraceId()), 32);
-        $this->assertSame(strlen($spanContext->getSpanId()), 16);
+        $span_context = SpanContext::generate();
+        $this->assertSame(strlen($span_context->getTraceId()), 32);
+        $this->assertSame(strlen($span_context->getSpanId()), 16);
 
-        $spanContext2 = SpanContext::generate();
-        $this->assertNotSame($spanContext->getTraceId(), $spanContext2->getTraceId());
-        $this->assertNotSame($spanContext->getSpanId(), $spanContext2->getSpanId());
+        $span_context2 = SpanContext::generate();
+        $this->assertNotSame($span_context->getTraceId(), $span_context2->getTraceId());
+        $this->assertNotSame($span_context->getSpanId(), $span_context2->getSpanId());
 
-        $spanContext3 = SpanContext::restore($spanContext->getTraceId(), $spanContext->getSpanId());
-        $this->assertSame($spanContext3->getTraceId(), $spanContext->getTraceId());
-        $this->assertSame($spanContext3->getSpanId(), $spanContext->getSpanId());
+        $span_context3 = SpanContext::restore($span_context->getTraceId(), $span_context->getSpanId());
+        $this->assertSame($span_context3->getTraceId(), $span_context->getTraceId());
+        $this->assertSame($span_context3->getSpanId(), $span_context->getSpanId());
     }
 
     public function testTracerSpanContextRestore()
     {
         $tracer = new Tracer();
-        $spanContext = $tracer->getActiveSpan()->getContext();
+        $span_context = $tracer->getActiveSpan()->getContext();
 
-        $spanContext2 = SpanContext::restore($spanContext->getTraceId(), $spanContext->getSpanId());
-        $tracer2 = new Tracer($spanContext2);
+        $span_context2 = SpanContext::restore($span_context->getTraceId(), $span_context->getSpanId());
+        $tracer2 = new Tracer($span_context2);
 
         $this->assertSame($tracer->getActiveSpan()->getContext()->getTraceId(), $tracer2->getActiveSpan()->getContext()->getTraceId());
     }
@@ -52,16 +52,17 @@ class TracingTest extends TestCase
         $tracer = new Tracer();
 
         $guard = $tracer->createSpan('guard.validate');
-        $connection = $tracer->createSpan('guard.database.connection');
-        $procedure = $tracer->createSpan('guard.procedure.registration')->end();
+        $connection = $tracer->createSpan('guard.validate.connection');
+        $procedure = $tracer->createSpan('guard.validate.registration')->end();
         $connection->end();
         $policy = $tracer->createSpan('policy.describe')->end();
 
         $guard->end();
 
-        $this->assertSame($connection->getParentContext(), $guard->getContext());
-        $this->assertSame($procedure->getParentContext(), $connection->getContext());
-        $this->assertSame($policy->getParentContext(), $guard->getContext());
+        $this->assertEquals($connection->getParentContext(), $guard->getContext());
+        $this->assertEquals($connection->getParentContext(), $guard->getContext());
+        $this->assertEquals($procedure->getParentContext(), $connection->getContext());
+        $this->assertEquals($policy->getParentContext(), $guard->getContext());
 
         $this->assertCount(5, $tracer->getSpans());
     }
@@ -70,11 +71,10 @@ class TracingTest extends TestCase
     {
         $tracer = new Tracer();
         $global = $tracer->getActiveSpan();
-
         $mysql = $tracer->createSpan('mysql');
         $this->assertSame($tracer->getActiveSpan(), $mysql);
         $this->assertSame($global->getContext()->getTraceId(), $mysql->getContext()->getTraceId());
-        $this->assertSame($mysql->getParentContext(), $global->getContext());
+        $this->assertEquals($mysql->getParentContext(), $global->getContext());
         $this->assertNotNull($mysql->getStart());
         $this->assertTrue($mysql->isRecording());
         $this->assertNull($mysql->getDuration());
@@ -89,11 +89,10 @@ class TracingTest extends TestCase
         $this->assertGreaterThan($duration, $mysql->getDuration());
 
         $this->assertTrue($mysql->getStatus()->getIsOk());
-        
+
         // active span rolled back
         $this->assertSame($tracer->getActiveSpan(), $global);
-        $this->assertNull($global->getStatus());
-        
+
         // active span should be kept for global span
         $global->end();
         $this->assertSame($tracer->getActiveSpan(), $global);
@@ -105,23 +104,20 @@ class TracingTest extends TestCase
         $tracer = new Tracer();
 
         $cancelled = $tracer->createSpan('cancelled');
-        $cancelled->end(new Status(Status::CANCELLED));
+        $cancelled->end(1);
         $this->assertFalse($cancelled->getStatus()->getIsOk());
         $this->assertSame($cancelled->getStatus()->getCanonicalCode(), Status::CANCELLED);
         $this->assertSame($cancelled->getStatus()->getDescription(), Status::DESCRIPTION[Status::CANCELLED]);
 
         $custom = $tracer->createSpan('custom');
-        $custom->end(new Status(404, 'Not found'));
+        $custom->end(5);
         $this->assertFalse($custom->getStatus()->getIsOk());
-        $this->assertSame($custom->getStatus()->getCanonicalCode(), 404);
-        $this->assertSame($custom->getStatus()->getDescription(), 'Not found');
+        $this->assertSame($custom->getStatus()->getCanonicalCode(), 5);
+        $this->assertSame($custom->getStatus()->getDescription(), 'Some requested entity (e.g., file or directory) was not found. Note to server developers: if a request is denied for an entire class of users, such as gradual feature rollout or undocumented whitelist, NOT_FOUND may be used. If a request is denied for some users within a class of users, such as user-based access control, PERMISSION_DENIED must be used.');
 
-        $noDescription = new Status(500);
-        $this->assertNull($noDescription->getDescription());
-
-        $custom->setStatus(new Status(Status::OK));
-        $this->assertTrue($custom->getStatus()->getIsOk());
-
+        $no_description = new Status(15);
+        $this->assertSame($no_description->getDescription(), 'Unrecoverable data loss or corruption.');
+        $this->assertFalse($custom->getStatus()->getIsOk());
         $this->assertCount(3, $tracer->getSpans());
     }
 
@@ -130,13 +126,13 @@ class TracingTest extends TestCase
         $span = (new Tracer())->getActiveSpan();
 
         // set attributes
-        $span->setAttributes([ 'username' => 'nekufa' ]);
+        $span->setAttributes(['username' => 'nekufa']);
 
         // get attribute
         $this->assertSame($span->getAttribute('username'), 'nekufa');
-        
+
         // otherwrite
-        $span->setAttributes([ 'email' => 'nekufa@gmail.com', ]);
+        $span->setAttributes(['email' => 'nekufa@gmail.com',]);
 
         // null attributes
         $this->assertNull($span->getAttribute('username'));
@@ -151,9 +147,9 @@ class TracingTest extends TestCase
         ]);
 
         // keep order
-        $span->setAttributes([ 'a' => 1, 'b' => 2]);
+        $span->setAttributes(['a' => 1, 'b' => 2]);
         $this->assertSame(array_keys($span->getAttributes()), ['a', 'b']);
-        $span->setAttributes([ 'b' => 2, 'a' => 1, ]);
+        $span->setAttributes(['b' => 2, 'a' => 1,]);
         $this->assertSame(array_keys($span->getAttributes()), ['b', 'a']);
 
         // attribute update don't change the order
@@ -182,7 +178,7 @@ class TracingTest extends TestCase
         $this->assertNull($event->getAttribute('invalid-attribute'));
         $this->assertCount(1, $span->getEvents());
         $this->assertSame($span->getEvents(), [$event]);
-        
+
         $span->addEvent('update')
             ->setAttribute('space', 'guard.session')
             ->setAttribute('id', 67235)
@@ -193,17 +189,6 @@ class TracingTest extends TestCase
         $this->expectExceptionMessage("Span is readonly");
         $span->end();
         $span->addEvent('update');
-    }
-
-    public function testBuilder()
-    {
-        $spanContext = SpanContext::generate();
-        $tracer = Builder::create()
-            ->setSpanContext($spanContext)
-            ->getTracer();
-
-        $this->assertInstanceOf(Tracer::class, $tracer);
-        $this->assertSame($tracer->getActiveSpan()->getContext(), $spanContext);
     }
 
     public function testParentSpanContext()
@@ -221,7 +206,7 @@ class TracingTest extends TestCase
         $tracer = new Tracer();
         $span = $tracer->createSpan('serializable');
         $span->setAttribute('attribute', 'value');
-        $span->addEvent('greet', [ 'name' => 'nekufa' ]);
+        $span->addEvent('greet', ['name' => 'nekufa']);
 
         $serialized = serialize($span);
         $unserialized = unserialize($serialized);
@@ -244,7 +229,7 @@ class TracingTest extends TestCase
         $tracer = new Tracer();
         $span = $tracer->createSpan('guard.validate');
         $span->setAttribute('service', 'guard');
-        $event = $span->addEvent('validators.list', [ 'job' => 'stage.updateTime' ]);
+        $event = $span->addEvent('validators.list', ['job' => 'stage.updateTime']);
         $span->end();
 
         $exporter = new BasisExporter();
@@ -274,7 +259,7 @@ class TracingTest extends TestCase
         $tracer = new Tracer();
         $span = $tracer->createSpan('guard.validate');
         $span->setAttribute('service', 'guard');
-        $event = $span->addEvent('validators.list', [ 'job' => 'stage.updateTime' ]);
+        $event = $span->addEvent('validators.list', ['job' => 'stage.updateTime']);
         $span->end();
 
         $exporter = new ZipkinExporter();
