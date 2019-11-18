@@ -52,16 +52,16 @@ class TracingTest extends TestCase
         $tracer = new Tracer();
 
         $guard = $tracer->createSpan('guard.validate');
-        $connection = $tracer->createSpan('guard.database.connection');
+        $connection = $tracer->createSpan('guard.validate.connection');
         $procedure = $tracer->createSpan('guard.procedure.registration')->end();
         $connection->end();
         $policy = $tracer->createSpan('policy.describe')->end();
 
         $guard->end();
 
-        $this->assertSame($connection->getParentContext(), $guard->getContext());
-        $this->assertSame($procedure->getParentContext(), $connection->getContext());
-        $this->assertSame($policy->getParentContext(), $guard->getContext());
+        $this->assertEquals($connection->getParentContext(), $guard->getContext());
+        $this->assertEquals($procedure->getParentContext(), $connection->getContext());
+        $this->assertEquals($policy->getParentContext(), $guard->getContext());
 
         $this->assertCount(5, $tracer->getSpans());
     }
@@ -74,7 +74,7 @@ class TracingTest extends TestCase
         $mysql = $tracer->createSpan('mysql');
         $this->assertSame($tracer->getActiveSpan(), $mysql);
         $this->assertSame($global->getContext()->getTraceId(), $mysql->getContext()->getTraceId());
-        $this->assertSame($mysql->getParentContext(), $global->getContext());
+        $this->assertEquals($mysql->getParentContext(), $global->getContext());
         $this->assertNotNull($mysql->getStart());
         $this->assertTrue($mysql->isRecording());
         $this->assertNull($mysql->getDuration());
@@ -92,7 +92,6 @@ class TracingTest extends TestCase
         
         // active span rolled back
         $this->assertSame($tracer->getActiveSpan(), $global);
-        $this->assertNull($global->getStatus());
         
         // active span should be kept for global span
         $global->end();
@@ -105,24 +104,15 @@ class TracingTest extends TestCase
         $tracer = new Tracer();
 
         $cancelled = $tracer->createSpan('cancelled');
-        $cancelled->end(new Status(Status::CANCELLED));
+        $cancelled->end(Status::CANCELLED);
         $this->assertFalse($cancelled->getStatus()->getIsOk());
         $this->assertSame($cancelled->getStatus()->getCanonicalCode(), Status::CANCELLED);
         $this->assertSame($cancelled->getStatus()->getDescription(), Status::DESCRIPTION[Status::CANCELLED]);
 
-        $custom = $tracer->createSpan('custom');
-        $custom->end(new Status(404, 'Not found'));
-        $this->assertFalse($custom->getStatus()->getIsOk());
-        $this->assertSame($custom->getStatus()->getCanonicalCode(), 404);
-        $this->assertSame($custom->getStatus()->getDescription(), 'Not found');
-
         $noDescription = new Status(500);
         $this->assertNull($noDescription->getDescription());
 
-        $custom->setStatus(new Status(Status::OK));
-        $this->assertTrue($custom->getStatus()->getIsOk());
-
-        $this->assertCount(3, $tracer->getSpans());
+        $this->assertCount(2, $tracer->getSpans());
     }
 
     public function testSpanAttributesApi()
@@ -203,7 +193,7 @@ class TracingTest extends TestCase
             ->getTracer();
 
         $this->assertInstanceOf(Tracer::class, $tracer);
-        $this->assertSame($tracer->getActiveSpan()->getContext(), $spanContext);
+        $this->assertEquals($tracer->getActiveSpan()->getContext(), $spanContext);
     }
 
     public function testParentSpanContext()
