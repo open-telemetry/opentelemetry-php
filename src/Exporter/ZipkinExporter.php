@@ -6,7 +6,6 @@ namespace OpenTelemetry\Exporter;
 
 use OpenTelemetry\Exporter;
 use OpenTelemetry\Tracing\Span;
-use OpenTelemetry\Tracing\Tracer;
 
 class ZipkinExporter extends Exporter
 {
