@@ -34,8 +34,10 @@ class Tracer
      * Span by default, but this functionality MAY be offered additionally as a
      * separate operation.
      * todo: fix ^
-     * */
-
+     * --> what would you like to do for this?  Would it make sense to return $this->tail[] ?
+     * Do we want to offer the setActiveSpan on a newly created span as a separate function?
+     *
+    */
     /* The API MUST accept the following parameters:
      * - The parent Span or parent Span context, and whether the new Span
      *   should be a root Span. API MAY also have an option for implicit parent
@@ -50,6 +52,8 @@ class Tracer
      *   set this argument.
 
      * todo: fix ^
+     * -> Is there a reason we didn't add this already?
+     *
      */
     public function createSpan(string $name): Span
     {

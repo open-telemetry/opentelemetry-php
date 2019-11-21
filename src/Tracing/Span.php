@@ -21,10 +21,20 @@ class Span
     private $events = [];
 
     // todo: missing span kind
+    // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#spankind
 
     // todo: missing links: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-links
 
-    // todo: Spec says a parent is a Span, SpanContext, or null
+    // -> Need to understand the difference between SpanKind and links.  From the documentation:
+    // SpanKind
+    // describes the relationship between the Span, its parents, and its children in a Trace. SpanKind describes two independent properties that benefit tracing systems during analysis.
+    // This was also updated recently -> https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#spankind
+
+    // Links 
+    // A Span may be linked to zero or more other Spans (defined by SpanContext) that are causally related. Links can point to SpanContexts inside a single Trace
+    // or across different Traces. Links can be used to represent batched operations where a Span was initiated by multiple initiating Spans, 
+    // each representing a single incoming item being processed in the batch.
+    // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#links-between-spans
 
     public function __construct(string $name, SpanContext $spanContext, SpanContext $parentSpanContext = null)
     {
@@ -34,6 +44,7 @@ class Span
         $this->start = microtime(true);
         $this->status = Status::OK;
         $this->statusDescription = null;
+        $this->link = addLinks();
     }
 
     public function getContext(): SpanContext
@@ -43,8 +54,14 @@ class Span
 
     public function getParentContext(): ?SpanContext
     {
+        // todo: Spec says a parent is a Span, SpanContext, or null -> should we implement this here?
         return $this->parentSpanContext !== null ? clone $this->parentSpanContext : null;
     }
+
+    public function addLinks()
+    {;
+    }
+
 
 
     public function end(int $statusCode = Status::OK, ?string $statusDescription = null, float $timestamp = null): self
@@ -65,15 +82,13 @@ class Span
         return $this->end;
     }
 
-    // todo: we decided setStatus did not seem necessary, and complicates the hotpath, and therefore not worth it
-    //public function setStatus(Status $status);
-
     public function getStatus(): Status
     {
         return Status::new($this->statusCode, $this->statusDescription);
     }
 
-    // I think this is too simple, see: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#isrecording
+    // I think this is too simple, see: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#isrecording 
+    // -> This had an update this past month: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#isrecording
     public function isRecording(): bool
     {
         return is_null($this->end);
@@ -108,9 +123,9 @@ class Span
 
     public function setAttribute(string $key, $value): self
     {
-        // todo: type check value:
-        // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#set-attributes
-        $this->throwIfNotRecording();
+        if (!is_string($value) || !is_bool($value) || !is_int($value)) {
+            $this->throwIfNotRecording();
+        }
 
         $this->attributes[$key] = $value;
         return $this;
@@ -132,13 +147,13 @@ class Span
         return $this;
     }
 
-    // todo: is accepting an Iterator enough to satisfy AddLazyEvent?
+    // todo: is accepting an Iterator enough to satisfy AddLazyEvent?  -> Looks like the spec might have been updated here: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-events
     public function addEvent(string $name, iterable $attributes = [], float $timestamp = null): Event
     {
         $this->throwIfNotRecording();
 
         $event = new Event($name, $attributes, $timestamp);
-        // todo: check that these are all Attributes
+        // todo: check that these are all Attributes -> What do we want to check about these?  Just a 'property_exist' check on this?
         $this->events[] = $event;
         return $event;
     }
@@ -152,8 +167,7 @@ class Span
      * created in another process. Each propagators' deserialization must set IsRemote to true on a parent
      *  SpanContext so Span creation knows if the parent is remote. */
     public function IsRemote(): bool
-    {
-        ;
+    {;
     }
 
     private function throwIfNotRecording()
