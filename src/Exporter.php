@@ -7,22 +7,30 @@ namespace OpenTelemetry;
 use OpenTelemetry\Tracing\Span;
 use OpenTelemetry\Tracing\Tracer;
 
-abstract class Exporter
+/**
+ * A simple Exporter interface
+ *
+ * @package OpenTelemetry
+ */
+interface Exporter
 {
-    abstract public function convertSpan(Span $span) : array;
+    /**
+     * Possible return values as outlined in the OpenTelemetry spec
+     */
+    const SUCCESS = 0;
+    const FAILED_NOT_RETRYABLE = 1;
+    const FAILED_RETRYABLE = 2;
 
-    public function flush(Tracer $tracer, Transport $transport) : int
-    {
-        $data = [];
+    /**
+     * Export trace data (spans)
+     * @param Span[] $spans List of spans to export
+     * @return int
+     */
+    public function export(Span ...$spans) : int;
 
-        foreach ($tracer->getSpans() as $span) {
-            $data[] = $this->convertSpan($span);
-        }
-
-        if (count($data)) {
-            $transport->write($data);
-        }
-
-        return count($data);
-    }
+    /**
+     * Shutdown the exporter, provide cleanup
+     * @return int
+     */
+    public function shutdown() : int;
 }
