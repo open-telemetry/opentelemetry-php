@@ -3,8 +3,7 @@
     "type": "library",
     "license": "Apache-2.0",
     "require": {
-        "php": "^7.1",
-        "phan/phan": "^2.4"
+        "php": "^7.1"
     },
     "authors": [
         {
