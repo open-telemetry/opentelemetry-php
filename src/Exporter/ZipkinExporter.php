@@ -6,7 +6,6 @@ namespace OpenTelemetry\Exporter;
 
 use OpenTelemetry\Exporter;
 use OpenTelemetry\Tracing\Span;
-use OpenTelemetry\Tracing\Tracer;
 
 /**
  * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
@@ -23,28 +22,19 @@ class ZipkinExporter implements Exporter
     /**
      * Exports the provided Span data via the Zipkin protocol
      *
-     * @param Span ...$spans Array of Spans
+     * @param iterable<Span> $spans Array of Spans
      * @return int return code, defined on the Exporter interface
      */
-    public function export(Span ...$spans) : int
+    public function export(iterable $spans) : int
     {
         $convertedSpans = [];
         foreach ($spans as &$span) {
-            array_push($convertedSpans, converSpan($span));
+            array_push($convertedSpans, $this->convertSpan($span));
         }
 
-        #todo: format into JSON paylod for zipkin: (see https://github.com/census-ecosystem/opencensus-php-exporter-zipkin/blob/master/src/ZipkinExporter.php#L143)
-    }
-
-    #todo: this method is required via the spec, but not sure if needed
-    /**
-     * Shutdown the export
-     *
-     * @return int
-     */
-    public function shutdown() : int
-    {
-
+        /* todo: format into JSON paylod for zipkin:
+         * @see https://github.com/census-ecosystem/opencensus-php-exporter-zipkin/blob/master/src/ZipkinExporter.php#L143
+         */
     }
 
     /**
