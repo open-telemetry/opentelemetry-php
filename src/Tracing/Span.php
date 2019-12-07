@@ -42,7 +42,7 @@ class Span
         $this->spanContext = $spanContext;
         $this->parentSpanContext = $parentSpanContext;
         $this->start = microtime(true);
-        $this->status = Status::OK;
+        $this->statusCode = Status::OK;
         $this->statusDescription = null;
         $this->link = addLinks();
     }
@@ -165,9 +165,12 @@ class Span
 
     /* A Span is said to have a remote parent if it is the child of a Span
      * created in another process. Each propagators' deserialization must set IsRemote to true on a parent
-     *  SpanContext so Span creation knows if the parent is remote. */
+     *  SpanContext so Span creation knows if the parent is remote.
+     * TODO - finish this function
+    */
     public function IsRemote(): bool
-    {;
+    {
+        return false;
     }
 
     private function throwIfNotRecording()
