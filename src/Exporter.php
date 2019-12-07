@@ -23,14 +23,12 @@ interface Exporter
 
     /**
      * Export trace data (spans)
-     * @param Span[] $spans List of spans to export
+     * @param iterable<Span> $spans Batch of spans to export
      * @return int
      */
-    public function export(Span ...$spans) : int;
+    public function export(iterable $spans) : int;
 
-    /**
-     * Shutdown the exporter, provide cleanup
-     * @return int
+    /* The spec mentions a shutdown() function. We don't see this as necessary;
+     * if an Exporter needs to clean up, it can use a destructor.
      */
-    public function shutdown() : int;
 }
