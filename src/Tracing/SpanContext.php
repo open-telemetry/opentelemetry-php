@@ -10,7 +10,12 @@ class SpanContext
     private $spanId;
 
     // todo: add 8 bit TraceFlags; currently has one flag "sampled"
+    // -> documentation: https://www.w3.org/TR/trace-context/#trace-flags
+    private $traceFlags;
+
     // todo: add Tracestate: https://www.w3.org/TR/trace-context/#tracestate-header
+    // -> we should discuss how we want to add to trace state; as I think this will be critical
+    private $traceState;
 
     public static function generate()
     {
@@ -23,24 +28,20 @@ class SpanContext
         return self::restore($traceId, bin2hex(random_bytes(8)));
     }
 
-    // this is exactly the same as a constructor -- why is it here?
-    public static function restore(string $traceId, string $spanId)
-    {
-        return new self($traceId, $spanId);
-    }
-
-    public function __construct(string $traceId, string $spanId)
+    public function __construct(string $traceId, string $spanId, string $traceFlags, array $traceState)
     {
         $this->traceId = $traceId;
         $this->spanId = $spanId;
+        $this->traceFlags = $traceFlags;
+        $this->traceState = $traceState;
     }
 
-    public function getTraceId() : string
+    public function getTraceId(): string
     {
         return $this->traceId;
     }
 
-    public function getSpanId() : string
+    public function getSpanId(): string
     {
         return $this->spanId;
     }
