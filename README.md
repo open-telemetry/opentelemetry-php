@@ -50,6 +50,10 @@ $span->addEvent('generated_session', [
 $span->end(); // pass status as an optional argument
 ```
 
+## Static Analysis
+We use [Phan](https://github.com/phan/phan/) for static analysis.  Currently our phan configuration is just set with a standard default analysis configuration.  You can use our phan docker hook to easily perform static analysis on your changes:
+`./resources/phan-using-docker`
+
 ## Testing
 To make sure the tests in this repo work as you expect, you can use the included docker test wrapper:
 
