@@ -45,13 +45,15 @@ class SpanContext
         return $this->spanId;
     }
 
+    /* TODO : Finish this function */
     public function IsValid() : bool
     {
-        ;
+        return false;
     }
 
+    /* TODO : Finish this function */
     public function IsRemote() : bool
     {
-        ;
+       return false;
     }
 }

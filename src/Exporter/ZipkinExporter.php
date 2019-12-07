@@ -6,7 +6,6 @@ namespace OpenTelemetry\Exporter;
 
 use OpenTelemetry\Exporter;
 use OpenTelemetry\Tracing\Span;
-use OpenTelemetry\Tracing\Tracer;
 
 /**
  * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
