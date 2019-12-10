@@ -22,6 +22,10 @@ $ composer require open-telemetry/opentelemetry
 
 You can use the [examples/AlwaysSampleTraceExample.php](https://github.com/open-telemetry/opentelemetry-php/tree/master/examples/AlwaysSampleTraceExample.php) file to test out the reference implementation we have.  This can be easily executed with docker by running `./resources/example-using-docker` from the root of the repository.
 
+## Static Analysis
+We use [Phan](https://github.com/phan/phan/) for static analysis.  Currently our phan configuration is just set with a standard default analysis configuration.  You can use our phan docker hook to easily perform static analysis on your changes:
+`./resources/phan-using-docker`
+
 ## Testing
 To make sure the tests in this repo work as you expect, you can use the included docker test wrapper:
 
