@@ -16,6 +16,7 @@ class Span
     private $end;
     private $statusCode;
     private $statusDescription;
+    private $link;
 
     private $attributes = [];
     private $events = [];
@@ -44,7 +45,7 @@ class Span
         $this->start = microtime(true);
         $this->statusCode = Status::OK;
         $this->statusDescription = null;
-        $this->link = addLinks();
+        $this->link = $this->addLinks();
     }
 
     public function getContext(): SpanContext
@@ -58,8 +59,9 @@ class Span
         return $this->parentSpanContext !== null ? clone $this->parentSpanContext : null;
     }
 
-    public function addLinks()
-    {;
+    public function addLinks(): int
+    {
+        return 0;
     }
 
 

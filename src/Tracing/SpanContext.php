@@ -19,16 +19,10 @@ class SpanContext
 
     public static function generate()
     {
-        return self::fork(bin2hex(random_bytes(16)));
+        return bin2hex(random_bytes(16));
     }
 
-    // This method is probably useful, but it's name is confusing
-    public static function fork(string $traceId)
-    {
-        return self::restore($traceId, bin2hex(random_bytes(8)));
-    }
-
-    public function __construct(string $traceId, string $spanId, string $traceFlags, array $traceState)
+    public function __construct(string $traceId, string $spanId, ?string $traceFlags = null, ?array $traceState = null)
     {
         $this->traceId = $traceId;
         $this->spanId = $spanId;
@@ -47,14 +41,14 @@ class SpanContext
     }
 
     /* TODO : Finish this function */
-    public function IsValid() : bool
+    public function IsValid(): bool
     {
         return false;
     }
 
     /* TODO : Finish this function */
-    public function IsRemote() : bool
+    public function IsRemote(): bool
     {
-       return false;
+        return false;
     }
 }

@@ -9,13 +9,14 @@ use OpenTelemetry\Tracing\Span;
 
 /**
  * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
+ *
  * @package OpenTelemetry\Exporter
  */
 class ZipkinExporter implements Exporter
 {
 
     /**
-     * @var endpoint to send Spans to
+     * @string $endpoint endpoint to send Spans to
      */
     private $endpoint;
 
@@ -23,27 +24,32 @@ class ZipkinExporter implements Exporter
      * Exports the provided Span data via the Zipkin protocol
      *
      * @param iterable<Span> $spans Array of Spans
+     *
      * @return int return code, defined on the Exporter interface
      */
-    public function export(iterable $spans) : int
+    public function export(iterable $spans): int
     {
-        $convertedSpans = [];
+        $converted_spans = [];
         foreach ($spans as &$span) {
-            array_push($convertedSpans, $this->convertSpan($span));
+            array_push($converted_spans, $this->convertSpan($span));
         }
 
         /* todo: format into JSON paylod for zipkin:
-         * @see https://github.com/census-ecosystem/opencensus-php-exporter-zipkin/blob/master/src/ZipkinExporter.php#L143
+         * https://github.com/census-ecosystem/opencensus-php-exporter-zipkin/blob/master/src/ZipkinExporter.php#L143
          */
+
+        // return 0 for now until the endpoint is finalized (to appease phan)
+        return 0;
     }
 
     /**
      * Converts spans to Zipkin format for export
      *
      * @param Span $span
+     *
      * @return array
      */
-    private function convertSpan(Span $span) : array
+    private function convertSpan(Span $span): array
     {
         $row = [
             'id' => $span->getContext()->getSpanId(),
@@ -53,8 +59,8 @@ class ZipkinExporter implements Exporter
                 : null,
             'localEndpoint' => $this->getEndpoint(),
             'name' => $span->getName(),
-            'timestamp' => (integer) round($span->getStart()*1000000),
-            'duration' => (integer) round($span->getEnd()*1000000) - round($span->getStart()*1000000),
+            'timestamp' => (int) round($span->getStart() * 1000000),
+            'duration' => (int) round($span->getEnd() * 1000000) - round($span->getStart() * 1000000),
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
@@ -72,7 +78,7 @@ class ZipkinExporter implements Exporter
                 $row['annotations'] = [];
             }
             $row['annotations'][] = [
-                'timestamp' => round($event->getTimestamp()*1000000),
+                'timestamp' => round($event->getTimestamp() * 1000000),
                 'value' => $event->getName(),
             ];
         }
@@ -83,9 +89,9 @@ class ZipkinExporter implements Exporter
     /**
      * Gets the configured endpoint for the Zipkin exporter
      *
-     * @return endpoint
+     * @return string $endpoint
      */
-    public function getEndpoint()
+    public function getEndpoint(): string
     {
         return $this->endpoint;
     }
@@ -93,10 +99,11 @@ class ZipkinExporter implements Exporter
     /**
      * Sets the configured endpoint for the zipkin exportedr
      *
-     * @param array $endpoint
+     * @param string $endpoint
+     *
      * @return $this
      */
-    public function setEndpoint(array $endpoint) : self
+    public function setEndpoint(string $endpoint): self
     {
         $this->endpoint = $endpoint;
         return $this;

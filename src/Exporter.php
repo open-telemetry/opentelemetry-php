@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry;
 
 use OpenTelemetry\Tracing\Span;
-use OpenTelemetry\Tracing\Tracer;
 
 /**
  * A simple Exporter interface
@@ -26,7 +25,7 @@ interface Exporter
      * @param iterable<Span> $spans Batch of spans to export
      * @return int
      */
-    public function export(iterable $spans) : int;
+    public function export(iterable $spans): int;
 
     /* The spec mentions a shutdown() function. We don't see this as necessary;
      * if an Exporter needs to clean up, it can use a destructor.

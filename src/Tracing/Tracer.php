@@ -58,7 +58,7 @@ class Tracer
     public function createSpan(string $name): Span
     {
         $parent = $this->getActiveSpan()->getContext();
-        $context = SpanContext::fork($parent->getTraceId());
+        $context = new SpanContext($parent->getTraceId(), $parent->getSpanId());
         $span = $this->generateSpanInstance($name, $context);
         return $this->setActiveSpan($span);
     }
