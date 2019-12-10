@@ -1,0 +1,4 @@
+FROM php:7.1-buster
+COPY . /usr/src/myapp
+WORKDIR /usr/src/myapp
+ENTRYPOINT ["php", "examples/AlwaysOnTraceExample.php"]
