@@ -2,6 +2,7 @@
 require __DIR__.'/../vendor/autoload.php';
 use OpenTelemetry\Tracing\SpanContext;
 use OpenTelemetry\Tracing\Sampler\AlwaysOffSampler;
+use OpenTelemetry\Tracing\Tracer;
 
 $sampler = AlwaysOffSampler::shouldSample();
 if ($sampler) {
