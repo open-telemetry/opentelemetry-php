@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Exporter;
 
-use OpenTelemetry\Exporter;
+use OpenTelemetry\Exporter\ExporterInterface;
 use OpenTelemetry\Tracing\Span;
 
 /**
  * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
  * @package OpenTelemetry\Exporter
  */
-class ZipkinExporter implements Exporter
+class ZipkinExporter implements ExporterInterface
 {
 
     /**

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace OpenTelemetry\Tests;
+
 use OpenTelemetry\Exporter\BasisExporter;
 use OpenTelemetry\Exporter\ZipkinExporter;
 use OpenTelemetry\Tracing\Builder;
