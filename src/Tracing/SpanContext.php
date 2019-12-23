@@ -28,6 +28,11 @@ class SpanContext
         return self::restore($traceId, bin2hex(random_bytes(8)));
     }
 
+    public static function restore(string $traceId, string $spanId)
+    {
+        return new self($traceId, $spanId, '', []);
+    }
+
     public function __construct(string $traceId, string $spanId, string $traceFlags, array $traceState)
     {
         $this->traceId = $traceId;

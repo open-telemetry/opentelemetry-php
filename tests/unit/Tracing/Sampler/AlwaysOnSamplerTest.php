@@ -1,7 +1,10 @@
 <?php
-require __DIR__.'/../../../../vendor/autoload.php';
+
+namespace OpenTelemetry\Tests\Unit\Tracing\Sampler;
+
 use OpenTelemetry\Tracing\Sampler\AlwaysOnSampler;
 use PHPUnit\Framework\TestCase;
+
 class AlwaysOnTest extends TestCase
 {
     public function testAlwaysOnSampler()

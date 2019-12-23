@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Exporter;
 
-use OpenTelemetry\Exporter;
+use OpenTelemetry\Exporter\ExporterInterface;
 use OpenTelemetry\Tracing\Span;
 
-class BasisExporter extends Exporter
+class BasisExporter implements ExporterInterface
 {
     public function convertSpan(Span $span) : array
     {
@@ -19,5 +19,10 @@ class BasisExporter extends Exporter
                 : null,
             'body' => serialize($span),
         ];
+    }
+
+    public function export(iterable $spans): int
+    {
+        return ExporterInterface::SUCCESS;
     }
 }

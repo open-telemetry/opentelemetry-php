@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace OpenTelemetry\Tests;
+
 use OpenTelemetry\Exporter\BasisExporter;
 use OpenTelemetry\Exporter\ZipkinExporter;
 use OpenTelemetry\Tracing\Builder;
@@ -10,6 +12,7 @@ use OpenTelemetry\Tracing\Status;
 use OpenTelemetry\Tracing\Tracer;
 use OpenTelemetry\Transport\TarantoolQueueTransport;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class TracingTest extends TestCase
 {
@@ -188,9 +191,7 @@ class TracingTest extends TestCase
     public function testBuilder()
     {
         $spanContext = SpanContext::generate();
-        $tracer = Builder::create()
-            ->setSpanContext($spanContext)
-            ->getTracer();
+        $tracer = new Tracer($spanContext);
 
         $this->assertInstanceOf(Tracer::class, $tracer);
         $this->assertEquals($tracer->getActiveSpan()->getContext(), $spanContext);
@@ -267,8 +268,12 @@ class TracingTest extends TestCase
         $event = $span->addEvent('validators.list', [ 'job' => 'stage.updateTime' ]);
         $span->end();
 
+        $method = new ReflectionMethod(ZipkinExporter::class, 'convertSpan');
+        $method->setAccessible(true);
+
         $exporter = new ZipkinExporter();
-        $row = $exporter->convertSpan($span);
+
+        $row = $method->invokeArgs($exporter, ['span' => $span]);
         $this->assertSame($row['name'], $span->getName());
 
         $this->assertSame($row['tags'], $span->getAttributes());

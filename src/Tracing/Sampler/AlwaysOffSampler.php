@@ -1,5 +1,6 @@
 <?php
 namespace OpenTelemetry\Tracing\Sampler;
+
 /**
  * This implementation of the SamplerInterface always returns false.
  * Example:
@@ -15,8 +16,13 @@ class AlwaysOffSampler implements SamplerInterface
      *
      * @return bool
      */
-    public function shouldSample()
+    public function shouldSample(): bool
     {
         return false;
     }
-} 
+
+    public function getDescription(): string
+    {
+        return self::class;
+    }
+}
