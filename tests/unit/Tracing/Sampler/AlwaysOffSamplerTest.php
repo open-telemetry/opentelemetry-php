@@ -1,5 +1,6 @@
 <?php
-require __DIR__.'/../../../../vendor/autoload.php';
+namespace OpenTelemetry\Tests\Unit\Tracing\Sampler;
+
 use OpenTelemetry\Tracing\Sampler\AlwaysOffSampler;
 use PHPUnit\Framework\TestCase;
 class AlwaysOffSamplerTest extends TestCase

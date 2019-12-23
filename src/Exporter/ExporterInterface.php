@@ -2,17 +2,16 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry;
+namespace OpenTelemetry\Exporter;
 
 use OpenTelemetry\Tracing\Span;
-use OpenTelemetry\Tracing\Tracer;
 
 /**
  * A simple Exporter interface
  *
  * @package OpenTelemetry
  */
-interface Exporter
+interface ExporterInterface
 {
     /**
      * Possible return values as outlined in the OpenTelemetry spec
