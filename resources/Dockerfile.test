@@ -5,7 +5,13 @@ mv composer.phar /usr/local/bin/composer && \
 chmod +x /usr/local/bin/composer && \
 pecl install ast-1.0.4 && \
 echo "extension=ast.so" >> /usr/local/etc/php/conf.d/docker-php-ext-ast.ini
-COPY . /usr/src/myapp
+
 WORKDIR /usr/src/myapp
+
+COPY ./composer.json ./
+COPY ./composer.lock ./
 RUN composer install
+
+COPY . ./
+
 ENTRYPOINT ["./vendor/phpunit/phpunit/phpunit", "--colors=always"]

@@ -15,7 +15,7 @@ class ZipkinExporter implements ExporterInterface
 {
 
     /**
-     * @var endpoint to send Spans to
+     * @var $endpoint array to send Spans to
      */
     private $endpoint;
 
@@ -35,6 +35,8 @@ class ZipkinExporter implements ExporterInterface
         /* todo: format into JSON paylod for zipkin:
          * @see https://github.com/census-ecosystem/opencensus-php-exporter-zipkin/blob/master/src/ZipkinExporter.php#L143
          */
+
+        return ExporterInterface::SUCCESS;
     }
 
     /**
@@ -83,9 +85,9 @@ class ZipkinExporter implements ExporterInterface
     /**
      * Gets the configured endpoint for the Zipkin exporter
      *
-     * @return endpoint
+     * @return array |null
      */
-    public function getEndpoint()
+    public function getEndpoint(): ?array
     {
         return $this->endpoint;
     }

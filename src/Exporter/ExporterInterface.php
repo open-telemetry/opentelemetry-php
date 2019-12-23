@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Exporter;
 
 use OpenTelemetry\Tracing\Span;
-use OpenTelemetry\Tracing\Tracer;
 
 /**
  * A simple Exporter interface
