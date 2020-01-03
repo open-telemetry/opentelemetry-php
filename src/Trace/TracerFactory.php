@@ -23,8 +23,26 @@ class TracerFactory
      */
     protected $spanProcessors;
 
-    private final function __construct()
+    /**
+     * TracerFactory constructor.
+     *
+     * @param SpanProcessorInterface[] $spanProcessors
+     */
+    private final function __construct(array $spanProcessors = [])
     {
+        foreach ($spanProcessors as $spanProcessor) {
+            if (!$spanProcessor instanceof SpanProcessorInterface) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        "Span Processors should be of type %s, but object of type %s provided",
+                        SpanProcessorInterface::class,
+                        gettype($spanProcessor) == "object" ? get_class($spanProcessor) : gettype($spanProcessor)
+                    )
+                );
+            }
+        }
+
+        $this->spanProcessors = $spanProcessors;
     }
 
     /**
@@ -38,20 +56,7 @@ class TracerFactory
             return self::$instance;
         }
 
-        foreach ($spanProcessors as $spanProcessor) {
-            if (!$spanProcessor instanceof SpanProcessorInterface) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        "Span Processors should be of type %s, but object of type %s provided",
-                        SpanProcessorInterface::class,
-                        get_class($spanProcessor)
-                    )
-                );
-            }
-        }
-
-        $instance = new TracerFactory();
-        $instance->spanProcessors = $spanProcessors;
+        $instance = new TracerFactory($spanProcessors);
 
         return self::$instance = $instance;
     }
