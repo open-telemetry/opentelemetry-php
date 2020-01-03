@@ -1,0 +1,32 @@
+name: Code Quality Checks
+on: [push]
+jobs:
+  build:
+    name: Build dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+  unit-test:
+    name: PHPunit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: PHPUnit test
+        run: php ./vendor/bin/phpunit
+
+  code-analysis:
+    name: Static Code Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Phan
+        run: php ./vendor/bin/phan
+
+
