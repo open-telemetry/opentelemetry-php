@@ -1,0 +1,17 @@
+name: Code Checks
+on: [push]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Install deps
+        run: make install
+
+      - name: Unit-test
+        run: make test
+
+      - name: Phan
+        run: make phan
