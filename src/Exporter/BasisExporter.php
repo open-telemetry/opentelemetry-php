@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Exporter;
 
-use OpenTelemetry\Exporter\ExporterInterface;
-use OpenTelemetry\Tracing\Span;
+use OpenTelemetry\Trace\Span;
 
 class BasisExporter implements ExporterInterface
 {

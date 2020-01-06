@@ -1,5 +1,5 @@
 <?php
-namespace OpenTelemetry\Tracing\Sampler;
+namespace OpenTelemetry\Trace\Sampler;
 
 /**
  * This implementation of the SamplerInterface always returns true.

@@ -2,7 +2,7 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use OpenTelemetry\Trace\TracerFactory;
-use OpenTelemetry\Tracing\Sampler\AlwaysOnSampler;
+use OpenTelemetry\Trace\Sampler\AlwaysOnSampler;
 
 $sampler = AlwaysOnSampler::shouldSample();
 if ($sampler) {

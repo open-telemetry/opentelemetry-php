@@ -28,7 +28,7 @@ class TracerFactory
      *
      * @param SpanProcessorInterface[] $spanProcessors
      */
-    private final function __construct(array $spanProcessors = [])
+    final private function __construct(array $spanProcessors = [])
     {
         foreach ($spanProcessors as $spanProcessor) {
             if (!$spanProcessor instanceof SpanProcessorInterface) {
@@ -61,7 +61,8 @@ class TracerFactory
         return self::$instance = $instance;
     }
 
-    public function getTracer(string $name, string $version = ""): Tracer {
+    public function getTracer(string $name, string $version = ""): Tracer
+    {
 
         if ($this->tracers[$name] instanceof Tracer) {
             return $this->tracers[$name];
