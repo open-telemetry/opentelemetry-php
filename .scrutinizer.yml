@@ -1,0 +1,25 @@
+filter:
+  excluded_paths:
+    - 'tests/*'
+checks:
+  php: true
+
+build:
+  nodes:
+    analysis:
+      tests:
+        override:
+          - php-scrutinizer-run
+          - command: phpcs-run
+            use_website_config: true
+          - command: ./vendor/bin/phpunit -c ./ --coverage-clover=coverage.xml
+            coverage:
+              file: coverage.xml
+              format: clover
+
+coding_style:
+  php:
+    spaces:
+      around_operators:
+        multiplicative: false
+        concatenation: true
