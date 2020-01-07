@@ -1,8 +1,8 @@
 <?php
 
-namespace OpenTelemetry;
+namespace OpenTelemetry\Trace;
 
-use OpenTelemetry\Tracing\Span;
+use OpenTelemetry\Trace\Span;
 
 interface SpanProcessorInterface
 {

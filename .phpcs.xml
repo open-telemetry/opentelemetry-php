@@ -1,0 +1,6 @@
+<ruleset name="PSR2 extended">
+    <rule ref="PSR2" />
+    <rule ref="Squiz.Strings.DoubleQuoteUsage.NotRequired" />
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax" />
+    <rule ref="PEAR.ControlStructures.MultiLineCondition" />
+</ruleset>

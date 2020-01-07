@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tracing;
+namespace OpenTelemetry\Context;
 
 class SpanContext
 {
@@ -60,6 +60,6 @@ class SpanContext
     /* TODO : Finish this function */
     public function IsRemote() : bool
     {
-       return false;
+        return false;
     }
 }

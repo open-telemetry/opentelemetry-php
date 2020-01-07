@@ -6,11 +6,9 @@ namespace OpenTelemetry\Tests;
 
 use OpenTelemetry\Exporter\BasisExporter;
 use OpenTelemetry\Exporter\ZipkinExporter;
-use OpenTelemetry\Tracing\Builder;
-use OpenTelemetry\Tracing\SpanContext;
-use OpenTelemetry\Tracing\Status;
-use OpenTelemetry\Tracing\Tracer;
-use OpenTelemetry\Transport\TarantoolQueueTransport;
+use OpenTelemetry\Context\SpanContext;
+use OpenTelemetry\Trace\Status;
+use OpenTelemetry\Trace\Tracer;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
