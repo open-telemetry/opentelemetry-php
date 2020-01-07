@@ -1,14 +1,15 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\Tracing\SpanContext;
-use OpenTelemetry\Tracing\Sampler\AlwaysOffSampler;
-use OpenTelemetry\Tracing\Tracer;
+use OpenTelemetry\Context\SpanContext;
+use OpenTelemetry\Trace\Sampler\AlwaysOffSampler;
+use OpenTelemetry\Trace\Tracer;
+use OpenTelemetry\Trace\TracerFactory;
 
 $sampler = AlwaysOffSampler::shouldSample();
 if ($sampler) {
-    $spanContext = SpanContext::generate(); // or extract from headers
-    $tracer = new Tracer($spanContext);
+    $tracer = TracerFactory::getInstance()
+        ->getTracer('io.opentelemetry.contrib.php');
 
     // start a span, register some events
     $span = $tracer->createSpan('session.generate');

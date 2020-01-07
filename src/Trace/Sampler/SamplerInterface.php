@@ -1,5 +1,5 @@
 <?php
-namespace OpenTelemetry\Tracing\Sampler;
+namespace OpenTelemetry\Trace\Sampler;
 
 /**
  * This interface is used to organize sampling logic.

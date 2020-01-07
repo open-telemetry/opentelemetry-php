@@ -13,10 +13,12 @@ cache:
         - $HOME/.composer/cache
 
 before_script:
+    - pecl install ast-1.0.4
     - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-dist
 
 script:
     - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+    - vendor/bin/phan
 
 after_script:
     - |

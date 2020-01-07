@@ -1,10 +1,10 @@
 <?php
-
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tracing;
+namespace OpenTelemetry\Trace;
 
 use Exception;
+use OpenTelemetry\Context\SpanContext;
 
 class Span
 {
@@ -31,9 +31,9 @@ class Span
     // describes the relationship between the Span, its parents, and its children in a Trace. SpanKind describes two independent properties that benefit tracing systems during analysis.
     // This was also updated recently -> https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#spankind
 
-    // Links 
+    // Links
     // A Span may be linked to zero or more other Spans (defined by SpanContext) that are causally related. Links can point to SpanContexts inside a single Trace
-    // or across different Traces. Links can be used to represent batched operations where a Span was initiated by multiple initiating Spans, 
+    // or across different Traces. Links can be used to represent batched operations where a Span was initiated by multiple initiating Spans,
     // each representing a single incoming item being processed in the batch.
     // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#links-between-spans
 
@@ -89,7 +89,7 @@ class Span
         return Status::new($this->statusCode, $this->statusDescription);
     }
 
-    // I think this is too simple, see: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#isrecording 
+    // I think this is too simple, see: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#isrecording
     // -> This had an update this past month: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#isrecording
     public function isRecording(): bool
     {
