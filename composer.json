@@ -1,9 +1,11 @@
 {
     "name": "open-telemetry/opentelemetry",
+    "description": "OpenTelemetry makes robust, portable telemetry a built-in feature of cloud-native software.",
     "type": "library",
     "license": "Apache-2.0",
     "require": {
-        "php": "^7.1"
+        "php": "^7.1",
+        "ext-json": "*"
     },
     "authors": [
         {
