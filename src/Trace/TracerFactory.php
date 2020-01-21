@@ -4,7 +4,7 @@ namespace OpenTelemetry\Trace;
 
 use InvalidArgumentException;
 use OpenTelemetry\Context\SpanContext;
-use OpenTelemetry\Trace\SpanProcessorInterface;
+use OpenTelemetry\Trace\SpanProcessor\SpanProcessorInterface;
 
 class TracerFactory
 {
@@ -69,6 +69,6 @@ class TracerFactory
         }
 
         $spanContext = SpanContext::generate();
-        return $this->tracers[$name] = new Tracer($spanContext);
+        return $this->tracers[$name] = new Tracer($this->spanProcessors, $spanContext);
     }
 }

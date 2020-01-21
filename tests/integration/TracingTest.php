@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests;
+namespace OpenTelemetry\Tests\Integration;
 
 use OpenTelemetry\Exporter\BasisExporter;
 use OpenTelemetry\Exporter\ZipkinExporter;
@@ -35,7 +35,7 @@ class TracingTest extends TestCase
         $spanContext = $tracer->getActiveSpan()->getContext();
 
         $spanContext2 = SpanContext::restore($spanContext->getTraceId(), $spanContext->getSpanId());
-        $tracer2 = new Tracer($spanContext2);
+        $tracer2 = new Tracer([], $spanContext2);
 
         $this->assertSame($tracer->getActiveSpan()->getContext()->getTraceId(), $tracer2->getActiveSpan()->getContext()->getTraceId());
     }
@@ -189,7 +189,7 @@ class TracingTest extends TestCase
     public function testBuilder()
     {
         $spanContext = SpanContext::generate();
-        $tracer = new Tracer($spanContext);
+        $tracer = new Tracer([], $spanContext);
 
         $this->assertInstanceOf(Tracer::class, $tracer);
         $this->assertEquals($tracer->getActiveSpan()->getContext(), $spanContext);
@@ -269,7 +269,10 @@ class TracingTest extends TestCase
         $method = new ReflectionMethod(ZipkinExporter::class, 'convertSpan');
         $method->setAccessible(true);
 
-        $exporter = new ZipkinExporter();
+        $exporter = new ZipkinExporter(
+            'test.name',
+            'http://host:123/path'
+        );
 
         $row = $method->invokeArgs($exporter, ['span' => $span]);
         $this->assertSame($row['name'], $span->getName());

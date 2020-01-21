@@ -2,6 +2,8 @@ DC_RUN_PHP = docker-compose run php
 
 install:
 	$(DC_RUN_PHP) composer install
+update:
+	$(DC_RUN_PHP) composer update
 test:
 	$(DC_RUN_PHP) php ./vendor/bin/phpunit --colors=always
 phan:

@@ -5,7 +5,7 @@ curl -sS https://getcomposer.org/installer | php && \
 mv composer.phar /usr/local/bin/composer && \
 chmod +x /usr/local/bin/composer && \
 
-pecl install ast-1.0.4 && \
-echo "extension=ast.so" >> /usr/local/etc/php/conf.d/docker-php-ext-ast.ini
+pecl install ast-1.0.4 xdebug && \
+docker-php-ext-enable ast xdebug
 
 WORKDIR /usr/src/myapp
