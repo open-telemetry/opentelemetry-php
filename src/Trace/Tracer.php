@@ -5,17 +5,29 @@ declare(strict_types=1);
 namespace OpenTelemetry\Trace;
 
 use OpenTelemetry\Context\SpanContext;
+use OpenTelemetry\Trace\SpanProcessor\SpanProcessorInterface;
 
 class Tracer
 {
     private $active;
     private $spans = [];
     private $tail = [];
+    /**
+     * @var SpanProcessorInterface[]
+     */
+    private $spanProcessors = [];
 
-    public function __construct(SpanContext $context = null)
+    /**
+     * Tracer constructor.
+     *
+     * @param SpanProcessorInterface[]         $spanProcessors
+     * @param SpanContext|NULL                 $context
+     */
+    public function __construct(iterable $spanProcessors = [], SpanContext $context = null)
     {
         $context = $context ?: SpanContext::generate();
         $this->active = $this->generateSpanInstance('tracer', $context);
+        $this->spanProcessors = $spanProcessors;
     }
 
     public function getActiveSpan(): Span
@@ -62,12 +74,33 @@ class Tracer
         $parent = $this->getActiveSpan()->getContext();
         $context = SpanContext::fork($parent->getTraceId());
         $span = $this->generateSpanInstance($name, $context);
+
+        if ($span->isRecording()) {
+            foreach ($this->spanProcessors as $spanProcessor) {
+                $spanProcessor->onStart($span);
+            }
+        }
+
         return $this->setActiveSpan($span);
     }
 
     public function getSpans(): array
     {
         return $this->spans;
+    }
+
+    public function endActiveSpan(
+        int $statusCode = Status::OK,
+        ?string $statusDescription = null,
+        float $timestamp = null
+    ){
+        if ($this->getActiveSpan()->isRecording()) {
+            foreach ($this->spanProcessors as $spanProcessor) {
+                $spanProcessor->onEnd($this->getActiveSpan());
+            }
+        }
+
+        $this->getActiveSpan()->end($statusCode, $statusDescription, $timestamp);
     }
 
     private function generateSpanInstance($name, SpanContext $context): Span

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Exporter;
 
+use Exception;
+use InvalidArgumentException;
 use OpenTelemetry\Trace\Span;
 
 /**
@@ -17,6 +19,19 @@ class ZipkinExporter implements ExporterInterface
      * @var $endpoint array to send Spans to
      */
     private $endpoint;
+    private $name;
+
+    public function __construct($name, string $endpointDsn)
+    {
+        $parsedDsn = parse_url($endpointDsn);
+
+        if (!is_array($parsedDsn)) {
+            throw new InvalidArgumentException('Unable to parse provided DSN');
+        }
+
+        $this->setEndpoint($parsedDsn);
+        $this->name = $name;
+    }
 
     /**
      * Exports the provided Span data via the Zipkin protocol
@@ -26,14 +41,31 @@ class ZipkinExporter implements ExporterInterface
      */
     public function export(iterable $spans) : int
     {
+        if (empty($spans)) {
+            return ExporterInterface::SUCCESS;
+        }
+
         $convertedSpans = [];
         foreach ($spans as &$span) {
             array_push($convertedSpans, $this->convertSpan($span));
         }
 
-        /* todo: format into JSON paylod for zipkin:
-         * @see https://github.com/census-ecosystem/opencensus-php-exporter-zipkin/blob/master/src/ZipkinExporter.php#L143
-         */
+        try {
+            $json = json_encode($convertedSpans);
+            $contextOptions = [
+                'http' => [
+                    'method' => 'POST',
+                    'header' => 'Content-Type: application/json',
+                    'content' => $json
+                ]
+            ];
+            $context = stream_context_create($contextOptions);
+            file_get_contents($this->getEndpointUrl(), false, $context);
+
+
+        } catch (Exception $e) {
+            return ExporterInterface::FAILED_RETRYABLE;
+        }
 
         return ExporterInterface::SUCCESS;
     }
@@ -52,7 +84,10 @@ class ZipkinExporter implements ExporterInterface
             'parentId' => $span->getParentContext()
                 ? $span->getParentContext()->getSpanId()
                 : null,
-            'localEndpoint' => $this->getEndpoint(),
+            'localEndpoint' => [
+                'serviceName' => $this->name,
+                'port'  => $this->getEndpoint()['port'] ?? 0
+            ],
             'name' => $span->getName(),
             'timestamp' => (integer) round($span->getStart()*1000000),
             'duration' => (integer) round($span->getEnd()*1000000) - round($span->getStart()*1000000),
@@ -99,7 +134,26 @@ class ZipkinExporter implements ExporterInterface
      */
     public function setEndpoint(array $endpoint) : self
     {
+        if (!isset($endpoint['scheme'])
+            || !isset($endpoint['host'])
+            || !isset($endpoint['port'])
+            || !isset($endpoint['path'])
+        ) {
+            throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
+        }
+
         $this->endpoint = $endpoint;
         return $this;
+    }
+
+    protected function getEndpointUrl(): string
+    {
+        return sprintf(
+            "%s://%s:%s%s",
+            $this->endpoint['scheme'],
+            $this->endpoint['host'],
+            $this->endpoint['port'],
+            $this->endpoint['path']
+        );
     }
 }

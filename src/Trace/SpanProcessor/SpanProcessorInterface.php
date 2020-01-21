@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenTelemetry\Trace;
+namespace OpenTelemetry\Trace\SpanProcessor;
 
 use OpenTelemetry\Trace\Span;
 

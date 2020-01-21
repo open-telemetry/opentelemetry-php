@@ -6,3 +6,7 @@ services:
       dockerfile: docker/Dockerfile
     volumes:
     - ./:/usr/src/myapp
+  zipkin:
+    image: openzipkin/zipkin-slim
+    ports:
+    - 9411:9411

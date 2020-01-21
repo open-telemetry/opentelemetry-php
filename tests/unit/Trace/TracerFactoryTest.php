@@ -1,10 +1,10 @@
 <?php
 
-namespace OpenTelemetry\Tests\Trace;
+namespace OpenTelemetry\Tests\Unit\Trace;
 
 use Error;
 use InvalidArgumentException;
-use OpenTelemetry\Trace\SpanProcessorInterface;
+use OpenTelemetry\Trace\SpanProcessor\SpanProcessorInterface;
 use OpenTelemetry\Trace\TracerFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
