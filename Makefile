@@ -7,7 +7,7 @@ update:
 test:
 	$(DC_RUN_PHP) php ./vendor/bin/phpunit --colors=always
 phan:
-	$(DC_RUN_PHP) php ./vendor/bin/phan
+	$(DC_RUN_PHP) env PHAN_DISABLE_XDEBUG_WARN=1 php ./vendor/bin/phan
 examples: FORCE
 	$(DC_RUN_PHP) php ./examples/AlwaysOnTraceExample.php
 bash:
