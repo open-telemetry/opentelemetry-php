@@ -14,13 +14,6 @@ use OpenTelemetry\Trace\Span;
 interface ExporterInterface
 {
     /**
-     * Possible return values as outlined in the OpenTelemetry spec
-     */
-    const SUCCESS = 0;
-    const FAILED_NOT_RETRYABLE = 1;
-    const FAILED_RETRYABLE = 2;
-
-    /**
      * Export trace data (spans)
      * @param iterable<Span> $spans Batch of spans to export
      * @return int Result of operation

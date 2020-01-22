@@ -42,7 +42,7 @@ class ZipkinExporter implements ExporterInterface
     public function export(iterable $spans) : int
     {
         if (empty($spans)) {
-            return ExporterInterface::SUCCESS;
+            return Status::SUCCESS;
         }
 
         $convertedSpans = [];
@@ -64,10 +64,10 @@ class ZipkinExporter implements ExporterInterface
 
 
         } catch (Exception $e) {
-            return ExporterInterface::FAILED_RETRYABLE;
+            return Status::FAILED_RETRYABLE;
         }
 
-        return ExporterInterface::SUCCESS;
+        return Status::SUCCESS;
     }
 
     /**

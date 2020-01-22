@@ -22,6 +22,6 @@ class BasisExporter implements ExporterInterface
 
     public function export(iterable $spans): int
     {
-        return ExporterInterface::SUCCESS;
+        return Status::SUCCESS;
     }
 }
