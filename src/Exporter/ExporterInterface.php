@@ -23,7 +23,8 @@ interface ExporterInterface
     /**
      * Export trace data (spans)
      * @param iterable<Span> $spans Batch of spans to export
-     * @return int
+     * @return int Result of operation
+     * @see \OpenTelemetry\Exporter\Status
      */
     public function export(iterable $spans) : int;
 
