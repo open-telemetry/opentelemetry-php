@@ -1,6 +1,7 @@
 # OpenTelemetry php library
 [![Gitter](https://badges.gitter.im/open-telemetry/opentelemetry-php.svg)](https://gitter.im/open-telemetry/opentelemetry-php?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Build Status](https://travis-ci.org/open-telemetry/opentelemetry-php.svg?branch=master)](https://travis-ci.org/open-telemetry/opentelemetry-php)
+[![codecov](https://codecov.io/gh/opentelemety/opentelemetry-php/branch/master/graph/badge.svg)](https://codecov.io/gh/opentelemety/opentelemetry-php)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/open-telemetry/opentelemetry-php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/open-telemetry/opentelemetry-php/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/open-telemetry/opentelemetry-php/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/open-telemetry/opentelemetry-php/?branch=master)
 
