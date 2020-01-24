@@ -12,4 +12,6 @@ examples: FORCE
 	$(DC_RUN_PHP) php ./examples/AlwaysOnTraceExample.php
 bash:
 	$(DC_RUN_PHP) bash
+style:
+	$(DC_RUN_PHP) php ./vendor/bin/php-cs-fixer fix
 FORCE:

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration;
 
+use OpenTelemetry\Context\SpanContext;
 use OpenTelemetry\Exporter\BasisExporter;
 use OpenTelemetry\Exporter\ZipkinExporter;
-use OpenTelemetry\Context\SpanContext;
 use OpenTelemetry\Trace\Status;
 use OpenTelemetry\Trace\Tracer;
 use PHPUnit\Framework\TestCase;
@@ -42,7 +42,7 @@ class TracingTest extends TestCase
 
     public function testSpanNameUpdate()
     {
-        $database = (new Tracer)->createSpan('database');
+        $database = (new Tracer())->createSpan('database');
         $this->assertSame($database->getName(), 'database');
         $database->updateName('tarantool');
         $this->assertSame($database->getName(), 'tarantool');
@@ -152,17 +152,17 @@ class TracingTest extends TestCase
         $span->setAttribute('b', 4);
         $this->assertSame(array_keys($span->getAttributes()), ['b', 'a']);
 
-        $this->expectExceptionMessage("Span is readonly");
+        $this->expectExceptionMessage('Span is readonly');
         $span->end();
         $span->setAttribute('b', 5);
     }
 
     public function testEventRegistration()
     {
-        $span = (new Tracer)->createSpan('database');
+        $span = (new Tracer())->createSpan('database');
         $event = $span->addEvent('select', [
             'space' => 'guard.session',
-            'id' => 67235
+            'id' => 67235,
         ]);
         $this->assertSame($event->getName(), 'select');
         $this->assertSame($event->getAttributes(), [
@@ -181,7 +181,7 @@ class TracingTest extends TestCase
 
         $this->assertCount(2, $span->getEvents());
 
-        $this->expectExceptionMessage("Span is readonly");
+        $this->expectExceptionMessage('Span is readonly');
         $span->end();
         $span->addEvent('update');
     }
@@ -197,7 +197,7 @@ class TracingTest extends TestCase
 
     public function testParentSpanContext()
     {
-        $tracer = new Tracer;
+        $tracer = new Tracer();
         $global = $tracer->getActiveSpan();
         $request = $tracer->createSpan('request');
         $this->assertSame($request->getParentContext()->getSpanId(), $global->getContext()->getSpanId());

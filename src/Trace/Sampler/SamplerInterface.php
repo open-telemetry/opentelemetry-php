@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Trace\Sampler;
 
 /**
@@ -22,4 +25,4 @@ interface SamplerInterface
      * @return string
      */
     public function getDescription(): string;
-} 
+}

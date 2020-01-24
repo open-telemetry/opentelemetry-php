@@ -56,13 +56,11 @@ class ZipkinExporter implements ExporterInterface
                 'http' => [
                     'method' => 'POST',
                     'header' => 'Content-Type: application/json',
-                    'content' => $json
-                ]
+                    'content' => $json,
+                ],
             ];
             $context = stream_context_create($contextOptions);
             file_get_contents($this->getEndpointUrl(), false, $context);
-
-
         } catch (Exception $e) {
             return ExporterInterface::FAILED_RETRYABLE;
         }
@@ -86,11 +84,11 @@ class ZipkinExporter implements ExporterInterface
                 : null,
             'localEndpoint' => [
                 'serviceName' => $this->name,
-                'port'  => $this->getEndpoint()['port'] ?? 0
+                'port'  => $this->getEndpoint()['port'] ?? 0,
             ],
             'name' => $span->getName(),
-            'timestamp' => (integer) round($span->getStart()*1000000),
-            'duration' => (integer) round($span->getEnd()*1000000) - round($span->getStart()*1000000),
+            'timestamp' => (int) round($span->getStart()*1000000),
+            'duration' => (int) round($span->getEnd()*1000000) - round($span->getStart()*1000000),
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
@@ -143,13 +141,14 @@ class ZipkinExporter implements ExporterInterface
         }
 
         $this->endpoint = $endpoint;
+
         return $this;
     }
 
     protected function getEndpointUrl(): string
     {
         return sprintf(
-            "%s://%s:%s%s",
+            '%s://%s:%s%s',
             $this->endpoint['scheme'],
             $this->endpoint['host'],
             $this->endpoint['port'],

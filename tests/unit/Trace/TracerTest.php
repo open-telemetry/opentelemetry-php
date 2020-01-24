@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\Tests\Unit\Trace;
 
 use OpenTelemetry\Trace\SpanProcessor\SpanProcessorInterface;

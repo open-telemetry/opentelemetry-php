@@ -3,3 +3,4 @@ vendor
 .idea/
 coverage.clover
 tests/coverage
+.php_cs.cache

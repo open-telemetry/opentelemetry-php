@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace OpenTelemetry\Trace;
@@ -64,13 +65,12 @@ class Span
         return [];
     }
 
-
-
     public function end(int $statusCode = Status::OK, ?string $statusDescription = null, float $timestamp = null): self
     {
         $this->end = $timestamp ?? microtime(true);
         $this->statusCode = $statusCode;
         $this->statusDescription = null;
+
         return $this;
     }
 
@@ -93,7 +93,7 @@ class Span
     // -> This had an update this past month: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#isrecording
     public function isRecording(): bool
     {
-        return is_null($this->end);
+        return null === $this->end;
     }
 
     public function getDuration(): ?float
@@ -101,6 +101,7 @@ class Span
         if (!$this->end) {
             return null;
         }
+
         return $this->end - $this->start;
     }
 
@@ -112,6 +113,7 @@ class Span
     public function updateName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -120,6 +122,7 @@ class Span
         if (!array_key_exists($key, $this->attributes)) {
             return null;
         }
+
         return $this->attributes[$key];
     }
 
@@ -130,6 +133,7 @@ class Span
         }
 
         $this->attributes[$key] = $value;
+
         return $this;
     }
 
@@ -146,6 +150,7 @@ class Span
         foreach ($attributes as $k => $v) {
             $this->setAttribute($k, $v);
         }
+
         return $this;
     }
 
@@ -157,6 +162,7 @@ class Span
         $event = new Event($name, $attributes, $timestamp);
         // todo: check that these are all Attributes -> What do we want to check about these?  Just a 'property_exist' check on this?
         $this->events[] = $event;
+
         return $event;
     }
 
@@ -178,7 +184,7 @@ class Span
     private function throwIfNotRecording()
     {
         if (!$this->isRecording()) {
-            throw new Exception("Span is readonly");
+            throw new Exception('Span is readonly');
         }
     }
 }
