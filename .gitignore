@@ -1,4 +1,5 @@
 composer.phar
+composer.lock
 vendor
 .idea/
 coverage.clover
