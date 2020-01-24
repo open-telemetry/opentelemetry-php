@@ -4,6 +4,7 @@ namespace OpenTelemetry\Trace\SpanProcessor;
 
 use InvalidArgumentException;
 use OpenTelemetry\Exporter\ExporterInterface;
+use OpenTelemetry\Internal\Clock;
 use OpenTelemetry\Trace\Span;
 
 class BatchSpanProcessor implements SpanProcessorInterface
@@ -28,9 +29,23 @@ class BatchSpanProcessor implements SpanProcessorInterface
      * @var int
      */
     private $maxExportBatchSize;
+    /**
+     * @var array
+     */
+    private $queue;
+
+    /**
+     * @var int
+     */
+    private $lastExportTimestamp = 0;
+    /**
+     * @var Clock
+     */
+    private $clock;
 
     public function __construct(
         ExporterInterface $exporter,
+        Clock $clock,
         int $maxQueueSize = 2048,
         int $scheduledDelayMillis = 5000,
         int $exporterTimeoutMillis = 30000,
@@ -40,10 +55,13 @@ class BatchSpanProcessor implements SpanProcessorInterface
             throw new InvalidArgumentException("maxExportBatchSize should be smaller or equal to $maxQueueSize");
         }
         $this->exporter = $exporter;
+        $this->clock = $clock;
         $this->maxQueueSize = $maxQueueSize;
         $this->scheduledDelayMillis = $scheduledDelayMillis;
         $this->exporterTimeoutMillis = $exporterTimeoutMillis;
         $this->maxExportBatchSize = $maxExportBatchSize;
+
+        $this->queue = [];
     }
 
     /**
@@ -51,7 +69,6 @@ class BatchSpanProcessor implements SpanProcessorInterface
      */
     public function onStart(Span $span): void
     {
-        // TODO: Implement onStart() method.
     }
 
     /**
@@ -59,6 +76,24 @@ class BatchSpanProcessor implements SpanProcessorInterface
      */
     public function onEnd(Span $span): void
     {
-        // TODO: Implement onEnd() method.
+        if (count($this->queue) < $this->maxQueueSize ) {
+            $this->queue[] = $span;
+        }
+
+        if ($this->bufferReachedExportLimit() && $this->enoughTimeHasPassed()) {
+            $this->exporter->export($this->queue);
+            $this->queue = [];
+            $this->lastExportTimestamp = $this->clock->millitime();
+        }
+    }
+
+    protected function bufferReachedExportLimit(): bool
+    {
+        return count($this->queue) >= $this->maxExportBatchSize;
+    }
+
+    protected function enoughTimeHasPassed(): bool
+    {
+        return $this->scheduledDelayMillis < ($this->clock->millitime() - $this->lastExportTimestamp);
     }
 }
