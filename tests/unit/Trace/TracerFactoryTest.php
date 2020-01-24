@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\Tests\Unit\Trace;
 
 use Error;
@@ -56,12 +58,12 @@ class TracerFactoryTest extends TestCase
      */
     public function shouldInstantiateWithoutErrorIfConfigurationIsOk()
     {
-            $factory = TracerFactory::getInstance([
+        $factory = TracerFactory::getInstance([
                 $this->createMock(SpanProcessorInterface::class),
-                $this->createMock(SpanProcessorInterface::class)
+                $this->createMock(SpanProcessorInterface::class),
             ]);
 
-            $this->assertInstanceOf(TracerFactory::class, $factory);
+        $this->assertInstanceOf(TracerFactory::class, $factory);
     }
 
     /**
@@ -78,17 +80,17 @@ class TracerFactoryTest extends TestCase
     {
         return [
             'array of numbers' => [
-                'spanProcessors' => [1, -1, 0.1, -0.1, 0]
+                'spanProcessors' => [1, -1, 0.1, -0.1, 0],
             ],
             'array of strings' => [
-                'spanProcessors' => ['aaa', 'bbb', '']
+                'spanProcessors' => ['aaa', 'bbb', ''],
             ],
             'array of standardObjects' => [
-                'spanProcessors' => [new StdClass(), new StdClass()]
+                'spanProcessors' => [new StdClass(), new StdClass()],
             ],
             'array of boolean' => [
-                'spanProcessors' => [true, false, null]
-            ]
+                'spanProcessors' => [true, false, null],
+            ],
         ];
     }
 }

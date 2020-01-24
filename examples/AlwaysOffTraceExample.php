@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
 use OpenTelemetry\Trace\Sampler\AlwaysOffSampler;
@@ -19,11 +21,11 @@ if ($sampler) {
       'username' => 'otuser',
     ]);
     $span->addEvent('generated_session', [
-      'id' => md5(microtime(true))
+      'id' => md5(microtime(true)),
     ]);
 
     $span->end(); // pass status as an optional argument
     print_r($span);  // print the span as a resulting output
 } else {
-    echo "Sampling is not enabled";
+    echo 'Sampling is not enabled';
 }
