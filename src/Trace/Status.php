@@ -46,7 +46,7 @@ class Status
 
     private $code;
     private $description;
-    static private $ok;
+    private static $ok;
 
     public function __construct(int $code, string $description = null)
     {
@@ -54,19 +54,22 @@ class Status
         if (!$description && array_key_exists($code, self::DESCRIPTION)) {
             $description = self::DESCRIPTION[$code];
         }
-        if (!is_null($description)) {
+        if (null !== $description) {
             $this->description = $description;
         }
     }
 
-    public static function new(int $code, string $description = null) {
+    public static function new(int $code, string $description = null)
+    {
         if ($code === self::OK && ($description === null || $description == self::DESCRIPTION[self::OK])) {
             return self::$ok;
         }
+
         return new Status($code, $description);
     }
 
-    public static function initOk() {
+    public static function initOk()
+    {
         if (!self::$ok) {
             self::$ok = new Status(self::OK);
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\Tests\Unit\Tracing\Sampler;
 
 use OpenTelemetry\Trace\Sampler\AlwaysOnSampler;

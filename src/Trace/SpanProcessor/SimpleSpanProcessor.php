@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\Trace\SpanProcessor;
 
 use OpenTelemetry\Exporter\ExporterInterface;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\Trace;
 
 use InvalidArgumentException;
@@ -34,9 +36,9 @@ class TracerFactory
             if (!$spanProcessor instanceof SpanProcessorInterface) {
                 throw new InvalidArgumentException(
                     sprintf(
-                        "Span Processors should be of type %s, but object of type %s provided",
+                        'Span Processors should be of type %s, but object of type %s provided',
                         SpanProcessorInterface::class,
-                        gettype($spanProcessor) == "object" ? get_class($spanProcessor) : gettype($spanProcessor)
+                        gettype($spanProcessor) == 'object' ? get_class($spanProcessor) : gettype($spanProcessor)
                     )
                 );
             }
@@ -61,14 +63,14 @@ class TracerFactory
         return self::$instance = $instance;
     }
 
-    public function getTracer(string $name, string $version = ""): Tracer
+    public function getTracer(string $name, string $version = ''): Tracer
     {
-
         if ($this->tracers[$name] instanceof Tracer) {
             return $this->tracers[$name];
         }
 
         $spanContext = SpanContext::generate();
+
         return $this->tracers[$name] = new Tracer($this->spanProcessors, $spanContext);
     }
 }

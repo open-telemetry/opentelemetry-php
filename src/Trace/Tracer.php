@@ -21,7 +21,7 @@ class Tracer
      * Tracer constructor.
      *
      * @param SpanProcessorInterface[]         $spanProcessors
-     * @param SpanContext|NULL                 $context
+     * @param SpanContext|null                 $context
      */
     public function __construct(iterable $spanProcessors = [], SpanContext $context = null)
     {
@@ -35,12 +35,14 @@ class Tracer
         while (count($this->tail) && $this->active->getEnd()) {
             $this->active = array_pop($this->tail);
         }
+
         return $this->active;
     }
 
     public function setActiveSpan(Span $span): Span
     {
         $this->tail[] = $this->active;
+
         return $this->active = $span;
     }
 
@@ -93,7 +95,7 @@ class Tracer
         int $statusCode = Status::OK,
         ?string $statusDescription = null,
         float $timestamp = null
-    ){
+    ) {
         if ($this->getActiveSpan()->isRecording()) {
             foreach ($this->spanProcessors as $spanProcessor) {
                 $spanProcessor->onEnd($this->getActiveSpan());
@@ -111,6 +113,7 @@ class Tracer
         }
         $span = new Span($name, $context, $parent);
         $this->spans[] = $span;
+
         return $span;
     }
 }
