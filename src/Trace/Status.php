@@ -50,11 +50,9 @@ class Status
     public function __construct(int $code, string $description = null)
     {
         $this->code = $code;
+        $this->description = $description;
         if (!$description && array_key_exists($code, self::DESCRIPTION)) {
-            $description = self::DESCRIPTION[$code];
-        }
-        if (null !== $description) {
-            $this->description = $description;
+            $this->description = self::DESCRIPTION[$code];
         }
     }
 
