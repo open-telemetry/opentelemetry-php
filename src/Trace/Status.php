@@ -77,7 +77,7 @@ class Status
         return $this->description;
     }
 
-    public function getIsOk() : bool
+    public function isOK() : bool
     {
         return $this->code === self::OK;
     }

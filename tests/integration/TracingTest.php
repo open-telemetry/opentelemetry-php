@@ -89,7 +89,7 @@ class TracingTest extends TestCase
         $mysql->end();
         $this->assertGreaterThan($duration, $mysql->getDuration());
 
-        $this->assertTrue($mysql->getStatus()->getIsOk());
+        $this->assertTrue($mysql->getStatus()->isOK());
         
         // active span rolled back
         $this->assertSame($tracer->getActiveSpan(), $global);
@@ -97,7 +97,7 @@ class TracingTest extends TestCase
         // active span should be kept for global span
         $global->end();
         $this->assertSame($tracer->getActiveSpan(), $global);
-        $this->assertTrue($global->getStatus()->getIsOk());
+        $this->assertTrue($global->getStatus()->isOK());
     }
 
     public function testStatusManipulation()
@@ -106,7 +106,7 @@ class TracingTest extends TestCase
 
         $cancelled = $tracer->createSpan('cancelled');
         $cancelled->end(Status::CANCELLED);
-        $this->assertFalse($cancelled->getStatus()->getIsOk());
+        $this->assertFalse($cancelled->getStatus()->isOK());
         $this->assertSame($cancelled->getStatus()->getCanonicalCode(), Status::CANCELLED);
         $this->assertSame($cancelled->getStatus()->getDescription(), Status::DESCRIPTION[Status::CANCELLED]);
 
