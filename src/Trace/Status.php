@@ -44,7 +44,14 @@ final class Status
         16 => 'The request does not have valid authentication credentials for the operation.',
     ];
 
+    /**
+     * @var int
+     */
     private $code;
+
+    /**
+     * @var string|null
+     */
     private $description;
 
     public function __construct(int $code, string $description = null)
