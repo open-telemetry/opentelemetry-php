@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace;
 
-class Status
+final class Status
 {
     const OK = 0;
     const CANCELLED = 1;
