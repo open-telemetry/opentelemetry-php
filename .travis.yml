@@ -1,12 +1,11 @@
 dist: trusty
 language: php
+os: linux
 
 php:
     - 7.1
     - 7.2
     - 7.3
-
-sudo: false
 
 ## Cache composer
 cache:
