@@ -76,6 +76,11 @@ final class Status
         return new Status($code, $description);
     }
 
+    public static function ok(): Status
+    {
+        return self::new(self::OK);
+    }
+
     public function getCanonicalCode() : int
     {
         return $this->code;
