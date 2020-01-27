@@ -110,7 +110,7 @@ class TracingTest extends TestCase
         $this->assertSame($cancelled->getStatus()->getCanonicalCode(), Status::CANCELLED);
         $this->assertSame($cancelled->getStatus()->getDescription(), Status::DESCRIPTION[Status::CANCELLED]);
 
-        $noDescription = new Status(500);
+        $noDescription = Status::new(500);
         $this->assertNull($noDescription->getDescription());
 
         $this->assertCount(2, $tracer->getSpans());

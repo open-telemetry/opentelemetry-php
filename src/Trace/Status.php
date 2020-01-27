@@ -45,6 +45,11 @@ final class Status
     ];
 
     /**
+     * @var Status[]
+     */
+    private static $map;
+
+    /**
      * @var int
      */
     private $code;
@@ -54,19 +59,18 @@ final class Status
      */
     private $description;
 
-    public function __construct(int $code, string $description = null)
+    private function __construct(int $code, string $description = null)
     {
         $this->code = $code;
         $this->description = $description;
-        if (!$description && array_key_exists($code, self::DESCRIPTION)) {
-            $this->description = self::DESCRIPTION[$code];
-        }
     }
 
     public static function new(int $code, string $description = null): Status
     {
-        if ($code === self::OK && $description === null) {
-            $description = self::DESCRIPTION[self::OK];
+        if (!$description && array_key_exists($code, self::DESCRIPTION)) {
+            $description = self::DESCRIPTION[$code];
+
+            return self::$map[$code] ?? self::$map[$code] = new Status($code, $description);
         }
 
         return new Status($code, $description);
