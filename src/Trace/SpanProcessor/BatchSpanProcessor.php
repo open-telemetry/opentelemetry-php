@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\Trace\SpanProcessor;
 
 use InvalidArgumentException;
@@ -76,7 +78,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
      */
     public function onEnd(Span $span): void
     {
-        if (count($this->queue) < $this->maxQueueSize ) {
+        if (count($this->queue) < $this->maxQueueSize) {
             $this->queue[] = $span;
         }
 
