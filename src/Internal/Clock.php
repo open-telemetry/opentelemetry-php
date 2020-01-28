@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\Internal;
 
 class Clock
@@ -9,6 +11,6 @@ class Clock
      */
     public function millitime(): int
     {
-        return (int)(microtime(true) * 1000);
+        return (int) (microtime(true) * 1000);
     }
 }

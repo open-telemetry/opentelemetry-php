@@ -1,4 +1,4 @@
-DC_RUN_PHP = docker-compose run php
+DC_RUN_PHP = docker-compose run --rm php
 
 install:
 	$(DC_RUN_PHP) composer install
