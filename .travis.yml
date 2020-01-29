@@ -13,6 +13,8 @@ cache:
         - $HOME/.composer/cache
 
 before_script:
+    - source .travis/xdebug.sh
+    - xdebug-disable
     - pecl install ast-1.0.4
     - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-dist
 
@@ -23,15 +25,9 @@ script:
         CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")
         if ! echo "${CHANGED_FILES}" | grep -qE "^(\\.php_cs(\\.dist)?|composer\\.lock)$"; then EXTRA_ARGS=$(printf -- '--path-mode=intersection\n--\n%s' "${CHANGED_FILES}"); else EXTRA_ARGS=''; fi
         vendor/bin/php-cs-fixer fix --config=.php_cs -v --dry-run --stop-on-violation --using-cache=no ${EXTRA_ARGS}
-    - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
     - vendor/bin/phan
-
-after_script:
-    - |
-        if [[ "$TRAVIS_PHP_VERSION" != 'hhvm' ]]; then
-          wget https://scrutinizer-ci.com/ocular.phar
-          php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-        fi
+    - xdebug-enable
+    - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)
