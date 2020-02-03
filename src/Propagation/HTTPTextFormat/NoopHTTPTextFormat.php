@@ -15,7 +15,8 @@ final class NoopHTTPTextFormat implements HTTPTextFormatInterface
      *
      * @return array
      */
-    public function fields() : array {
+    public function fields() : array
+    {
         return [];
     }
 
