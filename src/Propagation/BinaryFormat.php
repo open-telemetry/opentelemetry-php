@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Propagation;
 
 use OpenTelemetry\Context\SpanContext;
-use OpenTelemetry\Trace\Span;
 
 final class BinaryFormat
 {
