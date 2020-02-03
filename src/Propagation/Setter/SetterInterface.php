@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Propagation\Setter;
 
-interface SetterInterface {
+interface SetterInterface
+{
     /**
      * Retrieve the value for a given key from the associated carrier.
      *
