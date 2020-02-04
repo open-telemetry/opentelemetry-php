@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Propagation\Setter;
 
-final class NoopSetter implements SetterInterface
+final class NoopSetter implements Setter
 {
     /**
      * Set the value for a given key on the associated carrier.

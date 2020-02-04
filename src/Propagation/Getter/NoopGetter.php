@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Propagation\Getter;
 
-final class NoopGetter implements GetterInterface
+final class NoopGetter implements Getter
 {
     /**
      * Gets the value of a given key on a carrier.

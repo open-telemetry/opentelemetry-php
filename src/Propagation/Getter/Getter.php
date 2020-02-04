@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Propagation\Getter;
 
-interface GetterInterface
+interface Getter
 {
     /**
      * Gets the value of a given key on a carrier.

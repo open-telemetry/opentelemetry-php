@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Propagation\HTTPTextFormat;
 
 use OpenTelemetry\Context\SpanContext;
-use OpenTelemetry\Propagation\Getter\GetterInterface;
-use OpenTelemetry\Propagation\Setter\SetterInterface;
+use OpenTelemetry\Propagation\Getter\Getter;
+use OpenTelemetry\Propagation\Setter\Setter;
 
-final class NoopHTTPTextFormat implements HTTPTextFormatInterface
+final class NoopHTTPTextFormat implements HTTPTextFormat
 {
     /**
      * Returns list of fields that will be used by this formatter.
@@ -26,9 +26,9 @@ final class NoopHTTPTextFormat implements HTTPTextFormatInterface
      *
      * @param SpanContext $context
      * @param mixed $carrier
-     * @param SetterInterface $setter
+     * @param Setter $setter
      */
-    public function inject(SpanContext $context, $carrier, SetterInterface $setter) : void
+    public function inject(SpanContext $context, $carrier, Setter $setter) : void
     {
         // NOOP
     }
@@ -36,10 +36,11 @@ final class NoopHTTPTextFormat implements HTTPTextFormatInterface
     /**
      * Retrieves encoded SpanContext using Getter from the associated carrier.
      *
-     * @param GetterInterface $getter
+     * @param mixed $carrier
+     * @param Getter $getter
      * @return SpanContext
      */
-    public function extract(GetterInterface $getter) : SpanContext
+    public function extract($carrier, Getter $getter) : SpanContext
     {
         return SpanContext::generate();
     }
