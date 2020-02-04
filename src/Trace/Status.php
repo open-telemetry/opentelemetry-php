@@ -4,27 +4,27 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace;
 
-class Status
+final class Status
 {
-    const OK = 0;
-    const CANCELLED = 1;
-    const UNKNOWN = 2;
-    const INVALID_ARGUMENT = 3;
-    const DEADLINE_EXCEEDED = 4;
-    const NOT_FOUND = 5;
-    const ALREADY_EXISTS = 6;
-    const PERMISSION_DENIED = 7;
-    const RESOURCE_EXHAUSTED = 8;
-    const FAILED_PRECONDITION = 9;
-    const ABORTED = 10;
-    const OUT_OF_RANGE = 11;
-    const UNIMPLEMENTED = 12;
-    const INTERNAL = 13;
-    const UNAVAILABLE = 14;
-    const DATA_LOSS = 15;
-    const UNAUTHENTICATED = 16;
+    public const OK = 0;
+    public const CANCELLED = 1;
+    public const UNKNOWN = 2;
+    public const INVALID_ARGUMENT = 3;
+    public const DEADLINE_EXCEEDED = 4;
+    public const NOT_FOUND = 5;
+    public const ALREADY_EXISTS = 6;
+    public const PERMISSION_DENIED = 7;
+    public const RESOURCE_EXHAUSTED = 8;
+    public const FAILED_PRECONDITION = 9;
+    public const ABORTED = 10;
+    public const OUT_OF_RANGE = 11;
+    public const UNIMPLEMENTED = 12;
+    public const INTERNAL = 13;
+    public const UNAVAILABLE = 14;
+    public const DATA_LOSS = 15;
+    public const UNAUTHENTICATED = 16;
 
-    const DESCRIPTION = [
+    public const DESCRIPTION = [
         0 => 'Not an error; returned on success.',
         1 => 'The operation was cancelled, typically by the caller.',
         2 => 'Unknown error. For example, this error may be returned when a Status value received from another address space belongs to an error space that is not known in this address space. Also errors raised by APIs that do not return enough error information may be converted to this error.',
@@ -44,35 +44,41 @@ class Status
         16 => 'The request does not have valid authentication credentials for the operation.',
     ];
 
-    private $code;
-    private $description;
-    private static $ok;
+    /**
+     * @var Status[]
+     */
+    private static $map;
 
-    public function __construct(int $code, string $description = null)
+    /**
+     * @var int
+     */
+    private $code;
+
+    /**
+     * @var string|null
+     */
+    private $description;
+
+    private function __construct(int $code, string $description = null)
     {
         $this->code = $code;
-        if (!$description && array_key_exists($code, self::DESCRIPTION)) {
-            $description = self::DESCRIPTION[$code];
-        }
-        if (null !== $description) {
-            $this->description = $description;
-        }
+        $this->description = $description;
     }
 
-    public static function new(int $code, string $description = null)
+    public static function new(int $code, string $description = null): Status
     {
-        if ($code === self::OK && ($description === null || $description == self::DESCRIPTION[self::OK])) {
-            return self::$ok;
+        if (!$description && array_key_exists($code, self::DESCRIPTION)) {
+            $description = self::DESCRIPTION[$code];
+
+            return self::$map[$code] ?? self::$map[$code] = new Status($code, $description);
         }
 
         return new Status($code, $description);
     }
 
-    public static function initOk()
+    public static function ok(): Status
     {
-        if (!self::$ok) {
-            self::$ok = new Status(self::OK);
-        }
+        return self::new(self::OK);
     }
 
     public function getCanonicalCode() : int
@@ -85,10 +91,8 @@ class Status
         return $this->description;
     }
 
-    public function getIsOk() : bool
+    public function isOK() : bool
     {
-        return $this->code == self::OK;
+        return $this->code === self::OK;
     }
 }
-
-Status::initOk();
