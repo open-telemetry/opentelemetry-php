@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Trace;
 
 use OpenTelemetry\Trace\Status;
@@ -7,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class StatusTest extends TestCase
 {
-
     public function testGetCanonicalCode()
     {
         $status = Status::new(99);
