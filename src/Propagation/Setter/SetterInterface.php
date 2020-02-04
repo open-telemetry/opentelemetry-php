@@ -7,7 +7,7 @@ namespace OpenTelemetry\Propagation\Setter;
 interface SetterInterface
 {
     /**
-     * Retrieve the value for a given key from the associated carrier.
+     * Set the value for a given key from the associated carrier.
      *
      * @param $carrier
      * @param string $key

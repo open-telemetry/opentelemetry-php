@@ -10,9 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class BinaryFormatTest extends TestCase
 {
-    /**
-     * @test
-     */
     public function testValidSpanToBytes()
     {
         $serialized = (new BinaryFormat())
@@ -20,27 +17,18 @@ class BinaryFormatTest extends TestCase
         $this->assertNotEmpty($serialized);
     }
 
-    /**
-     * @test
-     */
     public function testEmptyFromBytes()
     {
         $span = (new BinaryFormat())->fromBytes('');
         $this->assertTrue($span->IsValid());
     }
 
-    /**
-     * @test
-     */
     public function testOnlyTraceIdFromBytes()
     {
         $traceId = '10000000000000000000000000000000';
         $this->assertEquals($traceId, (new BinaryFormat())->fromBytes("00{$traceId}12")->getTraceId());
     }
 
-    /**
-     * @test
-     */
     public function testValidSpanFromBytes()
     {
         $formatter = new BinaryFormat();
@@ -57,9 +45,6 @@ class BinaryFormatTest extends TestCase
         $this->assertNotEquals($span->isRemote(), $unserializedSpan->isRemote());
     }
 
-    /**
-     * @test
-     */
     public function testValidSpanWithFlagFromBytes()
     {
         $formatter = new BinaryFormat();
