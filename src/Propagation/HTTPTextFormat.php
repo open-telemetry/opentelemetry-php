@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Propagation;
 
 use OpenTelemetry\Context\SpanContext;
-use OpenTelemetry\Propagation\Getter;
-use OpenTelemetry\Propagation\Setter;
 
 interface HTTPTextFormat
 {
