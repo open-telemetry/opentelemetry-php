@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Propagation\Getter;
+namespace OpenTelemetry\Propagation;
 
-final class NoopGetter implements Getter
+interface Getter
 {
     /**
      * Gets the value of a given key on a carrier.
@@ -13,8 +13,5 @@ final class NoopGetter implements Getter
      * @param string $key
      * @return string|null
      */
-    public function get($carrier, string $key): ?string
-    {
-        return null;
-    }
+    public function get($carrier, string $key) : ?string;
 }

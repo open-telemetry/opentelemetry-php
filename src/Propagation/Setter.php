@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Propagation\Setter;
+namespace OpenTelemetry\Propagation;
 
 interface Setter
 {

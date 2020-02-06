@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Propagation\HTTPTextFormat;
+namespace OpenTelemetry\Propagation;
 
 use OpenTelemetry\Context\SpanContext;
-use OpenTelemetry\Propagation\Getter\Getter;
-use OpenTelemetry\Propagation\Setter\Setter;
+use OpenTelemetry\Propagation\Getter;
+use OpenTelemetry\Propagation\Setter;
 
 interface HTTPTextFormat
 {
