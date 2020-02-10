@@ -7,7 +7,7 @@ namespace OpenTelemetry\Trace\Sampler;
 /**
  * This interface is used to organize sampling logic.
  */
-interface SamplerInterface
+interface Sampler
 {
     const FLAG_SAMPLED = 1;
 

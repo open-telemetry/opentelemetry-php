@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Trace;
 
 use OpenTelemetry\Context\SpanContext;
-use OpenTelemetry\Trace\SpanProcessor\SpanProcessorInterface;
+use OpenTelemetry\Trace\SpanProcessor\SpanProcessor;
 
 class Tracer
 {
@@ -13,14 +13,14 @@ class Tracer
     private $spans = [];
     private $tail = [];
     /**
-     * @var SpanProcessorInterface[]
+     * @var SpanProcessor[]
      */
     private $spanProcessors = [];
 
     /**
      * Tracer constructor.
      *
-     * @param SpanProcessorInterface[]         $spanProcessors
+     * @param SpanProcessor[]         $spanProcessors
      * @param SpanContext|null                 $context
      */
     public function __construct(iterable $spanProcessors = [], SpanContext $context = null)

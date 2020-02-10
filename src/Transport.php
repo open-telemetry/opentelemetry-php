@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry;
 
-interface TransportInterface
+interface Transport
 {
     public function write(array $data) : bool;
 }

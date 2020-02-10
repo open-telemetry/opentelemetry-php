@@ -12,7 +12,7 @@ namespace OpenTelemetry\Trace\Sampler;
  * $sampler = new AlwaysSampleSampler();
  * ```
  */
-class AlwaysOnSampler implements SamplerInterface
+class AlwaysOnSampler implements Sampler
 {
     /**
      * Returns true because we always want to sample.

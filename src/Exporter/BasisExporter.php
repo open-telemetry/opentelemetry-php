@@ -6,7 +6,7 @@ namespace OpenTelemetry\Exporter;
 
 use OpenTelemetry\Trace\Span;
 
-class BasisExporter implements ExporterInterface
+class BasisExporter implements Exporter
 {
     public function convertSpan(Span $span) : array
     {
@@ -22,6 +22,6 @@ class BasisExporter implements ExporterInterface
 
     public function export(iterable $spans): int
     {
-        return ExporterInterface::SUCCESS;
+        return Exporter::SUCCESS;
     }
 }
