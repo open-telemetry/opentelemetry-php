@@ -8,7 +8,7 @@ use OpenTelemetry\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Trace\TracerFactory;
 
-$sampler = (new AlwaysOnSampler)->shouldSample();
+$sampler = (new AlwaysOnSampler())->shouldSample();
 
 $zipkinExporter = new ZipkinExporter(
     'alwaysOnExporter',
@@ -33,7 +33,7 @@ if ($sampler) {
         'username' => 'otuser' . $i,
     ]);
         $span->addEvent('generated_session', [
-        'id' => md5((string)microtime(true)),
+        'id' => md5((string) microtime(true)),
     ]);
 
         $tracer->endActiveSpan();

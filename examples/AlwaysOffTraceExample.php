@@ -6,7 +6,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use OpenTelemetry\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\Trace\TracerFactory;
 
-$sampler = (new AlwaysOffSampler)->shouldSample();
+$sampler = (new AlwaysOffSampler())->shouldSample();
 if ($sampler) {
     $tracer = TracerFactory::getInstance()
         ->getTracer('io.opentelemetry.contrib.php');
