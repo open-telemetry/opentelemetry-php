@@ -1,3 +1,0 @@
-#!/bin/bash
-docker build -f ./resources/Dockerfile.example -t opentelemetry-php-docker-example .
-docker run -it opentelemetry-php-docker-example /bin/bash

@@ -1,3 +1,0 @@
-#!/bin/bash
-docker build -f resources/Dockerfile.phan -t opentelemetry-php-docker-phan .
-docker run -it opentelemetry-php-docker-phan

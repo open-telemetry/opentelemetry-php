@@ -16,6 +16,7 @@ $zipkinExporter = new ZipkinExporter(
 );
 
 if ($sampler) {
+    echo 'Starting AlwaysOnTraceExample';
     $tracer = (TracerFactory::getInstance(
         [new SimpleSpanProcessor($zipkinExporter)]
     ))
@@ -38,6 +39,7 @@ if ($sampler) {
 
         $tracer->endActiveSpan();
     }
+    echo 'AlwaysOnTraceExample complete!  See the results at http://localhost:9411/';
 } else {
     echo 'Sampling is not enabled';
 }
