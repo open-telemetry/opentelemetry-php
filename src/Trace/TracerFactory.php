@@ -65,7 +65,8 @@ class TracerFactory
 
     public function getTracer(string $name, string $version = ''): Tracer
     {
-        if ($this->tracers != null && $this->tracers[$name] instanceof Tracer) {
+
+        if (isset($this->tracers[$name]) && $this->tracers[$name] instanceof Tracer) {
             return $this->tracers[$name];
         }
 
