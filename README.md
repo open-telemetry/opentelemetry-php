@@ -18,7 +18,7 @@ $ composer require open-telemetry/opentelemetry
 
 ### Examples
 
-You can use the [examples/AlwaysSampleTraceExample.php](/open-telemetry/opentelemetry-php/blob/master/examples/AlwaysOnTraceExample.php) file to test out the reference implementation we have.
+You can use the [examples/AlwaysSampleTraceExample.php](/examples/AlwaysOnTraceExample.php) file to test out the reference implementation we have.
 First you should start zipkin server by running `docker-compose up -d` and then you can you can easily execute examples using `make example`.
 Exported spans can be seen in zipkin at [http://127.0.0.1:9411](http://127.0.0.1:9411)
 
