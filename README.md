@@ -25,7 +25,6 @@ To your project's `composer.json` file, as this utility has not reached a stable
 $ composer require open-telemetry/opentelemetry
 ```
 
-
 ## Development
 We use docker and docker-compose to perform a lot of our static analysis and testing.  
 
