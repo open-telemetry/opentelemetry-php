@@ -9,9 +9,10 @@ interface Setter
     /**
      * Set the value for a given key from the associated carrier.
      *
+     * @param $carrier
      * @param string $key
      * @param string $value
      * @return void
      */
-    public function put(string $key, string $value) : void;
+    public function put($carrier, string $key, string $value) : void;
 }
