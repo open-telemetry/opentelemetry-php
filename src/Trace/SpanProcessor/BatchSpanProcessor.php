@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace OpenTelemetry\Trace\SpanProcessor;
 
 use InvalidArgumentException;
-use OpenTelemetry\Exporter\ExporterInterface;
+use OpenTelemetry\Exporter\Exporter;
 use OpenTelemetry\Internal\Clock;
 use OpenTelemetry\Trace\Span;
 
-class BatchSpanProcessor implements SpanProcessorInterface
+class BatchSpanProcessor implements SpanProcessor
 {
     /**
-     * @var ExporterInterface
+     * @var Exporter
      */
     private $exporter;
     /**
@@ -46,7 +46,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private $clock;
 
     public function __construct(
-        ExporterInterface $exporter,
+        Exporter $exporter,
         Clock $clock,
         int $maxQueueSize = 2048,
         int $scheduledDelayMillis = 5000,

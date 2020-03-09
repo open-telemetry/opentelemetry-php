@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Trace\SpanProcessor;
 
-use OpenTelemetry\Exporter\ExporterInterface;
+use OpenTelemetry\Exporter\Exporter;
 use OpenTelemetry\Internal\Clock;
 use OpenTelemetry\Trace\Span;
 use OpenTelemetry\Trace\SpanProcessor\BatchSpanProcessor;
@@ -25,7 +25,7 @@ class BatchSpanProcessorTest extends TestCase
             $spans[] = self::createMock(Span::class);
         }
 
-        $exporter = self::createMock(ExporterInterface::class);
+        $exporter = self::createMock(Exporter::class);
         $exporter->expects($this->at(0))->method('export')->with($spans);
 
         $clock = self::createMock(Clock::class);
@@ -47,7 +47,7 @@ class BatchSpanProcessorTest extends TestCase
     {
         $batchSize = 3;
         $exportDelay = 1;
-        $exporter = self::createMock(ExporterInterface::class);
+        $exporter = self::createMock(Exporter::class);
         $exporter->expects($this->exactly(0))->method('export');
         $clock = self::createMock(Clock::class);
         $clock->method('millitime')->will($this->returnValue($exportDelay + 1));
@@ -65,7 +65,7 @@ class BatchSpanProcessorTest extends TestCase
     public function shouldNotExportIfNotEnoughTimePassedSinceLastExport()
     {
         $batchSize = 3;
-        $exporter = self::createMock(ExporterInterface::class);
+        $exporter = self::createMock(Exporter::class);
         $exporter->expects($this->exactly(0))->method('export');
 
         $exportDelay = 2;

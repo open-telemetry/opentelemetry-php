@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace\SpanProcessor;
 
-use OpenTelemetry\Exporter\ExporterInterface;
+use OpenTelemetry\Exporter\Exporter;
 use OpenTelemetry\Trace\Span;
 
-class SimpleSpanProcessor implements SpanProcessorInterface
+class SimpleSpanProcessor implements SpanProcessor
 {
     /**
-     * @var ExporterInterface
+     * @var Exporter
      */
     private $exporter;
 
-    public function __construct(ExporterInterface $exporter)
+    public function __construct(Exporter $exporter)
     {
         $this->exporter = $exporter;
     }

@@ -12,7 +12,7 @@ use OpenTelemetry\Trace\Span;
  * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
  * @package OpenTelemetry\Exporter
  */
-class ZipkinExporter implements ExporterInterface
+class ZipkinExporter implements Exporter
 {
 
     /**
@@ -42,7 +42,7 @@ class ZipkinExporter implements ExporterInterface
     public function export(iterable $spans) : int
     {
         if (empty($spans)) {
-            return ExporterInterface::SUCCESS;
+            return Exporter::SUCCESS;
         }
 
         $convertedSpans = [];
@@ -62,10 +62,10 @@ class ZipkinExporter implements ExporterInterface
             $context = stream_context_create($contextOptions);
             file_get_contents($this->getEndpointUrl(), false, $context);
         } catch (Exception $e) {
-            return ExporterInterface::FAILED_RETRYABLE;
+            return Exporter::FAILED_RETRYABLE;
         }
 
-        return ExporterInterface::SUCCESS;
+        return Exporter::SUCCESS;
     }
 
     /**

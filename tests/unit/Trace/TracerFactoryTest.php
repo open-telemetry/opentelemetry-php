@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Unit\Trace;
 
 use Error;
 use InvalidArgumentException;
-use OpenTelemetry\Trace\SpanProcessor\SpanProcessorInterface;
+use OpenTelemetry\Trace\SpanProcessor\SpanProcessor;
 use OpenTelemetry\Trace\TracerFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -59,8 +59,8 @@ class TracerFactoryTest extends TestCase
     public function shouldInstantiateWithoutErrorIfConfigurationIsOk()
     {
         $factory = TracerFactory::getInstance([
-                $this->createMock(SpanProcessorInterface::class),
-                $this->createMock(SpanProcessorInterface::class),
+                $this->createMock(SpanProcessor::class),
+                $this->createMock(SpanProcessor::class),
             ]);
 
         $this->assertInstanceOf(TracerFactory::class, $factory);

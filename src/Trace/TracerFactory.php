@@ -6,7 +6,7 @@ namespace OpenTelemetry\Trace;
 
 use InvalidArgumentException;
 use OpenTelemetry\Context\SpanContext;
-use OpenTelemetry\Trace\SpanProcessor\SpanProcessorInterface;
+use OpenTelemetry\Trace\SpanProcessor\SpanProcessor;
 
 class TracerFactory
 {
@@ -21,23 +21,23 @@ class TracerFactory
     protected $tracers;
 
     /**
-     * @var SpanProcessorInterface[]
+     * @var SpanProcessor[]
      */
     protected $spanProcessors;
 
     /**
      * TracerFactory constructor.
      *
-     * @param SpanProcessorInterface[] $spanProcessors
+     * @param SpanProcessor[] $spanProcessors
      */
     final private function __construct(array $spanProcessors = [])
     {
         foreach ($spanProcessors as $spanProcessor) {
-            if (!$spanProcessor instanceof SpanProcessorInterface) {
+            if (!$spanProcessor instanceof SpanProcessor) {
                 throw new InvalidArgumentException(
                     sprintf(
                         'Span Processors should be of type %s, but object of type %s provided',
-                        SpanProcessorInterface::class,
+                        SpanProcessor::class,
                         gettype($spanProcessor) == 'object' ? get_class($spanProcessor) : gettype($spanProcessor)
                     )
                 );
@@ -48,7 +48,7 @@ class TracerFactory
     }
 
     /**
-     * @param SpanProcessorInterface[] $spanProcessors
+     * @param SpanProcessor[] $spanProcessors
      *
      * @return static
      */

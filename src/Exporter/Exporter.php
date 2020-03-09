@@ -11,7 +11,7 @@ use OpenTelemetry\Trace\Span;
  *
  * @package OpenTelemetry
  */
-interface ExporterInterface
+interface Exporter
 {
     /**
      * Possible return values as outlined in the OpenTelemetry spec

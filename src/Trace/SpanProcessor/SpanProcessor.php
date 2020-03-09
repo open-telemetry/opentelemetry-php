@@ -6,7 +6,7 @@ namespace OpenTelemetry\Trace\SpanProcessor;
 
 use OpenTelemetry\Trace\Span;
 
-interface SpanProcessorInterface
+interface SpanProcessor
 {
     /**
      * This method is called when a span is started.
