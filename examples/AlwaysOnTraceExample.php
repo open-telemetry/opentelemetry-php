@@ -3,10 +3,10 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\Exporter\ZipkinExporter;
-use OpenTelemetry\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\Trace\SpanProcessor\SimpleSpanProcessor;
-use OpenTelemetry\Trace\TracerFactory;
+use OpenTelemetry\Sdk\Trace\AlwaysOnSampler;
+use OpenTelemetry\Sdk\Trace\SimpleSpanProcessor;
+use OpenTelemetry\Sdk\Trace\TracerFactory;
+use OpenTelemetry\Sdk\Trace\ZipkinExporter;
 
 $sampler = (new AlwaysOnSampler())->shouldSample();
 

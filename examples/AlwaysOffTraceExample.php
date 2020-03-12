@@ -3,8 +3,8 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\Trace\Sampler\AlwaysOffSampler;
-use OpenTelemetry\Trace\TracerFactory;
+use OpenTelemetry\Sdk\Trace\AlwaysOffSampler;
+use OpenTelemetry\Sdk\Trace\TracerFactory;
 
 $sampler = (new AlwaysOffSampler())->shouldSample();
 if ($sampler) {

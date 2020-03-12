@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Trace;
 
 use Error;
-use InvalidArgumentException;
-use OpenTelemetry\Trace\SpanProcessor\SpanProcessor;
-use OpenTelemetry\Trace\TracerFactory;
+use OpenTelemetry\Sdk\Trace\TracerFactory;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use StdClass;
@@ -58,10 +56,7 @@ class TracerFactoryTest extends TestCase
      */
     public function shouldInstantiateWithoutErrorIfConfigurationIsOk()
     {
-        $factory = TracerFactory::getInstance([
-                $this->createMock(SpanProcessor::class),
-                $this->createMock(SpanProcessor::class),
-            ]);
+        $factory = TracerFactory::getInstance();
 
         $this->assertInstanceOf(TracerFactory::class, $factory);
     }
@@ -69,7 +64,7 @@ class TracerFactoryTest extends TestCase
     /**
      * @test
      * @dataProvider wrongConfigurationDataProvider
-     * @expectedException InvalidArgumentException
+     * @expectedException \TypeError
      */
     public function shouldThrowExceptionIfConfigurationParamsAreInvalid($spanProcessors)
     {

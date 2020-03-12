@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Trace\SpanProcessor;
 
-use OpenTelemetry\Exporter\Exporter;
-use OpenTelemetry\Internal\Clock;
-use OpenTelemetry\Trace\Span;
-use OpenTelemetry\Trace\SpanProcessor\BatchSpanProcessor;
+use OpenTelemetry\Sdk\Internal\Clock;
+use OpenTelemetry\Sdk\Trace\BatchSpanProcessor;
+use OpenTelemetry\Sdk\Trace\Exporter;
+use OpenTelemetry\Sdk\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
 class BatchSpanProcessorTest extends TestCase

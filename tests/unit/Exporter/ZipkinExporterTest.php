@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Exporter;
 
 use InvalidArgumentException;
-use OpenTelemetry\Exporter\ZipkinExporter;
+use OpenTelemetry\Sdk\Trace\ZipkinExporter;
 use PHPUnit\Framework\TestCase;
 
 class ZipkinExporterTest extends TestCase

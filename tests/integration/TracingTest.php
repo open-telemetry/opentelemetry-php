@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration;
 
-use OpenTelemetry\Context\SpanContext;
-use OpenTelemetry\Exporter\BasisExporter;
-use OpenTelemetry\Exporter\ZipkinExporter;
-use OpenTelemetry\Trace\Status;
-use OpenTelemetry\Trace\Tracer;
+use OpenTelemetry\Sdk\Trace\Attribute;
+use OpenTelemetry\Sdk\Trace\Attributes;
+use OpenTelemetry\Sdk\Trace\SpanContext;
+use OpenTelemetry\Sdk\Trace\SpanStatus;
+use OpenTelemetry\Sdk\Trace\Tracer;
+use OpenTelemetry\Sdk\Trace\ZipkinExporter;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -43,9 +44,9 @@ class TracingTest extends TestCase
     public function testSpanNameUpdate()
     {
         $database = (new Tracer())->createSpan('database');
-        $this->assertSame($database->getName(), 'database');
+        $this->assertSame($database->getSpanName(), 'database');
         $database->updateName('tarantool');
-        $this->assertSame($database->getName(), 'tarantool');
+        $this->assertSame($database->getSpanName(), 'tarantool');
     }
 
     public function testNestedSpans()
@@ -76,7 +77,7 @@ class TracingTest extends TestCase
         $this->assertSame($tracer->getActiveSpan(), $mysql);
         $this->assertSame($global->getContext()->getTraceId(), $mysql->getContext()->getTraceId());
         $this->assertEquals($mysql->getParentContext(), $global->getContext());
-        $this->assertNotNull($mysql->getStart());
+        $this->assertNotNull($mysql->getStartTimestamp());
         $this->assertTrue($mysql->isRecording());
         $this->assertNull($mysql->getDuration());
 
@@ -89,7 +90,7 @@ class TracingTest extends TestCase
         $mysql->end();
         $this->assertGreaterThan($duration, $mysql->getDuration());
 
-        $this->assertTrue($mysql->getStatus()->isOK());
+        $this->assertTrue($mysql->getStatus()->isStatusOK());
         
         // active span rolled back
         $this->assertSame($tracer->getActiveSpan(), $global);
@@ -97,7 +98,7 @@ class TracingTest extends TestCase
         // active span should be kept for global span
         $global->end();
         $this->assertSame($tracer->getActiveSpan(), $global);
-        $this->assertTrue($global->getStatus()->isOK());
+        $this->assertTrue($global->getStatus()->isStatusOK());
     }
 
     public function testStatusManipulation()
@@ -105,13 +106,14 @@ class TracingTest extends TestCase
         $tracer = new Tracer();
 
         $cancelled = $tracer->createSpan('cancelled');
-        $cancelled->end(Status::CANCELLED);
-        $this->assertFalse($cancelled->getStatus()->isOK());
-        $this->assertSame($cancelled->getStatus()->getCanonicalCode(), Status::CANCELLED);
-        $this->assertSame($cancelled->getStatus()->getDescription(), Status::DESCRIPTION[Status::CANCELLED]);
+        $cancelled->end(SpanStatus::CANCELLED);
+        $this->assertFalse($cancelled->getStatus()->isStatusOK());
+        $this->assertSame($cancelled->getStatus()->getCanonicalStatusCode(), SpanStatus::CANCELLED);
+        $this->assertSame($cancelled->getStatus()->getStatusDescription(), SpanStatus::DESCRIPTION[SpanStatus::CANCELLED]);
 
-        $noDescription = Status::new(500);
-        $this->assertNull($noDescription->getDescription());
+        // code -1 shouldn't ever exist
+        $noDescription = SpanStatus::new(-1);
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNKNOWN], $noDescription->getStatusDescription());
 
         $this->assertCount(2, $tracer->getSpans());
     }
@@ -121,69 +123,80 @@ class TracingTest extends TestCase
         $span = (new Tracer())->getActiveSpan();
 
         // set attributes
-        $span->setAttributes([ 'username' => 'nekufa' ]);
+        $span->replaceAttributes(['username' => 'nekufa']);
 
         // get attribute
-        $this->assertSame($span->getAttribute('username'), 'nekufa');
-        
+        $this->assertEquals(new Attribute('username', 'nekufa'), $span->getAttribute('username'));
+
         // otherwrite
-        $span->setAttributes([ 'email' => 'nekufa@gmail.com', ]);
+        $span->replaceAttributes(['email' => 'nekufa@gmail.com',]);
 
         // null attributes
-        $this->assertNull($span->getAttribute('username'));
-        $this->assertSame($span->getAttribute('email'), 'nekufa@gmail.com');
+        self::assertNull($span->getAttribute('username'));
+        self::assertEquals(new Attribute('email', 'nekufa@gmail.com'), $span->getAttribute('email'));
 
         // set attribute
         $span->setAttribute('username', 'nekufa');
-        $this->assertSame($span->getAttribute('username'), 'nekufa');
-        $this->assertSame($span->getAttributes(), [
-            'email' => 'nekufa@gmail.com',
-            'username' => 'nekufa',
-        ]);
+        self::assertEquals(new Attribute('username', 'nekufa'), $span->getAttribute('username'));
+        $attributes = $span->getAttributes();
+        self::assertCount(2, $attributes);
+        self::assertEquals(new Attribute('email', 'nekufa@gmail.com'), $span->getAttribute('email'));
+        self::assertEquals(new Attribute('username', 'nekufa'), $span->getAttribute('username'));
 
         // keep order
-        $span->setAttributes([ 'a' => 1, 'b' => 2]);
-        $this->assertSame(array_keys($span->getAttributes()), ['a', 'b']);
-        $span->setAttributes([ 'b' => 2, 'a' => 1, ]);
-        $this->assertSame(array_keys($span->getAttributes()), ['b', 'a']);
+        $expected = [
+            'a' => new Attribute('a', 1),
+            'b' => new Attribute('b', 2),
+        ];
+        $span->replaceAttributes(['a' => 1, 'b' => 2]);
+
+        $actual = \iterator_to_array($span->getAttributes());
+        self::assertEquals($expected, $actual);
 
         // attribute update don't change the order
         $span->setAttribute('a', 3);
         $span->setAttribute('b', 4);
-        $this->assertSame(array_keys($span->getAttributes()), ['b', 'a']);
 
-        $this->expectExceptionMessage('Span is readonly');
-        $span->end();
-        $span->setAttribute('b', 5);
+        $expected = [
+            'a' => new Attribute('a', 3),
+            'b' => new Attribute('b', 4),
+        ];
+        $actual = \iterator_to_array($span->getAttributes());
+        self::assertEquals($expected, $actual);
+    }
+
+    public function testSetAttributeWhenNotRecording()
+    {
+        // todo: implement test
+        $this->markTestIncomplete();
     }
 
     public function testEventRegistration()
     {
         $span = (new Tracer())->createSpan('database');
-        $event = $span->addEvent('select', [
+        $eventAttributes = new Attributes([
             'space' => 'guard.session',
             'id' => 67235,
         ]);
+        $span->addEvent('select', $eventAttributes);
+
+        $events = $span->getEvents();
+        self::assertCount(1, $events);
+
+        [$event] = \iterator_to_array($events);
         $this->assertSame($event->getName(), 'select');
-        $this->assertSame($event->getAttributes(), [
+        $attributes = new Attributes([
             'space' => 'guard.session',
             'id' => 67235,
         ]);
-        $this->assertSame($event->getAttribute('space'), 'guard.session');
-        $this->assertNull($event->getAttribute('invalid-attribute'));
-        $this->assertCount(1, $span->getEvents());
-        $this->assertSame($span->getEvents(), [$event]);
-        
+        self::assertEquals($attributes, $event->getAttributes());
+
         $span->addEvent('update')
-            ->setAttribute('space', 'guard.session')
-            ->setAttribute('id', 67235)
-            ->setAttribute('active_at', time());
+                    ->setAttribute('space', 'guard.session')
+                    ->setAttribute('id', 67235)
+                    ->setAttribute('active_at', time());
 
         $this->assertCount(2, $span->getEvents());
-
-        $this->expectExceptionMessage('Span is readonly');
-        $span->end();
-        $span->addEvent('update');
     }
 
     public function testBuilder()
@@ -205,65 +218,12 @@ class TracingTest extends TestCase
         $this->assertNotNull($request->getParentContext());
     }
 
-    public function testSerialization()
-    {
-        $tracer = new Tracer();
-        $span = $tracer->createSpan('serializable');
-        $span->setAttribute('attribute', 'value');
-        $span->addEvent('greet', [ 'name' => 'nekufa' ]);
-
-        $serialized = serialize($span);
-        $unserialized = unserialize($serialized);
-
-        $this->assertSame($span->getName(), $unserialized->getName());
-        $this->assertSame($span->getStart(), $unserialized->getStart());
-        $this->assertSame($span->getEnd(), $unserialized->getEnd());
-
-        $this->assertSame($unserialized->getAttribute('attribute'), 'value');
-        $this->assertCount(1, $unserialized->getEvents());
-        [$event] = $unserialized->getEvents();
-        $this->assertSame($event->getName(), 'greet');
-        $this->assertSame($event->getAttribute('name'), 'nekufa');
-
-        return $tracer;
-    }
-
-    public function testBasisConverter()
-    {
-        $tracer = new Tracer();
-        $span = $tracer->createSpan('guard.validate');
-        $span->setAttribute('service', 'guard');
-        $event = $span->addEvent('validators.list', [ 'job' => 'stage.updateTime' ]);
-        $span->end();
-
-        $exporter = new BasisExporter();
-        $row = $exporter->convertSpan($span);
-        $this->assertSame($row['traceId'], $span->getContext()->getTraceId());
-        $this->assertSame($row['spanId'], $span->getContext()->getSpanId());
-        $this->assertSame($row['parentSpanId'], $span->getParentContext()->getSpanId());
-
-        $this->assertNotNull($row['body']);
-        $unserialized = unserialize($row['body']);
-        $this->assertSame($unserialized->getName(), $span->getName());
-        $this->assertSame($unserialized->getAttributes(), $span->getAttributes());
-
-        $this->assertSame(
-            $unserialized->getEvents()[0]->getName(),
-            $span->getEvents()[0]->getName()
-        );
-
-        $this->assertSame(
-            $unserialized->getEvents()[0]->getTimestamp(),
-            $span->getEvents()[0]->getTimestamp()
-        );
-    }
-
     public function testZipkinConverter()
     {
         $tracer = new Tracer();
         $span = $tracer->createSpan('guard.validate');
         $span->setAttribute('service', 'guard');
-        $event = $span->addEvent('validators.list', [ 'job' => 'stage.updateTime' ]);
+        $span->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']));
         $span->end();
 
         $method = new ReflectionMethod(ZipkinExporter::class, 'convertSpan');
@@ -275,14 +235,16 @@ class TracingTest extends TestCase
         );
 
         $row = $method->invokeArgs($exporter, ['span' => $span]);
-        $this->assertSame($row['name'], $span->getName());
+        $this->assertSame($row['name'], $span->getSpanName());
 
-        $this->assertSame($row['tags'], $span->getAttributes());
-        $this->assertSame($row['tags']['service'], $span->getAttribute('service'));
+        self::assertCount(1, $row['tags']);
+        self::assertEquals($span->getAttribute('service')->getValue(), $row['tags']['service']);
 
-        $this->assertCount(1, $row['annotations']);
+        self::assertCount(1, $row['annotations']);
         [$annotation] = $row['annotations'];
-        $this->assertSame($annotation['value'], $event->getName());
-        $this->assertSame($annotation['timestamp'], 1000000 * $event->getTimestamp());
+        self::assertEquals('validators.list', $annotation['value']);
+
+        [$event] = \iterator_to_array($span->getEvents());
+        self::assertEquals($event->getTimestamp(), $annotation['timestamp']);
     }
 }
