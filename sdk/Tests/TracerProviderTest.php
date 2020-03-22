@@ -2,20 +2,19 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Trace;
+namespace OpenTelemetry\Sdk\Tests;
 
 use Error;
-use OpenTelemetry\Sdk\Trace\TracerFactory;
-use PHPUnit\Framework\TestCase;
+use OpenTelemetry\Sdk\Trace\TracerProvider;
 use ReflectionProperty;
 use StdClass;
 
-class TracerFactoryTest extends TestCase
+class TracerProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function tearDown()
     {
         // since a singleton is tested we need to reset instance after every test
-        $refProperty = new ReflectionProperty(TracerFactory::class, 'instance');
+        $refProperty = new ReflectionProperty(TracerProvider::class, 'instance');
         $refProperty->setAccessible(true);
         $refProperty->setValue(null);
     }
@@ -26,7 +25,7 @@ class TracerFactoryTest extends TestCase
      */
     public function shouldNotBeAbleToInstantiateDirectly()
     {
-        new TracerFactory();
+        new TracerProvider();
     }
 
     /**
@@ -34,10 +33,11 @@ class TracerFactoryTest extends TestCase
      */
     public function gettingSameTracerMultipleTimesShouldReturnSameObject()
     {
-        $tracer1 = TracerFactory::getInstance()->getTracer('test_tracer');
-        $tracer2 = TracerFactory::getInstance()->getTracer('test_tracer');
+        $traceProvider = TracerProvider::getInstance();
+        $tracer1 = $traceProvider->getTracer('test_tracer');
+        $tracer2 = $traceProvider->getTracer('test_tracer');
 
-        $this->assertTrue($tracer1 === $tracer2);
+        self::assertSame($tracer1, $tracer2);
     }
 
     /**
@@ -45,20 +45,10 @@ class TracerFactoryTest extends TestCase
      */
     public function callingSameInstanceMultipleTimesShouldReturnSameFactoryObject()
     {
-        $instance1 = TracerFactory::getInstance();
-        $instance2 = TracerFactory::getInstance();
+        $instance1 = TracerProvider::getInstance();
+        $instance2 = TracerProvider::getInstance();
 
-        $this->assertTrue($instance1 === $instance2);
-    }
-
-    /**
-     * @test
-     */
-    public function shouldInstantiateWithoutErrorIfConfigurationIsOk()
-    {
-        $factory = TracerFactory::getInstance();
-
-        $this->assertInstanceOf(TracerFactory::class, $factory);
+        self::assertSame($instance1, $instance2);
     }
 
     /**
@@ -68,7 +58,7 @@ class TracerFactoryTest extends TestCase
      */
     public function shouldThrowExceptionIfConfigurationParamsAreInvalid($spanProcessors)
     {
-        TracerFactory::getInstance($spanProcessors);
+        TracerProvider::getInstance($spanProcessors);
     }
 
     public function wrongConfigurationDataProvider()

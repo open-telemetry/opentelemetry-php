@@ -4,11 +4,11 @@ declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
 use OpenTelemetry\Sdk\Trace\AlwaysOffSampler;
-use OpenTelemetry\Sdk\Trace\TracerFactory;
+use OpenTelemetry\Sdk\Trace\TracerProvider;
 
 $sampler = (new AlwaysOffSampler())->shouldSample();
 if ($sampler) {
-    $tracer = TracerFactory::getInstance()
+    $tracer = TracerProvider::getInstance()
         ->getTracer('io.opentelemetry.contrib.php');
 
     // start a span, register some events

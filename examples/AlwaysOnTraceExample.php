@@ -5,7 +5,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use OpenTelemetry\Sdk\Trace\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\SimpleSpanProcessor;
-use OpenTelemetry\Sdk\Trace\TracerFactory;
+use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Sdk\Trace\ZipkinExporter;
 
 $sampler = (new AlwaysOnSampler())->shouldSample();
@@ -17,7 +17,7 @@ $zipkinExporter = new ZipkinExporter(
 
 if ($sampler) {
     echo 'Starting AlwaysOnTraceExample';
-    $tracer = (TracerFactory::getInstance(
+    $tracer = (TracerProvider::getInstance(
         [new SimpleSpanProcessor($zipkinExporter)]
     ))
         ->getTracer('io.opentelemetry.contrib.php');

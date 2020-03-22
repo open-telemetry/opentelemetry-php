@@ -30,6 +30,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "OpenTelemetry\\Sdk\\Tests\\": "sdk/Tests",
             "OpenTelemetry\\Tests\\": "test/"
         }
     },
