@@ -58,7 +58,8 @@ class Tracer implements API\Tracer
      * Do we want to offer the setActiveSpan on a newly created span as a separate function?
      *
     */
-    /* The API MUST accept the following parameters:
+    /**
+     * The API MUST accept the following parameters:
      * - The parent Span or parent Span context, and whether the new Span
      *   should be a root Span. API MAY also have an option for implicit parent
      *   context extraction from the current context as a default behavior.
@@ -70,12 +71,12 @@ class Tracer implements API\Tracer
      *   be set when span creation time has already passed. If API is called
      *   at a moment of a Span logical start, API user MUST not explicitly
      *   set this argument.
-
      * todo: fix ^
      * -> Is there a reason we didn't add this already?
-     *
+     * @param string $name
+     * @return Span
      */
-    public function createSpan(string $name): Span
+    public function startAndActivateSpan(string $name): API\Span
     {
         $parent = $this->getActiveSpan()->getContext();
         $context = SpanContext::fork($parent->getTraceId());
@@ -121,14 +122,9 @@ class Tracer implements API\Tracer
         return $span;
     }
 
-    public function startAndActivateSpan(string $name): API\Span
+    public function startSpanWithOptions(string $name): API\SpanOptions
     {
-        // TODO: Implement startAndActivateSpan() method.
-    }
-
-    public function startSpanWithOptions(): API\SpanOptions
-    {
-        // TODO: Implement startSpanWithOptions() method.
+        return new SpanOptions($this, $name);
     }
 
     public function finishSpan(API\Span $span, ?string $timestamp = null): void

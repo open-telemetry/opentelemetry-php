@@ -83,6 +83,13 @@ class Span implements API\Span
         return $this;
     }
 
+    public function setStartTimestamp(string $timestamp): Span
+    {
+        $this->start = $timestamp;
+
+        return $this;
+    }
+
     public function getStartTimestamp(): string
     {
         return $this->start;
@@ -186,6 +193,13 @@ class Span implements API\Span
         if (!$this->isRecording()) {
             throw new Exception('Span is readonly');
         }
+    }
+
+    public function setLinks(API\Links $links): Span
+    {
+        $this->links = $links;
+
+        return $this;
     }
 
     public function getLinks(): API\Links

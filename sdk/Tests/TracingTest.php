@@ -44,7 +44,7 @@ class TracingTest extends TestCase
 
     public function testSpanNameUpdate()
     {
-        $database = (new Tracer())->createSpan('database');
+        $database = (new Tracer())->startAndActivateSpan('database');
         $this->assertSame($database->getSpanName(), 'database');
         $database->updateName('tarantool');
         $this->assertSame($database->getSpanName(), 'tarantool');
@@ -54,11 +54,11 @@ class TracingTest extends TestCase
     {
         $tracer = new Tracer();
 
-        $guard = $tracer->createSpan('guard.validate');
-        $connection = $tracer->createSpan('guard.validate.connection');
-        $procedure = $tracer->createSpan('guard.procedure.registration')->end();
+        $guard = $tracer->startAndActivateSpan('guard.validate');
+        $connection = $tracer->startAndActivateSpan('guard.validate.connection');
+        $procedure = $tracer->startAndActivateSpan('guard.procedure.registration')->end();
         $connection->end();
-        $policy = $tracer->createSpan('policy.describe')->end();
+        $policy = $tracer->startAndActivateSpan('policy.describe')->end();
 
         $guard->end();
 
@@ -74,7 +74,7 @@ class TracingTest extends TestCase
         $tracer = new Tracer();
         $global = $tracer->getActiveSpan();
 
-        $mysql = $tracer->createSpan('mysql');
+        $mysql = $tracer->startAndActivateSpan('mysql');
         $this->assertSame($tracer->getActiveSpan(), $mysql);
         $this->assertSame($global->getContext()->getTraceId(), $mysql->getContext()->getTraceId());
         $this->assertEquals($mysql->getParent(), $global->getContext());
@@ -107,7 +107,7 @@ class TracingTest extends TestCase
     {
         $tracer = new Tracer();
 
-        $cancelled = $tracer->createSpan('cancelled')
+        $cancelled = $tracer->startAndActivateSpan('cancelled')
             ->setSpanStatus(SpanStatus::CANCELLED)
             ->end();
         self::assertFalse($cancelled->isStatusOK());
@@ -178,7 +178,7 @@ class TracingTest extends TestCase
 
     public function testEventRegistration()
     {
-        $span = (new Tracer())->createSpan('database');
+        $span = (new Tracer())->startAndActivateSpan('database');
         $eventAttributes = new Attributes([
             'space' => 'guard.session',
             'id' => 67235,
@@ -217,7 +217,7 @@ class TracingTest extends TestCase
     {
         $tracer = new Tracer();
         $global = $tracer->getActiveSpan();
-        $request = $tracer->createSpan('request');
+        $request = $tracer->startAndActivateSpan('request');
         $this->assertSame($request->getParent()->getSpanId(), $global->getContext()->getSpanId());
         $this->assertNull($global->getParent());
         $this->assertNotNull($request->getParent());
@@ -226,7 +226,7 @@ class TracingTest extends TestCase
     public function testZipkinConverter()
     {
         $tracer = new Tracer();
-        $span = $tracer->createSpan('guard.validate');
+        $span = $tracer->startAndActivateSpan('guard.validate');
         $span->setAttribute('service', 'guard');
         $span->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']));
         $span->end();

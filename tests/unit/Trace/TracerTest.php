@@ -20,7 +20,7 @@ class TracerTest extends TestCase
 
         $tracer = new Tracer([$processor]);
 
-        $tracer->createSpan('test.span');
+        $tracer->startAndActivateSpan('test.span');
     }
 
     /**
@@ -34,7 +34,7 @@ class TracerTest extends TestCase
 
         $tracer = new Tracer([$processor]);
 
-        $tracer->createSpan('test.span');
+        $tracer->startAndActivateSpan('test.span');
         $tracer->endActiveSpan();
     }
 }

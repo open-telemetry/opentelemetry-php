@@ -9,7 +9,7 @@ interface Tracer
     public function getActiveSpan(): Span;
 
     public function startAndActivateSpan(string $name): Span;
-    public function startSpanWithOptions(): SpanOptions;
+    public function startSpanWithOptions(string $name): SpanOptions;
 
     public function setActiveSpan(Span $span): void;
 

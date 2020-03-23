@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Tests;
 
-use Error;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
+use ReflectionClass;
 use ReflectionProperty;
 use StdClass;
 
@@ -21,8 +21,10 @@ class TracerProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldNotBeAbleToInstantiateDirectly()
     {
-        $this->expectException(Error::class);
-        new TracerProvider();
+        $this->expectException(\ReflectionException::class);
+        // use reflection to silence phan warning about calling private constructor
+        $class = new ReflectionClass(TracerProvider::class);
+        $class->newInstance();
     }
 
     /**
