@@ -117,16 +117,6 @@ class Tracer implements API\Tracer
         return $span;
     }
 
-    public function getTracerName(): string
-    {
-        // TODO: Implement getTracerName() method.
-    }
-
-    public function getTracerVersion(): ?string
-    {
-        // TODO: Implement getTracerVersion() method.
-    }
-
     public function startAndActivateSpan(string $name): API\Span
     {
         // TODO: Implement startAndActivateSpan() method.
