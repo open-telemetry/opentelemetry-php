@@ -72,7 +72,7 @@ class ZipkinExporter implements Exporter
     /**
      * Converts spans to Zipkin format for export
      *
-     * @param Span $span
+     * @param API\Span $span
      * @return array
      */
     private function convertSpan(API\Span $span) : array
@@ -80,16 +80,14 @@ class ZipkinExporter implements Exporter
         $row = [
             'id' => $span->getContext()->getSpanId(),
             'traceId' => $span->getContext()->getTraceId(),
-            'parentId' => $span->getParentContext()
-                ? $span->getParentContext()->getSpanId()
-                : null,
+            'parentId' => $span->getParent() ? $span->getParent()->getSpanId() : null,
             'localEndpoint' => [
                 'serviceName' => $this->name,
                 'port'  => $this->getEndpoint()['port'] ?? 0,
             ],
             'name' => $span->getSpanName(),
-            'timestamp' => (int) round($span->getStartTimestamp()),
-            'duration' => (int) round($span->getEndTimestamp()) - round($span->getStartTimestamp()),
+            'timestamp' => (int) round((float) $span->getStartTimestamp()),
+            'duration' => (int) round((float) $span->getEndTimestamp()) - round((float) $span->getStartTimestamp()),
         ];
 
         foreach ($span->getAttributes() as $k => $v) {

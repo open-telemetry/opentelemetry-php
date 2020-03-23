@@ -85,7 +85,7 @@ class BatchSpanProcessor implements SpanProcessor
         if ($this->bufferReachedExportLimit() && $this->enoughTimeHasPassed()) {
             $this->exporter->export($this->queue);
             $this->queue = [];
-            $this->lastExportTimestamp = $this->clock->millitime();
+            $this->lastExportTimestamp = (int) \round((float) $this->clock->millitime());
         }
     }
 
@@ -96,7 +96,9 @@ class BatchSpanProcessor implements SpanProcessor
 
     protected function enoughTimeHasPassed(): bool
     {
-        return $this->scheduledDelayMillis < ($this->clock->millitime() - $this->lastExportTimestamp);
+        $now = (int) \round((float) $this->clock->millitime());
+
+        return $this->scheduledDelayMillis < ($now - $this->lastExportTimestamp);
     }
 
     /**

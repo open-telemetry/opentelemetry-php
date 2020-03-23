@@ -19,12 +19,9 @@ class TracerProviderTest extends \PHPUnit\Framework\TestCase
         $refProperty->setValue(null);
     }
 
-    /**
-     * @test
-     * @expectedException Error
-     */
-    public function shouldNotBeAbleToInstantiateDirectly()
+    public function testShouldNotBeAbleToInstantiateDirectly()
     {
+        $this->expectException(Error::class);
         new TracerProvider();
     }
 

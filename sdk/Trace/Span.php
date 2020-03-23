@@ -48,7 +48,7 @@ class Span implements API\Span
         $this->parentSpanContext = $parentSpanContext;
         $this->start = (new Clock())->millitime();
         $this->statusCode = API\SpanStatus::OK;
-        $this->statusDescription = null;
+        $this->statusDescription = API\SpanStatus::DESCRIPTION[$this->statusCode];
 
         // todo: set these to null until needed
         $this->attributes = new Attributes();
@@ -60,7 +60,7 @@ class Span implements API\Span
         return clone $this->spanContext;
     }
 
-    public function getParentContext(): ?API\SpanContext
+    public function getParent(): ?API\SpanContext
     {
         // todo: Spec says a parent is a Span, SpanContext, or null -> should we implement this here?
         return $this->parentSpanContext !== null ? clone $this->parentSpanContext : null;
@@ -70,10 +70,11 @@ class Span implements API\Span
     {
         $this->statusCode = $code;
         $this->statusDescription = $description ?? self::DESCRIPTION[$code] ?? self::DESCRIPTION[self::UNKNOWN];
+
         return $this;
     }
 
-    public function end( string $timestamp = null): API\Span
+    public function end(string $timestamp = null): API\Span
     {
         if (!isset($this->end)) {
             $this->end = $timestamp ?? (new Clock())->millitime();
@@ -187,11 +188,6 @@ class Span implements API\Span
         }
     }
 
-    public function getParent(): ?API\SpanContext
-    {
-        // TODO: Implement getParent() method.
-    }
-
     public function getLinks(): API\Links
     {
         // TODO: Implement getLinks() method.
@@ -209,6 +205,7 @@ class Span implements API\Span
     public function getSpanKind(): int
     {
         // TODO: Implement getSpanKind() method.
+        return API\SpanKind::KIND_INTERNAL;
     }
 
     public function getCanonicalStatusCode(): int

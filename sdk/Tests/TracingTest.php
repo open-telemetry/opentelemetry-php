@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Tests;
 
+use OpenTelemetry\Sdk\Trace as SDK;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\SpanContext;
@@ -61,9 +62,9 @@ class TracingTest extends TestCase
 
         $guard->end();
 
-        $this->assertEquals($connection->getParentContext(), $guard->getContext());
-        $this->assertEquals($procedure->getParentContext(), $connection->getContext());
-        $this->assertEquals($policy->getParentContext(), $guard->getContext());
+        $this->assertEquals($connection->getParent(), $guard->getContext());
+        $this->assertEquals($procedure->getParent(), $connection->getContext());
+        $this->assertEquals($policy->getParent(), $guard->getContext());
 
         $this->assertCount(5, $tracer->getSpans());
     }
@@ -76,7 +77,7 @@ class TracingTest extends TestCase
         $mysql = $tracer->createSpan('mysql');
         $this->assertSame($tracer->getActiveSpan(), $mysql);
         $this->assertSame($global->getContext()->getTraceId(), $mysql->getContext()->getTraceId());
-        $this->assertEquals($mysql->getParentContext(), $global->getContext());
+        $this->assertEquals($mysql->getParent(), $global->getContext());
         $this->assertNotNull($mysql->getStartTimestamp());
         $this->assertTrue($mysql->isRecording());
         $this->assertNull($mysql->getDuration());
@@ -119,7 +120,12 @@ class TracingTest extends TestCase
 
     public function testSpanAttributesApi()
     {
+        /**
+         * @var SDK\Span
+         */
         $span = (new Tracer())->getActiveSpan();
+
+        self::assertInstanceOf(SDK\Span::class, $span);
 
         // set attributes
         $span->replaceAttributes(['username' => 'nekufa']);
@@ -212,9 +218,9 @@ class TracingTest extends TestCase
         $tracer = new Tracer();
         $global = $tracer->getActiveSpan();
         $request = $tracer->createSpan('request');
-        $this->assertSame($request->getParentContext()->getSpanId(), $global->getContext()->getSpanId());
-        $this->assertNull($global->getParentContext());
-        $this->assertNotNull($request->getParentContext());
+        $this->assertSame($request->getParent()->getSpanId(), $global->getContext()->getSpanId());
+        $this->assertNull($global->getParent());
+        $this->assertNotNull($request->getParent());
     }
 
     public function testZipkinConverter()

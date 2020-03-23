@@ -31,6 +31,9 @@ class Tracer implements API\Tracer
         $this->spanProcessors = $spanProcessors;
     }
 
+    /**
+     * @return Span
+     */
     public function getActiveSpan(): API\Span
     {
         while (count($this->tail) && $this->active->getEndTimestamp()) {
@@ -94,7 +97,8 @@ class Tracer implements API\Tracer
         return $this->spans;
     }
 
-    public function endActiveSpan(?string $timestamp = null) {
+    public function endActiveSpan(?string $timestamp = null)
+    {
         // todo: should processors be called before or after end()?
         if ($this->getActiveSpan()->isRecording()) {
             foreach ($this->spanProcessors as $spanProcessor) {
