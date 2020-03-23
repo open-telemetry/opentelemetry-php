@@ -16,7 +16,7 @@ class Span implements API\Span
 
     private $start;
     private $end;
-    private $statusCode = API\SpanStatus::UNKNOWN;
+    private $statusCode = API\SpanStatus::OK;
 
     /** @var string  */
     private $statusDescription = API\SpanStatus::DESCRIPTION[API\SpanStatus::UNKNOWN];
@@ -66,11 +66,18 @@ class Span implements API\Span
         return $this->parentSpanContext !== null ? clone $this->parentSpanContext : null;
     }
 
-    public function end(int $statusCode = API\SpanStatus::OK, ?string $statusDescription = null, string $timestamp = null): self
+    public function setSpanStatus(int $code, ?string $description = null): API\Span
     {
-        $this->end = $timestamp ?? (new Clock())->millitime();
-        $this->statusCode = $statusCode;
-        $this->statusDescription = $statusDescription ?? self::DESCRIPTION[$statusCode] ?? self::DESCRIPTION[self::UNKNOWN];
+        $this->statusCode = $code;
+        $this->statusDescription = $description ?? self::DESCRIPTION[$code] ?? self::DESCRIPTION[self::UNKNOWN];
+        return $this;
+    }
+
+    public function end( string $timestamp = null): API\Span
+    {
+        if (!isset($this->end)) {
+            $this->end = $timestamp ?? (new Clock())->millitime();
+        }
 
         return $this;
     }

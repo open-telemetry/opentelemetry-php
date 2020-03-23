@@ -48,6 +48,20 @@ interface Span extends SpanStatus, SpanKind
      */
     public function updateName(string $name): Span;
 
+    /**
+     * Sets the Status of the Span. If used, this will override the default Span status, which is OK.
+     * Only the value of the last call will be recorded, and implementations are free to ignore previous calls.
+     * @param int $code
+     * @param string|null $description
+     * @return Span Must return $this
+     */
+    public function setSpanStatus(int $code, ?string $description = null): Span;
+
+    /**
+     * @param string|null $timestamp
+     * @return Span Must return $this
+     */
+    public function end(?string $timestamp = null): Span;
+
     // TODO: addLazyEvent
-    // TODO: end(), though why is this allowed on the span? I thought Tracers were responsible for this?
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Integration;
+namespace OpenTelemetry\Sdk\Tests;
 
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
@@ -86,11 +86,12 @@ class TracingTest extends TestCase
         $this->assertNotNull($mysql->getDuration());
 
         $duration = $mysql->getDuration();
-        $this->assertSame($duration, $mysql->getDuration());
-        $mysql->end();
-        $this->assertGreaterThan($duration, $mysql->getDuration());
 
-        $this->assertTrue($mysql->getStatus()->isStatusOK());
+        // subsequent calls to end should be ignored
+        $mysql->end();
+        self::assertSame($duration, $mysql->getDuration());
+
+        self::assertTrue($mysql->isStatusOK());
         
         // active span rolled back
         $this->assertSame($tracer->getActiveSpan(), $global);
@@ -98,24 +99,22 @@ class TracingTest extends TestCase
         // active span should be kept for global span
         $global->end();
         $this->assertSame($tracer->getActiveSpan(), $global);
-        $this->assertTrue($global->getStatus()->isStatusOK());
+        self::assertTrue($global->isStatusOK());
     }
 
     public function testStatusManipulation()
     {
         $tracer = new Tracer();
 
-        $cancelled = $tracer->createSpan('cancelled');
-        $cancelled->end(SpanStatus::CANCELLED);
-        $this->assertFalse($cancelled->getStatus()->isStatusOK());
-        $this->assertSame($cancelled->getStatus()->getCanonicalStatusCode(), SpanStatus::CANCELLED);
-        $this->assertSame($cancelled->getStatus()->getStatusDescription(), SpanStatus::DESCRIPTION[SpanStatus::CANCELLED]);
+        $cancelled = $tracer->createSpan('cancelled')
+            ->setSpanStatus(SpanStatus::CANCELLED)
+            ->end();
+        self::assertFalse($cancelled->isStatusOK());
+        self::assertSame(SpanStatus::CANCELLED, $cancelled->getCanonicalStatusCode());
+        self::assertSame(SpanStatus::DESCRIPTION[SpanStatus::CANCELLED], $cancelled->getStatusDescription());
 
-        // code -1 shouldn't ever exist
-        $noDescription = SpanStatus::new(-1);
-        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNKNOWN], $noDescription->getStatusDescription());
-
-        $this->assertCount(2, $tracer->getSpans());
+        // todo: hold up, _two_?
+        self::assertCount(2, $tracer->getSpans());
     }
 
     public function testSpanAttributesApi()

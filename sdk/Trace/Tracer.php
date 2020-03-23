@@ -25,6 +25,8 @@ class Tracer implements API\Tracer
     public function __construct(iterable $spanProcessors = [], API\SpanContext $context = null)
     {
         $context = $context ?: SpanContext::generate();
+
+        // todo: hold up, why do we automatically make a root Span?
         $this->active = $this->generateSpanInstance('tracer', $context);
         $this->spanProcessors = $spanProcessors;
     }
@@ -92,18 +94,15 @@ class Tracer implements API\Tracer
         return $this->spans;
     }
 
-    public function endActiveSpan(
-        int $statusCode = API\SpanStatus::OK,
-        ?string $statusDescription = null,
-        float $timestamp = null
-    ) {
+    public function endActiveSpan(?string $timestamp = null) {
+        // todo: should processors be called before or after end()?
         if ($this->getActiveSpan()->isRecording()) {
             foreach ($this->spanProcessors as $spanProcessor) {
                 $spanProcessor->onEnd($this->getActiveSpan());
             }
         }
 
-        $this->getActiveSpan()->end($statusCode, $statusDescription, $timestamp);
+        $this->getActiveSpan()->end($timestamp);
     }
 
     private function generateSpanInstance($name, API\SpanContext $context): Span

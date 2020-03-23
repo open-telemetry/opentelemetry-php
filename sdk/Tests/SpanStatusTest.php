@@ -2,22 +2,24 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Sdk\Trace;
+namespace OpenTelemetry\Sdk\Tests\Trace;
 
-use PHPUnit\Framework\TestCase;
+use OpenTelemetry\Sdk\Trace\SpanStatus;
 
-class SpanStatusTest extends TestCase
+class SpanStatusTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetCanonicalCode()
     {
+        // todo: what's the point of SpanStatus::UNKNOWN if an unknown code gets propagated as some other code?
         $status = SpanStatus::new(99);
-        $this->assertEquals(99, $status->getStatusDescription());
+        self::assertEquals(99, $status->getCanonicalStatusCode());
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNKNOWN], $status->getStatusDescription());
     }
 
     public function testGetDescription()
     {
         $status = SpanStatus::new(99, 'Neunundneunzig Luftballons');
-        $this->assertEquals('Neunundneunzig Luftballons', $status->getStatusDescription());
+        self::assertEquals('Neunundneunzig Luftballons', $status->getStatusDescription());
     }
 
     public function testIsOKReturnsTrueForOkStatus()
