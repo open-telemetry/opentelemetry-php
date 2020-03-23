@@ -11,7 +11,7 @@ use StdClass;
 
 class TracerProviderTest extends \PHPUnit\Framework\TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         // since a singleton is tested we need to reset instance after every test
         $refProperty = new ReflectionProperty(TracerProvider::class, 'instance');
@@ -51,12 +51,11 @@ class TracerProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test
      * @dataProvider wrongConfigurationDataProvider
-     * @expectedException \TypeError
      */
-    public function shouldThrowExceptionIfConfigurationParamsAreInvalid($spanProcessors)
+    public function testShouldThrowExceptionIfConfigurationParamsAreInvalid($spanProcessors)
     {
+        $this->expectException(\TypeError::class);
         TracerProvider::getInstance($spanProcessors);
     }
 
