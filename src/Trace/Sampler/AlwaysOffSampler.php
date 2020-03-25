@@ -4,28 +4,37 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace\Sampler;
 
+use OpenTelemetry\Context\SpanContext;
+
 /**
- * This implementation of the SamplerInterface always returns false.
+ * This implementation of the SamplerInterface always skips record.
  * Example:
  * ```
- * use OpenTelemetry\Traceing\Sampler\NeverSampleSampler;
- * $sampler = new NeverSampleSampler();
+ * use OpenTelemetry\Trace\Sampler\AlwaysOffSampler;
+ * $sampler = new AlwaysOffSampler();
  * ```
  */
 class AlwaysOffSampler implements Sampler
 {
     /**
      * Returns false because we never want to sample.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function shouldSample(): bool
+    public function shouldSample(
+        ?SpanContext $parentContext,
+        string $traceId,
+        string $spanId,
+        string $spanName,
+        /* SpanKind $spanKind, */
+        array $attributes = [],
+        array $links = []
+    ): SamplingResult
     {
-        return false;
+        return new SamplingResult(SamplingResult::NOT_RECORD);
     }
 
     public function getDescription(): string
     {
-        return self::class;
+        return "AlwaysOffSampler";
     }
 }
