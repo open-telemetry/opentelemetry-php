@@ -25,20 +25,19 @@ class AlwaysParentSampler implements Sampler
         string $traceId,
         string $spanId,
         string $spanName,
-        /* SpanKind $spanKind, */
+        // SpanKind $spanKind,
         array $attributes = [],
         array $links = []
-    ): SamplingResult
-    {
-        if (!is_null($parentContext) && $parentContext->isSampled()) {
+    ): SamplingResult {
+        if (null !== $parentContext && $parentContext->isSampled()) {
             return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED);
-        } else {
-            return new SamplingResult(SamplingResult::NOT_RECORD);
         }
+
+        return new SamplingResult(SamplingResult::NOT_RECORD);
     }
 
     public function getDescription(): string
     {
-        return "AlwaysParentSampler";
+        return 'AlwaysParentSampler';
     }
 }

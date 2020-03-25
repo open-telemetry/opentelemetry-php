@@ -25,16 +25,15 @@ class AlwaysOffSampler implements Sampler
         string $traceId,
         string $spanId,
         string $spanName,
-        /* SpanKind $spanKind, */
+        // SpanKind $spanKind,
         array $attributes = [],
         array $links = []
-    ): SamplingResult
-    {
+    ): SamplingResult {
         return new SamplingResult(SamplingResult::NOT_RECORD);
     }
 
     public function getDescription(): string
     {
-        return "AlwaysOffSampler";
+        return 'AlwaysOffSampler';
     }
 }

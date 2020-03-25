@@ -39,12 +39,11 @@ class ProbabilitySampler implements Sampler
         string $traceId,
         string $spanId,
         string $spanName,
-        /* SpanKind $spanKind, */
+        // SpanKind $spanKind,
         array $attributes = [],
         array $links = []
-    ): SamplingResult
-    {
-        if (!is_null($parentContext) && $parentContext->isSampled()) {
+    ): SamplingResult {
+        if (null !== $parentContext && $parentContext->isSampled()) {
             return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED);
         }
 
@@ -52,11 +51,12 @@ class ProbabilitySampler implements Sampler
         $decision = (lcg_value() < $this->probability)
             ? SamplingResult::RECORD_AND_SAMPLED
             : SamplingResult::NOT_RECORD;
+
         return new SamplingResult($decision);
     }
 
     public function getDescription(): string
     {
-        return sprintf("%s{%.6f}", "ProbabilitySampler", $this->probability);
+        return sprintf('%s{%.6f}', 'ProbabilitySampler', $this->probability);
     }
 }

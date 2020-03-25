@@ -15,9 +15,9 @@ class AlwaysOnTest extends TestCase
         $sampler = new AlwaysOnSampler();
         $decision = $sampler->shouldSample(
             null,
-            "4bf92f3577b34da6a3ce929d0e0e4736",
-            "00f067aa0ba902b7",
-            "test.opentelemetry.io"
+            '4bf92f3577b34da6a3ce929d0e0e4736',
+            '00f067aa0ba902b7',
+            'test.opentelemetry.io'
         );
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLED, $decision->getDecision());
     }
@@ -25,6 +25,6 @@ class AlwaysOnTest extends TestCase
     public function testAlwaysOnSamplerDescription()
     {
         $sampler = new AlwaysOnSampler();
-        $this->assertEquals("AlwaysOnSampler", $sampler->getDescription());
+        $this->assertEquals('AlwaysOnSampler', $sampler->getDescription());
     }
 }

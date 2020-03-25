@@ -25,16 +25,15 @@ class AlwaysOnSampler implements Sampler
         string $traceId,
         string $spanId,
         string $spanName,
-        /* SpanKind $spanKind, */
+        // SpanKind $spanKind,
         array $attributes = [],
         array $links = []
-    ): SamplingResult
-    {
+    ): SamplingResult {
         return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED);
     }
 
     public function getDescription(): string
     {
-        return "AlwaysOnSampler";
+        return 'AlwaysOnSampler';
     }
 }
