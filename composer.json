@@ -15,16 +15,23 @@
         {
             "name": "Dmitry Krokhin",
             "email": "nekufa@gmail.com"
+        },
+        {
+            "name": "Levi Morrison",
+            "email": "levim@php.net"
         }
     ],
     "autoload": {
         "psr-4": {
-            "OpenTelemetry\\": "src/"
+            "OpenTelemetry\\Trace\\": "api/Trace",
+            "OpenTelemetry\\Sdk\\Internal\\": "sdk/Internal",
+            "OpenTelemetry\\Sdk\\Trace\\": "sdk/Trace"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Opentelemetry\\Tests\\": "test/"
+            "OpenTelemetry\\Sdk\\Tests\\": "sdk/Tests",
+            "OpenTelemetry\\Tests\\": "test/"
         }
     },
     "require-dev": {

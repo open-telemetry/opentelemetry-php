@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Tracing\Sampler;
 
-use OpenTelemetry\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\Sdk\Trace\AlwaysOnSampler;
 use PHPUnit\Framework\TestCase;
 
 class AlwaysOnTest extends TestCase

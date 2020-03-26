@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Trace;
 
-use OpenTelemetry\Trace\SpanProcessor\SpanProcessor;
-use OpenTelemetry\Trace\Tracer;
+use OpenTelemetry\Sdk\Trace\SpanProcessor;
+use OpenTelemetry\Sdk\Trace\Tracer;
 use PHPUnit\Framework\TestCase;
 
 class TracerTest extends TestCase
@@ -20,7 +20,7 @@ class TracerTest extends TestCase
 
         $tracer = new Tracer([$processor]);
 
-        $tracer->createSpan('test.span');
+        $tracer->startAndActivateSpan('test.span');
     }
 
     /**
@@ -34,7 +34,7 @@ class TracerTest extends TestCase
 
         $tracer = new Tracer([$processor]);
 
-        $tracer->createSpan('test.span');
+        $tracer->startAndActivateSpan('test.span');
         $tracer->endActiveSpan();
     }
 }
