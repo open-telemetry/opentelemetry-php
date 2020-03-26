@@ -42,8 +42,7 @@ return [
     //
     // Note that the **only** effect of choosing `'5.6'` is to infer that functions removed in php 7.0 exist.
     // (See `backward_compatibility_checks` for additional options)
-    // Automatically inferred from composer.json requirement for "php" of "^7.1"
-    'target_php_version' => '7.1',
+    'target_php_version' => '7.2',
 
     // If enabled, missing properties will be created when
     // they are first seen. If false, we'll report an
@@ -357,7 +356,8 @@ return [
     // Thus, both first-party and third-party code being used by
     // your application should be included in this list.
     'directory_list' => [
-        'src',
+        'api',
+        'sdk',
         'vendor/composer/xdebug-handler/src',
         'vendor/phan/phan/src/Phan',
         'vendor/phpunit/phpunit/src',
