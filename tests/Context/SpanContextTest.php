@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Context;
 
 use InvalidArgumentException;
-use OpenTelemetry\Context\SpanContext;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use PHPUnit\Framework\TestCase;
 
 class SpanContextTest extends TestCase
@@ -40,19 +40,19 @@ class SpanContextTest extends TestCase
     public function testValidSpan(): void
     {
         $spanContext = new SpanContext('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', 1);
-        $this->assertTrue($spanContext->isValid());
+        $this->assertTrue($spanContext->isValidContext());
     }
 
     public function testContextIsRemoteFromRestore(): void
     {
         $spanContext = SpanContext::restore('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', true);
-        $this->assertTrue($spanContext->isRemote());
+        $this->assertTrue($spanContext->isRemoteContext());
     }
 
     public function testContextIsNotRemoteFromConstructor(): void
     {
         $spanContext = new SpanContext('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', 1);
-        $this->assertFalse($spanContext->isRemote());
+        $this->assertFalse($spanContext->isRemoteContext());
     }
 
     public function testSampledSpan(): void
@@ -76,7 +76,7 @@ class SpanContextTest extends TestCase
     public function testGenerateReturnsNonSampledValidContext()
     {
         $spanContext = SpanContext::generate();
-        $this->assertTrue($spanContext->isValid());
+        $this->assertTrue($spanContext->isValidContext());
         $this->assertFalse($spanContext->isSampled());
     }
 }

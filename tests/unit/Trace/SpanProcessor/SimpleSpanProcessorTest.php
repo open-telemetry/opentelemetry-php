@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Trace\SpanProcessor;
 
-use OpenTelemetry\Exporter\Exporter;
-use OpenTelemetry\Trace\Span;
-use OpenTelemetry\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\Sdk\Trace\Exporter;
+use OpenTelemetry\Sdk\Trace\SimpleSpanProcessor;
+use OpenTelemetry\Sdk\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
 class SimpleSpanProcessorTest extends TestCase
