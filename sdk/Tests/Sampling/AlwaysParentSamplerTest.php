@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Tracing\Sampler;
+namespace OpenTelemetry\Tests\Unit\Tracing\Sampling;
 
-use OpenTelemetry\Context\SpanContext;
-use OpenTelemetry\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\Trace\Sampler\AlwaysParentSampler;
-use OpenTelemetry\Trace\Sampler\SamplingResult;
+use OpenTelemetry\Sdk\Trace\Sampling\AlwaysOnSampler;
+use OpenTelemetry\Sdk\Trace\Sampling\AlwaysParentSampler;
+use OpenTelemetry\Sdk\Trace\Sampling\SamplingResult;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use PHPUnit\Framework\TestCase;
 
 class AlwaysParentTest extends TestCase

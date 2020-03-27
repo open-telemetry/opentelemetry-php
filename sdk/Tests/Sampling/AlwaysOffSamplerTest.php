@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Tracing\Sampler;
+namespace OpenTelemetry\Tests\Unit\Tracing\Sampling;
 
-use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOffSampler;
-use OpenTelemetry\Sdk\Trace\Sampler\SamplingResult;
+use OpenTelemetry\Sdk\Trace\Sampling\AlwaysOffSampler;
+use OpenTelemetry\Sdk\Trace\Sampling\SamplingResult;
 use PHPUnit\Framework\TestCase;
 
 class AlwaysOffSamplerTest extends TestCase

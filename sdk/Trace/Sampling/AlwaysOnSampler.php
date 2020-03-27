@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Sdk\Trace\Sampler;
+namespace OpenTelemetry\Sdk\Trace\Sampling;
 
-use OpenTelemetry\Context\SpanContext;
+use OpenTelemetry\Trace as API;
 
 /**
  * This implementation of the SamplerInterface always records.
@@ -21,11 +21,11 @@ class AlwaysOnSampler implements Sampler
      * {@inheritdoc}
      */
     public function shouldSample(
-        ?SpanContext $parentContext,
+        ?API\SpanContext $parentContext,
         string $traceId,
         string $spanId,
         string $spanName,
-        // SpanKind $spanKind,
+        // API\SpanKind $spanKind,
         array $attributes = [],
         array $links = []
     ): SamplingResult {

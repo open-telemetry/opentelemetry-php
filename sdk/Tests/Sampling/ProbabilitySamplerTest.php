@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Tracing\Sampler;
+namespace OpenTelemetry\Tests\Unit\Tracing\Sampling;
 
-use OpenTelemetry\Trace\Sampler\ProbabilitySampler;
-use OpenTelemetry\Trace\Sampler\SamplingResult;
+use OpenTelemetry\Sdk\Trace\Sampling\ProbabilitySampler;
+use OpenTelemetry\Sdk\Trace\Sampling\SamplingResult;
 use PHPUnit\Framework\TestCase;
 
 class ProbabilitySamplerTest extends TestCase

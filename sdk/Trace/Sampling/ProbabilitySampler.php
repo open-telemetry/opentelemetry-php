@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Trace\Sampler;
+namespace OpenTelemetry\Sdk\Trace\Sampling;
 
-use OpenTelemetry\Context\SpanContext;
+use OpenTelemetry\Trace as API;
 
 /**
  * This implementation of the SamplerInterface records with given probability.
@@ -35,15 +35,15 @@ class ProbabilitySampler implements Sampler
      * {@inheritdoc}
      */
     public function shouldSample(
-        ?SpanContext $parentContext,
+        ?API\SpanContext $parentContext,
         string $traceId,
         string $spanId,
         string $spanName,
-        // SpanKind $spanKind,
+        // API\SpanKind $spanKind,
         array $attributes = [],
         array $links = []
     ): SamplingResult {
-        if (null !== $parentContext && $parentContext->isSampled()) {
+        if (null !== $parentContext && ($parentContext->getTraceFlags() & API\SpanContext::TRACE_FLAG_SAMPLED)) {
             return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED);
         }
 

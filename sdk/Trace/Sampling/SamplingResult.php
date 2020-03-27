@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Trace\Sampler;
+namespace OpenTelemetry\Sdk\Trace\Sampling;
 
 /**
  * Class SamplingResult
