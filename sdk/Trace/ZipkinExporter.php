@@ -15,22 +15,14 @@ use OpenTelemetry\Trace as API;
  */
 class ZipkinExporter implements Exporter
 {
-
-    /**
-     * @var $endpoint array to send Spans to
-     */
-    private $endpoint;
+    /** @var string */
+    private $endpointUrl;
+    /** @var string */
     private $name;
 
-    public function __construct($name, string $endpointDsn)
+    public function __construct($name, string $endpointUrl)
     {
-        $parsedDsn = parse_url($endpointDsn);
-
-        if (!is_array($parsedDsn)) {
-            throw new InvalidArgumentException('Unable to parse provided DSN');
-        }
-
-        $this->setEndpoint($parsedDsn);
+        $this->setEndpoint($endpointUrl);
         $this->name = $name;
     }
 
@@ -61,7 +53,7 @@ class ZipkinExporter implements Exporter
                 ],
             ];
             $context = stream_context_create($contextOptions);
-            file_get_contents($this->getEndpointUrl(), false, $context);
+            file_get_contents($this->endpointUrl, false, $context);
         } catch (Exception $e) {
             return Exporter::FAILED_RETRYABLE;
         }
@@ -117,43 +109,38 @@ class ZipkinExporter implements Exporter
     /**
      * Gets the configured endpoint for the Zipkin exporter
      *
-     * @return array |null
+     * @return string |null
      */
-    public function getEndpoint(): ?array
+    public function getEndpoint(): ?string
     {
-        return $this->endpoint;
+        return $this->endpointUrl;
     }
 
     /**
      * Sets the configured endpoint for the zipkin exportedr
      *
-     * @param array $endpoint
+     * @param string $endpointUrl
      * @return $this
      */
-    public function setEndpoint(array $endpoint) : self
+    public function setEndpoint(string $endpointUrl) : self
     {
-        if (!isset($endpoint['scheme'])
-            || !isset($endpoint['host'])
-            || !isset($endpoint['port'])
-            || !isset($endpoint['path'])
+        $parsedDsn = parse_url($endpointUrl);
+
+        if (!is_array($parsedDsn)) {
+            throw new InvalidArgumentException('Unable to parse provided DSN');
+        }
+
+        if (!isset($parsedDsn['scheme'])
+            || !isset($parsedDsn['host'])
+            || !isset($parsedDsn['port'])
+            || !isset($parsedDsn['path'])
         ) {
             throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
         }
 
-        $this->endpoint = $endpoint;
+        $this->endpointUrl = $endpointUrl;
 
         return $this;
-    }
-
-    protected function getEndpointUrl(): string
-    {
-        return sprintf(
-            '%s://%s:%s%s',
-            $this->endpoint['scheme'],
-            $this->endpoint['host'],
-            $this->endpoint['port'],
-            $this->endpoint['path']
-        );
     }
 
     public function shutdown(): void
