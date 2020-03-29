@@ -3,16 +3,16 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
+use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Sampling\AlwaysOffSampler;
 use OpenTelemetry\Sdk\Trace\Sampling\SamplingResult;
-use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 
 $sampler = new AlwaysOffSampler();
 $samplingResult = $sampler->shouldSample(
     null,
-    md5((string)microtime(true)),
-    substr(md5((string)microtime(true)), 16),
+    md5((string) microtime(true)),
+    substr(md5((string) microtime(true)), 16),
     'io.opentelemetry.example'
 );
 
