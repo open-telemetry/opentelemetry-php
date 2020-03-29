@@ -3,20 +3,27 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\Sdk\Trace\AlwaysOnSampler;
+use OpenTelemetry\Sdk\Trace\Sampling\AlwaysOnSampler;
+use OpenTelemetry\Sdk\Trace\Sampling\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Sdk\Trace\ZipkinExporter;
 
-$sampler = (new AlwaysOnSampler())->shouldSample();
+$sampler = new AlwaysOnSampler();
+$samplingResult = $sampler->shouldSample(
+    null,
+    md5((string)microtime(true)),
+    substr(md5((string)microtime(true)), 16),
+    'io.opentelemetry.example'
+);
 
 $zipkinExporter = new ZipkinExporter(
     'alwaysOnExporter',
     'http://zipkin:9411/api/v2/spans'
 );
 
-if ($sampler) {
+if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
     echo 'Starting AlwaysOnTraceExample';
     $tracer = (TracerProvider::getInstance(
         [new SimpleSpanProcessor($zipkinExporter)]

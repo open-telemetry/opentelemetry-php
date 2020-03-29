@@ -3,12 +3,20 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\Sdk\Trace\AlwaysOffSampler;
+use OpenTelemetry\Sdk\Trace\Sampling\AlwaysOffSampler;
+use OpenTelemetry\Sdk\Trace\Sampling\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 
-$sampler = (new AlwaysOffSampler())->shouldSample();
-if ($sampler) {
+$sampler = new AlwaysOffSampler();
+$samplingResult = $sampler->shouldSample(
+    null,
+    md5((string)microtime(true)),
+    substr(md5((string)microtime(true)), 16),
+    'io.opentelemetry.example'
+);
+
+if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult) {
     $tracer = TracerProvider::getInstance()
         ->getTracer('io.opentelemetry.contrib.php');
 
