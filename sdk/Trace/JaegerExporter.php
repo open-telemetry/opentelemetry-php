@@ -6,18 +6,18 @@ namespace OpenTelemetry\Sdk\Trace;
 
 use Exception;
 use InvalidArgumentException;
-
 use OpenTelemetry\Trace as API;
 
-/**
- * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
- * @package OpenTelemetry\Exporter
- */
-class ZipkinExporter implements Exporter
+class JaegerExporter implements Exporter
 {
+    const IMPLEMENTED_FORMATS = [
+        '/api/v1/spans',
+        '/api/v2/spans',
+    ];
+
     /** @var string */
     private $endpointUrl;
-    /** @var int */
+    /** @var string */
     private $endpointPort;
     /** @var string */
     private $name;
@@ -55,7 +55,8 @@ class ZipkinExporter implements Exporter
                 ],
             ];
             $context = stream_context_create($contextOptions);
-            @file_get_contents($this->getEndpoint(), false, $context);
+
+            @file_get_contents($this->endpointUrl, false, $context);
         } catch (Exception $e) {
             return Exporter::FAILED_RETRYABLE;
         }
@@ -109,7 +110,7 @@ class ZipkinExporter implements Exporter
     }
 
     /**
-     * Gets the configured endpoint for the Zipkin exporter
+     * Gets the configured endpoint
      *
      * @return string |null
      */
@@ -119,12 +120,12 @@ class ZipkinExporter implements Exporter
     }
 
     /**
-     * Sets the configured endpoint for the zipkin exportedr
+     * Sets the configured endpoint
      *
      * @param string $endpointUrl
      * @return $this
      */
-    public function setEndpoint(string $endpointUrl) : self
+    private function setEndpoint(string $endpointUrl) : self
     {
         $parsedDsn = parse_url($endpointUrl);
 
@@ -140,7 +141,11 @@ class ZipkinExporter implements Exporter
             throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
         }
 
-        $this->endpointPort = $parsedDsn['port'];
+        if (!in_array($parsedDsn['path'], self::IMPLEMENTED_FORMATS)) {
+            throw new InvalidArgumentException(
+                sprintf("Current implementation supports only '%s' format", implode(' or ', self::IMPLEMENTED_FORMATS))
+            );
+        }
 
         $this->endpointUrl = $endpointUrl;
 

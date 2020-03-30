@@ -5,21 +5,21 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use OpenTelemetry\Sdk\Trace\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\Attributes;
+use OpenTelemetry\Sdk\Trace\JaegerExporter;
 use OpenTelemetry\Sdk\Trace\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
-use OpenTelemetry\Sdk\Trace\ZipkinExporter;
 
 $sampler = (new AlwaysOnSampler())->shouldSample();
 
-$zipkinExporter = new ZipkinExporter(
-    'alwaysOnExporter',
-    'http://zipkin:9411/api/v2/spans'
+$exporter = new JaegerExporter(
+    'jaegerExporterExample',
+    'http://jaeger:9412/api/v2/spans'
 );
 
 if ($sampler) {
-    echo 'Starting AlwaysOnTraceExample';
+    echo 'Starting JaegerExporterExample';
     $tracer = (TracerProvider::getInstance(
-        [new SimpleSpanProcessor($zipkinExporter)]
+        [new SimpleSpanProcessor($exporter)]
     ))
         ->getTracer('io.opentelemetry.contrib.php');
 
@@ -27,7 +27,7 @@ if ($sampler) {
 
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
-        $span = $tracer->startAndActivateSpan('session.generate.span.' . time());
+        $span = $tracer->startAndActivateSpan('session.generate.span' . time());
         $tracer->setActiveSpan($span);
 
         $span->setAttribute('remote_ip', '1.2.3.4')
@@ -43,7 +43,7 @@ if ($sampler) {
 
         $tracer->endActiveSpan();
     }
-    echo PHP_EOL . 'AlwaysOnTraceExample complete!  See the results at http://localhost:9411/';
+    echo PHP_EOL . 'JaegerExporterExample complete!  See the results at http://localhost:16686/';
 } else {
     echo PHP_EOL . 'Sampling is not enabled';
 }

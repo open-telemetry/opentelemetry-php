@@ -28,5 +28,7 @@ if ($sampler) {
     $span->end(); // pass status as an optional argument
     print_r($span);  // print the span as a resulting output
 } else {
-    echo 'Sampling is not enabled';
+    echo PHP_EOL . 'Sampling is not enabled';
 }
+
+echo PHP_EOL;
