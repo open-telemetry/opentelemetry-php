@@ -10,9 +10,7 @@ use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
 use OpenTelemetry\Sdk\Trace\Tracer;
-use OpenTelemetry\Sdk\Trace\ZipkinExporter;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 
 class TracingTest extends TestCase
 {
@@ -221,35 +219,5 @@ class TracingTest extends TestCase
         $this->assertSame($request->getParent()->getSpanId(), $global->getContext()->getSpanId());
         $this->assertNull($global->getParent());
         $this->assertNotNull($request->getParent());
-    }
-
-    public function testZipkinConverter()
-    {
-        $tracer = new Tracer();
-        $span = $tracer->startAndActivateSpan('guard.validate');
-        $span->setAttribute('service', 'guard');
-        $span->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']));
-        $span->end();
-
-        $method = new ReflectionMethod(ZipkinExporter::class, 'convertSpan');
-        $method->setAccessible(true);
-
-        $exporter = new ZipkinExporter(
-            'test.name',
-            'http://host:123/path'
-        );
-
-        $row = $method->invokeArgs($exporter, ['span' => $span]);
-        $this->assertSame($row['name'], $span->getSpanName());
-
-        self::assertCount(1, $row['tags']);
-        self::assertEquals($span->getAttribute('service')->getValue(), $row['tags']['service']);
-
-        self::assertCount(1, $row['annotations']);
-        [$annotation] = $row['annotations'];
-        self::assertEquals('validators.list', $annotation['value']);
-
-        [$event] = \iterator_to_array($span->getEvents());
-        self::assertEquals($event->getTimestamp(), $annotation['timestamp']);
     }
 }

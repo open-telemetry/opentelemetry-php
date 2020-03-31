@@ -12,15 +12,6 @@ class ZipkinExporterTest extends TestCase
 {
     /**
      * @test
-     */
-    public function shouldParseAnValidDsn()
-    {
-        $exporter = new ZipkinExporter('test.zipkin', 'scheme://host:1234/path');
-        $this->assertEquals('scheme://host:1234/path', $exporter->getEndpoint());
-    }
-
-    /**
-     * @test
      * @dataProvider invalidDsnDataProvider
      */
     public function shouldThrowExceptionIfInvalidDsnIsPassed($invalidDsn)

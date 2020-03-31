@@ -12,15 +12,6 @@ class JaegerExporterTest extends TestCase
 {
     /**
      * @test
-     */
-    public function shouldParseAnValidDsn()
-    {
-        $exporter = new JaegerExporter('test.zipkin', 'scheme://host:9412/api/v2/spans');
-        $this->assertEquals('scheme://host:9412/api/v2/spans', $exporter->getEndpoint());
-    }
-
-    /**
-     * @test
      * @dataProvider invalidDsnDataProvider
      */
     public function shouldThrowExceptionIfInvalidDsnIsPassed($invalidDsn)
