@@ -10,14 +10,14 @@ use OpenTelemetry\Trace as API;
  * This implementation of the SamplerInterface always records.
  * Example:
  * ```
- * use OpenTelemetry\Sdk\Trace\AlwaysOnSampler;
- * $sampler = new AlwaysOnSampler();
+ * use OpenTelemetry\Trace\AlwaysParentSampler;
+ * $sampler = new AlwaysParentSampler();
  * ```
  */
-class AlwaysOnSampler implements Sampler
+class AlwaysParentSampler implements Sampler
 {
     /**
-     * Returns true because we always want to sample.
+     * Returns `RECORD_AND_SAMPLED` if SampledFlag is set to true on parent SpanContext and `NOT_RECORD` otherwise.
      * {@inheritdoc}
      */
     public function shouldSample(
@@ -30,11 +30,15 @@ class AlwaysOnSampler implements Sampler
         ?API\Links $links = null
     ): SamplingResult {
         // todo: hook up $attributes and $links
-        return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED);
+        if (null !== $parentContext && ($parentContext->getTraceFlags() & API\SpanContext::TRACE_FLAG_SAMPLED)) {
+            return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED);
+        }
+
+        return new SamplingResult(SamplingResult::NOT_RECORD);
     }
 
     public function getDescription(): string
     {
-        return 'AlwaysOnSampler';
+        return 'AlwaysParentSampler';
     }
 }
