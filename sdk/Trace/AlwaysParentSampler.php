@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Sdk\Trace\Sampling;
+namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Trace as API;
 
@@ -10,7 +10,7 @@ use OpenTelemetry\Trace as API;
  * This implementation of the SamplerInterface always records.
  * Example:
  * ```
- * use OpenTelemetry\Trace\Sampler\AlwaysParentSampler;
+ * use OpenTelemetry\Trace\AlwaysParentSampler;
  * $sampler = new AlwaysParentSampler();
  * ```
  */
@@ -26,9 +26,10 @@ class AlwaysParentSampler implements Sampler
         string $spanId,
         string $spanName,
         // API\SpanKind $spanKind,
-        array $attributes = [],
-        array $links = []
+        ?API\Attributes $attributes = null,
+        ?API\Links $links = null
     ): SamplingResult {
+        // todo: hook up $attributes and $links
         if (null !== $parentContext && ($parentContext->getTraceFlags() & API\SpanContext::TRACE_FLAG_SAMPLED)) {
             return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED);
         }

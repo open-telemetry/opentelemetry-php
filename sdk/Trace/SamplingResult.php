@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Sdk\Trace\Sampling;
+namespace OpenTelemetry\Sdk\Trace;
 
-/**
- * Class SamplingResult
- * @package OpenTelemetry\Trace\Sampler
- */
-class SamplingResult
+use OpenTelemetry\Trace as API;
+
+final class SamplingResult
 {
     /**
      * Span will not be recorded and all events and attributes will be dropped
@@ -31,32 +29,28 @@ class SamplingResult
     private $decision;
 
     /**
-     * @var array A set of span Attributes that will also be added to the Span.
+     * @var ?API\Attributes A set of span Attributes that will also be added to the Span.
      */
     private $attributes;
 
-    public function __construct(int $decision, array $attributes = [])
+    public function __construct(int $decision, ?API\Attributes $attributes = null)
     {
         $this->decision = $decision;
         $this->attributes = $attributes;
     }
 
     /**
-     * Return sampling decision whether span should be recorder or not.
-     *
-     * @return int
+     * Return sampling decision whether span should be recorded or not.
      */
-    public function getDecision()
+    public function getDecision(): int
     {
         return $this->decision;
     }
 
     /**
-     * Return tags which will be attached to the span.
-     *
-     * @return array
+     * Return attributes which will be attached to the span.
      */
-    public function getAttributes(): array
+    public function getAttributes(): ?API\Attributes
     {
         return $this->attributes;
     }
