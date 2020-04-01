@@ -21,8 +21,8 @@ interface Sampler
      *                        Typically in situations when the Span to be created starts a new Trace.
      * @param string $spanId SpanId of the Span to be created.
      * @param string $spanName Name of the Span to be created.
-     * @param array $attributes Initial set of Attributes for the Span being constructed.
-     * @param array $links Collection of links that will be associated with the Span to be created.
+     * @param API\Attributes|null $attributes Initial set of Attributes for the Span being constructed.
+     * @param API\Links|null $links Collection of links that will be associated with the Span to be created.
      *                     Typically useful for batch operations.
      *                     @see https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#links-between-spans
      * @return SamplingResult
