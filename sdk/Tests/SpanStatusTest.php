@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Sdk\Tests\Trace;
+namespace OpenTelemetry\Sdk\Tests;
 
 use OpenTelemetry\Sdk\Trace\SpanStatus;
+use PHPUnit\Framework\TestCase;
 
-class SpanStatusTest extends \PHPUnit\Framework\TestCase
+class SpanStatusTest extends TestCase
 {
     public function testGetCanonicalCode()
     {

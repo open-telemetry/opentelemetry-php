@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Sdk\Trace\Sampling;
+namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Trace as API;
 
@@ -10,7 +10,7 @@ use OpenTelemetry\Trace as API;
  * This implementation of the SamplerInterface always skips record.
  * Example:
  * ```
- * use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOffSampler;
+ * use OpenTelemetry\Sdk\Trace\AlwaysOffSampler;
  * $sampler = new AlwaysOffSampler();
  * ```
  */
@@ -26,8 +26,8 @@ class AlwaysOffSampler implements Sampler
         string $spanId,
         string $spanName,
         // API\SpanKind $spanKind,
-        array $attributes = [],
-        array $links = []
+        ?API\Attributes $attributes = null,
+        ?API\Links $links = null
     ): SamplingResult {
         return new SamplingResult(SamplingResult::NOT_RECORD);
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Sdk\Trace\Sampling;
+namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Trace as API;
 
@@ -33,8 +33,8 @@ interface Sampler
         string $spanId,
         string $spanName,
         /* API\SpanKind $spanKind, */ // TODO: missing SpanKind class
-        array $attributes = [],
-        array $links = []
+        ?API\Attributes $attributes = null,
+        ?API\Links $links = null
     ): SamplingResult;
 
     /**

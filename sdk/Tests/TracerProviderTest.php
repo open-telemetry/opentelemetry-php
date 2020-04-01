@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Tests;
 
 use OpenTelemetry\Sdk\Trace\TracerProvider;
+use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionProperty;
 use StdClass;
+use TypeError;
 
-class TracerProviderTest extends \PHPUnit\Framework\TestCase
+class TracerProviderTest extends TestCase
 {
     public function tearDown(): void
     {
@@ -21,7 +24,7 @@ class TracerProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldNotBeAbleToInstantiateDirectly()
     {
-        $this->expectException(\ReflectionException::class);
+        $this->expectException(ReflectionException::class);
         // use reflection to silence phan warning about calling private constructor
         $class = new ReflectionClass(TracerProvider::class);
         $class->newInstance();
@@ -55,7 +58,7 @@ class TracerProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testShouldThrowExceptionIfConfigurationParamsAreInvalid($spanProcessors)
     {
-        $this->expectException(\TypeError::class);
+        $this->expectException(TypeError::class);
         TracerProvider::getInstance($spanProcessors);
     }
 
