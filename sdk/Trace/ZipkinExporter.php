@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use Exception;
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use InvalidArgumentException;
 
@@ -59,7 +58,6 @@ class ZipkinExporter implements Exporter
             $headers = ['content-type' => 'application/json'];
             $request = new Request('POST', $this->endpointUrl, $headers, $json);
             $response = $client->send($request, ['timeout' => 2]);
-
         } catch (Exception $e) {
             return Exporter::FAILED_RETRYABLE;
         }
