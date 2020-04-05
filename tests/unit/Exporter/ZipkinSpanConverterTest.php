@@ -22,7 +22,7 @@ class ZipkinSpanConverterTest extends TestCase
         $span->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']));
         $span->end();
 
-        $converter = new SpanConverter('test.name', 'http://host:123/path');
+        $converter = new SpanConverter('test.name');
         $row = $converter->convert($span);
 
         $this->assertSame($span->getContext()->getSpanId(), $row['id']);
