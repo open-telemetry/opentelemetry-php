@@ -9,8 +9,8 @@ interface Attribute
     public function getKey(): string;
 
     /**
-     * 
-     * @return bool|int|float|string|list<int>|list<float> 
+     *
+     * @return bool|int|float|string|list<int>|list<float>
      *
      */
     public function getValue();
