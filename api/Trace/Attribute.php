@@ -10,7 +10,7 @@ interface Attribute
 
     /**
      *
-     * @return bool|int|float|string|list<int>|list<float>
+     * @return bool|int|float|string|list<int>|list<float>|list<string>
      *
      */
     public function getValue();
