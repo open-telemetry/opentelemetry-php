@@ -100,14 +100,18 @@ class Tracer implements API\Tracer
 
     public function endActiveSpan(?string $timestamp = null)
     {
-        // todo: should processors be called before or after end()?
-        if ($this->getActiveSpan()->isRecording()) {
+        /**
+         * a span should be ended before is sent to exporters, because the exporters need's span duration.
+         */
+        $span = $this->getActiveSpan();
+        $wasRecording = $span->isRecording();
+        $span->end();
+
+        if ($wasRecording) {
             foreach ($this->spanProcessors as $spanProcessor) {
-                $spanProcessor->onEnd($this->getActiveSpan());
+                $spanProcessor->onEnd($span);
             }
         }
-
-        $this->getActiveSpan()->end($timestamp);
     }
 
     private function generateSpanInstance($name, API\SpanContext $context): Span

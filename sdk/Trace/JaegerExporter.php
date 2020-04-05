@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use Exception;
-use GuzzleHttp\Psr7\Request;
 use InvalidArgumentException;
-
 use OpenTelemetry\Sdk\Trace\Zipkin\SpanConverter;
 use OpenTelemetry\Trace as API;
 
-/**
- * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
- * @package OpenTelemetry\Exporter
- */
-class ZipkinExporter implements Exporter
+class JaegerExporter implements Exporter
 {
+    const IMPLEMENTED_FORMATS = [
+        '/api/v1/spans',
+        '/api/v2/spans',
+    ];
+
     /**
      * @var string
      */
@@ -29,18 +28,24 @@ class ZipkinExporter implements Exporter
 
     public function __construct($name, string $endpointUrl, SpanConverter $spanConverter = null)
     {
-        $parsedDsn = parse_url($endpointUrl);
+        $url = parse_url($endpointUrl);
 
-        if (!is_array($parsedDsn)) {
+        if (!is_array($url)) {
             throw new InvalidArgumentException('Unable to parse provided DSN');
         }
 
-        if (!isset($parsedDsn['scheme'])
-            || !isset($parsedDsn['host'])
-            || !isset($parsedDsn['port'])
-            || !isset($parsedDsn['path'])
+        if (!isset($url['scheme'])
+            || !isset($url['host'])
+            || !isset($url['port'])
+            || !isset($url['path'])
         ) {
             throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
+        }
+
+        if (!in_array($url['path'], self::IMPLEMENTED_FORMATS)) {
+            throw new InvalidArgumentException(
+                sprintf("Current implementation supports only '%s' format", implode(' or ', self::IMPLEMENTED_FORMATS))
+            );
         }
 
         $this->endpointUrl = $endpointUrl;
@@ -67,12 +72,15 @@ class ZipkinExporter implements Exporter
 
         try {
             $json = json_encode($convertedSpans);
-            $url = $this->getEndpointUrl();
-            $client = new \GuzzleHttp\Client();
-            $headers = ['content-type' => 'application/json'];
-            $request = new Request('POST', $url, $headers, $json);
-            $response = $client->send($request, ['timeout' => 30]);
-
+            $contextOptions = [
+                'http' => [
+                    'method' => 'POST',
+                    'header' => 'Content-Type: application/json',
+                    'content' => $json,
+                ],
+            ];
+            $context = stream_context_create($contextOptions);
+            @file_get_contents($this->endpointUrl, false, $context);
         } catch (Exception $e) {
             return Exporter::FAILED_RETRYABLE;
         }
