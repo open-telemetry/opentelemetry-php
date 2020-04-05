@@ -25,6 +25,11 @@ class Attribute implements API\Attribute
 
     public function getValue()
     {
+        /**
+        * 
+        * @return bool|int|float|string|list<int>|list<float> 
+        *
+        */
         return $this->value;
     }
 }
