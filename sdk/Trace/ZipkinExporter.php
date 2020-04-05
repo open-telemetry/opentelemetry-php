@@ -72,7 +72,6 @@ class ZipkinExporter implements Exporter
             $headers = ['content-type' => 'application/json'];
             $request = new Request('POST', $url, $headers, $json);
             $response = $client->send($request, ['timeout' => 30]);
-
         } catch (Exception $e) {
             return Exporter::FAILED_RETRYABLE;
         }
