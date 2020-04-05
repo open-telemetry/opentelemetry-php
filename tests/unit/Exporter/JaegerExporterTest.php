@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Exporter;
 
 use InvalidArgumentException;
-use OpenTelemetry\Sdk\Trace\ZipkinExporter;
+use OpenTelemetry\Sdk\Trace\JaegerExporter;
 use PHPUnit\Framework\TestCase;
 
-class ZipkinExporterTest extends TestCase
+class JaegerExporterTest extends TestCase
 {
     /**
      * @test
@@ -18,7 +18,7 @@ class ZipkinExporterTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new ZipkinExporter('test.zipkin', $invalidDsn);
+        new JaegerExporter('test.zipkin', $invalidDsn);
     }
 
     public function invalidDsnDataProvider()
@@ -31,6 +31,7 @@ class ZipkinExporterTest extends TestCase
             'invalid port' => ['scheme://host:port/path'],
             'invalid scheme' => ['1234://host:port/path'],
             'invalid host' => ['scheme:///end:1234/path'],
+            'unimplemented path' => ['scheme:///host:1234/api/v1/spans'],
         ];
     }
 }
