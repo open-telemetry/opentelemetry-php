@@ -54,9 +54,10 @@ class ZipkinExporter implements Exporter
 
         try {
             $json = json_encode($convertedSpans);
+            $url = $this->getEndpointUrl();
             $client = new \GuzzleHttp\Client();
             $headers = ['content-type' => 'application/json'];
-            $request = new Request('POST', $this->endpointUrl, $headers, $json);
+            $request = new Request('POST', $url, $headers, $json);
             $response = $client->send($request, ['timeout' => 2]);
         } catch (Exception $e) {
             return Exporter::FAILED_RETRYABLE;
