@@ -9,6 +9,7 @@ test:
 phan:
 	$(DC_RUN_PHP) env PHAN_DISABLE_XDEBUG_WARN=1 php ./vendor/bin/phan
 examples: FORCE
+	docker-compose up -d
 	$(DC_RUN_PHP) php ./examples/AlwaysOnTraceExample.php
 	$(DC_RUN_PHP) php ./examples/AlwaysOffTraceExample.php
 	$(DC_RUN_PHP) php ./examples/JaegerExporterExample.php
