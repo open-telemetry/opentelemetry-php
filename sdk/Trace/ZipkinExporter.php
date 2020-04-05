@@ -58,7 +58,7 @@ class ZipkinExporter implements Exporter
             $client = new \GuzzleHttp\Client();
             $headers = ['content-type' => 'application/json'];
             $request = new Request('POST', $url, $headers, $json);
-            $response = $client->send($request, ['timeout' => 2]);
+            $response = $client->send($request, ['timeout' => 30]);
         } catch (Exception $e) {
             return Exporter::FAILED_RETRYABLE;
         }
