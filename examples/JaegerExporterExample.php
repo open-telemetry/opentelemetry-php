@@ -9,7 +9,12 @@ use OpenTelemetry\Sdk\Trace\JaegerExporter;
 use OpenTelemetry\Sdk\Trace\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 
-$sampler = (new AlwaysOnSampler())->shouldSample();
+$sampler = (new AlwaysOnSampler())->shouldSample(
+    null,
+    md5((string) microtime(true)),
+    substr(md5((string) microtime(true)), 16),
+    'io.opentelemetry.jagerexporterexample'
+);
 
 $exporter = new JaegerExporter(
     'jaegerExporterExample',

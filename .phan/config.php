@@ -360,6 +360,7 @@ return [
         'sdk',
         'vendor/composer/xdebug-handler/src',
         'vendor/phan/phan/src/Phan',
+        'vendor/guzzlehttp',
         'vendor/phpunit/phpunit/src',
     ],
 
