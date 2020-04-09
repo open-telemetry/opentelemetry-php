@@ -28,8 +28,8 @@ class SpanConverter
                 'serviceName' => $this->serviceName,
             ],
             'name' => $span->getSpanName(),
-            'timestamp' => (int) ((float) $span->getStartTimestamp() * 1000),
-            'duration' => (int) ((float) $span->getEndTimestamp() * 1000 - (float) $span->getStartTimestamp() * 1000),
+            'timestamp' => $span->getStartTimestamp(),
+            'duration' => $span->getEndTimestamp() - $span->getStartTimestamp(),
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
@@ -48,7 +48,7 @@ class SpanConverter
                 $row['annotations'] = [];
             }
             $row['annotations'][] = [
-                'timestamp' => (int) round((float) $event->getTimestamp() * 1000),
+                'timestamp' => $event->getTimestamp(),
                 'value' => $event->getName(),
             ];
         }

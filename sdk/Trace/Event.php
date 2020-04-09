@@ -14,7 +14,7 @@ class Event implements API\Event
     private $attributes;
 
     // todo: pick datatype for timestamp
-    public function __construct(string $name, ?API\Attributes $attributes = null, string $timestamp = null)
+    public function __construct(string $name, ?API\Attributes $attributes = null, int $timestamp = null)
     {
         if (null === $timestamp) {
             $timestamp = (new Clock())->millitime();
@@ -41,7 +41,7 @@ class Event implements API\Event
         return $this->name;
     }
 
-    public function getTimestamp(): string
+    public function getTimestamp(): int
     {
         return $this->timestamp;
     }

@@ -74,7 +74,7 @@ class Span implements API\Span
         return $this;
     }
 
-    public function end(string $timestamp = null): API\Span
+    public function end(int $timestamp = null): API\Span
     {
         if (!isset($this->end)) {
             $this->end = $timestamp ?? (new Clock())->millitime();
@@ -83,19 +83,19 @@ class Span implements API\Span
         return $this;
     }
 
-    public function setStartTimestamp(string $timestamp): Span
+    public function setStartTimestamp(int $timestamp): Span
     {
         $this->start = $timestamp;
 
         return $this;
     }
 
-    public function getStartTimestamp(): string
+    public function getStartTimestamp(): int
     {
         return $this->start;
     }
 
-    public function getEndTimestamp(): ?string
+    public function getEndTimestamp(): ?int
     {
         return $this->end;
     }
@@ -112,13 +112,13 @@ class Span implements API\Span
         return null === $this->end;
     }
 
-    public function getDuration(): ?string
+    public function getDuration(): ?int
     {
         if (!$this->end) {
             return null;
         }
 
-        return (string) ((float) $this->end - (float) $this->start);
+        return (int) $this->end - $this->start;
     }
 
     public function getSpanName(): string
@@ -163,7 +163,7 @@ class Span implements API\Span
     }
 
     // todo: is accepting an Iterator enough to satisfy AddLazyEvent?  -> Looks like the spec might have been updated here: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-events
-    public function addEvent(string $name, ?API\Attributes $attributes = null, ?string $timestamp = null): API\Span
+    public function addEvent(string $name, ?API\Attributes $attributes = null, ?int $timestamp = null): API\Span
     {
         // todo: really throw if not recording?
         $this->throwIfNotRecording();

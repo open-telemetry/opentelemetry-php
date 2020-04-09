@@ -359,6 +359,7 @@ return [
         'api',
         'sdk',
         'vendor/composer/xdebug-handler/src',
+        'vendor/guzzlehttp',
         'vendor/phan/phan/src/Phan',
         'vendor/phpunit/phpunit/src',
     ],

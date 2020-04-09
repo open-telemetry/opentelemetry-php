@@ -12,10 +12,10 @@ class Clock
     {
     }
 
-    public function millitime(): string
+    public function millitime(): int
     {
         $millitime = microtime(true) * 1000;
 
-        return (string) $millitime;
+        return (int) \round($millitime);
     }
 }

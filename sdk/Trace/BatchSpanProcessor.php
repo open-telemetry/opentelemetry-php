@@ -22,11 +22,11 @@ class BatchSpanProcessor implements SpanProcessor
     /**
      * @var int
      */
-    private $scheduledDelayMillis;
+    private $scheduledDelayMicros;
     /**
      * @var int
      */
-    private $exporterTimeoutMillis;
+    private $exporterTimeoutMicros;
     /**
      * @var int
      */
@@ -49,8 +49,8 @@ class BatchSpanProcessor implements SpanProcessor
         Exporter $exporter,
         Clock $clock,
         int $maxQueueSize = 2048,
-        int $scheduledDelayMillis = 5000,
-        int $exporterTimeoutMillis = 30000,
+        int $scheduledDelayMicros = 500000,
+        int $exporterTimeoutMicros = 3000000,
         int $maxExportBatchSize = 512
     ) {
         if ($maxExportBatchSize > $maxQueueSize) {
@@ -59,8 +59,8 @@ class BatchSpanProcessor implements SpanProcessor
         $this->exporter = $exporter;
         $this->clock = $clock;
         $this->maxQueueSize = $maxQueueSize;
-        $this->scheduledDelayMillis = $scheduledDelayMillis;
-        $this->exporterTimeoutMillis = $exporterTimeoutMillis;
+        $this->scheduledDelayMicros = $scheduledDelayMicros;
+        $this->exporterTimeoutMicros = $exporterTimeoutMicros;
         $this->maxExportBatchSize = $maxExportBatchSize;
 
         $this->queue = [];
@@ -98,7 +98,7 @@ class BatchSpanProcessor implements SpanProcessor
     {
         $now = (int) \round((float) $this->clock->millitime());
 
-        return $this->scheduledDelayMillis < ($now - $this->lastExportTimestamp);
+        return $this->scheduledDelayMicros < ($now - $this->lastExportTimestamp);
     }
 
     /**
