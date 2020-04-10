@@ -14,7 +14,7 @@ class Clock
 
     public function millitime(): int
     {
-        $millitime = microtime(true) * 1000;
+        $millitime = microtime(true) * 1e+6;
 
         return (int) \round($millitime);
     }
