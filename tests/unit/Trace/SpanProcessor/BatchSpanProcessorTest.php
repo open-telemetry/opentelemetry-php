@@ -29,7 +29,7 @@ class BatchSpanProcessorTest extends TestCase
         $exporter->expects($this->at(0))->method('export')->with($spans);
 
         $clock = self::createMock(Clock::class);
-        $clock->method('millitime')->will($this->returnValue((string) ($exportDelay + 1)));
+        $clock->method('zipkinFormattedTime')->will($this->returnValue((string) ($exportDelay + 1)));
 
         $exporter->expects($this->atLeastOnce())->method('export');
 
@@ -50,7 +50,7 @@ class BatchSpanProcessorTest extends TestCase
         $exporter = self::createMock(Exporter::class);
         $exporter->expects($this->exactly(0))->method('export');
         $clock = self::createMock(Clock::class);
-        $clock->method('millitime')->will($this->returnValue((string) ($exportDelay + 1)));
+        $clock->method('zipkinFormattedTime')->will($this->returnValue((string) ($exportDelay + 1)));
 
         $processor = new BatchSpanProcessor($exporter, $clock, $batchSize, $exportDelay, 3000, $batchSize);
 
@@ -70,7 +70,7 @@ class BatchSpanProcessorTest extends TestCase
 
         $exportDelay = 2;
         $clock = self::createMock(Clock::class);
-        $clock->method('millitime')->will($this->returnValue((string) ($exportDelay - 1)));
+        $clock->method('zipkinFormattedTime')->will($this->returnValue((int) ($exportDelay - 1)));
 
         $processor = new BatchSpanProcessor($exporter, $clock, $batchSize, $exportDelay, 3000, $batchSize);
 

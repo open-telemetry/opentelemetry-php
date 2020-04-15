@@ -46,7 +46,7 @@ class Span implements API\Span
         $this->name = $name;
         $this->spanContext = $spanContext;
         $this->parentSpanContext = $parentSpanContext;
-        $this->start = (new Clock())->millitime();
+        $this->start = (new Clock())->zipkinFormattedTime();
         $this->statusCode = API\SpanStatus::OK;
         $this->statusDescription = API\SpanStatus::DESCRIPTION[$this->statusCode];
 
@@ -77,7 +77,7 @@ class Span implements API\Span
     public function end(int $timestamp = null): API\Span
     {
         if (!isset($this->end)) {
-            $this->end = $timestamp ?? (new Clock())->millitime();
+            $this->end = $timestamp ?? (new Clock())->zipkinFormattedTime();
         }
 
         return $this;

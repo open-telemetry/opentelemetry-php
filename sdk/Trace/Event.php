@@ -17,7 +17,7 @@ class Event implements API\Event
     public function __construct(string $name, ?API\Attributes $attributes = null, int $timestamp = null)
     {
         if (null === $timestamp) {
-            $timestamp = (new Clock())->millitime();
+            $timestamp = (new Clock())->zipkinFormattedTime();
         }
         $this->name = $name;
         $this->timestamp = $timestamp;

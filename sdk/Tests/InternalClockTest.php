@@ -15,7 +15,7 @@ class InternalClockTest extends TestCase
     public function testReturnetStringRepresentMilliseconds()
     {
         $clock = new Clock();
-        $milliseconds = $clock->millitime();
+        $milliseconds = $clock->zipkinFormattedTime();
 
         $this->assertGreaterThan(1e12, (float) $milliseconds);
     }

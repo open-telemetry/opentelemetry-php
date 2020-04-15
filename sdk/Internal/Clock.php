@@ -12,10 +12,10 @@ class Clock
     {
     }
 
-    public function millitime(): int
+    public function zipkinFormattedTime(): int
     {
-        $millitime = microtime(true) * 1e+6;
+        $zipkinTime = microtime(true) * 1e+6;
 
-        return (int) \round($millitime);
+        return (int) \round($zipkinTime);
     }
 }
