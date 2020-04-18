@@ -13,6 +13,7 @@ class Span implements API\Span
     private $name;
     private $spanContext;
     private $parentSpanContext;
+    private $spanKind;
 
     private $start;
     private $end;
@@ -24,9 +25,6 @@ class Span implements API\Span
     private $attributes;
     private $events;
     private $links = null;
-
-    // todo: missing span kind
-    // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#spankind
 
     // todo: missing links: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-links
 
@@ -41,11 +39,16 @@ class Span implements API\Span
     // each representing a single incoming item being processed in the batch.
     // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#links-between-spans
 
-    public function __construct(string $name, API\SpanContext $spanContext, ?API\SpanContext $parentSpanContext = null)
-    {
+    public function __construct(
+        string $name,
+        API\SpanContext $spanContext,
+        ?API\SpanContext $parentSpanContext = null,
+        int $spanKind = API\SpanKind::KIND_INTERNAL
+    ) {
         $this->name = $name;
         $this->spanContext = $spanContext;
         $this->parentSpanContext = $parentSpanContext;
+        $this->spanKind = $spanKind;
         $this->start = (new Clock())->millitime();
         $this->statusCode = API\SpanStatus::OK;
         $this->statusDescription = API\SpanStatus::DESCRIPTION[$this->statusCode];
@@ -218,8 +221,7 @@ class Span implements API\Span
 
     public function getSpanKind(): int
     {
-        // TODO: Implement getSpanKind() method.
-        return API\SpanKind::KIND_INTERNAL;
+        return $this->spanKind;
     }
 
     public function getCanonicalStatusCode(): int
