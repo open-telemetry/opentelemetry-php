@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace\Zipkin;
 
-use OpenTelemetry\Trace\Span;
+use OpenTelemetry\Sdk\Internal\Time;
+use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Trace as API;
 
 class SpanConverter
 {
@@ -18,7 +20,11 @@ class SpanConverter
         $this->serviceName = $serviceName;
     }
 
-    public function convert(Span $span)
+    /**
+     * @param API\Span|Span $span
+     * @return array
+     */
+    public function convert(API\Span $span)
     {
         $row = [
             'id' => $span->getContext()->getSpanId(),
@@ -28,8 +34,8 @@ class SpanConverter
                 'serviceName' => $this->serviceName,
             ],
             'name' => $span->getSpanName(),
-            'timestamp' => (int) ((float) $span->getStartTimestamp() * 1000),
-            'duration' => (int) ((float) $span->getEndTimestamp() * 1000 - (float) $span->getStartTimestamp() * 1000),
+            'timestamp' => $span->getStartTimestamp()->to(Time::MICROSECOND),
+            'duration' => $span->getDuration()->to(Time::MICROSECOND),
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
@@ -48,7 +54,7 @@ class SpanConverter
                 $row['annotations'] = [];
             }
             $row['annotations'][] = [
-                'timestamp' => (int) round((float) $event->getTimestamp() * 1000),
+                'timestamp' => $span->getStartTimestamp()->to(Time::MICROSECOND),
                 'value' => $event->getName(),
             ];
         }

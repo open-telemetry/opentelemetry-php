@@ -7,6 +7,9 @@ namespace OpenTelemetry\Sdk\Trace;
 use InvalidArgumentException;
 
 use OpenTelemetry\Sdk\Internal\Clock;
+use OpenTelemetry\Sdk\Internal\Duration;
+use OpenTelemetry\Sdk\Internal\Time;
+use OpenTelemetry\Sdk\Internal\Timestamp;
 use OpenTelemetry\Trace as API;
 
 class BatchSpanProcessor implements SpanProcessor
@@ -37,20 +40,20 @@ class BatchSpanProcessor implements SpanProcessor
     private $queue;
 
     /**
-     * @var int
+     * @var Timestamp
      */
-    private $lastExportTimestamp = 0;
+    private $lastExportTimestamp;
+
     /**
      * @var Clock
      */
     private $clock;
-
     public function __construct(
         Exporter $exporter,
         Clock $clock,
         int $maxQueueSize = 2048,
-        int $scheduledDelayMillis = 5000,
-        int $exporterTimeoutMillis = 30000,
+        int $scheduledDelayMillis = 5000, // 5s
+        int $exporterTimeoutMillis = 30000, // 30s
         int $maxExportBatchSize = 512
     ) {
         if ($maxExportBatchSize > $maxQueueSize) {
@@ -64,6 +67,7 @@ class BatchSpanProcessor implements SpanProcessor
         $this->maxExportBatchSize = $maxExportBatchSize;
 
         $this->queue = [];
+        $this->lastExportTimestamp = Timestamp::at(0);
     }
 
     /**
@@ -85,7 +89,7 @@ class BatchSpanProcessor implements SpanProcessor
         if ($this->bufferReachedExportLimit() && $this->enoughTimeHasPassed()) {
             $this->exporter->export($this->queue);
             $this->queue = [];
-            $this->lastExportTimestamp = (int) \round((float) $this->clock->millitime());
+            $this->lastExportTimestamp = $this->clock->now();
         }
     }
 
@@ -96,9 +100,12 @@ class BatchSpanProcessor implements SpanProcessor
 
     protected function enoughTimeHasPassed(): bool
     {
-        $now = (int) \round((float) $this->clock->millitime());
+        $timePassed = Duration::between(
+            $this->lastExportTimestamp,
+            $this->clock->now()
+        )->to(Time::MILLISECOND);
 
-        return $this->scheduledDelayMillis < ($now - $this->lastExportTimestamp);
+        return $this->scheduledDelayMillis < $timePassed;
     }
 
     /**

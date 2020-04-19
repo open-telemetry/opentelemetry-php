@@ -10,10 +10,10 @@ interface Events extends \IteratorAggregate, \Countable
      * Adding an event should not invalidate nor change any existing iterators.
      * @param string $name
      * @param Attributes|null $attributes
-     * @param string|null $timestamp
+     * @param Timestamp|null $timestamp
      * @return Events Must return $this to allow setting multiple attributes at once in a chain.
      */
-    public function addEvent(string $name, ?Attributes $attributes = null, ?string $timestamp = null): Events;
+    public function addEvent(string $name, ?Attributes $attributes = null, ?Timestamp $timestamp = null): Events;
 
     public function count(): int;
     public function getIterator(): EventsIterator;

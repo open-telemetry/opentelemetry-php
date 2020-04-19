@@ -21,10 +21,10 @@ interface SpanOptions
 
     /**
      * This should only be used if the creation time has already passed; will set timestamp to current time by default
-     * @param $timestamp
+     * @param Timestamp $timestamp
      * @return mixed
      */
-    public function addStartTimestamp($timestamp): SpanOptions;
+    public function addStartTimestamp(Timestamp $timestamp): SpanOptions;
 
     public function toSpan(): Span;
     // todo: how do we want to optionally let people make these spans active? bool arg, setActive, or toActiveSpan?

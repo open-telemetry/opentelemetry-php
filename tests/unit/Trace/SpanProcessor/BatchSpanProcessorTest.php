@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Trace\SpanProcessor;
 
 use OpenTelemetry\Sdk\Internal\Clock;
+use OpenTelemetry\Sdk\Internal\Time;
+use OpenTelemetry\Sdk\Internal\Timestamp;
 use OpenTelemetry\Sdk\Trace\BatchSpanProcessor;
 use OpenTelemetry\Sdk\Trace\Exporter;
 use OpenTelemetry\Sdk\Trace\Span;
@@ -29,7 +31,7 @@ class BatchSpanProcessorTest extends TestCase
         $exporter->expects($this->at(0))->method('export')->with($spans);
 
         $clock = self::createMock(Clock::class);
-        $clock->method('millitime')->will($this->returnValue((string) ($exportDelay + 1)));
+        $clock->method('now')->will($this->returnValue(Timestamp::at(($exportDelay + 1) * Time::MILLISECOND)));
 
         $exporter->expects($this->atLeastOnce())->method('export');
 
@@ -50,7 +52,7 @@ class BatchSpanProcessorTest extends TestCase
         $exporter = self::createMock(Exporter::class);
         $exporter->expects($this->exactly(0))->method('export');
         $clock = self::createMock(Clock::class);
-        $clock->method('millitime')->will($this->returnValue((string) ($exportDelay + 1)));
+        $clock->method('now')->will($this->returnValue(Timestamp::at(($exportDelay + 1) * Time::MILLISECOND)));
 
         $processor = new BatchSpanProcessor($exporter, $clock, $batchSize, $exportDelay, 3000, $batchSize);
 
@@ -70,7 +72,7 @@ class BatchSpanProcessorTest extends TestCase
 
         $exportDelay = 2;
         $clock = self::createMock(Clock::class);
-        $clock->method('millitime')->will($this->returnValue((string) ($exportDelay - 1)));
+        $clock->method('now')->will($this->returnValue(Timestamp::at(($exportDelay - 1) * Time::MILLISECOND)));
 
         $processor = new BatchSpanProcessor($exporter, $clock, $batchSize, $exportDelay, 3000, $batchSize);
 

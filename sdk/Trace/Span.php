@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use Exception;
-use OpenTelemetry\Sdk\Internal\Clock;
+use OpenTelemetry\Sdk\Internal\Duration;
+use OpenTelemetry\Sdk\Internal\Timestamp;
 use OpenTelemetry\Trace as API;
 
 class Span implements API\Span
@@ -14,7 +15,9 @@ class Span implements API\Span
     private $spanContext;
     private $parentSpanContext;
 
+    /** @var Timestamp|API\Timestamp */
     private $start;
+    /** @var Timestamp|API\Timestamp|null */
     private $end;
     private $statusCode = API\SpanStatus::OK;
 
@@ -46,7 +49,7 @@ class Span implements API\Span
         $this->name = $name;
         $this->spanContext = $spanContext;
         $this->parentSpanContext = $parentSpanContext;
-        $this->start = (new Clock())->millitime();
+        $this->start = Timestamp::now();
         $this->statusCode = API\SpanStatus::OK;
         $this->statusDescription = API\SpanStatus::DESCRIPTION[$this->statusCode];
 
@@ -74,28 +77,34 @@ class Span implements API\Span
         return $this;
     }
 
-    public function end(string $timestamp = null): API\Span
+    public function end(API\Timestamp $timestamp = null): API\Span
     {
         if (!isset($this->end)) {
-            $this->end = $timestamp ?? (new Clock())->millitime();
+            $this->end = $timestamp ?? Timestamp::now();
         }
 
         return $this;
     }
 
-    public function setStartTimestamp(string $timestamp): Span
+    public function setStartTimestamp(API\Timestamp $timestamp): Span
     {
         $this->start = $timestamp;
 
         return $this;
     }
 
-    public function getStartTimestamp(): string
+    /**
+     * @return Timestamp|API\Timestamp
+     */
+    public function getStartTimestamp(): API\Timestamp
     {
         return $this->start;
     }
 
-    public function getEndTimestamp(): ?string
+    /**
+     * @return Timestamp|API\Timestamp
+     */
+    public function getEndTimestamp(): ?API\Timestamp
     {
         return $this->end;
     }
@@ -112,13 +121,13 @@ class Span implements API\Span
         return null === $this->end;
     }
 
-    public function getDuration(): ?string
+    public function getDuration(): ?Duration
     {
         if (!$this->end) {
             return null;
         }
 
-        return (string) ((float) $this->end - (float) $this->start);
+        return Duration::between($this->start, $this->end);
     }
 
     public function getSpanName(): string
@@ -163,7 +172,7 @@ class Span implements API\Span
     }
 
     // todo: is accepting an Iterator enough to satisfy AddLazyEvent?  -> Looks like the spec might have been updated here: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-events
-    public function addEvent(string $name, ?API\Attributes $attributes = null, ?string $timestamp = null): API\Span
+    public function addEvent(string $name, ?API\Attributes $attributes = null, ?API\Timestamp $timestamp = null): API\Span
     {
         // todo: really throw if not recording?
         $this->throwIfNotRecording();

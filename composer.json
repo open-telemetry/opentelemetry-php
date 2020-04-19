@@ -5,6 +5,7 @@
     "license": "Apache-2.0",
     "require": {
         "php": "^7.2",
+        "php-64bit": "*",
         "ext-json": "*"
     },
     "authors": [

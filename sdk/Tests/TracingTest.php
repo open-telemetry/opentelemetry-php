@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Tests;
 
+use OpenTelemetry\Sdk\Internal\Time;
 use OpenTelemetry\Sdk\Trace as SDK;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
@@ -88,7 +89,7 @@ class TracingTest extends TestCase
 
         // subsequent calls to end should be ignored
         $mysql->end();
-        self::assertSame($duration, $mysql->getDuration());
+        self::assertEquals($duration->to(Time::NANOSECOND), $mysql->getDuration()->to(Time::NANOSECOND));
 
         self::assertTrue($mysql->isStatusOK());
         

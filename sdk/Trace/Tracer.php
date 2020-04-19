@@ -98,14 +98,14 @@ class Tracer implements API\Tracer
         return $this->spans;
     }
 
-    public function endActiveSpan(?string $timestamp = null)
+    public function endActiveSpan(?API\Timestamp $timestamp = null)
     {
         /**
          * a span should be ended before is sent to exporters, because the exporters need's span duration.
          */
         $span = $this->getActiveSpan();
         $wasRecording = $span->isRecording();
-        $span->end();
+        $span->end($timestamp);
 
         if ($wasRecording) {
             foreach ($this->spanProcessors as $spanProcessor) {
@@ -131,7 +131,7 @@ class Tracer implements API\Tracer
         return new SpanOptions($this, $name);
     }
 
-    public function finishSpan(API\Span $span, ?string $timestamp = null): void
+    public function finishSpan(API\Span $span, ?API\Timestamp $timestamp = null): void
     {
         // TODO: Implement finishSpan() method.
     }
