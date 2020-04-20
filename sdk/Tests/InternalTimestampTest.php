@@ -14,13 +14,17 @@ class InternalTimestampTest extends TestCase
     {
         $timestamp = Timestamp::now();
 
-        $this->assertGreaterThan(1e15, $timestamp->to(Time::NANOSECOND), 'Timestamp for current Unix time has at least 15 digits');
+        $this->assertGreaterThanOrEqual(
+            19,
+            strlen(sprintf('%d', $timestamp->to(Time::NANOSECOND))),
+            'Timestamp for current Unix time has at least 19 digits'
+        );
     }
 
     public function testAt()
     {
-        $timetamp = Timestamp::at(7);
+        $timestamp = Timestamp::at(7);
 
-        $this->assertEquals(7, $timetamp->to(Time::NANOSECOND));
+        $this->assertEquals(7, $timestamp->to(Time::NANOSECOND));
     }
 }
