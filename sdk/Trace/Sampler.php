@@ -21,6 +21,7 @@ interface Sampler
      *                        Typically in situations when the Span to be created starts a new Trace.
      * @param string $spanId SpanId of the Span to be created.
      * @param string $spanName Name of the Span to be created.
+     * @param int $spanKind Span kind.
      * @param API\Attributes|null $attributes Initial set of Attributes for the Span being constructed.
      * @param API\Links|null $links Collection of links that will be associated with the Span to be created.
      *                     Typically useful for batch operations.
@@ -32,7 +33,7 @@ interface Sampler
         string $traceId,
         string $spanId,
         string $spanName,
-        /* API\SpanKind $spanKind, */ // TODO: missing SpanKind class
+        int $spanKind,
         ?API\Attributes $attributes = null,
         ?API\Links $links = null
     ): SamplingResult;

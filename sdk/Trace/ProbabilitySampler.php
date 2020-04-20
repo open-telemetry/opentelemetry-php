@@ -39,7 +39,7 @@ class ProbabilitySampler implements Sampler
         string $traceId,
         string $spanId,
         string $spanName,
-        // API\SpanKind $spanKind,
+        int $spanKind,
         ?API\Attributes $attributes = null,
         ?API\Links $links = null
     ): SamplingResult {
