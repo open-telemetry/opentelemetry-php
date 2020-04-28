@@ -9,8 +9,9 @@ interface Attribute
     public function getKey(): string;
 
     /**
-     * @return bool|int|float|string|iterable Note: the iterable MUST be homogeneous, i.e. it MUST NOT contain values
-     *                                        of different types.
+     *
+     * @return bool|int|float|string|list<bool>|list<int>|list<float>|list<string>
+     *
      */
     public function getValue();
 }
