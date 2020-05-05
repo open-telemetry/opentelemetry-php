@@ -20,6 +20,11 @@ class SpanConverter
 
     public function convert(Span $span)
     {
+        $moment = $this->moment;
+        $start_realtime = $span->getStartTimestamp();
+        $end_realtime = $span->getEndTimestamp();
+        $elapsed_realtime = $end_realtime[1] - $start_realtime[1];
+
         $row = [
             'id' => $span->getContext()->getSpanId(),
             'traceId' => $span->getContext()->getTraceId(),
@@ -28,8 +33,8 @@ class SpanConverter
                 'serviceName' => $this->serviceName,
             ],
             'name' => $span->getSpanName(),
-            'timestamp' => (int) ((float) $span->getStartTimestamp() * 1000),
-            'duration' => (int) ((float) $span->getEndTimestamp() * 1000 - (float) $span->getStartTimestamp() * 1000),
+            'timestamp' => $moment[0] * 1000, // RealtimeClock
+            'duration' => $elapsed_realtime,
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
@@ -48,7 +53,7 @@ class SpanConverter
                 $row['annotations'] = [];
             }
             $row['annotations'][] = [
-                'timestamp' => (int) round((float) $event->getTimestamp() * 1000),
+                'timestamp' => $moment[1] * 1000,
                 'value' => $event->getName(),
             ];
         }

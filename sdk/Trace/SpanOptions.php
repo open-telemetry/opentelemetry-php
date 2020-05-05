@@ -17,7 +17,7 @@ final class SpanOptions implements API\SpanOptions
     private $attributes = null;
     private $links = null;
 
-    /** @var string|null */
+    /** @var Clock|null */
     private $start = null;
 
     public function __construct(Tracer $tracer, string $name)
@@ -67,9 +67,9 @@ final class SpanOptions implements API\SpanOptions
         return $this;
     }
 
-    public function addStartTimestamp($timestamp): API\SpanOptions
+    public function addStartTimestamp($moment): API\SpanOptions
     {
-        $this->start = $timestamp;
+        $this->start = $moment;
 
         return $this;
     }

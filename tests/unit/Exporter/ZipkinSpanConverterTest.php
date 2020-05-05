@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace unit\Exporter;
 
 use OpenTelemetry\Sdk\Trace\Attributes;
+use Opentelemetry\Trace as API;
 use OpenTelemetry\Sdk\Trace\Tracer;
 use OpenTelemetry\Sdk\Trace\Zipkin\SpanConverter;
 use PHPUnit\Framework\TestCase;

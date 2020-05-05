@@ -6,7 +6,6 @@ namespace OpenTelemetry\Sdk\Trace;
 
 use InvalidArgumentException;
 
-use OpenTelemetry\Sdk\Internal\Clock;
 use OpenTelemetry\Trace as API;
 
 class BatchSpanProcessor implements SpanProcessor
@@ -85,7 +84,7 @@ class BatchSpanProcessor implements SpanProcessor
         if ($this->bufferReachedExportLimit() && $this->enoughTimeHasPassed()) {
             $this->exporter->export($this->queue);
             $this->queue = [];
-            $this->lastExportTimestamp = (int) \round((float) $this->clock->millitime());
+            $this->lastExportTimestamp = $this->clock->moment()[1];
         }
     }
 
@@ -96,8 +95,8 @@ class BatchSpanProcessor implements SpanProcessor
 
     protected function enoughTimeHasPassed(): bool
     {
-        $now = (int) \round((float) $this->clock->millitime());
 
+        $now = $this->clock->moment()[1];
         return $this->scheduledDelayMillis < ($now - $this->lastExportTimestamp);
     }
 

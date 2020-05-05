@@ -8,5 +8,5 @@ interface Event
 {
     public function getName(): string;
     public function getAttributes(): Attributes;
-    public function getTimestamp(): ?string;
+    public function getTimestamp(): ?Clock;
 }

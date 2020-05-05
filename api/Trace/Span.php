@@ -9,8 +9,8 @@ interface Span extends SpanStatus, SpanKind
     public function getSpanName(): string;
     public function getContext(): SpanContext;
     public function getParent(): ?SpanContext;
-    public function getStartTimestamp(): string;
-    public function getEndTimestamp(): ?string;
+    public function getStartTimestamp(): Clock;
+    public function getEndTimestamp(): ?Clock;
     public function getAttributes(): Attributes;
     public function getLinks(): Links;
     public function getEvents(): Events;
@@ -29,10 +29,10 @@ interface Span extends SpanStatus, SpanKind
     /**
      * @param string $name
      * @param Attributes|null $attributes
-     * @param string|null $timestamp
+     * @param Clock|null $moment
      * @return Span Must return $this to allow setting multiple attributes at once in a chain.
      */
-    public function addEvent(string $name, ?Attributes $attributes = null, ?string $timestamp = null): Span;
+    public function addEvent(string $name, ?Attributes $attributes = null, ?Clock $moment = null): Span;
 
     /**
      * @param SpanContext $context
@@ -58,10 +58,10 @@ interface Span extends SpanStatus, SpanKind
     public function setSpanStatus(int $code, ?string $description = null): Span;
 
     /**
-     * @param string|null $timestamp
+     * @param Clock|null $moment
      * @return Span Must return $this
      */
-    public function end(?string $timestamp = null): Span;
+    public function end(Clock $moment = null): Span;
 
     // TODO: addLazyEvent
 }

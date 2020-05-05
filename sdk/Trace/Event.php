@@ -4,23 +4,21 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
-use OpenTelemetry\Sdk\Internal\Clock;
 use OpenTelemetry\Trace as API;
 
 class Event implements API\Event
 {
     private $name;
-    private $timestamp;
+    private $moment;
     private $attributes;
 
-    // todo: pick datatype for timestamp
-    public function __construct(string $name, ?API\Attributes $attributes = null, string $timestamp = null)
+    public function __construct(string $name, ?API\Attributes $attributes = null, API\Clock $moment = null)
     {
-        if (null === $timestamp) {
-            $timestamp = (new Clock())->millitime();
+        if (null === $moment) {
+            $moment = (new Clock())->moment();
         }
         $this->name = $name;
-        $this->timestamp = $timestamp;
+        $this->moment = $moment;
         $this->attributes = $attributes ?? new Attributes();
     }
 
@@ -41,8 +39,8 @@ class Event implements API\Event
         return $this->name;
     }
 
-    public function getTimestamp(): string
+    public function getTimestamp(): API\Clock
     {
-        return $this->timestamp;
+        return $this->moment;
     }
 }
