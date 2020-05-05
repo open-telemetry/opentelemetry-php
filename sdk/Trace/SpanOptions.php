@@ -17,7 +17,7 @@ final class SpanOptions implements API\SpanOptions
     private $attributes = null;
     private $links = null;
 
-    /** @var string|null */
+    /** @var int|null */
     private $start = null;
 
     public function __construct(Tracer $tracer, string $name)

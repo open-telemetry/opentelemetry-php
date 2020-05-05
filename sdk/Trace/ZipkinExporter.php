@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use Exception;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 use InvalidArgumentException;
-
 use OpenTelemetry\Sdk\Trace\Zipkin\SpanConverter;
 use OpenTelemetry\Trace as API;
 
@@ -34,7 +36,8 @@ class ZipkinExporter implements Exporter
             throw new InvalidArgumentException('Unable to parse provided DSN');
         }
 
-        if (!isset($parsedDsn['scheme'])
+        if (
+            !isset($parsedDsn['scheme'])
             || !isset($parsedDsn['host'])
             || !isset($parsedDsn['port'])
             || !isset($parsedDsn['path'])
@@ -53,7 +56,7 @@ class ZipkinExporter implements Exporter
      * @param iterable<API\Span> $spans Array of Spans
      * @return int return code, defined on the Exporter interface
      */
-    public function export(iterable $spans) : int
+    public function export(iterable $spans): int
     {
         if (empty($spans)) {
             return Exporter::SUCCESS;
@@ -65,16 +68,21 @@ class ZipkinExporter implements Exporter
         }
 
         try {
+            $container = [];
+            $history = Middleware::history($container);
+            $stack = HandlerStack::create();
+            // Add the history middleware to the handler stack.
+            $stack->push($history);
             $json = json_encode($convertedSpans);
-            $contextOptions = [
-                'http' => [
-                    'method' => 'POST',
-                    'header' => 'Content-Type: application/json',
-                    'content' => $json,
-                ],
-            ];
-            $context = stream_context_create($contextOptions);
-            @file_get_contents($this->endpointUrl, false, $context);
+            $client = new \GuzzleHttp\Client(['handler' => $stack]);
+            $headers = ['content-type' => 'application/json'];
+            $request = new Request('POST', $this->endpointUrl, $headers, $json);
+            $response = $client->send($request, ['timeout' => 30]);
+
+            /* Used for debugging output for exporters
+            foreach ((array) $container as $transaction) {
+                echo (string) $transaction['request']->getBody();
+            } */
         } catch (Exception $e) {
             return Exporter::FAILED_RETRYABLE;
         }
