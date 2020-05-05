@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace\Zipkin;
 
+use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Trace\Span;
 
 class SpanConverter
@@ -20,10 +21,10 @@ class SpanConverter
 
     public function convert(Span $span)
     {
-        $moment = $this->moment;
-        $start_realtime = $span->getStartTimestamp();
-        $end_realtime = $span->getEndTimestamp();
-        $elapsed_realtime = $end_realtime[1] - $start_realtime[1];
+        $moment = (new Clock())->moment();
+        $start_realtime = (int)($span->getStartTimestamp());
+        $end_realtime = (int)($span->getEndTimestamp());
+        $elapsed_realtime = $end_realtime - $start_realtime;
 
         $row = [
             'id' => $span->getContext()->getSpanId(),
@@ -33,7 +34,7 @@ class SpanConverter
                 'serviceName' => $this->serviceName,
             ],
             'name' => $span->getSpanName(),
-            'timestamp' => $moment[0] * 1000, // RealtimeClock
+            'timestamp' => $moment[0], // RealtimeClock
             'duration' => $elapsed_realtime,
         ];
 

@@ -8,7 +8,7 @@ interface Clock
     /**
      * A combination of the Monotonic and Realtime Clocks
      * Monotonic time value in the first slot, as it'll get accessed more frequently in duration calculations.
-     * @return Iterable
+     * @return array
      */
-    public function moment(): Iterable;
+    public function moment(): array;
 }
