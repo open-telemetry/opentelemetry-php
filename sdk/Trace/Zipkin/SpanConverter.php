@@ -54,7 +54,7 @@ class SpanConverter
                 $row['annotations'] = [];
             }
             $row['annotations'][] = [
-                'timestamp' => (int) ($timestamp / 1e3) // RealtimeClock in milliseconds
+                'timestamp' => (int) ($timestamp / 1e3), // RealtimeClock in milliseconds
                 'value' => $event->getName(),
             ];
         }
