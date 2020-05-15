@@ -9,13 +9,15 @@ use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Sdk\Trace\ZipkinExporter;
+use OpenTelemetry\Trace as API;
 
 $sampler = new AlwaysOnSampler();
 $samplingResult = $sampler->shouldSample(
     null,
     md5((string) microtime(true)),
     substr(md5((string) microtime(true)), 16),
-    'io.opentelemetry.example'
+    'io.opentelemetry.example',
+    API\SpanKind::KIND_INTERNAL
 );
 
 $zipkinExporter = new ZipkinExporter(

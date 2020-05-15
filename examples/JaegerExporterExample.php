@@ -8,8 +8,16 @@ use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\JaegerExporter;
 use OpenTelemetry\Sdk\Trace\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
+use OpenTelemetry\Trace as API;
 
-$sampler = (new AlwaysOnSampler())->shouldSample();
+$sampler = new AlwaysOnSampler();
+$samplingResult = $sampler->shouldSample(
+    null,
+    md5((string) microtime(true)),
+    substr(md5((string) microtime(true)), 16),
+    'io.opentelemetry.example',
+    API\SpanKind::KIND_INTERNAL
+);
 
 $exporter = new JaegerExporter(
     'jaegerExporterExample',
