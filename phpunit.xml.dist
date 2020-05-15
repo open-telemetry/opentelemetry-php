@@ -19,9 +19,6 @@
     </php>
 
     <testsuites>
-        <testsuite name="SDK">
-            <directory>./sdk/tests</directory>
-        </testsuite>
         <testsuite name="Unit Tests">
             <directory>./tests/unit</directory>
         </testsuite>
@@ -29,13 +26,9 @@
             <directory>./tests/integration</directory>
         </testsuite>
     </testsuites>
-
     <filter>
         <whitelist>
-            <directory>sdk</directory>
-            <exclude>
-                <directory>sdk/Tests</directory>
-            </exclude>
+            <directory>tests</directory>
         </whitelist>
     </filter>
 
