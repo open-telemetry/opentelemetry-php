@@ -10,13 +10,15 @@ use OpenTelemetry\Sdk\Trace\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
 
-$sampler = (new AlwaysOnSampler())->shouldSample(
+$sampler = new AlwaysOnSampler();
+$samplingResult = $sampler->shouldSample(
     null,
-    md5((string) (microtime(true))),
+    md5((string) microtime(true)),
     substr(md5((string) microtime(true)), 16),
-    'io.opentelemetry.jagerexporterexample',
+    'io.opentelemetry.example',
     API\SpanKind::KIND_INTERNAL
 );
+
 $exporter = new JaegerExporter(
     'jaegerExporterExample',
     'http://jaeger:9412/api/v2/spans'
