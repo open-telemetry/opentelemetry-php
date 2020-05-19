@@ -31,18 +31,22 @@ class TracingTest extends TestCase
 
     public function testTracerSpanContextRestore()
     {
-        $tracer = new Tracer();
+        // todo: stop making a new span when a trace is made and then use getTracer instead of new Tracer.
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = new Tracer($tracerProvider);
         $spanContext = $tracer->getActiveSpan()->getContext();
 
         $spanContext2 = SpanContext::restore($spanContext->getTraceId(), $spanContext->getSpanId());
-        $tracer2 = new Tracer([], $spanContext2);
+        $tracer2 = new Tracer($tracerProvider, $spanContext2);
 
         $this->assertSame($tracer->getActiveSpan()->getContext()->getTraceId(), $tracer2->getActiveSpan()->getContext()->getTraceId());
     }
 
     public function testSpanNameUpdate()
     {
-        $database = (new Tracer())->startAndActivateSpan('database');
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+        $database = $tracer->startAndActivateSpan('database');
         $this->assertSame($database->getSpanName(), 'database');
         $database->updateName('tarantool');
         $this->assertSame($database->getSpanName(), 'tarantool');
@@ -50,7 +54,8 @@ class TracingTest extends TestCase
 
     public function testNestedSpans()
     {
-        $tracer = new Tracer();
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = new Tracer($tracerProvider);
 
         $guard = $tracer->startAndActivateSpan('guard.validate');
         $connection = $tracer->startAndActivateSpan('guard.validate.connection');
@@ -69,7 +74,8 @@ class TracingTest extends TestCase
 
     public function testCreateSpan()
     {
-        $tracer = new Tracer();
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
         $global = $tracer->getActiveSpan();
 
         $mysql = $tracer->startAndActivateSpan('mysql');
@@ -103,7 +109,8 @@ class TracingTest extends TestCase
 
     public function testStatusManipulation()
     {
-        $tracer = new Tracer();
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
 
         $cancelled = $tracer->startAndActivateSpan('cancelled')
             ->setSpanStatus(SpanStatus::CANCELLED)
@@ -118,10 +125,12 @@ class TracingTest extends TestCase
 
     public function testSpanAttributesApi()
     {
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
         /**
          * @var SDK\Span
          */
-        $span = (new Tracer())->getActiveSpan();
+        $span = $tracer->getActiveSpan();
 
         self::assertInstanceOf(SDK\Span::class, $span);
 
@@ -176,7 +185,9 @@ class TracingTest extends TestCase
 
     public function testEventRegistration()
     {
-        $span = (new Tracer())->startAndActivateSpan('database');
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+        $span = $tracer->startAndActivateSpan('database');
         $eventAttributes = new Attributes([
             'space' => 'guard.session',
             'id' => 67235,
@@ -202,18 +213,10 @@ class TracingTest extends TestCase
         $this->assertCount(2, $span->getEvents());
     }
 
-    public function testBuilder()
-    {
-        $spanContext = SpanContext::generate();
-        $tracer = new Tracer([], $spanContext);
-
-        $this->assertInstanceOf(Tracer::class, $tracer);
-        $this->assertEquals($tracer->getActiveSpan()->getContext(), $spanContext);
-    }
-
     public function testParentSpanContext()
     {
-        $tracer = new Tracer();
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
         $global = $tracer->getActiveSpan();
         $request = $tracer->startAndActivateSpan('request');
         $this->assertSame($request->getParent()->getSpanId(), $global->getContext()->getSpanId());

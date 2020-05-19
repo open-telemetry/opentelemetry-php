@@ -108,8 +108,6 @@ class Span implements API\Span
         return SpanStatus::new($this->statusCode, $this->statusDescription);
     }
 
-    // I think this is too simple, see: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#isrecording
-    // -> This had an update this past month: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#isrecording
     public function isRecording(): bool
     {
         return null === $this->end;
