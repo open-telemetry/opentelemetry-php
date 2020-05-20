@@ -21,24 +21,24 @@ class Clock implements API\Clock
     public static function get()
     {
         if (!self::$instance) {
-        self::$instance = new Clock();
+            self::$instance = new Clock();
         }
-    return self::$instance;
+
+        return self::$instance;
     }
 
     public function moment(): array
     {
-        return [$this->monotonic_clock->now(), $this->realtime_clock->now()];
-
+        return [$this->realtime_clock->now(), $this->monotonic_clock->now()];
     }
 
     public function timestamp(): int
     {
-        return $this->monotonic_clock->now();
+        return $this->realtime_clock->now();
     }
 
     public function now(): int
     {
-        return $this->realtime_clock->now();
+        return $this->monotonic_clock->now();
     }
 }

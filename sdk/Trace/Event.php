@@ -12,7 +12,7 @@ class Event implements API\Event
     private $timestamp;
     private $attributes;
 
-    public function __construct(string $name, ?API\Attributes $attributes = null, int $timestamp = null)
+    public function __construct(string $name, int $timestamp, ?API\Attributes $attributes = null)
     {
         $this->name = $name;
         $this->timestamp = $timestamp;

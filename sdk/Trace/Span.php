@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
+
 use Exception;
 use OpenTelemetry\Trace as API;
 
@@ -164,7 +165,7 @@ class Span implements API\Span
     }
 
     // todo: is accepting an Iterator enough to satisfy AddLazyEvent?  -> Looks like the spec might have been updated here: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-events
-    public function addEvent(string $name, ?API\Attributes $attributes = null, int $timestamp = null): API\Span
+    public function addEvent(string $name, int $timestamp, ?API\Attributes $attributes = null): API\Span
     {
         // todo: really throw if not recording?
         $this->throwIfNotRecording();

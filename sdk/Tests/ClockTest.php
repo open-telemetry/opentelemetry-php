@@ -14,7 +14,7 @@ class ClockTest extends TestCase
      */
     public function testReturnetStringRepresentMilliseconds()
     {
-        $clock = (new Clock())->moment();
+        $clock = Clock::get()->moment();
         $this->assertGreaterThan(1e12, (float) $clock[1]);
     }
 }

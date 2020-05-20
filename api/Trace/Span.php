@@ -28,11 +28,11 @@ interface Span extends SpanStatus, SpanKind
 
     /**
      * @param string $name
+     * @param int $timestamp
      * @param Attributes|null $attributes
-     * @param int|null $timestamp
      * @return Span Must return $this to allow setting multiple attributes at once in a chain.
      */
-    public function addEvent(string $name, ?Attributes $attributes = null, ?int $timestamp = null): Span;
+    public function addEvent(string $name, int $timestamp, ?Attributes $attributes = null): Span;
 
     /**
      * @param SpanContext $context

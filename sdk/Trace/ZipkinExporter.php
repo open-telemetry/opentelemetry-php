@@ -83,7 +83,6 @@ class ZipkinExporter implements Exporter
             foreach ((array) $container as $transaction) {
                 echo (string) $transaction['request']->getBody();
             }
-            //
         } catch (Exception $e) {
             return Exporter::FAILED_RETRYABLE;
         }
