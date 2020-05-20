@@ -50,15 +50,7 @@ To make sure the tests in this repo work as you expect, you can use the included
 Execute `make test` from your bash compatible shell.  This will output the test output as well as a test coverage analysis.  Code that doesn't pass our currently defined tests will emit a failure in CI
 
 ## Examples
-<<<<<<< HEAD
-<<<<<<< HEAD
 You can use the [examples/AlwaysSampleTraceExample.php](/examples/AlwaysOnTraceExample.php) file to test out the reference implementation we have.  This example perfoms a sample trace with a grouping of 5 spans and POSTs the result to a local zipkin instance.
-=======
-You can use the [examples/AlwaysSampleTraceExample.php](/open-telemetry/opentelemetry-php/blob/master/examples/AlwaysOnTraceExample.php) file to test out the reference implementation we have.  This example perfoms a sample trace with a grouping of 5 spans and POSTs the result to a local zipkin instance.
->>>>>>> 079160b... Adding more information to README.md (#84)
-=======
-You can use the [examples/AlwaysSampleTraceExample.php](/examples/AlwaysOnTraceExample.php) file to test out the reference implementation we have.  This example perfoms a sample trace with a grouping of 5 spans and POSTs the result to a local zipkin instance.
->>>>>>> 0a0db49... Fix relative link to AlwaysSampleTraceExample.php (#91)
 
 The PHP should execute by itself (if you have a zipkin instance running on localhost), but if you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
 
@@ -67,8 +59,4 @@ The PHP should execute by itself (if you have a zipkin instance running on local
 
 Exported spans can be seen in zipkin at [http://127.0.0.1:9411](http://127.0.0.1:9411)
 
-<<<<<<< HEAD
 Exported spans can also be seen in jaeger at [http://127.0.0.1:16686](http://127.0.0.1:16686)
-=======
-Exported spand can also be seen in jaeger at [http://127.0.0.1:16686](http://127.0.0.1:16686)
->>>>>>> 0a0db49... Fix relative link to AlwaysSampleTraceExample.php (#91)
