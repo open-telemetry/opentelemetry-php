@@ -14,9 +14,6 @@ class Event implements API\Event
 
     public function __construct(string $name, ?API\Attributes $attributes = null, int $timestamp = null)
     {
-        if (null === $timestamp) {
-            $timestamp = (new Clock())->timestamp();
-        }
         $this->name = $name;
         $this->timestamp = $timestamp;
         $this->attributes = $attributes ?? new Attributes();
@@ -39,7 +36,7 @@ class Event implements API\Event
         return $this->name;
     }
 
-    public function getTimestamp(): ?int
+    public function getTimestamp(): int
     {
         return $this->timestamp;
     }

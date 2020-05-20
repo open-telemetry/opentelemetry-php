@@ -8,26 +8,37 @@ use OpenTelemetry\Trace as API;
 
 class Clock implements API\Clock
 {
+    private static $instance;
+    public $realtime_clock;
+    public $monotonic_clock;
+
+    private function __construct()
+    {
+        $this->realtime_clock = new RealtimeClock();
+        $this->monotonic_clock = new MonotonicClock();
+    }
+
+    public static function get()
+    {
+        if (!self::$instance) {
+        self::$instance = new Clock();
+        }
+    return self::$instance;
+    }
+
     public function moment(): array
     {
-        $realtime_clock = new RealtimeClock();
-        $monotonic_clock = new MonotonicClock();
+        return [$this->monotonic_clock->now(), $this->realtime_clock->now()];
 
-        return [$monotonic_clock->now(), $realtime_clock->now()];
-        ;
     }
 
     public function timestamp(): int
     {
-        $realtime_clock = new RealtimeClock();
-
-        return $realtime_clock->now();
+        return $this->monotonic_clock->now();
     }
 
     public function now(): int
     {
-        $monotonic_clock = new MonotonicClock();
-
-        return $monotonic_clock->now();
+        return $this->realtime_clock->now();
     }
 }

@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
-
 use Exception;
 use OpenTelemetry\Trace as API;
 
@@ -48,7 +47,7 @@ class Span implements API\Span
         $this->spanContext = $spanContext;
         $this->parentSpanContext = $parentSpanContext;
         $this->spanKind = $spanKind;
-        $this->start = (new Clock())->timestamp();
+        $this->start = Clock::get()->timestamp();
         $this->statusCode = API\SpanStatus::OK;
         $this->statusDescription = API\SpanStatus::DESCRIPTION[$this->statusCode];
 
@@ -79,7 +78,7 @@ class Span implements API\Span
     public function end(int $timestamp = null): API\Span
     {
         if (!isset($this->end)) {
-            $this->end = $timestamp ?? (new Clock())->timestamp();
+            $this->end = $timestamp ?? Clock::get()->timestamp();
         }
 
         return $this;

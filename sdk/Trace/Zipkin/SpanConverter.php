@@ -21,7 +21,7 @@ class SpanConverter
 
     public function convert(Span $span)
     {
-        $timestamp = (new Clock())->timestamp();
+        $timestamp = Clock::get()->timestamp();
         $start_realtime = $span->getStartTimestamp();
         $end_realtime = $span->getEndTimestamp();
         $elapsed_realtime = $end_realtime - $start_realtime;

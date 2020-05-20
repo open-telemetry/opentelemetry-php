@@ -79,10 +79,11 @@ class ZipkinExporter implements Exporter
             $request = new Request('POST', $this->endpointUrl, $headers, $json);
             $response = $client->send($request, ['timeout' => 30]);
 
-            /* Used for debugging output for exporters
+            // Used for debugging output for exporters
             foreach ((array) $container as $transaction) {
                 echo (string) $transaction['request']->getBody();
-            } */
+            }
+            //
         } catch (Exception $e) {
             return Exporter::FAILED_RETRYABLE;
         }
