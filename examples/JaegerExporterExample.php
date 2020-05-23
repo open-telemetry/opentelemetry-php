@@ -5,6 +5,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use OpenTelemetry\Sdk\Trace\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\Attributes;
+use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\JaegerExporter;
 use OpenTelemetry\Sdk\Trace\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
@@ -35,17 +36,18 @@ if ($sampler) {
 
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
+        $timestamp = Clock::get()->timestamp();
         $span = $tracer->startAndActivateSpan('session.generate.span' . time());
         $tracer->setActiveSpan($span);
 
         $span->setAttribute('remote_ip', '1.2.3.4')
             ->setAttribute('country', 'USA');
 
-        $span->addEvent('found_login' . $i, new Attributes([
+        $span->addEvent('found_login' . $i, $timestamp, new Attributes([
             'id' => $i,
             'username' => 'otuser' . $i,
         ]));
-        $span->addEvent('generated_session', new Attributes([
+        $span->addEvent('generated_session', $timestamp, new Attributes([
             'id' => md5((string) microtime(true)),
         ]));
 

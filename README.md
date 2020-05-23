@@ -59,4 +59,4 @@ The PHP should execute by itself (if you have a zipkin instance running on local
 
 Exported spans can be seen in zipkin at [http://127.0.0.1:9411](http://127.0.0.1:9411)
 
-Exported spand can also be seen in jaeger at [http://127.0.0.1:16686](http://127.0.0.1:16686)
+Exported spans can also be seen in jaeger at [http://127.0.0.1:16686](http://127.0.0.1:16686)

@@ -7,6 +7,7 @@ namespace OpenTelemetry\Sdk\Tests;
 use OpenTelemetry\Sdk\Trace as SDK;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
+use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
 use OpenTelemetry\Sdk\Trace\Tracer;
@@ -181,7 +182,8 @@ class TracingTest extends TestCase
             'space' => 'guard.session',
             'id' => 67235,
         ]);
-        $span->addEvent('select', $eventAttributes);
+        $timestamp = Clock::get()->timestamp();
+        $span->addEvent('select', $timestamp, $eventAttributes);
 
         $events = $span->getEvents();
         self::assertCount(1, $events);
@@ -194,7 +196,7 @@ class TracingTest extends TestCase
         ]);
         self::assertEquals($attributes, $event->getAttributes());
 
-        $span->addEvent('update')
+        $span->addEvent('update', $timestamp)
                     ->setAttribute('space', 'guard.session')
                     ->setAttribute('id', 67235)
                     ->setAttribute('active_at', time());

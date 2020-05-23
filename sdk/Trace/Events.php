@@ -13,9 +13,9 @@ class Events implements API\Events
     public function addEvent(
         string $name,
         ?API\Attributes $attributes = null,
-        ?string $timestamp = null
+        int $timestamp = null
     ): API\Events {
-        $this->events[] = new Event($name, $attributes, $timestamp);
+        $this->events[] = new Event($name, $timestamp, $attributes);
 
         return $this;
     }
