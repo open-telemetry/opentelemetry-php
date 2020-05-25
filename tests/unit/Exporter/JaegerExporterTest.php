@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\Exporter;
 
 use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace\JaegerExporter;
+use OpenTelemetry\Sdk\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
 class JaegerExporterTest extends TestCase
@@ -18,7 +19,7 @@ class JaegerExporterTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new JaegerExporter('test.zipkin', $invalidDsn);
+        new JaegerExporter('test.jaeger', $invalidDsn);
     }
 
     public function invalidDsnDataProvider()
@@ -33,5 +34,17 @@ class JaegerExporterTest extends TestCase
             'invalid host' => ['scheme:///end:1234/path'],
             'unimplemented path' => ['scheme:///host:1234/api/v1/spans'],
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function failsIfNotRunning()
+    {
+        $exporter = new JaegerExporter('test.jaeger', 'scheme://host:123/api/v1/spans');
+        $span = $this->createMock(Span::class);
+        $exporter->shutdown();
+
+        $this->assertEquals($exporter->export([$span]), \OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE);
     }
 }

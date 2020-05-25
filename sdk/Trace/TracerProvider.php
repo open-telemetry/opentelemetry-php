@@ -29,6 +29,12 @@ final class TracerProvider implements API\TracerProvider
     {
         $this->spanProcessors = new SpanMultiProcessor();
         $this->resource = $resource ?? ResourceInfo::emptyResource();
+        register_shutdown_function([$this, 'shutdown']);
+    }
+
+    public function shutdown(): void
+    {
+        $this->spanProcessors->shutdown();
     }
 
     public function getTracer(string $name, ?string $version = ''): API\Tracer

@@ -23,7 +23,12 @@ interface SpanProcessor
     public function onEnd(API\Span $span): void;
 
     /**
-     * Cleanup; after shutdown, calling onStart or onEnd is invalid
+     * Export all ended spans to the configured Exporter that have not yet been exported.
+     */
+    public function forceFlush(): void;
+
+    /**
+     * Cleanup; after shutdown, calling onStart, onEnd, or forceFlush is invalid
      */
     public function shutdown(): void;
 }
