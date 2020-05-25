@@ -19,16 +19,20 @@
     </php>
 
     <testsuites>
-        <testsuite name="Unit Tests">
-            <directory>./tests/unit</directory>
+        <testsuite name="Sdk Unit Tests">
+            <directory>./tests/Sdk/Unit</directory>
         </testsuite>
         <testsuite name="Integration Tests">
-            <directory>./tests/integration</directory>
+            <directory>./tests/Sdk/Integration</directory>
+        </testsuite>
+        <testsuite name="Contrib Unit Tests">
+            <directory>./tests/Contrib/Unit</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist>
-            <directory>tests</directory>
+            <directory>contrib</directory>
+            <directory>sdk</directory>
         </whitelist>
     </filter>
 
