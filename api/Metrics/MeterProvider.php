@@ -13,7 +13,7 @@ interface MeterProvider
      * as a fallback rather than returning null or throwing an exception.
      * A MeterProvider could also return a no-op Meter here if application owners configure the SDK to suppress
      * telemetry produced by this library.
-     * @param string $version - (optional) - Specifies the version of the instrumentation library (e.g. semver:1.0.0)
+     * @param ?string $version - (optional) - Specifies the version of the instrumentation library (e.g. semver:1.0.0)
      * @return Meter
      */
     public function getMeter(string $name, ?string $version): Meter;
