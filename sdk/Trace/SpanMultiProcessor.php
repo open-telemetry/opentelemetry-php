@@ -7,10 +7,10 @@ namespace OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
 
 /**
- * Class MultiSpanProcessor is a SpanProcessor that forwards all events to an
+ * Class SpanMultiProcessor is a SpanProcessor that forwards all events to an
  * array of SpanProcessors.
  */
-final class MultiSpanProcessor implements SpanProcessor
+final class SpanMultiProcessor implements SpanProcessor
 {
     /**
      * @var SpanProcessor[]

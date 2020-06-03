@@ -15,13 +15,13 @@ final class TracerProvider implements API\TracerProvider
     protected $tracers;
 
     /**
-     * @var MultiSpanProcessor
+     * @var SpanMultiProcessor
      */
     protected $spanProcessors;
 
     public function __construct()
     {
-        $this->spanProcessors = new MultiSpanProcessor();
+        $this->spanProcessors = new SpanMultiProcessor();
     }
 
     public function getTracer(string $name, ?string $version = ''): API\Tracer
@@ -42,7 +42,7 @@ final class TracerProvider implements API\TracerProvider
         return $this;
     }
 
-    public function getSpanProcessor(): MultiSpanProcessor
+    public function getSpanProcessor(): SpanMultiProcessor
     {
         return $this->spanProcessors;
     }
