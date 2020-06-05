@@ -63,5 +63,7 @@ interface Span extends SpanStatus, SpanKind
      */
     public function end(int $timestamp = null): Span;
 
+    public function isRecording(): bool;
+
     // TODO: addLazyEvent
 }

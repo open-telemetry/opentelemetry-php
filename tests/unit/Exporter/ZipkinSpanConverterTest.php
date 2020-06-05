@@ -17,7 +17,9 @@ class ZipkinSpanConverterTest extends TestCase
      */
     public function shouldConvertASpanToAPayloadForZipkin()
     {
-        $tracer = new Tracer();
+        $processor = self::createMock(SpanProcessor::class);
+        $processor->expects($this->atLeastOnce())->method('onStart');
+        $tracer = new Tracer([$processor]);
         $timestamp = Clock::get()->timestamp();
         $span = $tracer->startAndActivateSpan('guard.validate');
         $span->setAttribute('service', 'guard');
