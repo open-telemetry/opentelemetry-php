@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace unit\Exporter;
 
 use OpenTelemetry\Sdk\Trace\Attributes;
-use OpenTelemetry\Sdk\Trace\TracerProvider;
+use OpenTelemetry\Sdk\Trace\Clock;
+use OpenTelemetry\Sdk\Trace\Tracer;
 use OpenTelemetry\Sdk\Trace\Zipkin\SpanConverter;
 use PHPUnit\Framework\TestCase;
 
@@ -16,11 +17,12 @@ class ZipkinSpanConverterTest extends TestCase
      */
     public function shouldConvertASpanToAPayloadForZipkin()
     {
-        $tracerProvider = new TracerProvider();
-        $tracer = $tracerProvider->getTracer('ZipkinSpanConverterTest');
+
+        $tracer = new Tracer();
+        $timestamp = Clock::get()->timestamp();
         $span = $tracer->startAndActivateSpan('guard.validate');
         $span->setAttribute('service', 'guard');
-        $span->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']));
+        $span->addEvent('validators.list', $timestamp, new Attributes(['job' => 'stage.updateTime']));
         $span->end();
 
         $converter = new SpanConverter('test.name');

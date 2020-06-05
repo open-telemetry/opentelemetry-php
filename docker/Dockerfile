@@ -1,4 +1,4 @@
-FROM php:7.2-buster
+FROM php:7.3-buster
 
 RUN apt-get -y update && apt-get -y install git zip && \
 curl -sS https://getcomposer.org/installer | php && \
