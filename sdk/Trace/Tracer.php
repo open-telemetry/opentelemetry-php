@@ -17,10 +17,18 @@ class Tracer implements API\Tracer
      */
     private $provider;
 
-    public function __construct(TracerProvider $provider, API\SpanContext $context = null)
-    {
-        $this->provider = $provider;
+    /**
+     * @var InstrumentationLibrary
+     */
+    private $instrumentationLibrary;
 
+    public function __construct(
+        TracerProvider $provider,
+        InstrumentationLibrary $instrumentationLibrary,
+        API\SpanContext $context = null
+    ) {
+        $this->provider = $provider;
+        $this->instrumentationLibrary = $instrumentationLibrary;
         $context = $context ?: SpanContext::generate();
 
         // todo: hold up, why do we automatically make a root Span?
