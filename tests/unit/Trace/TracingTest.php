@@ -34,11 +34,12 @@ class TracingTest extends TestCase
     {
         // todo: stop making a new span when a trace is made and then use getTracer instead of new Tracer.
         $tracerProvider = new SDK\TracerProvider();
-        $tracer = new Tracer($tracerProvider);
+        $instrumentationLibrary = new SDK\InstrumentationLibrary('OpenTelemetry.TracingTest.Test');
+        $tracer = new Tracer($tracerProvider, $instrumentationLibrary);
         $spanContext = $tracer->getActiveSpan()->getContext();
 
         $spanContext2 = SpanContext::restore($spanContext->getTraceId(), $spanContext->getSpanId());
-        $tracer2 = new Tracer($tracerProvider, $spanContext2);
+        $tracer2 = new Tracer($tracerProvider, $instrumentationLibrary, $spanContext2);
 
         $this->assertSame($tracer->getActiveSpan()->getContext()->getTraceId(), $tracer2->getActiveSpan()->getContext()->getTraceId());
     }
@@ -56,7 +57,7 @@ class TracingTest extends TestCase
     public function testNestedSpans()
     {
         $tracerProvider = new SDK\TracerProvider();
-        $tracer = new Tracer($tracerProvider);
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
 
         $guard = $tracer->startAndActivateSpan('guard.validate');
         $connection = $tracer->startAndActivateSpan('guard.validate.connection');

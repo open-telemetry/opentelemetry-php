@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 
 final class TracerProvider implements API\TracerProvider
@@ -19,9 +20,15 @@ final class TracerProvider implements API\TracerProvider
      */
     protected $spanProcessors;
 
-    public function __construct()
+    /**
+     * @var ResourceInfo
+     */
+    private $resource;
+
+    public function __construct(?ResourceInfo $resource = null)
     {
         $this->spanProcessors = new SpanMultiProcessor();
+        $this->resource = $resource ?? ResourceInfo::emptyResource();
     }
 
     public function getTracer(string $name, ?string $version = ''): API\Tracer
@@ -31,8 +38,9 @@ final class TracerProvider implements API\TracerProvider
         }
 
         $spanContext = SpanContext::generate();
+        $instrumentationLibrary = new InstrumentationLibrary($name, $version);
 
-        return $this->tracers[$name] = new Tracer($this, $spanContext);
+        return $this->tracers[$name] = new Tracer($this, $instrumentationLibrary, $spanContext);
     }
 
     public function addSpanProcessor(SpanProcessor $processor): self
@@ -45,5 +53,10 @@ final class TracerProvider implements API\TracerProvider
     public function getSpanProcessor(): SpanMultiProcessor
     {
         return $this->spanProcessors;
+    }
+
+    public function getResource(): ResourceInfo
+    {
+        return $this->resource;
     }
 }
