@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Contrib\Tests\Unit;
+namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\Zipkin\Exporter;

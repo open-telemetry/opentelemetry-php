@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Contrib\Tests\Unit;
+namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
+use OpenTelemetry\Sdk\Trace\InstrumentationLibrary;
+use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Sdk\Trace\Tracer;
+use OpenTelemetry\Sdk\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
 class ZipkinSpanConverterTest extends TestCase
@@ -17,7 +20,14 @@ class ZipkinSpanConverterTest extends TestCase
      */
     public function shouldConvertASpanToAPayloadForZipkin()
     {
-        $tracer = new Tracer();
+        $processor = self::createMock(SpanProcessor::class);
+        $processor->expects($this->atLeastOnce())->method('onStart');
+
+        $tracer = new Tracer(
+            (new TracerProvider())->addSpanProcessor($processor),
+            (new InstrumentationLibrary('zipkin.test'))
+        );
+
         $timestamp = Clock::get()->timestamp();
         $span = $tracer->startAndActivateSpan('guard.validate');
         $span->setAttribute('service', 'guard');

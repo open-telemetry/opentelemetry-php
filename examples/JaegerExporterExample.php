@@ -27,9 +27,8 @@ $exporter = new JaegerExpoter(
 
 if ($sampler) {
     echo 'Starting JaegerExporterExample';
-    $tracer = (TracerProvider::getInstance(
-        [new SimpleSpanProcessor($exporter)]
-    ))
+    $tracer = (new TracerProvider())
+        ->addSpanProcessor(new SimpleSpanProcessor($exporter))
         ->getTracer('io.opentelemetry.contrib.php');
 
     echo PHP_EOL . sprintf('Trace with id %s started ', $tracer->getActiveSpan()->getContext()->getTraceId());

@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 
-class TracerProvider implements API\TracerProvider
+final class TracerProvider implements API\TracerProvider
 {
-    /**
-     * @var self
-     */
-    protected static $instance;
 
     /**
      * @var Tracer[]
@@ -19,46 +16,19 @@ class TracerProvider implements API\TracerProvider
     protected $tracers;
 
     /**
-     * @var SpanProcessor[]
+     * @var SpanMultiProcessor
      */
     protected $spanProcessors;
 
     /**
-     * TracerFactory constructor.
-     *
-     * @param SpanProcessor[] $spanProcessors
+     * @var ResourceInfo
      */
-    final private function __construct(array $spanProcessors = [])
+    private $resource;
+
+    public function __construct(?ResourceInfo $resource = null)
     {
-        foreach ($spanProcessors as $spanProcessor) {
-            if (!$spanProcessor instanceof SpanProcessor) {
-                throw new \TypeError(
-                    sprintf(
-                        'Span Processors should be of type %s, but object of type %s provided',
-                        SpanProcessor::class,
-                        gettype($spanProcessor) == 'object' ? get_class($spanProcessor) : gettype($spanProcessor)
-                    )
-                );
-            }
-        }
-
-        $this->spanProcessors = $spanProcessors;
-    }
-
-    /**
-     * @param SpanProcessor[] $spanProcessors
-     *
-     * @return static
-     */
-    public static function getInstance(array $spanProcessors = []): self
-    {
-        if (self::$instance instanceof TracerProvider) {
-            return self::$instance;
-        }
-
-        $instance = new TracerProvider($spanProcessors);
-
-        return self::$instance = $instance;
+        $this->spanProcessors = new SpanMultiProcessor();
+        $this->resource = $resource ?? ResourceInfo::emptyResource();
     }
 
     public function getTracer(string $name, ?string $version = ''): API\Tracer
@@ -68,7 +38,25 @@ class TracerProvider implements API\TracerProvider
         }
 
         $spanContext = SpanContext::generate();
+        $instrumentationLibrary = new InstrumentationLibrary($name, $version);
 
-        return $this->tracers[$name] = new Tracer($this->spanProcessors, $spanContext);
+        return $this->tracers[$name] = new Tracer($this, $instrumentationLibrary, $spanContext);
+    }
+
+    public function addSpanProcessor(SpanProcessor $processor): self
+    {
+        $this->spanProcessors->addSpanProcessor($processor);
+
+        return $this;
+    }
+
+    public function getSpanProcessor(): SpanMultiProcessor
+    {
+        return $this->spanProcessors;
+    }
+
+    public function getResource(): ResourceInfo
+    {
+        return $this->resource;
     }
 }

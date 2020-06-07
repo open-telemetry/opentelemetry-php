@@ -19,7 +19,7 @@ $samplingResult = $sampler->shouldSample(
 );
 
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult) {
-    $tracer = TracerProvider::getInstance()
+    $tracer = (new TracerProvider())
     ->getTracer('io.opentelemetry.contrib.php');
 
     // start a span, register some events

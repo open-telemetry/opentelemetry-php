@@ -28,9 +28,8 @@ $zipkinExporter = new ZipkinExporter(
 
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
     echo 'Starting AlwaysOnTraceExample';
-    $tracer = (TracerProvider::getInstance(
-        [new SimpleSpanProcessor($zipkinExporter)]
-    ))
+    $tracer = (new TracerProvider())
+        ->addSpanProcessor(new SimpleSpanProcessor($zipkinExporter))
         ->getTracer('io.opentelemetry.contrib.php');
 
     echo PHP_EOL . sprintf('Trace with id %s started ', $tracer->getActiveSpan()->getContext()->getTraceId());

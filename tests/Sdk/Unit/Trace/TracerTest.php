@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
-use OpenTelemetry\Sdk\Trace\Tracer;
+use OpenTelemetry\Sdk\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
 class TracerTest extends TestCase
@@ -16,10 +16,12 @@ class TracerTest extends TestCase
     public function spanProcessorsShouldBeCalledWhenNewSpanIsCreated()
     {
         $processor = self::createMock(SpanProcessor::class);
-        $processor->expects($this->atLeastOnce())->method('onStart');
+        $processor->expects($this->exactly(1))->method('onStart');
 
-        /** @var \OpenTelemetry\Sdk\Trace\SpanProcessor $processor */
-        $tracer = new Tracer([$processor]);
+        $tracerProvider = new TracerProvider();
+        $tracerProvider->addSpanProcessor($processor);
+
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
 
         $tracer->startAndActivateSpan('test.span');
     }
@@ -31,10 +33,12 @@ class TracerTest extends TestCase
     {
         $processor = self::createMock(SpanProcessor::class);
 
-        $processor->expects($this->atLeastOnce())->method('onEnd');
+        $processor->expects($this->exactly(1))->method('onEnd');
 
-        /** @var \OpenTelemetry\Sdk\Trace\SpanProcessor $processor */
-        $tracer = new Tracer([$processor]);
+        $tracerProvider = new TracerProvider();
+        $tracerProvider->addSpanProcessor($processor);
+
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
 
         $tracer->startAndActivateSpan('test.span');
         $tracer->endActiveSpan();
