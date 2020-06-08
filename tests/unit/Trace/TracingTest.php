@@ -99,10 +99,10 @@ class TracingTest extends TestCase
         self::assertSame($duration, $mysql->getDuration());
 
         self::assertTrue($mysql->isStatusOK());
-        
+
         // active span rolled back
         $this->assertSame($tracer->getActiveSpan(), $global);
-        
+
         // active span should be kept for global span
         $global->end();
         $this->assertSame($tracer->getActiveSpan(), $global);

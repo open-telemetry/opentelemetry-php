@@ -26,6 +26,11 @@ class JaegerExporter implements Exporter
      */
     private $spanConverter;
 
+    /**
+     * @var bool
+     */
+    private $running = true;
+
     public function __construct($name, string $endpointUrl, SpanConverter $spanConverter = null)
     {
         $url = parse_url($endpointUrl);
@@ -61,6 +66,10 @@ class JaegerExporter implements Exporter
      */
     public function export(iterable $spans) : int
     {
+        if (!$this->running) {
+            return Exporter::FAILED_NOT_RETRYABLE;
+        }
+
         if (empty($spans)) {
             return Exporter::SUCCESS;
         }
@@ -90,6 +99,6 @@ class JaegerExporter implements Exporter
 
     public function shutdown(): void
     {
-        // TODO: Implement shutdown() method.
+        $this->running = false;
     }
 }
