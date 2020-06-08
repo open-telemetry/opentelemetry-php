@@ -50,4 +50,11 @@ final class SpanMultiProcessor implements SpanProcessor
             $processor->shutdown();
         }
     }
+
+    public function forceFlush(): void
+    {
+        foreach ($this->processors as $processor) {
+            $processor->forceFlush();
+        }
+    }
 }

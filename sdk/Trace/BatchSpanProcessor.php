@@ -11,7 +11,7 @@ use OpenTelemetry\Trace as API;
 class BatchSpanProcessor implements SpanProcessor
 {
     /**
-     * @var Exporter
+     * @var Exporter|null
      */
     private $exporter;
     /**
@@ -44,8 +44,13 @@ class BatchSpanProcessor implements SpanProcessor
      */
     private $clock;
 
+    /**
+     * @var bool
+     */
+    private $running = true;
+
     public function __construct(
-        Exporter $exporter,
+        ?Exporter $exporter,
         Clock $clock,
         int $maxQueueSize = 2048,
         int $scheduledDelayMillis = 5000,
@@ -77,11 +82,23 @@ class BatchSpanProcessor implements SpanProcessor
      */
     public function onEnd(API\Span $span): void
     {
-        if (count($this->queue) < $this->maxQueueSize) {
-            $this->queue[] = $span;
-        }
+        if (null !== $this->exporter && $this->running) {
+            if (count($this->queue) < $this->maxQueueSize) {
+                $this->queue[] = $span;
+            }
 
-        if ($this->bufferReachedExportLimit() && $this->enoughTimeHasPassed()) {
+            if ($this->bufferReachedExportLimit() || $this->enoughTimeHasPassed()) {
+                $this->forceFlush();
+            }
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function forceFlush(): void
+    {
+        if (null !== $this->exporter && $this->running) {
             $this->exporter->export($this->queue);
             $this->queue = [];
             $this->lastExportTimestamp = $this->clock->timestamp();
@@ -105,6 +122,10 @@ class BatchSpanProcessor implements SpanProcessor
      */
     public function shutdown(): void
     {
-        // TODO: Implement shutdown() method.
+        $this->running = false;
+        if (null !== $this->exporter) {
+            $this->forceFlush();
+            $this->exporter->shutdown();
+        }
     }
 }
