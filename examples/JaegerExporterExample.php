@@ -3,7 +3,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExpoter;
+use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
@@ -20,7 +20,7 @@ $samplingResult = $sampler->shouldSample(
     API\SpanKind::KIND_INTERNAL
 );
 
-$exporter = new JaegerExpoter(
+$exporter = new JaegerExporter(
     'jaegerExporterExample',
     'http://jaeger:9412/api/v2/spans'
 );

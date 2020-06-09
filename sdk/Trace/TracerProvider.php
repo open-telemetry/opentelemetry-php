@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
+use OpenTelemetry\Sdk\Trace\SpanProcessor\SpanMultiProcessor;
 use OpenTelemetry\Trace as API;
 
 final class TracerProvider implements API\TracerProvider
@@ -29,6 +30,12 @@ final class TracerProvider implements API\TracerProvider
     {
         $this->spanProcessors = new SpanMultiProcessor();
         $this->resource = $resource ?? ResourceInfo::emptyResource();
+        register_shutdown_function([$this, 'shutdown']);
+    }
+
+    public function shutdown(): void
+    {
+        $this->spanProcessors->shutdown();
     }
 
     public function getTracer(string $name, ?string $version = ''): API\Tracer

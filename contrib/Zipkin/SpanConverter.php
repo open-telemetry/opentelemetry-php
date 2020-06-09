@@ -24,7 +24,7 @@ class SpanConverter
         $timestamp = Clock::get()->timestamp();
         $start_realtime = $span->getStartTimestamp();
         $end_realtime = $span->getEndTimestamp();
-        $elapsed_realtime = $end_realtime - $start_realtime;
+        $elapsed_realtime = (int) (($end_realtime - $start_realtime) / 1e3); // diff in microseconds
 
         $row = [
             'id' => $span->getContext()->getSpanId(),
@@ -34,7 +34,7 @@ class SpanConverter
                 'serviceName' => $this->serviceName,
             ],
             'name' => $span->getSpanName(),
-            'timestamp' => (int) ($timestamp / 1e3), // RealtimeClock in milliseconds
+            'timestamp' => (int) ($timestamp / 1e3), // RealtimeClock in microseconds
             'duration' => $elapsed_realtime,
         ];
 
@@ -54,7 +54,7 @@ class SpanConverter
                 $row['annotations'] = [];
             }
             $row['annotations'][] = [
-                'timestamp' => (int) ($timestamp / 1e3), // RealtimeClock in milliseconds
+                'timestamp' => (int) ($timestamp / 1e3), // RealtimeClock in microseconds
                 'value' => $event->getName(),
             ];
         }

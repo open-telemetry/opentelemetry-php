@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\Zipkin\Exporter;
+use OpenTelemetry\Sdk\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
 class ZipkinExporterTest extends TestCase
@@ -32,5 +33,17 @@ class ZipkinExporterTest extends TestCase
             'invalid scheme' => ['1234://host:port/path'],
             'invalid host' => ['scheme:///end:1234/path'],
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function failsIfNotRunning()
+    {
+        $exporter = new Exporter('test.jaeger', 'scheme://host:123/path');
+        $span = $this->createMock(Span::class);
+        $exporter->shutdown();
+
+        $this->assertEquals($exporter->export([$span]), \OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE);
     }
 }

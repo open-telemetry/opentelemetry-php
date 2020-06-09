@@ -28,6 +28,11 @@ class Exporter implements Trace\Exporter
      */
     private $spanConverter;
 
+    /**
+     * @var bool
+     */
+    private $running = true;
+
     public function __construct($name, string $endpointUrl, SpanConverter $spanConverter = null)
     {
         $parsedDsn = parse_url($endpointUrl);
@@ -58,6 +63,10 @@ class Exporter implements Trace\Exporter
      */
     public function export(iterable $spans): int
     {
+        if (!$this->running) {
+            return Exporter::FAILED_NOT_RETRYABLE;
+        }
+
         if (empty($spans)) {
             return Trace\Exporter::SUCCESS;
         }
@@ -92,6 +101,6 @@ class Exporter implements Trace\Exporter
 
     public function shutdown(): void
     {
-        // TODO: Implement shutdown() method.
+        $this->running = false;
     }
 }
