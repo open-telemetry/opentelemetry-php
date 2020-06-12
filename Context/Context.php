@@ -105,4 +105,14 @@ class Context
     {
         return self::$current_context = call_user_func($token);
     }
+
+    /**
+     * @param Context $parent
+     *
+     * @return null
+     */
+    protected function setParent(Context $parent)
+    {
+        $this->parent = $parent;
+    }
 }
