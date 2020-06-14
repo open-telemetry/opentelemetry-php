@@ -9,7 +9,7 @@ class Context
     /**
      * @var ContextKey|null
      */
-    private $key;
+    protected $key;
 
     /**
      * @var mixed|null

@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\CorrelationContext;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextKey;
 
-class CorrelationContext implements Context
+class CorrelationContext extends Context
 {
     /**
+     * @var CorrelationContext|null
+     */
+    private $parent;
+
+    /**
      * @param Context $context
-     *
-     * @return Generator|mixed[]
      */
     public function getCorrelations($context = null)
     {
@@ -34,7 +38,7 @@ class CorrelationContext implements Context
         return $this;
     }
 
-    private function removeCorrelationHelper(ContextKey $key, Context $child)
+    private function removeCorrelationHelper(ContextKey $key, ?Context $child)
     {
         if ($this->key != $key) {
             if (null === $this->parent) {
