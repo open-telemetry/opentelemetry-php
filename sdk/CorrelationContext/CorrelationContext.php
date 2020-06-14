@@ -30,13 +30,14 @@ class CorrelationContext implements Context
         }
 
         $this->removeCorrelationHelper($key, null);
+
         return $this;
     }
 
     private function removeCorrelationHelper(ContextKey $key, Context $child)
     {
         if ($this->key != $key) {
-            if (is_null($this->parent)) {
+            if (null === $this->parent) {
                 return;
             }
 
