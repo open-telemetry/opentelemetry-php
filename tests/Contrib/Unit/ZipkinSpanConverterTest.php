@@ -8,6 +8,8 @@ use OpenTelemetry\Contrib\Zipkin\SpanConverter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\InstrumentationLibrary;
+use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Sdk\Trace\Tracer;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
@@ -62,5 +64,21 @@ class ZipkinSpanConverterTest extends TestCase
 
         // timestamp should be in microseconds
         $this->assertGreaterThan(1e15, $annotation['timestamp']);
+    }
+
+    /**
+     * @test
+     */
+    public function durationShouldBeInMicroseconds()
+    {
+        $span = new Span("duration.test", SpanContext::generate());
+
+        $row = (new SpanConverter('duration.test'))->convert($span);
+
+
+        $this->assertEquals(
+            (int)(($span->getEndTimestamp() - $span->getStartTimestamp()) / 1000),
+            $row['duration']
+        );
     }
 }

@@ -24,6 +24,7 @@
     ],
     "autoload": {
         "psr-4": {
+            "OpenTelemetry\\Context\\": "Context",
             "OpenTelemetry\\": "api",
             "OpenTelemetry\\Sdk\\": "sdk",
             "OpenTelemetry\\Contrib\\": "contrib"
