@@ -25,7 +25,6 @@ class CorrelationContextTest extends TestCase
      */
     public function getTest()
     {
-
         $key1 = new ContextKey('key1');
         $key2 = new ContextKey('key2');
         $ctx = (new Context())->set($key1, 'val1')->set($key2, 'val2');
@@ -43,7 +42,7 @@ class CorrelationContextTest extends TestCase
         $key3 = new ContextKey('key3');
         $key4 = new ContextKey('key4');
         $ctx = (new Context())->set($key1, 'val1')->set($key2, 'val2')->set($key3, 'val3')->set($key4, 'val4');
-        $result = $this->removeCorrelation($key3);
+        $result = $ctx->removeCorrelation($key3);
         print_r($result);
     }
 }
