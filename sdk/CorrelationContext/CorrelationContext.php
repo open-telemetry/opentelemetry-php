@@ -6,27 +6,79 @@ namespace OpenTelemetry\Sdk\CorrelationContext;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
-class CorrelationContext extends Context
+use OpenTelemetry\Context\ContextValueNotFoundException;
+
+class CorrelationContext
 {
     /**
      * @var CorrelationContext|null
      */
-    private $parent;
+    private ?CorrelationContext $parent;
 
     /**
-     * @param Context $context
+     * @var ContextKey|null
      */
-    public function getCorrelations($context = null)
+    protected ?ContextKey $key;
+
+    /**
+     * @var mixed|null
+     */
+    private $value;
+
+    public function __construct(ContextKey $key = null, $value = null, ?CorrelationContext $parent = null)
     {
-        // TODO: Write me
+        $this->key = $key;
+        $this->value = $value;
+        $this->parent = $parent;
+    }
+
+    /**
+     * @param ContextKey $key
+     * @param $value
+     * @return CorrelationContext
+     */
+    public function set(ContextKey $key, $value): CorrelationContext
+    {
+        return new CorrelationContext($key, $value, $this);
     }
 
     /**
      * @param ContextKey $key
      *
-     * @return Context
+     * @return mixed
      */
-    public function removeCorrelation(ContextKey $key): Context
+    public function get(ContextKey $key)
+    {
+        if ($this->key === $key) {
+            return $this->value;
+        }
+        if (null === $this->parent) {
+            throw new ContextValueNotFoundException();
+        }
+
+        return $this->parent->get($key);
+    }
+
+    /**
+     * @param CorrelationContext $context
+     */
+    public function getCorrelations($context = null)
+    {
+        if ($this->parent == null) {
+            return [$this->key => $this->value];
+        }
+
+        $val =($this->parent->getCorrelations());
+        $val[$this->key] = $this->value;
+        return $val;
+    }
+
+    /**
+     * @param ContextKey $key
+     *
+     * @return CorrelationContext
+     */
+    public function removeCorrelation(ContextKey $key): CorrelationContext
     {
         if ($this->key === $key) {
             return $this->parent;
@@ -37,7 +89,7 @@ class CorrelationContext extends Context
         return $this;
     }
 
-    private function removeCorrelationHelper(ContextKey $key, ?Context $child)
+    private function removeCorrelationHelper(ContextKey $key, ?CorrelationContext $child)
     {
         if ($this->key != $key) {
             if (null === $this->parent) {
@@ -45,6 +97,7 @@ class CorrelationContext extends Context
             }
 
             $this->parent->removeCorrelationHelper($key, $this);
+            return;
         }
 
         $child->setParent($this->parent);
@@ -53,5 +106,15 @@ class CorrelationContext extends Context
     public function clearCorrelations()
     {
         // TODO: Write me
+    }
+
+    /**
+     * @param CorrelationContext $parent
+     *
+     * @return null
+     */
+    protected function setParent(CorrelationContext $parent)
+    {
+        $this->parent = $parent;
     }
 }

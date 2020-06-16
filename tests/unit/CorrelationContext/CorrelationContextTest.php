@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\CorrelationContext;
 
-
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
-use OpenTelemetry\sdk\CorrelationContext\CorrelationContext;
+use OpenTelemetry\Sdk\CorrelationContext\CorrelationContext;
 use PHPUnit\Framework\TestCase;
 
 class CorrelationContextTest extends TestCase
@@ -41,8 +39,13 @@ class CorrelationContextTest extends TestCase
         $key2 = new ContextKey('key2');
         $key3 = new ContextKey('key3');
         $key4 = new ContextKey('key4');
-        $ctx = (new Context())->set($key1, 'val1')->set($key2, 'val2')->set($key3, 'val3')->set($key4, 'val4');
+        $ctx = (new CorrelationContext())->
+            set($key1, 'val1')->
+            set($key2, 'val2')->
+            set($key3, 'val3')->
+            set($key4, 'val4');
         $result = $ctx->removeCorrelation($key3);
-        print_r($result);
+        //print_r($result);
+        //4 keys, 2keys, 1key, 0keys
     }
 }

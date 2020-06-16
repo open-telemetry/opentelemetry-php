@@ -34,6 +34,7 @@ class Context
      * @param ContextKey $key
      * @param mixed $value
      *
+     * @param Context|null $parent
      * @return Context
      */
     public static function setValue(ContextKey $key, $value, ?Context $parent=null): Context
@@ -87,6 +88,7 @@ class Context
     }
 
     /**
+     * @param Context $ctx
      * @return callable
      */
     public static function attach(Context $ctx): callable
@@ -100,19 +102,11 @@ class Context
     }
 
     /**
+     * @param callable $token
+     * @return Context
      */
     public static function detach(callable $token): Context
     {
         return self::$current_context = call_user_func($token);
-    }
-
-    /**
-     * @param Context $parent
-     *
-     * @return null
-     */
-    protected function setParent(Context $parent)
-    {
-        $this->parent = $parent;
     }
 }
