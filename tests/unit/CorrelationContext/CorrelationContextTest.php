@@ -7,7 +7,7 @@ namespace OpenTelemetry\Tests\Unit\CorrelationContext;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
-use OpenTelemetry\Sdk\CorrelationContext\CorrelationContext;
+use OpenTelemetry\sdk\CorrelationContext\CorrelationContext;
 use PHPUnit\Framework\TestCase;
 
 class CorrelationContextTest extends TestCase
@@ -27,7 +27,7 @@ class CorrelationContextTest extends TestCase
     {
         $key1 = new ContextKey('key1');
         $key2 = new ContextKey('key2');
-        $ctx = (new Context())->set($key1, 'val1')->set($key2, 'val2');
+        $ctx = (new CorrelationContext())->set($key1, 'val1')->set($key2, 'val2');
         $this->assertSame($ctx->get($key1), 'val1');
         $this->assertSame($ctx->get($key2), 'val2');
     }

@@ -25,8 +25,7 @@
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\Context\\": "Context",
-            "OpenTelemetry\\api\\CorrelationContext\\": "api/CorrelationContext",
-            "OpenTelemetry\\sdk\\CorrelationContext\\": "sdk/CorrelationContext",
+            "OpenTelemetry\\Sdk\\CorrelationContext\\": "sdk/CorrelationContext",
             "OpenTelemetry\\Trace\\": "api/Trace",
             "OpenTelemetry\\Sdk\\Trace\\": "sdk/Trace",
             "OpenTelemetry\\Sdk\\Resource\\": "sdk/Resource"
