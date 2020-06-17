@@ -20,7 +20,7 @@ class SimpleSpanProcessor implements SpanProcessor
      */
     private $running = true;
 
-    public function __construct(?Exporter $exporter)
+    public function __construct(?Exporter $exporter = null)
     {
         $this->exporter = $exporter;
     }
