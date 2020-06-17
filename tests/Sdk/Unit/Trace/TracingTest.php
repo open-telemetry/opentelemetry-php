@@ -125,6 +125,19 @@ class TracingTest extends TestCase
         self::assertCount(2, $tracer->getSpans());
     }
 
+    public function testSetSpanStatusWhenNotRecording()
+    {
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+
+        $span = $tracer->startAndActivateSpan('span')
+            ->setSpanStatus(SpanStatus::UNKNOWN, 'my description')
+            ->end()
+            ->setSpanStatus(SpanStatus::CANCELLED, 'nope');
+
+        $this->assertEquals(SpanStatus::new(SpanStatus::UNKNOWN, 'my description'), $span->getStatus());
+    }
+
     public function testSpanAttributesApi()
     {
         $tracerProvider = new SDK\TracerProvider();
@@ -143,7 +156,7 @@ class TracingTest extends TestCase
         $this->assertEquals(new Attribute('username', 'nekufa'), $span->getAttribute('username'));
 
         // otherwrite
-        $span->replaceAttributes(['email' => 'nekufa@gmail.com',]);
+        $span->replaceAttributes(['email' => 'nekufa@gmail.com']);
 
         // null attributes
         self::assertNull($span->getAttribute('username'));
@@ -179,10 +192,26 @@ class TracingTest extends TestCase
         self::assertEquals($expected, $actual);
     }
 
-    public function testSetAttributeWhenNotRecording()
+    public function testSetAttributeReplaceAttributesWhenNotRecording()
     {
-        // todo: implement test
-        $this->markTestIncomplete();
+        $tracer = (new SDK\TracerProvider())->getTracer('OpenTelemetry.TracingTest');
+        $span = $tracer->startAndActivateSpan('testSpan');
+        $span->setAttribute('key1', 'value1');
+        $span->end();
+
+        $this->assertFalse($span->isRecording());
+        $this->assertCount(1, $span->getAttributes());
+        $this->assertArrayHasKey('key1', \iterator_to_array($span->getAttributes()));
+
+        $span->setAttribute('key2', 'value2');
+        $this->assertCount(1, $span->getAttributes());
+        $this->assertArrayHasKey('key1', \iterator_to_array($span->getAttributes()));
+        $this->assertArrayNotHasKey('key2', \iterator_to_array($span->getAttributes()));
+
+        $span->replaceAttributes(['foo' => 'bar']);
+        $this->assertCount(1, $span->getAttributes());
+        $this->assertArrayHasKey('key1', \iterator_to_array($span->getAttributes()));
+        $this->assertArrayNotHasKey('foo', \iterator_to_array($span->getAttributes()));
     }
 
     public function testEventRegistration()
@@ -214,6 +243,37 @@ class TracingTest extends TestCase
                     ->setAttribute('active_at', time());
 
         $this->assertCount(2, $span->getEvents());
+    }
+
+    public function testAddEventWhenNotRecording()
+    {
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+        $span = $tracer->startAndActivateSpan('span');
+        $span->addEvent('recorded_event', 0);
+
+        $events = $span->getEvents();
+        self::assertCount(1, $events);
+
+        [$event] = \iterator_to_array($events);
+        $this->assertSame($event->getName(), 'recorded_event');
+
+        $span->end();
+        $span->addEvent('not_recorded_event', 1);
+
+        $this->assertCount(1, $span->getEvents());
+        [$event] = \iterator_to_array($events);
+        $this->assertSame($event->getName(), 'recorded_event');
+    }
+
+    public function testStopRecordingWhenSpanEnds()
+    {
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+        $span = $tracer->startAndActivateSpan('span');
+        $this->assertTrue($span->isRecording());
+        $span->end();
+        $this->assertFalse($span->isRecording());
     }
 
     public function testParentSpanContext()
