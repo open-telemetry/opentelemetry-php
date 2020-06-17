@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
-use Exception;
 use OpenTelemetry\Trace as API;
 
 class Span implements API\Span
@@ -70,8 +69,10 @@ class Span implements API\Span
 
     public function setSpanStatus(int $code, ?string $description = null): API\Span
     {
-        $this->statusCode = $code;
-        $this->statusDescription = $description ?? self::DESCRIPTION[$code] ?? self::DESCRIPTION[self::UNKNOWN];
+        if ($this->isRecording()) {
+            $this->statusCode = $code;
+            $this->statusDescription = $description ?? self::DESCRIPTION[$code] ?? self::DESCRIPTION[self::UNKNOWN];
+        }
 
         return $this;
     }
@@ -140,7 +141,9 @@ class Span implements API\Span
 
     public function setAttribute(string $key, $value): API\Span
     {
-        $this->attributes->setAttribute($key, $value);
+        if ($this->isRecording()) {
+            $this->attributes->setAttribute($key, $value);
+        }
 
         return $this;
     }
@@ -152,11 +155,11 @@ class Span implements API\Span
 
     public function replaceAttributes(iterable $attributes): self
     {
-        $this->throwIfNotRecording();
-
-        $this->attributes = new Attributes();
-        foreach ($attributes as $k => $v) {
-            $this->setAttribute($k, $v);
+        if ($this->isRecording()) {
+            $this->attributes = new Attributes();
+            foreach ($attributes as $k => $v) {
+                $this->setAttribute($k, $v);
+            }
         }
 
         return $this;
@@ -165,10 +168,9 @@ class Span implements API\Span
     // todo: is accepting an Iterator enough to satisfy AddLazyEvent?  -> Looks like the spec might have been updated here: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-events
     public function addEvent(string $name, int $timestamp, ?API\Attributes $attributes = null): API\Span
     {
-        // todo: really throw if not recording?
-        $this->throwIfNotRecording();
-
-        $this->events->addEvent($name, $attributes, $timestamp);
+        if ($this->isRecording()) {
+            $this->events->addEvent($name, $attributes, $timestamp);
+        }
 
         return $this;
     }
@@ -186,13 +188,6 @@ class Span implements API\Span
     public function isRemote(): bool
     {
         return false;
-    }
-
-    private function throwIfNotRecording()
-    {
-        if (!$this->isRecording()) {
-            throw new Exception('Span is readonly');
-        }
     }
 
     public function setLinks(API\Links $links): Span
