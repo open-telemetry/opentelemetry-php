@@ -3,11 +3,11 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\Sdk\Trace\AlwaysOnSampler;
+use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
-use OpenTelemetry\Sdk\Trace\JaegerExporter;
-use OpenTelemetry\Sdk\Trace\SimpleSpanProcessor;
+use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
 
@@ -27,9 +27,8 @@ $exporter = new JaegerExporter(
 
 if ($sampler) {
     echo 'Starting JaegerExporterExample';
-    $tracer = (TracerProvider::getInstance(
-        [new SimpleSpanProcessor($exporter)]
-    ))
+    $tracer = (new TracerProvider())
+        ->addSpanProcessor(new SimpleSpanProcessor($exporter))
         ->getTracer('io.opentelemetry.contrib.php');
 
     echo PHP_EOL . sprintf('Trace with id %s started ', $tracer->getActiveSpan()->getContext()->getTraceId());
