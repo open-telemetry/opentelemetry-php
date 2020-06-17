@@ -3,13 +3,13 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\Sdk\Trace\AlwaysOnSampler;
+use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
+use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
-use OpenTelemetry\Sdk\Trace\SimpleSpanProcessor;
+use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
-use OpenTelemetry\Sdk\Trace\ZipkinExporter;
 use OpenTelemetry\Trace as API;
 
 $sampler = new AlwaysOnSampler();
@@ -28,9 +28,8 @@ $zipkinExporter = new ZipkinExporter(
 
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
     echo 'Starting AlwaysOnTraceExample';
-    $tracer = (TracerProvider::getInstance(
-        [new SimpleSpanProcessor($zipkinExporter)]
-    ))
+    $tracer = (new TracerProvider())
+        ->addSpanProcessor(new SimpleSpanProcessor($zipkinExporter))
         ->getTracer('io.opentelemetry.contrib.php');
 
     echo PHP_EOL . sprintf('Trace with id %s started ', $tracer->getActiveSpan()->getContext()->getTraceId());

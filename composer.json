@@ -25,16 +25,14 @@
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\Context\\": "Context",
-            "OpenTelemetry\\Trace\\": "api/Trace",
-            "OpenTelemetry\\Sdk\\Internal\\": "sdk/Internal",
-            "OpenTelemetry\\Sdk\\Trace\\": "sdk/Trace",
-            "OpenTelemetry\\Sdk\\Resource\\": "sdk/Resource"
+            "OpenTelemetry\\": "api",
+            "OpenTelemetry\\Sdk\\": "sdk",
+            "OpenTelemetry\\Contrib\\": "contrib"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "OpenTelemetry\\Sdk\\Tests\\": "sdk/Tests",
-            "OpenTelemetry\\Tests\\": "test/"
+            "OpenTelemetry\\Tests\\": "tests/"
         }
     },
     "require-dev": {
