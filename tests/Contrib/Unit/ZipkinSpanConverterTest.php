@@ -71,13 +71,12 @@ class ZipkinSpanConverterTest extends TestCase
      */
     public function durationShouldBeInMicroseconds()
     {
-        $span = new Span("duration.test", SpanContext::generate());
+        $span = new Span('duration.test', SpanContext::generate());
 
         $row = (new SpanConverter('duration.test'))->convert($span);
 
-
         $this->assertEquals(
-            (int)(($span->getEndTimestamp() - $span->getStartTimestamp()) / 1000),
+            (int) (($span->getEndTimestamp() - $span->getStartTimestamp()) / 1000),
             $row['duration']
         );
     }
