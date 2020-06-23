@@ -19,7 +19,7 @@ class ContextTest extends TestCase
         $key1 = new ContextKey('key1');
         $key2 = new ContextKey('key2');
 
-        $ctx = (new Context())->set($key1, 'val1')->set($key2, 'val2');
+        $ctx = (new MyClassUsesContextTrait())->set($key1, 'val1')->set($key2, 'val2');
 
         $this->assertSame($ctx->get($key1), 'val1');
         $this->assertSame($ctx->get($key2), 'val2');
@@ -33,7 +33,7 @@ class ContextTest extends TestCase
         $key1 = new ContextKey();
         $key2 = new ContextKey();
 
-        $parent = (new Context())->set($key1, 'foo');
+        $parent = (new MyClassUsesContextTrait())->set($key1, 'foo');
         $child = $parent->set($key2, 'bar');
 
         $this->assertSame($child->get($key1), 'foo');
@@ -54,7 +54,7 @@ class ContextTest extends TestCase
         $key1 = new ContextKey($key_name);
         $key2 = new ContextKey($key_name);
 
-        $ctx = (new Context())->set($key1, 'val1')->set($key2, 'val2');
+        $ctx = (new MyClassUsesContextTrait())->set($key1, 'val1')->set($key2, 'val2');
 
         $this->assertSame($ctx->get($key1), 'val1');
         $this->assertSame($ctx->get($key2), 'val2');
@@ -68,7 +68,7 @@ class ContextTest extends TestCase
         $key1 = new ContextKey();
         $key2 = new ContextKey();
 
-        $ctx = (new Context())->set($key1, 'val1')->set($key2, 'val2');
+        $ctx = (new MyClassUsesContextTrait())->set($key1, 'val1')->set($key2, 'val2');
 
         $this->assertSame($ctx->get($key1), 'val1');
         $this->assertSame($ctx->get($key2), 'val2');
@@ -89,7 +89,7 @@ class ContextTest extends TestCase
         $null_key = new ContextKey();
         $obj_key = new ContextKey();
 
-        $ctx = (new Context())
+        $ctx = (new MyClassUsesContextTrait())
             ->set($scalar_key, $scalar_val)
             ->set($array_key, $array_val)
             ->set($null_key, $null_val)
@@ -110,14 +110,14 @@ class ContextTest extends TestCase
         foreach (range(0, 9) as $i) {
             $r = rand(0, 100);
             $key = new ContextKey((string) $r);
-            Context::setValue($key, $r);
+            MyClassUsesContextTrait::setValue($key, $r);
             $arr[$r] = $key;
         }
 
         ksort($arr);
 
         foreach ($arr as $v => $k) {
-            $this->assertSame(Context::getValue($k), $v);
+            $this->assertSame(MyClassUsesContextTrait::getValue($k), $v);
         }
     }
 
@@ -130,20 +130,20 @@ class ContextTest extends TestCase
         $key2 = new ContextKey();
         $key3 = new ContextKey();
 
-        Context::setValue($key1, '111');
-        Context::setValue($key2, '222');
+        MyClassUsesContextTrait::setValue($key1, '111');
+        MyClassUsesContextTrait::setValue($key2, '222');
 
-        $ctx = Context::setValue($key3, '333', new Context());
+        $ctx = MyClassUsesContextTrait::setValue($key3, '333', new MyClassUsesContextTrait());
 
-        $this->assertSame(Context::getValue($key1), '111');
-        $this->assertSame(Context::getValue($key2), '222');
+        $this->assertSame(MyClassUsesContextTrait::getValue($key1), '111');
+        $this->assertSame(MyClassUsesContextTrait::getValue($key2), '222');
 
-        $this->assertSame(Context::getValue($key3, $ctx), '333');
+        $this->assertSame(MyClassUsesContextTrait::getValue($key3, $ctx), '333');
 
         $e = null;
 
         try {
-            Context::getValue($key1, $ctx);
+            MyClassUsesContextTrait::getValue($key1, $ctx);
         } catch (\Exception $e) {
         }
         $this->assertInstanceOf(ContextValueNotFoundException::class, $e);
@@ -151,7 +151,7 @@ class ContextTest extends TestCase
         $e = null;
 
         try {
-            Context::getValue($key2, $ctx);
+            MyClassUsesContextTrait::getValue($key2, $ctx);
         } catch (\Exception $e) {
         }
         $this->assertInstanceOf(ContextValueNotFoundException::class, $e);
@@ -159,7 +159,7 @@ class ContextTest extends TestCase
         $e = null;
 
         try {
-            Context::getValue($key3);
+            MyClassUsesContextTrait::getValue($key3);
         } catch (\Exception $e) {
         }
         $this->assertInstanceOf(ContextValueNotFoundException::class, $e);
@@ -171,7 +171,7 @@ class ContextTest extends TestCase
     public function reusingKeyOverwritesValue()
     {
         $key = new ContextKey();
-        $ctx = (new Context())->set($key, 'val1');
+        $ctx = (new MyClassUsesContextTrait())->set($key, 'val1');
         $this->assertSame($ctx->get($key), 'val1');
 
         $ctx = $ctx->set($key, 'val2');
@@ -184,7 +184,7 @@ class ContextTest extends TestCase
     public function ctxValueNotFoundThrows()
     {
         $this->expectException(ContextValueNotFoundException::class);
-        $ctx = (new Context())->set(new ContextKey('foo'), 'bar');
+        $ctx = (new MyClassUsesContextTrait())->set(new ContextKey('foo'), 'bar');
         $ctx->get(new ContextKey('baz'));
     }
 
@@ -194,9 +194,9 @@ class ContextTest extends TestCase
     public function attachAndDetachSetCurrentCtx()
     {
         $key = new ContextKey();
-        Context::attach((new Context())->set($key, '111'));
+        Context::attach((new MyClassUsesContextTrait())->set($key, '111'));
 
-        $token = Context::attach((new Context())->set($key, '222'));
+        $token = Context::attach((new MyClassUsesContextTrait())->set($key, '222'));
         $this->assertSame(Context::getValue($key), '222');
 
         Context::detach($token);
@@ -208,14 +208,14 @@ class ContextTest extends TestCase
      */
     public function instanceSetAndStaticGetUseSameCtx()
     {
-        $key = new ContextKey();
+        $key = new ContextKey('ofoba');
         $val = 'foobar';
 
-        $ctx = (new Context())->set($key, $val);
-        Context::attach($ctx);
+        $ctx = (new MyClassUsesContextTrait())->set($key, $val);
+        MyClassUsesContextTrait::attach($ctx);
 
-        $this->assertSame(Context::getValue($key, $ctx), $val);
-        $this->assertSame(Context::getValue($key), $val);
+        $this->assertSame(MyClassUsesContextTrait::getValue($key, $ctx), $val);
+        $this->assertSame(MyClassUsesContextTrait::getValue($key, null, true), $val);
     }
 
     /**
@@ -228,8 +228,8 @@ class ContextTest extends TestCase
         $val1 = '111';
         $val2 = '222';
 
-        $ctx = Context::setValue($key1, $val1);
-        $ctx = Context::setValue($key2, $val2, $ctx);
+        $ctx = MyClassUsesContextTrait::setValue($key1, $val1);
+        $ctx = MyClassUsesContextTrait::setValue($key2, $val2, $ctx);
 
         $this->assertSame($ctx->get($key1), $val1);
         $this->assertSame($ctx->get($key2), $val2);
@@ -240,12 +240,12 @@ class ContextTest extends TestCase
      */
     public function staticWithoutPassedCtxUsesCurrent()
     {
-        $ctx = Context::setValue(new ContextKey(), '111');
-        $first = Context::getCurrent();
+        $ctx = MyClassUsesContextTrait::setValue(new ContextKey(), '111');
+        $first = MyClassUsesContextTrait::getCurrent();
         $this->assertSame($first, $ctx);
 
-        $ctx = Context::setValue(new ContextKey(), '222');
-        $second = Context::getCurrent();
+        $ctx = MyClassUsesContextTrait::setValue(new ContextKey(), '222');
+        $second = MyClassUsesContextTrait::getCurrent();
         $this->assertSame($second, $ctx);
 
         $this->assertNotSame($first, $second);
@@ -257,10 +257,15 @@ class ContextTest extends TestCase
     public function staticWithPassedCtxDoesNotUseCurrent()
     {
         $key1 = new ContextKey();
-        $currentCtx = Context::setValue($key1, '111');
+        $currentCtx = MyClassUsesContextTrait::setValue($key1, '111');
 
         $key2 = new ContextKey();
-        $otherCtx = Context::setValue($key2, '222', new Context());
-        $this->assertSame($currentCtx, Context::getCurrent());
+        $otherCtx = MyClassUsesContextTrait::setValue($key2, '222', new MyClassUsesContextTrait());
+        $this->assertSame($currentCtx, MyClassUsesContextTrait::getCurrent());
     }
+}
+
+class MyClassUsesContextTrait
+{
+    use Context;
 }

@@ -28,6 +28,9 @@
         <testsuite name="Contrib Unit Tests">
             <directory>./tests/Contrib/Unit</directory>
         </testsuite>
+        <testsuite name="Context Unit Tests">
+            <directory>./tests/Context/Unit</directory>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist>
