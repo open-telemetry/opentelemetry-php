@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 
 class Tracer implements API\Tracer
@@ -18,17 +19,17 @@ class Tracer implements API\Tracer
     private $provider;
 
     /**
-     * @var InstrumentationLibrary
+     * @var ResourceInfo
      */
-    private $instrumentationLibrary;
+    private $resource;
 
     public function __construct(
         TracerProvider $provider,
-        InstrumentationLibrary $instrumentationLibrary,
+        ResourceInfo $resource,
         API\SpanContext $context = null
     ) {
         $this->provider = $provider;
-        $this->instrumentationLibrary = $instrumentationLibrary;
+        $this->resource = $resource;
         $context = $context ?: SpanContext::generate();
 
         // todo: hold up, why do we automatically make a root Span?
