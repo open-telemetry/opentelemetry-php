@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Zipkin;
 
-use Exception;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
+use Http\Adapter\Guzzle6\Client;
 use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Client\NetworkExceptionInterface;
+use Psr\Http\Client\RequestExceptionInterface;
 
 /**
  * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
@@ -33,8 +37,17 @@ class Exporter implements Trace\Exporter
      */
     private $running = true;
 
-    public function __construct($name, string $endpointUrl, SpanConverter $spanConverter = null)
-    {
+    /**
+     * @var ClientInterface|null
+     */
+    private $client;
+
+    public function __construct(
+        $name,
+        string $endpointUrl,
+        SpanConverter $spanConverter = null,
+        ClientInterface $client = null
+    ) {
         $parsedDsn = parse_url($endpointUrl);
 
         if (!is_array($parsedDsn)) {
@@ -51,7 +64,7 @@ class Exporter implements Trace\Exporter
         }
 
         $this->endpointUrl = $endpointUrl;
-
+        $this->client = $client ?? $this->createDefaultClient();
         $this->spanConverter = $spanConverter ?? new SpanConverter($name);
     }
 
@@ -72,22 +85,26 @@ class Exporter implements Trace\Exporter
         }
 
         $convertedSpans = [];
-        foreach ($spans as &$span) {
+        foreach ($spans as $span) {
             array_push($convertedSpans, $this->spanConverter->convert($span));
         }
 
         try {
-            $container = [];
-            $history = Middleware::history($container);
-            $stack = HandlerStack::create();
-            // Add the history middleware to the handler stack.
-            $stack->push($history);
             $json = json_encode($convertedSpans);
-            $client = new \GuzzleHttp\Client(['handler' => $stack]);
             $headers = ['content-type' => 'application/json'];
             $request = new Request('POST', $this->endpointUrl, $headers, $json);
-            $response = $client->send($request, ['timeout' => 30]);
-        } catch (Exception $e) {
+            $response = $this->client->sendRequest($request);
+        } catch (RequestExceptionInterface $e) {
+            return Trace\Exporter::FAILED_NOT_RETRYABLE;
+        } catch (NetworkExceptionInterface | ClientExceptionInterface $e) {
+            return Trace\Exporter::FAILED_RETRYABLE;
+        }
+
+        if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
+            return Trace\Exporter::FAILED_NOT_RETRYABLE;
+        }
+
+        if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
             return Trace\Exporter::FAILED_RETRYABLE;
         }
 
@@ -97,5 +114,19 @@ class Exporter implements Trace\Exporter
     public function shutdown(): void
     {
         $this->running = false;
+    }
+
+    protected function createDefaultClient(): ClientInterface
+    {
+        $container = [];
+        $history = Middleware::history($container);
+        $stack = HandlerStack::create();
+        // Add the history middleware to the handler stack.
+        $stack->push($history);
+
+        return Client::createWithConfig([
+            'handler' => $stack,
+            'timeout' => 30,
+        ]);
     }
 }
