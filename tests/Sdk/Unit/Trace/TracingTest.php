@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
+use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace as SDK;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
@@ -32,14 +33,12 @@ class TracingTest extends TestCase
 
     public function testTracerSpanContextRestore()
     {
-        // todo: stop making a new span when a trace is made and then use getTracer instead of new Tracer.
         $tracerProvider = new SDK\TracerProvider();
-        $instrumentationLibrary = new SDK\InstrumentationLibrary('OpenTelemetry.TracingTest.Test');
-        $tracer = new Tracer($tracerProvider, $instrumentationLibrary);
+        $tracer = new Tracer($tracerProvider, ResourceInfo::create(new Attributes([])));
         $spanContext = $tracer->getActiveSpan()->getContext();
 
         $spanContext2 = SpanContext::restore($spanContext->getTraceId(), $spanContext->getSpanId());
-        $tracer2 = new Tracer($tracerProvider, $instrumentationLibrary, $spanContext2);
+        $tracer2 = new Tracer($tracerProvider, ResourceInfo::create(new Attributes([])), $spanContext2);
 
         $this->assertSame($tracer->getActiveSpan()->getContext()->getTraceId(), $tracer2->getActiveSpan()->getContext()->getTraceId());
     }
