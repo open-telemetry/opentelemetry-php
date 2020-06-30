@@ -6,7 +6,9 @@
     "require": {
         "php": "^7.3",
         "ext-json": "*",
-        "guzzlehttp/guzzle": "^6.5"
+        "guzzlehttp/guzzle": "^6.5",
+        "psr/http-client": "^1.0",
+        "php-http/guzzle6-adapter": "^2.0"
     },
     "authors": [
         {

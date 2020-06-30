@@ -361,6 +361,8 @@ return [
         'contrib',
         'vendor/composer/xdebug-handler/src',
         'vendor/guzzlehttp',
+        'vendor/psr',
+        'vendor/php-http',
         'vendor/phan/phan/src/Phan',
         'vendor/phpunit/phpunit/src',
     ],
