@@ -25,6 +25,7 @@ class ZipkinSpanConverterTest extends TestCase
 
         $span = $tracer->startAndActivateSpan('guard.validate');
         $span->setAttribute('service', 'guard');
+        $span->setAttribute('boolean', true);
         $span->addEvent('validators.list', $timestamp, new Attributes(['job' => 'stage.updateTime']));
         $span->end();
 
@@ -44,8 +45,9 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertIsInt($row['duration']);
         $this->assertGreaterThan(0, $row['duration']);
 
-        $this->assertCount(1, $row['tags']);
+        $this->assertCount(2, $row['tags']);
         $this->assertEquals($span->getAttribute('service')->getValue(), $row['tags']['service']);
+        $this->assertEquals($span->getAttribute('boolean')->getValue(), $row['tags']['boolean']);
 
         $this->assertCount(1, $row['annotations']);
         [$annotation] = $row['annotations'];
