@@ -12,11 +12,22 @@ class CorrelationContext
     use Context;
 
     /**
-     * @param CorrelationContext $context
+     * @var CorrelationContext|null
      */
-    public function getCorrelations($context = null)
+    private $parent;
+
+    /**
+     * Return the k/v Correlation pairs from the CorrelationContext
+     * The yielded values are of the form `ContextKey => mixed`
+     *
+     * @return \Generator
+     */
+    public function getCorrelations()
     {
-        // TODO: Write me
+        if (null !== $this->parent) {
+            yield from $this->parent->getCorrelations();
+        }
+        yield $this->key => $this->value;
     }
 
     /**
@@ -38,8 +49,6 @@ class CorrelationContext
     /**
      * @param ContextKey $key
      * @param CorrelationContext|null $child
-     * @suppress PhanUndeclaredMethod
-     * @suppress PhanTypeMismatchArgument
      */
     private function removeCorrelationHelper(ContextKey $key, ?CorrelationContext $child)
     {
@@ -65,8 +74,18 @@ class CorrelationContext
         $this->parent = $parent;
     }
 
+    /**
+     * When called on a CorrelationContext, this function will destroy all Correlation data
+     *
+     * @return null
+     */
     public function clearCorrelations()
     {
-        // TODO: Write me
+        if (null !== $this->parent) {
+            $this->parent->clearCorrelations();
+        }
+        $this->key = null;
+        $this->value = null;
+        $this->parent = null;
     }
 }

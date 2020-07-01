@@ -76,4 +76,42 @@ class CorrelationContextTest extends TestCase
         $this->assertNotEquals('bar', $cctx->get($key1));
         $this->assertNotEquals('foo', $cctx->get($key2));
     }
+
+    /**
+     * @test
+     */
+    public function testClearCorrelations()
+    {
+        $key1 = new ContextKey();
+        $key2 = new ContextKey();
+
+        $cctx = (new CorrelationContext())->set($key1, 'foo')->set($key2, 'bar');
+
+        $this->assertEquals('foo', $cctx->get($key1));
+        $this->assertEquals('bar', $cctx->get($key2));
+
+        $cctx->clearCorrelations();
+        $this->expectException(ContextValueNotFoundException::class);
+        $cctx->get($key1);
+    }
+
+    /**
+     * @test
+     */
+    public function testGetCorrelations()
+    {
+        $key1 = new ContextKey();
+        $key2 = new ContextKey();
+
+        $cctx = (new CorrelationContext())->set($key1, 'foo')->set($key2, 'bar');
+
+        $res = [];
+        foreach ($cctx->getCorrelations() as $k => $v) {
+            // I am inverting the k/v pairs in an array here because php does not allow for object keys
+            $res[$v] = $k;
+        }
+
+        $this->assertSame($key1, $res['foo']);
+        $this->assertSame($key2, $res['bar']);
+    }
 }
