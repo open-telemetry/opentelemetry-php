@@ -4,37 +4,37 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
-trait Context
+class Context
 {
     /**
      * @var ContextKey|null
      */
-    private $key;
+    protected $key;
 
     /**
      * @var mixed|null
      */
-    private $value;
+    protected $value;
 
     /**
      * @var Context|null
      */
-    private $parent;
+    protected $parent;
 
-    private static $current_context = null;
+    protected static $current_context = null;
 
     /**
-     * The constructor for a Context object. Because this is a trait, a `Context` cannot be instantiated directly,
-     * this constructor is intended for use by the classes that use this trait. Throughout the docsblocks and comments
-     * in this class, we will refer to "Context instance" which really refers to an instance of the class
-     * that uses this trait.
-     *
      * This is a general purpose read-only key-value store. Read-only in the sense that adding a new value does not
      * mutate the existing context, but returns a new Context which has the new value added.
      *
      * In practical terms, this is implemented as a linked list of Context instances, with each one holding a reference
      * to the key object, the value that corresponds to the key, and an optional reference to the parent Context
      * (i.e. the next link in the linked list chain)
+     *
+     * If you inherit from this class, you should "shadow" $parent into your subclass so that all operations give
+     * you back an instance of the same type that you are interacting with and different subclasses should NOT be
+     * treated as interoperable. i.e. you should NOT have a Context object chain with both Context instances interleaved
+     * with CorrelationContext instances.
      *
      * @param ContextKey|null $key The key object. Should only be null when creating an "empty" context
      * @param mixed|null $value
@@ -51,20 +51,14 @@ trait Context
      * This adds a k/v pair to this Context. We do this by instantiating a new Context instance with the k/v and pass
      * a reference to $this as the "parent" creating the linked list chain.
      *
-     * The object instantiated will be of the same type as the concrete class using this trait as referenced by __CLASS__
-     *
      * @param ContextKey $key
      * @param mixed $value
-     *
-     * @suppress PhanTypeInstantiateTrait
      *
      * @return Context a new Context containing the k/v
      */
     public function set(ContextKey $key, $value)
     {
-        $cls = __CLASS__;
-
-        return new $cls($key, $value, $this);
+        return new $this($key, $value, $this);
     }
 
     /**
@@ -73,29 +67,25 @@ trait Context
      *
      * There are two ways to call this function.
      * 1) With a $parent parameter:
-     *    This should be an instance of __CLASS__ which is a concrete class that uses this Trait.
      *    Context::setValue($key, $value, $ctx) is functionally equivalent to $ctx->set($key, $value)
      * 2) Without a $parent parameter:
      *    In this scenario, setValue() will use the `$current_context` reference as supplied by `getCurrent()`
-     *    `getCurrent()` will always return a valid Context/__CLASS__. If one does not exist at the global scope,
+     *    `getCurrent()` will always return a valid Context. If one does not exist at the global scope,
      *    an "empty" context will be created.
      *
      * @param ContextKey $key
      * @param mixed $value
      * @param Context|null $parent
      *
-     * @suppress PhanTypeInstantiateTrait
-     *
      * @return Context a new Context containing the k/v
      */
     public static function setValue(ContextKey $key, $value, $parent=null)
     {
-        $cls = __CLASS__;
         if (null === $parent) {
-            return static::$current_context = new $cls($key, $value, $cls::getCurrent());
+            return static::$current_context = new static($key, $value, static::getCurrent());
         }
 
-        return new $cls($key, $value, $parent);
+        return new static($key, $value, $parent);
     }
 
     /**
@@ -125,7 +115,6 @@ trait Context
      *
      * There are two ways to call this function:
      * 1) With a $ctx value:
-     *    This should be an instance of __CLASS__ which is a concrete class that uses this trait.
      *    Context::getValue($key, $ctx) is functionally equivalent to $ctx->get($key)
      * 2) Without a $ctx value:
      *    This will fetch the "current" Context if one exists or create one if not, then attempt to get the value from it.
@@ -138,22 +127,18 @@ trait Context
      */
     public static function getValue(ContextKey $key, $ctx=null)
     {
-        $cls = __CLASS__;
-        $ctx = $ctx ?? $cls::getCurrent();
+        $ctx = $ctx ?? static::getCurrent();
 
         return $ctx->get($key);
     }
 
     /**
-     * @suppress PhanTypeInstantiateTrait
-     *
      * @return Context
      */
     public static function getCurrent()
     {
         if (null === static::$current_context) {
-            $cls = __CLASS__;
-            static::$current_context = new $cls();
+            static::$current_context = new static();
         }
 
         return static::$current_context;

@@ -7,14 +7,12 @@ namespace OpenTelemetry\Sdk;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
 
-class CorrelationContext
+class CorrelationContext extends Context
 {
-    use Context;
-
     /**
      * @var CorrelationContext|null
      */
-    private $parent;
+    protected $parent;
 
     /**
      * Return the k/v Correlation pairs from the CorrelationContext
@@ -69,7 +67,7 @@ class CorrelationContext
      *
      * @return null
      */
-    public function setParent(CorrelationContext $parent)
+    protected function setParent(CorrelationContext $parent)
     {
         $this->parent = $parent;
     }
