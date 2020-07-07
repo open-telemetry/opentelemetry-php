@@ -37,12 +37,16 @@ class SimpleSpanProcessor implements SpanProcessor
      */
     public function onEnd(API\Span $span): void
     {
-        if ($this->running) {
-            // @todo only spans with SampleFlag === true should be exported according to
-            // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sdk-tracing.md#sampling
-            if (null !== $this->exporter) {
-                $this->exporter->export([$span]);
-            }
+        if (!$this->running) {
+            return;
+        }
+
+        if ($span->isSampled()) {
+            return;
+        }
+
+        if (null !== $this->exporter) {
+            $this->exporter->export([$span]);
         }
     }
 

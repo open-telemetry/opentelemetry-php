@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Trace\SpanProcessor;
 
 use OpenTelemetry\Sdk\Trace\Exporter;
 use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
 use PHPUnit\Framework\TestCase;
 
@@ -72,5 +73,18 @@ class SimpleSpanProcessorTest extends TestCase
 
         // calling onEnd here does NOT result in another call to shutdown
         $this->assertEquals(1, $spy->getInvocationCount());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotExportSampledSpans()
+    {
+        $exporter = self::createMock(Exporter::class);
+        $exporter->expects($this->never())->method('export');
+
+        (new SimpleSpanProcessor($exporter))->onEnd(
+            new Span('sampled_span', new SpanContext('40de9aea7305cced3bb10ed45ba6870d', '277c169397adf2ec', 1))
+        );
     }
 }
