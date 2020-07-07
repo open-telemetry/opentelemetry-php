@@ -21,7 +21,7 @@ class SimpleSpanProcessorTest extends TestCase
         $exporter->expects($this->atLeastOnce())->method('export');
 
         (new SimpleSpanProcessor($exporter))->onEnd(
-            self::createMock(Span::class)
+            new Span('sampled_span', new SpanContext('40de9aea7305cced3bb10ed45ba6872d', '277c169397adf2ec', 1))
         );
     }
 
@@ -78,13 +78,13 @@ class SimpleSpanProcessorTest extends TestCase
     /**
      * @test
      */
-    public function shouldNotExportSampledSpans()
+    public function shouldExportOnlySampledSpans()
     {
         $exporter = self::createMock(Exporter::class);
         $exporter->expects($this->never())->method('export');
 
         (new SimpleSpanProcessor($exporter))->onEnd(
-            new Span('sampled_span', new SpanContext('40de9aea7305cced3bb10ed45ba6870d', '277c169397adf2ec', 1))
+            new Span('sampled_span', new SpanContext('40de9aea7305cced3bb10ed45ba6870d', '277c169397adf2ec', 0))
         );
     }
 }

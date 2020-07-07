@@ -85,14 +85,24 @@ class BatchSpanProcessor implements SpanProcessor
      */
     public function onEnd(API\Span $span): void
     {
-        if (null !== $this->exporter && $this->running) {
-            if (count($this->queue) < $this->maxQueueSize) {
-                $this->queue[] = $span;
-            }
+        if (null === $this->exporter) {
+            return;
+        }
 
-            if ($this->bufferReachedExportLimit() || $this->enoughTimeHasPassed()) {
-                $this->forceFlush();
-            }
+        if (!$this->running) {
+            return;
+        }
+
+        if (!$span->isSampled()) {
+            return;
+        }
+
+        if (count($this->queue) < $this->maxQueueSize) {
+            $this->queue[] = $span;
+        }
+
+        if ($this->bufferReachedExportLimit() || $this->enoughTimeHasPassed()) {
+            $this->forceFlush();
         }
     }
 
