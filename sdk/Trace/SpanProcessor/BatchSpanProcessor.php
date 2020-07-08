@@ -93,11 +93,7 @@ class BatchSpanProcessor implements SpanProcessor
             return;
         }
 
-        if (!$span->isSampled()) {
-            return;
-        }
-
-        if (count($this->queue) < $this->maxQueueSize) {
+        if ($span->isSampled() && !$this->queueReachedLimit()) {
             $this->queue[] = $span;
         }
 
@@ -121,6 +117,11 @@ class BatchSpanProcessor implements SpanProcessor
     protected function bufferReachedExportLimit(): bool
     {
         return count($this->queue) >= $this->maxExportBatchSize;
+    }
+
+    protected function queueReachedLimit(): bool
+    {
+        return count($this->queue) >= $this->maxQueueSize;
     }
 
     protected function enoughTimeHasPassed(): bool
