@@ -190,6 +190,11 @@ class Span implements API\Span
         return false;
     }
 
+    public function isSampled(): bool
+    {
+        return $this->spanContext->isSampled();
+    }
+
     public function setLinks(API\Links $links): Span
     {
         $this->links = $links;
