@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Trace as API;
+use ReflectionClass;
 
 final class SpanOptions implements API\SpanOptions
 {
@@ -16,6 +17,7 @@ final class SpanOptions implements API\SpanOptions
     private $parent = null;
     private $attributes = null;
     private $links = null;
+    private $kind = API\SpanKind::KIND_INTERNAL;
 
     /** @var int|null */
     private $start = null;
@@ -35,7 +37,14 @@ final class SpanOptions implements API\SpanOptions
 
     public function setSpanKind(int $spanKind): API\SpanOptions
     {
-        // TODO: Implement setSpanKind() method.
+        $reflection = new ReflectionClass(API\SpanKind::class);
+
+        if (!in_array($spanKind, $reflection->getConstants(), true)) {
+            throw new \InvalidArgumentException('You must pass a valid span kind');
+        }
+
+        $this->kind = $spanKind;
+
         return $this;
     }
 
@@ -81,7 +90,7 @@ final class SpanOptions implements API\SpanOptions
             ? SpanContext::fork($span->getContext()->getTraceId())
             : SpanContext::generate();
 
-        $span = new Span($this->name, $context, $this->parent);
+        $span = new Span($this->name, $context, $this->parent, $this->kind);
 
         if (isset($this->start)) {
             $span->setStartTimestamp($this->start);
