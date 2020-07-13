@@ -149,13 +149,13 @@ class TracingTest extends TestCase
         self::assertInstanceOf(SDK\Span::class, $span);
 
         // set attributes
-        $span->replaceAttributes(['username' => 'nekufa']);
+        $span->replaceAttributes(new Attributes(['username' => 'nekufa']));
 
         // get attribute
         $this->assertEquals(new Attribute('username', 'nekufa'), $span->getAttribute('username'));
 
         // otherwrite
-        $span->replaceAttributes(['email' => 'nekufa@gmail.com']);
+        $span->replaceAttributes(new Attributes(['email' => 'nekufa@gmail.com']));
 
         // null attributes
         self::assertNull($span->getAttribute('username'));
@@ -169,12 +169,16 @@ class TracingTest extends TestCase
         self::assertEquals(new Attribute('email', 'nekufa@gmail.com'), $span->getAttribute('email'));
         self::assertEquals(new Attribute('username', 'nekufa'), $span->getAttribute('username'));
 
+        // attribute key - code coverage
+        self::assertEquals('email', $span->getAttribute('email')->getKey());
+        self::assertEquals('username', $span->getAttribute('username')->getKey());
+
         // keep order
         $expected = [
             'a' => new Attribute('a', 1),
             'b' => new Attribute('b', 2),
         ];
-        $span->replaceAttributes(['a' => 1, 'b' => 2]);
+        $span->replaceAttributes(new Attributes(['a' => 1, 'b' => 2]));
 
         $actual = \iterator_to_array($span->getAttributes());
         self::assertEquals($expected, $actual);
@@ -207,7 +211,7 @@ class TracingTest extends TestCase
         $this->assertArrayHasKey('key1', \iterator_to_array($span->getAttributes()));
         $this->assertArrayNotHasKey('key2', \iterator_to_array($span->getAttributes()));
 
-        $span->replaceAttributes(['foo' => 'bar']);
+        $span->replaceAttributes(new Attributes(['foo' => 'bar']));
         $this->assertCount(1, $span->getAttributes());
         $this->assertArrayHasKey('key1', \iterator_to_array($span->getAttributes()));
         $this->assertArrayNotHasKey('foo', \iterator_to_array($span->getAttributes()));
