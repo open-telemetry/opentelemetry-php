@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Trace as API;
-use ReflectionClass;
 
 final class SpanOptions implements API\SpanOptions
 {
