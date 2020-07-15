@@ -19,6 +19,28 @@ class SpanConverter
         $this->serviceName = $serviceName;
     }
 
+    private function sanitiseTagValue($value)
+    {
+        // Casting false to string makes an empty string
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        // Zipkin tags must be strings, but opentelemetry
+        // accepts strings, booleans, numbers, and lists of each.
+        if (is_array($value)) {
+            return join(',', array_map([$this, 'sanitiseTagValue'], $value));
+        }
+
+        // Floats will lose precision if their string representation
+        // is >=14 or >=17 digits, depending on PHP settings.
+        // Can also throw E_RECOVERABLE_ERROR if $value is an object
+        // without a __toString() method.
+        // This is possible because OpenTelemetry\Trace\Span does not verify
+        // setAttribute() $value input.
+        return (string) $value;
+    }
+
     public function convert(Span $span)
     {
         $timestamp = Clock::get()->timestamp();
@@ -42,11 +64,7 @@ class SpanConverter
             if (!array_key_exists('tags', $row)) {
                 $row['tags'] = [];
             }
-            $v = $v->getValue();
-            if (is_bool($v)) {
-                $v = (string) $v;
-            }
-            $row['tags'][$k] = $v;
+            $row['tags'][$k] = $this->sanitiseTagValue($v->getValue());
         }
 
         foreach ($span->getEvents() as $event) {
