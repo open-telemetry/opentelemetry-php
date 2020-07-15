@@ -8,6 +8,7 @@ use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\SpanOptions;
 use OpenTelemetry\Sdk\Trace\Tracer;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
+use OpenTelemetry\Trace\SpanKind;
 use PHPUnit\Framework\TestCase;
 
 class SpanOptionsTest extends TestCase
@@ -74,6 +75,48 @@ class SpanOptionsTest extends TestCase
 
         // Check that span attributes are the ones passed in to spanOptions
         $this->assertSame($attributes, $web->getAttributes());
+    }
+
+    /**
+     * @test
+     * @dataProvider provideSpanKinds
+     */
+    public function testSpanKindIsSetCorrect($kind)
+    {
+        $options = new SpanOptions($this->getTracer(), 'test');
+
+        $options->setSpanKind($kind);
+
+        $this->assertEquals($kind, $options->toSpan()->getSpanKind());
+    }
+
+    /**
+     * @test
+     */
+    public function testExceptionIsThrownIfInvalidKindIsPassed()
+    {
+        $nonExistentKind = 999;
+
+        $options = new SpanOptions($this->getTracer(), 'test');
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $options->setSpanKind($nonExistentKind);
+    }
+
+    public function provideSpanKinds(): array
+    {
+        return [
+            [
+                SpanKind::KIND_INTERNAL,
+            ],
+            [
+                SpanKind::KIND_CLIENT,
+            ],
+            [
+                SpanKind::KIND_SERVER,
+            ],
+        ];
     }
 
     protected function getTracer(): Tracer

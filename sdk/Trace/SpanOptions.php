@@ -16,6 +16,7 @@ final class SpanOptions implements API\SpanOptions
     private $parent = null;
     private $attributes = null;
     private $links = null;
+    private $kind = API\SpanKind::KIND_INTERNAL;
 
     /** @var int|null */
     private $start = null;
@@ -35,7 +36,12 @@ final class SpanOptions implements API\SpanOptions
 
     public function setSpanKind(int $spanKind): API\SpanOptions
     {
-        // TODO: Implement setSpanKind() method.
+        if (!in_array($spanKind, API\SpanKind::TYPES, true)) {
+            throw new \InvalidArgumentException('You must pass a valid span kind');
+        }
+
+        $this->kind = $spanKind;
+
         return $this;
     }
 
@@ -81,7 +87,7 @@ final class SpanOptions implements API\SpanOptions
             ? SpanContext::fork($span->getContext()->getTraceId())
             : SpanContext::generate();
 
-        $span = new Span($this->name, $context, $this->parent);
+        $span = new Span($this->name, $context, $this->parent, $this->kind);
 
         if (isset($this->start)) {
             $span->setStartTimestamp($this->start);
