@@ -153,13 +153,10 @@ class Span implements API\Span
         return $this->attributes;
     }
 
-    public function replaceAttributes(iterable $attributes): self
+    public function replaceAttributes(API\Attributes $attributes): self
     {
         if ($this->isRecording()) {
-            $this->attributes = new Attributes();
-            foreach ($attributes as $k => $v) {
-                $this->setAttribute($k, $v);
-            }
+            $this->attributes = $attributes;
         }
 
         return $this;
