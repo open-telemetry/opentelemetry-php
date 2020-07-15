@@ -31,12 +31,11 @@ class AlwaysParentSampler implements Sampler
         ?API\Attributes $attributes = null,
         ?API\Links $links = null
     ): SamplingResult {
-        // todo: hook up $attributes and $links
         if (null !== $parentContext && ($parentContext->getTraceFlags() & API\SpanContext::TRACE_FLAG_SAMPLED)) {
-            return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED);
+            return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED, $attributes, $links);
         }
 
-        return new SamplingResult(SamplingResult::NOT_RECORD);
+        return new SamplingResult(SamplingResult::NOT_RECORD, $attributes, $links);
     }
 
     public function getDescription(): string

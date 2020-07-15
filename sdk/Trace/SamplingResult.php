@@ -33,10 +33,16 @@ final class SamplingResult
      */
     private $attributes;
 
-    public function __construct(int $decision, ?API\Attributes $attributes = null)
+    /**
+     * @var ?API\Links Collection of links that will be associated with the Span to be created.
+     */
+    private $links;
+
+    public function __construct(int $decision, ?API\Attributes $attributes = null, ?API\Links $links = null)
     {
         $this->decision = $decision;
         $this->attributes = $attributes;
+        $this->links = $links;
     }
 
     /**
@@ -53,5 +59,13 @@ final class SamplingResult
     public function getAttributes(): ?API\Attributes
     {
         return $this->attributes;
+    }
+
+    /**
+     * Return a collection of links that will be associated with the Span to be created.
+     */
+    public function getLinks(): ?API\Links
+    {
+        return $this->links;
     }
 }

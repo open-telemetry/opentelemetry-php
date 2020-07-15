@@ -32,7 +32,7 @@ class AlwaysOnSampler implements Sampler
         ?API\Links $links = null
     ): SamplingResult {
         // todo: hook up $attributes and $links
-        return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED);
+        return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED, $attributes, $links);
     }
 
     public function getDescription(): string
