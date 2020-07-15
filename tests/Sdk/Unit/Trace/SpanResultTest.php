@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
-use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Attributes;
-use PHPUnit\Framework\TestCase;
+use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Trace\Links;
+use PHPUnit\Framework\TestCase;
 
 class SpanResultTest extends TestCase
 {
