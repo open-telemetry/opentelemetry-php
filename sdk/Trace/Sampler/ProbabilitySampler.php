@@ -46,7 +46,7 @@ class ProbabilitySampler implements Sampler
         ?API\Links $links = null
     ): SamplingResult {
         if (null !== $parentContext && ($parentContext->getTraceFlags() & API\SpanContext::TRACE_FLAG_SAMPLED)) {
-            return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED);
+            return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED, $attributes, $links);
         }
 
         // TODO: implement as a function of TraceID when specification is ready
@@ -54,7 +54,7 @@ class ProbabilitySampler implements Sampler
             ? SamplingResult::RECORD_AND_SAMPLED
             : SamplingResult::NOT_RECORD;
 
-        return new SamplingResult($decision);
+        return new SamplingResult($decision, $attributes, $links);
     }
 
     public function getDescription(): string
