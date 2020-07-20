@@ -20,7 +20,7 @@ class MeterProvider implements API\MeterProvider
     public function getMeter(string $name, ?string $version = null): API\Meter
     {
         if (empty($this->meters[$name])) {
-            $this->meters[$name] = $this->getCreatedMeter();
+            $this->meters[$name] = $this->getCreatedMeter($name, $version);
         }
 
         return $this->meters[$name];
@@ -30,10 +30,13 @@ class MeterProvider implements API\MeterProvider
      * Creates a new Meter instance
      *
      * @access	protected
+     * @param	string	$name
+     * @param	string	$version Default: null
      * @return	API\Meter
      */
-    protected function getCreatedMeter(): API\Meter
+    protected function getCreatedMeter(string $name, string $version = null): API\Meter
     {
+        // todo: once the Meter interface and an implementation are done, change this
         return new Meter();
     }
 }

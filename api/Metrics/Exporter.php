@@ -18,20 +18,10 @@ interface Exporter
      * export.
      *
      * @access	public
-     * @param	iterable	$metrics	
+     * @param	iterable<Metric> $metrics
      * @return	void
      * 
-     * @todo Should we pass a result callback in the 2nd parameter?
+     * todo Should we pass a result callback in the 2nd parameter?
      */
     public function export(iterable $metrics): void;
-
-    public function shutDown(): void;
-
-    // export(
-    //     metrics: MetricRecord[],
-    //     resultCallback: (result: ExportResult) => void
-    //   ): void;
-    
-    //   /** Stops the exporter. */
-    //   shutdown(): void;
 }

@@ -17,7 +17,8 @@ final class GlobalMeterProvider
     protected static $globalProvider;
 
     /**
-     * Returns a global MeterProvider
+     * Returns a global instance MeterProvider.
+     * If global instance is missing, new MeterProvider will be lazily created
      *
      * @access	public static
      * @return	API\MeterProvider
@@ -43,6 +44,9 @@ final class GlobalMeterProvider
         static::$globalProvider = $globalProvider;
     }
 
+    /**
+     * Accessor for the global provider
+     */
     public static function __callStatic($name, $arguments)
     {
         return static::getGlobalProvider()->$name(...$arguments);
