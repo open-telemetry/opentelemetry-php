@@ -69,8 +69,9 @@ class SpanConverter
             if (!array_key_exists('annotations', $row)) {
                 $row['annotations'] = [];
             }
+            // Maybe $event->getTimestamp() (if not null)?
             $row['annotations'][] = [
-                'timestamp' => (int) ($timestamp / 1e3), // RealtimeClock in microseconds
+                'timestamp' => (int) ($start_realtime / 1e3), // RealtimeClock in microseconds
                 'value' => $event->getName(),
             ];
         }
