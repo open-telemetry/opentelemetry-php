@@ -84,7 +84,7 @@ class Tracer implements API\Tracer
     public function startAndActivateSpan(string $name): API\Span
     {
         $parent = $this->getActiveSpan()->getContext();
-        $context = SpanContext::fork($parent->getTraceId());
+        $context = SpanContext::fork($parent->getTraceId(), $parent->isSampled());
         $span = $this->generateSpanInstance($name, $context);
 
         if ($span->isRecording()) {
