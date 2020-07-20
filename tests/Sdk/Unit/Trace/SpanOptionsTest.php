@@ -9,10 +9,13 @@ use OpenTelemetry\Sdk\Trace\SpanOptions;
 use OpenTelemetry\Sdk\Trace\Tracer;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace\SpanKind;
+use OpenTelemetry\Tests\Sdk\Unit\Support\HasTraceProvider;
 use PHPUnit\Framework\TestCase;
 
 class SpanOptionsTest extends TestCase
 {
+    use HasTraceProvider;
+
     public function testShouldCreateSpanFromOptions()
     {
         $tracer = $this->getTracer();
@@ -117,12 +120,5 @@ class SpanOptionsTest extends TestCase
                 SpanKind::KIND_SERVER,
             ],
         ];
-    }
-
-    protected function getTracer(): Tracer
-    {
-        $tracerProvider = new TracerProvider();
-
-        return $tracerProvider->getTracer('OpenTelemetry.TracerTest');
     }
 }
