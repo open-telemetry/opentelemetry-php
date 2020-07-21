@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Metrics;
 
-interface Meter
+interface ValueRecorder
 {
+    public function Record(int $value) : int;
 }
