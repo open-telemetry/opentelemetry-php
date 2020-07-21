@@ -78,22 +78,24 @@ final class SpanContext implements API\SpanContext
     /**
      * Creates a new context with random trace
      *
+     * @param boolean $sampled Default: false
      * @return SpanContext
      */
-    public static function generate(): SpanContext
+    public static function generate(bool $sampled = false): SpanContext
     {
-        return self::fork(self::randomHex(16));
+        return self::fork(self::randomHex(16), $sampled);
     }
 
     /**
      * Creates a new context with random span on the same trace
      *
      * @param string $traceId Existing trace
+     * @param boolean $sampled Default: false
      * @return SpanContext
      */
-    public static function fork(string $traceId): SpanContext
+    public static function fork(string $traceId, bool $sampled = false): SpanContext
     {
-        return self::restore($traceId, self::randomHex(8));
+        return self::restore($traceId, self::randomHex(8), $sampled);
     }
 
     /**
