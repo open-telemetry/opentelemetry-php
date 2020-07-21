@@ -19,6 +19,8 @@ final class SpanOptions implements API\SpanOptions
     private $kind = API\SpanKind::KIND_INTERNAL;
 
     /** @var int|null */
+    private $startEpochTimestamp = null;
+    /** @var int|null */
     private $start = null;
 
     public function __construct(Tracer $tracer, string $name)
@@ -73,9 +75,16 @@ final class SpanOptions implements API\SpanOptions
         return $this;
     }
 
-    public function addStartTimestamp($timestamp): API\SpanOptions
+    public function addStartTimestamp(int $timestamp): API\SpanOptions
     {
-        $this->start = $timestamp;
+        $this->startEpochTimestamp = $timestamp;
+
+        return $this;
+    }
+
+    public function addStart(int $now): API\SpanOptions
+    {
+        $this->start = $now;
 
         return $this;
     }
@@ -89,8 +98,12 @@ final class SpanOptions implements API\SpanOptions
 
         $span = new Span($this->name, $context, $this->parent, $this->kind);
 
-        if (isset($this->start)) {
-            $span->setStartTimestamp($this->start);
+        if ($this->startEpochTimestamp !== null) {
+            $span->setStartEpochTimestamp($this->startEpochTimestamp);
+        }
+
+        if ($this->start !== null) {
+            $span->setStart($this->start);
         }
 
         if (isset($this->attributes)) {

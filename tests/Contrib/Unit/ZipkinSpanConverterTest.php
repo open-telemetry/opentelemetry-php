@@ -68,7 +68,7 @@ class ZipkinSpanConverterTest extends TestCase
         $row = (new SpanConverter('duration.test'))->convert($span);
 
         $this->assertEquals(
-            (int) (($span->getEndTimestamp() - $span->getStartTimestamp()) / 1000),
+            (int) (($span->getEnd() - $span->getStart()) / 1000),
             $row['duration']
         );
     }

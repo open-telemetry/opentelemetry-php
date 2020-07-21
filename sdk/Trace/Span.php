@@ -13,6 +13,7 @@ class Span implements API\Span
     private $parentSpanContext;
     private $spanKind;
 
+    private $startEpochTimestamp;
     private $start;
     private $end;
     private $statusCode = API\SpanStatus::OK;
@@ -47,7 +48,9 @@ class Span implements API\Span
         $this->spanContext = $spanContext;
         $this->parentSpanContext = $parentSpanContext;
         $this->spanKind = $spanKind;
-        $this->start = Clock::get()->timestamp();
+        $moment = Clock::get()->moment();
+        $this->startEpochTimestamp = $moment[0];
+        $this->start = $moment[1];
         $this->statusCode = API\SpanStatus::OK;
         $this->statusDescription = API\SpanStatus::DESCRIPTION[$this->statusCode];
 
@@ -77,28 +80,40 @@ class Span implements API\Span
         return $this;
     }
 
-    public function end(int $timestamp = null): API\Span
+    public function getStart(): int
+    {
+        return $this->start;
+    }
+
+    public function setStart(int $start): Span
+    {
+        $this->start = $start;
+
+        return $this;
+    }
+
+    public function end(?int $now = null): API\Span
     {
         if (!isset($this->end)) {
-            $this->end = $timestamp ?? Clock::get()->timestamp();
+            $this->end = $now ?? Clock::get()->now();
         }
 
         return $this;
     }
 
-    public function setStartTimestamp(int $timestamp): Span
+    public function setStartEpochTimestamp(int $timestamp): Span
     {
-        $this->start = $timestamp;
+        $this->startEpochTimestamp = $timestamp;
 
         return $this;
     }
 
-    public function getStartTimestamp(): int
+    public function getStartEpochTimestamp(): int
     {
-        return $this->start;
+        return $this->startEpochTimestamp;
     }
 
-    public function getEndTimestamp(): ?int
+    public function getEnd(): ?int
     {
         return $this->end;
     }

@@ -9,8 +9,9 @@ interface Span extends SpanStatus, SpanKind
     public function getSpanName(): string;
     public function getContext(): SpanContext;
     public function getParent(): ?SpanContext;
-    public function getStartTimestamp(): int;
-    public function getEndTimestamp(): ?int;
+    public function getStartEpochTimestamp(): int;
+    public function getStart(): int;
+    public function getEnd(): ?int;
     public function getAttributes(): Attributes;
     public function getLinks(): Links;
     public function getEvents(): Events;
