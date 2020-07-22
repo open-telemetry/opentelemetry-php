@@ -16,5 +16,5 @@ interface MeterProvider
      * @param ?string $version - (optional) - Specifies the version of the instrumentation library (e.g. semver:1.0.0)
      * @return Meter
      */
-    public function getMeter(string $name, ?string $version): Meter;
+    public function getMeter(string $name, ?string $version = null): Meter;
 }

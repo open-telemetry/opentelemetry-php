@@ -6,7 +6,6 @@ namespace OpenTelemetry\Metrics;
 
 interface Exporter
 {
-    // todo: Is that OKAY? Just copied this from SpanExporter
     /**
      * Possible return values as outlined in the OpenTelemetry spec
      */
@@ -19,9 +18,9 @@ interface Exporter
      *
      * @access	public
      * @param	iterable<Metric> $metrics
-     * @return	void
+     * @return	int
      * 
-     * todo Should we pass a result callback in the 2nd parameter?
+     * todo Should we pass a result callback in the 2nd parameter like in JavaScript implementation?
      */
-    public function export(iterable $metrics): void;
+    public function export(iterable $metrics): int;
 }

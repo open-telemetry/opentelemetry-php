@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Metrics;
 
+use Exception;
 use OpenTelemetry\Metrics as API;
-use Webmozart\Assert\Assert;
 use OpenTelemetry\Sdk\Metrics\Exceptions\ExportException;
 use OpenTelemetry\Sdk\Metrics\Exceptions\CantBeExported;
 use OpenTelemetry\Sdk\Metrics\Exceptions\RetryableExportException;
@@ -15,7 +15,7 @@ abstract class AbstractExporter implements API\Exporter
     /**
      * {@inheritDoc}
      */
-    public function export(iterable $metrics): void
+    public function export(iterable $metrics): int
     {
         // todo: we need to implement Logger?
         if (empty($metrics)) {
@@ -24,15 +24,15 @@ abstract class AbstractExporter implements API\Exporter
 
         $preparedMetrics = [];
 
-        foreach ($metrics as $metric) {
-            if (!($metric instanceof API\Metrics::class)) {
-                throw new CantBeExported('Metric must be an instance of API\Metrics');
+        try {
+            foreach ($metrics as $metric) {
+                if (!($metric instanceof API\Metrics)) {
+                    throw new CantBeExported('Metric must be an instance of API\Metrics');
+                }
+
+                $preparedMetrics[] = $this->getFormatted($metric);
             }
 
-            $preparedMetrics[] = $this->getPrepared($metric);
-        }
-
-        try {
             $this->send($preparedMetrics);
 
             return API\Exporter::SUCCESS;
@@ -50,7 +50,7 @@ abstract class AbstractExporter implements API\Exporter
      * @param	API\Metrics	$metric
      * @return	mixed
      */
-    abstract protected function getPrepared(API\Metrics $metric);
+    abstract protected function getFormatted(API\Metrics $metric);
 
     /**
      * Sends formatted metrics to the destination system
