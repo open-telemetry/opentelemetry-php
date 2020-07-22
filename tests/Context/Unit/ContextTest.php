@@ -208,14 +208,14 @@ class ContextTest extends TestCase
      */
     public function instanceSetAndStaticGetUseSameCtx()
     {
-        $key = new ContextKey();
+        $key = new ContextKey('ofoba');
         $val = 'foobar';
 
         $ctx = (new Context())->set($key, $val);
         Context::attach($ctx);
 
         $this->assertSame(Context::getValue($key, $ctx), $val);
-        $this->assertSame(Context::getValue($key), $val);
+        $this->assertSame(Context::getValue($key, null, true), $val);
     }
 
     /**

@@ -357,6 +357,7 @@ return [
     // your application should be included in this list.
     'directory_list' => [
         'api',
+        'Context',
         'sdk',
         'contrib',
         'vendor/composer/xdebug-handler/src',
