@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Metrics\Providers;
 
+use OpenTelemetry\Sdk\Metrics\Meter;
 use OpenTelemetry\Sdk\Metrics\Providers\GlobalMeterProvider;
 use OpenTelemetry\Sdk\Metrics\Providers\MeterProvider;
-use OpenTelemetry\Sdk\Metrics\Meter;
 use PHPUnit\Framework\TestCase;
 
 class GlobalMeterProvicerTest extends TestCase
@@ -14,6 +14,8 @@ class GlobalMeterProvicerTest extends TestCase
     public function testGLobalMeterProviderSettersAndGetters()
     {
         $defaultProvider = GlobalMeterProvider::getGlobalProvider();
+
+        $this->assertInstanceOf(MeterProvider::class, $defaultProvider);
 
         $meter = GlobalMeterProvider::getMeter('test');
 

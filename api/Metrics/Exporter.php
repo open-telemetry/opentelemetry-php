@@ -19,7 +19,7 @@ interface Exporter
      * @access	public
      * @param	iterable<Metric> $metrics
      * @return	int
-     * 
+     *
      * todo Should we pass a result callback in the 2nd parameter like in JavaScript implementation?
      */
     public function export(iterable $metrics): int;

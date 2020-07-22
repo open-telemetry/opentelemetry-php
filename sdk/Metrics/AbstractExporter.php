@@ -6,7 +6,6 @@ namespace OpenTelemetry\Sdk\Metrics;
 
 use Exception;
 use OpenTelemetry\Metrics as API;
-use OpenTelemetry\Sdk\Metrics\Exceptions\ExportException;
 use OpenTelemetry\Sdk\Metrics\Exceptions\CantBeExported;
 use OpenTelemetry\Sdk\Metrics\Exceptions\RetryableExportException;
 

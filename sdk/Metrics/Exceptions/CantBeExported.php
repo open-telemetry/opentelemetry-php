@@ -6,5 +6,4 @@ namespace OpenTelemetry\Sdk\Metrics\Exceptions;
 
 class CantBeExported extends ExportException
 {
-
 }
