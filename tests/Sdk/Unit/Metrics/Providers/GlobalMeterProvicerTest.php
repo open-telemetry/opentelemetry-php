@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
+namespace OpenTelemetry\Tests\Sdk\Unit\Metrics\Providers;
 
 use OpenTelemetry\Sdk\Metrics\Providers\GlobalMeterProvider;
 use OpenTelemetry\Sdk\Metrics\Providers\MeterProvider;
