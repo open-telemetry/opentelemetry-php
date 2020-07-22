@@ -31,7 +31,7 @@ class MeterProvider implements API\MeterProvider
      *
      * @access	protected
      * @param	string	$name
-     * @param	string	$version Default: null
+     * @param	string|null	$version Default: null
      * @return	API\Meter
      */
     protected function getCreatedMeter(string $name, string $version = null): API\Meter

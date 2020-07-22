@@ -56,7 +56,6 @@ abstract class AbstractExporter implements API\Exporter
      *
      * @access	protected
      * @param	array $preparedMetrics
-     * @throws  OpenTelemetry\Sdk\Metrics\Exceptions\ExportException
      * @return	void
      */
     abstract protected function send(array $preparedMetrics): void;
