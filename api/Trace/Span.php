@@ -9,9 +9,25 @@ interface Span extends SpanStatus, SpanKind
     public function getSpanName(): string;
     public function getContext(): SpanContext;
     public function getParent(): ?SpanContext;
+
+    /**
+     * Returns Epoch timestamp value (RealtimeClock) when the Span was created
+     * @return int
+     */
     public function getStartEpochTimestamp(): int;
+
+    /**
+     * Returns system time clock value (MonotonicClock) when the Span was created
+     * @return int
+     */
     public function getStart(): int;
+
+    /**
+     * Returns system time clock value (MonotonicClock) when the Span was stopped
+     * @return int
+     */
     public function getEnd(): ?int;
+
     public function getAttributes(): Attributes;
     public function getLinks(): Links;
     public function getEvents(): Events;
