@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Metrics\Exporters;
 
 use OpenTelemetry\Metrics as API;
-use OpenTelemetry\Sdk\Metrics\Exceptions\CantBeExported;
-use OpenTelemetry\Sdk\Metrics\Exceptions\RetryableExportException;
-use Prometheus\CollectorRegistry;
 use OpenTelemetry\Sdk\Metrics\Counter;
+use OpenTelemetry\Sdk\Metrics\Exceptions\CantBeExported;
+use Prometheus\CollectorRegistry;
 
 class PrometheusExporter extends AbstractExporter
 {
@@ -17,9 +16,15 @@ class PrometheusExporter extends AbstractExporter
      */
     protected $registry;
 
-    public function __construct(CollectorRegistry $registry)
+    /**
+     * @var string $namespace
+     */
+    protected $namespace;
+
+    public function __construct(CollectorRegistry $registry, string $namespace = '')
     {
         $this->registry = $registry;
+        $this->namespace = $namespace;
     }
 
     /**
@@ -31,22 +36,25 @@ class PrometheusExporter extends AbstractExporter
             switch (get_class($metric)) {
                 case Counter::class:
                     $this->exportCounter($metric);
+
                     break;
                 default:
-                    throw new CantBeExported('Unknown metrics type: ' . $metric['type']);
+                    throw new CantBeExported('Unknown metrics type: ' . get_class($metric));
             }
         }
     }
 
-    protected function exportCounter(API\Metrics $metric): void
+    protected function exportCounter(API\Counter $counter): void
     {
+        $labels = ($counter instanceof API\LabelableMetric) ? $counter->getLabels() : [];
+
         $record = $this->registry->getOrRegisterCounter(
-            '',
-            $metric->getName(),
-            $metric->getDescription(),
-            $metric->getLabels()
+            $this->namespace,
+            $counter->getName(),
+            $counter->getDescription(),
+            $labels
         );
 
-        $record->incBy($metric->getValue(), $metric->getLabels());
+        $record->incBy($counter->getValue(), $labels);
     }
 }

@@ -6,7 +6,6 @@ namespace OpenTelemetry\Sdk\Metrics\Exporters;
 
 use Exception;
 use OpenTelemetry\Metrics as API;
-use OpenTelemetry\Sdk\Metrics\Exceptions\CantBeExported;
 use OpenTelemetry\Sdk\Metrics\Exceptions\RetryableExportException;
 use Webmozart\Assert\Assert;
 
@@ -22,7 +21,7 @@ abstract class AbstractExporter implements API\Exporter
         }
 
         try {
-            Assert::allIsInstanceOf($metrics, API\Metrics::class);
+            Assert::allIsInstanceOf($metrics, API\Metric::class);
 
             $this->doExport($metrics);
 
@@ -38,7 +37,7 @@ abstract class AbstractExporter implements API\Exporter
      * Sends metrics to the destination system
      *
      * @access	protected
-     * @param	iterable<API\Metrics> $metrics
+     * @param	iterable<API\Metric> $metrics
      * @return	void
      */
     abstract protected function doExport(iterable $metrics): void;
