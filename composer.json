@@ -8,7 +8,9 @@
         "ext-json": "*",
         "guzzlehttp/guzzle": "^6.5",
         "psr/http-client": "^1.0",
-        "php-http/guzzle6-adapter": "^2.0"
+        "php-http/guzzle6-adapter": "^2.0",
+        "endclothing/prometheus_client_php": "^1.0",
+        "webmozart/assert": "^1.9"
     },
     "authors": [
         {
