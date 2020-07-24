@@ -21,8 +21,6 @@ abstract class AbstractExporter implements API\Exporter
             return API\Exporter::SUCCESS;
         }
 
-        $preparedMetrics = [];
-
         try {
             Assert::allIsInstanceOf($metrics, API\Metrics::class);
 
