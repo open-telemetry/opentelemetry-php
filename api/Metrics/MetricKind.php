@@ -19,11 +19,11 @@ interface MetricKind
     public const VALUE_OBSERVER = 5;
 
     public const TYPES = [
-        static::COUNTER,
-        static::UP_DOWN_COUNTER,
-        static::VALUE_RECORDER,
-        static::SUM_OBSERVER,
-        static::UP_DOWN_SUM_OBSERVER,
-        static::VALUE_OBSERVER,
+        self::COUNTER,
+        self::UP_DOWN_COUNTER,
+        self::VALUE_RECORDER,
+        self::SUM_OBSERVER,
+        self::UP_DOWN_SUM_OBSERVER,
+        self::VALUE_OBSERVER,
     ];
 }

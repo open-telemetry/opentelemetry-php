@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Sdk\Unit\Metrics\Exporters;
 
 use OpenTelemetry\Metrics as API;
-use OpenTelemetry\Sdk\Metrics\AbstractExporter;
+use OpenTelemetry\Sdk\Metrics\Exporters\AbstractExporter;
 use PHPUnit\Framework\TestCase;
 
 class AbstractExporterTest extends TestCase
@@ -29,12 +29,7 @@ class AbstractExporterTest extends TestCase
     protected function getExporter(): AbstractExporter
     {
         return new class() extends AbstractExporter {
-            protected function getFormatted(API\Metrics $metric)
-            {
-                return $metric;
-            }
-
-            protected function send(array $preparedMetrics): void
+            protected function doExport(iterable $metrics): void
             {
             }
         };

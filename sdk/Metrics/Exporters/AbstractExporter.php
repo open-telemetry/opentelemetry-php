@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Sdk\Metrics;
+namespace OpenTelemetry\Sdk\Metrics\Exporters;
 
 use Exception;
 use OpenTelemetry\Metrics as API;
 use OpenTelemetry\Sdk\Metrics\Exceptions\CantBeExported;
 use OpenTelemetry\Sdk\Metrics\Exceptions\RetryableExportException;
+use Webmozart\Assert\Assert;
 
 abstract class AbstractExporter implements API\Exporter
 {
@@ -23,15 +24,9 @@ abstract class AbstractExporter implements API\Exporter
         $preparedMetrics = [];
 
         try {
-            foreach ($metrics as $metric) {
-                if (!($metric instanceof API\Metrics)) {
-                    throw new CantBeExported('Metric must be an instance of API\Metrics');
-                }
+            Assert::allIsInstanceOf($metrics, API\Metrics::class);
 
-                $preparedMetrics[] = $this->getFormatted($metric);
-            }
-
-            $this->send($preparedMetrics);
+            $this->doExport($metrics);
 
             return API\Exporter::SUCCESS;
         } catch (RetryableExportException $exception) {
@@ -42,20 +37,11 @@ abstract class AbstractExporter implements API\Exporter
     }
 
     /**
-     * Returns formatted metric data
+     * Sends metrics to the destination system
      *
      * @access	protected
-     * @param	API\Metrics	$metric
-     * @return	mixed
-     */
-    abstract protected function getFormatted(API\Metrics $metric);
-
-    /**
-     * Sends formatted metrics to the destination system
-     *
-     * @access	protected
-     * @param	array $preparedMetrics
+     * @param	iterable<API\Metrics> $metrics
      * @return	void
      */
-    abstract protected function send(array $preparedMetrics): void;
+    abstract protected function doExport(iterable $metrics): void;
 }
