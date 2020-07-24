@@ -36,7 +36,6 @@ class AbstractExporterTest extends TestCase
 
             protected function send(array $preparedMetrics): void
             {
-                // No need to implement here
             }
         };
     }

@@ -16,7 +16,6 @@ abstract class AbstractExporter implements API\Exporter
      */
     public function export(iterable $metrics): int
     {
-        // todo: we need to implement Logger?
         if (empty($metrics)) {
             return API\Exporter::SUCCESS;
         }
