@@ -365,6 +365,8 @@ return [
         'vendor/php-http',
         'vendor/phan/phan/src/Phan',
         'vendor/phpunit/phpunit/src',
+        'vendor/webmozart/assert/src',
+        'vendor/endclothing/prometheus_client_php/src',
     ],
 
     // A list of individual files to include in analysis
