@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Zipkin;
 
-use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Trace\Span;
 
 class SpanConverter
@@ -43,11 +42,6 @@ class SpanConverter
 
     public function convert(Span $span)
     {
-        $timestamp = Clock::get()->timestamp();
-        $start_realtime = $span->getStartTimestamp();
-        $end_realtime = $span->getEndTimestamp();
-        $elapsed_realtime = (int) (($end_realtime - $start_realtime) / 1e3); // diff in microseconds
-
         $row = [
             'id' => $span->getContext()->getSpanId(),
             'traceId' => $span->getContext()->getTraceId(),
@@ -56,8 +50,8 @@ class SpanConverter
                 'serviceName' => $this->serviceName,
             ],
             'name' => $span->getSpanName(),
-            'timestamp' => (int) ($timestamp / 1e3), // RealtimeClock in microseconds
-            'duration' => $elapsed_realtime,
+            'timestamp' => (int) ($span->getStartEpochTimestamp() / 1e3), // RealtimeClock in microseconds
+            'duration' => (int) (($span->getEnd() - $span->getStart()) / 1e3), // Diff in microseconds
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
@@ -72,7 +66,7 @@ class SpanConverter
                 $row['annotations'] = [];
             }
             $row['annotations'][] = [
-                'timestamp' => (int) ($timestamp / 1e3), // RealtimeClock in microseconds
+                'timestamp' => (int) ($event->getTimestamp() / 1e3), // RealtimeClock in microseconds
                 'value' => $event->getName(),
             ];
         }

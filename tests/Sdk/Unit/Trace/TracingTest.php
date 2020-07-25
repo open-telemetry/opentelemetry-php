@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
+use function iterator_to_array;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace as SDK;
 use OpenTelemetry\Sdk\Trace\Attribute;
@@ -83,7 +84,7 @@ class TracingTest extends TestCase
         $this->assertSame($tracer->getActiveSpan(), $mysql);
         $this->assertSame($global->getContext()->getTraceId(), $mysql->getContext()->getTraceId());
         $this->assertEquals($mysql->getParent(), $global->getContext());
-        $this->assertNotNull($mysql->getStartTimestamp());
+        $this->assertNotNull($mysql->getStartEpochTimestamp());
         $this->assertTrue($mysql->isRecording());
         $this->assertNull($mysql->getDuration());
 
@@ -180,7 +181,7 @@ class TracingTest extends TestCase
         ];
         $span->replaceAttributes(new Attributes(['a' => 1, 'b' => 2]));
 
-        $actual = \iterator_to_array($span->getAttributes());
+        $actual = iterator_to_array($span->getAttributes());
         self::assertEquals($expected, $actual);
 
         // attribute update don't change the order
@@ -191,7 +192,7 @@ class TracingTest extends TestCase
             'a' => new Attribute('a', 3),
             'b' => new Attribute('b', 4),
         ];
-        $actual = \iterator_to_array($span->getAttributes());
+        $actual = iterator_to_array($span->getAttributes());
         self::assertEquals($expected, $actual);
     }
 
@@ -204,17 +205,17 @@ class TracingTest extends TestCase
 
         $this->assertFalse($span->isRecording());
         $this->assertCount(1, $span->getAttributes());
-        $this->assertArrayHasKey('key1', \iterator_to_array($span->getAttributes()));
+        $this->assertArrayHasKey('key1', iterator_to_array($span->getAttributes()));
 
         $span->setAttribute('key2', 'value2');
         $this->assertCount(1, $span->getAttributes());
-        $this->assertArrayHasKey('key1', \iterator_to_array($span->getAttributes()));
-        $this->assertArrayNotHasKey('key2', \iterator_to_array($span->getAttributes()));
+        $this->assertArrayHasKey('key1', iterator_to_array($span->getAttributes()));
+        $this->assertArrayNotHasKey('key2', iterator_to_array($span->getAttributes()));
 
         $span->replaceAttributes(new Attributes(['foo' => 'bar']));
         $this->assertCount(1, $span->getAttributes());
-        $this->assertArrayHasKey('key1', \iterator_to_array($span->getAttributes()));
-        $this->assertArrayNotHasKey('foo', \iterator_to_array($span->getAttributes()));
+        $this->assertArrayHasKey('key1', iterator_to_array($span->getAttributes()));
+        $this->assertArrayNotHasKey('foo', iterator_to_array($span->getAttributes()));
     }
 
     public function testEventRegistration()
@@ -232,7 +233,7 @@ class TracingTest extends TestCase
         $events = $span->getEvents();
         self::assertCount(1, $events);
 
-        [$event] = \iterator_to_array($events);
+        [$event] = iterator_to_array($events);
         $this->assertSame($event->getName(), 'select');
         $attributes = new Attributes([
             'space' => 'guard.session',
@@ -258,14 +259,14 @@ class TracingTest extends TestCase
         $events = $span->getEvents();
         self::assertCount(1, $events);
 
-        [$event] = \iterator_to_array($events);
+        [$event] = iterator_to_array($events);
         $this->assertSame($event->getName(), 'recorded_event');
 
         $span->end();
         $span->addEvent('not_recorded_event', 1);
 
         $this->assertCount(1, $span->getEvents());
-        [$event] = \iterator_to_array($events);
+        [$event] = iterator_to_array($events);
         $this->assertSame($event->getName(), 'recorded_event');
     }
 

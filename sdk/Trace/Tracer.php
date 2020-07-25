@@ -41,7 +41,7 @@ class Tracer implements API\Tracer
      */
     public function getActiveSpan(): API\Span
     {
-        while (count($this->tail) && $this->active->getEndTimestamp()) {
+        while (count($this->tail) && $this->active->getEnd()) {
             $this->active = array_pop($this->tail);
         }
 

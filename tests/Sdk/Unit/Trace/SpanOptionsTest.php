@@ -32,7 +32,8 @@ class SpanOptionsTest extends TestCase
 
         $this->assertSame($global->getContext()->getTraceId(), $web->getContext()->getTraceId());
         $this->assertEquals($web->getParent(), $global->getContext());
-        $this->assertNotNull($web->getStartTimestamp());
+        $this->assertNotNull($web->getStartEpochTimestamp());
+        $this->assertNotNull($web->getStart());
         $this->assertTrue($web->isRecording());
         $this->assertNull($web->getDuration());
     }
@@ -41,7 +42,7 @@ class SpanOptionsTest extends TestCase
     {
         $tracer = $this->getTracer();
         $spanOptions = new SpanOptions($tracer, 'web');
-        $global = $tracer->getActiveSpan();
+        $tracer->getActiveSpan();
         $this->assertSame($spanOptions, $spanOptions->setSpanName('web2'));
         $this->assertSame($spanOptions, $spanOptions->addStartTimestamp(1234));
 
@@ -52,14 +53,14 @@ class SpanOptionsTest extends TestCase
 
         // Assert previously set vars
         $this->assertEquals('web2', $web->getSpanName());
-        $this->assertEquals(1234, $web->getStartTimestamp());
+        $this->assertEquals(1234, $web->getStartEpochTimestamp());
     }
 
     public function testShouldCreateCorrectSpanAttributes()
     {
         $tracer = $this->getTracer();
         $spanOptions = new SpanOptions($tracer, 'web');
-        $global = $tracer->getActiveSpan();
+        $tracer->getActiveSpan();
 
         $attribRaw = [
             'attr_1' => 'value_1',
