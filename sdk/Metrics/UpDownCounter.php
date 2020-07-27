@@ -4,10 +4,26 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Metrics;
 
+use InvalidArgumentException;
 use OpenTelemetry\Metrics as API;
 
-class UpDownCounter extends Counter implements API\UpDownCounter
+/*
+ * Name: UpDownCounter
+ * Instrument kind : Synchronous additive
+ * Function(argument) : add(increment)
+ * Default aggregation : Sum
+ * Notes : Per-request, part of a non-monotonic sum
+ *
+ * UpDownCounter supports negative increments. This makes UpDownCounter
+ * not useful for computing a rate aggregation. It aggregates a Sum,
+ * only the sum is non-monotonic. It is generally useful for capturing changes
+ * in an amount of resources used, or any quantity that rises and falls during
+ * a request.
+ */
+class UpDownCounter extends AbstractMetric implements API\UpDownCounter, API\LabelableMetric
 {
+    use HasLabels;
+
     /**
      * @var int $value
      */
@@ -24,29 +40,41 @@ class UpDownCounter extends Counter implements API\UpDownCounter
     }
 
     /**
-     * Adds the specified value to the current counter's value
+     * Returns the current value
      *
      * @access	public
-     * @return	self
+     * @return	int
      */
-    public function add(int $value): API\Counter
+    public function getValue(): int
     {
-        $this->value += $value;
-
-        return $this;
+        return $this->value;
     }
 
-    public function subtract(int $value) : API\UpDownCounter
+    /**
+     * Updates the UpDownCounter's value with the specified increment then returns the current value.
+     *
+     * @access	public
+     *
+     * @param int $increment, accepts INTs or FLOATs. If increment is a float, it is truncated.
+     *
+     * @return int $value
+     */
+
+    public function add($increment): int
     {
-        $this->value -= $value;
+        if (is_float($increment)) {
+            /*
+             *
+             * todo: send the following message to the log when logger is implemented:
+             *       Floating point detected, ignoring the fractional decimal places.
+             */
+            $increment = (int) $increment;
+        }
+        if (!is_int($increment)) {
+            throw new InvalidArgumentException('Only numerical values can be used to update the UpDownCounter.');
+        }
+        $this->value += $increment;
 
-        return $this;
-    }
-
-    public function decrement() : API\UpDownCounter
-    {
-        $this->value--;
-
-        return $this;
+        return $this->value;
     }
 }
