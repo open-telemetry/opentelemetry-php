@@ -7,7 +7,7 @@ namespace OpenTelemetry\Metrics;
 interface ValueRecorder
 {
     /**
-     * record.
+     * records the given value to this ValueRecorder.
      *
      * @access	public
      * @param int|float $value
