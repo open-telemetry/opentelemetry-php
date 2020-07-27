@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Metrics;
 
-interface UpDownCounter
+interface UpDownCounter extends Counter
 {
-    public function Add() : int;
+    public function subtract(int $value) : UpDownCounter;
+
+    public function decrement() : UpDownCounter;
 }
