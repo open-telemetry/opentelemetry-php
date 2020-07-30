@@ -7,6 +7,7 @@ namespace OpenTelemetry\Metrics;
 interface MeterProvider
 {
     /**
+     * @access	public
      * @param string $name - (required) - This name must identify the instrumentation library
      * (e.g. io.opentelemetry.contrib.mongodb) and not the instrumented library.
      * In case an invalid name (null or empty string) is specified, a working default Meter implementation is returned
