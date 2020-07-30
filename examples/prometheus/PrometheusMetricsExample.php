@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 use OpenTelemetry\Sdk\Metrics\Counter;
 use OpenTelemetry\Sdk\Metrics\Exporters\PrometheusExporter;
@@ -20,7 +20,7 @@ Redis::setDefaultOptions(
     ]
 );
 
-$counter = new Counter('app_some_counter', 'Just a quick measurement');
+$counter = new Counter('opentelemetry_prometheus_counter', 'Just a quick measurement');
 
 $counter->increment();
 
