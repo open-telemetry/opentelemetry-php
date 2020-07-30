@@ -89,7 +89,6 @@ final class SpanContext implements API\SpanContext
     /**
      * Creates a new sampled context with random trace
      *
-     * @param boolean $sampled Default: false
      * @return SpanContext
      */
     public static function generateSampled(): SpanContext
