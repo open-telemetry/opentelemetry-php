@@ -94,7 +94,7 @@ final class SpanContext implements API\SpanContext
      */
     public static function generateSampled(): SpanContext
     {
-        return self::generate($sampled);
+        return self::generate(true);
     }
 
     /**
