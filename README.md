@@ -50,13 +50,24 @@ To make sure the tests in this repo work as you expect, you can use the included
 Execute `make test` from your bash compatible shell.  This will output the test output as well as a test coverage analysis.  Code that doesn't pass our currently defined tests will emit a failure in CI
 
 ## Examples
+
+### Trace
 You can use the [examples/AlwaysSampleTraceExample.php](/examples/AlwaysOnTraceExample.php) file to test out the reference implementation we have.  This example perfoms a sample trace with a grouping of 5 spans and POSTs the result to a local zipkin instance.
 
 The PHP should execute by itself (if you have a zipkin instance running on localhost), but if you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
 
 1.)  Install the necessary dependencies by running `make install`.  This will install the composer dependencies and store them in `/vendor`  
-2.)  Execute the example trace using `make examples`.  
+2.)  Execute the example trace using `make examples`.
 
 Exported spans can be seen in zipkin at [http://127.0.0.1:9411](http://127.0.0.1:9411)
 
 Exported spans can also be seen in jaeger at [http://127.0.0.1:16686](http://127.0.0.1:16686)
+
+### Metrics
+You can use the [examples/prometheus/PrometheusMetricsExample.php](/examples/prometheus/PrometheusMetricsExample.php) file to test out the reference implementation we have. This example will create a counter that will be scraped by local Prometheus instance.
+
+The easy way to test the example out with docker and docker-compose is:
+1.) Run `make metrics-prometheus-example`. Make sure that local ports 8080, 6379 and 9090 are available.
+2.) Open local Prometheus instance: http://localhost:9090
+3.) Go to Graph section, type "opentelemetry_prometheus_counter" in the search field or select it in the dropdown menu. You will see the counter value. Every other time you run `make metrics-prometheus-example` will increment the counter but remember that Prometheus scrapes values once in 10 seconds.
+4.) In order to stop docker containers for this example just run `make stop-prometheus`
