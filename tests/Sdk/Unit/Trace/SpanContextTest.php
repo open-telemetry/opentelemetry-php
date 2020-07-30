@@ -31,18 +31,22 @@ class SpanContextTest extends TestCase
         $span = SpanContext::generate(true);
 
         $this->assertTrue($span->isSampled());
+
+        $span = SpanContext::generateSampled();
+
+        $this->assertTrue($span->isSampled());
     }
 
     /**
      * @test
      */
-    public function testDefaultSpansFromTracerAreNotSampled()
+    public function testDefaultSpansFromTracerAreSampled()
     {
         $tracer = $this->getTracer();
 
         $span = $tracer->startAndActivateSpan('test');
 
-        $this->assertFalse($span->isSampled());
+        $this->assertTrue($span->isSampled());
     }
 
     /**
