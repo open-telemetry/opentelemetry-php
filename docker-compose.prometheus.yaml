@@ -11,23 +11,20 @@ services:
     ports:
         - 6379:6379
   web:
-    image: nginx:1.17-alpine
+    image: nginx:alpine
     ports:
-      - 8083:80
+      - 8080:80
     depends_on:
       - php-prometheus
     volumes:
-      - ./docker/prometheus/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/prometheus/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./docker/prometheus/index.php:/var/www/public/index.php
   php-prometheus:
     build:
       context: .
       dockerfile: docker/prometheus/Dockerfile
     volumes:
-      - ./examples/prometheus:/var/www/public
-      - ./vendor:/var/www/vendor
-      - ./api:/var/www/api
-      - ./sdk:/var/www/sdk
+      - ./:/var/www/public
     depends_on:
       - redis
       - prometheus
