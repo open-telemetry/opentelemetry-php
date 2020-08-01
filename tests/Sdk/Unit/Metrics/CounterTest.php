@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Metrics;
 
-use OpenTelemetry\Metrics as API;
-use PHPUnit\Framework\TestCase;
 use OpenTelemetry\Sdk\Metrics\Counter;
 use OpenTelemetry\Sdk\Metrics\UpDownCounter;
+use PHPUnit\Framework\TestCase;
 
 class CounterTest extends TestCase
 {
