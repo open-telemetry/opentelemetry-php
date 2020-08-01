@@ -8,6 +8,7 @@ interface LabelableMetric extends Metric
 {
     /**
      * Get $labels
+     * todo: we will probably need a class Label and a typed collection for labels
      *
      * @return  array<string>
      */
