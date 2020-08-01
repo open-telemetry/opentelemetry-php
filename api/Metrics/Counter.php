@@ -10,7 +10,7 @@ interface Counter extends Metric
      * Adds value to the counter
      *
      * @access	public
-     * @param	int	$value	
+     * @param	int	$value
      * @return	self
      */
     public function add(int $value): Counter;

@@ -10,7 +10,7 @@ interface UpDownCounter extends Counter
      * Subtracts counter value
      *
      * @access	public
-     * @param	int	$value	
+     * @param	int	$value
      * @return	UpDownCounter
      */
     public function subtract(int $value) : UpDownCounter;
