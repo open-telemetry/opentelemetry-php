@@ -9,14 +9,14 @@ interface LabelableMetric extends Metric
     /**
      * Get $labels
      *
-     * @return  array
+     * @return  array<string>
      */
     public function getLabels(): array;
 
     /**
      * Set $labels
      *
-     * @param  array  $labels
+     * @param  array<string>  $labels
      * @return  self
      */
     public function setLabels(array $labels);
