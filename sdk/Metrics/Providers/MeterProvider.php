@@ -23,7 +23,7 @@ class MeterProvider implements API\MeterProvider
             $this->meters[$name . $version] = $this->getCreatedMeter($name, $version);
         }
 
-        return $this->meters[$name];
+        return $this->meters[$name . $version];
     }
 
     /**
