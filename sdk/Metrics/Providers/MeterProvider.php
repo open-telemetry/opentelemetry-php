@@ -19,8 +19,8 @@ class MeterProvider implements API\MeterProvider
      */
     public function getMeter(string $name, ?string $version = null): API\Meter
     {
-        if (empty($this->meters[$name])) {
-            $this->meters[$name] = $this->getCreatedMeter($name, $version);
+        if (empty($this->meters[$name . $version])) {
+            $this->meters[$name . $version] = $this->getCreatedMeter($name, $version);
         }
 
         return $this->meters[$name];
