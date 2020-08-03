@@ -87,6 +87,16 @@ final class SpanContext implements API\SpanContext
     }
 
     /**
+     * Creates a new sampled context with random trace
+     *
+     * @return SpanContext
+     */
+    public static function generateSampled(): SpanContext
+    {
+        return self::generate(true);
+    }
+
+    /**
      * Creates a new context with random span on the same trace
      *
      * @param string $traceId Existing trace

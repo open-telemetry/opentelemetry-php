@@ -45,7 +45,7 @@ final class TracerProvider implements API\TracerProvider
             return $this->tracers[$name];
         }
 
-        $spanContext = SpanContext::generate();
+        $spanContext = SpanContext::generateSampled();
 
         $resource = ResourceInfo::create(
             new Attributes(
