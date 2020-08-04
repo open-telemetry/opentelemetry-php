@@ -6,5 +6,12 @@ namespace OpenTelemetry\Metrics;
 
 interface ValueRecorder
 {
-    public function Record(int $value) : int;
+    /**
+     * record.
+     *
+     * @access	public
+     * @param int|float $value
+     * @return void
+     */
+    public function record($value) : void;
 }
