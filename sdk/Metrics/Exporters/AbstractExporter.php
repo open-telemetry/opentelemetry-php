@@ -7,7 +7,6 @@ namespace OpenTelemetry\Sdk\Metrics\Exporters;
 use Exception;
 use OpenTelemetry\Metrics as API;
 use OpenTelemetry\Sdk\Metrics\Exceptions\RetryableExportException;
-use Webmozart\Assert\Assert;
 
 abstract class AbstractExporter implements API\Exporter
 {
@@ -21,7 +20,11 @@ abstract class AbstractExporter implements API\Exporter
         }
 
         try {
-            Assert::allIsInstanceOf($metrics, API\Metric::class);
+            foreach ($metrics as $metric) {
+                if (! $metric instanceof API\Metric) {
+                    throw new \InvalidArgumentException('Metric must implement ' . API\Metric::class);
+                }
+            }
 
             $this->doExport($metrics);
 

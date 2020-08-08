@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Metrics;
 
-use Webmozart\Assert\Assert;
-
 trait HasLabels
 {
     /**
@@ -27,7 +25,9 @@ trait HasLabels
     public function setLabels(array $labels)
     {
         foreach ($labels as $label) {
-            Assert::string($label, 'The label is expected to be a string. Got: %s');
+            if (! is_string($label)) {
+                throw new \InvalidArgumentException('The label is expected to be a string');
+            }
         }
 
         $this->labels = $labels;
