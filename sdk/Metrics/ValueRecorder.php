@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Metrics;
 
-use InvalidArgumentException;
 use OpenTelemetry\Metrics as API;
 
 class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\LabelableMetric
