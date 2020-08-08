@@ -23,7 +23,7 @@ interface Metric
     public function getDescription(): string;
 
     /**
-     * Returns metric's description
+     * Returns metric's type
      *
      * @access	public
      * @return	int
