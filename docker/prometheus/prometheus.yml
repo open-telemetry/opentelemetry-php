@@ -1,0 +1,32 @@
+global:
+    scrape_interval:     15s
+    evaluation_interval: 15s
+
+    # Attach these labels to any time series or alerts when communicating with
+    # external systems (federation, remote storage, Alertmanager).
+    external_labels:
+        monitor: 'prometheus-stack-monitor'
+
+  # Load and evaluate rules in this file every 'evaluation_interval' seconds.
+#   rule_files:
+#     - "prometheus.rules.yml"
+
+scrape_configs:
+
+    - job_name: 'prometheus'
+
+      scrape_interval: 10s
+      scrape_timeout: 5s
+
+      static_configs:
+        - targets: ['localhost:9090']
+
+    - job_name: 'webserver'
+  
+      scrape_interval: 10s
+      scrape_timeout: 5s
+
+      metrics_path: /index.php
+  
+      static_configs:
+        - targets: ['web']
