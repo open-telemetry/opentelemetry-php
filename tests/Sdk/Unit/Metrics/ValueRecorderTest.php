@@ -16,10 +16,13 @@ class ValueRecorderTest extends TestCase
     public function testValidPositiveIntRecord()
     {
         $metric = new ValueRecorder('name', 'description');
-        $retVal = $metric->Record(5);
-        $this->assertEquals(1, $retVal);
-        $retVal = $metric->Record(2);
-        $this->assertEquals(2, $retVal);
+        $metric->record(5);
+        $this->assertEquals(1, $metric->getValueCount());
+        $this->assertEquals(5, $metric->getValueMax());
+        $this->assertEquals(5, $metric->getValueMin());
+        $this->assertEquals(5, $metric->getValueSum());
+        $metric->record(2);
+        $this->assertEquals(2, $metric->getValueCount());
         $this->assertEquals(5, $metric->getValueMax());
         $this->assertEquals(2, $metric->getValueMin());
         $this->assertEquals(7, $metric->getValueSum());
@@ -27,10 +30,13 @@ class ValueRecorderTest extends TestCase
     public function testValidNegativeIntRecord()
     {
         $metric = new ValueRecorder('name', 'description');
-        $retVal = $metric->Record(-5);
-        $this->assertEquals(1, $retVal);
-        $retVal = $metric->Record(-2);
-        $this->assertEquals(2, $retVal);
+        $metric->record(-5);
+        $this->assertEquals(1, $metric->getValueCount());
+        $this->assertEquals(-5, $metric->getValueMax());
+        $this->assertEquals(-5, $metric->getValueMin());
+        $this->assertEquals(-5, $metric->getValueSum());
+        $metric->record(-2);
+        $this->assertEquals(2, $metric->getValueCount());
         $this->assertEquals(-2, $metric->getValueMax());
         $this->assertEquals(-5, $metric->getValueMin());
         $this->assertEquals(-7, $metric->getValueSum());
@@ -39,10 +45,13 @@ class ValueRecorderTest extends TestCase
     public function testValidPositiveAndNegativeIntRecord()
     {
         $metric = new ValueRecorder('name', 'description');
-        $retVal = $metric->Record(5);
-        $this->assertEquals(1, $retVal);
-        $retVal = $metric->Record(-2);
-        $this->assertEquals(2, $retVal);
+        $metric->record(5);
+        $this->assertEquals(1, $metric->getValueCount());
+        $this->assertEquals(5, $metric->getValueMax());
+        $this->assertEquals(5, $metric->getValueMin());
+        $this->assertEquals(5, $metric->getValueSum());
+        $metric->record(-2);
+        $this->assertEquals(2, $metric->getValueCount());
         $this->assertEquals(5, $metric->getValueMax());
         $this->assertEquals(-2, $metric->getValueMin());
         $this->assertEquals(3, $metric->getValueSum());
@@ -50,10 +59,13 @@ class ValueRecorderTest extends TestCase
     public function testValidNegativeAndPositiveRecord()
     {
         $metric = new ValueRecorder('name', 'description');
-        $retVal = $metric->Record(-5);
-        $this->assertEquals(1, $retVal);
-        $retVal = $metric->Record(2);
-        $this->assertEquals(2, $retVal);
+        $metric->record(-5);
+        $this->assertEquals(1, $metric->getValueCount());
+        $this->assertEquals(-5, $metric->getValueMax());
+        $this->assertEquals(-5, $metric->getValueMin());
+        $this->assertEquals(-5, $metric->getValueSum());
+        $metric->record(2);
+        $this->assertEquals(2, $metric->getValueCount());
         $this->assertEquals(2, $metric->getValueMax());
         $this->assertEquals(-5, $metric->getValueMin());
         $this->assertEquals(-3, $metric->getValueSum());
@@ -62,10 +74,13 @@ class ValueRecorderTest extends TestCase
     public function testValidPositiveFloastRecord()
     {
         $metric = new ValueRecorder('name', 'description');
-        $retVal = $metric->Record(5.2222);
-        $this->assertEquals(1, $retVal);
-        $retVal = $metric->Record(2.6666);
-        $this->assertEquals(2, $retVal);
+        $metric->record(5.2222);
+        $this->assertEquals(1, $metric->getValueCount());
+        $this->assertEquals(5.2222, $metric->getValueMax());
+        $this->assertEquals(5.2222, $metric->getValueMin());
+        $this->assertEquals(5.2222, $metric->getValueSum());
+        $metric->record(2.6666);
+        $this->assertEquals(2, $metric->getValueCount());
         $this->assertEquals(5.2222, $metric->getValueMax());
         $this->assertEquals(2.6666, $metric->getValueMin());
         $this->assertEquals(7.8888, $metric->getValueSum());
@@ -73,10 +88,13 @@ class ValueRecorderTest extends TestCase
     public function testValidNegativeFloatRecord()
     {
         $metric = new ValueRecorder('name', 'description');
-        $retVal = $metric->Record(-5.2222);
-        $this->assertEquals(1, $retVal);
-        $retVal = $metric->Record(-2.6666);
-        $this->assertEquals(2, $retVal);
+        $metric->record(-5.2222);
+        $this->assertEquals(1, $metric->getValueCount());
+        $this->assertEquals(-5.2222, $metric->getValueMax());
+        $this->assertEquals(-5.2222, $metric->getValueMin());
+        $this->assertEquals(-5.2222, $metric->getValueSum());
+        $metric->record(-2.6666);
+        $this->assertEquals(2, $metric->getValueCount());
         $this->assertEquals(-2.6666, $metric->getValueMax());
         $this->assertEquals(-5.2222, $metric->getValueMin());
         $this->assertEquals(-7.8888, $metric->getValueSum());
@@ -85,10 +103,13 @@ class ValueRecorderTest extends TestCase
     public function testValidPositiveAndNegativeFloatRecord()
     {
         $metric = new ValueRecorder('name', 'description');
-        $retVal = $metric->Record(5.2222);
-        $this->assertEquals(1, $retVal);
-        $retVal = $metric->Record(-2.6666);
-        $this->assertEquals(2, $retVal);
+        $metric->record(5.2222);
+        $this->assertEquals(1, $metric->getValueCount());
+        $this->assertEquals(5.2222, $metric->getValueMax());
+        $this->assertEquals(5.2222, $metric->getValueMin());
+        $this->assertEquals(5.2222, $metric->getValueSum());
+        $metric->record(-2.6666, $metric->getValueCount());
+        $this->assertEquals(2, $metric->getValueCount());
         $this->assertEquals(5.2222, $metric->getValueMax());
         $this->assertEquals(-2.6666, $metric->getValueMin());
         $this->assertEquals(2.5556, $metric->getValueSum());
@@ -96,10 +117,13 @@ class ValueRecorderTest extends TestCase
     public function testValidNegativeAndPositiveFloatRecord()
     {
         $metric = new ValueRecorder('name', 'description');
-        $retVal = $metric->Record(-5.2222);
-        $this->assertEquals(1, $retVal);
-        $retVal = $metric->Record(2.6666);
-        $this->assertEquals(2, $retVal);
+        $metric->record(-5.2222);
+        $this->assertEquals(1, $metric->getValueCount());
+        $this->assertEquals(-5.2222, $metric->getValueMax());
+        $this->assertEquals(-5.2222, $metric->getValueMin());
+        $this->assertEquals(-5.2222, $metric->getValueSum());
+        $metric->record(2.6666);
+        $this->assertEquals(2, $metric->getValueCount());
         $this->assertEquals(2.6666, $metric->getValueMax());
         $this->assertEquals(-5.2222, $metric->getValueMin());
         $this->assertEquals(-2.5556, $metric->getValueSum());
@@ -108,6 +132,6 @@ class ValueRecorderTest extends TestCase
     {
         $metric = new ValueRecorder('name', 'description');
         $this->expectException(InvalidArgumentException::class);
-        $retVal = $metric->Record('a');
+        $retVal = $metric->record('a');
     }
 }

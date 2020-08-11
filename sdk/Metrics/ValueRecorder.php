@@ -10,7 +10,7 @@ use OpenTelemetry\Metrics as API;
 /*
  * Name	: ValueRecorder
  * Instrument kind : Synchronous
- * Function(argument) : Record(value)
+ * Function(argument) : record(value)
  * Default aggregation : MinMaxSumCount
  * Notes : Per-request, any non-additive measurement
  *
@@ -56,9 +56,8 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\Lab
      */
     private $decimalPointPrecision = 10;
 
-
     /**
-     * GetType: get the type of metric instrument
+     * getType: get the type of metric instrument
      *
      * @return  int
      */
@@ -108,11 +107,11 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\Lab
      */
     public function getValueMean(): float
     {
-        if ($this->valueCount) {
-            return ($this->valueSum/$this->valueCount);
+        if (0 == $this->valueCount) {
+            return 0;
         }
 
-        return 0;
+        return ($this->valueSum/$this->valueCount);
     }
 
     /**
@@ -137,7 +136,7 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\Lab
      * @return int $valueCount, returns the current count of values recorded.
      */
 
-    public function Record($value): int
+    public function record($value): void
     {
         if (is_int($value)) {
             /*
@@ -158,7 +157,5 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\Lab
         $this->valueMin = min($this->valueMin, $value);
         $this->valueMax = max($this->valueMax, $value);
         $this->valueCount++;
-
-        return $this->valueCount;
     }
 }
