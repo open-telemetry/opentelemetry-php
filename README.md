@@ -67,7 +67,11 @@ Exported spans can also be seen in jaeger at [http://127.0.0.1:16686](http://127
 You can use the [examples/prometheus/PrometheusMetricsExample.php](/examples/prometheus/PrometheusMetricsExample.php) file to test out the reference implementation we have. This example will create a counter that will be scraped by local Prometheus instance.
 
 The easy way to test the example out with docker and docker-compose is:
+
 1.) Run `make metrics-prometheus-example`. Make sure that local ports 8080, 6379 and 9090 are available.
+
 2.) Open local Prometheus instance: http://localhost:9090
+
 3.) Go to Graph section, type "opentelemetry_prometheus_counter" in the search field or select it in the dropdown menu. You will see the counter value. Every other time you run `make metrics-prometheus-example` will increment the counter but remember that Prometheus scrapes values once in 10 seconds.
+
 4.) In order to stop docker containers for this example just run `make stop-prometheus`
