@@ -30,10 +30,10 @@ class UpDownCounter extends AbstractMetric implements API\UpDownCounter, API\Lab
     protected $value = 0;
 
     /**
-     * Get $type
+     * getType
      *
      * @access	public
-     * @return  int
+     * @return	int
      */
     public function getType(): int
     {
