@@ -24,7 +24,7 @@ interface UpDownCounter
      * Updates counter value with the positive or negative int that is passed in.
      *
      * @access	public
-     * @param	int	$value
+     * @param	$increment
      * @return	int returns the non-monotonic sum
      */
     public function add($increment) : int;
