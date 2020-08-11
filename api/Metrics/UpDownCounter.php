@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Metrics;
 
-
 /*
  * Name: UpDownCounter
  * Instrument kind : Synchronous additive
@@ -21,5 +20,12 @@ namespace OpenTelemetry\Metrics;
  */
 interface UpDownCounter
 {
+    /**
+     * Updates counter value with the positive or negative int that is passed in.
+     *
+     * @access	public
+     * @param	int	$value
+     * @return	int returns the non-monotonic sum
+     */
     public function add($increment) : int;
 }

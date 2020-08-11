@@ -16,74 +16,74 @@ class UpDownCounterTest extends TestCase
     public function testValidPositiveIntAdd()
     {
         $counter = new UpDownCounter('name', 'description');
-        $retVal = $counter->Add(5);
+        $retVal = $counter->add(5);
         $this->assertEquals(5, $retVal);
-        $retVal = $counter->Add(2);
+        $retVal = $counter->add(2);
         $this->assertEquals(7, $retVal);
     }
     public function testValidNegativeIntAdd()
     {
         $counter = new UpDownCounter('name', 'description');
-        $retVal = $counter->Add(-5);
+        $retVal = $counter->add(-5);
         $this->assertEquals(-5, $retVal);
-        $retVal = $counter->Add(-2);
+        $retVal = $counter->add(-2);
         $this->assertEquals(-7, $retVal);
     }
 
     public function testValidPositiveAndNegativeIntAdd()
     {
         $counter = new UpDownCounter('name', 'description');
-        $retVal = $counter->Add(5);
+        $retVal = $counter->add(5);
         $this->assertEquals(5, $retVal);
-        $retVal = $counter->Add(-2);
+        $retVal = $counter->add(-2);
         $this->assertEquals(3, $retVal);
     }
     public function testValidNegativeAndPositiveAdd()
     {
         $counter = new UpDownCounter('name', 'description');
-        $retVal = $counter->Add(-5);
+        $retVal = $counter->add(-5);
         $this->assertEquals(-5, $retVal);
-        $retVal = $counter->Add(2);
+        $retVal = $counter->add(2);
         $this->assertEquals(-3, $retVal);
     }
 
     public function testValidPositiveFloastAdd()
     {
         $counter = new UpDownCounter('name', 'description');
-        $retVal = $counter->Add(5.2222);
+        $retVal = $counter->add(5.2222);
         $this->assertEquals(5, $retVal);
-        $retVal = $counter->Add(2.6666);
+        $retVal = $counter->add(2.6666);
         $this->assertEquals(7, $retVal);
     }
     public function testValidNegativeFloatAdd()
     {
         $counter = new UpDownCounter('name', 'description');
-        $retVal = $counter->Add(-5.2222);
+        $retVal = $counter->add(-5.2222);
         $this->assertEquals(-5, $retVal);
-        $retVal = $counter->Add(-2.6666);
+        $retVal = $counter->add(-2.6666);
         $this->assertEquals(-7, $retVal);
     }
 
     public function testValidPositiveAndNegativeFloatAdd()
     {
         $counter = new UpDownCounter('name', 'description');
-        $retVal = $counter->Add(5.2222);
+        $retVal = $counter->add(5.2222);
         $this->assertEquals(5, $retVal);
-        $retVal = $counter->Add(-2.6666);
+        $retVal = $counter->add(-2.6666);
         $this->assertEquals(3, $retVal);
     }
     public function testValidNegativeAndPositiveFloatAdd()
     {
         $counter = new UpDownCounter('name', 'description');
-        $retVal = $counter->Add(-5.2222);
+        $retVal = $counter->add(-5.2222);
         $this->assertEquals(-5, $retVal);
-        $retVal = $counter->Add(2.6666);
+        $retVal = $counter->add(2.6666);
         $this->assertEquals(-3, $retVal);
     }
     public function testInvalidUpDownCounterAddThrowsException()
     {
         $counter = new UpDownCounter('name', 'description');
         $this->expectException(InvalidArgumentException::class);
-        $retVal = $counter->Add('a');
+        $retVal = $counter->add('a');
     }
 }
