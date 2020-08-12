@@ -72,7 +72,7 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\Lab
      * @access	public
      * @return	float
      */
-    public function getValueSum(): float
+    public function getSum(): float
     {
         return $this->valueSum;
     }
@@ -83,7 +83,7 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\Lab
      * @access	public
      * @return	float
      */
-    public function getValueMin(): float
+    public function getMin(): float
     {
         return $this->valueMin;
     }
@@ -94,7 +94,7 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\Lab
      * @access	public
      * @return	float
      */
-    public function getValueMax(): float
+    public function getMax(): float
     {
         return $this->valueMax;
     }
@@ -105,7 +105,7 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\Lab
      * @access	public
      * @return	float
      */
-    public function getValueMean(): float
+    public function getMean(): float
     {
         if (0 == $this->valueCount) {
             return 0;
@@ -120,7 +120,7 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\Lab
      * @access	public
      * @return	int
      */
-    public function getValueCount(): int
+    public function getCount(): int
     {
         return $this->valueCount;
     }
@@ -130,12 +130,9 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\Lab
      * the current value count.
      *
      * @access	public
-     *
-     * @param float $value, accepts INTs or FLOATs. If value is an int, it it cast as a float.
-     *
-     * @return int $valueCount, returns the current count of values recorded.
+     * @param int|float $value, accepts INTs or FLOATs. If value is an int, it it cast as a float.
+     * @return void
      */
-
     public function record($value): void
     {
         if (is_int($value)) {
