@@ -30,10 +30,6 @@ jobs:
     - name: Validate composer.json and composer.lock
       run: composer validate
 
-    - name: Install dependencies
-      if: steps.composer-cache.outputs.cache-hit != 'true'
-      run: composer install --prefer-dist --no-progress --no-suggest
-            
     - name: Cache Composer packages
       id: composer-cache
       uses: actions/cache@v2
@@ -42,7 +38,11 @@ jobs:
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-
-        
+
+    - name: Install dependencies
+      if: steps.composer-cache.outputs.cache-hit != 'true'
+      run: composer install --prefer-dist --no-progress --no-suggest
+
     - name: Check Style
       run: .github/phpcs.sh 
       

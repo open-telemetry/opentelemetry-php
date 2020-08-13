@@ -19,7 +19,7 @@ class SpanContextTest extends TestCase
     public function testInvalidSpan(string $traceID, string $spanID, string $errorRegex): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp($errorRegex);
+        $this->expectExceptionMessageMatches($errorRegex);
         SpanContext::restore($traceID, $spanID);
     }
 
