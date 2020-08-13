@@ -24,7 +24,7 @@ jobs:
       with:
         php-version: ${{ matrix.php-versions }}
         coverage: xdebug
-        tools: php-cs-fixer, phpunit, phan 
+        tools: php-cs-fixer, phpunit:9.3.5, phan 
         pecl: true
 
     - name: Validate composer.json and composer.lock
