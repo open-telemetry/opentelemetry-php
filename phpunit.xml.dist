@@ -25,7 +25,8 @@
 
     <coverage processUncoveredFiles="true">
         <include>
-            <directory suffix=".php">sdk</directory>
+            <directory>contrib</directory>	
+            <directory>sdk</directory>
         </include>
     </coverage>
 
