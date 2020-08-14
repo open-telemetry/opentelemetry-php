@@ -24,25 +24,25 @@ jobs:
       with:
         php-version: ${{ matrix.php-versions }}
         coverage: xdebug
-        tools: php-cs-fixer, phpunit, phan 
-        pecl: true
+        tools: php-cs-fixer
+        extensions: ast
 
     - name: Validate composer.json and composer.lock
       run: composer validate
 
-    - name: Install dependencies
-      if: steps.composer-cache.outputs.cache-hit != 'true'
-      run: composer install --prefer-dist --no-progress --no-suggest
-            
     - name: Cache Composer packages
       id: composer-cache
       uses: actions/cache@v2
       with:
         path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.json') }}
         restore-keys: |
           ${{ runner.os }}-php-
-        
+
+    - name: Install dependencies
+      if: steps.composer-cache.outputs.cache-hit != 'true'
+      run: composer install --prefer-dist --no-progress --no-suggest
+
     - name: Check Style
       run: .github/phpcs.sh 
       

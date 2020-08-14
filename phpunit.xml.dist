@@ -1,16 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit backupGlobals="false"
-     backupStaticAttributes="false"
-     colors="false"
-     cacheResult="false"
-     convertErrorsToExceptions="true"
-     convertNoticesToExceptions="true"
-     convertWarningsToExceptions="true"
-     stopOnFailure="false"
-     verbose="true"
-     bootstrap="./vendor/autoload.php"
->
+<phpunit 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" 
+    backupGlobals="false" 
+    backupStaticAttributes="false" 
+    bootstrap="./vendor/autoload.php" 
+    cacheResult="false"
+    colors="false" 
+    convertErrorsToExceptions="true" 
+    convertNoticesToExceptions="true" 
+    convertWarningsToExceptions="true" 
+    forceCoversAnnotation="false" 
+    processIsolation="false" 
+    stopOnError="false"
+    stopOnFailure="false"
+    stopOnIncomplete="false"
+    stopOnSkipped="false"
+    stopOnRisky="false" 
+    timeoutForSmallTests="1"
+    timeoutForMediumTests="10"
+    timeoutForLargeTests="60"
+    verbose="true">
+
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory>contrib</directory>	
+            <directory>sdk</directory>
+        </include>
+    </coverage>
+
     <php>
         <ini name="date.timezone" value="UTC" />
         <ini name="display_errors" value="On" />
@@ -32,14 +51,5 @@
             <directory>./tests/Context/Unit</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist>
-            <directory>contrib</directory>
-            <directory>sdk</directory>
-        </whitelist>
-    </filter>
 
-    <logging>
-        <log type="coverage-clover" target="coverage.clover"/>
-    </logging>
 </phpunit>
