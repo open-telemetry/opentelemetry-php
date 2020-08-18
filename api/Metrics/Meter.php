@@ -16,15 +16,15 @@ interface Meter
     /**
      * Returns the meter version.
      *
-     * @return string
+     * @return string (optional) - Metric version
      */
     public function getVersion(): ?string;
 
     /**
      * Creates a Counter metric instrument.
      *
-     * @param string $name        - (required) - Counter name
-     * @param string $description - (optional) - Counter description
+     * @param string $name        (required) - Counter name
+     * @param string $description (optional) - Counter description
      *
      * @return Counter
      */
@@ -33,8 +33,8 @@ interface Meter
     /**
      * Creates an UpDownCounter metric instrument.
      *
-     * @param string $name        - (required) - UpDownCounter name
-     * @param string $description - (optional) - UpDownCounter description
+     * @param string $name        (required) - UpDownCounter name
+     * @param string $description (optional) - UpDownCounter description
      *
      * @return UpDownCounter
      */
@@ -43,8 +43,8 @@ interface Meter
     /**
      * Creates a ValueRecorder metric instrument.
      *
-     * @param string $name        - (required) - ValueRecorder name
-     * @param string $description - (optional) - ValueRecorder description
+     * @param string $name        (required) - ValueRecorder name
+     * @param string $description (optional) - ValueRecorder description
      *
      * @return ValueRecorder
      */
