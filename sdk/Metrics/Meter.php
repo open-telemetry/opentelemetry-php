@@ -12,8 +12,8 @@ class Meter implements API\Meter
      * @var string $name
      * @var string $version
      */
-    private $name;
-    private $version;
+    protected $name;
+    protected $version;
 
     public function __construct(string $name, string $version = null)
     {
