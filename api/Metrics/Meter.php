@@ -16,9 +16,9 @@ interface Meter
     /**
      * Returns the meter version.
      *
-     * @return string (optional) - Metric version
+     * @return string Metric version
      */
-    public function getVersion(): ?string;
+    public function getVersion(): string;
 
     /**
      * Creates a Counter metric instrument.

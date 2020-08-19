@@ -9,22 +9,16 @@ use OpenTelemetry\Metrics as API;
 class Meter implements API\Meter
 {
     /**
-     * @var string            $name
-     * @var string            $version
-     * @var API\Counter       $counter
-     * @var API\UpDownCounter $upDownCounter
-     * @var API\ValueRecorder $valueRecorder
+     * @var string $name
+     * @var string $version
      */
     private $name;
     private $version;
-    private $counter;
-    private $upDownCounter;
-    private $valueRecorder;
 
-    public function __construct(string $name, ?string $version = null)
+    public function __construct(string $name, string $version = null)
     {
         $this->name = $name;
-        $this->version = $version !== null ? $version : '';
+        $this->version = (string) $version;
     }
 
     /**
@@ -38,7 +32,7 @@ class Meter implements API\Meter
     /**
      * {@inheritdoc}
      */
-    public function getVersion(): ?string
+    public function getVersion(): string
     {
         return $this->version;
     }
@@ -48,9 +42,7 @@ class Meter implements API\Meter
      */
     public function newCounter(string $name, string $description = null): API\Counter
     {
-        $this->counter = new Counter($name, $description);
-
-        return $this->counter;
+        return new Counter($name, $description);
     }
 
     /**
@@ -58,9 +50,7 @@ class Meter implements API\Meter
      */
     public function newUpDownCounter(string $name, string $description = null): API\UpDownCounter
     {
-        $this->upDownCounter = new UpDownCounter($name, $description);
-
-        return $this->upDownCounter;
+        return new UpDownCounter($name, $description);
     }
 
     /**
@@ -68,8 +58,6 @@ class Meter implements API\Meter
      */
     public function newValueRecorder(string $name, string $description = null): API\ValueRecorder
     {
-        $this->valueRecorder = new ValueRecorder($name, $description);
-
-        return $this->valueRecorder;
+        return new ValueRecorder($name, $description);
     }
 }

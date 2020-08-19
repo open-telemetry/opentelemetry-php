@@ -12,24 +12,47 @@ use PHPUnit\Framework\TestCase;
 
 class MeterTest extends TestCase
 {
-    public function testMeterInstrumentCreation()
+    public function testMeter()
     {
         $meter = new Meter('Meter', '0.1');
-        $this->assertInstanceOf(Meter::class, $meter);
 
-        $meter_name = $meter->getName();
-        $this->assertSame('Meter', $meter_name);
+        $this->assertSame('Meter', $meter->getName());
+        $this->assertSame('0.1', $meter->getVersion());
+    }
 
-        $meter_version = $meter->getVersion();
-        $this->assertSame('0.1', $meter_version);
+    public function testMeterCounter()
+    {
+        $meter = new Meter('Meter', '0.1');
 
-        $counter = $meter->newCounter('Counter', 'A counter');
+        $counterName = 'Counter';
+        $counterDescription = 'A counter';
+        $counter = $meter->newCounter($counterName, $counterDescription);
         $this->assertInstanceOf(Counter::class, $counter);
+        $this->assertEquals($counterName, $counter->getName());
+        $this->assertEquals($counterDescription, $counter->getDescription());
+    }
 
-        $upDownCounter = $meter->newUpDownCounter('Updowncounter', 'An up/down counter');
+    public function testMeterUpDownCounter()
+    {
+        $meter = new Meter('Meter', '0.1');
+
+        $upDownCounterName = 'Updowncounter';
+        $upDownCounterDescription = 'An up/down counter';
+        $upDownCounter = $meter->newUpDownCounter($upDownCounterName, $upDownCounterDescription);
         $this->assertInstanceOf(UpDownCounter::class, $upDownCounter);
+        $this->assertEquals($upDownCounterName, $upDownCounter->getName());
+        $this->assertEquals($upDownCounterDescription, $upDownCounter->getDescription());
+    }
 
-        $valueRecorder = $meter->newValueRecorder('ValueRecorder', 'A value recorder');
+    public function testMeterValueRecorder()
+    {
+        $meter = new Meter('Meter', '0.1');
+
+        $valueRecorderName = 'ValueRecorder';
+        $valueRecorderDescription = 'A value recorder';
+        $valueRecorder = $meter->newValueRecorder($valueRecorderName, $valueRecorderDescription);
         $this->assertInstanceOf(ValueRecorder::class, $valueRecorder);
+        $this->assertEquals($valueRecorderName, $valueRecorder->getName());
+        $this->assertEquals($valueRecorderDescription, $valueRecorder->getDescription());
     }
 }
