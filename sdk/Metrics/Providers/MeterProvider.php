@@ -37,6 +37,6 @@ class MeterProvider implements API\MeterProvider
     protected function getCreatedMeter(string $name, string $version = null): API\Meter
     {
         // todo: once the Meter interface and an implementation are done, change this
-        return new Meter();
+        return new Meter($name, $version);
     }
 }
