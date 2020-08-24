@@ -83,6 +83,4 @@ interface Span extends SpanStatus, SpanKind
     public function isRecording(): bool;
 
     public function isSampled(): bool;
-
-    // TODO: addLazyEvent
 }
