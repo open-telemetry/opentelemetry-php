@@ -78,7 +78,7 @@ final class SpanContext implements API\SpanContext
     /**
      * Creates a new context with random trace
      *
-     * @param boolean $sampled Default: false
+     * @param bool $sampled Default: false
      * @return SpanContext
      */
     public static function generate(bool $sampled = false): SpanContext
@@ -100,7 +100,7 @@ final class SpanContext implements API\SpanContext
      * Creates a new context with random span on the same trace
      *
      * @param string $traceId Existing trace
-     * @param boolean $sampled Default: false
+     * @param bool $sampled Default: false
      * @return SpanContext
      */
     public static function fork(string $traceId, bool $sampled = false): SpanContext

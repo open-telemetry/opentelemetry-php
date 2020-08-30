@@ -8,6 +8,8 @@ use OpenTelemetry\Trace\Span;
 
 class SpanConverter
 {
+    const STATUS_CODE_TAG_KEY = 'op.status_code';
+    const STATUS_DESCRIPTION_TAG_KEY = 'op.status_description';
     /**
      * @var string
      */
@@ -52,12 +54,13 @@ class SpanConverter
             'name' => $span->getSpanName(),
             'timestamp' => (int) ($span->getStartEpochTimestamp() / 1e3), // RealtimeClock in microseconds
             'duration' => (int) (($span->getEnd() - $span->getStart()) / 1e3), // Diff in microseconds
+            'tags' => [
+                self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCanonicalStatusCode(),
+                self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getStatusDescription(),
+            ],
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
-            if (!array_key_exists('tags', $row)) {
-                $row['tags'] = [];
-            }
             $row['tags'][$k] = $this->sanitiseTagValue($v->getValue());
         }
 

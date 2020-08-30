@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
+use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Tests\Sdk\Unit\Support\HasTraceProvider;
-use OpenTelemetry\Sdk\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
 class SpanContextTest extends TestCase

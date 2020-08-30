@@ -68,11 +68,11 @@ interface Span extends SpanStatus, SpanKind
     /**
      * Sets the Status of the Span. If used, this will override the default Span status, which is OK.
      * Only the value of the last call will be recorded, and implementations are free to ignore previous calls.
-     * @param int $code
+     * @param string $code
      * @param string|null $description
      * @return Span Must return $this
      */
-    public function setSpanStatus(int $code, ?string $description = null): Span;
+    public function setSpanStatus(string $code, ?string $description = null): Span;
 
     /**
      * @param int|null $timestamp
