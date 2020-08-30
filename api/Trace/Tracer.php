@@ -6,7 +6,7 @@ namespace OpenTelemetry\Trace;
 
 interface Tracer
 {
-    public function getActiveSpan(): Span;
+    public function getActiveSpan(): ?Span;
 
     public function startAndActivateSpan(string $name): Span;
     public function startSpanWithOptions(string $name): SpanOptions;

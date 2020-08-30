@@ -32,13 +32,17 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
         ->addSpanProcessor(new SimpleSpanProcessor($zipkinExporter))
         ->getTracer('io.opentelemetry.contrib.php');
 
-    echo PHP_EOL . sprintf('Trace with id %s started ', $tracer->getActiveSpan()->getContext()->getTraceId());
-
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
         $timestamp = Clock::get()->timestamp();
-        $span = $tracer->startAndActivateSpan('session.generate.span.' . time());
-        $tracer->setActiveSpan($span);
+        $span = $tracer->startAndActivateSpan('session.generate.span.' . microtime(true));
+
+        echo sprintf(
+            PHP_EOL . 'Exporting Trace: %s, Parent: %s, Span: %s',
+            $span->getContext()->getTraceId(),
+            $span->getParent() ? $span->getParent()->getSpanId() : 'None',
+            $span->getContext()->getSpanId()
+        );
 
         $span->setAttribute('remote_ip', '1.2.3.4')
             ->setAttribute('country', 'USA');

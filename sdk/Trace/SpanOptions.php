@@ -92,7 +92,7 @@ final class SpanOptions implements API\SpanOptions
     public function toSpan(): API\Span
     {
         $span = $this->tracer->getActiveSpan();
-        $context = $span->getContext()->IsValidContext()
+        $context = $span && $span->getContext()->IsValidContext()
             ? SpanContext::fork($span->getContext()->getTraceId())
             : SpanContext::generate();
 

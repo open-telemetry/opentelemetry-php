@@ -41,7 +41,7 @@ class BatchSpanProcessor implements SpanProcessor
     /**
      * @var int
      */
-    private $lastExportTimestamp = 0;
+    private $lastExportTimestamp;
     /**
      * @var Clock
      */
@@ -107,7 +107,7 @@ class BatchSpanProcessor implements SpanProcessor
      */
     public function forceFlush(): void
     {
-        if (null !== $this->exporter && $this->running) {
+        if (null !== $this->exporter) {
             $this->exporter->export($this->queue);
             $this->queue = [];
             $this->lastExportTimestamp = $this->clock->timestamp();
@@ -126,7 +126,14 @@ class BatchSpanProcessor implements SpanProcessor
 
     protected function enoughTimeHasPassed(): bool
     {
-        $now = $this->clock->timestamp();
+        $now = (int) ($this->clock->timestamp() / 1e6);
+
+        // if lastExport never occurred let it start from now on
+        if (null === $this->lastExportTimestamp) {
+            $this->lastExportTimestamp = $now;
+
+            return false;
+        }
 
         return $this->scheduledDelayMillis < ($now - $this->lastExportTimestamp);
     }

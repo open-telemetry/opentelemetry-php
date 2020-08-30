@@ -37,10 +37,12 @@ class TracingTest extends TestCase
     {
         $tracerProvider = new SDK\TracerProvider();
         $tracer = new Tracer($tracerProvider, ResourceInfo::create(new Attributes([])));
+        $tracer->startAndActivateSpan('tracer1.firstSpan');
         $spanContext = $tracer->getActiveSpan()->getContext();
 
         $spanContext2 = SpanContext::restore($spanContext->getTraceId(), $spanContext->getSpanId());
         $tracer2 = new Tracer($tracerProvider, ResourceInfo::create(new Attributes([])), $spanContext2);
+        $tracer2->startAndActivateSpan('tracer2.firstSpan');
 
         $this->assertSame($tracer->getActiveSpan()->getContext()->getTraceId(), $tracer2->getActiveSpan()->getContext()->getTraceId());
     }
@@ -72,13 +74,14 @@ class TracingTest extends TestCase
         $this->assertEquals($procedure->getParent(), $connection->getContext());
         $this->assertEquals($policy->getParent(), $guard->getContext());
 
-        $this->assertCount(5, $tracer->getSpans());
+        $this->assertCount(4, $tracer->getSpans());
     }
 
     public function testCreateSpan()
     {
         $tracerProvider = new SDK\TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+        $tracer->startAndActivateSpan('firstSpan');
         $global = $tracer->getActiveSpan();
 
         $mysql = $tracer->startAndActivateSpan('mysql');
@@ -103,11 +106,6 @@ class TracingTest extends TestCase
 
         // active span rolled back
         $this->assertSame($tracer->getActiveSpan(), $global);
-
-        // active span should be kept for global span
-        $global->end();
-        $this->assertSame($tracer->getActiveSpan(), $global);
-        self::assertTrue($global->isStatusOK());
     }
 
     public function testStatusManipulation()
@@ -121,9 +119,7 @@ class TracingTest extends TestCase
         self::assertFalse($cancelled->isStatusOK());
         self::assertSame(SpanStatus::CANCELLED, $cancelled->getCanonicalStatusCode());
         self::assertSame(SpanStatus::DESCRIPTION[SpanStatus::CANCELLED], $cancelled->getStatusDescription());
-
-        // todo: hold up, _two_?
-        self::assertCount(2, $tracer->getSpans());
+        self::assertCount(1, $tracer->getSpans());
     }
 
     public function testSetSpanStatusWhenNotRecording()
@@ -143,6 +139,7 @@ class TracingTest extends TestCase
     {
         $tracerProvider = new SDK\TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+        $tracer->startAndActivateSpan('firstSpan');
         /**
          * @var SDK\Span
          */
@@ -285,6 +282,7 @@ class TracingTest extends TestCase
     {
         $tracerProvider = new SDK\TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+        $tracer->startAndActivateSpan('firstSpan');
         $global = $tracer->getActiveSpan();
         $request = $tracer->startAndActivateSpan('request');
         $this->assertSame($request->getParent()->getSpanId(), $global->getContext()->getSpanId());
