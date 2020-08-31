@@ -32,7 +32,7 @@ class BatchSpanProcessorTest extends TestCase
 
         // Export will still happen even if clock will never trigger the batch
         $clock = self::createMock(Clock::class);
-        $clock->method('timestamp')->will($this->returnValue(($exportDelay - 1)));
+        $clock->method('now')->will($this->returnValue(($exportDelay - 1)));
 
         /** @var \OpenTelemetry\Sdk\Trace\Span[] $spans */
         /** @var \OpenTelemetry\Sdk\Trace\Exporter $exporter */
@@ -74,7 +74,7 @@ class BatchSpanProcessorTest extends TestCase
         $timestampReturns[count($spans)] = ($exportDelay - 1) * 1e6;
 
         $clock
-            ->method('timestamp')
+            ->method('now')
             ->willReturnOnConsecutiveCalls(...array_map(function ($e) {
                 return (int) $e;
             }, $timestampReturns));

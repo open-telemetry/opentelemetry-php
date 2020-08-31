@@ -126,7 +126,7 @@ class BatchSpanProcessor implements SpanProcessor
 
     protected function enoughTimeHasPassed(): bool
     {
-        $now = (int) ($this->clock->timestamp() / 1e6);
+        $now = (int) ($this->clock->now() / 1e6);
 
         // if lastExport never occurred let it start from now on
         if (null === $this->lastExportTimestamp) {

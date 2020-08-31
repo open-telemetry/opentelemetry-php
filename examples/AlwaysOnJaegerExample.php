@@ -7,8 +7,8 @@ use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\Sdk\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
+use OpenTelemetry\Sdk\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
 
