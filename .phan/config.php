@@ -277,7 +277,7 @@ return [
     'minimum_severity' => Issue::SEVERITY_LOW,
 
     // Add any issue types (such as `'PhanUndeclaredMethod'`)
-    // to this black-list to inhibit them from being reported.
+    // to this deny-list to inhibit them from being reported.
     'suppress_issue_types' => [],
 
     // A regular expression to match files to be excluded
