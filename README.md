@@ -11,7 +11,7 @@ This project currently lives in a pre-alpha status.  We keep the [OpenTelemetry 
 Most of our communication is done on gitter.im in the [opentelemetry-php](https://gitter.im/open-telemetry/opentelemetry-php) channel.
 
 Our meetings are held weekly on zoom on Wednesdays at 10:30am PST / 1:30pm EST.  
-A Google calendar invite with the included zoom link can be found [here](https://calendar.google.com/event?action=TEMPLATE&tmeid=NmkyMTM1cWtlNGlmODdrMTZsZW9qa2tzdDRfMjAyMDAyMTlUMTgzMDAwWiBnb29nbGUuY29tX2I3OWUzZTkwajdiYnNhMm4ycDVhbjVsZjYwQGc&tmsrc=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com&scp=ALL)
+A Google calendar invite with the included zoom link can be found [here](https://calendar.google.com/event?action=TEMPLATE&tmeid=N2VtZXZmYnVmbzZkYjZkbTYxdjZvYTdxN21fMjAyMDA5MTZUMTczMDAwWiBrYXJlbnlyeHVAbQ&tmsrc=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com&scp=ALL)
 
 Our open issues can all be found in the [github issues tab](https://github.com/open-telemetry/opentelemetry-php/issues).  Feel free to reach out in gitter if you have any additional questions about these issues; we are always happy to talk through implementation details.
 
