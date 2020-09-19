@@ -12,11 +12,11 @@ use OpenTelemetry\Trace as API;
  * This implementation of the SamplerInterface records with given probability.
  * Example:
  * ```
- * use OpenTelemetry\Trace\ProbabilitySampler;
- * $sampler = new ProbabilitySampler(0.01);
+ * use OpenTelemetry\Trace\TraceIdRatioBasedSampler;
+ * $sampler = new TraceIdRatioBasedSampler(0.01);
  * ```
  */
-class ProbabilitySampler implements Sampler
+class TraceIdRatioBasedSampler implements Sampler
 {
     /**
      * @var float
@@ -24,7 +24,7 @@ class ProbabilitySampler implements Sampler
     private $probability;
 
     /**
-     * ProbabilitySampler constructor.
+     * TraceIdRatioBasedSampler constructor.
      * @param float $probability Probability float value between 0.0 and 1.0.
      */
     public function __construct(float $probability)
@@ -59,6 +59,6 @@ class ProbabilitySampler implements Sampler
 
     public function getDescription(): string
     {
-        return sprintf('%s{%.6f}', 'ProbabilitySampler', $this->probability);
+        return sprintf('%s{%.6f}', 'TraceIdRatioBasedSampler', $this->probability);
     }
 }
