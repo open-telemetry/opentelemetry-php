@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace;
 
-interface HTTPTextFormatPropagator
+interface TextMapFormatPropagator
 {
     /**
      * Returns list of fields that will be used by this formatter.
