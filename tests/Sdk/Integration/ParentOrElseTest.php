@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Integration;
 
-use OpenTelemetry\Sdk\Trace\Sampler\AlwaysParentSampler;
+use OpenTelemetry\Sdk\Trace\Sampler\ParentOrElse;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Trace as API;
 use PHPUnit\Framework\TestCase;
 
-class AlwaysParentSamplerTest extends TestCase
+class ParentOrElseTest extends TestCase
 {
-    public function testRecordAlwaysParentSamplerDecision()
+    public function testRecordParentOrElseDecision()
     {
         $parentContext = new SpanContext(
             '4bf92f3577b34da6a3ce929d0e0e4736',
             '00f067aa0ba902b7',
             0x1
         );
-        $sampler = new AlwaysParentSampler();
+        $sampler = new ParentOrElse();
         $decision = $sampler->shouldSample(
             $parentContext,
             '4bf92f3577b34da6a3ce929d0e0e4736',
@@ -30,14 +30,14 @@ class AlwaysParentSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLED, $decision->getDecision());
     }
 
-    public function testSkipAlwaysParentSamplerDecision()
+    public function testSkipParentOrElseDecision()
     {
         $parentContext = new SpanContext(
             '4bf92f3577b34da6a3ce929d0e0e4736',
             '00f067aa0ba902b7',
             0
         );
-        $sampler = new AlwaysParentSampler();
+        $sampler = new ParentOrElse();
         $decision = $sampler->shouldSample(
             $parentContext,
             '4bf92f3577b34da6a3ce929d0e0e4736',
@@ -48,9 +48,9 @@ class AlwaysParentSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::NOT_RECORD, $decision->getDecision());
     }
 
-    public function testNullAlwaysParentSamplerDecision()
+    public function testNullParentOrElseDecision()
     {
-        $sampler = new AlwaysParentSampler();
+        $sampler = new ParentOrElse();
         $decision = $sampler->shouldSample(
             null,
             '4bf92f3577b34da6a3ce929d0e0e4736',
@@ -61,9 +61,9 @@ class AlwaysParentSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::NOT_RECORD, $decision->getDecision());
     }
 
-    public function testAlwaysParentSamplerDescription()
+    public function testParentOrElseDescription()
     {
-        $sampler = new AlwaysParentSampler();
-        $this->assertEquals('AlwaysParentSampler', $sampler->getDescription());
+        $sampler = new ParentOrElse();
+        $this->assertEquals('ParentOrElse', $sampler->getDescription());
     }
 }
