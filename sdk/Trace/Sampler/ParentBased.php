@@ -12,11 +12,11 @@ use OpenTelemetry\Trace as API;
  * This implementation of the SamplerInterface always records.
  * Example:
  * ```
- * use OpenTelemetry\Trace\ParentOrElse;
- * $sampler = new ParentOrElse();
+ * use OpenTelemetry\Trace\ParentBased;
+ * $sampler = new ParentBased();
  * ```
  */
-class ParentOrElse implements Sampler
+class ParentBased implements Sampler
 {
     /**
      * Returns `RECORD_AND_SAMPLED` if SampledFlag is set to true on parent SpanContext and `NOT_RECORD` otherwise.
@@ -40,6 +40,6 @@ class ParentOrElse implements Sampler
 
     public function getDescription(): string
     {
-        return 'ParentOrElse';
+        return 'ParentBased';
     }
 }
