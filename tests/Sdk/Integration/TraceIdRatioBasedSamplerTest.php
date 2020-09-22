@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Integration;
 
+use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Trace as API;
@@ -11,6 +12,14 @@ use PHPUnit\Framework\TestCase;
 
 class TraceIdRatioBasedSamplerTest extends TestCase
 {
+    public function testInvalidProbabilityTraceIdRatioBasedSampler()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $sampler = new TraceIdRatioBasedSampler(-0.5);
+        $this->expectException(InvalidArgumentException::class);
+        $sampler = new TraceIdRatioBasedSampler(1.5);
+    }
+
     public function testNeverTraceIdRatioBasedSamplerDecision()
     {
         $sampler = new TraceIdRatioBasedSampler(0.0);
@@ -63,7 +72,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLED, $decision->getDecision());
     }
 
-    public function testAlwaysOnSamplerDescription()
+    public function testTraceIdRatioBasedSamplerDescription()
     {
         $sampler = new TraceIdRatioBasedSampler(0.0001);
         $this->assertEquals('TraceIdRatioBasedSampler{0.000100}', $sampler->getDescription());
