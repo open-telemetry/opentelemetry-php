@@ -53,7 +53,7 @@ class TraceIdRatioBasedSampler implements Sampler
             return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED, $attributes, $links);
         }
         /**
-         * Since php can only store up to 
+         * Since php can only store up to 63 bit positive integers
          */
         $traceIdLimit = (1 << 60) - 1;
         $lowerOrderBytes = hexdec(substr($traceId, strlen($traceId) - 15, 15));
