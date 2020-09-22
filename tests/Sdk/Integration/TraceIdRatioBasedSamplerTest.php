@@ -37,6 +37,32 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLED, $decision->getDecision());
     }
 
+    public function testFailingTraceIdRatioBasedSamplerDecision()
+    {
+        $sampler = new TraceIdRatioBasedSampler(0.99);
+        $decision = $sampler->shouldSample(
+            null,
+            '4bf92f3577b34da6afffffffffffffff',
+            '00f067aa0ba902b7',
+            'test.opentelemetry.io',
+            API\SpanKind::KIND_INTERNAL
+        );
+        $this->assertEquals(SamplingResult::NOT_RECORD, $decision->getDecision());
+    }
+
+    public function testPassingTraceIdRatioBasedSamplerDecision()
+    {
+        $sampler = new TraceIdRatioBasedSampler(0.01);
+        $decision = $sampler->shouldSample(
+            null,
+            '4bf92f3577b34da6a000000000000000',
+            '00f067aa0ba902b7',
+            'test.opentelemetry.io',
+            API\SpanKind::KIND_INTERNAL
+        );
+        $this->assertEquals(SamplingResult::RECORD_AND_SAMPLED, $decision->getDecision());
+    }
+
     public function testAlwaysOnSamplerDescription()
     {
         $sampler = new TraceIdRatioBasedSampler(0.0001);

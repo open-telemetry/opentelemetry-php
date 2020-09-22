@@ -29,8 +29,8 @@ class TraceIdRatioBasedSampler implements Sampler
      */
     public function __construct(float $probability)
     {
-        if ($probability < 0.0 or $probability > 0.0) {
-            throw new InvalidArgumentException("probability should be be between 0.0 and 1.0.");
+        if ($probability < 0.0 || $probability > 1.0) {
+            throw new InvalidArgumentException('probability should be be between 0.0 and 1.0.');
         }
         $this->probability = $probability;
     }
@@ -48,19 +48,21 @@ class TraceIdRatioBasedSampler implements Sampler
         ?API\Attributes $attributes = null,
         ?API\Links $links = null
     ): SamplingResult {
+        // TODO: Add config to adjust which spans get sampled (only default from specification is implemented)
         if (null !== $parentContext && ($parentContext->getTraceFlags() & API\SpanContext::TRACE_FLAG_SAMPLED)) {
             return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED, $attributes, $links);
         }
-
-        // TODO: implement as a function of TraceID when specification is ready
         /**
-         * For compatibility with 64 bit IDs, the sampler checks the 64 first bits of the trace ID to decide whether to sample
+         * Since php can only store up to 
          */
-        $traceIdLimit = (1 << 64) - 1;
-        $traceIdLowerBytes = ($traceId[0]<<56) + ($traceId[1]<<48) + ($traceId[2]<<40) + ($traceId[3]<<32) + ($traceId[4]<<24) + ($traceId[5]<<16) + ($traceId[6]<<8) + $traceId[7]; 
-        $decision = ($traceIdLowerBytes < $probability * tradeIdLimit)
-            ? SamplingResult::RECORD_AND_SAMPLED
-            : SamplingResult::NOT_RECORD;
+        $traceIdLimit = (1 << 60) - 1;
+        $lowerOrderBytes = hexdec(substr($traceId, strlen($traceId) - 15, 15));
+        $traceIdCondition = $lowerOrderBytes < round($this->probability * $traceIdLimit);
+        $decision = SamplingResult::NOT_RECORD;
+        // TODO: Also sample Spans with remote parent
+        if (null == $parentContext && $traceIdCondition) {
+            $decision = SamplingResult::RECORD_AND_SAMPLED;
+        }
 
         return new SamplingResult($decision, $attributes, $links);
     }
