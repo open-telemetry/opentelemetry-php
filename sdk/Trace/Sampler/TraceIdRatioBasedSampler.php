@@ -59,6 +59,6 @@ class TraceIdRatioBasedSampler implements Sampler
 
     public function getDescription(): string
     {
-        return sprintf('%s{%.6f}', 'TraceIdRatioBasedSampler', $this->probability);
+        return sprintf('%s{%.6F}', 'TraceIdRatioBasedSampler', $this->probability);
     }
 }
