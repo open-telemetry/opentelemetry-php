@@ -64,20 +64,16 @@ class CorrelationContext extends Context
 
     /**
      * @param CorrelationContext $parent
-     *
-     * @return null
      */
-    protected function setParent(CorrelationContext $parent)
+    protected function setParent(CorrelationContext $parent): void
     {
         $this->parent = $parent;
     }
 
     /**
      * When called on a CorrelationContext, this function will destroy all Correlation data
-     *
-     * @return null
      */
-    public function clearCorrelations()
+    public function clearCorrelations(): void
     {
         if (null !== $this->parent) {
             $this->parent->clearCorrelations();

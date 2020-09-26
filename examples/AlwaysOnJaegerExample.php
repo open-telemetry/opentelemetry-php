@@ -7,6 +7,7 @@ use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
@@ -25,7 +26,7 @@ $exporter = new JaegerExporter(
     'http://jaeger:9412/api/v2/spans'
 );
 
-if ($sampler) {
+if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
     echo 'Starting AlwaysOnJaegerExample';
     $tracer = (new TracerProvider())
         ->addSpanProcessor(new SimpleSpanProcessor($exporter))

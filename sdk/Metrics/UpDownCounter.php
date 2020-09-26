@@ -56,7 +56,7 @@ class UpDownCounter extends AbstractMetric implements API\UpDownCounter, API\Lab
      *
      * @access	public
      *
-     * @param int $increment, accepts INTs or FLOATs. If increment is a float, it is truncated.
+     * @param int|float $increment, accepts INTs or FLOATs. If increment is a float, it is truncated.
      *
      * @return int $value
      */
