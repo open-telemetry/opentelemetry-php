@@ -15,7 +15,7 @@ use OpenTelemetry\Sdk\Trace\Attributes;
  */
 class ResourceInfo
 {
-    private $attributes = [];
+    private $attributes;
 
     private function __construct(Attributes $attributes)
     {

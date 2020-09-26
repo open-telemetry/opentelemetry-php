@@ -7,7 +7,7 @@ namespace OpenTelemetry\Sdk\Metrics;
 trait HasLabels
 {
     /**
-     * @var array $labels
+     * @var array<string>
      */
     protected $labels = [];
 

@@ -58,7 +58,7 @@ class Context
      */
     public function set(ContextKey $key, $value)
     {
-        return new $this($key, $value, $this);
+        return new static($key, $value, $this);
     }
 
     /**

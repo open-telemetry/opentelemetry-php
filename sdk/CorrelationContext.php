@@ -31,9 +31,9 @@ class CorrelationContext extends Context
     /**
      * @param ContextKey $key
      *
-     * @return CorrelationContext
+     * @return null|self
      */
-    public function removeCorrelation(ContextKey $key): CorrelationContext
+    public function removeCorrelation(ContextKey $key): ?self
     {
         if ($this->key === $key) {
             return $this->parent;
