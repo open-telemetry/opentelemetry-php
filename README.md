@@ -61,7 +61,7 @@ You can use the [examples/AlwaysSampleTraceExample.php](/examples/AlwaysOnTraceE
 The PHP should execute by itself (if you have a zipkin instance running on localhost), but if you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
 
 1.)  Install the necessary dependencies by running `make install`.  This will install the composer dependencies and store them in `/vendor`  
-2.)  Execute the example trace using `make examples`.
+2.)  Execute the example trace using `make trace examples`.
 
 Exported spans can be seen in zipkin at [http://127.0.0.1:9411](http://127.0.0.1:9411)
 
