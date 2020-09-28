@@ -56,9 +56,11 @@ Execute `make test` from your bash compatible shell.  This will output the test 
 ## Examples
 
 ### Trace
-You can use the [examples/AlwaysSampleTraceExample.php](/examples/AlwaysOnTraceExample.php) file to test out the reference implementation we have.  This example perfoms a sample trace with a grouping of 5 spans and POSTs the result to a local zipkin instance.
+You can use the [examples/AlwaysOnZipkinExample.php](/examples/AlwaysOnZipkinExample.php) file to test out the reference implementation we have for zipkin.  This example perfoms a sample trace with a grouping of 5 spans and POSTs the result to a local zipkin instance.
 
-The PHP should execute by itself (if you have a zipkin instance running on localhost), but if you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
+You can also use the [examples/AlwaysOnJaegerExample.php](/examples/AlwaysOnJaegerExample.php) file to test out the reference implementation we have for jaegar.  This example perfoms a sample trace with a grouping of 5 spans and POSTs the result to a local jaegar instance.
+
+The PHP for both examples should execute by itself (if you have a zipkin or jaegar instance running on localhost), but if you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
 
 1.)  Install the necessary dependencies by running `make install`.  This will install the composer dependencies and store them in `/vendor`  
 2.)  Execute the example trace using `make trace examples`.
