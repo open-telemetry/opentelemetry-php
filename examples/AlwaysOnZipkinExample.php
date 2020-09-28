@@ -55,7 +55,7 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
     }
     echo PHP_EOL . 'AlwaysOnZipkinExample complete!  See the results at http://localhost:9411/';
 } else {
-    echo PHP_EOL . 'AlwaysOnZipkinExample Sampling is not enabled';
+    echo PHP_EOL . 'AlwaysOnZipkinExample tracing is not enabled';
 }
 
 echo PHP_EOL;
