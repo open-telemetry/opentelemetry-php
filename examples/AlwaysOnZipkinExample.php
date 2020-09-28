@@ -22,12 +22,12 @@ $samplingResult = $sampler->shouldSample(
 );
 
 $zipkinExporter = new ZipkinExporter(
-    'alwaysOnExporter',
+    'alwaysOnZipkinExample',
     'http://zipkin:9411/api/v2/spans'
 );
 
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
-    echo 'Starting AlwaysOnTraceExample';
+    echo 'Starting AlwaysOnZipkinExample';
     $tracer = (new TracerProvider())
         ->addSpanProcessor(new SimpleSpanProcessor($zipkinExporter))
         ->getTracer('io.opentelemetry.contrib.php');
@@ -53,9 +53,9 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
 
         $tracer->endActiveSpan();
     }
-    echo PHP_EOL . 'AlwaysOnTraceExample complete!  See the results at http://localhost:9411/';
+    echo PHP_EOL . 'AlwaysOnZipkinExample complete!  See the results at http://localhost:9411/';
 } else {
-    echo PHP_EOL . 'Sampling is not enabled';
+    echo PHP_EOL . 'AlwaysOnZipkinExample tracing is not enabled';
 }
 
 echo PHP_EOL;

@@ -21,12 +21,12 @@ $samplingResult = $sampler->shouldSample(
 );
 
 $exporter = new JaegerExporter(
-    'jaegerExporterExample',
+    'alwaysOnJaegerExample',
     'http://jaeger:9412/api/v2/spans'
 );
 
 if ($sampler) {
-    echo 'Starting JaegerExporterExample';
+    echo 'Starting AlwaysOnJaegerExample';
     $tracer = (new TracerProvider())
         ->addSpanProcessor(new SimpleSpanProcessor($exporter))
         ->getTracer('io.opentelemetry.contrib.php');
@@ -52,9 +52,9 @@ if ($sampler) {
 
         $tracer->endActiveSpan();
     }
-    echo PHP_EOL . 'JaegerExporterExample complete!  See the results at http://localhost:16686/';
+    echo PHP_EOL . 'AlwaysOnJaegerExample complete!  See the results at http://localhost:16686/';
 } else {
-    echo PHP_EOL . 'Sampling is not enabled';
+    echo PHP_EOL . 'AlwaysOnJaegerExample tracing is not enabled';
 }
 
 echo PHP_EOL;
