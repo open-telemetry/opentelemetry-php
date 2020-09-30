@@ -6,10 +6,8 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\SpanOptions;
-use OpenTelemetry\Sdk\Trace\Tracer;
-use OpenTelemetry\Sdk\Trace\TracerProvider;
-use OpenTelemetry\Trace\SpanKind;
 use OpenTelemetry\Tests\Sdk\Unit\Support\HasTraceProvider;
+use OpenTelemetry\Trace\SpanKind;
 use PHPUnit\Framework\TestCase;
 
 class SpanOptionsTest extends TestCase
