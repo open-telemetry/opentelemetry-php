@@ -46,7 +46,7 @@ class SpanOptionsTest extends TestCase
 
         $web = $spanOptions->toActiveSpan();
 
-        // Make sure created span is not activated
+        // Make sure span is activated
         $this->assertSame($tracer->getActiveSpan(), $web);
 
         // Assert previously set vars

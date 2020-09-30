@@ -12,14 +12,14 @@ class SpanStatusTest extends TestCase
     public function testGetCanonicalCode()
     {
         // todo: what's the point of SpanStatus::UNKNOWN if an unknown code gets propagated as some other code?
-        $status = SpanStatus::new(99);
-        self::assertEquals(99, $status->getCanonicalStatusCode());
+        $status = SpanStatus::new('MY_CODE');
+        self::assertEquals('MY_CODE', $status->getCanonicalStatusCode());
         self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNKNOWN], $status->getStatusDescription());
     }
 
     public function testGetDescription()
     {
-        $status = SpanStatus::new(99, 'Neunundneunzig Luftballons');
+        $status = SpanStatus::new('MY_CODE', 'Neunundneunzig Luftballons');
         self::assertEquals('Neunundneunzig Luftballons', $status->getStatusDescription());
     }
 

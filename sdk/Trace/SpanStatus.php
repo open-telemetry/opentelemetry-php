@@ -14,7 +14,7 @@ final class SpanStatus implements API\SpanStatus
     private static $map;
 
     /**
-     * @var int
+     * @var string
      */
     private $code;
 
@@ -23,13 +23,13 @@ final class SpanStatus implements API\SpanStatus
      */
     private $description;
 
-    private function __construct(int $code, string $description = null)
+    private function __construct(string $code, string $description = null)
     {
         $this->code = $code;
         $this->description = $description ?? self::DESCRIPTION[self::UNKNOWN];
     }
 
-    public static function new(int $code, string $description = null): SpanStatus
+    public static function new(string $code, string $description = null): SpanStatus
     {
         if (!$description) {
             $description = self::DESCRIPTION[$code] ?? self::DESCRIPTION[self::UNKNOWN];
@@ -45,7 +45,7 @@ final class SpanStatus implements API\SpanStatus
         return self::new(self::OK);
     }
 
-    public function getCanonicalStatusCode(): int
+    public function getCanonicalStatusCode(): string
     {
         return $this->code;
     }

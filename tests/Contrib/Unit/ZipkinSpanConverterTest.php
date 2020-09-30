@@ -44,7 +44,7 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertIsInt($row['duration']);
         $this->assertGreaterThan(0, $row['duration']);
 
-        $this->assertCount(1, $row['tags']);
+        $this->assertCount(3, $row['tags']);
         $this->assertEquals($span->getAttribute('service')->getValue(), $row['tags']['service']);
 
         $this->assertCount(1, $row['annotations']);
@@ -99,7 +99,7 @@ class ZipkinSpanConverterTest extends TestCase
         $tags = (new SpanConverter('tags.test'))->convert($span)['tags'];
 
         // Check that we can convert all attributes to tags
-        $this->assertCount(10, $tags);
+        $this->assertCount(12, $tags);
 
         // Tags destined for Zipkin must be pairs of strings
         foreach ($tags as $tagKey => $tagValue) {

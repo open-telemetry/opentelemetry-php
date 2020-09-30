@@ -16,10 +16,8 @@ class Span implements API\Span
     private $startEpochTimestamp;
     private $start;
     private $end;
-    private $statusCode = API\SpanStatus::OK;
-
-    /** @var string  */
-    private $statusDescription = API\SpanStatus::DESCRIPTION[API\SpanStatus::UNKNOWN];
+    private $statusCode;
+    private $statusDescription;
 
     private $attributes;
     private $events;
@@ -70,7 +68,7 @@ class Span implements API\Span
         return $this->parentSpanContext !== null ? clone $this->parentSpanContext : null;
     }
 
-    public function setSpanStatus(int $code, ?string $description = null): API\Span
+    public function setSpanStatus(string $code, ?string $description = null): API\Span
     {
         if ($this->isRecording()) {
             $this->statusCode = $code;
@@ -236,7 +234,7 @@ class Span implements API\Span
         return $this->spanKind;
     }
 
-    public function getCanonicalStatusCode(): int
+    public function getCanonicalStatusCode(): string
     {
         return $this->statusCode;
     }
