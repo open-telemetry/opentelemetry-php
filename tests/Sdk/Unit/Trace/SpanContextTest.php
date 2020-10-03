@@ -66,4 +66,92 @@ class SpanContextTest extends TestCase
 
         $this->assertTrue($span->isSampled());
     }
+    /**
+     * @test
+     */
+    public function testSampledSpansFromTracerDoNotInheritParentIsRemoteStatus()
+    {
+        // When creating children from remote spans, their IsRemote flag MUST be set to false.
+        $tracer = $this->getTracer();
+
+        $context = SpanContext::generate(true);
+
+        $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context, true);
+
+        $this->assertTrue($remoteSpan->isRemote());
+
+        $span = $tracer->startAndActivateSpan('test');
+
+        $this->assertFalse($span->isRemote());
+    }
+    /**
+     * @test
+     */
+    public function testNotSampledSpansFromTracerDoNotInheritParentIsRemoteStatus()
+    {
+        // When creating children from remote spans, their IsRemote flag MUST be set to false.
+        $tracer = $this->getTracer();
+
+        $context = SpanContext::generate(false);
+
+        $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context, true);
+
+        $this->assertTrue($remoteSpan->isRemote());
+
+        $span = $tracer->startAndActivateSpan('test');
+
+        $this->assertFalse($span->isRemote());
+    }
+    /**
+     * @test
+     */
+    public function testIsRemoteStatus()
+    {
+        /*
+         * Test that when creating a sampled span from remote context, the
+         * `isRemote` flag is set to true.
+         */
+        $tracer = $this->getTracer();
+
+        $context1 = SpanContext::generate(true);
+
+        $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context1, true);
+
+        $this->assertTrue($remoteSpan->isRemote());
+        /*
+         * Test that when creating an unsampled span from remote context, the
+         * `isRemote` flag is set to true.
+         */
+        $tracer = $this->getTracer();
+
+        $context2 = SpanContext::generate(false);
+
+        $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context2, true);
+
+        $this->assertTrue($remoteSpan->isRemote());
+        /*
+         * Test that when creating a sampled span from
+         * a non-remote context, the
+         * `isRemote` flag is set to false.
+         */
+        $tracer = $this->getTracer();
+
+        $context3 = SpanContext::generate(true);
+
+        $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context3);
+
+        $this->assertFalse($remoteSpan->isRemote());
+        /*
+         * Test that when creating an unsampled span from
+         * a non-remote context, the
+         * `isRemote` flag is set to false.
+         */
+        $tracer = $this->getTracer();
+
+        $context2 = SpanContext::generate(false);
+
+        $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context2);
+
+        $this->assertFalse($remoteSpan->isRemote());
+    }
 }

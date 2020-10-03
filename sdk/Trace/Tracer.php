@@ -79,6 +79,52 @@ class Tracer implements API\Tracer
      * todo: fix ^
      * -> Is there a reason we didn't add this already?
      * @param string $name
+     * @param SpanContext $parent
+     * @param bool $isRemote
+     * @return Span
+     */
+    public function startAndActivateSpanFromContext(string $name, SpanContext $parent, bool $isRemote = false): API\Span
+    {
+        /*
+         * Pass in true if the SpanContext was propagated from a
+         * remote parent. When creating children from remote spans,
+         * their IsRemote flag MUST be set to false.
+         */
+        $context = SpanContext::fork($parent->getTraceId(), $parent->isSampled(), $isRemote);
+        $span = $this->generateSpanInstance($name, $context);
+
+        if ($span->isRecording()) {
+            $this->provider->getSpanProcessor()->onStart($span);
+        }
+
+        $this->setActiveSpan($span);
+
+        return $this->active;
+    }
+    /* Span creation MUST NOT set the newly created Span as the currently active
+ * Span by default, but this functionality MAY be offered additionally as a
+ * separate operation.
+ * todo: fix ^
+ * --> what would you like to do for this?  Would it make sense to return $this->tail[] ?
+ * Do we want to offer the setActiveSpan on a newly created span as a separate function?
+ *
+*/
+    /**
+     * The API MUST accept the following parameters:
+     * - The parent Span or parent Span context, and whether the new Span
+     *   should be a root Span. API MAY also have an option for implicit parent
+     *   context extraction from the current context as a default behavior.
+     * - SpanKind, default to SpanKind.Internal if not specified.
+     * - Attributes - similar API with Span::SetAttributes. These attributes
+     *   will be used to make a sampling decision as noted in sampling
+     *   description. Empty list will be assumed if not specified.
+     * - Start timestamp, default to current time. This argument SHOULD only
+     *   be set when span creation time has already passed. If API is called
+     *   at a moment of a Span logical start, API user MUST not explicitly
+     *   set this argument.
+     * todo: fix ^
+     * -> Is there a reason we didn't add this already?
+     * @param string $name
      * @return Span
      */
     public function startAndActivateSpan(string $name): API\Span
@@ -95,7 +141,6 @@ class Tracer implements API\Tracer
 
         return $this->active;
     }
-
     public function getSpans(): array
     {
         return $this->spans;

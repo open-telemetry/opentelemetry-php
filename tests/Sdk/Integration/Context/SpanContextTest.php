@@ -45,7 +45,7 @@ class SpanContextTest extends TestCase
 
     public function testContextIsRemoteFromRestore(): void
     {
-        $spanContext = SpanContext::restore('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', true);
+        $spanContext = SpanContext::restore('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', true, true);
         $this->assertTrue($spanContext->isRemoteContext());
     }
 

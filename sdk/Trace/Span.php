@@ -191,13 +191,16 @@ class Span implements API\Span
     }
 
     /* A Span is said to have a remote parent if it is the child of a Span
-     * created in another process. Each propagators' deserialization must set IsRemote to true on a parent
-     *  SpanContext so Span creation knows if the parent is remote.
-     * TODO - finish this function
+     * created in another process. Each propagators' deserialization must
+     * set IsRemote to true on a parent
+     * SpanContext so Span creation knows if the parent is remote.
+     * Returns true if the SpanContext was propagated from a
+     * remote parent. When creating children
+     * from remote spans, their IsRemote flag MUST be set to false.
     */
     public function isRemote(): bool
     {
-        return false;
+        return $this->spanContext->isRemoteContext();
     }
 
     public function isSampled(): bool

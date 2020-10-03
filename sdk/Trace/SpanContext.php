@@ -101,11 +101,12 @@ final class SpanContext implements API\SpanContext
      *
      * @param string $traceId Existing trace
      * @param bool $sampled Default: false
+     * @param bool $isRemote Default: false
      * @return SpanContext
      */
-    public static function fork(string $traceId, bool $sampled = false): SpanContext
+    public static function fork(string $traceId, bool $sampled = false, bool $isRemote = false): SpanContext
     {
-        return self::restore($traceId, self::randomHex(8), $sampled);
+        return self::restore($traceId, self::randomHex(8), $sampled, $isRemote);
     }
 
     /**
@@ -114,13 +115,14 @@ final class SpanContext implements API\SpanContext
      * @param string $traceId
      * @param string $spanId
      * @param bool $sampled
+     * @param bool $isRemote Default: false
      * @return SpanContext
      */
-    public static function restore(string $traceId, string $spanId, bool $sampled = false): SpanContext
+    public static function restore(string $traceId, string $spanId, bool $sampled = false, bool $isRemote = false): SpanContext
     {
         $sampleFlag = $sampled ? 1 : 0;
         $trace = new self($traceId, $spanId, $sampleFlag, []);
-        $trace->isRemote = true;
+        $trace->isRemote = $isRemote;
 
         return $trace;
     }
