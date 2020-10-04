@@ -9,7 +9,7 @@ interface PropagationSetter
     /**
      * Set the value for a given key on the associated carrier.
      *
-     * @param $carrier
+     * @param mixed  $carrier
      * @param string $key
      * @param string $value
      * @return void

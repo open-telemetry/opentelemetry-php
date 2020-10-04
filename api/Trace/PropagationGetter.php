@@ -9,7 +9,7 @@ interface PropagationGetter
     /**
      * Gets the value of a given key from a carrier.
      *
-     * @param $carrier
+     * @param mixed  $carrier
      * @param string $key
      * @return string|null
      */

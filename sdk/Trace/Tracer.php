@@ -160,7 +160,7 @@ class Tracer implements API\Tracer
         }
     }
 
-    private function generateSpanInstance($name, API\SpanContext $context): Span
+    private function generateSpanInstance(string $name, API\SpanContext $context): Span
     {
         $parent = null;
         if ($this->active) {
@@ -177,7 +177,7 @@ class Tracer implements API\Tracer
         return new SpanOptions($this, $name);
     }
 
-    public function finishSpan(API\Span $span, ?int $timestmap = null): void
+    public function finishSpan(API\Span $span, ?int $timestamp = null): void
     {
         // TODO: Implement finishSpan() method.
     }

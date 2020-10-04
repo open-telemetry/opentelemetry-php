@@ -19,7 +19,7 @@ $samplingResult = $sampler->shouldSample(
     API\SpanKind::KIND_INTERNAL
 );
 
-if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult) {
+if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
     $tracer = (new TracerProvider())
         ->getTracer('io.opentelemetry.contrib.php');
 
