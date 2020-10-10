@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace\Sampler;
 
+use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Trace as API;
@@ -29,6 +30,9 @@ class TraceIdRatioBasedSampler implements Sampler
      */
     public function __construct(float $probability)
     {
+        if ($probability < 0.0 || $probability > 1.0) {
+            throw new InvalidArgumentException('probability should be be between 0.0 and 1.0.');
+        }
         $this->probability = $probability;
     }
 
@@ -45,14 +49,21 @@ class TraceIdRatioBasedSampler implements Sampler
         ?API\Attributes $attributes = null,
         ?API\Links $links = null
     ): SamplingResult {
+        // TODO: Add config to adjust which spans get sampled (only default from specification is implemented)
         if (null !== $parentContext && ($parentContext->getTraceFlags() & API\SpanContext::TRACE_FLAG_SAMPLED)) {
             return new SamplingResult(SamplingResult::RECORD_AND_SAMPLED, $attributes, $links);
         }
-
-        // TODO: implement as a function of TraceID when specification is ready
-        $decision = (lcg_value() < $this->probability)
-            ? SamplingResult::RECORD_AND_SAMPLED
-            : SamplingResult::NOT_RECORD;
+        /**
+         * Since php can only store up to 63 bit positive integers
+         */
+        $traceIdLimit = (1 << 60) - 1;
+        $lowerOrderBytes = hexdec(substr($traceId, strlen($traceId) - 15, 15));
+        $traceIdCondition = $lowerOrderBytes < round($this->probability * $traceIdLimit);
+        $decision = SamplingResult::NOT_RECORD;
+        // TODO: Also sample Spans with remote parent
+        if (null == $parentContext && $traceIdCondition) {
+            $decision = SamplingResult::RECORD_AND_SAMPLED;
+        }
 
         return new SamplingResult($decision, $attributes, $links);
     }
