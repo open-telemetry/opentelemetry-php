@@ -50,6 +50,9 @@ jobs:
       env:
         PHAN_DISABLE_XDEBUG_WARN: 1
       run: vendor/bin/phan
+    
+    - name: Run Psalm
+      run: vendor/bin/psalm
 
     - name: Run PHPUnit
       run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover

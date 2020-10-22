@@ -12,7 +12,7 @@ trait HasLabels
     protected $labels = [];
 
     /**
-     * {@inheritDoc}
+     * @return	array<string>
      */
     public function getLabels(): array
     {
