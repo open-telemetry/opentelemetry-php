@@ -1,0 +1,10 @@
+parameters:
+    level: 0
+    paths:
+        -   Context
+        -   api
+        -   contrib
+        -   sdk
+    
+
+

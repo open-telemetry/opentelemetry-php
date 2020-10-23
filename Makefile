@@ -12,6 +12,8 @@ psalm:
 	$(DC_RUN_PHP) php ./vendor/bin/psalm
 psalm-info:
 	$(DC_RUN_PHP) php ./vendor/bin/psalm --show-info=true
+phpstan: 
+	$(DC_RUN_PHP) php ./vendor/bin/phpstan analyse
 trace examples: FORCE
 	docker-compose up -d
 	$(DC_RUN_PHP) php ./examples/AlwaysOnZipkinExample.php
