@@ -53,6 +53,9 @@ jobs:
     
     - name: Run Psalm
       run: vendor/bin/psalm
+    
+    - name: Run Phpstan
+      run: vendor/bin/phpstan analyse
 
     - name: Run PHPUnit
       run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover

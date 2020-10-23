@@ -40,7 +40,7 @@ class Context
      * @param mixed|null $value
      * @param Context|null $parent Reference to the parent object
      */
-    public function __construct(?ContextKey $key=null, $value=null, $parent=null)
+    public final function __construct(?ContextKey $key=null, $value=null, $parent=null)
     {
         $this->key = $key;
         $this->value = $value;
