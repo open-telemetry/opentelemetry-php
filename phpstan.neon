@@ -1,10 +1,7 @@
 parameters:
-    level: 0
+    level: 4
     paths:
         -   Context
         -   api
         -   contrib
         -   sdk
-    
-
-
