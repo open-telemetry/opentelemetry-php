@@ -130,8 +130,6 @@ class Tracer implements API\Tracer
             ? $this->getActiveSpan()->getContext()
             : SpanContext::generate(true);
 
-        $this->setActiveSpan($parent);
-
         $context = SpanContext::fork($parent->getTraceId(), $parent->isSampled());
         $span = $this->generateSpanInstance($name, $context);
 
