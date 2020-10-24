@@ -23,7 +23,6 @@ class Tracer implements API\Tracer
      */
     private $resource;
 
-    private $rootContext;
     private $rootSpan;
 
     public function __construct(
@@ -35,7 +34,6 @@ class Tracer implements API\Tracer
         $this->resource = $resource;
         $this->rootSpan = new NoopSpan();
         $this->setActiveSpan($this->rootSpan);
-        $this->rootContext = $context ? $context : SpanContext::generate(true);
     }
 
     /**
@@ -43,7 +41,9 @@ class Tracer implements API\Tracer
      */
     public function getActiveSpan(): API\Span
     {
+        // While elements in tail array and active span has finished
         while (count($this->tail) && $this->active->getEnd()) {
+            // Set active to the last item of array, and remove item from array, may be null if array is empty
             $this->active = array_pop($this->tail);
         }
 
@@ -131,7 +131,10 @@ class Tracer implements API\Tracer
      */
     public function startAndActivateSpan(string $name): API\Span
     {
-        $parent = $this->getActiveSpan() ? $this->getActiveSpan()->getContext() : $this->rootContext;
+        $parent = $this->getActiveSpan()->getContext()->isValidContext()
+            ? $this->getActiveSpan()->getContext()
+            : SpanContext::generate(true);
+
         $context = SpanContext::fork($parent->getTraceId(), $parent->isSampled());
         $span = $this->generateSpanInstance($name, $context);
 
