@@ -23,8 +23,6 @@ class Tracer implements API\Tracer
      */
     private $resource;
 
-    private $rootSpan;
-
     public function __construct(
         TracerProvider $provider,
         ResourceInfo $resource,
@@ -32,8 +30,7 @@ class Tracer implements API\Tracer
     ) {
         $this->provider = $provider;
         $this->resource = $resource;
-        $this->rootSpan = new NoopSpan();
-        $this->setActiveSpan($this->rootSpan);
+        $this->setActiveSpan(new NoopSpan());
     }
 
     /**
