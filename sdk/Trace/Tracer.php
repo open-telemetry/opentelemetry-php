@@ -24,6 +24,7 @@ class Tracer implements API\Tracer
     private $resource;
 
     private $rootContext;
+    private $rootSpan;
 
     public function __construct(
         TracerProvider $provider,
@@ -32,13 +33,15 @@ class Tracer implements API\Tracer
     ) {
         $this->provider = $provider;
         $this->resource = $resource;
+        $this->rootSpan = new NoopSpan();
+        $this->setActiveSpan($this->rootSpan);
         $this->rootContext = $context ? $context : SpanContext::generate(true);
     }
 
     /**
      * @return Span
      */
-    public function getActiveSpan(): ?API\Span
+    public function getActiveSpan(): API\Span
     {
         while (count($this->tail) && $this->active->getEnd()) {
             $this->active = array_pop($this->tail);
