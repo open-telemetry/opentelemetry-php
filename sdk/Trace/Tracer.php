@@ -41,9 +41,7 @@ class Tracer implements API\Tracer
      */
     public function getActiveSpan(): API\Span
     {
-        // While elements in tail array and active span has finished
         while (count($this->tail) && $this->active->getEnd()) {
-            // Set active to the last item of array, and remove item from array, may be null if array is empty
             $this->active = array_pop($this->tail);
         }
 
