@@ -30,7 +30,6 @@ class Tracer implements API\Tracer
     ) {
         $this->provider = $provider;
         $this->resource = $resource;
-        $this->setActiveSpan(new NoopSpan());
     }
 
     /**
@@ -42,7 +41,7 @@ class Tracer implements API\Tracer
             $this->active = array_pop($this->tail);
         }
 
-        return $this->active;
+        return $this->active ?? new NoopSpan();
     }
 
     public function setActiveSpan(API\Span $span): void
@@ -166,6 +165,7 @@ class Tracer implements API\Tracer
         if ($this->active) {
             $parent = $this->getActiveSpan()->getContext();
         }
+        
         $span = new Span($name, $context, $parent);
         $this->spans[] = $span;
 
