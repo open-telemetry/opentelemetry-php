@@ -16,11 +16,11 @@ class Tracer implements API\Tracer
     /**
      * @var TracerProvider $provider OpenTelemetry Tracer provider
      * @var ResourceInfo $resource Resource Info
-     * @var API\SpanContext $parentContext Parent context
+     * @var API\SpanContext $importedContext Context imported from an external system
      */
     private $provider;
     private $resource;
-    private $parentContext;
+    private $importedContext;
 
     public function __construct(
         TracerProvider $provider,
@@ -29,7 +29,7 @@ class Tracer implements API\Tracer
     ) {
         $this->provider = $provider;
         $this->resource = $resource;
-        $this->parentContext = $context;
+        $this->importedContext = $context;
     }
 
     /**
@@ -129,7 +129,7 @@ class Tracer implements API\Tracer
         $parentContextIsNoopSpan = !$parentContext->isValidContext();
         
         if ($parentContextIsNoopSpan) {
-            $parentContext = $this->parentContext ?? SpanContext::generate(true);
+            $parentContext = $this->importedContext ?? SpanContext::generate(true);
         }
 
         $context = SpanContext::fork($parentContext->getTraceId(), $parentContext->isSampled());
