@@ -126,7 +126,9 @@ class Tracer implements API\Tracer
     public function startAndActivateSpan(string $name): API\Span
     {
         $parentContext = $this->getActiveSpan()->getContext();
-        if (!$parentContext->isValidContext()) {
+        $parentContextIsNoopSpan = !$parentContext->isValidContext();
+        
+        if ($parentContextIsNoopSpan) {
             $parentContext = $this->parentContext ?? SpanContext::generate(true);
         }
 
@@ -141,7 +143,7 @@ class Tracer implements API\Tracer
 
         return $this->active;
     }
-    
+
     public function getSpans(): array
     {
         return $this->spans;
