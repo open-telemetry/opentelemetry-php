@@ -14,14 +14,13 @@ class Tracer implements API\Tracer
     private $tail = [];
 
     /**
-     * @var TracerProvider
+     * @var TracerProvider $provider OpenTelemetry Tracer provider
+     * @var ResourceInfo $resource Resource Info
+     * @var API\SpanContext $parentContext Parent context
      */
     private $provider;
-
-    /**
-     * @var ResourceInfo
-     */
     private $resource;
+    private $parentContext;
 
     public function __construct(
         TracerProvider $provider,
@@ -30,6 +29,7 @@ class Tracer implements API\Tracer
     ) {
         $this->provider = $provider;
         $this->resource = $resource;
+        $this->parentContext = $context;
     }
 
     /**
@@ -125,11 +125,12 @@ class Tracer implements API\Tracer
      */
     public function startAndActivateSpan(string $name): API\Span
     {
-        $parent = $this->getActiveSpan()->getContext()->isValidContext()
-            ? $this->getActiveSpan()->getContext()
-            : SpanContext::generate(true);
+        $parentContext = $this->getActiveSpan()->getContext();
+        if (!$parentContext->isValidContext()) {
+            $parentContext = $this->parentContext ?? SpanContext::generate(true);
+        }
 
-        $context = SpanContext::fork($parent->getTraceId(), $parent->isSampled());
+        $context = SpanContext::fork($parentContext->getTraceId(), $parentContext->isSampled());
         $span = $this->generateSpanInstance($name, $context);
 
         if ($span->isRecording()) {
@@ -140,6 +141,7 @@ class Tracer implements API\Tracer
 
         return $this->active;
     }
+    
     public function getSpans(): array
     {
         return $this->spans;

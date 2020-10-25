@@ -44,7 +44,10 @@ class TracingTest extends TestCase
         $tracer2 = new Tracer($tracerProvider, ResourceInfo::create(new Attributes([])), $spanContext2);
         $tracer2->startAndActivateSpan('tracer2.firstSpan');
 
-        $this->assertSame($tracer->getActiveSpan()->getContext()->getTraceId(), $tracer2->getActiveSpan()->getContext()->getTraceId());
+        $this->assertSame(
+            $tracer->getActiveSpan()->getContext()->getTraceId(),
+            $tracer2->getActiveSpan()->getContext()->getTraceId()
+        );
     }
 
     public function testSpanNameUpdate()
