@@ -292,4 +292,14 @@ class TracingTest extends TestCase
         $this->assertNull($global->getParent());
         $this->assertNotNull($request->getParent());
     }
+
+    public function testActiveRootSpanIsNoopSpanIfNoParentProvided()
+    {
+        $tracer = (new SDK\TracerProvider())->getTracer('OpenTelemetry.TracingTest');
+
+        $this->assertInstanceOf(
+            SDK\NoopSpan::class,
+            $tracer->getActiveSpan()
+        );
+    }
 }

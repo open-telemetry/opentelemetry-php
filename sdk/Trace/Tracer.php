@@ -13,13 +13,11 @@ class Tracer implements API\Tracer
     private $spans = [];
     private $tail = [];
 
-    /**
-     * @var TracerProvider $provider OpenTelemetry Tracer provider
-     * @var ResourceInfo $resource Resource Info
-     * @var API\SpanContext $importedContext Context imported from an external system
-     */
+    /** @var TracerProvider  */
     private $provider;
+    /** @var ResourceInfo */
     private $resource;
+    /** @var API\SpanContext|null  */
     private $importedContext;
 
     public function __construct(
@@ -32,9 +30,6 @@ class Tracer implements API\Tracer
         $this->importedContext = $context;
     }
 
-    /**
-     * @return Span
-     */
     public function getActiveSpan(): API\Span
     {
         while (count($this->tail) && $this->active->getEnd()) {
