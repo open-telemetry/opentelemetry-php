@@ -1,10 +1,15 @@
 # OpenTelemetry php library
+
 [![Gitter](https://badges.gitter.im/open-telemetry/opentelemetry-php.svg)](https://gitter.im/open-telemetry/opentelemetry-php?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 ![CI Build](https://github.com/open-telemetry/opentelemetry-php/workflows/PHP%20Composer/badge.svg)
 [![codecov](https://codecov.io/gh/open-telemetry/opentelemetry-php/branch/master/graph/badge.svg)](https://codecov.io/gh/open-telemetry/opentelemetry-php)
 
 ## Current Project Status
-This project currently lives in a pre-alpha status.  We keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show
+![Current Version](https://img.shields.io/github/v/tag/open-telemetry/opentelemetry-php)
+
+This project currently lives in a pre-alpha status.  Our current release is not production ready; it has been created in order to receive feedback from the community.
+
+We keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show
  which features are available and which have not yet been implemented.
  
 ## Communication
