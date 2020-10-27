@@ -28,12 +28,11 @@ class BatchSpanProcessorTest extends TestCase
         }
 
         $exporter = self::createMock(Exporter::class);
-        $exporter->expects($this->at(0))->method('export')->with($spans);
         $exporter->expects($this->atLeastOnce())->method('export');
 
         // Export will still happen even if clock will never trigger the batch
         $clock = self::createMock(Clock::class);
-        $clock->method('timestamp')->will($this->returnValue(($exportDelay - 1)));
+        $clock->method('now')->will($this->returnValue(($exportDelay - 1)));
 
         /** @var \OpenTelemetry\Sdk\Trace\Span[] $spans */
         /** @var \OpenTelemetry\Sdk\Trace\Exporter $exporter */
@@ -64,17 +63,21 @@ class BatchSpanProcessorTest extends TestCase
 
         // The clock will be "before" the delay until the final call, then the timeout will trigger
         $clock = self::createMock(Clock::class);
+
         $timestampReturns = [];
         for ($i = 0; $i < count($spans) - 1; $i++) {
-            $timestampReturns[] = $exportDelay - 1;
+            $timestampReturns[] = ($exportDelay - 1) * 1e6;
         }
-        $timestampReturns[count($spans) - 1] = $exportDelay + 1;
+        $timestampReturns[count($spans) - 1] = ($exportDelay + 1) * 1e6;
 
         // forceFlush method will call timestamp once again to set exportedTimestamp
-        $timestampReturns[count($spans)] = $exportDelay - 1;
+        $timestampReturns[count($spans)] = ($exportDelay - 1) * 1e6;
+
         $clock
-            ->method('timestamp')
-            ->willReturnOnConsecutiveCalls(...$timestampReturns);
+            ->method('now')
+            ->willReturnOnConsecutiveCalls(...array_map(function ($e) {
+                return (int) $e;
+            }, $timestampReturns));
 
         /** @var \OpenTelemetry\Sdk\Trace\Exporter $exporter */
         /** @var \OpenTelemetry\Sdk\Trace\Clock $clock */

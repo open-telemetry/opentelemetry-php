@@ -13,15 +13,12 @@ class Tracer implements API\Tracer
     private $spans = [];
     private $tail = [];
 
-    /**
-     * @var TracerProvider
-     */
+    /** @var TracerProvider  */
     private $provider;
-
-    /**
-     * @var ResourceInfo
-     */
+    /** @var ResourceInfo */
     private $resource;
+    /** @var API\SpanContext|null  */
+    private $importedContext;
 
     public function __construct(
         TracerProvider $provider,
@@ -30,22 +27,16 @@ class Tracer implements API\Tracer
     ) {
         $this->provider = $provider;
         $this->resource = $resource;
-        $context = $context ?: SpanContext::generate();
-
-        // todo: hold up, why do we automatically make a root Span?
-        $this->active = $this->generateSpanInstance('tracer', $context);
+        $this->importedContext = $context;
     }
 
-    /**
-     * @return Span
-     */
     public function getActiveSpan(): API\Span
     {
         while (count($this->tail) && $this->active->getEnd()) {
             $this->active = array_pop($this->tail);
         }
 
-        return $this->active;
+        return $this->active ?? new NoopSpan();
     }
 
     public function setActiveSpan(API\Span $span): void
@@ -129,8 +120,14 @@ class Tracer implements API\Tracer
      */
     public function startAndActivateSpan(string $name): API\Span
     {
-        $parent = $this->getActiveSpan()->getContext();
-        $context = SpanContext::fork($parent->getTraceId(), $parent->isSampled());
+        $parentContext = $this->getActiveSpan()->getContext();
+        $parentContextIsNoopSpan = !$parentContext->isValidContext();
+        
+        if ($parentContextIsNoopSpan) {
+            $parentContext = $this->importedContext ?? SpanContext::generate(true);
+        }
+
+        $context = SpanContext::fork($parentContext->getTraceId(), $parentContext->isSampled());
         $span = $this->generateSpanInstance($name, $context);
 
         if ($span->isRecording()) {
@@ -141,6 +138,7 @@ class Tracer implements API\Tracer
 
         return $this->active;
     }
+
     public function getSpans(): array
     {
         return $this->spans;
@@ -166,6 +164,7 @@ class Tracer implements API\Tracer
         if ($this->active) {
             $parent = $this->getActiveSpan()->getContext();
         }
+        
         $span = new Span($name, $context, $parent);
         $this->spans[] = $span;
 

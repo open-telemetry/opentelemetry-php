@@ -24,7 +24,7 @@ interface Span extends SpanStatus, SpanKind
 
     /**
      * Returns system time clock value (MonotonicClock) when the Span was stopped
-     * @return int
+     * @return int|null
      */
     public function getEnd(): ?int;
 

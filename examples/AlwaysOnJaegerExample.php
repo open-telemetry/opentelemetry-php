@@ -8,7 +8,7 @@ use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
-use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\Sdk\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
 
@@ -29,16 +29,20 @@ $exporter = new JaegerExporter(
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
     echo 'Starting AlwaysOnJaegerExample';
     $tracer = (new TracerProvider())
-        ->addSpanProcessor(new SimpleSpanProcessor($exporter))
+        ->addSpanProcessor(new BatchSpanProcessor($exporter, Clock::get()))
         ->getTracer('io.opentelemetry.contrib.php');
-
-    echo PHP_EOL . sprintf('Trace with id %s started ', $tracer->getActiveSpan()->getContext()->getTraceId());
 
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
         $timestamp = Clock::get()->timestamp();
-        $span = $tracer->startAndActivateSpan('session.generate.span' . time());
-        $tracer->setActiveSpan($span);
+        $span = $tracer->startAndActivateSpan('session.generate.span' . microtime(true));
+
+        echo sprintf(
+            PHP_EOL . 'Exporting Trace: %s, Parent: %s, Span: %s',
+            $span->getContext()->getTraceId(),
+            $span->getParent() ? $span->getParent()->getSpanId() : 'None',
+            $span->getContext()->getSpanId()
+        );
 
         $span->setAttribute('remote_ip', '1.2.3.4')
             ->setAttribute('country', 'USA');

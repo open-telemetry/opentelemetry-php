@@ -9,9 +9,9 @@ use Throwable;
 
 final class SpanContext implements API\SpanContext
 {
-    private const INVALID_TRACE = '00000000000000000000000000000000';
+    public const INVALID_TRACE = '00000000000000000000000000000000';
     private const VALID_TRACE = '/^[0-9a-f]{32}$/';
-    private const INVALID_SPAN = '0000000000000000';
+    public const INVALID_SPAN = '0000000000000000';
     private const VALID_SPAN = '/^[0-9a-f]{16}$/';
     private const SAMPLED_FLAG = 1;
 

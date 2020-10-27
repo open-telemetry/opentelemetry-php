@@ -17,6 +17,7 @@ class SpanOptionsTest extends TestCase
     public function testShouldCreateSpanFromOptions()
     {
         $tracer = $this->getTracer();
+        $tracer->startAndActivateSpan('firstSpan');
         $spanOptions = new SpanOptions($tracer, 'web');
 
         $global = $tracer->getActiveSpan();
@@ -39,6 +40,7 @@ class SpanOptionsTest extends TestCase
     public function testShouldCreateAndSetActiveSpanFromOptions()
     {
         $tracer = $this->getTracer();
+        $tracer->startAndActivateSpan('firstSpan');
         $spanOptions = new SpanOptions($tracer, 'web');
         $tracer->getActiveSpan();
         $this->assertSame($spanOptions, $spanOptions->setSpanName('web2'));
@@ -57,6 +59,7 @@ class SpanOptionsTest extends TestCase
     public function testShouldCreateCorrectSpanAttributes()
     {
         $tracer = $this->getTracer();
+        $tracer->startAndActivateSpan('firstSpan');
         $spanOptions = new SpanOptions($tracer, 'web');
         $tracer->getActiveSpan();
 
