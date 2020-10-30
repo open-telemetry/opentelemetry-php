@@ -3,7 +3,8 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\Contrib\otlp\Exporter as otlpExporter;
+
+use OpenTelemetry\Contrib\otlp\Exporter as OTLPExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
@@ -20,13 +21,13 @@ $samplingResult = $sampler->shouldSample(
     'io.opentelemetry.example',
     API\SpanKind::KIND_INTERNAL
 );
-
-$otlpExporter = new otlpExporter();
+$Exporter = new OTLPExporter(
+    'OTLP Example Service');
 
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
-    echo 'Starting OTLP TraceExample';
+    echo 'Starting OTLPExample';
     $tracer = (new TracerProvider())
-        ->addSpanProcessor(new SimpleSpanProcessor($otlpExporter))
+        ->addSpanProcessor(new SimpleSpanProcessor($Exporter))
         ->getTracer('io.opentelemetry.contrib.php');
 
     echo PHP_EOL . sprintf('Trace with id %s started ', $tracer->getActiveSpan()->getContext()->getTraceId());
@@ -50,9 +51,9 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
 
         $tracer->endActiveSpan();
     }
-    echo PHP_EOL . 'OTLP TraceExample complete!  See the results at http://localhost:9411/';
+    echo PHP_EOL . 'OTLPExample complete!  ';
 } else {
-    echo PHP_EOL . 'Sampling is not enabled';
+    echo PHP_EOL . 'OTLPExample tracing is not enabled';
 }
 
 echo PHP_EOL;

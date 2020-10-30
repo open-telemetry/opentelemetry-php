@@ -25,7 +25,7 @@ class SpanConverter
             return $value ? 'true' : 'false';
         }
 
-        // Zipkin tags must be strings, but opentelemetry
+        // OTLP tags must be strings, but opentelemetry
         // accepts strings, booleans, numbers, and lists of each.
         if (is_array($value)) {
             return join(',', array_map([$this, 'sanitiseTagValue'], $value));

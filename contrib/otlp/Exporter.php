@@ -62,17 +62,15 @@ class Exporter implements Trace\Exporter
 
     /**
      * Exporter constructor.
-     * @param ClientInterface|null $client
-     * @param $name
+     * @param $serviceName
      */
     public function __construct(
-        ClientInterface $client,
-        $name
+        $serviceName
     )
     {
 
         // Set default values based on presence of env variable
-        $this->endpointURL = getenv("OTEL_EXPORTER_OTLP_ENDPOINT") ?: "localhost:56680";
+        $this->endpointURL = getenv("OTEL_EXPORTER_OTLP_ENDPOINT") ?: "localhost:55680";
         $this->protocol = getenv("OTEL_EXPORTER_OTLP_PROTOCOL") ?: "grpc";
         $this->insecure = getenv("OTEL_EXPORTER_OTLP_INSECURE") ?: "false";
         $this->certificateFile = getenv("OTEL_EXPORTER_OTLP_CERTIFICATE") ?: "none";
@@ -81,22 +79,19 @@ class Exporter implements Trace\Exporter
         $this->timeout = getenv("OTEL_EXPORTER_OTLP_TIMEOUT") ?: 10;
 
 
-        $this->client = $client ?? $this->createDefaultClient();
-        $this->spanConverter = $spanConverter ?? new SpanConverter($name);
+        $this->client = $this->createDefaultClient();
+        $this->spanConverter = $spanConverter ?? new SpanConverter($serviceName);
     }
 
     /**
-     * Exports the provided Span data via the Zipkin protocol
+     * Exports the provided Span data via the OTLP protocol
      *
      * @param iterable<API\Span> $spans Array of Spans
      * @return int return code, defined on the Exporter interface
      */
     public function export(iterable $spans): int
     {
-       // if (!$this->running) {
-       //     return \OpenTelemetry\Contrib\Zipkin\Exporter::FAILED_NOT_RETRYABLE;
-       // }
-
+       
         if (empty($spans)) {
             return Trace\Exporter::SUCCESS;
         }
