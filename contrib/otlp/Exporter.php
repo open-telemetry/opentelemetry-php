@@ -70,7 +70,7 @@ class Exporter implements Trace\Exporter
 
     /**
      * Exporter constructor.
-     * @param $serviceName
+     * @param string $serviceName 
      */
     public function __construct(
         $serviceName
