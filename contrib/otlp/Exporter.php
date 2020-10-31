@@ -11,8 +11,9 @@ use Http\Adapter\Guzzle6\Client;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
-use Psr\Http\Client\RequestExceoptionInterface;
+use Psr\Http\Client\RequestExceptionInterface;
 use OpenTelemetry\Sdk\Trace;
+use OpenTelemetry\Trace as API;
 
 
 class Exporter implements Trace\Exporter
@@ -55,9 +56,16 @@ class Exporter implements Trace\Exporter
      * @var SpanConverter
      */
     private $spanConverter;
+    
+     /**
+     * @var bool
+     */
+    private $running = true;
+
     /**
      * @var ClientInterface
      */
+
     private $client;
 
     /**
@@ -74,13 +82,13 @@ class Exporter implements Trace\Exporter
         $this->protocol = getenv("OTEL_EXPORTER_OTLP_PROTOCOL") ?: "grpc";
         $this->insecure = getenv("OTEL_EXPORTER_OTLP_INSECURE") ?: "false";
         $this->certificateFile = getenv("OTEL_EXPORTER_OTLP_CERTIFICATE") ?: "none";
-        $this->headers = getenv("OTEL_EXPORTER_OTLP_HEADERS") ?: "none";
+        $this->headers[] = getenv("OTEL_EXPORTER_OTLP_HEADERS") ?: "none";
         $this->compression = getenv("OTEL_EXPORTER_OTLP_COMPRESSION") ?: "none";
         $this->timeout = getenv("OTEL_EXPORTER_OTLP_TIMEOUT") ?: 10;
 
 
         $this->client = $this->createDefaultClient();
-        $this->spanConverter = $spanConverter ?? new SpanConverter($serviceName);
+        $this->spanConverter = new SpanConverter($serviceName);
     }
 
     /**
@@ -91,7 +99,6 @@ class Exporter implements Trace\Exporter
      */
     public function export(iterable $spans): int
     {
-       
         if (empty($spans)) {
             return Trace\Exporter::SUCCESS;
         }
@@ -104,7 +111,7 @@ class Exporter implements Trace\Exporter
         try {
             $json = json_encode($convertedSpans);
 
-            $this->headers = '';
+            $this->headers[] = '';
 
             if($this->protocol = "grpc") {
                 $headers = ['content-type' => 'application/x-protobuf'];
@@ -115,7 +122,7 @@ class Exporter implements Trace\Exporter
 
             }
 
-            $request = new Request('POST', $this->endpointURL, $headers, $json);
+            $request = new Request('POST', $this->endpointURL, $this->headers, $json);
             $response = $this->client->sendRequest($request);
         } catch (RequestExceptionInterface $e) {
             return Trace\Exporter::FAILED_NOT_RETRYABLE;
