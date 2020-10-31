@@ -113,11 +113,11 @@ class Exporter implements Trace\Exporter
 
             $this->headers[] = '';
 
-            if($this->protocol = "grpc") {
+            if($this->protocol == "grpc") {
                 $headers = ['content-type' => 'application/x-protobuf'];
             }
 
-            else if($this->protocol = "json") {
+            else if($this->protocol == "json") {
                 $headers = ['content-type' => 'application/json', "Content-Encoding" => "gzip"];
 
             }
