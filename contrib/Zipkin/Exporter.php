@@ -38,7 +38,7 @@ class Exporter implements Trace\Exporter
     private $running = true;
 
     /**
-     * @var ClientInterface|null
+     * @var ClientInterface
      */
     private $client;
 

@@ -40,7 +40,7 @@ class Meter implements API\Meter
     /**
      * {@inheritdoc}
      */
-    public function newCounter(string $name, string $description = null): API\Counter
+    public function newCounter(string $name, string $description = ''): API\Counter
     {
         return new Counter($name, $description);
     }
@@ -48,7 +48,7 @@ class Meter implements API\Meter
     /**
      * {@inheritdoc}
      */
-    public function newUpDownCounter(string $name, string $description = null): API\UpDownCounter
+    public function newUpDownCounter(string $name, string $description = ''): API\UpDownCounter
     {
         return new UpDownCounter($name, $description);
     }
@@ -56,7 +56,7 @@ class Meter implements API\Meter
     /**
      * {@inheritdoc}
      */
-    public function newValueRecorder(string $name, string $description = null): API\ValueRecorder
+    public function newValueRecorder(string $name, string $description = ''): API\ValueRecorder
     {
         return new ValueRecorder($name, $description);
     }

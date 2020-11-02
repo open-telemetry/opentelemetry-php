@@ -34,7 +34,7 @@ class BatchSpanProcessor implements SpanProcessor
      */
     private $maxExportBatchSize;
     /**
-     * @var array
+     * @var array<API\Span>
      */
     private $queue;
 

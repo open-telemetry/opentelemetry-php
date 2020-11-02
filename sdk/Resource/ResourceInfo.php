@@ -44,7 +44,8 @@ class ResourceInfo
 
         // merge attributes from the secondary resource
         foreach ($secondary->getAttributes() as $name => $attribute) {
-            if (null === $mergedAttributes->getAttribute($name) || $mergedAttributes->getAttribute($name)->getValue() === '') {
+            $mergedAttribute = $mergedAttributes->getAttribute($name);
+            if (null === $mergedAttribute || $mergedAttribute->getValue() === '') {
                 $mergedAttributes->setAttribute($name, $attribute->getValue());
             }
         }
