@@ -37,11 +37,8 @@ final class TracerProvider implements API\TracerProvider
     {
         $this->spanProcessors = new SpanMultiProcessor();
         $this->resource = $resource ?? ResourceInfo::emptyResource();
-        if (null == $sampler) {
-            $this->sampler = new AlwaysOnSampler();
-        } else {
-            $this->sampler = $sampler;
-        }
+        $this->sampler = $sampler ?? new AlwaysOnSampler();
+
         register_shutdown_function([$this, 'shutdown']);
     }
 
