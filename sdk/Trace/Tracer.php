@@ -32,7 +32,7 @@ class Tracer implements API\Tracer
 
     public function getActiveSpan(): API\Span
     {
-        while (count($this->tail) && $this->active->getEnd()) {
+        while (count($this->tail) && ($this->active->ended())) {
             $this->active = array_pop($this->tail);
         }
 
@@ -67,7 +67,8 @@ class Tracer implements API\Tracer
          * Based on this, it decides whether to create a real or Noop (non-recorded/non-exported) span.
          */
         // When attributes and links are coded, they will need to be passed in here.
-        $samplingResult = $this->provider->getSampler()->shouldSample(
+        $sampler = $this->provider->getSampler();
+        $samplingResult = $sampler->shouldSample(
             $parentContext,
             $parentContext->getTraceId(),
             $parentContext->getSpanId(),
@@ -78,9 +79,9 @@ class Tracer implements API\Tracer
         $context = SpanContext::fork($parentContext->getTraceId(), $parentContext->isSampled(), $isRemote);
 
         if (SamplingResult::NOT_RECORD == $samplingResult->getDecision()) {
-            $span = new NoopSpan($context);
+            $span = $this->generateSpanInstance('', $context);
         } else {
-            $span = $this->generateSpanInstance($name, $context);
+            $span = $this->generateSpanInstance($name, $context, $sampler);
 
             if ($span->isRecording()) {
                 $this->provider->getSpanProcessor()->onStart($span);
@@ -181,14 +182,20 @@ class Tracer implements API\Tracer
         }
     }
 
-    private function generateSpanInstance(string $name, API\SpanContext $context): Span
+    private function generateSpanInstance(string $name, API\SpanContext $context, Sampler $sampler = null): API\Span
     {
         $parent = null;
-        if ($this->active) {
-            $parent = $this->getActiveSpan()->getContext();
+
+        if (null == $sampler) {
+            $span = new NoopSpan($context);
+        } else {
+
+            if ($this->active) {
+                $parent = $this->getActiveSpan()->getContext();
+            }
+
+            $span = new Span($name, $context, $parent, $sampler);
         }
-        
-        $span = new Span($name, $context, $parent);
         $this->spans[] = $span;
 
         return $span;

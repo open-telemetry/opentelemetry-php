@@ -24,6 +24,10 @@ class NoopSpan implements \OpenTelemetry\Trace\Span
     /** @var API\SpanStatus */
     private $status;
 
+    /** @var bool */
+    private $ended = false;
+    /* To allow for the span to be deactivated and not seen in getActiveSpan */
+
     /*
      * All operations are no-op except context propagation.
      * If a valid context is passed in, the context is propagated;
@@ -76,6 +80,10 @@ class NoopSpan implements \OpenTelemetry\Trace\Span
         return 0;
     }
 
+    public function getDuration(): ?int
+    {
+        return null;
+    }
     public function getAttributes(): API\Attributes
     {
         return $this->attributes;
@@ -123,7 +131,12 @@ class NoopSpan implements \OpenTelemetry\Trace\Span
 
     public function end(int $timestamp = null): API\Span
     {
+        $this->ended = true;
         return $this;
+    }
+    public function ended(): bool
+    {
+        return $this->ended;
     }
 
     public function isRecording(): bool

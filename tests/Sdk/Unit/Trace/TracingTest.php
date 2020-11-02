@@ -111,6 +111,31 @@ class TracingTest extends TestCase
         $this->assertSame($tracer->getActiveSpan(), $global);
     }
 
+    public function testCreateSpanWithSampler()
+    {
+        $tracerProvider = new SDK\TracerProvider(null, new SDK\Sampler\AlwaysOffSampler());
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+        $tracer->startAndActivateSpan('firstSpan');
+        $global = $tracer->getActiveSpan();
+        $this->assertSame($tracer->getActiveSpan(), $global);
+
+        $mysql = $tracer->startAndActivateSpan('mysql');
+        $this->assertSame($tracer->getActiveSpan(), $mysql);
+        $this->assertSame($global->getContext()->getTraceId(), $mysql->getContext()->getTraceId());
+        $this->assertNotNull($mysql->getStartEpochTimestamp());
+        $this->assertFalse($mysql->isRecording());
+        $this->assertNull($mysql->getDuration());
+
+        $mysql->end();
+        $this->assertFalse($mysql->isRecording());
+        $this->assertNull($mysql->getDuration());
+
+        self::assertTrue($mysql->isStatusOK());
+
+        // active span rolled back
+        $this->assertSame($tracer->getActiveSpan(), $global);
+    }
+
     public function testStatusManipulation()
     {
         $tracerProvider = new SDK\TracerProvider();
