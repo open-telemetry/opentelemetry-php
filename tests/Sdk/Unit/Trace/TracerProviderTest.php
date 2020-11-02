@@ -57,9 +57,9 @@ class TracerProviderTest extends TestCase
 
         self::assertSame($description, 'AlwaysOnSampler');
 
-        $traceProvider = new TracerProvider(null, new TraceIdRatioBasedSampler(1.0));
+        $traceProvider = new TracerProvider(null, new TraceIdRatioBasedSampler(0.5));
         $description = $traceProvider->getSampler()->getDescription();
 
-        self::assertSame($description, 'TraceIdRatioBasedSampler{1.000000}');
+        self::assertSame($description, 'TraceIdRatioBasedSampler{0.500000}');
     }
 }
