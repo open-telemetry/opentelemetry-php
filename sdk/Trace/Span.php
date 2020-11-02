@@ -104,7 +104,8 @@ class Span implements API\Span
 
         return $this;
     }
-    public function ended(): bool {
+    public function ended(): bool
+    {
         return $this->ended;
     }
     public function setStartEpochTimestamp(int $timestamp): Span

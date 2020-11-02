@@ -48,12 +48,12 @@ class Tracer implements API\Tracer
 
     /**
      * @param string $name
-     * @param SpanContext $parent
+     * @param API\SpanContext $parentContext
      * @param bool $isRemote
      * @return Span
      */
 
-    public function startActiveSpan(string $name, SpanContext $parentContext, bool $isRemote = false, int $spanKind): API\Span
+    public function startActiveSpan(string $name, API\SpanContext $parentContext, bool $isRemote = false, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
     {
         $parentContextIsNoopSpan = !$parentContext->isValidContext();
 
@@ -117,11 +117,11 @@ class Tracer implements API\Tracer
      * todo: fix ^
      * -> Is there a reason we didn't add this already?
      * @param string $name
-     * @param SpanContext $parent
+     * @param API\SpanContext $parentContext
      * @param bool $isRemote
      * @return Span
      */
-    public function startAndActivateSpanFromContext(string $name, SpanContext $parentContext, bool $isRemote = false, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
+    public function startAndActivateSpanFromContext(string $name, API\SpanContext $parentContext, bool $isRemote = false, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
     {
         /*
          * Pass in true if the SpanContext was propagated from a
@@ -189,7 +189,6 @@ class Tracer implements API\Tracer
         if (null == $sampler) {
             $span = new NoopSpan($context);
         } else {
-
             if ($this->active) {
                 $parent = $this->getActiveSpan()->getContext();
             }
