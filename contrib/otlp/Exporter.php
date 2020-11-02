@@ -72,9 +72,7 @@ class Exporter implements Trace\Exporter
      * Exporter constructor.
      * @param string $serviceName 
      */
-    public function __construct(
-        $serviceName
-    )
+    public function __construct($serviceName)
     {
 
         // Set default values based on presence of env variable
