@@ -12,6 +12,7 @@ class Span implements API\Span
     private $spanContext;
     private $parentSpanContext;
     private $spanKind;
+    private $sampler;
 
     private $startEpochTimestamp;
     private $start;
@@ -40,12 +41,14 @@ class Span implements API\Span
         string $name,
         API\SpanContext $spanContext,
         ?API\SpanContext $parentSpanContext = null,
-        int $spanKind = API\SpanKind::KIND_INTERNAL
+        int $spanKind = API\SpanKind::KIND_INTERNAL,
+        ?Sampler $sampler = null
     ) {
         $this->name = $name;
         $this->spanContext = $spanContext;
         $this->parentSpanContext = $parentSpanContext;
         $this->spanKind = $spanKind;
+        $this->sampler = $sampler;
         $moment = Clock::get()->moment();
         $this->startEpochTimestamp = $moment[0];
         $this->start = $moment[1];

@@ -53,7 +53,7 @@ class Tracer implements API\Tracer
      * @return Span
      */
 
-    public function startActiveSpan(string $name, SpanContext $parentContext, bool $isRemote = false): API\Span
+    public function startActiveSpan(string $name, SpanContext $parentContext, bool $isRemote = false, int $spanKind): API\Span
     {
         $parentContextIsNoopSpan = !$parentContext->isValidContext();
 
@@ -61,11 +61,30 @@ class Tracer implements API\Tracer
             $parentContext = $this->importedContext ?? SpanContext::generate(true);
         }
 
-        $context = SpanContext::fork($parentContext->getTraceId(), $parentContext->isSampled(), $isRemote);
-        $span = $this->generateSpanInstance($name, $context);
+        /*
+         * The sampler returns a sampling SamplingResult based on information that is typically
+         * available just before the Span was created.
+         * Based on this, it decides whether to create a real or Noop (non-recorded/non-exported) span.
+         */
+        // When attributes and links are coded, they will need to be passed in here.
+        $samplingResult = $this->provider->getSampler()->shouldSample(
+            $parentContext,
+            $parentContext->getTraceId(),
+            $parentContext->getSpanId(),
+            $name,
+            $spanKind
+        );
 
-        if ($span->isRecording()) {
-            $this->provider->getSpanProcessor()->onStart($span);
+        $context = SpanContext::fork($parentContext->getTraceId(), $parentContext->isSampled(), $isRemote);
+
+        if (SamplingResult::NOT_RECORD == $samplingResult->getDecision()) {
+            $span = new NoopSpan($context);
+        } else {
+            $span = $this->generateSpanInstance($name, $context);
+
+            if ($span->isRecording()) {
+                $this->provider->getSpanProcessor()->onStart($span);
+            }
         }
 
         $this->setActiveSpan($span);
@@ -101,14 +120,14 @@ class Tracer implements API\Tracer
      * @param bool $isRemote
      * @return Span
      */
-    public function startAndActivateSpanFromContext(string $name, SpanContext $parentContext, bool $isRemote = false): API\Span
+    public function startAndActivateSpanFromContext(string $name, SpanContext $parentContext, bool $isRemote = false, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
     {
         /*
          * Pass in true if the SpanContext was propagated from a
          * remote parent. When creating children from remote spans,
          * their IsRemote flag MUST be set to false.
          */
-        return self::startActiveSpan($name, $parentContext, $isRemote);
+        return self::startActiveSpan($name, $parentContext, $isRemote, $spanKind);
     }
     /* Span creation MUST NOT set the newly created Span as the currently active
  * Span by default, but this functionality MAY be offered additionally as a
@@ -136,11 +155,11 @@ class Tracer implements API\Tracer
      * @param string $name
      * @return Span
      */
-    public function startAndActivateSpan(string $name): API\Span
+    public function startAndActivateSpan(string $name, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
     {
         $parentContext = $this->getActiveSpan()->getContext();
 
-        return self::startActiveSpan($name, $parentContext);
+        return self::startActiveSpan($name, $parentContext, false, $spanKind);
     }
 
     public function getSpans(): array

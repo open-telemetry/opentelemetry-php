@@ -24,15 +24,23 @@ class NoopSpan implements \OpenTelemetry\Trace\Span
     /** @var API\SpanStatus */
     private $status;
 
-    public function __construct()
+    /*
+     * All operations are no-op except context propagation.
+     * If a valid context is passed in, the context is propagated;
+     * otherwise, it returns an invalid span.
+     */
+    public function __construct(SpanContext $spanContext = null)
     {
-        $this->context = new SpanContext(
-            SpanContext::INVALID_TRACE,
-            SpanContext::INVALID_SPAN,
-            0,
-            []
-        );
-
+        if (null == $spanContext) {
+            $this->context = new SpanContext(
+                SpanContext::INVALID_TRACE,
+                SpanContext::INVALID_SPAN,
+                0,
+                []
+            );
+        } else {
+            $this->context = $spanContext;
+        }
         $this->attributes = new Attributes();
         $this->events = new Events();
         $this->status = SpanStatus::ok();
