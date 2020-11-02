@@ -6,6 +6,7 @@ namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Sdk\Resource\ResourceConstants;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
+use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SpanMultiProcessor;
 use OpenTelemetry\Trace as API;
 
@@ -27,10 +28,20 @@ final class TracerProvider implements API\TracerProvider
      */
     private $resource;
 
-    public function __construct(?ResourceInfo $resource = null)
+    /**
+     * @var Sampler
+     */
+    private $sampler;
+
+    public function __construct(?ResourceInfo $resource = null, ?Sampler $sampler = null)
     {
         $this->spanProcessors = new SpanMultiProcessor();
         $this->resource = $resource ?? ResourceInfo::emptyResource();
+        if (null == $sampler) {
+            $sampler = new AlwaysOnSampler();
+        } else {
+            $this->sampler = $sampler;
+        }
         register_shutdown_function([$this, 'shutdown']);
     }
 
