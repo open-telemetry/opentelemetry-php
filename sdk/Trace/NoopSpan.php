@@ -8,7 +8,7 @@ use OpenTelemetry\Trace as API;
 
 class NoopSpan implements \OpenTelemetry\Trace\Span
 {
-    /** @var SpanContext */
+    /** @var API\SpanContext */
     private $context;
 
     /** @var API\Attributes */
