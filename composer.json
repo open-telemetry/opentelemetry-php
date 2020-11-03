@@ -44,6 +44,8 @@
         "phan/phan": "^3.0",
         "friendsofphp/php-cs-fixer": "^2.16",
         "vimeo/psalm": "^4.0",
-        "phpstan/phpstan": "^0.12.50"
+        "phpstan/phpstan": "^0.12.50",
+        "phpstan/phpstan-phpunit": "^0.12.16",
+        "psalm/plugin-phpunit": "^0.13.0"
     }
 }

@@ -1,7 +1,15 @@
+includes:
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+
 parameters:
+    tmpDir: var/cache/phpstan
     level: 5
     paths:
-        - Context
-        - api
-        - contrib
-        - sdk
+        - .
+    excludes_analyse:
+        - var
+        - vendor
+    ignoreErrors:
+        # PHPStan false positive
+        - message: '#Call to an undefined static method OpenTelemetry\\Sdk\\Metrics\\Providers\\GlobalMeterProvider\:\:getMeter\(\)\.#'
+          path: tests/Sdk/Unit/Metrics/Providers/GlobalMeterProvicerTest.php

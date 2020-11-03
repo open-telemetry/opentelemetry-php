@@ -111,7 +111,7 @@ class ValueRecorderTest extends TestCase
         $this->assertEquals(5.2222, $metric->getMax());
         $this->assertEquals(5.2222, $metric->getMin());
         $this->assertEquals(5.2222, $metric->getSum());
-        $metric->record(-2.6666, $metric->getCount());
+        $metric->record(-2.6666);
         $this->assertEquals(2, $metric->getCount());
         $this->assertEquals(5.2222, $metric->getMax());
         $this->assertEquals(-2.6666, $metric->getMin());
@@ -147,6 +147,10 @@ class ValueRecorderTest extends TestCase
     {
         $metric = new ValueRecorder('name', 'description');
         $this->expectException(InvalidArgumentException::class);
-        $retVal = $metric->record('a');
+        /**
+         * @phpstan-ignore-next-line
+         * @psalm-suppress InvalidScalarArgument
+         */
+        $metric->record('a');
     }
 }

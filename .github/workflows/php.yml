@@ -15,10 +15,10 @@ jobs:
       matrix:
         operating-system: [ubuntu-latest]
         php-versions: ['7.3', '7.4']
-        
+
     steps:
     - uses: actions/checkout@v2
-  
+
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
@@ -44,21 +44,21 @@ jobs:
       run: composer install --prefer-dist --no-progress --no-suggest
 
     - name: Check Style
-      run: .github/phpcs.sh 
-      
+      run: .github/phpcs.sh
+
     - name: Run Phan
       env:
         PHAN_DISABLE_XDEBUG_WARN: 1
       run: vendor/bin/phan
-    
+
     - name: Run Psalm
-      run: vendor/bin/psalm
-    
+      run: vendor/bin/psalm --output-format=github
+
     - name: Run Phpstan
-      run: vendor/bin/phpstan analyse
+      run: vendor/bin/phpstan analyse --error-format=github
 
     - name: Run PHPUnit
       run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
-          
+
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash)

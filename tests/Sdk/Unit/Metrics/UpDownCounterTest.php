@@ -84,6 +84,10 @@ class UpDownCounterTest extends TestCase
     {
         $counter = new UpDownCounter('name', 'description');
         $this->expectException(InvalidArgumentException::class);
-        $retVal = $counter->add('a');
+        /**
+         * @phpstan-ignore-next-line
+         * @psalm-suppress InvalidScalarArgument
+         */
+        $counter->add('a');
     }
 }

@@ -37,10 +37,11 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
         $timestamp = Clock::get()->timestamp();
         $span = $tracer->startAndActivateSpan('session.generate.span' . microtime(true));
 
+        $spanParent = $span->getParent();
         echo sprintf(
             PHP_EOL . 'Exporting Trace: %s, Parent: %s, Span: %s',
             $span->getContext()->getTraceId(),
-            $span->getParent() ? $span->getParent()->getSpanId() : 'None',
+            $spanParent ? $spanParent->getSpanId() : 'None',
             $span->getContext()->getSpanId()
         );
 

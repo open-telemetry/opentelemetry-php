@@ -54,6 +54,7 @@ class BatchSpanProcessorTest extends TestCase
         $exportDelay = 1;
         $timeout = 3000;
 
+        $spans = [];
         for ($i = 0; $i < $batchSize - 1; $i++) {
             $spans[] = $this->createSampledSpanMock();
         }
@@ -83,8 +84,8 @@ class BatchSpanProcessorTest extends TestCase
         /** @var \OpenTelemetry\Sdk\Trace\Clock $clock */
         $processor = new BatchSpanProcessor($exporter, $clock, $queueSize, $exportDelay, $timeout, $batchSize);
 
+        /** @var \OpenTelemetry\Sdk\Trace\Span $span */
         foreach ($spans as $span) {
-            /** @var \OpenTelemetry\Sdk\Trace\Span $mock_span */
             $processor->onEnd($span);
         }
     }
@@ -144,15 +145,13 @@ class BatchSpanProcessorTest extends TestCase
         $clock->method('timestamp')->will($this->returnValue(($exportDelay - 1)));
 
         $exporter = self::createMock(Exporter::class);
-        /** @var \OpenTelemetry\Sdk\Trace\Exporter $exporter */
-        /** @var \OpenTelemetry\Sdk\Trace\Clock $clock */
         $processor = new BatchSpanProcessor($exporter, $clock, $queueSize, $exportDelay, $timeout, $batchSize);
 
         $spans = [];
         for ($i = 0; $i < $batchSize - 1; $i++) {
+            /** @var \OpenTelemetry\Sdk\Trace\Span $span */
             $span = $this->createSampledSpanMock();
             $spans[] = $span;
-            /** @var \OpenTelemetry\Sdk\Trace\Span $mock_span */
             $processor->onEnd($span);
         }
 
@@ -178,22 +177,14 @@ class BatchSpanProcessorTest extends TestCase
     public function noExportAfterShutdown()
     {
         $exporter = self::createMock(Exporter::class);
-        // grap a reference to the InvocationOrder object so we can inspect/assert *when* the call happens
-        $exporter->expects($spy = $this->exactly(1))->method('shutdown');
-
-        $this->assertEquals(0, $spy->getInvocationCount());
+        $exporter->expects($this->exactly(1))->method('shutdown');
 
         $proc = new BatchSpanProcessor($exporter, self::createMock(Clock::class));
         $proc->shutdown();
-        // calling SpanProcessor's shutdown() calls Exporter's shutdown()
-        $this->assertEquals(1, $spy->getInvocationCount());
 
         $span = $this->createSampledSpanMock();
         $proc->onStart($span);
         $proc->onEnd($span);
-
-        // calling onEnd here does NOT result in another call to shutdown
-        $this->assertEquals(1, $spy->getInvocationCount());
     }
 
     /**
