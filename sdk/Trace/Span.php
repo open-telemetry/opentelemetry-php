@@ -12,6 +12,7 @@ class Span implements API\Span
     private $spanContext;
     private $parentSpanContext;
     private $spanKind;
+    private $sampler;
 
     private $startEpochTimestamp;
     private $start;
@@ -22,6 +23,8 @@ class Span implements API\Span
     private $attributes;
     private $events;
     private $links = null;
+
+    private $ended = false;
 
     // todo: missing links: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-links
 
@@ -40,12 +43,14 @@ class Span implements API\Span
         string $name,
         API\SpanContext $spanContext,
         ?API\SpanContext $parentSpanContext = null,
+        ?Sampler $sampler = null,
         int $spanKind = API\SpanKind::KIND_INTERNAL
     ) {
         $this->name = $name;
         $this->spanContext = $spanContext;
         $this->parentSpanContext = $parentSpanContext;
         $this->spanKind = $spanKind;
+        $this->sampler = $sampler;
         $moment = Clock::get()->moment();
         $this->startEpochTimestamp = $moment[0];
         $this->start = $moment[1];
@@ -94,11 +99,15 @@ class Span implements API\Span
     {
         if (!isset($this->end)) {
             $this->end = $now ?? Clock::get()->now();
+            $this->ended = true;
         }
 
         return $this;
     }
-
+    public function ended(): bool
+    {
+        return $this->ended;
+    }
     public function setStartEpochTimestamp(int $timestamp): Span
     {
         $this->startEpochTimestamp = $timestamp;
