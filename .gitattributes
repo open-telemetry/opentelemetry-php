@@ -1,0 +1,10 @@
+/docker export-ignore
+/examples export-ignore
+/tests export-ignore
+/.* export-ignore
+/*dist export-ignore
+/code-of-conduct.md
+/CODEOWNERS export-ignore
+/CONTRIBUTING.md export-ignore
+/docker-compose* export-ignore
+/Makefile export-ignore
