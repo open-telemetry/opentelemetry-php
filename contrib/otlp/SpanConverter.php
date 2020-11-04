@@ -42,10 +42,11 @@ class SpanConverter
 
     public function convert(Span $span)
     {
+         $spanParent = $span->getParent();
         $row = [
             'id' => $span->getContext()->getSpanId(),
             'traceId' => $span->getContext()->getTraceId(),
-            'parentId' => $span->getParent() ? $span->getParent()->getSpanId() : null,
+            'parentId' => $spanParent ? $spanParent->getSpanId() : null,
             'localEndpoint' => [
                 'serviceName' => $this->serviceName,
             ],
