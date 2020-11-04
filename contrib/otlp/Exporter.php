@@ -84,7 +84,7 @@ class Exporter implements Trace\Exporter
         $this->certificateFile = getenv("OTEL_EXPORTER_OTLP_CERTIFICATE") ?: "none";
         $this->headers[] = getenv("OTEL_EXPORTER_OTLP_HEADERS") ?: "none";
         $this->compression = getenv("OTEL_EXPORTER_OTLP_COMPRESSION") ?: "none";
-        $this->timeout =(int)getenv("OTEL_EXPORTER_OTLP_TIMEOUT");
+        $this->timeout =(int)getenv("OTEL_EXPORTER_OTLP_TIMEOUT") ?: 10;
 
 
         $this->client = $this->createDefaultClient();
