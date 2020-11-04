@@ -59,7 +59,9 @@ class CorrelationContext extends Context
             return;
         }
 
-        $child->setParent($this->parent);
+        if ($child !== null && $this->parent !== null) {
+            $child->setParent($this->parent);
+        }
     }
 
     /**
