@@ -4,6 +4,7 @@ declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
+use OpenTelemetry\Contrib\Zipkin\SpanConverter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
@@ -22,8 +23,13 @@ $samplingResult = $sampler->shouldSample(
 );
 
 $exporter = new JaegerExporter(
-    'alwaysOnJaegerExample',
-    'http://jaeger:9412/api/v2/spans'
+    $serviceName = 'alwaysOnJaegerExample',
+    'http://jaeger:9412/api/v2/spans',
+    // Optionally you can pass in SpanConverter with custom config
+    new SpanConverter($serviceName, [
+        // If set to true (default case), adds op.status_code and op.status_description into tags
+        SpanConverter::CONFIG_ADD_DEFAULT_TAG => false,
+    ])
 );
 
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
