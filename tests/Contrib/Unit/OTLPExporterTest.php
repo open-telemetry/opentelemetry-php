@@ -101,7 +101,7 @@ class OTLPExporterTest extends TestCase
         $span = $this->createMock(Span::class);
         $exporter->shutdown();
 
-        $this->assertEquals($exporter->export([$span]), \Opentelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE);
+        $this->assertEquals($exporter->export([$span]), \OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE);
     }
 
 }
