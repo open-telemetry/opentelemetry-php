@@ -47,7 +47,7 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertGreaterThan(0, $row['duration']);
 
         $this->assertCount(3, $row['tags']);
-        
+
         /** @var Attribute $attribute */
         $attribute = $span->getAttribute('service');
         $this->assertEquals($attribute->getValue(), $row['tags']['service']);
@@ -127,5 +127,22 @@ class ZipkinSpanConverterTest extends TestCase
         // This currently works, but OpenTelemetry\Trace\Span should stop arrays
         // containing multiple value types from being passed to the Exporter.
         $this->assertEquals($tags['list-of-random'], 'true,1,2,3,false,string-1,3.1415');
+    }
+
+    /**
+     * @test
+     */
+    public function defaultTagsCanBeToggled()
+    {
+        $span = new Span('duration.test', SpanContext::generate());
+
+        $rowOn = (new SpanConverter('default.tags.on'))->convert($span);
+        $rowOff = (new SpanConverter('default.tags.on', [SpanConverter::CONFIG_ADD_DEFAULT_TAG => false]))->convert($span);
+
+        $this->assertArrayHasKey('op.status_code', $rowOn['tags']);
+        $this->assertArrayHasKey('op.status_description', $rowOn['tags']);
+
+        $this->assertArrayNotHasKey('op.status_code', $rowOff['tags']);
+        $this->assertArrayNotHasKey('op.status_description', $rowOff['tags']);
     }
 }
