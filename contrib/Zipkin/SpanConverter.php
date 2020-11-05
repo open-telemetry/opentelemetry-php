@@ -8,6 +8,8 @@ use OpenTelemetry\Trace\Span;
 
 class SpanConverter
 {
+    const CONFIG_ADD_DEFAULT_TAG = 'add_default_tag';
+
     const STATUS_CODE_TAG_KEY = 'op.status_code';
     const STATUS_DESCRIPTION_TAG_KEY = 'op.status_description';
     /**
@@ -15,9 +17,17 @@ class SpanConverter
      */
     private $serviceName;
 
-    public function __construct(string $serviceName)
+    /**
+     * Converter configuration. Use SpanConverter::CONFIG_* as key to set a value.
+     *
+     * @var array
+     */
+    private $config;
+
+    public function __construct(string $serviceName, array $config = [])
     {
         $this->serviceName = $serviceName;
+        $this->config = $config + [self::CONFIG_ADD_DEFAULT_TAG => true];
     }
 
     private function sanitiseTagValue($value)
@@ -55,11 +65,15 @@ class SpanConverter
             'name' => $span->getSpanName(),
             'timestamp' => (int) ($span->getStartEpochTimestamp() / 1e3), // RealtimeClock in microseconds
             'duration' => (int) (($span->getEnd() - $span->getStart()) / 1e3), // Diff in microseconds
-            'tags' => [
+            'tags' => [],
+        ];
+
+        if ($this->config[self::CONFIG_ADD_DEFAULT_TAG] ?? false) {
+            $row['tags'] = [
                 self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCanonicalStatusCode(),
                 self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getStatusDescription(),
-            ],
-        ];
+            ];
+        }
 
         foreach ($span->getAttributes() as $k => $v) {
             $row['tags'][$k] = $this->sanitiseTagValue($v->getValue());
