@@ -46,7 +46,7 @@ class OTLPSpanConverterTest extends TestCase
         $this->assertIsInt($row['duration']);
         $this->assertGreaterThan(0, $row['duration']);
 
-        $this->assertCount(3, $row['tags']);
+        $this->assertCount(1, $row['tags']);
         
         /** @var Attribute $attribute */
         $attribute = $span->getAttribute('service');
@@ -104,7 +104,7 @@ class OTLPSpanConverterTest extends TestCase
         $tags = (new SpanConverter('tags.test'))->convert($span)['tags'];
 
         // Check that we can convert all attributes to tags
-        $this->assertCount(12, $tags);
+        $this->assertCount(10, $tags);
 
         // Tags destined for Otlp must be pairs of strings
         foreach ($tags as $tagKey => $tagValue) {
