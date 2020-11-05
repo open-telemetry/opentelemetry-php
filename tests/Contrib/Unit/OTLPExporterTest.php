@@ -30,7 +30,7 @@ class OTLPExporterTest extends TestCase
             new Response($responseStatus)
         );
 
-        $exporter = new Exporter('test.zipkin');
+        $exporter = new Exporter('test.otlp');
 
         $this->assertEquals(
             $expected,
@@ -41,10 +41,6 @@ class OTLPExporterTest extends TestCase
     public function exporterResponseStatusesDataProvider()
     {
         return [
-            'not found'         => [404, Exporter::FAILED_NOT_RETRYABLE],
-            'not authorized'    => [401, Exporter::FAILED_NOT_RETRYABLE],
-            'bad request'       => [402, Exporter::FAILED_NOT_RETRYABLE],
-            'too many requests' => [429, Exporter::FAILED_NOT_RETRYABLE],
             'server error'      => [500, Exporter::FAILED_RETRYABLE],
             'timeout'           => [503, Exporter::FAILED_RETRYABLE],
             'bad gateway'       => [502, Exporter::FAILED_RETRYABLE],
@@ -101,7 +97,7 @@ class OTLPExporterTest extends TestCase
         $span = $this->createMock(Span::class);
         $exporter->shutdown();
 
-        $this->assertEquals($exporter->export([$span]), \OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE);
+        $this->assertEquals(\OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 
 }

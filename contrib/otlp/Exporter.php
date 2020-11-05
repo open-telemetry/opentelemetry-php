@@ -99,6 +99,10 @@ class Exporter implements Trace\Exporter
      */
     public function export(iterable $spans): int
     {
+        if (!$this->running) {
+            return Exporter::FAILED_NOT_RETRYABLE;
+        }
+        
         if (empty($spans)) {
             return Trace\Exporter::SUCCESS;
         }
