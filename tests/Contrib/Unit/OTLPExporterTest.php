@@ -41,6 +41,10 @@ class OTLPExporterTest extends TestCase
     public function exporterResponseStatusesDataProvider()
     {
         return [
+            'not found'         => [404, Exporter::FAILED_NOT_RETRYABLE],
+            'not authorized'    => [401, Exporter::FAILED_NOT_RETRYABLE],
+            'bad request'       => [402, Exporter::FAILED_NOT_RETRYABLE],
+            'too many requests' => [429, Exporter::FAILED_NOT_RETRYABLE],
             'server error'      => [500, Exporter::FAILED_RETRYABLE],
             'timeout'           => [503, Exporter::FAILED_RETRYABLE],
             'bad gateway'       => [502, Exporter::FAILED_RETRYABLE],
@@ -87,6 +91,17 @@ class OTLPExporterTest extends TestCase
             Exporter::SUCCESS,
             (new Exporter('test.otlp'))->export([])
         );
+    }
+    /**
+     * @test
+     */
+      public function failsIfNotRunning()
+    {
+        $exporter = new Exporter('test.otlp');
+        $span = $this->createMock(Span::class);
+        $exporter->shutdown();
+
+        $this->assertEquals($exporter->export([$span]), \Opentelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE);
     }
 
 }
