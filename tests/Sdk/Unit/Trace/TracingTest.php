@@ -63,6 +63,7 @@ class TracingTest extends TestCase
     public function testNestedSpans()
     {
         $tracerProvider = new SDK\TracerProvider();
+        /** @var Tracer $tracer */
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
 
         $guard = $tracer->startAndActivateSpan('guard.validate');
@@ -87,6 +88,7 @@ class TracingTest extends TestCase
         $tracer->startAndActivateSpan('firstSpan');
         $global = $tracer->getActiveSpan();
 
+        /** @var SDK\Span $mysql */
         $mysql = $tracer->startAndActivateSpan('mysql');
         $this->assertSame($tracer->getActiveSpan(), $mysql);
         $this->assertSame($global->getContext()->getTraceId(), $mysql->getContext()->getTraceId());
@@ -119,6 +121,7 @@ class TracingTest extends TestCase
         $global = $tracer->getActiveSpan();
         $this->assertSame($tracer->getActiveSpan(), $global);
 
+        /** @var SDK\Span $mysql */
         $mysql = $tracer->startAndActivateSpan('mysql');
         $this->assertSame($tracer->getActiveSpan(), $mysql);
         $this->assertSame($global->getContext()->getTraceId(), $mysql->getContext()->getTraceId());
@@ -139,6 +142,7 @@ class TracingTest extends TestCase
     public function testStatusManipulation()
     {
         $tracerProvider = new SDK\TracerProvider();
+        /** @var Tracer $tracer */
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
 
         $cancelled = $tracer->startAndActivateSpan('cancelled')
@@ -186,19 +190,22 @@ class TracingTest extends TestCase
 
         // null attributes
         self::assertNull($span->getAttribute('username'));
-        self::assertEquals(new Attribute('email', 'nekufa@gmail.com'), $span->getAttribute('email'));
+        /** @var Attribute $email */
+        $email = $span->getAttribute('email');
+        self::assertEquals(new Attribute('email', 'nekufa@gmail.com'), $email);
 
         // set attribute
         $span->setAttribute('username', 'nekufa');
-        self::assertEquals(new Attribute('username', 'nekufa'), $span->getAttribute('username'));
         $attributes = $span->getAttributes();
         self::assertCount(2, $attributes);
-        self::assertEquals(new Attribute('email', 'nekufa@gmail.com'), $span->getAttribute('email'));
-        self::assertEquals(new Attribute('username', 'nekufa'), $span->getAttribute('username'));
+        /** @var Attribute $username */
+        $username = $span->getAttribute('username');
+        self::assertEquals(new Attribute('email', 'nekufa@gmail.com'), $email);
+        self::assertEquals(new Attribute('username', 'nekufa'), $username);
 
         // attribute key - code coverage
-        self::assertEquals('email', $span->getAttribute('email')->getKey());
-        self::assertEquals('username', $span->getAttribute('username')->getKey());
+        self::assertEquals('email', $email->getKey());
+        self::assertEquals('username', $username->getKey());
 
         // keep order
         $expected = [
@@ -225,6 +232,7 @@ class TracingTest extends TestCase
     public function testSetAttributeReplaceAttributesWhenNotRecording()
     {
         $tracer = (new SDK\TracerProvider())->getTracer('OpenTelemetry.TracingTest');
+        /** @var SDK\Span $span */
         $span = $tracer->startAndActivateSpan('testSpan');
         $span->setAttribute('key1', 'value1');
         $span->end();
@@ -313,9 +321,10 @@ class TracingTest extends TestCase
         $tracer->startAndActivateSpan('firstSpan');
         $global = $tracer->getActiveSpan();
         $request = $tracer->startAndActivateSpan('request');
-        $this->assertSame($request->getParent()->getSpanId(), $global->getContext()->getSpanId());
+        $requestParent = $request->getParent();
+        $this->assertNotNull($requestParent);
+        $this->assertSame($requestParent->getSpanId(), $global->getContext()->getSpanId());
         $this->assertNull($global->getParent());
-        $this->assertNotNull($request->getParent());
     }
 
     public function testActiveRootSpanIsNoopSpanIfNoParentProvided()

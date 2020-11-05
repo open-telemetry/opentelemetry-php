@@ -20,10 +20,13 @@ class AbstractExporterTest extends TestCase
 
     public function testErrorReturnsIfTryingToExportNotAMetric()
     {
-        $this->assertEquals(
-            API\Exporter::FAILED_NOT_RETRYABLE,
-            $this->getExporter()->export([1])
-        );
+        /**
+         * @phpstan-ignore-next-line
+         * @psalm-suppress InvalidArgument
+         */
+        $export = $this->getExporter()->export([1]);
+
+        $this->assertEquals(API\Exporter::FAILED_NOT_RETRYABLE, $export);
     }
 
     protected function getExporter(): AbstractExporter

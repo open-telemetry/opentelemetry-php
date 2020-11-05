@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
+use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Span;
@@ -23,6 +24,7 @@ class ZipkinSpanConverterTest extends TestCase
 
         $timestamp = Clock::get()->timestamp();
 
+        /** @var Span $span */
         $span = $tracer->startAndActivateSpan('guard.validate');
         $span->setAttribute('service', 'guard');
         $span->addEvent('validators.list', $timestamp, new Attributes(['job' => 'stage.updateTime']));
@@ -45,7 +47,10 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertGreaterThan(0, $row['duration']);
 
         $this->assertCount(3, $row['tags']);
-        $this->assertEquals($span->getAttribute('service')->getValue(), $row['tags']['service']);
+        
+        /** @var Attribute $attribute */
+        $attribute = $span->getAttribute('service');
+        $this->assertEquals($attribute->getValue(), $row['tags']['service']);
 
         $this->assertCount(1, $row['annotations']);
         [$annotation] = $row['annotations'];

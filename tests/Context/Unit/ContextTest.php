@@ -215,7 +215,7 @@ class ContextTest extends TestCase
         Context::attach($ctx);
 
         $this->assertSame(Context::getValue($key, $ctx), $val);
-        $this->assertSame(Context::getValue($key, null, true), $val);
+        $this->assertSame(Context::getValue($key, null), $val);
     }
 
     /**

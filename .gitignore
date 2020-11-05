@@ -1,5 +1,6 @@
 composer.phar
 composer.lock
+var
 vendor
 .idea/
 coverage.clover

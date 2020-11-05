@@ -100,10 +100,8 @@ class ZipkinExporterTest extends TestCase
     /**
      * @test
      * @dataProvider invalidDsnDataProvider
-     *
-     * @param $invalidDsn
      */
-    public function shouldThrowExceptionIfInvalidDsnIsPassed($invalidDsn)
+    public function shouldThrowExceptionIfInvalidDsnIsPassed(string $invalidDsn)
     {
         $this->expectException(InvalidArgumentException::class);
 

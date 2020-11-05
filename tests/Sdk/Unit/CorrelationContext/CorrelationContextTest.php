@@ -18,7 +18,9 @@ class CorrelationContextTest extends TestCase
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
+        /** @var CorrelationContext $cctx */
         $cctx = (new CorrelationContext())->set($key1, 'foo')->set($key2, 'bar');
+        /** @var CorrelationContext $cctx_res */
         $cctx_res = $cctx->removeCorrelation($key2);
         $this->assertEquals('foo', $cctx_res->get($key1));
         $this->expectException(ContextValueNotFoundException::class);
@@ -33,7 +35,9 @@ class CorrelationContextTest extends TestCase
         $key1 = new ContextKey('key1');
         $key2 = new ContextKey('key2');
         $key3 = new ContextKey('key3');
+        /** @var CorrelationContext $cctx */
         $cctx = (new CorrelationContext())->set($key1, 'foo')->set($key2, 'bar')->set($key3, 'baz');
+        /** @var CorrelationContext $cctx_res */
         $cctx_res = $cctx->removeCorrelation($key2);
         $this->assertEquals('foo', $cctx_res->get($key1));
         $this->assertEquals('baz', $cctx_res->get($key3));
@@ -48,7 +52,9 @@ class CorrelationContextTest extends TestCase
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
+        /** @var CorrelationContext $cctx */
         $cctx = (new CorrelationContext())->set($key2, 'bar')->set($key1, 'foo');
+        /** @var CorrelationContext $cctx_res */
         $cctx_res = $cctx->removeCorrelation($key2);
         $this->assertEquals('foo', $cctx_res->get($key1));
         $this->expectException(ContextValueNotFoundException::class);
@@ -85,6 +91,7 @@ class CorrelationContextTest extends TestCase
         $key1 = new ContextKey();
         $key2 = new ContextKey();
 
+        /** @var CorrelationContext $cctx */
         $cctx = (new CorrelationContext())->set($key1, 'foo')->set($key2, 'bar');
 
         $this->assertEquals('foo', $cctx->get($key1));
@@ -103,6 +110,7 @@ class CorrelationContextTest extends TestCase
         $key1 = new ContextKey();
         $key2 = new ContextKey();
 
+        /** @var CorrelationContext $cctx */
         $cctx = (new CorrelationContext())->set($key1, 'foo')->set($key2, 'bar');
 
         $res = [];

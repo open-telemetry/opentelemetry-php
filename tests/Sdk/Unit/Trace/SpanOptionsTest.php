@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
 use OpenTelemetry\Sdk\Trace\Attributes;
+use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanOptions;
 use OpenTelemetry\Tests\Sdk\Unit\Support\HasTraceProvider;
 use OpenTelemetry\Trace\SpanKind;
@@ -24,6 +25,7 @@ class SpanOptionsTest extends TestCase
         $spanOptions->setParentSpan($global);
 
         // Create span from options
+        /** @var Span $web */
         $web = $spanOptions->toSpan();
 
         // Make sure created span is not activated

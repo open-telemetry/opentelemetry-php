@@ -11,6 +11,9 @@ trait HasTraceProvider
 {
     protected function getTracer(string $name = 'OpenTelemetry.TracerTest'): Tracer
     {
-        return (new TracerProvider())->getTracer($name);
+        /** @var Tracer $tracer */
+        $tracer = (new TracerProvider())->getTracer($name);
+
+        return $tracer;
     }
 }

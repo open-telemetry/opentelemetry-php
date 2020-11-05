@@ -34,7 +34,7 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
         'username' => 'otuser',
       ]));
     $span->addEvent('generated_session', $timestamp, new Attributes([
-        'id' => md5(microtime(true)),
+        'id' => md5((string) microtime(true)),
       ]));
 
     $span->end(); // pass status as an optional argument

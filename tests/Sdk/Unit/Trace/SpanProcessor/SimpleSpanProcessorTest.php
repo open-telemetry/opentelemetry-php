@@ -57,22 +57,14 @@ class SimpleSpanProcessorTest extends TestCase
     public function noExportAfterShutdown()
     {
         $exporter = self::createMock(Exporter::class);
-        // grap a reference to the InvocationOrder object so we can inspect/assert *when* the call happens
-        $exporter->expects($spy = $this->exactly(1))->method('shutdown');
-
-        $this->assertEquals(0, $spy->getInvocationCount());
+        $exporter->expects($this->exactly(1))->method('shutdown');
 
         $proc = new SimpleSpanProcessor($exporter);
         $proc->shutdown();
-        // calling SpanProcessor's shutdown() calls Exporter's shutdown()
-        $this->assertEquals(1, $spy->getInvocationCount());
 
         $span = self::createMock(Span::class);
         $proc->onStart($span);
         $proc->onEnd($span);
-
-        // calling onEnd here does NOT result in another call to shutdown
-        $this->assertEquals(1, $spy->getInvocationCount());
     }
 
     /**
