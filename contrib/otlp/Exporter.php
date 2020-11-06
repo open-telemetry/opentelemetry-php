@@ -73,13 +73,14 @@ class Exporter implements Trace\Exporter
      * @param string $serviceName 
      */
     public function __construct(
-        $serviceName
+        $serviceName,
+        ClientInterface $client=null
     )
     {
 
         // Set default values based on presence of env variable
         $this->endpointURL = getenv("OTEL_EXPORTER_OTLP_ENDPOINT") ?: "localhost:55680";
-        $this->protocol = getenv("OTEL_EXPORTER_OTLP_PROTOCOL") ?: "grpc";
+        $this->protocol = getenv("OTEL_EXPORTER_OTLP_PROTOCOL") ?: "json";
         $this->insecure = getenv("OTEL_EXPORTER_OTLP_INSECURE") ?: "false";
         $this->certificateFile = getenv("OTEL_EXPORTER_OTLP_CERTIFICATE") ?: "none";
         $this->headers[] = getenv("OTEL_EXPORTER_OTLP_HEADERS") ?: "none";
@@ -87,7 +88,7 @@ class Exporter implements Trace\Exporter
         $this->timeout =(int)getenv("OTEL_EXPORTER_OTLP_TIMEOUT") ?: 10;
 
 
-        $this->client = $this->createDefaultClient();
+        $this->client = $client ?? $this->createDefaultClient();
         $this->spanConverter = new SpanConverter($serviceName);
     }
 
@@ -117,11 +118,7 @@ class Exporter implements Trace\Exporter
 
             $this->headers[] = '';
 
-            if($this->protocol == "grpc") {
-                $headers = ['content-type' => 'application/x-protobuf'];
-            }
-
-            else if($this->protocol == "json") {
+            if($this->protocol == "json") {
                 $headers = ['content-type' => 'application/json', "Content-Encoding" => "gzip"];
 
             }
