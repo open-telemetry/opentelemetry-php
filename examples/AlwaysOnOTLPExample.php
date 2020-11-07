@@ -4,7 +4,7 @@ declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
 
-use OpenTelemetry\Contrib\otlp\Exporter as OTLPExporter;
+use OpenTelemetry\Contrib\Otlp\Exporter as OTLPExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;

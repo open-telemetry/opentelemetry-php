@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
-use OpenTelemetry\Contrib\otlp\SpanConverter;
+use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;

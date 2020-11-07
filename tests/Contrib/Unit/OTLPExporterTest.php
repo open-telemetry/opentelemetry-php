@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
-use OpenTelemetry\Contrib\otlp\Exporter;
+use OpenTelemetry\Contrib\Otlp\Exporter;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use PHPUnit\Framework\TestCase;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Contrib\otlp;
+namespace OpenTelemetry\Contrib\Otlp;
 
 use OpenTelemetry\Trace\Span;
 
