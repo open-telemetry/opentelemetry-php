@@ -42,7 +42,7 @@ class SpanConverter
 
     public function convert(Span $span)
     {
-         $spanParent = $span->getParent();
+        $spanParent = $span->getParent();
         $row = [
             'id' => $span->getContext()->getSpanId(),
             'traceId' => $span->getContext()->getTraceId(),

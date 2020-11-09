@@ -8,20 +8,19 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use Http\Adapter\Guzzle6\Client;
+use OpenTelemetry\Sdk\Trace;
+use OpenTelemetry\Trace as API;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
-use OpenTelemetry\Sdk\Trace;
-use OpenTelemetry\Trace as API;
-
 
 class Exporter implements Trace\Exporter
 {
     /**
      * @var string
      */
-     private $endpointURL;
+    private $endpointURL;
 
     /**
      * @var string
@@ -57,9 +56,9 @@ class Exporter implements Trace\Exporter
      */
     private $spanConverter;
     
-     /**
-     * @var bool
-     */
+    /**
+    * @var bool
+    */
     private $running = true;
 
     /**
@@ -70,23 +69,21 @@ class Exporter implements Trace\Exporter
 
     /**
      * Exporter constructor.
-     * @param string $serviceName 
+     * @param string $serviceName
      */
     public function __construct(
         $serviceName,
         ClientInterface $client=null
-    )
-    {
+    ) {
 
         // Set default values based on presence of env variable
-        $this->endpointURL = getenv("OTEL_EXPORTER_OTLP_ENDPOINT") ?: "localhost:55680";
-        $this->protocol = getenv("OTEL_EXPORTER_OTLP_PROTOCOL") ?: "json";
-        $this->insecure = getenv("OTEL_EXPORTER_OTLP_INSECURE") ?: "false";
-        $this->certificateFile = getenv("OTEL_EXPORTER_OTLP_CERTIFICATE") ?: "none";
-        $this->headers[] = getenv("OTEL_EXPORTER_OTLP_HEADERS") ?: "none";
-        $this->compression = getenv("OTEL_EXPORTER_OTLP_COMPRESSION") ?: "none";
-        $this->timeout =(int)getenv("OTEL_EXPORTER_OTLP_TIMEOUT") ?: 10;
-
+        $this->endpointURL = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'localhost:55680';
+        $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'json';
+        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ?: 'false';
+        $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
+        $this->headers[] = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: 'none';
+        $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: 'none';
+        $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
         $this->client = $client ?? $this->createDefaultClient();
         $this->spanConverter = new SpanConverter($serviceName);
@@ -118,9 +115,8 @@ class Exporter implements Trace\Exporter
 
             $this->headers[] = '';
 
-            if($this->protocol == "json") {
-                $headers = ['content-type' => 'application/json', "Content-Encoding" => "gzip"];
-
+            if ($this->protocol == 'json') {
+                $headers = ['content-type' => 'application/json', 'Content-Encoding' => 'gzip'];
             }
 
             $request = new Request('POST', $this->endpointURL, $this->headers, $json);

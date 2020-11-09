@@ -3,7 +3,6 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-
 use OpenTelemetry\Contrib\Otlp\Exporter as OTLPExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
@@ -22,7 +21,8 @@ $samplingResult = $sampler->shouldSample(
     API\SpanKind::KIND_INTERNAL
 );
 $Exporter = new OTLPExporter(
-    'OTLP Example Service');
+    'OTLP Example Service'
+);
 
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
     echo 'Starting OTLPExample';
@@ -30,11 +30,10 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
         ->addSpanProcessor(new SimpleSpanProcessor($Exporter))
         ->getTracer('io.opentelemetry.contrib.php');
 
-
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
         $timestamp = Clock::get()->timestamp();
-         $span = $tracer->startAndActivateSpan('session.generate.span.' . microtime(true));
+        $span = $tracer->startAndActivateSpan('session.generate.span.' . microtime(true));
 
         $spanParent = $span->getParent();
         echo sprintf(

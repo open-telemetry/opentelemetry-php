@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use GuzzleHttp\Psr7\Response;
-use InvalidArgumentException;
 use OpenTelemetry\Contrib\Otlp\Exporter;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
@@ -13,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
-use Psr\Http\Client\RequestExceptionInterface;
 
 class OTLPExporterTest extends TestCase
 {
@@ -35,7 +33,7 @@ class OTLPExporterTest extends TestCase
             $expected,
             $exporter->export([new Span('test.otlp.span', SpanContext::generate())])
         );
-    }  
+    }
 
     public function exporterResponseStatusesDataProvider()
     {
@@ -95,7 +93,7 @@ class OTLPExporterTest extends TestCase
     /**
      * @test
      */
-      public function failsIfNotRunning()
+    public function failsIfNotRunning()
     {
         $exporter = new Exporter('test.otlp');
         $span = $this->createMock(Span::class);
@@ -103,5 +101,4 @@ class OTLPExporterTest extends TestCase
 
         $this->assertEquals(\OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
-
 }
