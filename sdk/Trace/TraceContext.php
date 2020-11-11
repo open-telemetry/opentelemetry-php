@@ -24,7 +24,7 @@ final class TraceContext implements API\TextMapFormatPropagator
     /**
      * {@inheritdoc}
      */
-    public function fields(): array
+    public static function fields(): array
     {
         return [self::TRACEPARENT, self::TRACESTATE];
     }

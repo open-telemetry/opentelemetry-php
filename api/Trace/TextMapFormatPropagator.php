@@ -11,7 +11,7 @@ interface TextMapFormatPropagator
      *
      * @return array
      */
-    public function fields() : array;
+    public static function fields() : array;
 
     /**
      * Encodes the given SpanContext into propagator specific format and injects

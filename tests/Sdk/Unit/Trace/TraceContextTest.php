@@ -20,6 +20,16 @@ class TraceContextTest extends TestCase
     /**
      * @test
      */
+    public function testETraceContextFields()
+    {
+        $fields = TraceContext::fields();
+        $this->assertSame($fields[0], TraceContext::TRACEPARENT);
+        $this->assertSame($fields[1], TraceContext::TRACESTATE);
+    }
+
+    /**
+     * @test
+     */
     public function testExtractValidTraceContext()
     {
         $traceparentValues = [self::TRACEPARENTVALUE,                                               // sampled == true
@@ -32,6 +42,19 @@ class TraceContextTest extends TestCase
             $extractedTraceparent = '00-' . $context->getTraceId() . '-' . $context->getSpanId() . '-' . ($context->isSampled() ? '01' : '00');
             $this->assertSame($traceparentValue, $extractedTraceparent);
         }
+    }
+
+    /**
+     * @test
+     */
+    public function testExtractInvalidTraceContext()
+    {
+        $carrier = [];
+        $map = new PropagationMap();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Traceparent not present');
+        $context = TraceContext::extract($carrier, $map);
     }
 
     /**
