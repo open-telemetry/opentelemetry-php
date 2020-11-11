@@ -59,7 +59,7 @@ class PropagationMap implements API\PropagationGetter, API\PropagationSetter
 
         throw new \InvalidArgumentException(
             sprintf(
-                'Invalid carrier of type %s. Unable to set value',
+                'Invalid carrier of type %s. Unable to set value associated with key:%s',
                 \is_object($carrier) ? \get_class($carrier) : \gettype($carrier),
                 $key
             )
