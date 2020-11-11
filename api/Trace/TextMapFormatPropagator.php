@@ -22,7 +22,7 @@ interface TextMapFormatPropagator
      * @param PropagationSetter $setter
      * @return void
      */
-    public function inject(SpanContext $context, $carrier, PropagationSetter $setter) : void;
+    public static function inject(SpanContext $context, &$carrier, PropagationSetter $setter) : void;
 
     /**
      * Retrieves encoded SpanContext using Getter from the associated carrier.
@@ -31,5 +31,5 @@ interface TextMapFormatPropagator
      * @param PropagationGetter $getter
      * @return SpanContext
      */
-    public function extract($carrier, PropagationGetter $getter): SpanContext;
+    public static function extract($carrier, PropagationGetter $getter): SpanContext;
 }
