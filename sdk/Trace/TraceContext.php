@@ -31,8 +31,6 @@ final class TraceContext implements API\TextMapFormatPropagator
 
     /**
      * {@inheritdoc}
-     *
-     * @param array|ArrayAccess $carrier
      */
     public static function inject(API\SpanContext $context, &$carrier, API\PropagationSetter $setter): void
     {
@@ -40,14 +38,12 @@ final class TraceContext implements API\TextMapFormatPropagator
             throw new \InvalidArgumentException('Unable to inject traceparent value');
         }
 
-        $traceparent = self::SUPPORTED_VERSION.'-'.$context->getTraceId().'-'.$context->getSpanId().'-'.($context->isSampled() ? '01' : '00');
+        $traceparent = self::SUPPORTED_VERSION . '-' . $context->getTraceId() . '-' . $context->getSpanId() . '-' . ($context->isSampled() ? '01' : '00');
         $setter->set($carrier, self::TRACEPARENT, $traceparent);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param array|ArrayAccess $carrier
      */
     public static function extract($carrier, API\PropagationGetter $getter): API\SpanContext
     {
@@ -56,9 +52,7 @@ final class TraceContext implements API\TextMapFormatPropagator
             throw new \InvalidArgumentException('Traceparent not present');
         }
 
-        /*
-         * Traceparent = {version}-{trace-id}-{parent-id}-{trace-flags}
-         */
+        // Traceparent = {version}-{trace-id}-{parent-id}-{trace-flags}
         $pieces = explode('-', $traceparent);
 
         $peicesCount = count($pieces);
@@ -66,9 +60,7 @@ final class TraceContext implements API\TextMapFormatPropagator
             throw new \InvalidArgumentException('Unable to extract traceparent. Contains Invalid values');
         }
 
-        /*
-         * Parse the traceparent version. Currently only '00' is supported.
-         */
+        // Parse the traceparent version. Currently only '00' is supported.
         $version = $pieces[0];
         if ((preg_match(self::VALID_VERSION, $version) === 0) || ($version !== self::SUPPORTED_VERSION)) {
             throw new \InvalidArgumentException(
@@ -96,7 +88,10 @@ final class TraceContext implements API\TextMapFormatPropagator
                 sprintf('TraceFlags must be exactly 1 bytes (1 char) representing a bit field, got %s', $traceFlags)
             );
         }
-        $isSampled = ($traceFlags & self::SAMPLED_FLAG) === self::SAMPLED_FLAG;
+
+        // Only the sampled flag is extracted from the traceFlags (00000001)
+        $convertedTraceFlags = hexdec($traceFlags);
+        $isSampled = ($convertedTraceFlags & self::SAMPLED_FLAG) === self::SAMPLED_FLAG;
 
         return SpanContext::restore($traceId, $spanId, $isSampled, true);
     }

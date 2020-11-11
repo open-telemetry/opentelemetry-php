@@ -15,21 +15,21 @@ class TraceContextTest extends TestCase
     private const TRACEID = '00000000000000000000000000000032';
     private const SPANID = '0000000000000016';
     private const SAMPLED = '01';
-    private const TRACEPARENTVALUE = self::VERSION.'-'.self::TRACEID.'-'.self::SPANID.'-'.self::SAMPLED;
+    private const TRACEPARENTVALUE = self::VERSION . '-' . self::TRACEID . '-' . self::SPANID . '-' . self::SAMPLED;
 
     /**
      * @test
      */
     public function testExtractValidTraceContext()
     {
-        $traceparentValues = [self::TRACEPARENTVALUE,                                     // sampled == true
-                              self::VERSION.'-'.self::TRACEID.'-'.self::SPANID.'-00', ];  // sampled == false
+        $traceparentValues = [self::TRACEPARENTVALUE,                                               // sampled == true
+                              self::VERSION . '-' . self::TRACEID . '-' . self::SPANID . '-00', ];  // sampled == false
 
         foreach ($traceparentValues as $traceparentValue) {
             $carrier = [TraceContext::TRACEPARENT => $traceparentValue];
             $map = new PropagationMap();
             $context = TraceContext::extract($carrier, $map);
-            $extractedTraceparent = '00-'.$context->getTraceId().'-'.$context->getSpanId().'-'.($context->isSampled() ? '01' : '00');
+            $extractedTraceparent = '00-' . $context->getTraceId() . '-' . $context->getSpanId() . '-' . ($context->isSampled() ? '01' : '00');
             $this->assertSame($traceparentValue, $extractedTraceparent);
         }
     }
@@ -52,8 +52,8 @@ class TraceContextTest extends TestCase
      */
     public function testTraceparentLength()
     {
-        $invalidValues = [self::TRACEPARENTVALUE.'-extra',                      // Length > 4 values
-                          self::VERSION.'-'.self::SPANID.'-'.self::SAMPLED, ];  // Length < 4 values
+        $invalidValues = [self::TRACEPARENTVALUE . '-extra',                            // Length > 4 values
+                          self::VERSION . '-' . self::SPANID . '-' . self::SAMPLED, ];  // Length < 4 values
 
         foreach ($invalidValues as $invalidTraceparentValue) {
             $carrier = [TraceContext::TRACEPARENT => $invalidTraceparentValue];
@@ -75,15 +75,15 @@ class TraceContextTest extends TestCase
                           '1',      // Length < 2
                           '0j', ];  // Hex character != 'a - f or 0 - 9'
 
-        $buildTraceparent = self::TRACEID.'-'.self::SPANID.'-'.self::SAMPLED;
+        $buildTraceparent = self::TRACEID . '-' . self::SPANID . '-' . self::SAMPLED;
 
         foreach ($invalidValues as $invalidVersion) {
-            $traceparentValue = $invalidVersion.'-'.$buildTraceparent;
+            $traceparentValue = $invalidVersion . '-' . $buildTraceparent;
             $carrier = [TraceContext::TRACEPARENT => $traceparentValue];
             $map = new PropagationMap();
 
             $this->expectException(\InvalidArgumentException::class);
-            $this->expectExceptionMessage('Only version 00 is supported, got '.$invalidVersion);
+            $this->expectExceptionMessage('Only version 00 is supported, got ' . $invalidVersion);
             $context = TraceContext::extract($carrier, $map);
         }
     }
@@ -99,12 +99,12 @@ class TraceContextTest extends TestCase
                           '000000000000000000000g0000000032', ];  // Hex character != 'a - f or 0 - 9'
 
         foreach ($invalidValues as $invalidTraceId) {
-            $traceparentValue = self::VERSION.'-'.$invalidTraceId.'-'.self::SPANID.'-'.self::SAMPLED;
+            $traceparentValue = self::VERSION . '-' . $invalidTraceId . '-' . self::SPANID . '-' . self::SAMPLED;
             $carrier = [TraceContext::TRACEPARENT => $traceparentValue];
             $map = new PropagationMap();
 
             $this->expectException(\InvalidArgumentException::class);
-            $this->expectExceptionMessage('TraceID must be exactly 16 bytes (32 chars) and at least one non-zero byte, got '.$invalidTraceId);
+            $this->expectExceptionMessage('TraceID must be exactly 16 bytes (32 chars) and at least one non-zero byte, got ' . $invalidTraceId);
             $context = TraceContext::extract($carrier, $map);
         }
     }
@@ -120,12 +120,12 @@ class TraceContextTest extends TestCase
                           '00000000*0000016', ];  // Hex character != 'a - f or 0 - 9'
 
         foreach ($invalidValues as $invalidSpanId) {
-            $traceparentValue = self::VERSION.'-'.self::TRACEID.'-'.$invalidSpanId.'-'.self::SAMPLED;
+            $traceparentValue = self::VERSION . '-' . self::TRACEID . '-' . $invalidSpanId . '-' . self::SAMPLED;
             $carrier = [TraceContext::TRACEPARENT => $traceparentValue];
             $map = new PropagationMap();
 
             $this->expectException(\InvalidArgumentException::class);
-            $this->expectExceptionMessage('SpanID must be exactly 8 bytes (16 chars) and at least one non-zero byte, got '.$invalidSpanId);
+            $this->expectExceptionMessage('SpanID must be exactly 8 bytes (16 chars) and at least one non-zero byte, got ' . $invalidSpanId);
             $context = TraceContext::extract($carrier, $map);
         }
     }
@@ -139,14 +139,14 @@ class TraceContextTest extends TestCase
                           '1',      // Length < 2
                           '0g', ];  // Hex character != 'a - f or 0 - 9'
 
-        $buildTraceperent = self::VERSION.'-'.self::TRACEID.'-'.self::SPANID;
+        $buildTraceperent = self::VERSION . '-' . self::TRACEID . '-' . self::SPANID;
         foreach ($invalidValues as $invalidTraceFlag) {
-            $traceparentValue = $buildTraceperent.'-'.$invalidTraceFlag;
+            $traceparentValue = $buildTraceperent . '-' . $invalidTraceFlag;
             $carrier = [TraceContext::TRACEPARENT => $traceparentValue];
             $map = new PropagationMap();
 
             $this->expectException(\InvalidArgumentException::class);
-            $this->expectExceptionMessage('TraceFlags must be exactly 1 bytes (1 char) representing a bit field, got '.$invalidTraceFlag);
+            $this->expectExceptionMessage('TraceFlags must be exactly 1 bytes (1 char) representing a bit field, got ' . $invalidTraceFlag);
             $context = TraceContext::extract($carrier, $map);
         }
     }
