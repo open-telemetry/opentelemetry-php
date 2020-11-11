@@ -11,8 +11,6 @@ class PropagationMap implements API\PropagationGetter, API\PropagationSetter
 {
     /**
      * {@inheritdoc}
-     *
-     * @param array|ArrayAccess $carrier
      */
     public function get($carrier, string $key): ?string
     {
@@ -46,8 +44,6 @@ class PropagationMap implements API\PropagationGetter, API\PropagationSetter
 
     /**
      * {@inheritdoc}
-     *
-     * @param array|ArrayAccess $carrier
      */
     public function set(&$carrier, string $key, string $value): void
     {

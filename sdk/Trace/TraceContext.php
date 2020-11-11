@@ -34,10 +34,6 @@ final class TraceContext implements API\TextMapFormatPropagator
      */
     public static function inject(API\SpanContext $context, &$carrier, API\PropagationSetter $setter): void
     {
-        if (null === $context || null === $setter) {
-            throw new \InvalidArgumentException('Unable to inject traceparent value');
-        }
-
         $traceparent = self::SUPPORTED_VERSION . '-' . $context->getTraceId() . '-' . $context->getSpanId() . '-' . ($context->isSampled() ? '01' : '00');
         $setter->set($carrier, self::TRACEPARENT, $traceparent);
     }
