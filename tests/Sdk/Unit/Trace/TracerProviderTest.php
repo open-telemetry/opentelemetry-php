@@ -84,16 +84,21 @@ class TracerProviderTest extends TestCase
     public function newTraceProviderWithTracerProvidesNonEmptyResource()
     {
         $traceProvider = new TracerProvider();
+        /** @var Tracer $tracer */
         $tracer = $traceProvider->getTracer('name', 'version');
         $resource = $tracer->getResource();
         $attributes = $resource->getAttributes();
 
-        $sdkname = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
-        $sdklanguage = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
-        $sdkversion = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
         $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
         $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
-
         $this->assertEquals($attributes, $resource->getAttributes());
 
         $this->assertEquals('opentelemetry', $sdkname->getValue());
@@ -130,13 +135,12 @@ class TracerProviderTest extends TestCase
         $this->assertEquals('', $empty->getValue());
 
         // Add a Tracer.  The trace provider should add its resource to the new Tracer.
+        /** @var Tracer $tracer */
         $tracer = $traceProvider->getTracer('name', 'version');
         $resource = $tracer->getResource();
         $attributes = $resource->getAttributes();
 
         // Verify the resource associated with the tracer.
-        /** @var Attribute $name */
-        $name = $resource->getAttributes()->getAttribute('name');
         /** @var Attribute $sdkname */
         $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
         /** @var Attribute $sdklanguage */
@@ -148,7 +152,9 @@ class TracerProviderTest extends TestCase
         /** @var Attribute $serviceversion */
         $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
+        /** @var Attribute $primary */
         $primary = $attributes->getAttribute('provider');
+        /** @var Attribute $empty */
         $empty = $attributes->getAttribute('empty');
         $this->assertEquals('primary', $primary->getValue());
         $this->assertEquals('', $empty->getValue());

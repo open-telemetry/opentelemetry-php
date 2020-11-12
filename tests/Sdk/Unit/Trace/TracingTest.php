@@ -11,6 +11,7 @@ use OpenTelemetry\Sdk\Trace as SDK;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
+use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
 use OpenTelemetry\Sdk\Trace\Tracer;
@@ -362,6 +363,7 @@ class TracingTest extends TestCase
         $this->assertEquals('', $empty->getValue());
 
         // Add a Tracer.  The trace provider should add its resource to the new Tracer.
+        /** @var Tracer $tracer */
         $tracer = $traceProvider->getTracer('name', 'version');
         $resource = $tracer->getResource();
         $attributes = $resource->getAttributes();
@@ -380,7 +382,9 @@ class TracingTest extends TestCase
         /** @var Attribute $serviceversion */
         $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
+        /** @var Attribute $primary */
         $primary = $attributes->getAttribute('provider');
+        /** @var Attribute $empty */
         $empty = $attributes->getAttribute('empty');
         $this->assertEquals('primary', $primary->getValue());
         $this->assertEquals('', $empty->getValue());
@@ -396,6 +400,7 @@ class TracingTest extends TestCase
         // Start a span with the tracer.
         $tracer->startAndActivateSpan('firstSpan');
 
+        /** @var Span $global */
         $global = $tracer->getActiveSpan();
         $this->assertSame($tracer->getActiveSpan(), $global);
 
@@ -448,15 +453,21 @@ class TracingTest extends TestCase
         $this->assertCount(0, $tpAttributes);
 
         // Add a Tracer.  The trace provider should merge its resource one inherited from the traceprovider.
+        /** @var Tracer $tracer */
         $tracer = $traceProvider->getTracer('name');
         $resource = $tracer->getResource();
         $attributes = $resource->getAttributes();
 
         // Verify the resource associated with the tracer.
-        $sdkname = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
-        $sdklanguage = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
-        $sdkversion = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
         $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
         $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         $this->assertEquals('opentelemetry', $sdkname->getValue());
@@ -469,7 +480,7 @@ class TracingTest extends TestCase
 
         // Start a span with the tracer.
         $tracer->startAndActivateSpan('firstSpan');
-
+        /** @var Span $global */
         $global = $tracer->getActiveSpan();
         $this->assertSame($tracer->getActiveSpan(), $global);
 
@@ -477,10 +488,15 @@ class TracingTest extends TestCase
 
         $attributes = $global->getResource()->getAttributes();
 
-        $sdkname = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
-        $sdklanguage = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
-        $sdkversion = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
         $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
         $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         $this->assertEquals('opentelemetry', $sdkname->getValue());
@@ -516,6 +532,7 @@ class TracingTest extends TestCase
         $this->assertEquals('', $empty->getValue());
 
         // Add a Tracer.  The trace provider should add its resource to the new Tracer.
+        /** @var Tracer $tracer */
         $tracer = $traceProvider->getTracer('name');
         $resource = $tracer->getResource();
         $attributes = $resource->getAttributes();
@@ -536,7 +553,7 @@ class TracingTest extends TestCase
 
         /** @var Attribute $primary */
         $primary = $attributes->getAttribute('provider');
-        /** @var Attribute $serviceversion */
+        /** @var Attribute $empty */
         $empty = $attributes->getAttribute('empty');
         $this->assertEquals('primary', $primary->getValue());
         $this->assertEquals('', $empty->getValue());
@@ -552,6 +569,7 @@ class TracingTest extends TestCase
         // Start a span with the tracer.
         $tracer->startAndActivateSpan('firstSpan');
 
+        /** @var Span $global */
         $global = $tracer->getActiveSpan();
         $this->assertSame($tracer->getActiveSpan(), $global);
 
@@ -559,13 +577,20 @@ class TracingTest extends TestCase
 
         $attributes = $global->getResource()->getAttributes();
 
-        $sdkname = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
-        $sdklanguage = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
-        $sdkversion = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
         $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
         $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
+        /** @var Attribute $primary */
         $primary = $attributes->getAttribute('provider');
+        /** @var Attribute $empty */
         $empty = $attributes->getAttribute('empty');
         $this->assertEquals('primary', $primary->getValue());
         $this->assertEquals('', $empty->getValue());
@@ -595,15 +620,21 @@ class TracingTest extends TestCase
         $this->assertCount(0, $tpAttributes);
 
         // Add a Tracer.  The trace provider should merge its resource one inherited from the traceprovider.
+        /** @var Tracer $tracer */
         $tracer = $traceProvider->getTracer('name', 'version');
         $resource = $tracer->getResource();
         $attributes = $resource->getAttributes();
 
         // Verify the resource associated with the tracer.
-        $sdkname = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
-        $sdklanguage = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
-        $sdkversion = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
         $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
         $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         $this->assertEquals('opentelemetry', $sdkname->getValue());
@@ -617,6 +648,7 @@ class TracingTest extends TestCase
         // Start a span with the tracer.
         $tracer->startAndActivateSpan('firstSpan');
 
+        /** @var Span $global */
         $global = $tracer->getActiveSpan();
         $this->assertSame($tracer->getActiveSpan(), $global);
 
@@ -624,10 +656,15 @@ class TracingTest extends TestCase
 
         $attributes = $global->getResource()->getAttributes();
 
-        $sdkname = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
-        $sdklanguage = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
-        $sdkversion = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
         $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
         $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         $this->assertEquals('opentelemetry', $sdkname->getValue());
