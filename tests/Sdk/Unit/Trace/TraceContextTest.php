@@ -20,7 +20,7 @@ class TraceContextTest extends TestCase
     /**
      * @test
      */
-    public function testETraceContextFields()
+    public function testTraceContextFields()
     {
         $fields = TraceContext::fields();
         $this->assertSame($fields[0], TraceContext::TRACEPARENT);
