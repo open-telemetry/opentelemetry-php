@@ -21,6 +21,9 @@ class Span implements API\Span
     private $statusCode;
     private $statusDescription;
 
+    /**
+     * @var ResourceInfo
+     */
     private $resource; // An immutable representation of the entity producing telemetry.
 
     private $attributes;

@@ -354,7 +354,9 @@ class TracingTest extends TestCase
 
         // Verify the resource associated with the trace provider.
         $this->assertCount(5, $tpAttributes);
+        /** @var Attribute $primary */
         $primary = $tpAttributes->getAttribute('provider');
+        /** @var Attribute $empty */
         $empty = $tpAttributes->getAttribute('empty');
         $this->assertEquals('primary', $primary->getValue());
         $this->assertEquals('', $empty->getValue());
@@ -365,10 +367,17 @@ class TracingTest extends TestCase
         $attributes = $resource->getAttributes();
 
         // Verify the resource associated with the tracer.
-        $sdkname = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
-        $sdklanguage = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
-        $sdkversion = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $name */
+        $name = $resource->getAttributes()->getAttribute('name');
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
         $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
         $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         $primary = $attributes->getAttribute('provider');
@@ -391,16 +400,25 @@ class TracingTest extends TestCase
         $this->assertSame($tracer->getActiveSpan(), $global);
 
         // Verify the resource associated with the span.
-
+        /** @var Attributes $attributes */
         $attributes = $global->getResource()->getAttributes();
 
-        $sdkname = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
-        $sdklanguage = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
-        $sdkversion = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $name */
+        $name = $resource->getAttributes()->getAttribute('name');
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
         $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
         $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
+        /** @var Attribute $primary */
         $primary = $attributes->getAttribute('provider');
+        /** @var Attribute $empty */
         $empty = $attributes->getAttribute('empty');
         $this->assertEquals('primary', $primary->getValue());
         $this->assertEquals('', $empty->getValue());
@@ -489,7 +507,10 @@ class TracingTest extends TestCase
 
         // Verify the resource associated with the trace provider.
         $this->assertCount(5, $tpAttributes);
+
+        /** @var Attribute $primary */
         $primary = $tpAttributes->getAttribute('provider');
+        /** @var Attribute $empty */
         $empty = $tpAttributes->getAttribute('empty');
         $this->assertEquals('primary', $primary->getValue());
         $this->assertEquals('', $empty->getValue());
@@ -500,13 +521,22 @@ class TracingTest extends TestCase
         $attributes = $resource->getAttributes();
 
         // Verify the resource associated with the tracer.
-        $sdkname = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
-        $sdklanguage = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
-        $sdkversion = $attributes->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $name */
+        $name = $resource->getAttributes()->getAttribute('name');
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
         $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
         $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
+        /** @var Attribute $primary */
         $primary = $attributes->getAttribute('provider');
+        /** @var Attribute $serviceversion */
         $empty = $attributes->getAttribute('empty');
         $this->assertEquals('primary', $primary->getValue());
         $this->assertEquals('', $empty->getValue());

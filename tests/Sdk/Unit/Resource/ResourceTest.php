@@ -31,9 +31,11 @@ class ResourceTest extends TestCase
 
         /** @var Attribute $name */
         $name = $resource->getAttributes()->getAttribute('name');
-
+        /** @var Attribute $sdkname */
         $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
         $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
         $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
 
         $attributes->setAttribute(ResourceConstants::TELEMETRY_SDK_NAME, 'opentelemetry');
@@ -61,9 +63,11 @@ class ResourceTest extends TestCase
             ]
         );
         $resource = ResourceInfo::create(new Attributes());
-
+        /** @var Attribute $sdkname */
         $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
         $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
         $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
 
         $this->assertEquals($attributes, $resource->getAttributes());
