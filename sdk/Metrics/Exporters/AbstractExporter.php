@@ -26,7 +26,7 @@ abstract class AbstractExporter implements API\Exporter
                 }
             }
 
-            $this->doExport($metrics);
+                $this->doExport($metrics);
 
             return API\Exporter::SUCCESS;
         } catch (RetryableExportException $exception) {
