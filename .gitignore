@@ -6,3 +6,5 @@ vendor
 coverage.clover
 tests/coverage
 .php_cs.cache
+proto/*
+
