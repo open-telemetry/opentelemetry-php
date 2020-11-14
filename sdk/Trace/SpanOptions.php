@@ -96,7 +96,7 @@ final class SpanOptions implements API\SpanOptions
             ? SpanContext::fork($span->getContext()->getTraceId())
             : SpanContext::generate();
 
-        $span = new Span($this->name, $context, $this->parent, null, $this->kind);
+        $span = new Span($this->name, $context, $this->parent, null, $this->tracer->getResource(), $this->kind);
 
         if ($this->startEpochTimestamp !== null) {
             $span->setStartEpochTimestamp($this->startEpochTimestamp);

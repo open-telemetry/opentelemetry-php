@@ -22,11 +22,11 @@ class Tracer implements API\Tracer
 
     public function __construct(
         TracerProvider $provider,
-        ResourceInfo $resource,
+        ResourceInfo $resource = null,
         API\SpanContext $context = null
     ) {
         $this->provider = $provider;
-        $this->resource = $resource;
+        $this->resource = $resource ?? ResourceInfo::emptyResource();
         $this->importedContext = $context;
     }
 
@@ -50,6 +50,7 @@ class Tracer implements API\Tracer
      * @param string $name
      * @param API\SpanContext $parentContext
      * @param bool $isRemote
+     * @param int $spanKind
      * @return Span
      */
 
@@ -81,7 +82,7 @@ class Tracer implements API\Tracer
         if (SamplingResult::NOT_RECORD == $samplingResult->getDecision()) {
             $span = $this->generateSpanInstance('', $context);
         } else {
-            $span = $this->generateSpanInstance($name, $context, $sampler);
+            $span = $this->generateSpanInstance($name, $context, $sampler, $this->resource);
 
             if ($span->isRecording()) {
                 $this->provider->getSpanProcessor()->onStart($span);
@@ -167,7 +168,10 @@ class Tracer implements API\Tracer
     {
         return $this->spans;
     }
-
+    public function getResource(): ResourceInfo
+    {
+        return clone $this->resource;
+    }
     public function endActiveSpan(?int $timestamp = null)
     {
         /**
@@ -182,7 +186,7 @@ class Tracer implements API\Tracer
         }
     }
 
-    private function generateSpanInstance(string $name, API\SpanContext $context, Sampler $sampler = null): API\Span
+    private function generateSpanInstance(string $name, API\SpanContext $context, Sampler $sampler = null, ResourceInfo $resource = null): API\Span
     {
         $parent = null;
 
@@ -193,7 +197,7 @@ class Tracer implements API\Tracer
                 $parent = $this->getActiveSpan()->getContext();
             }
 
-            $span = new Span($name, $context, $parent, $sampler);
+            $span = new Span($name, $context, $parent, $sampler, $resource);
         }
         $this->spans[] = $span;
 

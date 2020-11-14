@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Resource;
 
+use OpenTelemetry\Sdk\Resource\ResourceConstants;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
@@ -19,7 +20,9 @@ class ResourceTest extends TestCase
         $resource = ResourceInfo::emptyResource();
         $this->assertEmpty($resource->getAttributes());
     }
-
+    /**
+     * @test
+     */
     public function testGetAttributes()
     {
         $attributes = new Attributes();
@@ -28,11 +31,54 @@ class ResourceTest extends TestCase
 
         /** @var Attribute $name */
         $name = $resource->getAttributes()->getAttribute('name');
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
 
+        $attributes->setAttribute(ResourceConstants::TELEMETRY_SDK_NAME, 'opentelemetry');
+        $attributes->setAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE, 'php');
+        $attributes->setAttribute(ResourceConstants::TELEMETRY_SDK_VERSION, 'dev');
+
+        $this->assertEquals($attributes, $resource->getAttributes());
+        $this->assertEquals('opentelemetry', $sdkname->getValue());
+        $this->assertEquals('php', $sdklanguage->getValue());
+        $this->assertEquals('dev', $sdkversion->getValue());
         $this->assertEquals($attributes, $resource->getAttributes());
         $this->assertEquals('test', $name->getValue());
     }
 
+    /**
+     * @test
+     */
+    public function testDefaultResource()
+    {
+        $attributes = new Attributes(
+            [
+                ResourceConstants::TELEMETRY_SDK_NAME => 'opentelemetry',
+                ResourceConstants::TELEMETRY_SDK_LANGUAGE => 'php',
+                ResourceConstants::TELEMETRY_SDK_VERSION => 'dev',
+            ]
+        );
+        $resource = ResourceInfo::create(new Attributes());
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+
+        $this->assertEquals($attributes, $resource->getAttributes());
+        $this->assertEquals('opentelemetry', $sdkname->getValue());
+        $this->assertEquals('php', $sdklanguage->getValue());
+        $this->assertEquals('dev', $sdkversion->getValue());
+    }
+
+    /**
+     * @test
+     */
     public function testMerge()
     {
         $primary = ResourceInfo::create(new Attributes(['name' => 'primary', 'empty' => '']));
@@ -46,12 +92,15 @@ class ResourceTest extends TestCase
         /** @var Attribute $empty */
         $empty = $result->getAttributes()->getAttribute('empty');
 
-        $this->assertCount(3, $result->getAttributes());
+        $this->assertCount(6, $result->getAttributes());
         $this->assertEquals('primary', $name->getValue());
         $this->assertEquals('1.0.0', $version->getValue());
         $this->assertEquals('value', $empty->getValue());
     }
 
+    /**
+     * @test
+     */
     public function testImmutableCreate()
     {
         $attributes = new Attributes();

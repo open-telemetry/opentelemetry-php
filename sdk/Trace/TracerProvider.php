@@ -54,13 +54,15 @@ final class TracerProvider implements API\TracerProvider
         }
 
         $spanContext = SpanContext::generateSampled();
-
+        /*
+         * A resource can be associated with the TracerProvider when the TracerProvider is created.
+         * That association cannot be changed later. When associated with a TracerProvider, all
+         * Spans produced by any Tracer from the provider MUST be associated with this Resource.
+         */
+        $primary = $this->getResource();
         $resource = ResourceInfo::create(
             new Attributes(
                 [
-                    ResourceConstants::TELEMETRY_SDK_NAME => 'opentelemetry',
-                    ResourceConstants::TELEMETRY_SDK_LANGUAGE => 'php',
-                    ResourceConstants::TELEMETRY_SDK_VERSION => 'dev',
                     ResourceConstants::SERVICE_NAME => $name,
                     ResourceConstants::SERVICE_VERSION => $version,
                     ResourceConstants::SERVICE_INSTANCE_ID => uniqid($name . $version),
@@ -70,7 +72,7 @@ final class TracerProvider implements API\TracerProvider
 
         return $this->tracers[$name] = new Tracer(
             $this,
-            ResourceInfo::merge($this->getResource(), $resource),
+            ResourceInfo::merge($primary, $resource),
             $spanContext
         );
     }
@@ -94,6 +96,6 @@ final class TracerProvider implements API\TracerProvider
 
     public function getResource(): ResourceInfo
     {
-        return $this->resource;
+        return clone $this->resource;
     }
 }
