@@ -8,3 +8,4 @@ tests/coverage
 .php_cs.cache
 proto/*
 opentelemetry-proto/*
+grpc/*
