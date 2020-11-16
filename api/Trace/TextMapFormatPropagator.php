@@ -18,7 +18,7 @@ interface TextMapFormatPropagator
      * the encoded SpanContext using Setter into it's associated carrier.
      *
      * @param SpanContext $context
-     * @param mixed $carrier
+     * @param mixed &$carrier
      * @param PropagationSetter $setter
      * @return void
      */

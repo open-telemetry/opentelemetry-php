@@ -83,7 +83,7 @@ class TraceContextTest extends TestCase
             $map = new PropagationMap();
 
             $this->expectException(\InvalidArgumentException::class);
-            $this->expectExceptionMessage('Unable to extract traceparent. Contains Invalid values');
+            $this->expectExceptionMessage('Unable to extract traceparent. Expected 4 values, got ' . 5);
             $context = TraceContext::extract($carrier, $map);
         }
     }

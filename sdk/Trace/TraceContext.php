@@ -44,7 +44,7 @@ final class TraceContext implements API\TextMapFormatPropagator
     public static function extract($carrier, API\PropagationGetter $getter): API\SpanContext
     {
         $traceparent = $getter->get($carrier, self::TRACEPARENT);
-        if (null === $traceparent) {
+        if ($traceparent === null) {
             throw new \InvalidArgumentException('Traceparent not present');
         }
 
@@ -53,7 +53,9 @@ final class TraceContext implements API\TextMapFormatPropagator
 
         $peicesCount = count($pieces);
         if ($peicesCount != 4) {
-            throw new \InvalidArgumentException('Unable to extract traceparent. Contains Invalid values');
+            throw new \InvalidArgumentException(
+                sprintf('Unable to extract traceparent. Expected 4 values, got %d', $peicesCount)
+            );
         }
 
         // Parse the traceparent version. Currently only '00' is supported.
