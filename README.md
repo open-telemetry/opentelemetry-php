@@ -42,6 +42,13 @@ We use docker and docker-compose to perform a lot of our static analysis and tes
 If you're planning to develop for this library, it'll help to install `docker engine` and `docker-compose`.  
 You can find installation instructions for these packages can be found [here](https://docs.docker.com/install/), under the `Docker Engine` and `Docker Compose` submenus respectively.
 
+##Proto Generation
+In order to generate proto files for use with this repository, we can perform a 
+
+`make proto`
+
+From the root directory.  This wil create a `/proto` folder in the root directory of the repository.
+
 ## Styling
 We use [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) for our code linting and standards fixer.  The associated configuration for this standards fixer can be found in the root of the repository [here](https://github.com/open-telemetry/opentelemetry-php/blob/master/.php_cs)
 
