@@ -3,5 +3,5 @@ services:
   proto:
     image: socialpoint/protobuf-tools
     volumes:
-    - ../:/mnt
+    - ./:/mnt
     command: sh -c "/mnt/script/proto_gen.sh"
