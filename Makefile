@@ -24,6 +24,8 @@ metrics-prometheus-example:
 	@docker-compose -f docker-compose.prometheus.yaml run php-prometheus php /var/www/public/examples/prometheus/PrometheusMetricsExample.php
 stop-prometheus:
 	@docker-compose -f docker-compose.prometheus.yaml stop
+proto:
+	@docker-compose -f docker-compose.proto.yaml up proto
 bash:
 	$(DC_RUN_PHP) bash
 style:
