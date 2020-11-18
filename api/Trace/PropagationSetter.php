@@ -14,5 +14,5 @@ interface PropagationSetter
      * @param string $value
      * @return void
      */
-    public function set($carrier, string $key, string $value) : void;
+    public function set(&$carrier, string $key, string $value) : void;
 }
