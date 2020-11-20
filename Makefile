@@ -6,13 +6,15 @@ update:
 	$(DC_RUN_PHP) composer update
 test:
 	$(DC_RUN_PHP) php ./vendor/bin/phpunit --colors=always --coverage-text --testdox --coverage-clover coverage.clover
+infection:
+	$(DC_RUN_PHP) php ./vendor/bin/infection run --verbose --show-mutations --only-covered --no-interaction --min-msi=100 --min-covered-msi=100 --threads 4
 phan:
 	$(DC_RUN_PHP) env PHAN_DISABLE_XDEBUG_WARN=1 php ./vendor/bin/phan
 psalm:
 	$(DC_RUN_PHP) php ./vendor/bin/psalm
 psalm-info:
 	$(DC_RUN_PHP) php ./vendor/bin/psalm --show-info=true
-phpstan: 
+phpstan:
 	$(DC_RUN_PHP) php ./vendor/bin/phpstan analyse
 trace examples: FORCE
 	docker-compose up -d

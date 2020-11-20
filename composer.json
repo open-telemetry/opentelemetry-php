@@ -46,6 +46,7 @@
         "vimeo/psalm": "^4.0",
         "phpstan/phpstan": "^0.12.50",
         "phpstan/phpstan-phpunit": "^0.12.16",
-        "psalm/plugin-phpunit": "^0.13.0"
+        "psalm/plugin-phpunit": "^0.13.0",
+        "infection/infection": "^0.18.2"
     }
 }

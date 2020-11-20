@@ -1,0 +1,16 @@
+{
+    "source": {
+        "directories": [
+            "api",
+            "Context",
+            "contrib",
+            "sdk"
+        ]
+    },
+    "logs": {
+        "text": "var/infection.log"
+    },
+    "mutators": {
+        "@default": true
+    }
+}
