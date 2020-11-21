@@ -24,7 +24,15 @@ class ResourceInfo
 
     public static function create(Attributes $attributes): self
     {
-        return new ResourceInfo(clone $attributes);
+        $resource = self::merge(self::defaultResource(), new ResourceInfo(clone $attributes));
+        /*
+         * The SDK MUST extract information from the OTEL_RESOURCE_ATTRIBUTES environment
+         * variable and merge this.
+         * todo: after resource detection is implemented, merge it here.
+         * return $resource.merge(....);
+         *
+         */
+        return $resource;
     }
 
     /**
@@ -51,6 +59,17 @@ class ResourceInfo
         }
 
         return new ResourceInfo($mergedAttributes);
+    }
+
+    public static function defaultResource(): self
+    {
+        return new ResourceInfo(new Attributes(
+            [
+                ResourceConstants::TELEMETRY_SDK_NAME => 'opentelemetry',
+                ResourceConstants::TELEMETRY_SDK_LANGUAGE => 'php',
+                ResourceConstants::TELEMETRY_SDK_VERSION => 'dev',
+            ]
+        ));
     }
 
     public static function emptyResource(): self

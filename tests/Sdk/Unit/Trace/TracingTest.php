@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
 use function iterator_to_array;
+use OpenTelemetry\Sdk\Resource\ResourceConstants;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace as SDK;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
+use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
 use OpenTelemetry\Sdk\Trace\Tracer;
+use OpenTelemetry\Sdk\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
 class TracingTest extends TestCase
@@ -335,5 +338,341 @@ class TracingTest extends TestCase
             SDK\NoopSpan::class,
             $tracer->getActiveSpan()
         );
+    }
+
+    public function testCreateSpanResourceNonDefaultTraceProviderNonDefaultTrace()
+    {
+        /*
+         * A resource can be associated with the TracerProvider when the TracerProvider is created.
+         * That association cannot be changed later. When associated with a TracerProvider, all
+         * Spans produced by any Tracer from the provider MUST be associated with this Resource.
+         */
+
+        // Create a new provider with a resource containing 2 attributes.
+        $providerResource = ResourceInfo::create(new Attributes(['provider' => 'primary', 'empty' => '']));
+        $traceProvider = new TracerProvider($providerResource);
+        $tpAttributes = $traceProvider->getResource()->getAttributes();
+
+        // Verify the resource associated with the trace provider.
+        $this->assertCount(5, $tpAttributes);
+        /** @var Attribute $primary */
+        $primary = $tpAttributes->getAttribute('provider');
+        /** @var Attribute $empty */
+        $empty = $tpAttributes->getAttribute('empty');
+        $this->assertEquals('primary', $primary->getValue());
+        $this->assertEquals('', $empty->getValue());
+
+        // Add a Tracer.  The trace provider should add its resource to the new Tracer.
+        /** @var Tracer $tracer */
+        $tracer = $traceProvider->getTracer('name', 'version');
+        $resource = $tracer->getResource();
+        $attributes = $resource->getAttributes();
+
+        // Verify the resource associated with the tracer.
+        /** @var Attribute $name */
+        $name = $resource->getAttributes()->getAttribute('name');
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
+        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
+        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
+
+        /** @var Attribute $primary */
+        $primary = $attributes->getAttribute('provider');
+        /** @var Attribute $empty */
+        $empty = $attributes->getAttribute('empty');
+        $this->assertEquals('primary', $primary->getValue());
+        $this->assertEquals('', $empty->getValue());
+
+        $this->assertEquals('opentelemetry', $sdkname->getValue());
+        $this->assertEquals('php', $sdklanguage->getValue());
+        $this->assertEquals('dev', $sdkversion->getValue());
+        $this->assertEquals('name', $servicename->getValue());
+        $this->assertEquals('version', $serviceversion->getValue());
+
+        $this->assertCount(8, $attributes);
+
+        // Start a span with the tracer.
+        $tracer->startAndActivateSpan('firstSpan');
+
+        /** @var Span $global */
+        $global = $tracer->getActiveSpan();
+        $this->assertSame($tracer->getActiveSpan(), $global);
+
+        // Verify the resource associated with the span.
+        /** @var Attributes $attributes */
+        $attributes = $global->getResource()->getAttributes();
+
+        /** @var Attribute $name */
+        $name = $resource->getAttributes()->getAttribute('name');
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
+        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
+        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
+
+        /** @var Attribute $primary */
+        $primary = $attributes->getAttribute('provider');
+        /** @var Attribute $empty */
+        $empty = $attributes->getAttribute('empty');
+        $this->assertEquals('primary', $primary->getValue());
+        $this->assertEquals('', $empty->getValue());
+
+        $this->assertEquals('opentelemetry', $sdkname->getValue());
+        $this->assertEquals('php', $sdklanguage->getValue());
+        $this->assertEquals('dev', $sdkversion->getValue());
+        $this->assertEquals('name', $servicename->getValue());
+        $this->assertEquals('version', $serviceversion->getValue());
+
+        $this->assertCount(8, $attributes);
+    }
+
+    public function testCreateSpanGetsResourceFromDefaultTraceProviderDefaultTrace()
+    {
+        /*
+         * A resource can be associated with the TracerProvider when the TracerProvider is created.
+         * That association cannot be changed later. When associated with a TracerProvider, all
+         * Spans produced by any Tracer from the provider MUST be associated with this Resource.
+         */
+
+        // Create a new provider.
+        $traceProvider = new TracerProvider();
+        $tpAttributes = $traceProvider->getResource()->getAttributes();
+
+        // Verify the resource associated with the trace provider.
+        $this->assertCount(0, $tpAttributes);
+
+        // Add a Tracer.  The trace provider should merge its resource one inherited from the traceprovider.
+        /** @var Tracer $tracer */
+        $tracer = $traceProvider->getTracer('name');
+        $resource = $tracer->getResource();
+        $attributes = $resource->getAttributes();
+
+        // Verify the resource associated with the tracer.
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
+        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
+        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
+
+        $this->assertEquals('opentelemetry', $sdkname->getValue());
+        $this->assertEquals('php', $sdklanguage->getValue());
+        $this->assertEquals('dev', $sdkversion->getValue());
+        $this->assertEquals('name', $servicename->getValue());
+        $this->assertEquals('', $serviceversion->getValue());
+
+        $this->assertCount(6, $attributes);
+
+        // Start a span with the tracer.
+        $tracer->startAndActivateSpan('firstSpan');
+        /** @var Span $global */
+        $global = $tracer->getActiveSpan();
+        $this->assertSame($tracer->getActiveSpan(), $global);
+
+        // Verify the resource associated with the span.
+
+        $attributes = $global->getResource()->getAttributes();
+
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
+        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
+        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
+
+        $this->assertEquals('opentelemetry', $sdkname->getValue());
+        $this->assertEquals('php', $sdklanguage->getValue());
+        $this->assertEquals('dev', $sdkversion->getValue());
+        $this->assertEquals('name', $servicename->getValue());
+        $this->assertEquals('', $serviceversion->getValue());
+
+        $this->assertCount(6, $attributes);
+    }
+
+    public function testCreateSpanGetsResourceFromNonDefaultTraceProviderDefaultTrace()
+    {
+        /*
+         * A resource can be associated with the TracerProvider when the TracerProvider is created.
+         * That association cannot be changed later. When associated with a TracerProvider, all
+         * Spans produced by any Tracer from the provider MUST be associated with this Resource.
+         */
+
+        // Create a new provider with a resource containing 2 attributes.
+        $providerResource = ResourceInfo::create(new Attributes(['provider' => 'primary', 'empty' => '']));
+        $traceProvider = new TracerProvider($providerResource);
+        $tpAttributes = $traceProvider->getResource()->getAttributes();
+
+        // Verify the resource associated with the trace provider.
+        $this->assertCount(5, $tpAttributes);
+
+        /** @var Attribute $primary */
+        $primary = $tpAttributes->getAttribute('provider');
+        /** @var Attribute $empty */
+        $empty = $tpAttributes->getAttribute('empty');
+        $this->assertEquals('primary', $primary->getValue());
+        $this->assertEquals('', $empty->getValue());
+
+        // Add a Tracer.  The trace provider should add its resource to the new Tracer.
+        /** @var Tracer $tracer */
+        $tracer = $traceProvider->getTracer('name');
+        $resource = $tracer->getResource();
+        $attributes = $resource->getAttributes();
+
+        // Verify the resource associated with the tracer.
+        /** @var Attribute $name */
+        $name = $resource->getAttributes()->getAttribute('name');
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
+        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
+        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
+
+        /** @var Attribute $primary */
+        $primary = $attributes->getAttribute('provider');
+        /** @var Attribute $empty */
+        $empty = $attributes->getAttribute('empty');
+        $this->assertEquals('primary', $primary->getValue());
+        $this->assertEquals('', $empty->getValue());
+
+        $this->assertEquals('opentelemetry', $sdkname->getValue());
+        $this->assertEquals('php', $sdklanguage->getValue());
+        $this->assertEquals('dev', $sdkversion->getValue());
+        $this->assertEquals('name', $servicename->getValue());
+        $this->assertEquals('', $serviceversion->getValue());
+
+        $this->assertCount(8, $attributes);
+
+        // Start a span with the tracer.
+        $tracer->startAndActivateSpan('firstSpan');
+
+        /** @var Span $global */
+        $global = $tracer->getActiveSpan();
+        $this->assertSame($tracer->getActiveSpan(), $global);
+
+        // Verify the resource associated with the span.
+
+        $attributes = $global->getResource()->getAttributes();
+
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
+        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
+        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
+
+        /** @var Attribute $primary */
+        $primary = $attributes->getAttribute('provider');
+        /** @var Attribute $empty */
+        $empty = $attributes->getAttribute('empty');
+        $this->assertEquals('primary', $primary->getValue());
+        $this->assertEquals('', $empty->getValue());
+
+        $this->assertEquals('opentelemetry', $sdkname->getValue());
+        $this->assertEquals('php', $sdklanguage->getValue());
+        $this->assertEquals('dev', $sdkversion->getValue());
+        $this->assertEquals('name', $servicename->getValue());
+        $this->assertEquals('', $serviceversion->getValue());
+
+        $this->assertCount(8, $attributes);
+    }
+
+    public function testCreateSpanGetsResourceFromDefaultTraceProviderNonDefaultTrace()
+    {
+        /*
+         * A resource can be associated with the TracerProvider when the TracerProvider is created.
+         * That association cannot be changed later. When associated with a TracerProvider, all
+         * Spans produced by any Tracer from the provider MUST be associated with this Resource.
+         */
+
+        // Create a new provider.
+        $traceProvider = new TracerProvider();
+        $tpAttributes = $traceProvider->getResource()->getAttributes();
+
+        // Verify the resource associated with the trace provider.
+        $this->assertCount(0, $tpAttributes);
+
+        // Add a Tracer.  The trace provider should merge its resource one inherited from the traceprovider.
+        /** @var Tracer $tracer */
+        $tracer = $traceProvider->getTracer('name', 'version');
+        $resource = $tracer->getResource();
+        $attributes = $resource->getAttributes();
+
+        // Verify the resource associated with the tracer.
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
+        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
+        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
+
+        $this->assertEquals('opentelemetry', $sdkname->getValue());
+        $this->assertEquals('php', $sdklanguage->getValue());
+        $this->assertEquals('dev', $sdkversion->getValue());
+        $this->assertEquals('name', $servicename->getValue());
+        $this->assertEquals('version', $serviceversion->getValue());
+
+        $this->assertCount(6, $attributes);
+
+        // Start a span with the tracer.
+        $tracer->startAndActivateSpan('firstSpan');
+
+        /** @var Span $global */
+        $global = $tracer->getActiveSpan();
+        $this->assertSame($tracer->getActiveSpan(), $global);
+
+        // Verify the resource associated with the span.
+
+        $attributes = $global->getResource()->getAttributes();
+
+        /** @var Attribute $sdkname */
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        /** @var Attribute $sdklanguage */
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        /** @var Attribute $sdkversion */
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        /** @var Attribute $servicename */
+        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
+        /** @var Attribute $serviceversion */
+        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
+
+        $this->assertEquals('opentelemetry', $sdkname->getValue());
+        $this->assertEquals('php', $sdklanguage->getValue());
+        $this->assertEquals('dev', $sdkversion->getValue());
+        $this->assertEquals('name', $servicename->getValue());
+        $this->assertEquals('version', $serviceversion->getValue());
+
+        $this->assertCount(6, $attributes);
     }
 }

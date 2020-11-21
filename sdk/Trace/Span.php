@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 
 class Span implements API\Span
@@ -19,6 +20,11 @@ class Span implements API\Span
     private $end;
     private $statusCode;
     private $statusDescription;
+
+    /**
+     * @var ResourceInfo
+     */
+    private $resource; // An immutable representation of the entity producing telemetry.
 
     private $attributes;
     private $events;
@@ -44,6 +50,7 @@ class Span implements API\Span
         API\SpanContext $spanContext,
         ?API\SpanContext $parentSpanContext = null,
         ?Sampler $sampler = null,
+        ?ResourceInfo $resource = null,
         int $spanKind = API\SpanKind::KIND_INTERNAL
     ) {
         $this->name = $name;
@@ -51,6 +58,7 @@ class Span implements API\Span
         $this->parentSpanContext = $parentSpanContext;
         $this->spanKind = $spanKind;
         $this->sampler = $sampler;
+        $this->resource =  $resource ?? ResourceInfo::emptyResource();
         $moment = Clock::get()->moment();
         $this->startEpochTimestamp = $moment[0];
         $this->start = $moment[1];
@@ -60,6 +68,11 @@ class Span implements API\Span
         // todo: set these to null until needed
         $this->attributes = new Attributes();
         $this->events = new Events();
+    }
+
+    public function getResource(): ResourceInfo
+    {
+        return clone $this->resource;
     }
 
     public function getContext(): API\SpanContext
