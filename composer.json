@@ -9,7 +9,10 @@
         "guzzlehttp/guzzle": "^6.5",
         "psr/http-client": "^1.0",
         "php-http/guzzle6-adapter": "^2.0",
-        "endclothing/prometheus_client_php": "^1.0"
+        "endclothing/prometheus_client_php": "^1.0",
+        "grpc/grpc": "^1.30",
+        "google/protobuf": "^v3.3.0"
+
     },
     "authors": [
         {
@@ -30,7 +33,8 @@
             "OpenTelemetry\\Context\\": "Context",
             "OpenTelemetry\\": "api",
             "OpenTelemetry\\Sdk\\": "sdk",
-            "OpenTelemetry\\Contrib\\": "contrib"
+            "OpenTelemetry\\Contrib\\": "contrib",
+            "Opentelemetry\\Proto\\Collector\\Trace\\V1\\": "proto/Opentelemetry/Proto/Collector/Trace/V1"
         }
     },
     "autoload-dev": {
