@@ -8,7 +8,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 use grpc;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
-use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
+use Opentelemetry\Proto\Collector\Trace\V1;
 
 class Exporter implements Trace\Exporter
 {
@@ -80,10 +80,10 @@ class Exporter implements Trace\Exporter
         $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: 'none';
         $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
-        $this->client = $client ?? new TraceServiceClient($endpointURL, [
+        $this->client = $client ?? new V1\TraceServiceClient($endpointURL, [
         'credentials' => Grpc\ChannelCredentials::createInsecure(),
     ]);
-        // $this->spanConverter = new SpanConverter($serviceName);
+        $this->spanConverter = new SpanConverter($serviceName);
     }
 
     /**
@@ -107,24 +107,16 @@ class Exporter implements Trace\Exporter
             array_push($convertedSpans, $this->spanConverter->convert($span));
         }
 
+        $request= new V1\ExportTraceServiceRequest();
+        $request->setResourceSpans($convertedSpans);
 
-        // try {
-        //     $json = json_encode($convertedSpans);
-
-        //     $this->headers[] = '';
-
-        //     if ($this->protocol == 'json') {
-        //         $headers = ['content-type' => 'application/json', 'Content-Encoding' => 'gzip'];
-        //     }
-
-        //     $request = new Request('POST', $this->endpointURL, $this->headers, $json);
-        //     $response = $this->client->sendRequest($request);
-        // } catch (RequestExceptionInterface $e) {
-        //     return Trace\Exporter::FAILED_NOT_RETRYABLE;
-        // } catch (NetworkExceptionInterface | ClientExceptionInterface $e) {
-        //     return Trace\Exporter::FAILED_RETRYABLE;
-        // }
-
+        list($response, $status) = $client->Export($request)->wait();
+        if ($status->code !== Grpc\STATUS_OK) {
+            echo "ERROR: " . $status->code . ", " . $status->details . PHP_EOL;
+            exit(1);
+            }
+        echo $response->getMessage() . PHP_EOL;
+        
         if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
             return Trace\Exporter::FAILED_NOT_RETRYABLE;
         }
