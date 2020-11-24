@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpGrpc;
 
-use OpenTelemetry\Trace\Span;
+//use OpenTelemetry\Trace\Span;
+use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans as Span;
 
 class SpanConverter
 {

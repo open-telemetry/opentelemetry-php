@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 namespace OpenTelemetry\Contrib\OtlpGrpc;
-require __DIR__ . '/../../vendor/autoload.php';
+//require __DIR__ . '/../../vendor/autoload.php';
 
 
 use grpc;
@@ -80,7 +80,7 @@ class Exporter implements Trace\Exporter
         $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: 'none';
         $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
-        $this->client = $client ?? new V1\TraceServiceClient($endpointURL, [
+        $this->client = $client ?? new V1\TraceServiceClient($this->endpointURL, [
         'credentials' => Grpc\ChannelCredentials::createInsecure(),
     ]);
         $this->spanConverter = new SpanConverter($serviceName);

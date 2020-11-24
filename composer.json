@@ -34,7 +34,12 @@
             "OpenTelemetry\\": "api",
             "OpenTelemetry\\Sdk\\": "sdk",
             "OpenTelemetry\\Contrib\\": "contrib",
-            "Opentelemetry\\Proto\\Collector\\Trace\\V1\\": "proto/Opentelemetry/Proto/Collector/Trace/V1"
+            "Opentelemetry\\Proto\\Collector\\Trace\\V1\\": "proto/Opentelemetry/Proto/Collector/Trace/V1",
+            "Opentelemetry\\Proto\\Trace\\V1\\":"proto/Opentelemetry/Proto/Trace/V1",
+            "GPBMetadata\\Opentelemetry\\Proto\\Collector\\Trace\\V1\\": "proto/GPBMetadata/Opentelemetry/Proto/Collector/Trace/V1",
+            "GPBMetadata\\Opentelemetry\\Proto\\Trace\\V1\\":"proto/GPBMetadata/Opentelemetry/Proto/Trace/V1",
+            "GPBMetadata\\Opentelemetry\\Proto\\Common\\V1\\":"proto/GPBMetadata/Opentelemetry/Proto/Common/V1",
+            "GPBMetadata\\Opentelemetry\\Proto\\Resource\\V1\\":"proto/GPBMetadata/Opentelemetry/Proto/Resource/V1"
         }
     },
     "autoload-dev": {
