@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpGrpc;
 
-//use OpenTelemetry\Trace\Span;
-use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans as Span;
+use OpenTelemetry\Trace\Span;
+use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
+use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
+use Opentelemetry\Proto\Trace\V1\Status;
 
 class SpanConverter
 {
@@ -54,6 +56,7 @@ class SpanConverter
             'name' => $span->getSpanName(),
             'timestamp' => (int) ($span->getStartEpochTimestamp() / 1e3), // RealtimeClock in microseconds
             'duration' => (int) (($span->getEnd() - $span->getStart()) / 1e3), // Diff in microseconds
+
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
@@ -73,6 +76,33 @@ class SpanConverter
             ];
         }
 
+        foreach ($span->getLinks() as $link) {
+            if (!array_key_exists('link', $row)) {
+                $row['link'] = [];
+            }
+            $row['link'][] = [
+                'trace_id' => $span->getContext()->getTraceId(),
+                'span_id' => $span->getContext()->getSpanId(),
+            ];
+        }
+        if (!array_key_exists('status', $row)) {
+                $proto_status = StatusCode::STATUS_CODE_OK;
+                //////
+                /////HIGHLIGHTED
+                ////
+                ///
+                if ($span->getStatus()->getCanonicalStatusCode() === "ERROR") {
+                    $proto_status = StatusCode::STATUS_CODE_ERROR;
+                }
+                $status=new Status();
+                $row['status']=$status->setCode('$proto_status')->setMessage("Description");
+            }
+
         return $row;
     }
 }
+            // $key=new keyValue();
+            // $key->setKey("id")
+            // $value=new AnyValue();
+            // $value->setStringValue($span->getContext()->getSpanId());
+            // $key->setValue($value);

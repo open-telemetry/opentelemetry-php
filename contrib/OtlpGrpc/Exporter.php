@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 namespace OpenTelemetry\Contrib\OtlpGrpc;
-//require __DIR__ . '/../../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 
 use grpc;
@@ -106,6 +106,7 @@ class Exporter implements Trace\Exporter
         foreach ($spans as $span) {
             array_push($convertedSpans, $this->spanConverter->convert($span));
         }
+        echo "$convertedSpans";
 
         $request= new V1\ExportTraceServiceRequest();
         $request->setResourceSpans($convertedSpans);
