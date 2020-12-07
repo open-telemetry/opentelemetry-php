@@ -42,7 +42,7 @@ We use docker and docker-compose to perform a lot of our static analysis and tes
 If you're planning to develop for this library, it'll help to install `docker engine` and `docker-compose`.  
 You can find installation instructions for these packages can be found [here](https://docs.docker.com/install/), under the `Docker Engine` and `Docker Compose` submenus respectively.
 
-##Proto Generation
+## Proto Generation
 In order to generate proto files for use with this repository, we can perform a 
 
 `make proto`
