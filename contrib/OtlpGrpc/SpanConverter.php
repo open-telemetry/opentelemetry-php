@@ -8,6 +8,7 @@ use OpenTelemetry\Trace\Span;
 use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
 use Opentelemetry\Proto\Trace\V1\Status;
+use Opentelemetry\Proto\Common\V1\InstrumentationLibrary
 
 class SpanConverter
 {
@@ -44,7 +45,14 @@ class SpanConverter
     }
 
     public function convert(Span $span)
-    {
+    {   
+        $instrumentation_library_spans=[];
+        $il=new InstrumentationLibrary();
+        $name=$il->getName();
+        $version=$il->getVersion();
+
+
+
         $spanParent = $span->getParent();
         $row = [
             'id' => $span->getContext()->getSpanId(),
@@ -56,6 +64,7 @@ class SpanConverter
             'name' => $span->getSpanName(),
             'timestamp' => (int) ($span->getStartEpochTimestamp() / 1e3), // RealtimeClock in microseconds
             'duration' => (int) (($span->getEnd() - $span->getStart()) / 1e3), // Diff in microseconds
+            'trace_state' => $span->getContext();
 
         ];
 
@@ -87,10 +96,6 @@ class SpanConverter
         }
         if (!array_key_exists('status', $row)) {
                 $proto_status = StatusCode::STATUS_CODE_OK;
-                //////
-                /////HIGHLIGHTED
-                ////
-                ///
                 if ($span->getStatus()->getCanonicalStatusCode() === "ERROR") {
                     $proto_status = StatusCode::STATUS_CODE_ERROR;
                 }

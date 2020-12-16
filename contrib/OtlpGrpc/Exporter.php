@@ -63,7 +63,7 @@ class Exporter implements Trace\Exporter
     private $client;
 
     /**
-     * Exporter constructor.
+     * OTLP GRPC Exporter Constructor
      * @param string $serviceName
      */
     public function __construct(
@@ -106,8 +106,7 @@ class Exporter implements Trace\Exporter
         foreach ($spans as $span) {
             array_push($convertedSpans, $this->spanConverter->convert($span));
         }
-        echo "$convertedSpans";
-
+        
         $request= new V1\ExportTraceServiceRequest();
         $request->setResourceSpans($convertedSpans);
 
