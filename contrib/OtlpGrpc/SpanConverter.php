@@ -106,8 +106,3 @@ class SpanConverter
         return $row;
     }
 }
-            // $key=new keyValue();
-            // $key->setKey("id")
-            // $value=new AnyValue();
-            // $value->setStringValue($span->getContext()->getSpanId());
-            // $key->setValue($value);
