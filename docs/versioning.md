@@ -3,7 +3,7 @@ This project uses [semver v2](https://semver.org/), as does the rest of OpenTele
 
 ### Goals
 #### API Stability:
-* Once the API for a given signal (spans, logs, metrics, baggage) has been officially released, that API module will function, with any SDK that has the same major version, and equal or greater minor or patch version.
+* Once the API for a given signal (spans, logs, metrics, baggage) has been officially released, that API module will function with any SDK that has the same major version and an equal or greater minor version.
   * example: libraries that are instrumented with opentelemetry-api-trace:1.0.1 will function with SDK library opentelemetry-sdk-trace:1.11.33.
 * No existing method names or signatures will change with patch versioning.  We will only change signatures in a backwards compatible way with minor versioning.
 
