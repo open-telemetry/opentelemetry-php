@@ -93,3 +93,7 @@ The easy way to test the example out with docker and docker-compose is:
 3.) Go to Graph section, type "opentelemetry_prometheus_counter" in the search field or select it in the dropdown menu. You will see the counter value. Every other time you run `make metrics-prometheus-example` will increment the counter but remember that Prometheus scrapes values once in 10 seconds.
 
 4.) In order to stop docker containers for this example just run `make stop-prometheus`
+
+## Versioning
+
+Versioning rationale can be found in the [Versioning Documentation](/docs/versioning.md)
