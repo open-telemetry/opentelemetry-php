@@ -11,7 +11,7 @@ interface SpanContext
     public function getTraceId(): string;
     public function getSpanId(): string;
     public function getTraceFlags(): int;
-    public function getTracestate(): array;
+    public function getTraceState(): ?TraceState;
     public function isValidContext(): bool;
     public function isRemoteContext(): bool;
     public function isSampled(): bool;

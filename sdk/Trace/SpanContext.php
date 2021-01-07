@@ -10,10 +10,10 @@ use Throwable;
 final class SpanContext implements API\SpanContext
 {
     public const INVALID_TRACE = '00000000000000000000000000000000';
-    private const VALID_TRACE = '/^[0-9a-f]{32}$/';
+    public const VALID_TRACE = '/^[0-9a-f]{32}$/';
     public const INVALID_SPAN = '0000000000000000';
-    private const VALID_SPAN = '/^[0-9a-f]{16}$/';
-    private const SAMPLED_FLAG = 1;
+    public const VALID_SPAN = '/^[0-9a-f]{16}$/';
+    public const SAMPLED_FLAG = 1;
 
     /**
      * @var string
@@ -24,8 +24,7 @@ final class SpanContext implements API\SpanContext
      */
     private $spanId;
     /**
-     * @var string[]
-     * @see https://www.w3.org/TR/trace-context/#tracestate-header
+     * @var API\TraceState
      */
     private $traceState;
     /**
@@ -51,9 +50,9 @@ final class SpanContext implements API\SpanContext
      * @param string $traceId
      * @param string $spanId
      * @param int $traceFlags
-     * @param array $traceState
+     * @param API\TraceState|null $traceState
      */
-    public function __construct(string $traceId, string $spanId, int $traceFlags, array $traceState = [])
+    public function __construct(string $traceId, string $spanId, int $traceFlags, ?API\TraceState $traceState = null)
     {
         if (preg_match(self::VALID_TRACE, $traceId) === 0) {
             throw new \InvalidArgumentException(
@@ -116,12 +115,13 @@ final class SpanContext implements API\SpanContext
      * @param string $spanId
      * @param bool $sampled
      * @param bool $isRemote Default: false
+     * @param API\TraceState|null $traceState
      * @return SpanContext
      */
-    public static function restore(string $traceId, string $spanId, bool $sampled = false, bool $isRemote = false): SpanContext
+    public static function restore(string $traceId, string $spanId, bool $sampled = false, bool $isRemote = false, ?API\TraceState $traceState = null): SpanContext
     {
         $sampleFlag = $sampled ? 1 : 0;
-        $trace = new self($traceId, $spanId, $sampleFlag, []);
+        $trace = new self($traceId, $spanId, $sampleFlag, $traceState);
         $trace->isRemote = $isRemote;
 
         return $trace;
@@ -144,9 +144,9 @@ final class SpanContext implements API\SpanContext
     }
 
     /**
-     * @return string[] Returns a key-value array of extra vendor headers
+     * @return API\TraceState Returns a Tracestate object containing parsed list-members
      */
-    public function getTraceState(): array
+    public function getTraceState(): ?API\TraceState
     {
         return $this->traceState;
     }
