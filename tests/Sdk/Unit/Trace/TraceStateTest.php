@@ -48,6 +48,19 @@ class TraceStateTest extends TestCase
     /**
      * @test
      */
+    public function testBuildTracestate()
+    {
+        $tracestate = new TraceState('vendor1=value1');
+        $emptyTracestate = new TraceState();
+
+        $this->assertSame('vendor1=value1', $tracestate->build());
+        $this->assertSame(0, $emptyTracestate->getListMemberCount());
+        $this->assertNull($emptyTracestate->build());
+    }
+
+    /**
+     * @test
+     */
     public function testMaxTracestateListMembers()
     {
         // Build a tracestate with the max 32 values. Ex '0=0,1=1,...,31=31'
