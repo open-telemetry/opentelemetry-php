@@ -52,7 +52,7 @@ class TracerProviderTest extends TestCase
 
         self::assertSame($description, 'AlwaysOffSampler');
 
-        $traceProvider = new TracerProvider(null, new ParentBased());
+        $traceProvider = new TracerProvider(null, new ParentBased(new AlwaysOffSampler()));
         $description = $traceProvider->getSampler()->getDescription();
 
         self::assertSame($description, 'ParentBased');
