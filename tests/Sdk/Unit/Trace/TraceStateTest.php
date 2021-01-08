@@ -37,7 +37,7 @@ class TraceStateTest extends TestCase
     public function testWithoutTracestateValue()
     {
         $tracestate = new TraceState('vendor1=value1,vendor2=value2');
-        $tracestateWithoutNewValue = $tracestate->without('vendor1', 'value1');
+        $tracestateWithoutNewValue = $tracestate->without('vendor1');
 
         $this->assertNull($tracestateWithoutNewValue->get('vendor1'));
         $this->assertSame('value2', $tracestateWithoutNewValue->get('vendor2'));

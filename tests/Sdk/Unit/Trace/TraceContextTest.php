@@ -60,7 +60,8 @@ class TraceContextTest extends TestCase
             $map = new PropagationMap();
             $context = TraceContext::extract($carrier, $map);
 
-            $this->assertSame($tracestate, $context->getTraceState()->build());
+            $extractedTracestate = $context->getTraceState();
+            $this->assertSame($tracestate, $extractedTracestate ? $extractedTracestate->build() : '');
         }
     }
 
@@ -90,7 +91,8 @@ class TraceContextTest extends TestCase
         $context = TraceContext::extract($carrier, $map);
 
         // Invalid list-member should be dropped
-        $this->assertSame('vendor2=opaqueValue2', $context->getTraceState()->build());
+        $extractedTracestate = $context->getTraceState();
+        $this->assertSame('vendor2=opaqueValue2', $extractedTracestate ? $extractedTracestate->build() : '');
 
         // Tracestate with an invalid value
         $carrier = [TraceContext::TRACEPARENT => self::TRACEPARENTVALUE,
@@ -100,7 +102,8 @@ class TraceContextTest extends TestCase
         $context = TraceContext::extract($carrier, $map);
 
         // Invalid list-member should be dropped
-        $this->assertSame('vendor3=opaqueValue3', $context->getTraceState()->build());
+        $extractedTracestate = $context->getTraceState();
+        $this->assertSame('vendor3=opaqueValue3', $extractedTracestate ? $extractedTracestate->build() : '');
     }
 
     /**

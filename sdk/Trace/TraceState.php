@@ -162,6 +162,6 @@ class TraceState implements API\TraceState
     private function validateValue(string $key): bool
     {
         return (preg_match(self::VALID_VALUE_BASE_REGEX, $key) !== 0)
-            && (!preg_match(self::INVALID_VALUE_COMMA_EQUAL_REGEX, $key) !== 0);
+            && (preg_match(self::INVALID_VALUE_COMMA_EQUAL_REGEX, $key) === 0);
     }
 }

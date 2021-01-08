@@ -24,7 +24,7 @@ final class SpanContext implements API\SpanContext
      */
     private $spanId;
     /**
-     * @var API\TraceState
+     * @var API\TraceState|null
      */
     private $traceState;
     /**
