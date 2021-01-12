@@ -6,20 +6,23 @@ namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Trace as API;
 
+/**
+ * TraceContext is a propagator that supports the W3C Trace Context format
+ * (https://www.w3.org/TR/trace-context/)
+ *
+ * This propagator will propagate the traceparent and tracestate headers to
+ * guarantee traces are not broken. It is up to the users of this propagator
+ * to choose if they want to participate in a trace by modifying the
+ * traceparent header and relevant parts of the tracestate header containing
+ * their proprietary information.
+ */
 final class TraceContext implements API\TextMapFormatPropagator
 {
     public const TRACEPARENT = 'http_traceparent';
     public const TRACESTATE = 'http_tracestate';
-
-    // TODO Consolidate these and the validity checks in SpanContext.php
-    private const SUPPORTED_VERSION = '00';
-    private const INVALID_TRACE = '00000000000000000000000000000000';
-    private const INVALID_SPAN = '0000000000000000';
+    private const VERSION = '00'; // Currently only '00' is supported
     private const VALID_VERSION = '/^[0-9a-f]{2}$/';
-    private const VALID_TRACE = '/^[0-9a-f]{32}$/';
-    private const VALID_SPAN = '/^[0-9a-f]{16}$/';
     private const VALID_TRACEFLAGS = '/^[0-9a-f]{2}$/';
-    private const SAMPLED_FLAG = 1;
 
     /**
      * {@inheritdoc}
@@ -34,8 +37,16 @@ final class TraceContext implements API\TextMapFormatPropagator
      */
     public static function inject(API\SpanContext $context, &$carrier, API\PropagationSetter $setter): void
     {
-        $traceparent = self::SUPPORTED_VERSION . '-' . $context->getTraceId() . '-' . $context->getSpanId() . '-' . ($context->isSampled() ? '01' : '00');
+        // Build and inject the traceparent header
+        $traceparent = self::VERSION . '-' . $context->getTraceId() . '-' . $context->getSpanId() . '-' . ($context->isSampled() ? '01' : '00');
         $setter->set($carrier, self::TRACEPARENT, $traceparent);
+
+        // Build and inject the tracestate header
+        $tracestate = $context->getTraceState();
+        if ($tracestate !== null) {
+            $tracestateStr = $tracestate->build();
+            $setter->set($carrier, self::TRACESTATE, $tracestateStr ? $tracestateStr : '');
+        }
     }
 
     /**
@@ -51,30 +62,29 @@ final class TraceContext implements API\TextMapFormatPropagator
         // Traceparent = {version}-{trace-id}-{parent-id}-{trace-flags}
         $pieces = explode('-', $traceparent);
 
-        $peicesCount = count($pieces);
-        if ($peicesCount != 4) {
+        $piecesCount = count($pieces);
+        if ($piecesCount != 4) {
             throw new \InvalidArgumentException(
-                sprintf('Unable to extract traceparent. Expected 4 values, got %d', $peicesCount)
+                sprintf('Unable to extract traceparent. Expected 4 values, got %d', $piecesCount)
             );
         }
 
-        // Parse the traceparent version. Currently only '00' is supported.
         $version = $pieces[0];
-        if ((preg_match(self::VALID_VERSION, $version) === 0) || ($version !== self::SUPPORTED_VERSION)) {
+        if ((preg_match(self::VALID_VERSION, $version) === 0) || ($version !== self::VERSION)) {
             throw new \InvalidArgumentException(
                 sprintf('Only version 00 is supported, got %s', $version)
             );
         }
 
         $traceId = $pieces[1];
-        if ((preg_match(self::VALID_TRACE, $traceId) === 0) || ($traceId === self::INVALID_TRACE)) {
+        if ((preg_match(SpanContext::VALID_TRACE, $traceId) === 0) || ($traceId === SpanContext::INVALID_TRACE)) {
             throw new \InvalidArgumentException(
                 sprintf('TraceID must be exactly 16 bytes (32 chars) and at least one non-zero byte, got %s', $traceId)
             );
         }
 
         $spanId = $pieces[2];
-        if ((preg_match(self::VALID_SPAN, $spanId) === 0) || ($spanId === self::INVALID_SPAN)) {
+        if ((preg_match(SpanContext::VALID_SPAN, $spanId) === 0) || ($spanId === SpanContext::INVALID_SPAN)) {
             throw new \InvalidArgumentException(
                 sprintf('SpanID must be exactly 8 bytes (16 chars) and at least one non-zero byte, got %s', $spanId)
             );
@@ -89,8 +99,17 @@ final class TraceContext implements API\TextMapFormatPropagator
 
         // Only the sampled flag is extracted from the traceFlags (00000001)
         $convertedTraceFlags = hexdec($traceFlags);
-        $isSampled = ($convertedTraceFlags & self::SAMPLED_FLAG) === self::SAMPLED_FLAG;
+        $isSampled = ($convertedTraceFlags & SpanContext::SAMPLED_FLAG) === SpanContext::SAMPLED_FLAG;
 
+        // Tracestate = 'Vendor1=Value1,...,VendorN=ValueN'
+        $rawTracestate = $getter->get($carrier, self::TRACESTATE);
+        if ($rawTracestate !== null) {
+            $tracestate = new TraceState($rawTracestate);
+
+            return SpanContext::restore($traceId, $spanId, $isSampled, true, $tracestate);
+        }
+
+        // Only traceparent header is extracted. No tracestate.
         return SpanContext::restore($traceId, $spanId, $isSampled, true);
     }
 }

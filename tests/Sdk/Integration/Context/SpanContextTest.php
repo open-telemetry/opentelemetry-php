@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Sdk\Integration\Context;
 
 use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace\SpanContext;
+use OpenTelemetry\Sdk\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
 class SpanContextTest extends TestCase
@@ -65,11 +66,11 @@ class SpanContextTest extends TestCase
     {
         $trace = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         $span = 'bbbbbbbbbbbbbbbb';
-        $state = ['a' => 'b'];
-        $spanContext = new SpanContext($trace, $span, 0, $state);
+        $tracestate = new TraceState('a=b');
+        $spanContext = new SpanContext($trace, $span, 0, $tracestate);
         $this->assertSame($trace, $spanContext->getTraceId());
         $this->assertSame($span, $spanContext->getSpanId());
-        $this->assertSame($state, $spanContext->getTraceState());
+        $this->assertSame($tracestate, $spanContext->getTraceState());
         $this->assertFalse($spanContext->isSampled());
     }
 

@@ -39,8 +39,7 @@ class NoopSpan implements \OpenTelemetry\Trace\Span
             $this->context = new SpanContext(
                 SpanContext::INVALID_TRACE,
                 SpanContext::INVALID_SPAN,
-                0,
-                []
+                0
             );
         } else {
             $this->context = $spanContext;
