@@ -44,8 +44,6 @@ jobs:
       run: composer install --prefer-dist --no-progress --no-suggest
 
     - name: Check Style
-      env:
-        PHP_CS_FIXER_IGNORE_ENV: 1
       run: vendor/bin/php-cs-fixer fix --config=.php_cs -v --dry-run --stop-on-violation --using-cache=no
 
     - name: Run Phan
