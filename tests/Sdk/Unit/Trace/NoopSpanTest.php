@@ -108,7 +108,7 @@ class NoopSpanTest extends TestCase
     /** @test */
     public function itShouldHaveAnInvalidSpanContext()
     {
-        $this->assertFalse($this->span->getContext()->isValidContext());
+        $this->assertFalse($this->span->getContext()->isValid());
     }
 
     /** @test */
