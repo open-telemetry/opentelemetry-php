@@ -41,19 +41,19 @@ class SpanContextTest extends TestCase
     public function testValidSpan(): void
     {
         $spanContext = new SpanContext('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', 1);
-        $this->assertTrue($spanContext->isValidContext());
+        $this->assertTrue($spanContext->isValid());
     }
 
     public function testContextIsRemoteFromRestore(): void
     {
         $spanContext = SpanContext::restore('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', true, true);
-        $this->assertTrue($spanContext->isRemoteContext());
+        $this->assertTrue($spanContext->isRemote());
     }
 
     public function testContextIsNotRemoteFromConstructor(): void
     {
         $spanContext = new SpanContext('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', 1);
-        $this->assertFalse($spanContext->isRemoteContext());
+        $this->assertFalse($spanContext->isRemote());
     }
 
     public function testSampledSpan(): void
@@ -77,7 +77,7 @@ class SpanContextTest extends TestCase
     public function testGenerateReturnsNonSampledValidContext()
     {
         $spanContext = SpanContext::generate();
-        $this->assertTrue($spanContext->isValidContext());
+        $this->assertTrue($spanContext->isValid());
         $this->assertFalse($spanContext->isSampled());
     }
 }

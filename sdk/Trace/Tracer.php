@@ -56,7 +56,7 @@ class Tracer implements API\Tracer
 
     public function startActiveSpan(string $name, API\SpanContext $parentContext, bool $isRemote = false, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
     {
-        $parentContextIsNoopSpan = !$parentContext->isValidContext();
+        $parentContextIsNoopSpan = !$parentContext->isValid();
 
         if ($parentContextIsNoopSpan) {
             $parentContext = $this->importedContext ?? SpanContext::generate(true);

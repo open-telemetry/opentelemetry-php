@@ -222,7 +222,7 @@ class Span implements API\Span
     */
     public function isRemote(): bool
     {
-        return $this->spanContext->isRemoteContext();
+        return $this->spanContext->isRemote();
     }
 
     public function isSampled(): bool

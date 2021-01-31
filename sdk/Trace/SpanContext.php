@@ -162,7 +162,7 @@ final class SpanContext implements API\SpanContext
     /**
      * @return bool Returns a value that indicates if the context has non-zero trace and span
      */
-    public function isValidContext(): bool
+    public function isValid(): bool
     {
         return $this->isValid;
     }
@@ -170,7 +170,7 @@ final class SpanContext implements API\SpanContext
     /**
      * @return bool Returns a value that indicates if the context was created from a previously existing trace
      */
-    public function isRemoteContext(): bool
+    public function isRemote(): bool
     {
         return $this->isRemote;
     }

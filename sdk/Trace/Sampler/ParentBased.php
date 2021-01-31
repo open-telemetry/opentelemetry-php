@@ -88,7 +88,7 @@ class ParentBased implements Sampler
             return $this->root->shouldSample($parentContext, $traceId, $spanId, $spanName, $spanKind, $attributes, $links);
         }
 
-        if ($parentContext->isRemoteContext()) {
+        if ($parentContext->isRemote()) {
             return $parentContext->isSampled()
                 ? $this->remoteParentSampled->shouldSample($parentContext, $traceId, $spanId, $spanName, $spanKind, $attributes, $links)
                 : $this->remoteParentNotSampled->shouldSample($parentContext, $traceId, $spanId, $spanName, $spanKind, $attributes, $links);
