@@ -34,6 +34,30 @@ class TracerProviderTest extends TestCase
     /**
      * @test
      */
+    public function gettingTracersWithDifferentVersionReturnsDifferentTracers()
+    {
+        $traceProvider = new TracerProvider();
+        $tracer1 = $traceProvider->getTracer('test_tracer', 'v1');
+        $tracer2 = $traceProvider->getTracer('test_tracer', 'v2');
+
+        self::assertNotSame($tracer1, $tracer2);
+    }
+
+    /**
+     * @test
+     */
+    public function gettingTracersWithSameNameAndVersionReturnsSameTracer()
+    {
+        $traceProvider = new TracerProvider();
+        $tracer1 = $traceProvider->getTracer('test_tracer', 'v1');
+        $tracer2 = $traceProvider->getTracer('test_tracer', 'v1');
+
+        self::assertSame($tracer1, $tracer2);
+    }
+
+    /**
+     * @test
+     */
     public function newTraceProviderDefaultsToAlwaysOnSampler()
     {
         $traceProvider = new TracerProvider();

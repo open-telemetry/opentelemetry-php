@@ -12,7 +12,6 @@ use OpenTelemetry\Trace as API;
 
 final class TracerProvider implements API\TracerProvider
 {
-
     /**
      * @var Tracer[]
      */
@@ -49,8 +48,10 @@ final class TracerProvider implements API\TracerProvider
 
     public function getTracer(string $name, ?string $version = ''): API\Tracer
     {
-        if (isset($this->tracers[$name]) && $this->tracers[$name] instanceof API\Tracer) {
-            return $this->tracers[$name];
+        $key = sprintf("%s@%s", $name, $version);
+
+        if (isset($this->tracers[$key]) && $this->tracers[$key] instanceof API\Tracer) {
+            return $this->tracers[$key];
         }
 
         $spanContext = SpanContext::generateSampled();
@@ -70,7 +71,7 @@ final class TracerProvider implements API\TracerProvider
             )
         );
 
-        return $this->tracers[$name] = new Tracer(
+        return $this->tracers[$key] = new Tracer(
             $this,
             ResourceInfo::merge($primary, $resource),
             $spanContext
