@@ -48,7 +48,6 @@ final class TracerProvider implements API\TracerProvider
 
     public function getTracer(string $name, ?string $version = ''): API\Tracer
     {
-
         if (!$version) {
             $version = 'unknown';
         }
