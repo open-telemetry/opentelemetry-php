@@ -48,7 +48,12 @@ final class TracerProvider implements API\TracerProvider
 
     public function getTracer(string $name, ?string $version = ''): API\Tracer
     {
-        $key = sprintf('%s@%s', $name, $version);
+
+        if (!$version) {
+            $version = '';
+        }
+
+        $key = sprintf('%s', $name);
 
         if (isset($this->tracers[$key]) && $this->tracers[$key] instanceof API\Tracer) {
             return $this->tracers[$key];
