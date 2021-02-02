@@ -474,7 +474,7 @@ class TracingTest extends TestCase
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
         $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('unknown', $serviceversion->getValue());
+        $this->assertEquals('', $serviceversion->getValue());
 
         $this->assertCount(6, $attributes);
 
@@ -503,7 +503,7 @@ class TracingTest extends TestCase
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
         $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('unknown', $serviceversion->getValue());
+        $this->assertEquals('', $serviceversion->getValue());
 
         $this->assertCount(6, $attributes);
     }
@@ -562,7 +562,7 @@ class TracingTest extends TestCase
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
         $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('unknown', $serviceversion->getValue());
+        $this->assertEquals('', $serviceversion->getValue());
 
         $this->assertCount(8, $attributes);
 
@@ -599,7 +599,7 @@ class TracingTest extends TestCase
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
         $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('unknown', $serviceversion->getValue());
+        $this->assertEquals('', $serviceversion->getValue());
 
         $this->assertCount(8, $attributes);
     }
