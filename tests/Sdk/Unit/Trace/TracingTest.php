@@ -11,6 +11,7 @@ use OpenTelemetry\Sdk\Trace as SDK;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
+use OpenTelemetry\Sdk\Trace\Exceptions\NoSpansCreatedException;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
@@ -330,14 +331,40 @@ class TracingTest extends TestCase
         $this->assertNull($global->getParent());
     }
 
-    public function testActiveRootSpanIsNoopSpanIfNoParentProvided()
+    public function testGetActiveSpanThrowsExceptionWhenNoSpans()
     {
         $tracer = (new SDK\TracerProvider())->getTracer('OpenTelemetry.TracingTest');
 
-        $this->assertInstanceOf(
-            SDK\NoopSpan::class,
-            $tracer->getActiveSpan()
-        );
+        $this->expectException(NoSpansCreatedException::class);
+
+        $tracer->getActiveSpan();
+    }
+
+    public function testGetSpansThrowsExceptionWhenNoSpans()
+    {
+        $tracer = (new SDK\TracerProvider())->getTracer('OpenTelemetry.TracingTest');
+
+        $this->expectException(NoSpansCreatedException::class);
+
+        $tracer->getSpans();
+    }
+
+    public function testEndActiveSpanThrowsExceptionWhenNoSpans()
+    {
+        $tracer = (new SDK\TracerProvider())->getTracer('OpenTelemetry.TracingTest');
+
+        $this->expectException(NoSpansCreatedException::class);
+
+        $tracer->endActiveSpan();
+    }
+
+    public function testDeactivateActiveSpanThrowsExceptionWhenNoSpans()
+    {
+        $tracer = (new SDK\TracerProvider())->getTracer('OpenTelemetry.TracingTest');
+
+        $this->expectException(NoSpansCreatedException::class);
+
+        $tracer->deactivateActiveSpan();
     }
 
     public function testCreateSpanResourceNonDefaultTraceProviderNonDefaultTrace()

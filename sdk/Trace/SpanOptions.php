@@ -12,7 +12,7 @@ final class SpanOptions implements API\SpanOptions
     /**
      * @var string
      */
-    private $name;
+    private $name = null;
     private $parent = null;
     private $attributes = null;
     private $links = null;
@@ -91,7 +91,13 @@ final class SpanOptions implements API\SpanOptions
 
     public function toSpan(): API\Span
     {
-        $span = $this->tracer->getActiveSpan();
+        if ($this->tracer->spansCreated() == true) {
+            $span = $this->tracer->getActiveSpan();
+        } else {
+            $span = new NoopSpan();
+        }
+        //amber
+        //$span = $this->tracer->getActiveSpan();
         $context = $span->getContext()->isValid()
             ? SpanContext::fork($span->getContext()->getTraceId())
             : SpanContext::generate();

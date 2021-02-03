@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
+use OpenTelemetry\Sdk\Trace\Exceptions\NoSpansCreatedException;
 use OpenTelemetry\Trace as API;
 
 class Tracer implements API\Tracer
 {
-    private $active;
+    /** @var Span|null|NoopSpan  */
+    private $active = null;
     private $spans = [];
     private $tail = [];
 
@@ -32,18 +34,34 @@ class Tracer implements API\Tracer
 
     public function getActiveSpan(): API\Span
     {
-        while (count($this->tail) && ($this->active->ended())) {
+        if (! $this->spansCreated()) {
+            throw new NoSpansCreatedException();
+        }
+        while (count($this->tail) && (($this->active == null) || ($this->active->ended()))) {
             $this->active = array_pop($this->tail);
         }
 
         return $this->active ?? new NoopSpan();
     }
-
-    public function setActiveSpan(API\Span $span): void
+    public function spansCreated(): bool
     {
-        $this->tail[] = $this->active;
+        if (count($this->spans) == 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function setActiveSpan(API\Span $span, bool $extGeneratedSpan = true): void
+    {
+        if (! $this->active == null) {
+            $this->tail[] = $this->active;
+        }
 
         $this->active = $span;
+        if ($extGeneratedSpan == true) {
+            $this->spans[] = $span;
+        }
     }
 
     /**
@@ -88,8 +106,8 @@ class Tracer implements API\Tracer
                 $this->provider->getSpanProcessor()->onStart($span);
             }
         }
-
-        $this->setActiveSpan($span);
+        //amber
+        $this->setActiveSpan($span, false);
 
         return $this->active;
     }
@@ -159,13 +177,21 @@ class Tracer implements API\Tracer
      */
     public function startAndActivateSpan(string $name, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
     {
-        $parentContext = $this->getActiveSpan()->getContext();
+        if (!$this->spansCreated()) {
+            $parentContext = (new NoopSpan())->getContext();
+        } else {
+            $parentContext = $this->getActiveSpan()->getContext();
+        }
 
         return self::startActiveSpan($name, $parentContext, false, $spanKind);
     }
 
     public function getSpans(): array
     {
+        if (! $this->spansCreated()) {
+            throw new NoSpansCreatedException();
+        }
+
         return $this->spans;
     }
     public function getResource(): ResourceInfo
@@ -177,6 +203,11 @@ class Tracer implements API\Tracer
         /**
          * a span should be ended before is sent to exporters, because the exporters need's span duration.
          */
+
+        if (! $this->spansCreated()) {
+            throw new NoSpansCreatedException();
+        }
+
         $span = $this->getActiveSpan();
         $wasRecording = $span->isRecording();
         $span->end();
@@ -217,5 +248,8 @@ class Tracer implements API\Tracer
     public function deactivateActiveSpan(): void
     {
         // TODO: Implement deactivateActiveSpan() method.
+        if (! $this->spansCreated()) {
+            throw new NoSpansCreatedException();
+        }
     }
 }
