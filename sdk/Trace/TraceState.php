@@ -39,7 +39,14 @@ class TraceState implements API\TraceState
         $clonedTracestate = clone $this;
 
         //TODO: Log if we can't set the value
-        if ($key !== '') {
+        if (self::validateKey($key) && self::validateValue($value)) {
+
+            // Overwrite the vendor entry if the key already exists
+            if (array_key_exists($key, $clonedTracestate->traceState)) {
+                unset($clonedTracestate->traceState[$key]);
+            }
+
+            // Add new or updated entry to the back.
             $clonedTracestate->traceState[$key] = $value;
         }
 
@@ -84,6 +91,10 @@ class TraceState implements API\TraceState
     {
         if (!empty($this->traceState)) {
             $clonedTracestate = clone $this;
+
+            // Reverse the order back to the original to ensure new entries are at the beginning.
+            $clonedTracestate->traceState = array_reverse($clonedTracestate->traceState);
+
             array_walk(
                 $clonedTracestate->traceState,
                 function (&$v, $k) {
@@ -98,7 +109,10 @@ class TraceState implements API\TraceState
     }
 
     /**
-     * Parse the raw tracestate header into the TraceState object.
+     * Parse the raw tracestate header into the TraceState object. Since new or updated entries must
+     * be added to the beginning of the list, the key-value pairs in the TraceState object will be
+     * in stored in reverse order. This ensures new entries added to the TraceState object are at
+     * the beginning when we reverse the order back again while building the final tracestate header.
      *
      * Ex:
      *      tracestate = 'vendor1=value1,vendor2=value2'
@@ -106,15 +120,14 @@ class TraceState implements API\TraceState
      *                              ||
      *                              \/
      *
-     *      $this->tracestate = ['vendor1' => 'value1' ,'vendor2' => 'value2']
+     *      $this->tracestate = ['vendor2' => 'value2' ,'vendor1' => 'value1']
      *
      */
     private function parse(string $rawTracestate): array
     {
         $parsedTracestate = [];
 
-        if(\strlen($rawTracestate) <= self::MAX_TRACESTATE_LENGTH)
-        {
+        if (\strlen($rawTracestate) <= self::MAX_TRACESTATE_LENGTH) {
             $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
 
             $listMembersCount = count($listMembers);
@@ -139,7 +152,7 @@ class TraceState implements API\TraceState
             }
         }
 
-        return $parsedTracestate;
+        return array_reverse($parsedTracestate);
     }
 
     /**
