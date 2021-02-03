@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class StartTraceRequest extends TBase
+class StartTraceRequest
 {
     static public $isValidate = false;
 
@@ -64,7 +64,18 @@ class StartTraceRequest extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['serverRole'])) {
+                $this->serverRole = $vals['serverRole'];
+            }
+            if (isset($vals['sampled'])) {
+                $this->sampled = $vals['sampled'];
+            }
+            if (isset($vals['baggage'])) {
+                $this->baggage = $vals['baggage'];
+            }
+            if (isset($vals['downstream'])) {
+                $this->downstream = $vals['downstream'];
+            }
         }
     }
 
@@ -76,13 +87,85 @@ class StartTraceRequest extends TBase
 
     public function read($input)
     {
-        return $this->_read('StartTraceRequest', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->serverRole);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::BOOL) {
+                        $xfer += $input->readBool($this->sampled);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 3:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->baggage);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 4:
+                    if ($ftype == TType::STRUCT) {
+                        $this->downstream = new \Jaeger\Thrift\Crossdock\Downstream();
+                        $xfer += $this->downstream->read($input);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('StartTraceRequest', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('StartTraceRequest');
+        if ($this->serverRole !== null) {
+            $xfer += $output->writeFieldBegin('serverRole', TType::STRING, 1);
+            $xfer += $output->writeString($this->serverRole);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->sampled !== null) {
+            $xfer += $output->writeFieldBegin('sampled', TType::BOOL, 2);
+            $xfer += $output->writeBool($this->sampled);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->baggage !== null) {
+            $xfer += $output->writeFieldBegin('baggage', TType::STRING, 3);
+            $xfer += $output->writeString($this->baggage);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->downstream !== null) {
+            if (!is_object($this->downstream)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('downstream', TType::STRUCT, 4);
+            $xfer += $this->downstream->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

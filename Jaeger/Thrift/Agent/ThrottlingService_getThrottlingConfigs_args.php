@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class ThrottlingService_getThrottlingConfigs_args extends TBase
+class ThrottlingService_getThrottlingConfigs_args
 {
     static public $isValidate = false;
 
@@ -40,7 +40,9 @@ class ThrottlingService_getThrottlingConfigs_args extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['serviceNames'])) {
+                $this->serviceNames = $vals['serviceNames'];
+            }
         }
     }
 
@@ -52,13 +54,61 @@ class ThrottlingService_getThrottlingConfigs_args extends TBase
 
     public function read($input)
     {
-        return $this->_read('ThrottlingService_getThrottlingConfigs_args', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::LST) {
+                        $this->serviceNames = array();
+                        $_size7 = 0;
+                        $_etype10 = 0;
+                        $xfer += $input->readListBegin($_etype10, $_size7);
+                        for ($_i11 = 0; $_i11 < $_size7; ++$_i11) {
+                            $elem12 = null;
+                            $xfer += $input->readString($elem12);
+                            $this->serviceNames []= $elem12;
+                        }
+                        $xfer += $input->readListEnd();
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('ThrottlingService_getThrottlingConfigs_args', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('ThrottlingService_getThrottlingConfigs_args');
+        if ($this->serviceNames !== null) {
+            if (!is_array($this->serviceNames)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('serviceNames', TType::LST, 1);
+            $output->writeListBegin(TType::STRING, count($this->serviceNames));
+            foreach ($this->serviceNames as $iter13) {
+                $xfer += $output->writeString($iter13);
+            }
+            $output->writeListEnd();
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class RateLimitingSamplingStrategy extends TBase
+class RateLimitingSamplingStrategy
 {
     static public $isValidate = false;
 
@@ -36,7 +36,9 @@ class RateLimitingSamplingStrategy extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['maxTracesPerSecond'])) {
+                $this->maxTracesPerSecond = $vals['maxTracesPerSecond'];
+            }
         }
     }
 
@@ -48,13 +50,45 @@ class RateLimitingSamplingStrategy extends TBase
 
     public function read($input)
     {
-        return $this->_read('RateLimitingSamplingStrategy', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::I16) {
+                        $xfer += $input->readI16($this->maxTracesPerSecond);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('RateLimitingSamplingStrategy', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('RateLimitingSamplingStrategy');
+        if ($this->maxTracesPerSecond !== null) {
+            $xfer += $output->writeFieldBegin('maxTracesPerSecond', TType::I16, 1);
+            $xfer += $output->writeI16($this->maxTracesPerSecond);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

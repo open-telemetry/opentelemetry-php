@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class PerOperationSamplingStrategies extends TBase
+class PerOperationSamplingStrategies
 {
     static public $isValidate = false;
 
@@ -68,7 +68,18 @@ class PerOperationSamplingStrategies extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['defaultSamplingProbability'])) {
+                $this->defaultSamplingProbability = $vals['defaultSamplingProbability'];
+            }
+            if (isset($vals['defaultLowerBoundTracesPerSecond'])) {
+                $this->defaultLowerBoundTracesPerSecond = $vals['defaultLowerBoundTracesPerSecond'];
+            }
+            if (isset($vals['perOperationStrategies'])) {
+                $this->perOperationStrategies = $vals['perOperationStrategies'];
+            }
+            if (isset($vals['defaultUpperBoundTracesPerSecond'])) {
+                $this->defaultUpperBoundTracesPerSecond = $vals['defaultUpperBoundTracesPerSecond'];
+            }
         }
     }
 
@@ -80,13 +91,98 @@ class PerOperationSamplingStrategies extends TBase
 
     public function read($input)
     {
-        return $this->_read('PerOperationSamplingStrategies', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::DOUBLE) {
+                        $xfer += $input->readDouble($this->defaultSamplingProbability);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::DOUBLE) {
+                        $xfer += $input->readDouble($this->defaultLowerBoundTracesPerSecond);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 3:
+                    if ($ftype == TType::LST) {
+                        $this->perOperationStrategies = array();
+                        $_size0 = 0;
+                        $_etype3 = 0;
+                        $xfer += $input->readListBegin($_etype3, $_size0);
+                        for ($_i4 = 0; $_i4 < $_size0; ++$_i4) {
+                            $elem5 = null;
+                            $elem5 = new \Jaeger\Thrift\Agent\OperationSamplingStrategy();
+                            $xfer += $elem5->read($input);
+                            $this->perOperationStrategies []= $elem5;
+                        }
+                        $xfer += $input->readListEnd();
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 4:
+                    if ($ftype == TType::DOUBLE) {
+                        $xfer += $input->readDouble($this->defaultUpperBoundTracesPerSecond);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('PerOperationSamplingStrategies', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('PerOperationSamplingStrategies');
+        if ($this->defaultSamplingProbability !== null) {
+            $xfer += $output->writeFieldBegin('defaultSamplingProbability', TType::DOUBLE, 1);
+            $xfer += $output->writeDouble($this->defaultSamplingProbability);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->defaultLowerBoundTracesPerSecond !== null) {
+            $xfer += $output->writeFieldBegin('defaultLowerBoundTracesPerSecond', TType::DOUBLE, 2);
+            $xfer += $output->writeDouble($this->defaultLowerBoundTracesPerSecond);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->perOperationStrategies !== null) {
+            if (!is_array($this->perOperationStrategies)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('perOperationStrategies', TType::LST, 3);
+            $output->writeListBegin(TType::STRUCT, count($this->perOperationStrategies));
+            foreach ($this->perOperationStrategies as $iter6) {
+                $xfer += $iter6->write($output);
+            }
+            $output->writeListEnd();
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->defaultUpperBoundTracesPerSecond !== null) {
+            $xfer += $output->writeFieldBegin('defaultUpperBoundTracesPerSecond', TType::DOUBLE, 4);
+            $xfer += $output->writeDouble($this->defaultUpperBoundTracesPerSecond);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

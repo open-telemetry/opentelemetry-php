@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class TracedService_joinTrace_args extends TBase
+class TracedService_joinTrace_args
 {
     static public $isValidate = false;
 
@@ -37,7 +37,9 @@ class TracedService_joinTrace_args extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['request'])) {
+                $this->request = $vals['request'];
+            }
         }
     }
 
@@ -49,13 +51,49 @@ class TracedService_joinTrace_args extends TBase
 
     public function read($input)
     {
-        return $this->_read('TracedService_joinTrace_args', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRUCT) {
+                        $this->request = new \Jaeger\Thrift\Crossdock\JoinTraceRequest();
+                        $xfer += $this->request->read($input);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('TracedService_joinTrace_args', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('TracedService_joinTrace_args');
+        if ($this->request !== null) {
+            if (!is_object($this->request)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('request', TType::STRUCT, 1);
+            $xfer += $this->request->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

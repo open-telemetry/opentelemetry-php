@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class BaggageRestrictionManager_getBaggageRestrictions_args extends TBase
+class BaggageRestrictionManager_getBaggageRestrictions_args
 {
     static public $isValidate = false;
 
@@ -36,7 +36,9 @@ class BaggageRestrictionManager_getBaggageRestrictions_args extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['serviceName'])) {
+                $this->serviceName = $vals['serviceName'];
+            }
         }
     }
 
@@ -48,13 +50,45 @@ class BaggageRestrictionManager_getBaggageRestrictions_args extends TBase
 
     public function read($input)
     {
-        return $this->_read('BaggageRestrictionManager_getBaggageRestrictions_args', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->serviceName);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('BaggageRestrictionManager_getBaggageRestrictions_args', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('BaggageRestrictionManager_getBaggageRestrictions_args');
+        if ($this->serviceName !== null) {
+            $xfer += $output->writeFieldBegin('serviceName', TType::STRING, 1);
+            $xfer += $output->writeString($this->serviceName);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

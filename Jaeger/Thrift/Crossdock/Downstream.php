@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class Downstream extends TBase
+class Downstream
 {
     static public $isValidate = false;
 
@@ -82,7 +82,24 @@ class Downstream extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['serviceName'])) {
+                $this->serviceName = $vals['serviceName'];
+            }
+            if (isset($vals['serverRole'])) {
+                $this->serverRole = $vals['serverRole'];
+            }
+            if (isset($vals['host'])) {
+                $this->host = $vals['host'];
+            }
+            if (isset($vals['port'])) {
+                $this->port = $vals['port'];
+            }
+            if (isset($vals['transport'])) {
+                $this->transport = $vals['transport'];
+            }
+            if (isset($vals['downstream'])) {
+                $this->downstream = $vals['downstream'];
+            }
         }
     }
 
@@ -94,13 +111,109 @@ class Downstream extends TBase
 
     public function read($input)
     {
-        return $this->_read('Downstream', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->serviceName);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->serverRole);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 3:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->host);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 4:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->port);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 5:
+                    if ($ftype == TType::I32) {
+                        $xfer += $input->readI32($this->transport);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 6:
+                    if ($ftype == TType::STRUCT) {
+                        $this->downstream = new \Jaeger\Thrift\Crossdock\Downstream();
+                        $xfer += $this->downstream->read($input);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('Downstream', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('Downstream');
+        if ($this->serviceName !== null) {
+            $xfer += $output->writeFieldBegin('serviceName', TType::STRING, 1);
+            $xfer += $output->writeString($this->serviceName);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->serverRole !== null) {
+            $xfer += $output->writeFieldBegin('serverRole', TType::STRING, 2);
+            $xfer += $output->writeString($this->serverRole);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->host !== null) {
+            $xfer += $output->writeFieldBegin('host', TType::STRING, 3);
+            $xfer += $output->writeString($this->host);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->port !== null) {
+            $xfer += $output->writeFieldBegin('port', TType::STRING, 4);
+            $xfer += $output->writeString($this->port);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->transport !== null) {
+            $xfer += $output->writeFieldBegin('transport', TType::I32, 5);
+            $xfer += $output->writeI32($this->transport);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->downstream !== null) {
+            if (!is_object($this->downstream)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('downstream', TType::STRUCT, 6);
+            $xfer += $this->downstream->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

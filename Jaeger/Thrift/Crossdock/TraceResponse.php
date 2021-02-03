@@ -22,7 +22,7 @@ use Thrift\Exception\TApplicationException;
  * If the server was instructed to make a downstream call, it must embed the
  * downstream response in its own response.
  */
-class TraceResponse extends TBase
+class TraceResponse
 {
     static public $isValidate = false;
 
@@ -62,7 +62,15 @@ class TraceResponse extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['span'])) {
+                $this->span = $vals['span'];
+            }
+            if (isset($vals['downstream'])) {
+                $this->downstream = $vals['downstream'];
+            }
+            if (isset($vals['notImplementedError'])) {
+                $this->notImplementedError = $vals['notImplementedError'];
+            }
         }
     }
 
@@ -74,13 +82,77 @@ class TraceResponse extends TBase
 
     public function read($input)
     {
-        return $this->_read('TraceResponse', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRUCT) {
+                        $this->span = new \Jaeger\Thrift\Crossdock\ObservedSpan();
+                        $xfer += $this->span->read($input);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::STRUCT) {
+                        $this->downstream = new \Jaeger\Thrift\Crossdock\TraceResponse();
+                        $xfer += $this->downstream->read($input);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 3:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->notImplementedError);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('TraceResponse', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('TraceResponse');
+        if ($this->span !== null) {
+            if (!is_object($this->span)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('span', TType::STRUCT, 1);
+            $xfer += $this->span->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->downstream !== null) {
+            if (!is_object($this->downstream)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('downstream', TType::STRUCT, 2);
+            $xfer += $this->downstream->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->notImplementedError !== null) {
+            $xfer += $output->writeFieldBegin('notImplementedError', TType::STRING, 3);
+            $xfer += $output->writeString($this->notImplementedError);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

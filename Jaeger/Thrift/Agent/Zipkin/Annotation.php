@@ -20,7 +20,7 @@ use Thrift\Exception\TApplicationException;
  * An annotation is similar to a log statement. It includes a host field which
  * allows these events to be attributed properly, and also aggregatable.
  */
-class Annotation extends TBase
+class Annotation
 {
     static public $isValidate = false;
 
@@ -67,7 +67,15 @@ class Annotation extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['timestamp'])) {
+                $this->timestamp = $vals['timestamp'];
+            }
+            if (isset($vals['value'])) {
+                $this->value = $vals['value'];
+            }
+            if (isset($vals['host'])) {
+                $this->host = $vals['host'];
+            }
         }
     }
 
@@ -79,13 +87,73 @@ class Annotation extends TBase
 
     public function read($input)
     {
-        return $this->_read('Annotation', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::I64) {
+                        $xfer += $input->readI64($this->timestamp);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->value);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 3:
+                    if ($ftype == TType::STRUCT) {
+                        $this->host = new \Jaeger\Thrift\Agent\Zipkin\Endpoint();
+                        $xfer += $this->host->read($input);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('Annotation', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('Annotation');
+        if ($this->timestamp !== null) {
+            $xfer += $output->writeFieldBegin('timestamp', TType::I64, 1);
+            $xfer += $output->writeI64($this->timestamp);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->value !== null) {
+            $xfer += $output->writeFieldBegin('value', TType::STRING, 2);
+            $xfer += $output->writeString($this->value);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->host !== null) {
+            if (!is_object($this->host)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('host', TType::STRUCT, 3);
+            $xfer += $this->host->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

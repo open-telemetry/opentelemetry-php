@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class Dependencies extends TBase
+class Dependencies
 {
     static public $isValidate = false;
 
@@ -41,7 +41,9 @@ class Dependencies extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['links'])) {
+                $this->links = $vals['links'];
+            }
         }
     }
 
@@ -53,13 +55,62 @@ class Dependencies extends TBase
 
     public function read($input)
     {
-        return $this->_read('Dependencies', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::LST) {
+                        $this->links = array();
+                        $_size0 = 0;
+                        $_etype3 = 0;
+                        $xfer += $input->readListBegin($_etype3, $_size0);
+                        for ($_i4 = 0; $_i4 < $_size0; ++$_i4) {
+                            $elem5 = null;
+                            $elem5 = new \Jaeger\Thrift\Agent\DependencyLink();
+                            $xfer += $elem5->read($input);
+                            $this->links []= $elem5;
+                        }
+                        $xfer += $input->readListEnd();
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('Dependencies', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('Dependencies');
+        if ($this->links !== null) {
+            if (!is_array($this->links)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('links', TType::LST, 1);
+            $output->writeListBegin(TType::STRUCT, count($this->links));
+            foreach ($this->links as $iter6) {
+                $xfer += $iter6->write($output);
+            }
+            $output->writeListEnd();
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

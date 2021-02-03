@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class Collector_submitBatches_result extends TBase
+class Collector_submitBatches_result
 {
     static public $isValidate = false;
 
@@ -41,7 +41,9 @@ class Collector_submitBatches_result extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['success'])) {
+                $this->success = $vals['success'];
+            }
         }
     }
 
@@ -53,13 +55,62 @@ class Collector_submitBatches_result extends TBase
 
     public function read($input)
     {
-        return $this->_read('Collector_submitBatches_result', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 0:
+                    if ($ftype == TType::LST) {
+                        $this->success = array();
+                        $_size49 = 0;
+                        $_etype52 = 0;
+                        $xfer += $input->readListBegin($_etype52, $_size49);
+                        for ($_i53 = 0; $_i53 < $_size49; ++$_i53) {
+                            $elem54 = null;
+                            $elem54 = new \Jaeger\Thrift\BatchSubmitResponse();
+                            $xfer += $elem54->read($input);
+                            $this->success []= $elem54;
+                        }
+                        $xfer += $input->readListEnd();
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('Collector_submitBatches_result', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('Collector_submitBatches_result');
+        if ($this->success !== null) {
+            if (!is_array($this->success)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('success', TType::LST, 0);
+            $output->writeListBegin(TType::STRUCT, count($this->success));
+            foreach ($this->success as $iter55) {
+                $xfer += $iter55->write($output);
+            }
+            $output->writeListEnd();
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

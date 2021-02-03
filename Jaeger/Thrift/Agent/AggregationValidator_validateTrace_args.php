@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class AggregationValidator_validateTrace_args extends TBase
+class AggregationValidator_validateTrace_args
 {
     static public $isValidate = false;
 
@@ -36,7 +36,9 @@ class AggregationValidator_validateTrace_args extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['traceId'])) {
+                $this->traceId = $vals['traceId'];
+            }
         }
     }
 
@@ -48,13 +50,45 @@ class AggregationValidator_validateTrace_args extends TBase
 
     public function read($input)
     {
-        return $this->_read('AggregationValidator_validateTrace_args', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->traceId);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('AggregationValidator_validateTrace_args', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('AggregationValidator_validateTrace_args');
+        if ($this->traceId !== null) {
+            $xfer += $output->writeFieldBegin('traceId', TType::STRING, 1);
+            $xfer += $output->writeString($this->traceId);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

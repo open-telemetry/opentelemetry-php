@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class ObservedSpan extends TBase
+class ObservedSpan
 {
     static public $isValidate = false;
 
@@ -54,7 +54,15 @@ class ObservedSpan extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['traceId'])) {
+                $this->traceId = $vals['traceId'];
+            }
+            if (isset($vals['sampled'])) {
+                $this->sampled = $vals['sampled'];
+            }
+            if (isset($vals['baggage'])) {
+                $this->baggage = $vals['baggage'];
+            }
         }
     }
 
@@ -66,13 +74,69 @@ class ObservedSpan extends TBase
 
     public function read($input)
     {
-        return $this->_read('ObservedSpan', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->traceId);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::BOOL) {
+                        $xfer += $input->readBool($this->sampled);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 3:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->baggage);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('ObservedSpan', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('ObservedSpan');
+        if ($this->traceId !== null) {
+            $xfer += $output->writeFieldBegin('traceId', TType::STRING, 1);
+            $xfer += $output->writeString($this->traceId);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->sampled !== null) {
+            $xfer += $output->writeFieldBegin('sampled', TType::BOOL, 2);
+            $xfer += $output->writeBool($this->sampled);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->baggage !== null) {
+            $xfer += $output->writeFieldBegin('baggage', TType::STRING, 3);
+            $xfer += $output->writeString($this->baggage);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

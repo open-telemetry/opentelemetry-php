@@ -31,7 +31,8 @@
             "OpenTelemetry\\Context\\": "Context",
             "OpenTelemetry\\": "api",
             "OpenTelemetry\\Sdk\\": "sdk",
-            "OpenTelemetry\\Contrib\\": "contrib"
+            "OpenTelemetry\\Contrib\\": "contrib",
+            "Jaeger\\": "Jaeger"
         }
     },
     "autoload-dev": {

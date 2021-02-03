@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class ProbabilisticSamplingStrategy extends TBase
+class ProbabilisticSamplingStrategy
 {
     static public $isValidate = false;
 
@@ -36,7 +36,9 @@ class ProbabilisticSamplingStrategy extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['samplingRate'])) {
+                $this->samplingRate = $vals['samplingRate'];
+            }
         }
     }
 
@@ -48,13 +50,45 @@ class ProbabilisticSamplingStrategy extends TBase
 
     public function read($input)
     {
-        return $this->_read('ProbabilisticSamplingStrategy', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::DOUBLE) {
+                        $xfer += $input->readDouble($this->samplingRate);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('ProbabilisticSamplingStrategy', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('ProbabilisticSamplingStrategy');
+        if ($this->samplingRate !== null) {
+            $xfer += $output->writeFieldBegin('samplingRate', TType::DOUBLE, 1);
+            $xfer += $output->writeDouble($this->samplingRate);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

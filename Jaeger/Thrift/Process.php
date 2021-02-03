@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class Process extends TBase
+class Process
 {
     static public $isValidate = false;
 
@@ -50,7 +50,12 @@ class Process extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['serviceName'])) {
+                $this->serviceName = $vals['serviceName'];
+            }
+            if (isset($vals['tags'])) {
+                $this->tags = $vals['tags'];
+            }
         }
     }
 
@@ -62,13 +67,74 @@ class Process extends TBase
 
     public function read($input)
     {
-        return $this->_read('Process', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->serviceName);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::LST) {
+                        $this->tags = array();
+                        $_size28 = 0;
+                        $_etype31 = 0;
+                        $xfer += $input->readListBegin($_etype31, $_size28);
+                        for ($_i32 = 0; $_i32 < $_size28; ++$_i32) {
+                            $elem33 = null;
+                            $elem33 = new \Jaeger\Thrift\Tag();
+                            $xfer += $elem33->read($input);
+                            $this->tags []= $elem33;
+                        }
+                        $xfer += $input->readListEnd();
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('Process', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('Process');
+        if ($this->serviceName !== null) {
+            $xfer += $output->writeFieldBegin('serviceName', TType::STRING, 1);
+            $xfer += $output->writeString($this->serviceName);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->tags !== null) {
+            if (!is_array($this->tags)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('tags', TType::LST, 2);
+            $output->writeListBegin(TType::STRUCT, count($this->tags));
+            foreach ($this->tags as $iter34) {
+                $xfer += $iter34->write($output);
+            }
+            $output->writeListEnd();
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

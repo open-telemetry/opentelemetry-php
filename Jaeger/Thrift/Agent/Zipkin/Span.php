@@ -23,7 +23,7 @@ use Thrift\Exception\TApplicationException;
  * usually the longest interval in the trace, starting with a SERVER_RECV
  * annotation and ending with a SERVER_SEND.
  */
-class Span extends TBase
+class Span
 {
     static public $isValidate = false;
 
@@ -170,7 +170,36 @@ class Span extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['trace_id'])) {
+                $this->trace_id = $vals['trace_id'];
+            }
+            if (isset($vals['name'])) {
+                $this->name = $vals['name'];
+            }
+            if (isset($vals['id'])) {
+                $this->id = $vals['id'];
+            }
+            if (isset($vals['parent_id'])) {
+                $this->parent_id = $vals['parent_id'];
+            }
+            if (isset($vals['annotations'])) {
+                $this->annotations = $vals['annotations'];
+            }
+            if (isset($vals['binary_annotations'])) {
+                $this->binary_annotations = $vals['binary_annotations'];
+            }
+            if (isset($vals['debug'])) {
+                $this->debug = $vals['debug'];
+            }
+            if (isset($vals['timestamp'])) {
+                $this->timestamp = $vals['timestamp'];
+            }
+            if (isset($vals['duration'])) {
+                $this->duration = $vals['duration'];
+            }
+            if (isset($vals['trace_id_high'])) {
+                $this->trace_id_high = $vals['trace_id_high'];
+            }
         }
     }
 
@@ -182,13 +211,187 @@ class Span extends TBase
 
     public function read($input)
     {
-        return $this->_read('Span', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::I64) {
+                        $xfer += $input->readI64($this->trace_id);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 3:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->name);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 4:
+                    if ($ftype == TType::I64) {
+                        $xfer += $input->readI64($this->id);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 5:
+                    if ($ftype == TType::I64) {
+                        $xfer += $input->readI64($this->parent_id);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 6:
+                    if ($ftype == TType::LST) {
+                        $this->annotations = array();
+                        $_size0 = 0;
+                        $_etype3 = 0;
+                        $xfer += $input->readListBegin($_etype3, $_size0);
+                        for ($_i4 = 0; $_i4 < $_size0; ++$_i4) {
+                            $elem5 = null;
+                            $elem5 = new \Jaeger\Thrift\Agent\Zipkin\Annotation();
+                            $xfer += $elem5->read($input);
+                            $this->annotations []= $elem5;
+                        }
+                        $xfer += $input->readListEnd();
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 8:
+                    if ($ftype == TType::LST) {
+                        $this->binary_annotations = array();
+                        $_size6 = 0;
+                        $_etype9 = 0;
+                        $xfer += $input->readListBegin($_etype9, $_size6);
+                        for ($_i10 = 0; $_i10 < $_size6; ++$_i10) {
+                            $elem11 = null;
+                            $elem11 = new \Jaeger\Thrift\Agent\Zipkin\BinaryAnnotation();
+                            $xfer += $elem11->read($input);
+                            $this->binary_annotations []= $elem11;
+                        }
+                        $xfer += $input->readListEnd();
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 9:
+                    if ($ftype == TType::BOOL) {
+                        $xfer += $input->readBool($this->debug);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 10:
+                    if ($ftype == TType::I64) {
+                        $xfer += $input->readI64($this->timestamp);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 11:
+                    if ($ftype == TType::I64) {
+                        $xfer += $input->readI64($this->duration);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 12:
+                    if ($ftype == TType::I64) {
+                        $xfer += $input->readI64($this->trace_id_high);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('Span', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('Span');
+        if ($this->trace_id !== null) {
+            $xfer += $output->writeFieldBegin('trace_id', TType::I64, 1);
+            $xfer += $output->writeI64($this->trace_id);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->name !== null) {
+            $xfer += $output->writeFieldBegin('name', TType::STRING, 3);
+            $xfer += $output->writeString($this->name);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->id !== null) {
+            $xfer += $output->writeFieldBegin('id', TType::I64, 4);
+            $xfer += $output->writeI64($this->id);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->parent_id !== null) {
+            $xfer += $output->writeFieldBegin('parent_id', TType::I64, 5);
+            $xfer += $output->writeI64($this->parent_id);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->annotations !== null) {
+            if (!is_array($this->annotations)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('annotations', TType::LST, 6);
+            $output->writeListBegin(TType::STRUCT, count($this->annotations));
+            foreach ($this->annotations as $iter12) {
+                $xfer += $iter12->write($output);
+            }
+            $output->writeListEnd();
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->binary_annotations !== null) {
+            if (!is_array($this->binary_annotations)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('binary_annotations', TType::LST, 8);
+            $output->writeListBegin(TType::STRUCT, count($this->binary_annotations));
+            foreach ($this->binary_annotations as $iter13) {
+                $xfer += $iter13->write($output);
+            }
+            $output->writeListEnd();
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->debug !== null) {
+            $xfer += $output->writeFieldBegin('debug', TType::BOOL, 9);
+            $xfer += $output->writeBool($this->debug);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->timestamp !== null) {
+            $xfer += $output->writeFieldBegin('timestamp', TType::I64, 10);
+            $xfer += $output->writeI64($this->timestamp);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->duration !== null) {
+            $xfer += $output->writeFieldBegin('duration', TType::I64, 11);
+            $xfer += $output->writeI64($this->duration);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->trace_id_high !== null) {
+            $xfer += $output->writeFieldBegin('trace_id_high', TType::I64, 12);
+            $xfer += $output->writeI64($this->trace_id_high);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

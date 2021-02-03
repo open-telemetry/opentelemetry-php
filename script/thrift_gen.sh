@@ -10,7 +10,7 @@ git clone https://github.com/jaegertracing/jaeger-idl
 
 # define thrift cmd
 THRIFT="docker run -u $(id -u) -v '${PWD}:/data' jaegertracing/thrift:0.13 thrift -o /data/jaeger-idl"
-THRIFT_CMD="${THRIFT} --gen php:psr4,oop"
+THRIFT_CMD="${THRIFT} --gen php"
 
 # generate php files
 FILES=$(find jaeger-idl/thrift -type f -name \*.thrift)
@@ -21,6 +21,7 @@ done
 
 # move generated files
 rm -rf Jaeger/Thrift
+mkdir -p Jaeger
 mv jaeger-idl/gen-php/Jaeger/Thrift Jaeger/Thrift
 
 # remove thrift files

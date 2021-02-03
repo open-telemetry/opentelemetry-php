@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class SamplingStrategyResponse extends TBase
+class SamplingStrategyResponse
 {
     static public $isValidate = false;
 
@@ -66,7 +66,18 @@ class SamplingStrategyResponse extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['strategyType'])) {
+                $this->strategyType = $vals['strategyType'];
+            }
+            if (isset($vals['probabilisticSampling'])) {
+                $this->probabilisticSampling = $vals['probabilisticSampling'];
+            }
+            if (isset($vals['rateLimitingSampling'])) {
+                $this->rateLimitingSampling = $vals['rateLimitingSampling'];
+            }
+            if (isset($vals['operationSampling'])) {
+                $this->operationSampling = $vals['operationSampling'];
+            }
         }
     }
 
@@ -78,13 +89,93 @@ class SamplingStrategyResponse extends TBase
 
     public function read($input)
     {
-        return $this->_read('SamplingStrategyResponse', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::I32) {
+                        $xfer += $input->readI32($this->strategyType);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::STRUCT) {
+                        $this->probabilisticSampling = new \Jaeger\Thrift\Agent\ProbabilisticSamplingStrategy();
+                        $xfer += $this->probabilisticSampling->read($input);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 3:
+                    if ($ftype == TType::STRUCT) {
+                        $this->rateLimitingSampling = new \Jaeger\Thrift\Agent\RateLimitingSamplingStrategy();
+                        $xfer += $this->rateLimitingSampling->read($input);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 4:
+                    if ($ftype == TType::STRUCT) {
+                        $this->operationSampling = new \Jaeger\Thrift\Agent\PerOperationSamplingStrategies();
+                        $xfer += $this->operationSampling->read($input);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('SamplingStrategyResponse', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('SamplingStrategyResponse');
+        if ($this->strategyType !== null) {
+            $xfer += $output->writeFieldBegin('strategyType', TType::I32, 1);
+            $xfer += $output->writeI32($this->strategyType);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->probabilisticSampling !== null) {
+            if (!is_object($this->probabilisticSampling)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('probabilisticSampling', TType::STRUCT, 2);
+            $xfer += $this->probabilisticSampling->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->rateLimitingSampling !== null) {
+            if (!is_object($this->rateLimitingSampling)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('rateLimitingSampling', TType::STRUCT, 3);
+            $xfer += $this->rateLimitingSampling->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->operationSampling !== null) {
+            if (!is_object($this->operationSampling)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('operationSampling', TType::STRUCT, 4);
+            $xfer += $this->operationSampling->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

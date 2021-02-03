@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class ZipkinCollector_submitZipkinBatch_result extends TBase
+class ZipkinCollector_submitZipkinBatch_result
 {
     static public $isValidate = false;
 
@@ -41,7 +41,9 @@ class ZipkinCollector_submitZipkinBatch_result extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['success'])) {
+                $this->success = $vals['success'];
+            }
         }
     }
 
@@ -53,13 +55,62 @@ class ZipkinCollector_submitZipkinBatch_result extends TBase
 
     public function read($input)
     {
-        return $this->_read('ZipkinCollector_submitZipkinBatch_result', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 0:
+                    if ($ftype == TType::LST) {
+                        $this->success = array();
+                        $_size21 = 0;
+                        $_etype24 = 0;
+                        $xfer += $input->readListBegin($_etype24, $_size21);
+                        for ($_i25 = 0; $_i25 < $_size21; ++$_i25) {
+                            $elem26 = null;
+                            $elem26 = new \Jaeger\Thrift\Agent\Zipkin\Response();
+                            $xfer += $elem26->read($input);
+                            $this->success []= $elem26;
+                        }
+                        $xfer += $input->readListEnd();
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('ZipkinCollector_submitZipkinBatch_result', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('ZipkinCollector_submitZipkinBatch_result');
+        if ($this->success !== null) {
+            if (!is_array($this->success)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('success', TType::LST, 0);
+            $output->writeListBegin(TType::STRUCT, count($this->success));
+            foreach ($this->success as $iter27) {
+                $xfer += $iter27->write($output);
+            }
+            $output->writeListEnd();
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

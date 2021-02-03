@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class BaggageRestriction extends TBase
+class BaggageRestriction
 {
     static public $isValidate = false;
 
@@ -45,7 +45,12 @@ class BaggageRestriction extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['baggageKey'])) {
+                $this->baggageKey = $vals['baggageKey'];
+            }
+            if (isset($vals['maxValueLength'])) {
+                $this->maxValueLength = $vals['maxValueLength'];
+            }
         }
     }
 
@@ -57,13 +62,57 @@ class BaggageRestriction extends TBase
 
     public function read($input)
     {
-        return $this->_read('BaggageRestriction', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->baggageKey);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::I32) {
+                        $xfer += $input->readI32($this->maxValueLength);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('BaggageRestriction', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('BaggageRestriction');
+        if ($this->baggageKey !== null) {
+            $xfer += $output->writeFieldBegin('baggageKey', TType::STRING, 1);
+            $xfer += $output->writeString($this->baggageKey);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->maxValueLength !== null) {
+            $xfer += $output->writeFieldBegin('maxValueLength', TType::I32, 2);
+            $xfer += $output->writeI32($this->maxValueLength);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

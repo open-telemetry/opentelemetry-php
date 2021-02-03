@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class ThrottlingResponse extends TBase
+class ThrottlingResponse
 {
     static public $isValidate = false;
 
@@ -51,7 +51,12 @@ class ThrottlingResponse extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['defaultConfig'])) {
+                $this->defaultConfig = $vals['defaultConfig'];
+            }
+            if (isset($vals['serviceConfigs'])) {
+                $this->serviceConfigs = $vals['serviceConfigs'];
+            }
         }
     }
 
@@ -63,13 +68,78 @@ class ThrottlingResponse extends TBase
 
     public function read($input)
     {
-        return $this->_read('ThrottlingResponse', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRUCT) {
+                        $this->defaultConfig = new \Jaeger\Thrift\Agent\ThrottlingConfig();
+                        $xfer += $this->defaultConfig->read($input);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::LST) {
+                        $this->serviceConfigs = array();
+                        $_size0 = 0;
+                        $_etype3 = 0;
+                        $xfer += $input->readListBegin($_etype3, $_size0);
+                        for ($_i4 = 0; $_i4 < $_size0; ++$_i4) {
+                            $elem5 = null;
+                            $elem5 = new \Jaeger\Thrift\Agent\ServiceThrottlingConfig();
+                            $xfer += $elem5->read($input);
+                            $this->serviceConfigs []= $elem5;
+                        }
+                        $xfer += $input->readListEnd();
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('ThrottlingResponse', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('ThrottlingResponse');
+        if ($this->defaultConfig !== null) {
+            if (!is_object($this->defaultConfig)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('defaultConfig', TType::STRUCT, 1);
+            $xfer += $this->defaultConfig->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->serviceConfigs !== null) {
+            if (!is_array($this->serviceConfigs)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('serviceConfigs', TType::LST, 2);
+            $output->writeListBegin(TType::STRUCT, count($this->serviceConfigs));
+            foreach ($this->serviceConfigs as $iter6) {
+                $xfer += $iter6->write($output);
+            }
+            $output->writeListEnd();
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

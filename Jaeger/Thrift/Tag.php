@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class Tag extends TBase
+class Tag
 {
     static public $isValidate = false;
 
@@ -90,7 +90,27 @@ class Tag extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['key'])) {
+                $this->key = $vals['key'];
+            }
+            if (isset($vals['vType'])) {
+                $this->vType = $vals['vType'];
+            }
+            if (isset($vals['vStr'])) {
+                $this->vStr = $vals['vStr'];
+            }
+            if (isset($vals['vDouble'])) {
+                $this->vDouble = $vals['vDouble'];
+            }
+            if (isset($vals['vBool'])) {
+                $this->vBool = $vals['vBool'];
+            }
+            if (isset($vals['vLong'])) {
+                $this->vLong = $vals['vLong'];
+            }
+            if (isset($vals['vBinary'])) {
+                $this->vBinary = $vals['vBinary'];
+            }
         }
     }
 
@@ -102,13 +122,117 @@ class Tag extends TBase
 
     public function read($input)
     {
-        return $this->_read('Tag', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->key);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::I32) {
+                        $xfer += $input->readI32($this->vType);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 3:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->vStr);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 4:
+                    if ($ftype == TType::DOUBLE) {
+                        $xfer += $input->readDouble($this->vDouble);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 5:
+                    if ($ftype == TType::BOOL) {
+                        $xfer += $input->readBool($this->vBool);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 6:
+                    if ($ftype == TType::I64) {
+                        $xfer += $input->readI64($this->vLong);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 7:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->vBinary);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('Tag', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('Tag');
+        if ($this->key !== null) {
+            $xfer += $output->writeFieldBegin('key', TType::STRING, 1);
+            $xfer += $output->writeString($this->key);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->vType !== null) {
+            $xfer += $output->writeFieldBegin('vType', TType::I32, 2);
+            $xfer += $output->writeI32($this->vType);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->vStr !== null) {
+            $xfer += $output->writeFieldBegin('vStr', TType::STRING, 3);
+            $xfer += $output->writeString($this->vStr);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->vDouble !== null) {
+            $xfer += $output->writeFieldBegin('vDouble', TType::DOUBLE, 4);
+            $xfer += $output->writeDouble($this->vDouble);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->vBool !== null) {
+            $xfer += $output->writeFieldBegin('vBool', TType::BOOL, 5);
+            $xfer += $output->writeBool($this->vBool);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->vLong !== null) {
+            $xfer += $output->writeFieldBegin('vLong', TType::I64, 6);
+            $xfer += $output->writeI64($this->vLong);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->vBinary !== null) {
+            $xfer += $output->writeFieldBegin('vBinary', TType::STRING, 7);
+            $xfer += $output->writeString($this->vBinary);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

@@ -16,7 +16,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class JoinTraceRequest extends TBase
+class JoinTraceRequest
 {
     static public $isValidate = false;
 
@@ -46,7 +46,12 @@ class JoinTraceRequest extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['serverRole'])) {
+                $this->serverRole = $vals['serverRole'];
+            }
+            if (isset($vals['downstream'])) {
+                $this->downstream = $vals['downstream'];
+            }
         }
     }
 
@@ -58,13 +63,61 @@ class JoinTraceRequest extends TBase
 
     public function read($input)
     {
-        return $this->_read('JoinTraceRequest', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->serverRole);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::STRUCT) {
+                        $this->downstream = new \Jaeger\Thrift\Crossdock\Downstream();
+                        $xfer += $this->downstream->read($input);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('JoinTraceRequest', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('JoinTraceRequest');
+        if ($this->serverRole !== null) {
+            $xfer += $output->writeFieldBegin('serverRole', TType::STRING, 1);
+            $xfer += $output->writeString($this->serverRole);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->downstream !== null) {
+            if (!is_object($this->downstream)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('downstream', TType::STRUCT, 2);
+            $xfer += $this->downstream->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

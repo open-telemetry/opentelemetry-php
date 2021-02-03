@@ -25,7 +25,7 @@ use Thrift\Exception\TApplicationException;
  * allows zipkin to display network context of uninstrumented services, or
  * clients such as web browsers.
  */
-class Endpoint extends TBase
+class Endpoint
 {
     static public $isValidate = false;
 
@@ -88,7 +88,18 @@ class Endpoint extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['ipv4'])) {
+                $this->ipv4 = $vals['ipv4'];
+            }
+            if (isset($vals['port'])) {
+                $this->port = $vals['port'];
+            }
+            if (isset($vals['service_name'])) {
+                $this->service_name = $vals['service_name'];
+            }
+            if (isset($vals['ipv6'])) {
+                $this->ipv6 = $vals['ipv6'];
+            }
         }
     }
 
@@ -100,13 +111,81 @@ class Endpoint extends TBase
 
     public function read($input)
     {
-        return $this->_read('Endpoint', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::I32) {
+                        $xfer += $input->readI32($this->ipv4);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::I16) {
+                        $xfer += $input->readI16($this->port);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 3:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->service_name);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 4:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->ipv6);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('Endpoint', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('Endpoint');
+        if ($this->ipv4 !== null) {
+            $xfer += $output->writeFieldBegin('ipv4', TType::I32, 1);
+            $xfer += $output->writeI32($this->ipv4);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->port !== null) {
+            $xfer += $output->writeFieldBegin('port', TType::I16, 2);
+            $xfer += $output->writeI16($this->port);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->service_name !== null) {
+            $xfer += $output->writeFieldBegin('service_name', TType::STRING, 3);
+            $xfer += $output->writeString($this->service_name);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->ipv6 !== null) {
+            $xfer += $output->writeFieldBegin('ipv6', TType::STRING, 4);
+            $xfer += $output->writeString($this->ipv6);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }

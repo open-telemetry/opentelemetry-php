@@ -31,7 +31,7 @@ use Thrift\Exception\TApplicationException;
  * rewriting, like "/api/v1/myresource" vs "/myresource. Via the host field,
  * you can see the different points of view, which often help in debugging.
  */
-class BinaryAnnotation extends TBase
+class BinaryAnnotation
 {
     static public $isValidate = false;
 
@@ -86,7 +86,18 @@ class BinaryAnnotation extends TBase
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            parent::__construct(self::$_TSPEC, $vals);
+            if (isset($vals['key'])) {
+                $this->key = $vals['key'];
+            }
+            if (isset($vals['value'])) {
+                $this->value = $vals['value'];
+            }
+            if (isset($vals['annotation_type'])) {
+                $this->annotation_type = $vals['annotation_type'];
+            }
+            if (isset($vals['host'])) {
+                $this->host = $vals['host'];
+            }
         }
     }
 
@@ -98,13 +109,85 @@ class BinaryAnnotation extends TBase
 
     public function read($input)
     {
-        return $this->_read('BinaryAnnotation', self::$_TSPEC, $input);
+        $xfer = 0;
+        $fname = null;
+        $ftype = 0;
+        $fid = 0;
+        $xfer += $input->readStructBegin($fname);
+        while (true) {
+            $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+            if ($ftype == TType::STOP) {
+                break;
+            }
+            switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->key);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 2:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->value);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 3:
+                    if ($ftype == TType::I32) {
+                        $xfer += $input->readI32($this->annotation_type);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 4:
+                    if ($ftype == TType::STRUCT) {
+                        $this->host = new \Jaeger\Thrift\Agent\Zipkin\Endpoint();
+                        $xfer += $this->host->read($input);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                default:
+                    $xfer += $input->skip($ftype);
+                    break;
+            }
+            $xfer += $input->readFieldEnd();
+        }
+        $xfer += $input->readStructEnd();
+        return $xfer;
     }
-
 
     public function write($output)
     {
-        return $this->_write('BinaryAnnotation', self::$_TSPEC, $output);
+        $xfer = 0;
+        $xfer += $output->writeStructBegin('BinaryAnnotation');
+        if ($this->key !== null) {
+            $xfer += $output->writeFieldBegin('key', TType::STRING, 1);
+            $xfer += $output->writeString($this->key);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->value !== null) {
+            $xfer += $output->writeFieldBegin('value', TType::STRING, 2);
+            $xfer += $output->writeString($this->value);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->annotation_type !== null) {
+            $xfer += $output->writeFieldBegin('annotation_type', TType::I32, 3);
+            $xfer += $output->writeI32($this->annotation_type);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->host !== null) {
+            if (!is_object($this->host)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('host', TType::STRUCT, 4);
+            $xfer += $this->host->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        $xfer += $output->writeFieldStop();
+        $xfer += $output->writeStructEnd();
+        return $xfer;
     }
-
 }
