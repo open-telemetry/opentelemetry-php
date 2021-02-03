@@ -106,7 +106,7 @@ class Tracer implements API\Tracer
                 $this->provider->getSpanProcessor()->onStart($span);
             }
         }
-        //amber
+
         $this->setActiveSpan($span, false);
 
         return $this->active;

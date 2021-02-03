@@ -96,8 +96,7 @@ final class SpanOptions implements API\SpanOptions
         } else {
             $span = new NoopSpan();
         }
-        //amber
-        //$span = $this->tracer->getActiveSpan();
+
         $context = $span->getContext()->isValid()
             ? SpanContext::fork($span->getContext()->getTraceId())
             : SpanContext::generate();
