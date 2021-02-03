@@ -9,6 +9,9 @@ use Thrift\Transport\TTransport;
 
 class ThriftUdpTransport extends TTransport
 {
+
+    const MAX_UDP_PACKET = 65000;
+
     private $socket;
 
     /**
@@ -21,6 +24,8 @@ class ThriftUdpTransport extends TTransport
      */
     private $port;
 
+    protected $buffer = "";
+    
     /**
      * @var LoggerInterface
      */
@@ -59,7 +64,9 @@ class ThriftUdpTransport extends TTransport
     {
         $ok = @socket_connect($this->socket, $this->host, $this->port);
         if ($ok === false) {
-            throw new TTransportException('socket_connect failed');
+            $errorcode = socket_last_error();
+            $errormsg = socket_strerror($errorcode);
+            throw new TTransportException("socket_connect failed: [$errorcode] $errormsg");
         }
     }
 
@@ -92,13 +99,42 @@ class ThriftUdpTransport extends TTransport
      */
     public function write($buf)
     {
-        if (!$this->isOpen()) {
-            throw new TTransportException('transport is closed');
+        // ensure that the data will still fit in a UDP packeg
+        if (strlen($this->buffer) + strlen($buf) > self::MAX_UDP_PACKET) {
+            throw new TTransportException("Data does not fit within one UDP packet");
         }
 
-        $ok = @socket_write($this->socket, $buf);
-        if ($ok === false) {
-            throw new TTransportException('socket_write failed');
+        // buffer up some data
+        $this->buffer .= $buf;
+
+        if (!$this->isOpen()) {
+            $errorcode = socket_last_error();
+            $errormsg = socket_strerror($errorcode);
+            throw new TTransportException("transport is closed: [$errorcode] $errormsg");
         }
+
+        $ok = @socket_write($this->socket, $this->buffer);
+        if ($ok === false) {
+            $errorcode = socket_last_error();
+            $errormsg = socket_strerror($errorcode);
+            throw new TTransportException("socket_write failed: [$errorcode] $errormsg");
+        }
+    }
+
+    public function flush()
+    {
+        // no data to send; don't send a packet
+        if (strlen($this->buffer) == 0) {
+            return;
+        }
+
+        // flush the buffer to the socket
+        if (!socket_sendto($this->socket, $this->buffer, strlen($this->buffer), 0, $this->server, $this->port)) {
+            $errorcode = socket_last_error();
+            $errormsg = socket_strerror($errorcode);
+            throw new TTransportException("Could not flush data: [$errorcode] $errormsg");
+        }
+
+        $this->buffer = ""; // empty the buffer
     }
 }
