@@ -9,6 +9,7 @@ use OpenTelemetry\Trace as API;
 class TraceState implements API\TraceState
 {
     public const MAX_TRACESTATE_LIST_MEMBERS = 32;
+    public const MAX_TRACESTATE_LENGTH = 512;
     public const LIST_MEMBERS_SEPARATOR = ',';
     public const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
     private const VALID_KEY_CHAR_RANGE = '[_0-9a-z-*\/]';
@@ -111,25 +112,29 @@ class TraceState implements API\TraceState
     private function parse(string $rawTracestate): array
     {
         $parsedTracestate = [];
-        $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
 
-        $listMembersCount = count($listMembers);
-        if ($listMembersCount > self::MAX_TRACESTATE_LIST_MEMBERS) {
-            
-            // Truncate the tracestate if it exceeds the maximum list-members allowed
-            // TODO: Log a message when truncation occurs
-            $listMembers = array_slice($listMembers, 0, self::MAX_TRACESTATE_LIST_MEMBERS);
-        }
+        if(\strlen($rawTracestate) <= self::MAX_TRACESTATE_LENGTH)
+        {
+            $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
 
-        foreach ($listMembers as $listMember) {
-            $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, $listMember);
-            
-            // There should only be one list-member per vendor separated by '='
-            if (count($vendor) == 2) {
+            $listMembersCount = count($listMembers);
+            if ($listMembersCount > self::MAX_TRACESTATE_LIST_MEMBERS) {
 
-                // TODO: Log if we can't validate the key and value
-                if (self::validateKey($vendor[0]) && self::validateValue($vendor[1])) {
-                    $parsedTracestate[$vendor[0]] = $vendor[1];
+                // Truncate the tracestate if it exceeds the maximum list-members allowed
+                // TODO: Log a message when truncation occurs
+                $listMembers = array_slice($listMembers, 0, self::MAX_TRACESTATE_LIST_MEMBERS);
+            }
+
+            foreach ($listMembers as $listMember) {
+                $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, $listMember);
+
+                // There should only be one list-member per vendor separated by '='
+                if (count($vendor) == 2) {
+
+                    // TODO: Log if we can't validate the key and value
+                    if (self::validateKey($vendor[0]) && self::validateValue($vendor[1])) {
+                        $parsedTracestate[$vendor[0]] = $vendor[1];
+                    }
                 }
             }
         }

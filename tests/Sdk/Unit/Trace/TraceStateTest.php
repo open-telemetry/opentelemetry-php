@@ -66,7 +66,7 @@ class TraceStateTest extends TestCase
         // Build a tracestate with the max 32 values. Ex '0=0,1=1,...,31=31'
         $rawTraceState = range(0, TraceState::MAX_TRACESTATE_LIST_MEMBERS - 1);
         array_walk($rawTraceState, function (&$v, $k) {
-            $v = 'vendor' . $k . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . 'value' . $v;
+            $v = 'k' . $k . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . 'v' . $v;
         });
         $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, count($rawTraceState));
 
@@ -74,11 +74,37 @@ class TraceStateTest extends TestCase
         $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, $validTracestate->getListMemberCount());
 
         // Add a list-member to the tracestate that exceeds the max of 32. This will cause it to be truncated
-        $rawTraceState['32'] = 'vendor32' . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . 'value32';
+        $rawTraceState['32'] = 'k32' . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . 'v32';
         $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS + 1, count($rawTraceState));
 
         $truncatedTracestate = new TraceState(implode(Tracestate::LIST_MEMBERS_SEPARATOR, $rawTraceState));
         $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, $truncatedTracestate->getListMemberCount());
+    }
+
+    /**
+     * @test
+     */
+    public function testMaxTracestateLength()
+    {
+        // Build a vendor key with a length of 256 characters. The max characters allowed.
+        $vendorKey = \str_repeat('v', TraceState::MAX_TRACESTATE_LENGTH / 2);
+
+        // Build a vendor value with a length of 255 characters. One below the max allowed.
+        $vendorValue = \str_repeat('a', TraceState::MAX_TRACESTATE_LENGTH / 2 - 1);
+
+        // tracestate length = 513 characters (not accepted).
+        $rawTraceState = $vendorKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $vendorValue . 'a';
+        $this->assertGreaterThan(TraceState::MAX_TRACESTATE_LENGTH, \strlen($rawTraceState));
+
+        $validTracestate = new TraceState($rawTraceState);
+        $this->assertNull($validTracestate->get($vendorKey));
+
+        // tracestate length = 512 characters (accepted).
+        $rawTraceState = $vendorKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $vendorValue;
+        $this->assertSame(TraceState::MAX_TRACESTATE_LENGTH, \strlen($rawTraceState));
+
+        $validTracestate = new TraceState($rawTraceState);
+        $this->assertSame($rawTraceState, $validTracestate->build());
     }
 
     /**
