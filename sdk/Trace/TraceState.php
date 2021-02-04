@@ -130,8 +130,7 @@ class TraceState implements API\TraceState
         if (\strlen($rawTracestate) <= self::MAX_TRACESTATE_LENGTH) {
             $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
 
-            $listMembersCount = count($listMembers);
-            if ($listMembersCount > self::MAX_TRACESTATE_LIST_MEMBERS) {
+            if (count($listMembers) > self::MAX_TRACESTATE_LIST_MEMBERS) {
 
                 // Truncate the tracestate if it exceeds the maximum list-members allowed
                 // TODO: Log a message when truncation occurs
