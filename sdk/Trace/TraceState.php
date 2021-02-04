@@ -9,6 +9,7 @@ use OpenTelemetry\Trace as API;
 class TraceState implements API\TraceState
 {
     public const MAX_TRACESTATE_LIST_MEMBERS = 32;
+    public const MAX_TRACESTATE_LENGTH = 512;
     public const LIST_MEMBERS_SEPARATOR = ',';
     public const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
     private const VALID_KEY_CHAR_RANGE = '[_0-9a-z-*\/]';
@@ -38,7 +39,19 @@ class TraceState implements API\TraceState
         $clonedTracestate = clone $this;
 
         //TODO: Log if we can't set the value
-        if ($key !== '') {
+        if (self::validateKey($key) && self::validateValue($value)) {
+
+            /*
+             * Only one entry per key is allowed. In this case we need to overwrite the vendor entry
+             * upon reentry to the tracing system and ensure the updated entry is at the beginning of
+             * the list. This means we place it the back for now and it will be at the beginning once
+             * we reverse the order back during build().
+             */
+            if (array_key_exists($key, $clonedTracestate->traceState)) {
+                unset($clonedTracestate->traceState[$key]);
+            }
+
+            // Add new or updated entry to the back of the list.
             $clonedTracestate->traceState[$key] = $value;
         }
 
@@ -83,6 +96,10 @@ class TraceState implements API\TraceState
     {
         if (!empty($this->traceState)) {
             $clonedTracestate = clone $this;
+
+            // Reverse the order back to the original to ensure new entries are at the beginning.
+            $clonedTracestate->traceState = array_reverse($clonedTracestate->traceState);
+
             array_walk(
                 $clonedTracestate->traceState,
                 function (&$v, $k) {
@@ -97,7 +114,10 @@ class TraceState implements API\TraceState
     }
 
     /**
-     * Parse the raw tracestate header into the TraceState object.
+     * Parse the raw tracestate header into the TraceState object. Since new or updated entries must
+     * be added to the beginning of the list, the key-value pairs in the TraceState object will be
+     * stored in reverse order. This ensures new entries added to the TraceState object are at the
+     * beginning when we reverse the order back again while building the final tracestate header.
      *
      * Ex:
      *      tracestate = 'vendor1=value1,vendor2=value2'
@@ -105,36 +125,42 @@ class TraceState implements API\TraceState
      *                              ||
      *                              \/
      *
-     *      $this->tracestate = ['vendor1' => 'value1' ,'vendor2' => 'value2']
+     *      $this->tracestate = ['vendor2' => 'value2' ,'vendor1' => 'value1']
      *
      */
     private function parse(string $rawTracestate): array
     {
         $parsedTracestate = [];
-        $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
 
-        $listMembersCount = count($listMembers);
-        if ($listMembersCount > self::MAX_TRACESTATE_LIST_MEMBERS) {
-            
-            // Truncate the tracestate if it exceeds the maximum list-members allowed
-            // TODO: Log a message when truncation occurs
-            $listMembers = array_slice($listMembers, 0, self::MAX_TRACESTATE_LIST_MEMBERS);
-        }
+        if (\strlen($rawTracestate) <= self::MAX_TRACESTATE_LENGTH) {
+            $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
 
-        foreach ($listMembers as $listMember) {
-            $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, $listMember);
-            
-            // There should only be one list-member per vendor separated by '='
-            if (count($vendor) == 2) {
+            if (count($listMembers) > self::MAX_TRACESTATE_LIST_MEMBERS) {
 
-                // TODO: Log if we can't validate the key and value
-                if (self::validateKey($vendor[0]) && self::validateValue($vendor[1])) {
-                    $parsedTracestate[$vendor[0]] = $vendor[1];
+                // Truncate the tracestate if it exceeds the maximum list-members allowed
+                // TODO: Log a message when truncation occurs
+                $listMembers = array_slice($listMembers, 0, self::MAX_TRACESTATE_LIST_MEMBERS);
+            }
+
+            foreach ($listMembers as $listMember) {
+                $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, $listMember);
+
+                // There should only be one list-member per vendor separated by '='
+                if (count($vendor) == 2) {
+
+                    // TODO: Log if we can't validate the key and value
+                    if (self::validateKey($vendor[0]) && self::validateValue($vendor[1])) {
+                        $parsedTracestate[$vendor[0]] = $vendor[1];
+                    }
                 }
             }
         }
 
-        return $parsedTracestate;
+        /*
+         * Reversing the tracestate ensures the new entries added to the TraceState object are at
+         * the beginning when we reverse it back during build().
+        */
+        return array_reverse($parsedTracestate);
     }
 
     /**
