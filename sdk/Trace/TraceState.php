@@ -46,7 +46,7 @@ class TraceState implements API\TraceState
                 unset($clonedTracestate->traceState[$key]);
             }
 
-            // Add new or updated entry to the back.
+            // Add new or updated entry to the back of the list.
             $clonedTracestate->traceState[$key] = $value;
         }
 
@@ -111,8 +111,8 @@ class TraceState implements API\TraceState
     /**
      * Parse the raw tracestate header into the TraceState object. Since new or updated entries must
      * be added to the beginning of the list, the key-value pairs in the TraceState object will be
-     * in stored in reverse order. This ensures new entries added to the TraceState object are at
-     * the beginning when we reverse the order back again while building the final tracestate header.
+     * stored in reverse order. This ensures new entries added to the TraceState object are at the
+     * beginning when we reverse the order back again while building the final tracestate header.
      *
      * Ex:
      *      tracestate = 'vendor1=value1,vendor2=value2'
