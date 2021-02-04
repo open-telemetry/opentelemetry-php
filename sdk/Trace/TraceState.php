@@ -41,7 +41,12 @@ class TraceState implements API\TraceState
         //TODO: Log if we can't set the value
         if (self::validateKey($key) && self::validateValue($value)) {
 
-            // Overwrite the vendor entry if the key already exists
+            /*
+             * Only one entry per key is allowed. In this case we need to overwrite the vendor entry
+             * upon reentry to the tracing system and ensure the updated entry is at the beginning of
+             * the list. This means we place it the back for now and it will be at the beginning once
+             * we reverse the order back during build().
+             */
             if (array_key_exists($key, $clonedTracestate->traceState)) {
                 unset($clonedTracestate->traceState[$key]);
             }
@@ -151,6 +156,10 @@ class TraceState implements API\TraceState
             }
         }
 
+        /*
+         * Reversing the tracestate ensures the new entries added to the TraceState object are at
+         * the beginning when we reverse it back during build().
+        */
         return array_reverse($parsedTracestate);
     }
 
