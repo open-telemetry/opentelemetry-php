@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent\Zipkin;
 
 /**
@@ -7,33 +10,25 @@ namespace Jaeger\Thrift\Agent\Zipkin;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
-use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
 
 final class Constant extends \Thrift\Type\TConstant
 {
-    static protected $CLIENT_SEND;
-    static protected $CLIENT_RECV;
-    static protected $SERVER_SEND;
-    static protected $SERVER_RECV;
-    static protected $MESSAGE_SEND;
-    static protected $MESSAGE_RECV;
-    static protected $WIRE_SEND;
-    static protected $WIRE_RECV;
-    static protected $CLIENT_SEND_FRAGMENT;
-    static protected $CLIENT_RECV_FRAGMENT;
-    static protected $SERVER_SEND_FRAGMENT;
-    static protected $SERVER_RECV_FRAGMENT;
-    static protected $LOCAL_COMPONENT;
-    static protected $CLIENT_ADDR;
-    static protected $SERVER_ADDR;
-    static protected $MESSAGE_ADDR;
+    protected static $CLIENT_SEND;
+    protected static $CLIENT_RECV;
+    protected static $SERVER_SEND;
+    protected static $SERVER_RECV;
+    protected static $MESSAGE_SEND;
+    protected static $MESSAGE_RECV;
+    protected static $WIRE_SEND;
+    protected static $WIRE_RECV;
+    protected static $CLIENT_SEND_FRAGMENT;
+    protected static $CLIENT_RECV_FRAGMENT;
+    protected static $SERVER_SEND_FRAGMENT;
+    protected static $SERVER_RECV_FRAGMENT;
+    protected static $LOCAL_COMPONENT;
+    protected static $CLIENT_ADDR;
+    protected static $SERVER_ADDR;
+    protected static $MESSAGE_ADDR;
 
     protected static function init_CLIENT_SEND()
     {
@@ -41,15 +36,15 @@ final class Constant extends \Thrift\Type\TConstant
          * The client sent ("cs") a request to a server. There is only one send per
          * span. For example, if there's a transport error, each attempt can be logged
          * as a WIRE_SEND annotation.
-         * 
+         *
          * If chunking is involved, each chunk could be logged as a separate
          * CLIENT_SEND_FRAGMENT in the same span.
-         * 
+         *
          * Annotation.host is not the server. It is the host which logged the send
          * event, almost always the client. When logging CLIENT_SEND, instrumentation
          * should also log the SERVER_ADDR.
          */
-"cs";
+'cs';
     }
 
     protected static function init_CLIENT_RECV()
@@ -58,15 +53,15 @@ final class Constant extends \Thrift\Type\TConstant
          * The client received ("cr") a response from a server. There is only one
          * receive per span. For example, if duplicate responses were received, each
          * can be logged as a WIRE_RECV annotation.
-         * 
+         *
          * If chunking is involved, each chunk could be logged as a separate
          * CLIENT_RECV_FRAGMENT in the same span.
-         * 
+         *
          * Annotation.host is not the server. It is the host which logged the receive
          * event, almost always the client. The actual endpoint of the server is
          * recorded separately as SERVER_ADDR when CLIENT_SEND is logged.
          */
-"cr";
+'cr';
     }
 
     protected static function init_SERVER_SEND()
@@ -75,18 +70,18 @@ final class Constant extends \Thrift\Type\TConstant
          * The server sent ("ss") a response to a client. There is only one response
          * per span. If there's a transport error, each attempt can be logged as a
          * WIRE_SEND annotation.
-         * 
+         *
          * Typically, a trace ends with a server send, so the last timestamp of a trace
          * is often the timestamp of the root span's server send.
-         * 
+         *
          * If chunking is involved, each chunk could be logged as a separate
          * SERVER_SEND_FRAGMENT in the same span.
-         * 
+         *
          * Annotation.host is not the client. It is the host which logged the send
          * event, almost always the server. The actual endpoint of the client is
          * recorded separately as CLIENT_ADDR when SERVER_RECV is logged.
          */
-"ss";
+'ss';
     }
 
     protected static function init_SERVER_RECV()
@@ -95,18 +90,18 @@ final class Constant extends \Thrift\Type\TConstant
          * The server received ("sr") a request from a client. There is only one
          * request per span.  For example, if duplicate responses were received, each
          * can be logged as a WIRE_RECV annotation.
-         * 
+         *
          * Typically, a trace starts with a server receive, so the first timestamp of a
          * trace is often the timestamp of the root span's server receive.
-         * 
+         *
          * If chunking is involved, each chunk could be logged as a separate
          * SERVER_RECV_FRAGMENT in the same span.
-         * 
+         *
          * Annotation.host is not the client. It is the host which logged the receive
          * event, almost always the server. When logging SERVER_RECV, instrumentation
          * should also log the CLIENT_ADDR.
          */
-"sr";
+'sr';
     }
 
     protected static function init_MESSAGE_SEND()
@@ -116,15 +111,15 @@ final class Constant extends \Thrift\Type\TConstant
          * a broker. This may be the only annotation in a messaging span. If WIRE_SEND
          * exists in the same span, it follows this moment and clarifies delays sending
          * the message, such as batching.
-         * 
+         *
          * Unlike RPC annotations like CLIENT_SEND, messaging spans never share a span
          * ID. For example, "ms" should always be the parent of "mr".
-         * 
+         *
          * Annotation.host is not the destination, it is the host which logged the send
          * event: the producer. When annotating MESSAGE_SEND, instrumentation should
          * also tag the MESSAGE_ADDR.
          */
-"ms";
+'ms';
     }
 
     protected static function init_MESSAGE_RECV()
@@ -133,16 +128,16 @@ final class Constant extends \Thrift\Type\TConstant
          * A consumer received ("mr") a message from a broker. This may be the only
          * annotation in a messaging span. If WIRE_RECV exists in the same span, it
          * precedes this moment and clarifies any local queuing delay.
-         * 
+         *
          * Unlike RPC annotations like SERVER_RECV, messaging spans never share a span
          * ID. For example, "mr" should always be a child of "ms" unless it is a root
          * span.
-         * 
+         *
          * Annotation.host is not the broker, it is the host which logged the receive
          * event: the consumer.  When annotating MESSAGE_RECV, instrumentation should
          * also tag the MESSAGE_ADDR.
          */
-"mr";
+'mr';
     }
 
     protected static function init_WIRE_SEND()
@@ -152,7 +147,7 @@ final class Constant extends \Thrift\Type\TConstant
          * events could indicate network retries. A lag between client or server send
          * and wire send might indicate queuing or processing delay.
          */
-"ws";
+'ws';
     }
 
     protected static function init_WIRE_RECV()
@@ -162,7 +157,7 @@ final class Constant extends \Thrift\Type\TConstant
          * receive events could indicate network retries. A lag between wire receive
          * and client or server receive might indicate queuing or processing delay.
          */
-"wr";
+'wr';
     }
 
     protected static function init_CLIENT_SEND_FRAGMENT()
@@ -171,7 +166,7 @@ final class Constant extends \Thrift\Type\TConstant
          * Optionally logs progress of a (CLIENT_SEND, WIRE_SEND). For example, this
          * could be one chunk in a chunked request.
          */
-"csf";
+'csf';
     }
 
     protected static function init_CLIENT_RECV_FRAGMENT()
@@ -180,7 +175,7 @@ final class Constant extends \Thrift\Type\TConstant
          * Optionally logs progress of a (CLIENT_RECV, WIRE_RECV). For example, this
          * could be one chunk in a chunked response.
          */
-"crf";
+'crf';
     }
 
     protected static function init_SERVER_SEND_FRAGMENT()
@@ -189,7 +184,7 @@ final class Constant extends \Thrift\Type\TConstant
          * Optionally logs progress of a (SERVER_SEND, WIRE_SEND). For example, this
          * could be one chunk in a chunked response.
          */
-"ssf";
+'ssf';
     }
 
     protected static function init_SERVER_RECV_FRAGMENT()
@@ -198,37 +193,37 @@ final class Constant extends \Thrift\Type\TConstant
          * Optionally logs progress of a (SERVER_RECV, WIRE_RECV). For example, this
          * could be one chunk in a chunked request.
          */
-"srf";
+'srf';
     }
 
     protected static function init_LOCAL_COMPONENT()
     {
         return         /**
          * The value of "lc" is the component or namespace of a local span.
-         * 
+         *
          * BinaryAnnotation.host adds service context needed to support queries.
-         * 
+         *
          * Local Component("lc") supports three key features: flagging, query by
          * service and filtering Span.name by namespace.
-         * 
+         *
          * While structurally the same, local spans are fundamentally different than
          * RPC spans in how they should be interpreted. For example, zipkin v1 tools
          * center on RPC latency and service graphs. Root local-spans are neither
          * indicative of critical path RPC latency, nor have impact on the shape of a
          * service graph. By flagging with "lc", tools can special-case local spans.
-         * 
+         *
          * Zipkin v1 Spans are unqueryable unless they can be indexed by service name.
          * The only path to a service name is by (Binary)?Annotation.host.serviceName.
          * By logging "lc", a local span can be queried even if no other annotations
          * are logged.
-         * 
+         *
          * The value of "lc" is the namespace of Span.name. For example, it might be
          * "finatra2", for a span named "bootstrap". "lc" allows you to resolves
          * conflicts for the same Span.name, for example "finatra/bootstrap" vs
          * "finch/bootstrap". Using local component, you'd search for spans named
          * "bootstrap" where "lc=finch"
          */
-"lc";
+'lc';
     }
 
     protected static function init_CLIENT_ADDR()
@@ -238,7 +233,7 @@ final class Constant extends \Thrift\Type\TConstant
          * Multiple addresses are possible when a client changes its ip or port within
          * a span.
          */
-"ca";
+'ca';
     }
 
     protected static function init_SERVER_ADDR()
@@ -248,7 +243,7 @@ final class Constant extends \Thrift\Type\TConstant
          * Multiple addresses are possible when a client is redirected, or fails to a
          * different server ip or port.
          */
-"sa";
+'sa';
     }
 
     protected static function init_MESSAGE_ADDR()
@@ -256,6 +251,6 @@ final class Constant extends \Thrift\Type\TConstant
         return         /**
          * Indicates the remote address of a messaging span, usually the broker.
          */
-"ma";
+'ma';
     }
 }

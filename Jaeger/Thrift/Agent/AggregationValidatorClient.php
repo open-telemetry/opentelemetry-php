@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent;
 
 /**
@@ -7,14 +10,9 @@ namespace Jaeger\Thrift\Agent;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
-use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
+use Thrift\Protocol\TBinaryProtocolAccelerated;
+use Thrift\Type\TMessageType;
 
 class AggregationValidatorClient implements \Jaeger\Thrift\Agent\AggregationValidatorIf
 {
@@ -29,10 +27,10 @@ class AggregationValidatorClient implements \Jaeger\Thrift\Agent\AggregationVali
         $this->output_ = $output ? $output : $input;
     }
 
-
     public function validateTrace($traceId)
     {
         $this->send_validateTrace($traceId);
+
         return $this->recv_validateTrace();
     }
 
@@ -77,6 +75,7 @@ class AggregationValidatorClient implements \Jaeger\Thrift\Agent\AggregationVali
                 $x = new TApplicationException();
                 $x->read($this->input_);
                 $this->input_->readMessageEnd();
+
                 throw $x;
             }
             $result = new \Jaeger\Thrift\Agent\AggregationValidator_validateTrace_result();
@@ -86,6 +85,7 @@ class AggregationValidatorClient implements \Jaeger\Thrift\Agent\AggregationVali
         if ($result->success !== null) {
             return $result->success;
         }
-        throw new \Exception("validateTrace failed: unknown result");
+
+        throw new \Exception('validateTrace failed: unknown result');
     }
 }

@@ -1,80 +1,74 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jaeger;
 
-use OpenTelemetry\Trace\Span;
 use Jaeger\Thrift\Agent\AgentClient;
 use Jaeger\Thrift\Batch;
-use Jaeger\Thrift\Span as JTSpan;
-use Thrift\Protocol\TCompactProtocol;
+use Jaeger\Thrift\Process;
+use Jaeger\Thrift\Span;
 use Thrift\Exception\TTransportException;
+use Thrift\Protocol\TCompactProtocol;
 
-final class JaegerTransport
+final class JaegerTransport implements Transport
 {
 
-    const STATUS_CODE_TAG_KEY = 'op.status_code';
-    const STATUS_DESCRIPTION_TAG_KEY = 'op.status_description';
+    // DEFAULT_BUFFER_SIZE indicates the default maximum buffer size, or the size threshold
+    // at which the buffer will be flushed to the agent.
+    const DEFAULT_BUFFER_SIZE = 1;
 
     private $transport;
     private $client;
 
     private $buffer = [];
     private $process = null;
+    private $maxBufferSize = 0;
 
-    public function __construct($address = "127.0.0.1", $port = 6831)
+    public function __construct($address = '127.0.0.1', $port = 6831, $maxBufferSize = 0)
     {
         $this->transport = new ThriftUdpTransport($address, $port);
         $p = new TCompactProtocol($this->transport);
         $this->client = new AgentClient($p, $p);
+
+        $this->maxBufferSize = ($maxBufferSize > 0 ? $maxBufferSize : self::DEFAULT_BUFFER_SIZE);
     }
 
     /**
-    * Encode it to Jaeger Thrift Span format
+    * Submits a new span to collectors, possibly delayed and/or with buffering.
+    *
+    * @param Span $span
     */
-    private function encode(Span $span)
+    public function append(Span $span, $serviceName)
     {
-        $spanParent = $span->getParent();
+        // Grab a copy of the process data, if we didn't already.
+        if ($this->process == null) {
+            $this->process = new Process([
+                'serviceName' => $serviceName,
+                'tags' => $span->tags,
+            ]);
+        }
 
-        $startTime = (int) ($span->getStartEpochTimestamp() / 1e3); // microseconds
-        $duration = (int) (($span->getEnd() - $span->getStart()) / 1e3); // microseconds
+        $this->buffer[] = $span;
 
-        $references = '';
-        $tags = array(
-            self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCanonicalStatusCode(),
-            self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getStatusDescription()
-        );
-        $logs = '';
-
-        $traceId = $span->getContext()->getTraceID();
-        $parentSpanId = $spanParent ? $spanParent->getSpanId() : null;
-
-        return new JTSpan([
-            "traceIdLow" => (is_array($traceId) ? $traceId["low"] : $traceId),
-            "traceIdHigh" => (is_array($traceId) ? $traceId["high"] : 0),
-            "spanId" => $span->getContext()->getSpanID(),
-            "parentSpanId" => (is_numeric($parentSpanId) ? $parentSpanId : 0),
-            "operationName" => $this->serviceName,
-            "references" => $references,
-            "flags" => $span->getContext()->getTraceFlags(),
-            "startTime" => $startTime,
-            "duration" => $duration,
-            'tags' => $tags,
-            "logs" => $logs,
-        ]);
+        // TODO(tylerc): Buffer spans and send them in as few UDP packets as possible.
+        return $this->flush();
     }
 
     /**
     * Flush submits the internal buffer to the remote server. It returns the
     * number of spans flushed.
+    *
+    * @param $force bool - force a flush, even on a partial buffer
     */
-    public function flush($spans)
+    public function flush($force = false)
     {
-
-        foreach ($spans as $span) {
-            array_push($this->buffer[], $this->encode($span));
-        }
-
         $spans = count($this->buffer);
+
+        // buffer not full yet
+        if (!$force && $spans < $this->maxBufferSize) {
+            return 0;
+        }
 
         // no spans to flush
         if ($spans <= 0) {
@@ -84,21 +78,31 @@ final class JaegerTransport
         try {
             // emit a batch
             $this->client->emitBatch(new Batch([
-                "process" => $this->process,
-                "spans" => $this->buffer,
+                'process' => $this->process,
+                'spans' => $this->buffer,
             ]));
-
-            // flush & close the UDP
+ 
+            // flush the UDP data
             $this->transport->flush();
-            $this->transport->close();
 
             // reset the internal buffer
             $this->buffer = [];
         } catch (TTransportException $e) {
-            error_log("jaeger: transport failure: " . $e->getMessage());
+            error_log('jaeger: transport failure: ' . $e->getMessage());
+
             return 0;
         }
 
         return $spans;
+    }
+
+    /**
+    * Does a clean shutdown of the reporter, flushing any traces that may be
+    * buffered in memory.
+    */
+    public function close()
+    {
+        $this->flush(true); // flush all remaining data
+        $this->transport->close();
     }
 }

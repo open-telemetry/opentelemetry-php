@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent\Zipkin;
 
 /**
@@ -7,14 +10,6 @@ namespace Jaeger\Thrift\Agent\Zipkin;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
-use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
 
 final class AnnotationType
 {
@@ -32,7 +27,7 @@ final class AnnotationType
 
     const STRING = 6;
 
-    static public $__names = array(
+    public static $__names = [
         0 => 'BOOL',
         1 => 'BYTES',
         2 => 'I16',
@@ -40,6 +35,5 @@ final class AnnotationType
         4 => 'I64',
         5 => 'DOUBLE',
         6 => 'STRING',
-    );
+    ];
 }
-

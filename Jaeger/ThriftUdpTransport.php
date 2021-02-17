@@ -1,124 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jaeger;
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Thrift\Exception\TTransportException;
 use Thrift\Transport\TTransport;
 
 class ThriftUdpTransport extends TTransport
 {
-
     const MAX_UDP_PACKET = 65000;
 
-    private $socket;
+    protected $server;
+    protected $port;
 
-    /**
-     * @var string
-     */
-    private $host;
+    protected $socket = null;
+    protected $buffer = '';
 
-    /**
-     * @var int
-     */
-    private $port;
-
-    protected $buffer = "";
-    
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * ThriftUdpTransport constructor.
-     * @param string $host
-     * @param int $port
-     * @param LoggerInterface $logger
-     */
-    public function __construct(string $host, int $port, LoggerInterface $logger = null)
+    // this implements a TTransport over UDP
+    public function __construct($server, $port)
     {
-        $this->host = $host;
+        $this->server = $server;
         $this->port = $port;
-        $this->socket = @socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-        $this->logger = $logger ?? new NullLogger();
-    }
 
-    /**
-     * Whether this transport is open.
-     *
-     * @return boolean true if open
-     */
-    public function isOpen()
-    {
-        return $this->socket !== null;
-    }
-
-    /**
-     * Open the transport for reading/writing
-     *
-     * @throws TTransportException if cannot open
-     */
-    public function open()
-    {
-        $ok = @socket_connect($this->socket, $this->host, $this->port);
-        if ($ok === false) {
+        // open a UDP socket to somewhere
+        if (!($this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP))) {
             $errorcode = socket_last_error();
             $errormsg = socket_strerror($errorcode);
-            throw new TTransportException("socket_connect failed: [$errorcode] $errormsg");
+             
+            error_log("jaeger: transport: Couldn't create socket: [$errorcode] $errormsg");
+
+            throw new TTransportException('unable to open UDP socket', TTransportException::UNKNOWN);
         }
     }
 
-    /**
-     * Close the transport.
-     */
+    public function isOpen()
+    {
+        return $this->socket != null;
+    }
+
+    // Open does nothing as connection is opened on creation
+    // Required to maintain thrift.TTransport interface
+    public function open()
+    {
+    }
+
     public function close()
     {
-        @socket_close($this->socket);
+        socket_close($this->socket);
         $this->socket = null;
     }
 
-    /**
-     * Read some data into the array.
-     *
-     * @todo
-     *
-     * @param int $len How much to read
-     * @return string The data that has been read
-     */
     public function read($len)
     {
+        // not implemented
     }
 
-    /**
-     * Writes the given data out.
-     *
-     * @param string $buf The data to write
-     * @throws TTransportException if writing fails
-     */
     public function write($buf)
     {
         // ensure that the data will still fit in a UDP packeg
         if (strlen($this->buffer) + strlen($buf) > self::MAX_UDP_PACKET) {
-            throw new TTransportException("Data does not fit within one UDP packet");
+            throw new TTransportException('Data does not fit within one UDP packet', TTransportException::UNKNOWN);
         }
 
         // buffer up some data
         $this->buffer .= $buf;
-
-        if (!$this->isOpen()) {
-            $errorcode = socket_last_error();
-            $errormsg = socket_strerror($errorcode);
-            throw new TTransportException("transport is closed: [$errorcode] $errormsg");
-        }
-
-        $ok = @socket_write($this->socket, $this->buffer);
-        if ($ok === false) {
-            $errorcode = socket_last_error();
-            $errormsg = socket_strerror($errorcode);
-            throw new TTransportException("socket_write failed: [$errorcode] $errormsg");
-        }
     }
 
     public function flush()
@@ -128,13 +74,16 @@ class ThriftUdpTransport extends TTransport
             return;
         }
 
+        // TODO(tylerc): This assumes that the whole buffer successfully sent... I believe
+        // that this should always be the case for UDP packets, but I could be wrong.
+
         // flush the buffer to the socket
         if (!socket_sendto($this->socket, $this->buffer, strlen($this->buffer), 0, $this->server, $this->port)) {
             $errorcode = socket_last_error();
             $errormsg = socket_strerror($errorcode);
-            throw new TTransportException("Could not flush data: [$errorcode] $errormsg");
+            error_log("jaeger: transport: Could not flush data: [$errorcode] $errormsg");
         }
 
-        $this->buffer = ""; // empty the buffer
+        $this->buffer = ''; // empty the buffer
     }
 }

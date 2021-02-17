@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent;
 
 /**
@@ -7,27 +10,21 @@ namespace Jaeger\Thrift\Agent;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
 use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
+use Thrift\Type\TType;
 
 class ThrottlingService_getThrottlingConfigs_result
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        0 => array(
+    public static $_TSPEC = [
+        0 => [
             'var' => 'success',
             'isRequired' => false,
             'type' => TType::STRUCT,
             'class' => '\Jaeger\Thrift\Agent\ThrottlingResponse',
-        ),
-    );
+        ],
+    ];
 
     /**
      * @var \Jaeger\Thrift\Agent\ThrottlingResponse
@@ -47,7 +44,6 @@ class ThrottlingService_getThrottlingConfigs_result
     {
         return 'ThrottlingService_getThrottlingConfigs_result';
     }
-
 
     public function read($input)
     {
@@ -69,14 +65,17 @@ class ThrottlingService_getThrottlingConfigs_result
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -94,6 +93,7 @@ class ThrottlingService_getThrottlingConfigs_result
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

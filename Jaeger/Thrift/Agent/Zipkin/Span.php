@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent\Zipkin;
 
 /**
@@ -7,88 +10,82 @@ namespace Jaeger\Thrift\Agent\Zipkin;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
 use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
+use Thrift\Type\TType;
 
 /**
  * A trace is a series of spans (often RPC calls) which form a latency tree.
- * 
+ *
  * The root span is where trace_id = id and parent_id = Nil. The root span is
  * usually the longest interval in the trace, starting with a SERVER_RECV
  * annotation and ending with a SERVER_SEND.
  */
 class Span
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'trace_id',
             'isRequired' => false,
             'type' => TType::I64,
-        ),
-        3 => array(
+        ],
+        3 => [
             'var' => 'name',
             'isRequired' => false,
             'type' => TType::STRING,
-        ),
-        4 => array(
+        ],
+        4 => [
             'var' => 'id',
             'isRequired' => false,
             'type' => TType::I64,
-        ),
-        5 => array(
+        ],
+        5 => [
             'var' => 'parent_id',
             'isRequired' => false,
             'type' => TType::I64,
-        ),
-        6 => array(
+        ],
+        6 => [
             'var' => 'annotations',
             'isRequired' => false,
             'type' => TType::LST,
             'etype' => TType::STRUCT,
-            'elem' => array(
+            'elem' => [
                 'type' => TType::STRUCT,
                 'class' => '\Jaeger\Thrift\Agent\Zipkin\Annotation',
-                ),
-        ),
-        8 => array(
+                ],
+        ],
+        8 => [
             'var' => 'binary_annotations',
             'isRequired' => false,
             'type' => TType::LST,
             'etype' => TType::STRUCT,
-            'elem' => array(
+            'elem' => [
                 'type' => TType::STRUCT,
                 'class' => '\Jaeger\Thrift\Agent\Zipkin\BinaryAnnotation',
-                ),
-        ),
-        9 => array(
+                ],
+        ],
+        9 => [
             'var' => 'debug',
             'isRequired' => false,
             'type' => TType::BOOL,
-        ),
-        10 => array(
+        ],
+        10 => [
             'var' => 'timestamp',
             'isRequired' => false,
             'type' => TType::I64,
-        ),
-        11 => array(
+        ],
+        11 => [
             'var' => 'duration',
             'isRequired' => false,
             'type' => TType::I64,
-        ),
-        12 => array(
+        ],
+        12 => [
             'var' => 'trace_id_high',
             'isRequired' => false,
             'type' => TType::I64,
-        ),
-    );
+        ],
+    ];
 
     /**
      * @var int
@@ -96,9 +93,9 @@ class Span
     public $trace_id = null;
     /**
      * Span name in lowercase, rpc method for example
-     * 
+     *
      * Conventionally, when the span name isn't known, name = "unknown".
-     * 
+     *
      * @var string
      */
     public $name = null;
@@ -124,45 +121,45 @@ class Span
     public $debug = false;
     /**
      * Microseconds from epoch of the creation of this span.
-     * 
+     *
      * This value should be set directly by instrumentation, using the most
      * precise value possible. For example, gettimeofday or syncing nanoTime
      * against a tick of currentTimeMillis.
-     * 
+     *
      * For compatibility with instrumentation that precede this field, collectors
      * or span stores can derive this via Annotation.timestamp.
      * For example, SERVER_RECV.timestamp or CLIENT_SEND.timestamp.
-     * 
+     *
      * This field is optional for compatibility with old data: first-party span
      * stores are expected to support this at time of introduction.
-     * 
+     *
      * @var int
      */
     public $timestamp = null;
     /**
      * Measurement of duration in microseconds, used to support queries.
-     * 
+     *
      * This value should be set directly, where possible. Doing so encourages
      * precise measurement decoupled from problems of clocks, such as skew or NTP
      * updates causing time to move backwards.
-     * 
+     *
      * For compatibility with instrumentation that precede this field, collectors
      * or span stores can derive this by subtracting Annotation.timestamp.
      * For example, SERVER_SEND.timestamp - SERVER_RECV.timestamp.
-     * 
+     *
      * If this field is persisted as unset, zipkin will continue to work, except
      * duration query support will be implementation-specific. Similarly, setting
      * this field non-atomically is implementation-specific.
-     * 
+     *
      * This field is i64 vs i32 to support spans longer than 35 minutes.
-     * 
+     *
      * @var int
      */
     public $duration = null;
     /**
      * Optional unique 8-byte additional identifier for a trace. If non zero, this
      * means the trace uses 128 bit traceIds instead of 64 bit.
-     * 
+     *
      * @var int
      */
     public $trace_id_high = null;
@@ -208,7 +205,6 @@ class Span
         return 'Span';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -228,6 +224,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 3:
                     if ($ftype == TType::STRING) {
@@ -235,6 +232,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 4:
                     if ($ftype == TType::I64) {
@@ -242,6 +240,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 5:
                     if ($ftype == TType::I64) {
@@ -249,10 +248,11 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 6:
                     if ($ftype == TType::LST) {
-                        $this->annotations = array();
+                        $this->annotations = [];
                         $_size0 = 0;
                         $_etype3 = 0;
                         $xfer += $input->readListBegin($_etype3, $_size0);
@@ -266,10 +266,11 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 8:
                     if ($ftype == TType::LST) {
-                        $this->binary_annotations = array();
+                        $this->binary_annotations = [];
                         $_size6 = 0;
                         $_etype9 = 0;
                         $xfer += $input->readListBegin($_etype9, $_size6);
@@ -283,6 +284,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 9:
                     if ($ftype == TType::BOOL) {
@@ -290,6 +292,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 10:
                     if ($ftype == TType::I64) {
@@ -297,6 +300,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 11:
                     if ($ftype == TType::I64) {
@@ -304,6 +308,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 12:
                     if ($ftype == TType::I64) {
@@ -311,14 +316,17 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -392,6 +400,7 @@ class Span
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent\Zipkin;
 
 /**
@@ -7,19 +10,12 @@ namespace Jaeger\Thrift\Agent\Zipkin;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
 use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
-use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
 
 /**
  * Indicates the network context of a service recording an annotation with two
  * exceptions.
- * 
+ *
  * When a BinaryAnnotation, and key is CLIENT_ADDR or SERVER_ADDR,
  * the endpoint indicates the source or destination of an RPC. This exception
  * allows zipkin to display network context of uninstrumented services, or
@@ -27,60 +23,60 @@ use Thrift\Exception\TApplicationException;
  */
 class Endpoint
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'ipv4',
             'isRequired' => false,
             'type' => TType::I32,
-        ),
-        2 => array(
+        ],
+        2 => [
             'var' => 'port',
             'isRequired' => false,
             'type' => TType::I16,
-        ),
-        3 => array(
+        ],
+        3 => [
             'var' => 'service_name',
             'isRequired' => false,
             'type' => TType::STRING,
-        ),
-        4 => array(
+        ],
+        4 => [
             'var' => 'ipv6',
             'isRequired' => false,
             'type' => TType::STRING,
-        ),
-    );
+        ],
+    ];
 
     /**
      * IPv4 host address packed into 4 bytes.
-     * 
+     *
      * Ex for the ip 1.2.3.4, it would be (1 << 24) | (2 << 16) | (3 << 8) | 4
-     * 
+     *
      * @var int
      */
     public $ipv4 = null;
     /**
      * IPv4 port
-     * 
+     *
      * Note: this is to be treated as an unsigned integer, so watch for negatives.
-     * 
+     *
      * Conventionally, when the port isn't known, port = 0.
-     * 
+     *
      * @var int
      */
     public $port = null;
     /**
      * Service name in lowercase, such as "memcache" or "zipkin-web"
-     * 
+     *
      * Conventionally, when the service name isn't known, service_name = "unknown".
-     * 
+     *
      * @var string
      */
     public $service_name = null;
     /**
      * IPv6 host address packed into 16 bytes. Ex Inet6Address.getBytes()
-     * 
+     *
      * @var string
      */
     public $ipv6 = null;
@@ -108,7 +104,6 @@ class Endpoint
         return 'Endpoint';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -128,6 +123,7 @@ class Endpoint
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 2:
                     if ($ftype == TType::I16) {
@@ -135,6 +131,7 @@ class Endpoint
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 3:
                     if ($ftype == TType::STRING) {
@@ -142,6 +139,7 @@ class Endpoint
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 4:
                     if ($ftype == TType::STRING) {
@@ -149,14 +147,17 @@ class Endpoint
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -186,6 +187,7 @@ class Endpoint
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

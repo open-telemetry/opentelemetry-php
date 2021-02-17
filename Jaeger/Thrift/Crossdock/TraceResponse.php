@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Crossdock;
 
 /**
@@ -7,14 +10,8 @@ namespace Jaeger\Thrift\Crossdock;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
 use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
+use Thrift\Type\TType;
 
 /**
  * Each server must include the information about the span it observed.
@@ -24,27 +21,27 @@ use Thrift\Exception\TApplicationException;
  */
 class TraceResponse
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'span',
             'isRequired' => false,
             'type' => TType::STRUCT,
             'class' => '\Jaeger\Thrift\Crossdock\ObservedSpan',
-        ),
-        2 => array(
+        ],
+        2 => [
             'var' => 'downstream',
             'isRequired' => false,
             'type' => TType::STRUCT,
             'class' => '\Jaeger\Thrift\Crossdock\TraceResponse',
-        ),
-        3 => array(
+        ],
+        3 => [
             'var' => 'notImplementedError',
             'isRequired' => true,
             'type' => TType::STRING,
-        ),
-    );
+        ],
+    ];
 
     /**
      * @var \Jaeger\Thrift\Crossdock\ObservedSpan
@@ -79,7 +76,6 @@ class TraceResponse
         return 'TraceResponse';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -100,6 +96,7 @@ class TraceResponse
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 2:
                     if ($ftype == TType::STRUCT) {
@@ -108,6 +105,7 @@ class TraceResponse
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 3:
                     if ($ftype == TType::STRING) {
@@ -115,14 +113,17 @@ class TraceResponse
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -153,6 +154,7 @@ class TraceResponse
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift;
 
 /**
@@ -7,56 +10,49 @@ namespace Jaeger\Thrift;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
 use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
-use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
 
 class Tag
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'key',
             'isRequired' => true,
             'type' => TType::STRING,
-        ),
-        2 => array(
+        ],
+        2 => [
             'var' => 'vType',
             'isRequired' => true,
             'type' => TType::I32,
-        ),
-        3 => array(
+        ],
+        3 => [
             'var' => 'vStr',
             'isRequired' => false,
             'type' => TType::STRING,
-        ),
-        4 => array(
+        ],
+        4 => [
             'var' => 'vDouble',
             'isRequired' => false,
             'type' => TType::DOUBLE,
-        ),
-        5 => array(
+        ],
+        5 => [
             'var' => 'vBool',
             'isRequired' => false,
             'type' => TType::BOOL,
-        ),
-        6 => array(
+        ],
+        6 => [
             'var' => 'vLong',
             'isRequired' => false,
             'type' => TType::I64,
-        ),
-        7 => array(
+        ],
+        7 => [
             'var' => 'vBinary',
             'isRequired' => false,
             'type' => TType::STRING,
-        ),
-    );
+        ],
+    ];
 
     /**
      * @var string
@@ -71,7 +67,7 @@ class Tag
      */
     public $vStr = null;
     /**
-     * @var double
+     * @var float
      */
     public $vDouble = null;
     /**
@@ -119,7 +115,6 @@ class Tag
         return 'Tag';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -139,6 +134,7 @@ class Tag
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 2:
                     if ($ftype == TType::I32) {
@@ -146,6 +142,7 @@ class Tag
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 3:
                     if ($ftype == TType::STRING) {
@@ -153,6 +150,7 @@ class Tag
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 4:
                     if ($ftype == TType::DOUBLE) {
@@ -160,6 +158,7 @@ class Tag
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 5:
                     if ($ftype == TType::BOOL) {
@@ -167,6 +166,7 @@ class Tag
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 6:
                     if ($ftype == TType::I64) {
@@ -174,6 +174,7 @@ class Tag
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 7:
                     if ($ftype == TType::STRING) {
@@ -181,14 +182,17 @@ class Tag
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -233,6 +237,7 @@ class Tag
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

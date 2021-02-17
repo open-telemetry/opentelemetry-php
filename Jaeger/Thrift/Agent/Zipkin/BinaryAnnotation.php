@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent\Zipkin;
 
 /**
@@ -7,23 +10,17 @@ namespace Jaeger\Thrift\Agent\Zipkin;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
 use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
+use Thrift\Type\TType;
 
 /**
  * Binary annotations are tags applied to a Span to give it context. For
  * example, a binary annotation of "http.uri" could the path to a resource in a
  * RPC call.
- * 
+ *
  * Binary annotations of type STRING are always queryable, though more a
  * historical implementation detail than a structural concern.
- * 
+ *
  * Binary annotations can repeat, and vary on the host. Similar to Annotation,
  * the host indicates who logged the event. This allows you to tell the
  * difference between the client and server side of the same key. For example,
@@ -33,31 +30,31 @@ use Thrift\Exception\TApplicationException;
  */
 class BinaryAnnotation
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'key',
             'isRequired' => false,
             'type' => TType::STRING,
-        ),
-        2 => array(
+        ],
+        2 => [
             'var' => 'value',
             'isRequired' => false,
             'type' => TType::STRING,
-        ),
-        3 => array(
+        ],
+        3 => [
             'var' => 'annotation_type',
             'isRequired' => false,
             'type' => TType::I32,
-        ),
-        4 => array(
+        ],
+        4 => [
             'var' => 'host',
             'isRequired' => false,
             'type' => TType::STRUCT,
             'class' => '\Jaeger\Thrift\Agent\Zipkin\Endpoint',
-        ),
-    );
+        ],
+    ];
 
     /**
      * @var string
@@ -74,11 +71,11 @@ class BinaryAnnotation
     /**
      * The host that recorded tag, which allows you to differentiate between
      * multiple tags with the same key. There are two exceptions to this.
-     * 
+     *
      * When the key is CLIENT_ADDR or SERVER_ADDR, host indicates the source or
      * destination of an RPC. This exception allows zipkin to display network
      * context of uninstrumented services, or clients such as web browsers.
-     * 
+     *
      * @var \Jaeger\Thrift\Agent\Zipkin\Endpoint
      */
     public $host = null;
@@ -106,7 +103,6 @@ class BinaryAnnotation
         return 'BinaryAnnotation';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -126,6 +122,7 @@ class BinaryAnnotation
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 2:
                     if ($ftype == TType::STRING) {
@@ -133,6 +130,7 @@ class BinaryAnnotation
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 3:
                     if ($ftype == TType::I32) {
@@ -140,6 +138,7 @@ class BinaryAnnotation
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 4:
                     if ($ftype == TType::STRUCT) {
@@ -148,14 +147,17 @@ class BinaryAnnotation
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -188,6 +190,7 @@ class BinaryAnnotation
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

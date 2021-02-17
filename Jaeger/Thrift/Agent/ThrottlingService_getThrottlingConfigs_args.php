@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent;
 
 /**
@@ -7,30 +10,24 @@ namespace Jaeger\Thrift\Agent;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
 use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
+use Thrift\Type\TType;
 
 class ThrottlingService_getThrottlingConfigs_args
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'serviceNames',
             'isRequired' => false,
             'type' => TType::LST,
             'etype' => TType::STRING,
-            'elem' => array(
+            'elem' => [
                 'type' => TType::STRING,
-                ),
-        ),
-    );
+                ],
+        ],
+    ];
 
     /**
      * @var string[]
@@ -51,7 +48,6 @@ class ThrottlingService_getThrottlingConfigs_args
         return 'ThrottlingService_getThrottlingConfigs_args';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -67,7 +63,7 @@ class ThrottlingService_getThrottlingConfigs_args
             switch ($fid) {
                 case 1:
                     if ($ftype == TType::LST) {
-                        $this->serviceNames = array();
+                        $this->serviceNames = [];
                         $_size7 = 0;
                         $_etype10 = 0;
                         $xfer += $input->readListBegin($_etype10, $_size7);
@@ -80,14 +76,17 @@ class ThrottlingService_getThrottlingConfigs_args
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -109,6 +108,7 @@ class ThrottlingService_getThrottlingConfigs_args
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

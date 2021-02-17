@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Crossdock;
 
 /**
@@ -7,14 +10,6 @@ namespace Jaeger\Thrift\Crossdock;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
-use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
 
 interface TracedServiceIf
 {
@@ -24,7 +19,7 @@ interface TracedServiceIf
      * It can only be omitted from the response if notImplementedError field is not empty.
      * If the server was instructed to make a downstream call, it must embed the
      * downstream response in its own response.
-     * 
+     *
      */
     public function startTrace(\Jaeger\Thrift\Crossdock\StartTraceRequest $request);
     /**
@@ -33,7 +28,7 @@ interface TracedServiceIf
      * It can only be omitted from the response if notImplementedError field is not empty.
      * If the server was instructed to make a downstream call, it must embed the
      * downstream response in its own response.
-     * 
+     *
      */
     public function joinTrace(\Jaeger\Thrift\Crossdock\JoinTraceRequest $request);
 }

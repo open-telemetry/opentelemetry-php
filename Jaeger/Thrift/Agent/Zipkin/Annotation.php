@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent\Zipkin;
 
 /**
@@ -7,14 +10,8 @@ namespace Jaeger\Thrift\Agent\Zipkin;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
 use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
+use Thrift\Type\TType;
 
 /**
  * An annotation is similar to a log statement. It includes a host field which
@@ -22,33 +19,33 @@ use Thrift\Exception\TApplicationException;
  */
 class Annotation
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'timestamp',
             'isRequired' => false,
             'type' => TType::I64,
-        ),
-        2 => array(
+        ],
+        2 => [
             'var' => 'value',
             'isRequired' => false,
             'type' => TType::STRING,
-        ),
-        3 => array(
+        ],
+        3 => [
             'var' => 'host',
             'isRequired' => false,
             'type' => TType::STRUCT,
             'class' => '\Jaeger\Thrift\Agent\Zipkin\Endpoint',
-        ),
-    );
+        ],
+    ];
 
     /**
      * Microseconds from epoch.
-     * 
+     *
      * This value should use the most precise value possible. For example,
      * gettimeofday or syncing nanoTime against a tick of currentTimeMillis.
-     * 
+     *
      * @var int
      */
     public $timestamp = null;
@@ -59,7 +56,7 @@ class Annotation
     /**
      * Always the host that recorded the event. By specifying the host you allow
      * rollup of all events (such as client requests to a service) by IP address.
-     * 
+     *
      * @var \Jaeger\Thrift\Agent\Zipkin\Endpoint
      */
     public $host = null;
@@ -84,7 +81,6 @@ class Annotation
         return 'Annotation';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -104,6 +100,7 @@ class Annotation
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 2:
                     if ($ftype == TType::STRING) {
@@ -111,6 +108,7 @@ class Annotation
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 3:
                     if ($ftype == TType::STRUCT) {
@@ -119,14 +117,17 @@ class Annotation
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -154,6 +155,7 @@ class Annotation
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

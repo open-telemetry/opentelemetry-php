@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent;
 
 /**
@@ -7,44 +10,38 @@ namespace Jaeger\Thrift\Agent;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
 use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
+use Thrift\Type\TType;
 
 class SamplingStrategyResponse
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'strategyType',
             'isRequired' => true,
             'type' => TType::I32,
-        ),
-        2 => array(
+        ],
+        2 => [
             'var' => 'probabilisticSampling',
             'isRequired' => false,
             'type' => TType::STRUCT,
             'class' => '\Jaeger\Thrift\Agent\ProbabilisticSamplingStrategy',
-        ),
-        3 => array(
+        ],
+        3 => [
             'var' => 'rateLimitingSampling',
             'isRequired' => false,
             'type' => TType::STRUCT,
             'class' => '\Jaeger\Thrift\Agent\RateLimitingSamplingStrategy',
-        ),
-        4 => array(
+        ],
+        4 => [
             'var' => 'operationSampling',
             'isRequired' => false,
             'type' => TType::STRUCT,
             'class' => '\Jaeger\Thrift\Agent\PerOperationSamplingStrategies',
-        ),
-    );
+        ],
+    ];
 
     /**
      * @var int
@@ -86,7 +83,6 @@ class SamplingStrategyResponse
         return 'SamplingStrategyResponse';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -106,6 +102,7 @@ class SamplingStrategyResponse
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 2:
                     if ($ftype == TType::STRUCT) {
@@ -114,6 +111,7 @@ class SamplingStrategyResponse
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 3:
                     if ($ftype == TType::STRUCT) {
@@ -122,6 +120,7 @@ class SamplingStrategyResponse
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 4:
                     if ($ftype == TType::STRUCT) {
@@ -130,14 +129,17 @@ class SamplingStrategyResponse
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -176,6 +178,7 @@ class SamplingStrategyResponse
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

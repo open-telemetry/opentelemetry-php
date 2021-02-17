@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift;
 
 /**
@@ -7,14 +10,9 @@ namespace Jaeger\Thrift;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
-use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
+use Thrift\Protocol\TBinaryProtocolAccelerated;
+use Thrift\Type\TMessageType;
 
 class CollectorClient implements \Jaeger\Thrift\CollectorIf
 {
@@ -29,10 +27,10 @@ class CollectorClient implements \Jaeger\Thrift\CollectorIf
         $this->output_ = $output ? $output : $input;
     }
 
-
     public function submitBatches(array $batches)
     {
         $this->send_submitBatches($batches);
+
         return $this->recv_submitBatches();
     }
 
@@ -77,6 +75,7 @@ class CollectorClient implements \Jaeger\Thrift\CollectorIf
                 $x = new TApplicationException();
                 $x->read($this->input_);
                 $this->input_->readMessageEnd();
+
                 throw $x;
             }
             $result = new \Jaeger\Thrift\Collector_submitBatches_result();
@@ -86,6 +85,7 @@ class CollectorClient implements \Jaeger\Thrift\CollectorIf
         if ($result->success !== null) {
             return $result->success;
         }
-        throw new \Exception("submitBatches failed: unknown result");
+
+        throw new \Exception('submitBatches failed: unknown result');
     }
 }

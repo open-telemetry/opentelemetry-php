@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Crossdock;
 
 /**
@@ -7,14 +10,9 @@ namespace Jaeger\Thrift\Crossdock;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
-use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
+use Thrift\Protocol\TBinaryProtocolAccelerated;
+use Thrift\Type\TMessageType;
 
 class TracedServiceClient implements \Jaeger\Thrift\Crossdock\TracedServiceIf
 {
@@ -29,10 +27,10 @@ class TracedServiceClient implements \Jaeger\Thrift\Crossdock\TracedServiceIf
         $this->output_ = $output ? $output : $input;
     }
 
-
     public function startTrace(\Jaeger\Thrift\Crossdock\StartTraceRequest $request)
     {
         $this->send_startTrace($request);
+
         return $this->recv_startTrace();
     }
 
@@ -77,6 +75,7 @@ class TracedServiceClient implements \Jaeger\Thrift\Crossdock\TracedServiceIf
                 $x = new TApplicationException();
                 $x->read($this->input_);
                 $this->input_->readMessageEnd();
+
                 throw $x;
             }
             $result = new \Jaeger\Thrift\Crossdock\TracedService_startTrace_result();
@@ -86,12 +85,14 @@ class TracedServiceClient implements \Jaeger\Thrift\Crossdock\TracedServiceIf
         if ($result->success !== null) {
             return $result->success;
         }
-        throw new \Exception("startTrace failed: unknown result");
+
+        throw new \Exception('startTrace failed: unknown result');
     }
 
     public function joinTrace(\Jaeger\Thrift\Crossdock\JoinTraceRequest $request)
     {
         $this->send_joinTrace($request);
+
         return $this->recv_joinTrace();
     }
 
@@ -136,6 +137,7 @@ class TracedServiceClient implements \Jaeger\Thrift\Crossdock\TracedServiceIf
                 $x = new TApplicationException();
                 $x->read($this->input_);
                 $this->input_->readMessageEnd();
+
                 throw $x;
             }
             $result = new \Jaeger\Thrift\Crossdock\TracedService_joinTrace_result();
@@ -145,6 +147,7 @@ class TracedServiceClient implements \Jaeger\Thrift\Crossdock\TracedServiceIf
         if ($result->success !== null) {
             return $result->success;
         }
-        throw new \Exception("joinTrace failed: unknown result");
+
+        throw new \Exception('joinTrace failed: unknown result');
     }
 }

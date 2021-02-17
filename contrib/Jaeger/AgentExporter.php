@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Jaeger;
 
 use InvalidArgumentException;
+use Jaeger\JaegerTransport;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
-use Jaeger\JaegerTransport;
 
 /**
  * @package OpenTelemetry\Exporter
@@ -16,10 +16,19 @@ class AgentExporter implements Trace\Exporter
 {
 
     /**
+     * @var string
+     */
+    private $endpointUrl;
+
+    /**
+     * @var SpanConverter
+     */
+    private $spanConverter;
+
+    /**
      * @var bool
      */
     private $running = true;
-
 
     public function __construct(
         $name,
@@ -31,19 +40,17 @@ class AgentExporter implements Trace\Exporter
             throw new InvalidArgumentException('Unable to parse provided DSN');
         }
 
-        if (
-            !isset($parsedDsn['scheme'])
-            || !isset($parsedDsn['host'])
-            || !isset($parsedDsn['port'])
-        ) {
-            throw new InvalidArgumentException('Endpoint should have scheme, host, port');
+        if (!isset($parsedDsn['host']) || !isset($parsedDsn['port'])) {
+            throw new InvalidArgumentException('Endpoint should have host, port');
         }
 
-        $this->udpJaegerTransport = new JaegerTransport($parsedDsn['host'], $parsedDsn['port']);
+        $this->endpointUrl = $endpointUrl;
+        $this->serviceName = $name;
+        $this->spanConverter = $spanConverter ?? new SpanConverter($name);
+        $this->jaegerTransport = new JaegerTransport($parsedDsn['host'], $parsedDsn['port']);
     }
 
     /**
-     * Exports the provided Span data via the Zipkin protocol
      *
      * @param iterable<API\Span> $spans Array of Spans
      * @return int return code, defined on the Exporter interface
@@ -58,8 +65,11 @@ class AgentExporter implements Trace\Exporter
             return Trace\Exporter::SUCCESS;
         }
 
-        // UDP Transport begins here
-        $this->udpJaegerTransport->flush($spans);
+        // UDP Transport begins here after converting to thrift format span
+        foreach ($spans as $span) {
+            $cSpan = $this->spanConverter->convert($span);
+            $this->jaegerTransport->append($cSpan, $this->serviceName);
+        }
 
         return Trace\Exporter::SUCCESS;
     }
@@ -69,4 +79,3 @@ class AgentExporter implements Trace\Exporter
         $this->running = false;
     }
 }
-

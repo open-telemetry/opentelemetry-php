@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent;
 
 /**
@@ -7,14 +10,9 @@ namespace Jaeger\Thrift\Agent;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
-use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
+use Thrift\Protocol\TBinaryProtocolAccelerated;
+use Thrift\Type\TMessageType;
 
 class ThrottlingServiceClient implements \Jaeger\Thrift\Agent\ThrottlingServiceIf
 {
@@ -29,10 +27,10 @@ class ThrottlingServiceClient implements \Jaeger\Thrift\Agent\ThrottlingServiceI
         $this->output_ = $output ? $output : $input;
     }
 
-
     public function getThrottlingConfigs(array $serviceNames)
     {
         $this->send_getThrottlingConfigs($serviceNames);
+
         return $this->recv_getThrottlingConfigs();
     }
 
@@ -77,6 +75,7 @@ class ThrottlingServiceClient implements \Jaeger\Thrift\Agent\ThrottlingServiceI
                 $x = new TApplicationException();
                 $x->read($this->input_);
                 $this->input_->readMessageEnd();
+
                 throw $x;
             }
             $result = new \Jaeger\Thrift\Agent\ThrottlingService_getThrottlingConfigs_result();
@@ -86,6 +85,7 @@ class ThrottlingServiceClient implements \Jaeger\Thrift\Agent\ThrottlingServiceI
         if ($result->success !== null) {
             return $result->success;
         }
-        throw new \Exception("getThrottlingConfigs failed: unknown result");
+
+        throw new \Exception('getThrottlingConfigs failed: unknown result');
     }
 }

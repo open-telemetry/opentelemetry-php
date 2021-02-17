@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift;
 
 /**
@@ -7,48 +10,42 @@ namespace Jaeger\Thrift;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
 use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
+use Thrift\Type\TType;
 
 class Batch
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'process',
             'isRequired' => true,
             'type' => TType::STRUCT,
             'class' => '\Jaeger\Thrift\Process',
-        ),
-        2 => array(
+        ],
+        2 => [
             'var' => 'spans',
             'isRequired' => true,
             'type' => TType::LST,
             'etype' => TType::STRUCT,
-            'elem' => array(
+            'elem' => [
                 'type' => TType::STRUCT,
                 'class' => '\Jaeger\Thrift\Span',
-                ),
-        ),
-        3 => array(
+                ],
+        ],
+        3 => [
             'var' => 'seqNo',
             'isRequired' => false,
             'type' => TType::I64,
-        ),
-        4 => array(
+        ],
+        4 => [
             'var' => 'stats',
             'isRequired' => false,
             'type' => TType::STRUCT,
             'class' => '\Jaeger\Thrift\ClientStats',
-        ),
-    );
+        ],
+    ];
 
     /**
      * @var \Jaeger\Thrift\Process
@@ -90,7 +87,6 @@ class Batch
         return 'Batch';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -111,10 +107,11 @@ class Batch
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 2:
                     if ($ftype == TType::LST) {
-                        $this->spans = array();
+                        $this->spans = [];
                         $_size35 = 0;
                         $_etype38 = 0;
                         $xfer += $input->readListBegin($_etype38, $_size35);
@@ -128,6 +125,7 @@ class Batch
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 3:
                     if ($ftype == TType::I64) {
@@ -135,6 +133,7 @@ class Batch
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 4:
                     if ($ftype == TType::STRUCT) {
@@ -143,14 +142,17 @@ class Batch
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -193,6 +195,7 @@ class Batch
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

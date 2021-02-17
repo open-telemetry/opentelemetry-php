@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift;
 
 /**
@@ -7,91 +10,85 @@ namespace Jaeger\Thrift;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
 use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
+use Thrift\Type\TType;
 
 class Span
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'traceIdLow',
             'isRequired' => true,
             'type' => TType::I64,
-        ),
-        2 => array(
+        ],
+        2 => [
             'var' => 'traceIdHigh',
             'isRequired' => true,
             'type' => TType::I64,
-        ),
-        3 => array(
+        ],
+        3 => [
             'var' => 'spanId',
             'isRequired' => true,
             'type' => TType::I64,
-        ),
-        4 => array(
+        ],
+        4 => [
             'var' => 'parentSpanId',
             'isRequired' => true,
             'type' => TType::I64,
-        ),
-        5 => array(
+        ],
+        5 => [
             'var' => 'operationName',
             'isRequired' => true,
             'type' => TType::STRING,
-        ),
-        6 => array(
+        ],
+        6 => [
             'var' => 'references',
             'isRequired' => false,
             'type' => TType::LST,
             'etype' => TType::STRUCT,
-            'elem' => array(
+            'elem' => [
                 'type' => TType::STRUCT,
                 'class' => '\Jaeger\Thrift\SpanRef',
-                ),
-        ),
-        7 => array(
+                ],
+        ],
+        7 => [
             'var' => 'flags',
             'isRequired' => true,
             'type' => TType::I32,
-        ),
-        8 => array(
+        ],
+        8 => [
             'var' => 'startTime',
             'isRequired' => true,
             'type' => TType::I64,
-        ),
-        9 => array(
+        ],
+        9 => [
             'var' => 'duration',
             'isRequired' => true,
             'type' => TType::I64,
-        ),
-        10 => array(
+        ],
+        10 => [
             'var' => 'tags',
             'isRequired' => false,
             'type' => TType::LST,
             'etype' => TType::STRUCT,
-            'elem' => array(
+            'elem' => [
                 'type' => TType::STRUCT,
                 'class' => '\Jaeger\Thrift\Tag',
-                ),
-        ),
-        11 => array(
+                ],
+        ],
+        11 => [
             'var' => 'logs',
             'isRequired' => false,
             'type' => TType::LST,
             'etype' => TType::STRUCT,
-            'elem' => array(
+            'elem' => [
                 'type' => TType::STRUCT,
                 'class' => '\Jaeger\Thrift\Log',
-                ),
-        ),
-    );
+                ],
+        ],
+    ];
 
     /**
      * @var int
@@ -182,7 +179,6 @@ class Span
         return 'Span';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -202,6 +198,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 2:
                     if ($ftype == TType::I64) {
@@ -209,6 +206,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 3:
                     if ($ftype == TType::I64) {
@@ -216,6 +214,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 4:
                     if ($ftype == TType::I64) {
@@ -223,6 +222,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 5:
                     if ($ftype == TType::STRING) {
@@ -230,10 +230,11 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 6:
                     if ($ftype == TType::LST) {
-                        $this->references = array();
+                        $this->references = [];
                         $_size7 = 0;
                         $_etype10 = 0;
                         $xfer += $input->readListBegin($_etype10, $_size7);
@@ -247,6 +248,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 7:
                     if ($ftype == TType::I32) {
@@ -254,6 +256,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 8:
                     if ($ftype == TType::I64) {
@@ -261,6 +264,7 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 9:
                     if ($ftype == TType::I64) {
@@ -268,10 +272,11 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 10:
                     if ($ftype == TType::LST) {
-                        $this->tags = array();
+                        $this->tags = [];
                         $_size13 = 0;
                         $_etype16 = 0;
                         $xfer += $input->readListBegin($_etype16, $_size13);
@@ -285,10 +290,11 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 11:
                     if ($ftype == TType::LST) {
-                        $this->logs = array();
+                        $this->logs = [];
                         $_size19 = 0;
                         $_etype22 = 0;
                         $xfer += $input->readListBegin($_etype22, $_size19);
@@ -302,14 +308,17 @@ class Span
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -395,6 +404,7 @@ class Span
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

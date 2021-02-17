@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift;
 
 /**
@@ -7,36 +10,30 @@ namespace Jaeger\Thrift;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
 use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
+use Thrift\Type\TType;
 
 class Log
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'timestamp',
             'isRequired' => true,
             'type' => TType::I64,
-        ),
-        2 => array(
+        ],
+        2 => [
             'var' => 'fields',
             'isRequired' => true,
             'type' => TType::LST,
             'etype' => TType::STRUCT,
-            'elem' => array(
+            'elem' => [
                 'type' => TType::STRUCT,
                 'class' => '\Jaeger\Thrift\Tag',
-                ),
-        ),
-    );
+                ],
+        ],
+    ];
 
     /**
      * @var int
@@ -64,7 +61,6 @@ class Log
         return 'Log';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -84,10 +80,11 @@ class Log
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 2:
                     if ($ftype == TType::LST) {
-                        $this->fields = array();
+                        $this->fields = [];
                         $_size0 = 0;
                         $_etype3 = 0;
                         $xfer += $input->readListBegin($_etype3, $_size0);
@@ -101,14 +98,17 @@ class Log
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -135,6 +135,7 @@ class Log
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

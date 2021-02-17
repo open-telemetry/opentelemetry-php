@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent;
 
 /**
@@ -7,31 +10,25 @@ namespace Jaeger\Thrift\Agent;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
 use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
+use Thrift\Type\TType;
 
 class Dependencies
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'links',
             'isRequired' => true,
             'type' => TType::LST,
             'etype' => TType::STRUCT,
-            'elem' => array(
+            'elem' => [
                 'type' => TType::STRUCT,
                 'class' => '\Jaeger\Thrift\Agent\DependencyLink',
-                ),
-        ),
-    );
+                ],
+        ],
+    ];
 
     /**
      * @var \Jaeger\Thrift\Agent\DependencyLink[]
@@ -52,7 +49,6 @@ class Dependencies
         return 'Dependencies';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -68,7 +64,7 @@ class Dependencies
             switch ($fid) {
                 case 1:
                     if ($ftype == TType::LST) {
-                        $this->links = array();
+                        $this->links = [];
                         $_size0 = 0;
                         $_etype3 = 0;
                         $xfer += $input->readListBegin($_etype3, $_size0);
@@ -82,14 +78,17 @@ class Dependencies
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -111,6 +110,7 @@ class Dependencies
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

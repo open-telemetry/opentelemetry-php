@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent;
 
 /**
@@ -7,36 +10,29 @@ namespace Jaeger\Thrift\Agent;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
 use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
-use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
 
 class DependencyLink
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        1 => array(
+    public static $_TSPEC = [
+        1 => [
             'var' => 'parent',
             'isRequired' => true,
             'type' => TType::STRING,
-        ),
-        2 => array(
+        ],
+        2 => [
             'var' => 'child',
             'isRequired' => true,
             'type' => TType::STRING,
-        ),
-        4 => array(
+        ],
+        4 => [
             'var' => 'callCount',
             'isRequired' => true,
             'type' => TType::I64,
-        ),
-    );
+        ],
+    ];
 
     /**
      * @var string
@@ -71,7 +67,6 @@ class DependencyLink
         return 'DependencyLink';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -91,6 +86,7 @@ class DependencyLink
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 2:
                     if ($ftype == TType::STRING) {
@@ -98,6 +94,7 @@ class DependencyLink
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 case 4:
                     if ($ftype == TType::I64) {
@@ -105,14 +102,17 @@ class DependencyLink
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -137,6 +137,7 @@ class DependencyLink
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }

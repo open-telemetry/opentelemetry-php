@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Jaeger\Thrift\Agent\Zipkin;
 
 /**
@@ -7,31 +10,25 @@ namespace Jaeger\Thrift\Agent\Zipkin;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use Thrift\Base\TBase;
-use Thrift\Type\TType;
-use Thrift\Type\TMessageType;
-use Thrift\Exception\TException;
 use Thrift\Exception\TProtocolException;
-use Thrift\Protocol\TProtocol;
-use Thrift\Protocol\TBinaryProtocolAccelerated;
-use Thrift\Exception\TApplicationException;
+use Thrift\Type\TType;
 
 class ZipkinCollector_submitZipkinBatch_result
 {
-    static public $isValidate = false;
+    public static $isValidate = false;
 
-    static public $_TSPEC = array(
-        0 => array(
+    public static $_TSPEC = [
+        0 => [
             'var' => 'success',
             'isRequired' => false,
             'type' => TType::LST,
             'etype' => TType::STRUCT,
-            'elem' => array(
+            'elem' => [
                 'type' => TType::STRUCT,
                 'class' => '\Jaeger\Thrift\Agent\Zipkin\Response',
-                ),
-        ),
-    );
+                ],
+        ],
+    ];
 
     /**
      * @var \Jaeger\Thrift\Agent\Zipkin\Response[]
@@ -52,7 +49,6 @@ class ZipkinCollector_submitZipkinBatch_result
         return 'ZipkinCollector_submitZipkinBatch_result';
     }
 
-
     public function read($input)
     {
         $xfer = 0;
@@ -68,7 +64,7 @@ class ZipkinCollector_submitZipkinBatch_result
             switch ($fid) {
                 case 0:
                     if ($ftype == TType::LST) {
-                        $this->success = array();
+                        $this->success = [];
                         $_size21 = 0;
                         $_etype24 = 0;
                         $xfer += $input->readListBegin($_etype24, $_size21);
@@ -82,14 +78,17 @@ class ZipkinCollector_submitZipkinBatch_result
                     } else {
                         $xfer += $input->skip($ftype);
                     }
+
                     break;
                 default:
                     $xfer += $input->skip($ftype);
+
                     break;
             }
             $xfer += $input->readFieldEnd();
         }
         $xfer += $input->readStructEnd();
+
         return $xfer;
     }
 
@@ -111,6 +110,7 @@ class ZipkinCollector_submitZipkinBatch_result
         }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
+
         return $xfer;
     }
 }
