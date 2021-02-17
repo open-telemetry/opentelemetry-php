@@ -18,6 +18,11 @@ final class TracerProvider implements API\TracerProvider
     protected $tracers;
 
     /**
+     * @var IdGenerator
+     */
+    protected $idGenerator;
+
+    /**
      * @var SpanMultiProcessor
      */
     protected $spanProcessors;
@@ -32,11 +37,12 @@ final class TracerProvider implements API\TracerProvider
      */
     private $sampler;
 
-    public function __construct(?ResourceInfo $resource = null, ?Sampler $sampler = null)
+    public function __construct(?ResourceInfo $resource = null, ?Sampler $sampler = null, ?IdGenerator $idGenerator = null)
     {
         $this->spanProcessors = new SpanMultiProcessor();
         $this->resource = $resource ?? ResourceInfo::emptyResource();
         $this->sampler = $sampler ?? new AlwaysOnSampler();
+        $this->idGenerator = $idGenerator ?? new RandomIdGenerator();
 
         register_shutdown_function([$this, 'shutdown']);
     }
@@ -98,5 +104,10 @@ final class TracerProvider implements API\TracerProvider
     public function getResource(): ResourceInfo
     {
         return clone $this->resource;
+    }
+
+    public function getIdGenerator(): IdGenerator
+    {
+        return $this->idGenerator;
     }
 }

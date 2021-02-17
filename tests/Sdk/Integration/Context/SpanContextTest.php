@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Sdk\Integration\Context;
 
 use InvalidArgumentException;
+use OpenTelemetry\Sdk\Trace\RandomIdGenerator;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
@@ -79,5 +80,12 @@ class SpanContextTest extends TestCase
         $spanContext = SpanContext::generate();
         $this->assertTrue($spanContext->isValid());
         $this->assertFalse($spanContext->isSampled());
+    }
+
+    public function testRandomGeneratedIdsCreateValidContext()
+    {
+        $idGenerator = new RandomIdGenerator();
+        $context = new SpanContext($idGenerator->generateTraceId(), $idGenerator->generateSpanId(), 0);
+        $this->assertTrue($context->isValid());
     }
 }
