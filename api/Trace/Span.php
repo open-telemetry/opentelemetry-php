@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace;
 
+use Exception;
+
 interface Span extends SpanStatus, SpanKind
 {
     public function getSpanName(): string;
@@ -57,6 +59,13 @@ interface Span extends SpanStatus, SpanKind
      * @return Span Must return $this to allow setting multiple links at once in a chain.
      */
     public function addLink(SpanContext $context, ?Attributes $attributes = null): Span;
+
+    /**
+     *
+     * @param Exception $exception
+     * @return Span Must return $this to allow setting multiple attributes at once in a chain.
+     */
+    public function recordException(Exception $exception): Span;
 
     /**
      * Calling this method is highly discouraged; the name should be set on creation and left alone.

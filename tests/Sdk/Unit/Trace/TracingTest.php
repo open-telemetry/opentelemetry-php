@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
+use Exception;
 use function iterator_to_array;
 use OpenTelemetry\Sdk\Resource\ResourceConstants;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
@@ -278,6 +279,40 @@ class TracingTest extends TestCase
         ]);
         self::assertEquals($attributes, $event->getAttributes());
 
+        $span->addEvent('update', $timestamp)
+                    ->setAttribute('space', 'guard.session')
+                    ->setAttribute('id', 67235)
+                    ->setAttribute('active_at', time());
+
+        $this->assertCount(2, $span->getEvents());
+    }
+
+    public function testRecordExceptionEventRegistration()
+    {
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+        $span = $tracer->startAndActivateSpan('zerodivisiontest');
+        $firstInput = 1;
+        $secondInput = 0;
+
+        try {
+            // @phpstan-ignore-next-line
+            $firstInput / $secondInput;
+        } catch (Exception $exception) {
+            $span->recordException($exception);
+        }
+
+        $events = $span->getEvents();
+        self::assertCount(1, $events);
+
+        [$event] = iterator_to_array($events);
+        
+        $this->assertSame($event->getName(), 'exception');
+        $this->assertArrayHasKey('exception.type', iterator_to_array($event->getAttributes()));
+        $this->assertArrayHasKey('exception.message', iterator_to_array($event->getAttributes()));
+        $this->assertArrayHasKey('exception.stacktrace', iterator_to_array($event->getAttributes()));
+        
+        $timestamp = Clock::get()->timestamp();
         $span->addEvent('update', $timestamp)
                     ->setAttribute('space', 'guard.session')
                     ->setAttribute('id', 67235)
