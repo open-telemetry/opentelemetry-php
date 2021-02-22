@@ -292,12 +292,9 @@ class TracingTest extends TestCase
         $tracerProvider = new SDK\TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
         $span = $tracer->startAndActivateSpan('zerodivisiontest');
-        $firstInput = 1;
-        $secondInput = 0;
-
+        
         try {
-            // @phpstan-ignore-next-line
-            $firstInput / $secondInput;
+            throw new Exception('Record exception test event');
         } catch (Exception $exception) {
             $span->recordException($exception);
         }

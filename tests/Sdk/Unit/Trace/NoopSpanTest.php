@@ -56,12 +56,9 @@ class NoopSpanTest extends TestCase
     public function eventsCollectionShouldBeEmptyEvenAfterRecordExceptionEventUpdate()
     {
         $this->assertEmpty($this->span->getEvents());
-        $firstInput = 1;
-        $secondInput = 0;
         
         try {
-            // @phpstan-ignore-next-line
-            $firstInput / $secondInput;
+            throw new Exception('Record exception test event');
         } catch (Exception $exception) {
             $this->span->recordException($exception);
         }

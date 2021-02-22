@@ -3,7 +3,6 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use Exception as Exception;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
@@ -57,8 +56,11 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
             'id' => md5((string) microtime(true)),
         ]));
 
-        $exception  = new Exception('Record event test exception');
-        $span->recordException($exception);
+        try {
+            throw new Exception('Record exception test event');
+        } catch (Exception $exception) {
+            $span->recordException($exception);
+        }
 
         $tracer->endActiveSpan();
     }
