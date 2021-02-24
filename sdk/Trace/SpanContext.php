@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use Jaeger\Codec\CodecUtility;
 use OpenTelemetry\Trace as API;
-use Throwable;
 
 final class SpanContext implements API\SpanContext
 {
-    public const INVALID_TRACE = '00000000000000000000000000000000';
+    public const INVALID_TRACE = 0;
     public const VALID_TRACE = '/^[0-9a-f]{32}$/';
-    public const INVALID_SPAN = '0000000000000000';
+    public const INVALID_SPAN = 0;
     public const VALID_SPAN = '/^[0-9a-f]{16}$/';
     public const SAMPLED_FLAG = 1;
 
     /**
-     * @var string
+     * @var int
      */
     private $traceId;
     /**
-     * @var string
+     * @var int
      */
     private $spanId;
     /**
@@ -47,23 +47,28 @@ final class SpanContext implements API\SpanContext
     private $traceFlags;
 
     /**
-     * @param string $traceId
-     * @param string $spanId
+     * @param int $traceId
+     * @param int $spanId
      * @param int $traceFlags
      * @param API\TraceState|null $traceState
      */
-    public function __construct(string $traceId, string $spanId, int $traceFlags, ?API\TraceState $traceState = null)
+    public function __construct(int $traceId, int $spanId, int $traceFlags, ?API\TraceState $traceState = null)
     {
-        if (preg_match(self::VALID_TRACE, $traceId) === 0) {
-            throw new \InvalidArgumentException(
-                sprintf('TraceID must be exactly 16 bytes (32 chars) and at least one non-zero byte, got %s', $traceId)
-            );
-        }
-        if (preg_match(self::VALID_SPAN, $spanId) === 0) {
-            throw new \InvalidArgumentException(
-                sprintf('SpanID must be exactly 8 bytes (16 chars) and at least one non-zero byte, got %s', $spanId)
-            );
-        }
+        /**
+         * For time being keeping the below validation commented,
+         * Later will open it once we have the zipkin exporter working with http traces.
+         */
+
+        // if (preg_match(self::VALID_TRACE, $traceId) === 0) {
+        //     throw new \InvalidArgumentException(
+        //         sprintf('TraceID must be exactly 16 bytes (32 chars) and at least one non-zero byte, got %s', $traceId)
+        //     );
+        // }
+        // if (preg_match(self::VALID_SPAN, $spanId) === 0) {
+        //     throw new \InvalidArgumentException(
+        //         sprintf('SpanID must be exactly 8 bytes (16 chars) and at least one non-zero byte, got %s', $spanId)
+        //     );
+        // }
 
         $this->traceId = $traceId;
         $this->spanId = $spanId;
@@ -71,7 +76,7 @@ final class SpanContext implements API\SpanContext
         $this->isRemote = false;
         $this->isSampled = ($traceFlags & self::SAMPLED_FLAG) === self::SAMPLED_FLAG;
         $this->traceFlags = $traceFlags;
-        $this->isValid = $this->traceId !== self::INVALID_TRACE && $this->spanId !== self::INVALID_SPAN;
+        $this->isValid = $this->traceId !== 0 && $this->spanId !== 0;
     }
 
     /**
@@ -82,7 +87,7 @@ final class SpanContext implements API\SpanContext
      */
     public static function generate(bool $sampled = false): SpanContext
     {
-        return self::fork(self::randomHex(16), $sampled);
+        return self::fork(CodecUtility::getValidI64(16), $sampled);
     }
 
     /**
@@ -98,27 +103,27 @@ final class SpanContext implements API\SpanContext
     /**
      * Creates a new context with random span on the same trace
      *
-     * @param string $traceId Existing trace
+     * @param int $traceId Existing trace
      * @param bool $sampled Default: false
      * @param bool $isRemote Default: false
      * @return SpanContext
      */
-    public static function fork(string $traceId, bool $sampled = false, bool $isRemote = false): SpanContext
+    public static function fork(int $traceId, bool $sampled = false, bool $isRemote = false): SpanContext
     {
-        return self::restore($traceId, self::randomHex(8), $sampled, $isRemote);
+        return self::restore($traceId, CodecUtility::getValidI64(8), $sampled, $isRemote);
     }
 
     /**
      * Generates a context from an already existing trace
      *
-     * @param string $traceId
-     * @param string $spanId
+     * @param int $traceId
+     * @param int $spanId
      * @param bool $sampled
      * @param bool $isRemote Default: false
      * @param API\TraceState|null $traceState
      * @return SpanContext
      */
-    public static function restore(string $traceId, string $spanId, bool $sampled = false, bool $isRemote = false, ?API\TraceState $traceState = null): SpanContext
+    public static function restore(int $traceId, int $spanId, bool $sampled = false, bool $isRemote = false, ?API\TraceState $traceState = null): SpanContext
     {
         $sampleFlag = $sampled ? 1 : 0;
         $trace = new self($traceId, $spanId, $sampleFlag, $traceState);
@@ -128,17 +133,17 @@ final class SpanContext implements API\SpanContext
     }
 
     /**
-     * @return string Returns the TraceID
+     * @return int Returns the TraceID
      */
-    public function getTraceId(): string
+    public function getTraceId(): int
     {
         return $this->traceId;
     }
 
     /**
-     * @return string Returns the SpanID
+     * @return int Returns the SpanID
      */
-    public function getSpanId(): string
+    public function getSpanId(): int
     {
         return $this->spanId;
     }
@@ -173,23 +178,6 @@ final class SpanContext implements API\SpanContext
     public function isRemoteContext(): bool
     {
         return $this->isRemote;
-    }
-
-    /**
-     * Generates a random hex string
-     *
-     * In case where there is not enough entropy for random_bytes() the generation will use a simpler method.
-     *
-     * @param int $length of bytes
-     * @return string
-     */
-    private static function randomHex(int $length): string
-    {
-        try {
-            return bin2hex(random_bytes($length));
-        } catch (Throwable $ex) {
-            return substr(str_shuffle(str_repeat('0123456789abcdef', $length)), 1, $length);
-        }
     }
 
     public function getTraceFlags(): int

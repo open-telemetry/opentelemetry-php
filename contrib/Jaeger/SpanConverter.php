@@ -31,7 +31,8 @@ class SpanConverter
 
     public function convert(Span $span)
     {
-        $spanParent = $traceId = $parentSpanId = $references = $tags = $logs = $type =  null;
+        $spanParent = $parentSpanId = $traceId = $type =  null;
+        $references = $tags = $logs = [];
         $startTime = (int) ($span->getStartEpochTimestamp() / 1e3); // microseconds
         $duration = (int) (($span->getEnd() - $span->getStart()) / 1e3); // microseconds
         $tags = [
@@ -46,7 +47,8 @@ class SpanConverter
 
         $spanParent = $span->getParent();
         $traceId = $span->getContext()->getTraceID();
-        $parentSpanId = $spanParent ? $spanParent->getSpanId() : $span->getContext()->getSpanID();
+        $parentSpanId = $spanParent ? $spanParent->getSpanId() : 0;
+        $spanId = $span->getContext()->getSpanID();
 
         // foreach ($span->getEvents() as $event) {
         //     $logs = [
@@ -55,7 +57,7 @@ class SpanConverter
         //     ];
         // }
 
-        $type = ($parentSpanId != null) ? SpanRefType::CHILD_OF : SpanRefType::FOLLOWS_FROM;
+        //$type = ($parentSpanId != null) ? SpanRefType::CHILD_OF : SpanRefType::FOLLOWS_FROM;
 
         // $references = (array) new SpanRef([
         //     "refType" => $type,
@@ -66,8 +68,8 @@ class SpanConverter
 
         return new JTSpan([
             'traceIdLow' => (is_array($traceId) ? $traceId['low'] : $traceId),
-            'traceIdHigh' => (is_array($traceId) ? $traceId['high'] : $traceId),
-            'spanId' => $span->getContext()->getSpanID(),
+            'traceIdHigh' => (is_array($traceId) ? $traceId['high'] : 0),
+            'spanId' => $spanId,
             'parentSpanId' => $parentSpanId,
             'operationName' => $span->getSpanName(),
             'references' => $references,

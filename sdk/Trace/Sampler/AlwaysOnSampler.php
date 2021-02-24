@@ -24,8 +24,8 @@ class AlwaysOnSampler implements Sampler
      */
     public function shouldSample(
         ?API\SpanContext $parentContext,
-        string $traceId,
-        string $spanId,
+        int $traceId,
+        int $spanId,
         string $spanName,
         int $spanKind,
         ?API\Attributes $attributes = null,

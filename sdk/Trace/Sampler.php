@@ -17,9 +17,9 @@ interface Sampler
      * Returns SamplingResult.
      *
      * @param API\SpanContext|null $parentContext `SpanContext` of a parent Span. Typically extracted from the wire. Can be null.
-     * @param string $traceId TraceId of the Span to be created. It can be different from the TraceId in the SpanContext.
+     * @param int $traceId TraceId of the Span to be created. It can be different from the TraceId in the SpanContext.
      *                        Typically in situations when the Span to be created starts a new Trace.
-     * @param string $spanId SpanId of the Span to be created.
+     * @param int $spanId SpanId of the Span to be created.
      * @param string $spanName Name of the Span to be created.
      * @param int $spanKind Span kind.
      * @param API\Attributes|null $attributes Initial set of Attributes for the Span being constructed.
@@ -30,8 +30,8 @@ interface Sampler
      */
     public function shouldSample(
         ?API\SpanContext $parentContext,
-        string $traceId,
-        string $spanId,
+        int $traceId,
+        int $spanId,
         string $spanName,
         int $spanKind,
         ?API\Attributes $attributes = null,

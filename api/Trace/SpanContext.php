@@ -8,8 +8,8 @@ interface SpanContext
 {
     const TRACE_FLAG_SAMPLED = 1;
 
-    public function getTraceId(): string;
-    public function getSpanId(): string;
+    public function getTraceId(): int;
+    public function getSpanId(): int;
     public function getTraceFlags(): int;
     public function getTraceState(): ?TraceState;
     public function isValidContext(): bool;
