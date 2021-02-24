@@ -52,33 +52,19 @@ class NoopSpanTest extends TestCase
     }
 
     /** @test */
-    public function itsStatusShouldBeOkAndNoUpdatesShouldChangeIt()
+    public function itsStatusShouldBeUnsetAndNoUpdatesShouldChangeIt()
     {
-        $this->assertEquals(
-            SpanStatus::ok(),
-            $this->span->getStatus()
-        );
+        $this->assertFalse($this->span->isStatusOk());
 
-        $this->assertTrue($this->span->isStatusOk());
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $this->span->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $this->span->getCanonicalStatusCode());
 
-        $this->assertEquals(
-            SpanStatus::ok()->getStatusDescription(),
-            $this->span->getStatusDescription()
-        );
+        $this->span->setSpanStatus(\OpenTelemetry\Trace\SpanStatus::ERROR);
 
-        $this->assertEquals(
-            SpanStatus::ok()->getCanonicalStatusCode(),
-            $this->span->getCanonicalStatusCode()
-        );
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $this->span->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $this->span->getCanonicalStatusCode());
 
-        $this->span->setSpanStatus(\OpenTelemetry\Trace\SpanStatus::ABORTED);
-
-        $this->assertEquals(
-            SpanStatus::ok(),
-            $this->span->getStatus()
-        );
-
-        $this->assertTrue($this->span->isStatusOk());
+        $this->assertFalse($this->span->isStatusOk());
     }
 
     /** @test */
