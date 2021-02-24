@@ -65,6 +65,50 @@ class NoopSpanTest extends TestCase
         self::assertEquals(SpanStatus::UNSET, $this->span->getCanonicalStatusCode());
 
         $this->assertFalse($this->span->isStatusOk());
+
+        $this->span->setSpanStatus(\OpenTelemetry\Trace\SpanStatus::OK);
+
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $this->span->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $this->span->getCanonicalStatusCode());
+
+        $this->assertFalse($this->span->isStatusOk());
+
+        $this->span->setSpanStatus('mycode');
+
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $this->span->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $this->span->getCanonicalStatusCode());
+
+        $this->assertFalse($this->span->isStatusOk());
+    }
+
+    /** @test */
+    public function testGetStatusStaysSameAndNoUpdatesShouldChangeIt()
+    {
+        $status = $this->span->getStatus();
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $this->span->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $this->span->getCanonicalStatusCode());
+
+        $this->span->setSpanStatus(\OpenTelemetry\Trace\SpanStatus::ERROR);
+        $status2 = $this->span->getStatus();
+
+        self::assertEquals($status->getStatusDescription(), $status2->getStatusDescription());
+        self::assertEquals($status->getCanonicalStatusCode(), $status2->getCanonicalStatusCode());
+
+        $this->assertFalse($this->span->isStatusOk());
+
+        $this->span->setSpanStatus(\OpenTelemetry\Trace\SpanStatus::OK);
+        $status2 = $this->span->getStatus();
+
+        self::assertEquals($status->getStatusDescription(), $status2->getStatusDescription());
+        self::assertEquals($status->getCanonicalStatusCode(), $status2->getCanonicalStatusCode());
+
+        $this->span->setSpanStatus('mycode');
+        $status2 = $this->span->getStatus();
+
+        self::assertEquals($status->getStatusDescription(), $status2->getStatusDescription());
+        self::assertEquals($status->getCanonicalStatusCode(), $status2->getCanonicalStatusCode());
+
+        $this->assertFalse($this->span->isStatusOk());
     }
 
     /** @test */
