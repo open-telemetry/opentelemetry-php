@@ -9,7 +9,8 @@
         "guzzlehttp/guzzle": "^7.1.0",
         "psr/http-client": "^1.0",
         "php-http/guzzle7-adapter": "^0.1.1",
-        "promphp/prometheus_client_php": "^2.2.1"
+        "promphp/prometheus_client_php": "^2.2.1",
+        "spatie/async": "^1.5"
     },
     "authors": [
         {
