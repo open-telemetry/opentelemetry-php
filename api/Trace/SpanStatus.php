@@ -19,4 +19,5 @@ interface SpanStatus
     public function getCanonicalStatusCode(): string;
     public function getStatusDescription(): string;
     public function isStatusOk(): bool;
+    public function setStatus(string $code = self::UNSET, string $description = null): void;
 }
