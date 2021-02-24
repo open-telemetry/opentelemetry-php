@@ -144,6 +144,60 @@ class TracingTest extends TestCase
         $this->assertSame($tracer->getActiveSpan(), $global);
     }
 
+    public function testGetStatus()
+    {
+        $tracerProvider = new SDK\TracerProvider();
+        /** @var Tracer $tracer */
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+
+        $span = $tracer->startAndActivateSpan('setSpanStatus');
+
+        // If an invalid code is given, SpanStatus should be/remain UNSET.
+        $firstStatus = $span->setSpanStatus('MY_CODE');
+        $status = $firstStatus->getStatus();
+        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
+
+        $firstStatus = $span->setSpanStatus(SpanStatus::UNSET);
+        $status = $firstStatus->getStatus();
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
+
+        $firstStatus = $span->setSpanStatus(SpanStatus::OK);
+        $status = $firstStatus->getStatus();
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::OK], $status->getStatusDescription());
+        self::assertEquals(SpanStatus::OK, $status->getCanonicalStatusCode());
+
+        $firstStatus = $span->setSpanStatus(SpanStatus::ERROR);
+        $status = $firstStatus->getStatus();
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::ERROR], $status->getStatusDescription());
+        self::assertEquals(SpanStatus::ERROR, $status->getCanonicalStatusCode());
+
+        /*
+         * Only ERROR codes should modify span status description.
+         * Description MUST only be used with the Error.
+         */
+        $firstStatus = $span->setSpanStatus('mycode', 'Neunundneunzig Luftballons');
+        $status = $firstStatus->getStatus();
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
+
+        $firstStatus = $span->setSpanStatus(SpanStatus::OK, 'Neunundneunzig Luftballons');
+        $status = $firstStatus->getStatus();
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::OK], $status->getStatusDescription());
+        self::assertEquals(SpanStatus::OK, $status->getCanonicalStatusCode());
+
+        $firstStatus = $span->setSpanStatus(SpanStatus::UNSET, 'Neunundneunzig Luftballons');
+        $status = $firstStatus->getStatus();
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
+
+        $firstStatus = $span->setSpanStatus(SpanStatus::ERROR, 'Neunundneunzig Luftballons');
+        $status = $firstStatus->getStatus();
+        self::assertEquals('Neunundneunzig Luftballons', $status->getStatusDescription());
+        self::assertEquals(SpanStatus::ERROR, $status->getCanonicalStatusCode());
+    }
+
     public function testStatusManipulation()
     {
         $tracerProvider = new SDK\TracerProvider();

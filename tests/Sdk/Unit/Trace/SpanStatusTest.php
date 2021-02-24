@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class SpanStatusTest extends TestCase
 {
-    public function testGetCanonicalCodeAfterFunctionNew()
+    public function testGetCanonicalCode()
     {
         // If an invalid code is given, SpanStatus should be/remain UNSET.
         $status = SpanStatus::new('MY_CODE');
@@ -25,6 +25,24 @@ class SpanStatusTest extends TestCase
         self::assertEquals(SpanStatus::OK, $status->getCanonicalStatusCode());
 
         $status = SpanStatus::new(SpanStatus::ERROR);
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::ERROR], $status->getStatusDescription());
+        self::assertEquals(SpanStatus::ERROR, $status->getCanonicalStatusCode());
+
+        // Using new SpanStatus
+        // If an invalid code is given, SpanStatus should be/remain UNSET.
+        $status = new SpanStatus('MY_CODE');
+        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
+
+        $status = new SpanStatus(SpanStatus::UNSET);
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
+
+        $status = new SpanStatus(SpanStatus::OK);
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::OK], $status->getStatusDescription());
+        self::assertEquals(SpanStatus::OK, $status->getCanonicalStatusCode());
+
+        $status = new SpanStatus(SpanStatus::ERROR);
         self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::ERROR], $status->getStatusDescription());
         self::assertEquals(SpanStatus::ERROR, $status->getCanonicalStatusCode());
     }
@@ -69,32 +87,16 @@ class SpanStatusTest extends TestCase
         self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
     }
 
-    public function testGetCanonicalCode()
-    {
-        // If an invalid code is given, SpanStatus should be/remain UNSET.
-        $status = new SpanStatus('MY_CODE');
-        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
-        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
-
-        $status = new SpanStatus(SpanStatus::UNSET);
-        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
-        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
-
-        $status = new SpanStatus(SpanStatus::OK);
-        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::OK], $status->getStatusDescription());
-        self::assertEquals(SpanStatus::OK, $status->getCanonicalStatusCode());
-
-        $status = new SpanStatus(SpanStatus::ERROR);
-        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::ERROR], $status->getStatusDescription());
-        self::assertEquals(SpanStatus::ERROR, $status->getCanonicalStatusCode());
-    }
-
     public function testGetDescription()
     {
         /*
          * Only ERROR codes should modify span status description.
          * Description MUST only be used with the Error.
          */
+        $status = new SpanStatus('mycode', 'Neunundneunzig Luftballons');
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
+
         $status = new SpanStatus(SpanStatus::OK, 'Neunundneunzig Luftballons');
         self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::OK], $status->getStatusDescription());
         self::assertEquals(SpanStatus::OK, $status->getCanonicalStatusCode());
@@ -107,7 +109,6 @@ class SpanStatusTest extends TestCase
         self::assertEquals('Neunundneunzig Luftballons', $status->getStatusDescription());
         self::assertEquals(SpanStatus::ERROR, $status->getCanonicalStatusCode());
     }
-
     public function testSetStatusWithoutDescription()
     {
         /*
