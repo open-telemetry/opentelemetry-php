@@ -69,6 +69,18 @@ class TracerProviderTest extends TestCase
     /**
      * @test
      */
+    public function newTraceProviderGetIdGenerator()
+    {
+        $traceProvider = new TracerProvider();
+        $idGen = $traceProvider->getIdGenerator();
+        $spanID = $idGen->generateSpanID();
+        $traceId = $idGen->generateTraceId();
+        self::assertTrue(true, 'Not implemented yet but code coverage noticed.');
+    }
+
+    /**
+     * @test
+     */
     public function newTraceProviderAcceptsOtherSamplers()
     {
         $traceProvider = new TracerProvider(null, new AlwaysOffSampler());
@@ -133,6 +145,7 @@ class TracerProviderTest extends TestCase
 
         $this->assertCount(6, $attributes);
     }
+
     /**
      * @test
      */

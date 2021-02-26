@@ -19,8 +19,8 @@ class Span implements API\Span
     private $startEpochTimestamp;
     private $start;
     private $end;
-    private $statusCode;
-    private $statusDescription;
+
+    private $spanStatus;
 
     /**
      * @var ResourceInfo
@@ -63,8 +63,7 @@ class Span implements API\Span
         $moment = Clock::get()->moment();
         $this->startEpochTimestamp = $moment[0];
         $this->start = $moment[1];
-        $this->statusCode = API\SpanStatus::OK;
-        $this->statusDescription = API\SpanStatus::DESCRIPTION[$this->statusCode];
+        $this->spanStatus = new SpanStatus();
 
         // todo: set these to null until needed
         $this->attributes = new Attributes();
@@ -90,8 +89,7 @@ class Span implements API\Span
     public function setSpanStatus(string $code, ?string $description = null): API\Span
     {
         if ($this->isRecording()) {
-            $this->statusCode = $code;
-            $this->statusDescription = $description ?? self::DESCRIPTION[$code] ?? self::DESCRIPTION[self::UNKNOWN];
+            $this->spanStatus->setStatus($code, $description);
         }
 
         return $this;
@@ -141,7 +139,7 @@ class Span implements API\Span
 
     public function getStatus(): API\SpanStatus
     {
-        return SpanStatus::new($this->statusCode, $this->statusDescription);
+        return $this->spanStatus;
     }
 
     public function isRecording(): bool
@@ -273,16 +271,16 @@ class Span implements API\Span
 
     public function getCanonicalStatusCode(): string
     {
-        return $this->statusCode;
+        return $this->spanStatus->getCanonicalStatusCode();
     }
 
     public function getStatusDescription(): string
     {
-        return $this->statusDescription;
+        return $this->spanStatus->getStatusDescription();
     }
 
     public function isStatusOk(): bool
     {
-        return $this->statusCode == API\SpanStatus::OK;
+        return $this->spanStatus->isStatusOK();
     }
 }

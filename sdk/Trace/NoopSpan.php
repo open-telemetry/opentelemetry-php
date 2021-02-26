@@ -47,7 +47,7 @@ class NoopSpan implements \OpenTelemetry\Trace\Span
         }
         $this->attributes = new Attributes();
         $this->events = new Events();
-        $this->status = SpanStatus::ok();
+        $this->status = new SpanStatus();
     }
 
     public function getSpanName(): string
