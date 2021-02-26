@@ -56,6 +56,12 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
             'id' => md5((string) microtime(true)),
         ]));
 
+        try {
+            throw new Exception('Record exception test event');
+        } catch (Exception $exception) {
+            $span->recordException($exception);
+        }
+        
         $tracer->endActiveSpan();
     }
     echo PHP_EOL . 'AlwaysOnZipkinExample complete!  See the results at http://localhost:9411/';

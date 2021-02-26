@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
+use Exception;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\NoopSpan;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
@@ -48,6 +49,20 @@ class NoopSpanTest extends TestCase
         $this->assertEmpty($this->span->getEvents());
 
         $this->span->addEvent('event', (Clock::get())->timestamp());
+        $this->assertEmpty($this->span->getEvents());
+    }
+
+    /** @test */
+    public function eventsCollectionShouldBeEmptyEvenAfterRecordExceptionEventUpdate()
+    {
+        $this->assertEmpty($this->span->getEvents());
+        
+        try {
+            throw new Exception('Record exception test event');
+        } catch (Exception $exception) {
+            $this->span->recordException($exception);
+        }
+
         $this->assertEmpty($this->span->getEvents());
     }
 
