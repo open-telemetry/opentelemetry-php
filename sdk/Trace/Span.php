@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use Exception;
+use OpenTelemetry\Context\ContextKey;
+use OpenTelemetry\Context\ContextValueTrait;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 
 class Span implements API\Span
 {
+    use ContextValueTrait;
+
     private $name;
     private $spanContext;
     private $parentSpanContext;
@@ -33,6 +37,9 @@ class Span implements API\Span
 
     private $ended = false;
 
+    /** @var ?SpanProcessor */
+    private $spanProcessor;
+
     // todo: missing links: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-links
 
     // -> Need to understand the difference between SpanKind and links.  From the documentation:
@@ -52,7 +59,8 @@ class Span implements API\Span
         ?API\SpanContext $parentSpanContext = null,
         ?Sampler $sampler = null,
         ?ResourceInfo $resource = null,
-        int $spanKind = API\SpanKind::KIND_INTERNAL
+        ?int $spanKind = API\SpanKind::KIND_INTERNAL,
+        ?SpanProcessor $spanProcessor = null
     ) {
         $this->name = $name;
         $this->spanContext = $spanContext;
@@ -60,6 +68,7 @@ class Span implements API\Span
         $this->spanKind = $spanKind;
         $this->sampler = $sampler;
         $this->resource =  $resource ?? ResourceInfo::emptyResource();
+        $this->spanProcessor = $spanProcessor;
         $moment = Clock::get()->moment();
         $this->startEpochTimestamp = $moment[0];
         $this->start = $moment[1];
@@ -114,6 +123,10 @@ class Span implements API\Span
         if (!isset($this->end)) {
             $this->end = $now ?? Clock::get()->now();
             $this->ended = true;
+        }
+
+        if ($this->spanProcessor !== null) {
+            $this->spanProcessor->onEnd($this);
         }
 
         return $this;
@@ -284,5 +297,14 @@ class Span implements API\Span
     public function isStatusOk(): bool
     {
         return $this->statusCode == API\SpanStatus::OK;
+    }
+
+    /**
+     * @return ContextKey
+     * @phan-override
+     */
+    protected static function getContextKey(): ContextKey
+    {
+        return SpanContextKey::instance();
     }
 }
