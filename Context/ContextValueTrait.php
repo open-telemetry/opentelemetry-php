@@ -9,6 +9,7 @@ trait ContextValueTrait
     /**
      * @param Context $context
      * @return mixed|null
+     * @phan-suppress PhanAbstractStaticMethodCallInTrait
      */
     public static function extract(Context $context)
     {
@@ -23,6 +24,7 @@ trait ContextValueTrait
      * @param mixed $value
      * @param Context $context
      * @return Context
+     * @phan-suppress PhanAbstractStaticMethodCallInTrait
      */
     public static function insert($value, Context $context): Context
     {
@@ -32,6 +34,7 @@ trait ContextValueTrait
     /**
      * @param mixed $value
      * @return Scope
+     * @phan-suppress PhanAbstractStaticMethodCallInTrait
      */
     public static function setCurrent($value): Scope
     {
@@ -42,6 +45,7 @@ trait ContextValueTrait
 
     /**
      * @return mixed|null
+     * @phan-suppress PhanAbstractStaticMethodCallInTrait
      */
     public static function getCurrent()
     {

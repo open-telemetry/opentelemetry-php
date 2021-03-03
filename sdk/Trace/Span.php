@@ -59,7 +59,7 @@ class Span implements API\Span
         ?API\SpanContext $parentSpanContext = null,
         ?Sampler $sampler = null,
         ?ResourceInfo $resource = null,
-        ?int $spanKind = API\SpanKind::KIND_INTERNAL,
+        int $spanKind = API\SpanKind::KIND_INTERNAL,
         ?SpanProcessor $spanProcessor = null
     ) {
         $this->name = $name;
