@@ -60,7 +60,6 @@ final class TracerProvider implements API\TracerProvider
             return $this->tracers[$key];
         }
 
-        $spanContext = SpanContext::generateSampled();
         /*
          * A resource can be associated with the TracerProvider when the TracerProvider is created.
          * That association cannot be changed later. When associated with a TracerProvider, all
@@ -79,8 +78,7 @@ final class TracerProvider implements API\TracerProvider
 
         return $this->tracers[$key] = new Tracer(
             $this,
-            ResourceInfo::merge($primary, $resource),
-            $spanContext
+            ResourceInfo::merge($primary, $resource)
         );
     }
 

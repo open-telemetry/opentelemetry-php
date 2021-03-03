@@ -39,8 +39,9 @@ sleep(1);
 $rootScope = Span::setCurrent($rootSpan); // set the root span active in the current context
 
 try {
-    $span1 = $tracer->startSpan('span-1');
+    $span1 = $tracer->startSpan('child-span-1');
     $internalScope = Span::setCurrent($span1); // set the child span active in the context
+
     try {
         for ($i = 0; $i < 3; $i++) {
             $loopSpan = $tracer->startSpan('loop-' . $i);
@@ -48,23 +49,27 @@ try {
             $loopSpan->end();
         }
     } finally {
-        $internalScope->close(); // deactivate child span, the rootSpan is set as active
+        $internalScope->close(); // deactivate child span, the rootSpan is set back as active
     }
     $span1->end();
     
-    $span2 = $tracer->startSpan('span-2');
+    $span2 = $tracer->startSpan('child-span-2');
     sleep(1);
     $span2->end();
 } finally {
-    $rootScope->close(); // close the scope of the root span, now active span in context now
+    $rootScope->close(); // close the scope of the root span, no active span in the context now
 }
 $rootSpan->end();
  
 // start the second root span
-$secondRootSpan = $tracer->startSpan('span-out');
+$secondRootSpan = $tracer->startSpan('root-span-2');
 sleep(2);
 $secondRootSpan->end();
 
+echo 'This example generates two traces:' . PHP_EOL;
+echo '  - ' . $rootSpan->getContext()->getTraceId() . PHP_EOL;
+echo '  - ' . $secondRootSpan->getContext()->getTraceId() . PHP_EOL;
+echo PHP_EOL;
 echo 'See the results at' . PHP_EOL;
-echo 'Jaeger: http://localhost:16686/' . PHP_EOL;;
-echo 'Zipkin: http://localhost:9411/' . PHP_EOL;;
+echo 'Jaeger: http://localhost:16686/' . PHP_EOL;
+echo 'Zipkin: http://localhost:9411/' . PHP_EOL;

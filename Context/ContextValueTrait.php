@@ -7,25 +7,46 @@ namespace OpenTelemetry\Context;
 trait ContextValueTrait
 {
     /**
+     * @param Context $context
+     * @return mixed|null
+     */
+    public static function extract(Context $context)
+    {
+        try {
+            return $context->get(static::getContextKey());
+        } catch (ContextValueNotFoundException $e) {
+            return null;
+        }
+    }
+
+    /**
      * @param mixed $value
-     * @param Context|null $context
+     * @param Context $context
+     * @return Context
+     */
+    public static function insert($value, Context $context): Context
+    {
+        return $context->set(static::getContextKey(), $value);
+    }
+
+    /**
+     * @param mixed $value
      * @return Scope
      */
-    public static function setCurrent($value, ?Context $context = null): Scope
+    public static function setCurrent($value): Scope
     {
-        $context = $context ?? Context::getCurrent()->set(static::getContextKey(), $value);
+        $context = Context::getCurrent()->set(static::getContextKey(), $value);
 
         return new Scope(Context::attach($context));
     }
 
     /**
-     * @param Context|null $context
      * @return mixed|null
      */
-    public static function getCurrent(?Context $context = null)
+    public static function getCurrent()
     {
         try {
-            return ($context ?? Context::getCurrent())->get(static::getContextKey());
+            return Context::getCurrent()->get(static::getContextKey());
         } catch (ContextValueNotFoundException $e) {
             return null;
         }

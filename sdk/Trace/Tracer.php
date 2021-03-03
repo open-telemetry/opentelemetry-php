@@ -14,9 +14,6 @@ class Tracer implements API\Tracer
     private $spans = [];
     private $tail = [];
 
-    /** @var string */
-    private $traceId;
-
     /** @var TracerProvider  */
     private $provider;
     /** @var ResourceInfo */
@@ -42,18 +39,19 @@ class Tracer implements API\Tracer
         ?API\Links $links = null,
         ?int $startTimestamp = null
     ): API\Span {
-        $parentContext = $parentContext ?? Context::getCurrent();
-        $parentSpan = Span::getCurrent($parentContext);
+        $parentSpan = $parentContext !== null ? Span::extract($parentContext) : Span::getCurrent();
         $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
 
-        if ($this->traceId === null) {
-            $this->traceId = $parentSpan !== null ? $parentSpanContext->getTraceId() : $this->provider->getIdGenerator()->generateTraceId();
-        }
+        /**
+         * Implementations MUST generate a new TraceId for each root span created.
+         * For a Span with a parent, the TraceId MUST be the same as the parent.
+         */
+        $traceId = $parentSpanContext->isValid() ? $parentSpanContext->getTraceId() : $this->provider->getIdGenerator()->generateTraceId();
         $spanId = $this->provider->getIdGenerator()->generateSpanId();
 
         $sampleResult = $this->provider->getSampler()->shouldSample(
             $parentSpanContext, // TODO: change to `Context`
-            $this->traceId,
+            $traceId,
             $spanId,
             $name,
             $spanKind,
@@ -62,8 +60,9 @@ class Tracer implements API\Tracer
         );
         // TODO: Merge sampling attributes from $sampleResult
 
-        $traceFlags = ($sampleResult->getDecision() === SamplingResult::RECORD_AND_SAMPLED) ? SpanContext::TRACE_FLAG_SAMPLED : 0;
-        $spanContext = new SpanContext($this->traceId, $spanId, $traceFlags, new TraceState());
+        $traceFlags = $sampleResult->getDecision() === SamplingResult::RECORD_AND_SAMPLED ? SpanContext::TRACE_FLAG_SAMPLED : 0;
+        $traceState = $parentSpanContext->isValid() ? $parentSpanContext->getTraceState() : new TraceState();
+        $spanContext = new SpanContext($traceId, $spanId, $traceFlags, $traceState);
 
         $span = new Span(
             $name,
