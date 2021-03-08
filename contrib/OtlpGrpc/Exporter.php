@@ -15,6 +15,7 @@ use Opentelemetry\Proto\Common\V1\KeyValue;
 use Opentelemetry\Proto\Common\V1\AnyValue;
 use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
+use Opentelemetry\Proto\Trace\V1\Span\Event;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
 use Opentelemetry\Proto\Trace\V1\Status;
@@ -229,11 +230,9 @@ class Exporter implements Trace\Exporter
         $end_timestamp = ($span->getStartEpochTimestamp() + $duration_ns);
 
         $row = [
-            // TODO: Fix this, I was getting 32, and 16 byte ids sent to the collector which it didn't like
-            // fudged it with this substr for now, it's possibly an easy fix
-            'trace_id' => substr($span->getContext()->getTraceId(), 0, 16),
-            'span_id' => substr($span->getContext()->getSpanId(), 0, 8),
-            'parent_span_id' => $span->getParent() ? $span->getParent()->getSpanId() : null,
+            'trace_id' => hex2bin($span->getContext()->getTraceId()),
+            'span_id' => hex2bin($span->getContext()->getSpanId()),
+            'parent_span_id' => $span->getParent() ? hex2bin($span->getParent()->getSpanId()) : null,
             // 'localEndpoint' => [
             //     'serviceName' => $this->serviceName,
             // ],
@@ -248,13 +247,13 @@ class Exporter implements Trace\Exporter
 
 
         foreach ($span->getEvents() as $event) {
-            if (!array_key_exists('annotations', $row)) {
-                $row['annotations'] = [];
+            if (!array_key_exists('events', $row)) {
+                $row['events'] = [];
             }
-            $row['annotations'][] = [
-                'timestamp' => (int) ($event->getTimestamp() / 1e3), // RealtimeClock in microseconds
-                'value' => $event->getName(),
-            ];
+            $row['events'][] = new Event([
+                'time_unix_nano' => $event->getTimestamp(), // RealtimeClock in microseconds
+                'name' => $event->getName(),
+            ]);
         }
 
         foreach ($span->getAttributes() as $k => $v) {
