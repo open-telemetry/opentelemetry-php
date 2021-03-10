@@ -72,7 +72,11 @@ You can use the [examples/AlwaysOnZipkinExample.php](/examples/AlwaysOnZipkinExa
 
 You can also use the [examples/AlwaysOnJaegerExample.php](/examples/AlwaysOnJaegerExample.php) file to test out the reference implementation we have for jaegar.  This example perfoms a sample trace with a grouping of 5 spans and POSTs the result to a local jaegar instance.
 
-The PHP for both examples should execute by itself (if you have a zipkin or jaegar instance running on localhost), but if you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
+You can use the [examples/AlwaysOnZipkinToNewrelicExample.php](/examples/AlwaysOnZipkinToNewrelicExample.php) file to test out the reference implementation we have for zipkin to Newrelic.  This example perfoms a sample trace with spans and POSTs the result to a Newrelic endpoint.  This requires a license key (free accounts available) to be set in the environment (NEW_RELIC_INSERT_KEY) to authenticate to the backend.
+
+You can use the [examples/AlwaysOnNewrelicExample.php](/examples/AlwaysOnNewrelicExample.php) file to test out the reference implementation we have for Newrelic.  This example perfoms a sample trace with spans and POSTs the result to a Newrelic endpoint.  This requires a license key (free accounts available) set in the environment (NEW_RELIC_INSERT_KEY) to authenticate to the backend.
+
+The PHP for all examples should execute by itself (if you have a zipkin or jaegar instance running on localhost), but if you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
 
 1.)  Install the necessary dependencies by running `make install`.  This will install the composer dependencies and store them in `/vendor`  
 2.)  Execute the example trace using `make trace examples`.
