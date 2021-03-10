@@ -41,12 +41,12 @@ class NewrelicSpanConverterTest extends TestCase
         $this->assertNull($row['attributes']['parent.id']);
         $this->assertSame($span->getSpanName(), $row['attributes']['name']);
 
-        $this->assertIsInt($row['attributes']['timestamp']);
+        $this->assertIsFloat($row['attributes']['timestamp']);
         // timestamp should be in milliseconds
         $this->assertGreaterThan(1e12, $row['attributes']['timestamp']);
 
-        $this->assertIsInt($row['attributes']['duration.ms']);
-        $this->assertEquals(0, $row['attributes']['duration.ms']);
+        $this->assertIsFloat($row['attributes']['duration.ms']);
+        $this->assertGreaterThan(0, $row['attributes']['duration.ms']);
 
         /** @var Attribute $attribute */
         $attribute = $span->getAttribute('service');
@@ -63,7 +63,7 @@ class NewrelicSpanConverterTest extends TestCase
         $row = (new SpanConverter('duration.test'))->convert($span);
 
         $this->assertEquals(
-            (int) (($span->getEnd() - $span->getStart()) / 1000000),
+            (($span->getEnd() - $span->getStart()) / 1000000),
             $row['attributes']['duration.ms']
         );
     }
