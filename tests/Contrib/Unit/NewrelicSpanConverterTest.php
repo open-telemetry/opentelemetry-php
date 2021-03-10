@@ -105,7 +105,7 @@ class NewrelicSpanConverterTest extends TestCase
         $this->assertEquals($attributes['boolean-1'], true);
         $this->assertEquals($attributes['boolean-2'], false);
 
-        // Lists must be casted to strings and joined with a separator
+        // Lists are accepted
         $this->assertEquals($attributes['list-of-strings'], $listOfStrings);
         $this->assertEquals($attributes['list-of-numbers'], $listOfNumbers);
         $this->assertEquals($attributes['list-of-booleans'], $listOfBooleans);
