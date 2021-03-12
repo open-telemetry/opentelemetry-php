@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 
@@ -28,6 +29,54 @@ class Tracer implements API\Tracer
         $this->provider = $provider;
         $this->resource = $resource ?? ResourceInfo::emptyResource();
         $this->importedContext = $context;
+    }
+
+    public function startSpan(
+        string $name,
+        ?Context $parentContext = null,
+        int $spanKind = API\SpanKind::KIND_INTERNAL,
+        ?API\Attributes $attributes = null,
+        ?API\Links $links = null,
+        ?int $startTimestamp = null
+    ): API\Span {
+        $parentSpan = $parentContext !== null ? Span::extract($parentContext) : Span::getCurrent();
+        $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
+
+        /**
+         * Implementations MUST generate a new TraceId for each root span created.
+         * For a Span with a parent, the TraceId MUST be the same as the parent.
+         */
+        $traceId = $parentSpanContext->isValid() ? $parentSpanContext->getTraceId() : $this->provider->getIdGenerator()->generateTraceId();
+        $spanId = $this->provider->getIdGenerator()->generateSpanId();
+
+        $sampleResult = $this->provider->getSampler()->shouldSample(
+            $parentSpanContext, // TODO: change to `Context`
+            $traceId,
+            $spanId,
+            $name,
+            $spanKind,
+            $attributes,
+            $links
+        );
+        // TODO: Merge sampling attributes from $sampleResult
+
+        $traceFlags = $sampleResult->getDecision() === SamplingResult::RECORD_AND_SAMPLED ? SpanContext::TRACE_FLAG_SAMPLED : 0;
+        $traceState = $parentSpanContext->isValid() ? $parentSpanContext->getTraceState() : new TraceState();
+        $spanContext = new SpanContext($traceId, $spanId, $traceFlags, $traceState);
+
+        $span = new Span(
+            $name,
+            $spanContext,
+            $parentSpanContext,
+            $this->provider->getSampler(),
+            $this->resource,
+            $spanKind,
+            $this->provider->getSpanProcessor()
+        );
+
+        $this->provider->getSpanProcessor()->onStart($span);
+
+        return $span;
     }
 
     public function getActiveSpan(): API\Span

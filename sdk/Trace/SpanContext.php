@@ -74,6 +74,11 @@ final class SpanContext implements API\SpanContext
         $this->isValid = $this->traceId !== self::INVALID_TRACE && $this->spanId !== self::INVALID_SPAN;
     }
 
+    public static function getInvalid(): API\SpanContext
+    {
+        return new self(self::INVALID_TRACE, self::INVALID_SPAN, 0);
+    }
+
     /**
      * Creates a new context with random trace
      *

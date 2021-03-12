@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use Exception;
+use OpenTelemetry\Context\ContextKey;
+use OpenTelemetry\Context\ContextValueTrait;
 use OpenTelemetry\Trace as API;
 
-class NoopSpan implements \OpenTelemetry\Trace\Span
+class NoopSpan implements API\Span
 {
+    use ContextValueTrait;
+
     /** @var API\SpanContext */
     private $context;
 
@@ -182,5 +186,14 @@ class NoopSpan implements \OpenTelemetry\Trace\Span
     public function isStatusOk(): bool
     {
         return $this->status->isStatusOK();
+    }
+
+    /**
+     * @return ContextKey
+     * @phan-override
+     */
+    protected static function getContextKey(): ContextKey
+    {
+        return SpanContextKey::instance();
     }
 }
