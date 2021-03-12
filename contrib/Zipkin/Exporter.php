@@ -7,7 +7,7 @@ namespace OpenTelemetry\Contrib\Zipkin;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
-use Http\Adapter\Guzzle6\Client;
+use Http\Adapter\Guzzle7\Client;
 use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;

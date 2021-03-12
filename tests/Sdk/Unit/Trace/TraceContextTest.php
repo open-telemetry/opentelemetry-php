@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 use OpenTelemetry\Sdk\Trace\PropagationMap;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\TraceContext;
+use OpenTelemetry\Sdk\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
 class TraceContextTest extends TestCase
@@ -30,9 +31,9 @@ class TraceContextTest extends TestCase
     /**
      * @test
      */
-    public function testExtractValidTraceContext()
+    public function testExtractValidTraceparent()
     {
-        $traceparentValues = [self::TRACEPARENTVALUE,                                               // sampled == true
+        $traceparentValues = [self::TRACEPARENTVALUE,
                               self::VERSION . '-' . self::TRACEID . '-' . self::SPANID . '-00', ];  // sampled == false
 
         foreach ($traceparentValues as $traceparentValue) {
@@ -47,7 +48,27 @@ class TraceContextTest extends TestCase
     /**
      * @test
      */
-    public function testExtractInvalidTraceContext()
+    public function testExtractValidTracestate()
+    {
+        $tracestateValues = ['vendor1=opaqueValue1',
+                             'vendor2=opaqueValue2,vendor3=opaqueValue3', ];
+
+        foreach ($tracestateValues as $tracestate) {
+            $carrier = [TraceContext::TRACEPARENT => self::TRACEPARENTVALUE,
+                        TraceContext::TRACESTATE => $tracestate, ];
+
+            $map = new PropagationMap();
+            $context = TraceContext::extract($carrier, $map);
+
+            $extractedTracestate = $context->getTraceState();
+            $this->assertSame($tracestate, $extractedTracestate ? $extractedTracestate->build() : '');
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function testExtractInvalidTraceparent()
     {
         $carrier = [];
         $map = new PropagationMap();
@@ -60,7 +81,35 @@ class TraceContextTest extends TestCase
     /**
      * @test
      */
-    public function testInjectValidTraceContext()
+    public function testExtractInvalidTracestate()
+    {
+        // Tracestate with an invalid key
+        $carrier = [TraceContext::TRACEPARENT => self::TRACEPARENTVALUE,
+                    TraceContext::TRACESTATE => '@vendor1=opaqueValue1,vendor2=opaqueValue2', ];
+
+        $map = new PropagationMap();
+        $context = TraceContext::extract($carrier, $map);
+
+        // Invalid list-member should be dropped
+        $extractedTracestate = $context->getTraceState();
+        $this->assertSame('vendor2=opaqueValue2', $extractedTracestate ? $extractedTracestate->build() : '');
+
+        // Tracestate with an invalid value
+        $carrier = [TraceContext::TRACEPARENT => self::TRACEPARENTVALUE,
+                    TraceContext::TRACESTATE => 'vendor3=opaqueValue3,vendor4=' . chr(0x7F) . 'opaqueValue4', ];
+
+        $map = new PropagationMap();
+        $context = TraceContext::extract($carrier, $map);
+
+        // Invalid list-member should be dropped
+        $extractedTracestate = $context->getTraceState();
+        $this->assertSame('vendor3=opaqueValue3', $extractedTracestate ? $extractedTracestate->build() : '');
+    }
+
+    /**
+     * @test
+     */
+    public function testInjectValidTraceparent()
     {
         $carrier = [];
         $map = new PropagationMap();
@@ -73,7 +122,21 @@ class TraceContextTest extends TestCase
     /**
      * @test
      */
-    public function testTraceparentLength()
+    public function testInjectValidTracestate()
+    {
+        $carrier = [];
+        $map = new PropagationMap();
+        $tracestate = new TraceState('vendor1=opaqueValue1');
+        $context = SpanContext::restore(self::TRACEID, self::SPANID, true, false, $tracestate);
+        TraceContext::inject($context, $carrier, $map);
+
+        $this->assertSame('vendor1=opaqueValue1', $map->get($carrier, TraceContext::TRACESTATE));
+    }
+
+    /**
+     * @test
+     */
+    public function testInvalidTraceparentLength()
     {
         $invalidValues = [self::TRACEPARENTVALUE . '-extra',                            // Length > 4 values
                           self::VERSION . '-' . self::SPANID . '-' . self::SAMPLED, ];  // Length < 4 values
@@ -96,7 +159,7 @@ class TraceContextTest extends TestCase
         $invalidValues = ['ff',     // invalid hex value
                           '003',    // Length > 2
                           '1',      // Length < 2
-                          '0j', ];  // Hex character != 'a - f or 0 - 9'
+                          '0j', ];  // Hex character != 'a - f' or '0 - 9'
 
         $buildTraceparent = self::TRACEID . '-' . self::SPANID . '-' . self::SAMPLED;
 
@@ -156,7 +219,7 @@ class TraceContextTest extends TestCase
     /**
      * @test
      */
-    public function testInvalidTraceFlags()
+    public function testInvalidTraceparentTraceFlags()
     {
         $invalidValues = ['003',    // Length > 2
                           '1',      // Length < 2

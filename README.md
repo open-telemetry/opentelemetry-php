@@ -13,7 +13,7 @@ We keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemet
  which features are available and which have not yet been implemented.
  
 ## Communication
-Most of our communication is done on gitter.im in the [opentelemetry-php](https://gitter.im/open-telemetry/opentelemetry-php) channel.
+Most of our communication is done on CNCF Slack, in the [otel-php](https://cloud-native.slack.com/archives/C01NFPCV44V) channel. To sign up, create a CNCF slack account here http://slack.cncf.io/
 
 Our meetings are held weekly on zoom on Wednesdays at 10:30am PST / 1:30pm EST.  
 A Google calendar invite with the included zoom link can be found [here](https://calendar.google.com/event?action=TEMPLATE&tmeid=N2VtZXZmYnVmbzZkYjZkbTYxdjZvYTdxN21fMjAyMDA5MTZUMTczMDAwWiBrYXJlbnlyeHVAbQ&tmsrc=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com&scp=ALL)
@@ -42,7 +42,7 @@ We use docker and docker-compose to perform a lot of our static analysis and tes
 If you're planning to develop for this library, it'll help to install `docker engine` and `docker-compose`.  
 You can find installation instructions for these packages can be found [here](https://docs.docker.com/install/), under the `Docker Engine` and `Docker Compose` submenus respectively.
 
-##Proto Generation
+## Proto Generation
 In order to generate proto files for use with this repository, we can perform a 
 
 `make proto`
@@ -93,3 +93,7 @@ The easy way to test the example out with docker and docker-compose is:
 3.) Go to Graph section, type "opentelemetry_prometheus_counter" in the search field or select it in the dropdown menu. You will see the counter value. Every other time you run `make metrics-prometheus-example` will increment the counter but remember that Prometheus scrapes values once in 10 seconds.
 
 4.) In order to stop docker containers for this example just run `make stop-prometheus`
+
+## Versioning
+
+Versioning rationale can be found in the [Versioning Documentation](/docs/versioning.md)

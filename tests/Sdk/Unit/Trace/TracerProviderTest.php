@@ -34,12 +34,48 @@ class TracerProviderTest extends TestCase
     /**
      * @test
      */
+    public function gettingTracersWithDifferentVersionReturnsDifferentTracers()
+    {
+        $traceProvider = new TracerProvider();
+        $tracer1 = $traceProvider->getTracer('test_tracer', 'v1');
+        $tracer2 = $traceProvider->getTracer('test_tracer', 'v2');
+
+        self::assertNotSame($tracer1, $tracer2);
+    }
+
+    /**
+     * @test
+     */
+    public function gettingTracersWithSameNameAndVersionReturnsSameTracer()
+    {
+        $traceProvider = new TracerProvider();
+        $tracer1 = $traceProvider->getTracer('test_tracer', 'v1');
+        $tracer2 = $traceProvider->getTracer('test_tracer', 'v1');
+
+        self::assertSame($tracer1, $tracer2);
+    }
+
+    /**
+     * @test
+     */
     public function newTraceProviderDefaultsToAlwaysOnSampler()
     {
         $traceProvider = new TracerProvider();
         $description = $traceProvider->getSampler()->getDescription();
 
         self::assertSame($description, 'AlwaysOnSampler');
+    }
+
+    /**
+     * @test
+     */
+    public function newTraceProviderGetIdGenerator()
+    {
+        $traceProvider = new TracerProvider();
+        $idGen = $traceProvider->getIdGenerator();
+        $spanID = $idGen->generateSpanID();
+        $traceId = $idGen->generateTraceId();
+        self::assertTrue(true, 'Not implemented yet but code coverage noticed.');
     }
 
     /**
@@ -52,7 +88,7 @@ class TracerProviderTest extends TestCase
 
         self::assertSame($description, 'AlwaysOffSampler');
 
-        $traceProvider = new TracerProvider(null, new ParentBased());
+        $traceProvider = new TracerProvider(null, new ParentBased(new AlwaysOffSampler()));
         $description = $traceProvider->getSampler()->getDescription();
 
         self::assertSame($description, 'ParentBased');
@@ -109,6 +145,7 @@ class TracerProviderTest extends TestCase
 
         $this->assertCount(6, $attributes);
     }
+
     /**
      * @test
      */

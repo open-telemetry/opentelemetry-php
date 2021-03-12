@@ -12,11 +12,15 @@ use OpenTelemetry\Trace as API;
 
 final class TracerProvider implements API\TracerProvider
 {
-
     /**
      * @var Tracer[]
      */
     protected $tracers;
+
+    /**
+     * @var IdGenerator
+     */
+    protected $idGenerator;
 
     /**
      * @var SpanMultiProcessor
@@ -33,11 +37,12 @@ final class TracerProvider implements API\TracerProvider
      */
     private $sampler;
 
-    public function __construct(?ResourceInfo $resource = null, ?Sampler $sampler = null)
+    public function __construct(?ResourceInfo $resource = null, ?Sampler $sampler = null, ?IdGenerator $idGenerator = null)
     {
         $this->spanProcessors = new SpanMultiProcessor();
         $this->resource = $resource ?? ResourceInfo::emptyResource();
         $this->sampler = $sampler ?? new AlwaysOnSampler();
+        $this->idGenerator = $idGenerator ?? new RandomIdGenerator();
 
         register_shutdown_function([$this, 'shutdown']);
     }
@@ -49,8 +54,10 @@ final class TracerProvider implements API\TracerProvider
 
     public function getTracer(string $name, ?string $version = ''): API\Tracer
     {
-        if (isset($this->tracers[$name]) && $this->tracers[$name] instanceof API\Tracer) {
-            return $this->tracers[$name];
+        $key = sprintf('%s@%s', $name, ($version ?? 'unknown'));
+
+        if (isset($this->tracers[$key]) && $this->tracers[$key] instanceof API\Tracer) {
+            return $this->tracers[$key];
         }
 
         $spanContext = SpanContext::generateSampled();
@@ -70,7 +77,7 @@ final class TracerProvider implements API\TracerProvider
             )
         );
 
-        return $this->tracers[$name] = new Tracer(
+        return $this->tracers[$key] = new Tracer(
             $this,
             ResourceInfo::merge($primary, $resource),
             $spanContext
@@ -97,5 +104,10 @@ final class TracerProvider implements API\TracerProvider
     public function getResource(): ResourceInfo
     {
         return clone $this->resource;
+    }
+
+    public function getIdGenerator(): IdGenerator
+    {
+        return $this->idGenerator;
     }
 }

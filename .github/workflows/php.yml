@@ -3,9 +3,9 @@ name: PHP Composer
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
-        php-versions: ['7.3', '7.4']
+        php-versions: ['7.3', '7.4', '8.0']
 
     steps:
     - uses: actions/checkout@v2

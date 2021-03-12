@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use Exception;
 use OpenTelemetry\Trace as API;
 
 class NoopSpan implements \OpenTelemetry\Trace\Span
@@ -39,15 +40,14 @@ class NoopSpan implements \OpenTelemetry\Trace\Span
             $this->context = new SpanContext(
                 SpanContext::INVALID_TRACE,
                 SpanContext::INVALID_SPAN,
-                0,
-                []
+                0
             );
         } else {
             $this->context = $spanContext;
         }
         $this->attributes = new Attributes();
         $this->events = new Events();
-        $this->status = SpanStatus::ok();
+        $this->status = new SpanStatus();
     }
 
     public function getSpanName(): string
@@ -117,6 +117,20 @@ class NoopSpan implements \OpenTelemetry\Trace\Span
     public function addLink(API\SpanContext $context, ?API\Attributes $attributes = null): API\Span
     {
         return $this;
+    }
+
+    public function recordException(Exception $exception): API\Span
+    {
+        $attributes = new Attributes(
+            [
+                'exception.type' => get_class($exception),
+                'exception.message' => $exception->getMessage(),
+                'exception.stacktrace' => $exception->getTraceAsString(),
+            ]
+        );
+        $timestamp = time();
+
+        return  $this->addEvent('exception', $timestamp, $attributes);
     }
 
     public function updateName(string $name): API\Span
