@@ -82,8 +82,7 @@ class Exporter implements Trace\Exporter
     ) {
 
         // Set default values based on presence of env variable
-        $this->endpointURL = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'host.docker.internal:4317';
-        //$this->endpointURL = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'api.honeycomb.io:443';
+        $this->endpointURL = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'localhost:4317';
         $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc';
         $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ?: 'false';
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
@@ -221,8 +220,6 @@ class Exporter implements Trace\Exporter
         return SpanKind::SPAN_KIND_UNSPECIFIED;
     }
 
-    // ["trace_id":protected]=> string(32) "f8ebf54644f65fae5e98c5dd84b9d196"
-    // ["span_id":protected]=> string(16) "b90a8323cfd7cd66"
     public function as_otlp_span(Span $span): CollectorSpan
     {
 
@@ -251,7 +248,7 @@ class Exporter implements Trace\Exporter
                 $row['events'] = [];
             }
             $row['events'][] = new Event([
-                'time_unix_nano' => $event->getTimestamp(), // RealtimeClock in microseconds
+                'time_unix_nano' => $event->getTimestamp(),
                 'name' => $event->getName(),
             ]);
         }
