@@ -18,7 +18,7 @@ class SpanProcessorTest extends TestCase
     public function parentContextShouldBePassedToSpanProcessor()
     {
         $parentContext = new Context();
-        
+
         $spanProcessor = $this->createMock(SpanProcessor::class);
         $spanProcessor
             ->expects($this->once())
@@ -30,5 +30,25 @@ class SpanProcessorTest extends TestCase
         $tracerProvider->addSpanProcessor($spanProcessor);
         $tracer = $tracerProvider->getTracer('OpenTelemetry.Test');
         $tracer->startSpan('test.span', $parentContext);
+    }
+
+    /**
+     * @test
+     */
+    public function currentContextShouldBePassedToSpanProcessorByDefault()
+    {
+        $currentContext = Context::getCurrent();
+
+        $spanProcessor = $this->createMock(SpanProcessor::class);
+        $spanProcessor
+            ->expects($this->once())
+            ->method('onStart')
+            ->with($this->isInstanceOf(Span::class), $this->equalTo($currentContext))
+        ;
+
+        $tracerProvider = new TracerProvider();
+        $tracerProvider->addSpanProcessor($spanProcessor);
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.Test');
+        $tracer->startSpan('test.span', null);
     }
 }
