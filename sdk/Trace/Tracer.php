@@ -74,7 +74,7 @@ class Tracer implements API\Tracer
             $this->provider->getSpanProcessor()
         );
 
-        $this->provider->getSpanProcessor()->onStart($span);
+        $this->provider->getSpanProcessor()->onStart($span, $parentContext ?? Context::getCurrent());
 
         return $span;
     }
