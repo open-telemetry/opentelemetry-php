@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Newrelic;
 
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use Http\Adapter\Guzzle7\Client;
 use InvalidArgumentException;
@@ -26,6 +24,9 @@ use Psr\Http\Client\RequestExceptionInterface;
  */
 class Exporter implements Trace\Exporter
 {
+    private const DATA_FORMAT = 'newrelic';
+    private const DATA_FORMAT_VERSION_DEFAULT = '1';
+
     /**
      * @var string
      */
@@ -56,12 +57,15 @@ class Exporter implements Trace\Exporter
      */
     private $client;
 
+    private $dataFormatVersion;
+
     public function __construct(
         $name,
         string $endpointUrl,
         string $licenseKey,
         SpanConverter $spanConverter = null,
-        ClientInterface $client = null
+        ClientInterface $client = null,
+        string $dataFormatVersion = Exporter::DATA_FORMAT_VERSION_DEFAULT
     ) {
         $parsedDsn = parse_url($endpointUrl);
 
@@ -75,7 +79,7 @@ class Exporter implements Trace\Exporter
         ) {
             throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
         }
-
+        $this->dataFormatVersion = $dataFormatVersion;
         $this->licenseKey = $licenseKey;
         $this->endpointUrl = $endpointUrl;
         $this->name = $name;
@@ -104,7 +108,7 @@ class Exporter implements Trace\Exporter
             array_push($convertedSpans, $this->spanConverter->convert($span));
         }
         $commonAttributes = ['attributes' => [ 'service.name' => $this->name,
-                                                'host' => $this->endpointUrl, ]];
+                                               'host' => $this->endpointUrl, ]];
         $payload = [[ 'common' => $commonAttributes,
                      'spans' => $convertedSpans, ]];
 
@@ -112,8 +116,8 @@ class Exporter implements Trace\Exporter
             $json = json_encode($payload);
             $headers = ['content-type' => 'application/json',
                         'Api-Key' => $this->licenseKey,
-                        'Data-Format' => 'newrelic',
-                        'Data-Format-Version' => '1', ];
+                        'Data-Format' => Exporter::DATA_FORMAT,
+                        'Data-Format-Version' => $this->dataFormatVersion, ];
             $request = new Request('POST', $this->endpointUrl, $headers, $json);
             $response = $this->client->sendRequest($request);
         } catch (RequestExceptionInterface $e) {
@@ -124,9 +128,12 @@ class Exporter implements Trace\Exporter
 
         $statusCode = $response->getStatusCode();
         $reason = $response->getReasonPhrase();
-        echo "\nsendRequest response = " . $statusCode . "\n";
-        echo "\nsendRequest response = " . $reason . "\n";
 
+        // Useful information for when logging is implemented.
+        /*
+         * echo "\nsendRequest response = " . $statusCode . "\n";
+         * echo "\nsendRequest response = " . $reason . "\n";
+         */
         if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
             return Trace\Exporter::FAILED_NOT_RETRYABLE;
         }
@@ -145,14 +152,7 @@ class Exporter implements Trace\Exporter
 
     protected function createDefaultClient(): ClientInterface
     {
-        $container = [];
-        $history = Middleware::history($container);
-        $stack = HandlerStack::create();
-        // Add the history middleware to the handler stack.
-        $stack->push($history);
-
         return Client::createWithConfig([
-            'handler' => $stack,
             'timeout' => 30,
         ]);
     }
