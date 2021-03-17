@@ -8,7 +8,10 @@ use OpenTelemetry\Trace\Span;
 use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
 use Opentelemetry\Proto\Trace\V1\Status;
-use Opentelemetry\Proto\Common\V1\InstrumentationLibrary
+use Opentelemetry\Proto\Common\V1\KeyValue;
+use Opentelemetry\Proto\Common\V1\AnyValue;
+use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
+use Opentelemetry\Proto\Trace\V1\Span\Event;
 
 class SpanConverter
 {
@@ -22,87 +25,104 @@ class SpanConverter
         $this->serviceName = $serviceName;
     }
 
-    private function sanitiseTagValue($value)
-    {
-        // Casting false to string makes an empty string
-        if (is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
 
-        // OTLP tags must be strings, but opentelemetry
-        // accepts strings, booleans, numbers, and lists of each.
-        if (is_array($value)) {
-            return join(',', array_map([$this, 'sanitiseTagValue'], $value));
-        }
-
-        // Floats will lose precision if their string representation
-        // is >=14 or >=17 digits, depending on PHP settings.
-        // Can also throw E_RECOVERABLE_ERROR if $value is an object
-        // without a __toString() method.
-        // This is possible because OpenTelemetry\Trace\Span does not verify
-        // setAttribute() $value input.
-        return (string) $value;
+    public function as_otlp_key_value($key, $value): KeyValue {
+        return new KeyValue([
+            'key' => $key,
+            'value' => $this->as_otlp_any_value($value)
+        ]);
     }
 
-    public function convert(Span $span)
-    {   
-        $instrumentation_library_spans=[];
-        $il=new InstrumentationLibrary();
-        $name=$il->getName();
-        $version=$il->getVersion();
+    public function as_otlp_any_value($value): AnyValue
+    {
+        $result = new AnyValue();
 
+        switch (true) {
+            case is_array($value):
+                $result->setArrayValue($value);
+                break;
+            case is_int($value):
+                $result->setIntValue($value);
+                break;
+            case is_bool($value):
+                $result->setBoolValue($value);
+                break;
+            case is_double($value):
+                $result->setDoubleValue($value);
+                break;
+            case is_string($value):
+                $result->setStringValue($value);
+                break;
+        }
 
+        return $result;
+    }
 
-        $spanParent = $span->getParent();
+    public function as_otlp_span_kind($kind): int
+    {
+
+        switch ($kind) {
+            case 0: return SpanKind::SPAN_KIND_INTERNAL;
+            case 1: return SpanKind::SPAN_KIND_CLIENT;
+            case 2: return SpanKind::SPAN_KIND_SERVER;
+            case 3: return SpanKind::SPAN_KIND_PRODUCER;
+            case 4: return SpanKind::SPAN_KIND_CONSUMER;
+        }
+
+        return SpanKind::SPAN_KIND_UNSPECIFIED;
+    }
+
+    public function as_otlp_span(Span $span): CollectorSpan
+    {
+
+        $duration_ns = (($span->getEnd() - $span->getStart()));
+        $end_timestamp = ($span->getStartEpochTimestamp() + $duration_ns);
+
         $row = [
-            'id' => $span->getContext()->getSpanId(),
-            'traceId' => $span->getContext()->getTraceId(),
-            'parentId' => $spanParent ? $spanParent->getSpanId() : null,
-            'localEndpoint' => [
-                'serviceName' => $this->serviceName,
-            ],
+            'trace_id' => hex2bin($span->getContext()->getTraceId()),
+            'span_id' => hex2bin($span->getContext()->getSpanId()),
+            'parent_span_id' => $span->getParent() ? hex2bin($span->getParent()->getSpanId()) : null,
+            // 'localEndpoint' => [
+            //     'serviceName' => $this->serviceName,
+            // ],
             'name' => $span->getSpanName(),
-            'timestamp' => (int) ($span->getStartEpochTimestamp() / 1e3), // RealtimeClock in microseconds
-            'duration' => (int) (($span->getEnd() - $span->getStart()) / 1e3), // Diff in microseconds
-            'trace_state' => $span->getContext();
-
+            'start_time_unix_nano' => $span->getStartEpochTimestamp(),
+            'end_time_unix_nano' => $end_timestamp,
+            'kind' => $this->as_otlp_span_kind($span->getSpanKind()),
+            // 'trace_state' => $span->getContext()
+            // 'links' =>
         ];
 
-        foreach ($span->getAttributes() as $k => $v) {
-            if (!array_key_exists('tags', $row)) {
-                $row['tags'] = [];
-            }
-            $row['tags'][$k] = $this->sanitiseTagValue($v->getValue());
-        }
 
         foreach ($span->getEvents() as $event) {
-            if (!array_key_exists('annotations', $row)) {
-                $row['annotations'] = [];
+            if (!array_key_exists('events', $row)) {
+                $row['events'] = [];
             }
-            $row['annotations'][] = [
-                'timestamp' => (int) ($event->getTimestamp() / 1e3), // RealtimeClock in microseconds
-                'value' => $event->getName(),
-            ];
+            $row['events'][] = new Event([
+                'time_unix_nano' => $event->getTimestamp(),
+                'name' => $event->getName(),
+            ]);
         }
 
-        foreach ($span->getLinks() as $link) {
-            if (!array_key_exists('link', $row)) {
-                $row['link'] = [];
+        foreach ($span->getAttributes() as $k => $v) {
+            if (!array_key_exists('attributes', $row)) {
+                $row['attributes'] = [];
             }
-            $row['link'][] = [
-                'trace_id' => $span->getContext()->getTraceId(),
-                'span_id' => $span->getContext()->getSpanId(),
-            ];
+            array_push($row['attributes'], $this->as_otlp_key_value($k, $v->getValue()));
+
         }
+
         if (!array_key_exists('status', $row)) {
-                $proto_status = StatusCode::STATUS_CODE_OK;
-                if ($span->getStatus()->getCanonicalStatusCode() === "ERROR") {
-                    $proto_status = StatusCode::STATUS_CODE_ERROR;
-                }
-                $status=new Status();
-                $row['status']=$status->setCode('$proto_status')->setMessage("Description");
+            $proto_status = StatusCode::STATUS_CODE_OK;
+            if ($span->getStatus()->getCanonicalStatusCode() === "ERROR") {
+                $proto_status = StatusCode::STATUS_CODE_ERROR;
             }
+            $status=new Status();
+            $row['status']=$status->setCode($proto_status)->setMessage("Description");
+        }
 
-        return $row;
+        return new CollectorSpan($row);
+
     }
+
 }

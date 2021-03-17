@@ -1,8 +1,8 @@
 <?php
 
 declare(strict_types=1);
-namespace OpenTelemetry\Contrib\OtlpGrpc;
 
+namespace OpenTelemetry\Contrib\OtlpGrpc;
 
 use grpc;
 use OpenTelemetry\Sdk\Trace;
@@ -11,11 +11,8 @@ use OpenTelemetry\Trace\Span;
 use Opentelemetry\Proto;
 use Opentelemetry\Proto\Collector\Trace\V1;
 use Opentelemetry\Proto\Common\V1\InstrumentationLibrary;
-use Opentelemetry\Proto\Common\V1\KeyValue;
-use Opentelemetry\Proto\Common\V1\AnyValue;
+
 use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
-use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
-use Opentelemetry\Proto\Trace\V1\Span\Event;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
 use Opentelemetry\Proto\Trace\V1\Status;
@@ -77,29 +74,48 @@ class Exporter implements Trace\Exporter
      * @param string $serviceName
      */
     public function __construct(
-        $serviceName,
-        ClientInterface $client=null
+        string $endpointURL = 'localhost:4317',
+        bool $insecure = true,
+        string $certificateFile = null,
+        array $headers = [],
+        bool $compression = false,
+        int $timeout = 10,
+        ClientInterface $client = null
     ) {
 
         // Set default values based on presence of env variable
-        $this->endpointURL = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'localhost:4317';
-        $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc';
-        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ?: 'false';
-        $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
-        $this->headers[] = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: 'none';
-        $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: 'none';
-        $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
+        $this->endpointURL = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: $endpointURL;
+        $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc'; // I guess this is redundant?
+        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ?: $insecure;
+        $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: $certificateFile;
+        $this->headers[] = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: $headers; // TODO
+        $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: $compression; // TODO
+        $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: $timeout; // TODO
 
+        $this->spanConverter = new SpanConverter('foo');
+
+
+        if (!$this->insecure && !$this->certificateFile) {
+            // Assumed default
+            $_credentials = Grpc\ChannelCredentials::createSsl();
+        } elseif (!$this->insecure && $this->certificateFile) {
+            // Should we validate more?
+            $_credentials = Grpc\ChannelCredentials::createSsl(file_get_contents($certificateFile));
+        } else {
+            $_credentials = Grpc\ChannelCredentials::createInsecure();
+        }
 
         $opts = [
-            'credentials' => Grpc\ChannelCredentials::createInsecure(),
-            //'credentials' => Grpc\ChannelCredentials::createSsl(),
-            'update_metadata' => function() {
+            'credentials' => $_credentials,
+            'update_metadata' =>  function() {
                 return [
                     'x-honeycomb-team' => ['xxx'],
-                    'x-honeycomb-dataset' =>  ['xxx'],
+                    'x-honeycomb-dataset' => ['xxx']
                 ];
             },
+            // https://github.com/grpc/grpc/tree/master/src/php#compression
+            // 'grpc.default_compression_algorithm' => 2,
+            // 'grpc.default_compression_level' => 2,
         ];
 
 
@@ -125,7 +141,7 @@ class Exporter implements Trace\Exporter
 
         $convertedSpans = [];
         foreach ($spans as $span) {
-            array_push($convertedSpans, $this->as_otlp_span($span));
+            array_push($convertedSpans, $this->spanConverter->as_otlp_span($span));
         }
 
 
@@ -156,123 +172,22 @@ class Exporter implements Trace\Exporter
 
         list($response, $status) = $this->client->Export($request)->wait();
         if ($status->code !== Grpc\STATUS_OK) {
+            // TODO: This probably shouldn't  echo
             echo "ERROR: " . $status->code . ", " . $status->details . PHP_EOL;
         }
 
+        if ($status->code >= 400 && $status->code < 500) {
+            return Trace\Exporter::FAILED_NOT_RETRYABLE;
+        }
 
-        // TODO: Make this work
-        //echo $response->getMessage() . PHP_EOL;
-
-        // if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
-        //     return Trace\Exporter::FAILED_NOT_RETRYABLE;
-        // }
-
-        // if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
-        //     return Trace\Exporter::FAILED_RETRYABLE;
-        // }
+        if ($status->code >= 500 && $status->code < 600) {
+            return Trace\Exporter::FAILED_RETRYABLE;
+        }
 
         return Trace\Exporter::SUCCESS;
     }
 
-    public function as_otlp_key_value($key, $value): KeyValue {
-        return new KeyValue([
-            'key' => $key,
-            'value' => $this->as_otlp_any_value($value)
-        ]);
-    }
 
-    public function as_otlp_any_value($value): AnyValue
-    {
-        $result = new AnyValue();
-
-        switch (true) {
-            case is_array($value):
-                $result->setArrayValue($value);
-                break;
-            case is_int($value):
-                $result->setIntValue($value);
-                break;
-            case is_bool($value):
-                $result->setBoolValue($value);
-                break;
-            case is_double($value):
-                $result->setDoubleValue($value);
-                break;
-            case is_string($value):
-                $result->setStringValue($value);
-                break;
-        }
-
-        return $result;
-    }
-
-    public function as_otlp_span_kind($kind): int
-    {
-
-        switch ($kind) {
-            case 0: return SpanKind::SPAN_KIND_INTERNAL;
-            case 1: return SpanKind::SPAN_KIND_CLIENT;
-            case 2: return SpanKind::SPAN_KIND_SERVER;
-            case 3: return SpanKind::SPAN_KIND_PRODUCER;
-            case 4: return SpanKind::SPAN_KIND_CONSUMER;
-        }
-
-        return SpanKind::SPAN_KIND_UNSPECIFIED;
-    }
-
-    public function as_otlp_span(Span $span): CollectorSpan
-    {
-
-        $duration_ns = (($span->getEnd() - $span->getStart()));
-        $end_timestamp = ($span->getStartEpochTimestamp() + $duration_ns);
-
-        $row = [
-            'trace_id' => hex2bin($span->getContext()->getTraceId()),
-            'span_id' => hex2bin($span->getContext()->getSpanId()),
-            'parent_span_id' => $span->getParent() ? hex2bin($span->getParent()->getSpanId()) : null,
-            // 'localEndpoint' => [
-            //     'serviceName' => $this->serviceName,
-            // ],
-            'name' => $span->getSpanName(),
-            'start_time_unix_nano' => $span->getStartEpochTimestamp(),
-            'end_time_unix_nano' => $end_timestamp,
-            'kind' => $this->as_otlp_span_kind($span->getSpanKind()),
-            // 'trace_state' => $span->getContext()
-            // 'events' =>
-            // 'links' =>
-        ];
-
-
-        foreach ($span->getEvents() as $event) {
-            if (!array_key_exists('events', $row)) {
-                $row['events'] = [];
-            }
-            $row['events'][] = new Event([
-                'time_unix_nano' => $event->getTimestamp(),
-                'name' => $event->getName(),
-            ]);
-        }
-
-        foreach ($span->getAttributes() as $k => $v) {
-            if (!array_key_exists('attributes', $row)) {
-                $row['attributes'] = [];
-            }
-            array_push($row['attributes'], $this->as_otlp_key_value($k, $v->getValue()));
-
-        }
-
-        if (!array_key_exists('status', $row)) {
-            $proto_status = StatusCode::STATUS_CODE_OK;
-            if ($span->getStatus()->getCanonicalStatusCode() === "ERROR") {
-                $proto_status = StatusCode::STATUS_CODE_ERROR;
-            }
-            $status=new Status();
-            $row['status']=$status->setCode($proto_status)->setMessage("Description");
-        }
-
-        return new CollectorSpan($row);
-
-    }
     public function shutdown(): void
     {
         $this->running = false;
