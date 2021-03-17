@@ -1,18 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
+use GuzzleHttp\Client;
 use OpenTelemetry\Sdk\Trace\PropagationMap;
-use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
-use OpenTelemetry\Sdk\Trace\TraceContext;
-use OpenTelemetry\Sdk\Trace\TraceState;
 
+use OpenTelemetry\Sdk\Trace\TraceContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
-use GuzzleHttp\Client;
+use Symfony\Component\Routing\Annotation\Route;
 
 class TestController
 {
