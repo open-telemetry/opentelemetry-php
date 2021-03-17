@@ -7,3 +7,7 @@ coverage.clover
 tests/coverage
 .php_cs.cache
 proto/*
+
+# W3C Test Service build artifacts
+tests/TraceContext/W3CTestService/test_app
+tests/TraceContext/W3CTestService/trace-context
