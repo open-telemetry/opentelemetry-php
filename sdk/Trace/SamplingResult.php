@@ -9,19 +9,19 @@ use OpenTelemetry\Trace as API;
 final class SamplingResult
 {
     /**
-     * Span will not be recorded and all events and attributes will be dropped
+     * Span will not be recorded and all events and attributes will be dropped.
      */
-    public const NOT_RECORD = 0;
+    public const DROP = 0;
 
     /**
-     * Span will be recorded but SpanExporters will not receive this Span
+     * Span will be recorded but SpanExporters will not receive this Span.
      */
-    public const RECORD = 1;
+    public const RECORD_ONLY = 1;
 
     /**
      * Span will be recorder and exported.
      */
-    public const RECORD_AND_SAMPLED = 2;
+    public const RECORD_AND_SAMPLE = 2;
 
     /**
      * @var int A sampling Decision.
@@ -34,15 +34,15 @@ final class SamplingResult
     private $attributes;
 
     /**
-     * @var ?API\Links Collection of links that will be associated with the Span to be created.
+     * @var ?API\TraceState A Tracestate that will be associated with the Span through the new SpanContext.
      */
-    private $links;
+    private $traceState;
 
-    public function __construct(int $decision, ?API\Attributes $attributes = null, ?API\Links $links = null)
+    public function __construct(int $decision, ?API\Attributes $attributes = null, ?API\TraceState $traceState = null)
     {
         $this->decision = $decision;
         $this->attributes = $attributes;
-        $this->links = $links;
+        $this->traceState = $traceState;
     }
 
     /**
@@ -64,8 +64,8 @@ final class SamplingResult
     /**
      * Return a collection of links that will be associated with the Span to be created.
      */
-    public function getLinks(): ?API\Links
+    public function getTraceState(): ?API\TraceState
     {
-        return $this->links;
+        return $this->traceState;
     }
 }

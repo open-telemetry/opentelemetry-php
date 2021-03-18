@@ -50,19 +50,29 @@ class Tracer implements API\Tracer
         $spanId = $this->provider->getIdGenerator()->generateSpanId();
 
         $sampleResult = $this->provider->getSampler()->shouldSample(
-            $parentSpanContext, // TODO: change to `Context`
+            $parentContext ?? Context::getCurrent(),
             $traceId,
-            $spanId,
             $name,
             $spanKind,
             $attributes,
             $links
         );
-        // TODO: Merge sampling attributes from $sampleResult
 
-        $traceFlags = $sampleResult->getDecision() === SamplingResult::RECORD_AND_SAMPLED ? SpanContext::TRACE_FLAG_SAMPLED : 0;
-        $traceState = $parentSpanContext->isValid() ? $parentSpanContext->getTraceState() : new TraceState();
+        $attributes = $attributes ?? new Attributes();
+        $sampleAttributes = $sampleResult->getAttributes();
+        if ($sampleAttributes !== null) {
+            foreach ($sampleAttributes as $name => $value) {
+                $attributes->setAttribute($name, $value);
+            }
+        }
+
+        $traceFlags = $sampleResult->getDecision() === SamplingResult::RECORD_AND_SAMPLE ? SpanContext::TRACE_FLAG_SAMPLED : 0;
+        $traceState = $sampleResult->getTraceState();
         $spanContext = new SpanContext($traceId, $spanId, $traceFlags, $traceState);
+
+        if ($sampleResult->getDecision() === SamplingResult::DROP) {
+            return new NoopSpan($spanContext);
+        }
 
         $span = new Span(
             $name,
@@ -119,16 +129,15 @@ class Tracer implements API\Tracer
         // When attributes and links are coded, they will need to be passed in here.
         $sampler = $this->provider->getSampler();
         $samplingResult = $sampler->shouldSample(
-            $parentContext,
+            Span::insert(new NoopSpan($parentContext), new Context()),
             $parentContext->getTraceId(),
-            $parentContext->getSpanId(),
             $name,
             $spanKind
         );
 
         $context = SpanContext::fork($parentContext->getTraceId(), $parentContext->isSampled(), $isRemote);
 
-        if (SamplingResult::NOT_RECORD == $samplingResult->getDecision()) {
+        if (SamplingResult::DROP == $samplingResult->getDecision()) {
             $span = $this->generateSpanInstance('', $context);
         } else {
             $span = $this->generateSpanInstance($name, $context, $sampler, $this->resource, $spanKind);
