@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\OtlpGrpc;
 
 use grpc;
-use OpenTelemetry\Sdk\Trace;
-use OpenTelemetry\Trace as API;
-use OpenTelemetry\Trace\Span;
 use Opentelemetry\Proto;
 use Opentelemetry\Proto\Collector\Trace\V1;
 use Opentelemetry\Proto\Common\V1\InstrumentationLibrary;
-
-use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
-use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
-use Opentelemetry\Proto\Trace\V1\Status;
+use OpenTelemetry\Sdk\Trace;
+use OpenTelemetry\Trace as API;
+
+use OpenTelemetry\Trace\Span;
 
 class Exporter implements Trace\Exporter
 {
@@ -94,7 +91,6 @@ class Exporter implements Trace\Exporter
 
         $this->spanConverter = new SpanConverter('foo');
 
-
         if (!$this->insecure && !$this->certificateFile) {
             // Assumed default
             $_credentials = Grpc\ChannelCredentials::createSsl();
@@ -107,10 +103,10 @@ class Exporter implements Trace\Exporter
 
         $opts = [
             'credentials' => $_credentials,
-            'update_metadata' =>  function() {
+            'update_metadata' =>  function () {
                 return [
                     'x-honeycomb-team' => ['xxx'],
-                    'x-honeycomb-dataset' => ['xxx']
+                    'x-honeycomb-dataset' => ['xxx'],
                 ];
             },
             // https://github.com/grpc/grpc/tree/master/src/php#compression
@@ -118,9 +114,7 @@ class Exporter implements Trace\Exporter
             // 'grpc.default_compression_level' => 2,
         ];
 
-
         $this->client = $client ?? new V1\TraceServiceClient($this->endpointURL, $opts);
-
     }
 
     /**
@@ -144,36 +138,32 @@ class Exporter implements Trace\Exporter
             array_push($convertedSpans, $this->spanConverter->as_otlp_span($span));
         }
 
-
         $il = new InstrumentationLibrary([
             'name' => 'otel-php',
-            'version' => '0.0.1'
+            'version' => '0.0.1',
         ]);
 
         $ilspans = [];
-        foreach($convertedSpans as $convertedSpan) {
+        foreach ($convertedSpans as $convertedSpan) {
             $ilspan = new InstrumentationLibrarySpans([
                 'instrumentation_library' => $il,
-                'spans' => [$convertedSpan]
+                'spans' => [$convertedSpan],
             ]);
 
             array_push($ilspans, $ilspan);
         }
 
-
         $resourcespans = new Proto\Trace\V1\ResourceSpans([
-            'instrumentation_library_spans' => $ilspans
+            'instrumentation_library_spans' => $ilspans,
         ]);
 
-        
         $request= new V1\ExportTraceServiceRequest();
         $request->setResourceSpans([$resourcespans]);
-
 
         list($response, $status) = $this->client->Export($request)->wait();
         if ($status->code !== Grpc\STATUS_OK) {
             // TODO: This probably shouldn't  echo
-            echo "ERROR: " . $status->code . ", " . $status->details . PHP_EOL;
+            echo 'ERROR: ' . $status->code . ', ' . $status->details . PHP_EOL;
         }
 
         if ($status->code >= 400 && $status->code < 500) {
@@ -187,10 +177,8 @@ class Exporter implements Trace\Exporter
         return Trace\Exporter::SUCCESS;
     }
 
-
     public function shutdown(): void
     {
         $this->running = false;
     }
-
 }

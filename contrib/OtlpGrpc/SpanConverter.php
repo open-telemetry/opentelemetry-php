@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpGrpc;
 
-use OpenTelemetry\Trace\Span;
-use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
-use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
-use Opentelemetry\Proto\Trace\V1\Status;
-use Opentelemetry\Proto\Common\V1\KeyValue;
 use Opentelemetry\Proto\Common\V1\AnyValue;
-use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
+use Opentelemetry\Proto\Common\V1\ArrayValue;
+use Opentelemetry\Proto\Common\V1\KeyValue;
+use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
 use Opentelemetry\Proto\Trace\V1\Span\Event;
+use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
+use Opentelemetry\Proto\Trace\V1\Status;
+use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
+use OpenTelemetry\Trace\Span;
 
 class SpanConverter
 {
@@ -25,11 +26,11 @@ class SpanConverter
         $this->serviceName = $serviceName;
     }
 
-
-    public function as_otlp_key_value($key, $value): KeyValue {
+    public function as_otlp_key_value($key, $value): KeyValue
+    {
         return new KeyValue([
             'key' => $key,
-            'value' => $this->as_otlp_any_value($value)
+            'value' => $this->as_otlp_any_value($value),
         ]);
     }
 
@@ -39,19 +40,30 @@ class SpanConverter
 
         switch (true) {
             case is_array($value):
-                $result->setArrayValue($value);
+
+                $values = [];
+                foreach ($value as $element) {
+                    $this->as_otlp_any_value($element);
+                }
+
+                $result->setArrayValue(new ArrayValue($values));
+
                 break;
             case is_int($value):
                 $result->setIntValue($value);
+
                 break;
             case is_bool($value):
                 $result->setBoolValue($value);
+
                 break;
             case is_double($value):
                 $result->setDoubleValue($value);
+
                 break;
             case is_string($value):
                 $result->setStringValue($value);
+
                 break;
         }
 
@@ -60,7 +72,6 @@ class SpanConverter
 
     public function as_otlp_span_kind($kind): int
     {
-
         switch ($kind) {
             case 0: return SpanKind::SPAN_KIND_INTERNAL;
             case 1: return SpanKind::SPAN_KIND_CLIENT;
@@ -74,7 +85,6 @@ class SpanConverter
 
     public function as_otlp_span(Span $span): CollectorSpan
     {
-
         $duration_ns = (($span->getEnd() - $span->getStart()));
         $end_timestamp = ($span->getStartEpochTimestamp() + $duration_ns);
 
@@ -93,7 +103,6 @@ class SpanConverter
             // 'links' =>
         ];
 
-
         foreach ($span->getEvents() as $event) {
             if (!array_key_exists('events', $row)) {
                 $row['events'] = [];
@@ -109,20 +118,17 @@ class SpanConverter
                 $row['attributes'] = [];
             }
             array_push($row['attributes'], $this->as_otlp_key_value($k, $v->getValue()));
-
         }
 
         if (!array_key_exists('status', $row)) {
             $proto_status = StatusCode::STATUS_CODE_OK;
-            if ($span->getStatus()->getCanonicalStatusCode() === "ERROR") {
+            if ($span->getStatus()->getCanonicalStatusCode() === 'ERROR') {
                 $proto_status = StatusCode::STATUS_CODE_ERROR;
             }
             $status=new Status();
-            $row['status']=$status->setCode($proto_status)->setMessage("Description");
+            $row['status']=$status->setCode($proto_status)->setMessage('Description');
         }
 
         return new CollectorSpan($row);
-
     }
-
 }

@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\Contrib\OtlpGrpc\SpanConverter;
+use Opentelemetry\Proto\Trace\V1;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Span;
+
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
-
-use Opentelemetry\Proto\Trace\V1;
-use Opentelemetry\Proto\Common\V1\KeyValue;
 
 use PHPUnit\Framework\TestCase;
 
@@ -102,14 +101,12 @@ class OTLPGrpcSpanConverterTest extends TestCase
         $span->setAttribute('boolean-1', true);
         $span->setAttribute('boolean-2', false);
         $span->setAttribute('list-of-strings', $listOfStrings);
-        // $span->setAttribute('list-of-numbers', $listOfNumbers);
-        // $span->setAttribute('list-of-booleans', $listOfBooleans);
-        // $span->setAttribute('list-of-random', $listOfRandoms);
+        $span->setAttribute('list-of-numbers', $listOfNumbers);
+        $span->setAttribute('list-of-booleans', $listOfBooleans);
+        $span->setAttribute('list-of-random', $listOfRandoms);
 
         $converter = new SpanConverter('test.name');
         $tags = $converter->as_otlp_span($span)->getAttributes();
-
-        //$this->assertInstanceOf(KeyValue::class, $tags);
 
         // // Check that we can convert all attributes to tags
         $this->assertCount(10, $tags);
