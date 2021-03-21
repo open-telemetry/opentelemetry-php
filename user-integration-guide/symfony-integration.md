@@ -2,7 +2,7 @@
 
 ## Introduction 
 
-As a developer, you might be wondering how  Telemetry could be beneficial to you. You are not alone.  Without practical examples, the usefulness of distributed tracing can be difficult to grasp for persons without a cloud or site reliability engineering background. This user guide shows how Telemetry could be useful to gain insights into exceptions happening within an application. This example uses the OpenTelemtry PHP library integrated into a Symfony application, bundled with Jaeger and Zipkin, for visualizing data.  
+As a developer, you might be wondering how  OpenTelemetry could be beneficial to you. You are not alone.  Without practical examples, the usefulness of distributed tracing can be difficult to grasp for persons without a cloud or site reliability engineering background. This user guide shows how Telemetry could be useful to gain insights into exceptions happening within an application. This example uses the OpenTelemtry PHP library integrated into a Symfony application, bundled with Jaeger and Zipkin, for visualizing data.  
 ## Prerequisites
 To follow this guide you will need:
 
@@ -89,4 +89,138 @@ We can confirm that Zipkin is up by navigating to `http://localhost:9411/` on ou
 Now it is time to utilize our OpenTelemetry PHP Library to export traces to both Zipkin and Jaeger.
 
 ## Step 5
+
+The entry point for all Symfony applications is the `index.php` file located in the `public` folder. Let's navigate to `public\index.php` to see what is happening. Resources(namespaces, classes, variables) used within the `index.php` file are available within the entire application, by default the index file imports all auto loaded classes within the vendor folder. It also imports contents of the `.env` file. The other parts of the `index.php` file enable debugging as well as support request and response resolution using the application kernel. 
+
+To use open-telemetry specific classes we have to import them at the top of our index file, using the `use` keyword. This is what our imports look like:
+
+```
+use App\Kernel;
+use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
+use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
+use OpenTelemetry\Sdk\Trace\Clock;
+use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\Sdk\Trace\SamplingResult;
+use OpenTelemetry\Sdk\Trace\SpanProcessor\BatchSpanProcessor;
+use OpenTelemetry\Sdk\Trace\TracerProvider;
+use OpenTelemetry\Trace as API;
+use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\ErrorHandler\Debug;
+use Symfony\Component\HttpFoundation\Request;
+```
+
+Next, we create a sample recording traces using the `AlwaysOnSampler`,  class, just before the Kernel instance is created like below:
+
+```
+$sampler = new AlwaysOnSampler();
+$samplingResult = $sampler->shouldSample(
+    null,
+    md5((string) microtime(true)),
+    substr(md5((string) microtime(true)), 16),
+    'io.opentelemetry.example',
+    API\SpanKind::KIND_INTERNAL
+);
+```
+
+Since we are looking to export traces to both Zipkin and Jaeger we have to make use of their individual exporters;
+
+```
+$jaegarExporter = new JaegerExporter(
+    'Hello World Web Server Jaegar',
+    'http://localhost:9412/api/v2/spans'
+);
+
+$zipkinExporter = new ZipkinExporter(
+    'Hello World Web Server Zipkin',
+    'http://localhost:9411/api/v2/spans'
+);
+```
+
+Next we create a trace, and add processors for each trace(One for Jaeger and another for Zipkin). then we proceed to start and activate a span for each trace;
+
+```
+if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
+
+    $jaegarTracer = (new TracerProvider())
+        ->addSpanProcessor(new BatchSpanProcessor($jaegarExporter, Clock::get()))
+        ->getTracer('io.opentelemetry.contrib.php');
+
+    $zipkinTracer = (new TracerProvider())
+    ->addSpanProcessor(new BatchSpanProcessor($zipkinExporter, Clock::get()))
+    ->getTracer('io.opentelemetry.contrib.php');
+
+    $request = Request::createFromGlobals();
+    $jaegarSpan = $jaegarTracer->startAndActivateSpan($request->getUri());
+    $zipkinSpan = $zipkinTracer->startAndActivateSpan($request->getUri());
+
+}
+```
+
+Finally we end the active spans if sampling is complete, by adding the following block at the end of the `index.php` file;
+
+```
+if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
+    $zipkinTracer->endActiveSpan();
+    $jaegarTracer->endActiveSpan();
+}
+```
+
+lets confirm that we can see exported traces on both Zipkin and Jaeger. To do that we need to reload `localhost/hello` or any other route on our symfony server;
+
+![image](https://user-images.githubusercontent.com/22311928/110263970-7810a980-7fb8-11eb-8683-b5f2d8a82c4a.png)
+
+We also need to navigate to Zipkin and Jaegar on our browser, using the URLS   `http://localhost:16686/` and `http://localhost:9411/`. Do ensure that both your symfony server and docker instance are running for this step. 
+
+For Jaegar under service, you should see a `Hello World Web Server Jaegar` service, go ahead and click find traces to see exported traces.
+
+![image](https://user-images.githubusercontent.com/22311928/111910928-a041e300-8a63-11eb-8ae8-c17746a39d7e.png)
+
+Once we click on `Find Traces` you should be able to see traces like below:
+
+
+![image](https://user-images.githubusercontent.com/22311928/111911267-24489a80-8a65-11eb-9ee6-d231b3f4287a.png)
+
+We can click on a trace to get more information about the trace. 
+
+![image](https://user-images.githubusercontent.com/22311928/111911354-8c977c00-8a65-11eb-9d0f-0bca5c4c51d4.png)
+
+For Zipkin, we can visualize our trace by clicking on `Run Query` 
+
+![image](https://user-images.githubusercontent.com/22311928/111911625-9ec5ea00-8a66-11eb-90f8-2863a299a6de.png)
+
+Since resources in Symfony's `public\index.php` file are available to the entire application, we can use any of the already instantiated tracers within `HelloController`. In addition to the tracers, we can also utilize associated properties, methods and events.
+
+Lets try using the `recordException` event, to capture errors within our controller as follows:
+
+```
+global $tracer;
+        if ($tracer) {
+            /** @var Span $span */
+            $span = $tracer->getActiveSpan();
+            
+            $span->setAttribute('foo', 'bar');
+            $span->updateName('New name');
+
+            $tracer->startAndActivateSpan('Child span');
+            usleep(30000);
+            try {
+                throw new \Exception('Ruh roh');
+            } catch (\Exception $exception) {
+                $span->record;
+            }
+            $tracer->endActiveSpan();
+        }
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
