@@ -17,8 +17,6 @@ Create a Symfony application by running the command `symfony new my_project_name
 
 ## Step 2 - Require and Test Symfony Dependencies
 
-We will be adding dependencies to make our development easy. First is the [Symfony maker bundle](https://symfony.com/doc/current/bundles/SymfonyMakerBundle/index.html) to help us create boilerplate code easily. We can require this by running `composer require symfony/maker-bundle --dev`.
-
  To define our routes within our controller methods, let's require the Doctrine annotation library by running the command `composer require doctrine/annotations`.
 
 We can test that routes defined within Controllers work by creating a `HelloController.php` file within the `src\Controller` folder as follows:
