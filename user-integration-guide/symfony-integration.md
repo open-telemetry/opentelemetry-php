@@ -2,7 +2,7 @@
 
 ## Introduction 
 
-As a developer, you might be wondering how  OpenTelemetry could be beneficial to you. You are not alone.  Without practical examples, the usefulness of distributed tracing can be difficult to grasp for persons without a cloud or site reliability engineering background. This user guide shows how Telemetry could be useful to gain insights into exceptions happening within an application. This example uses the OpenTelemtry PHP library integrated into a Symfony application, bundled with Jaeger and Zipkin, for visualizing data.  
+As a developer, you might be wondering how  OpenTelemetry could be beneficial to you. You are not alone.  Without practical examples, the usefulness of distributed tracing can be difficult to grasp for persons without a cloud or site reliability engineering background. This user guide shows how OpenTelemetry could be useful to gain insights into exceptions happening within an application. This example uses the OpenTelemtry PHP library integrated into a Symfony application, bundled with Jaeger and Zipkin, for visualizing data.  
 ## Prerequisites
 To follow this guide you will need:
 
@@ -47,13 +47,13 @@ To check out the routes available in our current project run `php bin/console de
 
 Let's confirm that our application works by running the command `symfony server:start`.
 
-You can navigate to `localhost/hello` route to see the `Hello world` response returned in the HelloController index method above.
+You can navigate to `localhost/hello` route to see the `Hello world` response returned from the HelloController index method above.
 ![image](https://user-images.githubusercontent.com/22311928/110263970-7810a980-7fb8-11eb-8683-b5f2d8a82c4a.png)
 
 
 ## Step 3 - Require the OpenTelemetry PHP Library
 
-For this step, we require the OpenTelemetry PHP Library by running the command `composer require open-telemetry/opentelemetry:dev-main`. It is worthy of note that this command pulls in the latest changes from the Opentelemetry PHP repository.
+For this step, we require the OpenTelemetry PHP Library by running the command `composer require open-telemetry/opentelemetry`. It is worthy of note that this command pulls in the last stable release for the library.
 
 ## Step 4 - Bundle Zipkin and  Jaeger into the Application
 
@@ -90,7 +90,7 @@ Now it is time to utilize our OpenTelemetry PHP Library to export traces to both
 
 ## Step 5
 
-The entry point for all Symfony applications is the `index.php` file located in the `public` folder. Let's navigate to `public\index.php` to see what is happening. Resources(namespaces, classes, variables) used within the `index.php` file are available within the entire application, by default the index file imports all auto loaded classes within the vendor folder. It also imports contents of the `.env` file. The other parts of the `index.php` file enable debugging as well as support request and response resolution using the application kernel. 
+The entry point for all Symfony applications is the `index.php` file located in the `public` folder. Let's navigate to `public\index.php` to see what is happening. It is worthy of note that resources(namespaces, classes, variables) created within the `index.php` file are available within the entire application, by default the index file imports all auto loaded classes within the vendor folder. It also imports contents of the `.env` file. The other parts of the `index.php` file enable debugging as well as support request and response resolution using the application kernel. 
 
 To use open-telemetry specific classes we have to import them at the top of our index file, using the `use` keyword. This is what our imports look like:
 
@@ -109,7 +109,7 @@ use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
 ```
 
-Next, we create a sample recording traces using the `AlwaysOnSampler`,  class, just before the Kernel instance is created like below:
+Next, we create a sample recording trace using the `AlwaysOnSampler`,  class, just before the Kernel instance is created like below:
 
 ```
 $sampler = new AlwaysOnSampler();
@@ -136,7 +136,7 @@ $zipkinExporter = new ZipkinExporter(
 );
 ```
 
-Next we create a trace, and add processors for each trace(One for Jaeger and another for Zipkin). then we proceed to start and activate a span for each trace;
+Next we create a trace, and add processors for each trace(One for Jaeger and another for Zipkin). Then we proceed to start and activate a span for each trace;
 
 ```
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
@@ -165,7 +165,7 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
 }
 ```
 
-lets confirm that we can see exported traces on both Zipkin and Jaeger. To do that we need to reload `localhost/hello` or any other route on our symfony server;
+lets confirm that we can see exported traces on both Zipkin and Jaeger. To do that we need to reload `http://localhost:8000/hello` or any other route on our symfony server;
 
 ![image](https://user-images.githubusercontent.com/22311928/110263970-7810a980-7fb8-11eb-8683-b5f2d8a82c4a.png)
 
@@ -190,37 +190,31 @@ For Zipkin, we can visualize our trace by clicking on `Run Query`
 
 Since resources in Symfony's `public\index.php` file are available to the entire application, we can use any of the already instantiated tracers within `HelloController`. In addition to the tracers, we can also utilize associated properties, methods and events.
 
-Lets try using the `recordException` event, to capture errors within our controller as follows:
+Lets try using the `addEvent` method, to capture errors within our controller as follows:
 
 ```
-global $tracer;
-        if ($tracer) {
+global $zipkinTracer;
+        if ($zipkinTracer) {
             /** @var Span $span */
-            $span = $tracer->getActiveSpan();
+            $span = $zipkinTracer->getActiveSpan();
             
             $span->setAttribute('foo', 'bar');
             $span->updateName('New name');
 
-            $tracer->startAndActivateSpan('Child span');
-            usleep(30000);
+            $zipkinTracer->startAndActivateSpan('Child span');
             try {
-                throw new \Exception('Ruh roh');
+                throw new \Exception('Exception Example');
             } catch (\Exception $exception) {
-                $span->record;
+                $span->setSpanStatus($exception->getCode(), $exception->getMessage());
             }
-            $tracer->endActiveSpan();
+            $zipkinTracer->endActiveSpan();
         }
 ```
 
+We need to reload our `http://localhost:8000/hello` route or any other route, then navigate to Zipkin like before to see that our span name gets updated to `new name` and our `Exception Example` is visible 
 
+![image](https://user-images.githubusercontent.com/22311928/111915995-3cc2b000-8a79-11eb-82e9-78048da09b92.png)
 
+## Summary
 
-
-
-
-
-
-
-
-
-
+With the above example we have been able to instrument a Symfony application using the opentelemetry php library. You can fork the example project [here](https://github.com/prondubuisi/otel-php-symfony-basic-example). You can also checkout the original test application [here](https://github.com/dkarlovi/opentelemetry-php-user-test).
