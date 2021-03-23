@@ -163,6 +163,11 @@ class NoopSpan implements API\Span
         return false;
     }
 
+    public function isRemote(): bool
+    {
+        return $this->context->isRemote();
+    }
+
     public function isSampled(): bool
     {
         return false;
