@@ -2,18 +2,20 @@
 
 ## Introduction 
 
-As a developer, you might be wondering how  OpenTelemetry could be beneficial to you. You are not alone.  Without practical examples, the usefulness of distributed tracing can be difficult to grasp for persons without a cloud or site reliability engineering background. This user guide shows how OpenTelemetry could be useful to gain insights into exceptions happening within an application. This example uses the OpenTelemtry PHP library integrated into a Symfony application, bundled with Jaeger and Zipkin, for visualizing data.  
+As a developer, you might be wondering how OpenTelemetry could be beneficial to you. Without practical examples, the usefulness of distributed tracing can be difficult to grasp for persons without a cloud or site reliability engineering background. This user guide shows how OpenTelemetry could be useful to gain insights into exceptions happening within an application. This example uses the OpenTelemtry PHP library integrated into a Symfony application, bundled with Jaeger and Zipkin, for visualizing data.  
 ## Prerequisites
 To follow this guide you will need:
 
 * PHP Installed, this example uses PHP 7.4 .
 * [Composer](https://getcomposer.org/download/ ) for dependency management. 
-* [Symfony CLI](https://symfony.com/download) for managing your Symfony application
-*  [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools
+* [Symfony CLI](https://symfony.com/download) for managing your Symfony application.
+* [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools. We have setup instructions for docker on this project's [readme](https://github.com/open-telemetry/opentelemetry-php#development)
 
 ## Step 1 - Creating a Symfony Application 
 
-Create a Symfony application by running the command `symfony new my_project_name`. Remember that you need the  [Symfony CLI](https://symfony.com/download) installed for the `symfony` command to work. I am calling this example `otel-php-symfony-basic-example`, so the command is as follows; `symfony new otel-php-symfony-basic-example` .
+Create a Symfony application by running the command `symfony new my_project_name`. We are calling this example `otel-php-symfony-basic-example`, so the command is as follows; 
+
+`symfony new otel-php-symfony-basic-example` .
 
 ## Step 2 - Require and Test Symfony Dependencies
 
@@ -43,9 +45,15 @@ class HelloController extends AbstractController
 
 To check out the routes available in our current project run `php bin/console debug:router`. 
 
+![image](https://user-images.githubusercontent.com/22311928/112389811-a18a3e80-8cf5-11eb-89cb-e4fb78d44bf4.png)
+
+
 Let's confirm that our application works by running the command `symfony server:start`.
 
-You can navigate to `localhost/hello` route to see the `Hello world` response returned from the HelloController index method above.
+![image](https://user-images.githubusercontent.com/22311928/112422222-d10a6c80-8d30-11eb-971c-75229e71f7cd.png)
+
+
+You can navigate to `http://127.0.0.1:8000/hello` route to see the `Hello world` response returned from the HelloController index method above.
 ![image](https://user-images.githubusercontent.com/22311928/110263970-7810a980-7fb8-11eb-8683-b5f2d8a82c4a.png)
 
 
@@ -77,6 +85,9 @@ services:
 
 To confirm that docker is installed and running on our system, we can run the hello world docker example using the command `docker run -it --rm hello-world`. If everything works well, run  `docker-compose up -d` to pull in Zipkin and Jaeger. This might take some time, depending on your internet connection speed.
 
+![image](https://user-images.githubusercontent.com/22311928/112422478-470ed380-8d31-11eb-8d21-c19c6839063d.png)
+
+
 We can confirm that Zipkin is up by navigating to `http://localhost:9411/` on our browser. For Jaeger, navigating to `http://localhost:16686/` on our browser should display the Jaeger home page.
 
 ![image](https://user-images.githubusercontent.com/22311928/110503699-bfa04e00-80fc-11eb-9186-c9b295d100f4.png)
@@ -107,7 +118,7 @@ use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
 ```
 
-Next, we create a sample recording trace using the `AlwaysOnSampler`,  class, just before the Kernel instance is created like below:
+Next, we create a sample recording trace using the [AlwaysOnSampler](https://github.com/open-telemetry/opentelemetry-php/blob/main/sdk/Trace/Sampler/AlwaysOnSampler.php) class, just before the Kernel instance is created like below:
 
 ```
 $sampler = new AlwaysOnSampler();
@@ -123,8 +134,8 @@ $samplingResult = $sampler->shouldSample(
 Since we are looking to export traces to both Zipkin and Jaeger we have to make use of their individual exporters;
 
 ```
-$jaegarExporter = new JaegerExporter(
-    'Hello World Web Server Jaegar',
+$jaegerExporter = new JaegerExporter(
+    'Hello World Web Server Jaeger',
     'http://localhost:9412/api/v2/spans'
 );
 
@@ -134,13 +145,13 @@ $zipkinExporter = new ZipkinExporter(
 );
 ```
 
-Next we create a trace, and add processors for each trace(One for Jaeger and another for Zipkin). Then we proceed to start and activate a span for each trace;
+Next we create a trace, and add processors for each trace(One for Jaeger and another for Zipkin). Then we proceed to start and activate a span for each trace. We create a trace only if the RECORD AND SAMPLED sampling result condition passes as follows;
 
 ```
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
 
-    $jaegarTracer = (new TracerProvider())
-        ->addSpanProcessor(new BatchSpanProcessor($jaegarExporter, Clock::get()))
+    $jaegerTracer = (new TracerProvider())
+        ->addSpanProcessor(new BatchSpanProcessor($jaegerExporter, Clock::get()))
         ->getTracer('io.opentelemetry.contrib.php');
 
     $zipkinTracer = (new TracerProvider())
@@ -148,7 +159,7 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
     ->getTracer('io.opentelemetry.contrib.php');
 
     $request = Request::createFromGlobals();
-    $jaegarSpan = $jaegarTracer->startAndActivateSpan($request->getUri());
+    $jaegerSpan = $jaegerTracer->startAndActivateSpan($request->getUri());
     $zipkinSpan = $zipkinTracer->startAndActivateSpan($request->getUri());
 
 }
@@ -159,28 +170,32 @@ Finally we end the active spans if sampling is complete, by adding the following
 ```
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
     $zipkinTracer->endActiveSpan();
-    $jaegarTracer->endActiveSpan();
+    $jaegerTracer->endActiveSpan();
 }
 ```
 
-lets confirm that we can see exported traces on both Zipkin and Jaeger. To do that we need to reload `http://localhost:8000/hello` or any other route on our symfony server;
+lets confirm that we can see exported traces on both Zipkin and Jaeger. To do that we need to reload `http://127.0.0.1:8000/hello` or any other route on our symfony server;
 
 ![image](https://user-images.githubusercontent.com/22311928/110263970-7810a980-7fb8-11eb-8683-b5f2d8a82c4a.png)
 
-We also need to navigate to Zipkin and Jaegar on our browser, using the URLS   `http://localhost:16686/` and `http://localhost:9411/`. Do ensure that both your symfony server and docker instance are running for this step. 
+We also need to navigate to Zipkin and Jaeger on our browser, using the URLS `http://localhost:9411/`  and `http://localhost:16686/`. Do ensure that both your symfony server and docker instance are running for this step. 
 
-For Jaegar under service, you should see a `Hello World Web Server Jaegar` service, go ahead and click find traces to see exported traces.
+For Jaeger under service, you should see a `Hello World Web Server Jaeger` service, go ahead and click find traces to see exported traces.
 
-![image](https://user-images.githubusercontent.com/22311928/111910928-a041e300-8a63-11eb-8ae8-c17746a39d7e.png)
+![image](https://user-images.githubusercontent.com/22311928/112386141-cc25c880-8cf0-11eb-84ae-56d5dc3bf4a0.png)
+
 
 Once we click on `Find Traces` you should be able to see traces like below:
 
 
-![image](https://user-images.githubusercontent.com/22311928/111911267-24489a80-8a65-11eb-9ee6-d231b3f4287a.png)
+![image](https://user-images.githubusercontent.com/22311928/112387947-bc0ee880-8cf2-11eb-88db-eb93a4170404.png)
+
+
 
 We can click on a trace to get more information about the trace. 
 
-![image](https://user-images.githubusercontent.com/22311928/111911354-8c977c00-8a65-11eb-9d0f-0bca5c4c51d4.png)
+![image](https://user-images.githubusercontent.com/22311928/112388154-04c6a180-8cf3-11eb-8d22-abc9a9bc73b1.png)
+
 
 For Zipkin, we can visualize our trace by clicking on `Run Query` 
 
@@ -209,10 +224,10 @@ global $zipkinTracer;
         }
 ```
 
-We need to reload our `http://localhost:8000/hello` route or any other route, then navigate to Zipkin like before to see that our span name gets updated to `new name` and our `Exception Example` is visible 
+We need to reload our `http://127.0.0.1:8000/hello` route, then navigate to Zipkin like before to see that our span name gets updated to `new name` and our `Exception Example` is visible 
 
 ![image](https://user-images.githubusercontent.com/22311928/111915995-3cc2b000-8a79-11eb-82e9-78048da09b92.png)
 
 ## Summary
 
-With the above example we have been able to instrument a Symfony application using the opentelemetry php library. You can fork the example project [here](https://github.com/prondubuisi/otel-php-symfony-basic-example). You can also checkout the original test application [here](https://github.com/dkarlovi/opentelemetry-php-user-test).
+With the above example we have been able to instrument a Symfony application using the OpenTelemetry php library. You can fork the example project [here](https://github.com/prondubuisi/otel-php-symfony-basic-example). You can also checkout the original test application [here](https://github.com/dkarlovi/opentelemetry-php-user-test).
