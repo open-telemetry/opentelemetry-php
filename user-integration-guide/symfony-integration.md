@@ -6,10 +6,10 @@ As a developer, you might be wondering how OpenTelemetry could be beneficial to 
 ## Prerequisites
 To follow this guide you will need:
 
-* PHP Installed, this example uses PHP 7.4 .
+* PHP Installed, this example uses PHP 7.4.
 * [Composer](https://getcomposer.org/download/ ) for dependency management. 
 * [Symfony CLI](https://symfony.com/download) for managing your Symfony application.
-* [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools. We have setup instructions for docker on this project's [readme](https://github.com/open-telemetry/opentelemetry-php#development)
+* [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools. We have setup instructions for docker on this project's [readme](https://github.com/open-telemetry/opentelemetry-php#development).
 
 ## Step 1 - Creating a Symfony Application 
 
