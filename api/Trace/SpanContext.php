@@ -12,7 +12,7 @@ interface SpanContext
     public function getSpanId(): int;
     public function getTraceFlags(): int;
     public function getTraceState(): ?TraceState;
-    public function isValidContext(): bool;
-    public function isRemoteContext(): bool;
+    public function isValid(): bool;
+    public function isRemote(): bool;
     public function isSampled(): bool;
 }

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOffSampler;
@@ -12,14 +13,13 @@ use OpenTelemetry\Trace as API;
 
 $sampler = new AlwaysOffSampler();
 $samplingResult = $sampler->shouldSample(
-    null,
+    Context::getCurrent(),
     md5((string) microtime(true)),
-    substr(md5((string) microtime(true)), 16),
     'io.opentelemetry.example',
     API\SpanKind::KIND_INTERNAL
 );
 
-if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
+if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     $tracer = (new TracerProvider())
         ->getTracer('io.opentelemetry.contrib.php');
 

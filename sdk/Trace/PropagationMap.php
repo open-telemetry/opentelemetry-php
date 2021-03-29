@@ -26,6 +26,10 @@ class PropagationMap implements API\PropagationGetter, API\PropagationSetter
 
             foreach ($carrier as $k => $value) {
                 if (strtolower($k) === $lKey) {
+                    if (\is_array($value)) {
+                        return empty($value) ? null : $value[0];
+                    }
+
                     return $value;
                 }
             }

@@ -6,6 +6,7 @@ namespace OpenTelemetry\Sdk\Trace\SpanProcessor;
 
 use InvalidArgumentException;
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Exporter;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
@@ -76,7 +77,7 @@ class BatchSpanProcessor implements SpanProcessor
     /**
      * @inheritDoc
      */
-    public function onStart(API\Span $span): void
+    public function onStart(API\Span $span, ?Context $parentContext = null): void
     {
     }
 

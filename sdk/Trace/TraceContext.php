@@ -18,8 +18,8 @@ use OpenTelemetry\Trace as API;
  */
 final class TraceContext implements API\TextMapFormatPropagator
 {
-    public const TRACEPARENT = 'http_traceparent';
-    public const TRACESTATE = 'http_tracestate';
+    public const TRACEPARENT = 'traceparent';
+    public const TRACESTATE = 'tracestate';
     private const VERSION = '00'; // Currently only '00' is supported
     private const VALID_VERSION = '/^[0-9a-f]{2}$/';
     private const VALID_TRACEFLAGS = '/^[0-9a-f]{2}$/';

@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace\Sampler;
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
+use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Trace as API;
 
 /**
@@ -76,27 +79,30 @@ class ParentBased implements Sampler
      * {@inheritdoc}
      */
     public function shouldSample(
-        ?API\SpanContext $parentContext,
-        int $traceId,
-        int $spanId,
+        Context $parentContext,
+        string $traceId,
         string $spanName,
         int $spanKind,
         ?API\Attributes $attributes = null,
         ?API\Links $links = null
     ): SamplingResult {
-        if ($parentContext === null) {
-            return $this->root->shouldSample($parentContext, $traceId, $spanId, $spanName, $spanKind, $attributes, $links);
+        $parentSpan = Span::extract($parentContext);
+        $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
+        
+        // Invalid parent SpanContext indicates root span is being created
+        if (!$parentSpanContext->isValid()) {
+            return $this->root->shouldSample(...func_get_args());
         }
 
-        if ($parentContext->isRemoteContext()) {
-            return $parentContext->isSampled()
-                ? $this->remoteParentSampled->shouldSample($parentContext, $traceId, $spanId, $spanName, $spanKind, $attributes, $links)
-                : $this->remoteParentNotSampled->shouldSample($parentContext, $traceId, $spanId, $spanName, $spanKind, $attributes, $links);
+        if ($parentSpanContext->isRemote()) {
+            return $parentSpanContext->isSampled()
+                ? $this->remoteParentSampled->shouldSample(...func_get_args())
+                : $this->remoteParentNotSampled->shouldSample(...func_get_args());
         }
 
-        return $parentContext->isSampled()
-            ? $this->localParentSampled->shouldSample($parentContext, $traceId, $spanId, $spanName, $spanKind, $attributes, $links)
-            : $this->localParentNotSampled->shouldSample($parentContext, $traceId, $spanId, $spanName, $spanKind, $attributes, $links);
+        return $parentSpanContext->isSampled()
+            ? $this->localParentSampled->shouldSample(...func_get_args())
+            : $this->localParentNotSampled->shouldSample(...func_get_args());
     }
 
     public function getDescription(): string

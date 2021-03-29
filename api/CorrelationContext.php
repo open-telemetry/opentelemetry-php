@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\CorrelationContext;
+namespace OpenTelemetry;
 
 use OpenTelemetry\Context\ContextKey;
 
