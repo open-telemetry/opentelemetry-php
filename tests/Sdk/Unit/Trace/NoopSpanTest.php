@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
+use Exception;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\NoopSpan;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
@@ -52,33 +53,77 @@ class NoopSpanTest extends TestCase
     }
 
     /** @test */
+    public function eventsCollectionShouldBeEmptyEvenAfterRecordExceptionEventUpdate()
+    {
+        $this->assertEmpty($this->span->getEvents());
+        
+        try {
+            throw new Exception('Record exception test event');
+        } catch (Exception $exception) {
+            $this->span->recordException($exception);
+        }
+
+        $this->assertEmpty($this->span->getEvents());
+    }
+
+    /** @test */
     public function itsStatusShouldBeOkAndNoUpdatesShouldChangeIt()
     {
-        $this->assertEquals(
-            SpanStatus::ok(),
-            $this->span->getStatus()
-        );
+        $this->assertFalse($this->span->isStatusOk());
 
-        $this->assertTrue($this->span->isStatusOk());
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $this->span->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $this->span->getCanonicalStatusCode());
 
-        $this->assertEquals(
-            SpanStatus::ok()->getStatusDescription(),
-            $this->span->getStatusDescription()
-        );
+        $this->span->setSpanStatus(\OpenTelemetry\Trace\SpanStatus::ERROR);
 
-        $this->assertEquals(
-            SpanStatus::ok()->getCanonicalStatusCode(),
-            $this->span->getCanonicalStatusCode()
-        );
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $this->span->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $this->span->getCanonicalStatusCode());
 
-        $this->span->setSpanStatus(\OpenTelemetry\Trace\SpanStatus::ABORTED);
+        $this->assertFalse($this->span->isStatusOk());
 
-        $this->assertEquals(
-            SpanStatus::ok(),
-            $this->span->getStatus()
-        );
+        $this->span->setSpanStatus(\OpenTelemetry\Trace\SpanStatus::OK);
 
-        $this->assertTrue($this->span->isStatusOk());
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $this->span->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $this->span->getCanonicalStatusCode());
+
+        $this->assertFalse($this->span->isStatusOk());
+
+        $this->span->setSpanStatus('mycode');
+
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $this->span->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $this->span->getCanonicalStatusCode());
+
+        $this->assertFalse($this->span->isStatusOk());
+    }
+
+    /** @test */
+    public function testGetStatusStaysSameAndNoUpdatesShouldChangeIt()
+    {
+        $status = $this->span->getStatus();
+        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $this->span->getStatusDescription());
+        self::assertEquals(SpanStatus::UNSET, $this->span->getCanonicalStatusCode());
+
+        $this->span->setSpanStatus(\OpenTelemetry\Trace\SpanStatus::ERROR);
+        $status2 = $this->span->getStatus();
+
+        self::assertEquals($status->getStatusDescription(), $status2->getStatusDescription());
+        self::assertEquals($status->getCanonicalStatusCode(), $status2->getCanonicalStatusCode());
+
+        $this->assertFalse($this->span->isStatusOk());
+
+        $this->span->setSpanStatus(\OpenTelemetry\Trace\SpanStatus::OK);
+        $status2 = $this->span->getStatus();
+
+        self::assertEquals($status->getStatusDescription(), $status2->getStatusDescription());
+        self::assertEquals($status->getCanonicalStatusCode(), $status2->getCanonicalStatusCode());
+
+        $this->span->setSpanStatus('mycode');
+        $status2 = $this->span->getStatus();
+
+        self::assertEquals($status->getStatusDescription(), $status2->getStatusDescription());
+        self::assertEquals($status->getCanonicalStatusCode(), $status2->getCanonicalStatusCode());
+
+        $this->assertFalse($this->span->isStatusOk());
     }
 
     /** @test */
@@ -108,7 +153,7 @@ class NoopSpanTest extends TestCase
     /** @test */
     public function itShouldHaveAnInvalidSpanContext()
     {
-        $this->assertFalse($this->span->getContext()->isValidContext());
+        $this->assertFalse($this->span->getContext()->isValid());
     }
 
     /** @test */

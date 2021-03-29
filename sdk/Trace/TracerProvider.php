@@ -7,16 +7,21 @@ namespace OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Sdk\Resource\ResourceConstants;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\Sdk\Trace\Sampler\ParentBased;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SpanMultiProcessor;
 use OpenTelemetry\Trace as API;
 
 final class TracerProvider implements API\TracerProvider
 {
-
     /**
      * @var Tracer[]
      */
     protected $tracers;
+
+    /**
+     * @var IdGenerator
+     */
+    protected $idGenerator;
 
     /**
      * @var SpanMultiProcessor
@@ -33,11 +38,12 @@ final class TracerProvider implements API\TracerProvider
      */
     private $sampler;
 
-    public function __construct(?ResourceInfo $resource = null, ?Sampler $sampler = null)
+    public function __construct(?ResourceInfo $resource = null, ?Sampler $sampler = null, ?IdGenerator $idGenerator = null)
     {
         $this->spanProcessors = new SpanMultiProcessor();
         $this->resource = $resource ?? ResourceInfo::emptyResource();
-        $this->sampler = $sampler ?? new AlwaysOnSampler();
+        $this->sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
+        $this->idGenerator = $idGenerator ?? new RandomIdGenerator();
 
         register_shutdown_function([$this, 'shutdown']);
     }
@@ -49,11 +55,12 @@ final class TracerProvider implements API\TracerProvider
 
     public function getTracer(string $name, ?string $version = ''): API\Tracer
     {
-        if (isset($this->tracers[$name]) && $this->tracers[$name] instanceof API\Tracer) {
-            return $this->tracers[$name];
+        $key = sprintf('%s@%s', $name, ($version ?? 'unknown'));
+
+        if (isset($this->tracers[$key]) && $this->tracers[$key] instanceof API\Tracer) {
+            return $this->tracers[$key];
         }
 
-        $spanContext = SpanContext::generateSampled();
         /*
          * A resource can be associated with the TracerProvider when the TracerProvider is created.
          * That association cannot be changed later. When associated with a TracerProvider, all
@@ -70,10 +77,9 @@ final class TracerProvider implements API\TracerProvider
             )
         );
 
-        return $this->tracers[$name] = new Tracer(
+        return $this->tracers[$key] = new Tracer(
             $this,
-            ResourceInfo::merge($primary, $resource),
-            $spanContext
+            ResourceInfo::merge($primary, $resource)
         );
     }
 
@@ -97,5 +103,10 @@ final class TracerProvider implements API\TracerProvider
     public function getResource(): ResourceInfo
     {
         return clone $this->resource;
+    }
+
+    public function getIdGenerator(): IdGenerator
+    {
+        return $this->idGenerator;
     }
 }

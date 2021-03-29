@@ -13,7 +13,7 @@ We keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemet
  which features are available and which have not yet been implemented.
  
 ## Communication
-Most of our communication is done on gitter.im in the [opentelemetry-php](https://gitter.im/open-telemetry/opentelemetry-php) channel.
+Most of our communication is done on CNCF Slack, in the [otel-php](https://cloud-native.slack.com/archives/C01NFPCV44V) channel. To sign up, create a CNCF slack account here http://slack.cncf.io/
 
 Our meetings are held weekly on zoom on Wednesdays at 10:30am PST / 1:30pm EST.  
 A Google calendar invite with the included zoom link can be found [here](https://calendar.google.com/event?action=TEMPLATE&tmeid=N2VtZXZmYnVmbzZkYjZkbTYxdjZvYTdxN21fMjAyMDA5MTZUMTczMDAwWiBrYXJlbnlyeHVAbQ&tmsrc=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com&scp=ALL)
@@ -72,7 +72,11 @@ You can use the [examples/AlwaysOnZipkinExample.php](/examples/AlwaysOnZipkinExa
 
 You can also use the [examples/AlwaysOnJaegerExample.php](/examples/AlwaysOnJaegerExample.php) file to test out the reference implementation we have for jaegar.  This example perfoms a sample trace with a grouping of 5 spans and POSTs the result to a local jaegar instance.
 
-The PHP for both examples should execute by itself (if you have a zipkin or jaegar instance running on localhost), but if you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
+You can use the [examples/AlwaysOnZipkinToNewrelicExample.php](/examples/AlwaysOnZipkinToNewrelicExample.php) file to test out the reference implementation we have for zipkin to Newrelic.  This example perfoms a sample trace with spans and POSTs the result to a Newrelic endpoint.  This requires a license key (free accounts available) to be set in the environment (NEW_RELIC_INSERT_KEY) to authenticate to the backend.
+
+You can use the [examples/AlwaysOnNewrelicExample.php](/examples/AlwaysOnNewrelicExample.php) file to test out the reference implementation we have for Newrelic.  This example perfoms a sample trace with spans and POSTs the result to a Newrelic endpoint.  This requires a license key (free accounts available) set in the environment (NEW_RELIC_INSERT_KEY) to authenticate to the backend.
+
+The PHP for all examples should execute by itself (if you have a zipkin or jaegar instance running on localhost), but if you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
 
 1.)  Install the necessary dependencies by running `make install`.  This will install the composer dependencies and store them in `/vendor`  
 2.)  Execute the example trace using `make trace examples`.

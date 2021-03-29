@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Trace as API;
 
 /**
@@ -16,10 +17,9 @@ interface Sampler
     /**
      * Returns SamplingResult.
      *
-     * @param API\SpanContext|null $parentContext `SpanContext` of a parent Span. Typically extracted from the wire. Can be null.
-     * @param int $traceId TraceId of the Span to be created. It can be different from the TraceId in the SpanContext.
+     * @param Context $parentContext Context with parent Span. The Span's SpanContext may be invalid to indicate a root span.
+     * @param string $traceId TraceId of the Span to be created. It can be different from the TraceId in the SpanContext.
      *                        Typically in situations when the Span to be created starts a new Trace.
-     * @param int $spanId SpanId of the Span to be created.
      * @param string $spanName Name of the Span to be created.
      * @param int $spanKind Span kind.
      * @param API\Attributes|null $attributes Initial set of Attributes for the Span being constructed.
@@ -29,9 +29,8 @@ interface Sampler
      * @return SamplingResult
      */
     public function shouldSample(
-        ?API\SpanContext $parentContext,
-        int $traceId,
-        int $spanId,
+        Context $parentContext,
+        string $traceId,
         string $spanName,
         int $spanKind,
         ?API\Attributes $attributes = null,

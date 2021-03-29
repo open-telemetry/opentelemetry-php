@@ -8,10 +8,6 @@ use OpenTelemetry\Trace as API;
 
 final class SpanStatus implements API\SpanStatus
 {
-    /**
-     * @var SpanStatus[]
-     */
-    private static $map;
 
     /**
      * @var string
@@ -23,18 +19,43 @@ final class SpanStatus implements API\SpanStatus
      */
     private $description;
 
-    private function __construct(string $code, string $description = null)
+    public function __construct(string $code = self::UNSET, string $description = null)
     {
+        /*
+        * Description provides a descriptive message of the Status. Description MUST
+        * only be used with the Error StatusCode value.
+        * Description MUST be IGNORED for StatusCode Ok & Unset values.
+        * If an invalid code is provided, the default span is set.
+        */
+
+        if (!array_key_exists($code, self::DESCRIPTION)) {
+            // An invalid code was given; return default spanStatus.
+            $code = self::UNSET;
+            $description = self::DESCRIPTION[self::UNSET];
+        }
+        if ((!$description) || ($code != self::ERROR)) {
+            $description = self::DESCRIPTION[$code];
+        }
         $this->code = $code;
-        $this->description = $description ?? self::DESCRIPTION[self::UNKNOWN];
+        $this->description = $description;
     }
 
-    public static function new(string $code, string $description = null): SpanStatus
+    public static function new(string $code = self::UNSET, string $description = null): SpanStatus
     {
-        if (!$description) {
-            $description = self::DESCRIPTION[$code] ?? self::DESCRIPTION[self::UNKNOWN];
+        /*
+        * Description provides a descriptive message of the Status. Description MUST
+        * only be used with the Error StatusCode value.
+        * Description MUST be IGNORED for StatusCode Ok & Unset values.
+        * If an invalid code is provided, the default span is returned.
+        */
 
-            return self::$map[$code] ?? self::$map[$code] = new SpanStatus($code, $description);
+        if (!array_key_exists($code, self::DESCRIPTION)) {
+            // An invalid code was given; return default spanStatus.
+            return new SpanStatus();
+        }
+
+        if ((!$description) || ($code != self::ERROR)) {
+            $description = self::DESCRIPTION[$code];
         }
 
         return new SpanStatus($code, $description);
@@ -58,5 +79,28 @@ final class SpanStatus implements API\SpanStatus
     public function isStatusOK() : bool
     {
         return $this->code === self::OK;
+    }
+    public function setStatus(string $code = self::UNSET, string $description = null): void
+    {
+        /*
+        * Description provides a descriptive message of the Status. Description MUST
+        * only be used with the Error StatusCode value.
+        * Description MUST be IGNORED for StatusCode Ok & Unset values.
+        * If an invalid code is provided, the default span is set.
+        */
+
+        if (!array_key_exists($code, self::DESCRIPTION)) {
+            // An invalid code was given; set to defaults.
+            $this->code = self::UNSET;
+            $this->description = self::DESCRIPTION[self::UNSET];
+
+            return;
+        }
+
+        if ((!$description) || ($code != self::ERROR)) {
+            $description = self::DESCRIPTION[$code];
+        }
+        $this->code = $code;
+        $this->description = $description;
     }
 }

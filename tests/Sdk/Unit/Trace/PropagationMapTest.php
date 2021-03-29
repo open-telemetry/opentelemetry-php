@@ -110,4 +110,19 @@ class PropagationMapTest extends TestCase
         $this->expectExceptionMessage('Unable to set value with an empty key');
         $map->set($carrier, '', 'alpha');
     }
+
+    /**
+     * @test
+     */
+    public function testGetArrayValuesFromCarrier()
+    {
+        // Carrier contains an array as one of the values
+        $carrier = [
+            'a' => 'alpha',
+            'b' => ['bravo'],
+        ];
+        $map = new PropagationMap();
+        $this->assertSame('alpha', $map->get($carrier, 'a'));
+        $this->assertSame('bravo', $map->get($carrier, 'b'));
+    }
 }

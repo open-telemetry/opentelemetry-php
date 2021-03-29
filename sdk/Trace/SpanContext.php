@@ -79,6 +79,11 @@ final class SpanContext implements API\SpanContext
         $this->isValid = $this->traceId !== 0 && $this->spanId !== 0;
     }
 
+    public static function getInvalid(): API\SpanContext
+    {
+        return new self(self::INVALID_TRACE, self::INVALID_SPAN, 0);
+    }
+
     /**
      * Creates a new context with random trace
      *
@@ -167,7 +172,7 @@ final class SpanContext implements API\SpanContext
     /**
      * @return bool Returns a value that indicates if the context has non-zero trace and span
      */
-    public function isValidContext(): bool
+    public function isValid(): bool
     {
         return $this->isValid;
     }
@@ -175,7 +180,7 @@ final class SpanContext implements API\SpanContext
     /**
      * @return bool Returns a value that indicates if the context was created from a previously existing trace
      */
-    public function isRemoteContext(): bool
+    public function isRemote(): bool
     {
         return $this->isRemote;
     }

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
+/**
+ * @template TContext of Context
+ */
 class Context
 {
     /**
@@ -17,7 +20,7 @@ class Context
     protected $value;
 
     /**
-     * @var Context|null
+     * @var TContext|null
      */
     protected $parent;
 
@@ -38,7 +41,7 @@ class Context
      *
      * @param ContextKey|null $key The key object. Should only be null when creating an "empty" context
      * @param mixed|null $value
-     * @param Context|null $parent Reference to the parent object
+     * @param TContext|null $parent Reference to the parent object
      */
     final public function __construct(?ContextKey $key=null, $value=null, $parent=null)
     {
@@ -95,6 +98,7 @@ class Context
      *
      * @throws ContextValueNotFoundException
      * @return mixed
+     * @suppress PhanUndeclaredClassMethod
      */
     public function get(ContextKey $key)
     {

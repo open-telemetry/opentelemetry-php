@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use Exception;
+use OpenTelemetry\Context\ContextKey;
+use OpenTelemetry\Context\ContextValueTrait;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 
 class Span implements API\Span
 {
+    use ContextValueTrait;
+
     private $name;
     private $spanContext;
     private $parentSpanContext;
@@ -18,8 +23,8 @@ class Span implements API\Span
     private $startEpochTimestamp;
     private $start;
     private $end;
-    private $statusCode;
-    private $statusDescription;
+
+    private $spanStatus;
 
     /**
      * @var ResourceInfo
@@ -31,6 +36,9 @@ class Span implements API\Span
     private $links = null;
 
     private $ended = false;
+
+    /** @var ?SpanProcessor */
+    private $spanProcessor;
 
     // todo: missing links: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-links
 
@@ -51,7 +59,8 @@ class Span implements API\Span
         ?API\SpanContext $parentSpanContext = null,
         ?Sampler $sampler = null,
         ?ResourceInfo $resource = null,
-        int $spanKind = API\SpanKind::KIND_INTERNAL
+        int $spanKind = API\SpanKind::KIND_INTERNAL,
+        ?SpanProcessor $spanProcessor = null
     ) {
         $this->name = $name;
         $this->spanContext = $spanContext;
@@ -59,11 +68,11 @@ class Span implements API\Span
         $this->spanKind = $spanKind;
         $this->sampler = $sampler;
         $this->resource =  $resource ?? ResourceInfo::emptyResource();
+        $this->spanProcessor = $spanProcessor;
         $moment = Clock::get()->moment();
         $this->startEpochTimestamp = $moment[0];
         $this->start = $moment[1];
-        $this->statusCode = API\SpanStatus::OK;
-        $this->statusDescription = API\SpanStatus::DESCRIPTION[$this->statusCode];
+        $this->spanStatus = new SpanStatus();
 
         // todo: set these to null until needed
         $this->attributes = new Attributes();
@@ -89,8 +98,7 @@ class Span implements API\Span
     public function setSpanStatus(string $code, ?string $description = null): API\Span
     {
         if ($this->isRecording()) {
-            $this->statusCode = $code;
-            $this->statusDescription = $description ?? self::DESCRIPTION[$code] ?? self::DESCRIPTION[self::UNKNOWN];
+            $this->spanStatus->setStatus($code, $description);
         }
 
         return $this;
@@ -113,6 +121,10 @@ class Span implements API\Span
         if (!isset($this->end)) {
             $this->end = $now ?? Clock::get()->now();
             $this->ended = true;
+        }
+
+        if ($this->spanProcessor !== null) {
+            $this->spanProcessor->onEnd($this);
         }
 
         return $this;
@@ -140,7 +152,7 @@ class Span implements API\Span
 
     public function getStatus(): API\SpanStatus
     {
-        return SpanStatus::new($this->statusCode, $this->statusDescription);
+        return $this->spanStatus;
     }
 
     public function isRecording(): bool
@@ -207,6 +219,20 @@ class Span implements API\Span
         return $this;
     }
 
+    public function recordException(Exception $exception): API\Span
+    {
+        $attributes = new Attributes(
+            [
+                'exception.type' => get_class($exception),
+                'exception.message' => $exception->getMessage(),
+                'exception.stacktrace' => $exception->getTraceAsString(),
+            ]
+        );
+        $timestamp = time();
+
+        return  $this->addEvent('exception', $timestamp, $attributes);
+    }
+
     public function getEvents(): API\Events
     {
         return $this->events;
@@ -222,7 +248,7 @@ class Span implements API\Span
     */
     public function isRemote(): bool
     {
-        return $this->spanContext->isRemoteContext();
+        return $this->spanContext->isRemote();
     }
 
     public function isSampled(): bool
@@ -258,16 +284,25 @@ class Span implements API\Span
 
     public function getCanonicalStatusCode(): string
     {
-        return $this->statusCode;
+        return $this->spanStatus->getCanonicalStatusCode();
     }
 
     public function getStatusDescription(): string
     {
-        return $this->statusDescription;
+        return $this->spanStatus->getStatusDescription();
     }
 
     public function isStatusOk(): bool
     {
-        return $this->statusCode == API\SpanStatus::OK;
+        return $this->spanStatus->isStatusOK();
+    }
+
+    /**
+     * @return ContextKey
+     * @phan-override
+     */
+    protected static function getContextKey(): ContextKey
+    {
+        return SpanContextKey::instance();
     }
 }

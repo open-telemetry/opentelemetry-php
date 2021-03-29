@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use Http\Adapter\Guzzle7\Client;
 use OpenTelemetry\Sdk\Trace;
@@ -55,7 +53,7 @@ class Exporter implements Trace\Exporter
      * @var SpanConverter
      */
     private $spanConverter;
-    
+
     /**
     * @var bool
     */
@@ -100,7 +98,7 @@ class Exporter implements Trace\Exporter
         if (!$this->running) {
             return Exporter::FAILED_NOT_RETRYABLE;
         }
-        
+
         if (empty($spans)) {
             return Trace\Exporter::SUCCESS;
         }
@@ -145,14 +143,7 @@ class Exporter implements Trace\Exporter
 
     protected function createDefaultClient(): ClientInterface
     {
-        $container = [];
-        $history = Middleware::history($container);
-        $stack = HandlerStack::create();
-        // Add the history middleware to the handler stack.
-        $stack->push($history);
-
         return Client::createWithConfig([
-            'handler' => $stack,
             'timeout' => 30,
         ]);
     }
