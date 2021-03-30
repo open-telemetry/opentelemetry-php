@@ -253,7 +253,7 @@ class Tracer implements API\Tracer
         } else {
             if ($this->active) {
                 $parent = $this->getActiveSpan()->getContext();
-            } elseif ($this->active == null && $parentContext->isRemoteContext() == true) {
+            } elseif ($this->active == null && $parentContext->isRemote() == true) {
                 $parent = $parentContext;
             }
 
