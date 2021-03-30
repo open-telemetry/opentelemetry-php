@@ -140,7 +140,7 @@ class Tracer implements API\Tracer
         if (SamplingResult::DROP == $samplingResult->getDecision()) {
             $span = $this->generateSpanInstance('', $context);
         } else {
-            $span = $this->generateSpanInstance($name, $context, $sampler, $this->resource, $spanKind);
+            $span = $this->generateSpanInstance($name, $context, $parentContext, $sampler, $this->resource, $spanKind);
 
             if ($span->isRecording()) {
                 $this->provider->getSpanProcessor()->onStart($span);
@@ -244,7 +244,7 @@ class Tracer implements API\Tracer
         }
     }
 
-    private function generateSpanInstance(string $name, API\SpanContext $context, Sampler $sampler = null, ResourceInfo $resource = null, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
+    private function generateSpanInstance(string $name, API\SpanContext $context, API\SpanContext $parentContext = null, Sampler $sampler = null, ResourceInfo $resource = null, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
     {
         $parent = null;
 
@@ -253,6 +253,8 @@ class Tracer implements API\Tracer
         } else {
             if ($this->active) {
                 $parent = $this->getActiveSpan()->getContext();
+            } elseif (is_object($parentContext) && $parentContext->isRemote() == true) {
+                $parent = $parentContext;
             }
 
             $span = new Span($name, $context, $parent, $sampler, $resource, $spanKind);
