@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\OtlpGrpc;
 
 use grpc;
+use InvalidArgumentException;
 use Opentelemetry\Proto;
 use Opentelemetry\Proto\Collector\Trace\V1;
 use Opentelemetry\Proto\Common\V1\InstrumentationLibrary;
@@ -37,7 +38,7 @@ class Exporter implements Trace\Exporter
     private $certificateFile;
 
     /**
-     * @var array
+     * @var string
      */
     private $headers;
 
@@ -68,13 +69,12 @@ class Exporter implements Trace\Exporter
 
     /**
      * OTLP GRPC Exporter Constructor
-     * @param string $serviceName
      */
     public function __construct(
         string $endpointURL = 'localhost:4317',
         bool $insecure = true,
         string $certificateFile = null,
-        array $headers = [],
+        string $headers = '',
         bool $compression = false,
         int $timeout = 10,
         ClientInterface $client = null
@@ -85,34 +85,33 @@ class Exporter implements Trace\Exporter
         $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc'; // I guess this is redundant?
         $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ?: $insecure;
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: $certificateFile;
-        $this->headers[] = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: $headers; // TODO
-        $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: $compression; // TODO
-        $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: $timeout; // TODO
+        $this->headers = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: $headers;
+        $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: $compression;
+        $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: $timeout;
 
-        $this->spanConverter = new SpanConverter('foo');
+        $this->spanConverter = new SpanConverter();
+
+        $opts = [
+            'update_metadata' => function () {
+                return $this->metadataFromHeaders($this->headers);
+            },
+            'timeout' => $this->timeout
+        ];
 
         if (!$this->insecure && !$this->certificateFile) {
             // Assumed default
-            $_credentials = Grpc\ChannelCredentials::createSsl();
+            $opts['credentials'] = Grpc\ChannelCredentials::createSsl();
         } elseif (!$this->insecure && $this->certificateFile) {
             // Should we validate more?
-            $_credentials = Grpc\ChannelCredentials::createSsl(file_get_contents($certificateFile));
+            $opts['credentials'] = Grpc\ChannelCredentials::createSsl(file_get_contents($certificateFile));
         } else {
-            $_credentials = Grpc\ChannelCredentials::createInsecure();
+            $opts['credentials'] = Grpc\ChannelCredentials::createInsecure();
         }
 
-        $opts = [
-            'credentials' => $_credentials,
-            'update_metadata' =>  function () {
-                return [
-                    'x-honeycomb-team' => ['xxx'],
-                    'x-honeycomb-dataset' => ['xxx'],
-                ];
-            },
-            // https://github.com/grpc/grpc/tree/master/src/php#compression
-            // 'grpc.default_compression_algorithm' => 2,
-            // 'grpc.default_compression_level' => 2,
-        ];
+        if ($this->compression) {
+            // gzip is the only specified compression method for now
+            $opts['grpc.default_compression_algorithm'] = 2;
+        }
 
         $this->client = $client ?? new V1\TraceServiceClient($this->endpointURL, $opts);
     }
@@ -138,6 +137,7 @@ class Exporter implements Trace\Exporter
             array_push($convertedSpans, $this->spanConverter->as_otlp_span($span));
         }
 
+        // TODO: Don't think this should be in the exporter
         $il = new InstrumentationLibrary([
             'name' => 'otel-php',
             'version' => '0.0.1',
@@ -161,20 +161,44 @@ class Exporter implements Trace\Exporter
         $request->setResourceSpans([$resourcespans]);
 
         list($response, $status) = $this->client->Export($request)->wait();
-        if ($status->code !== Grpc\STATUS_OK) {
-            // TODO: This probably shouldn't  echo
-            echo 'ERROR: ' . $status->code . ', ' . $status->details . PHP_EOL;
+
+        if ($status->code == Grpc\STATUS_OK) {
+            return Trace\Exporter::SUCCESS;
         }
 
-        if ($status->code >= 400 && $status->code < 500) {
-            return Trace\Exporter::FAILED_NOT_RETRYABLE;
-        }
-
-        if ($status->code >= 500 && $status->code < 600) {
+        if (in_array($status->code, [
+            Grpc\STATUS_CANCELLED,
+            Grpc\STATUS_DEADLINE_EXCEEDED,
+            Grpc\STATUS_PERMISSION_DENIED,
+            Grpc\STATUS_RESOURCE_EXHAUSTED,
+            Grpc\STATUS_ABORTED,
+            Grpc\STATUS_OUT_OF_RANGE,
+            Grpc\STATUS_UNAVAILABLE,
+            Grpc\STATUS_DATA_LOSS,
+            Grpc\STATUS_UNAUTHENTICATED,
+        ])) {
             return Trace\Exporter::FAILED_RETRYABLE;
         }
 
-        return Trace\Exporter::SUCCESS;
+        return Trace\Exporter::FAILED_NOT_RETRYABLE;
+    }
+
+
+    public function metadataFromHeaders(string $headers): array {
+
+        $pairs = explode(",", $headers);
+
+        if (!array_key_exists(1, $pairs)) {
+            return [];
+        }
+
+        $metadata = [];
+        foreach($pairs as $pair) {
+            list($key, $value) = explode("=", $pair, 2);
+            $metadata[$key] = [$value];
+        }
+
+        return $metadata;
     }
 
     public function shutdown(): void

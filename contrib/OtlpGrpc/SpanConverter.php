@@ -16,15 +16,6 @@ use OpenTelemetry\Trace\Span;
 
 class SpanConverter
 {
-    /**
-     * @var string
-     */
-    private $serviceName;
-
-    public function __construct(string $serviceName)
-    {
-        $this->serviceName = $serviceName;
-    }
 
     public function as_otlp_key_value($key, $value): KeyValue
     {
@@ -92,9 +83,6 @@ class SpanConverter
             'trace_id' => hex2bin($span->getContext()->getTraceId()),
             'span_id' => hex2bin($span->getContext()->getSpanId()),
             'parent_span_id' => $span->getParent() ? hex2bin($span->getParent()->getSpanId()) : null,
-            // 'localEndpoint' => [
-            //     'serviceName' => $this->serviceName,
-            // ],
             'name' => $span->getSpanName(),
             'start_time_unix_nano' => $span->getStartEpochTimestamp(),
             'end_time_unix_nano' => $end_timestamp,
