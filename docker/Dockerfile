@@ -9,4 +9,9 @@ docker-php-ext-enable ast xdebug && \
 # The pcntl extension is used for speeding up `make phan`
 docker-php-ext-install pcntl
 
+# install GRPC
+RUN apt install -y --no-install-recommends zlib1g-dev && \
+    pecl install grpc && \
+    docker-php-ext-enable grpc
+
 WORKDIR /usr/src/myapp
