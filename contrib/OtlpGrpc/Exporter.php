@@ -55,6 +55,8 @@ class Exporter implements Trace\Exporter
      * @var SpanConverter
      */
     private $spanConverter;
+
+    private $metadata;
     
     /**
     * @var bool
@@ -77,7 +79,7 @@ class Exporter implements Trace\Exporter
         string $headers = '',
         bool $compression = false,
         int $timeout = 10,
-        ClientInterface $client = null
+        V1\TraceServiceClient $client = null
     ) {
 
         // Set default values based on presence of env variable
@@ -91,11 +93,13 @@ class Exporter implements Trace\Exporter
 
         $this->spanConverter = new SpanConverter();
 
+        $this->metadata = $this->metadataFromHeaders($this->headers);
+
         $opts = [
             'update_metadata' => function () {
-                return $this->metadataFromHeaders($this->headers);
+                return $this->metadata;
             },
-            'timeout' => $this->timeout
+            'timeout' => $this->timeout,
         ];
 
         if (!$this->insecure && !$this->certificateFile) {
@@ -162,20 +166,20 @@ class Exporter implements Trace\Exporter
 
         list($response, $status) = $this->client->Export($request)->wait();
 
-        if ($status->code == Grpc\STATUS_OK) {
+        if ($status->code == \Grpc\STATUS_OK) {
             return Trace\Exporter::SUCCESS;
         }
 
         if (in_array($status->code, [
-            Grpc\STATUS_CANCELLED,
-            Grpc\STATUS_DEADLINE_EXCEEDED,
-            Grpc\STATUS_PERMISSION_DENIED,
-            Grpc\STATUS_RESOURCE_EXHAUSTED,
-            Grpc\STATUS_ABORTED,
-            Grpc\STATUS_OUT_OF_RANGE,
-            Grpc\STATUS_UNAVAILABLE,
-            Grpc\STATUS_DATA_LOSS,
-            Grpc\STATUS_UNAUTHENTICATED,
+            \Grpc\STATUS_CANCELLED,
+            \Grpc\STATUS_DEADLINE_EXCEEDED,
+            \Grpc\STATUS_PERMISSION_DENIED,
+            \Grpc\STATUS_RESOURCE_EXHAUSTED,
+            \Grpc\STATUS_ABORTED,
+            \Grpc\STATUS_OUT_OF_RANGE,
+            \Grpc\STATUS_UNAVAILABLE,
+            \Grpc\STATUS_DATA_LOSS,
+            \Grpc\STATUS_UNAUTHENTICATED,
         ])) {
             return Trace\Exporter::FAILED_RETRYABLE;
         }
@@ -183,18 +187,31 @@ class Exporter implements Trace\Exporter
         return Trace\Exporter::FAILED_NOT_RETRYABLE;
     }
 
+    public function setHeader($key, $value)
+    {
+        $this->metadata[$key] = [$value];
+    }
 
-    public function metadataFromHeaders(string $headers): array {
+    public function getHeaders()
+    {
+        return $this->metadata;
+    }
 
-        $pairs = explode(",", $headers);
+    public function metadataFromHeaders($headers): array
+    {
+        if (is_array($headers)) {
+            throw new InvalidArgumentException('Configuring Headers Via');
+        }
+
+        $pairs = explode(',', $headers);
 
         if (!array_key_exists(1, $pairs)) {
             return [];
         }
 
         $metadata = [];
-        foreach($pairs as $pair) {
-            list($key, $value) = explode("=", $pair, 2);
+        foreach ($pairs as $pair) {
+            list($key, $value) = explode('=', $pair, 2);
             $metadata[$key] = [$value];
         }
 
@@ -205,4 +222,9 @@ class Exporter implements Trace\Exporter
     {
         $this->running = false;
     }
+
+    // public function getHeaders()
+    // {
+    //     return $this->metadataFromHeaders($this->headers);
+    // }
 }

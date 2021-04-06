@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use InvalidArgumentException;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
+use OpenTelemetry\Sdk\Resource\ResourceInfo;
+use OpenTelemetry\Sdk\Trace\Attributes;
+
 use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace;
+use OpenTelemetry\Sdk\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
 class OTLPGrpcExporterTest extends TestCase
@@ -17,12 +21,56 @@ class OTLPGrpcExporterTest extends TestCase
      */
     public function testExporter()
     {
-        $exporter = new Exporter();
+        $provider = new TracerProvider(
+            ResourceInfo::create(
+                new Attributes([
+                    'service.name' => 'my-service',
+                ])
+            )
+        );
 
-        $this->assertInstanceOf(Trace\Exporter::class, $exporter);
+        $tracer = $provider->getTracer('io.opentelemetry.contrib.php');
 
+        $span = $tracer->startAndActivateSpan('test.otlp');
+
+        $span->setAttribute('attr1', 'val1')
+            ->setAttribute('attr2', 'val1');
+
+        $foo = (new Exporter())->export([$span]);
+
+        $this->assertEquals(Exporter::FAILED_RETRYABLE, $foo);
     }
 
+    public function testRefusesInvalidHeaders()
+    {
+        $foo = new Exporter('localhost:4317', true, null, 'a:bc');
+
+        $this->assertEquals([], $foo->getHeaders());
+
+        //$this->expectException(InvalidArgumentException::class);
+    }
+
+    public function testSetHeadersWithEnvironmentVariables()
+    {
+        putenv('OTEL_EXPORTER_OTLP_HEADERS=x-aaa=foo,x-bbb=barf');
+
+        $exporter = new Exporter();
+
+        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['barf']], $exporter->getHeaders());
+
+        putenv('OTEL_EXPORTER_OTLP_HEADERS'); // Clear the envvar or it breaks future tests
+    }
+
+    public function testSetHeadersInConstructor()
+    {
+        $exporter = new Exporter('localhost:4317', true, null, 'x-aaa=foo,x-bbb=bar');
+
+        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar']], $exporter->getHeaders());
+
+        $exporter->setHeader('key', 'value');
+
+        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar'], 'key' => ['value']], $exporter->getHeaders());
+    }
 
     /**
      * @test
@@ -46,13 +94,14 @@ class OTLPGrpcExporterTest extends TestCase
         $this->assertEquals(\OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 
-    public function testHeadersShouldBeConvertedToArray()
+    public function testHeadersShouldRefuseArray()
     {
-        $expected = ['x-aaa' => ['foo'], 'x-bbb' => ['bar']];
+        $headers = [
+            'key' => ['value'],
+        ];
 
-        $headers_as_string = (new Exporter)->metadataFromHeaders('x-aaa=foo,x-bbb=bar');
+        $this->expectException(InvalidArgumentException::class);
 
-        $this->assertEquals($expected, $headers_as_string);
-
+        $headers_as_string = (new Exporter())->metadataFromHeaders($headers);
     }
 }
