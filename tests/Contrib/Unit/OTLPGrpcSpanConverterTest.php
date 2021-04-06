@@ -6,12 +6,14 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\Contrib\OtlpGrpc\SpanConverter;
 use Opentelemetry\Proto\Trace\V1;
+use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Span;
 
 use OpenTelemetry\Sdk\Trace\SpanContext;
+use OpenTelemetry\Sdk\Trace\SpanStatus;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 
 use PHPUnit\Framework\TestCase;
@@ -132,5 +134,76 @@ class OTLPGrpcSpanConverterTest extends TestCase
         // // This currently works, but OpenTelemetry\Trace\Span should stop arrays
         // // containing multiple value types from being passed to the Exporter.
         // $this->assertEquals($tags['list-of-random'], 'true,1,2,3,false,string-1,3.1415');
+    }
+
+    public function testOtlpHappyPathSpan()
+    {
+        $start_time = 1617315085034507008;
+        $end_time = 1617313804325769988;
+
+        // Construct a comprehensive happy path Span in the SDK
+        $sdk = new Span(
+            'http_get',
+            new SpanContext(
+                bin2hex('0000000000000001'), // traceId
+                bin2hex('00000001'), // spanId
+                0, // traceFlags
+            ),
+            null, // parentSpanContext
+            null, // sampler
+            ResourceInfo::create(
+                new Attributes([
+                    'instance' => 'test-a',
+                ])
+            )
+        );
+
+        $sdk->setStartEpochTimestamp($start_time);
+
+        $sdk->setAttribute('user', 'alice');
+        $sdk->setAttribute('authenticated', true);
+
+        $sdk->addEvent('Event1', 1617313804325769955, new Attributes(['sucess' => 'yes']));
+
+        $sdk->setSpanStatus(SpanStatus::OK);
+
+        $sdk->end($end_time); // Setting the end timestamp does not work how I expect it to
+
+        // Construct the same span in OTLP to compare.
+        $expected = new V1\Span([
+            'trace_id' => '0000000000000001',
+            'span_id' => '00000001',
+            'name' => 'http_get',
+            'start_time_unix_nano' => $start_time,
+            'end_time_unix_nano' => $end_time,
+            'kind' => V1\Span\SpanKind::SPAN_KIND_INTERNAL,
+            'status' => new V1\Status([ 'code' => V1\Status\StatusCode::STATUS_CODE_OK ]),
+            'attributes' => [
+                new \Opentelemetry\Proto\Common\V1\KeyValue([
+                    'key' => 'user',
+                    'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'alice']),
+                ]),
+                new \Opentelemetry\Proto\Common\V1\KeyValue([
+                    'key' => 'authenticated',
+                    'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'bool_value' => true]),
+                ]),
+            ],
+            'events' => [
+                new V1\Span\Event([
+                    'name' => 'Event1',
+                    'time_unix_nano' => 1617313804325769955,
+                    'attributes' => [
+                        new \Opentelemetry\Proto\Common\V1\KeyValue([
+                            'key' => 'sucess',
+                            'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'yes']),
+                        ]),
+                    ],
+                ]),
+            ],
+        ]);
+
+        $otlpspan = (new SpanConverter())->as_otlp_span($sdk);
+
+        $this->assertEquals($expected, $otlpspan);
     }
 }

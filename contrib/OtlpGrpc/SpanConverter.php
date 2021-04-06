@@ -12,11 +12,11 @@ use Opentelemetry\Proto\Trace\V1\Span\Event;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
+use OpenTelemetry\Sdk\Trace\SpanStatus;
 use OpenTelemetry\Trace\Span;
 
 class SpanConverter
 {
-
     public function as_otlp_key_value($key, $value): KeyValue
     {
         return new KeyValue([
@@ -109,12 +109,23 @@ class SpanConverter
         }
 
         if (!array_key_exists('status', $row)) {
-            $proto_status = StatusCode::STATUS_CODE_OK;
-            if ($span->getStatus()->getCanonicalStatusCode() === 'ERROR') {
-                $proto_status = StatusCode::STATUS_CODE_ERROR;
+            $spanStatus = $span->getStatus();
+            $status = new Status();
+
+            switch ($spanStatus->getCanonicalStatusCode()) {
+                case SpanStatus::OK:
+                    $status->setCode(StatusCode::STATUS_CODE_OK);
+
+                    break;
+                case SpanStatus::ERROR:
+                    $status->setCode(StatusCode::STATUS_CODE_ERROR)->setMessage($spanStatus->getStatusDescription());
+
+                    break;
+                default:
+                    $status->setCode(StatusCode::STATUS_CODE_UNSET);
             }
-            $status=new Status();
-            $row['status']=$status->setCode($proto_status)->setMessage('Description');
+
+            $row['status'] = $status;
         }
 
         return new CollectorSpan($row);
