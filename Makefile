@@ -22,7 +22,7 @@ trace examples: FORCE
         # The following examples do not use the DC_RUN_PHP global because they need environment variables.
 	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/AlwaysOnNewrelicExample.php
 	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/AlwaysOnZipkinToNewrelicExample.php
-i	docker-compose run -e OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317 --rm php php ./examples/AlwaysOnOTLPGrpcExample.php
+	docker-compose run -e OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317 --rm php php ./examples/AlwaysOnOTLPGrpcExample.php
 
 
 metrics-prometheus-example:
