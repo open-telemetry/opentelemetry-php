@@ -18,12 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 (new Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
 
-if ($_SERVER['APP_DEBUG']) {
-    umask(0000);
-
-    Debug::enable();
-}
-
 $sampler = new AlwaysOnSampler();
 $samplingResult = $sampler->shouldSample(
     Context::getCurrent(),
