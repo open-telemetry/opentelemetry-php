@@ -7,11 +7,9 @@ namespace App\Controller;
 use GuzzleHttp\Client;
 use OpenTelemetry\Sdk\Trace\PropagationMap;
 use OpenTelemetry\Sdk\Trace\SpanContext;
-
 use OpenTelemetry\Sdk\Trace\TraceContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
 use Symfony\Component\Routing\Annotation\Route;
 
 class TestController

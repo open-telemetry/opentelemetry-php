@@ -7,7 +7,7 @@ mv /root/.symfony/bin/symfony /usr/local/bin/symfony
 # Set up Symfony test application
 cd tests/TraceContext/W3CTestService
 rm -rf test_app
-composer create-project symfony/skeleton test_app
+symfony new test_app --version=5.2
 
 # Move our files into the test application
 cp index.php test_app/public/index.php
