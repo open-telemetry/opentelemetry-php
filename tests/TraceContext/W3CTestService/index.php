@@ -13,7 +13,6 @@ use OpenTelemetry\Sdk\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
 use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
 
 (new Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
