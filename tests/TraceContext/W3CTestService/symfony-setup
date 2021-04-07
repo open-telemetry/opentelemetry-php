@@ -15,7 +15,15 @@ cp TestController.php test_app/src/Controller/TestController.php
 cd test_app
 
 composer require annotations
-composer require open-telemetry/opentelemetry
+
+# Link the local opentelemetry changes to vendor/open-telemetry
+composer require open-telemetry/opentelemetry "*"
+composer config repositories.local \
+    '{"type": "path", "url": "/usr/src/open-telemetry/", "options": {"symLink": true }}' \
+    --file composer.json
+rm composer.lock
+composer clearcache
+composer install
 
 # Start the server to start listening in the background
 symfony server:start -d --port=8001

@@ -35,6 +35,5 @@ bash:
 style:
 	$(DC_RUN_PHP) php ./vendor/bin/php-cs-fixer fix
 w3c-test-service:
-	docker-compose up -d
-	$(DC_RUN_PHP) ./tests/TraceContext/W3CTestService/symfony-setup
+	@docker-compose -f docker-compose.w3cTraceContext.yaml run --rm php ./tests/TraceContext/W3CTestService/symfony-setup
 FORCE:

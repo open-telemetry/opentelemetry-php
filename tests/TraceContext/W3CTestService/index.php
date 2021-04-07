@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Kernel;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
@@ -25,9 +26,8 @@ if ($_SERVER['APP_DEBUG']) {
 
 $sampler = new AlwaysOnSampler();
 $samplingResult = $sampler->shouldSample(
-    null,
+    Context::getCurrent(),
     md5((string) microtime(true)),
-    substr(md5((string) microtime(true)), 16),
     'io.opentelemetry.example',
     API\SpanKind::KIND_INTERNAL
 );
@@ -37,7 +37,7 @@ $exporter = new JaegerExporter(
     'http://localhost:9412/api/v2/spans'
 );
 
-if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
+if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     $tracer = (new TracerProvider())
         ->addSpanProcessor(new BatchSpanProcessor($exporter, Clock::get()))
         ->getTracer('io.opentelemetry.contrib.php');
