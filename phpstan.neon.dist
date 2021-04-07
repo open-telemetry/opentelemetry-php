@@ -9,8 +9,7 @@ parameters:
     excludes_analyse:
         - var
         - vendor
-        - '%currentWorkingDirectory%/tests/TraceContext/W3CTestService/TestController.php'
-        - '%currentWorkingDirectory%/tests/TraceContext/W3CTestService/index.php'
+        - tests/TraceContext/W3CTestService
     ignoreErrors:
         # PHPStan false positive
         - message: '#Call to an undefined static method OpenTelemetry\\Sdk\\Metrics\\Providers\\GlobalMeterProvider\:\:getMeter\(\)\.#'

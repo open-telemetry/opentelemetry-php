@@ -10,6 +10,7 @@
         <ignoreFiles>
             <directory name="var"/>
             <directory name="vendor"/>
+            <directory name="tests/TraceContext/W3CTestService"/>
         </ignoreFiles>
     </projectFiles>
     <plugins>
