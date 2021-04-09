@@ -95,9 +95,16 @@ class SpanConverter
             if (!array_key_exists('events', $row)) {
                 $row['events'] = [];
             }
+            $attrs = [];
+
+            foreach($event->getAttributes() as $k => $v) {
+                array_push($attrs, $this->as_otlp_key_value($k, $v->getValue()));
+            }
+
             $row['events'][] = new Event([
                 'time_unix_nano' => $event->getTimestamp(),
                 'name' => $event->getName(),
+                'attributes' => $attrs,
             ]);
         }
 

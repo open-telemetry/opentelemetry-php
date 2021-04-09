@@ -163,7 +163,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
         $sdk->setAttribute('user', 'alice');
         $sdk->setAttribute('authenticated', true);
 
-        $sdk->addEvent('Event1', 1617313804325769955, new Attributes(['sucess' => 'yes']));
+        $sdk->addEvent('Event1', 1617313804325769955, new Attributes(['success' => 'yes']));
 
         $sdk->setSpanStatus(SpanStatus::OK);
 
@@ -194,7 +194,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
                     'time_unix_nano' => 1617313804325769955,
                     'attributes' => [
                         new \Opentelemetry\Proto\Common\V1\KeyValue([
-                            'key' => 'sucess',
+                            'key' => 'success',
                             'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'yes']),
                         ]),
                     ],
