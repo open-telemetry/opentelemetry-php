@@ -3,6 +3,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
@@ -10,7 +11,6 @@ use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\Trace as API;
 
 $sampler = new AlwaysOnSampler();
@@ -51,7 +51,6 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
         $span->addEvent('generated_session', $timestamp, new Attributes([
             'id' => md5((string) microtime(true)),
         ]));
-
 
         // temporarily setting service name here.  It should eventually be pulled from tracer.resources.
         $childSpan->setAttribute('service.name', 'alwaysOnOTLPGrpcExample');

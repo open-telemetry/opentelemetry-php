@@ -3,6 +3,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
@@ -11,7 +12,6 @@ use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\Trace as API;
 
 $sampler = new AlwaysOnSampler();
