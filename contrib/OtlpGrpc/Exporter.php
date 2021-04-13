@@ -6,10 +6,7 @@ namespace OpenTelemetry\Contrib\OtlpGrpc;
 
 use grpc;
 use InvalidArgumentException;
-use Opentelemetry\Proto;
 use Opentelemetry\Proto\Collector\Trace\V1;
-use Opentelemetry\Proto\Common\V1\InstrumentationLibrary;
-use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
 
@@ -136,30 +133,7 @@ class Exporter implements Trace\Exporter
             return Trace\Exporter::SUCCESS;
         }
 
-        $convertedSpans = [];
-        foreach ($spans as $span) {
-            array_push($convertedSpans, $this->spanConverter->as_otlp_span($span));
-        }
-
-        // TODO: Don't think this should be in the exporter
-        $il = new InstrumentationLibrary([
-            'name' => 'otel-php',
-            'version' => '0.0.1',
-        ]);
-
-        $ilspans = [];
-        foreach ($convertedSpans as $convertedSpan) {
-            $ilspan = new InstrumentationLibrarySpans([
-                'instrumentation_library' => $il,
-                'spans' => [$convertedSpan],
-            ]);
-
-            array_push($ilspans, $ilspan);
-        }
-
-        $resourcespans = new Proto\Trace\V1\ResourceSpans([
-            'instrumentation_library_spans' => $ilspans,
-        ]);
+        $resourcespans = $this->spanConverter->as_otlp_resouce_span($spans);
 
         $request= new V1\ExportTraceServiceRequest();
         $request->setResourceSpans([$resourcespans]);

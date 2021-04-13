@@ -6,6 +6,8 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\Contrib\OtlpGrpc\SpanConverter;
 use Opentelemetry\Proto\Trace\V1;
+use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
+use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
@@ -138,8 +140,8 @@ class OTLPGrpcSpanConverterTest extends TestCase
 
     public function testOtlpHappyPathSpan()
     {
-        $start_time = 1617315085034507008;
-        $end_time = 1617313804325769988;
+        $start_time = 1617313804325769988;
+        $end_time = 1617313804325783095;
 
         // Construct a comprehensive happy path Span in the SDK
         $sdk = new Span(
@@ -159,6 +161,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
         );
 
         $sdk->setStartEpochTimestamp($start_time);
+        $sdk->setStart(125464959232828);
 
         $sdk->setAttribute('user', 'alice');
         $sdk->setAttribute('authenticated', true);
@@ -167,42 +170,75 @@ class OTLPGrpcSpanConverterTest extends TestCase
 
         $sdk->setSpanStatus(SpanStatus::OK);
 
-        $sdk->end($end_time); // Setting the end timestamp does not work how I expect it to
+        $sdk->end(125464959245935);
 
         // Construct the same span in OTLP to compare.
-        $expected = new V1\Span([
-            'trace_id' => '0000000000000001',
-            'span_id' => '00000001',
-            'name' => 'http_get',
-            'start_time_unix_nano' => $start_time,
-            'end_time_unix_nano' => $end_time,
-            'kind' => V1\Span\SpanKind::SPAN_KIND_INTERNAL,
-            'status' => new V1\Status([ 'code' => V1\Status\StatusCode::STATUS_CODE_OK ]),
-            'attributes' => [
-                new \Opentelemetry\Proto\Common\V1\KeyValue([
-                    'key' => 'user',
-                    'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'alice']),
-                ]),
-                new \Opentelemetry\Proto\Common\V1\KeyValue([
-                    'key' => 'authenticated',
-                    'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'bool_value' => true]),
-                ]),
-            ],
-            'events' => [
-                new V1\Span\Event([
-                    'name' => 'Event1',
-                    'time_unix_nano' => 1617313804325769955,
-                    'attributes' => [
-                        new \Opentelemetry\Proto\Common\V1\KeyValue([
-                            'key' => 'success',
-                            'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'yes']),
+        $expected = new ResourceSpans([
+            'resource' => new \Opentelemetry\Proto\Resource\V1\Resource([
+                'attributes' => [
+                    new \Opentelemetry\Proto\Common\V1\KeyValue([
+                        'key' => 'telemetry.sdk.name',
+                        'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'opentelemetry']),
+                    ]),
+                    new \Opentelemetry\Proto\Common\V1\KeyValue([
+                        'key' => 'telemetry.sdk.language',
+                        'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'php']),
+                    ]),
+                    new \Opentelemetry\Proto\Common\V1\KeyValue([
+                        'key' => 'telemetry.sdk.version',
+                        'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'dev']),
+                    ]),
+                    new \Opentelemetry\Proto\Common\V1\KeyValue([
+                        'key' => 'instance',
+                        'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'test-a']),
+                    ]),
+
+                ],
+            ]),
+            'instrumentation_library_spans' => [
+                new InstrumentationLibrarySpans([
+                    'instrumentation_library' => new \Opentelemetry\Proto\Common\V1\InstrumentationLibrary([
+                        'name' => 'lib-a',
+                        'version' => 'v0.1.0',
+                    ]),
+                    'spans' => [
+                        new V1\Span([
+                            'trace_id' => '0000000000000001',
+                            'span_id' => '00000001',
+                            'name' => 'http_get',
+                            'start_time_unix_nano' => $start_time,
+                            'end_time_unix_nano' => $end_time,
+                            'kind' => V1\Span\SpanKind::SPAN_KIND_INTERNAL,
+                            'status' => new V1\Status([ 'code' => V1\Status\StatusCode::STATUS_CODE_OK ]),
+                            'attributes' => [
+                                new \Opentelemetry\Proto\Common\V1\KeyValue([
+                                    'key' => 'user',
+                                    'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'alice']),
+                                ]),
+                                new \Opentelemetry\Proto\Common\V1\KeyValue([
+                                    'key' => 'authenticated',
+                                    'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'bool_value' => true]),
+                                ]),
+                            ],
+                            'events' => [
+                                new V1\Span\Event([
+                                    'name' => 'Event1',
+                                    'time_unix_nano' => 1617313804325769955,
+                                    'attributes' => [
+                                        new \Opentelemetry\Proto\Common\V1\KeyValue([
+                                            'key' => 'success',
+                                            'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'yes']),
+                                        ]),
+                                    ],
+                                ]),
+                            ],
                         ]),
                     ],
                 ]),
             ],
         ]);
 
-        $otlpspan = (new SpanConverter())->as_otlp_span($sdk);
+        $otlpspan = (new SpanConverter())->as_otlp_resource_span([$sdk]);
 
         $this->assertEquals($expected, $otlpspan);
     }

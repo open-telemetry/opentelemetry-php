@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpGrpc;
 
+use Opentelemetry\Proto;
 use Opentelemetry\Proto\Common\V1\AnyValue;
 use Opentelemetry\Proto\Common\V1\ArrayValue;
+use Opentelemetry\Proto\Common\V1\InstrumentationLibrary;
 use Opentelemetry\Proto\Common\V1\KeyValue;
+use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
+use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
 use Opentelemetry\Proto\Trace\V1\Span\Event;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
@@ -76,8 +80,7 @@ class SpanConverter
 
     public function as_otlp_span(Span $span): CollectorSpan
     {
-        $duration_ns = (($span->getEnd() - $span->getStart()));
-        $end_timestamp = ($span->getStartEpochTimestamp() + $duration_ns);
+        $end_timestamp = ($span->getStartEpochTimestamp() + $span->getDuration());
 
         $row = [
             'trace_id' => hex2bin($span->getContext()->getTraceId()),
@@ -97,7 +100,7 @@ class SpanConverter
             }
             $attrs = [];
 
-            foreach($event->getAttributes() as $k => $v) {
+            foreach ($event->getAttributes() as $k => $v) {
                 array_push($attrs, $this->as_otlp_key_value($k, $v->getValue()));
             }
 
@@ -136,5 +139,48 @@ class SpanConverter
         }
 
         return new CollectorSpan($row);
+    }
+
+    // @return KeyValue[]
+    public function as_otlp_resource_attributes(Span $span): array
+    {
+        $attrs = [];
+
+        foreach ($span->getResource()->getAttributes() as $k => $v) {
+            array_push($attrs, $this->as_otlp_key_value($k, $v->getValue()));
+        }
+
+        return $attrs;
+    }
+
+    public function as_otlp_resource_span(iterable $spans): ResourceSpans
+    {
+        $convertedSpans = [];
+        foreach ($spans as $span) {
+            array_push($convertedSpans, $this->as_otlp_span($span));
+        }
+
+        // TODO: Pluck this information from the Tracer
+        $il = new InstrumentationLibrary([
+            // 'name' => 'otel-php',
+            // 'version' => '0.0.1',
+        ]);
+
+        $ilspans = [];
+        foreach ($convertedSpans as $convertedSpan) {
+            $ilspan = new InstrumentationLibrarySpans([
+                'instrumentation_library' => $il,
+                'spans' => [$convertedSpan],
+            ]);
+
+            array_push($ilspans, $ilspan);
+        }
+
+        return new Proto\Trace\V1\ResourceSpans([
+            'resource' => new Proto\Resource\V1\Resource([
+                'attributes' => $this->as_otlp_resource_attributes($span),
+            ]),
+            'instrumentation_library_spans' => $ilspans,
+        ]);
     }
 }
