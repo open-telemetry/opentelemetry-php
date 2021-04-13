@@ -9,7 +9,7 @@ To follow this guide you will need:
 * [Composer](https://getcomposer.org/download/ ) for dependency management. 
 * [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools. We have setup instructions for docker on this project's [readme](https://github.com/open-telemetry/opentelemetry-php#development).
 
-This example uses Laravel version 8.0.
+This example uses Laravel version 8.0 .
 
 ## Step 1 - Creating a Laravel Application
 

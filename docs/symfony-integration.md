@@ -11,6 +11,8 @@ To follow this guide you will need:
 * [Symfony CLI](https://symfony.com/download) for managing your Symfony application.
 * [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools. We have setup instructions for docker on this project's [readme](https://github.com/open-telemetry/opentelemetry-php#development).
 
+This example uses Symfony version 5.2 .
+
 ## Step 1 - Creating a Symfony Application 
 
 Create a Symfony application by running the command `symfony new my_project_name`. We are calling this example `otel-php-symfony-basic-example`, so the command is as follows; 
@@ -22,7 +24,7 @@ Create a Symfony application by running the command `symfony new my_project_name
  To define our routes within our controller methods, let's require the Doctrine annotation library by running the command `composer require doctrine/annotations`.
 
 We can test that routes defined within Controllers work by creating a `HelloController.php` file within the `src\Controller` folder as follows:
-```
+```php
 <?php
 
 namespace App\Controller;
@@ -67,7 +69,7 @@ To visualize traces from our application, we have to bundle open source tracing 
 
 Let's add a `docker-compose.yaml` file in the root of our project with the content as follows:
 
-```
+```yaml
 version: '3.7'
 services:
     zipkin:
@@ -103,7 +105,7 @@ The entry point for all Symfony applications is the `index.php` file located in 
 
 To use open-telemetry specific classes we have to import them at the top of our index file, using the `use` keyword. This is what our imports look like:
 
-```
+```php
 use App\Kernel;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
@@ -120,7 +122,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 Next, we create a sample recording trace using the [AlwaysOnSampler](https://github.com/open-telemetry/opentelemetry-php/blob/main/sdk/Trace/Sampler/AlwaysOnSampler.php) class, just before the Kernel instance is created like below:
 
-```
+```php
 $sampler = new AlwaysOnSampler();
 $samplingResult = $sampler->shouldSample(
     null,
@@ -133,7 +135,7 @@ $samplingResult = $sampler->shouldSample(
 
 Since we are looking to export traces to both Zipkin and Jaeger we have to make use of their individual exporters;
 
-```
+```php
 $jaegerExporter = new JaegerExporter(
     'Hello World Web Server Jaeger',
     'http://localhost:9412/api/v2/spans'
@@ -147,7 +149,7 @@ $zipkinExporter = new ZipkinExporter(
 
 Next we create a trace, and add processors for each trace(One for Jaeger and another for Zipkin). Then we proceed to start and activate a span for each trace. We create a trace only if the RECORD AND SAMPLED sampling result condition passes as follows;
 
-```
+```php
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
 
     $jaegerTracer = (new TracerProvider())
@@ -167,7 +169,7 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
 
 Finally we end the active spans if sampling is complete, by adding the following block at the end of the `index.php` file;
 
-```
+```php
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
     $zipkinTracer->endActiveSpan();
     $jaegerTracer->endActiveSpan();
@@ -205,7 +207,7 @@ Since resources in Symfony's `public\index.php` file are available to the entire
 
 Lets try using the `addEvent` method, to capture errors within our controller as follows:
 
-```
+```php
 global $zipkinTracer;
         if ($zipkinTracer) {
             /** @var Span $span */
@@ -223,6 +225,7 @@ global $zipkinTracer;
             $zipkinTracer->endActiveSpan();
         }
 ```
+In the above snippet we change the span name and attributes for our Zipkin trace, we also add an exception event to the span.
 
 We need to reload our `http://127.0.0.1:8000/hello` route, then navigate to Zipkin like before to see that our span name gets updated to `new name` and our `Exception Example` is visible 
 
