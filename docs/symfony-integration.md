@@ -97,7 +97,7 @@ We can confirm that Zipkin is up by navigating to `http://localhost:9411/` on ou
 
 Now it is time to utilize our OpenTelemetry PHP Library to export traces to both Zipkin and Jaeger.
 
-## Step 5
+## Step 5 - Instrument Laravel Application
 
 The entry point for all Symfony applications is the `index.php` file located in the `public` folder. Let's navigate to `public\index.php` to see what is happening. It is worthy of note that resources(namespaces, classes, variables) created within the `index.php` file are available within the entire application, by default the index file imports all auto loaded classes within the vendor folder. It also imports contents of the `.env` file. The other parts of the `index.php` file enable debugging as well as support request and response resolution using the application kernel. 
 
@@ -178,7 +178,7 @@ lets confirm that we can see exported traces on both Zipkin and Jaeger. To do th
 
 ![image](https://user-images.githubusercontent.com/22311928/110263970-7810a980-7fb8-11eb-8683-b5f2d8a82c4a.png)
 
-We also need to navigate to Zipkin and Jaeger on our browser, using the URLS `http://localhost:9411/`  and `http://localhost:16686/`. Do ensure that both your symfony server and docker instance are running for this step. 
+We also need reload both Zipkin and Jaeger on our browser, using the URLs `http://localhost:9411/`  and `http://localhost:16686/`. Do ensure that both your symfony server and docker instance are running for this step. 
 
 For Jaeger under service, you should see a `Hello World Web Server Jaeger` service, go ahead and click find traces to see exported traces.
 
