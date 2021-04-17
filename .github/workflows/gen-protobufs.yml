@@ -8,6 +8,7 @@ jobs:
        - name: Build protobuf library
          run: |
            git clone https://github.com/open-telemetry/opentelemetry-proto
+           cd opentelemetry-proto
            make gen-php
        - name: make
          run: make
