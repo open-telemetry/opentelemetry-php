@@ -1,0 +1,13 @@
+name: build
+on: push
+jobs:
+   build-ubuntu:
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v2
+       - name: Build protobuf library
+         run: |
+           git clone https://github.com/open-telemetry/opentelemetry-proto
+           make gen-php
+       - name: make
+         run: make
