@@ -1,6 +1,4 @@
 <?php
-
-declare(strict_types=1);
 // GENERATED CODE -- DO NOT EDIT!
 
 // Original file comments:
@@ -18,7 +16,6 @@ declare(strict_types=1);
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-
 namespace Opentelemetry\Proto\Collector\Metrics\V1;
 
 /**
@@ -26,16 +23,14 @@ namespace Opentelemetry\Proto\Collector\Metrics\V1;
  * instrumented with OpenTelemetry and a collector, or between a collector and a
  * central collector.
  */
-class MetricsServiceClient extends \Grpc\BaseStub
-{
+class MetricsServiceClient extends \Grpc\BaseStub {
 
     /**
      * @param string $hostname hostname
      * @param array $opts channel options
      * @param \Grpc\Channel $channel (optional) re-use channel object
      */
-    public function __construct($hostname, $opts, $channel = null)
-    {
+    public function __construct($hostname, $opts, $channel = null) {
         parent::__construct($hostname, $opts, $channel);
     }
 
@@ -46,17 +41,12 @@ class MetricsServiceClient extends \Grpc\BaseStub
      * @param array $metadata metadata
      * @param array $options call options
      */
-    public function Export(
-        \Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsServiceRequest $argument,
-        $metadata = [],
-        $options = []
-    ) {
-        return $this->_simpleRequest(
-            '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
-            $argument,
-            ['\Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsServiceResponse', 'decode'],
-            $metadata,
-            $options
-        );
+    public function Export(\Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsServiceRequest $argument,
+      $metadata = [], $options = []) {
+        return $this->_simpleRequest('/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
+        $argument,
+        ['\Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsServiceResponse', 'decode'],
+        $metadata, $options);
     }
+
 }

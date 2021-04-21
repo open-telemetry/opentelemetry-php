@@ -1,6 +1,4 @@
 <?php
-
-declare(strict_types=1);
 // GENERATED CODE -- DO NOT EDIT!
 
 // Original file comments:
@@ -18,7 +16,6 @@ declare(strict_types=1);
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-
 namespace Opentelemetry\Proto\Metrics\Experimental;
 
 /**
@@ -29,16 +26,14 @@ namespace Opentelemetry\Proto\Metrics\Experimental;
  * the SDK, piping updated configs from a third-party source to an instrumented
  * application.
  */
-class MetricConfigClient extends \Grpc\BaseStub
-{
+class MetricConfigClient extends \Grpc\BaseStub {
 
     /**
      * @param string $hostname hostname
      * @param array $opts channel options
      * @param \Grpc\Channel $channel (optional) re-use channel object
      */
-    public function __construct($hostname, $opts, $channel = null)
-    {
+    public function __construct($hostname, $opts, $channel = null) {
         parent::__construct($hostname, $opts, $channel);
     }
 
@@ -47,17 +42,12 @@ class MetricConfigClient extends \Grpc\BaseStub
      * @param array $metadata metadata
      * @param array $options call options
      */
-    public function GetMetricConfig(
-        \Opentelemetry\Proto\Metrics\Experimental\MetricConfigRequest $argument,
-        $metadata = [],
-        $options = []
-    ) {
-        return $this->_simpleRequest(
-            '/opentelemetry.proto.metrics.experimental.MetricConfig/GetMetricConfig',
-            $argument,
-            ['\Opentelemetry\Proto\Metrics\Experimental\MetricConfigResponse', 'decode'],
-            $metadata,
-            $options
-        );
+    public function GetMetricConfig(\Opentelemetry\Proto\Metrics\Experimental\MetricConfigRequest $argument,
+      $metadata = [], $options = []) {
+        return $this->_simpleRequest('/opentelemetry.proto.metrics.experimental.MetricConfig/GetMetricConfig',
+        $argument,
+        ['\Opentelemetry\Proto\Metrics\Experimental\MetricConfigResponse', 'decode'],
+        $metadata, $options);
     }
+
 }
