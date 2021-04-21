@@ -10,6 +10,7 @@
         <ignoreFiles>
             <directory name="var"/>
             <directory name="vendor"/>
+            <directory name="proto"/>
         </ignoreFiles>
     </projectFiles>
     <plugins>

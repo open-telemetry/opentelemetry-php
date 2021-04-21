@@ -9,6 +9,7 @@ parameters:
     excludes_analyse:
         - var
         - vendor
+        - proto
     ignoreErrors:
         # PHPStan false positive
         - message: '#Call to an undefined static method OpenTelemetry\\Sdk\\Metrics\\Providers\\GlobalMeterProvider\:\:getMeter\(\)\.#'

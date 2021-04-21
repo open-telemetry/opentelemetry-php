@@ -37,7 +37,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
         $span->addEvent('validators.list', $timestamp, new Attributes(['job' => 'stage.updateTime']));
         $span->end();
 
-        $converter = new SpanConverter('test.name');
+        $converter = new SpanConverter();
         $row = $converter->as_otlp_span($span);
 
         $this->assertInstanceOf(V1\Span::class, $row);
@@ -109,7 +109,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
         $span->setAttribute('list-of-booleans', $listOfBooleans);
         $span->setAttribute('list-of-random', $listOfRandoms);
 
-        $converter = new SpanConverter('test.name');
+        $converter = new SpanConverter();
         $tags = $converter->as_otlp_span($span)->getAttributes();
 
         // // Check that we can convert all attributes to tags

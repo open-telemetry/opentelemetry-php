@@ -16,8 +16,8 @@ use Opentelemetry\Proto\Trace\V1\Span\Event;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
+use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
-use OpenTelemetry\Trace\Span;
 
 class SpanConverter
 {
@@ -85,7 +85,7 @@ class SpanConverter
         $row = [
             'trace_id' => hex2bin($span->getContext()->getTraceId()),
             'span_id' => hex2bin($span->getContext()->getSpanId()),
-            'parent_span_id' => $span->getParent() ? hex2bin($span->getParent()->getSpanId()) : null,
+            'parent_span_id' => !is_null($span->getParent()) ? hex2bin($span->getParent()->getSpanId()) : null,
             'name' => $span->getSpanName(),
             'start_time_unix_nano' => $span->getStartEpochTimestamp(),
             'end_time_unix_nano' => $end_timestamp,
@@ -142,12 +142,13 @@ class SpanConverter
     }
 
     // @return KeyValue[]
-    public function as_otlp_resource_attributes(Span $span): array
+    public function as_otlp_resource_attributes(iterable $spans): array
     {
         $attrs = [];
-
-        foreach ($span->getResource()->getAttributes() as $k => $v) {
-            array_push($attrs, $this->as_otlp_key_value($k, $v->getValue()));
+        foreach($spans as $span) {
+            foreach ($span->getResource()->getAttributes() as $k => $v) {
+                array_push($attrs, $this->as_otlp_key_value($k, $v->getValue()));
+            }
         }
 
         return $attrs;
@@ -178,7 +179,7 @@ class SpanConverter
 
         return new Proto\Trace\V1\ResourceSpans([
             'resource' => new Proto\Resource\V1\Resource([
-                'attributes' => $this->as_otlp_resource_attributes($span),
+                'attributes' => $this->as_otlp_resource_attributes($spans),
             ]),
             'instrumentation_library_spans' => $ilspans,
         ]);

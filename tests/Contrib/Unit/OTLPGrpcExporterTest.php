@@ -43,7 +43,7 @@ class OTLPGrpcExporterTest extends TestCase
 
     public function testRefusesInvalidHeaders()
     {
-        $foo = new Exporter('localhost:4317', true, null, 'a:bc');
+        $foo = new Exporter('localhost:4317', true, '', 'a:bc');
 
         $this->assertEquals([], $foo->getHeaders());
 
@@ -63,7 +63,7 @@ class OTLPGrpcExporterTest extends TestCase
 
     public function testSetHeadersInConstructor()
     {
-        $exporter = new Exporter('localhost:4317', true, null, 'x-aaa=foo,x-bbb=bar');
+        $exporter = new Exporter('localhost:4317', true, '', 'x-aaa=foo,x-bbb=bar');
 
         $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar']], $exporter->getHeaders());
 

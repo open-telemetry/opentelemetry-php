@@ -6,11 +6,10 @@ namespace OpenTelemetry\Contrib\OtlpGrpc;
 
 use grpc;
 use InvalidArgumentException;
-use Opentelemetry\Proto\Collector\Trace\V1;
+use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
+use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
-
-use OpenTelemetry\Trace\Span;
 
 class Exporter implements Trace\Exporter
 {
@@ -61,7 +60,7 @@ class Exporter implements Trace\Exporter
     private $running = true;
 
     /**
-     * @var ClientInterface
+     * @var TraceServiceClient
      */
 
     private $client;
@@ -72,11 +71,11 @@ class Exporter implements Trace\Exporter
     public function __construct(
         string $endpointURL = 'localhost:4317',
         bool $insecure = true,
-        string $certificateFile = null,
+        string $certificateFile = '',
         string $headers = '',
         bool $compression = false,
         int $timeout = 10,
-        V1\TraceServiceClient $client = null
+        TraceServiceClient $client = null
     ) {
 
         // Set default values based on presence of env variable
@@ -101,8 +100,8 @@ class Exporter implements Trace\Exporter
 
         if (!$this->insecure && !$this->certificateFile) {
             // Assumed default
-            $opts['credentials'] = Grpc\ChannelCredentials::createSsl();
-        } elseif (!$this->insecure && $this->certificateFile) {
+            $opts['credentials'] = Grpc\ChannelCredentials::createSsl('');
+        } elseif (!$this->insecure && $this->certificateFile !== '') {
             // Should we validate more?
             $opts['credentials'] = Grpc\ChannelCredentials::createSsl(file_get_contents($certificateFile));
         } else {
@@ -114,7 +113,7 @@ class Exporter implements Trace\Exporter
             $opts['grpc.default_compression_algorithm'] = 2;
         }
 
-        $this->client = $client ?? new V1\TraceServiceClient($this->endpointURL, $opts);
+        $this->client = $client ?? new TraceServiceClient($this->endpointURL, $opts);
     }
 
     /**
@@ -133,9 +132,9 @@ class Exporter implements Trace\Exporter
             return Trace\Exporter::SUCCESS;
         }
 
-        $resourcespans = $this->spanConverter->as_otlp_resouce_span($spans);
+        $resourcespans = $this->spanConverter->as_otlp_resource_span($spans);
 
-        $request= new V1\ExportTraceServiceRequest();
+        $request= new ExportTraceServiceRequest();
         $request->setResourceSpans([$resourcespans]);
 
         list($response, $status) = $this->client->Export($request)->wait();
