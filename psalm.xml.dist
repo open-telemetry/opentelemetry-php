@@ -11,6 +11,7 @@
             <directory name="var"/>
             <directory name="vendor"/>
             <directory name="proto"/>
+            <directory name="tests/TraceContext/W3CTestService"/>
         </ignoreFiles>
     </projectFiles>
     <plugins>

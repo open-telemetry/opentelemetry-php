@@ -1,0 +1,31 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+  zipkin:
+
+exporters:
+  zipkin:
+    endpoint: "http://zipkin:9411/api/v2/spans"
+  newrelic:
+    apikey: 'ADD_A_LICENSE_KEY_HERE'
+    timeout: 30s
+    spans_host_override: "trace-api.newrelic.com"
+  logging:
+    loglevel: debug
+
+processors:
+  batch:
+
+extensions:
+  health_check:
+  pprof:
+  zpages:
+
+service:
+  extensions: [pprof, zpages, health_check]
+  pipelines:
+    traces:
+      receivers: [otlp, zipkin]
+      exporters: [zipkin, logging, newrelic]
+      processors: [batch]

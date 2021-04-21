@@ -17,6 +17,7 @@ use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
 use OpenTelemetry\Sdk\Trace\Tracer;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
+use OpenTelemetry\Trace as API;
 use PHPUnit\Framework\TestCase;
 
 class TracingTest extends TestCase
@@ -143,6 +144,32 @@ class TracingTest extends TestCase
 
         // active span rolled back
         $this->assertSame($tracer->getActiveSpan(), $global);
+    }
+
+    public function testCreateSpanWithSpanKind()
+    {
+        $tracerProvider = new SDK\TracerProvider(null, new SDK\Sampler\AlwaysOnSampler());
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+
+        $span = $tracer->startAndActivateSpan('someSpan');
+        $this->assertSame($span->getSpanKind(), API\SpanKind::KIND_INTERNAL);
+        $span->end();
+
+        $span = $tracer->startAndActivateSpan('someSpan', API\SpanKind::KIND_CLIENT);
+        $this->assertSame($span->getSpanKind(), API\SpanKind::KIND_CLIENT);
+        $span->end();
+
+        $span = $tracer->startAndActivateSpan('someSpan', API\SpanKind::KIND_SERVER);
+        $this->assertSame($span->getSpanKind(), API\SpanKind::KIND_SERVER);
+        $span->end();
+
+        $span = $tracer->startAndActivateSpan('someSpan', API\SpanKind::KIND_PRODUCER);
+        $this->assertSame($span->getSpanKind(), API\SpanKind::KIND_PRODUCER);
+        $span->end();
+
+        $span = $tracer->startAndActivateSpan('someSpan', API\SpanKind::KIND_CONSUMER);
+        $this->assertSame($span->getSpanKind(), API\SpanKind::KIND_CONSUMER);
+        $span->end();
     }
 
     public function testGetStatus()

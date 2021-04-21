@@ -58,12 +58,12 @@ class TracerProviderTest extends TestCase
     /**
      * @test
      */
-    public function newTraceProviderDefaultsToAlwaysOnSampler()
+    public function newTraceProviderDefaultsToParentBasedSampler()
     {
         $traceProvider = new TracerProvider();
         $description = $traceProvider->getSampler()->getDescription();
 
-        self::assertSame($description, 'AlwaysOnSampler');
+        self::assertSame($description, 'ParentBased');
     }
 
     /**

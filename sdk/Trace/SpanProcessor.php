@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Trace as API;
 
 interface SpanProcessor
@@ -13,7 +14,7 @@ interface SpanProcessor
      * This method is called synchronously on the thread that started the span,
      * therefore it should not block or throw exceptions.
      */
-    public function onStart(API\Span $span): void;
+    public function onStart(API\Span $span, ?Context $parentContext = null): void;
 
     /**
      * This method  is called when a span is ended.

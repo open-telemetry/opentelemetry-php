@@ -10,6 +10,7 @@ parameters:
         - var
         - vendor
         - proto
+        - tests/TraceContext/W3CTestService
     ignoreErrors:
         # PHPStan false positive
         - message: '#Call to an undefined static method OpenTelemetry\\Sdk\\Metrics\\Providers\\GlobalMeterProvider\:\:getMeter\(\)\.#'

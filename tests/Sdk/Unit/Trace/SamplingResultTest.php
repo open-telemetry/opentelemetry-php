@@ -6,20 +6,20 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
-use OpenTelemetry\Trace\Links;
+use OpenTelemetry\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
-class SpanResultTest extends TestCase
+class SamplingResultTest extends TestCase
 {
     /**
      * @dataProvider provideAttributesAndLinks
      */
-    public function testAttributesAndLinksGetters($attributes, $links)
+    public function testAttributesAndLinksGetters($attributes, $traceState)
     {
-        $result = new SamplingResult(SamplingResult::NOT_RECORD, $attributes, $links);
+        $result = new SamplingResult(SamplingResult::DROP, $attributes, $traceState);
 
         $this->assertSame($attributes, $result->getAttributes());
-        $this->assertSame($links, $result->getLinks());
+        $this->assertSame($traceState, $result->getTraceState());
     }
 
     /**
@@ -30,7 +30,7 @@ class SpanResultTest extends TestCase
         return [
             [
                 new Attributes(['foo' => 'bar']),
-                $this->createMock(Links::class),
+                $this->createMock(TraceState::class),
             ],
             [
                 null,
