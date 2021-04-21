@@ -85,7 +85,7 @@ class SpanConverter
         $row = [
             'trace_id' => hex2bin($span->getContext()->getTraceId()),
             'span_id' => hex2bin($span->getContext()->getSpanId()),
-            'parent_span_id' => !is_null($span->getParent()) ? hex2bin($span->getParent()->getSpanId()) : null,
+            'parent_span_id' => null !== $span->getParent() ? hex2bin($span->getParent()->getSpanId()) : null,
             'name' => $span->getSpanName(),
             'start_time_unix_nano' => $span->getStartEpochTimestamp(),
             'end_time_unix_nano' => $end_timestamp,
@@ -145,7 +145,7 @@ class SpanConverter
     public function as_otlp_resource_attributes(iterable $spans): array
     {
         $attrs = [];
-        foreach($spans as $span) {
+        foreach ($spans as $span) {
             foreach ($span->getResource()->getAttributes() as $k => $v) {
                 array_push($attrs, $this->as_otlp_key_value($k, $v->getValue()));
             }
