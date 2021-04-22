@@ -24,7 +24,7 @@ class Exporter implements Trace\Exporter
     private $protocol;
 
     /**
-     * @var string
+     * @var bool|string
      */
     private $insecure;
 
@@ -39,7 +39,7 @@ class Exporter implements Trace\Exporter
     private $headers;
 
     /**
-     * @var string
+     * @var bool|string
      */
     private $compression;
 
@@ -132,10 +132,11 @@ class Exporter implements Trace\Exporter
             return Trace\Exporter::SUCCESS;
         }
 
-        $resourcespans = $this->spanConverter->as_otlp_resource_span($spans);
+        $resourcespans = [$this->spanConverter->as_otlp_resource_span($spans)];
 
-        $request= new ExportTraceServiceRequest();
-        $request->setResourceSpans([$resourcespans]);
+        $request = new ExportTraceServiceRequest([
+            'resource_spans' => $resourcespans,
+        ]);
 
         list($response, $status) = $this->client->Export($request)->wait();
 

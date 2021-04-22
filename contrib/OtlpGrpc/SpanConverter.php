@@ -82,10 +82,13 @@ class SpanConverter
     {
         $end_timestamp = ($span->getStartEpochTimestamp() + $span->getDuration());
 
+        $parent_span = $span->getParent();
+        $parent_span_id = $parent_span ? $parent_span->getSpanId() : false;
+
         $row = [
             'trace_id' => hex2bin($span->getContext()->getTraceId()),
             'span_id' => hex2bin($span->getContext()->getSpanId()),
-            'parent_span_id' => null !== $span->getParent() ? hex2bin($span->getParent()->getSpanId()) : null,
+            'parent_span_id' => $parent_span_id ? hex2bin($parent_span_id) : null,
             'name' => $span->getSpanName(),
             'start_time_unix_nano' => $span->getStartEpochTimestamp(),
             'end_time_unix_nano' => $end_timestamp,
@@ -118,25 +121,22 @@ class SpanConverter
             array_push($row['attributes'], $this->as_otlp_key_value($k, $v->getValue()));
         }
 
-        if (!array_key_exists('status', $row)) {
-            $spanStatus = $span->getStatus();
-            $status = new Status();
+        $status = new Status();
 
-            switch ($spanStatus->getCanonicalStatusCode()) {
-                case SpanStatus::OK:
-                    $status->setCode(StatusCode::STATUS_CODE_OK);
+        switch ($span->getStatus()->getCanonicalStatusCode()) {
+            case SpanStatus::OK:
+                $status->setCode(StatusCode::STATUS_CODE_OK);
 
-                    break;
-                case SpanStatus::ERROR:
-                    $status->setCode(StatusCode::STATUS_CODE_ERROR)->setMessage($spanStatus->getStatusDescription());
+                break;
+            case SpanStatus::ERROR:
+                $status->setCode(StatusCode::STATUS_CODE_ERROR)->setMessage($span->getStatus()->getStatusDescription());
 
-                    break;
-                default:
-                    $status->setCode(StatusCode::STATUS_CODE_UNSET);
-            }
-
-            $row['status'] = $status;
+                break;
+            default:
+                $status->setCode(StatusCode::STATUS_CODE_UNSET);
         }
+
+        $row['status'] = $status;
 
         return new CollectorSpan($row);
     }
