@@ -19,12 +19,11 @@ The Laravel framework supports creating applications using composer. To do that,
 
 To confirm that our application works, we can move to the application directory using `cd otel-php-laravel-basic-example` ,  then serve the application with `php artisan serve` .
 
-![image](https://user-images.githubusercontent.com/22311928/112561555-c6ee7980-8dd5-11eb-844c-141d22334937.png)
+![image](https://user-images.githubusercontent.com/22311928/115635306-5585e600-a303-11eb-8943-f50846b293b3.png)
 
 Let's navigate to `http://127.0.0.1:8000` on our browser to see the default Laravel welcome page. 
 
-![image](https://user-images.githubusercontent.com/22311928/112561803-35cbd280-8dd6-11eb-8f6d-a4b60ee325b3.png)
-
+![image](https://user-images.githubusercontent.com/22311928/115635309-56b71300-a303-11eb-97bc-7c64e3f4da97.png)
 ## Step 2 - Require OpenTelemetry PHP Package
 
 Laravel comes with most packages needed for development out of the box, so for this example, we will only require the open-telemetry PHP package. Let's run `composer require open-telemetry/opentelemetry` to pull that in.
@@ -56,13 +55,13 @@ services:
 
 Next, we pull in Zipkin and Jaeger by running `docker-compose up -d`. This might take some time, depending on your internet connection speed.
 
-![image](https://user-images.githubusercontent.com/22311928/112565173-e8069880-8ddc-11eb-9220-0d50b7e92139.png)
+![image](https://user-images.githubusercontent.com/22311928/115635312-5880d680-a303-11eb-9f55-bcd80115abc9.png)
 
 We can confirm that Zipkin is up by navigating to `http://localhost:9411/` on our browser. For Jaeger, navigating to `http://localhost:16686/` on our browser should display the Jaeger home page.
 
-![image](https://user-images.githubusercontent.com/22311928/110503699-bfa04e00-80fc-11eb-9186-c9b295d100f4.png)
+![image](https://user-images.githubusercontent.com/22311928/115635313-59196d00-a303-11eb-817c-37f4f6416fe1.png)
 
-![image](https://user-images.githubusercontent.com/22311928/110504108-1f96f480-80fd-11eb-9a2b-a7b4faf8b11c.png)
+![image](https://user-images.githubusercontent.com/22311928/115635316-59b20380-a303-11eb-86e4-e15d0efd04d7.png)
 
 ## Step 5 - Instrument Laravel Application
 
@@ -164,30 +163,31 @@ We also need reload both Zipkin and Jaeger on our browser, using the URLs `http:
 
 For Jaeger under service, you should see a `Hello World Web Server Jaeger` service. Go ahead and click find traces to see exported traces.
 
-![image](https://user-images.githubusercontent.com/22311928/112386141-cc25c880-8cf0-11eb-84ae-56d5dc3bf4a0.png)
+![image](https://user-images.githubusercontent.com/22311928/115635317-5a4a9a00-a303-11eb-9840-2dba0e6475d8.png)
 
 
 Once we click on `Find Traces`, you should be able to see traces like below:
 
-
-![image](https://user-images.githubusercontent.com/22311928/112387947-bc0ee880-8cf2-11eb-88db-eb93a4170404.png)
+![image](https://user-images.githubusercontent.com/22311928/115635318-5a4a9a00-a303-11eb-9d4e-69e45a3b810c.png)
 
 
 
 We can click on a trace to get more information about the trace. 
 
-![image](https://user-images.githubusercontent.com/22311928/112388154-04c6a180-8cf3-11eb-8d22-abc9a9bc73b1.png)
+![image](https://user-images.githubusercontent.com/22311928/115635320-5ae33080-a303-11eb-8956-97d9f1ce0073.png)
 
 
 For Zipkin, we can visualize our trace by clicking on `Run Query` 
 
-![image](https://user-images.githubusercontent.com/22311928/111911625-9ec5ea00-8a66-11eb-90f8-2863a299a6de.png)
+![image](https://user-images.githubusercontent.com/22311928/115635321-5b7bc700-a303-11eb-9d9d-19168e50445e.png)
+
 
 Since resources in Laravel's `public\index.php` file are available to the entire application, we can use any of the already instantiated tracers to further instrument controllers or any other parts of our application. 
 
 Let's create a `Hello` controller  to check this out. Run the command `php artisan make:controller HelloController`
 
-![image](https://user-images.githubusercontent.com/22311928/114498827-b5ea9880-9c1c-11eb-8603-dc1bc0400f77.png)
+![image](https://user-images.githubusercontent.com/22311928/115635322-5c145d80-a303-11eb-8071-1453edbaca14.png)
+
 
 Next we need to add a route for accessing the controller. To do this we need to utilize the `HelloController` class within our web routes file located in  the `routes\web.php` as follows:
 
@@ -208,7 +208,8 @@ public function index(){
 ```
 Let's confirm that everything works well by visiting the `/hello` route on our browser.
 
-![image](https://user-images.githubusercontent.com/22311928/114500443-ea138880-9c1f-11eb-84c8-820bd8da8350.png)
+![](https://user-images.githubusercontent.com/22311928/115635323-5c145d80-a303-11eb-869f-6fe18f7f01a4.png)
+
 
 Now that we have the `index` method working, we can simulate adding an exception event to our Zipkin trace as follows:
 
@@ -234,7 +235,8 @@ In the above snippet we change the span name and attributes for our Zipkin trace
 
 We need to reload our `http://127.0.0.1:8000/hello` route, then navigate to Zipkin like before, to see that our span name gets updated to `new name` and our `Exception Example` is visible.
 
-![image](https://user-images.githubusercontent.com/22311928/111915995-3cc2b000-8a79-11eb-82e9-78048da09b92.png)
+![image](https://user-images.githubusercontent.com/22311928/115635324-5cacf400-a303-11eb-947d-cf8205c0e93b.png)
+
 
 ## Summary
 With the above example we have been able to instrument a Laravel application using the OpenTelemetry PHP library. You can fork the example project [here](https://github.com/prondubuisi/otel-php-laravel-basic-example).
