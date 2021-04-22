@@ -47,16 +47,20 @@ class HelloController extends AbstractController
 
 To check out the routes available in our current project run `php bin/console debug:router`. 
 
-![image](https://user-images.githubusercontent.com/22311928/112389811-a18a3e80-8cf5-11eb-89cb-e4fb78d44bf4.png)
+![image](https://user-images.githubusercontent.com/22311928/115637047-3e48f780-a307-11eb-9f75-2a5d033b572a.png)
+
 
 
 Let's confirm that our application works by running the command `symfony server:start`.
 
-![image](https://user-images.githubusercontent.com/22311928/112422222-d10a6c80-8d30-11eb-971c-75229e71f7cd.png)
+![image](https://user-images.githubusercontent.com/22311928/115637051-4012bb00-a307-11eb-93b4-703b766f6324.png)
+
 
 
 You can navigate to `http://127.0.0.1:8000/hello` route to see the `Hello world` response returned from the HelloController index method above.
-![image](https://user-images.githubusercontent.com/22311928/110263970-7810a980-7fb8-11eb-8683-b5f2d8a82c4a.png)
+
+![image](https://user-images.githubusercontent.com/22311928/115637055-4143e800-a307-11eb-8bb3-44060e5661fc.png)
+
 
 
 ## Step 3 - Require the OpenTelemetry PHP Library
@@ -87,14 +91,14 @@ services:
 
 To confirm that docker is installed and running on our system, we can run the hello world docker example using the command `docker run -it --rm hello-world`. If everything works well, run  `docker-compose up -d` to pull in Zipkin and Jaeger. This might take some time, depending on your internet connection speed.
 
-![image](https://user-images.githubusercontent.com/22311928/112422478-470ed380-8d31-11eb-8d21-c19c6839063d.png)
+![image](https://user-images.githubusercontent.com/22311928/115637058-41dc7e80-a307-11eb-9315-d188d2b84682.png)
 
 
 We can confirm that Zipkin is up by navigating to `http://localhost:9411/` on our browser. For Jaeger, navigating to `http://localhost:16686/` on our browser should display the Jaeger home page.
 
-![image](https://user-images.githubusercontent.com/22311928/110503699-bfa04e00-80fc-11eb-9186-c9b295d100f4.png)
+![image](https://user-images.githubusercontent.com/22311928/115637059-42751500-a307-11eb-9b99-d5bbfec54df2.png)
 
-![image](https://user-images.githubusercontent.com/22311928/110504108-1f96f480-80fd-11eb-9a2b-a7b4faf8b11c.png)
+![image](https://user-images.githubusercontent.com/22311928/115637065-430dab80-a307-11eb-8d7b-90d425b32454.png)
 
 
 Now it is time to utilize our OpenTelemetry PHP Library to export traces to both Zipkin and Jaeger.
@@ -178,30 +182,30 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
 
 lets confirm that we can see exported traces on both Zipkin and Jaeger. To do that we need to reload `http://127.0.0.1:8000/hello` or any other route on our symfony server;
 
-![image](https://user-images.githubusercontent.com/22311928/110263970-7810a980-7fb8-11eb-8683-b5f2d8a82c4a.png)
+![image](https://user-images.githubusercontent.com/22311928/115637070-43a64200-a307-11eb-8abb-80f19285ef01.png)
 
 We also need reload both Zipkin and Jaeger on our browser, using the URLs `http://localhost:9411/`  and `http://localhost:16686/`. Do ensure that both your symfony server and docker instance are running for this step. 
 
 For Jaeger under service, you should see a `Hello World Web Server Jaeger` service, go ahead and click find traces to see exported traces.
 
-![image](https://user-images.githubusercontent.com/22311928/112386141-cc25c880-8cf0-11eb-84ae-56d5dc3bf4a0.png)
+)
+![image](https://user-images.githubusercontent.com/22311928/115637071-443ed880-a307-11eb-8521-78c803dcd623.png)
 
 
 Once we click on `Find Traces` you should be able to see traces like below:
 
-
-![image](https://user-images.githubusercontent.com/22311928/112387947-bc0ee880-8cf2-11eb-88db-eb93a4170404.png)
-
+![image](https://user-images.githubusercontent.com/22311928/115637073-44d76f00-a307-11eb-9e80-aa8f152577a8.png)
 
 
 We can click on a trace to get more information about the trace. 
 
-![image](https://user-images.githubusercontent.com/22311928/112388154-04c6a180-8cf3-11eb-8d22-abc9a9bc73b1.png)
+![image](https://user-images.githubusercontent.com/22311928/115637075-44d76f00-a307-11eb-8d8e-5bf559bd2bf6.png)
 
 
 For Zipkin, we can visualize our trace by clicking on `Run Query` 
 
-![image](https://user-images.githubusercontent.com/22311928/111911625-9ec5ea00-8a66-11eb-90f8-2863a299a6de.png)
+
+![image](https://user-images.githubusercontent.com/22311928/115637078-45700580-a307-11eb-9867-aa0c1a69f9fe.png)
 
 Since resources in Symfony's `public\index.php` file are available to the entire application, we can use any of the already instantiated tracers within `HelloController`. In addition to the tracers, we can also utilize associated properties, methods and events.
 
@@ -229,7 +233,7 @@ In the above snippet we change the span name and attributes for our Zipkin trace
 
 We need to reload our `http://127.0.0.1:8000/hello` route, then navigate to Zipkin like before to see that our span name gets updated to `new name` and our `Exception Example` is visible 
 
-![image](https://user-images.githubusercontent.com/22311928/111915995-3cc2b000-8a79-11eb-82e9-78048da09b92.png)
+![image](https://user-images.githubusercontent.com/22311928/115637079-46089c00-a307-11eb-9d9d-b5c0f941baeb.png)
 
 ## Summary
 
