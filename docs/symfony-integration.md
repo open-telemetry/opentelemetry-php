@@ -103,7 +103,7 @@ We can confirm that Zipkin is up by navigating to `http://localhost:9411/` on ou
 
 Now it is time to utilize our OpenTelemetry PHP Library to export traces to both Zipkin and Jaeger.
 
-## Step 5 - Instrument Laravel Application
+## Step 5 - Instrument Symfony Application
 
 The entry point for all Symfony applications is the `index.php` file located in the `public` folder. Let's navigate to `public\index.php` to see what is happening. It is worthy of note that resources(namespaces, classes, variables) created within the `index.php` file are available within the entire application, by default the index file imports all auto loaded classes within the vendor folder. It also imports contents of the `.env` file. The other parts of the `index.php` file enable debugging as well as support request and response resolution using the application kernel. 
 
