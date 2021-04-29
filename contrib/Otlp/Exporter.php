@@ -114,7 +114,7 @@ class Exporter implements Trace\Exporter
             $this->headers[] = '';
 
             if ($this->protocol == 'json') {
-                $headers = ['content-type' => 'application/json', 'Content-Encoding' => 'gzip'];
+                $this->headers = ['content-type' => 'application/json', 'Content-Encoding' => 'gzip'];
             }
 
             $request = new Request('POST', $this->endpointURL, $this->headers, $json);
