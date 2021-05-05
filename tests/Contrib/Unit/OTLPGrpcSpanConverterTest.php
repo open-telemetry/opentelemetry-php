@@ -160,6 +160,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
             )
         );
 
+        // We have to set the time twice here due to the way PHP deals with Monotonic Clock and Realtime Clock.
         $sdk->setStartEpochTimestamp($start_time);
         $sdk->setStart(125464959232828);
 
@@ -198,8 +199,9 @@ class OTLPGrpcSpanConverterTest extends TestCase
             'instrumentation_library_spans' => [
                 new InstrumentationLibrarySpans([
                     'instrumentation_library' => new \Opentelemetry\Proto\Common\V1\InstrumentationLibrary([
-                        'name' => 'lib-a',
-                        'version' => 'v0.1.0',
+                        // TODO: Fetch instrumentation library from TracerProvider
+                        // 'name' => 'lib-a',
+                        // 'version' => 'v0.1.0',
                     ]),
                     'spans' => [
                         new V1\Span([

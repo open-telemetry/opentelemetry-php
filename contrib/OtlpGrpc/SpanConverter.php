@@ -156,16 +156,16 @@ class SpanConverter
 
     public function as_otlp_resource_span(iterable $spans): ResourceSpans
     {
+        // TODO: Should return an empty ResourceSpans when $spans is empty
+        // At the minute it returns an semi populated ResourceSpan
+
         $convertedSpans = [];
         foreach ($spans as $span) {
             array_push($convertedSpans, $this->as_otlp_span($span));
         }
 
-        // TODO: Pluck this information from the Tracer
-        $il = new InstrumentationLibrary([
-            // 'name' => 'otel-php',
-            // 'version' => '0.0.1',
-        ]);
+        // TODO: Fetch InstrumentationLibrary from the TracerProvider
+        $il = new InstrumentationLibrary([]);
 
         $ilspans = [];
         foreach ($convertedSpans as $convertedSpan) {
