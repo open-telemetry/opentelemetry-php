@@ -9,6 +9,7 @@ parameters:
     excludes_analyse:
         - var
         - vendor
+        - proto
         - tests/TraceContext/W3CTestService
     ignoreErrors:
         # PHPStan false positive

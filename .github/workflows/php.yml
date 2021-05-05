@@ -25,7 +25,7 @@ jobs:
         php-version: ${{ matrix.php-versions }}
         coverage: xdebug
         tools: php-cs-fixer
-        extensions: ast
+        extensions: ast, grpc
 
     - name: Validate composer.json and composer.lock
       run: composer validate

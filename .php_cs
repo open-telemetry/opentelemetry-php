@@ -2,6 +2,7 @@
 $finder = PhpCsFixer\Finder::create()
     ->exclude('vendor')
     ->exclude('var/cache')
+    ->exclude('proto')
     ->in(__DIR__);
 
 return PhpCsFixer\Config::create()
