@@ -14,6 +14,6 @@ Find more information about the approver role in the [community repository](http
 
 Triagers ([@open-telemetry/php-triagers](https://github.com/orgs/open-telemetry/teams/php-triagers)):
 
-- [Jodee Varney](https://github.com/jodeev), New Relic
+- [Jodee Varney](https://github.com/jodeev), Splunk
 
 Find more information about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#triager)
