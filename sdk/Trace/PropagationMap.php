@@ -25,12 +25,15 @@ class PropagationMap implements API\PropagationGetter, API\PropagationSetter
             }
 
             foreach ($carrier as $k => $value) {
-                if (strtolower($k) === $lKey) {
-                    if (\is_array($value)) {
-                        return empty($value) ? null : $value[0];
-                    }
+                // Ensure traceparent and tracestate header keys are lowercase
+                if (is_string($k)) {
+                    if (strtolower($k) === $lKey) {
+                        if (\is_array($value)) {
+                            return empty($value) ? null : $value[0];
+                        }
 
-                    return $value;
+                        return $value;
+                    }
                 }
             }
 
