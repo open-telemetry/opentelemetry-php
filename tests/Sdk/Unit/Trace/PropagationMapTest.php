@@ -136,7 +136,6 @@ class PropagationMapTest extends TestCase
             1 => ['alpha'],
             'b' => 'bravo',
         ];
-        var_dump($carrier);
         $map = new PropagationMap();
         $this->assertNull($map->get($carrier, '1'));
         $this->assertSame('bravo', $map->get($carrier, 'b'));
