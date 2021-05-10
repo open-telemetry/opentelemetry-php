@@ -68,6 +68,26 @@ class TraceContextTest extends TestCase
     /**
      * @test
      */
+    public function testExtractCaseInsensitiveHeaders()
+    {
+        $tracestateValue = 'vendor2=opaqueValue2,vendor3=opaqueValue3';
+
+        $carrier = ['TrAcEpArEnT' => self::TRACEPARENTVALUE,
+                    'TrAcEsTaTe' => $tracestateValue, ];
+
+        $map = new PropagationMap();
+        $context = TraceContext::extract($carrier, $map);
+
+        $extractedTraceparent = '00-' . $context->getTraceId() . '-' . $context->getSpanId() . '-' . ($context->isSampled() ? '01' : '00');
+        $this->assertSame(self::TRACEPARENTVALUE, $extractedTraceparent);
+
+        $extractedTracestate = $context->getTraceState();
+        $this->assertSame($tracestateValue, $extractedTracestate ? $extractedTracestate->build() : '');
+    }
+
+    /**
+     * @test
+     */
     public function testExtractInvalidTraceparent()
     {
         $carrier = [];

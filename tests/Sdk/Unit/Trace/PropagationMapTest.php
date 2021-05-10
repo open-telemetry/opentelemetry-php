@@ -56,7 +56,7 @@ class PropagationMapTest extends TestCase
 
         $this->assertNull($map->get([], 'a'));
         $this->assertNull($map->get($carrier, 'b'));
-         
+
         $this->expectException(\InvalidArgumentException::class);
         $value = $map->get('invalid carrier', 'a');
     }
@@ -123,6 +123,21 @@ class PropagationMapTest extends TestCase
         ];
         $map = new PropagationMap();
         $this->assertSame('alpha', $map->get($carrier, 'a'));
+        $this->assertSame('bravo', $map->get($carrier, 'b'));
+    }
+
+    /**
+     * @test
+     */
+    public function testGetNumericalKeyFromCarrier()
+    {
+        // Carrier contains an array as one of the values
+        $carrier = [
+            1 => ['alpha'],
+            'b' => 'bravo',
+        ];
+        $map = new PropagationMap();
+        $this->assertNull($map->get($carrier, '1'));
         $this->assertSame('bravo', $map->get($carrier, 'b'));
     }
 }
