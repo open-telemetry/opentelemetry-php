@@ -11,8 +11,6 @@ use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
-use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Trace as API;
 
 $sampler = new AlwaysOnSampler();
