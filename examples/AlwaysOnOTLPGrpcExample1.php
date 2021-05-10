@@ -21,9 +21,7 @@ $samplingResult = $sampler->shouldSample(
     API\SpanKind::KIND_INTERNAL
 );
 
-$Exporter = new OTLPExporter(
-    'OTLP Grpc Example Service'
-);
+$Exporter = new OTLPExporter();
 
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     echo 'Starting OTLPGrpcExample';
@@ -38,7 +36,7 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
 
         $childSpan = $tracer->startAndActivateSpanFromContext('child', $span->getContext());
 
-        // temporarily setting service name here.  It should eventually be pulled from tracer.resources.
+        // Temporarily setting service name here.  It should eventually be pulled from tracer.resources.
         $span->setAttribute('service.name', 'alwaysOnOTLPGrpcExample');
 
         $span->setAttribute('remote_ip', '1.2.3.4')
