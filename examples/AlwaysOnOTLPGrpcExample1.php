@@ -11,6 +11,8 @@ use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
+use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Trace as API;
 
 $sampler = new AlwaysOnSampler();
@@ -32,9 +34,10 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
         $timestamp = Clock::get()->timestamp();
-        $span = $tracer->startAndActivateSpan('session.generate.span.' . microtime(true));
+        $span = $tracer->startAndActivateSpan('session.generate.span' . microtime(true));
+        //startAndActivateSpan('session.generate.span.' . microtime(true));
 
-        $childSpan = $tracer->startAndActivateSpanFromContext('child', $span->getContext());
+        $childSpan = $tracer->startSpan('child');
 
         // Temporarily setting service name here.  It should eventually be pulled from tracer.resources.
         $span->setAttribute('service.name', 'alwaysOnOTLPGrpcExample');
