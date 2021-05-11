@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Sdk\Trace\Baggage;
 use OpenTelemetry\Sdk\Trace\NoopSpan;
 use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
@@ -77,10 +77,10 @@ class TracerTest extends TestCase
      */
     public function spanAndParentContextShouldHaveIdenticalTraceId()
     {
-        $parentSpan = new NoopSpan(new SpanContext(
+        $parentSpan = new NoopSpan(new Baggage(
             'faa0c74e14bd78114ec2bc447ad94ec9',
             '50a75f197c3de59a',
-            SpanContext::TRACE_FLAG_SAMPLED
+            Baggage::TRACE_FLAG_SAMPLED
         ));
         $parentContext = (new Context());
         $parentContext = Span::insert($parentSpan, $parentContext);
@@ -92,9 +92,9 @@ class TracerTest extends TestCase
         $this->assertEquals($parentSpan->getContext()->getTraceId(), $childSpan->getContext()->getTraceId());
         $this->assertNotEquals($parentSpan->getContext()->getSpanId(), $childSpan->getContext()->getSpanId());
 
-        $parentSpanContext = $childSpan->getParent();
-        $this->assertNotNull($parentSpanContext);
-        $this->assertEquals($parentSpan->getContext()->getSpanId(), $parentSpanContext->getSpanId());
+        $parentBaggage = $childSpan->getParent();
+        $this->assertNotNull($parentBaggage);
+        $this->assertEquals($parentSpan->getContext()->getSpanId(), $parentBaggage->getSpanId());
     }
 
     /**

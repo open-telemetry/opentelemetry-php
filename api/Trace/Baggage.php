@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace;
 
-interface SpanContext
+interface Baggage
 {
     const TRACE_FLAG_SAMPLED = 1;
 
