@@ -47,7 +47,7 @@ final class SpanOptions implements API\SpanOptions
         return $this;
     }
 
-    public function setParentContext(API\Baggage $span): API\SpanOptions
+    public function setParentBaggage(API\Baggage $span): API\SpanOptions
     {
         $this->parent = $span;
 
