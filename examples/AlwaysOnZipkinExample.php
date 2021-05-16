@@ -12,6 +12,9 @@ use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
+
 
 $sampler = new AlwaysOnSampler();
 $samplingResult = $sampler->shouldSample(
@@ -23,7 +26,10 @@ $samplingResult = $sampler->shouldSample(
 
 $zipkinExporter = new ZipkinExporter(
     'alwaysOnZipkinExample',
-    'http://zipkin:9411/api/v2/spans'
+    'http://zipkin:9411/api/v2/spans',
+    new Client(),
+    new HttpFactory(),
+    new HttpFactory()
 );
 
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {

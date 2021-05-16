@@ -14,6 +14,8 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 
 class NewrelicExporterTest extends TestCase
 {
@@ -29,7 +31,7 @@ class NewrelicExporterTest extends TestCase
             new Response($responseStatus)
         );
 
-        $exporter = new Exporter('test.newrelic', 'scheme://host:123/path', '', null, $client);
+        $exporter = new Exporter('test.newrelic', 'scheme://host:123/path', '', $client, new HttpFactory(), new HttpFactory());
 
         $this->assertEquals(
             $expected,
@@ -60,7 +62,7 @@ class NewrelicExporterTest extends TestCase
         $client = self::createMock(ClientInterface::class);
         $client->method('sendRequest')->willThrowException($exception);
 
-        $exporter = new Exporter('test.newrelic', 'scheme://host:123/path', '', null, $client);
+        $exporter = new Exporter('test.newrelic', 'scheme://host:123/path', '',  $client, new HttpFactory(), new HttpFactory());
 
         $this->assertEquals(
             $expected,
@@ -93,7 +95,7 @@ class NewrelicExporterTest extends TestCase
     {
         $this->assertEquals(
             Exporter::SUCCESS,
-            (new Exporter('test.newrelic', 'scheme://host:123/path', ''))->export([])
+            (new Exporter('test.newrelic', 'scheme://host:123/path', '', new Client(), new HttpFactory(), new HttpFactory()))->export([])
         );
     }
 
@@ -105,7 +107,7 @@ class NewrelicExporterTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new Exporter('test.newrelic', $invalidDsn, '');
+        new Exporter('test.newrelic', $invalidDsn, '', new Client(), new HttpFactory(), new HttpFactory());
     }
 
     public function invalidDsnDataProvider()
@@ -124,7 +126,7 @@ class NewrelicExporterTest extends TestCase
      */
     public function failsIfNotRunning()
     {
-        $exporter = new Exporter('test.newrelic', 'scheme://host/path', '');
+        $exporter = new Exporter('test.newrelic', 'scheme://host/path', '', new Client(), new HttpFactory(), new HttpFactory());
         $span = $this->createMock(Span::class);
         $exporter->shutdown();
 

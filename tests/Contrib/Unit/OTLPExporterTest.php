@@ -12,6 +12,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 
 class OTLPExporterTest extends TestCase
 {
@@ -27,7 +29,7 @@ class OTLPExporterTest extends TestCase
             new Response($responseStatus)
         );
 
-        $exporter = new Exporter('test.otlp', $client);
+        $exporter = new Exporter('test.otlp', $client, new HttpFactory(), new HttpFactory());
 
         $this->assertEquals(
             $expected,
@@ -58,7 +60,7 @@ class OTLPExporterTest extends TestCase
         $client = self::createMock(ClientInterface::class);
         $client->method('sendRequest')->willThrowException($exception);
 
-        $exporter = new Exporter('test.otlp');
+        $exporter = new Exporter('test.otlp', $client, new HttpFactory(), new HttpFactory());
 
         $this->assertEquals(
             $expected,
@@ -87,7 +89,7 @@ class OTLPExporterTest extends TestCase
     {
         $this->assertEquals(
             Exporter::SUCCESS,
-            (new Exporter('test.otlp'))->export([])
+            (new Exporter('test.otlp', new Client, new HttpFactory, new HttpFactory()))->export([])
         );
     }
     /**
@@ -95,7 +97,7 @@ class OTLPExporterTest extends TestCase
      */
     public function failsIfNotRunning()
     {
-        $exporter = new Exporter('test.otlp');
+        $exporter = new Exporter('test.otlp', new Client, new HttpFactory, new HttpFactory());
         $span = $this->createMock(Span::class);
         $exporter->shutdown();
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Newrelic;
 
 use GuzzleHttp\Psr7\Request;
-use Http\Adapter\Guzzle7\Client;
+use GuzzleHttp\Client;
 use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
@@ -13,6 +13,8 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 
 /**
  * Class NewrelicExporter - implements the export interface for data transfer via Newrelic protocol
@@ -57,14 +59,26 @@ class Exporter implements Trace\Exporter
      */
     private $client;
 
+    /**
+     * @var RequestFactoryInterface
+     */
+    private $requestFactory;
+    
+    /**
+     * @var StreamFactoryInterface
+     */
+    private $streamFactory;
+
     private $dataFormatVersion;
 
     public function __construct(
         $name,
         string $endpointUrl,
         string $licenseKey,
+        ClientInterface $client,
+        RequestFactoryInterface $requestFactory,
+        StreamFactoryInterface $streamFactory,
         SpanConverter $spanConverter = null,
-        ClientInterface $client = null,
         string $dataFormatVersion = Exporter::DATA_FORMAT_VERSION_DEFAULT
     ) {
         $parsedDsn = parse_url($endpointUrl);
@@ -79,12 +93,15 @@ class Exporter implements Trace\Exporter
         ) {
             throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
         }
-        $this->dataFormatVersion = $dataFormatVersion;
-        $this->licenseKey = $licenseKey;
-        $this->endpointUrl = $endpointUrl;
+
         $this->name = $name;
-        $this->client = $client ?? $this->createDefaultClient();
+        $this->endpointUrl = $endpointUrl;
+        $this->licenseKey = $licenseKey;
+        $this->client = $client;
+        $this->requestFactory = $requestFactory;
+        $this->streamFactory = $streamFactory;
         $this->spanConverter = $spanConverter ?? new SpanConverter($name);
+        $this->dataFormatVersion = $dataFormatVersion;
     }
 
     /**
@@ -113,12 +130,15 @@ class Exporter implements Trace\Exporter
                      'spans' => $convertedSpans, ]];
 
         try {
-            $json = json_encode($payload);
-            $headers = ['content-type' => 'application/json',
-                        'Api-Key' => $this->licenseKey,
-                        'Data-Format' => Exporter::DATA_FORMAT,
-                        'Data-Format-Version' => $this->dataFormatVersion, ];
-            $request = new Request('POST', $this->endpointUrl, $headers, $json);
+            $body = $this->streamFactory->createStream(json_encode($payload));
+            $request = $this->requestFactory
+                ->createRequest('POST', $this->endpointUrl)
+                ->withBody($body)
+                ->withHeader('content-type', 'application/json')
+                ->withAddedHeader('Api-Key', $this->licenseKey )
+                ->withAddedHeader('Data-Format', Exporter::DATA_FORMAT)
+                ->withAddedHeader('Data-Format-Version', $this->dataFormatVersion);
+
             $response = $this->client->sendRequest($request);
         } catch (RequestExceptionInterface $e) {
             return Trace\Exporter::FAILED_NOT_RETRYABLE;
@@ -148,12 +168,5 @@ class Exporter implements Trace\Exporter
     public function shutdown(): void
     {
         $this->running = false;
-    }
-
-    protected function createDefaultClient(): ClientInterface
-    {
-        return Client::createWithConfig([
-            'timeout' => 30,
-        ]);
     }
 }

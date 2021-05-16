@@ -8,6 +8,8 @@ use InvalidArgumentException;
 use OpenTelemetry\Contrib\Jaeger\Exporter;
 use OpenTelemetry\Sdk\Trace\Span;
 use PHPUnit\Framework\TestCase;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 
 class JaegerExporterTest extends TestCase
 {
@@ -19,7 +21,7 @@ class JaegerExporterTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new Exporter('test.jaeger', $invalidDsn);
+        new Exporter('test.jaeger', $invalidDsn, new Client(), new HttpFactory(), new HttpFactory());
     }
 
     public function invalidDsnDataProvider()
@@ -41,7 +43,11 @@ class JaegerExporterTest extends TestCase
      */
     public function failsIfNotRunning()
     {
-        $exporter = new Exporter('test.jaeger', 'scheme://host:123/api/v1/spans');
+       
+        $exporter = new Exporter('test.jaeger', 'scheme://host:123/api/v1/spans', new Client(), 
+        new HttpFactory(),
+        new HttpFactory());
+
         $span = $this->createMock(Span::class);
         $exporter->shutdown();
 
