@@ -98,7 +98,7 @@ class Exporter implements Trace\Exporter
         $this->client = $client;
         $this->requestFactory = $requestFactory;
         $this->streamFactory = $streamFactory;
-        $this->spanConverter = new SpanConverter($serviceName);
+        $this->spanConverter =  $spanConverter ?? new SpanConverter($serviceName);
     }
 
     /**
