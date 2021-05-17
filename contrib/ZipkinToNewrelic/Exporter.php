@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\ZipkinToNewrelic;
 
-use GuzzleHttp\Psr7\Request;
 use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
@@ -59,6 +58,11 @@ class Exporter implements Trace\Exporter
      * @var StreamFactoryInterface
      */
     private $streamFactory;
+
+    /**
+    * @var string
+    */
+    private $name;
 
     public function __construct(
         $name,
@@ -118,7 +122,7 @@ class Exporter implements Trace\Exporter
                 ->createRequest('POST', $this->endpointUrl)
                 ->withBody($body)
                 ->withHeader('content-type', 'application/json')
-                ->withAddedHeader('Api-Key', $this->licenseKey )
+                ->withAddedHeader('Api-Key', $this->licenseKey)
                 ->withAddedHeader('Data-Format', 'zipkin')
                 ->withAddedHeader('Data-Format-Version', '2');
 

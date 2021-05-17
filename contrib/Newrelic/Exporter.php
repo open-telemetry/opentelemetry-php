@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Newrelic;
 
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Client;
 use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
@@ -135,7 +133,7 @@ class Exporter implements Trace\Exporter
                 ->createRequest('POST', $this->endpointUrl)
                 ->withBody($body)
                 ->withHeader('content-type', 'application/json')
-                ->withAddedHeader('Api-Key', $this->licenseKey )
+                ->withAddedHeader('Api-Key', $this->licenseKey)
                 ->withAddedHeader('Data-Format', Exporter::DATA_FORMAT)
                 ->withAddedHeader('Data-Format-Version', $this->dataFormatVersion);
 

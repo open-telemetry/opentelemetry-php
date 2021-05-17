@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\Newrelic\Exporter;
@@ -14,8 +16,6 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 
 class NewrelicExporterTest extends TestCase
 {
@@ -62,7 +62,7 @@ class NewrelicExporterTest extends TestCase
         $client = self::createMock(ClientInterface::class);
         $client->method('sendRequest')->willThrowException($exception);
 
-        $exporter = new Exporter('test.newrelic', 'scheme://host:123/path', '',  $client, new HttpFactory(), new HttpFactory());
+        $exporter = new Exporter('test.newrelic', 'scheme://host:123/path', '', $client, new HttpFactory(), new HttpFactory());
 
         $this->assertEquals(
             $expected,

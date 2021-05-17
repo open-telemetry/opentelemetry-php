@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use GuzzleHttp\Psr7\Request;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
 use Psr\Http\Client\ClientExceptionInterface;

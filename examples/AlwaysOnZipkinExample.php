@@ -3,6 +3,8 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
@@ -12,9 +14,6 @@ use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
-
 
 $sampler = new AlwaysOnSampler();
 $samplingResult = $sampler->shouldSample(

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use OpenTelemetry\Contrib\Otlp\Exporter;
 use OpenTelemetry\Sdk\Trace\Span;
@@ -12,8 +14,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 
 class OTLPExporterTest extends TestCase
 {
@@ -89,7 +89,7 @@ class OTLPExporterTest extends TestCase
     {
         $this->assertEquals(
             Exporter::SUCCESS,
-            (new Exporter('test.otlp', new Client, new HttpFactory, new HttpFactory()))->export([])
+            (new Exporter('test.otlp', new Client(), new HttpFactory(), new HttpFactory()))->export([])
         );
     }
     /**
@@ -97,7 +97,7 @@ class OTLPExporterTest extends TestCase
      */
     public function failsIfNotRunning()
     {
-        $exporter = new Exporter('test.otlp', new Client, new HttpFactory, new HttpFactory());
+        $exporter = new Exporter('test.otlp', new Client(), new HttpFactory(), new HttpFactory());
         $span = $this->createMock(Span::class);
         $exporter->shutdown();
 

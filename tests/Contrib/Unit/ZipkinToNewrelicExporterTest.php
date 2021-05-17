@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter;
@@ -14,8 +16,6 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 
 class ZipkinToNewrelicExporterTest extends TestCase
 {
@@ -95,7 +95,7 @@ class ZipkinToNewrelicExporterTest extends TestCase
     {
         $this->assertEquals(
             Exporter::SUCCESS,
-            (new Exporter('test.zipkinToNR', 'scheme://host:123/path', '', new Client(), new HttpFactory(), new HttpFactory() ))->export([])
+            (new Exporter('test.zipkinToNR', 'scheme://host:123/path', '', new Client(), new HttpFactory(), new HttpFactory()))->export([])
         );
     }
 
@@ -107,7 +107,7 @@ class ZipkinToNewrelicExporterTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new Exporter('test.zipkinToNR', $invalidDsn, '', new Client(), new HttpFactory(), new HttpFactory() );
+        new Exporter('test.zipkinToNR', $invalidDsn, '', new Client(), new HttpFactory(), new HttpFactory());
     }
 
     public function invalidDsnDataProvider()

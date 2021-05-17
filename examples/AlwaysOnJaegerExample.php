@@ -12,9 +12,6 @@ use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
-
 
 $sampler = new AlwaysOnSampler();
 $samplingResult = $sampler->shouldSample(
