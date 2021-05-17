@@ -3,6 +3,8 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
@@ -23,7 +25,10 @@ $samplingResult = $sampler->shouldSample(
 
 $exporter = new JaegerExporter(
     'alwaysOnJaegerExample',
-    'http://jaeger:9412/api/v2/spans'
+    'http://jaeger:9412/api/v2/spans',
+    new Client(),
+    new HttpFactory(),
+    new HttpFactory()
 );
 
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {

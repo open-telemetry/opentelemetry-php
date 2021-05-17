@@ -3,6 +3,8 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Newrelic\Exporter as NewrelicExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
@@ -51,7 +53,10 @@ if ($endpointUrl == false) {
 $newrelicExporter = new NewrelicExporter(
     'alwaysOnNewrelicExample',
     $endpointUrl,
-    $licenseKey
+    $licenseKey,
+    new Client(),
+    new HttpFactory(),
+    new HttpFactory()
 );
 
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
