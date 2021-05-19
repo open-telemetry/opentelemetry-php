@@ -118,7 +118,7 @@ class Tracer implements API\Tracer
         $parentContextIsNoopSpan = !$parentContext->isValid();
 
         if ($parentContextIsNoopSpan) {
-            $parentContext = $this->importedContext ?? Baggage::generate(true);
+            $parentContext = $this->importedContext ?? Baggage::fork($this->provider->getIdGenerator()->generateTraceId(), true);
         }
 
         /*
