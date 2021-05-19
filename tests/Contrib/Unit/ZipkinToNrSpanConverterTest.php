@@ -7,9 +7,9 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\SpanConverter;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
+use OpenTelemetry\Sdk\Trace\Baggage;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -68,7 +68,7 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
      */
     public function durationShouldBeInMicroseconds()
     {
-        $span = new Span('duration.test', SpanContext::generate());
+        $span = new Span('duration.test', Baggage::generate());
 
         $row = (new SpanConverter('duration.test'))->convert($span);
 
@@ -83,7 +83,7 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
      */
     public function tagsAreCoercedCorrectlyToStrings()
     {
-        $span = new Span('tags.test', SpanContext::generate());
+        $span = new Span('tags.test', Baggage::generate());
 
         $listOfStrings = ['string-1','string-2'];
         $listOfNumbers = [1,2,3,3.1415,42];

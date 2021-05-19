@@ -6,11 +6,11 @@ namespace OpenTelemetry\Tests\Sdk\Integration;
 
 use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Sdk\Trace\Baggage;
 use OpenTelemetry\Sdk\Trace\NoopSpan;
 use OpenTelemetry\Sdk\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\TraceState;
 use OpenTelemetry\Trace as API;
 use PHPUnit\Framework\TestCase;
@@ -96,7 +96,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
 
     private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceState $traceState = null): Context
     {
-        return Span::insert(new NoopSpan(SpanContext::restore(
+        return Span::insert(new NoopSpan(Baggage::restore(
             '4bf92f3577b34da6a3ce929d0e0e4736',
             '00f067aa0ba902b7',
             $sampled,

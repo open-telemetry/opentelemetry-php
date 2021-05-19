@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace\Sampler;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Sdk\Trace\Baggage;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Trace as API;
 
 /**
@@ -87,20 +87,20 @@ class ParentBased implements Sampler
         ?API\Links $links = null
     ): SamplingResult {
         $parentSpan = Span::extract($parentContext);
-        $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
-        
-        // Invalid parent SpanContext indicates root span is being created
-        if (!$parentSpanContext->isValid()) {
+        $parentBaggage = $parentSpan !== null ? $parentSpan->getContext() : Baggage::getInvalid();
+
+        // Invalid parent Baggage indicates root span is being created
+        if (!$parentBaggage->isValid()) {
             return $this->root->shouldSample(...func_get_args());
         }
 
-        if ($parentSpanContext->isRemote()) {
-            return $parentSpanContext->isSampled()
+        if ($parentBaggage->isRemote()) {
+            return $parentBaggage->isSampled()
                 ? $this->remoteParentSampled->shouldSample(...func_get_args())
                 : $this->remoteParentNotSampled->shouldSample(...func_get_args());
         }
 
-        return $parentSpanContext->isSampled()
+        return $parentBaggage->isSampled()
             ? $this->localParentSampled->shouldSample(...func_get_args())
             : $this->localParentNotSampled->shouldSample(...func_get_args());
     }

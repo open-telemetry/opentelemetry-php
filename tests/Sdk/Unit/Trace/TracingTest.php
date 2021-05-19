@@ -11,9 +11,9 @@ use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace as SDK;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
+use OpenTelemetry\Sdk\Trace\Baggage;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
 use OpenTelemetry\Sdk\Trace\Tracer;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
@@ -24,29 +24,29 @@ class TracingTest extends TestCase
 {
     public function testContextGenerationAndRestore()
     {
-        $spanContext = SpanContext::generate();
-        $this->assertSame(strlen($spanContext->getTraceId()), 32);
-        $this->assertSame(strlen($spanContext->getSpanId()), 16);
-        $this->assertSame(strlen($spanContext->getSpanId()), 16);
+        $baggage = Baggage::generate();
+        $this->assertSame(strlen($baggage->getTraceId()), 32);
+        $this->assertSame(strlen($baggage->getSpanId()), 16);
+        $this->assertSame(strlen($baggage->getSpanId()), 16);
 
-        $spanContext2 = SpanContext::generate();
-        $this->assertNotSame($spanContext->getTraceId(), $spanContext2->getTraceId());
-        $this->assertNotSame($spanContext->getSpanId(), $spanContext2->getSpanId());
+        $baggage2 = Baggage::generate();
+        $this->assertNotSame($baggage->getTraceId(), $baggage2->getTraceId());
+        $this->assertNotSame($baggage->getSpanId(), $baggage2->getSpanId());
 
-        $spanContext3 = SpanContext::restore($spanContext->getTraceId(), $spanContext->getSpanId());
-        $this->assertSame($spanContext3->getTraceId(), $spanContext->getTraceId());
-        $this->assertSame($spanContext3->getSpanId(), $spanContext->getSpanId());
+        $baggage3 = Baggage::restore($baggage->getTraceId(), $baggage->getSpanId());
+        $this->assertSame($baggage3->getTraceId(), $baggage->getTraceId());
+        $this->assertSame($baggage3->getSpanId(), $baggage->getSpanId());
     }
 
-    public function testTracerSpanContextRestore()
+    public function testTracerBaggageRestore()
     {
         $tracerProvider = new SDK\TracerProvider();
         $tracer = new Tracer($tracerProvider, ResourceInfo::create(new Attributes([])));
         $tracer->startAndActivateSpan('tracer1.firstSpan');
-        $spanContext = $tracer->getActiveSpan()->getContext();
+        $baggage = $tracer->getActiveSpan()->getContext();
 
-        $spanContext2 = SpanContext::restore($spanContext->getTraceId(), $spanContext->getSpanId());
-        $tracer2 = new Tracer($tracerProvider, ResourceInfo::create(new Attributes([])), $spanContext2);
+        $baggage2 = Baggage::restore($baggage->getTraceId(), $baggage->getSpanId());
+        $tracer2 = new Tracer($tracerProvider, ResourceInfo::create(new Attributes([])), $baggage2);
         $tracer2->startAndActivateSpan('tracer2.firstSpan');
 
         $this->assertSame(
@@ -388,7 +388,7 @@ class TracingTest extends TestCase
         $tracerProvider = new SDK\TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
         $span = $tracer->startAndActivateSpan('zerodivisiontest');
-        
+
         try {
             throw new Exception('Record exception test event');
         } catch (Exception $exception) {
@@ -399,12 +399,12 @@ class TracingTest extends TestCase
         self::assertCount(1, $events);
 
         [$event] = iterator_to_array($events);
-        
+
         $this->assertSame($event->getName(), 'exception');
         $this->assertArrayHasKey('exception.type', iterator_to_array($event->getAttributes()));
         $this->assertArrayHasKey('exception.message', iterator_to_array($event->getAttributes()));
         $this->assertArrayHasKey('exception.stacktrace', iterator_to_array($event->getAttributes()));
-        
+
         $timestamp = Clock::get()->timestamp();
         $span->addEvent('update', $timestamp)
                     ->setAttribute('space', 'guard.session')
@@ -445,7 +445,7 @@ class TracingTest extends TestCase
         $this->assertFalse($span->isRecording());
     }
 
-    public function testParentSpanContext()
+    public function testParentBaggage()
     {
         $tracerProvider = new SDK\TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');

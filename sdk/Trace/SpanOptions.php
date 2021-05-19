@@ -47,7 +47,7 @@ final class SpanOptions implements API\SpanOptions
         return $this;
     }
 
-    public function setParentContext(API\SpanContext $span): API\SpanOptions
+    public function setParentBaggage(API\Baggage $span): API\SpanOptions
     {
         $this->parent = $span;
 
@@ -93,8 +93,8 @@ final class SpanOptions implements API\SpanOptions
     {
         $span = $this->tracer->getActiveSpan();
         $context = $span->getContext()->isValid()
-            ? SpanContext::fork($span->getContext()->getTraceId())
-            : SpanContext::generate();
+            ? Baggage::fork($span->getContext()->getTraceId())
+            : Baggage::generate();
 
         $span = new Span($this->name, $context, $this->parent, null, $this->tracer->getResource(), $this->kind);
 

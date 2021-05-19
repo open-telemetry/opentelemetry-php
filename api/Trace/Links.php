@@ -11,9 +11,9 @@ interface Links extends \IteratorAggregate, \Countable
 
     /**
      * Adding a link should not invalidate nor change any existing iterators.
-     * @param SpanContext $context
+     * @param Baggage $context
      * @param Attributes|null $attributes
      * @return Links Return $this to allow setting multiple links at once in a chain.
      */
-    public function addLink(SpanContext $context, ?Attributes $attributes = null): Links;
+    public function addLink(Baggage $context, ?Attributes $attributes = null): Links;
 }

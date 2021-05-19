@@ -56,7 +56,7 @@ class NoopSpanTest extends TestCase
     public function eventsCollectionShouldBeEmptyEvenAfterRecordExceptionEventUpdate()
     {
         $this->assertEmpty($this->span->getEvents());
-        
+
         try {
             throw new Exception('Record exception test event');
         } catch (Exception $exception) {
@@ -151,7 +151,7 @@ class NoopSpanTest extends TestCase
     }
 
     /** @test */
-    public function itShouldHaveAnInvalidSpanContext()
+    public function itShouldHaveAnInvalidBaggage()
     {
         $this->assertFalse($this->span->getContext()->isValid());
     }

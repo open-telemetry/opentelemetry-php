@@ -39,5 +39,5 @@ The validation service then checks the `traceparent` and `tracestate` headers in
 
 ### Test service
 
-The test service is created using a `symfony` application that has a `/test` endpoint. Once this endpoint is hit by the validation service, the test service creates a `SpanContext` using the received `traceparent` and `tracestate` headers. These headers are used to propagate the trace.
+The test service is created using a `symfony` application that has a `/test` endpoint. Once this endpoint is hit by the validation service, the test service creates a `Baggage` using the received `traceparent` and `tracestate` headers. These headers are used to propagate the trace.
 

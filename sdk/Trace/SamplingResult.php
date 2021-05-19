@@ -34,7 +34,7 @@ final class SamplingResult
     private $attributes;
 
     /**
-     * @var ?API\TraceState A Tracestate that will be associated with the Span through the new SpanContext.
+     * @var ?API\TraceState A Tracestate that will be associated with the Span through the new Baggage.
      */
     private $traceState;
 
