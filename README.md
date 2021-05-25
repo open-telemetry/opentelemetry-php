@@ -74,7 +74,7 @@ After you open the pull request, the CI/CD pipeline will run all of the associat
 You can simulate the important github actions locally before you submit your PR by running the following command:
 
 ```bash
-make install && make update && make style && make test && make phan && make psalm
+make install && make update && make style && make test && make phan && make psalm && make phpstan
 ```
 
 from your bash compatible shell.  This does the following things:
@@ -82,7 +82,7 @@ from your bash compatible shell.  This does the following things:
 * Installs all the required dependencies for the project and ensures they are up to date
 * Uses [php-cs-fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) to style your code using our style preferences.
 * Runs all of our [phpunit](https://phpunit.de/) unit tests.
-* Performs static analysis with [Phan](https://github.com/phan/phan) and [Psalm](https://psalm.dev/)
+* Performs static analysis with [Phan](https://github.com/phan/phan), [Psalm](https://psalm.dev/) and [PHPStan](https://phpstan.org/user-guide/getting-started)
 
 
 ## Proto Generation
