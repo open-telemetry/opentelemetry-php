@@ -60,5 +60,8 @@ jobs:
     - name: Run PHPUnit
       run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
+    - name: Run Infection
+      run: vendor/bin/infection run --verbose --show-mutations --only-covered --no-interaction --min-msi=100 --min-covered-msi=100
+
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash)
