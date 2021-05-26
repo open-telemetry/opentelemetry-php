@@ -6,6 +6,6 @@ namespace OpenTelemetry\Trace;
 
 interface Link
 {
-    public function getBaggage(): Baggage;
+    public function getSpanContext(): SpanContext;
     public function getAttributes(): Attributes;
 }

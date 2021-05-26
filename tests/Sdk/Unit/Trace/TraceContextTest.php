@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
-use OpenTelemetry\Sdk\Trace\Baggage;
 use OpenTelemetry\Sdk\Trace\PropagationMap;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\TraceContext;
 use OpenTelemetry\Sdk\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
@@ -133,7 +133,7 @@ class TraceContextTest extends TestCase
     {
         $carrier = [];
         $map = new PropagationMap();
-        $context = Baggage::restore(self::TRACEID, self::SPANID, true, false);
+        $context = SpanContext::restore(self::TRACEID, self::SPANID, true, false);
         TraceContext::inject($context, $carrier, $map);
 
         $this->assertSame(self::TRACEPARENTVALUE, $map->get($carrier, TraceContext::TRACEPARENT));
@@ -147,7 +147,7 @@ class TraceContextTest extends TestCase
         $carrier = [];
         $map = new PropagationMap();
         $tracestate = new TraceState('vendor1=opaqueValue1');
-        $context = Baggage::restore(self::TRACEID, self::SPANID, true, false, $tracestate);
+        $context = SpanContext::restore(self::TRACEID, self::SPANID, true, false, $tracestate);
         TraceContext::inject($context, $carrier, $map);
 
         $this->assertSame('vendor1=opaqueValue1', $map->get($carrier, TraceContext::TRACESTATE));

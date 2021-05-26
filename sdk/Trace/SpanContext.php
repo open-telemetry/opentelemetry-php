@@ -7,7 +7,7 @@ namespace OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
 use Throwable;
 
-final class Baggage implements API\Baggage
+final class SpanContext implements API\SpanContext
 {
     public const INVALID_TRACE = '00000000000000000000000000000000';
     public const VALID_TRACE = '/^[0-9a-f]{32}$/';
@@ -74,7 +74,7 @@ final class Baggage implements API\Baggage
         $this->isValid = $this->traceId !== self::INVALID_TRACE && $this->spanId !== self::INVALID_SPAN;
     }
 
-    public static function getInvalid(): API\Baggage
+    public static function getInvalid(): API\SpanContext
     {
         return new self(self::INVALID_TRACE, self::INVALID_SPAN, 0);
     }
@@ -83,9 +83,9 @@ final class Baggage implements API\Baggage
      * Creates a new context with random trace
      *
      * @param bool $sampled Default: false
-     * @return Baggage
+     * @return SpanContext
      */
-    public static function generate(bool $sampled = false): Baggage
+    public static function generate(bool $sampled = false): SpanContext
     {
         return self::fork(self::randomHex(16), $sampled);
     }
@@ -93,9 +93,9 @@ final class Baggage implements API\Baggage
     /**
      * Creates a new sampled context with random trace
      *
-     * @return Baggage
+     * @return SpanContext
      */
-    public static function generateSampled(): Baggage
+    public static function generateSampled(): SpanContext
     {
         return self::generate(true);
     }
@@ -106,9 +106,9 @@ final class Baggage implements API\Baggage
      * @param string $traceId Existing trace
      * @param bool $sampled Default: false
      * @param bool $isRemote Default: false
-     * @return Baggage
+     * @return SpanContext
      */
-    public static function fork(string $traceId, bool $sampled = false, bool $isRemote = false): Baggage
+    public static function fork(string $traceId, bool $sampled = false, bool $isRemote = false): SpanContext
     {
         return self::restore($traceId, self::randomHex(8), $sampled, $isRemote);
     }
@@ -121,9 +121,9 @@ final class Baggage implements API\Baggage
      * @param bool $sampled
      * @param bool $isRemote Default: false
      * @param API\TraceState|null $traceState
-     * @return Baggage
+     * @return SpanContext
      */
-    public static function restore(string $traceId, string $spanId, bool $sampled = false, bool $isRemote = false, ?API\TraceState $traceState = null): Baggage
+    public static function restore(string $traceId, string $spanId, bool $sampled = false, bool $isRemote = false, ?API\TraceState $traceState = null): SpanContext
     {
         $sampleFlag = $sampled ? 1 : 0;
         $trace = new self($traceId, $spanId, $sampleFlag, $traceState);

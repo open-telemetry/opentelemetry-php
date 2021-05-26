@@ -7,8 +7,8 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter;
-use OpenTelemetry\Sdk\Trace\Baggage;
 use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -33,7 +33,7 @@ class ZipkinToNewrelicExporterTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $exporter->export([new Span('test.zipkin.span', Baggage::generate())])
+            $exporter->export([new Span('test.zipkin.span', SpanContext::generate())])
         );
     }
 
@@ -64,7 +64,7 @@ class ZipkinToNewrelicExporterTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $exporter->export([new Span('test.zipkinToNR.span', Baggage::generate())])
+            $exporter->export([new Span('test.zipkinToNR.span', SpanContext::generate())])
         );
     }
 

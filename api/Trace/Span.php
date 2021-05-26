@@ -9,8 +9,8 @@ use Exception;
 interface Span extends SpanStatus, SpanKind
 {
     public function getSpanName(): string;
-    public function getContext(): Baggage;
-    public function getParent(): ?Baggage;
+    public function getContext(): SpanContext;
+    public function getParent(): ?SpanContext;
 
     /**
      * Returns Epoch timestamp value (RealtimeClock) when the Span was created
@@ -54,11 +54,11 @@ interface Span extends SpanStatus, SpanKind
     public function addEvent(string $name, int $timestamp, ?Attributes $attributes = null): Span;
 
     /**
-     * @param Baggage $context
+     * @param SpanContext $context
      * @param Attributes|null $attributes
      * @return Span Must return $this to allow setting multiple links at once in a chain.
      */
-    public function addLink(Baggage $context, ?Attributes $attributes = null): Span;
+    public function addLink(SpanContext $context, ?Attributes $attributes = null): Span;
 
     /**
      *

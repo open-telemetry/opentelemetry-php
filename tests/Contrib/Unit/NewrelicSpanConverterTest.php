@@ -7,9 +7,9 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 use OpenTelemetry\Contrib\Newrelic\SpanConverter;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
-use OpenTelemetry\Sdk\Trace\Baggage;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -58,7 +58,7 @@ class NewrelicSpanConverterTest extends TestCase
      */
     public function durationShouldBeInMilliseconds()
     {
-        $span = new Span('duration.test', Baggage::generate());
+        $span = new Span('duration.test', SpanContext::generate());
 
         $row = (new SpanConverter('duration.test'))->convert($span);
 
@@ -73,7 +73,7 @@ class NewrelicSpanConverterTest extends TestCase
      */
     public function attributesMaintainTypes()
     {
-        $span = new Span('attributes.test', Baggage::generate());
+        $span = new Span('attributes.test', SpanContext::generate());
 
         $listOfStrings = ['string-1','string-2'];
         $listOfNumbers = [1,2,3,3.1415,42];

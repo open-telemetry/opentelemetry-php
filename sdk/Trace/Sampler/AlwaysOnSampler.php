@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace\Sampler;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Sdk\Trace\Baggage;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Trace as API;
 
 /**
@@ -34,8 +34,8 @@ class AlwaysOnSampler implements Sampler
         ?API\Links $links = null
     ): SamplingResult {
         $parentSpan = Span::extract($parentContext);
-        $parentBaggage = $parentSpan !== null ? $parentSpan->getContext() : Baggage::getInvalid();
-        $traceState = $parentBaggage->getTraceState();
+        $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
+        $traceState = $parentSpanContext->getTraceState();
 
         return new SamplingResult(
             SamplingResult::RECORD_AND_SAMPLE,

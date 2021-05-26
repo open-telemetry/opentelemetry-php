@@ -15,8 +15,8 @@ class Span implements API\Span
     use ContextValueTrait;
 
     private $name;
-    private $baggage;
-    private $parentBaggage;
+    private $spanContext;
+    private $parentSpanContext;
     private $spanKind;
     private $sampler;
 
@@ -48,23 +48,23 @@ class Span implements API\Span
     // This was also updated recently -> https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#spankind
 
     // Links
-    // A Span may be linked to zero or more other Spans (defined by Baggage) that are causally related. Links can point to Baggages inside a single Trace
+    // A Span may be linked to zero or more other Spans (defined by SpanContext) that are causally related. Links can point to SpanContexts inside a single Trace
     // or across different Traces. Links can be used to represent batched operations where a Span was initiated by multiple initiating Spans,
     // each representing a single incoming item being processed in the batch.
     // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#links-between-spans
 
     public function __construct(
         string $name,
-        API\Baggage $baggage,
-        ?API\Baggage $parentBaggage = null,
+        API\SpanContext $spanContext,
+        ?API\SpanContext $parentSpanContext = null,
         ?Sampler $sampler = null,
         ?ResourceInfo $resource = null,
         int $spanKind = API\SpanKind::KIND_INTERNAL,
         ?SpanProcessor $spanProcessor = null
     ) {
         $this->name = $name;
-        $this->baggage = $baggage;
-        $this->parentBaggage = $parentBaggage;
+        $this->spanContext = $spanContext;
+        $this->parentSpanContext = $parentSpanContext;
         $this->spanKind = $spanKind;
         $this->sampler = $sampler;
         $this->resource =  $resource ?? ResourceInfo::emptyResource();
@@ -84,15 +84,15 @@ class Span implements API\Span
         return clone $this->resource;
     }
 
-    public function getContext(): API\Baggage
+    public function getContext(): API\SpanContext
     {
-        return clone $this->baggage;
+        return clone $this->spanContext;
     }
 
-    public function getParent(): ?API\Baggage
+    public function getParent(): ?API\SpanContext
     {
-        // todo: Spec says a parent is a Span, Baggage, or null -> should we implement this here?
-        return $this->parentBaggage !== null ? clone $this->parentBaggage : null;
+        // todo: Spec says a parent is a Span, SpanContext, or null -> should we implement this here?
+        return $this->parentSpanContext !== null ? clone $this->parentSpanContext : null;
     }
 
     public function setSpanStatus(string $code, ?string $description = null): API\Span
@@ -241,19 +241,19 @@ class Span implements API\Span
     /* A Span is said to have a remote parent if it is the child of a Span
      * created in another process. Each propagators' deserialization must
      * set IsRemote to true on a parent
-     * Baggage so Span creation knows if the parent is remote.
-     * Returns true if the Baggage was propagated from a
+     * SpanContext so Span creation knows if the parent is remote.
+     * Returns true if the SpanContext was propagated from a
      * remote parent. When creating children
      * from remote spans, their IsRemote flag MUST be set to false.
     */
     public function isRemote(): bool
     {
-        return $this->baggage->isRemote();
+        return $this->spanContext->isRemote();
     }
 
     public function isSampled(): bool
     {
-        return $this->baggage->isSampled();
+        return $this->spanContext->isSampled();
     }
 
     public function setLinks(API\Links $links): Span
@@ -272,7 +272,7 @@ class Span implements API\Span
     /**
      * @inheritDoc
      */
-    public function addLink(API\Baggage $context, ?API\Attributes $attributes = null): API\Span
+    public function addLink(API\SpanContext $context, ?API\Attributes $attributes = null): API\Span
     {
         return $this;
     }
@@ -303,6 +303,6 @@ class Span implements API\Span
      */
     protected static function getContextKey(): ContextKey
     {
-        return BaggageKey::instance();
+        return SpanContextKey::instance();
     }
 }

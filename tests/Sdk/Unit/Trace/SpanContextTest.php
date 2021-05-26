@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
-use OpenTelemetry\Sdk\Trace\Baggage;
 use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Tests\Sdk\Unit\Support\HasTraceProvider;
 use PHPUnit\Framework\TestCase;
 
-class BaggageTest extends TestCase
+class SpanContextTest extends TestCase
 {
     use HasTraceProvider;
 
@@ -18,7 +18,7 @@ class BaggageTest extends TestCase
      */
     public function testDefaultSpansFromContextAreNotSampled()
     {
-        $span = Baggage::generate();
+        $span = SpanContext::generate();
 
         $this->assertFalse($span->isSampled());
     }
@@ -26,13 +26,13 @@ class BaggageTest extends TestCase
     /**
      * @test
      */
-    public function testBaggageCanCreateSampledSpans()
+    public function testSpanContextCanCreateSampledSpans()
     {
-        $span = Baggage::generate(true);
+        $span = SpanContext::generate(true);
 
         $this->assertTrue($span->isSampled());
 
-        $span = Baggage::generateSampled();
+        $span = SpanContext::generateSampled();
 
         $this->assertTrue($span->isSampled());
     }
@@ -56,7 +56,7 @@ class BaggageTest extends TestCase
     {
         $tracer = $this->getTracer();
 
-        $context = Baggage::generate(true);
+        $context = SpanContext::generate(true);
 
         $activeSpan = new Span('test.span', $context);
 
@@ -74,7 +74,7 @@ class BaggageTest extends TestCase
         // When creating children from remote spans, their IsRemote flag MUST be set to false.
         $tracer = $this->getTracer();
 
-        $context = Baggage::generate(true);
+        $context = SpanContext::generate(true);
 
         $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context, true);
 
@@ -92,7 +92,7 @@ class BaggageTest extends TestCase
         // When creating children from remote spans, their IsRemote flag MUST be set to false.
         $tracer = $this->getTracer();
 
-        $context = Baggage::generate(false);
+        $context = SpanContext::generate(false);
 
         $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context, true);
 
@@ -113,7 +113,7 @@ class BaggageTest extends TestCase
          */
         $tracer = $this->getTracer();
 
-        $context1 = Baggage::generate(true);
+        $context1 = SpanContext::generate(true);
 
         $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context1, true);
 
@@ -124,7 +124,7 @@ class BaggageTest extends TestCase
          */
         $tracer = $this->getTracer();
 
-        $context2 = Baggage::generate(false);
+        $context2 = SpanContext::generate(false);
 
         $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context2, true);
 
@@ -136,7 +136,7 @@ class BaggageTest extends TestCase
          */
         $tracer = $this->getTracer();
 
-        $context3 = Baggage::generate(true);
+        $context3 = SpanContext::generate(true);
 
         $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context3);
 
@@ -148,7 +148,7 @@ class BaggageTest extends TestCase
          */
         $tracer = $this->getTracer();
 
-        $context2 = Baggage::generate(false);
+        $context2 = SpanContext::generate(false);
 
         $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context2);
 

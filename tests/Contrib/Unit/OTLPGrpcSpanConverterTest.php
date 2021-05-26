@@ -11,10 +11,10 @@ use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
-use OpenTelemetry\Sdk\Trace\Baggage;
 use OpenTelemetry\Sdk\Trace\Clock;
-
 use OpenTelemetry\Sdk\Trace\Span;
+
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 
@@ -55,7 +55,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
         // $this->assertGreaterThan(0, $row['duration']);
 
         // $this->assertCount(1, $row['tags']);
-
+        
         // /** @var Attribute $attribute */
         // $attribute = $span->getAttribute('service');
         // $this->assertEquals($attribute->getValue(), $row['tags']['service']);
@@ -76,7 +76,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
      */
     // public function durationShouldBeInMicroseconds()
     // {
-    //     $span = new Span('duration.test', Baggage::generate());
+    //     $span = new Span('duration.test', SpanContext::generate());
 
     //     $row = (new SpanConverter('duration.test'))->as_otlp_span($span);
 
@@ -91,7 +91,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
      */
     public function tagsAreCoercedCorrectlyToStrings()
     {
-        $span = new Span('tags.test', Baggage::generate());
+        $span = new Span('tags.test', SpanContext::generate());
 
         $listOfStrings = ['string-1','string-2'];
         $listOfNumbers = [1,2,3,3.1415,42];
@@ -146,12 +146,12 @@ class OTLPGrpcSpanConverterTest extends TestCase
         // Construct a comprehensive happy path Span in the SDK
         $sdk = new Span(
             'http_get',
-            new Baggage(
+            new SpanContext(
                 bin2hex('0000000000000001'), // traceId
                 bin2hex('00000001'), // spanId
                 0, // traceFlags
             ),
-            null, // parentBaggage
+            null, // parentSpanContext
             null, // sampler
             ResourceInfo::create(
                 new Attributes([
