@@ -7,11 +7,11 @@ namespace OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Context\ContextKey;
 
 /**
- * Class BaggageKey
+ * Class SpanContextKey
  * @package OpenTelemetry\Sdk\Trace
  * @internal
  */
-class BaggageKey extends ContextKey
+class SpanContextKey extends ContextKey
 {
     private const KEY_NAME = 'opentelemetry-trace-span-key';
 
@@ -19,13 +19,13 @@ class BaggageKey extends ContextKey
      * @var ContextKey
      */
     private static $instance;
-
+    
     public static function instance(): ContextKey
     {
         if (self::$instance === null) {
             self::$instance = new ContextKey(self::KEY_NAME);
         }
-
+        
         return self::$instance;
     }
 }

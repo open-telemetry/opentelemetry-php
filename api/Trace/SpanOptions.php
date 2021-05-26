@@ -14,7 +14,7 @@ interface SpanOptions
     public function setSpanName(string $name): SpanOptions;
     /** should default to INTERNAL if not called */
     public function setSpanKind(int $spanKind): SpanOptions;
-    public function setParentBaggage(Baggage $span): SpanOptions;
+    public function setParentContext(SpanContext $span): SpanOptions;
     public function setParentSpan(Span $span): SpanOptions;
     public function addAttributes(Attributes $attributes): SpanOptions;
     public function addLinks(Links $links): SpanOptions;

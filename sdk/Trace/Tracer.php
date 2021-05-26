@@ -18,13 +18,13 @@ class Tracer implements API\Tracer
     private $provider;
     /** @var ResourceInfo */
     private $resource;
-    /** @var API\Baggage|null  */
+    /** @var API\SpanContext|null  */
     private $importedContext;
 
     public function __construct(
         TracerProvider $provider,
         ResourceInfo $resource = null,
-        API\Baggage $context = null
+        API\SpanContext $context = null
     ) {
         $this->provider = $provider;
         $this->resource = $resource ?? ResourceInfo::emptyResource();
@@ -40,13 +40,13 @@ class Tracer implements API\Tracer
         ?int $startTimestamp = null
     ): API\Span {
         $parentSpan = $parentContext !== null ? Span::extract($parentContext) : Span::getCurrent();
-        $parentBaggage = $parentSpan !== null ? $parentSpan->getContext() : Baggage::getInvalid();
+        $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
 
         /**
          * Implementations MUST generate a new TraceId for each root span created.
          * For a Span with a parent, the TraceId MUST be the same as the parent.
          */
-        $traceId = $parentBaggage->isValid() ? $parentBaggage->getTraceId() : $this->provider->getIdGenerator()->generateTraceId();
+        $traceId = $parentSpanContext->isValid() ? $parentSpanContext->getTraceId() : $this->provider->getIdGenerator()->generateTraceId();
         $spanId = $this->provider->getIdGenerator()->generateSpanId();
 
         $sampleResult = $this->provider->getSampler()->shouldSample(
@@ -66,18 +66,18 @@ class Tracer implements API\Tracer
             }
         }
 
-        $traceFlags = $sampleResult->getDecision() === SamplingResult::RECORD_AND_SAMPLE ? Baggage::TRACE_FLAG_SAMPLED : 0;
+        $traceFlags = $sampleResult->getDecision() === SamplingResult::RECORD_AND_SAMPLE ? SpanContext::TRACE_FLAG_SAMPLED : 0;
         $traceState = $sampleResult->getTraceState();
-        $baggage = new Baggage($traceId, $spanId, $traceFlags, $traceState);
+        $spanContext = new SpanContext($traceId, $spanId, $traceFlags, $traceState);
 
         if ($sampleResult->getDecision() === SamplingResult::DROP) {
-            return new NoopSpan($baggage);
+            return new NoopSpan($spanContext);
         }
 
         $span = new Span(
             $name,
-            $baggage,
-            $parentBaggage,
+            $spanContext,
+            $parentSpanContext,
             $this->provider->getSampler(),
             $this->resource,
             $spanKind,
@@ -107,18 +107,18 @@ class Tracer implements API\Tracer
 
     /**
      * @param string $name
-     * @param API\Baggage $parentContext
+     * @param API\SpanContext $parentContext
      * @param bool $isRemote
      * @param int $spanKind
      * @return Span
      */
 
-    public function startActiveSpan(string $name, API\Baggage $parentContext, bool $isRemote = false, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
+    public function startActiveSpan(string $name, API\SpanContext $parentContext, bool $isRemote = false, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
     {
         $parentContextIsNoopSpan = !$parentContext->isValid();
 
         if ($parentContextIsNoopSpan) {
-            $parentContext = $this->importedContext ?? Baggage::fork($this->provider->getIdGenerator()->generateTraceId(), true);
+            $parentContext = $this->importedContext ?? SpanContext::generate(true);
         }
 
         /*
@@ -135,7 +135,7 @@ class Tracer implements API\Tracer
             $spanKind
         );
 
-        $context = Baggage::fork($parentContext->getTraceId(), $parentContext->isSampled(), $isRemote);
+        $context = SpanContext::fork($parentContext->getTraceId(), $parentContext->isSampled(), $isRemote);
 
         if (SamplingResult::DROP == $samplingResult->getDecision()) {
             $span = $this->generateSpanInstance('', $context);
@@ -176,14 +176,14 @@ class Tracer implements API\Tracer
      * todo: fix ^
      * -> Is there a reason we didn't add this already?
      * @param string $name
-     * @param API\Baggage $parentContext
+     * @param API\SpanContext $parentContext
      * @param bool $isRemote
      * @return Span
      */
-    public function startAndActivateSpanFromContext(string $name, API\Baggage $parentContext, bool $isRemote = false, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
+    public function startAndActivateSpanFromContext(string $name, API\SpanContext $parentContext, bool $isRemote = false, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
     {
         /*
-         * Pass in true if the Baggage was propagated from a
+         * Pass in true if the SpanContext was propagated from a
          * remote parent. When creating children from remote spans,
          * their IsRemote flag MUST be set to false.
          */
@@ -244,7 +244,7 @@ class Tracer implements API\Tracer
         }
     }
 
-    private function generateSpanInstance(string $name, API\Baggage $context, API\Baggage $parentContext = null, Sampler $sampler = null, ResourceInfo $resource = null, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
+    private function generateSpanInstance(string $name, API\SpanContext $context, API\SpanContext $parentContext = null, Sampler $sampler = null, ResourceInfo $resource = null, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
     {
         $parent = null;
 

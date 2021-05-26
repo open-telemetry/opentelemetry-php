@@ -14,22 +14,22 @@ interface TextMapFormatPropagator
     public static function fields() : array;
 
     /**
-     * Encodes the given Baggage into propagator specific format and injects
-     * the encoded Baggage using Setter into it's associated carrier.
+     * Encodes the given SpanContext into propagator specific format and injects
+     * the encoded SpanContext using Setter into it's associated carrier.
      *
-     * @param Baggage $context
+     * @param SpanContext $context
      * @param mixed $carrier
      * @param PropagationSetter $setter
      * @return void
      */
-    public static function inject(Baggage $context, &$carrier, PropagationSetter $setter) : void;
+    public static function inject(SpanContext $context, &$carrier, PropagationSetter $setter) : void;
 
     /**
-     * Retrieves encoded Baggage using Getter from the associated carrier.
+     * Retrieves encoded SpanContext using Getter from the associated carrier.
      *
      * @param mixed $carrier
      * @param PropagationGetter $getter
-     * @return Baggage
+     * @return SpanContext
      */
-    public static function extract($carrier, PropagationGetter $getter): Baggage;
+    public static function extract($carrier, PropagationGetter $getter): SpanContext;
 }

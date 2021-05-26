@@ -35,7 +35,7 @@ final class TraceContext implements API\TextMapFormatPropagator
     /**
      * {@inheritdoc}
      */
-    public static function inject(API\Baggage $context, &$carrier, API\PropagationSetter $setter): void
+    public static function inject(API\SpanContext $context, &$carrier, API\PropagationSetter $setter): void
     {
         // Build and inject the traceparent header
         $traceparent = self::VERSION . '-' . $context->getTraceId() . '-' . $context->getSpanId() . '-' . ($context->isSampled() ? '01' : '00');
@@ -52,7 +52,7 @@ final class TraceContext implements API\TextMapFormatPropagator
     /**
      * {@inheritdoc}
      */
-    public static function extract($carrier, API\PropagationGetter $getter): API\Baggage
+    public static function extract($carrier, API\PropagationGetter $getter): API\SpanContext
     {
         $traceparent = $getter->get($carrier, self::TRACEPARENT);
         if ($traceparent === null) {
@@ -77,14 +77,14 @@ final class TraceContext implements API\TextMapFormatPropagator
         }
 
         $traceId = $pieces[1];
-        if ((preg_match(Baggage::VALID_TRACE, $traceId) === 0) || ($traceId === Baggage::INVALID_TRACE)) {
+        if ((preg_match(SpanContext::VALID_TRACE, $traceId) === 0) || ($traceId === SpanContext::INVALID_TRACE)) {
             throw new \InvalidArgumentException(
                 sprintf('TraceID must be exactly 16 bytes (32 chars) and at least one non-zero byte, got %s', $traceId)
             );
         }
 
         $spanId = $pieces[2];
-        if ((preg_match(Baggage::VALID_SPAN, $spanId) === 0) || ($spanId === Baggage::INVALID_SPAN)) {
+        if ((preg_match(SpanContext::VALID_SPAN, $spanId) === 0) || ($spanId === SpanContext::INVALID_SPAN)) {
             throw new \InvalidArgumentException(
                 sprintf('SpanID must be exactly 8 bytes (16 chars) and at least one non-zero byte, got %s', $spanId)
             );
@@ -99,17 +99,17 @@ final class TraceContext implements API\TextMapFormatPropagator
 
         // Only the sampled flag is extracted from the traceFlags (00000001)
         $convertedTraceFlags = hexdec($traceFlags);
-        $isSampled = ($convertedTraceFlags & Baggage::SAMPLED_FLAG) === Baggage::SAMPLED_FLAG;
+        $isSampled = ($convertedTraceFlags & SpanContext::SAMPLED_FLAG) === SpanContext::SAMPLED_FLAG;
 
         // Tracestate = 'Vendor1=Value1,...,VendorN=ValueN'
         $rawTracestate = $getter->get($carrier, self::TRACESTATE);
         if ($rawTracestate !== null) {
             $tracestate = new TraceState($rawTracestate);
 
-            return Baggage::restore($traceId, $spanId, $isSampled, true, $tracestate);
+            return SpanContext::restore($traceId, $spanId, $isSampled, true, $tracestate);
         }
 
         // Only traceparent header is extracted. No tracestate.
-        return Baggage::restore($traceId, $spanId, $isSampled, true);
+        return SpanContext::restore($traceId, $spanId, $isSampled, true);
     }
 }

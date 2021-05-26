@@ -13,7 +13,7 @@ use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Sdk\Trace\TraceState;
-use OpenTelemetry\Trace\Baggage;
+use OpenTelemetry\Trace\SpanContext;
 use PHPUnit\Framework\TestCase;
 
 class TracerTest extends TestCase
@@ -33,7 +33,7 @@ class TracerTest extends TestCase
         $span = $tracer->startSpan('test.span');
 
         $this->assertInstanceOf(NoopSpan::class, $span);
-        $this->assertNotEquals(Baggage::TRACE_FLAG_SAMPLED, $span->getContext()->getTraceFlags());
+        $this->assertNotEquals(SpanContext::TRACE_FLAG_SAMPLED, $span->getContext()->getTraceFlags());
     }
 
     /**
@@ -42,7 +42,7 @@ class TracerTest extends TestCase
     public function samplerMayOverrideParentsTraceState()
     {
         $parentTraceState = new TraceState('orig-key=orig_value');
-        $parentContext = Span::insert(new NoopSpan(\OpenTelemetry\Sdk\Trace\Baggage::restore(
+        $parentContext = Span::insert(new NoopSpan(\OpenTelemetry\Sdk\Trace\SpanContext::restore(
             '4bf92f3577b34da6a3ce929d0e0e4736',
             '00f067aa0ba902b7',
             true,

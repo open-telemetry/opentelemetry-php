@@ -17,8 +17,8 @@ interface Sampler
     /**
      * Returns SamplingResult.
      *
-     * @param Context $parentContext Context with parent Span. The Span's Baggage may be invalid to indicate a root span.
-     * @param string $traceId TraceId of the Span to be created. It can be different from the TraceId in the Baggage.
+     * @param Context $parentContext Context with parent Span. The Span's SpanContext may be invalid to indicate a root span.
+     * @param string $traceId TraceId of the Span to be created. It can be different from the TraceId in the SpanContext.
      *                        Typically in situations when the Span to be created starts a new Trace.
      * @param string $spanName Name of the Span to be created.
      * @param int $spanKind Span kind.

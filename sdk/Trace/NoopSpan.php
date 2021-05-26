@@ -13,7 +13,7 @@ class NoopSpan implements API\Span
 {
     use ContextValueTrait;
 
-    /** @var API\Baggage */
+    /** @var API\SpanContext */
     private $context;
 
     /** @var API\Attributes */
@@ -38,16 +38,16 @@ class NoopSpan implements API\Span
      * If a valid context is passed in, the context is propagated;
      * otherwise, it returns an invalid span.
      */
-    public function __construct(API\Baggage $baggage = null)
+    public function __construct(API\SpanContext $spanContext = null)
     {
-        if (null == $baggage) {
-            $this->context = new Baggage(
-                Baggage::INVALID_TRACE,
-                Baggage::INVALID_SPAN,
+        if (null == $spanContext) {
+            $this->context = new SpanContext(
+                SpanContext::INVALID_TRACE,
+                SpanContext::INVALID_SPAN,
                 0
             );
         } else {
-            $this->context = $baggage;
+            $this->context = $spanContext;
         }
         $this->attributes = new Attributes();
         $this->events = new Events();
@@ -59,12 +59,12 @@ class NoopSpan implements API\Span
         return '';
     }
 
-    public function getContext(): API\Baggage
+    public function getContext(): API\SpanContext
     {
         return $this->context;
     }
 
-    public function getParent(): ?API\Baggage
+    public function getParent(): ?API\SpanContext
     {
         return null;
     }
@@ -118,7 +118,7 @@ class NoopSpan implements API\Span
         return $this;
     }
 
-    public function addLink(API\Baggage $context, ?API\Attributes $attributes = null): API\Span
+    public function addLink(API\SpanContext $context, ?API\Attributes $attributes = null): API\Span
     {
         return $this;
     }
@@ -199,6 +199,6 @@ class NoopSpan implements API\Span
      */
     protected static function getContextKey(): ContextKey
     {
-        return BaggageKey::instance();
+        return SpanContextKey::instance();
     }
 }
