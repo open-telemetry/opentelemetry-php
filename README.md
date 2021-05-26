@@ -131,6 +131,15 @@ standards that we have defined in
 our [psalm config](https://github.com/open-telemetry/opentelemetry-php/blob/main/psalm.xml.dist) will emit a failure
 in CI.
 
+We use [PHPStan](https://github.com/phpstan/phpstan) as our third tool for static analysis. 
+You can use our PHPStan docker wrapper to easily perform static analysis on your changes.
+
+Execute `make phpstan` from your bash compatible shell. This process will return 0 on success. Usually this process is
+performed as part of a code checkin. This process runs during CI and is a required check. Code that doesn't match the
+standards that we have defined in
+our [PHPStan config](https://github.com/open-telemetry/opentelemetry-php/blob/main/phpstan.neon.dist) will emit a failure
+in CI.
+
 ## Testing
 To make sure the tests in this repo work as you expect, you can use the included docker test wrapper.  
 To run the test suite, execute
