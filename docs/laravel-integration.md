@@ -28,9 +28,6 @@ Let's navigate to `http://127.0.0.1:8000` on our browser to see the default Lara
 
 Laravel comes with most packages needed for development out of the box, so for this example, we will only require the open-telemetry PHP package. Let's run `composer require open-telemetry/opentelemetry` to pull that in.
 
-** Notes **
-As of the time of writing this, Laravel ships with Guzzle version `^7.0.1`,  but our open-telemetry PHP package uses Guzzle version `^6.2.0`, so pulling in open-telemetry PHP could lead to errors around unresolved packages. To fix the errors run `composer require guzzlehttp/guzzle:^6.2.0` to downgrade Guzzle first. Then run  `composer require open-telemetry/opentelemetry` to pull in the open-telemetry package.
-
 ## Step 3 - Bundle Zipkin and  Jaeger into the Application
 
 To visualize traces exported from our application, we need to integrate open source tracing tools [Zipkin](https://zipkin.io/) and [Jaeger](https://www.jaegertracing.io/) into our setup using docker.
