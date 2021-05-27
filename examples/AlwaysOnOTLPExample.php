@@ -3,6 +3,8 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Otlp\Exporter as OTLPExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
@@ -21,7 +23,10 @@ $samplingResult = $sampler->shouldSample(
     API\SpanKind::KIND_INTERNAL
 );
 $Exporter = new OTLPExporter(
-    'OTLP Example Service'
+    'OTLP Example Service',
+    new Client(),
+    new HttpFactory(),
+    new HttpFactory()
 );
 
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {

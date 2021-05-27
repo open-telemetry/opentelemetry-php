@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Zipkin;
 
-use GuzzleHttp\Psr7\Request;
-use Http\Adapter\Guzzle7\Client;
 use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
@@ -13,6 +11,8 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 
 /**
  * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
@@ -39,12 +39,18 @@ class Exporter implements Trace\Exporter
      * @var ClientInterface
      */
     private $client;
+    
+    private $requestFactory;
+    
+    private $streamFactory;
 
     public function __construct(
         $name,
         string $endpointUrl,
-        SpanConverter $spanConverter = null,
-        ClientInterface $client = null
+        ClientInterface $client,
+        RequestFactoryInterface $requestFactory,
+        StreamFactoryInterface $streamFactory,
+        SpanConverter $spanConverter = null
     ) {
         $parsedDsn = parse_url($endpointUrl);
 
@@ -62,7 +68,9 @@ class Exporter implements Trace\Exporter
         }
 
         $this->endpointUrl = $endpointUrl;
-        $this->client = $client ?? $this->createDefaultClient();
+        $this->client = $client;
+        $this->requestFactory = $requestFactory;
+        $this->streamFactory = $streamFactory;
         $this->spanConverter = $spanConverter ?? new SpanConverter($name);
     }
 
@@ -88,9 +96,12 @@ class Exporter implements Trace\Exporter
         }
 
         try {
-            $json = json_encode($convertedSpans);
-            $headers = ['content-type' => 'application/json'];
-            $request = new Request('POST', $this->endpointUrl, $headers, $json);
+            $body = $this->streamFactory->createStream(json_encode($convertedSpans));
+            $request = $this->requestFactory
+                ->createRequest('POST', $this->endpointUrl)
+                ->withBody($body)
+                ->withHeader('content-type', 'application/json');
+            
             $response = $this->client->sendRequest($request);
         } catch (RequestExceptionInterface $e) {
             return Trace\Exporter::FAILED_NOT_RETRYABLE;
@@ -112,12 +123,5 @@ class Exporter implements Trace\Exporter
     public function shutdown(): void
     {
         $this->running = false;
-    }
-
-    protected function createDefaultClient(): ClientInterface
-    {
-        return Client::createWithConfig([
-            'timeout' => 30,
-        ]);
     }
 }

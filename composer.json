@@ -6,12 +6,11 @@
     "require": {
         "php": "^7.3 || ^8.0",
         "ext-json": "*",
-        "guzzlehttp/guzzle": "^7.1.0",
-        "psr/http-client": "^1.0",
-        "php-http/guzzle7-adapter": "^0.1.1",
         "promphp/prometheus_client_php": "^2.2.1",
         "grpc/grpc": "^1.30",
-        "google/protobuf": "^v3.3.0"
+        "google/protobuf": "^v3.3.0",
+        "psr/http-client-implementation": "^1.0",
+        "psr/http-factory-implementation": "^1.0"
     },
     "authors": [
         {
@@ -56,6 +55,10 @@
         "vimeo/psalm": "^4.0",
         "phpstan/phpstan": "^0.12.50",
         "phpstan/phpstan-phpunit": "^0.12.16",
-        "psalm/plugin-phpunit": "^0.13.0"
+        "psalm/plugin-phpunit": "^0.13.0",
+        "guzzlehttp/guzzle": "^7.3",
+        "guzzlehttp/psr7": "^2.0@RC",
+        "symfony/http-client": "^5.2",
+        "nyholm/psr7": "^1.4"
     }
 }
