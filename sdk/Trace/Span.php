@@ -116,10 +116,10 @@ class Span implements API\Span
         return $this;
     }
 
-    public function end(?int $now = null): API\Span
+    public function end(?int $timestamp = null): API\Span
     {
         if (!isset($this->end)) {
-            $this->end = $now ?? Clock::get()->now();
+            $this->end = $timestamp ?? Clock::get()->now();
             $this->ended = true;
         }
 
