@@ -83,6 +83,7 @@ class Tracer implements API\Tracer
             $spanKind,
             $this->provider->getSpanProcessor()
         );
+        $span->replaceAttributes($attributes);
 
         $this->provider->getSpanProcessor()->onStart($span, $parentContext ?? Context::getCurrent());
 
