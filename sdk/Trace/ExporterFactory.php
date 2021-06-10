@@ -90,24 +90,26 @@ class ExporterFactory
 
     private function generateJaeger(string $endpointUrl)
     {
+        $factory = new HttpFactory();
         $exporter = new JaegerExporter(
             $this->name,
             $endpointUrl,
             new Client(),
-            new HttpFactory(),
-            new HttpFactory()
+            $factory,
+            $factory
         );
 
         return $exporter;
     }
     private function generateZipkin(string $endpointUrl)
     {
+        $factory = new HttpFactory();
         $exporter = new ZipkinExporter(
             $this->name,
             $endpointUrl,
             new Client(),
-            new HttpFactory(),
-            new HttpFactory()
+            $factory,
+            $factory
         );
 
         return $exporter;
@@ -117,13 +119,14 @@ class ExporterFactory
         if ($licenseKey == false) {
             return null;
         }
+        $factory = new HttpFactory();
         $exporter = new NewrelicExporter(
             $this->name,
             $endpointUrl,
             $licenseKey,
             new Client(),
-            new HttpFactory(),
-            new HttpFactory()
+            $factory,
+            $factory
         );
 
         return $exporter;
@@ -131,11 +134,12 @@ class ExporterFactory
 
     private function generateOtlp()
     {
+        $factory = new HttpFactory();
         $exporter = new OtlpExporter(
             $this->name,
             new Client(),
-            new HttpFactory(),
-            new HttpFactory()
+            $factory,
+            $factory
         );
 
         return $exporter;
@@ -151,13 +155,14 @@ class ExporterFactory
         if ($licenseKey == false) {
             return null;
         }
+        $factory = new HttpFactory();
         $exporter = new ZipkinToNewrelicExporter(
             $this->name,
             $endpointUrl,
             $licenseKey,
             new Client(),
-            new HttpFactory(),
-            new HttpFactory()
+            $factory,
+            $factory
         );
 
         return $exporter;
