@@ -30,7 +30,7 @@ class ExporterFactoryTest extends TestCase
         $exporter = $factory->fromConnectionString($input);
         $this->assertInstanceOf(Path\Newrelic\Exporter::class, $exporter);
 
-        $input = 'otlp+';
+        $input = 'otlp+http://';
         $factory = new ExporterFactory('test.otlp');
         $exporter = $factory->fromConnectionString($input);
         $this->assertInstanceOf(Path\Otlp\Exporter::class, $exporter);
