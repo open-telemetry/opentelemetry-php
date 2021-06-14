@@ -414,6 +414,28 @@ class TracingTest extends TestCase
         $this->assertCount(2, $span->getEvents());
     }
 
+    public function testRecordExceptionEventAdditionalAttributes()
+    {
+        $tracerProvider = new SDK\TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
+        $span = $tracer->startSpan('span');
+
+        $span->recordException(new Exception('exception'), new Attributes([
+            'exception.message' => 'message',
+            'exception.escaped' => true,
+        ]));
+
+        [$event] = iterator_to_array($span->getEvents());
+
+        $this->assertArrayHasKey('exception.type', iterator_to_array($event->getAttributes()));
+        $this->assertArrayHasKey('exception.message', iterator_to_array($event->getAttributes()));
+        $this->assertArrayHasKey('exception.stacktrace', iterator_to_array($event->getAttributes()));
+        $this->assertArrayHasKey('exception.escaped', iterator_to_array($event->getAttributes()));
+
+        $this->assertSame('message', iterator_to_array($event->getAttributes())['exception.message']->getValue());
+        $this->assertTrue(iterator_to_array($event->getAttributes())['exception.escaped']->getValue());
+    }
+
     public function testAddEventWhenNotRecording()
     {
         $tracerProvider = new SDK\TracerProvider();
