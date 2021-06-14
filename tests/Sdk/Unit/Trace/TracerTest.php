@@ -143,4 +143,23 @@ class TracerTest extends TestCase
         $tracer->startAndActivateSpan('test.span');
         $tracer->endActiveSpan();
     }
+
+    /**
+     * @test
+     */
+    public function spanProcessorsShouldBeCalledWhenSetActiveSpanIsEnded()
+    {
+        $processor = self::createMock(SpanProcessor::class);
+
+        $processor->expects($this->exactly(1))->method('onEnd');
+
+        $tracerProvider = new TracerProvider();
+        $tracerProvider->addSpanProcessor($processor);
+
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
+
+        $span = $tracer->startSpan('test.span');
+        $tracer->setActiveSpan($span);
+        $tracer->endActiveSpan();
+    }
 }
