@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
+use Exception;
 use OpenTelemetry\Contrib as Path;
 use OpenTelemetry\Sdk\Trace\ExporterFactory as ExporterFactory;
 use PHPUnit\Framework\TestCase;
@@ -35,7 +36,7 @@ class ExporterFactoryTest extends TestCase
         $exporter = $factory->fromConnectionString($input);
         $this->assertInstanceOf(Path\Otlp\Exporter::class, $exporter);
 
-        $input = 'otlpgrpc+';
+        $input = 'otlp+grpc://';
         $factory = new ExporterFactory('test.otlpgrpc');
         $exporter = $factory->fromConnectionString($input);
         $this->assertInstanceOf(Path\OtlpGrpc\Exporter::class, $exporter);
@@ -51,25 +52,25 @@ class ExporterFactoryTest extends TestCase
      */
     public function testInvalidInput()
     {
+        $this->expectException(Exception::class);
         $input = 'zipkinhttp://zipkin:9411/api/v2/spans';
         $factory = new ExporterFactory('test.zipkin');
         $exporter = $factory->fromConnectionString($input);
-        $this->assertNull($exporter);
 
+        $this->expectException(Exception::class);
         $input = 'zipkin+http://zipkin:9411/api/v2/spans+extraField';
         $factory = new ExporterFactory('test.zipkin');
         $exporter = $factory->fromConnectionString($input);
-        $this->assertNull($exporter);
 
+        $this->expectException(Exception::class);
         $input = 'zapkin+http://zipkin:9411/api/v2/spans';
         $factory = new ExporterFactory('test.zipkin');
         $exporter = $factory->fromConnectionString($input);
-        $this->assertNull($exporter);
 
+        $this->expectException(Exception::class);
         $input = 'otlp';
         $factory = new ExporterFactory('test.otlp');
         $exporter = $factory->fromConnectionString($input);
-        $this->assertNull($exporter);
     }
 
     /**
@@ -77,14 +78,14 @@ class ExporterFactoryTest extends TestCase
      */
     public function testMissingLicenseKey()
     {
+        $this->expectException(Exception::class);
         $input = 'newrelic+https://trace-api.newrelic.com/trace/v1';
         $factory = new ExporterFactory('test.newrelic');
         $exporter = $factory->fromConnectionString($input);
-        $this->assertNull($exporter);
 
+        $this->expectException(Exception::class);
         $input = 'zipkintonewrelic+https://trace-api.newrelic.com/trace/v1';
         $factory = new ExporterFactory('test.zipkintonewrelic');
         $exporter = $factory->fromConnectionString($input);
-        $this->assertNull($exporter);
     }
 }
