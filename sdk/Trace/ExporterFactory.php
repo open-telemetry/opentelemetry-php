@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use Nyholm\Dsn\DsnParser;
@@ -36,17 +37,17 @@ class ExporterFactory
         $strArr = explode('+', $configurationString);
         // checks if input is given with the format type+baseUrl
         if (sizeof($strArr) != 2) {
-            return null;
+            throw new Exception('Invalid format.');
         }
 
         $contribName = strtolower($strArr[0]);
         $endpointUrl = $strArr[1];
 
         if (!$this->isAllowed($contribName)) {
-            return null;
+            throw new Exception('Invalid contrib name.');
         }
 
-        // endpoint is only parsed if it is provided
+        // @phan-suppress-next-line PhanUndeclaredClassMethod
         $dsn = empty($endpointUrl) ? '' : DsnParser::parse($endpointUrl);
         $endpointUrl = $this->parseBaseUrl($dsn);
         // parameters are only retrieved if there was an endpoint given
@@ -60,11 +61,13 @@ class ExporterFactory
             case 'newrelic':
                 return $exporter = $this->generateNewrelic($endpointUrl, $args['licenseKey'] ?? null);
             case 'otlp':
-                return $exporter = $this->generateOtlp();
+                return $exporter = $this->generateOtlp($dsn);
             case 'otlpgrpc':
                 return $exporter = $this->generateOtlpGrpc();
             case 'zipkintonewrelic':
                 return $exporter = $this->generateZipkinToNewrelic($endpointUrl, $args['licenseKey'] ?? null);
+            default:
+                throw new Exception('Invalid contrib name.');
             }
     }
 
@@ -77,7 +80,7 @@ class ExporterFactory
     private function parseBaseUrl($dsn)
     {
         if ($dsn == false) {
-            return null;
+            throw new Exception('Invalid endpoint');
         }
         $parsedUrl = '';
         $parsedUrl .= empty($dsn->getScheme()) ? '' : $dsn->getScheme() . '://';
@@ -117,7 +120,7 @@ class ExporterFactory
     private function generateNewrelic(string $endpointUrl, $licenseKey)
     {
         if ($licenseKey == false) {
-            return null;
+            throw new Exception('Invalid license key.');
         }
         $factory = new HttpFactory();
         $exporter = new NewrelicExporter(
@@ -132,8 +135,12 @@ class ExporterFactory
         return $exporter;
     }
 
-    private function generateOtlp()
+    private function generateOtlp($dsn)
     {
+        if ($dsn != false && str_contains($dsn->getScheme(), 'grpc')) {
+            return $this->generateOtlpGrpc();
+        }
+
         $factory = new HttpFactory();
         $exporter = new OtlpExporter(
             $this->name,
@@ -153,7 +160,7 @@ class ExporterFactory
     private function generateZipkinToNewrelic(string $endpointUrl, $licenseKey)
     {
         if ($licenseKey == false) {
-            return null;
+            throw new Exception('Invalid license key.');
         }
         $factory = new HttpFactory();
         $exporter = new ZipkinToNewrelicExporter(
