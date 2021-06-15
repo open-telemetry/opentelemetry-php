@@ -36,7 +36,7 @@ class ExporterFactory
     {
         $strArr = explode('+', $configurationString);
         // checks if input is given with the format type+baseUrl
-        if (sizeof($strArr) != 2) {
+        if (sizeof($strArr) !== 2) {
             throw new Exception('Invalid format.');
         }
 
@@ -52,6 +52,7 @@ class ExporterFactory
         $endpointUrl = $this->parseBaseUrl($dsn);
         // parameters are only retrieved if there was an endpoint given
         $args = empty($dsn) ? [] : $dsn->getParameters();
+        $scheme = empty($dsn) ? '' : $dsn->getScheme();
         
         switch ($contribName) {
             case 'jaeger':
@@ -61,7 +62,7 @@ class ExporterFactory
             case 'newrelic':
                 return $exporter = $this->generateNewrelic($endpointUrl, $args['licenseKey'] ?? null);
             case 'otlp':
-                return $exporter = $this->generateOtlp($dsn);
+                return $exporter = $this->generateOtlp($scheme);
             case 'otlpgrpc':
                 return $exporter = $this->generateOtlpGrpc();
             case 'zipkintonewrelic':
@@ -135,9 +136,9 @@ class ExporterFactory
         return $exporter;
     }
 
-    private function generateOtlp($dsn)
+    private function generateOtlp($scheme)
     {
-        if ($dsn != false && str_contains($dsn->getScheme(), 'grpc')) {
+        if ($scheme !== false && str_contains($scheme, 'grpc')) {
             return $this->generateOtlpGrpc();
         }
 
