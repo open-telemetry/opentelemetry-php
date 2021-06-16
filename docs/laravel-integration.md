@@ -92,7 +92,7 @@ $kernel->terminate($request, $response);
 ```
  It is worthy of note that resources(namespaces, classes, variables) created within the `index.php` file are available within the entire application.
 
- To use open-telemetry specific classes within our application we have to import them at the top of our index file, using the `use` keyword. This is what our imports look like:
+ To use open-telemetry specific classes within our application we have to import them at the top of our index file, using the `use` keyword. This is what our list of open-telemetry imported classes should look like:
 
  ```php
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
@@ -107,6 +107,8 @@ use OpenTelemetry\Trace as API;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 ```
+
+Remember that these imports should go side by side with the default class imports that come with the `index.php` file.
 
 Next, we create a sample recording trace using the [AlwaysOnSampler](https://github.com/open-telemetry/opentelemetry-php/blob/main/sdk/Trace/Sampler/AlwaysOnSampler.php) class, just before the app instance is created like below:
 
