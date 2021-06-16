@@ -261,14 +261,4 @@ class Tracer implements API\Tracer
     {
         return new SpanOptions($this, $name, $this->provider->getSpanProcessor());
     }
-
-    public function finishSpan(API\Span $span, ?int $timestamp = null): void
-    {
-        // TODO: Implement finishSpan() method.
-    }
-
-    public function deactivateActiveSpan(): void
-    {
-        // TODO: Implement deactivateActiveSpan() method.
-    }
 }
