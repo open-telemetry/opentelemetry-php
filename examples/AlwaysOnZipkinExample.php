@@ -67,7 +67,7 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
             $span->recordException($exception);
         }
 
-        $tracer->endActiveSpan();
+        $span->end();
     }
     echo PHP_EOL . 'AlwaysOnZipkinExample complete!  See the results at http://localhost:9411/';
 } else {

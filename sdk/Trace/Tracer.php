@@ -231,11 +231,6 @@ class Tracer implements API\Tracer
     {
         return clone $this->resource;
     }
-    public function endActiveSpan(?int $timestamp = null)
-    {
-        $span = $this->getActiveSpan();
-        $span->end();
-    }
 
     private function generateSpanInstance(string $name, API\SpanContext $context, API\SpanContext $parentContext = null, Sampler $sampler = null, ResourceInfo $resource = null, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
     {

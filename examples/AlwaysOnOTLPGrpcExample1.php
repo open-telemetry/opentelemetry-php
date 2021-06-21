@@ -62,9 +62,8 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
             'username' => 'child' . $i,
         ]));
 
-        $tracer->endActiveSpan();
-        $tracer->setActiveSpan($span);
-        $tracer->endActiveSpan();
+        $childSpan->end();
+        $span->end();
     }
     echo PHP_EOL . 'OTLPGrpcExample complete!  ';
 } else {

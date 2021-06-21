@@ -59,7 +59,7 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
             'id' => md5((string) microtime(true)),
         ]));
 
-        $tracer->endActiveSpan();
+        $span->end();
     }
     echo PHP_EOL . 'OTLPExample complete!  ';
 } else {

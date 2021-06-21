@@ -166,8 +166,8 @@ Finally, we end the active spans if sampling is complete, by adding the followin
 
 ```php
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
-    $zipkinTracer->endActiveSpan();
-    $jaegerTracer->endActiveSpan();
+    $zipkinSpan->end();
+    $jaegerSpan->end();
 }
 ```
 
@@ -236,13 +236,13 @@ if ($zipkinTracer) {
     $span->setAttribute('foo', 'bar');
     $span->updateName('New name');
 
-    $zipkinTracer->startAndActivateSpan('Child span');
+    $childSpan = $zipkinTracer->startAndActivateSpan('Child span');
     try {
         throw new \Exception('Exception Example');
     } catch (\Exception $exception) {
         $span->setSpanStatus($exception->getCode(), $exception->getMessage());
     }
-    $zipkinTracer->endActiveSpan();
+    $childSpan->end();
 }
 ```
 In the above snippet we change the span name and attributes for our Zipkin trace, we also add an exception event to the span.

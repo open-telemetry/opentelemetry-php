@@ -23,6 +23,4 @@ interface Tracer
     public function startSpanWithOptions(string $name): SpanOptions;
 
     public function setActiveSpan(Span $span): void;
-
-    public function endActiveSpan(?int $timestamp = null);
 }
