@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpHttp;
 
+use InvalidArgumentException;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
@@ -37,7 +38,7 @@ class Exporter implements Trace\Exporter
     private $certificateFile;
 
     /**
-     * @var array
+     * @var string
      */
     private $headers;
 
@@ -86,11 +87,10 @@ class Exporter implements Trace\Exporter
     ) {
 
         // Set default values based on presence of env variable
-        $this->endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'localhost:55681/v1/traces';
+        $this->endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'https://localhost:55681/v1/traces';
         $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'http/protobuf';
-        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ?: 'false';
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
-        $this->headers[] = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: 'none';
+        $this->headers = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: 'none';
         $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: 'none';
         $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
@@ -98,6 +98,25 @@ class Exporter implements Trace\Exporter
         $this->requestFactory = $requestFactory;
         $this->streamFactory = $streamFactory;
         $this->spanConverter =  $spanConverter ?? new SpanConverter();
+
+        if ($this->protocol != 'http/protobuf') {
+            throw new InvalidArgumentException('Invalid OTLP Protocol Specified');
+        }
+
+        $parsedDsn = parse_url($this->endpointUrl);
+
+        if (!is_array($parsedDsn)) {
+            throw new InvalidArgumentException('Unable to parse provided DSN');
+        }
+
+        if (
+            !isset($parsedDsn['scheme'])
+            || !isset($parsedDsn['host'])
+            || !isset($parsedDsn['port'])
+            || !isset($parsedDsn['path'])
+        ) {
+            throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
+        }
     }
 
     /**
@@ -116,26 +135,32 @@ class Exporter implements Trace\Exporter
             return Trace\Exporter::SUCCESS;
         }
 
-        if ($this->protocol === 'http/json') {
-            // https://github.com/open-telemetry/opentelemetry-specification/issues/786
-            return Exporter::FAILED_NOT_RETRYABLE;
-        }
-
         $resourcespans = [$this->spanConverter->as_otlp_resource_span($spans)];
 
         $exportrequest = new ExportTraceServiceRequest([
             'resource_spans' => $resourcespans,
         ]);
 
-        $proto = $exportrequest->serializeToString();
+        $bytes = $exportrequest->serializeToString();
 
         try {
-            $body = $this->streamFactory->createStream($proto);
-
             $request = $this->requestFactory
                 ->createRequest('POST', $this->endpointUrl)
-                ->withHeader('content-type', 'application/x-protobuf')
-                ->withBody($body);
+                ->withHeader('content-type', 'application/x-protobuf');
+
+            foreach ($this->processHeaders($this->headers) as $header => $value) {
+                $request = $request->withHeader($header, $value);
+            }
+
+            if ($this->compression === 'gzip') {
+                // TODO: Add Tests
+                $body = $this->streamFactory->createStream(gzencode($bytes));
+                $request = $request->withHeader('Content-Encoding', 'gzip');
+            } else {
+                $body = $this->streamFactory->createStream($bytes);
+            }
+
+            $request->withBody($body);
 
             $response = $this->client->sendRequest($request);
         } catch (RequestExceptionInterface $e) {
@@ -153,6 +178,29 @@ class Exporter implements Trace\Exporter
         }
 
         return Trace\Exporter::SUCCESS;
+    }
+
+    /**
+     * processHeaders converts comma separated headers into an array
+     */
+    public function processHeaders(string $headers): array
+    {
+        $pairs = explode(',', $headers);
+
+        $metadata = [];
+        foreach ($pairs as $pair) {
+            $kv = explode('=', $pair, 2);
+
+            if (count($kv) !== 2) {
+                continue;
+            }
+
+            list($key, $value) = $kv;
+
+            $metadata[$key] = $value;
+        }
+
+        return $metadata;
     }
 
     public function shutdown(): void
