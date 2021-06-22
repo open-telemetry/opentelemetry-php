@@ -177,14 +177,17 @@ class Exporter implements Trace\Exporter
             throw new InvalidArgumentException('Configuring Headers Via');
         }
 
-        $pairs = explode(',', $headers);
-
-        if (!array_key_exists(1, $pairs)) {
+        if (strlen($headers) <= 0) {
             return [];
         }
 
+        $pairs = explode(',', $headers);
+
         $metadata = [];
         foreach ($pairs as $pair) {
+            if (!strpos($pair, '=')) {
+                continue;
+            }
             list($key, $value) = explode('=', $pair, 2);
             $metadata[$key] = [$value];
         }
