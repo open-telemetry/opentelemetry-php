@@ -106,10 +106,10 @@ class OTLPGrpcExporterTest extends TestCase
     }
     public function testMetadataFromHeaders()
     {
-        $metadata = (new Exporter())->metadataFromHeaders("key=value");
+        $metadata = (new Exporter())->metadataFromHeaders('key=value');
         $this->assertEquals(['key' => ['value']], $metadata);
 
-        $metadata = (new Exporter())->metadataFromHeaders("key=value,key2=value2");
+        $metadata = (new Exporter())->metadataFromHeaders('key=value,key2=value2');
         $this->assertEquals(['key' => ['value'], 'key2' => ['value2']], $metadata);
     }
 }
