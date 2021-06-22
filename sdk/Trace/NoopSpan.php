@@ -123,18 +123,9 @@ class NoopSpan implements API\Span
         return $this;
     }
 
-    public function recordException(Exception $exception): API\Span
+    public function recordException(Exception $exception, ?API\Attributes $attributes = null): API\Span
     {
-        $attributes = new Attributes(
-            [
-                'exception.type' => get_class($exception),
-                'exception.message' => $exception->getMessage(),
-                'exception.stacktrace' => $exception->getTraceAsString(),
-            ]
-        );
-        $timestamp = time();
-
-        return  $this->addEvent('exception', $timestamp, $attributes);
+        return $this;
     }
 
     public function updateName(string $name): API\Span

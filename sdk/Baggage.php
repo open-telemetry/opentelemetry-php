@@ -8,14 +8,14 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
 
 /**
- * @extends Context<CorrelationContext>
+ * @extends Context<Baggage>
  */
-class CorrelationContext extends Context
+class Baggage extends Context
 {
     protected $parent;
 
     /**
-     * Return the k/v Correlation pairs from the CorrelationContext
+     * Return the k/v Correlation pairs from the Baggage
      * The yielded values are of the form `ContextKey => mixed`
      *
      * @return \Generator
@@ -46,9 +46,9 @@ class CorrelationContext extends Context
 
     /**
      * @param ContextKey $key
-     * @param CorrelationContext|null $child
+     * @param Baggage|null $child
      */
-    private function removeCorrelationHelper(ContextKey $key, ?CorrelationContext $child)
+    private function removeCorrelationHelper(ContextKey $key, ?Baggage $child)
     {
         if ($this->key !== $key) {
             if (null === $this->parent) {
@@ -65,15 +65,15 @@ class CorrelationContext extends Context
     }
 
     /**
-     * @param CorrelationContext $parent
+     * @param Baggage $parent
      */
-    protected function setParent(CorrelationContext $parent): void
+    protected function setParent(Baggage $parent): void
     {
         $this->parent = $parent;
     }
 
     /**
-     * When called on a CorrelationContext, this function will destroy all Correlation data
+     * When called on a Baggage, this function will destroy all Correlation data
      */
     public function clearCorrelations(): void
     {

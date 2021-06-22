@@ -83,6 +83,7 @@ class Tracer implements API\Tracer
             $spanKind,
             $this->provider->getSpanProcessor()
         );
+        $span->replaceAttributes($attributes);
 
         $this->provider->getSpanProcessor()->onStart($span, $parentContext ?? Context::getCurrent());
 
@@ -230,19 +231,6 @@ class Tracer implements API\Tracer
     {
         return clone $this->resource;
     }
-    public function endActiveSpan(?int $timestamp = null)
-    {
-        /**
-         * a span should be ended before is sent to exporters, because the exporters need's span duration.
-         */
-        $span = $this->getActiveSpan();
-        $wasRecording = $span->isRecording();
-        $span->end();
-
-        if ($wasRecording) {
-            $this->provider->getSpanProcessor()->onEnd($span);
-        }
-    }
 
     private function generateSpanInstance(string $name, API\SpanContext $context, API\SpanContext $parentContext = null, Sampler $sampler = null, ResourceInfo $resource = null, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
     {
@@ -257,7 +245,7 @@ class Tracer implements API\Tracer
                 $parent = $parentContext;
             }
 
-            $span = new Span($name, $context, $parent, $sampler, $resource, $spanKind);
+            $span = new Span($name, $context, $parent, $sampler, $resource, $spanKind, $this->provider->getSpanProcessor());
         }
         $this->spans[] = $span;
 
@@ -266,16 +254,6 @@ class Tracer implements API\Tracer
 
     public function startSpanWithOptions(string $name): API\SpanOptions
     {
-        return new SpanOptions($this, $name);
-    }
-
-    public function finishSpan(API\Span $span, ?int $timestamp = null): void
-    {
-        // TODO: Implement finishSpan() method.
-    }
-
-    public function deactivateActiveSpan(): void
-    {
-        // TODO: Implement deactivateActiveSpan() method.
+        return new SpanOptions($this, $name, $this->provider->getSpanProcessor());
     }
 }

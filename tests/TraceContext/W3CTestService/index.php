@@ -45,5 +45,5 @@ $response->send();
 $kernel->terminate($request, $response);
 
 if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
-    $tracer->endActiveSpan();
+    $span->end();
 }

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Sdk\Unit\CorrelationContext;
+namespace OpenTelemetry\Tests\Sdk\Unit\Baggage;
 
 use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\Context\ContextValueNotFoundException;
-use OpenTelemetry\Sdk\CorrelationContext;
+use OpenTelemetry\Sdk\Baggage;
 use PHPUnit\Framework\TestCase;
 
-class CorrelationContextTest extends TestCase
+class BaggageTest extends TestCase
 {
     /**
      * @test
@@ -18,9 +18,9 @@ class CorrelationContextTest extends TestCase
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
-        /** @var CorrelationContext $cctx */
-        $cctx = (new CorrelationContext())->set($key1, 'foo')->set($key2, 'bar');
-        /** @var CorrelationContext $cctx_res */
+        /** @var Baggage $cctx */
+        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar');
+        /** @var Baggage $cctx_res */
         $cctx_res = $cctx->removeCorrelation($key2);
         $this->assertEquals('foo', $cctx_res->get($key1));
         $this->expectException(ContextValueNotFoundException::class);
@@ -35,9 +35,9 @@ class CorrelationContextTest extends TestCase
         $key1 = new ContextKey('key1');
         $key2 = new ContextKey('key2');
         $key3 = new ContextKey('key3');
-        /** @var CorrelationContext $cctx */
-        $cctx = (new CorrelationContext())->set($key1, 'foo')->set($key2, 'bar')->set($key3, 'baz');
-        /** @var CorrelationContext $cctx_res */
+        /** @var Baggage $cctx */
+        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar')->set($key3, 'baz');
+        /** @var Baggage $cctx_res */
         $cctx_res = $cctx->removeCorrelation($key2);
         $this->assertEquals('foo', $cctx_res->get($key1));
         $this->assertEquals('baz', $cctx_res->get($key3));
@@ -52,9 +52,9 @@ class CorrelationContextTest extends TestCase
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
-        /** @var CorrelationContext $cctx */
-        $cctx = (new CorrelationContext())->set($key2, 'bar')->set($key1, 'foo');
-        /** @var CorrelationContext $cctx_res */
+        /** @var Baggage $cctx */
+        $cctx = (new Baggage())->set($key2, 'bar')->set($key1, 'foo');
+        /** @var Baggage $cctx_res */
         $cctx_res = $cctx->removeCorrelation($key2);
         $this->assertEquals('foo', $cctx_res->get($key1));
         $this->expectException(ContextValueNotFoundException::class);
@@ -67,7 +67,7 @@ class CorrelationContextTest extends TestCase
     public function testOnlyItemInTheContext()
     {
         $key1 = new ContextKey();
-        $cctx = (new CorrelationContext())->set($key1, 'foo');
+        $cctx = (new Baggage())->set($key1, 'foo');
         $this->assertEquals('foo', $cctx->get($key1));
     }
 
@@ -78,7 +78,7 @@ class CorrelationContextTest extends TestCase
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
-        $cctx = (new CorrelationContext())->set($key2, 'bar')->set($key1, 'foo');
+        $cctx = (new Baggage())->set($key2, 'bar')->set($key1, 'foo');
         $this->assertNotEquals('bar', $cctx->get($key1));
         $this->assertNotEquals('foo', $cctx->get($key2));
     }
@@ -91,8 +91,8 @@ class CorrelationContextTest extends TestCase
         $key1 = new ContextKey();
         $key2 = new ContextKey();
 
-        /** @var CorrelationContext $cctx */
-        $cctx = (new CorrelationContext())->set($key1, 'foo')->set($key2, 'bar');
+        /** @var Baggage $cctx */
+        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar');
 
         $this->assertEquals('foo', $cctx->get($key1));
         $this->assertEquals('bar', $cctx->get($key2));
@@ -110,8 +110,8 @@ class CorrelationContextTest extends TestCase
         $key1 = new ContextKey();
         $key2 = new ContextKey();
 
-        /** @var CorrelationContext $cctx */
-        $cctx = (new CorrelationContext())->set($key1, 'foo')->set($key2, 'bar');
+        /** @var Baggage $cctx */
+        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar');
 
         $res = [];
         foreach ($cctx->getCorrelations() as $k => $v) {

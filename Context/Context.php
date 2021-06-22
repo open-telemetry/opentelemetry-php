@@ -37,7 +37,7 @@ class Context
      * If you inherit from this class, you should "shadow" $parent into your subclass so that all operations give
      * you back an instance of the same type that you are interacting with and different subclasses should NOT be
      * treated as interoperable. i.e. you should NOT have a Context object chain with both Context instances interleaved
-     * with CorrelationContext instances.
+     * with Baggage instances.
      *
      * @param ContextKey|null $key The key object. Should only be null when creating an "empty" context
      * @param mixed|null $value
