@@ -153,6 +153,7 @@ class OTLPHttpExporterTest extends TestCase
         $this->assertEquals(['tomato'], $request->getHeader('x-auth-header'));
         $this->assertEquals(['gzip'], $request->getHeader('Content-Encoding'));
         $this->assertEquals(['application/x-protobuf'], $request->getHeader('content-type'));
+        $this->assertNotEquals(0, strlen($request->getBody()->getContents()));
     }
 
     public function exporterEndpointDataProvider()

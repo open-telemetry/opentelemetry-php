@@ -160,7 +160,7 @@ class Exporter implements Trace\Exporter
                 $body = $this->streamFactory->createStream($bytes);
             }
 
-            $request->withBody($body);
+            $request = $request->withBody($body);
 
             $response = $this->client->sendRequest($request);
         } catch (RequestExceptionInterface $e) {
