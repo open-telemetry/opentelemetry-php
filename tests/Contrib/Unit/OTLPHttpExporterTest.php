@@ -155,12 +155,13 @@ class OTLPHttpExporterTest extends TestCase
         $this->assertEquals(['application/x-protobuf'], $request->getHeader('content-type'));
     }
 
-    public function exporterEndpointDataProvider() {
+    public function exporterEndpointDataProvider()
+    {
         return [
             'Default Endpoint' => ['', 'https://localhost:55681/v1/traces'],
             'Custom Endpoint' => ['https://otel-collector:4317/custom/path', 'https://otel-collector:4317/custom/path'],
             'Insecure Endpoint' => ['http://api.example.com:80/v1/traces', 'http://api.example.com/v1/traces'],
-            #'Without Path' => ['https://api.example.com', 'https://api.example.com/v1/traces'] # TODO: Support a default path of /v1/traces
+            //'Without Path' => ['https://api.example.com', 'https://api.example.com/v1/traces'] # TODO: Support a default path of /v1/traces
         ];
     }
 
