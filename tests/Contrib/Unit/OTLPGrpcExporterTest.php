@@ -122,7 +122,7 @@ class OTLPGrpcExporterTest extends TestCase
         $this->assertNull($opts['credentials']);
         $this->assertFalse(array_key_exists('grpc.default_compression_algorithm', $opts));
         // method args
-        $opts = (new Exporter(timeout:5, insecure:false, compression:true))->getClientOptions();
+        $opts = (new Exporter('localhost:4317', false, '', '', true, 5))->getClientOptions();
         $this->assertEquals(5, $opts['timeout']);
         $this->assertTrue(is_a($opts['credentials'], 'Grpc\ChannelCredentials'));
         $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);

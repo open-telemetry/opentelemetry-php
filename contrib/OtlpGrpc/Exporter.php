@@ -96,7 +96,7 @@ class Exporter implements Trace\Exporter
         $this->client = $client ?? new TraceServiceClient($this->endpointURL, $opts);
     }
 
-    public function getClientOptions(): mixed
+    public function getClientOptions(): array
     {
         $opts = [
             'update_metadata' => function () {
