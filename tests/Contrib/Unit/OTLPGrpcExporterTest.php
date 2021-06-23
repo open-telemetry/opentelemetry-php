@@ -117,7 +117,7 @@ class OTLPGrpcExporterTest extends TestCase
     public function testClientOptions()
     {
         // default options
-        $opts = (new Exporter())->getClientOptions();
+        $opts = (new Exporter('localhost:4317', true))->getClientOptions();
         $this->assertEquals(10, $opts['timeout']);
         $this->assertNull($opts['credentials']);
         $this->assertFalse(array_key_exists('grpc.default_compression_algorithm', $opts));
