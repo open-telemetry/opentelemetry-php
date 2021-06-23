@@ -104,6 +104,7 @@ class OTLPGrpcExporterTest extends TestCase
 
         $headers_as_string = (new Exporter())->metadataFromHeaders($headers);
     }
+
     public function testMetadataFromHeaders()
     {
         $metadata = (new Exporter())->metadataFromHeaders('key=value');
@@ -111,5 +112,30 @@ class OTLPGrpcExporterTest extends TestCase
 
         $metadata = (new Exporter())->metadataFromHeaders('key=value,key2=value2');
         $this->assertEquals(['key' => ['value'], 'key2' => ['value2']], $metadata);
+    }
+
+    public function testClientOptions()
+    {
+        // default options
+        $opts = (new Exporter())->getClientOptions();
+        $this->assertEquals(10, $opts['timeout']);
+        $this->assertNull($opts['credentials']);
+        $this->assertFalse(array_key_exists('grpc.default_compression_algorithm', $opts));
+        // method args
+        $opts = (new Exporter(timeout:5, insecure:false, compression:true))->getClientOptions();
+        $this->assertEquals(5, $opts['timeout']);
+        $this->assertTrue(is_a($opts['credentials'], 'Grpc\ChannelCredentials'));
+        $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
+        // env vars
+        putenv('OTEL_EXPORTER_OTLP_TIMEOUT=1');
+        putenv('OTEL_EXPORTER_OTLP_COMPRESSION=1');
+        putenv('OTEL_EXPORTER_OTLP_INSECURE=false');
+        $opts = (new Exporter())->getClientOptions();
+        $this->assertEquals(1, $opts['timeout']);
+        $this->assertTrue(is_a($opts['credentials'], 'Grpc\ChannelCredentials'));
+        $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
+        putenv('OTEL_EXPORTER_OTLP_TIMEOUT');
+        putenv('OTEL_EXPORTER_OTLP_COMPRESSION');
+        putenv('OTEL_EXPORTER_OTLP_INSECURE');
     }
 }
