@@ -81,7 +81,7 @@ class Exporter implements Trace\Exporter
         // Set default values based on presence of env variable
         $this->endpointURL = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: $endpointURL;
         $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc'; // I guess this is redundant?
-        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ? filter_var(getenv('OTEL_EXPORTER_OTLP_INSECURE'), FILTER_VALIDATE_BOOLEAN): $insecure;
+        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE', true) ? filter_var(getenv('OTEL_EXPORTER_OTLP_INSECURE'), FILTER_VALIDATE_BOOLEAN): $insecure;
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: $certificateFile;
         $this->headers = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: $headers;
         $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: $compression;
