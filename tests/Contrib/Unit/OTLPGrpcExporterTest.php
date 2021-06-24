@@ -114,25 +114,37 @@ class OTLPGrpcExporterTest extends TestCase
         $this->assertEquals(['key' => ['value'], 'key2' => ['value2']], $metadata);
     }
 
+    private function isInsecure(Exporter $exporter) : bool
+    {
+        $reflection = new \ReflectionClass($exporter);
+        $property = $reflection->getProperty('insecure');
+        $property->setAccessible(true);
+
+        return $property->getValue($exporter);
+    }
+
     public function testClientOptions()
     {
         // default options
-        $opts = (new Exporter('localhost:4317'))->getClientOptions();
+        $exporter = new Exporter('localhost:4317');
+        $opts = $exporter->getClientOptions();
         $this->assertEquals(10, $opts['timeout']);
-        $this->assertNull($opts['credentials']);
+        $this->assertTrue($this->isInsecure($exporter));
         $this->assertFalse(array_key_exists('grpc.default_compression_algorithm', $opts));
         // method args
-        $opts = (new Exporter('localhost:4317', false, '', '', true, 5))->getClientOptions();
+        $exporter = new Exporter('localhost:4317', false, '', '', true, 5);
+        $opts = $exporter->getClientOptions();
         $this->assertEquals(5, $opts['timeout']);
-        $this->assertTrue(is_a($opts['credentials'], 'Grpc\ChannelCredentials'));
+        $this->assertFalse($this->isInsecure($exporter));
         $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
         // env vars
         putenv('OTEL_EXPORTER_OTLP_TIMEOUT=1');
         putenv('OTEL_EXPORTER_OTLP_COMPRESSION=1');
         putenv('OTEL_EXPORTER_OTLP_INSECURE=false');
-        $opts = (new Exporter())->getClientOptions();
+        $exporter = new Exporter('localhost:4317');
+        $opts = $exporter->getClientOptions();
         $this->assertEquals(1, $opts['timeout']);
-        $this->assertTrue(is_a($opts['credentials'], 'Grpc\ChannelCredentials'));
+        $this->assertFalse($this->isInsecure($exporter));
         $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
         putenv('OTEL_EXPORTER_OTLP_TIMEOUT');
         putenv('OTEL_EXPORTER_OTLP_COMPRESSION');
