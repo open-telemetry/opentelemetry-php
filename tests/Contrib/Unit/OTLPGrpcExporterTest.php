@@ -104,6 +104,7 @@ class OTLPGrpcExporterTest extends TestCase
 
         $headers_as_string = (new Exporter())->metadataFromHeaders($headers);
     }
+
     public function testMetadataFromHeaders()
     {
         $metadata = (new Exporter())->metadataFromHeaders('key=value');
@@ -111,5 +112,42 @@ class OTLPGrpcExporterTest extends TestCase
 
         $metadata = (new Exporter())->metadataFromHeaders('key=value,key2=value2');
         $this->assertEquals(['key' => ['value'], 'key2' => ['value2']], $metadata);
+    }
+
+    private function isInsecure(Exporter $exporter) : bool
+    {
+        $reflection = new \ReflectionClass($exporter);
+        $property = $reflection->getProperty('insecure');
+        $property->setAccessible(true);
+
+        return $property->getValue($exporter);
+    }
+
+    public function testClientOptions()
+    {
+        // default options
+        $exporter = new Exporter('localhost:4317');
+        $opts = $exporter->getClientOptions();
+        $this->assertEquals(10, $opts['timeout']);
+        $this->assertTrue($this->isInsecure($exporter));
+        $this->assertFalse(array_key_exists('grpc.default_compression_algorithm', $opts));
+        // method args
+        $exporter = new Exporter('localhost:4317', false, '', '', true, 5);
+        $opts = $exporter->getClientOptions();
+        $this->assertEquals(5, $opts['timeout']);
+        $this->assertFalse($this->isInsecure($exporter));
+        $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
+        // env vars
+        putenv('OTEL_EXPORTER_OTLP_TIMEOUT=1');
+        putenv('OTEL_EXPORTER_OTLP_COMPRESSION=1');
+        putenv('OTEL_EXPORTER_OTLP_INSECURE=false');
+        $exporter = new Exporter('localhost:4317');
+        $opts = $exporter->getClientOptions();
+        $this->assertEquals(1, $opts['timeout']);
+        $this->assertFalse($this->isInsecure($exporter));
+        $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
+        putenv('OTEL_EXPORTER_OTLP_TIMEOUT');
+        putenv('OTEL_EXPORTER_OTLP_COMPRESSION');
+        putenv('OTEL_EXPORTER_OTLP_INSECURE');
     }
 }
