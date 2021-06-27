@@ -3,6 +3,8 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
@@ -23,7 +25,10 @@ $samplingResult = $sampler->shouldSample(
 
 $zipkinExporter = new ZipkinExporter(
     'alwaysOnZipkinExample',
-    'http://zipkin:9411/api/v2/spans'
+    'http://zipkin:9411/api/v2/spans',
+    new Client(),
+    new HttpFactory(),
+    new HttpFactory()
 );
 
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
@@ -62,7 +67,7 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
             $span->recordException($exception);
         }
 
-        $tracer->endActiveSpan();
+        $span->end();
     }
     echo PHP_EOL . 'AlwaysOnZipkinExample complete!  See the results at http://localhost:9411/';
 } else {

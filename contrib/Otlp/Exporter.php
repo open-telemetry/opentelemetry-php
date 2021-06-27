@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use GuzzleHttp\Psr7\Request;
-use Http\Adapter\Guzzle7\Client;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 
 class Exporter implements Trace\Exporter
 {
     /**
      * @var string
      */
-    private $endpointURL;
+    private $endpointUrl;
 
     /**
      * @var string
@@ -62,8 +62,17 @@ class Exporter implements Trace\Exporter
     /**
      * @var ClientInterface
      */
-
     private $client;
+
+    /**
+     * @var RequestFactoryInterface
+     */
+    private $requestFactory;
+    
+    /**
+     * @var StreamFactoryInterface
+     */
+    private $streamFactory;
 
     /**
      * Exporter constructor.
@@ -71,11 +80,14 @@ class Exporter implements Trace\Exporter
      */
     public function __construct(
         $serviceName,
-        ClientInterface $client=null
+        ClientInterface $client,
+        RequestFactoryInterface $requestFactory,
+        StreamFactoryInterface $streamFactory,
+        SpanConverter $spanConverter = null
     ) {
 
         // Set default values based on presence of env variable
-        $this->endpointURL = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'localhost:55681';
+        $this->endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'localhost:55681';
         $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'json';
         $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ?: 'false';
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
@@ -83,8 +95,10 @@ class Exporter implements Trace\Exporter
         $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: 'none';
         $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
-        $this->client = $client ?? $this->createDefaultClient();
-        $this->spanConverter = new SpanConverter($serviceName);
+        $this->client = $client;
+        $this->requestFactory = $requestFactory;
+        $this->streamFactory = $streamFactory;
+        $this->spanConverter =  $spanConverter ?? new SpanConverter($serviceName);
     }
 
     /**
@@ -109,15 +123,14 @@ class Exporter implements Trace\Exporter
         }
 
         try {
-            $json = json_encode($convertedSpans);
-
-            $this->headers[] = '';
+            $body = $this->streamFactory->createStream(json_encode($convertedSpans));
+            $request = $this->requestFactory
+                ->createRequest('POST', $this->endpointUrl)
+                ->withBody($body);
 
             if ($this->protocol == 'json') {
-                $this->headers = ['content-type' => 'application/json'];
+                $request->withHeader('content-type', 'application/json');
             }
-
-            $request = new Request('POST', $this->endpointURL, $this->headers, $json);
             $response = $this->client->sendRequest($request);
         } catch (RequestExceptionInterface $e) {
             return Trace\Exporter::FAILED_NOT_RETRYABLE;
@@ -139,12 +152,5 @@ class Exporter implements Trace\Exporter
     public function shutdown(): void
     {
         $this->running = false;
-    }
-
-    protected function createDefaultClient(): ClientInterface
-    {
-        return Client::createWithConfig([
-            'timeout' => 30,
-        ]);
     }
 }

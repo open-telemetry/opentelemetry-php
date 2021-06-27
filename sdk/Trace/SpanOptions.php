@@ -23,10 +23,14 @@ final class SpanOptions implements API\SpanOptions
     /** @var int|null */
     private $start = null;
 
-    public function __construct(Tracer $tracer, string $name)
+    /** @var SpanProcessor|null */
+    private $spanProcessor;
+
+    public function __construct(Tracer $tracer, string $name, ?SpanProcessor $spanProcessor = null)
     {
         $this->tracer = $tracer;
         $this->name = $name;
+        $this->spanProcessor = $spanProcessor;
     }
 
     public function setSpanName(string $name): API\SpanOptions
@@ -96,7 +100,7 @@ final class SpanOptions implements API\SpanOptions
             ? SpanContext::fork($span->getContext()->getTraceId())
             : SpanContext::generate();
 
-        $span = new Span($this->name, $context, $this->parent, null, $this->tracer->getResource(), $this->kind);
+        $span = new Span($this->name, $context, $this->parent, null, $this->tracer->getResource(), $this->kind, $this->spanProcessor);
 
         if ($this->startEpochTimestamp !== null) {
             $span->setStartEpochTimestamp($this->startEpochTimestamp);

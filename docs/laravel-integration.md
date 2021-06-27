@@ -9,7 +9,7 @@ To follow this guide you will need:
 * [Composer](https://getcomposer.org/download/ ) for dependency management. 
 * [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools. We have setup instructions for docker on this project's [readme](https://github.com/open-telemetry/opentelemetry-php#development).
 
-This example uses Laravel version 8.0 .
+This example uses Laravel version 8.40 .
 
 ## Step 1 - Creating a Laravel Application
 
@@ -26,10 +26,13 @@ Let's navigate to `http://127.0.0.1:8000` on our browser to see the default Lara
 ![image](https://user-images.githubusercontent.com/22311928/115635309-56b71300-a303-11eb-97bc-7c64e3f4da97.png)
 ## Step 2 - Require OpenTelemetry PHP Package
 
-Laravel comes with most packages needed for development out of the box, so for this example, we will only require the open-telemetry PHP package. Let's run `composer require open-telemetry/opentelemetry` to pull that in.
+Starting from version `v.0.0.2`, the open-telemetry php package allows users to use their preferred HTTP layers for exporting traces. The benefit of this is that users can reuse already existing HTTP configurations for their applications. Hence, there is need to require packages that satisfy both `psr/http-client-implementation` and `psr/http-factory-implementation` before requiring the opentelemetry-php package. 
 
-** Notes **
-As of the time of writing this, Laravel ships with Guzzle version `^7.0.1`,  but our open-telemetry PHP package uses Guzzle version `^6.2.0`, so pulling in open-telemetry PHP could lead to errors around unresolved packages. To fix the errors run `composer require guzzlehttp/guzzle:^6.2.0` to downgrade Guzzle first. Then run  `composer require open-telemetry/opentelemetry` to pull in the open-telemetry package.
+By default, the Laravel framework utilizes `guzzlehttp/guzzle` and this satisfies `psr/http-client-implementation`, so we need to require the `guzzlehttp/psr7` to meet the `psr/http-factory-implementation` requirement. Let's run `composer require guzzlehttp/psr7:2.0.0-rc1`. 
+
+Note: We are specifying `2.0.0-rc1` as that is the release for `guzzlehttp/psr7` that includes HTTP factories as at the time of writing this guide.
+
+Next, let's run `composer require open-telemetry/opentelemetry` to pull in the openTelemetry-php package.
 
 ## Step 3 - Bundle Zipkin and  Jaeger into the Application
 
@@ -47,7 +50,8 @@ services:
     jaeger:
         image: jaegertracing/all-in-one
         environment:
-            COLLECTOR_ZIPKIN_HTTP_PORT: 9412
+            COLLECTOR_ZIPKIN_HOST_PORT: 9412
+
         ports:
             - 9412:9412
             - 16686:16686
@@ -88,27 +92,31 @@ $kernel->terminate($request, $response);
 ```
  It is worthy of note that resources(namespaces, classes, variables) created within the `index.php` file are available within the entire application.
 
- To use open-telemetry specific classes within our application we have to import them at the top of our index file, using the `use` keyword. This is what our imports look like:
+ To use open-telemetry specific classes within our application we have to import them at the top of our index file, using the `use` keyword. This is what our list of open-telemetry imported classes should look like:
 
  ```php
- use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
+use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\Sdk\Trace\Clock;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 ```
 
-Next, we create a sample recording trace using the [AlwaysOnSampler](https://github.com/open-telemetry/opentelemetry-php/blob/main/sdk/Trace/Sampler/AlwaysOnSampler.php) class, just before the Kernel instance is created like below:
+Remember that these imports should go side by side with the default class imports that come with the `index.php` file.
+
+Next, we create a sample recording trace using the [AlwaysOnSampler](https://github.com/open-telemetry/opentelemetry-php/blob/main/sdk/Trace/Sampler/AlwaysOnSampler.php) class, just before the app instance is created like below:
 
 ```php
 $sampler = new AlwaysOnSampler();
 $samplingResult = $sampler->shouldSample(
-    null,
+    new Context(),
     md5((string) microtime(true)),
-    substr(md5((string) microtime(true)), 16),
     'io.opentelemetry.example',
     API\SpanKind::KIND_INTERNAL
 );
@@ -119,19 +127,25 @@ Since we are looking to export traces to both Zipkin and Jaeger we have to make 
 ```php
 $jaegerExporter = new JaegerExporter(
     'Hello World Web Server Jaeger',
-    'http://localhost:9412/api/v2/spans'
+    'http://localhost:9412/api/v2/spans',
+    new Client(),
+    new HttpFactory(),
+    new HttpFactory()
 );
 
 $zipkinExporter = new ZipkinExporter(
     'Hello World Web Server Zipkin',
-    'http://localhost:9411/api/v2/spans'
+    'http://localhost:9411/api/v2/spans',
+    new Client(),
+    new HttpFactory(),
+    new HttpFactory()
 );
 ```
 
 Next, we create a trace then add processors for each trace(One for Jaeger and another for Zipkin). Then we proceed to start and activate a span for each trace. We create a trace only if the RECORD AND SAMPLED sampling result condition passes as follows;
 
 ```php
-if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
+if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
 
     $jaegerTracer = (new TracerProvider())
         ->addSpanProcessor(new BatchSpanProcessor($jaegerExporter, Clock::get()))
@@ -151,9 +165,9 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
 Finally, we end the active spans if sampling is complete, by adding the following block at the end of the `index.php` file;
 
 ```php
-if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
-    $zipkinTracer->endActiveSpan();
-    $jaegerTracer->endActiveSpan();
+if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
+    $zipkinSpan->end();
+    $jaegerSpan->end();
 }
 ```
 
@@ -222,13 +236,13 @@ if ($zipkinTracer) {
     $span->setAttribute('foo', 'bar');
     $span->updateName('New name');
 
-    $zipkinTracer->startAndActivateSpan('Child span');
+    $childSpan = $zipkinTracer->startAndActivateSpan('Child span');
     try {
         throw new \Exception('Exception Example');
     } catch (\Exception $exception) {
         $span->setSpanStatus($exception->getCode(), $exception->getMessage());
     }
-    $zipkinTracer->endActiveSpan();
+    $childSpan->end();
 }
 ```
 In the above snippet we change the span name and attributes for our Zipkin trace, we also add an exception event to the span.

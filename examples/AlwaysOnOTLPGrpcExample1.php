@@ -3,10 +3,8 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Contrib\Otlp\Exporter as OTLPExporter;
+use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPExporter;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
@@ -22,15 +20,11 @@ $samplingResult = $sampler->shouldSample(
     'io.opentelemetry.example',
     API\SpanKind::KIND_INTERNAL
 );
-$Exporter = new OTLPExporter(
-    'OTLP Example Service',
-    new Client(),
-    new HttpFactory(),
-    new HttpFactory()
-);
+
+$Exporter = new OTLPExporter();
 
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
-    echo 'Starting OTLPExample';
+    echo 'Starting OTLPGrpcExample';
     $tracer = (new TracerProvider())
         ->addSpanProcessor(new SimpleSpanProcessor($Exporter))
         ->getTracer('io.opentelemetry.contrib.php');
@@ -38,15 +32,13 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
         $timestamp = Clock::get()->timestamp();
-        $span = $tracer->startAndActivateSpan('session.generate.span.' . microtime(true));
+        $span = $tracer->startAndActivateSpan('session.generate.span' . microtime(true));
+        //startAndActivateSpan('session.generate.span.' . microtime(true));
 
-        $spanParent = $span->getParent();
-        echo sprintf(
-            PHP_EOL . 'Exporting Trace: %s, Parent: %s, Span: %s',
-            $span->getContext()->getTraceId(),
-            $spanParent ? $spanParent->getSpanId() : 'None',
-            $span->getContext()->getSpanId()
-        );
+        $childSpan = $tracer->startSpan('child');
+
+        // Temporarily setting service name here.  It should eventually be pulled from tracer.resources.
+        $span->setAttribute('service.name', 'alwaysOnOTLPGrpcExample');
 
         $span->setAttribute('remote_ip', '1.2.3.4')
             ->setAttribute('country', 'USA');
@@ -59,11 +51,23 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
             'id' => md5((string) microtime(true)),
         ]));
 
+        // temporarily setting service name here.  It should eventually be pulled from tracer.resources.
+        $childSpan->setAttribute('service.name', 'alwaysOnOTLPGrpcExample');
+
+        $childSpan->setAttribute('attr_one', 'one')
+            ->setAttribute('attr_two', 'two');
+
+        $childSpan->addEvent('found_event1' . $i, $timestamp, new Attributes([
+            'id' => $i,
+            'username' => 'child' . $i,
+        ]));
+
+        $childSpan->end();
         $span->end();
     }
-    echo PHP_EOL . 'OTLPExample complete!  ';
+    echo PHP_EOL . 'OTLPGrpcExample complete!  ';
 } else {
-    echo PHP_EOL . 'OTLPExample tracing is not enabled';
+    echo PHP_EOL . 'OTLPGrpcExample tracing is not enabled';
 }
 
 echo PHP_EOL;

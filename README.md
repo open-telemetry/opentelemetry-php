@@ -1,6 +1,5 @@
 # OpenTelemetry php library
 
-[![Gitter](https://badges.gitter.im/open-telemetry/opentelemetry-php.svg)](https://gitter.im/open-telemetry/opentelemetry-php?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 ![CI Build](https://github.com/open-telemetry/opentelemetry-php/workflows/PHP%20Composer/badge.svg)
 [![codecov](https://codecov.io/gh/open-telemetry/opentelemetry-php/branch/master/graph/badge.svg)](https://codecov.io/gh/open-telemetry/opentelemetry-php)
 
@@ -9,8 +8,9 @@
 
 This project currently lives in a pre-alpha status.  Our current release is not production ready; it has been created in order to receive feedback from the community.
 
-We keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show
- which features are available and which have not yet been implemented.
+We attempt to keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show which features are available and which have not yet been implemented.  
+
+If you find an inconsistency in the data in the matrix vs. the data in this repository, please let us know in our slack channel and we'll get it rectified.
  
 ## Communication
 Most of our communication is done on CNCF Slack, in the [otel-php](https://cloud-native.slack.com/archives/C01NFPCV44V) channel. To sign up, create a CNCF slack account here http://slack.cncf.io/
@@ -18,17 +18,19 @@ Most of our communication is done on CNCF Slack, in the [otel-php](https://cloud
 Our meetings are held weekly on zoom on Wednesdays at 10:30am PST / 1:30pm EST.  
 A Google calendar invite with the included zoom link can be found [here](https://calendar.google.com/event?action=TEMPLATE&tmeid=N2VtZXZmYnVmbzZkYjZkbTYxdjZvYTdxN21fMjAyMDA5MTZUMTczMDAwWiBrYXJlbnlyeHVAbQ&tmsrc=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com&scp=ALL)
 
-Our open issues can all be found in the [github issues tab](https://github.com/open-telemetry/opentelemetry-php/issues).  Feel free to reach out in gitter if you have any additional questions about these issues; we are always happy to talk through implementation details.
+Our open issues can all be found in the [github issues tab](https://github.com/open-telemetry/opentelemetry-php/issues).  Feel free to reach out on Slack if you have any additional questions about these issues; we are always happy to talk through implementation details.
 
 ## Installation
 The recommended way to install the library is through [Composer](http://getcomposer.org):
 
-1.)  You'll need to add a  
+1.)  Install the composer package using [Composer's installation instructions](https://getcomposer.org/doc/00-intromd#installation-linux-unix-macos).
+
+2.)  Add
 ```bash
  "minimum-stability": "dev"
 ```
 
-To your project's `composer.json` file, as this utility has not reached a stable release status quite yet.
+To your project's `composer.json` file, as this utility has not reached a stable release status yet.
 
 2.)  Install the dependency with composer:
 
@@ -37,33 +39,114 @@ $ composer require open-telemetry/opentelemetry
 ```
 
 ## Development
-We use docker and docker-compose to perform a lot of our static analysis and testing.  
+We use `docker` and `docker-compose` to perform a lot of our static analysis and testing.  
 
 If you're planning to develop for this library, it'll help to install `docker engine` and `docker-compose`.  
+
 You can find installation instructions for these packages can be found [here](https://docs.docker.com/install/), under the `Docker Engine` and `Docker Compose` submenus respectively.
 
+To ensure you have all the correct packages installed locally in your dev environment, you can run
+
+```bash
+make install
+```
+
+From your bash compatible shell.  This will install all of the necessary vendored libraries that the project uses to 
+the 
+`/vendor` directory.
+
+To update these dependencies, you can run
+
+```bash
+make update
+```
+
+In order to update all the vendored libraries in the `/vendor` directory.
+
+
+## Pull Requests
+
+Once you've made the update to the codebase that you'd like to submit, you may [create a pull request](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request) to the opentelemetry-php project.
+
+After you open the pull request, the CI/CD pipeline will run all of the associated [github actions](https://github.com/open-telemetry/opentelemetry-php/actions/workflows/php.yml). 
+  
+You can simulate the important github actions locally before you submit your PR by running the following command:
+
+```bash
+make install && make update && make style && make test && make phan && make psalm && make phpstan
+```
+
+from your bash compatible shell.  This does the following things:
+
+* Installs all the required dependencies for the project and ensures they are up to date
+* Uses [php-cs-fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) to style your code using our style preferences.
+* Runs all of our [phpunit](https://phpunit.de/) unit tests.
+* Performs static analysis with [Phan](https://github.com/phan/phan), [Psalm](https://psalm.dev/) and [PHPStan](https://phpstan.org/user-guide/getting-started)
+
+
 ## Proto Generation
-In order to generate proto files for use with this repository, we can perform a 
+Our proto files are committed to the repository into the `/proto` folder.  These are used in gRPC connections to the 
+upstream.  These get updated when the [opentelemetry-proto](https://github.com/open-telemetry/opentelemetry-proto) 
+repo has a meaningful update.  The maintainer SIG is discussing a way to make this more automatic in the future.
 
-`make proto`
+If you'd like to generate proto files for use with this repository, one can run the following command: 
 
-From the root directory.  This wil create a `/proto` folder in the root directory of the repository.
+```bash
+make proto
+```
+
+From your bash compatible shell in the root of this directory.  This wil create a `/proto` folder in the root 
+directory of the 
+repository.
 
 ## Styling
 We use [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) for our code linting and standards fixer.  The associated configuration for this standards fixer can be found in the root of the repository [here](https://github.com/open-telemetry/opentelemetry-php/blob/master/.php_cs)
 
-To ensure that your code is stylish, you can execute `make style` from your bash compatible shell.  This process will print out the fixes that it is making to your associated files.  Usually this process is performed as part of a code checkin.  This process runs during CI and is a required check.  Code that doesn't follow this style pattern will emit a failure in CI.
+To ensure that your code is stylish, you can run the follwing command: 
+```bash
+make style
+```
+
+from your bash compatible shell.  This process will print out the fixes that it is making to your 
+associated files.  Usually this process is performed as part of a code checkin.  This process runs during CI and is a required check.  Code that doesn't follow this style pattern will emit a failure in CI.
 
 ## Static Analysis
 We use [Phan](https://github.com/phan/phan/) for static analysis.  Currently our phan configuration is just a standard default analysis configuration.  You can use our phan docker wrapper to easily perform static analysis on your changes.
 
-Execute `make phan` from your bash compatible shell.
+To run Phan, one can run the following command:
+```bash
+make phan
+```
+from your bash compatible shell.
 This process will return 0 on success.
 Usually this process is performed as part of a code checkin.  This process runs during CI and is a required check.  Code that doesn't match the standards that we have defined in our [phan config](https://github.com/open-telemetry/opentelemetry-php/blob/master/.phan/config.php) will emit a failure in CI. 
 
+We also use [Psalm](https://psalm.dev/) as a second static analysis tool.  
+You can use our psalm docker wrapper to easily perform static analysis on your changes.
+
+To run Psalm, one can run the following command:
+```bash
+make psalm
+```
+from your bash compatible shell. This process will return 0 on success. Usually this process is performed as part of a code checkin. This process runs during CI and is a required check. Code that doesn't match the standards that we have defined in our [psalm config](https://github.com/open-telemetry/opentelemetry-php/blob/main/psalm.xml.dist) will emit a failure in CI.
+
+We use [PHPStan](https://github.com/phpstan/phpstan) as our third tool for static analysis. 
+You can use our PHPStan docker wrapper to easily perform static analysis on your changes.
+
+Execute `make phpstan` from your bash compatible shell. This process will return 0 on success. Usually this process is
+performed as part of a code checkin. This process runs during CI and is a required check. Code that doesn't match the
+standards that we have defined in
+our [PHPStan config](https://github.com/open-telemetry/opentelemetry-php/blob/main/phpstan.neon.dist) will emit a failure
+in CI.
+
 ## Testing
 To make sure the tests in this repo work as you expect, you can use the included docker test wrapper.  
-Execute `make test` from your bash compatible shell.  This will output the test output as well as a test coverage analysis.  Code that doesn't pass our currently defined tests will emit a failure in CI
+To run the test suite, execute
+```bash
+make test
+```
+from your bash compatible shell.  This will output the test output as well 
+as a test coverage analysis.  Code that doesn't pass our currently defined tests will emit a failure in CI
 
 ## Examples
 

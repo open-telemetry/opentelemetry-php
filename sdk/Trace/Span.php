@@ -116,10 +116,10 @@ class Span implements API\Span
         return $this;
     }
 
-    public function end(?int $now = null): API\Span
+    public function end(?int $timestamp = null): API\Span
     {
         if (!isset($this->end)) {
-            $this->end = $now ?? Clock::get()->now();
+            $this->end = $timestamp ?? Clock::get()->now();
             $this->ended = true;
         }
 
@@ -219,18 +219,21 @@ class Span implements API\Span
         return $this;
     }
 
-    public function recordException(Exception $exception): API\Span
+    public function recordException(Exception $exception, ?API\Attributes $attributes = null): API\Span
     {
-        $attributes = new Attributes(
+        $eventAttributes = new Attributes(
             [
                 'exception.type' => get_class($exception),
                 'exception.message' => $exception->getMessage(),
                 'exception.stacktrace' => $exception->getTraceAsString(),
             ]
         );
+        foreach ($attributes ?? [] as $attribute) {
+            $eventAttributes->setAttribute($attribute->getKey(), $attribute->getValue());
+        }
         $timestamp = time();
 
-        return  $this->addEvent('exception', $timestamp, $attributes);
+        return $this->addEvent('exception', $timestamp, $eventAttributes);
     }
 
     public function getEvents(): API\Events

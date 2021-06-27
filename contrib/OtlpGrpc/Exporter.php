@@ -81,7 +81,7 @@ class Exporter implements Trace\Exporter
         // Set default values based on presence of env variable
         $this->endpointURL = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: $endpointURL;
         $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc'; // I guess this is redundant?
-        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ?: $insecure;
+        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ? filter_var(getenv('OTEL_EXPORTER_OTLP_INSECURE'), FILTER_VALIDATE_BOOLEAN): $insecure;
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: $certificateFile;
         $this->headers = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: $headers;
         $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: $compression;
@@ -91,6 +91,13 @@ class Exporter implements Trace\Exporter
 
         $this->metadata = $this->metadataFromHeaders($this->headers);
 
+        $opts = $this->getClientOptions();
+
+        $this->client = $client ?? new TraceServiceClient($this->endpointURL, $opts);
+    }
+
+    public function getClientOptions(): array
+    {
         $opts = [
             'update_metadata' => function () {
                 return $this->metadata;
@@ -103,7 +110,7 @@ class Exporter implements Trace\Exporter
             $opts['credentials'] = Grpc\ChannelCredentials::createSsl('');
         } elseif (!$this->insecure && $this->certificateFile !== '') {
             // Should we validate more?
-            $opts['credentials'] = Grpc\ChannelCredentials::createSsl(file_get_contents($certificateFile));
+            $opts['credentials'] = Grpc\ChannelCredentials::createSsl(file_get_contents($this->certificateFile));
         } else {
             $opts['credentials'] = Grpc\ChannelCredentials::createInsecure();
         }
@@ -113,7 +120,7 @@ class Exporter implements Trace\Exporter
             $opts['grpc.default_compression_algorithm'] = 2;
         }
 
-        $this->client = $client ?? new TraceServiceClient($this->endpointURL, $opts);
+        return $opts;
     }
 
     /**
@@ -177,14 +184,17 @@ class Exporter implements Trace\Exporter
             throw new InvalidArgumentException('Configuring Headers Via');
         }
 
-        $pairs = explode(',', $headers);
-
-        if (!array_key_exists(1, $pairs)) {
+        if (strlen($headers) <= 0) {
             return [];
         }
 
+        $pairs = explode(',', $headers);
+
         $metadata = [];
         foreach ($pairs as $pair) {
+            if (!strpos($pair, '=')) {
+                continue;
+            }
             list($key, $value) = explode('=', $pair, 2);
             $metadata[$key] = [$value];
         }
