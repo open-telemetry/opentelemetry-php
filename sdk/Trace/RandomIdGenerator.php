@@ -19,7 +19,7 @@ class RandomIdGenerator implements IdGenerator
         return $this->randomHex(self::SPAN_ID_HEX_LENGTH);
     }
 
-    private function randomHex(int $hexLength): string
+    public function randomHex(int $hexLength): string
     {
         try {
             return bin2hex(random_bytes(intdiv($hexLength, 2)));
