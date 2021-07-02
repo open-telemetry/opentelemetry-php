@@ -72,26 +72,25 @@ final class TraceContext implements API\TextMapFormatPropagator
         $traceFlags = $pieces[3];
 
         // Validates the version, traceId, spanId and traceFlags 
-        // If successful, returns a new span context with new context
-        if ($version === self::VERSION && SpanContext::isValidTraceId($traceId) && 
-            SpanContext::isValidSpanId($spanId) && SpanContext::isValidTraceFlag($traceFlags)) {
-            
-            // Only the sampled flag is extracted from the traceFlags (00000001)
-            $convertedTraceFlags = hexdec($traceFlags);
-            $isSampled = ($convertedTraceFlags & SpanContext::SAMPLED_FLAG) === SpanContext::SAMPLED_FLAG;
-
-            // Tracestate = 'Vendor1=Value1,...,VendorN=ValueN'
-            $rawTracestate = $getter->get($carrier, self::TRACESTATE);
-            if ($rawTracestate !== null) {
-                $tracestate = new TraceState($rawTracestate);
-
-                return SpanContext::restore($traceId, $spanId, $isSampled, true, $tracestate);
-            }
-
-            // Only traceparent header is extracted. No tracestate.
-            return SpanContext::restore($traceId, $spanId, $isSampled, true);
+        // Returns an invalid spanContext if any of the checks fail
+        if ($version !== self::VERSION || !SpanContext::isValidTraceId($traceId) || 
+            !SpanContext::isValidSpanId($spanId) || !SpanContext::isValidTraceFlag($traceFlags)) {   
+            return SpanContext::getInvalid();
         }
 
-        return SpanContext::getInvalid();
+        // Only the sampled flag is extracted from the traceFlags (00000001)
+        $convertedTraceFlags = hexdec($traceFlags);
+        $isSampled = ($convertedTraceFlags & SpanContext::SAMPLED_FLAG) === SpanContext::SAMPLED_FLAG;
+
+        // Tracestate = 'Vendor1=Value1,...,VendorN=ValueN'
+        $rawTracestate = $getter->get($carrier, self::TRACESTATE);
+        if ($rawTracestate !== null) {
+            $tracestate = new TraceState($rawTracestate);
+
+            return SpanContext::restore($traceId, $spanId, $isSampled, true, $tracestate);
+        }
+
+        // Only traceparent header is extracted. No tracestate.
+        return SpanContext::restore($traceId, $spanId, $isSampled, true);
     }
 }
