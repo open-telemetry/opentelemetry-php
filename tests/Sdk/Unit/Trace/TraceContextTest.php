@@ -98,7 +98,7 @@ class TraceContextTest extends TestCase
         $this->assertSame(SpanContext::INVALID_TRACE, $context->getTraceId());
         $this->assertSame(SpanContext::INVALID_SPAN, $context->getSpanId());
         $this->assertSame(self::VERSION, ($context->isSampled() ? '01' : '00'));
-        $this->assertSame(false, $context->isRemote());
+        $this->assertFalse($context->isRemote());
     }
 
     /**
@@ -173,7 +173,7 @@ class TraceContextTest extends TestCase
             $this->assertSame(SpanContext::INVALID_TRACE, $context->getTraceId());
             $this->assertSame(SpanContext::INVALID_SPAN, $context->getSpanId());
             $this->assertSame(self::VERSION, ($context->isSampled() ? '01' : '00'));
-            $this->assertSame(false, $context->isRemote());
+            $this->assertFalse($context->isRemote());
         }
     }
 
@@ -199,7 +199,7 @@ class TraceContextTest extends TestCase
             $this->assertSame(SpanContext::INVALID_TRACE, $context->getTraceId());
             $this->assertSame(SpanContext::INVALID_SPAN, $context->getSpanId());
             $this->assertSame(self::VERSION, ($context->isSampled() ? '01' : '00'));
-            $this->assertSame(false, $context->isRemote());
+            $this->assertFalse($context->isRemote());
         }
     }
 
@@ -223,7 +223,7 @@ class TraceContextTest extends TestCase
             $this->assertSame(SpanContext::INVALID_TRACE, $context->getTraceId());
             $this->assertSame(SpanContext::INVALID_SPAN, $context->getSpanId());
             $this->assertSame(self::VERSION, ($context->isSampled() ? '01' : '00'));
-            $this->assertSame(false, $context->isRemote());
+            $this->assertFalse($context->isRemote());
         }
     }
 
@@ -247,7 +247,7 @@ class TraceContextTest extends TestCase
             $this->assertSame(SpanContext::INVALID_TRACE, $context->getTraceId());
             $this->assertSame(SpanContext::INVALID_SPAN, $context->getSpanId());
             $this->assertSame(self::VERSION, ($context->isSampled() ? '01' : '00'));
-            $this->assertSame(false, $context->isRemote());
+            $this->assertFalse($context->isRemote());
         }
     }
 
@@ -271,7 +271,7 @@ class TraceContextTest extends TestCase
             $this->assertSame(SpanContext::INVALID_TRACE, $context->getTraceId());
             $this->assertSame(SpanContext::INVALID_SPAN, $context->getSpanId());
             $this->assertSame(self::VERSION, ($context->isSampled() ? '01' : '00'));
-            $this->assertSame(false, $context->isRemote());
+            $this->assertFalse($context->isRemote());
         }
     }
 }

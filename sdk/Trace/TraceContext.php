@@ -71,10 +71,10 @@ final class TraceContext implements API\TextMapFormatPropagator
         $spanId = $pieces[2];
         $traceFlags = $pieces[3];
 
-        // Validates the version, traceId, spanId and traceFlags 
+        // Validates the version, traceId, spanId and traceFlags
         // Returns an invalid spanContext if any of the checks fail
-        if ($version !== self::VERSION || !SpanContext::isValidTraceId($traceId) || 
-            !SpanContext::isValidSpanId($spanId) || !SpanContext::isValidTraceFlag($traceFlags)) {   
+        if ($version !== self::VERSION || !SpanContext::isValidTraceId($traceId) ||
+            !SpanContext::isValidSpanId($spanId) || !SpanContext::isValidTraceFlag($traceFlags)) {
             return SpanContext::getInvalid();
         }
 

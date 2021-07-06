@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Integration\Context;
 
-use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace\RandomIdGenerator;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\TraceState;

@@ -182,14 +182,16 @@ final class SpanContext implements API\SpanContext
     /**
      * @return bool Returns a value that indicates whether a trace id is valid
      */
-    public static function isValidTraceId($traceId): bool {
+    public static function isValidTraceId($traceId): bool
+    {
         return ctype_xdigit($traceId) && strlen($traceId) === self::TRACE_LENGTH && $traceId !== self::INVALID_TRACE && $traceId === strtolower($traceId);
     }
 
     /**
      * @return bool Returns a value that indicates whether a span id is valid
      */
-    public static function isValidSpanId($spanId): bool {
+    public static function isValidSpanId($spanId): bool
+    {
         return ctype_xdigit($spanId) && strlen($spanId) === self::SPAN_LENGTH && $spanId !== self::INVALID_SPAN && $spanId === strtolower($spanId);
     }
 
@@ -197,7 +199,8 @@ final class SpanContext implements API\SpanContext
      * @return bool Returns a value that indicates whether trace flag is valid
      * TraceFlags must be exactly 1 bytes (1 char) representing a bit field
      */
-    public static function isValidTraceFlag($traceFlag): bool {
+    public static function isValidTraceFlag($traceFlag): bool
+    {
         return ctype_xdigit($traceFlag) && strlen($traceFlag) === self::TRACE_FLAG_LENGTH;
     }
 
