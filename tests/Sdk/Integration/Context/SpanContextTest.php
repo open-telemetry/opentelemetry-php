@@ -13,8 +13,8 @@ class SpanContextTest extends TestCase
 {
     /**
      * @dataProvider invalidSpanData
-     * @param string $traceID
-     * @param string $spanID
+     * @param string $traceId
+     * @param string $spanId
      */
     public function testInvalidSpan(string $traceId, string $spanId): void
     {
