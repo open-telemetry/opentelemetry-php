@@ -114,11 +114,31 @@ class OTLPHttpExporterTest extends TestCase
     public function processHeadersDataHandler()
     {
         return [
-            'None' => ['none', []],
             'No Headers' => ['', []],
+            'Empty Header' => ['empty=', ['empty' => '']],
             'One Header' => ['header-1=one', ['header-1' => 'one']],
             'Two Headers' => ['header-1=one,header-2=two', ['header-1' => 'one', 'header-2' => 'two']],
-            'Invalid Headers' => ['header-1,header-2=bar,,,', ['header-2' => 'bar']],
+            'Two Equals' => ['header-1=bWFkZSB5b3UgbG9vaw==,header-2=two', ['header-1' => 'bWFkZSB5b3UgbG9vaw==', 'header-2' => 'two']],
+            'Unicode' => ['héader-1=one', ['héader-1' => 'one']],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider invalidHeadersDataHandler
+     */
+    public function testInvalidHeaders($input)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $headers = (new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->processHeaders($input);
+    }
+
+    public function invalidHeadersDataHandler()
+    {
+        return [
+            '#1' => ['a:b,c'],
+            '#2' => ['a,,l'],
+            '#3' => ['header-1'],
         ];
     }
 

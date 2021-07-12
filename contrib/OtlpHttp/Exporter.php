@@ -38,7 +38,7 @@ class Exporter implements Trace\Exporter
     private $certificateFile;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $headers;
 
@@ -90,7 +90,7 @@ class Exporter implements Trace\Exporter
         $this->endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'https://localhost:55681/v1/traces';
         $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'http/protobuf';
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
-        $this->headers = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: 'none';
+        $this->headers = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: null;
         $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: 'none';
         $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
@@ -183,8 +183,12 @@ class Exporter implements Trace\Exporter
     /**
      * processHeaders converts comma separated headers into an array
      */
-    public function processHeaders(string $headers): array
+    public function processHeaders(?string $headers): array
     {
+        if ($headers === null || $headers === '') {
+            return [];
+        }
+
         $pairs = explode(',', $headers);
 
         $metadata = [];
@@ -192,7 +196,7 @@ class Exporter implements Trace\Exporter
             $kv = explode('=', $pair, 2);
 
             if (count($kv) !== 2) {
-                continue;
+                throw new InvalidArgumentException('Invalid headers passed');
             }
 
             list($key, $value) = $kv;
