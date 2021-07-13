@@ -33,6 +33,7 @@ class ResourceConstants
      * Container
      */
     public const CONTAINER_NAME = 'container.name';
+    public const CONTAINER_ID = 'container.id';
     public const CONTAINER_IMAGE_NAME = 'container.image.name';
     public const CONTAINER_IMAGE_TAG = 'container.image.tag';
 
