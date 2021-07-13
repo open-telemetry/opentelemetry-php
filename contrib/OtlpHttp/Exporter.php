@@ -38,7 +38,7 @@ class Exporter implements Trace\Exporter
     private $certificateFile;
 
     /**
-     * @var string|null
+     * @var array
      */
     private $headers;
 
@@ -90,7 +90,7 @@ class Exporter implements Trace\Exporter
         $this->endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'https://localhost:55681/v1/traces';
         $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'http/protobuf';
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
-        $this->headers = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: null;
+        $this->headers = $this->processHeaders(getenv('OTEL_EXPORTER_OTLP_HEADERS'));
         $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: 'none';
         $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
@@ -148,7 +148,7 @@ class Exporter implements Trace\Exporter
                 ->createRequest('POST', $this->endpointUrl)
                 ->withHeader('content-type', 'application/x-protobuf');
 
-            foreach ($this->processHeaders($this->headers) as $header => $value) {
+            foreach ($this->headers as $header => $value) {
                 $request = $request->withHeader($header, $value);
             }
 
@@ -183,9 +183,9 @@ class Exporter implements Trace\Exporter
     /**
      * processHeaders converts comma separated headers into an array
      */
-    public function processHeaders(?string $headers): array
+    public function processHeaders($headers): array
     {
-        if ($headers === null || $headers === '') {
+        if (empty($headers)) {
             return [];
         }
 
