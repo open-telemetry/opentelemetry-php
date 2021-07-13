@@ -71,4 +71,5 @@ class ResourceConstants
     public const CLOUD_ACCOUNT_ID = 'cloud.account.id';
     public const CLOUD_REGION = 'cloud.region';
     public const CLOUD_ZONE = 'cloud.zone';
+    public const CLOUD_PLATFORM = 'cloud.platform';
 }
