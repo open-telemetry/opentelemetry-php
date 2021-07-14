@@ -98,7 +98,7 @@ final class SpanOptions implements API\SpanOptions
         $span = $this->tracer->getActiveSpan();
         $context = $span->getContext()->isValid()
             ? SpanContext::fork($span->getContext()->getTraceId())
-            : SpanContext::generate();
+            : SpanContext::fork($this->tracer->getTracerProvider()->getIdGenerator()->generateTraceId());
 
         $span = new Span($this->name, $context, $this->parent, null, $this->tracer->getResource(), $this->kind, $this->spanProcessor);
 

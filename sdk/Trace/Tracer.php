@@ -119,7 +119,7 @@ class Tracer implements API\Tracer
         $parentContextIsNoopSpan = !$parentContext->isValid();
 
         if ($parentContextIsNoopSpan) {
-            $parentContext = $this->importedContext ?? SpanContext::generate(true);
+            $parentContext = $this->importedContext ?? SpanContext::fork($this->provider->getIdGenerator()->generateTraceId(), true);
         }
 
         /*
@@ -230,6 +230,11 @@ class Tracer implements API\Tracer
     public function getResource(): ResourceInfo
     {
         return clone $this->resource;
+    }
+
+    public function getTracerProvider(): TracerProvider
+    {
+        return $this->provider;
     }
 
     private function generateSpanInstance(string $name, API\SpanContext $context, API\SpanContext $parentContext = null, Sampler $sampler = null, ResourceInfo $resource = null, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
