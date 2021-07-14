@@ -9,7 +9,6 @@ use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
-use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Span;
@@ -33,7 +32,9 @@ class OTLPhttpSpanConverterTest extends TestCase
 
         /** @var Span $span */
         $span = $tracer->startAndActivateSpan('guard.validate');
-        $span->setAttribute('service', 'guard');
+        $span->setAttribute('attr1', 'apple');
+        $span->setAttribute('attr2', 'orange');
+
         $span->addEvent('validators.list', $timestamp, new Attributes(['job' => 'stage.updateTime']));
         $span->end();
 
@@ -47,95 +48,56 @@ class OTLPhttpSpanConverterTest extends TestCase
 
         $this->assertSame($span->getSpanName(), $row->getName());
 
-        // $this->assertIsInt($row['timestamp']);
-        // // timestamp should be in microseconds
-        // $this->assertGreaterThan(1e15, $row['timestamp']);
-
-        // $this->assertIsInt($row['duration']);
-        // $this->assertGreaterThan(0, $row['duration']);
-
-        // $this->assertCount(1, $row['tags']);
-        
-        // /** @var Attribute $attribute */
-        // $attribute = $span->getAttribute('service');
-        // $this->assertEquals($attribute->getValue(), $row['tags']['service']);
-
-        // $this->assertCount(1, $row['annotations']);
-        // [$annotation] = $row['annotations'];
-        // $this->assertEquals('validators.list', $annotation['value']);
-
-        // [$event] = \iterator_to_array($span->getEvents());
-        // $this->assertIsInt($annotation['timestamp']);
-
-        // // timestamp should be in microseconds
-        // $this->assertGreaterThan(1e15, $annotation['timestamp']);
+        $this->assertEquals(2, $row->getAttributes()->count());
     }
 
     /**
      * @test
+     * @dataProvider attributeAreCoercedCorrectlyDataProvider
      */
-    // public function durationShouldBeInMicroseconds()
-    // {
-    //     $span = new Span('duration.test', SpanContext::generate());
-
-    //     $row = (new SpanConverter('duration.test'))->as_otlp_span($span);
-
-    //     $this->assertEquals(
-    //         (int) (($span->getEnd() - $span->getStart()) / 1000),
-    //         $row['duration']
-    //     );
-    // }
-
-    /**
-     * @test
-     */
-    public function tagsAreCoercedCorrectlyToStrings()
+    public function attributeAreCoercedCorrectly($actual, $expected)
     {
-        $span = new Span('tags.test', SpanContext::generate());
+        $span = new Span('attributes.test', SpanContext::generate());
 
-        $listOfStrings = ['string-1','string-2'];
-        $listOfNumbers = [1,2,3,3.1415,42];
-        $listOfBooleans = [true,true,false,true];
-        $listOfRandoms = [true,[1,2,3],false,'string-1',3.1415];
-
-        $span->setAttribute('string', 'string');
-        $span->setAttribute('integer-1', 1024);
-        $span->setAttribute('integer-2', 0);
-        $span->setAttribute('float', '1.2345');
-        $span->setAttribute('boolean-1', true);
-        $span->setAttribute('boolean-2', false);
-        $span->setAttribute('list-of-strings', $listOfStrings);
-        $span->setAttribute('list-of-numbers', $listOfNumbers);
-        $span->setAttribute('list-of-booleans', $listOfBooleans);
-        $span->setAttribute('list-of-random', $listOfRandoms);
+        $span->setAttribute('test.attribute', $actual);
 
         $converter = new SpanConverter();
-        $tags = $converter->as_otlp_span($span)->getAttributes();
+        $attributes = $converter->as_otlp_span($span)->getAttributes();
 
-        // // Check that we can convert all attributes to tags
-        $this->assertCount(10, $tags);
+        // Check that we can convert all attributes to tags
+        $this->assertCount(1, $attributes);
 
-        // // Tags destined for Otlp must be pairs of strings
-        // foreach ($tags as $tagKey => $tagValue) {
-        //     $this->assertIsString($tagKey);
-        //     $this->assertIsString($tagValue);
-        // }
+        $protoSpan = new V1\Span([
+            'attributes' => [
+                new \Opentelemetry\Proto\Common\V1\KeyValue([
+                    'key' => 'test.attribute',
+                    'value' => $expected,
+                ]),
+            ],
+        ]);
 
-        // $this->assertEquals($tags['string'], 'string');
-        // $this->assertEquals($tags['integer-1'], '1024');
-        // $this->assertEquals($tags['integer-2'], '0');
-        // $this->assertEquals($tags['float'], '1.2345');
-        // $this->assertEquals($tags['boolean-1'], 'true');
-        // $this->assertEquals($tags['boolean-2'], 'false');
+        $this->assertEquals($protoSpan->getAttributes(), $attributes);
+    }
 
-        // // Lists must be casted to strings and joined with a separator
-        // $this->assertEquals($tags['list-of-strings'], join(',', $listOfStrings));
-        // $this->assertEquals($tags['list-of-numbers'], join(',', $listOfNumbers));
-        // $this->assertEquals($tags['list-of-booleans'], 'true,true,false,true');
-
-        // // This currently works, but OpenTelemetry\Trace\Span should stop arrays
-        // // containing multiple value types from being passed to the Exporter.
-        // $this->assertEquals($tags['list-of-random'], 'true,1,2,3,false,string-1,3.1415');
+    public function attributeAreCoercedCorrectlyDataProvider()
+    {
+        return [
+            'String' => [
+                'Pear', new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'Pear']),
+            ],
+            'Int' => [
+                1024, new \Opentelemetry\Proto\Common\V1\AnyValue(['int_value' => 1024]),
+            ],
+            'Float/Double' => [
+                3.1415926535897932384626433832795028841971, new \Opentelemetry\Proto\Common\V1\AnyValue(['double_value' => 3.1415926535897932384626433832795028841971]),
+            ],
+            'Bool: true' => [
+                true, new \Opentelemetry\Proto\Common\V1\AnyValue(['bool_value' => true]),
+            ],
+            'Bool: false' => [
+                false, new \Opentelemetry\Proto\Common\V1\AnyValue(['bool_value' => false]),
+            ],
+        ];
     }
 
     public function testOtlpHappyPathSpan()
