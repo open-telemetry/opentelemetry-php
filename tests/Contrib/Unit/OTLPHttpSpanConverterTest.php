@@ -97,6 +97,36 @@ class OTLPhttpSpanConverterTest extends TestCase
             'Bool: false' => [
                 false, new \Opentelemetry\Proto\Common\V1\AnyValue(['bool_value' => false]),
             ],
+            'Array of Strings' => [
+                ['string-1','string-2'],
+                new \Opentelemetry\Proto\Common\V1\AnyValue([
+                    'array_value' => new \Opentelemetry\Proto\Common\V1\ArrayValue([
+                        'values' => [
+                            new \Opentelemetry\Proto\Common\V1\AnyValue(['string_value' => 'string-1']),
+                            new \Opentelemetry\Proto\Common\V1\AnyValue(['string_value' => 'string-2']),
+                        ],
+                    ]),
+                ]),
+            ],
+            'Array of Randoms' => [
+                ['Answer',42,true,['Nested Array']],
+                new \Opentelemetry\Proto\Common\V1\AnyValue([
+                    'array_value' => new \Opentelemetry\Proto\Common\V1\ArrayValue([
+                        'values' => [
+                            new \Opentelemetry\Proto\Common\V1\AnyValue(['string_value' => 'Answer']),
+                            new \Opentelemetry\Proto\Common\V1\AnyValue(['int_value' => '42']),
+                            new \Opentelemetry\Proto\Common\V1\AnyValue(['bool_value' => true]),
+                            new \Opentelemetry\Proto\Common\V1\AnyValue([
+                                'array_value' => new \Opentelemetry\Proto\Common\V1\ArrayValue([
+                                    'values' => [
+                                        new \Opentelemetry\Proto\Common\V1\AnyValue(['string_value' => 'Nested Array']),
+                                    ],
+                                ]),
+                            ]),
+                        ],
+                    ]),
+                ]),
+            ],
         ];
     }
 

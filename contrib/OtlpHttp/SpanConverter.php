@@ -35,13 +35,11 @@ class SpanConverter
 
         switch (true) {
             case is_array($value):
-
                 $values = [];
                 foreach ($value as $element) {
-                    $this->as_otlp_any_value($element);
+                    array_push($values, $this->as_otlp_any_value($element));
                 }
-
-                $result->setArrayValue(new ArrayValue($values));
+                $result->setArrayValue(new ArrayValue(['values' => $values]));
 
                 break;
             case is_int($value):
