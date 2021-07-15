@@ -27,7 +27,6 @@ class TracingTest extends TestCase
         $spanContext = SpanContext::generate();
         $this->assertSame(strlen($spanContext->getTraceId()), 32);
         $this->assertSame(strlen($spanContext->getSpanId()), 16);
-        $this->assertSame(strlen($spanContext->getSpanId()), 16);
 
         $spanContext2 = SpanContext::generate();
         $this->assertNotSame($spanContext->getTraceId(), $spanContext2->getTraceId());

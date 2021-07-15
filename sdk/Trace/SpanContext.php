@@ -12,9 +12,11 @@ final class SpanContext implements API\SpanContext
     public const INVALID_TRACE = '00000000000000000000000000000000';
     public const VALID_TRACE = '/^[0-9a-f]{32}$/';
     public const TRACE_LENGTH = 32;
+    public const TRACE_LENGTH_BYTES = 16;
     public const INVALID_SPAN = '0000000000000000';
     public const VALID_SPAN = '/^[0-9a-f]{16}$/';
     public const SPAN_LENGTH = 16;
+    public const SPAN_LENGTH_BYTES = 8;
     public const SAMPLED_FLAG = 1;
     public const TRACE_FLAG_LENGTH = 2;
 
@@ -70,7 +72,7 @@ final class SpanContext implements API\SpanContext
         $this->isRemote = false;
         $this->isSampled = ($traceFlags & self::SAMPLED_FLAG) === self::SAMPLED_FLAG;
         $this->traceFlags = $traceFlags;
-        $this->isValid = $this->traceId !== self::INVALID_TRACE && $this->spanId !== self::INVALID_SPAN;
+        $this->isValid = self::isValidTraceId($this->traceId) && self::isValidSpanId($this->spanId);
     }
 
     public static function getInvalid(): API\SpanContext
@@ -86,7 +88,7 @@ final class SpanContext implements API\SpanContext
      */
     public static function generate(bool $sampled = false): SpanContext
     {
-        return self::fork(self::randomHex(self::SPAN_LENGTH), $sampled);
+        return self::fork(self::randomHex(self::TRACE_LENGTH_BYTES), $sampled);
     }
 
     /**
@@ -109,7 +111,7 @@ final class SpanContext implements API\SpanContext
      */
     public static function fork(string $traceId, bool $sampled = false, bool $isRemote = false): SpanContext
     {
-        return self::restore($traceId, self::randomHex(8), $sampled, $isRemote);
+        return self::restore($traceId, self::randomHex(self::SPAN_LENGTH_BYTES), $sampled, $isRemote);
     }
 
     /**
