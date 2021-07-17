@@ -40,13 +40,22 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\Lab
 
     /**
      * @var float $valueSum
-     * @var float $valueMin
-     * @var float $valueMax
-     * @var int $valueCount
      */
     protected $valueSum = 0;
+
+    /**
+     * @var float $valueMin
+     */
     protected $valueMin = INF;
+
+    /**
+     * @var float $valueMax
+     */
     protected $valueMax = -INF;
+
+    /**
+     * @var int $valueCount
+     */
     protected $valueCount = 0;
 
     /*

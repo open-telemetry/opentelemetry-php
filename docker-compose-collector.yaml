@@ -31,4 +31,5 @@ services:
       - "13133:13133" # health_check extension
       - "9411"   # Zipkin receiver
       - "4317:4317"        # OTLP gRPC receiver
+      - "55681:55681" # Legacy OTLP/HTTP Port
       - "55680:55679" # zpages extension
