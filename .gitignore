@@ -1,6 +1,7 @@
 composer.phar
 composer.lock
 var
+Jaeger/Thrift/*
 vendor
 .idea/
 coverage.clover
