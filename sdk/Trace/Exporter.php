@@ -28,4 +28,6 @@ interface Exporter
     public function export(iterable $spans): int;
 
     public function shutdown(): void;
+
+    public static function fromConnectionString(string $endpointUrl, string $name, string $args);
 }
