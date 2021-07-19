@@ -60,7 +60,6 @@
         "guzzlehttp/guzzle": "^7.3",
         "guzzlehttp/psr7": "^2.0@RC",
         "symfony/http-client": "^5.2",
-        "nyholm/psr7": "^1.4",
-        "nyholm/dsn": "^2.0.0"
+        "nyholm/psr7": "^1.4"
     }
 }
