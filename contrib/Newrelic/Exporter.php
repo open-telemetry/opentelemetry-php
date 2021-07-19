@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Newrelic;
 
+use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
@@ -166,5 +169,23 @@ class Exporter implements Trace\Exporter
     public function shutdown(): void
     {
         $this->running = false;
+    }
+
+    public static function fromConnectionString(string $endpointUrl, string $name, $args)
+    {
+        if ($args == false) {
+            throw new Exception('Invalid license key.');
+        }
+        $factory = new HttpFactory();
+        $exporter = new Exporter(
+            $name,
+            $endpointUrl,
+            $args,
+            new Client(),
+            $factory,
+            $factory
+        );
+
+        return $exporter;
     }
 }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 use Nyholm\Dsn\DsnParser;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Newrelic\Exporter as NewrelicExporter;
@@ -56,17 +54,17 @@ class ExporterFactory
         
         switch ($contribName) {
             case 'jaeger':
-                return $exporter = $this->generateJaeger($endpointUrl);
+                return JaegerExporter::fromConnectionString($endpointUrl, $this->name);
             case 'zipkin':
-                return $exporter = $this->generateZipkin($endpointUrl);
+                return ZipkinExporter::fromConnectionString($endpointUrl, $this->name);
             case 'newrelic':
-                return $exporter = $this->generateNewrelic($endpointUrl, $args['licenseKey'] ?? null);
+                return NewrelicExporter::fromConnectionString($endpointUrl, $this->name, $args['licenseKey'] ?? null);
             case 'otlp':
-                return $exporter = $this->generateOtlp($scheme);
+                return OtlpExporter::fromConnectionString('', $this->name, $scheme);
             case 'otlpgrpc':
-                return $exporter = $this->generateOtlpGrpc();
+                return OtlpGrpcExporter::fromConnectionString();
             case 'zipkintonewrelic':
-                return $exporter = $this->generateZipkinToNewrelic($endpointUrl, $args['licenseKey'] ?? null);
+                return ZipkinToNewrelicExporter::fromConnectionString($endpointUrl, $this->name, $args['licenseKey'] ?? null);
             default:
                 throw new Exception('Invalid contrib name.');
             }
@@ -90,89 +88,5 @@ class ExporterFactory
         $parsedUrl .= empty($dsn->getPath()) ? '' : $dsn->getPath();
 
         return $parsedUrl;
-    }
-
-    private function generateJaeger(string $endpointUrl)
-    {
-        $factory = new HttpFactory();
-        $exporter = new JaegerExporter(
-            $this->name,
-            $endpointUrl,
-            new Client(),
-            $factory,
-            $factory
-        );
-
-        return $exporter;
-    }
-    private function generateZipkin(string $endpointUrl)
-    {
-        $factory = new HttpFactory();
-        $exporter = new ZipkinExporter(
-            $this->name,
-            $endpointUrl,
-            new Client(),
-            $factory,
-            $factory
-        );
-
-        return $exporter;
-    }
-    private function generateNewrelic(string $endpointUrl, $licenseKey)
-    {
-        if ($licenseKey == false) {
-            throw new Exception('Invalid license key.');
-        }
-        $factory = new HttpFactory();
-        $exporter = new NewrelicExporter(
-            $this->name,
-            $endpointUrl,
-            $licenseKey,
-            new Client(),
-            $factory,
-            $factory
-        );
-
-        return $exporter;
-    }
-
-    private function generateOtlp($scheme)
-    {
-        if ($scheme !== false && str_contains($scheme, 'grpc')) {
-            return $this->generateOtlpGrpc();
-        }
-
-        $factory = new HttpFactory();
-        $exporter = new OtlpExporter(
-            $this->name,
-            new Client(),
-            $factory,
-            $factory
-        );
-
-        return $exporter;
-    }
-
-    private function generateOtlpGrpc()
-    {
-        return new OtlpGrpcExporter();
-    }
-   
-    private function generateZipkinToNewrelic(string $endpointUrl, $licenseKey)
-    {
-        if ($licenseKey == false) {
-            throw new Exception('Invalid license key.');
-        }
-        $factory = new HttpFactory();
-        $exporter = new ZipkinToNewrelicExporter(
-            $this->name,
-            $endpointUrl,
-            $licenseKey,
-            new Client(),
-            $factory,
-            $factory
-        );
-
-        return $exporter;
     }
 }

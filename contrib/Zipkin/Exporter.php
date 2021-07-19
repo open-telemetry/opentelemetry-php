@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Zipkin;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
@@ -123,5 +125,18 @@ class Exporter implements Trace\Exporter
     public function shutdown(): void
     {
         $this->running = false;
+    }
+    public static function fromConnectionString(string $endpointUrl, string $name, $args = null)
+    {
+        $factory = new HttpFactory();
+        $exporter = new Exporter(
+            $name,
+            $endpointUrl,
+            new Client(),
+            $factory,
+            $factory
+        );
+
+        return $exporter;
     }
 }
