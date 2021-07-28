@@ -147,11 +147,11 @@ Next, we create a trace then add processors for each trace(One for Jaeger and an
 ```php
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
 
-    $jaegerTracer = (new TracerProvider())
+    $jaegerTracer = (new TracerProvider(null, $sampler))
         ->addSpanProcessor(new BatchSpanProcessor($jaegerExporter, Clock::get()))
         ->getTracer('io.opentelemetry.contrib.php');
 
-    $zipkinTracer = (new TracerProvider())
+    $zipkinTracer = (new TracerProvider(null, $sampler))
     ->addSpanProcessor(new BatchSpanProcessor($zipkinExporter, Clock::get()))
     ->getTracer('io.opentelemetry.contrib.php');
 
