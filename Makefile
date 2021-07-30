@@ -38,7 +38,7 @@ proto:
 bash:
 	$(DC_RUN_PHP) bash
 style:
-	$(DC_RUN_PHP) php ./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
+	$(DC_RUN_PHP) php ./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --stop-on-violation --using-cache=no -vvv
 w3c-test-service:
 	@docker-compose -f docker-compose.w3cTraceContext.yaml run --rm php ./tests/TraceContext/W3CTestService/symfony-setup
 FORCE:
