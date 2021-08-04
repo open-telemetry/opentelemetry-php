@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace;
 
-use Exception;
+use Throwable;
 
 interface Span extends SpanStatus, SpanKind
 {
@@ -62,10 +62,10 @@ interface Span extends SpanStatus, SpanKind
 
     /**
      *
-     * @param Exception $exception
+     * @param Throwable $exception
      * @return Span Must return $this to allow setting multiple attributes at once in a chain.
      */
-    public function recordException(Exception $exception, ?Attributes $attributes = null): Span;
+    public function recordException(Throwable $exception, ?Attributes $attributes = null): Span;
 
     /**
      * Calling this method is highly discouraged; the name should be set on creation and left alone.
