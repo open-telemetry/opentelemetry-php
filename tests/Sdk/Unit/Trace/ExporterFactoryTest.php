@@ -34,7 +34,7 @@ class ExporterFactoryTest extends TestCase
         $input = 'otlp+http://';
         $factory = new ExporterFactory('test.otlp');
         $exporter = $factory->fromConnectionString($input);
-        $this->assertInstanceOf(Path\Otlp\Exporter::class, $exporter);
+        $this->assertInstanceOf(Path\OtlpHttp\Exporter::class, $exporter);
 
         $input = 'otlp+grpc://';
         $factory = new ExporterFactory('test.otlpgrpc');

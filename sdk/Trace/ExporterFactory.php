@@ -10,13 +10,14 @@ use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Newrelic\Exporter as NewrelicExporter;
 use OpenTelemetry\Contrib\Otlp\Exporter as OtlpExporter;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OtlpGrpcExporter;
+use OpenTelemetry\Contrib\OtlpHttp\Exporter as OtlpHttpExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter as ZipkinToNewrelicExporter;
 
 class ExporterFactory
 {
     private $name;
-    private $allowedExporters = ['jaeger' => true, 'zipkin' => true, 'newrelic' => true, 'otlp' => true, 'otlpgrpc' => true, 'zipkintonewrelic' => true];
+    private $allowedExporters = ['jaeger' => true, 'zipkin' => true, 'newrelic' => true, 'otlp' => true, 'otlpgrpc' => true, 'otlphttp' => true ,'zipkintonewrelic' => true];
 
     public function __construct(string $name)
     {
@@ -63,6 +64,8 @@ class ExporterFactory
                 return OtlpExporter::fromConnectionString('', $this->name, $scheme);
             case 'otlpgrpc':
                 return OtlpGrpcExporter::fromConnectionString();
+            case 'otlphttp':
+                return OtlpHttpExporter::fromConnectionString();
             case 'zipkintonewrelic':
                 return ZipkinToNewrelicExporter::fromConnectionString($endpointUrl, $this->name, $args['licenseKey'] ?? null);
             default:

@@ -7,6 +7,7 @@ namespace OpenTelemetry\Contrib\Otlp;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OtlpGrpcExporter;
+use OpenTelemetry\Contrib\OtlpHttp\Exporter as OtlpHttpExporter;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -162,6 +163,10 @@ class Exporter implements Trace\Exporter
         // @phan-suppress-next-line PhanUndeclaredFunction
         if ($args !== '' && str_contains($args, 'grpc')) {
             return OtlpGrpcExporter::fromConnectionString();
+        }
+        // @phan-suppress-next-line PhanUndeclaredFunction
+        if ($args !== '' && str_contains($args, 'http')) {
+            return OtlpHttpExporter::fromConnectionString();
         }
 
         $factory = new HttpFactory();
