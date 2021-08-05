@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Integration\Context;
 
-use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace\RandomIdGenerator;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\TraceState;
@@ -14,15 +13,14 @@ class SpanContextTest extends TestCase
 {
     /**
      * @dataProvider invalidSpanData
-     * @param string $traceID
-     * @param string $spanID
-     * @param string $errorRegex
+     * @param string $traceId
+     * @param string $spanId
      */
-    public function testInvalidSpan(string $traceID, string $spanID, string $errorRegex): void
+    public function testInvalidSpan(string $traceId, string $spanId): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches($errorRegex);
-        SpanContext::restore($traceID, $spanID);
+        $spanContext = SpanContext::restore($traceId, $spanId);
+        $this->assertSame(SpanContext::INVALID_TRACE, $spanContext->getTraceId());
+        $this->assertSame(SpanContext::INVALID_SPAN, $spanContext->getSpanId());
     }
 
     public function invalidSpanData(): array

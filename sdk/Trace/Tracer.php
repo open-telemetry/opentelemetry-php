@@ -62,7 +62,7 @@ class Tracer implements API\Tracer
         $sampleAttributes = $sampleResult->getAttributes();
         if ($sampleAttributes !== null) {
             foreach ($sampleAttributes as $name => $value) {
-                $attributes->setAttribute($name, $value);
+                $attributes->setAttribute($name, $value->getValue());
             }
         }
 
@@ -119,7 +119,7 @@ class Tracer implements API\Tracer
         $parentContextIsNoopSpan = !$parentContext->isValid();
 
         if ($parentContextIsNoopSpan) {
-            $parentContext = $this->importedContext ?? SpanContext::generate(true);
+            $parentContext = $this->importedContext ?? SpanContext::fork($this->provider->getIdGenerator()->generateTraceId(), true);
         }
 
         /*
@@ -141,7 +141,7 @@ class Tracer implements API\Tracer
         if (SamplingResult::DROP == $samplingResult->getDecision()) {
             $span = $this->generateSpanInstance('', $context);
         } else {
-            $span = $this->generateSpanInstance($name, $context, $parentContext, $sampler, $this->resource, $spanKind);
+            $span = $this->generateSpanInstance($name, $context, $parentContext, $sampler, $this->resource, $spanKind, $samplingResult->getAttributes());
 
             if ($span->isRecording()) {
                 $this->provider->getSpanProcessor()->onStart($span);
@@ -232,7 +232,12 @@ class Tracer implements API\Tracer
         return clone $this->resource;
     }
 
-    private function generateSpanInstance(string $name, API\SpanContext $context, API\SpanContext $parentContext = null, Sampler $sampler = null, ResourceInfo $resource = null, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
+    public function getTracerProvider(): TracerProvider
+    {
+        return $this->provider;
+    }
+
+    private function generateSpanInstance(string $name, API\SpanContext $context, API\SpanContext $parentContext = null, Sampler $sampler = null, ResourceInfo $resource = null, int $spanKind = API\SpanKind::KIND_INTERNAL, ?API\Attributes $attributes = null): API\Span
     {
         $parent = null;
 
@@ -246,6 +251,9 @@ class Tracer implements API\Tracer
             }
 
             $span = new Span($name, $context, $parent, $sampler, $resource, $spanKind, $this->provider->getSpanProcessor());
+            if ($attributes) {
+                $span->replaceAttributes($attributes);
+            }
         }
         $this->spans[] = $span;
 

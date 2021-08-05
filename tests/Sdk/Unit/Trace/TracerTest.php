@@ -7,6 +7,8 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\NoopSpan;
+use OpenTelemetry\Sdk\Trace\Sampler;
+use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
@@ -20,6 +22,13 @@ class TracerTest extends TestCase
     {
         parent::setUp();
         Context::attach(new Context()); // clean up the current Context
+    }
+
+    private function readSpanAttributesArray(API\Span $span)
+    {
+        return array_map(function (API\Attribute $attribute) {
+            return $attribute->getValue();
+        }, iterator_to_array($span->getAttributes()));
     }
 
     /**
@@ -142,8 +151,31 @@ class TracerTest extends TestCase
         ];
         $span = $tracer->startSpan('test.span', null, API\SpanKind::KIND_INTERNAL, new Attributes($attributes));
 
-        $this->assertSame($attributes, array_map(function (API\Attribute $attribute) {
-            return $attribute->getValue();
-        }, iterator_to_array($span->getAttributes())));
+        $this->assertSame($attributes, $this->readSpanAttributesArray($span));
+    }
+
+    /**
+     * @test
+     */
+    public function startingSpanRespectsSamplerAttributes()
+    {
+        $tracerProvider = new TracerProvider(null, new class() implements Sampler {
+            public function shouldSample(Context $parentContext, string $traceId, string $spanName, int $spanKind, ?API\Attributes $attributes = null, ?API\Links $links = null): SamplingResult
+            {
+                return new SamplingResult(SamplingResult::RECORD_AND_SAMPLE, new Attributes(['attribute' => 'value']));
+            }
+
+            public function getDescription(): string
+            {
+                return 'test';
+            }
+        });
+
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
+        $span1 = $tracer->startSpan('test.span.1');
+        $span2 = $tracer->startAndActivateSpan('test.span.2');
+
+        $this->assertEquals(['attribute' => 'value'], $this->readSpanAttributesArray($span1));
+        $this->assertEquals(['attribute' => 'value'], $this->readSpanAttributesArray($span2));
     }
 }

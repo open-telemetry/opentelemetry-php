@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Contrib\Otlp;
+namespace OpenTelemetry\Contrib\OtlpHttp;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
-use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OtlpGrpcExporter;
-use OpenTelemetry\Contrib\OtlpHttp\Exporter as OtlpHttpExporter;
+use InvalidArgumentException;
+use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Trace as API;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -72,7 +72,7 @@ class Exporter implements Trace\Exporter
      * @var RequestFactoryInterface
      */
     private $requestFactory;
-    
+
     /**
      * @var StreamFactoryInterface
      */
@@ -80,10 +80,8 @@ class Exporter implements Trace\Exporter
 
     /**
      * Exporter constructor.
-     * @param string $serviceName
      */
     public function __construct(
-        $serviceName,
         ClientInterface $client,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
@@ -91,18 +89,36 @@ class Exporter implements Trace\Exporter
     ) {
 
         // Set default values based on presence of env variable
-        $this->endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'localhost:55681';
-        $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'json';
-        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ?: 'false';
+        $this->endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'https://localhost:55681/v1/traces';
+        $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'http/protobuf';
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
-        $this->headers[] = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: 'none';
+        $this->headers = $this->processHeaders(getenv('OTEL_EXPORTER_OTLP_HEADERS'));
         $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: 'none';
         $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
         $this->client = $client;
         $this->requestFactory = $requestFactory;
         $this->streamFactory = $streamFactory;
-        $this->spanConverter =  $spanConverter ?? new SpanConverter($serviceName);
+        $this->spanConverter =  $spanConverter ?? new SpanConverter();
+
+        if ($this->protocol != 'http/protobuf') {
+            throw new InvalidArgumentException('Invalid OTLP Protocol Specified');
+        }
+
+        $parsedDsn = parse_url($this->endpointUrl);
+
+        if (!is_array($parsedDsn)) {
+            throw new InvalidArgumentException('Unable to parse provided DSN');
+        }
+
+        if (
+            !isset($parsedDsn['scheme'])
+            || !isset($parsedDsn['host'])
+            || !isset($parsedDsn['port'])
+            || !isset($parsedDsn['path'])
+        ) {
+            throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
+        }
     }
 
     /**
@@ -121,20 +137,33 @@ class Exporter implements Trace\Exporter
             return Trace\Exporter::SUCCESS;
         }
 
-        $convertedSpans = [];
-        foreach ($spans as $span) {
-            array_push($convertedSpans, $this->spanConverter->convert($span));
-        }
+        $resourcespans = [$this->spanConverter->as_otlp_resource_span($spans)];
+
+        $exportrequest = new ExportTraceServiceRequest([
+            'resource_spans' => $resourcespans,
+        ]);
+
+        $bytes = $exportrequest->serializeToString();
 
         try {
-            $body = $this->streamFactory->createStream(json_encode($convertedSpans));
             $request = $this->requestFactory
                 ->createRequest('POST', $this->endpointUrl)
-                ->withBody($body);
+                ->withHeader('content-type', 'application/x-protobuf');
 
-            if ($this->protocol == 'json') {
-                $request->withHeader('content-type', 'application/json');
+            foreach ($this->headers as $header => $value) {
+                $request = $request->withHeader($header, $value);
             }
+
+            if ($this->compression === 'gzip') {
+                // TODO: Add Tests
+                $body = $this->streamFactory->createStream(gzencode($bytes));
+                $request = $request->withHeader('Content-Encoding', 'gzip');
+            } else {
+                $body = $this->streamFactory->createStream($bytes);
+            }
+
+            $request = $request->withBody($body);
+
             $response = $this->client->sendRequest($request);
         } catch (RequestExceptionInterface $e) {
             return Trace\Exporter::FAILED_NOT_RETRYABLE;
@@ -153,25 +182,42 @@ class Exporter implements Trace\Exporter
         return Trace\Exporter::SUCCESS;
     }
 
+    /**
+     * processHeaders converts comma separated headers into an array
+     */
+    public function processHeaders($headers): array
+    {
+        if (empty($headers)) {
+            return [];
+        }
+
+        $pairs = explode(',', $headers);
+
+        $metadata = [];
+        foreach ($pairs as $pair) {
+            $kv = explode('=', $pair, 2);
+
+            if (count($kv) !== 2) {
+                throw new InvalidArgumentException('Invalid headers passed');
+            }
+
+            list($key, $value) = $kv;
+
+            $metadata[$key] = $value;
+        }
+
+        return $metadata;
+    }
+
     public function shutdown(): void
     {
         $this->running = false;
     }
 
-    public static function fromConnectionString(string $endpointUrl, string $name, $args)
+    public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
     {
-        // @phan-suppress-next-line PhanUndeclaredFunction
-        if ($args !== '' && str_contains($args, 'grpc')) {
-            return OtlpGrpcExporter::fromConnectionString();
-        }
-        // @phan-suppress-next-line PhanUndeclaredFunction
-        if ($args !== '' && str_contains($args, 'http')) {
-            return OtlpHttpExporter::fromConnectionString();
-        }
-
         $factory = new HttpFactory();
         $exporter = new Exporter(
-            $name,
             new Client(),
             $factory,
             $factory

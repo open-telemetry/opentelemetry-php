@@ -33,6 +33,7 @@ class ResourceConstants
      * Container
      */
     public const CONTAINER_NAME = 'container.name';
+    public const CONTAINER_ID = 'container.id';
     public const CONTAINER_IMAGE_NAME = 'container.image.name';
     public const CONTAINER_IMAGE_TAG = 'container.image.tag';
 
@@ -70,4 +71,5 @@ class ResourceConstants
     public const CLOUD_ACCOUNT_ID = 'cloud.account.id';
     public const CLOUD_REGION = 'cloud.region';
     public const CLOUD_ZONE = 'cloud.zone';
+    public const CLOUD_PLATFORM = 'cloud.platform';
 }

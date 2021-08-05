@@ -21,8 +21,6 @@ final class TraceContext implements API\TextMapFormatPropagator
     public const TRACEPARENT = 'traceparent';
     public const TRACESTATE = 'tracestate';
     private const VERSION = '00'; // Currently only '00' is supported
-    private const VALID_VERSION = '/^[0-9a-f]{2}$/';
-    private const VALID_TRACEFLAGS = '/^[0-9a-f]{2}$/';
 
     /**
      * {@inheritdoc}
@@ -56,45 +54,28 @@ final class TraceContext implements API\TextMapFormatPropagator
     {
         $traceparent = $getter->get($carrier, self::TRACEPARENT);
         if ($traceparent === null) {
-            throw new \InvalidArgumentException('Traceparent not present');
+            return SpanContext::getInvalid();
         }
 
         // Traceparent = {version}-{trace-id}-{parent-id}-{trace-flags}
         $pieces = explode('-', $traceparent);
 
+        // Unable to extract traceparent. Expected 4 values
         $piecesCount = count($pieces);
-        if ($piecesCount != 4) {
-            throw new \InvalidArgumentException(
-                sprintf('Unable to extract traceparent. Expected 4 values, got %d', $piecesCount)
-            );
+        if ($piecesCount !== 4) {
+            return SpanContext::getInvalid();
         }
 
         $version = $pieces[0];
-        if ((preg_match(self::VALID_VERSION, $version) === 0) || ($version !== self::VERSION)) {
-            throw new \InvalidArgumentException(
-                sprintf('Only version 00 is supported, got %s', $version)
-            );
-        }
-
         $traceId = $pieces[1];
-        if ((preg_match(SpanContext::VALID_TRACE, $traceId) === 0) || ($traceId === SpanContext::INVALID_TRACE)) {
-            throw new \InvalidArgumentException(
-                sprintf('TraceID must be exactly 16 bytes (32 chars) and at least one non-zero byte, got %s', $traceId)
-            );
-        }
-
         $spanId = $pieces[2];
-        if ((preg_match(SpanContext::VALID_SPAN, $spanId) === 0) || ($spanId === SpanContext::INVALID_SPAN)) {
-            throw new \InvalidArgumentException(
-                sprintf('SpanID must be exactly 8 bytes (16 chars) and at least one non-zero byte, got %s', $spanId)
-            );
-        }
-
         $traceFlags = $pieces[3];
-        if (preg_match(self::VALID_TRACEFLAGS, $traceFlags) === 0) {
-            throw new \InvalidArgumentException(
-                sprintf('TraceFlags must be exactly 1 bytes (1 char) representing a bit field, got %s', $traceFlags)
-            );
+
+        // Validates the version, traceId, spanId and traceFlags
+        // Returns an invalid spanContext if any of the checks fail
+        if ($version !== self::VERSION || !SpanContext::isValidTraceId($traceId) ||
+            !SpanContext::isValidSpanId($spanId) || !SpanContext::isValidTraceFlag($traceFlags)) {
+            return SpanContext::getInvalid();
         }
 
         // Only the sampled flag is extracted from the traceFlags (00000001)

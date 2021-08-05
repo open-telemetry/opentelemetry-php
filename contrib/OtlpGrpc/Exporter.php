@@ -207,6 +207,10 @@ class Exporter implements Trace\Exporter
         $this->running = false;
     }
 
+    public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
+    {
+        return new Exporter();
+    }
     // public function getHeaders()
     // {
     //     return $this->metadataFromHeaders($this->headers);

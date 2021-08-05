@@ -11,9 +11,14 @@ final class SpanContext implements API\SpanContext
 {
     public const INVALID_TRACE = '00000000000000000000000000000000';
     public const VALID_TRACE = '/^[0-9a-f]{32}$/';
+    public const TRACE_LENGTH = 32;
+    public const TRACE_LENGTH_BYTES = 16;
     public const INVALID_SPAN = '0000000000000000';
     public const VALID_SPAN = '/^[0-9a-f]{16}$/';
+    public const SPAN_LENGTH = 16;
+    public const SPAN_LENGTH_BYTES = 8;
     public const SAMPLED_FLAG = 1;
+    public const TRACE_FLAG_LENGTH = 2;
 
     /**
      * @var string
@@ -54,15 +59,11 @@ final class SpanContext implements API\SpanContext
      */
     public function __construct(string $traceId, string $spanId, int $traceFlags, ?API\TraceState $traceState = null)
     {
-        if (preg_match(self::VALID_TRACE, $traceId) === 0) {
-            throw new \InvalidArgumentException(
-                sprintf('TraceID must be exactly 16 bytes (32 chars) and at least one non-zero byte, got %s', $traceId)
-            );
-        }
-        if (preg_match(self::VALID_SPAN, $spanId) === 0) {
-            throw new \InvalidArgumentException(
-                sprintf('SpanID must be exactly 8 bytes (16 chars) and at least one non-zero byte, got %s', $spanId)
-            );
+        // TraceId must be exactly 16 bytes (32 chars) and at least one non-zero byte
+        // SpanId must be exactly 8 bytes (16 chars) and at least one non-zero byte
+        if (!self::isValidTraceId($traceId) || !self::isValidSpanId($spanId)) {
+            $traceId = self::INVALID_TRACE;
+            $spanId = self::INVALID_SPAN;
         }
 
         $this->traceId = $traceId;
@@ -71,7 +72,7 @@ final class SpanContext implements API\SpanContext
         $this->isRemote = false;
         $this->isSampled = ($traceFlags & self::SAMPLED_FLAG) === self::SAMPLED_FLAG;
         $this->traceFlags = $traceFlags;
-        $this->isValid = $this->traceId !== self::INVALID_TRACE && $this->spanId !== self::INVALID_SPAN;
+        $this->isValid = self::isValidTraceId($this->traceId) && self::isValidSpanId($this->spanId);
     }
 
     public static function getInvalid(): API\SpanContext
@@ -87,7 +88,7 @@ final class SpanContext implements API\SpanContext
      */
     public static function generate(bool $sampled = false): SpanContext
     {
-        return self::fork(self::randomHex(16), $sampled);
+        return self::fork(self::randomHex(self::TRACE_LENGTH_BYTES), $sampled);
     }
 
     /**
@@ -110,7 +111,7 @@ final class SpanContext implements API\SpanContext
      */
     public static function fork(string $traceId, bool $sampled = false, bool $isRemote = false): SpanContext
     {
-        return self::restore($traceId, self::randomHex(8), $sampled, $isRemote);
+        return self::restore($traceId, self::randomHex(self::SPAN_LENGTH_BYTES), $sampled, $isRemote);
     }
 
     /**
@@ -178,6 +179,31 @@ final class SpanContext implements API\SpanContext
     public function isRemote(): bool
     {
         return $this->isRemote;
+    }
+
+    /**
+     * @return bool Returns a value that indicates whether a trace id is valid
+     */
+    public static function isValidTraceId($traceId): bool
+    {
+        return ctype_xdigit($traceId) && strlen($traceId) === self::TRACE_LENGTH && $traceId !== self::INVALID_TRACE && $traceId === strtolower($traceId);
+    }
+
+    /**
+     * @return bool Returns a value that indicates whether a span id is valid
+     */
+    public static function isValidSpanId($spanId): bool
+    {
+        return ctype_xdigit($spanId) && strlen($spanId) === self::SPAN_LENGTH && $spanId !== self::INVALID_SPAN && $spanId === strtolower($spanId);
+    }
+
+    /**
+     * @return bool Returns a value that indicates whether trace flag is valid
+     * TraceFlags must be exactly 1 bytes (1 char) representing a bit field
+     */
+    public static function isValidTraceFlag($traceFlag): bool
+    {
+        return ctype_xdigit($traceFlag) && strlen($traceFlag) === self::TRACE_FLAG_LENGTH;
     }
 
     /**

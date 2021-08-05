@@ -105,6 +105,68 @@ class SpanContextTest extends TestCase
     /**
      * @test
      */
+    public function testValidSpanId()
+    {
+        $spanId = '53995c3f42cd8ad8';
+
+        $this->assertTrue(SpanContext::isValidSpanId($spanId));
+    }
+    /**
+     * @test
+     */
+    public function testInvalidSpanId()
+    {
+        $spanIds = ['0000000000000000', '539g5c3f42cdpad8', '123fgh', ' '];
+        
+        foreach ($spanIds as $spanId) {
+            $this->assertFalse(SpanContext::isValidSpanId($spanId));
+        }
+    }
+    /**
+     * @test
+     */
+    public function testValidTraceId()
+    {
+        $traceId = '5759e988bd862e3fe1be46a994272793';
+
+        $this->assertTrue(SpanContext::isValidTraceId($traceId));
+    }
+    /**
+     * @test
+     */
+    public function testInvalidTraceId()
+    {
+        $traceIds = ['00000000000000000000000000000000', ' ', '123fgh', '5759e988bdhjk62e3fe1be46a994272793'];
+        
+        foreach ($traceIds as $traceId) {
+            $this->assertFalse(SpanContext::isValidTraceId($traceId));
+        }
+    }
+    /**
+     * @test
+     */
+    public function testValidTraceFlag()
+    {
+        $traceFlags = ['f0', 'ff', '00', '01'];
+        
+        foreach ($traceFlags as $traceFlag) {
+            $this->assertTrue(SpanContext::isValidTraceFlag($traceFlag));
+        }
+    }
+    /**
+     * @test
+     */
+    public function testInvalidTraceFlag()
+    {
+        $traceFlags = ['0000000000000000', ' ', 'gg', 'abc123'];
+        
+        foreach ($traceFlags as $traceFlag) {
+            $this->assertFalse(SpanContext::isValidTraceFlag($traceFlag));
+        }
+    }
+    /**
+     * @test
+     */
     public function testIsRemoteStatus()
     {
         /*
