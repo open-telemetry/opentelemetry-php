@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpHttp;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use InvalidArgumentException;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use OpenTelemetry\Sdk\Trace;
@@ -210,5 +212,17 @@ class Exporter implements Trace\Exporter
     public function shutdown(): void
     {
         $this->running = false;
+    }
+
+    public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
+    {
+        $factory = new HttpFactory();
+        $exporter = new Exporter(
+            new Client(),
+            $factory,
+            $factory
+        );
+
+        return $exporter;
     }
 }
