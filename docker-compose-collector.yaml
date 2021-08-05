@@ -20,6 +20,7 @@ services:
     - 9412:9412
     - 16686:16686
   otel-collector:
+    platform: linux/amd64
     image: otel/opentelemetry-collector-contrib
     command: ["--config=/etc/otel-collector-config.yml"]
     volumes:
