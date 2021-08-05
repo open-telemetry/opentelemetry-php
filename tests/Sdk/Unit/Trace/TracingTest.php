@@ -89,7 +89,7 @@ class TracingTest extends TestCase
     public function testGetStackTrace()
     {
         $stacktrace = 'Exception: Thrown from here
- at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.testGetStackTrace(TracingTest.php:101)
+ at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.testGetStackTrace(TracingTest.php:102)
  at PHPUnit.Framework.TestCase.runTest(TestCase.php:1527)
  at PHPUnit.Framework.TestCase.runBare(TestCase.php:1133)
  at PHPUnit.Framework.TestResult.run(TestResult.php:722)
@@ -97,7 +97,7 @@ class TracingTest extends TestCase
  at PHPUnit.Framework.TestSuite.run(TestSuite.php:677)
  ... 6 more';
         $actualStacktrace = '';
-        
+
         try {
             throw new \Exception('Thrown from here');
         } catch (\Exception $e) {
@@ -112,7 +112,7 @@ class TracingTest extends TestCase
     {
         throw new \Exception('Thrown from fail2()');
     }
-    
+
     private static function fail1()
     {
         try {
@@ -125,8 +125,8 @@ class TracingTest extends TestCase
     public function testGetStackTraceWithCause()
     {
         $stacktrace = 'Exception: Thrown from fail1()
- at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail1(TracingTest.php:120)
- at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.testGetStackTraceWithCause(TracingTest.php:143)
+ at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail1(TracingTest.php:121)
+ at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.testGetStackTraceWithCause(TracingTest.php:144)
  at PHPUnit.Framework.TestCase.runTest(TestCase.php:1527)
  at PHPUnit.Framework.TestCase.runBare(TestCase.php:1133)
  at PHPUnit.Framework.TestResult.run(TestResult.php:722)
@@ -134,10 +134,10 @@ class TracingTest extends TestCase
  at PHPUnit.Framework.TestSuite.run(TestSuite.php:677)
  ... 6 more
 Caused by: Exception: Thrown from fail2()
- at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail2(TracingTest.php:112)
- at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail1(TracingTest.php:118)
+ at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail2(TracingTest.php:113)
+ at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail1(TracingTest.php:119)
  ... 12 more';
- 
+
         $actualStacktrace = '';
 
         try {
