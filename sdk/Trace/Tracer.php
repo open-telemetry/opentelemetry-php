@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 
@@ -18,15 +19,19 @@ class Tracer implements API\Tracer
     private $provider;
     /** @var ResourceInfo */
     private $resource;
+    /** @var InstrumentationLibrary */
+    private $instrumentationLibrary;
     /** @var API\SpanContext|null  */
     private $importedContext;
 
     public function __construct(
         TracerProvider $provider,
+        InstrumentationLibrary $instrumentationLibrary,
         ResourceInfo $resource = null,
         API\SpanContext $context = null
     ) {
         $this->provider = $provider;
+        $this->instrumentationLibrary = $instrumentationLibrary;
         $this->resource = $resource ?? ResourceInfo::emptyResource();
         $this->importedContext = $context;
     }
@@ -84,6 +89,7 @@ class Tracer implements API\Tracer
             $this->provider->getSpanProcessor()
         );
         $span->replaceAttributes($attributes);
+        $span->setInstrumentationLibrary($this->instrumentationLibrary);
 
         $this->provider->getSpanProcessor()->onStart($span, $parentContext ?? Context::getCurrent());
 
@@ -254,6 +260,7 @@ class Tracer implements API\Tracer
             if ($attributes) {
                 $span->replaceAttributes($attributes);
             }
+            $span->setInstrumentationLibrary($this->instrumentationLibrary);
         }
         $this->spans[] = $span;
 

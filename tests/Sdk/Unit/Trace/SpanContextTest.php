@@ -58,7 +58,7 @@ class SpanContextTest extends TestCase
 
         $context = SpanContext::generate(true);
 
-        $activeSpan = new Span('test.span', $context);
+        $activeSpan = $tracer->startSpan('test.span');
 
         $tracer->setActiveSpan($activeSpan);
 

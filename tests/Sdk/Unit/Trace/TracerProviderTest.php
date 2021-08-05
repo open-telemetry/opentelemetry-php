@@ -131,19 +131,13 @@ class TracerProviderTest extends TestCase
         $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
         /** @var Attribute $sdkversion */
         $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
-        /** @var Attribute $servicename */
-        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
-        /** @var Attribute $serviceversion */
-        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
         $this->assertEquals($attributes, $resource->getAttributes());
 
         $this->assertEquals('opentelemetry', $sdkname->getValue());
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
-        $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('version', $serviceversion->getValue());
 
-        $this->assertCount(6, $attributes);
+        $this->assertCount(3, $attributes);
     }
 
     /**
@@ -184,10 +178,6 @@ class TracerProviderTest extends TestCase
         $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
         /** @var Attribute $sdkversion */
         $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
-        /** @var Attribute $servicename */
-        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
-        /** @var Attribute $serviceversion */
-        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         /** @var Attribute $primary */
         $primary = $attributes->getAttribute('provider');
@@ -199,9 +189,7 @@ class TracerProviderTest extends TestCase
         $this->assertEquals('opentelemetry', $sdkname->getValue());
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
-        $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('version', $serviceversion->getValue());
 
-        $this->assertCount(8, $attributes);
+        $this->assertCount(5, $attributes);
     }
 }

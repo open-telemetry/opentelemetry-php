@@ -67,4 +67,19 @@ class TracerTest extends TestCase
         $this->assertNotEquals($parentTraceState, $span->getContext()->getTraceState());
         $this->assertEquals($newTraceState, $span->getContext()->getTraceState());
     }
+
+    /**
+     * @test
+     */
+    public function spanShouldReceiveInstrumentationLibrary()
+    {
+        $tracerProvider = new TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest', 'dev');
+        /** @var Span $span */
+        $span = $tracer->startSpan('test.span');
+        $spanInstrumentationLibrary = $span->getInstrumentationLibrary();
+
+        $this->assertEquals('OpenTelemetry.TracerTest', $spanInstrumentationLibrary->getName());
+        $this->assertEquals('dev', $spanInstrumentationLibrary->getVersion());
+    }
 }
