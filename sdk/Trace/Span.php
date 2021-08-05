@@ -225,7 +225,7 @@ class Span implements API\Span
             [
                 'exception.type' => get_class($exception),
                 'exception.message' => $exception->getMessage(),
-                'exception.stacktrace' => $exception->getTraceAsString(),
+                'exception.stacktrace' => self::getStackTrace($exception),
             ]
         );
         foreach ($attributes ?? [] as $attribute) {
@@ -307,5 +307,66 @@ class Span implements API\Span
     protected static function getContextKey(): ContextKey
     {
         return SpanContextKey::instance();
+    }
+
+    /**
+     * This function provides a more java-like stacktrace
+     * that supports exception chaining and provides exact
+     * lines of where exceptions are thrown
+     *
+     * Example:
+     * Exception: Thrown from grandparent
+     *  at grandparent_func(test.php:56)
+     *  at parent_func(test.php:51)
+     *  at child_func(test.php:44)
+     *  at (main)(test.php:62)
+     *
+     * Credit: https://www.php.net/manual/en/exception.gettraceasstring.php#114980
+     *
+     */
+    public static function getStackTrace($e, $seen=null)
+    {
+        $starter = $seen ? 'Caused by: ' : '';
+        $result = [];
+        if (!$seen) {
+            $seen = [];
+        }
+        $trace  = $e->getTrace();
+        $prev   = $e->getPrevious();
+        $result[] = sprintf('%s%s: %s', $starter, get_class($e), $e->getMessage());
+        $file = $e->getFile();
+        $line = $e->getLine();
+        while (true) {
+            $current = "$file:$line";
+            if (is_array($seen) && in_array($current, $seen)) {
+                $result[] = sprintf(' ... %d more', count($trace)+1);
+
+                break;
+            }
+            $result[] = sprintf(
+                ' at %s%s%s(%s%s%s)',
+                count($trace) && array_key_exists('class', $trace[0]) ? str_replace('\\', '.', $trace[0]['class']) : '',
+                count($trace) && array_key_exists('class', $trace[0]) && array_key_exists('function', $trace[0]) ? '.' : '',
+                count($trace) && array_key_exists('function', $trace[0]) ? str_replace('\\', '.', $trace[0]['function']) : 'main',
+                $line === null ? $file : basename($file),
+                $line === null ? '' : ':',
+                $line === null ? '' : $line
+            );
+            if (is_array($seen)) {
+                $seen[] = "$file:$line";
+            }
+            if (!count($trace)) {
+                break;
+            }
+            $file = array_key_exists('file', $trace[0]) ? $trace[0]['file'] : 'Unknown Source';
+            $line = array_key_exists('file', $trace[0]) && array_key_exists('line', $trace[0]) && $trace[0]['line'] ? $trace[0]['line'] : null;
+            array_shift($trace);
+        }
+        $result = join("\n", $result);
+        if ($prev) {
+            $result  .= "\n" . self::getStackTrace($prev, $seen);
+        }
+    
+        return $result;
     }
 }
