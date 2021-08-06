@@ -7,6 +7,7 @@ namespace OpenTelemetry\Sdk\Trace;
 use Exception;
 use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\Context\ContextValueTrait;
+use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 
@@ -30,6 +31,11 @@ class Span implements API\Span
      * @var ResourceInfo
      */
     private $resource; // An immutable representation of the entity producing telemetry.
+
+    /**
+     * @var InstrumentationLibrary
+     */
+    private $instrumentationLibrary;
 
     private $attributes;
     private $events;
@@ -77,6 +83,22 @@ class Span implements API\Span
         // todo: set these to null until needed
         $this->attributes = new Attributes();
         $this->events = new Events();
+    }
+
+    /**
+     * @internal
+     */
+    public function setInstrumentationLibrary(InstrumentationLibrary $instrumentationLibrary)
+    {
+        $this->instrumentationLibrary = $instrumentationLibrary;
+    }
+
+    /**
+     * @internal
+     */
+    public function getInstrumentationLibrary(): InstrumentationLibrary
+    {
+        return $this->instrumentationLibrary;
     }
 
     public function getResource(): ResourceInfo

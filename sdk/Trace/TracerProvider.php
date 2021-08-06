@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
-use OpenTelemetry\Sdk\Resource\ResourceConstants;
+use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\Sampler\ParentBased;
@@ -53,7 +53,7 @@ final class TracerProvider implements API\TracerProvider
         $this->spanProcessors->shutdown();
     }
 
-    public function getTracer(string $name, ?string $version = ''): API\Tracer
+    public function getTracer(string $name, ?string $version = null): API\Tracer
     {
         $key = sprintf('%s@%s', $name, ($version ?? 'unknown'));
 
@@ -61,25 +61,12 @@ final class TracerProvider implements API\TracerProvider
             return $this->tracers[$key];
         }
 
-        /*
-         * A resource can be associated with the TracerProvider when the TracerProvider is created.
-         * That association cannot be changed later. When associated with a TracerProvider, all
-         * Spans produced by any Tracer from the provider MUST be associated with this Resource.
-         */
-        $primary = $this->getResource();
-        $resource = ResourceInfo::create(
-            new Attributes(
-                [
-                    ResourceConstants::SERVICE_NAME => $name,
-                    ResourceConstants::SERVICE_VERSION => $version,
-                    ResourceConstants::SERVICE_INSTANCE_ID => uniqid($name . $version),
-                ]
-            )
-        );
+        $instrumentationLibrary = new InstrumentationLibrary($name, $version);
 
         return $this->tracers[$key] = new Tracer(
             $this,
-            ResourceInfo::merge($primary, $resource)
+            $instrumentationLibrary,
+            ResourceInfo::merge($this->getResource(), ResourceInfo::defaultResource())
         );
     }
 

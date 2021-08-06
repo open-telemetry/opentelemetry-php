@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
 use Exception;
 use function iterator_to_array;
+use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceConstants;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace as SDK;
@@ -40,12 +41,12 @@ class TracingTest extends TestCase
     public function testTracerSpanContextRestore()
     {
         $tracerProvider = new SDK\TracerProvider();
-        $tracer = new Tracer($tracerProvider, ResourceInfo::create(new Attributes([])));
+        $tracer = new Tracer($tracerProvider, new InstrumentationLibrary('OpenTelemetry.TracingTest'), ResourceInfo::create(new Attributes([])));
         $tracer->startAndActivateSpan('tracer1.firstSpan');
         $spanContext = $tracer->getActiveSpan()->getContext();
 
         $spanContext2 = SpanContext::restore($spanContext->getTraceId(), $spanContext->getSpanId());
-        $tracer2 = new Tracer($tracerProvider, ResourceInfo::create(new Attributes([])), $spanContext2);
+        $tracer2 = new Tracer($tracerProvider, new InstrumentationLibrary('OpenTelemetry.TracingTest'), ResourceInfo::create(new Attributes([])), $spanContext2);
         $tracer2->startAndActivateSpan('tracer2.firstSpan');
 
         $this->assertSame(
@@ -88,7 +89,7 @@ class TracingTest extends TestCase
     public function testGetStackTrace()
     {
         $stacktrace = 'Exception: Thrown from here
- at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.testGetStackTrace(TracingTest.php:101)
+ at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.testGetStackTrace(TracingTest.php:102)
  at PHPUnit.Framework.TestCase.runTest(TestCase.php:1527)
  at PHPUnit.Framework.TestCase.runBare(TestCase.php:1133)
  at PHPUnit.Framework.TestResult.run(TestResult.php:722)
@@ -96,7 +97,7 @@ class TracingTest extends TestCase
  at PHPUnit.Framework.TestSuite.run(TestSuite.php:677)
  ... 6 more';
         $actualStacktrace = '';
-        
+
         try {
             throw new \Exception('Thrown from here');
         } catch (\Exception $e) {
@@ -111,7 +112,7 @@ class TracingTest extends TestCase
     {
         throw new \Exception('Thrown from fail2()');
     }
-    
+
     private static function fail1()
     {
         try {
@@ -124,8 +125,8 @@ class TracingTest extends TestCase
     public function testGetStackTraceWithCause()
     {
         $stacktrace = 'Exception: Thrown from fail1()
- at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail1(TracingTest.php:120)
- at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.testGetStackTraceWithCause(TracingTest.php:143)
+ at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail1(TracingTest.php:121)
+ at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.testGetStackTraceWithCause(TracingTest.php:144)
  at PHPUnit.Framework.TestCase.runTest(TestCase.php:1527)
  at PHPUnit.Framework.TestCase.runBare(TestCase.php:1133)
  at PHPUnit.Framework.TestResult.run(TestResult.php:722)
@@ -133,10 +134,10 @@ class TracingTest extends TestCase
  at PHPUnit.Framework.TestSuite.run(TestSuite.php:677)
  ... 6 more
 Caused by: Exception: Thrown from fail2()
- at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail2(TracingTest.php:112)
- at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail1(TracingTest.php:118)
+ at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail2(TracingTest.php:113)
+ at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail1(TracingTest.php:119)
  ... 12 more';
- 
+
         $actualStacktrace = '';
 
         try {
@@ -450,7 +451,7 @@ Caused by: Exception: Thrown from fail2()
         $tracerProvider = new SDK\TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
         $span = $tracer->startAndActivateSpan('zerodivisiontest');
-        
+
         try {
             throw new Exception('Record exception test event');
         } catch (Exception $exception) {
@@ -461,12 +462,12 @@ Caused by: Exception: Thrown from fail2()
         self::assertCount(1, $events);
 
         [$event] = iterator_to_array($events);
-        
+
         $this->assertSame($event->getName(), 'exception');
         $this->assertArrayHasKey('exception.type', iterator_to_array($event->getAttributes()));
         $this->assertArrayHasKey('exception.message', iterator_to_array($event->getAttributes()));
         $this->assertArrayHasKey('exception.stacktrace', iterator_to_array($event->getAttributes()));
-        
+
         $timestamp = Clock::get()->timestamp();
         $span->addEvent('update', $timestamp)
                     ->setAttribute('space', 'guard.session')
@@ -589,10 +590,6 @@ Caused by: Exception: Thrown from fail2()
         $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
         /** @var Attribute $sdkversion */
         $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
-        /** @var Attribute $servicename */
-        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
-        /** @var Attribute $serviceversion */
-        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         /** @var Attribute $primary */
         $primary = $attributes->getAttribute('provider');
@@ -604,10 +601,8 @@ Caused by: Exception: Thrown from fail2()
         $this->assertEquals('opentelemetry', $sdkname->getValue());
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
-        $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('version', $serviceversion->getValue());
 
-        $this->assertCount(8, $attributes);
+        $this->assertCount(5, $attributes);
 
         // Start a span with the tracer.
         $tracer->startAndActivateSpan('firstSpan');
@@ -628,10 +623,6 @@ Caused by: Exception: Thrown from fail2()
         $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
         /** @var Attribute $sdkversion */
         $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
-        /** @var Attribute $servicename */
-        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
-        /** @var Attribute $serviceversion */
-        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         /** @var Attribute $primary */
         $primary = $attributes->getAttribute('provider');
@@ -643,10 +634,8 @@ Caused by: Exception: Thrown from fail2()
         $this->assertEquals('opentelemetry', $sdkname->getValue());
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
-        $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('version', $serviceversion->getValue());
 
-        $this->assertCount(8, $attributes);
+        $this->assertCount(5, $attributes);
     }
 
     public function testCreateSpanGetsResourceFromDefaultTraceProviderDefaultTrace()
@@ -677,18 +666,12 @@ Caused by: Exception: Thrown from fail2()
         $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
         /** @var Attribute $sdkversion */
         $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
-        /** @var Attribute $servicename */
-        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
-        /** @var Attribute $serviceversion */
-        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         $this->assertEquals('opentelemetry', $sdkname->getValue());
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
-        $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('', $serviceversion->getValue());
 
-        $this->assertCount(6, $attributes);
+        $this->assertCount(3, $attributes);
 
         // Start a span with the tracer.
         $tracer->startAndActivateSpan('firstSpan');
@@ -706,18 +689,12 @@ Caused by: Exception: Thrown from fail2()
         $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
         /** @var Attribute $sdkversion */
         $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
-        /** @var Attribute $servicename */
-        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
-        /** @var Attribute $serviceversion */
-        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         $this->assertEquals('opentelemetry', $sdkname->getValue());
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
-        $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('', $serviceversion->getValue());
 
-        $this->assertCount(6, $attributes);
+        $this->assertCount(3, $attributes);
     }
 
     public function testCreateSpanGetsResourceFromNonDefaultTraceProviderDefaultTrace()
@@ -758,10 +735,6 @@ Caused by: Exception: Thrown from fail2()
         $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
         /** @var Attribute $sdkversion */
         $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
-        /** @var Attribute $servicename */
-        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
-        /** @var Attribute $serviceversion */
-        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         /** @var Attribute $primary */
         $primary = $attributes->getAttribute('provider');
@@ -773,10 +746,8 @@ Caused by: Exception: Thrown from fail2()
         $this->assertEquals('opentelemetry', $sdkname->getValue());
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
-        $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('', $serviceversion->getValue());
 
-        $this->assertCount(8, $attributes);
+        $this->assertCount(5, $attributes);
 
         // Start a span with the tracer.
         $tracer->startAndActivateSpan('firstSpan');
@@ -795,10 +766,6 @@ Caused by: Exception: Thrown from fail2()
         $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
         /** @var Attribute $sdkversion */
         $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
-        /** @var Attribute $servicename */
-        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
-        /** @var Attribute $serviceversion */
-        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         /** @var Attribute $primary */
         $primary = $attributes->getAttribute('provider');
@@ -810,10 +777,8 @@ Caused by: Exception: Thrown from fail2()
         $this->assertEquals('opentelemetry', $sdkname->getValue());
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
-        $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('', $serviceversion->getValue());
 
-        $this->assertCount(8, $attributes);
+        $this->assertCount(5, $attributes);
     }
 
     public function testCreateSpanGetsResourceFromDefaultTraceProviderNonDefaultTrace()
@@ -844,18 +809,12 @@ Caused by: Exception: Thrown from fail2()
         $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
         /** @var Attribute $sdkversion */
         $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
-        /** @var Attribute $servicename */
-        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
-        /** @var Attribute $serviceversion */
-        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         $this->assertEquals('opentelemetry', $sdkname->getValue());
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
-        $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('version', $serviceversion->getValue());
 
-        $this->assertCount(6, $attributes);
+        $this->assertCount(3, $attributes);
 
         // Start a span with the tracer.
         $tracer->startAndActivateSpan('firstSpan');
@@ -874,17 +833,11 @@ Caused by: Exception: Thrown from fail2()
         $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
         /** @var Attribute $sdkversion */
         $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
-        /** @var Attribute $servicename */
-        $servicename = $attributes->getAttribute(ResourceConstants::SERVICE_NAME);
-        /** @var Attribute $serviceversion */
-        $serviceversion = $attributes->getAttribute(ResourceConstants::SERVICE_VERSION);
 
         $this->assertEquals('opentelemetry', $sdkname->getValue());
         $this->assertEquals('php', $sdklanguage->getValue());
         $this->assertEquals('dev', $sdkversion->getValue());
-        $this->assertEquals('name', $servicename->getValue());
-        $this->assertEquals('version', $serviceversion->getValue());
 
-        $this->assertCount(6, $attributes);
+        $this->assertCount(3, $attributes);
     }
 }
