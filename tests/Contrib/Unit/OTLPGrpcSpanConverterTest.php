@@ -8,6 +8,7 @@ use OpenTelemetry\Contrib\OtlpGrpc\SpanConverter;
 use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
+use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
@@ -55,7 +56,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
         // $this->assertGreaterThan(0, $row['duration']);
 
         // $this->assertCount(1, $row['tags']);
-        
+
         // /** @var Attribute $attribute */
         // $attribute = $span->getAttribute('service');
         // $this->assertEquals($attribute->getValue(), $row['tags']['service']);
@@ -159,6 +160,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
                 ])
             )
         );
+        $sdk->setInstrumentationLibrary(new InstrumentationLibrary('lib-test', 'v0.1.0'));
 
         // We have to set the time twice here due to the way PHP deals with Monotonic Clock and Realtime Clock.
         $sdk->setStartEpochTimestamp($start_time);
@@ -199,9 +201,8 @@ class OTLPGrpcSpanConverterTest extends TestCase
             'instrumentation_library_spans' => [
                 new InstrumentationLibrarySpans([
                     'instrumentation_library' => new \Opentelemetry\Proto\Common\V1\InstrumentationLibrary([
-                        // TODO: Fetch instrumentation library from TracerProvider
-                        // 'name' => 'lib-a',
-                        // 'version' => 'v0.1.0',
+                        'name' => 'lib-test',
+                        'version' => 'v0.1.0',
                     ]),
                     'spans' => [
                         new V1\Span([

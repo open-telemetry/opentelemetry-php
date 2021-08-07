@@ -157,29 +157,31 @@ class SpanConverter
         // TODO: Should return an empty ResourceSpans when $spans is empty
         // At the minute it returns an semi populated ResourceSpan
 
-        $convertedSpans = [];
+        $ils = $convertedSpans = [];
         foreach ($spans as $span) {
-            array_push($convertedSpans, $this->as_otlp_span($span));
+            /** @var \OpenTelemetry\Sdk\InstrumentationLibrary $il */
+            $il = $span->getInstrumentationLibrary();
+            $ilKey = sprintf('%s@%s', $il->getName(), $il->getVersion()??'');
+            if (!isset($ils[$ilKey])) {
+                $convertedSpans[$ilKey] = [];
+                $ils[$ilKey] = new InstrumentationLibrary(['name' => $il->getName(), 'version' => $il->getVersion()??'']);
+            }
+            $convertedSpans[$ilKey][] = $this->as_otlp_span($span);
         }
 
-        // TODO: Fetch InstrumentationLibrary from the TracerProvider
-        $il = new InstrumentationLibrary([]);
-
-        $ilspans = [];
-        foreach ($convertedSpans as $convertedSpan) {
-            $ilspan = new InstrumentationLibrarySpans([
+        $ilSpans = [];
+        foreach ($ils as $ilKey => $il) {
+            $ilSpans[] = new InstrumentationLibrarySpans([
                 'instrumentation_library' => $il,
-                'spans' => [$convertedSpan],
+                'spans' => $convertedSpans[$ilKey],
             ]);
-
-            array_push($ilspans, $ilspan);
         }
 
         return new Proto\Trace\V1\ResourceSpans([
             'resource' => new Proto\Resource\V1\Resource([
                 'attributes' => $this->as_otlp_resource_attributes($spans),
             ]),
-            'instrumentation_library_spans' => $ilspans,
+            'instrumentation_library_spans' => $ilSpans,
         ]);
     }
 }
