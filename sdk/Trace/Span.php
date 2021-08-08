@@ -11,7 +11,7 @@ use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 use Throwable;
 
-class Span implements API\Span
+class Span implements API\Span, ReadableSpan
 {
     use ContextValueTrait;
 
@@ -22,6 +22,7 @@ class Span implements API\Span
     private $sampler;
 
     private $startEpochTimestamp;
+    private $endEpochTimestamp;
     private $start;
     private $end;
 
@@ -167,6 +168,11 @@ class Span implements API\Span
         return $this->startEpochTimestamp;
     }
 
+    public function getEndEpochTimestamp(): ?int
+    {
+        return $this->endEpochTimestamp;
+    }
+
     public function getEnd(): ?int
     {
         return $this->end;
@@ -201,6 +207,11 @@ class Span implements API\Span
         $this->name = $name;
 
         return $this;
+    }
+
+    public function getSpanContext(): API\SpanContext
+    {
+        return $this->spanContext;
     }
 
     public function getAttribute(string $key): ?Attribute
@@ -388,7 +399,7 @@ class Span implements API\Span
         if ($prev) {
             $result  .= "\n" . self::getStackTrace($prev, $seen);
         }
-    
+
         return $result;
     }
 }

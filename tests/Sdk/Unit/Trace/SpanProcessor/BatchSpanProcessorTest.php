@@ -123,6 +123,7 @@ class BatchSpanProcessorTest extends TestCase
     public function shouldAllowNullExporter()
     {
         $proc = new BatchSpanProcessor(null, self::createMock(Clock::class));
+        /** @var \OpenTelemetry\Sdk\Trace\Span $span */
         $span = $this->createSampledSpanMock();
         $proc->onStart($span);
         $proc->onEnd($span);
@@ -182,6 +183,7 @@ class BatchSpanProcessorTest extends TestCase
         $proc = new BatchSpanProcessor($exporter, self::createMock(Clock::class));
         $proc->shutdown();
 
+        /** @var \OpenTelemetry\Sdk\Trace\Span $span */
         $span = $this->createSampledSpanMock();
         $proc->onStart($span);
         $proc->onEnd($span);

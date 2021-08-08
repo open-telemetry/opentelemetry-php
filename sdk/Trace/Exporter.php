@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
-use OpenTelemetry\Trace as API;
-
 /**
  * A simple Exporter interface
  *
@@ -22,7 +20,7 @@ interface Exporter
 
     /**
      * Export trace data (spans)
-     * @param iterable<API\Span> $spans Batch of spans to export
+     * @param iterable<ReadableSpan> $spans Batch of spans to export
      * @return int
      */
     public function export(iterable $spans): int;

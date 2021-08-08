@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Sdk\Trace\ReadableSpan;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Trace as API;
 
@@ -39,7 +40,7 @@ final class SpanMultiProcessor implements SpanProcessor
         }
     }
 
-    public function onEnd(API\Span $span): void
+    public function onEnd(ReadableSpan $span): void
     {
         foreach ($this->processors as $processor) {
             $processor->onEnd($span);

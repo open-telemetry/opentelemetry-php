@@ -36,6 +36,9 @@ class Tracer implements API\Tracer
         $this->importedContext = $context;
     }
 
+    /**
+     * @return Span|NoopSpan
+     */
     public function startSpan(
         string $name,
         ?Context $parentContext = null,
@@ -96,6 +99,9 @@ class Tracer implements API\Tracer
         return $span;
     }
 
+    /**
+     * @return Span
+     */
     public function getActiveSpan(): API\Span
     {
         while (count($this->tail) && ($this->active->ended())) {

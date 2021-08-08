@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Exporter;
+use OpenTelemetry\Sdk\Trace\ReadableSpan;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Trace as API;
 
@@ -35,7 +36,7 @@ class BatchSpanProcessor implements SpanProcessor
      */
     private $maxExportBatchSize;
     /**
-     * @var array<API\Span>
+     * @var array<ReadableSpan>
      */
     private $queue;
 
@@ -84,7 +85,7 @@ class BatchSpanProcessor implements SpanProcessor
     /**
      * @inheritDoc
      */
-    public function onEnd(API\Span $span): void
+    public function onEnd(ReadableSpan $span): void
     {
         if (null === $this->exporter) {
             return;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Newrelic;
 
-use OpenTelemetry\Trace\Span;
+use OpenTelemetry\Sdk\Trace\ReadableSpan;
 
 class SpanConverter
 {
@@ -21,7 +21,7 @@ class SpanConverter
         $this->serviceName = $serviceName;
     }
 
-    public function convert(Span $span)
+    public function convert(ReadableSpan $span)
     {
         $spanParent = $span->getParent();
         $row = [

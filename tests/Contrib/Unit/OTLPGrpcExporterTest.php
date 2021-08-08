@@ -31,6 +31,7 @@ class OTLPGrpcExporterTest extends TestCase
 
         $tracer = $provider->getTracer('io.opentelemetry.contrib.php');
 
+        /** @var \OpenTelemetry\Sdk\Trace\Span $span */
         $span = $tracer->startAndActivateSpan('test.otlp');
 
         $span->setAttribute('attr1', 'val1')
