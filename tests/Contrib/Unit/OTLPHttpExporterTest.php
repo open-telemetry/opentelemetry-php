@@ -11,6 +11,7 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter;
+use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use PHPUnit\Framework\TestCase;
@@ -47,10 +48,12 @@ class OTLPHttpExporterTest extends TestCase
         );
         /** @var ClientInterface $client */
         $exporter = new Exporter($client, new HttpFactory(), new HttpFactory());
+        $span = new Span('test.otlp.span', SpanContext::generate());
+        $span->setInstrumentationLibrary(new InstrumentationLibrary('lib-test', 'v0.1.0'));
 
         $this->assertEquals(
             $expected,
-            $exporter->export([new Span('test.otlp.span', SpanContext::generate())])
+            $exporter->export([$span])
         );
     }
 
@@ -79,10 +82,12 @@ class OTLPHttpExporterTest extends TestCase
 
         /** @var ClientInterface $client */
         $exporter = new Exporter($client, new HttpFactory(), new HttpFactory());
+        $span = new Span('test.otlp.span', SpanContext::generate());
+        $span->setInstrumentationLibrary(new InstrumentationLibrary('lib-test', 'v0.1.0'));
 
         $this->assertEquals(
             $expected,
-            $exporter->export([new Span('test.otlp.span', SpanContext::generate())])
+            $exporter->export([$span])
         );
     }
 
@@ -163,8 +168,10 @@ class OTLPHttpExporterTest extends TestCase
 
         $client = new Client(['handler' => $stack]);
         $exporter = new Exporter($client, new HttpFactory(), new HttpFactory());
+        $span = new Span('test.otlp.span', SpanContext::generate());
+        $span->setInstrumentationLibrary(new InstrumentationLibrary('lib-test', 'v0.1.0'));
 
-        $exporter->export([new Span('test.otlp.span', SpanContext::generate())]);
+        $exporter->export([$span]);
 
         $request = $container[0]['request'];
 
