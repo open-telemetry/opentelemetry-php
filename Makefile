@@ -25,7 +25,7 @@ trace examples: FORCE
 	docker-compose stop
 collector:
 	docker-compose -f docker-compose-collector.yaml up -d --remove-orphans
-	docker-compose -f docker-compose-collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317 --rm php php ./examples/AlwaysOnOTLPGrpcExample2.php
+	docker-compose -f docker-compose-collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4318 --rm php php ./examples/AlwaysOnOTLPGrpcExample2.php
 	docker-compose -f docker-compose-collector.yaml stop
 
 metrics-prometheus-example:
