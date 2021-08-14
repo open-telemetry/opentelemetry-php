@@ -69,7 +69,7 @@ class Exporter implements Trace\Exporter
      * OTLP GRPC Exporter Constructor
      */
     public function __construct(
-        string $endpointURL = 'localhost:4317',
+        string $endpointURL = 'localhost:4318',
         bool $insecure = true,
         string $certificateFile = '',
         string $headers = '',
