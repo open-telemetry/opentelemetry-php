@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
-use Exception;
 use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\Context\ContextValueTrait;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
+use Throwable;
 
 class Span implements API\Span
 {
@@ -241,7 +241,7 @@ class Span implements API\Span
         return $this;
     }
 
-    public function recordException(Exception $exception, ?API\Attributes $attributes = null): API\Span
+    public function recordException(Throwable $exception, ?API\Attributes $attributes = null): API\Span
     {
         $eventAttributes = new Attributes(
             [
