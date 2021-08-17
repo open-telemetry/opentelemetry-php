@@ -43,7 +43,7 @@ class OTLPGrpcExporterTest extends TestCase
 
     public function testRefusesInvalidHeaders()
     {
-        $foo = new Exporter('localhost:4318', true, '', 'a:bc');
+        $foo = new Exporter('localhost:4317', true, '', 'a:bc');
 
         $this->assertEquals([], $foo->getHeaders());
 
@@ -63,7 +63,7 @@ class OTLPGrpcExporterTest extends TestCase
 
     public function testSetHeadersInConstructor()
     {
-        $exporter = new Exporter('localhost:4318', true, '', 'x-aaa=foo,x-bbb=bar');
+        $exporter = new Exporter('localhost:4317', true, '', 'x-aaa=foo,x-bbb=bar');
 
         $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar']], $exporter->getHeaders());
 
@@ -126,13 +126,13 @@ class OTLPGrpcExporterTest extends TestCase
     public function testClientOptions()
     {
         // default options
-        $exporter = new Exporter('localhost:4318');
+        $exporter = new Exporter('localhost:4317');
         $opts = $exporter->getClientOptions();
         $this->assertEquals(10, $opts['timeout']);
         $this->assertTrue($this->isInsecure($exporter));
         $this->assertFalse(array_key_exists('grpc.default_compression_algorithm', $opts));
         // method args
-        $exporter = new Exporter('localhost:4318', false, '', '', true, 5);
+        $exporter = new Exporter('localhost:4317', false, '', '', true, 5);
         $opts = $exporter->getClientOptions();
         $this->assertEquals(5, $opts['timeout']);
         $this->assertFalse($this->isInsecure($exporter));
@@ -141,7 +141,7 @@ class OTLPGrpcExporterTest extends TestCase
         putenv('OTEL_EXPORTER_OTLP_TIMEOUT=1');
         putenv('OTEL_EXPORTER_OTLP_COMPRESSION=1');
         putenv('OTEL_EXPORTER_OTLP_INSECURE=false');
-        $exporter = new Exporter('localhost:4318');
+        $exporter = new Exporter('localhost:4317');
         $opts = $exporter->getClientOptions();
         $this->assertEquals(1, $opts['timeout']);
         $this->assertFalse($this->isInsecure($exporter));
