@@ -6,10 +6,12 @@ namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\Context\ContextValueTrait;
+use OpenTelemetry\Sdk\InstrumentationLibrary;
+use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 use Throwable;
 
-class NoopSpan implements API\Span
+class NoopSpan implements API\Span, ReadableSpan
 {
     use ContextValueTrait;
 
@@ -191,5 +193,25 @@ class NoopSpan implements API\Span
     protected static function getContextKey(): ContextKey
     {
         return SpanContextKey::instance();
+    }
+
+    public function getSpanContext(): API\SpanContext
+    {
+        return $this->context;
+    }
+
+    public function getEndEpochTimestamp(): ?int
+    {
+        return null;
+    }
+
+    public function getResource(): ResourceInfo
+    {
+        return ResourceInfo::emptyResource();
+    }
+
+    public function getInstrumentationLibrary(): InstrumentationLibrary
+    {
+        return new InstrumentationLibrary('');
     }
 }

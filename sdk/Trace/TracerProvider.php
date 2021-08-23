@@ -53,6 +53,11 @@ final class TracerProvider implements API\TracerProvider
         $this->spanProcessors->shutdown();
     }
 
+    /**
+     * @param string $name
+     * @param string|null $version
+     * @return Tracer
+     */
     public function getTracer(string $name, ?string $version = null): API\Tracer
     {
         $key = sprintf('%s@%s', $name, ($version ?? 'unknown'));

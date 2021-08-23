@@ -100,7 +100,7 @@ class Tracer implements API\Tracer
     }
 
     /**
-     * @return Span
+     * @return Span|NoopSpan
      */
     public function getActiveSpan(): API\Span
     {
@@ -123,7 +123,8 @@ class Tracer implements API\Tracer
      * @param API\SpanContext $parentContext
      * @param bool $isRemote
      * @param int $spanKind
-     * @return Span
+     * @psalm-return Span
+     * @return Span|NoopSpan
      */
 
     public function startActiveSpan(string $name, API\SpanContext $parentContext, bool $isRemote = false, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
@@ -226,6 +227,7 @@ class Tracer implements API\Tracer
      * todo: fix ^
      * -> Is there a reason we didn't add this already?
      * @param string $name
+     * @psalm-return Span
      * @return Span
      */
     public function startAndActivateSpan(string $name, int $spanKind = API\SpanKind::KIND_INTERNAL): API\Span
@@ -249,6 +251,16 @@ class Tracer implements API\Tracer
         return $this->provider;
     }
 
+    /**
+     * @param string $name
+     * @param API\SpanContext $context
+     * @param API\SpanContext|null $parentContext
+     * @param Sampler|null $sampler
+     * @param ResourceInfo|null $resource
+     * @param int $spanKind
+     * @param API\Attributes|null $attributes
+     * @return Span|NoopSpan
+     */
     private function generateSpanInstance(string $name, API\SpanContext $context, API\SpanContext $parentContext = null, Sampler $sampler = null, ResourceInfo $resource = null, int $spanKind = API\SpanKind::KIND_INTERNAL, ?API\Attributes $attributes = null): API\Span
     {
         $parent = null;

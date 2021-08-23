@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Trace\SpanProcessor;
 use OpenTelemetry\Sdk\Trace\Exporter;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\Trace\SpanContext;
 use PHPUnit\Framework\TestCase;
 
 class SimpleSpanProcessorTest extends TestCase
@@ -19,8 +20,10 @@ class SimpleSpanProcessorTest extends TestCase
         $exporter = self::createMock(Exporter::class);
         $exporter->expects($this->atLeastOnce())->method('export');
 
+        $spanContext = self::createStub(SpanContext::class);
+        $spanContext->method('isSampled')->willReturn(true); // only sampled spans are exported
         $span = self::createStub(Span::class);
-        $span->method('isSampled')->willReturn(true); // only sampled spans are exported
+        $span->method('getSpanContext')->willReturn($spanContext);
 
         (new SimpleSpanProcessor($exporter))->onEnd($span);
     }
@@ -75,8 +78,10 @@ class SimpleSpanProcessorTest extends TestCase
         $exporter = self::createMock(Exporter::class);
         $exporter->expects($this->never())->method('export');
 
+        $spanContext = self::createStub(SpanContext::class);
+        $spanContext->method('isSampled')->willReturn(false);
         $span = self::createStub(Span::class);
-        $span->method('isSampled')->willReturn(false);
+        $span->method('getSpanContext')->willReturn($spanContext);
 
         (new SimpleSpanProcessor($exporter))->onEnd($span);
     }

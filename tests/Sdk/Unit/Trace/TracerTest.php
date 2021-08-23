@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\NoopSpan;
+use OpenTelemetry\Sdk\Trace\ReadableSpan;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
@@ -24,7 +25,7 @@ class TracerTest extends TestCase
         Context::attach(new Context()); // clean up the current Context
     }
 
-    private function readSpanAttributesArray(API\Span $span)
+    private function readSpanAttributesArray(ReadableSpan $span)
     {
         return array_map(function (API\Attribute $attribute) {
             return $attribute->getValue();

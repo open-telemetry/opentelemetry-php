@@ -43,7 +43,7 @@ class SimpleSpanProcessor implements SpanProcessor
             return;
         }
 
-        if (!$span->isSampled()) {
+        if (!$span->getSpanContext()->isSampled()) {
             return;
         }
 

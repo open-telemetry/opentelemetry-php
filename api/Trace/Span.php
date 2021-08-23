@@ -8,33 +8,6 @@ use Throwable;
 
 interface Span extends SpanStatus, SpanKind
 {
-    public function getSpanName(): string;
-    public function getContext(): SpanContext;
-    public function getParent(): ?SpanContext;
-
-    /**
-     * Returns Epoch timestamp value (RealtimeClock) when the Span was created
-     * @return int
-     */
-    public function getStartEpochTimestamp(): int;
-
-    /**
-     * Returns system time clock value (MonotonicClock) when the Span was created
-     * @return int
-     */
-    public function getStart(): int;
-
-    /**
-     * Returns system time clock value (MonotonicClock) when the Span was stopped
-     * @return int|null
-     */
-    public function getEnd(): ?int;
-
-    public function getAttributes(): Attributes;
-    public function getLinks(): Links;
-    public function getEvents(): Events;
-    public function getStatus(): SpanStatus;
-
     /**
      * Attributes SHOULD preserve the order in which they're set. Setting an attribute with the same key as an existing
      * attribute SHOULD overwrite the existing attribute's value.
@@ -90,6 +63,4 @@ interface Span extends SpanStatus, SpanKind
     public function end(int $timestamp = null): Span;
 
     public function isRecording(): bool;
-
-    public function isSampled(): bool;
 }

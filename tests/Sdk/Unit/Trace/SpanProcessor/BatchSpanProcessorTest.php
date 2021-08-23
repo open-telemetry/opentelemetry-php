@@ -8,6 +8,7 @@ use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Exporter;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\BatchSpanProcessor;
+use OpenTelemetry\Trace\SpanContext;
 use PHPUnit\Framework\TestCase;
 
 class BatchSpanProcessorTest extends TestCase
@@ -210,11 +211,13 @@ class BatchSpanProcessorTest extends TestCase
 
     private function createSampledSpanMock()
     {
-        return self::createConfiguredMock(Span::class, ['isSampled' => true]);
+        $spanContext = self::createConfiguredMock(SpanContext::class, ['isSampled' => true]);
+        return self::createConfiguredMock(Span::class, ['getSpanContext' => $spanContext]);
     }
 
     private function createNonSampledSpanMock()
     {
-        return self::createConfiguredMock(Span::class, ['isSampled' => false]);
+        $spanContext = self::createConfiguredMock(SpanContext::class, ['isSampled' => false]);
+        return self::createConfiguredMock(Span::class, ['getSpanContext' => $spanContext]);
     }
 }

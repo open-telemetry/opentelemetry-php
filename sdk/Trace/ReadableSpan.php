@@ -44,6 +44,4 @@ interface ReadableSpan
     public function getStart(): int;
 
     public function getEnd(): ?int;
-
-    public function isSampled(): bool;
 }
