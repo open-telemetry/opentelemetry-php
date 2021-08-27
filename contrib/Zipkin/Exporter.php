@@ -8,7 +8,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use InvalidArgumentException;
 use OpenTelemetry\Sdk\Trace;
-use OpenTelemetry\Trace as API;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
@@ -41,9 +40,9 @@ class Exporter implements Trace\Exporter
      * @var ClientInterface
      */
     private $client;
-    
+
     private $requestFactory;
-    
+
     private $streamFactory;
 
     public function __construct(
@@ -79,7 +78,7 @@ class Exporter implements Trace\Exporter
     /**
      * Exports the provided Span data via the Zipkin protocol
      *
-     * @param iterable<API\Span> $spans Array of Spans
+     * @param iterable<Trace\ReadableSpan> $spans Array of Spans
      * @return int return code, defined on the Exporter interface
      */
     public function export(iterable $spans): int
@@ -103,7 +102,7 @@ class Exporter implements Trace\Exporter
                 ->createRequest('POST', $this->endpointUrl)
                 ->withBody($body)
                 ->withHeader('content-type', 'application/json');
-            
+
             $response = $this->client->sendRequest($request);
         } catch (RequestExceptionInterface $e) {
             return Trace\Exporter::FAILED_NOT_RETRYABLE;

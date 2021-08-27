@@ -11,7 +11,7 @@ use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 use Throwable;
 
-class Span implements API\Span
+class Span implements API\Span, ReadableSpan
 {
     use ContextValueTrait;
 
@@ -22,6 +22,7 @@ class Span implements API\Span
     private $sampler;
 
     private $startEpochTimestamp;
+    private $endEpochTimestamp;
     private $start;
     private $end;
 
@@ -117,6 +118,11 @@ class Span implements API\Span
         return $this->parentSpanContext !== null ? clone $this->parentSpanContext : null;
     }
 
+    /**
+     * @param string $code
+     * @param string|null $description
+     * @return Span
+     */
     public function setSpanStatus(string $code, ?string $description = null): API\Span
     {
         if ($this->isRecording()) {
@@ -138,6 +144,10 @@ class Span implements API\Span
         return $this;
     }
 
+    /**
+     * @param int|null $timestamp
+     * @return Span
+     */
     public function end(?int $timestamp = null): API\Span
     {
         if (!isset($this->end)) {
@@ -165,6 +175,11 @@ class Span implements API\Span
     public function getStartEpochTimestamp(): int
     {
         return $this->startEpochTimestamp;
+    }
+
+    public function getEndEpochTimestamp(): ?int
+    {
+        return $this->endEpochTimestamp;
     }
 
     public function getEnd(): ?int
@@ -196,6 +211,10 @@ class Span implements API\Span
         return $this->name;
     }
 
+    /**
+     * @param string $name
+     * @return Span
+     */
     public function updateName(string $name): API\Span
     {
         $this->name = $name;
@@ -203,11 +222,21 @@ class Span implements API\Span
         return $this;
     }
 
+    public function getSpanContext(): API\SpanContext
+    {
+        return $this->spanContext;
+    }
+
     public function getAttribute(string $key): ?Attribute
     {
         return $this->attributes->getAttribute($key);
     }
 
+    /**
+     * @param string $key
+     * @param array|bool|float|int|string $value
+     * @return Span
+     */
     public function setAttribute(string $key, $value): API\Span
     {
         if ($this->isRecording()) {
@@ -232,6 +261,12 @@ class Span implements API\Span
     }
 
     // todo: is accepting an Iterator enough to satisfy AddLazyEvent?  -> Looks like the spec might have been updated here: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-events
+    /**
+     * @param string $name
+     * @param int $timestamp
+     * @param API\Attributes|null $attributes
+     * @return Span
+     */
     public function addEvent(string $name, int $timestamp, ?API\Attributes $attributes = null): API\Span
     {
         if ($this->isRecording()) {
@@ -241,6 +276,11 @@ class Span implements API\Span
         return $this;
     }
 
+    /**
+     * @param Throwable $exception
+     * @param API\Attributes|null $attributes
+     * @return Span
+     */
     public function recordException(Throwable $exception, ?API\Attributes $attributes = null): API\Span
     {
         $eventAttributes = new Attributes(
@@ -276,11 +316,6 @@ class Span implements API\Span
         return $this->spanContext->isRemote();
     }
 
-    public function isSampled(): bool
-    {
-        return $this->spanContext->isSampled();
-    }
-
     public function setLinks(API\Links $links): Span
     {
         $this->links = $links;
@@ -295,7 +330,9 @@ class Span implements API\Span
     }
 
     /**
-     * @inheritDoc
+     * @param API\SpanContext $context
+     * @param API\Attributes|null $attributes
+     * @return Span
      */
     public function addLink(API\SpanContext $context, ?API\Attributes $attributes = null): API\Span
     {
@@ -388,7 +425,7 @@ class Span implements API\Span
         if ($prev) {
             $result  .= "\n" . self::getStackTrace($prev, $seen);
         }
-    
+
         return $result;
     }
 }

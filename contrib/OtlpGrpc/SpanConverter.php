@@ -16,7 +16,7 @@ use Opentelemetry\Proto\Trace\V1\Span\Event;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
-use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\ReadableSpan;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
 
 class SpanConverter
@@ -78,7 +78,7 @@ class SpanConverter
         return SpanKind::SPAN_KIND_UNSPECIFIED;
     }
 
-    public function as_otlp_span(Span $span): CollectorSpan
+    public function as_otlp_span(ReadableSpan $span): CollectorSpan
     {
         $end_timestamp = ($span->getStartEpochTimestamp() + $span->getDuration());
 

@@ -9,7 +9,6 @@ use InvalidArgumentException;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\Sdk\Trace;
-use OpenTelemetry\Trace as API;
 
 class Exporter implements Trace\Exporter
 {
@@ -53,7 +52,7 @@ class Exporter implements Trace\Exporter
     private $spanConverter;
 
     private $metadata;
-    
+
     /**
     * @var bool
     */
@@ -126,7 +125,7 @@ class Exporter implements Trace\Exporter
     /**
      * Exports the provided Span data via the OTLP protocol
      *
-     * @param iterable<API\Span> $spans Array of Spans
+     * @param iterable<Trace\ReadableSpan> $spans Array of Spans
      * @return int return code, defined on the Exporter interface
      */
     public function export(iterable $spans): int
@@ -134,7 +133,7 @@ class Exporter implements Trace\Exporter
         if (!$this->running) {
             return Exporter::FAILED_NOT_RETRYABLE;
         }
-        
+
         if (empty($spans)) {
             return Trace\Exporter::SUCCESS;
         }

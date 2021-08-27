@@ -21,7 +21,7 @@ interface SpanProcessor
      * This method is called synchronously on the execution thread,
      * therefore it should not block or throw an exception.
      */
-    public function onEnd(API\Span $span): void;
+    public function onEnd(ReadableSpan $span): void;
 
     /**
      * Export all ended spans to the configured Exporter that have not yet been exported.

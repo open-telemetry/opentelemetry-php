@@ -46,7 +46,7 @@ class SpanContextTest extends TestCase
 
         $span = $tracer->startAndActivateSpan('test');
 
-        $this->assertTrue($span->isSampled());
+        $this->assertTrue($span->getSpanContext()->isSampled());
     }
 
     /**
@@ -64,7 +64,7 @@ class SpanContextTest extends TestCase
 
         $span = $tracer->startAndActivateSpan('test');
 
-        $this->assertTrue($span->isSampled());
+        $this->assertTrue($span->getSpanContext()->isSampled());
     }
     /**
      * @test
@@ -117,7 +117,7 @@ class SpanContextTest extends TestCase
     public function testInvalidSpanId()
     {
         $spanIds = ['0000000000000000', '539g5c3f42cdpad8', '123fgh', ' '];
-        
+
         foreach ($spanIds as $spanId) {
             $this->assertFalse(SpanContext::isValidSpanId($spanId));
         }
@@ -137,7 +137,7 @@ class SpanContextTest extends TestCase
     public function testInvalidTraceId()
     {
         $traceIds = ['00000000000000000000000000000000', ' ', '123fgh', '5759e988bdhjk62e3fe1be46a994272793'];
-        
+
         foreach ($traceIds as $traceId) {
             $this->assertFalse(SpanContext::isValidTraceId($traceId));
         }
@@ -148,7 +148,7 @@ class SpanContextTest extends TestCase
     public function testValidTraceFlag()
     {
         $traceFlags = ['f0', 'ff', '00', '01'];
-        
+
         foreach ($traceFlags as $traceFlag) {
             $this->assertTrue(SpanContext::isValidTraceFlag($traceFlag));
         }
@@ -159,7 +159,7 @@ class SpanContextTest extends TestCase
     public function testInvalidTraceFlag()
     {
         $traceFlags = ['0000000000000000', ' ', 'gg', 'abc123'];
-        
+
         foreach ($traceFlags as $traceFlag) {
             $this->assertFalse(SpanContext::isValidTraceFlag($traceFlag));
         }

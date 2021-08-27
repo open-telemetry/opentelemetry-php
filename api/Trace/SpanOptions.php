@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace;
 
+use OpenTelemetry\Context\Context;
+
 /**
  * The SpanOptions implementation is intended to be tightly coupled with the Span and Tracer implementations.
  * Hopefully the Span object can implement SpanOptions so that the toSpan() call is almost a no-op, but prevents
@@ -14,8 +16,7 @@ interface SpanOptions
     public function setSpanName(string $name): SpanOptions;
     /** should default to INTERNAL if not called */
     public function setSpanKind(int $spanKind): SpanOptions;
-    public function setParentContext(SpanContext $span): SpanOptions;
-    public function setParentSpan(Span $span): SpanOptions;
+    public function setParent(Context $parentContext): SpanOptions;
     public function addAttributes(Attributes $attributes): SpanOptions;
     public function addLinks(Links $links): SpanOptions;
 

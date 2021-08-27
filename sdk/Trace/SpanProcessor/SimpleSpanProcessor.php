@@ -6,6 +6,7 @@ namespace OpenTelemetry\Sdk\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Exporter;
+use OpenTelemetry\Sdk\Trace\ReadableSpan;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Trace as API;
 
@@ -36,13 +37,13 @@ class SimpleSpanProcessor implements SpanProcessor
     /**
      * @inheritDoc
      */
-    public function onEnd(API\Span $span): void
+    public function onEnd(ReadableSpan $span): void
     {
         if (!$this->running) {
             return;
         }
 
-        if (!$span->isSampled()) {
+        if (!$span->getSpanContext()->isSampled()) {
             return;
         }
 

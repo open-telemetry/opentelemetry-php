@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Trace as API;
 
 final class SpanOptions implements API\SpanOptions
@@ -51,16 +52,11 @@ final class SpanOptions implements API\SpanOptions
         return $this;
     }
 
-    public function setParentContext(API\SpanContext $span): API\SpanOptions
+    public function setParent(Context $parentContext): API\SpanOptions
     {
-        $this->parent = $span;
-
-        return $this;
-    }
-
-    public function setParentSpan(API\Span $span): API\SpanOptions
-    {
-        $this->parent = $span->getContext();
+        $parentSpan = Span::extract($parentContext);
+        $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
+        $this->parent = $parentSpanContext;
 
         return $this;
     }
@@ -93,6 +89,9 @@ final class SpanOptions implements API\SpanOptions
         return $this;
     }
 
+    /**
+     * @return Span
+     */
     public function toSpan(): API\Span
     {
         $span = $this->tracer->getActiveSpan();
@@ -121,6 +120,9 @@ final class SpanOptions implements API\SpanOptions
         return $span;
     }
 
+    /**
+     * @return Span
+     */
     public function toActiveSpan(): API\Span
     {
         $span = $this->toSpan();
