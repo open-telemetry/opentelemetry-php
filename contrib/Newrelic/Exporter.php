@@ -146,14 +146,6 @@ class Exporter implements Trace\Exporter
             return Trace\Exporter::FAILED_RETRYABLE;
         }
 
-        $statusCode = $response->getStatusCode();
-        $reason = $response->getReasonPhrase();
-
-        // Useful information for when logging is implemented.
-        /*
-         * echo "\nsendRequest response = " . $statusCode . "\n";
-         * echo "\nsendRequest response = " . $reason . "\n";
-         */
         if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
             return Trace\Exporter::FAILED_NOT_RETRYABLE;
         }
