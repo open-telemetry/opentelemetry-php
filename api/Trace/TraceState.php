@@ -55,9 +55,7 @@ interface TraceState
     public function getListMemberCount(): int;
 
     /**
-     * Build the TraceState header
-     *
-     * @return string|null
+     * Returns a string representation of this TraceSate
      */
-    public function build(): ?string;
+    public function __toString(): string;
 }

@@ -40,10 +40,9 @@ final class TraceContext implements API\TextMapFormatPropagator
         $setter->set($carrier, self::TRACEPARENT, $traceparent);
 
         // Build and inject the tracestate header
-        $tracestate = $context->getTraceState();
-        if ($tracestate !== null) {
-            $tracestateStr = $tracestate->build();
-            $setter->set($carrier, self::TRACESTATE, $tracestateStr ? $tracestateStr : '');
+        // Spec says to avoid sending empty tracestate headers
+        if ($tracestate = (string) $context->getTraceState()) {
+            $setter->set($carrier, self::TRACESTATE, $tracestate);
         }
     }
 
