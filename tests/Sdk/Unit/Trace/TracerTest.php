@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Attributes;
+use OpenTelemetry\Sdk\Trace\Links;
 use OpenTelemetry\Sdk\Trace\NoopSpan;
 use OpenTelemetry\Sdk\Trace\ReadableSpan;
 use OpenTelemetry\Sdk\Trace\Sampler;
@@ -153,6 +154,20 @@ class TracerTest extends TestCase
         $span = $tracer->startSpan('test.span', null, API\SpanKind::KIND_INTERNAL, new Attributes($attributes));
 
         $this->assertSame($attributes, $this->readSpanAttributesArray($span));
+    }
+
+    /**
+     * @test
+     */
+    public function startSpanLinksShouldBePropagatedToSpan()
+    {
+        $tracerProvider = new TracerProvider();
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
+
+        $links = new Links();
+        $span = $tracer->startSpan('test.span', null, API\SpanKind::KIND_INTERNAL, null, $links);
+
+        $this->assertSame($links, $span->getLinks());
     }
 
     /**
