@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use function array_reverse;
+use function array_walk;
+use function implode;
 use OpenTelemetry\Trace as API;
 
 class TraceState implements API\TraceState
@@ -26,8 +29,8 @@ class TraceState implements API\TraceState
 
     public function __construct(string $rawTracestate = null)
     {
-        if ($rawTracestate != null) {
-            $this->traceState = self::parse($rawTracestate);
+        if ($rawTracestate !== null) {
+            $this->traceState = $this->parse($rawTracestate);
         }
     }
 
@@ -39,13 +42,13 @@ class TraceState implements API\TraceState
         $clonedTracestate = clone $this;
 
         //TODO: Log if we can't set the value
-        if (self::validateKey($key) && self::validateValue($value)) {
+        if ($this->validateKey($key) && $this->validateValue($value)) {
 
             /*
              * Only one entry per key is allowed. In this case we need to overwrite the vendor entry
              * upon reentry to the tracing system and ensure the updated entry is at the beginning of
              * the list. This means we place it the back for now and it will be at the beginning once
-             * we reverse the order back during build().
+             * we reverse the order back during __toString().
              */
             if (array_key_exists($key, $clonedTracestate->traceState)) {
                 unset($clonedTracestate->traceState[$key]);
@@ -92,7 +95,7 @@ class TraceState implements API\TraceState
     /**
      * {@inheritdoc}
      */
-    public function build(): ?string
+    public function __toString(): string
     {
         if (!empty($this->traceState)) {
             $clonedTracestate = clone $this;
@@ -102,7 +105,7 @@ class TraceState implements API\TraceState
 
             array_walk(
                 $clonedTracestate->traceState,
-                function (&$v, $k) {
+                static function (&$v, $k) {
                     $v = $k . self::LIST_MEMBER_KEY_VALUE_SPLITTER . $v;
                 }
             );
@@ -110,7 +113,7 @@ class TraceState implements API\TraceState
             return implode(self::LIST_MEMBERS_SEPARATOR, $clonedTracestate->traceState);
         }
 
-        return null;
+        return '';
     }
 
     /**
@@ -146,10 +149,10 @@ class TraceState implements API\TraceState
                 $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, $listMember);
 
                 // There should only be one list-member per vendor separated by '='
-                if (count($vendor) == 2) {
+                if (count($vendor) === 2) {
 
                     // TODO: Log if we can't validate the key and value
-                    if (self::validateKey($vendor[0]) && self::validateValue($vendor[1])) {
+                    if ($this->validateKey($vendor[0]) && $this->validateValue($vendor[1])) {
                         $parsedTracestate[$vendor[0]] = $vendor[1];
                     }
                 }
@@ -158,7 +161,7 @@ class TraceState implements API\TraceState
 
         /*
          * Reversing the tracestate ensures the new entries added to the TraceState object are at
-         * the beginning when we reverse it back during build().
+         * the beginning when we reverse it back during __toString().
         */
         return array_reverse($parsedTracestate);
     }

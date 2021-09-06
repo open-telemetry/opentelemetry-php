@@ -40,25 +40,12 @@ class Span implements API\Span, ReadableSpan
 
     private $attributes;
     private $events;
-    private $links = null;
+    private $links;
 
     private $ended = false;
 
     /** @var ?SpanProcessor */
     private $spanProcessor;
-
-    // todo: missing links: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-links
-
-    // -> Need to understand the difference between SpanKind and links.  From the documentation:
-    // SpanKind
-    // describes the relationship between the Span, its parents, and its children in a Trace. SpanKind describes two independent properties that benefit tracing systems during analysis.
-    // This was also updated recently -> https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#spankind
-
-    // Links
-    // A Span may be linked to zero or more other Spans (defined by SpanContext) that are causally related. Links can point to SpanContexts inside a single Trace
-    // or across different Traces. Links can be used to represent batched operations where a Span was initiated by multiple initiating Spans,
-    // each representing a single incoming item being processed in the batch.
-    // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#links-between-spans
 
     public function __construct(
         string $name,
@@ -84,6 +71,7 @@ class Span implements API\Span, ReadableSpan
         // todo: set these to null until needed
         $this->attributes = new Attributes();
         $this->events = new Events();
+        $this->links = new Links();
     }
 
     /**
@@ -325,7 +313,6 @@ class Span implements API\Span, ReadableSpan
 
     public function getLinks(): API\Links
     {
-        // TODO: Implement getLinks() method.
         return $this->links;
     }
 
@@ -336,6 +323,8 @@ class Span implements API\Span, ReadableSpan
      */
     public function addLink(API\SpanContext $context, ?API\Attributes $attributes = null): API\Span
     {
+        $this->links->addLink($context, $attributes);
+
         return $this;
     }
 

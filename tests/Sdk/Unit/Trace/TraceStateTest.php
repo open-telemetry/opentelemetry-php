@@ -32,24 +32,24 @@ class TraceStateTest extends TestCase
         $this->assertNull($tracestate->get('vendor2'));
 
         // New entry is placed at the beginning of the tracestate header
-        $this->assertSame('vendor2=value2,vendor1=value1', $tracestateWithNewValue->build());
+        $this->assertSame('vendor2=value2,vendor1=value1', (string) $tracestateWithNewValue);
 
         $tracestateWithUpdatedValue = $tracestateWithNewValue->with('vendor1', 'newValue1');
 
         // The updated entry is overwritten and placed at the beginning of the header
         $this->assertSame('value1', $tracestateWithNewValue->get('vendor1'));
         $this->assertSame('newValue1', $tracestateWithUpdatedValue->get('vendor1'));
-        $this->assertSame('vendor1=newValue1,vendor2=value2', $tracestateWithUpdatedValue->build());
+        $this->assertSame('vendor1=newValue1,vendor2=value2', (string) $tracestateWithUpdatedValue);
 
         // A new entry containing an invalid key will not be added
         $tracestateWithInvalidKey = $tracestate->with('@', 'value');
         $this->assertNull($tracestateWithInvalidKey->get('@'));
-        $this->assertSame($tracestate->build(), $tracestateWithInvalidKey->build());
+        $this->assertSame((string) $tracestate, (string) $tracestateWithInvalidKey);
 
         // A new entry containing an invalid value will not be added
         $tracestateWithInvalidValue = $tracestate->with('vendor2', 'value' . chr(0x19) . '1');
         $this->assertNull($tracestateWithInvalidValue->get('vendor2'));
-        $this->assertSame($tracestate->build(), $tracestateWithInvalidValue->build());
+        $this->assertSame((string) $tracestate, (string) $tracestateWithInvalidValue);
     }
 
     /**
@@ -69,14 +69,14 @@ class TraceStateTest extends TestCase
     /**
      * @test
      */
-    public function testBuildTracestate()
+    public function testToStringTracestate()
     {
         $tracestate = new TraceState('vendor1=value1');
         $emptyTracestate = new TraceState();
 
-        $this->assertSame('vendor1=value1', $tracestate->build());
+        $this->assertSame('vendor1=value1', (string) $tracestate);
         $this->assertSame(0, $emptyTracestate->getListMemberCount());
-        $this->assertNull($emptyTracestate->build());
+        $this->assertEmpty((string) $emptyTracestate);
     }
 
     /**
@@ -86,17 +86,22 @@ class TraceStateTest extends TestCase
     {
         // Build a tracestate with the max 32 values. Ex '0=0,1=1,...,31=31'
         $rawTraceState = range(0, TraceState::MAX_TRACESTATE_LIST_MEMBERS - 1);
-        array_walk($rawTraceState, function (&$v, $k) {
+        array_walk($rawTraceState, static function (&$v, $k) {
             $v = 'k' . $k . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . 'v' . $v;
         });
-        $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, count($rawTraceState));
+
+        /**
+         * @var array $rawTraceState
+         * @see https://github.com/vimeo/psalm/issues/6394
+         */
+        $this->assertCount(TraceState::MAX_TRACESTATE_LIST_MEMBERS, $rawTraceState);
 
         $validTracestate = new TraceState(implode(Tracestate::LIST_MEMBERS_SEPARATOR, $rawTraceState));
         $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, $validTracestate->getListMemberCount());
 
         // Add a list-member to the tracestate that exceeds the max of 32. This will cause it to be truncated
-        $rawTraceState['32'] = 'k32' . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . 'v32';
-        $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS + 1, count($rawTraceState));
+        $rawTraceState[32] = 'k32' . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . 'v32';
+        $this->assertCount(TraceState::MAX_TRACESTATE_LIST_MEMBERS + 1, $rawTraceState);
 
         $truncatedTracestate = new TraceState(implode(Tracestate::LIST_MEMBERS_SEPARATOR, $rawTraceState));
         $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, $truncatedTracestate->getListMemberCount());
@@ -125,7 +130,7 @@ class TraceStateTest extends TestCase
         $this->assertSame(TraceState::MAX_TRACESTATE_LENGTH, \strlen($rawTraceState));
 
         $validTracestate = new TraceState($rawTraceState);
-        $this->assertSame($rawTraceState, $validTracestate->build());
+        $this->assertSame($rawTraceState, (string) $validTracestate);
     }
 
     /**
@@ -142,7 +147,7 @@ class TraceStateTest extends TestCase
         $this->assertSame('3', $tracestate->get('e/f'));
         $this->assertSame('4', $tracestate->get('g_h'));
         $this->assertSame('5', $tracestate->get('01@i-j'));
-        $this->assertSame($validKeys, $tracestate->build());
+        $this->assertSame($validKeys, (string) $tracestate);
 
         // Mixed invalid keys in with valid ones
         $mixedInvalidKeys = 'a=1=,c*d=2,@e/f=3,g_h=4,I-j=5,k&l=6';
@@ -154,7 +159,7 @@ class TraceStateTest extends TestCase
         $this->assertNull($tracestate->get('k&l'));
         $this->assertSame('2', $tracestate->get('c*d'));
         $this->assertSame('4', $tracestate->get('g_h'));
-        $this->assertSame('c*d=2,g_h=4', $tracestate->build());
+        $this->assertSame('c*d=2,g_h=4', (string) $tracestate);
 
         // Tests a valid key with a length of 256 characters. The max characters allowed.
         $validKey = \str_repeat('k', 256);
@@ -163,7 +168,7 @@ class TraceStateTest extends TestCase
 
         $this->assertSame(256, \strlen($validKey));
         $this->assertSame($validValue, $tracestate->get($validKey));
-        $this->assertSame($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue, $tracestate->build());
+        $this->assertSame($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue, (string) $tracestate);
 
         // Tests an invalid key with a length of 257 characters. One more than the max characters allowed.
         $invalidKey = \str_repeat('k', 257);
@@ -190,7 +195,7 @@ class TraceStateTest extends TestCase
         $this->assertNull($parsedTracestate->get('char4'));
         $this->assertSame('value' . chr(0x20) . '2', $parsedTracestate->get('char2'));
         $this->assertSame('value' . chr(0x7E) . '3', $parsedTracestate->get('char3'));
-        $this->assertSame('char2=value' . chr(0x20) . '2,char3=value' . chr(0x7E) . '3', $parsedTracestate->build());
+        $this->assertSame('char2=value' . chr(0x20) . '2,char3=value' . chr(0x7E) . '3', (string) $parsedTracestate);
 
         // Tests a valid value with a length of 256 characters. The max allowed.
         $validValue = \str_repeat('v', 256);
@@ -199,7 +204,7 @@ class TraceStateTest extends TestCase
 
         $this->assertSame(256, \strlen($validValue));
         $this->assertSame($validValue, $tracestate->get($validKey));
-        $this->assertSame($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue, $tracestate->build());
+        $this->assertSame($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue, (string) $tracestate);
 
         // Tests an invalid value with a length of 257 characters. One more than the max allowed.
         $invalidValue = \str_repeat('v', 257);

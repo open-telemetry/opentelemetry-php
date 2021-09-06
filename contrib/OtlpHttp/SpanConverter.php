@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpHttp;
 
+use function array_key_exists;
+use function hex2bin;
 use Opentelemetry\Proto;
 use Opentelemetry\Proto\Common\V1\AnyValue;
 use Opentelemetry\Proto\Common\V1\ArrayValue;
@@ -13,6 +15,7 @@ use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
 use Opentelemetry\Proto\Trace\V1\Span\Event;
+use Opentelemetry\Proto\Trace\V1\Span\Link;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
@@ -37,7 +40,7 @@ class SpanConverter
             case is_array($value):
                 $values = [];
                 foreach ($value as $element) {
-                    array_push($values, $this->as_otlp_any_value($element));
+                    $values[] = $this->as_otlp_any_value($element);
                 }
                 $result->setArrayValue(new ArrayValue(['values' => $values]));
 
@@ -91,8 +94,7 @@ class SpanConverter
             'start_time_unix_nano' => $span->getStartEpochTimestamp(),
             'end_time_unix_nano' => $end_timestamp,
             'kind' => $this->as_otlp_span_kind($span->getSpanKind()),
-            // 'trace_state' => $span->getContext()
-            // 'links' =>
+            'trace_state' => (string) $span->getContext()->getTraceState(),
         ];
 
         foreach ($span->getEvents() as $event) {
@@ -102,7 +104,7 @@ class SpanConverter
             $attrs = [];
 
             foreach ($event->getAttributes() as $k => $v) {
-                array_push($attrs, $this->as_otlp_key_value($k, $v->getValue()));
+                $attrs[] = $this->as_otlp_key_value($k, $v->getValue());
             }
 
             $row['events'][] = new Event([
@@ -112,11 +114,29 @@ class SpanConverter
             ]);
         }
 
+        foreach ($span->getLinks() as $link) {
+            if (!array_key_exists('links', $row)) {
+                $row['links'] = [];
+            }
+            $attrs = [];
+
+            foreach ($link->getAttributes() as $k => $v) {
+                $attrs[] = $this->as_otlp_key_value($k, $v->getValue());
+            }
+
+            $row['links'][] = new Link([
+                'trace_id' => hex2bin($link->getSpanContext()->getTraceId()),
+                'span_id' => hex2bin($link->getSpanContext()->getSpanId()),
+                'trace_state' => (string) $link->getSpanContext()->getTraceState(),
+                'attributes' => $attrs,
+            ]);
+        }
+
         foreach ($span->getAttributes() as $k => $v) {
             if (!array_key_exists('attributes', $row)) {
                 $row['attributes'] = [];
             }
-            array_push($row['attributes'], $this->as_otlp_key_value($k, $v->getValue()));
+            $row['attributes'][] = $this->as_otlp_key_value($k, $v->getValue());
         }
 
         $status = new Status();
@@ -145,7 +165,7 @@ class SpanConverter
         $attrs = [];
         foreach ($spans as $span) {
             foreach ($span->getResource()->getAttributes() as $k => $v) {
-                array_push($attrs, $this->as_otlp_key_value($k, $v->getValue()));
+                $attrs[] = $this->as_otlp_key_value($k, $v->getValue());
             }
         }
 

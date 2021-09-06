@@ -94,7 +94,7 @@ class TracingTest extends TestCase
  at PHPUnit.Framework.TestCase.runBare(TestCase.php:1133)
  at PHPUnit.Framework.TestResult.run(TestResult.php:722)
  at PHPUnit.Framework.TestCase.run(TestCase.php:885)
- at PHPUnit.Framework.TestSuite.run(TestSuite.php:677)
+ at PHPUnit.Framework.TestSuite.run(TestSuite.php:678)
  ... 6 more';
         $actualStacktrace = '';
 
@@ -131,7 +131,7 @@ class TracingTest extends TestCase
  at PHPUnit.Framework.TestCase.runBare(TestCase.php:1133)
  at PHPUnit.Framework.TestResult.run(TestResult.php:722)
  at PHPUnit.Framework.TestCase.run(TestCase.php:885)
- at PHPUnit.Framework.TestSuite.run(TestSuite.php:677)
+ at PHPUnit.Framework.TestSuite.run(TestSuite.php:678)
  ... 6 more
 Caused by: Exception: Thrown from fail2()
  at OpenTelemetry.Tests.Sdk.Unit.Trace.TracingTest.fail2(TracingTest.php:113)

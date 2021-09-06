@@ -19,24 +19,27 @@ use OpenTelemetry\Sdk\Trace\SpanStatus;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 
 use PHPUnit\Framework\TestCase;
+use function bin2hex;
 
 class OTLPHttpSpanConverterTest extends TestCase
 {
     /**
      * @test
      */
-    public function shouldConvertASpanToAPayloadForOtlp()
+    public function shouldConvertASpanToAPayloadForOtlp(): void
     {
         $tracer = (new TracerProvider())->getTracer('OpenTelemetry.OtlpTest');
 
         $timestamp = Clock::get()->timestamp();
 
+        $otherSpan = $tracer->startSpan('batch.manager');
+
         /** @var Span $span */
         $span = $tracer->startAndActivateSpan('guard.validate');
         $span->setAttribute('attr1', 'apple');
         $span->setAttribute('attr2', 'orange');
-
         $span->addEvent('validators.list', $timestamp, new Attributes(['job' => 'stage.updateTime']));
+        $span->addLink($otherSpan->getContext(), new Attributes(['foo' => 'bar']));
         $span->end();
 
         $converter = new SpanConverter();
@@ -49,7 +52,15 @@ class OTLPHttpSpanConverterTest extends TestCase
 
         $this->assertSame($span->getSpanName(), $row->getName());
 
-        $this->assertEquals(2, $row->getAttributes()->count());
+        $this->assertCount(2, $row->getAttributes());
+        $this->assertCount(1, $row->getLinks());
+
+        /** @var V1\Span\Link $link */
+        $link = $row->getLinks()[0];
+
+        $this->assertSame($otherSpan->getContext()->getTraceId(), bin2hex($link->getTraceId()));
+        $this->assertSame($otherSpan->getContext()->getSpanId(), bin2hex($link->getSpanId()));
+        $this->assertCount(1, $link->getAttributes());
     }
 
     /**

@@ -60,8 +60,7 @@ class TraceContextTest extends TestCase
             $map = new PropagationMap();
             $context = TraceContext::extract($carrier, $map);
 
-            $extractedTracestate = $context->getTraceState();
-            $this->assertSame($tracestate, $extractedTracestate ? $extractedTracestate->build() : '');
+            $this->assertSame($tracestate, (string) $context->getTraceState());
         }
     }
 
@@ -81,8 +80,7 @@ class TraceContextTest extends TestCase
         $extractedTraceparent = '00-' . $context->getTraceId() . '-' . $context->getSpanId() . '-' . ($context->isSampled() ? '01' : '00');
         $this->assertSame(self::TRACEPARENTVALUE, $extractedTraceparent);
 
-        $extractedTracestate = $context->getTraceState();
-        $this->assertSame($tracestateValue, $extractedTracestate ? $extractedTracestate->build() : '');
+        $this->assertSame($tracestateValue, (string) $context->getTraceState());
     }
 
     /**
@@ -114,8 +112,7 @@ class TraceContextTest extends TestCase
         $context = TraceContext::extract($carrier, $map);
 
         // Invalid list-member should be dropped
-        $extractedTracestate = $context->getTraceState();
-        $this->assertSame('vendor2=opaqueValue2', $extractedTracestate ? $extractedTracestate->build() : '');
+        $this->assertSame('vendor2=opaqueValue2', (string) $context->getTraceState());
 
         // Tracestate with an invalid value
         $carrier = [TraceContext::TRACEPARENT => self::TRACEPARENTVALUE,
@@ -125,8 +122,7 @@ class TraceContextTest extends TestCase
         $context = TraceContext::extract($carrier, $map);
 
         // Invalid list-member should be dropped
-        $extractedTracestate = $context->getTraceState();
-        $this->assertSame('vendor3=opaqueValue3', $extractedTracestate ? $extractedTracestate->build() : '');
+        $this->assertSame('vendor3=opaqueValue3', (string) $context->getTraceState());
     }
 
     /**
@@ -154,6 +150,27 @@ class TraceContextTest extends TestCase
         TraceContext::inject($context, $carrier, $map);
 
         $this->assertSame('vendor1=opaqueValue1', $map->get($carrier, TraceContext::TRACESTATE));
+    }
+
+    public function testInjectNullTracestate(): void
+    {
+        $carrier = [];
+        $map = new PropagationMap();
+        $context = SpanContext::restore(self::TRACEID, self::SPANID, true, false);
+        TraceContext::inject($context, $carrier, $map);
+
+        $this->assertNull($map->get($carrier, TraceContext::TRACESTATE));
+    }
+
+    public function testInjectEmptyTracestate(): void
+    {
+        $carrier = [];
+        $map = new PropagationMap();
+        $tracestate = new TraceState();
+        $context = SpanContext::restore(self::TRACEID, self::SPANID, true, false, $tracestate);
+        TraceContext::inject($context, $carrier, $map);
+
+        $this->assertNull($map->get($carrier, TraceContext::TRACESTATE));
     }
 
     /**
