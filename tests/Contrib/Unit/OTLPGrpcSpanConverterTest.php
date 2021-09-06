@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use function bin2hex;
 use OpenTelemetry\Contrib\OtlpGrpc\SpanConverter;
 use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
-use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
-use OpenTelemetry\Sdk\Trace\Span;
 
+use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
-use OpenTelemetry\Sdk\Trace\TracerProvider;
 
+use OpenTelemetry\Sdk\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
 class OTLPGrpcSpanConverterTest extends TestCase
@@ -26,16 +26,19 @@ class OTLPGrpcSpanConverterTest extends TestCase
     /**
      * @test
      */
-    public function shouldConvertASpanToAPayloadForOtlp()
+    public function shouldConvertASpanToAPayloadForOtlp(): void
     {
         $tracer = (new TracerProvider())->getTracer('OpenTelemetry.OtlpTest');
 
         $timestamp = Clock::get()->timestamp();
 
+        $otherSpan = $tracer->startSpan('batch.manager');
+
         /** @var Span $span */
         $span = $tracer->startAndActivateSpan('guard.validate');
         $span->setAttribute('service', 'guard');
         $span->addEvent('validators.list', $timestamp, new Attributes(['job' => 'stage.updateTime']));
+        $span->addLink($otherSpan->getContext(), new Attributes(['foo' => 'bar']));
         $span->end();
 
         $converter = new SpanConverter();
@@ -47,6 +50,16 @@ class OTLPGrpcSpanConverterTest extends TestCase
         $this->assertSame($span->getContext()->getTraceId(), bin2hex($row->getTraceId()));
 
         $this->assertSame($span->getSpanName(), $row->getName());
+
+        $this->assertCount(1, $row->getAttributes());
+        $this->assertCount(1, $row->getLinks());
+
+        /** @var V1\Span\Link $link */
+        $link = $row->getLinks()[0];
+
+        $this->assertSame($otherSpan->getContext()->getTraceId(), bin2hex($link->getTraceId()));
+        $this->assertSame($otherSpan->getContext()->getSpanId(), bin2hex($link->getSpanId()));
+        $this->assertCount(1, $link->getAttributes());
 
         // $this->assertIsInt($row['timestamp']);
         // // timestamp should be in microseconds
