@@ -86,17 +86,22 @@ class TraceStateTest extends TestCase
     {
         // Build a tracestate with the max 32 values. Ex '0=0,1=1,...,31=31'
         $rawTraceState = range(0, TraceState::MAX_TRACESTATE_LIST_MEMBERS - 1);
-        array_walk($rawTraceState, function (&$v, $k) {
+        array_walk($rawTraceState, static function (&$v, $k) {
             $v = 'k' . $k . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . 'v' . $v;
         });
-        $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, count($rawTraceState));
+
+        /**
+         * @var array $rawTraceState
+         * @see https://github.com/vimeo/psalm/issues/6394
+         */
+        $this->assertCount(TraceState::MAX_TRACESTATE_LIST_MEMBERS, $rawTraceState);
 
         $validTracestate = new TraceState(implode(Tracestate::LIST_MEMBERS_SEPARATOR, $rawTraceState));
         $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, $validTracestate->getListMemberCount());
 
         // Add a list-member to the tracestate that exceeds the max of 32. This will cause it to be truncated
-        $rawTraceState['32'] = 'k32' . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . 'v32';
-        $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS + 1, count($rawTraceState));
+        $rawTraceState[32] = 'k32' . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . 'v32';
+        $this->assertCount(TraceState::MAX_TRACESTATE_LIST_MEMBERS + 1, $rawTraceState);
 
         $truncatedTracestate = new TraceState(implode(Tracestate::LIST_MEMBERS_SEPARATOR, $rawTraceState));
         $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, $truncatedTracestate->getListMemberCount());
