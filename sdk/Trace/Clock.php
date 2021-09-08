@@ -27,6 +27,7 @@ class Clock implements API\Clock
         return self::$instance;
     }
 
+    /** @return array{int, int} */
     public function moment(): array
     {
         return [$this->realtime_clock->now(), $this->monotonic_clock->now()];

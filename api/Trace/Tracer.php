@@ -19,8 +19,22 @@ interface Tracer
 
     public function getActiveSpan(): Span;
 
-    public function startActiveSpan(string $name, SpanContext $parentContext, bool $isRemote = false, int $spanKind = SpanKind::KIND_INTERNAL): Span;
-    public function startAndActivateSpan(string $name, int $spanKind = SpanKind::KIND_INTERNAL): Span;
+    public function startActiveSpan(
+        string $name,
+        SpanContext $parentContext,
+        bool $isRemote = false,
+        int $spanKind = SpanKind::KIND_INTERNAL,
+        ?Attributes $attributes = null,
+        ?Links $links = null
+    ): Span;
+
+    public function startAndActivateSpan(
+        string $name,
+        int $spanKind = SpanKind::KIND_INTERNAL,
+        ?Attributes $attributes = null,
+        ?Links $links = null
+    ): Span;
+
     public function startSpanWithOptions(string $name): SpanOptions;
 
     public function setActiveSpan(Span $span): void;

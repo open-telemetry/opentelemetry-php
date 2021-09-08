@@ -14,9 +14,9 @@ class Links implements API\Links
     private $links = [];
 
     /** @inheritDoc */
-    public function addLink(API\SpanContext $context, ?API\Attributes $attributes = null): API\Links
+    public function addLink(API\Link $link): API\Links
     {
-        $this->links[] = new Link($context, $attributes);
+        $this->links[] = $link;
 
         return $this;
     }

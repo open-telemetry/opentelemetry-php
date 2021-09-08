@@ -27,13 +27,6 @@ interface Span extends SpanStatus, SpanKind
     public function addEvent(string $name, int $timestamp, ?Attributes $attributes = null): Span;
 
     /**
-     * @param SpanContext $context
-     * @param Attributes|null $attributes
-     * @return Span Must return $this to allow setting multiple links at once in a chain.
-     */
-    public function addLink(SpanContext $context, ?Attributes $attributes = null): Span;
-
-    /**
      *
      * @param Throwable $exception
      * @return Span Must return $this to allow setting multiple attributes at once in a chain.

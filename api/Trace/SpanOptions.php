@@ -18,7 +18,7 @@ interface SpanOptions
     public function setSpanKind(int $spanKind): SpanOptions;
     public function setParent(Context $parentContext): SpanOptions;
     public function addAttributes(Attributes $attributes): SpanOptions;
-    public function addLinks(Links $links): SpanOptions;
+    public function addLink(Link $link): SpanOptions;
 
     /**
      * This should only be used if the creation time has already passed; will set timestamp to current time by default

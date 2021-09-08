@@ -68,9 +68,13 @@ final class SpanOptions implements API\SpanOptions
         return $this;
     }
 
-    public function addLinks(API\Links $links): API\SpanOptions
+    public function addLink(API\Link $link): API\SpanOptions
     {
-        $this->links = $links;
+        if (null === $this->links) {
+            $this->links = new Links();
+        }
+
+        $this->links->addLink($context, $attributes);
 
         return $this;
     }
