@@ -126,6 +126,9 @@ class Tracer implements API\Tracer
         $this->active = $span;
     }
 
+    /**
+     * @return Span|NoopSpan
+     */
     public function startActiveSpan(
         string $name,
         API\SpanContext $parentContext,
@@ -278,6 +281,14 @@ class Tracer implements API\Tracer
         return $this->provider;
     }
 
+    public function startSpanWithOptions(string $name): API\SpanOptions
+    {
+        return new SpanOptions($this, $name, $this->provider->getSpanProcessor());
+    }
+
+    /**
+     * @return Span|NoopSpan
+     */
     private function generateSpanInstance(
         string $name,
         API\SpanContext $context,
@@ -316,10 +327,5 @@ class Tracer implements API\Tracer
         $this->spans[] = $span;
 
         return $span;
-    }
-
-    public function startSpanWithOptions(string $name): API\SpanOptions
-    {
-        return new SpanOptions($this, $name, $this->provider->getSpanProcessor());
     }
 }

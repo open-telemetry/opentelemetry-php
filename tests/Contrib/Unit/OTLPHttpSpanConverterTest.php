@@ -13,12 +13,15 @@ use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
-
+use OpenTelemetry\Sdk\Trace\Link;
+use OpenTelemetry\Sdk\Trace\Links;
 use OpenTelemetry\Sdk\Trace\Span;
+
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
-
 use OpenTelemetry\Sdk\Trace\TracerProvider;
+
+use OpenTelemetry\Trace\SpanKind;
 use PHPUnit\Framework\TestCase;
 
 class OTLPHttpSpanConverterTest extends TestCase
@@ -34,13 +37,15 @@ class OTLPHttpSpanConverterTest extends TestCase
 
         $otherSpan = $tracer->startSpan('batch.manager');
 
-        /** @var Span $span */
-        $span = $tracer->startAndActivateSpan('guard.validate');
-        $span->setAttribute('attr1', 'apple');
-        $span->setAttribute('attr2', 'orange');
+        $span = $tracer->startAndActivateSpan(
+            'guard.validate',
+            SpanKind::KIND_INTERNAL,
+            new Attributes(['attr1' => 'apple', 'attr2' => 'orange']),
+            new Links([new Link($otherSpan->getContext(), new Attributes(['foo' => 'bar']))])
+        );
         $span->addEvent('validators.list', $timestamp, new Attributes(['job' => 'stage.updateTime']));
-        $span->addLink($otherSpan->getContext(), new Attributes(['foo' => 'bar']));
         $span->end();
+        $otherSpan->end();
 
         $converter = new SpanConverter();
         $row = $converter->as_otlp_span($span);
@@ -156,7 +161,6 @@ class OTLPHttpSpanConverterTest extends TestCase
                 0, // traceFlags
             ),
             null, // parentSpanContext
-            null, // sampler
             ResourceInfo::create(
                 new Attributes([
                     'instance' => 'test-a',

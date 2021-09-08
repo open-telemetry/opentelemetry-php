@@ -74,7 +74,7 @@ final class SpanOptions implements API\SpanOptions
             $this->links = new Links();
         }
 
-        $this->links->addLink($context, $attributes);
+        $this->links->addLink($link);
 
         return $this;
     }
@@ -103,7 +103,16 @@ final class SpanOptions implements API\SpanOptions
             ? SpanContext::fork($span->getContext()->getTraceId())
             : SpanContext::fork($this->tracer->getTracerProvider()->getIdGenerator()->generateTraceId());
 
-        $span = new Span($this->name, $context, $this->parent, null, $this->tracer->getResource(), $this->kind, $this->spanProcessor);
+        $span = new Span(
+            $this->name,
+            $context,
+            $this->parent,
+            $this->tracer->getResource(),
+            $this->kind,
+            $this->attributes,
+            $this->links,
+            $this->spanProcessor
+        );
 
         if ($this->startEpochTimestamp !== null) {
             $span->setStartEpochTimestamp($this->startEpochTimestamp);
@@ -111,14 +120,6 @@ final class SpanOptions implements API\SpanOptions
 
         if ($this->start !== null) {
             $span->setStart($this->start);
-        }
-
-        if (isset($this->attributes)) {
-            $span->replaceAttributes($this->attributes);
-        }
-
-        if (isset($this->links)) {
-            $span->setLinks($this->links);
         }
 
         return $span;
