@@ -15,7 +15,7 @@ class Events implements API\Events
         ?API\Attributes $attributes = null,
         int $timestamp = null
     ): API\Events {
-        $this->events[] = new Event($name, $timestamp ?? time(), $attributes);
+        $this->events[] = new Event($name, $timestamp ?? Clock::get()->timestamp(), $attributes);
 
         return $this;
     }

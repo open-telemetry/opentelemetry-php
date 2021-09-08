@@ -281,9 +281,8 @@ class Span implements API\Span, ReadableSpan
         foreach ($attributes ?? [] as $attribute) {
             $eventAttributes->setAttribute($attribute->getKey(), $attribute->getValue());
         }
-        $timestamp = time();
 
-        return $this->addEvent('exception', $timestamp, $eventAttributes);
+        return $this->addEvent('exception', Clock::get()->timestamp(), $eventAttributes);
     }
 
     public function getEvents(): API\Events
