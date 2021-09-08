@@ -127,6 +127,7 @@ class Tracer implements API\Tracer
     }
 
     /**
+     * @psalm-return Span
      * @return Span|NoopSpan
      */
     public function startActiveSpan(
@@ -211,7 +212,8 @@ class Tracer implements API\Tracer
      * @param string $name
      * @param API\SpanContext $parentContext
      * @param bool $isRemote
-     * @return Span
+     * @psalm-return Span
+     * @return Span|NoopSpan
      */
     public function startAndActivateSpanFromContext(
         string $name,
@@ -253,7 +255,7 @@ class Tracer implements API\Tracer
      * -> Is there a reason we didn't add this already?
      * @param string $name
      * @psalm-return Span
-     * @return Span
+     * @return Span|NoopSpan
      */
     public function startAndActivateSpan(
         string $name,

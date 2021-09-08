@@ -9,7 +9,11 @@ use OpenTelemetry\Trace as API;
 class Clock implements API\Clock
 {
     private static $instance;
+
+    /** @var API\RealtimeClock */
     public $realtime_clock;
+
+    /** @var API\MonotonicClock */
     public $monotonic_clock;
 
     private function __construct()
@@ -18,7 +22,7 @@ class Clock implements API\Clock
         $this->monotonic_clock = new MonotonicClock();
     }
 
-    public static function get()
+    public static function get(): Clock
     {
         if (!self::$instance) {
             self::$instance = new Clock();
