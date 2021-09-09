@@ -17,4 +17,7 @@
     <plugins>
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
     </plugins>
+    <stubs>
+        <file name="stubs/grpc.phpstub" />
+    </stubs>
 </psalm>
