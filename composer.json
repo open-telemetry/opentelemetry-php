@@ -6,6 +6,7 @@
     "require": {
         "php": "^7.3 || ^8.0",
         "ext-json": "*",
+        "ext-grpc": "*",
         "promphp/prometheus_client_php": "^2.2.1",
         "grpc/grpc": "^1.30",
         "google/protobuf": "^v3.3.0",

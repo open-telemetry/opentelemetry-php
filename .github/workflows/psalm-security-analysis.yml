@@ -14,7 +14,7 @@ jobs:
         uses: docker://vimeo/psalm-github-actions
         with:
           composer_require_dev: true
-          composer_ignore_platform_reqs: true
+          composer_ignore_platform_reqs: false # https://github.com/psalm/psalm-github-actions/pull/29
           security_analysis: true
           report_file: results.sarif
 
