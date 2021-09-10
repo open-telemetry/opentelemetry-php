@@ -11,12 +11,18 @@ use OpenTelemetry\Trace as API;
 class Links implements API\Links
 {
     /** @var list<API\Link> */
-    private $links = [];
+    private $links;
+
+    /** @param list<API\Link> $links */
+    public function __construct(iterable $links = [])
+    {
+        $this->links = $links;
+    }
 
     /** @inheritDoc */
-    public function addLink(API\SpanContext $context, ?API\Attributes $attributes = null): API\Links
+    public function addLink(API\Link $link): API\Links
     {
-        $this->links[] = new Link($context, $attributes);
+        $this->links[] = $link;
 
         return $this;
     }

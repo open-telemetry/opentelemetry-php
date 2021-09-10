@@ -51,27 +51,25 @@ class Span implements API\Span, ReadableSpan
         string $name,
         API\SpanContext $spanContext,
         ?API\SpanContext $parentSpanContext = null,
-        ?Sampler $sampler = null,
         ?ResourceInfo $resource = null,
         int $spanKind = API\SpanKind::KIND_INTERNAL,
+        ?API\Attributes $attributes = null,
+        ?API\Links $links = null,
         ?SpanProcessor $spanProcessor = null
     ) {
         $this->name = $name;
         $this->spanContext = $spanContext;
         $this->parentSpanContext = $parentSpanContext;
         $this->spanKind = $spanKind;
-        $this->sampler = $sampler;
         $this->resource =  $resource ?? ResourceInfo::emptyResource();
         $this->spanProcessor = $spanProcessor;
-        $moment = Clock::get()->moment();
-        $this->startEpochTimestamp = $moment[0];
-        $this->start = $moment[1];
+        [$this->startEpochTimestamp, $this->start] = Clock::get()->moment();
         $this->spanStatus = new SpanStatus();
 
         // todo: set these to null until needed
-        $this->attributes = new Attributes();
+        $this->attributes = $attributes ?? new Attributes();
         $this->events = new Events();
-        $this->links = new Links();
+        $this->links = $links ?? new Links();
     }
 
     /**
@@ -313,18 +311,6 @@ class Span implements API\Span, ReadableSpan
     public function getLinks(): API\Links
     {
         return $this->links;
-    }
-
-    /**
-     * @param API\SpanContext $context
-     * @param API\Attributes|null $attributes
-     * @return Span
-     */
-    public function addLink(API\SpanContext $context, ?API\Attributes $attributes = null): API\Span
-    {
-        $this->links->addLink($context, $attributes);
-
-        return $this;
     }
 
     public function getSpanKind(): int

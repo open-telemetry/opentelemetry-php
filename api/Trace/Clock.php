@@ -9,7 +9,8 @@ interface Clock
     /**
      * A combination of the Monotonic and Realtime Clocks
      * Monotonic time value in the first slot, as it'll get accessed more frequently in duration calculations.
-     * @return array
+     *
+     * @return array{int, int}
      */
     public function moment(): array;
     public function now(): int;
