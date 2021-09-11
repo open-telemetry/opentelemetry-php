@@ -16,7 +16,7 @@ use OpenTelemetry\Trace as API;
  * traceparent header and relevant parts of the tracestate header containing
  * their proprietary information.
  */
-final class TraceContext implements API\TextMapFormatPropagator
+final class TraceContextPropagator implements API\TextMapPropagator
 {
     public const TRACEPARENT = 'traceparent';
     public const TRACESTATE = 'tracestate';

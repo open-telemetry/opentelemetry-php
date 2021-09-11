@@ -7,7 +7,7 @@ namespace App\Controller;
 use GuzzleHttp\Client;
 use OpenTelemetry\Sdk\Trace\PropagationMap;
 use OpenTelemetry\Sdk\Trace\SpanContext;
-use OpenTelemetry\Sdk\Trace\TraceContext;
+use OpenTelemetry\Sdk\Trace\TraceContextPropagator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -34,13 +34,13 @@ class TestController
                 $carrier = new PropagationMap();
 
                 try {
-                    $context = TraceContext::extract($request->headers->all(), $carrier);
+                    $context = TraceContextPropagator::extract($request->headers->all(), $carrier);
                 } catch (\InvalidArgumentException $th) {
                     $context = SpanContext::generate();
                 }
 
                 $span = $tracer->startAndActivateSpanFromContext($url, $context, true);
-                TraceContext::inject($context, $headers, $carrier);
+                TraceContextPropagator::inject($context, $headers, $carrier);
 
                 $client = new Client([
                     'base_uri' => $url,
