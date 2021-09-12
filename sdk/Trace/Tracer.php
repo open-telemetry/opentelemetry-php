@@ -156,7 +156,7 @@ class Tracer implements API\Tracer
         // When attributes and links are coded, they will need to be passed in here.
         $sampler = $this->provider->getSampler();
         $samplingResult = $sampler->shouldSample(
-            Span::insert(new NoopSpan($parentContext), new Context()),
+            (new Context())->with(new NoopSpan($parentContext)),
             $parentContext->getTraceId(),
             $name,
             $spanKind,
@@ -267,7 +267,7 @@ class Tracer implements API\Tracer
         ?API\Attributes $attributes = null,
         ?API\Links $links = null
     ): API\Span {
-        $parentContext = $this->getActiveSpan()->getContext();
+        $parentContext = $this->getActiveSpan()->getSpanContext();
 
         return $this->startActiveSpan($name, $parentContext, false, $spanKind, $attributes, $links);
     }
@@ -311,7 +311,7 @@ class Tracer implements API\Tracer
             $span = new NoopSpan($context);
         } else {
             if ($this->active) {
-                $parent = $this->getActiveSpan()->getContext();
+                $parent = $this->getActiveSpan()->getSpanContext();
             } elseif (is_object($parentContext) && $parentContext->isRemote() == true) {
                 $parent = $parentContext;
             }

@@ -6,7 +6,6 @@ namespace OpenTelemetry\Tests\Context\Unit;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
-use OpenTelemetry\Context\ContextValueNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class ContextTest extends TestCase

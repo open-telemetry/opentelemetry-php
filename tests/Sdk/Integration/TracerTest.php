@@ -21,11 +21,11 @@ class TracerTest extends TestCase
     /**
      * @test
      */
-    public function noopSpanShouldBeStartedWhenSamplingResultIsDrop()
+    public function noopSpanShouldBeStartedWhenSamplingResultIsDrop(): void
     {
         $alwaysOffSampler = new AlwaysOffSampler();
         $tracerProvider = new TracerProvider(null, $alwaysOffSampler);
-        $processor = self::createMock(SpanProcessor::class);
+        $processor = $this->createMock(SpanProcessor::class);
         $tracerProvider->addSpanProcessor($processor);
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
 
@@ -39,16 +39,21 @@ class TracerTest extends TestCase
     /**
      * @test
      */
-    public function samplerMayOverrideParentsTraceState()
+    public function samplerMayOverrideParentsTraceState(): void
     {
         $parentTraceState = new TraceState('orig-key=orig_value');
-        $parentContext = Span::insert(new NoopSpan(\OpenTelemetry\Sdk\Trace\SpanContext::restore(
-            '4bf92f3577b34da6a3ce929d0e0e4736',
-            '00f067aa0ba902b7',
-            true,
-            false,
-            $parentTraceState
-        )), new Context());
+        $parentContext = (new Context())
+            ->with(
+                new NoopSpan(
+                    \OpenTelemetry\Sdk\Trace\SpanContext::restore(
+                        '4bf92f3577b34da6a3ce929d0e0e4736',
+                        '00f067aa0ba902b7',
+                        true,
+                        false,
+                        $parentTraceState
+                    )
+                )
+            );
 
         $newTraceState = new TraceState('new-key=new_value');
 
@@ -71,7 +76,7 @@ class TracerTest extends TestCase
     /**
      * @test
      */
-    public function spanShouldReceiveInstrumentationLibrary()
+    public function spanShouldReceiveInstrumentationLibrary(): void
     {
         $tracerProvider = new TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest', 'dev');

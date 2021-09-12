@@ -220,7 +220,7 @@ class TraceContextPropagatorTest extends TestCase
     {
         $carrier = [];
         $map = new PropagationMap();
-        $context = Context::inject(Span::wrap(SpanContext::restore(self::TRACEID, self::SPANID, true, false)));
+        $context = (new Context())->with(Span::wrap(SpanContext::restore(self::TRACEID, self::SPANID, true, false)));
         TraceContextPropagator::inject($carrier, $context, $map);
 
         $this->assertSame(self::TRACEPARENTVALUE, $map->get($carrier, TraceContextPropagator::TRACEPARENT));
@@ -231,7 +231,7 @@ class TraceContextPropagatorTest extends TestCase
         $carrier = [];
         $map = new PropagationMap();
         $tracestate = new TraceState('vendor1=opaqueValue1');
-        $context = Context::inject(Span::wrap(SpanContext::restore(self::TRACEID, self::SPANID, true, false, $tracestate)));
+        $context = (new Context())->with(Span::wrap(SpanContext::restore(self::TRACEID, self::SPANID, true, false, $tracestate)));
 
         TraceContextPropagator::inject($carrier, $context, $map);
 
@@ -242,7 +242,7 @@ class TraceContextPropagatorTest extends TestCase
     {
         $carrier = [];
         $map = new PropagationMap();
-        $context = Context::inject(Span::wrap(SpanContext::restore(self::TRACEID, self::SPANID, true, false)));
+        $context = (new Context())->with(Span::wrap(SpanContext::restore(self::TRACEID, self::SPANID, true, false)));
         TraceContextPropagator::inject($carrier, $context, $map);
 
         $this->assertNull($map->get($carrier, TraceContextPropagator::TRACESTATE));
@@ -253,7 +253,7 @@ class TraceContextPropagatorTest extends TestCase
         $carrier = [];
         $map = new PropagationMap();
         $tracestate = new TraceState();
-        $context = Context::inject(Span::wrap(SpanContext::restore(self::TRACEID, self::SPANID, true, false, $tracestate)));
+        $context = (new Context())->with(Span::wrap(SpanContext::restore(self::TRACEID, self::SPANID, true, false, $tracestate)));
         TraceContextPropagator::inject($carrier, $context, $map);
 
         $this->assertNull($map->get($carrier, TraceContextPropagator::TRACESTATE));

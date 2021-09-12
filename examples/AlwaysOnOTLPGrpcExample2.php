@@ -46,11 +46,11 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     ]));
     sleep(1);
 
-    $rootScope = Span::setCurrent($rootSpan); // set the root span active in the current context
+    $rootScope = $rootSpan->makeCurrent(); // set the root span active in the current context
 
     try {
         $span1 = $tracer->startSpan('child-span-1', null, API\SpanKind::KIND_SERVER);
-        $internalScope = Span::setCurrent($span1); // set the child span active in the context
+        $internalScope = $span1->makeCurrent(); // set the child span active in the context
 
         try {
             for ($i = 0; $i < 3; $i++) {
@@ -70,7 +70,7 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
         $span2->setAttribute('error.message', 'this is an error');
         $span2->setAttribute('error.class', 'error.class.this.is');
         sleep(1);
-        $internalScope = Span::setCurrent($span2); // set the child span active in the context
+        $internalScope = $span2->makeCurrent(); // set the child span active in the context
 
         try {
             $internalSpan = $tracer->startSpan('internal', null, API\SpanKind::KIND_CLIENT);

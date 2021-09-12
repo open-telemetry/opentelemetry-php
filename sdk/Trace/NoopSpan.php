@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\Context\Scope;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
@@ -189,15 +188,6 @@ class NoopSpan implements ReadWriteSpan
     public function isStatusOk(): bool
     {
         return $this->status->isStatusOK();
-    }
-
-    /**
-     * @return ContextKey
-     * @phan-override
-     */
-    protected static function getContextKey(): ContextKey
-    {
-        return SpanContextKey::instance();
     }
 
     public function getSpanContext(): API\SpanContext
