@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKey;
+use OpenTelemetry\Context\Scope;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 use Throwable;
 
-final class Span implements ReadWriteSpan
+class Span implements ReadWriteSpan
 {
     /** @var NoopSpan|null */
     private static $invalidSpan;
@@ -20,7 +20,6 @@ final class Span implements ReadWriteSpan
     private $spanContext;
     private $parentSpanContext;
     private $spanKind;
-    private $sampler;
 
     private $startEpochTimestamp;
     private $endEpochTimestamp;
@@ -370,12 +369,19 @@ final class Span implements ReadWriteSpan
     }
 
     /**
-     * @return ContextKey
-     * @phan-override
+     * @todo: Implement this on the API side
      */
-    protected static function getContextKey(): ContextKey
+    public function storeInContext(Context $context): Context
     {
-        return SpanContextKey::instance();
+        return $context->set(SpanContextKey::instance(), $this);
+    }
+
+    /**
+     * @todo: Implement this on the API side
+     */
+    public function makeCurrent(): Scope
+    {
+        return Context::getCurrent()->with($this)->makeCurrent();
     }
 
     /**

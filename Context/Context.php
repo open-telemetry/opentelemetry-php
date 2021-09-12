@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
-use OpenTelemetry\Sdk\Trace\SpanContextKey;
-use OpenTelemetry\Trace\Span;
-
 /**
  * @template TContext of Context
  */
@@ -37,16 +34,6 @@ class Context
     public static function createKey(string $key): ContextKey
     {
         return new ContextKey($key);
-    }
-
-    /**
-     * @todo: Figure out a better name for this
-     * @todo: How to best also support Baggage
-     * @todo Implement this in the API layer
-     */
-    public static function inject(Span $value): Context
-    {
-        return static::setValue(SpanContextKey::instance(), $value);
     }
 
     /**
@@ -85,6 +72,22 @@ class Context
     public function set(ContextKey $key, $value)
     {
         return new static($key, $value, $this);
+    }
+
+    /**
+     * @todo: Implement this on the API side
+     */
+    public function with(ImplicitContextKeyed $value): self
+    {
+        return $value->storeInContext($this);
+    }
+
+    /**
+     * @todo: Implement this on the API side
+     */
+    public function makeCurrent(): Scope
+    {
+        return new Scope(self::attach($this));
     }
 
     /**

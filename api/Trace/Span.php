@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace;
 
+use OpenTelemetry\Context\ImplicitContextKeyed;
 use Throwable;
 
-interface Span extends SpanStatus, SpanKind
+interface Span extends SpanStatus, SpanKind, ImplicitContextKeyed
 {
     /**
      * Attributes SHOULD preserve the order in which they're set. Setting an attribute with the same key as an existing

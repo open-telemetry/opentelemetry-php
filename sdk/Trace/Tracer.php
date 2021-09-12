@@ -51,7 +51,7 @@ class Tracer implements API\Tracer
         ?int $startTimestamp = null
     ): API\Span {
         $parentSpan = $parentContext !== null ? Span::fromContext($parentContext) : Span::getCurrent();
-        $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
+        $parentSpanContext = $parentSpan->getSpanContext();
 
         /**
          * Implementations MUST generate a new TraceId for each root span created.

@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
-use OpenTelemetry\Context\ContextValueTrait;
+use OpenTelemetry\Context\Scope;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 use Throwable;
 
-class NoopSpan implements API\Span, ReadableSpan
+/**
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#wrapping-a-spancontext-in-a-span
+ * @todo: Implement this on the API side.
+ * @todo: Can we just use {@see https://www.php.net/manual/en/language.oop5.anonymous.php}?
+ * @todo: If not rename this to `NonRecordingSpan`.
+ */
+class NoopSpan implements ReadWriteSpan
 {
-    use ContextValueTrait;
-
     /** @var API\SpanContext */
     private $context;
 
@@ -213,5 +218,21 @@ class NoopSpan implements API\Span, ReadableSpan
     public function getInstrumentationLibrary(): InstrumentationLibrary
     {
         return new InstrumentationLibrary('');
+    }
+
+    /**
+     * @todo: Implement this on the API side
+     */
+    public function makeCurrent(): Scope
+    {
+        return Context::getCurrent()->with($this)->makeCurrent();
+    }
+
+    /**
+     * @todo: Implement this on the API side
+     */
+    public function storeInContext(Context $context): Context
+    {
+        return $context->set(SpanContextKey::instance(), $this);
     }
 }
