@@ -124,6 +124,10 @@ class Tracer implements API\Tracer
         $this->tail[] = $this->active;
 
         $this->active = $span;
+
+        // FIXME: This should either be called manually or as part of a dedicated tracer operation,
+        // probably some sort of `inSpan` method?
+        $span->makeCurrent();
     }
 
     /**

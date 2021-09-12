@@ -59,6 +59,9 @@ class Span implements ReadWriteSpan
         return self::getInvalid();
     }
 
+    /**
+     * @todo Implement this in the API layer
+     */
     public static function getCurrent(): API\Span
     {
         return self::fromContext(Context::getCurrent());
