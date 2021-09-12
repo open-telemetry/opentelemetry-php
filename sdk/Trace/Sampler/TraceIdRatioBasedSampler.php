@@ -52,7 +52,7 @@ class TraceIdRatioBasedSampler implements Sampler
         ?API\Links $links = null
     ): SamplingResult {
         // TODO: Add config to adjust which spans get sampled (only default from specification is implemented)
-        $parentSpan = Span::extract($parentContext);
+        $parentSpan = Span::fromContext($parentContext);
         $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
         $traceState = $parentSpanContext->getTraceState();
 

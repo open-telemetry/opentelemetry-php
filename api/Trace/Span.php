@@ -55,5 +55,7 @@ interface Span extends SpanStatus, SpanKind
      */
     public function end(int $timestamp = null): Span;
 
+    public function getSpanContext(): SpanContext;
+
     public function isRecording(): bool;
 }

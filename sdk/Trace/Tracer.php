@@ -50,7 +50,7 @@ class Tracer implements API\Tracer
         ?API\Links $links = null,
         ?int $startTimestamp = null
     ): API\Span {
-        $parentSpan = $parentContext !== null ? Span::extract($parentContext) : Span::getCurrent();
+        $parentSpan = $parentContext !== null ? Span::fromContext($parentContext) : Span::getCurrent();
         $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
 
         /**

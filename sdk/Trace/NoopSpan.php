@@ -23,7 +23,6 @@ class NoopSpan implements API\Span, ReadableSpan
 
     /** @var API\Links */
     private $links;
-    // @todo when links will be implemented, this attribute should be initialized properly
 
     /** @var API\Events */
     private $events;
@@ -53,6 +52,7 @@ class NoopSpan implements API\Span, ReadableSpan
         }
         $this->attributes = new Attributes();
         $this->events = new Events();
+        $this->links = new Links();
         $this->status = new SpanStatus();
     }
 

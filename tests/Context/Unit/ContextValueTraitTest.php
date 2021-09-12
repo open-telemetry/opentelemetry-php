@@ -45,7 +45,7 @@ class ContextValueTraitTest extends TestCase
         $ctxValue::insert($ctxValue, $context);
         $this->assertEquals(3, $ctxValue::$invocations);
 
-        $ctxValue::extract($context);
+        $ctxValue::fromContext($context);
         $this->assertEquals(4, $ctxValue::$invocations);
     }
 }

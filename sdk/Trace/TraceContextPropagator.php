@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use function count;
+use function explode;
+use function hexdec;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Trace as API;
+use OpenTelemetry\Trace\PropagationGetter;
+use OpenTelemetry\Trace\PropagationSetter;
 
 /**
  * TraceContext is a propagator that supports the W3C Trace Context format
@@ -20,36 +26,51 @@ final class TraceContextPropagator implements API\TextMapPropagator
 {
     public const TRACEPARENT = 'traceparent';
     public const TRACESTATE = 'tracestate';
-    private const VERSION = '00'; // Currently only '00' is supported
+    private const VERSION = '00'; // Currently, only '00' is supported
 
-    /**
-     * {@inheritdoc}
-     */
+    /** {@inheritdoc} */
     public static function fields(): array
     {
         return [self::TRACEPARENT, self::TRACESTATE];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function inject(API\SpanContext $context, &$carrier, API\PropagationSetter $setter): void
+    /** {@inheritdoc} */
+    public static function inject(&$carrier, Context $context = null, PropagationSetter $setter = null): void
     {
+        $context = $context ?? Context::getCurrent();
+        $setter = $setter ?? new PropagationMap();
+        $spanContext = Span::fromContext($context)->getSpanContext();
+
+        if (!$spanContext->isValid()) {
+            return;
+        }
+
         // Build and inject the traceparent header
-        $traceparent = self::VERSION . '-' . $context->getTraceId() . '-' . $context->getSpanId() . '-' . ($context->isSampled() ? '01' : '00');
+        $traceparent = self::VERSION . '-' . $spanContext->getTraceId() . '-' . $spanContext->getSpanId() . '-' . ($spanContext->isSampled() ? '01' : '00');
         $setter->set($carrier, self::TRACEPARENT, $traceparent);
 
         // Build and inject the tracestate header
         // Spec says to avoid sending empty tracestate headers
-        if ($tracestate = (string) $context->getTraceState()) {
+        if ($tracestate = (string) $spanContext->getTraceState()) {
             $setter->set($carrier, self::TRACESTATE, $tracestate);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function extract($carrier, API\PropagationGetter $getter): API\SpanContext
+    /** {@inheritdoc} */
+    public static function extract($carrier, Context $context = null, PropagationGetter $getter = null): Context
+    {
+        $context = $context ?? Context::getCurrent();
+        $getter = $getter ?? new PropagationMap();
+
+        $spanContext = self::extractImpl($carrier, $getter);
+        if (!$spanContext->isValid()) {
+            return $context;
+        }
+
+        return Context::inject(Span::wrap($spanContext));
+    }
+
+    private static function extractImpl($carrier, PropagationGetter $getter): API\SpanContext
     {
         $traceparent = $getter->get($carrier, self::TRACEPARENT);
         if ($traceparent === null) {
@@ -60,15 +81,11 @@ final class TraceContextPropagator implements API\TextMapPropagator
         $pieces = explode('-', $traceparent);
 
         // Unable to extract traceparent. Expected 4 values
-        $piecesCount = count($pieces);
-        if ($piecesCount !== 4) {
+        if (count($pieces) !== 4) {
             return SpanContext::getInvalid();
         }
 
-        $version = $pieces[0];
-        $traceId = $pieces[1];
-        $spanId = $pieces[2];
-        $traceFlags = $pieces[3];
+        [$version, $traceId, $spanId, $traceFlags] = $pieces;
 
         // Validates the version, traceId, spanId and traceFlags
         // Returns an invalid spanContext if any of the checks fail

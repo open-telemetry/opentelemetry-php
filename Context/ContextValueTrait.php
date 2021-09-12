@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
+use OpenTelemetry\Sdk\Trace\Span;
+
 trait ContextValueTrait
 {
     /**
@@ -11,13 +13,13 @@ trait ContextValueTrait
      * @return mixed|null
      * @phan-suppress PhanAbstractStaticMethodCallInTrait
      */
-    public static function extract(Context $context)
+    public static function fromContext(Context $context)
     {
-        try {
-            return $context->get(static::getContextKey());
-        } catch (ContextValueNotFoundException $e) {
-            return null;
-        }
+//        try {
+        return $context->get(static::getContextKey());
+//        } catch (ContextValueNotFoundException $e) {
+//            return Span::getInvalid();
+//        }
     }
 
     /**

@@ -54,7 +54,7 @@ final class SpanOptions implements API\SpanOptions
 
     public function setParent(Context $parentContext): API\SpanOptions
     {
-        $parentSpan = Span::extract($parentContext);
+        $parentSpan = Span::fromContext($parentContext);
         $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
         $this->parent = $parentSpanContext;
 

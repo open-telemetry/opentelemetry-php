@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
-use OpenTelemetry\Context\ContextValueTrait;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 use Throwable;
 
-class Span implements API\Span, ReadableSpan
+final class Span implements ReadWriteSpan
 {
-    use ContextValueTrait;
+    /** @var NoopSpan|null */
+    private static $invalidSpan;
 
     private $name;
     private $spanContext;
@@ -46,6 +47,41 @@ class Span implements API\Span, ReadableSpan
 
     /** @var ?SpanProcessor */
     private $spanProcessor;
+
+    /**
+     * @todo Implement this in the API layer
+     */
+    public static function fromContext(Context $context): API\Span
+    {
+        if ($span = $context->get(SpanContextKey::instance())) {
+            return $span;
+        }
+
+        return self::getInvalid();
+    }
+
+    public static function getCurrent(): API\Span
+    {
+        return self::fromContext(Context::getCurrent());
+    }
+
+    public static function getInvalid(): NoopSpan
+    {
+        if (null === self::$invalidSpan) {
+            self::$invalidSpan = new NoopSpan();
+        }
+
+        return self::$invalidSpan;
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#wrapping-a-spancontext-in-a-span
+     * @todo Implement this in the API layer
+     */
+    public static function wrap(API\SpanContext $context): NoopSpan
+    {
+        return new NoopSpan($context);
+    }
 
     public function __construct(
         string $name,

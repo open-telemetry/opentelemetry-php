@@ -86,9 +86,9 @@ class ParentBased implements Sampler
         ?API\Attributes $attributes = null,
         ?API\Links $links = null
     ): SamplingResult {
-        $parentSpan = Span::extract($parentContext);
+        $parentSpan = Span::fromContext($parentContext);
         $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
-        
+
         // Invalid parent SpanContext indicates root span is being created
         if (!$parentSpanContext->isValid()) {
             return $this->root->shouldSample(...func_get_args());

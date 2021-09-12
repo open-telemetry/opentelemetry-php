@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
+use OpenTelemetry\Sdk\Trace\SpanContextKey;
+use OpenTelemetry\Trace\Span;
+
 /**
  * @template TContext of Context
  */
@@ -25,6 +28,26 @@ class Context
     protected $parent;
 
     protected static $current_context = null;
+
+    /**
+     * @param non-empty-string $key
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/context.md#create-a-key
+     */
+    public static function createKey(string $key): ContextKey
+    {
+        return new ContextKey($key);
+    }
+
+    /**
+     * @todo: Figure out a better name for this
+     * @todo: How to best also support Baggage
+     * @todo Implement this in the API layer
+     */
+    public static function inject(Span $value): Context
+    {
+        return static::setValue(SpanContextKey::instance(), $value);
+    }
 
     /**
      * This is a general purpose read-only key-value store. Read-only in the sense that adding a new value does not
@@ -94,19 +117,16 @@ class Context
     /**
      * Fetch a value from the Context given a key value.
      *
-     * @param ContextKey $key
-     *
-     * @throws ContextValueNotFoundException
-     * @return mixed
-     * @suppress PhanUndeclaredClassMethod
+     * @return mixed|null
      */
     public function get(ContextKey $key)
     {
         if ($this->key === $key) {
             return $this->value;
         }
+
         if (null === $this->parent) {
-            throw new ContextValueNotFoundException();
+            return null;
         }
 
         return $this->parent->get($key);
@@ -126,7 +146,6 @@ class Context
      * @param ContextKey $key
      * @param Context|null $ctx
      *
-     * @throws ContextValueNotFoundException
      * @return mixed
      */
     public static function getValue(ContextKey $key, $ctx=null)
@@ -136,10 +155,7 @@ class Context
         return $ctx->get($key);
     }
 
-    /**
-     * @return Context
-     */
-    public static function getCurrent()
+    public static function getCurrent(): Context
     {
         if (null === static::$current_context) {
             static::$current_context = new static();
