@@ -12,10 +12,12 @@ use OpenTelemetry\Trace as API;
 use Throwable;
 
 /**
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#wrapping-a-spancontext-in-a-span
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#wrapping-a-spancontext-in-a-span
+ *
  * @todo: Implement this on the API side.
  * @todo: Can we just use {@see https://www.php.net/manual/en/language.oop5.anonymous.php}?
  * @todo: If not rename this to `NonRecordingSpan`.
+ * @todo: Make this only implement {@see API\Span}.
  */
 class NoopSpan implements ReadWriteSpan
 {
@@ -63,11 +65,6 @@ class NoopSpan implements ReadWriteSpan
     public function getSpanName(): string
     {
         return '';
-    }
-
-    public function getContext(): API\SpanContext
-    {
-        return $this->context;
     }
 
     public function getParent(): ?API\SpanContext
@@ -190,7 +187,7 @@ class NoopSpan implements ReadWriteSpan
         return $this->status->isStatusOK();
     }
 
-    public function getSpanContext(): API\SpanContext
+    public function getContext(): API\SpanContext
     {
         return $this->context;
     }
@@ -210,17 +207,11 @@ class NoopSpan implements ReadWriteSpan
         return new InstrumentationLibrary('');
     }
 
-    /**
-     * @todo: Implement this on the API side
-     */
     public function makeCurrent(): Scope
     {
         return Context::getCurrent()->with($this)->makeCurrent();
     }
 
-    /**
-     * @todo: Implement this on the API side
-     */
     public function storeInContext(Context $context): Context
     {
         return $context->set(SpanContextKey::instance(), $this);

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
+/**
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#overview
+ */
 class Context
 {
     /**
@@ -24,7 +27,7 @@ class Context
     /**
      * @param non-empty-string $key
      *
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/context.md#create-a-key
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#create-a-key
      */
     public static function createKey(string $key): ContextKey
     {

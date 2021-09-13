@@ -51,7 +51,7 @@ class Tracer implements API\Tracer
         ?int $startTimestamp = null
     ): API\Span {
         $parentSpan = $parentContext !== null ? Span::fromContext($parentContext) : Span::getCurrent();
-        $parentSpanContext = $parentSpan->getSpanContext();
+        $parentSpanContext = $parentSpan->getContext();
 
         /**
          * Implementations MUST generate a new TraceId for each root span created.
@@ -267,7 +267,7 @@ class Tracer implements API\Tracer
         ?API\Attributes $attributes = null,
         ?API\Links $links = null
     ): API\Span {
-        $parentContext = $this->getActiveSpan()->getSpanContext();
+        $parentContext = $this->getActiveSpan()->getContext();
 
         return $this->startActiveSpan($name, $parentContext, false, $spanKind, $attributes, $links);
     }
@@ -311,7 +311,7 @@ class Tracer implements API\Tracer
             $span = new NoopSpan($context);
         } else {
             if ($this->active) {
-                $parent = $this->getActiveSpan()->getSpanContext();
+                $parent = $this->getActiveSpan()->getContext();
             } elseif (is_object($parentContext) && $parentContext->isRemote() == true) {
                 $parent = $parentContext;
             }

@@ -39,7 +39,7 @@ final class TraceContextPropagator implements API\TextMapPropagator
     {
         $context = $context ?? Context::getCurrent();
         $setter = $setter ?? new PropagationMap();
-        $spanContext = Span::fromContext($context)->getSpanContext();
+        $spanContext = Span::fromContext($context)->getContext();
 
         if (!$spanContext->isValid()) {
             return;

@@ -12,8 +12,6 @@ interface ReadableSpan
 {
     public function getSpanName(): string;
 
-    public function getSpanContext(): API\SpanContext;
-
     public function getSpanKind(): int;
 
     public function getStartEpochTimestamp(): int;
@@ -35,8 +33,6 @@ interface ReadableSpan
     public function ended(): bool;
 
     // ambiguous methods
-    public function getContext(): API\SpanContext;
-
     public function getDuration(): ?int;
 
     public function getParent(): ?API\SpanContext;

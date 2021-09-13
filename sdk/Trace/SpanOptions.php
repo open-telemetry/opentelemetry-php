@@ -55,7 +55,7 @@ final class SpanOptions implements API\SpanOptions
     public function setParent(Context $parentContext): API\SpanOptions
     {
         $parentSpan = Span::fromContext($parentContext);
-        $parentSpanContext = $parentSpan->getSpanContext();
+        $parentSpanContext = $parentSpan->getContext();
         $this->parent = $parentSpanContext;
 
         return $this;
@@ -99,8 +99,8 @@ final class SpanOptions implements API\SpanOptions
     public function toSpan(): API\Span
     {
         $span = $this->tracer->getActiveSpan();
-        $context = $span->getSpanContext()->isValid()
-            ? SpanContext::fork($span->getSpanContext()->getTraceId())
+        $context = $span->getContext()->isValid()
+            ? SpanContext::fork($span->getContext()->getTraceId())
             : SpanContext::fork($this->tracer->getTracerProvider()->getIdGenerator()->generateTraceId());
 
         $span = new Span(

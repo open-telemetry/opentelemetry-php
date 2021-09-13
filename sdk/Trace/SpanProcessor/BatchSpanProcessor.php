@@ -95,7 +95,7 @@ class BatchSpanProcessor implements SpanProcessor
             return;
         }
 
-        if ($span->getSpanContext()->isSampled() && !$this->queueReachedLimit()) {
+        if ($span->getContext()->isSampled() && !$this->queueReachedLimit()) {
             $this->queue[] = $span;
         }
 

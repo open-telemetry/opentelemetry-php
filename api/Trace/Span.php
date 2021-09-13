@@ -7,6 +7,9 @@ namespace OpenTelemetry\Trace;
 use OpenTelemetry\Context\ImplicitContextKeyed;
 use Throwable;
 
+/**
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#span-operations
+ */
 interface Span extends SpanStatus, SpanKind, ImplicitContextKeyed
 {
     /**
@@ -56,7 +59,7 @@ interface Span extends SpanStatus, SpanKind, ImplicitContextKeyed
      */
     public function end(int $timestamp = null): Span;
 
-    public function getSpanContext(): SpanContext;
+    public function getContext(): SpanContext;
 
     public function isRecording(): bool;
 }

@@ -33,7 +33,7 @@ class AlwaysOnSampler implements Sampler
         ?API\Links $links = null
     ): SamplingResult {
         $parentSpan = Span::fromContext($parentContext);
-        $parentSpanContext = $parentSpan->getSpanContext();
+        $parentSpanContext = $parentSpan->getContext();
         $traceState = $parentSpanContext->getTraceState();
 
         return new SamplingResult(

@@ -77,7 +77,7 @@ class Span implements ReadWriteSpan
     }
 
     /**
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#wrapping-a-spancontext-in-a-span
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#wrapping-a-spancontext-in-a-span
      * @todo Implement this in the API layer
      */
     public static function wrap(API\SpanContext $context): NoopSpan
@@ -129,11 +129,6 @@ class Span implements ReadWriteSpan
     public function getResource(): ResourceInfo
     {
         return clone $this->resource;
-    }
-
-    public function getContext(): API\SpanContext
-    {
-        return clone $this->spanContext;
     }
 
     public function getParent(): ?API\SpanContext
@@ -246,7 +241,7 @@ class Span implements ReadWriteSpan
         return $this;
     }
 
-    public function getSpanContext(): API\SpanContext
+    public function getContext(): API\SpanContext
     {
         return $this->spanContext;
     }
@@ -371,17 +366,13 @@ class Span implements ReadWriteSpan
         return $this->spanStatus->isStatusOK();
     }
 
-    /**
-     * @todo: Implement this on the API side
-     */
+    /** @inheritDoc */
     public function storeInContext(Context $context): Context
     {
         return $context->set(SpanContextKey::instance(), $this);
     }
 
-    /**
-     * @todo: Implement this on the API side
-     */
+    /** @inheritDoc */
     public function makeCurrent(): Scope
     {
         return Context::getCurrent()->with($this)->makeCurrent();
