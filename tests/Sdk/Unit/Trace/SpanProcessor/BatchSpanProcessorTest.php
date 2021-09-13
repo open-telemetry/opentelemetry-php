@@ -213,13 +213,13 @@ class BatchSpanProcessorTest extends TestCase
     {
         $spanContext = self::createConfiguredMock(SpanContext::class, ['isSampled' => true]);
 
-        return self::createConfiguredMock(Span::class, ['getSpanContext' => $spanContext]);
+        return self::createConfiguredMock(Span::class, ['getContext' => $spanContext]);
     }
 
     private function createNonSampledSpanMock()
     {
         $spanContext = self::createConfiguredMock(SpanContext::class, ['isSampled' => false]);
 
-        return self::createConfiguredMock(Span::class, ['getSpanContext' => $spanContext]);
+        return self::createConfiguredMock(Span::class, ['getContext' => $spanContext]);
     }
 }

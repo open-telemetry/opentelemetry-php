@@ -17,7 +17,7 @@ class Link implements API\Link
         $this->context = $context;
     }
 
-    public function getSpanContext(): API\SpanContext
+    public function getContext(): API\SpanContext
     {
         return $this->context;
     }

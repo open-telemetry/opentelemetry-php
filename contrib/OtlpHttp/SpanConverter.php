@@ -125,9 +125,9 @@ class SpanConverter
             }
 
             $row['links'][] = new Link([
-                'trace_id' => hex2bin($link->getSpanContext()->getTraceId()),
-                'span_id' => hex2bin($link->getSpanContext()->getSpanId()),
-                'trace_state' => (string) $link->getSpanContext()->getTraceState(),
+                'trace_id' => hex2bin($link->getContext()->getTraceId()),
+                'span_id' => hex2bin($link->getContext()->getSpanId()),
+                'trace_state' => (string) $link->getContext()->getTraceState(),
                 'attributes' => $attrs,
             ]);
         }
