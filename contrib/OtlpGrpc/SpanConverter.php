@@ -176,11 +176,12 @@ class SpanConverter
 
     public function as_otlp_resource_span(iterable $spans): ResourceSpans
     {
-        // TODO: Should return an empty ResourceSpans when $spans is empty
-        // At the minute it returns an semi populated ResourceSpan
+        $isSpansEmpty = true; //Waiting for the loop to prove otherwise
 
         $ils = $convertedSpans = [];
         foreach ($spans as $span) {
+            $isSpansEmpty = false;
+
             /** @var \OpenTelemetry\Sdk\InstrumentationLibrary $il */
             $il = $span->getInstrumentationLibrary();
             $ilKey = sprintf('%s@%s', $il->getName(), $il->getVersion()??'');
@@ -189,6 +190,10 @@ class SpanConverter
                 $ils[$ilKey] = new InstrumentationLibrary(['name' => $il->getName(), 'version' => $il->getVersion()??'']);
             }
             $convertedSpans[$ilKey][] = $this->as_otlp_span($span);
+        }
+
+        if ($isSpansEmpty == true) {
+            return new Proto\Trace\V1\ResourceSpans();
         }
 
         $ilSpans = [];
