@@ -39,12 +39,7 @@ class ArrayAccessGetterSetter implements API\PropagationGetter, API\PropagationS
         return self::$instance;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param KeyedArrayAccess|array $carrier
-     * @psalm-suppress LessSpecificImplementedReturnType
-     */
+    /** {@inheritdoc} */
     public function keys($carrier): array
     {
         if (is_array($carrier)) {
@@ -63,11 +58,7 @@ class ArrayAccessGetterSetter implements API\PropagationGetter, API\PropagationS
         );
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param ArrayAccess|array $carrier
-     */
+    /** {@inheritdoc} */
     public function get($carrier, string $key): ?string
     {
         $lKey = strtolower($key);

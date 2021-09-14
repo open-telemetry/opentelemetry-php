@@ -53,8 +53,6 @@ class ArrayAccessGetterSetterTest extends TestCase
         $carrier = new stdClass();
         $map = new ArrayAccessGetterSetter();
         $this->expectException(InvalidArgumentException::class);
-
-        /** @psalm-suppress InvalidArgument */
         $map->get($carrier, 'a');
     }
 
@@ -63,8 +61,6 @@ class ArrayAccessGetterSetterTest extends TestCase
         $carrier = new ArrayObject(['a' => 'alpha']);
         $map = new ArrayAccessGetterSetter();
         $this->expectException(InvalidArgumentException::class);
-
-        /** @psalm-suppress InvalidArgument */
         $map->keys($carrier);
     }
 
@@ -73,8 +69,6 @@ class ArrayAccessGetterSetterTest extends TestCase
         $carrier = new stdClass();
         $map = new ArrayAccessGetterSetter();
         $this->expectException(InvalidArgumentException::class);
-
-        /** @psalm-suppress InvalidArgument */
         $map->keys($carrier);
     }
 
