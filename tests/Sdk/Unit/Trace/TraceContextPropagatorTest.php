@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Sdk\Trace\ArrayAccessGetterSetter;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
-use OpenTelemetry\Sdk\Trace\TextMapGetterSetter;
 use OpenTelemetry\Sdk\Trace\TraceContextPropagator;
 use OpenTelemetry\Sdk\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
@@ -62,7 +62,7 @@ class TraceContextPropagatorTest extends TestCase
             $carrier = [TraceContextPropagator::TRACEPARENT => self::TRACEPARENTVALUE,
                         TraceContextPropagator::TRACESTATE => $tracestate, ];
 
-            $map = new TextMapGetterSetter();
+            $map = new ArrayAccessGetterSetter();
             $context = Span::fromContext(TraceContextPropagator::extract($carrier))->getContext();
 
             $this->assertSame($tracestate, (string) $context->getTraceState());
@@ -219,9 +219,9 @@ class TraceContextPropagatorTest extends TestCase
     public function testInjectValidTraceparent(): void
     {
         $carrier = [];
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
         $context = (new Context())->withContextValue(Span::wrap(SpanContext::restore(self::TRACEID, self::SPANID, true, false)));
-        TraceContextPropagator::inject($carrier, $context, $map);
+        TraceContextPropagator::inject($carrier, $map, $context);
 
         $this->assertSame(self::TRACEPARENTVALUE, $map->get($carrier, TraceContextPropagator::TRACEPARENT));
     }
@@ -229,11 +229,11 @@ class TraceContextPropagatorTest extends TestCase
     public function testInjectValidTracestate(): void
     {
         $carrier = [];
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
         $tracestate = new TraceState('vendor1=opaqueValue1');
         $context = (new Context())->withContextValue(Span::wrap(SpanContext::restore(self::TRACEID, self::SPANID, true, false, $tracestate)));
 
-        TraceContextPropagator::inject($carrier, $context, $map);
+        TraceContextPropagator::inject($carrier, $map, $context);
 
         $this->assertSame('vendor1=opaqueValue1', $map->get($carrier, TraceContextPropagator::TRACESTATE));
     }
@@ -241,9 +241,9 @@ class TraceContextPropagatorTest extends TestCase
     public function testInjectNullTracestate(): void
     {
         $carrier = [];
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
         $context = (new Context())->withContextValue(Span::wrap(SpanContext::restore(self::TRACEID, self::SPANID, true, false)));
-        TraceContextPropagator::inject($carrier, $context, $map);
+        TraceContextPropagator::inject($carrier, $map, $context);
 
         $this->assertNull($map->get($carrier, TraceContextPropagator::TRACESTATE));
     }
@@ -251,10 +251,10 @@ class TraceContextPropagatorTest extends TestCase
     public function testInjectEmptyTracestate(): void
     {
         $carrier = [];
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
         $tracestate = new TraceState();
         $context = (new Context())->withContextValue(Span::wrap(SpanContext::restore(self::TRACEID, self::SPANID, true, false, $tracestate)));
-        TraceContextPropagator::inject($carrier, $context, $map);
+        TraceContextPropagator::inject($carrier, $map, $context);
 
         $this->assertNull($map->get($carrier, TraceContextPropagator::TRACESTATE));
     }

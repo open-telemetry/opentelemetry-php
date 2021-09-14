@@ -22,7 +22,7 @@ use function strtolower;
  * Default implementation of {@see API\PropagationGetter} and {@see API\PropagationSetter}.
  * This type is used if no custom getter/setter is provided to {@see API\TextMapPropagator::inject()} or {@see API\TextMapPropagator::extract()}.
  */
-class TextMapGetterSetter implements API\PropagationGetter, API\PropagationSetter
+class ArrayAccessGetterSetter implements API\PropagationGetter, API\PropagationSetter
 {
     /** @var self|null */
     private static $instance;
@@ -39,11 +39,20 @@ class TextMapGetterSetter implements API\PropagationGetter, API\PropagationSette
         return self::$instance;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     *
+     * @param KeyedArrayAccess|array $carrier
+     * @psalm-suppress LessSpecificImplementedReturnType
+     */
     public function keys($carrier): array
     {
         if (is_array($carrier)) {
             return array_keys($carrier);
+        }
+
+        if ($carrier instanceof KeyedArrayAccess) {
+            return $carrier->keys();
         }
 
         throw new InvalidArgumentException(
@@ -54,7 +63,11 @@ class TextMapGetterSetter implements API\PropagationGetter, API\PropagationSette
         );
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     *
+     * @param ArrayAccess|array $carrier
+     */
     public function get($carrier, string $key): ?string
     {
         $lKey = strtolower($key);
@@ -85,7 +98,7 @@ class TextMapGetterSetter implements API\PropagationGetter, API\PropagationSette
 
         throw new InvalidArgumentException(
             sprintf(
-                'Invalid carrier of type %s. Unable to get value associated with key:%s',
+                'Unsupported carrier type: %s. Unable to get value associated with key:%s',
                 is_object($carrier) ? get_class($carrier) : gettype($carrier),
                 $key
             )
@@ -107,7 +120,7 @@ class TextMapGetterSetter implements API\PropagationGetter, API\PropagationSette
 
         throw new InvalidArgumentException(
             sprintf(
-                'Invalid carrier of type %s. Unable to set value associated with key:%s',
+                'Unsupported carrier type: %s. Unable to set value associated with key:%s',
                 is_object($carrier) ? get_class($carrier) : gettype($carrier),
                 $key
             )

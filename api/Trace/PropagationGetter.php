@@ -12,9 +12,11 @@ interface PropagationGetter
     /**
      * Returns the list of all the keys in the carrier.
      *
-     * @return iterable<string>
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/api-propagators.md#keys
+     *
+     * @return list<string>
      */
-    public function keys($carrier): iterable;
+    public function keys($carrier): array;
 
     /**
      * Gets the value of a given key from a carrier.

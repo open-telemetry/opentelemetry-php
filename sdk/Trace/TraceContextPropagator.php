@@ -35,10 +35,10 @@ final class TraceContextPropagator implements API\TextMapPropagator
     }
 
     /** {@inheritdoc} */
-    public static function inject(&$carrier, Context $context = null, PropagationSetter $setter = null): void
+    public static function inject(&$carrier, PropagationSetter $setter = null, Context $context = null): void
     {
+        $setter = $setter ?? ArrayAccessGetterSetter::getInstance();
         $context = $context ?? Context::getCurrent();
-        $setter = $setter ?? TextMapGetterSetter::getInstance();
         $spanContext = Span::fromContext($context)->getContext();
 
         if (!$spanContext->isValid()) {
@@ -57,10 +57,10 @@ final class TraceContextPropagator implements API\TextMapPropagator
     }
 
     /** {@inheritdoc} */
-    public static function extract($carrier, Context $context = null, PropagationGetter $getter = null): Context
+    public static function extract($carrier, PropagationGetter $getter = null, Context $context = null): Context
     {
+        $getter = $getter ?? ArrayAccessGetterSetter::getInstance();
         $context = $context ?? Context::getCurrent();
-        $getter = $getter ?? TextMapGetterSetter::getInstance();
 
         $spanContext = self::extractImpl($carrier, $getter);
         if (!$spanContext->isValid()) {

@@ -28,7 +28,7 @@ interface TextMapPropagator
      *
      * @param mixed $carrier
      */
-    public static function inject(&$carrier, Context $context = null, PropagationSetter $setter = null): void;
+    public static function inject(&$carrier, PropagationSetter $setter = null, Context $context = null): void;
 
     /**
      * Extracts specific values from the provided carrier into the provided {@see Context}
@@ -36,5 +36,5 @@ interface TextMapPropagator
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/api-propagators.md#textmap-extract
      */
-    public static function extract($carrier, Context $context = null, PropagationGetter $getter = null): Context;
+    public static function extract($carrier, PropagationGetter $getter = null, Context $context = null): Context;
 }

@@ -6,16 +6,17 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
 use ArrayObject;
 use InvalidArgumentException;
-use OpenTelemetry\Sdk\Trace\TextMapGetterSetter;
+use OpenTelemetry\Sdk\Trace\ArrayAccessGetterSetter;
+use OpenTelemetry\Sdk\Trace\KeyedArrayAccess;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-class TextMapGetterSetterTest extends TestCase
+class ArrayAccessGetterSetterTest extends TestCase
 {
     public function testGetFromMapArray(): void
     {
         $carrier = ['a' => 'alpha'];
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
 
         $this->assertSame('alpha', $map->get($carrier, 'a'));
         $this->assertSame(['a'], $map->keys($carrier));
@@ -28,7 +29,7 @@ class TextMapGetterSetterTest extends TestCase
             'a' => 'alpha',
             'b' => ['bravo'],
         ];
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
         $this->assertSame('alpha', $map->get($carrier, 'a'));
         $this->assertSame('bravo', $map->get($carrier, 'b'));
         $this->assertSame(['a', 'b'], $map->keys($carrier));
@@ -41,52 +42,77 @@ class TextMapGetterSetterTest extends TestCase
             1 => ['alpha'],
             'b' => 'bravo',
         ];
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
         $this->assertNull($map->get($carrier, '1'));
         $this->assertSame('bravo', $map->get($carrier, 'b'));
         $this->assertSame([1, 'b'], $map->keys($carrier));
     }
 
-    public function testGetFromMapArrayAccess(): void
-    {
-        $carrier = new ArrayObject(['a' => 'alpha']);
-        $map = new TextMapGetterSetter();
-        $this->expectException(InvalidArgumentException::class);
-        $map->keys($carrier);
-    }
-
     public function testGetFromUnsupportedCarrier(): void
     {
         $carrier = new stdClass();
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
         $this->expectException(InvalidArgumentException::class);
+
+        /** @psalm-suppress InvalidArgument */
         $map->get($carrier, 'a');
+    }
+
+    public function testKeysFromMapArrayAccess(): void
+    {
+        $carrier = new ArrayObject(['a' => 'alpha']);
+        $map = new ArrayAccessGetterSetter();
+        $this->expectException(InvalidArgumentException::class);
+
+        /** @psalm-suppress InvalidArgument */
+        $map->keys($carrier);
     }
 
     public function testKeysFromUnsupportedCarrier(): void
     {
         $carrier = new stdClass();
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
         $this->expectException(InvalidArgumentException::class);
+
+        /** @psalm-suppress InvalidArgument */
         $map->keys($carrier);
     }
 
-    public function testInvalidGetFromMap(): void
+    public function testKeysKeyedArrayAccessObject(): void
     {
-        $carrier = ['a' => 'alpha'];
-        $map = new TextMapGetterSetter();
+        $carrier = new class() implements KeyedArrayAccess {
+            public function offsetExists($offset): bool
+            {
+                return true;
+            }
 
-        $this->assertNull($map->get([], 'a'));
-        $this->assertNull($map->get($carrier, 'b'));
+            public function offsetGet($offset)
+            {
+            }
 
-        $this->expectException(InvalidArgumentException::class);
-        $map->get('invalid carrier', 'a');
+            public function offsetSet($offset, $value)
+            {
+            }
+
+            public function offsetUnset($offset)
+            {
+            }
+
+            public function keys(): array
+            {
+                return ['a', 'b'];
+            }
+        };
+
+        $map = new ArrayAccessGetterSetter();
+
+        $this->assertSame(['a', 'b'], $map->keys($carrier));
     }
 
     public function testSetMapArray(): void
     {
         $carrier = ['a' => 'alpha'];
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
 
         $map->set($carrier, 'b', 'bravo');
         $value = $map->get($carrier, 'b');
@@ -96,7 +122,7 @@ class TextMapGetterSetterTest extends TestCase
     public function testSetMapArrayAccess(): void
     {
         $carrier = new ArrayObject(['a' => 'alpha']);
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
 
         $map->set($carrier, 'b', 'bravo');
         $value = $map->get($carrier, 'b');
@@ -106,16 +132,16 @@ class TextMapGetterSetterTest extends TestCase
     public function testSetUnsupportedCarrier(): void
     {
         $carrier = new stdClass();
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid carrier of type ' . \get_class($carrier) . '. Unable to set value associated with key:a');
+        $this->expectExceptionMessage('Unsupported carrier type: ' . \get_class($carrier) . '. Unable to set value associated with key:a');
         $map->set($carrier, 'a', 'alpha');
     }
 
     public function testSetEmptyKey(): void
     {
         $carrier = ['a' => 'alpha'];
-        $map = new TextMapGetterSetter();
+        $map = new ArrayAccessGetterSetter();
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to set value with an empty key');
         $map->set($carrier, '', 'alpha');

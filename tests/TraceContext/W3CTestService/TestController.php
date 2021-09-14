@@ -36,7 +36,7 @@ class TestController
                 }
 
                 $span = $tracer->startAndActivateSpanFromContext($url, $context, true);
-                TraceContextPropagator::inject($carrier, $context);
+                TraceContextPropagator::inject($carrier, null, $context);
 
                 $client = new Client([
                     'base_uri' => $url,
