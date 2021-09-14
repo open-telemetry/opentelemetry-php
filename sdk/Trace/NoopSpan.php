@@ -209,11 +209,11 @@ class NoopSpan implements ReadWriteSpan
 
     public function activate(): Scope
     {
-        return Context::getCurrent()->with($this)->activate();
+        return Context::getCurrent()->withContextValue($this)->activate();
     }
 
     public function storeInContext(Context $context): Context
     {
-        return $context->set(SpanContextKey::instance(), $this);
+        return $context->with(SpanContextKey::instance(), $this);
     }
 }

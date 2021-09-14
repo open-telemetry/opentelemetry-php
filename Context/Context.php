@@ -67,7 +67,7 @@ class Context
      *
      * @return Context a new Context containing the k/v
      */
-    public function set(ContextKey $key, $value)
+    public function with(ContextKey $key, $value)
     {
         return new static($key, $value, $this);
     }
@@ -75,7 +75,7 @@ class Context
     /**
      * @todo: Implement this on the API side
      */
-    public function with(ImplicitContextKeyed $value): Context
+    public function withContextValue(ImplicitContextKeyed $value): Context
     {
         return $value->storeInContext($this);
     }
@@ -108,7 +108,7 @@ class Context
      *
      * @return Context a new Context containing the k/v
      */
-    public static function setValue(ContextKey $key, $value, $parent=null)
+    public static function withValue(ContextKey $key, $value, $parent=null)
     {
         if (null === $parent) {
             return static::$current_context = new static($key, $value, static::getCurrent());

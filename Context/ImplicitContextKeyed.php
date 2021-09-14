@@ -27,7 +27,7 @@ interface ImplicitContextKeyed
 
     /**
      * Returns a new {@see Context} created by setting `$this` into the provided [@see Context}.
-     * It is suggested to use {@see Context::with()} instead of using this method directly.
+     * It is suggested to use {@see Context::withContextValue()} instead of using this method directly.
      */
     public function storeInContext(Context $context): Context;
 }

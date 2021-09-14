@@ -96,7 +96,7 @@ class TracerTest extends TestCase
             SpanContext::TRACE_FLAG_SAMPLED
         ));
         $parentContext = (new Context());
-        $parentContext = $parentContext->with($parentSpan);
+        $parentContext = $parentContext->withContextValue($parentSpan);
 
         $tracerProvider = new TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');

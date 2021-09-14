@@ -156,7 +156,7 @@ class Tracer implements API\Tracer
         // When attributes and links are coded, they will need to be passed in here.
         $sampler = $this->provider->getSampler();
         $samplingResult = $sampler->shouldSample(
-            (new Context())->with(new NoopSpan($parentContext)),
+            (new Context())->withContextValue(new NoopSpan($parentContext)),
             $parentContext->getTraceId(),
             $name,
             $spanKind,

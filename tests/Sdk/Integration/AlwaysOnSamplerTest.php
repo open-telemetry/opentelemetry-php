@@ -38,7 +38,7 @@ class AlwaysOnSamplerTest extends TestCase
 
     private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceState $traceState = null): Context
     {
-        return (new Context())->with(
+        return (new Context())->withContextValue(
             new NoopSpan(
                 SpanContext::restore(
                     '4bf92f3577b34da6a3ce929d0e0e4736',

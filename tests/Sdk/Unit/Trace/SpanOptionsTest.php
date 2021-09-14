@@ -24,7 +24,7 @@ class SpanOptionsTest extends TestCase
 
         $global = $tracer->getActiveSpan();
         $globalContext = (new Context());
-        $globalContext = $globalContext->with($global);
+        $globalContext = $globalContext->withContextValue($global);
         $spanOptions->setParent($globalContext);
 
         // Create span from options

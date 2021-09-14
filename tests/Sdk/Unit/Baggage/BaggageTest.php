@@ -15,7 +15,7 @@ class BaggageTest extends TestCase
         $key1 = new ContextKey();
         $key2 = new ContextKey();
         /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar');
+        $cctx = (new Baggage())->with($key1, 'foo')->with($key2, 'bar');
         /** @var Baggage $cctx_res */
         $cctx_res = $cctx->removeCorrelation($key2);
         $this->assertEquals('foo', $cctx_res->get($key1));
@@ -29,7 +29,7 @@ class BaggageTest extends TestCase
         $key2 = new ContextKey('key2');
         $key3 = new ContextKey('key3');
         /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar')->set($key3, 'baz');
+        $cctx = (new Baggage())->with($key1, 'foo')->with($key2, 'bar')->with($key3, 'baz');
         /** @var Baggage $cctx_res */
         $cctx_res = $cctx->removeCorrelation($key2);
         $this->assertEquals('foo', $cctx_res->get($key1));
@@ -43,7 +43,7 @@ class BaggageTest extends TestCase
         $key1 = new ContextKey();
         $key2 = new ContextKey();
         /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key2, 'bar')->set($key1, 'foo');
+        $cctx = (new Baggage())->with($key2, 'bar')->with($key1, 'foo');
         /** @var Baggage $cctx_res */
         $cctx_res = $cctx->removeCorrelation($key2);
         $this->assertEquals('foo', $cctx_res->get($key1));
@@ -54,7 +54,7 @@ class BaggageTest extends TestCase
     public function testOnlyItemInTheContext(): void
     {
         $key1 = new ContextKey();
-        $cctx = (new Baggage())->set($key1, 'foo');
+        $cctx = (new Baggage())->with($key1, 'foo');
         $this->assertEquals('foo', $cctx->get($key1));
     }
 
@@ -62,7 +62,7 @@ class BaggageTest extends TestCase
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
-        $cctx = (new Baggage())->set($key2, 'bar')->set($key1, 'foo');
+        $cctx = (new Baggage())->with($key2, 'bar')->with($key1, 'foo');
         $this->assertNotEquals('bar', $cctx->get($key1));
         $this->assertNotEquals('foo', $cctx->get($key2));
     }
@@ -73,7 +73,7 @@ class BaggageTest extends TestCase
         $key2 = new ContextKey();
 
         /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar');
+        $cctx = (new Baggage())->with($key1, 'foo')->with($key2, 'bar');
 
         $this->assertEquals('foo', $cctx->get($key1));
         $this->assertEquals('bar', $cctx->get($key2));
@@ -88,7 +88,7 @@ class BaggageTest extends TestCase
         $key2 = new ContextKey();
 
         /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar');
+        $cctx = (new Baggage())->with($key1, 'foo')->with($key2, 'bar');
 
         $res = [];
         foreach ($cctx->getCorrelations() as $k => $v) {

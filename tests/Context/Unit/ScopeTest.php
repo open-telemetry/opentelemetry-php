@@ -14,7 +14,7 @@ class ScopeTest extends TestCase
     public function testScopeCloseRestoresContext(): void
     {
         $key = new ContextKey();
-        $ctx = (new Context())->set($key, 'test');
+        $ctx = (new Context())->with($key, 'test');
         $scope = new Scope(Context::attach($ctx));
 
         $this->assertSame('test', Context::getValue($key));
@@ -27,11 +27,11 @@ class ScopeTest extends TestCase
     public function testNestedScope(): void
     {
         $key = new ContextKey();
-        $ctx1 = (new Context())->set($key, 'test1');
+        $ctx1 = (new Context())->with($key, 'test1');
         $scope1 = new Scope(Context::attach($ctx1));
         $this->assertSame('test1', Context::getValue($key));
 
-        $ctx2 = (new Context())->set($key, 'test2');
+        $ctx2 = (new Context())->with($key, 'test2');
         $scope2 = new Scope(Context::attach($ctx2));
         $this->assertSame('test2', Context::getValue($key));
 

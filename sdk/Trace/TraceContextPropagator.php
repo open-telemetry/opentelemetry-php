@@ -67,7 +67,7 @@ final class TraceContextPropagator implements API\TextMapPropagator
             return $context;
         }
 
-        return $context->with(Span::wrap($spanContext));
+        return $context->withContextValue(Span::wrap($spanContext));
     }
 
     private static function extractImpl($carrier, PropagationGetter $getter): API\SpanContext

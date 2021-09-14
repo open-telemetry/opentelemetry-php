@@ -369,13 +369,13 @@ class Span implements ReadWriteSpan
     /** @inheritDoc */
     public function storeInContext(Context $context): Context
     {
-        return $context->set(SpanContextKey::instance(), $this);
+        return $context->with(SpanContextKey::instance(), $this);
     }
 
     /** @inheritDoc */
     public function activate(): Scope
     {
-        return Context::getCurrent()->with($this)->activate();
+        return Context::getCurrent()->withContextValue($this)->activate();
     }
 
     /**
