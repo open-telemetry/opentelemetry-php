@@ -265,7 +265,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
         $this->assertEquals($expected, $otlpspan);
     }
 
-    public function testOtlpNoSpans() 
+    public function testOtlpNoSpans()
     {
         $spans = [];
 
