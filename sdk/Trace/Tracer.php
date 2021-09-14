@@ -127,7 +127,7 @@ class Tracer implements API\Tracer
 
         // FIXME: This should either be called manually or as part of a dedicated tracer operation,
         // probably some sort of `inSpan` method?
-        $span->makeCurrent();
+        $span->activate();
     }
 
     /**

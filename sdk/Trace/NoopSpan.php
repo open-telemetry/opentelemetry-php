@@ -207,9 +207,9 @@ class NoopSpan implements ReadWriteSpan
         return new InstrumentationLibrary('');
     }
 
-    public function makeCurrent(): Scope
+    public function activate(): Scope
     {
-        return Context::getCurrent()->with($this)->makeCurrent();
+        return Context::getCurrent()->with($this)->activate();
     }
 
     public function storeInContext(Context $context): Context

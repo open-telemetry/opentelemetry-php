@@ -74,7 +74,7 @@ class TracerTest extends TestCase
         $tracerProvider = new TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
         $span1 = $tracer->startSpan('test.span.1');
-        $span1->makeCurrent();
+        $span1->activate();
         $span2 = $tracer->startSpan('test.span.2');
 
         $this->assertEquals($span1->getContext()->getTraceId(), $span2->getContext()->getTraceId());

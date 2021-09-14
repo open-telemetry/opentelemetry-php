@@ -44,11 +44,11 @@ $tracer = $tracerProvider->getTracer('example.php.opentelemetry.io', '0.0.1');
 $rootSpan = $tracer->startSpan('root-span');
 sleep(1);
 
-$rootScope = $rootSpan->makeCurrent(); // set the root span active in the current context
+$rootScope = $rootSpan->activate(); // set the root span active in the current context
 
 try {
     $span1 = $tracer->startSpan('child-span-1');
-    $internalScope = $span1->makeCurrent(); // set the child span active in the context
+    $internalScope = $span1->activate(); // set the child span active in the context
 
     try {
         for ($i = 0; $i < 3; $i++) {

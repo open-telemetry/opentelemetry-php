@@ -373,9 +373,9 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public function makeCurrent(): Scope
+    public function activate(): Scope
     {
-        return Context::getCurrent()->with($this)->makeCurrent();
+        return Context::getCurrent()->with($this)->activate();
     }
 
     /**

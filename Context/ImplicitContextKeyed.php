@@ -19,11 +19,11 @@ interface ImplicitContextKeyed
      *
      * {@see Scope::close()} _MUST_ be called to properly restore the previous context.
      *
-     * This method is equivalent to `Context::getCurrent().with($value).makeCurrent();`.
+     * This method is equivalent to `Context::getCurrent().with($value).activate();`.
      *
      * @todo: Update this to suggest using the new helper method way to doing something in a specific context/span.
      */
-    public function makeCurrent(): Scope;
+    public function activate(): Scope;
 
     /**
      * Returns a new {@see Context} created by setting `$this` into the provided [@see Context}.

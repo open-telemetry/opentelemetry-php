@@ -81,9 +81,11 @@ class Context
     }
 
     /**
+     * Makes `$this` the currently active {@see Context}.
+     *
      * @todo: Implement this on the API side
      */
-    public function makeCurrent(): Scope
+    public function activate(): Scope
     {
         return new Scope(self::attach($this));
     }

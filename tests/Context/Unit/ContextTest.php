@@ -10,6 +10,15 @@ use PHPUnit\Framework\TestCase;
 
 class ContextTest extends TestCase
 {
+    public function testActivate(): void
+    {
+        $context = new Context();
+
+        $this->assertNotSame($context, Context::getCurrent());
+        $context->activate();
+        $this->assertSame($context, Context::getCurrent());
+    }
+
     /**
      * @test
      */
