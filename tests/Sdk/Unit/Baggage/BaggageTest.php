@@ -5,113 +5,90 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Sdk\Unit\Baggage;
 
 use OpenTelemetry\Context\ContextKey;
-use OpenTelemetry\Context\ContextValueNotFoundException;
 use OpenTelemetry\Sdk\Baggage;
 use PHPUnit\Framework\TestCase;
 
 class BaggageTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function testRemoveCorrelationFromBeginning()
+    public function testRemoveCorrelationFromBeginning(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
         /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar');
+        $cctx = (new Baggage())->with($key1, 'foo')->with($key2, 'bar');
         /** @var Baggage $cctx_res */
         $cctx_res = $cctx->removeCorrelation($key2);
         $this->assertEquals('foo', $cctx_res->get($key1));
-        $this->expectException(ContextValueNotFoundException::class);
-        $cctx_res->get($key2);
+
+        $this->assertNull($cctx_res->get($key2));
     }
 
-    /**
-     * @test
-     */
-    public function testRemoveCorrelationFromMiddle()
+    public function testRemoveCorrelationFromMiddle(): void
     {
         $key1 = new ContextKey('key1');
         $key2 = new ContextKey('key2');
         $key3 = new ContextKey('key3');
         /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar')->set($key3, 'baz');
+        $cctx = (new Baggage())->with($key1, 'foo')->with($key2, 'bar')->with($key3, 'baz');
         /** @var Baggage $cctx_res */
         $cctx_res = $cctx->removeCorrelation($key2);
         $this->assertEquals('foo', $cctx_res->get($key1));
         $this->assertEquals('baz', $cctx_res->get($key3));
-        $this->expectException(ContextValueNotFoundException::class);
-        $cctx_res->get($key2);
+
+        $this->assertNull($cctx_res->get($key2));
     }
 
-    /**
-     * @test
-     */
-    public function testRemoveCorrelationFromEnd()
+    public function testRemoveCorrelationFromEnd(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
         /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key2, 'bar')->set($key1, 'foo');
+        $cctx = (new Baggage())->with($key2, 'bar')->with($key1, 'foo');
         /** @var Baggage $cctx_res */
         $cctx_res = $cctx->removeCorrelation($key2);
         $this->assertEquals('foo', $cctx_res->get($key1));
-        $this->expectException(ContextValueNotFoundException::class);
-        $cctx_res->get($key2);
+
+        $this->assertNull($cctx_res->get($key2));
     }
 
-    /**
-     * @test
-     */
-    public function testOnlyItemInTheContext()
+    public function testOnlyItemInTheContext(): void
     {
         $key1 = new ContextKey();
-        $cctx = (new Baggage())->set($key1, 'foo');
+        $cctx = (new Baggage())->with($key1, 'foo');
         $this->assertEquals('foo', $cctx->get($key1));
     }
 
-    /**
-     * @test
-     */
-    public function testWrongKeyValue()
+    public function testWrongKeyValue(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
-        $cctx = (new Baggage())->set($key2, 'bar')->set($key1, 'foo');
+        $cctx = (new Baggage())->with($key2, 'bar')->with($key1, 'foo');
         $this->assertNotEquals('bar', $cctx->get($key1));
         $this->assertNotEquals('foo', $cctx->get($key2));
     }
 
-    /**
-     * @test
-     */
-    public function testClearCorrelations()
+    public function testClearCorrelations(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
 
         /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar');
+        $cctx = (new Baggage())->with($key1, 'foo')->with($key2, 'bar');
 
         $this->assertEquals('foo', $cctx->get($key1));
         $this->assertEquals('bar', $cctx->get($key2));
 
         $cctx->clearCorrelations();
-        $this->expectException(ContextValueNotFoundException::class);
-        $cctx->get($key1);
+        $this->assertNull($cctx->get($key1));
     }
 
-    /**
-     * @test
-     */
-    public function testGetCorrelations()
+    public function testGetCorrelations(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
 
         /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar');
+        $cctx = (new Baggage())->with($key1, 'foo')->with($key2, 'bar');
 
         $res = [];
         foreach ($cctx->getCorrelations() as $k => $v) {

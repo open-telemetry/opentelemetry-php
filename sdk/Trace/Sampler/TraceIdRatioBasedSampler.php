@@ -9,7 +9,6 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Trace as API;
 
 /**
@@ -52,8 +51,8 @@ class TraceIdRatioBasedSampler implements Sampler
         ?API\Links $links = null
     ): SamplingResult {
         // TODO: Add config to adjust which spans get sampled (only default from specification is implemented)
-        $parentSpan = Span::extract($parentContext);
-        $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
+        $parentSpan = Span::fromContext($parentContext);
+        $parentSpanContext = $parentSpan->getContext();
         $traceState = $parentSpanContext->getTraceState();
 
         /**

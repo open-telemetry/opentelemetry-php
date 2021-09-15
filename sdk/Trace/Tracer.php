@@ -50,8 +50,8 @@ class Tracer implements API\Tracer
         ?API\Links $links = null,
         ?int $startTimestamp = null
     ): API\Span {
-        $parentSpan = $parentContext !== null ? Span::extract($parentContext) : Span::getCurrent();
-        $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
+        $parentSpan = $parentContext !== null ? Span::fromContext($parentContext) : Span::getCurrent();
+        $parentSpanContext = $parentSpan->getContext();
 
         /**
          * Implementations MUST generate a new TraceId for each root span created.
@@ -124,6 +124,10 @@ class Tracer implements API\Tracer
         $this->tail[] = $this->active;
 
         $this->active = $span;
+
+        // FIXME: This should either be called manually or as part of a dedicated tracer operation,
+        // probably some sort of `inSpan` method?
+        $span->activate();
     }
 
     /**
@@ -152,7 +156,7 @@ class Tracer implements API\Tracer
         // When attributes and links are coded, they will need to be passed in here.
         $sampler = $this->provider->getSampler();
         $samplingResult = $sampler->shouldSample(
-            Span::insert(new NoopSpan($parentContext), new Context()),
+            (new Context())->withContextValue(new NoopSpan($parentContext)),
             $parentContext->getTraceId(),
             $name,
             $spanKind,

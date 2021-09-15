@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
 
 /**
- * Class SpanContextKey
- * @package OpenTelemetry\Sdk\Trace
- * @internal
+ * @psalm-internal \OpenTelemetry
  */
 class SpanContextKey extends ContextKey
 {
@@ -19,13 +18,13 @@ class SpanContextKey extends ContextKey
      * @var ContextKey
      */
     private static $instance;
-    
+
     public static function instance(): ContextKey
     {
         if (self::$instance === null) {
-            self::$instance = new ContextKey(self::KEY_NAME);
+            self::$instance = Context::createKey(self::KEY_NAME);
         }
-        
+
         return self::$instance;
     }
 }

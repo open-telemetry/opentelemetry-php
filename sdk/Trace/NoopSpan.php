@@ -4,17 +4,23 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
-use OpenTelemetry\Context\ContextKey;
-use OpenTelemetry\Context\ContextValueTrait;
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\Scope;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 use Throwable;
 
-class NoopSpan implements API\Span, ReadableSpan
+/**
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#wrapping-a-spancontext-in-a-span
+ *
+ * @todo: Implement this on the API side.
+ * @todo: Can we just use {@see https://www.php.net/manual/en/language.oop5.anonymous.php}?
+ * @todo: If not rename this to `NonRecordingSpan`.
+ * @todo: Make this only implement {@see API\Span}.
+ */
+class NoopSpan implements ReadWriteSpan
 {
-    use ContextValueTrait;
-
     /** @var API\SpanContext */
     private $context;
 
@@ -23,7 +29,6 @@ class NoopSpan implements API\Span, ReadableSpan
 
     /** @var API\Links */
     private $links;
-    // @todo when links will be implemented, this attribute should be initialized properly
 
     /** @var API\Events */
     private $events;
@@ -53,17 +58,13 @@ class NoopSpan implements API\Span, ReadableSpan
         }
         $this->attributes = new Attributes();
         $this->events = new Events();
+        $this->links = new Links();
         $this->status = new SpanStatus();
     }
 
     public function getSpanName(): string
     {
         return '';
-    }
-
-    public function getContext(): API\SpanContext
-    {
-        return $this->context;
     }
 
     public function getParent(): ?API\SpanContext
@@ -186,16 +187,7 @@ class NoopSpan implements API\Span, ReadableSpan
         return $this->status->isStatusOK();
     }
 
-    /**
-     * @return ContextKey
-     * @phan-override
-     */
-    protected static function getContextKey(): ContextKey
-    {
-        return SpanContextKey::instance();
-    }
-
-    public function getSpanContext(): API\SpanContext
+    public function getContext(): API\SpanContext
     {
         return $this->context;
     }
@@ -213,5 +205,15 @@ class NoopSpan implements API\Span, ReadableSpan
     public function getInstrumentationLibrary(): InstrumentationLibrary
     {
         return new InstrumentationLibrary('');
+    }
+
+    public function activate(): Scope
+    {
+        return Context::getCurrent()->withContextValue($this)->activate();
+    }
+
+    public function storeInContext(Context $context): Context
+    {
+        return $context->with(SpanContextKey::instance(), $this);
     }
 }

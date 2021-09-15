@@ -6,20 +6,28 @@ namespace OpenTelemetry\Tests\Context\Unit;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
-use OpenTelemetry\Context\ContextValueNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class ContextTest extends TestCase
 {
+    public function testActivate(): void
+    {
+        $context = new Context();
+
+        $this->assertNotSame($context, Context::getCurrent());
+        $context->activate();
+        $this->assertSame($context, Context::getCurrent());
+    }
+
     /**
      * @test
      */
-    public function ctxCanStoreValuesByKey()
+    public function ctxCanStoreValuesByKey(): void
     {
         $key1 = new ContextKey('key1');
         $key2 = new ContextKey('key2');
 
-        $ctx = (new Context())->set($key1, 'val1')->set($key2, 'val2');
+        $ctx = (new Context())->with($key1, 'val1')->with($key2, 'val2');
 
         $this->assertSame($ctx->get($key1), 'val1');
         $this->assertSame($ctx->get($key2), 'val2');
@@ -28,33 +36,32 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function setDoesNotMutateTheOriginal()
+    public function setDoesNotMutateTheOriginal(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
 
-        $parent = (new Context())->set($key1, 'foo');
-        $child = $parent->set($key2, 'bar');
+        $parent = (new Context())->with($key1, 'foo');
+        $child = $parent->with($key2, 'bar');
 
         $this->assertSame($child->get($key1), 'foo');
         $this->assertSame($child->get($key2), 'bar');
         $this->assertSame($parent->get($key1), 'foo');
 
-        $this->expectException(ContextValueNotFoundException::class);
-        $parent->get($key2);
+        $this->assertNull($parent->get($key2));
     }
 
     /**
      * @test
      */
-    public function ctxKeyNamesAreNotIds()
+    public function ctxKeyNamesAreNotIds(): void
     {
         $key_name = 'foo';
 
         $key1 = new ContextKey($key_name);
         $key2 = new ContextKey($key_name);
 
-        $ctx = (new Context())->set($key1, 'val1')->set($key2, 'val2');
+        $ctx = (new Context())->with($key1, 'val1')->with($key2, 'val2');
 
         $this->assertSame($ctx->get($key1), 'val1');
         $this->assertSame($ctx->get($key2), 'val2');
@@ -63,12 +70,12 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function emptyCtxKeysAreValid()
+    public function emptyCtxKeysAreValid(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
 
-        $ctx = (new Context())->set($key1, 'val1')->set($key2, 'val2');
+        $ctx = (new Context())->with($key1, 'val1')->with($key2, 'val2');
 
         $this->assertSame($ctx->get($key1), 'val1');
         $this->assertSame($ctx->get($key2), 'val2');
@@ -77,7 +84,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function ctxCanStoreScalarArrayNullAndObj()
+    public function ctxCanStoreScalarArrayNullAndObj(): void
     {
         $scalar_val = 42;
         $array_val = ['foo', 'bar'];
@@ -90,10 +97,10 @@ class ContextTest extends TestCase
         $obj_key = new ContextKey();
 
         $ctx = (new Context())
-            ->set($scalar_key, $scalar_val)
-            ->set($array_key, $array_val)
-            ->set($null_key, $null_val)
-            ->set($obj_key, $obj_val);
+            ->with($scalar_key, $scalar_val)
+            ->with($array_key, $array_val)
+            ->with($null_key, $null_val)
+            ->with($obj_key, $obj_val);
 
         $this->assertSame($ctx->get($scalar_key), $scalar_val);
         $this->assertSame($ctx->get($array_key), $array_val);
@@ -104,13 +111,13 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function storageOrderDoesntMatter()
+    public function storageOrderDoesntMatter(): void
     {
         $arr = [];
         foreach (range(0, 9) as $i) {
             $r = rand(0, 100);
             $key = new ContextKey((string) $r);
-            Context::setValue($key, $r);
+            Context::withValue($key, $r);
             $arr[$r] = $key;
         }
 
@@ -124,79 +131,58 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function staticUseOfCurrentDoesntInterfereWithOtherCalls()
+    public function staticUseOfCurrentDoesntInterfereWithOtherCalls(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
         $key3 = new ContextKey();
 
-        Context::setValue($key1, '111');
-        Context::setValue($key2, '222');
+        Context::withValue($key1, '111');
+        Context::withValue($key2, '222');
 
-        $ctx = Context::setValue($key3, '333', new Context());
+        $ctx = Context::withValue($key3, '333', new Context());
 
         $this->assertSame(Context::getValue($key1), '111');
         $this->assertSame(Context::getValue($key2), '222');
 
         $this->assertSame(Context::getValue($key3, $ctx), '333');
 
-        $e = null;
-
-        try {
-            Context::getValue($key1, $ctx);
-        } catch (\Exception $e) {
-        }
-        $this->assertInstanceOf(ContextValueNotFoundException::class, $e);
-
-        $e = null;
-
-        try {
-            Context::getValue($key2, $ctx);
-        } catch (\Exception $e) {
-        }
-        $this->assertInstanceOf(ContextValueNotFoundException::class, $e);
-
-        $e = null;
-
-        try {
-            Context::getValue($key3);
-        } catch (\Exception $e) {
-        }
-        $this->assertInstanceOf(ContextValueNotFoundException::class, $e);
+        $this->assertNull(Context::getValue($key1, $ctx));
+        $this->assertNull(Context::getValue($key2, $ctx));
+        $this->assertNull(Context::getValue($key3));
     }
 
     /**
      * @test
      */
-    public function reusingKeyOverwritesValue()
+    public function reusingKeyOverwritesValue(): void
     {
         $key = new ContextKey();
-        $ctx = (new Context())->set($key, 'val1');
+        $ctx = (new Context())->with($key, 'val1');
         $this->assertSame($ctx->get($key), 'val1');
 
-        $ctx = $ctx->set($key, 'val2');
+        $ctx = $ctx->with($key, 'val2');
         $this->assertSame($ctx->get($key), 'val2');
     }
 
     /**
      * @test
      */
-    public function ctxValueNotFoundThrows()
+    public function ctxValueNotFoundThrows(): void
     {
-        $this->expectException(ContextValueNotFoundException::class);
-        $ctx = (new Context())->set(new ContextKey('foo'), 'bar');
-        $ctx->get(new ContextKey('baz'));
+        $ctx = (new Context())->with(new ContextKey('foo'), 'bar');
+        $this->assertNull($ctx->get(new ContextKey('baz')));
     }
 
     /**
      * @test
      */
-    public function attachAndDetachSetCurrentCtx()
+    public function attachAndDetachSetCurrentCtx(): void
     {
         $key = new ContextKey();
-        Context::attach((new Context())->set($key, '111'));
+        Context::attach((new Context())->with($key, '111'));
 
-        $token = Context::attach((new Context())->set($key, '222'));
+        $token = Context::attach((new Context())->with($key, '222'));
         $this->assertSame(Context::getValue($key), '222');
 
         Context::detach($token);
@@ -206,12 +192,12 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function instanceSetAndStaticGetUseSameCtx()
+    public function instanceSetAndStaticGetUseSameCtx(): void
     {
         $key = new ContextKey('ofoba');
         $val = 'foobar';
 
-        $ctx = (new Context())->set($key, $val);
+        $ctx = (new Context())->with($key, $val);
         Context::attach($ctx);
 
         $this->assertSame(Context::getValue($key, $ctx), $val);
@@ -221,15 +207,15 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function staticSetAndInstanceGetUseSameCtx()
+    public function staticSetAndInstanceGetUseSameCtx(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
         $val1 = '111';
         $val2 = '222';
 
-        $ctx = Context::setValue($key1, $val1);
-        $ctx = Context::setValue($key2, $val2, $ctx);
+        $ctx = Context::withValue($key1, $val1);
+        $ctx = Context::withValue($key2, $val2, $ctx);
 
         $this->assertSame($ctx->get($key1), $val1);
         $this->assertSame($ctx->get($key2), $val2);
@@ -238,13 +224,13 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function staticWithoutPassedCtxUsesCurrent()
+    public function staticWithoutPassedCtxUsesCurrent(): void
     {
-        $ctx = Context::setValue(new ContextKey(), '111');
+        $ctx = Context::withValue(new ContextKey(), '111');
         $first = Context::getCurrent();
         $this->assertSame($first, $ctx);
 
-        $ctx = Context::setValue(new ContextKey(), '222');
+        $ctx = Context::withValue(new ContextKey(), '222');
         $second = Context::getCurrent();
         $this->assertSame($second, $ctx);
 
@@ -254,13 +240,13 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function staticWithPassedCtxDoesNotUseCurrent()
+    public function staticWithPassedCtxDoesNotUseCurrent(): void
     {
         $key1 = new ContextKey();
-        $currentCtx = Context::setValue($key1, '111');
+        $currentCtx = Context::withValue($key1, '111');
 
         $key2 = new ContextKey();
-        $otherCtx = Context::setValue($key2, '222', new Context());
+        $otherCtx = Context::withValue($key2, '222', new Context());
         $this->assertSame($currentCtx, Context::getCurrent());
     }
 }

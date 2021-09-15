@@ -8,7 +8,6 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Trace as API;
 
 /**
@@ -86,9 +85,9 @@ class ParentBased implements Sampler
         ?API\Attributes $attributes = null,
         ?API\Links $links = null
     ): SamplingResult {
-        $parentSpan = Span::extract($parentContext);
-        $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
-        
+        $parentSpan = Span::fromContext($parentContext);
+        $parentSpanContext = $parentSpan->getContext();
+
         // Invalid parent SpanContext indicates root span is being created
         if (!$parentSpanContext->isValid()) {
             return $this->root->shouldSample(...func_get_args());

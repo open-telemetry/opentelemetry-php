@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Context;
 
 /**
- * @template TContext of Context
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#overview
  */
 class Context
 {
@@ -19,12 +19,20 @@ class Context
      */
     protected $value;
 
-    /**
-     * @var TContext|null
-     */
+    /** @var self|null */
     protected $parent;
 
     protected static $current_context = null;
+
+    /**
+     * @param non-empty-string $key
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#create-a-key
+     */
+    public static function createKey(string $key): ContextKey
+    {
+        return new ContextKey($key);
+    }
 
     /**
      * This is a general purpose read-only key-value store. Read-only in the sense that adding a new value does not
@@ -41,7 +49,7 @@ class Context
      *
      * @param ContextKey|null $key The key object. Should only be null when creating an "empty" context
      * @param mixed|null $value
-     * @param TContext|null $parent Reference to the parent object
+     * @param self|null $parent Reference to the parent object
      */
     final public function __construct(?ContextKey $key=null, $value=null, $parent=null)
     {
@@ -59,9 +67,27 @@ class Context
      *
      * @return Context a new Context containing the k/v
      */
-    public function set(ContextKey $key, $value)
+    public function with(ContextKey $key, $value)
     {
         return new static($key, $value, $this);
+    }
+
+    /**
+     * @todo: Implement this on the API side
+     */
+    public function withContextValue(ImplicitContextKeyed $value): Context
+    {
+        return $value->storeInContext($this);
+    }
+
+    /**
+     * Makes `$this` the currently active {@see Context}.
+     *
+     * @todo: Implement this on the API side
+     */
+    public function activate(): Scope
+    {
+        return new Scope(self::attach($this));
     }
 
     /**
@@ -82,7 +108,7 @@ class Context
      *
      * @return Context a new Context containing the k/v
      */
-    public static function setValue(ContextKey $key, $value, $parent=null)
+    public static function withValue(ContextKey $key, $value, $parent=null)
     {
         if (null === $parent) {
             return static::$current_context = new static($key, $value, static::getCurrent());
@@ -94,19 +120,16 @@ class Context
     /**
      * Fetch a value from the Context given a key value.
      *
-     * @param ContextKey $key
-     *
-     * @throws ContextValueNotFoundException
-     * @return mixed
-     * @suppress PhanUndeclaredClassMethod
+     * @return mixed|null
      */
     public function get(ContextKey $key)
     {
         if ($this->key === $key) {
             return $this->value;
         }
+
         if (null === $this->parent) {
-            throw new ContextValueNotFoundException();
+            return null;
         }
 
         return $this->parent->get($key);
@@ -126,7 +149,6 @@ class Context
      * @param ContextKey $key
      * @param Context|null $ctx
      *
-     * @throws ContextValueNotFoundException
      * @return mixed
      */
     public static function getValue(ContextKey $key, $ctx=null)
@@ -136,10 +158,7 @@ class Context
         return $ctx->get($key);
     }
 
-    /**
-     * @return Context
-     */
-    public static function getCurrent()
+    public static function getCurrent(): Context
     {
         if (null === static::$current_context) {
             static::$current_context = new static();

@@ -4,23 +4,20 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk;
 
+use Generator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
 
-/**
- * @extends Context<Baggage>
- */
 class Baggage extends Context
 {
+    /** @var self|null */
     protected $parent;
 
     /**
      * Return the k/v Correlation pairs from the Baggage
      * The yielded values are of the form `ContextKey => mixed`
-     *
-     * @return \Generator
      */
-    public function getCorrelations()
+    public function getCorrelations(): Generator
     {
         if (null !== $this->parent) {
             yield from $this->parent->getCorrelations();

@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
-use OpenTelemetry\Context\ContextKey;
-use OpenTelemetry\Context\ContextValueTrait;
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\Scope;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 use Throwable;
 
-class Span implements API\Span, ReadableSpan
+class Span implements ReadWriteSpan
 {
-    use ContextValueTrait;
+    /** @var NoopSpan|null */
+    private static $invalidSpan;
 
     private $name;
     private $spanContext;
     private $parentSpanContext;
     private $spanKind;
-    private $sampler;
 
     private $startEpochTimestamp;
     private $endEpochTimestamp;
@@ -46,6 +46,44 @@ class Span implements API\Span, ReadableSpan
 
     /** @var ?SpanProcessor */
     private $spanProcessor;
+
+    /**
+     * @todo Implement this in the API layer
+     */
+    public static function fromContext(Context $context): API\Span
+    {
+        if ($span = $context->get(SpanContextKey::instance())) {
+            return $span;
+        }
+
+        return self::getInvalid();
+    }
+
+    /**
+     * @todo Implement this in the API layer
+     */
+    public static function getCurrent(): API\Span
+    {
+        return self::fromContext(Context::getCurrent());
+    }
+
+    public static function getInvalid(): NoopSpan
+    {
+        if (null === self::$invalidSpan) {
+            self::$invalidSpan = new NoopSpan();
+        }
+
+        return self::$invalidSpan;
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#wrapping-a-spancontext-in-a-span
+     * @todo Implement this in the API layer
+     */
+    public static function wrap(API\SpanContext $context): NoopSpan
+    {
+        return new NoopSpan($context);
+    }
 
     public function __construct(
         string $name,
@@ -91,11 +129,6 @@ class Span implements API\Span, ReadableSpan
     public function getResource(): ResourceInfo
     {
         return clone $this->resource;
-    }
-
-    public function getContext(): API\SpanContext
-    {
-        return clone $this->spanContext;
     }
 
     public function getParent(): ?API\SpanContext
@@ -208,7 +241,7 @@ class Span implements API\Span, ReadableSpan
         return $this;
     }
 
-    public function getSpanContext(): API\SpanContext
+    public function getContext(): API\SpanContext
     {
         return $this->spanContext;
     }
@@ -333,13 +366,16 @@ class Span implements API\Span, ReadableSpan
         return $this->spanStatus->isStatusOK();
     }
 
-    /**
-     * @return ContextKey
-     * @phan-override
-     */
-    protected static function getContextKey(): ContextKey
+    /** @inheritDoc */
+    public function storeInContext(Context $context): Context
     {
-        return SpanContextKey::instance();
+        return $context->with(SpanContextKey::instance(), $this);
+    }
+
+    /** @inheritDoc */
+    public function activate(): Scope
+    {
+        return Context::getCurrent()->withContextValue($this)->activate();
     }
 
     /**

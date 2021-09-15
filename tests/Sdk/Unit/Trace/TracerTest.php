@@ -26,7 +26,7 @@ class TracerTest extends TestCase
         Context::attach(new Context()); // clean up the current Context
     }
 
-    private function readSpanAttributesArray(ReadableSpan $span)
+    private function readSpanAttributesArray(ReadableSpan $span): array
     {
         return array_map(function (API\Attribute $attribute) {
             return $attribute->getValue();
@@ -36,25 +36,25 @@ class TracerTest extends TestCase
     /**
      * @test
      */
-    public function spanProcessorsShouldBeCalledWhenNewSpanIsStarted()
+    public function spanProcessorsShouldBeCalledWhenNewSpanIsStarted(): void
     {
-        $processor = self::createMock(SpanProcessor::class);
+        $processor = $this->createMock(SpanProcessor::class);
 
         $tracerProvider = new TracerProvider();
         $tracerProvider->addSpanProcessor($processor);
 
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
 
-        $processor->expects($this->exactly(1))->method('onStart')->with($this->isInstanceOf(Span::class));
+        $processor->expects($this->once())->method('onStart')->with($this->isInstanceOf(Span::class));
         $tracer->startSpan('test.span');
     }
 
     /**
      * @test
      */
-    public function spanProcessorsShouldBeCalledWhenSpanEnded()
+    public function spanProcessorsShouldBeCalledWhenSpanEnded(): void
     {
-        $processor = self::createMock(SpanProcessor::class);
+        $processor = $this->createMock(SpanProcessor::class);
 
         $tracerProvider = new TracerProvider();
         $tracerProvider->addSpanProcessor($processor);
@@ -62,19 +62,19 @@ class TracerTest extends TestCase
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
         $span = $tracer->startSpan('test.span');
 
-        $processor->expects($this->exactly(1))->method('onEnd')->with($this->equalTo($span));
+        $processor->expects($this->once())->method('onEnd')->with($this->equalTo($span));
         $span->end();
     }
 
     /**
      * @test
      */
-    public function activeSpanFromCurrentContextShouldBeUsedAsParent()
+    public function activeSpanFromCurrentContextShouldBeUsedAsParent(): void
     {
         $tracerProvider = new TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
         $span1 = $tracer->startSpan('test.span.1');
-        Span::setCurrent($span1);
+        $span1->activate();
         $span2 = $tracer->startSpan('test.span.2');
 
         $this->assertEquals($span1->getContext()->getTraceId(), $span2->getContext()->getTraceId());
@@ -88,7 +88,7 @@ class TracerTest extends TestCase
     /**
      * @test
      */
-    public function spanAndParentContextShouldHaveIdenticalTraceId()
+    public function spanAndParentContextShouldHaveIdenticalTraceId(): void
     {
         $parentSpan = new NoopSpan(new SpanContext(
             'faa0c74e14bd78114ec2bc447ad94ec9',
@@ -96,7 +96,7 @@ class TracerTest extends TestCase
             SpanContext::TRACE_FLAG_SAMPLED
         ));
         $parentContext = (new Context());
-        $parentContext = Span::insert($parentSpan, $parentContext);
+        $parentContext = $parentContext->withContextValue($parentSpan);
 
         $tracerProvider = new TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
@@ -113,7 +113,7 @@ class TracerTest extends TestCase
     /**
      * @test
      */
-    public function rootSpansShouldHaveDifferentTraceId()
+    public function rootSpansShouldHaveDifferentTraceId(): void
     {
         $tracerProvider = new TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
@@ -126,10 +126,10 @@ class TracerTest extends TestCase
     /**
      * @test
      */
-    public function spanProcessorsShouldBeCalledWhenNewSpanIsCreated()
+    public function spanProcessorsShouldBeCalledWhenNewSpanIsCreated(): void
     {
-        $processor = self::createMock(SpanProcessor::class);
-        $processor->expects($this->exactly(1))->method('onStart');
+        $processor = $this->createMock(SpanProcessor::class);
+        $processor->expects($this->once())->method('onStart');
 
         $tracerProvider = new TracerProvider();
         $tracerProvider->addSpanProcessor($processor);
@@ -142,7 +142,7 @@ class TracerTest extends TestCase
     /**
      * @test
      */
-    public function startSpanAttributesShouldBePropagatedToSpan()
+    public function startSpanAttributesShouldBePropagatedToSpan(): void
     {
         $tracerProvider = new TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
@@ -159,7 +159,7 @@ class TracerTest extends TestCase
     /**
      * @test
      */
-    public function startSpanLinksShouldBePropagatedToSpan()
+    public function startSpanLinksShouldBePropagatedToSpan(): void
     {
         $tracerProvider = new TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
@@ -173,7 +173,7 @@ class TracerTest extends TestCase
     /**
      * @test
      */
-    public function startingSpanRespectsSamplerAttributes()
+    public function startingSpanRespectsSamplerAttributes(): void
     {
         $tracerProvider = new TracerProvider(null, new class() implements Sampler {
             public function shouldSample(Context $parentContext, string $traceId, string $spanName, int $spanKind, ?API\Attributes $attributes = null, ?API\Links $links = null): SamplingResult
