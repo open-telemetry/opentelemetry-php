@@ -9,6 +9,9 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Scope;
 use OpenTelemetry\Sdk\Trace\BaggageContextKey;
 
+/**
+ * @todo Implement this in the API layer
+ */
 final class Baggage implements API\Baggage
 {
     /** @var self|null */
@@ -24,6 +27,11 @@ final class Baggage implements API\Baggage
         }
 
         return self::getEmpty();
+    }
+
+    public static function getBuilder(): API\BaggageBuilder
+    {
+        return new BaggageBuilder();
     }
 
     /**
@@ -59,17 +67,12 @@ final class Baggage implements API\Baggage
     }
 
     /** @inheritDoc */
-    public function storeInContext(Context $context): Context
-    {
-        return $context->with(BaggageContextKey::instance(), $this);
-    }
-
-    /** @inheritDoc */
     public function getEntry(string $key): ?API\Entry
     {
         return $this->entries[$key] ?? null;
     }
 
+    /** @inheritDoc */
     public function getValue(string $key)
     {
         if ($entry = $this->getEntry($key)) {
@@ -80,28 +83,21 @@ final class Baggage implements API\Baggage
     }
 
     /** @inheritDoc */
-    public function getAll()
+    public function getAll(): iterable
     {
-        // TODO: Implement getAll() method.
+        foreach ($this->entries as $key => $entry) {
+            yield $key => $entry;
+        }
+    }
+
+    public function toBuilder(): API\BaggageBuilder
+    {
+        return new BaggageBuilder($this->entries);
     }
 
     /** @inheritDoc */
-    public function set(string $key, $value, ?API\Metadata $metadata = null): API\Baggage
+    public function storeInContext(Context $context): Context
     {
-        $entries = $this->entries;
-        $entries[$key] = new API\Entry($value, $metadata);
-
-        return new self($entries);
-    }
-
-    /** @inheritDoc */
-    public function remove(string $key): void
-    {
-        unset($this->entries[$key]);
-    }
-
-    public function clear(): void
-    {
-        $this->entries = [];
+        return $context->with(BaggageContextKey::instance(), $this);
     }
 }

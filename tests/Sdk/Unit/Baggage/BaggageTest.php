@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Baggage;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Baggage\Baggage;
+use OpenTelemetry\Sdk\Baggage\Metadata;
 use PHPUnit\Framework\TestCase;
 
 class BaggageTest extends TestCase
@@ -22,10 +23,9 @@ class BaggageTest extends TestCase
     public function testCurrent(): void
     {
         $scope = Context::getRoot()->withContextValue(
-            (new Baggage())->set('foo', 'bar') // TODO: Replace this wither the builder
+            Baggage::getBuilder()->set('foo', 'bar')->build(),
         )->activate();
-        $result = Baggage::getCurrent();
-        $this->assertSame('bar', $result->getValue('foo'));
+        $this->assertSame('bar', Baggage::getCurrent()->getValue('foo'));
         $scope->close();
     }
 
@@ -56,6 +56,62 @@ class BaggageTest extends TestCase
         $baggage = Baggage::getEmpty();
         $context = Context::getRoot()->withContextValue($baggage);
         $this->assertSame(Baggage::fromContext($context), $baggage);
+    }
+
+    // endregion
+
+    // region functionality
+
+    public function testGetValuePresent(): void
+    {
+        $this->assertSame(10, Baggage::getBuilder()->set('foo', 10)->build()->getValue('foo'));
+    }
+
+    public function testGetValueMissing(): void
+    {
+        $this->assertNull(Baggage::getBuilder()->build()->getValue('foo'));
+    }
+
+    public function testGetEntryPresent(): void
+    {
+        $entry = Baggage::getBuilder()->set('foo', 10, new Metadata('meta'))->build()->getEntry('foo');
+        /** @psalm-suppress PossiblyNullReference */
+        $this->assertSame(10, $entry->getValue());
+
+        /** @psalm-suppress PossiblyNullReference */
+        $this->assertSame('meta', $entry->getMetadata()->getValue());
+    }
+
+    public function testGetEntryMissing(): void
+    {
+        $this->assertNull(Baggage::getBuilder()->build()->getEntry('foo'));
+    }
+
+    public function testToBuilder(): void
+    {
+        $baggage = Baggage::getBuilder()->set('foo', 10)->build();
+        $baggage2 = $baggage->toBuilder()->build();
+
+        $this->assertSame(10, $baggage2->getValue('foo'));
+    }
+
+    public function testGetAll(): void
+    {
+        $baggage = Baggage::getBuilder()
+            ->set('foo', 'bar')
+            ->set('bar', 'baz')
+            ->build();
+
+        $arr = [];
+
+        foreach ($baggage->getAll() as $key => $value) {
+            $arr[$key] = $value->getValue();
+        }
+
+        $this->assertEquals(
+            ['foo' => 'bar', 'bar' => 'baz'],
+            $arr
+        );
     }
 
     // endregion

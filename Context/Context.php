@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
-use function var_dump;
-
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#overview
  */
@@ -21,7 +19,7 @@ final class Context
      * This will set the given Context to be the "current" one. We return a token which can be passed to `detach()` to
      * reset the Current Context back to the previous one.
      *
-     * @return callable token for resetting the $current_context back
+     * @return callable():Context - token for resetting the $current_context back
      */
     public static function attach(Context $ctx): callable
     {
@@ -45,6 +43,7 @@ final class Context
 
     /**
      * Given a token, the current context will be set back to the one prior to the token being generated.
+     * @param callable():Context $token
      */
     public static function detach(callable $token): Context
     {

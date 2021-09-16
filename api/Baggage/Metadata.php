@@ -9,5 +9,5 @@ namespace OpenTelemetry\Baggage;
  */
 interface Metadata
 {
-    public function getMetadata(): string;
+    public function getValue(): string;
 }

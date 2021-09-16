@@ -28,7 +28,7 @@ class Metadata implements API\Metadata
         $this->metadata = $metadata;
     }
 
-    public function getMetadata(): string
+    public function getValue(): string
     {
         return $this->metadata;
     }
