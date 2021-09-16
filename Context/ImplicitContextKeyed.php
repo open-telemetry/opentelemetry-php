@@ -9,6 +9,8 @@ namespace OpenTelemetry\Context;
  * Allows storing themselves without exposing a {@see ContextKey}.
  *
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#context-interaction
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/baggage/api.md#context-interaction
+ *
  * @todo: Implement this on the API side
  */
 interface ImplicitContextKeyed

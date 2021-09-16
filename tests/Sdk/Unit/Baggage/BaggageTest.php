@@ -4,99 +4,59 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Baggage;
 
-use OpenTelemetry\Context\ContextKey;
-use OpenTelemetry\Sdk\Baggage;
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\Sdk\Baggage\Baggage;
 use PHPUnit\Framework\TestCase;
 
 class BaggageTest extends TestCase
 {
-    public function testRemoveCorrelationFromBeginning(): void
-    {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
-        /** @var Baggage $cctx */
-        $cctx = (new Baggage())->with($key1, 'foo')->with($key2, 'bar');
-        /** @var Baggage $cctx_res */
-        $cctx_res = $cctx->removeCorrelation($key2);
-        $this->assertEquals('foo', $cctx_res->get($key1));
+    // region contextInteraction
 
-        $this->assertNull($cctx_res->get($key2));
+    public function testCurrentEmpty(): void
+    {
+        $scope = Context::getRoot()->activate();
+        $this->assertSame(Baggage::getCurrent(), Baggage::getEmpty());
+        $scope->close();
     }
 
-    public function testRemoveCorrelationFromMiddle(): void
+    public function testCurrent(): void
     {
-        $key1 = new ContextKey('key1');
-        $key2 = new ContextKey('key2');
-        $key3 = new ContextKey('key3');
-        /** @var Baggage $cctx */
-        $cctx = (new Baggage())->with($key1, 'foo')->with($key2, 'bar')->with($key3, 'baz');
-        /** @var Baggage $cctx_res */
-        $cctx_res = $cctx->removeCorrelation($key2);
-        $this->assertEquals('foo', $cctx_res->get($key1));
-        $this->assertEquals('baz', $cctx_res->get($key3));
-
-        $this->assertNull($cctx_res->get($key2));
+        $scope = Context::getRoot()->withContextValue(
+            (new Baggage())->set('foo', 'bar') // TODO: Replace this wither the builder
+        )->activate();
+        $result = Baggage::getCurrent();
+        $this->assertSame('bar', $result->getValue('foo'));
+        $scope->close();
     }
 
-    public function testRemoveCorrelationFromEnd(): void
+    public function testGetCurrentBaggageDefault(): void
     {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
-        /** @var Baggage $cctx */
-        $cctx = (new Baggage())->with($key2, 'bar')->with($key1, 'foo');
-        /** @var Baggage $cctx_res */
-        $cctx_res = $cctx->removeCorrelation($key2);
-        $this->assertEquals('foo', $cctx_res->get($key1));
-
-        $this->assertNull($cctx_res->get($key2));
+        $scope = Context::getRoot()->activate();
+        $baggage = Baggage::getCurrent();
+        $this->assertSame($baggage, Baggage::getEmpty());
+        $scope->close();
     }
 
-    public function testOnlyItemInTheContext(): void
+    public function testGetCurrentBaggageSetsCorrectContext(): void
     {
-        $key1 = new ContextKey();
-        $cctx = (new Baggage())->with($key1, 'foo');
-        $this->assertEquals('foo', $cctx->get($key1));
+        $baggage = Baggage::getEmpty();
+        $scope = Context::getRoot()->withContextValue($baggage)->activate();
+        $this->assertSame(Baggage::getCurrent(), $baggage);
+        $scope->close();
     }
 
-    public function testWrongKeyValue(): void
+    public function testBaggageFromContextDefaultContext(): void
     {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
-        $cctx = (new Baggage())->with($key2, 'bar')->with($key1, 'foo');
-        $this->assertNotEquals('bar', $cctx->get($key1));
-        $this->assertNotEquals('foo', $cctx->get($key2));
+        $baggage = Baggage::fromContext(Context::getRoot());
+        $this->assertSame($baggage, Baggage::getEmpty());
     }
 
-    public function testClearCorrelations(): void
+    public function testGetBaggageExplicitContext(): void
     {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
-
-        /** @var Baggage $cctx */
-        $cctx = (new Baggage())->with($key1, 'foo')->with($key2, 'bar');
-
-        $this->assertEquals('foo', $cctx->get($key1));
-        $this->assertEquals('bar', $cctx->get($key2));
-
-        $cctx->clearCorrelations();
-        $this->assertNull($cctx->get($key1));
+        $baggage = Baggage::getEmpty();
+        $context = Context::getRoot()->withContextValue($baggage);
+        $this->assertSame(Baggage::fromContext($context), $baggage);
     }
 
-    public function testGetCorrelations(): void
-    {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
-
-        /** @var Baggage $cctx */
-        $cctx = (new Baggage())->with($key1, 'foo')->with($key2, 'bar');
-
-        $res = [];
-        foreach ($cctx->getCorrelations() as $k => $v) {
-            // I am inverting the k/v pairs in an array here because php does not allow for object keys
-            $res[$v] = $k;
-        }
-
-        $this->assertSame($key1, $res['foo']);
-        $this->assertSame($key2, $res['bar']);
-    }
+    // endregion
 }
