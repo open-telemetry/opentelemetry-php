@@ -6,12 +6,12 @@ namespace OpenTelemetry\Sdk\Baggage;
 
 use OpenTelemetry\Baggage as API;
 
-class Metadata implements API\Metadata
+final class Metadata implements API\Metadata
 {
     /** @var self|null */
     private static $instance;
 
-    public static function getEmpty(): ?Metadata
+    public static function getEmpty(): Metadata
     {
         if (null === self::$instance) {
             self::$instance = new self('');

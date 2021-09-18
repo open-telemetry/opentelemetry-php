@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Baggage;
 
+use OpenTelemetry\Baggage\Entry;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Baggage\Baggage;
 use OpenTelemetry\Sdk\Baggage\Metadata;
@@ -74,12 +75,18 @@ class BaggageTest extends TestCase
 
     public function testGetEntryPresent(): void
     {
+        /** @var Entry $entry */
         $entry = Baggage::getBuilder()->set('foo', 10, new Metadata('meta'))->build()->getEntry('foo');
-        /** @psalm-suppress PossiblyNullReference */
         $this->assertSame(10, $entry->getValue());
-
-        /** @psalm-suppress PossiblyNullReference */
         $this->assertSame('meta', $entry->getMetadata()->getValue());
+    }
+
+    public function testGetEntryPresentNoMetadata(): void
+    {
+        /** @var Entry $entry */
+        $entry = Baggage::getBuilder()->set('foo', 10)->build()->getEntry('foo');
+        $this->assertSame(10, $entry->getValue());
+        $this->assertEmpty($entry->getMetadata()->getValue());
     }
 
     public function testGetEntryMissing(): void
@@ -100,6 +107,8 @@ class BaggageTest extends TestCase
         $baggage = Baggage::getBuilder()
             ->set('foo', 'bar')
             ->set('bar', 'baz')
+            ->set('biz', 'fiz')
+            ->remove('biz')
             ->build();
 
         $arr = [];

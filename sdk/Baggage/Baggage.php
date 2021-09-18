@@ -17,9 +17,7 @@ final class Baggage implements API\Baggage
     /** @var self|null */
     private static $emptyBaggage;
 
-    /**
-     * @todo Implement this in the API layer
-     */
+    /** @inheritDoc */
     public static function fromContext(Context $context): API\Baggage
     {
         if ($baggage = $context->get(BaggageContextKey::instance())) {
@@ -29,19 +27,19 @@ final class Baggage implements API\Baggage
         return self::getEmpty();
     }
 
+    /** @inheritDoc */
     public static function getBuilder(): API\BaggageBuilder
     {
         return new BaggageBuilder();
     }
 
-    /**
-     * @todo Implement this in the API layer
-     */
+    /** @inheritDoc */
     public static function getCurrent(): API\Baggage
     {
         return self::fromContext(Context::getCurrent());
     }
 
+    /** @inheritDoc */
     public static function getEmpty(): API\Baggage
     {
         if (null === self::$emptyBaggage) {
@@ -90,6 +88,7 @@ final class Baggage implements API\Baggage
         }
     }
 
+    /** @inheritDoc */
     public function toBuilder(): API\BaggageBuilder
     {
         return new BaggageBuilder($this->entries);

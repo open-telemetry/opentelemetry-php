@@ -11,7 +11,7 @@ interface BaggageBuilder
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/baggage/api.md#set-value
      */
-    public function set(string $key, $value, ?API\Metadata $metadata = null): API\BaggageBuilder;
+    public function set(string $key, $value, API\Metadata $metadata = null): API\BaggageBuilder;
 
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/baggage/api.md#remove-value
