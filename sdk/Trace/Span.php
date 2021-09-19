@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use OpenTelemetry\Sdk\Trace\Sampler\ParentBased;
 use function array_key_exists;
 use function array_shift;
 use function basename;
@@ -290,28 +291,28 @@ class Span implements ReadWriteSpan
         return !$this->hasEnded;
     }
 
-    public function setAttribute(string $key, $value): API\Span
+    public function setAttribute(string $key, $value): ReadWriteSpan
     {
         // TODO: Implement setAttribute() method.
     }
 
-    public function setAttributes(Attributes $attributes): API\Span
+    public function setAttributes(Attributes $attributes): ReadWriteSpan
     {
         // TODO: Implement setAttributes() method.
     }
 
-    public function addEvent(string $name, ?Attributes $attributes = null, int $timestamp = null): API\Span
+    public function addEvent(string $name, ?Attributes $attributes = null, int $timestamp = null): ReadWriteSpan
     {
         // TODO: Implement addEvent() method.
     }
 
-    public function recordException(Throwable $exception, ?Attributes $attributes = null): API\Span
+    public function recordException(Throwable $exception, ?Attributes $attributes = null): ReadWriteSpan
     {
         // TODO: Implement recordException() method.
     }
 
     /** @inheritDoc */
-    public function updateName(string $name): API\Span
+    public function updateName(string $name): ReadWriteSpan
     {
         if ($this->hasEnded) {
             return $this;
@@ -322,9 +323,13 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public function setStatus(string $code, string $description = null): API\Span
+    public function setStatus(string $code, string $description = null): ReadWriteSpan
     {
-        // TODO: Implement setStatus() method.
+        if ($this->hasEnded) {
+            return $this;
+        }
+
+        $this->status = $code;
     }
 
     /** @inheritDoc */
@@ -361,14 +366,15 @@ class Span implements ReadWriteSpan
         return $this->hasEnded;
     }
 
-    public function toSpanData()
+    public function toSpanData(): SpanData
     {
         // TODO: Implement toSpanData() method.
     }
 
+    /** @inheritDoc */
     public function getDuration(): int
     {
-        // TODO: Implement getDuration() method.
+        return ($this->hasEnded ? $this->endEpochNanos : Clock::get()->now()) - $this->startEpochNanos;
     }
 
     /** @inheritDoc */

@@ -84,7 +84,9 @@ interface Span extends ImplicitContextKeyed
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-status
      *
-     * @todo: Do another pass on this.
+     * @param StatusCode::STATUS_* $code
+     *
+     * @todo: Make this return SDK\StatusData
      */
     public function setStatus(string $code, string $description = null): Span;
 
