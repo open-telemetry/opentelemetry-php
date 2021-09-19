@@ -27,6 +27,7 @@ class Span implements ReadWriteSpan
      * This method _MUST_ not be used directly.
      * End users should use a {@see Tracer} in order to create spans.
      *
+     * @param non-empty-string $name
      * @param API\SpanKind::KIND_* $kind
      *
      * @internal
@@ -209,10 +210,11 @@ class Span implements ReadWriteSpan
 
     private ?API\Attributes $attributes;
     private int $totalRecordedEvents = 0;
-    private string $status = API\StatusCode::STATUS_UNSET;
+    private StatusData $status;
     private int $endEpochNanos;
     private bool $hasEnded = false;
 
+    /** @param non-empty-string $name */
     private function __construct(
         string $name,
         API\SpanContext $context,
@@ -238,6 +240,7 @@ class Span implements ReadWriteSpan
         $this->startEpochNanos = $startEpochNanos;
         $this->attributes = $attributes;
         $this->events = new Events();
+        $this->status = StatusData::unset();
     }
 
     /** @inheritDoc */
@@ -338,7 +341,9 @@ class Span implements ReadWriteSpan
             return $this;
         }
 
-        $this->status = $code;
+        $this->status = StatusData::create($code, $description);
+
+        return $this;
     }
 
     /** @inheritDoc */

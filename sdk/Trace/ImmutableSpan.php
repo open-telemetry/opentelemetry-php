@@ -23,7 +23,7 @@ final class ImmutableSpan implements SpanData
     private API\Attributes $attributes;
     private int $totalAttributeCount;
     private int $totalRecordedEvents;
-    private string $status;
+    private StatusData $status;
     private int $endEpochNanos;
     private bool $hasEnded;
 
@@ -41,7 +41,7 @@ final class ImmutableSpan implements SpanData
         API\Attributes $attributes,
         int $totalAttributeCount,
         int $totalRecordedEvents,
-        string $status,
+        StatusData $status,
         int $encEpochNanos,
         bool $hasEnded
     ) {
@@ -142,7 +142,7 @@ final class ImmutableSpan implements SpanData
         return $this->totalRecordedEvents;
     }
 
-    public function getStatus(): string
+    public function getStatus(): StatusData
     {
         return $this->status;
     }

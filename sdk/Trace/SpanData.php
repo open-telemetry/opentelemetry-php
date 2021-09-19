@@ -17,7 +17,7 @@ interface SpanData
     public function getTraceId(): string;
     public function getSpanId(): string;
     public function getParentSpanId(): string;
-    public function getStatus(): string;
+    public function getStatus(): StatusData;
     public function getStartEpochNanos(): int;
     public function getAttributes(): API\Attributes;
     public function getEvents(): API\Events;
