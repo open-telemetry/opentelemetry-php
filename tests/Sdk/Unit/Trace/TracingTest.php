@@ -548,7 +548,7 @@ Caused by: Exception: Thrown from fail2()
         $tracer = (new SDK\TracerProvider())->getTracer('OpenTelemetry.TracingTest');
 
         $this->assertInstanceOf(
-            SDK\NoopSpan::class,
+            SDK\NonRecordingSpan::class,
             $tracer->getActiveSpan()
         );
     }

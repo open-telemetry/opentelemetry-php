@@ -40,7 +40,7 @@ class Tracer implements API\Tracer
     }
 
     /**
-     * @return Span|NoopSpan
+     * @return Span|NonRecordingSpan
      */
     public function startSpan(
         string $name,
@@ -82,7 +82,7 @@ class Tracer implements API\Tracer
         $spanContext = new SpanContext($traceId, $spanId, $traceFlags, $traceState);
 
         if ($sampleResult->getDecision() === SamplingResult::DROP) {
-            return new NoopSpan($spanContext);
+            return new NonRecordingSpan($spanContext);
         }
 
         $span = new Span(
@@ -108,7 +108,7 @@ class Tracer implements API\Tracer
     }
 
     /**
-     * @return Span|NoopSpan
+     * @return Span|NonRecordingSpan
      */
     public function getActiveSpan(): API\Span
     {
@@ -116,7 +116,7 @@ class Tracer implements API\Tracer
             $this->active = array_pop($this->tail);
         }
 
-        return $this->active ?? new NoopSpan();
+        return $this->active ?? new NonRecordingSpan();
     }
 
     public function setActiveSpan(API\Span $span): void
@@ -132,7 +132,7 @@ class Tracer implements API\Tracer
 
     /**
      * @psalm-return Span
-     * @return Span|NoopSpan
+     * @return Span|NonRecordingSpan
      */
     public function startActiveSpan(
         string $name,
@@ -156,7 +156,7 @@ class Tracer implements API\Tracer
         // When attributes and links are coded, they will need to be passed in here.
         $sampler = $this->provider->getSampler();
         $samplingResult = $sampler->shouldSample(
-            (new Context())->withContextValue(new NoopSpan($parentContext)),
+            (new Context())->withContextValue(new NonRecordingSpan($parentContext)),
             $parentContext->getTraceId(),
             $name,
             $spanKind,
@@ -217,7 +217,7 @@ class Tracer implements API\Tracer
      * @param API\SpanContext $parentContext
      * @param bool $isRemote
      * @psalm-return Span
-     * @return Span|NoopSpan
+     * @return Span|NonRecordingSpan
      */
     public function startAndActivateSpanFromContext(
         string $name,
@@ -259,7 +259,7 @@ class Tracer implements API\Tracer
      * -> Is there a reason we didn't add this already?
      * @param string $name
      * @psalm-return Span
-     * @return Span|NoopSpan
+     * @return Span|NonRecordingSpan
      */
     public function startAndActivateSpan(
         string $name,
@@ -293,7 +293,7 @@ class Tracer implements API\Tracer
     }
 
     /**
-     * @return Span|NoopSpan
+     * @return Span|NonRecordingSpan
      */
     private function generateSpanInstance(
         string $name,
@@ -308,7 +308,7 @@ class Tracer implements API\Tracer
         $parent = null;
 
         if (null === $sampler) {
-            $span = new NoopSpan($context);
+            $span = new NonRecordingSpan($context);
         } else {
             if ($this->active) {
                 $parent = $this->getActiveSpan()->getContext();

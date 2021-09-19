@@ -7,7 +7,7 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Links;
-use OpenTelemetry\Sdk\Trace\NoopSpan;
+use OpenTelemetry\Sdk\Trace\NonRecordingSpan;
 use OpenTelemetry\Sdk\Trace\ReadableSpan;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
@@ -90,7 +90,7 @@ class TracerTest extends TestCase
      */
     public function spanAndParentContextShouldHaveIdenticalTraceId(): void
     {
-        $parentSpan = new NoopSpan(new SpanContext(
+        $parentSpan = new NonRecordingSpan(new SpanContext(
             'faa0c74e14bd78114ec2bc447ad94ec9',
             '50a75f197c3de59a',
             SpanContext::TRACE_FLAG_SAMPLED

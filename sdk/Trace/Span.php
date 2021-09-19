@@ -21,8 +21,6 @@ use Throwable;
 
 class Span implements ReadWriteSpan
 {
-    private static ?NoopSpan $invalidSpan;
-
     /**
      * This method _MUST_ not be used directly.
      * End users should use a {@see Tracer} in order to create spans.
@@ -92,11 +90,7 @@ class Span implements ReadWriteSpan
     /** @inheritDoc */
     public static function getInvalid(): API\Span
     {
-        if (null === self::$invalidSpan) {
-            self::$invalidSpan = new NoopSpan();
-        }
-
-        return self::$invalidSpan;
+        return NonRecordingSpan::getInvalid();
     }
 
     /**
@@ -160,7 +154,7 @@ class Span implements ReadWriteSpan
     /** @inheritDoc */
     public static function wrap(API\SpanContext $spanContext): API\Span
     {
-        return new NoopSpan($spanContext);
+        return NonRecordingSpan::create($spanContext);
     }
 
     // TODO: Add a SpanLimits object to the constructor for configuration options.

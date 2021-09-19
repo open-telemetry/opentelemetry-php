@@ -20,43 +20,30 @@ final class SpanContext implements API\SpanContext
     public const SAMPLED_FLAG = 1;
     public const TRACE_FLAG_LENGTH = 2;
 
+    private static ?self $invalidContext;
+
+    public static function getInvalid(): API\SpanContext
+    {
+        if (null === self::$invalidContext) {
+            self::$invalidContext = new self(self::INVALID_TRACE, self::INVALID_SPAN, 0);
+        }
+
+        return self::$invalidContext;
+    }
+
     /**
-     * @var string
-     */
-    private $traceId;
-    /**
-     * @var string
-     */
-    private $spanId;
-    /**
-     * @var API\TraceState|null
-     */
-    private $traceState;
-    /**
-     * @var bool
      * @see https://www.w3.org/TR/trace-context/#trace-flags
      * @see https://www.w3.org/TR/trace-context/#sampled-flag
      */
-    private $isSampled;
-    /**
-     * @var bool
-     */
-    private $isValid;
-    /**
-     * @var bool Flag which tells if the context was generated from an already existing trace
-     */
-    private $isRemote;
-    /**
-     * @var int
-     */
-    private $traceFlags;
+    private bool $isSampled;
 
-    /**
-     * @param string $traceId
-     * @param string $spanId
-     * @param int $traceFlags
-     * @param API\TraceState|null $traceState
-     */
+    private string $traceId;
+    private string $spanId;
+    private ?API\TraceState $traceState;
+    private bool $isValid;
+    private bool $isRemote;
+    private int $traceFlags;
+
     public function __construct(string $traceId, string $spanId, int $traceFlags, ?API\TraceState $traceState = null)
     {
         // TraceId must be exactly 16 bytes (32 chars) and at least one non-zero byte
@@ -73,11 +60,6 @@ final class SpanContext implements API\SpanContext
         $this->isSampled = ($traceFlags & self::SAMPLED_FLAG) === self::SAMPLED_FLAG;
         $this->traceFlags = $traceFlags;
         $this->isValid = self::isValidTraceId($this->traceId) && self::isValidSpanId($this->spanId);
-    }
-
-    public static function getInvalid(): API\SpanContext
-    {
-        return new self(self::INVALID_TRACE, self::INVALID_SPAN, 0);
     }
 
     /**

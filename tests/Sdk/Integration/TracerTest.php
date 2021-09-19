@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Sdk\Integration\Trace;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Sdk\Trace\NoopSpan;
+use OpenTelemetry\Sdk\Trace\NonRecordingSpan;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
@@ -32,7 +32,7 @@ class TracerTest extends TestCase
         $processor->expects($this->never())->method('onStart');
         $span = $tracer->startSpan('test.span');
 
-        $this->assertInstanceOf(NoopSpan::class, $span);
+        $this->assertInstanceOf(NonRecordingSpan::class, $span);
         $this->assertNotEquals(SpanContext::TRACE_FLAG_SAMPLED, $span->getContext()->getTraceFlags());
     }
 
@@ -44,7 +44,7 @@ class TracerTest extends TestCase
         $parentTraceState = new TraceState('orig-key=orig_value');
         $parentContext = (new Context())
             ->withContextValue(
-                new NoopSpan(
+                new NonRecordingSpan(
                     \OpenTelemetry\Sdk\Trace\SpanContext::restore(
                         '4bf92f3577b34da6a3ce929d0e0e4736',
                         '00f067aa0ba902b7',

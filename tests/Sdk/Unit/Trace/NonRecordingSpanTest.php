@@ -6,22 +6,22 @@ namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
 use Exception;
 use OpenTelemetry\Sdk\Trace\Clock;
-use OpenTelemetry\Sdk\Trace\NoopSpan;
+use OpenTelemetry\Sdk\Trace\NonRecordingSpan;
 use OpenTelemetry\Sdk\Trace\StatusCode;
 use OpenTelemetry\Trace\SpanKind;
 use PHPUnit\Framework\TestCase;
 
-class NoopSpanTest extends TestCase
+class NonRecordingSpanTest extends TestCase
 {
 
     /**
-     * @var NoopSpan
+     * @var NonRecordingSpan
      */
     private $span;
 
     public function setUp(): void
     {
-        $this->span = new NoopSpan();
+        $this->span = new NonRecordingSpan();
     }
 
     /** @test */
