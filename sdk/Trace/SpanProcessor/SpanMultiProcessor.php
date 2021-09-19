@@ -15,10 +15,17 @@ use OpenTelemetry\Trace as API;
  */
 final class SpanMultiProcessor implements SpanProcessor
 {
-    /**
-     * @var SpanProcessor[]
-     */
+    /** @var list<SpanProcessor> */
     private $processors = [];
+
+    /** @param list<SpanProcessor> $spanProcessors */
+    public function __construct(
+        array $spanProcessors
+    ) {
+        foreach ($spanProcessors as $processor) {
+            $this->addSpanProcessor($processor);
+        }
+    }
 
     public function addSpanProcessor(SpanProcessor $processor)
     {

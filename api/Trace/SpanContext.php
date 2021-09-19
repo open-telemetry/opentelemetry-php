@@ -6,7 +6,8 @@ namespace OpenTelemetry\Trace;
 
 interface SpanContext
 {
-    public const TRACE_FLAG_SAMPLED = 1;
+    public const TRACE_FLAG_SAMPLED = 0x01;
+    public const TRACE_FLAG_DEFAULT = 0x00;
 
     public static function getInvalid(): SpanContext;
 

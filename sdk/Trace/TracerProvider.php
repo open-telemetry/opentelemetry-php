@@ -8,56 +8,48 @@ use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\Sampler\ParentBased;
-use OpenTelemetry\Sdk\Trace\SpanProcessor\SpanMultiProcessor;
 use OpenTelemetry\Trace as API;
+use function register_shutdown_function;
 
 final class TracerProvider implements API\TracerProvider
 {
-    /**
-     * @var Tracer[]
-     */
-    protected $tracers;
+    /** @var array<string, API\Tracer> */
+    private $tracers;
 
-    /**
-     * @var IdGenerator
-     */
-    protected $idGenerator;
+    /** @readonly */
+    private TracerSharedState $tracerSharedState;
 
-    /**
-     * @var SpanMultiProcessor
-     */
-    protected $spanProcessors;
+    /** @param list<SpanProcessor> $spanProcessors */
+    public function __construct(
+        array $spanProcessors = [],
+        ResourceInfo $resource = null,
+        Sampler $sampler = null,
+        IdGenerator $idGenerator = null
+    ) {
+        $resource = $resource ?? ResourceInfo::defaultResource();
+        $sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
+        $idGenerator = $idGenerator ?? new RandomIdGenerator();
 
-    /**
-     * @var ResourceInfo
-     */
-    private $resource;
-
-    /**
-     * @var Sampler
-     */
-    private $sampler;
-
-    public function __construct(?ResourceInfo $resource = null, ?Sampler $sampler = null, ?IdGenerator $idGenerator = null)
-    {
-        $this->spanProcessors = new SpanMultiProcessor();
-        $this->resource = $resource ?? ResourceInfo::emptyResource();
-        $this->sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
-        $this->idGenerator = $idGenerator ?? new RandomIdGenerator();
+        $this->tracerSharedState = new TracerSharedState(
+            $idGenerator,
+            $resource,
+            $sampler,
+            $spanProcessors
+        );
 
         register_shutdown_function([$this, 'shutdown']);
     }
 
     public function shutdown(): void
     {
-        $this->spanProcessors->shutdown();
+        if ($this->tracerSharedState->hasShutdown()) {
+            return;
+        }
+
+        $this->tracerSharedState->shutdown();
     }
 
-    /**
-     * @param string $name
-     * @param string|null $version
-     * @return Tracer
-     */
+    /** @inheritDoc */
     public function getTracer(string $name, ?string $version = null): API\Tracer
     {
         $key = sprintf('%s@%s', $name, ($version ?? 'unknown'));
@@ -69,36 +61,13 @@ final class TracerProvider implements API\TracerProvider
         $instrumentationLibrary = new InstrumentationLibrary($name, $version);
 
         return $this->tracers[$key] = new Tracer(
-            $this,
+            $this->tracerSharedState,
             $instrumentationLibrary,
-            ResourceInfo::merge($this->getResource(), ResourceInfo::defaultResource())
         );
-    }
-
-    public function addSpanProcessor(SpanProcessor $processor): self
-    {
-        $this->spanProcessors->addSpanProcessor($processor);
-
-        return $this;
-    }
-
-    public function getSpanProcessor(): SpanMultiProcessor
-    {
-        return $this->spanProcessors;
     }
 
     public function getSampler(): Sampler
     {
-        return $this->sampler;
-    }
-
-    public function getResource(): ResourceInfo
-    {
-        return clone $this->resource;
-    }
-
-    public function getIdGenerator(): IdGenerator
-    {
-        return $this->idGenerator;
+        return $this->tracerSharedState->getSampler();
     }
 }
