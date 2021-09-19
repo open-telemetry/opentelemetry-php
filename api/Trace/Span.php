@@ -91,5 +91,5 @@ interface Span extends ImplicitContextKeyed
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#end
      */
-    public function end(int $timestamp = null): Span;
+    public function end(int $endEpochNanos = null): void;
 }

@@ -20,7 +20,7 @@ interface ReadableSpan
 
     public function getInstrumentationLibrary(): InstrumentationLibrary;
 
-    public function ended(): bool;
+    public function hasEnded(): bool;
 
     /**
      * Returns an immutable representation of this instance.
@@ -34,13 +34,15 @@ interface ReadableSpan
     public function getDuration(): int;
 
     /**
-     * @return API\SpanKind::KIND_*
+     * @see API\SpanKind
      */
     public function getKind(): int;
 
     /**
      * Returns the value of the attribute with the provided *key*.
      * Returns `null` if there are no attributes set, or no attribute with that key exists.
+     *
+     * @return mixed
      */
     public function getAttribute(string $key);
 }

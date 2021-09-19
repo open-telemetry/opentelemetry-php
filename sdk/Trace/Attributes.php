@@ -29,6 +29,15 @@ class Attributes implements API\Attributes
         return $this;
     }
 
+    public function get(string $name)
+    {
+        if ($attribute = $this->getAttribute($name)) {
+            return $attribute->getValue();
+        }
+
+        return null;
+    }
+
     public function getAttribute(string $name): ?Attribute
     {
         return $this->attributes[$name] ?? null;

@@ -147,7 +147,7 @@ class NoopSpan implements ReadWriteSpan
 
         return $this;
     }
-    public function ended(): bool
+    public function hasEnded(): bool
     {
         return $this->ended;
     }
