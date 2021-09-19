@@ -185,7 +185,7 @@ class Span implements ReadWriteSpan
      *
      * @todo: Java just has this as list<API\Link>, could we just do that?
      */
-    private ?API\Links $links;
+    private API\Links $links;
 
     /** @readonly */
     private int $totalRecordedLinks;
@@ -348,7 +348,7 @@ class Span implements ReadWriteSpan
             return;
         }
 
-        $this->endEpochNanos = $endEpochNanos;
+        $this->endEpochNanos = $endEpochNanos ?? Clock::get()->now();
         $this->hasEnded = true;
 
         $this->spanProcessor->onEnd($this);
@@ -360,7 +360,7 @@ class Span implements ReadWriteSpan
         return $this->name;
     }
 
-    public function getParentContext(): ?API\SpanContext
+    public function getParentContext(): API\SpanContext
     {
         return $this->parentSpanContext;
     }
@@ -377,7 +377,18 @@ class Span implements ReadWriteSpan
 
     public function toSpanData(): SpanData
     {
-        // TODO: Implement toSpanData() method.
+        return new ImmutableSpan(
+            $this,
+            $this->name,
+            $this->links,
+            $this->getImmutableEvents(),
+            $this->getImmutableAttributes(),
+            (null === $this->attributes) ? 0 : $this->attributes->count(),
+            $this->totalRecordedEvents,
+            $this->status,
+            $this->endEpochNanos,
+            $this->hasEnded
+        );
     }
 
     /** @inheritDoc */
@@ -402,9 +413,43 @@ class Span implements ReadWriteSpan
         return $this->attributes->get($key);
     }
 
+    public function getStartEpochNanos(): int
+    {
+        return $this->startEpochNanos;
+    }
+
+    public function getTotalRecordedLinks(): int
+    {
+        return $this->totalRecordedLinks;
+    }
+
+    public function getTotalRecordedEvents(): int
+    {
+        return $this->totalRecordedEvents;
+    }
+
+    public function getResource(): ResourceInfo
+    {
+        return $this->resource;
+    }
+
     /** @inheritDoc */
     public function storeInContext(Context $context): Context
     {
         return $context->with(SpanContextKey::instance(), $this);
+    }
+
+    private function getImmutableAttributes(): API\Attributes
+    {
+        if (null === $this->attributes) {
+            return new Attributes();
+        }
+
+        return clone $this->attributes;
+    }
+
+    private function getImmutableEvents(): API\Events
+    {
+        return clone $this->events;
     }
 }

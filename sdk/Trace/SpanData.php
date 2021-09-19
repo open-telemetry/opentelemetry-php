@@ -11,13 +11,13 @@ use OpenTelemetry\Trace as API;
 interface SpanData
 {
     public function getName(): string;
-    public function getKind(): API\SpanKind;
+    public function getKind(): int;
     public function getContext(): API\SpanContext;
     public function getParentContext(): API\SpanContext;
     public function getTraceId(): string;
     public function getSpanId(): string;
     public function getParentSpanId(): string;
-    public function getStatus(): API\StatusCode;
+    public function getStatus(): string;
     public function getStartEpochNanos(): int;
     public function getAttributes(): API\Attributes;
     public function getEvents(): API\Events;
@@ -25,6 +25,7 @@ interface SpanData
     public function getEndEpochNanos(): int;
     public function getInstrumentationLibrary(): InstrumentationLibrary;
     public function getResource(): ResourceInfo;
-
-    // TODO: Track total total amount of recorded events, links, and attributes.
+    public function getTotalRecordedEvents(): int;
+    public function getTotalRecordedLinks(): int;
+    public function getTotalAttributeCount(): int;
 }

@@ -16,7 +16,7 @@ interface ReadableSpan
 
     public function getContext(): API\SpanContext;
 
-    public function getParentContext(): ?API\SpanContext;
+    public function getParentContext(): API\SpanContext;
 
     public function getInstrumentationLibrary(): InstrumentationLibrary;
 
