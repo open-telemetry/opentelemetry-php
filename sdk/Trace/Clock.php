@@ -4,11 +4,33 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use function intdiv;
 use OpenTelemetry\Trace as API;
 
 class Clock implements API\Clock
 {
-    private static $instance;
+    private static ?self $instance = null;
+
+    public static function get(): Clock
+    {
+        if (null === self::$instance) {
+            self::$instance = new Clock();
+        }
+
+        return self::$instance;
+    }
+
+    /** @psalm-pure */
+    public static function nanosToMicro(int $nanoseconds): int
+    {
+        return intdiv($nanoseconds, 1000);
+    }
+
+    /** @psalm-pure */
+    public static function nanosToMilli(int $nanoseconds): int
+    {
+        return intdiv($nanoseconds, 1000000);
+    }
 
     /** @var API\RealtimeClock */
     public $realtime_clock;
@@ -20,15 +42,6 @@ class Clock implements API\Clock
     {
         $this->realtime_clock = new RealtimeClock();
         $this->monotonic_clock = new MonotonicClock();
-    }
-
-    public static function get(): Clock
-    {
-        if (!self::$instance) {
-            self::$instance = new Clock();
-        }
-
-        return self::$instance;
     }
 
     /** @return array{int, int} */

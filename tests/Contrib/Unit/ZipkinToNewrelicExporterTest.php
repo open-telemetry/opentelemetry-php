@@ -10,7 +10,7 @@ use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter;
 use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
+use OpenTelemetry\Sdk\Trace\Test\SpanData;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -35,7 +35,7 @@ class ZipkinToNewrelicExporterTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $exporter->export([new Span('test.zipkin.span', SpanContext::generate())])
+            $exporter->export([new SpanData()])
         );
     }
 
@@ -66,7 +66,7 @@ class ZipkinToNewrelicExporterTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $exporter->export([new Span('test.zipkinToNR.span', SpanContext::generate())])
+            $exporter->export([new SpanData()])
         );
     }
 

@@ -8,9 +8,9 @@ use OpenTelemetry\Trace as API;
 
 final class StatusData
 {
-    private static ?self $ok;
-    private static ?self $unset;
-    private static ?self $error;
+    private static ?self $ok = null;
+    private static ?self $unset = null;
+    private static ?self $error = null;
 
     /** @param API\StatusCode::STATUS_* $code */
     public static function create(string $code, ?string $description = null): self

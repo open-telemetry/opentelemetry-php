@@ -20,7 +20,7 @@ final class SpanContext implements API\SpanContext
     public const SAMPLED_FLAG = 1;
     public const TRACE_FLAG_LENGTH = 2;
 
-    private static ?self $invalidContext;
+    private static ?self $invalidContext = null;
 
     public static function getInvalid(): API\SpanContext
     {

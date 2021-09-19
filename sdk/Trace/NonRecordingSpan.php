@@ -16,7 +16,7 @@ use Throwable;
  */
 final class NonRecordingSpan implements API\Span
 {
-    private static ?self $invalidSpan;
+    private static ?self $invalidSpan = null;
 
     public static function create(API\SpanContext $spanContext): API\Span
     {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
+use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\SpanData;
 
 class SpanConverter
@@ -47,8 +48,8 @@ class SpanConverter
     {
         $spanParent = $span->getParentContext();
 
-        $startTimestamp = $span->getStartEpochNanos() / 1e3;
-        $endTimestamp = $span->getEndEpochNanos() / 1e3;
+        $startTimestamp = Clock::nanosToMicro($span->getStartEpochNanos());
+        $endTimestamp = Clock::nanosToMicro($span->getEndEpochNanos());
 
         $row = [
             'id' => $span->getContext()->getSpanId(),
@@ -58,8 +59,8 @@ class SpanConverter
                 'serviceName' => $this->serviceName,
             ],
             'name' => $span->getName(),
-            'timestamp' => $startTimestamp, // RealtimeClock in microseconds
-            'duration' => max(1, $startTimestamp - $endTimestamp), // Diff in microseconds
+            'timestamp' => $startTimestamp,
+            'duration' => max(1, $endTimestamp - $startTimestamp),
             'tags' => [
                 self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
                 self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
@@ -75,7 +76,7 @@ class SpanConverter
                 $row['annotations'] = [];
             }
             $row['annotations'][] = [
-                'timestamp' => (int) ($event->getTimestamp() / 1e3), // RealtimeClock in microseconds
+                'timestamp' => Clock::nanosToMicro($event->getTimestamp()),
                 'value' => $event->getName(),
             ];
         }

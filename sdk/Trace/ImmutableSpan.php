@@ -45,7 +45,7 @@ final class ImmutableSpan implements SpanData
         int $encEpochNanos,
         bool $hasEnded
     ) {
-        $this->span =$span;
+        $this->span = $span;
         $this->name = $name;
         $this->links = $links;
         $this->events = $events;
