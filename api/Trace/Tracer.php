@@ -14,7 +14,7 @@ interface Tracer
         int $spanKind = SpanKind::KIND_INTERNAL,
         ?Attributes $attributes = null,
         ?Links $links = null,
-        ?int $startTimestamp = null
+        int $startTimestamp = 0
     ): Span;
 
     public function getActiveSpan(): Span;

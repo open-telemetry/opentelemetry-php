@@ -96,7 +96,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
     private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceState $traceState = null): Context
     {
         return (new Context())->withContextValue(
-            new NonRecordingSpan(
+            NonRecordingSpan::create(
                 SpanContext::restore(
                     '4bf92f3577b34da6a3ce929d0e0e4736',
                     '00f067aa0ba902b7',

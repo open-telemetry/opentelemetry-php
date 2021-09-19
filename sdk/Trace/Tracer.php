@@ -48,20 +48,22 @@ class Tracer implements API\Tracer
         int $spanKind = API\SpanKind::KIND_INTERNAL,
         ?API\Attributes $attributes = null,
         ?API\Links $links = null,
-        ?int $startTimestamp = null
+        int $startTimestamp = 0
     ): API\Span {
-        $parentSpan = $parentContext !== null ? Span::fromContext($parentContext) : Span::getCurrent();
+        $parentContext = $parentContext ?? Context::getCurrent();
+        $parentSpan = Span::fromContext($parentContext);
         $parentSpanContext = $parentSpan->getContext();
 
-        /**
-         * Implementations MUST generate a new TraceId for each root span created.
-         * For a Span with a parent, the TraceId MUST be the same as the parent.
-         */
-        $traceId = $parentSpanContext->isValid() ? $parentSpanContext->getTraceId() : $this->provider->getIdGenerator()->generateTraceId();
         $spanId = $this->provider->getIdGenerator()->generateSpanId();
 
+        if (!$parentSpanContext->isValid()) {
+            $traceId = $this->provider->getIdGenerator()->generateTraceId();
+        } else {
+            $traceId = $parentSpanContext->getTraceId();
+        }
+
         $sampleResult = $this->provider->getSampler()->shouldSample(
-            $parentContext ?? Context::getCurrent(),
+            $parentContext,
             $traceId,
             $name,
             $spanKind,
@@ -77,34 +79,30 @@ class Tracer implements API\Tracer
             }
         }
 
-        $traceFlags = $sampleResult->getDecision() === SamplingResult::RECORD_AND_SAMPLE ? SpanContext::TRACE_FLAG_SAMPLED : 0;
+        $traceFlags = $sampleResult->getDecision() === SamplingResult::RECORD_AND_SAMPLE ? API\SpanContext::TRACE_FLAG_SAMPLED : 0;
         $traceState = $sampleResult->getTraceState();
         $spanContext = new SpanContext($traceId, $spanId, $traceFlags, $traceState);
 
         if ($sampleResult->getDecision() === SamplingResult::DROP) {
-            return new NonRecordingSpan($spanContext);
+            return NonRecordingSpan::create($spanContext);
         }
 
-        $span = new Span(
+        $links = $links ?? new Links();
+
+        return Span::startSpan(
             $name,
             $spanContext,
-            $parentSpanContext,
-            $this->resource,
+            $this->instrumentationLibrary,
             $spanKind,
+            $parentSpan,
+            $parentContext,
+            $this->provider->getSpanProcessor(),
+            $this->resource,
             $attributes,
             $links,
-            $this->provider->getSpanProcessor()
+            $links->count(), // TODO: Is this sufficient?
+            $startTimestamp
         );
-
-        $span->setInstrumentationLibrary($this->instrumentationLibrary);
-
-        if ($links) {
-            $span->setLinks($links);
-        }
-
-        $this->provider->getSpanProcessor()->onStart($span, $parentContext ?? Context::getCurrent());
-
-        return $span;
     }
 
     /**
@@ -116,7 +114,7 @@ class Tracer implements API\Tracer
             $this->active = array_pop($this->tail);
         }
 
-        return $this->active ?? new NonRecordingSpan();
+        return $this->active ?? NonRecordingSpan::create(SpanContext::getInvalid());
     }
 
     public function setActiveSpan(API\Span $span): void
@@ -156,7 +154,7 @@ class Tracer implements API\Tracer
         // When attributes and links are coded, they will need to be passed in here.
         $sampler = $this->provider->getSampler();
         $samplingResult = $sampler->shouldSample(
-            (new Context())->withContextValue(new NonRecordingSpan($parentContext)),
+            (new Context())->withContextValue(NonRecordingSpan::create($parentContext)),
             $parentContext->getTraceId(),
             $name,
             $spanKind,
@@ -293,7 +291,8 @@ class Tracer implements API\Tracer
     }
 
     /**
-     * @return Span|NonRecordingSpan
+     * @param non-empty-string $name
+     * @param API\SpanKind::KIND_* $spanKind
      */
     private function generateSpanInstance(
         string $name,
@@ -305,29 +304,25 @@ class Tracer implements API\Tracer
         ?API\Attributes $attributes = null,
         ?API\Links $links = null
     ): API\Span {
-        $parent = null;
-
         if (null === $sampler) {
-            $span = new NonRecordingSpan($context);
+            $span = NonRecordingSpan::create($context);
         } else {
-            if ($this->active) {
-                $parent = $this->getActiveSpan()->getContext();
-            } elseif (is_object($parentContext) && $parentContext->isRemote() == true) {
-                $parent = $parentContext;
-            }
+            $links = $links ?? new Links();
 
-            $span = new Span(
+            $span = Span::startSpan(
                 $name,
                 $context,
-                $parent,
-                $resource,
+                $this->instrumentationLibrary,
                 $spanKind,
+                Span::fromContext(Context::getCurrent()),
+                Context::getCurrent(),
+                $this->provider->getSpanProcessor(),
+                $resource ?? ResourceInfo::emptyResource(),
                 $attributes,
                 $links,
-                $this->provider->getSpanProcessor()
+                $links->count(), // TODO: Is this sufficient?
+                Clock::get()->timestamp()
             );
-
-            $span->setInstrumentationLibrary($this->instrumentationLibrary);
         }
 
         $this->spans[] = $span;
