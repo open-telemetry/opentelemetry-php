@@ -20,7 +20,7 @@ use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
 use OpenTelemetry\Sdk\Trace\ReadableSpan;
-use OpenTelemetry\Sdk\Trace\SpanStatus;
+use OpenTelemetry\Sdk\Trace\StatusCode;
 
 class SpanConverter
 {
@@ -85,17 +85,17 @@ class SpanConverter
     {
         $end_timestamp = ($span->getStartEpochTimestamp() + $span->getDuration());
 
-        $parent_span = $span->getParent();
+        $parent_span = $span->getParentContext();
         $parent_span_id = $parent_span ? $parent_span->getSpanId() : false;
 
         $row = [
             'trace_id' => hex2bin($span->getContext()->getTraceId()),
             'span_id' => hex2bin($span->getContext()->getSpanId()),
             'parent_span_id' => $parent_span_id ? hex2bin($parent_span_id) : null,
-            'name' => $span->getSpanName(),
+            'name' => $span->getName(),
             'start_time_unix_nano' => $span->getStartEpochTimestamp(),
             'end_time_unix_nano' => $end_timestamp,
-            'kind' => $this->as_otlp_span_kind($span->getSpanKind()),
+            'kind' => $this->as_otlp_span_kind($span->getKind()),
             'trace_state' => (string) $span->getContext()->getTraceState(),
         ];
 
@@ -144,11 +144,11 @@ class SpanConverter
         $status = new Status();
 
         switch ($span->getStatus()->getCanonicalStatusCode()) {
-            case SpanStatus::OK:
+            case StatusCode::OK:
                 $status->setCode(StatusCode::STATUS_CODE_OK);
 
                 break;
-            case SpanStatus::ERROR:
+            case StatusCode::ERROR:
                 $status->setCode(StatusCode::STATUS_CODE_ERROR)->setMessage($span->getStatus()->getStatusDescription());
 
                 break;

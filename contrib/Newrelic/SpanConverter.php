@@ -23,12 +23,12 @@ class SpanConverter
 
     public function convert(ReadableSpan $span)
     {
-        $spanParent = $span->getParent();
+        $spanParent = $span->getParentContext();
         $row = [
             'id' => $span->getContext()->getSpanId(),
             'trace.id' => $span->getContext()->getTraceId(),
             'attributes' => [
-                'name' => $span->getSpanName(),
+                'name' => $span->getName(),
                 'service.name' => $this->serviceName,
                 'parent.id' => $spanParent ? $spanParent->getSpanId() : null,
                 'timestamp' => ($span->getStartEpochTimestamp()  / 1e6), // RealtimeClock in milliseconds

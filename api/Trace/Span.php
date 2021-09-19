@@ -4,62 +4,92 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace;
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ImplicitContextKeyed;
 use Throwable;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#span-operations
  */
-interface Span extends SpanStatus, SpanKind, ImplicitContextKeyed
+interface Span extends ImplicitContextKeyed
 {
     /**
-     * Attributes SHOULD preserve the order in which they're set. Setting an attribute with the same key as an existing
-     * attribute SHOULD overwrite the existing attribute's value.
-     * @param string $key
-     * @param bool|int|float|string|array $value Note: the array MUST be homogeneous, i.e. it MUST NOT contain values
-     *                                           of different types.
-     * @return Span Must return $this to allow setting multiple attributes at once in a chain
+     * Returns the {@see Span} from the provided *$context*,
+     * falling back on {@see Span::getInvalid()} if there is no span in the provided context.
+     *
+     * @todo Implement this in the API layer
+     */
+    public static function fromContext(Context $context): Span;
+
+    /**
+     * Returns the current {@see Span} from the current {@see Context},
+     * falling back on {@see Span::getEmpty()} if there is no span in the current context.
+     *
+     * @todo Implement this in the API layer
+     */
+    public static function getCurrent(): Span;
+
+    /**
+     * Returns an invalid {@see Span} that is used when tracing is disabled, such s when there is no available SDK.
+     */
+    public static function getInvalid(): Span;
+
+    /**
+     * Returns a non-recording {@see Span} that hold the provided *$spanContext* but has no functionality.
+     * It will not be exported and al tracing operations are no-op, but can be used to propagate a valid {@see SpanContext} downstream.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#wrapping-a-spancontext-in-a-span
+     *
+     * @todo Implement this in the API layer
+     */
+    public static function wrap(SpanContext $spanContext): Span;
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#get-context
+     */
+    public function getContext(): SpanContext;
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#isrecording
+     */
+    public function isRecording(): bool;
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-attributes
+     *
+     * @param bool|int|float|string|array $value Note: the array MUST be homogeneous, i.e. it MUST NOT contain values of different types.
      */
     public function setAttribute(string $key, $value): Span;
 
     /**
-     * @param string $name
-     * @param int $timestamp
-     * @param Attributes|null $attributes
-     * @return Span Must return $this to allow setting multiple attributes at once in a chain.
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-attributes
      */
-    public function addEvent(string $name, int $timestamp, ?Attributes $attributes = null): Span;
+    public function setAttributes(Attributes $attributes): Span;
 
     /**
-     *
-     * @param Throwable $exception
-     * @return Span Must return $this to allow setting multiple attributes at once in a chain.
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#add-events
+     */
+    public function addEvent(string $name, ?Attributes $attributes = null, int $timestamp = null): Span;
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#record-exception
      */
     public function recordException(Throwable $exception, ?Attributes $attributes = null): Span;
 
     /**
-     * Calling this method is highly discouraged; the name should be set on creation and left alone.
-     * @param string $name
-     * @return Span Must return $this
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#updatename
      */
     public function updateName(string $name): Span;
 
     /**
-     * Sets the Status of the Span. If used, this will override the default Span status, which is OK.
-     * Only the value of the last call will be recorded, and implementations are free to ignore previous calls.
-     * @param string $code
-     * @param string|null $description
-     * @return Span Must return $this
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-status
+     *
+     * @todo: Do another pass on this.
      */
-    public function setSpanStatus(string $code, ?string $description = null): Span;
+    public function setStatus(string $code, string $description = null): Span;
 
     /**
-     * @param int|null $timestamp
-     * @return Span Must return $this
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#end
      */
     public function end(int $timestamp = null): Span;
-
-    public function getContext(): SpanContext;
-
-    public function isRecording(): bool;
 }

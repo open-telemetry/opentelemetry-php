@@ -80,7 +80,7 @@ class TracerTest extends TestCase
         $this->assertEquals($span1->getContext()->getTraceId(), $span2->getContext()->getTraceId());
         $this->assertNotEquals($span1->getContext()->getSpanId(), $span2->getContext()->getSpanId());
 
-        $span2ParentContext = $span2->getParent();
+        $span2ParentContext = $span2->getParentContext();
         $this->assertNotNull($span2ParentContext);
         $this->assertEquals($span1->getContext()->getSpanId(), $span2ParentContext->getSpanId());
     }
@@ -105,7 +105,7 @@ class TracerTest extends TestCase
         $this->assertEquals($parentSpan->getContext()->getTraceId(), $childSpan->getContext()->getTraceId());
         $this->assertNotEquals($parentSpan->getContext()->getSpanId(), $childSpan->getContext()->getSpanId());
 
-        $parentSpanContext = $childSpan->getParent();
+        $parentSpanContext = $childSpan->getParentContext();
         $this->assertNotNull($parentSpanContext);
         $this->assertEquals($parentSpan->getContext()->getSpanId(), $parentSpanContext->getSpanId());
     }

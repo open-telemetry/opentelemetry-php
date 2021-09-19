@@ -15,7 +15,7 @@ use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
-use OpenTelemetry\Sdk\Trace\SpanStatus;
+use OpenTelemetry\Sdk\Trace\StatusCode;
 use OpenTelemetry\Sdk\Trace\Tracer;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
@@ -60,9 +60,9 @@ class TracingTest extends TestCase
         $tracerProvider = new SDK\TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
         $database = $tracer->startAndActivateSpan('database');
-        $this->assertSame($database->getSpanName(), 'database');
+        $this->assertSame($database->getName(), 'database');
         $database->updateName('tarantool');
-        $this->assertSame($database->getSpanName(), 'tarantool');
+        $this->assertSame($database->getName(), 'tarantool');
     }
 
     public function testNestedSpans()
@@ -79,9 +79,9 @@ class TracingTest extends TestCase
 
         $guard->end();
 
-        $this->assertEquals($connection->getParent(), $guard->getContext());
-        $this->assertEquals($procedure->getParent(), $connection->getContext());
-        $this->assertEquals($policy->getParent(), $guard->getContext());
+        $this->assertEquals($connection->getParentContext(), $guard->getContext());
+        $this->assertEquals($procedure->getParentContext(), $connection->getContext());
+        $this->assertEquals($policy->getParentContext(), $guard->getContext());
 
         $this->assertCount(4, $tracer->getSpans());
     }
@@ -101,7 +101,7 @@ class TracingTest extends TestCase
         try {
             throw new \Exception('Thrown from here');
         } catch (\Exception $e) {
-            $actualStacktrace = Span::getStackTrace($e);
+            $actualStacktrace = Span::formatStackTrace($e);
         }
 
         $this->assertEquals($stacktrace, $actualStacktrace);
@@ -143,7 +143,7 @@ Caused by: Exception: Thrown from fail2()
         try {
             self::fail1();
         } catch (\Exception $e) {
-            $actualStacktrace = Span::getStackTrace($e);
+            $actualStacktrace = Span::formatStackTrace($e);
         }
 
         $this->assertEquals($stacktrace, $actualStacktrace);
@@ -160,7 +160,7 @@ Caused by: Exception: Thrown from fail2()
         $mysql = $tracer->startAndActivateSpan('mysql');
         $this->assertSame($tracer->getActiveSpan(), $mysql);
         $this->assertSame($global->getContext()->getTraceId(), $mysql->getContext()->getTraceId());
-        $this->assertEquals($mysql->getParent(), $global->getContext());
+        $this->assertEquals($mysql->getParentContext(), $global->getContext());
         $this->assertNotNull($mysql->getStartEpochTimestamp());
         $this->assertTrue($mysql->isRecording());
         $this->assertNull($mysql->getDuration());
@@ -215,23 +215,23 @@ Caused by: Exception: Thrown from fail2()
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
 
         $span = $tracer->startAndActivateSpan('someSpan');
-        $this->assertSame($span->getSpanKind(), API\SpanKind::KIND_INTERNAL);
+        $this->assertSame($span->getKind(), API\SpanKind::KIND_INTERNAL);
         $span->end();
 
         $span = $tracer->startAndActivateSpan('someSpan', API\SpanKind::KIND_CLIENT);
-        $this->assertSame($span->getSpanKind(), API\SpanKind::KIND_CLIENT);
+        $this->assertSame($span->getKind(), API\SpanKind::KIND_CLIENT);
         $span->end();
 
         $span = $tracer->startAndActivateSpan('someSpan', API\SpanKind::KIND_SERVER);
-        $this->assertSame($span->getSpanKind(), API\SpanKind::KIND_SERVER);
+        $this->assertSame($span->getKind(), API\SpanKind::KIND_SERVER);
         $span->end();
 
         $span = $tracer->startAndActivateSpan('someSpan', API\SpanKind::KIND_PRODUCER);
-        $this->assertSame($span->getSpanKind(), API\SpanKind::KIND_PRODUCER);
+        $this->assertSame($span->getKind(), API\SpanKind::KIND_PRODUCER);
         $span->end();
 
         $span = $tracer->startAndActivateSpan('someSpan', API\SpanKind::KIND_CONSUMER);
-        $this->assertSame($span->getSpanKind(), API\SpanKind::KIND_CONSUMER);
+        $this->assertSame($span->getKind(), API\SpanKind::KIND_CONSUMER);
         $span->end();
     }
 
@@ -244,49 +244,49 @@ Caused by: Exception: Thrown from fail2()
         $span = $tracer->startAndActivateSpan('setSpanStatus');
 
         // If an invalid code is given, SpanStatus should be/remain UNSET.
-        $firstStatus = $span->setSpanStatus('MY_CODE');
+        $firstStatus = $span->setStatus('MY_CODE');
         $status = $firstStatus->getStatus();
-        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
-        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
+        self::assertEquals(StatusCode::UNSET, $status->getCanonicalStatusCode());
+        self::assertEquals(StatusCode::DESCRIPTION[StatusCode::UNSET], $status->getStatusDescription());
 
-        $firstStatus = $span->setSpanStatus(SpanStatus::UNSET);
+        $firstStatus = $span->setStatus(StatusCode::UNSET);
         $status = $firstStatus->getStatus();
-        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
-        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
+        self::assertEquals(StatusCode::DESCRIPTION[StatusCode::UNSET], $status->getStatusDescription());
+        self::assertEquals(StatusCode::UNSET, $status->getCanonicalStatusCode());
 
-        $firstStatus = $span->setSpanStatus(SpanStatus::OK);
+        $firstStatus = $span->setStatus(StatusCode::OK);
         $status = $firstStatus->getStatus();
-        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::OK], $status->getStatusDescription());
-        self::assertEquals(SpanStatus::OK, $status->getCanonicalStatusCode());
+        self::assertEquals(StatusCode::DESCRIPTION[StatusCode::OK], $status->getStatusDescription());
+        self::assertEquals(StatusCode::OK, $status->getCanonicalStatusCode());
 
-        $firstStatus = $span->setSpanStatus(SpanStatus::ERROR);
+        $firstStatus = $span->setStatus(StatusCode::ERROR);
         $status = $firstStatus->getStatus();
-        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::ERROR], $status->getStatusDescription());
-        self::assertEquals(SpanStatus::ERROR, $status->getCanonicalStatusCode());
+        self::assertEquals(StatusCode::DESCRIPTION[StatusCode::ERROR], $status->getStatusDescription());
+        self::assertEquals(StatusCode::ERROR, $status->getCanonicalStatusCode());
 
         /*
          * Only ERROR codes should modify span status description.
          * Description MUST only be used with the Error.
          */
-        $firstStatus = $span->setSpanStatus('mycode', 'Neunundneunzig Luftballons');
+        $firstStatus = $span->setStatus('mycode', 'Neunundneunzig Luftballons');
         $status = $firstStatus->getStatus();
-        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
-        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
+        self::assertEquals(StatusCode::DESCRIPTION[StatusCode::UNSET], $status->getStatusDescription());
+        self::assertEquals(StatusCode::UNSET, $status->getCanonicalStatusCode());
 
-        $firstStatus = $span->setSpanStatus(SpanStatus::OK, 'Neunundneunzig Luftballons');
+        $firstStatus = $span->setStatus(StatusCode::OK, 'Neunundneunzig Luftballons');
         $status = $firstStatus->getStatus();
-        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::OK], $status->getStatusDescription());
-        self::assertEquals(SpanStatus::OK, $status->getCanonicalStatusCode());
+        self::assertEquals(StatusCode::DESCRIPTION[StatusCode::OK], $status->getStatusDescription());
+        self::assertEquals(StatusCode::OK, $status->getCanonicalStatusCode());
 
-        $firstStatus = $span->setSpanStatus(SpanStatus::UNSET, 'Neunundneunzig Luftballons');
+        $firstStatus = $span->setStatus(StatusCode::UNSET, 'Neunundneunzig Luftballons');
         $status = $firstStatus->getStatus();
-        self::assertEquals(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $status->getStatusDescription());
-        self::assertEquals(SpanStatus::UNSET, $status->getCanonicalStatusCode());
+        self::assertEquals(StatusCode::DESCRIPTION[StatusCode::UNSET], $status->getStatusDescription());
+        self::assertEquals(StatusCode::UNSET, $status->getCanonicalStatusCode());
 
-        $firstStatus = $span->setSpanStatus(SpanStatus::ERROR, 'Neunundneunzig Luftballons');
+        $firstStatus = $span->setStatus(StatusCode::ERROR, 'Neunundneunzig Luftballons');
         $status = $firstStatus->getStatus();
         self::assertEquals('Neunundneunzig Luftballons', $status->getStatusDescription());
-        self::assertEquals(SpanStatus::ERROR, $status->getCanonicalStatusCode());
+        self::assertEquals(StatusCode::ERROR, $status->getCanonicalStatusCode());
     }
 
     public function testStatusManipulation()
@@ -296,22 +296,22 @@ Caused by: Exception: Thrown from fail2()
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
 
         $span = $tracer->startAndActivateSpan('setSpanStatus')
-            ->setSpanStatus(SpanStatus::ERROR);
+            ->setStatus(StatusCode::ERROR);
         self::assertFalse($span->isStatusOK());
-        self::assertSame(SpanStatus::ERROR, $span->getCanonicalStatusCode());
-        self::assertSame(SpanStatus::DESCRIPTION[SpanStatus::ERROR], $span->getStatusDescription());
+        self::assertSame(StatusCode::ERROR, $span->getCanonicalStatusCode());
+        self::assertSame(StatusCode::DESCRIPTION[StatusCode::ERROR], $span->getStatusDescription());
 
-        $span->setSpanStatus(SpanStatus::UNSET);
+        $span->setStatus(StatusCode::UNSET);
 
         self::assertFalse($span->isStatusOK());
-        self::assertSame(SpanStatus::UNSET, $span->getCanonicalStatusCode());
-        self::assertSame(SpanStatus::DESCRIPTION[SpanStatus::UNSET], $span->getStatusDescription());
+        self::assertSame(StatusCode::UNSET, $span->getCanonicalStatusCode());
+        self::assertSame(StatusCode::DESCRIPTION[StatusCode::UNSET], $span->getStatusDescription());
 
-        $span->setSpanStatus(SpanStatus::OK);
+        $span->setStatus(StatusCode::OK);
 
         self::assertTrue($span->isStatusOK());
-        self::assertSame(SpanStatus::OK, $span->getCanonicalStatusCode());
-        self::assertSame(SpanStatus::DESCRIPTION[SpanStatus::OK], $span->getStatusDescription());
+        self::assertSame(StatusCode::OK, $span->getCanonicalStatusCode());
+        self::assertSame(StatusCode::DESCRIPTION[StatusCode::OK], $span->getStatusDescription());
 
         self::assertCount(1, $tracer->getSpans());
         $span->end();
@@ -323,11 +323,11 @@ Caused by: Exception: Thrown from fail2()
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
 
         $span = $tracer->startAndActivateSpan('span')
-            ->setSpanStatus(SpanStatus::ERROR, 'my description')
+            ->setStatus(StatusCode::ERROR, 'my description')
             ->end()
-            ->setSpanStatus(SpanStatus::UNSET, 'nope');
+            ->setStatus(StatusCode::UNSET, 'nope');
 
-        $this->assertEquals(SpanStatus::new(SpanStatus::ERROR, 'my description'), $span->getStatus());
+        $this->assertEquals(StatusCode::new(StatusCode::ERROR, 'my description'), $span->getStatus());
     }
 
     public function testSpanAttributesApi()
@@ -425,7 +425,7 @@ Caused by: Exception: Thrown from fail2()
             'id' => 67235,
         ]);
         $timestamp = Clock::get()->timestamp();
-        $span->addEvent('select', $timestamp, $eventAttributes);
+        $span->addEvent('select', $eventAttributes, $timestamp);
 
         $events = $span->getEvents();
         self::assertCount(1, $events);
@@ -438,7 +438,7 @@ Caused by: Exception: Thrown from fail2()
         ]);
         self::assertEquals($attributes, $event->getAttributes());
 
-        $span->addEvent('update', $timestamp)
+        $span->addEvent('update', null, $timestamp)
                     ->setAttribute('space', 'guard.session')
                     ->setAttribute('id', 67235)
                     ->setAttribute('active_at', time());
@@ -469,7 +469,7 @@ Caused by: Exception: Thrown from fail2()
         $this->assertArrayHasKey('exception.stacktrace', iterator_to_array($event->getAttributes()));
 
         $timestamp = Clock::get()->timestamp();
-        $span->addEvent('update', $timestamp)
+        $span->addEvent('update', null, $timestamp)
                     ->setAttribute('space', 'guard.session')
                     ->setAttribute('id', 67235)
                     ->setAttribute('active_at', time());
@@ -504,7 +504,7 @@ Caused by: Exception: Thrown from fail2()
         $tracerProvider = new SDK\TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracingTest');
         $span = $tracer->startAndActivateSpan('span');
-        $span->addEvent('recorded_event', 0);
+        $span->addEvent('recorded_event', null, 0);
 
         $events = $span->getEvents();
         self::assertCount(1, $events);
@@ -513,7 +513,7 @@ Caused by: Exception: Thrown from fail2()
         $this->assertSame($event->getName(), 'recorded_event');
 
         $span->end();
-        $span->addEvent('not_recorded_event', 1);
+        $span->addEvent('not_recorded_event', null, 1);
 
         $this->assertCount(1, $span->getEvents());
         [$event] = iterator_to_array($events);
@@ -537,10 +537,10 @@ Caused by: Exception: Thrown from fail2()
         $tracer->startAndActivateSpan('firstSpan');
         $global = $tracer->getActiveSpan();
         $request = $tracer->startAndActivateSpan('request');
-        $requestParent = $request->getParent();
+        $requestParent = $request->getParentContext();
         $this->assertNotNull($requestParent);
         $this->assertSame($requestParent->getSpanId(), $global->getContext()->getSpanId());
-        $this->assertNull($global->getParent());
+        $this->assertNull($global->getParentContext());
     }
 
     public function testActiveRootSpanIsNoopSpanIfNoParentProvided()

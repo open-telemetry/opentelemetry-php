@@ -27,7 +27,7 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
         /** @var Span $span */
         $span = $tracer->startAndActivateSpan('guard.validate');
         $span->setAttribute('service', 'guard');
-        $span->addEvent('validators.list', $timestamp, new Attributes(['job' => 'stage.updateTime']));
+        $span->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), $timestamp);
         $span->end();
 
         $converter = new SpanConverter('test.name');
@@ -37,7 +37,7 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
         $this->assertSame($span->getContext()->getTraceId(), $row['traceId']);
 
         $this->assertSame('test.name', $row['localEndpoint']['serviceName']);
-        $this->assertSame($span->getSpanName(), $row['name']);
+        $this->assertSame($span->getName(), $row['name']);
 
         $this->assertIsInt($row['timestamp']);
         // timestamp should be in microseconds

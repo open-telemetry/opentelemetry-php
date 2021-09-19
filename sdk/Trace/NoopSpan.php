@@ -33,7 +33,7 @@ class NoopSpan implements ReadWriteSpan
     /** @var API\Events */
     private $events;
 
-    /** @var API\SpanStatus */
+    /** @var API\StatusCode */
     private $status;
 
     /** @var bool */
@@ -59,15 +59,15 @@ class NoopSpan implements ReadWriteSpan
         $this->attributes = new Attributes();
         $this->events = new Events();
         $this->links = new Links();
-        $this->status = new SpanStatus();
+        $this->status = new StatusCode();
     }
 
-    public function getSpanName(): string
+    public function getName(): string
     {
         return '';
     }
 
-    public function getParent(): ?API\SpanContext
+    public function getParentContext(): ?API\SpanContext
     {
         return null;
     }
@@ -106,7 +106,7 @@ class NoopSpan implements ReadWriteSpan
         return $this->events;
     }
 
-    public function getStatus(): API\SpanStatus
+    public function getStatus(): API\StatusCode
     {
         return $this->status;
     }
@@ -116,7 +116,7 @@ class NoopSpan implements ReadWriteSpan
         return $this;
     }
 
-    public function addEvent(string $name, int $timestamp, ?API\Attributes $attributes = null): API\Span
+    public function addEvent(string $name, ?API\Attributes $attributes = null, int $timestamp = null): API\Span
     {
         return $this;
     }
@@ -136,7 +136,7 @@ class NoopSpan implements ReadWriteSpan
         return $this;
     }
 
-    public function setSpanStatus(string $code, ?string $description = null): API\Span
+    public function setStatus(string $code, ?string $description = null): API\Span
     {
         return $this;
     }
@@ -167,7 +167,7 @@ class NoopSpan implements ReadWriteSpan
         return false;
     }
 
-    public function getSpanKind(): int
+    public function getKind(): int
     {
         return API\SpanKind::KIND_INTERNAL;
     }

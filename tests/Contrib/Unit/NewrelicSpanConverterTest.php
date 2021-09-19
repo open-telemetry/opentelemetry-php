@@ -27,7 +27,7 @@ class NewrelicSpanConverterTest extends TestCase
         /** @var Span $span */
         $span = $tracer->startAndActivateSpan('guard.validate');
         $span->setAttribute('service', 'guard');
-        $span->addEvent('validators.list', $timestamp, new Attributes(['job' => 'stage.updateTime']));
+        $span->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), $timestamp);
         $span->end();
 
         $converter = new SpanConverter('test.name');
@@ -37,9 +37,9 @@ class NewrelicSpanConverterTest extends TestCase
         $this->assertSame($span->getContext()->getTraceId(), $row['trace.id']);
 
         $this->assertSame('test.name', $row['attributes']['service.name']);
-        $this->assertSame($span->getSpanName(), $row['attributes']['name']);
+        $this->assertSame($span->getName(), $row['attributes']['name']);
         $this->assertNull($row['attributes']['parent.id']);
-        $this->assertSame($span->getSpanName(), $row['attributes']['name']);
+        $this->assertSame($span->getName(), $row['attributes']['name']);
 
         $this->assertIsFloat($row['attributes']['timestamp']);
         // timestamp should be in milliseconds

@@ -35,7 +35,7 @@ class SpanOptionsTest extends TestCase
         $this->assertSame($tracer->getActiveSpan(), $global);
 
         $this->assertSame($global->getContext()->getTraceId(), $web->getContext()->getTraceId());
-        $this->assertEquals($web->getParent(), $global->getContext());
+        $this->assertEquals($web->getParentContext(), $global->getContext());
         $this->assertNotNull($web->getStartEpochTimestamp());
         $this->assertNotNull($web->getStart());
         $this->assertTrue($web->isRecording());
@@ -57,7 +57,7 @@ class SpanOptionsTest extends TestCase
         $this->assertSame($tracer->getActiveSpan(), $web);
 
         // Assert previously set vars
-        $this->assertEquals('web2', $web->getSpanName());
+        $this->assertEquals('web2', $web->getName());
         $this->assertEquals(1234, $web->getStartEpochTimestamp());
     }
 
@@ -96,7 +96,7 @@ class SpanOptionsTest extends TestCase
 
         $options->setSpanKind($kind);
 
-        $this->assertEquals($kind, $options->toSpan()->getSpanKind());
+        $this->assertEquals($kind, $options->toSpan()->getKind());
     }
 
     public function testExceptionIsThrownIfInvalidKindIsPassed(): void

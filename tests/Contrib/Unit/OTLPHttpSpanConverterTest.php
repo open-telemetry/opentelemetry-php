@@ -18,7 +18,7 @@ use OpenTelemetry\Sdk\Trace\Links;
 use OpenTelemetry\Sdk\Trace\Span;
 
 use OpenTelemetry\Sdk\Trace\SpanContext;
-use OpenTelemetry\Sdk\Trace\SpanStatus;
+use OpenTelemetry\Sdk\Trace\StatusCode;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 
 use OpenTelemetry\Trace\SpanKind;
@@ -43,7 +43,7 @@ class OTLPHttpSpanConverterTest extends TestCase
             new Attributes(['attr1' => 'apple', 'attr2' => 'orange']),
             new Links([new Link($otherSpan->getContext(), new Attributes(['foo' => 'bar']))])
         );
-        $span->addEvent('validators.list', $timestamp, new Attributes(['job' => 'stage.updateTime']));
+        $span->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), $timestamp);
         $span->end();
         $otherSpan->end();
 
@@ -55,7 +55,7 @@ class OTLPHttpSpanConverterTest extends TestCase
         $this->assertSame($span->getContext()->getSpanId(), bin2hex($row->getSpanId()));
         $this->assertSame($span->getContext()->getTraceId(), bin2hex($row->getTraceId()));
 
-        $this->assertSame($span->getSpanName(), $row->getName());
+        $this->assertSame($span->getName(), $row->getName());
 
         $this->assertCount(2, $row->getAttributes());
         $this->assertCount(1, $row->getLinks());
@@ -176,9 +176,9 @@ class OTLPHttpSpanConverterTest extends TestCase
         $sdk->setAttribute('user', 'alice');
         $sdk->setAttribute('authenticated', true);
 
-        $sdk->addEvent('Event1', 1617313804325769955, new Attributes(['success' => 'yes']));
+        $sdk->addEvent('Event1', new Attributes(['success' => 'yes']), 1617313804325769955);
 
-        $sdk->setSpanStatus(SpanStatus::OK);
+        $sdk->setStatus(StatusCode::OK);
 
         $sdk->end(125464959245935);
 

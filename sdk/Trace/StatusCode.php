@@ -6,7 +6,7 @@ namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Trace as API;
 
-final class SpanStatus implements API\SpanStatus
+final class StatusCode implements API\StatusCode
 {
 
     /**
@@ -40,7 +40,7 @@ final class SpanStatus implements API\SpanStatus
         $this->description = $description;
     }
 
-    public static function new(string $code = self::UNSET, string $description = null): SpanStatus
+    public static function new(string $code = self::UNSET, string $description = null): StatusCode
     {
         /*
         * Description provides a descriptive message of the Status. Description MUST
@@ -51,17 +51,17 @@ final class SpanStatus implements API\SpanStatus
 
         if (!array_key_exists($code, self::DESCRIPTION)) {
             // An invalid code was given; return default spanStatus.
-            return new SpanStatus();
+            return new StatusCode();
         }
 
         if ((!$description) || ($code != self::ERROR)) {
             $description = self::DESCRIPTION[$code];
         }
 
-        return new SpanStatus($code, $description);
+        return new StatusCode($code, $description);
     }
 
-    public static function ok(): SpanStatus
+    public static function ok(): StatusCode
     {
         return self::new(self::OK);
     }

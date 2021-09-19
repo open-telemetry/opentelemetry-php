@@ -43,13 +43,13 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
         $span->setAttribute('remote_ip', '1.2.3.4')
             ->setAttribute('country', 'USA');
 
-        $span->addEvent('found_login' . $i, $timestamp, new Attributes([
+        $span->addEvent('found_login' . $i, new Attributes([
             'id' => $i,
             'username' => 'otuser' . $i,
-        ]));
-        $span->addEvent('generated_session', $timestamp, new Attributes([
+        ]), $timestamp);
+        $span->addEvent('generated_session', new Attributes([
             'id' => md5((string) microtime(true)),
-        ]));
+        ]), $timestamp);
 
         // temporarily setting service name here.  It should eventually be pulled from tracer.resources.
         $childSpan->setAttribute('service.name', 'alwaysOnOTLPGrpcExample');
@@ -57,10 +57,10 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
         $childSpan->setAttribute('attr_one', 'one')
             ->setAttribute('attr_two', 'two');
 
-        $childSpan->addEvent('found_event1' . $i, $timestamp, new Attributes([
+        $childSpan->addEvent('found_event1' . $i, new Attributes([
             'id' => $i,
             'username' => 'child' . $i,
-        ]));
+        ]), $timestamp);
 
         $childSpan->end();
         $span->end();

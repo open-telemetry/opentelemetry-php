@@ -44,7 +44,7 @@ class SpanConverter
 
     public function convert(ReadableSpan $span)
     {
-        $spanParent = $span->getParent();
+        $spanParent = $span->getParentContext();
         $row = [
             'id' => $span->getContext()->getSpanId(),
             'traceId' => $span->getContext()->getTraceId(),
@@ -52,7 +52,7 @@ class SpanConverter
             'localEndpoint' => [
                 'serviceName' => $this->serviceName,
             ],
-            'name' => $span->getSpanName(),
+            'name' => $span->getName(),
             'timestamp' => (int) ($span->getStartEpochTimestamp() / 1e3), // RealtimeClock in microseconds
             'duration' => (int) (($span->getEnd() - $span->getStart()) / 1e3), // Diff in microseconds
             'tags' => [

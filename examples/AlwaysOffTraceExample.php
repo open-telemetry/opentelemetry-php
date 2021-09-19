@@ -29,13 +29,13 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     $span->setAttribute('country', 'USA');
 
     $timestamp = Clock::get()->timestamp();
-    $span->addEvent('found_login', $timestamp, new Attributes([
+    $span->addEvent('found_login', new Attributes([
         'id' => 12345,
         'username' => 'otuser',
-      ]));
-    $span->addEvent('generated_session', $timestamp, new Attributes([
+    ]), $timestamp);
+    $span->addEvent('generated_session', new Attributes([
         'id' => md5((string) microtime(true)),
-      ]));
+    ]), $timestamp);
 
     $span->end(); // pass status as an optional argument
     print_r($span);  // print the span as a resulting output

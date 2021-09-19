@@ -43,7 +43,7 @@ final class SpanOptions implements API\SpanOptions
 
     public function setSpanKind(int $spanKind): API\SpanOptions
     {
-        if (!in_array($spanKind, API\SpanKind::TYPES, true)) {
+        if (!in_array($spanKind, API\SpanKind::getChoices(), true)) {
             throw new \InvalidArgumentException('You must pass a valid span kind');
         }
 

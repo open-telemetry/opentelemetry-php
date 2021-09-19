@@ -37,13 +37,13 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     $rootSpan->setAttribute('remote_ip', '1.2.3.4')
         ->setAttribute('country', 'USA');
     $timestamp = Clock::get()->timestamp();
-    $rootSpan->addEvent('found_login', $timestamp, new Attributes([
+    $rootSpan->addEvent('found_login', new Attributes([
         'id' => 1,
         'username' => 'otuser',
-    ]));
-    $rootSpan->addEvent('generated_session', $timestamp, new Attributes([
+    ]), $timestamp);
+    $rootSpan->addEvent('generated_session', new Attributes([
         'id' => md5((string) microtime(true)),
-    ]));
+    ]), $timestamp);
     sleep(1);
 
     $rootScope = $rootSpan->activate(); // set the root span active in the current context
