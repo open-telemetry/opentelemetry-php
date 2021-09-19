@@ -13,7 +13,7 @@ final class StatusData
     private static ?self $error;
 
     /** @param API\StatusCode::STATUS_* $code */
-    public static function create(string $code, string $description = null): self
+    public static function create(string $code, ?string $description = null): self
     {
         if (empty($description)) {
             switch ($code) {
@@ -24,6 +24,11 @@ final class StatusData
                 case API\StatusCode::STATUS_OK:
                     return self::ok();
             }
+        }
+
+        // Ignore description for non Error statuses.
+        if (API\StatusCode::STATUS_ERROR !== $code) {
+            $description = '';
         }
 
         return new self($code, $description);

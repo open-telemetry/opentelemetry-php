@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Newrelic;
 
-use OpenTelemetry\Sdk\Trace\ReadableSpan;
+use function max;
+use OpenTelemetry\Sdk\Trace\SpanData;
 
 class SpanConverter
 {
@@ -21,20 +22,24 @@ class SpanConverter
         $this->serviceName = $serviceName;
     }
 
-    public function convert(ReadableSpan $span)
+    public function convert(SpanData $span)
     {
         $spanParent = $span->getParentContext();
+
+        $startTimestamp = $span->getStartEpochNanos() / 1e6;
+        $endTimestamp = $span->getEndEpochNanos() / 1e6;
+
         $row = [
-            'id' => $span->getContext()->getSpanId(),
-            'trace.id' => $span->getContext()->getTraceId(),
+            'id' => $span->getSpanId(),
+            'trace.id' => $span->getTraceId(),
             'attributes' => [
                 'name' => $span->getName(),
                 'service.name' => $this->serviceName,
-                'parent.id' => $spanParent ? $spanParent->getSpanId() : null,
-                'timestamp' => ($span->getStartEpochTimestamp()  / 1e6), // RealtimeClock in milliseconds
-                'duration.ms' => (($span->getEnd() - $span->getStart())  / 1e6), // Diff in milliseconds
-                self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCanonicalStatusCode(),
-                self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getStatusDescription(),
+                'parent.id' => $spanParent->isValid() ? $spanParent->getSpanId() : null,
+                'timestamp' => $startTimestamp, // RealtimeClock in milliseconds
+                'duration.ms' => max(1, $startTimestamp - $endTimestamp), // Diff in milliseconds
+                self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
+                self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
             ],
         ];
 

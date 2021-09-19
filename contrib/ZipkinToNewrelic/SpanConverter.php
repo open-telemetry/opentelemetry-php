@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\ZipkinToNewrelic;
 
-use OpenTelemetry\Sdk\Trace\ReadableSpan;
+use function max;
+use OpenTelemetry\Sdk\Trace\SpanData;
 
 class SpanConverter
 {
@@ -42,22 +43,26 @@ class SpanConverter
         return (string) $value;
     }
 
-    public function convert(ReadableSpan $span)
+    public function convert(SpanData $span)
     {
         $spanParent = $span->getParentContext();
+
+        $startTimestamp = $span->getStartEpochNanos() / 1e3;
+        $endTimestamp = $span->getEndEpochNanos() / 1e3;
+
         $row = [
-            'id' => $span->getContext()->getSpanId(),
-            'traceId' => $span->getContext()->getTraceId(),
-            'parentId' => $spanParent ? $spanParent->getSpanId() : null,
+            'id' => $span->getSpanId(),
+            'traceId' => $span->getTraceId(),
+            'parentId' => $spanParent->isValid() ? $spanParent->getSpanId() : null,
             'localEndpoint' => [
                 'serviceName' => $this->serviceName,
             ],
             'name' => $span->getName(),
-            'timestamp' => (int) ($span->getStartEpochTimestamp() / 1e3), // RealtimeClock in microseconds
-            'duration' => (int) (($span->getEnd() - $span->getStart()) / 1e3), // Diff in microseconds
+            'timestamp' => $startTimestamp, // RealtimeClock in microseconds
+            'duration' => max(1, $startTimestamp - $endTimestamp), // Diff in microseconds
             'tags' => [
-                self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCanonicalStatusCode(),
-                self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getStatusDescription(),
+                self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
+                self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
             ],
         ];
 

@@ -5,54 +5,27 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace\SpanProcessor;
 
 use InvalidArgumentException;
-
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Exporter;
 use OpenTelemetry\Sdk\Trace\ReadableSpan;
+use OpenTelemetry\Sdk\Trace\SpanData;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Trace as API;
 
 class BatchSpanProcessor implements SpanProcessor
 {
-    /**
-     * @var Exporter|null
-     */
-    private $exporter;
-    /**
-     * @var int
-     */
-    private $maxQueueSize;
-    /**
-     * @var int
-     */
-    private $scheduledDelayMillis;
-    /**
-     * @var int
-     */
-    private $exporterTimeoutMillis;
-    /**
-     * @var int
-     */
-    private $maxExportBatchSize;
-    /**
-     * @var array<ReadableSpan>
-     */
-    private $queue;
+    private ?Exporter $exporter;
+    private int $maxQueueSize;
+    private int $scheduledDelayMillis;
+    private int $exporterTimeoutMillis;
+    private int $maxExportBatchSize;
+    private int $lastExportTimestamp;
+    private Clock $clock;
+    private bool $running = true;
 
-    /**
-     * @var int
-     */
-    private $lastExportTimestamp;
-    /**
-     * @var Clock
-     */
-    private $clock;
-
-    /**
-     * @var bool
-     */
-    private $running = true;
+    /** @var list<SpanData> */
+    private array $queue;
 
     public function __construct(
         ?Exporter $exporter,
@@ -96,7 +69,7 @@ class BatchSpanProcessor implements SpanProcessor
         }
 
         if ($span->getContext()->isSampled() && !$this->queueReachedLimit()) {
-            $this->queue[] = $span;
+            $this->queue[] = $span->toSpanData();
         }
 
         if ($this->bufferReachedExportLimit() || $this->enoughTimeHasPassed()) {

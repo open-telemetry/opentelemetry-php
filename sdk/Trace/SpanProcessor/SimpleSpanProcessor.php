@@ -48,7 +48,7 @@ class SimpleSpanProcessor implements SpanProcessor
         }
 
         if (null !== $this->exporter) {
-            $this->exporter->export([$span]);
+            $this->exporter->export([$span->toSpanData()]);
         }
     }
 
