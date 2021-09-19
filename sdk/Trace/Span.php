@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
-use OpenTelemetry\Sdk\Trace\Sampler\ParentBased;
 use function array_key_exists;
 use function array_shift;
 use function basename;
@@ -16,16 +15,13 @@ use OpenTelemetry\Context\Scope;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
-use OpenTelemetry\Trace\Attributes;
-use OpenTelemetry\Trace\SpanContext;
 use function sprintf;
 use function str_replace;
 use Throwable;
 
 class Span implements ReadWriteSpan
 {
-    /** @var NoopSpan|null */
-    private static $invalidSpan;
+    private static ?NoopSpan $invalidSpan;
 
     /**
      * This method _MUST_ not be used directly.
@@ -168,89 +164,54 @@ class Span implements ReadWriteSpan
 
     // TODO: Add a SpanLimits object to the constructor for configuration options.
 
-    /**
-     * @var API\SpanContext
-     * @readonly
-     */
-    private $context;
+    /** @readonly */
+    private API\SpanContext $context;
+
+    /** @readonly */
+    private API\SpanContext $parentSpanContext;
+
+    /** @readonly */
+    private SpanProcessor $spanProcessor;
 
     /**
-     * @var API\SpanContext
-     * @readonly
-     */
-    private $parentSpanContext;
-
-    /**
-     * @var SpanProcessor
-     * @readonly
-     */
-    private $spanProcessor;
-
-    /**
-     * @var API\Events
      * @readonly
      *
      * @todo: Java just has this as list<API\Event>, could we just do that?
      */
-    private $events;
+    private API\Events $events;
 
     /**
-     * @var API\Links|null
      * @readonly
      *
      * @todo: Java just has this as list<API\Link>, could we just do that?
      */
-    private $links;
+    private ?API\Links $links;
 
-    /**
-     * @var int
-     * @readonly
-     */
-    private $totalRecordedLinks;
+    /** @readonly */
+    private int $totalRecordedLinks;
 
-    /**
-     * @var int
-     * @readonly
-     */
-    private $kind;
+    /** @readonly */
+    private int $kind;
 
     // TODO: Store a clock instance on the Span?
 
-    /**
-     * @var ResourceInfo
-     * @readonly
-     */
-    private $resource;
+    /** @readonly */
+    private ResourceInfo $resource;
 
-    /**
-     * @var InstrumentationLibrary
-     * @readonly
-     */
-    private $instrumentationLibrary;
+    /** @readonly */
+    private InstrumentationLibrary $instrumentationLibrary;
 
-    /**
-     * @var int
-     * @readonly
-     */
-    private $startEpochNanos;
+    /** @readonly */
+    private int $startEpochNanos;
 
     /** @var non-empty-string */
-    private $name;
+    private string $name;
 
-    /** @var API\Attributes|null */
-    private $attributes;
-
-    /** @var int */
-    private $totalRecordedEvents = 0;
-
-    /** @var string */
-    private $status = API\StatusCode::STATUS_UNSET;
-
-    /** @var int */
-    private $endEpochNanos;
-
-    /** @var bool */
-    private $hasEnded = false;
+    private ?API\Attributes $attributes;
+    private int $totalRecordedEvents = 0;
+    private string $status = API\StatusCode::STATUS_UNSET;
+    private int $endEpochNanos;
+    private bool $hasEnded = false;
 
     private function __construct(
         string $name,
@@ -280,7 +241,13 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public function getContext(): SpanContext
+    public function activate(): Scope
+    {
+        return Context::getCurrent()->withContextValue($this)->activate();
+    }
+
+    /** @inheritDoc */
+    public function getContext(): API\SpanContext
     {
         return $this->context;
     }
@@ -291,24 +258,66 @@ class Span implements ReadWriteSpan
         return !$this->hasEnded;
     }
 
+    /** @inheritDoc */
     public function setAttribute(string $key, $value): ReadWriteSpan
     {
-        // TODO: Implement setAttribute() method.
+        if (null === $value || $this->hasEnded) {
+            return $this;
+        }
+
+        if (null === $this->attributes) {
+            $this->attributes = new Attributes();
+        }
+
+        $this->attributes->setAttribute($key, $value);
+
+        return $this;
     }
 
-    public function setAttributes(Attributes $attributes): ReadWriteSpan
+    /** @inheritDoc */
+    public function setAttributes(API\Attributes $attributes): ReadWriteSpan
     {
-        // TODO: Implement setAttributes() method.
+        if (0 === $attributes->count()) {
+            return $this;
+        }
+
+        foreach ($attributes as $attribute) {
+            $this->setAttribute($attribute->getKey(), $attribute->getValue());
+        }
+
+        return $this;
     }
 
-    public function addEvent(string $name, ?Attributes $attributes = null, int $timestamp = null): ReadWriteSpan
+    /** @inheritDoc */
+    public function addEvent(string $name, ?API\Attributes $attributes = null, int $timestamp = null): ReadWriteSpan
     {
-        // TODO: Implement addEvent() method.
+        if ($this->hasEnded) {
+            return $this;
+        }
+
+        $this->events->addEvent($name, $attributes, $timestamp);
+        $this->totalRecordedEvents++;
+
+        return $this;
     }
 
-    public function recordException(Throwable $exception, ?Attributes $attributes = null): ReadWriteSpan
+    /** @inheritDoc */
+    public function recordException(Throwable $exception, API\Attributes $attributes = null): ReadWriteSpan
     {
-        // TODO: Implement recordException() method.
+        $timestamp = Clock::get()->now();
+        $eventAttributes = new Attributes([
+                'exception.type' => get_class($exception),
+                'exception.message' => $exception->getMessage(),
+                'exception.stacktrace' => self::formatStackTrace($exception),
+            ]);
+
+        if ($attributes) {
+            foreach ($attributes as $attribute) {
+                $eventAttributes->setAttribute($attribute->getKey(), $attribute->getValue());
+            }
+        }
+
+        return $this->addEvent('exception', $eventAttributes, $timestamp);
     }
 
     /** @inheritDoc */
@@ -391,5 +400,11 @@ class Span implements ReadWriteSpan
         }
 
         return $this->attributes->get($key);
+    }
+
+    /** @inheritDoc */
+    public function storeInContext(Context $context): Context
+    {
+        return $context->with(SpanContextKey::instance(), $this);
     }
 }

@@ -57,6 +57,7 @@ interface Span extends ImplicitContextKeyed
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-attributes
      *
+     * @param non-empty-string $key
      * @param bool|int|float|string|array $value Note: the array MUST be homogeneous, i.e. it MUST NOT contain values of different types.
      */
     public function setAttribute(string $key, $value): Span;
@@ -74,10 +75,12 @@ interface Span extends ImplicitContextKeyed
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#record-exception
      */
-    public function recordException(Throwable $exception, ?Attributes $attributes = null): Span;
+    public function recordException(Throwable $exception, Attributes $attributes = null): Span;
 
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#updatename
+     *
+     * @param non-empty-string $name
      */
     public function updateName(string $name): Span;
 
