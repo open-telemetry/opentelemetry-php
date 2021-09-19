@@ -47,6 +47,15 @@ class Span implements ReadWriteSpan
     /** @var ?SpanProcessor */
     private $spanProcessor;
 
+    /** @var SpanLimits */
+    private $spanLimits;
+
+    /** @var int Counts for events dropped due to collection limits */
+    private $droppedEventCount = 0;
+
+    /** @var int Counts for links dropped due to collection limits */
+    private $droppedLinkCount = 0;
+
     /**
      * @todo Implement this in the API layer
      */
@@ -93,7 +102,8 @@ class Span implements ReadWriteSpan
         int $spanKind = API\SpanKind::KIND_INTERNAL,
         ?API\Attributes $attributes = null,
         ?API\Links $links = null,
-        ?SpanProcessor $spanProcessor = null
+        ?SpanProcessor $spanProcessor = null,
+        ?SpanLimits $spanLimits = null
     ) {
         $this->name = $name;
         $this->spanContext = $spanContext;
@@ -103,11 +113,12 @@ class Span implements ReadWriteSpan
         $this->spanProcessor = $spanProcessor;
         [$this->startEpochTimestamp, $this->start] = Clock::get()->moment();
         $this->spanStatus = new SpanStatus();
+        $this->spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
 
         // todo: set these to null until needed
-        $this->attributes = $attributes ?? new Attributes();
+        $this->attributes = Attributes::withLimits($attributes ?? new Attributes(), $this->spanLimits->getAttributeLimits());
         $this->events = new Events();
-        $this->links = $links ?? new Links();
+        $this->setLinks($links);
     }
 
     /**
@@ -288,9 +299,18 @@ class Span implements ReadWriteSpan
      */
     public function addEvent(string $name, int $timestamp, ?API\Attributes $attributes = null): API\Span
     {
-        if ($this->isRecording()) {
-            $this->events->addEvent($name, $attributes, $timestamp);
+        if (!$this->isRecording()) {
+            return $this;
         }
+
+        if ($this->events->count() >= $this->spanLimits->getEventCountLimit()) {
+            $this->droppedEventCount++;
+
+            return $this;
+        }
+
+        $eventAttributes = null !== $attributes ? Attributes::withLimits($attributes, new AttributeLimits($this->spanLimits->getAttributePerEventCountLimit())) : null;
+        $this->events->addEvent($name, $eventAttributes, $timestamp);
 
         return $this;
     }
@@ -321,6 +341,11 @@ class Span implements ReadWriteSpan
         return $this->events;
     }
 
+    public function getDroppedEventsCount(): int
+    {
+        return $this->droppedEventCount;
+    }
+
     /* A Span is said to have a remote parent if it is the child of a Span
      * created in another process. Each propagators' deserialization must
      * set IsRemote to true on a parent
@@ -334,16 +359,30 @@ class Span implements ReadWriteSpan
         return $this->spanContext->isRemote();
     }
 
-    public function setLinks(API\Links $links): Span
-    {
-        $this->links = $links;
-
-        return $this;
-    }
-
     public function getLinks(): API\Links
     {
         return $this->links;
+    }
+
+    private function setLinks(?API\Links $links): void
+    {
+        $this->links = new Links();
+        if (null !== $links) {
+            foreach ($links as $link) {
+                $linkAttributes = Attributes::withLimits($link->getAttributes(), new AttributeLimits($this->spanLimits->getAttributePerLinkCountLimit()));
+                $this->links->addLink(new Link($link->getSpanContext(), $linkAttributes));
+                if (count($this->links) === $this->spanLimits->getLinkCountLimit()) {
+                    $this->droppedLinkCount = count($links) - $this->spanLimits->getLinkCountLimit();
+
+                    break;
+                }
+            }
+        }
+    }
+
+    public function getDroppedLinksCount(): int
+    {
+        return $this->droppedLinkCount;
     }
 
     public function getSpanKind(): int

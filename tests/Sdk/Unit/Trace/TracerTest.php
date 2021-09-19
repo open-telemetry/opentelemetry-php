@@ -167,7 +167,7 @@ class TracerTest extends TestCase
         $links = new Links();
         $span = $tracer->startSpan('test.span', null, API\SpanKind::KIND_INTERNAL, null, $links);
 
-        $this->assertSame($links, $span->getLinks());
+        $this->assertEquals($links, $span->getLinks());
     }
 
     /**

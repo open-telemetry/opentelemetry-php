@@ -84,7 +84,7 @@ class SpanOptionsTest extends TestCase
         $web = $spanOptions->toActiveSpan();
 
         // Check that span attributes are the ones passed in to spanOptions
-        $this->assertSame($attributes, $web->getAttributes());
+        $this->assertEquals($attributes, $web->getAttributes());
     }
 
     /**

@@ -95,6 +95,9 @@ class SpanConverter
             'end_time_unix_nano' => $end_timestamp,
             'kind' => $this->as_otlp_span_kind($span->getSpanKind()),
             'trace_state' => (string) $span->getContext()->getTraceState(),
+            'dropped_attributes_count' => $span->getAttributes()->getDroppedAttributesCount(),
+            'dropped_events_count' => $span->getDroppedEventsCount(),
+            'dropped_links_count' => $span->getDroppedLinksCount(),
         ];
 
         foreach ($span->getEvents() as $event) {
@@ -111,6 +114,7 @@ class SpanConverter
                 'time_unix_nano' => $event->getTimestamp(),
                 'name' => $event->getName(),
                 'attributes' => $attrs,
+                'dropped_attributes_count' => $event->getAttributes()->getDroppedAttributesCount(),
             ]);
         }
 
@@ -129,6 +133,7 @@ class SpanConverter
                 'span_id' => hex2bin($link->getSpanContext()->getSpanId()),
                 'trace_state' => (string) $link->getSpanContext()->getTraceState(),
                 'attributes' => $attrs,
+                'dropped_attributes_count' => $link->getAttributes()->getDroppedAttributesCount(),
             ]);
         }
 

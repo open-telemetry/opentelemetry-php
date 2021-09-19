@@ -27,7 +27,11 @@ interface ReadableSpan
 
     public function getLinks(): API\Links;
 
+    public function getDroppedLinksCount(): int;
+
     public function getEvents(): API\Events;
+
+    public function getDroppedEventsCount(): int;
 
     public function getStatus(): API\SpanStatus;
 
