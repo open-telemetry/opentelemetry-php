@@ -55,7 +55,7 @@ class SpanConverter
                 $result->setBoolValue($value);
 
                 break;
-            case is_double($value):
+            case is_float($value):
                 $result->setDoubleValue($value);
 
                 break;

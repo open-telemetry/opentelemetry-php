@@ -81,8 +81,6 @@ class SpanConverter
 
     public function as_otlp_span(SpanData $span): CollectorSpan
     {
-        $end_timestamp = $span->getEndEpochNanos();
-
         $parent_span = $span->getParentContext();
         $parent_span_id = $parent_span->isValid() ? $parent_span->getSpanId() : null;
 
@@ -92,7 +90,7 @@ class SpanConverter
             'parent_span_id' => $parent_span_id ? hex2bin($parent_span_id) : null,
             'name' => $span->getName(),
             'start_time_unix_nano' => $span->getStartEpochNanos(),
-            'end_time_unix_nano' => $end_timestamp,
+            'end_time_unix_nano' => $span->getEndEpochNanos(),
             'kind' => $this->as_otlp_span_kind($span->getKind()),
             'trace_state' => (string) $span->getContext()->getTraceState(),
         ];

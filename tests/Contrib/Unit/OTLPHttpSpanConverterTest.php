@@ -6,22 +6,21 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use function bin2hex;
 use OpenTelemetry\Contrib\OtlpHttp\SpanConverter;
+use Opentelemetry\Proto\Common\V1\AnyValue;
+use Opentelemetry\Proto\Common\V1\ArrayValue;
+use Opentelemetry\Proto\Common\V1\KeyValue;
+use Opentelemetry\Proto\Resource\V1\Resource;
 use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Attributes;
-use OpenTelemetry\Sdk\Trace\Clock;
-use OpenTelemetry\Sdk\Trace\Link;
-use OpenTelemetry\Sdk\Trace\Links;
 use OpenTelemetry\Sdk\Trace\Span;
-
 use OpenTelemetry\Sdk\Trace\SpanContext;
-use OpenTelemetry\Sdk\Trace\StatusCode;
-use OpenTelemetry\Sdk\Trace\TracerProvider;
+use OpenTelemetry\Sdk\Trace\StatusData;
+use OpenTelemetry\Sdk\Trace\Test\SpanData;
 
-use OpenTelemetry\Trace\SpanKind;
 use PHPUnit\Framework\TestCase;
 
 class OTLPHttpSpanConverterTest extends TestCase
@@ -31,30 +30,21 @@ class OTLPHttpSpanConverterTest extends TestCase
      */
     public function shouldConvertASpanToAPayloadForOtlp(): void
     {
-        $tracer = (new TracerProvider())->getTracer('OpenTelemetry.OtlpTest');
+        $context = SpanContext::getInvalid();
 
-        $timestamp = Clock::get()->timestamp();
-
-        $otherSpan = $tracer->startSpan('batch.manager');
-
-        $span = $tracer->startAndActivateSpan(
-            'guard.validate',
-            SpanKind::KIND_INTERNAL,
-            new Attributes(['attr1' => 'apple', 'attr2' => 'orange']),
-            new Links([new Link($otherSpan->getContext(), new Attributes(['foo' => 'bar']))])
-        );
-        $span->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), $timestamp);
-        $span->end();
-        $otherSpan->end();
+        $span = (new SpanData())
+            ->setName('batch.manager')
+            ->addAttribute('attr1', 'apple')
+            ->addAttribute('attr2', 'orange')
+            ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
+            ->addLink($context, new Attributes(['foo' => 'bar']))
+            ->setHasEnded(true);
 
         $converter = new SpanConverter();
         $row = $converter->as_otlp_span($span);
 
-        $this->assertInstanceOf(V1\Span::class, $row);
-
         $this->assertSame($span->getContext()->getSpanId(), bin2hex($row->getSpanId()));
         $this->assertSame($span->getContext()->getTraceId(), bin2hex($row->getTraceId()));
-
         $this->assertSame($span->getName(), $row->getName());
 
         $this->assertCount(2, $row->getAttributes());
@@ -63,8 +53,8 @@ class OTLPHttpSpanConverterTest extends TestCase
         /** @var V1\Span\Link $link */
         $link = $row->getLinks()[0];
 
-        $this->assertSame($otherSpan->getContext()->getTraceId(), bin2hex($link->getTraceId()));
-        $this->assertSame($otherSpan->getContext()->getSpanId(), bin2hex($link->getSpanId()));
+        $this->assertSame($context->getTraceId(), bin2hex($link->getTraceId()));
+        $this->assertSame($context->getSpanId(), bin2hex($link->getSpanId()));
         $this->assertCount(1, $link->getAttributes());
     }
 
@@ -74,9 +64,9 @@ class OTLPHttpSpanConverterTest extends TestCase
      */
     public function attributeAreCoercedCorrectly($actual, $expected)
     {
-        $span = new Span('attributes.test', SpanContext::generate());
-
-        $span->setAttribute('test.attribute', $actual);
+        $span = (new SpanData())
+            ->setName('batch.manager')
+            ->addAttribute('test.attribute', $actual);
 
         $converter = new SpanConverter();
         $attributes = $converter->as_otlp_span($span)->getAttributes();
@@ -86,7 +76,7 @@ class OTLPHttpSpanConverterTest extends TestCase
 
         $protoSpan = new V1\Span([
             'attributes' => [
-                new \Opentelemetry\Proto\Common\V1\KeyValue([
+                new KeyValue([
                     'key' => 'test.attribute',
                     'value' => $expected,
                 ]),
@@ -100,43 +90,43 @@ class OTLPHttpSpanConverterTest extends TestCase
     {
         return [
             'String' => [
-                'Pear', new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'Pear']),
+                'Pear', new AnyValue([ 'string_value' => 'Pear']),
             ],
             'Int' => [
-                1024, new \Opentelemetry\Proto\Common\V1\AnyValue(['int_value' => 1024]),
+                1024, new AnyValue(['int_value' => 1024]),
             ],
             'Float/Double' => [
-                3.1415926535897932384626433832795028841971, new \Opentelemetry\Proto\Common\V1\AnyValue(['double_value' => 3.1415926535897932384626433832795028841971]),
+                3.1415926535897932384626433832795028841971, new AnyValue(['double_value' => 3.1415926535897932384626433832795028841971]),
             ],
             'Bool: true' => [
-                true, new \Opentelemetry\Proto\Common\V1\AnyValue(['bool_value' => true]),
+                true, new AnyValue(['bool_value' => true]),
             ],
             'Bool: false' => [
-                false, new \Opentelemetry\Proto\Common\V1\AnyValue(['bool_value' => false]),
+                false, new AnyValue(['bool_value' => false]),
             ],
             'Array of Strings' => [
                 ['string-1','string-2'],
-                new \Opentelemetry\Proto\Common\V1\AnyValue([
-                    'array_value' => new \Opentelemetry\Proto\Common\V1\ArrayValue([
+                new AnyValue([
+                    'array_value' => new ArrayValue([
                         'values' => [
-                            new \Opentelemetry\Proto\Common\V1\AnyValue(['string_value' => 'string-1']),
-                            new \Opentelemetry\Proto\Common\V1\AnyValue(['string_value' => 'string-2']),
+                            new AnyValue(['string_value' => 'string-1']),
+                            new AnyValue(['string_value' => 'string-2']),
                         ],
                     ]),
                 ]),
             ],
             'Array of Randoms' => [
                 ['Answer',42,true,['Nested Array']],
-                new \Opentelemetry\Proto\Common\V1\AnyValue([
-                    'array_value' => new \Opentelemetry\Proto\Common\V1\ArrayValue([
+                new AnyValue([
+                    'array_value' => new ArrayValue([
                         'values' => [
-                            new \Opentelemetry\Proto\Common\V1\AnyValue(['string_value' => 'Answer']),
-                            new \Opentelemetry\Proto\Common\V1\AnyValue(['int_value' => '42']),
-                            new \Opentelemetry\Proto\Common\V1\AnyValue(['bool_value' => true]),
-                            new \Opentelemetry\Proto\Common\V1\AnyValue([
-                                'array_value' => new \Opentelemetry\Proto\Common\V1\ArrayValue([
+                            new AnyValue(['string_value' => 'Answer']),
+                            new AnyValue(['int_value' => '42']),
+                            new AnyValue(['bool_value' => true]),
+                            new AnyValue([
+                                'array_value' => new ArrayValue([
                                     'values' => [
-                                        new \Opentelemetry\Proto\Common\V1\AnyValue(['string_value' => 'Nested Array']),
+                                        new AnyValue(['string_value' => 'Nested Array']),
                                     ],
                                 ]),
                             ]),
@@ -152,55 +142,50 @@ class OTLPHttpSpanConverterTest extends TestCase
         $start_time = 1617313804325769988;
         $end_time = 1617313804325783095;
 
-        // Construct a comprehensive happy path Span in the SDK
-        $sdk = new Span(
-            'http_get',
-            new SpanContext(
-                bin2hex('0000000000000001'), // traceId
-                bin2hex('00000001'), // spanId
-                0, // traceFlags
-            ),
-            null, // parentSpanContext
-            ResourceInfo::create(
-                new Attributes([
-                    'instance' => 'test-a',
-                ])
+        $sdk = (new SpanData())
+            ->setContext(
+                new SpanContext(
+                    bin2hex('0000000000000001'), // traceId
+                    bin2hex('00000001'), // spanId
+                    0, // traceFlags
+                )
             )
-        );
-        $sdk->setInstrumentationLibrary(new InstrumentationLibrary('lib-test', 'v0.1.0'));
-
-        // We have to set the time twice here due to the way PHP deals with Monotonic Clock and Realtime Clock.
-        $sdk->setStartEpochTimestamp($start_time);
-        $sdk->setStart(125464959232828);
-
-        $sdk->setAttribute('user', 'alice');
-        $sdk->setAttribute('authenticated', true);
-
-        $sdk->addEvent('Event1', new Attributes(['success' => 'yes']), 1617313804325769955);
-
-        $sdk->setStatus(StatusCode::OK);
-
-        $sdk->end(125464959245935);
+            ->setResource(
+                ResourceInfo::create(
+                    new Attributes([
+                        'instance' => 'test-a',
+                    ])
+                )
+            )
+            ->setStartEpochNanos($start_time)
+            ->setEndEpochNanos($end_time)
+            ->setName('http_get')
+            ->setInstrumentationLibrary(new InstrumentationLibrary('lib-test', 'v0.1.0'))
+            ->addAttribute('user', 'alice')
+            ->addAttribute('authenticated', true)
+            ->addEvent('Event1', new Attributes(['success' => 'yes']), 1617313804325769955)
+            ->setStatus(StatusData::ok())
+            ->setHasEnded(true);
 
         // Construct the same span in OTLP to compare.
         $expected = new ResourceSpans([
-            'resource' => new \Opentelemetry\Proto\Resource\V1\Resource([
+            'resource' => new Resource([
                 'attributes' => [
-                    new \Opentelemetry\Proto\Common\V1\KeyValue([
+                    new KeyValue([
                         'key' => 'telemetry.sdk.name',
-                        'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'opentelemetry']),
+                        'value' => new AnyValue([ 'string_value' => 'opentelemetry']),
                     ]),
-                    new \Opentelemetry\Proto\Common\V1\KeyValue([
+                    new KeyValue([
                         'key' => 'telemetry.sdk.language',
-                        'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'php']),
+                        'value' => new AnyValue([ 'string_value' => 'php']),
                     ]),
-                    new \Opentelemetry\Proto\Common\V1\KeyValue([
+                    new KeyValue([
                         'key' => 'telemetry.sdk.version',
-                        'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'dev']),
+                        'value' => new AnyValue([ 'string_value' => 'dev']),
                     ]),
-                    new \Opentelemetry\Proto\Common\V1\KeyValue([
+                    new KeyValue([
                         'key' => 'instance',
-                        'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'test-a']),
+                        'value' => new AnyValue([ 'string_value' => 'test-a']),
                     ]),
 
                 ],
@@ -221,13 +206,13 @@ class OTLPHttpSpanConverterTest extends TestCase
                             'kind' => V1\Span\SpanKind::SPAN_KIND_INTERNAL,
                             'status' => new V1\Status([ 'code' => V1\Status\StatusCode::STATUS_CODE_OK ]),
                             'attributes' => [
-                                new \Opentelemetry\Proto\Common\V1\KeyValue([
+                                new KeyValue([
                                     'key' => 'user',
-                                    'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'alice']),
+                                    'value' => new AnyValue([ 'string_value' => 'alice']),
                                 ]),
-                                new \Opentelemetry\Proto\Common\V1\KeyValue([
+                                new KeyValue([
                                     'key' => 'authenticated',
-                                    'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'bool_value' => true]),
+                                    'value' => new AnyValue([ 'bool_value' => true]),
                                 ]),
                             ],
                             'events' => [
@@ -235,9 +220,9 @@ class OTLPHttpSpanConverterTest extends TestCase
                                     'name' => 'Event1',
                                     'time_unix_nano' => 1617313804325769955,
                                     'attributes' => [
-                                        new \Opentelemetry\Proto\Common\V1\KeyValue([
+                                        new KeyValue([
                                             'key' => 'success',
-                                            'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'yes']),
+                                            'value' => new AnyValue([ 'string_value' => 'yes']),
                                         ]),
                                     ],
                                 ]),

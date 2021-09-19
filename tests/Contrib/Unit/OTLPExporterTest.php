@@ -9,7 +9,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use OpenTelemetry\Contrib\Otlp\Exporter;
 use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
+use OpenTelemetry\Sdk\Trace\Test\SpanData;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -33,7 +33,7 @@ class OTLPExporterTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $exporter->export([new Span('test.otlp.span', SpanContext::generate())])
+            $exporter->export([new SpanData()])
         );
     }
 
@@ -64,7 +64,7 @@ class OTLPExporterTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $exporter->export([new Span('test.otlp.span', SpanContext::generate())])
+            $exporter->export([new SpanData()])
         );
     }
 

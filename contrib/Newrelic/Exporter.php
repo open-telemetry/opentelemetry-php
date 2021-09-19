@@ -104,16 +104,11 @@ class Exporter implements Trace\Exporter
         $this->dataFormatVersion = $dataFormatVersion;
     }
 
-    /**
-     * Exports the provided Span data via the Newrelic protocol
-     *
-     * @param iterable<Trace\ReadableSpan> $spans Array of Spans
-     * @return int return code, defined on the Exporter interface
-     */
+    /** @inheritDoc */
     public function export(iterable $spans): int
     {
         if (!$this->running) {
-            return Exporter::FAILED_NOT_RETRYABLE;
+            return Trace\Exporter::FAILED_NOT_RETRYABLE;
         }
 
         if (empty($spans)) {
@@ -122,7 +117,7 @@ class Exporter implements Trace\Exporter
 
         $convertedSpans = [];
         foreach ($spans as $span) {
-            array_push($convertedSpans, $this->spanConverter->convert($span));
+            $convertedSpans[] = $this->spanConverter->convert($span);
         }
         $commonAttributes = ['attributes' => [ 'service.name' => $this->name,
                                                'host' => $this->endpointUrl, ]];
@@ -136,7 +131,7 @@ class Exporter implements Trace\Exporter
                 ->withBody($body)
                 ->withHeader('content-type', 'application/json')
                 ->withAddedHeader('Api-Key', $this->licenseKey)
-                ->withAddedHeader('Data-Format', Exporter::DATA_FORMAT)
+                ->withAddedHeader('Data-Format', self::DATA_FORMAT)
                 ->withAddedHeader('Data-Format-Version', $this->dataFormatVersion);
 
             $response = $this->client->sendRequest($request);
@@ -168,7 +163,8 @@ class Exporter implements Trace\Exporter
             throw new Exception('Invalid license key.');
         }
         $factory = new HttpFactory();
-        $exporter = new Exporter(
+
+        return new Exporter(
             $name,
             $endpointUrl,
             $args,
@@ -176,7 +172,5 @@ class Exporter implements Trace\Exporter
             $factory,
             $factory
         );
-
-        return $exporter;
     }
 }

@@ -6,22 +6,18 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use function bin2hex;
 use OpenTelemetry\Contrib\OtlpGrpc\SpanConverter;
+use Opentelemetry\Proto\Common\V1\AnyValue;
+use Opentelemetry\Proto\Common\V1\KeyValue;
+use Opentelemetry\Proto\Resource\V1\Resource;
 use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Attributes;
-use OpenTelemetry\Sdk\Trace\Clock;
-use OpenTelemetry\Sdk\Trace\Link;
-use OpenTelemetry\Sdk\Trace\Links;
-use OpenTelemetry\Sdk\Trace\Span;
-
 use OpenTelemetry\Sdk\Trace\SpanContext;
-use OpenTelemetry\Sdk\Trace\StatusCode;
-use OpenTelemetry\Sdk\Trace\TracerProvider;
-
-use OpenTelemetry\Trace\SpanKind;
+use OpenTelemetry\Sdk\Trace\StatusData;
+use OpenTelemetry\Sdk\Trace\Test\SpanData;
 use PHPUnit\Framework\TestCase;
 
 class OTLPGrpcSpanConverterTest extends TestCase
@@ -31,27 +27,17 @@ class OTLPGrpcSpanConverterTest extends TestCase
      */
     public function shouldConvertASpanToAPayloadForOtlp(): void
     {
-        $tracer = (new TracerProvider())->getTracer('OpenTelemetry.OtlpTest');
+        $context = SpanContext::getInvalid();
 
-        $timestamp = Clock::get()->timestamp();
-
-        $otherSpan = $tracer->startSpan('batch.manager');
-
-        /** @var Span $span */
-        $span = $tracer->startAndActivateSpan(
-            'guard.validate',
-            SpanKind::KIND_INTERNAL,
-            new Attributes(['service' => 'guard']),
-            new Links([new Link($otherSpan->getContext(), new Attributes(['foo' => 'bar']))])
-        );
-        $span->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), $timestamp);
-        $span->end();
-        $otherSpan->end();
+        $span = (new SpanData())
+            ->setName('batch.manager')
+            ->addAttribute('service', 'guard')
+            ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
+            ->addLink($context, new Attributes(['foo' => 'bar']))
+            ->setHasEnded(true);
 
         $converter = new SpanConverter();
         $row = $converter->as_otlp_span($span);
-
-        $this->assertInstanceOf(V1\Span::class, $row);
 
         $this->assertSame($span->getContext()->getSpanId(), bin2hex($row->getSpanId()));
         $this->assertSame($span->getContext()->getTraceId(), bin2hex($row->getTraceId()));
@@ -64,16 +50,9 @@ class OTLPGrpcSpanConverterTest extends TestCase
         /** @var V1\Span\Link $link */
         $link = $row->getLinks()[0];
 
-        $this->assertSame($otherSpan->getContext()->getTraceId(), bin2hex($link->getTraceId()));
-        $this->assertSame($otherSpan->getContext()->getSpanId(), bin2hex($link->getSpanId()));
+        $this->assertSame($context->getTraceId(), bin2hex($link->getTraceId()));
+        $this->assertSame($context->getSpanId(), bin2hex($link->getSpanId()));
         $this->assertCount(1, $link->getAttributes());
-
-        // $this->assertIsInt($row['timestamp']);
-        // // timestamp should be in microseconds
-        // $this->assertGreaterThan(1e15, $row['timestamp']);
-
-        // $this->assertIsInt($row['duration']);
-        // $this->assertGreaterThan(0, $row['duration']);
 
         // $this->assertCount(1, $row['tags']);
 
@@ -95,40 +74,25 @@ class OTLPGrpcSpanConverterTest extends TestCase
     /**
      * @test
      */
-    // public function durationShouldBeInMicroseconds()
-    // {
-    //     $span = new Span('duration.test', SpanContext::generate());
-
-    //     $row = (new SpanConverter('duration.test'))->as_otlp_span($span);
-
-    //     $this->assertEquals(
-    //         (int) (($span->getEnd() - $span->getStart()) / 1000),
-    //         $row['duration']
-    //     );
-    // }
-
-    /**
-     * @test
-     */
     public function tagsAreCoercedCorrectlyToStrings()
     {
-        $span = new Span('tags.test', SpanContext::generate());
+        $listOfStrings = ['string-1', 'string-2'];
+        $listOfNumbers = [1, 2, 3, 3.1415, 42];
+        $listOfBooleans = [true, true, false, true];
+        $listOfRandoms = [true, [1, 2, 3], false, 'string-1', 3.1415];
 
-        $listOfStrings = ['string-1','string-2'];
-        $listOfNumbers = [1,2,3,3.1415,42];
-        $listOfBooleans = [true,true,false,true];
-        $listOfRandoms = [true,[1,2,3],false,'string-1',3.1415];
-
-        $span->setAttribute('string', 'string');
-        $span->setAttribute('integer-1', 1024);
-        $span->setAttribute('integer-2', 0);
-        $span->setAttribute('float', '1.2345');
-        $span->setAttribute('boolean-1', true);
-        $span->setAttribute('boolean-2', false);
-        $span->setAttribute('list-of-strings', $listOfStrings);
-        $span->setAttribute('list-of-numbers', $listOfNumbers);
-        $span->setAttribute('list-of-booleans', $listOfBooleans);
-        $span->setAttribute('list-of-random', $listOfRandoms);
+        $span = (new SpanData())
+            ->setName('tags.test')
+            ->addAttribute('string', 'string')
+            ->addAttribute('integer-1', 1024)
+            ->addAttribute('integer-2', 0)
+            ->addAttribute('float', '1.2345')
+            ->addAttribute('boolean-1', true)
+            ->addAttribute('boolean-2', false)
+            ->addAttribute('list-of-strings', $listOfStrings)
+            ->addAttribute('list-of-numbers', $listOfNumbers)
+            ->addAttribute('list-of-booleans', $listOfBooleans)
+            ->addAttribute('list-of-random', $listOfRandoms);
 
         $converter = new SpanConverter();
         $tags = $converter->as_otlp_span($span)->getAttributes();
@@ -164,55 +128,50 @@ class OTLPGrpcSpanConverterTest extends TestCase
         $start_time = 1617313804325769988;
         $end_time = 1617313804325783095;
 
-        // Construct a comprehensive happy path Span in the SDK
-        $sdk = new Span(
-            'http_get',
-            new SpanContext(
-                bin2hex('0000000000000001'), // traceId
-                bin2hex('00000001'), // spanId
-                0, // traceFlags
-            ),
-            null, // parentSpanContext
-            ResourceInfo::create(
-                new Attributes([
-                    'instance' => 'test-a',
-                ])
+        $sdk = (new SpanData())
+            ->setContext(
+                new SpanContext(
+                    bin2hex('0000000000000001'), // traceId
+                    bin2hex('00000001'), // spanId
+                    0, // traceFlags
+                )
             )
-        );
-        $sdk->setInstrumentationLibrary(new InstrumentationLibrary('lib-test', 'v0.1.0'));
-
-        // We have to set the time twice here due to the way PHP deals with Monotonic Clock and Realtime Clock.
-        $sdk->setStartEpochTimestamp($start_time);
-        $sdk->setStart(125464959232828);
-
-        $sdk->setAttribute('user', 'alice');
-        $sdk->setAttribute('authenticated', true);
-
-        $sdk->addEvent('Event1', new Attributes(['success' => 'yes']), 1617313804325769955);
-
-        $sdk->setStatus(StatusCode::OK);
-
-        $sdk->end(125464959245935);
+            ->setResource(
+                ResourceInfo::create(
+                    new Attributes([
+                        'instance' => 'test-a',
+                    ])
+                )
+            )
+            ->setStartEpochNanos($start_time)
+            ->setEndEpochNanos($end_time)
+            ->setName('http_get')
+            ->setInstrumentationLibrary(new InstrumentationLibrary('lib-test', 'v0.1.0'))
+            ->addAttribute('user', 'alice')
+            ->addAttribute('authenticated', true)
+            ->addEvent('Event1', new Attributes(['success' => 'yes']), 1617313804325769955)
+            ->setStatus(StatusData::ok())
+            ->setHasEnded(true);
 
         // Construct the same span in OTLP to compare.
         $expected = new ResourceSpans([
-            'resource' => new \Opentelemetry\Proto\Resource\V1\Resource([
+            'resource' => new Resource([
                 'attributes' => [
-                    new \Opentelemetry\Proto\Common\V1\KeyValue([
+                    new KeyValue([
                         'key' => 'telemetry.sdk.name',
-                        'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'opentelemetry']),
+                        'value' => new AnyValue([ 'string_value' => 'opentelemetry']),
                     ]),
-                    new \Opentelemetry\Proto\Common\V1\KeyValue([
+                    new KeyValue([
                         'key' => 'telemetry.sdk.language',
-                        'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'php']),
+                        'value' => new AnyValue([ 'string_value' => 'php']),
                     ]),
-                    new \Opentelemetry\Proto\Common\V1\KeyValue([
+                    new KeyValue([
                         'key' => 'telemetry.sdk.version',
-                        'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'dev']),
+                        'value' => new AnyValue([ 'string_value' => 'dev']),
                     ]),
-                    new \Opentelemetry\Proto\Common\V1\KeyValue([
+                    new KeyValue([
                         'key' => 'instance',
-                        'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'test-a']),
+                        'value' => new AnyValue([ 'string_value' => 'test-a']),
                     ]),
 
                 ],
@@ -233,13 +192,13 @@ class OTLPGrpcSpanConverterTest extends TestCase
                             'kind' => V1\Span\SpanKind::SPAN_KIND_INTERNAL,
                             'status' => new V1\Status([ 'code' => V1\Status\StatusCode::STATUS_CODE_OK ]),
                             'attributes' => [
-                                new \Opentelemetry\Proto\Common\V1\KeyValue([
+                                new KeyValue([
                                     'key' => 'user',
-                                    'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'alice']),
+                                    'value' => new AnyValue([ 'string_value' => 'alice']),
                                 ]),
-                                new \Opentelemetry\Proto\Common\V1\KeyValue([
+                                new KeyValue([
                                     'key' => 'authenticated',
-                                    'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'bool_value' => true]),
+                                    'value' => new AnyValue([ 'bool_value' => true]),
                                 ]),
                             ],
                             'events' => [
@@ -247,9 +206,9 @@ class OTLPGrpcSpanConverterTest extends TestCase
                                     'name' => 'Event1',
                                     'time_unix_nano' => 1617313804325769955,
                                     'attributes' => [
-                                        new \Opentelemetry\Proto\Common\V1\KeyValue([
+                                        new KeyValue([
                                             'key' => 'success',
-                                            'value' => new \Opentelemetry\Proto\Common\V1\AnyValue([ 'string_value' => 'yes']),
+                                            'value' => new AnyValue([ 'string_value' => 'yes']),
                                         ]),
                                     ],
                                 ]),

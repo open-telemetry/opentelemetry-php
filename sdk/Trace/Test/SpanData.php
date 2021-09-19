@@ -50,7 +50,7 @@ class SpanData implements SDK\SpanData
     }
 
     /** @param non-empty-string $name */
-    public function setName(string $name): SpanData
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -62,9 +62,16 @@ class SpanData implements SDK\SpanData
         return $this->links;
     }
 
-    public function setLinks(API\Links $links)
+    public function setLinks(API\Links $links): self
     {
         $this->links = $links;
+
+        return $this;
+    }
+
+    public function addLink(API\SpanContext $context, ?API\Attributes $attributes = null): self
+    {
+        $this->links->addLink(new SDK\Link($context, $attributes));
 
         return $this;
     }
@@ -74,14 +81,14 @@ class SpanData implements SDK\SpanData
         return $this->events;
     }
 
-    public function setEvents(API\Events $events)
+    public function setEvents(API\Events $events): self
     {
         $this->events = $events;
 
         return $this;
     }
 
-    public function addEvent(string $name, ?API\Attributes $attributes, int $timestamp = null)
+    public function addEvent(string $name, ?API\Attributes $attributes, int $timestamp = null): self
     {
         $this->events->addEvent($name, $attributes, $timestamp);
 
@@ -93,14 +100,14 @@ class SpanData implements SDK\SpanData
         return $this->attributes;
     }
 
-    public function setAttributes(API\Attributes $attributes)
+    public function setAttributes(API\Attributes $attributes): self
     {
         $this->attributes = $attributes;
 
         return $this;
     }
 
-    public function addAttribute(string $key, $value)
+    public function addAttribute(string $key, $value): self
     {
         $this->attributes->setAttribute($key, $value);
 
@@ -112,7 +119,7 @@ class SpanData implements SDK\SpanData
         return $this->totalAttributeCount;
     }
 
-    public function setTotalAttributeCount(int $totalAttributeCount): SpanData
+    public function setTotalAttributeCount(int $totalAttributeCount): self
     {
         $this->totalAttributeCount = $totalAttributeCount;
 
@@ -124,7 +131,7 @@ class SpanData implements SDK\SpanData
         return $this->totalRecordedEvents;
     }
 
-    public function setTotalRecordedEvents(int $totalRecordedEvents): SpanData
+    public function setTotalRecordedEvents(int $totalRecordedEvents): self
     {
         $this->totalRecordedEvents = $totalRecordedEvents;
 
@@ -136,7 +143,7 @@ class SpanData implements SDK\SpanData
         return $this->totalRecordedLinks;
     }
 
-    public function setTotalRecordedLinks(int $totalRecordedLinks): SpanData
+    public function setTotalRecordedLinks(int $totalRecordedLinks): self
     {
         $this->totalRecordedLinks = $totalRecordedLinks;
 
@@ -148,7 +155,7 @@ class SpanData implements SDK\SpanData
         return $this->kind;
     }
 
-    public function setKind(int $kind): SpanData
+    public function setKind(int $kind): self
     {
         $this->kind = $kind;
 
@@ -160,7 +167,7 @@ class SpanData implements SDK\SpanData
         return $this->status;
     }
 
-    public function setStatus(StatusData $status): SpanData
+    public function setStatus(StatusData $status): self
     {
         $this->status = $status;
 
@@ -172,7 +179,7 @@ class SpanData implements SDK\SpanData
         return $this->endEpochNanos;
     }
 
-    public function setEndEpochNanos(int $endEpochNanos): SpanData
+    public function setEndEpochNanos(int $endEpochNanos): self
     {
         $this->endEpochNanos = $endEpochNanos;
 
@@ -184,7 +191,7 @@ class SpanData implements SDK\SpanData
         return $this->startEpochNanos;
     }
 
-    public function setStartEpochNanos(int $startEpochNanos): SpanData
+    public function setStartEpochNanos(int $startEpochNanos): self
     {
         $this->startEpochNanos = $startEpochNanos;
 
@@ -196,7 +203,7 @@ class SpanData implements SDK\SpanData
         return $this->hasEnded;
     }
 
-    public function setHasEnded(bool $hasEnded): SpanData
+    public function setHasEnded(bool $hasEnded): self
     {
         $this->hasEnded = $hasEnded;
 
@@ -208,7 +215,7 @@ class SpanData implements SDK\SpanData
         return $this->resource;
     }
 
-    public function setResource(ResourceInfo $resource): SpanData
+    public function setResource(ResourceInfo $resource): self
     {
         $this->resource = $resource;
 
@@ -220,7 +227,7 @@ class SpanData implements SDK\SpanData
         return $this->instrumentationLibrary;
     }
 
-    public function setInstrumentationLibrary(InstrumentationLibrary $instrumentationLibrary): SpanData
+    public function setInstrumentationLibrary(InstrumentationLibrary $instrumentationLibrary): self
     {
         $this->instrumentationLibrary = $instrumentationLibrary;
 
@@ -232,7 +239,7 @@ class SpanData implements SDK\SpanData
         return $this->context;
     }
 
-    public function setContext(API\SpanContext $context): SpanData
+    public function setContext(API\SpanContext $context): self
     {
         $this->context = $context;
 
@@ -244,7 +251,7 @@ class SpanData implements SDK\SpanData
         return $this->parentContext;
     }
 
-    public function setParentContext(API\SpanContext $parentContext): SpanData
+    public function setParentContext(API\SpanContext $parentContext): self
     {
         $this->parentContext = $parentContext;
 

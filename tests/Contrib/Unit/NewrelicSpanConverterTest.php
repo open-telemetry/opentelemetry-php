@@ -7,10 +7,7 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 use OpenTelemetry\Contrib\Newrelic\SpanConverter;
 use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
-use OpenTelemetry\Sdk\Trace\Clock;
-use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
-use OpenTelemetry\Sdk\Trace\TracerProvider;
+use OpenTelemetry\Sdk\Trace\Test\SpanData;
 use PHPUnit\Framework\TestCase;
 
 class NewrelicSpanConverterTest extends TestCase
@@ -20,15 +17,11 @@ class NewrelicSpanConverterTest extends TestCase
      */
     public function shouldConvertASpanToAPayloadForNewrelic()
     {
-        $tracer = (new TracerProvider())->getTracer('OpenTelemetry.NewrelicTest');
-
-        $timestamp = Clock::get()->timestamp();
-
-        /** @var Span $span */
-        $span = $tracer->startAndActivateSpan('guard.validate');
-        $span->setAttribute('service', 'guard');
-        $span->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), $timestamp);
-        $span->end();
+        $span = (new SpanData())
+            ->setName('guard.validate')
+            ->addAttribute('service', 'guard')
+            ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
+            ->setHasEnded(true);
 
         $converter = new SpanConverter('test.name');
         $row = $converter->convert($span);
@@ -40,32 +33,13 @@ class NewrelicSpanConverterTest extends TestCase
         $this->assertSame($span->getName(), $row['attributes']['name']);
         $this->assertNull($row['attributes']['parent.id']);
         $this->assertSame($span->getName(), $row['attributes']['name']);
-
-        $this->assertIsFloat($row['attributes']['timestamp']);
-        // timestamp should be in milliseconds
-        $this->assertGreaterThan(1e12, $row['attributes']['timestamp']);
-
+        $this->assertSame(1505855794194, $row['attributes']['timestamp']);
         $this->assertIsFloat($row['attributes']['duration.ms']);
-        $this->assertGreaterThan(0, $row['attributes']['duration.ms']);
+        $this->assertSame(5271.0, $row['attributes']['duration.ms']);
 
         /** @var Attribute $attribute */
-        $attribute = $span->getAttribute('service');
+        $attribute = $span->getAttributes()->getAttribute('service');
         $this->assertEquals($attribute->getValue(), $row['attributes']['service']);
-    }
-
-    /**
-     * @test
-     */
-    public function durationShouldBeInMilliseconds()
-    {
-        $span = new Span('duration.test', SpanContext::generate());
-
-        $row = (new SpanConverter('duration.test'))->convert($span);
-
-        $this->assertEquals(
-            (($span->getEnd() - $span->getStart()) / 1000000),
-            $row['attributes']['duration.ms']
-        );
     }
 
     /**
@@ -73,23 +47,23 @@ class NewrelicSpanConverterTest extends TestCase
      */
     public function attributesMaintainTypes()
     {
-        $span = new Span('attributes.test', SpanContext::generate());
+        $listOfStrings = ['string-1', 'string-2'];
+        $listOfNumbers = [1, 2, 3, 3.1415, 42];
+        $listOfBooleans = [true, true, false, true];
+        $listOfRandoms = [true, [1, 2, 3], false, 'string-1', 3.1415];
 
-        $listOfStrings = ['string-1','string-2'];
-        $listOfNumbers = [1,2,3,3.1415,42];
-        $listOfBooleans = [true,true,false,true];
-        $listOfRandoms = [true,[1,2,3],false,'string-1',3.1415];
-
-        $span->setAttribute('string', 'string');
-        $span->setAttribute('integer-1', 1024);
-        $span->setAttribute('integer-2', 0);
-        $span->setAttribute('float', '1.2345');
-        $span->setAttribute('boolean-1', true);
-        $span->setAttribute('boolean-2', false);
-        $span->setAttribute('list-of-strings', $listOfStrings);
-        $span->setAttribute('list-of-numbers', $listOfNumbers);
-        $span->setAttribute('list-of-booleans', $listOfBooleans);
-        $span->setAttribute('list-of-random', $listOfRandoms);
+        $span = (new SpanData())
+            ->setName('attributes.test')
+            ->addAttribute('string', 'string')
+            ->addAttribute('integer-1', 1024)
+            ->addAttribute('integer-2', 0)
+            ->addAttribute('float', 1.2345)
+            ->addAttribute('boolean-1', true)
+            ->addAttribute('boolean-2', false)
+            ->addAttribute('list-of-strings', $listOfStrings)
+            ->addAttribute('list-of-numbers', $listOfNumbers)
+            ->addAttribute('list-of-booleans', $listOfBooleans)
+            ->addAttribute('list-of-random', $listOfRandoms);
 
         $attributes = (new SpanConverter('tags.test'))->convert($span)['attributes'];
 
@@ -98,20 +72,20 @@ class NewrelicSpanConverterTest extends TestCase
 
         // Attributes destined for Newrelic must be key/value pairs
 
-        $this->assertEquals($attributes['string'], 'string');
-        $this->assertEquals($attributes['integer-1'], 1024);
-        $this->assertEquals($attributes['integer-2'], 0);
-        $this->assertEquals($attributes['float'], 1.2345);
-        $this->assertEquals($attributes['boolean-1'], true);
-        $this->assertEquals($attributes['boolean-2'], false);
+        $this->assertSame('string', $attributes['string']);
+        $this->assertSame(1024, $attributes['integer-1']);
+        $this->assertSame(0, $attributes['integer-2']);
+        $this->assertSame(1.2345, $attributes['float']);
+        $this->assertTrue($attributes['boolean-1']);
+        $this->assertFalse($attributes['boolean-2']);
 
         // Lists are accepted
-        $this->assertEquals($attributes['list-of-strings'], $listOfStrings);
-        $this->assertEquals($attributes['list-of-numbers'], $listOfNumbers);
-        $this->assertEquals($attributes['list-of-booleans'], $listOfBooleans);
+        $this->assertSame($listOfStrings, $attributes['list-of-strings']);
+        $this->assertSame($listOfNumbers, $attributes['list-of-numbers']);
+        $this->assertSame($listOfBooleans, $attributes['list-of-booleans']);
 
         // This currently works, but OpenTelemetry\Trace\Span should stop arrays
         // containing multiple value types from being passed to the Exporter.
-        $this->assertEquals($attributes['list-of-random'], $listOfRandoms);
+        $this->assertSame($listOfRandoms, $attributes['list-of-random']);
     }
 }

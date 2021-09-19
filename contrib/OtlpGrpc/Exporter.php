@@ -122,16 +122,11 @@ class Exporter implements Trace\Exporter
         return $opts;
     }
 
-    /**
-     * Exports the provided Span data via the OTLP protocol
-     *
-     * @param iterable<Trace\ReadableSpan> $spans Array of Spans
-     * @return int return code, defined on the Exporter interface
-     */
+    /** @inheritDoc */
     public function export(iterable $spans): int
     {
         if (!$this->running) {
-            return Exporter::FAILED_NOT_RETRYABLE;
+            return Trace\Exporter::FAILED_NOT_RETRYABLE;
         }
 
         if (empty($spans)) {
@@ -194,7 +189,7 @@ class Exporter implements Trace\Exporter
             if (!strpos($pair, '=')) {
                 continue;
             }
-            list($key, $value) = explode('=', $pair, 2);
+            [$key, $value] = explode('=', $pair, 2);
             $metadata[$key] = [$value];
         }
 

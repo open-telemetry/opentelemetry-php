@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Newrelic;
 
 use function max;
+use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\SpanData;
 
+/**
+ * @see https://docs.newrelic.com/docs/distributed-tracing/trace-api/report-new-relic-format-traces-trace-api/#new-relic-guidelines
+ */
 class SpanConverter
 {
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
@@ -26,8 +30,8 @@ class SpanConverter
     {
         $spanParent = $span->getParentContext();
 
-        $startTimestamp = $span->getStartEpochNanos() / 1e6;
-        $endTimestamp = $span->getEndEpochNanos() / 1e6;
+        $startTimestamp = Clock::nanosToMilli($span->getStartEpochNanos());
+        $endTimestamp = Clock::nanosToMilli($span->getEndEpochNanos());
 
         $row = [
             'id' => $span->getSpanId(),
@@ -36,8 +40,8 @@ class SpanConverter
                 'name' => $span->getName(),
                 'service.name' => $this->serviceName,
                 'parent.id' => $spanParent->isValid() ? $spanParent->getSpanId() : null,
-                'timestamp' => $startTimestamp, // RealtimeClock in milliseconds
-                'duration.ms' => max(1, $startTimestamp - $endTimestamp), // Diff in milliseconds
+                'timestamp' => $startTimestamp,
+                'duration.ms' => (float) max(1, $endTimestamp - $startTimestamp),
                 self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
                 self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
             ],
