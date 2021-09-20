@@ -1,0 +1,30 @@
+name: publish-otel-php-base-docker-image
+on:
+  push:
+    branches: [ 'main' ]
+  workflow_dispatch:
+jobs:
+  push_to_registry:
+    name: OpenTelemetry PHP base docker image creation
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+
+      - name: check out the repo
+        uses: actions/checkout@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push to ghcr.io
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: docker/Dockerfile
+          tags: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:latest
