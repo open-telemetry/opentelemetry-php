@@ -154,7 +154,7 @@ class Span implements ReadWriteSpan
     /** @inheritDoc */
     public static function wrap(API\SpanContext $spanContext): API\Span
     {
-        return NonRecordingSpan::create($spanContext);
+        return new NonRecordingSpan($spanContext);
     }
 
     // TODO: Add a SpanLimits object to the constructor for configuration options.
@@ -205,7 +205,7 @@ class Span implements ReadWriteSpan
     private ?API\Attributes $attributes;
     private int $totalRecordedEvents = 0;
     private StatusData $status;
-    private int $endEpochNanos;
+    private int $endEpochNanos = 0;
     private bool $hasEnded = false;
 
     /** @param non-empty-string $name */

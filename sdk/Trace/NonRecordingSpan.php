@@ -18,11 +18,6 @@ final class NonRecordingSpan implements API\Span
 {
     private static ?self $invalidSpan = null;
 
-    public static function create(API\SpanContext $spanContext): API\Span
-    {
-        return new self($spanContext);
-    }
-
     /** @inheritDoc */
     public static function fromContext(Context $context): API\Span
     {
@@ -57,7 +52,7 @@ final class NonRecordingSpan implements API\Span
 
     private API\SpanContext $context;
 
-    private function __construct(
+    public function __construct(
         API\SpanContext $context
     ) {
         $this->context = $context;

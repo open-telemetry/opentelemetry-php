@@ -147,8 +147,12 @@ final class SpanBuilder implements API\SpanBuilder
             $traceId = $parentSpanContext->getTraceId();
         }
 
+        // Reset links and attributes back to null to prevent mutation of the started span.
         $links = $this->links ?? new Links();
+        $this->links = null;
+
         $attributes = $this->attributes ?? new Attributes();
+        $this->attributes = null;
 
         $samplingResult = $this
             ->tracerSharedState

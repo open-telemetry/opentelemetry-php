@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use function is_array;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
@@ -19,13 +20,14 @@ final class TracerProvider implements API\TracerProvider
     /** @readonly */
     private TracerSharedState $tracerSharedState;
 
-    /** @param list<SpanProcessor> $spanProcessors */
+    /** @param list<SpanProcessor>|SpanProcessor $spanProcessors */
     public function __construct(
-        array $spanProcessors = [],
+        $spanProcessors = [],
         ResourceInfo $resource = null,
         Sampler $sampler = null,
         IdGenerator $idGenerator = null
     ) {
+        $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
         $resource = $resource ?? ResourceInfo::defaultResource();
         $sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
         $idGenerator = $idGenerator ?? new RandomIdGenerator();

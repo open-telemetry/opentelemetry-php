@@ -89,7 +89,7 @@ class TracerTest extends TestCase
      */
     public function spanAndParentContextShouldHaveIdenticalTraceId(): void
     {
-        $parentSpan = NonRecordingSpan::create(new SpanContext(
+        $parentSpan = new NonRecordingSpan(new SpanContext(
             'faa0c74e14bd78114ec2bc447ad94ec9',
             '50a75f197c3de59a',
             SpanContext::TRACE_FLAG_SAMPLED

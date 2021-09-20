@@ -6,9 +6,12 @@ namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Trace as API;
+use function ctype_space;
 
 class Tracer implements API\Tracer
 {
+    public const FALLBACK_SPAN_NAME = '<unspecified span name>';
+
     /** @readonly */
     private TracerSharedState $tracerSharedState;
 
@@ -26,6 +29,10 @@ class Tracer implements API\Tracer
     /** @inheritDoc */
     public function spanBuilder(string $spanName): API\SpanBuilder
     {
+        if (ctype_space($spanName)) {
+            $spanName = self::FALLBACK_SPAN_NAME;
+        }
+
         if ($this->tracerSharedState->hasShutdown()) {
             // TODO: Return a noop tracer
         }
