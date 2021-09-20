@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 jobs:
   push_to_registry:
-    name: make otel-php-base-image
+    name: OpenTelemetry PHP base docker image creation
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -28,7 +28,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Push to ghcr.io 
+      - name: Push to ghcr.io
         uses: docker/build-push-action@v2
         with:
           context: .
