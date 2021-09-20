@@ -7,8 +7,113 @@ namespace OpenTelemetry\Context;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#overview
  */
-class Context
+final class Context
 {
+    /** @var self|null */
+    private static $current_context;
+
+    /** @var self|null */
+    private static $root;
+
+    /**
+     * This will set the given Context to be the "current" one. We return a token which can be passed to `detach()` to
+     * reset the Current Context back to the previous one.
+     *
+     * @return callable():Context - token for resetting the $current_context back
+     */
+    public static function attach(Context $ctx): callable
+    {
+        $former_ctx = self::getCurrent();
+        self::$current_context = $ctx;
+
+        return static function () use ($former_ctx) {
+            return $former_ctx;
+        };
+    }
+
+    /**
+     * @param non-empty-string $key
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#create-a-key
+     */
+    public static function createKey(string $key): ContextKey
+    {
+        return new ContextKey($key);
+    }
+
+    /**
+     * Given a token, the current context will be set back to the one prior to the token being generated.
+     * @param callable():Context $token
+     */
+    public static function detach(callable $token): Context
+    {
+        return self::$current_context = $token();
+    }
+
+    public static function getCurrent(): Context
+    {
+        return self::$current_context ?? (self::$current_context = self::getRoot());
+    }
+
+    public static function getRoot(): self
+    {
+        if (null === self::$root) {
+            self::$root = new self();
+        }
+
+        return self::$root;
+    }
+
+    /**
+     * Static version of get()
+     * This is primarily useful when the caller doesn't already have a reference to the Context that they want to mutate.
+     * This will operate on the "current" global context in that scenario.
+     *
+     * There are two ways to call this function:
+     * 1) With a $ctx value:
+     *    Context::getValue($key, $ctx) is functionally equivalent to $ctx->get($key)
+     * 2) Without a $ctx value:
+     *    This will fetch the "current" Context if one exists or create one if not, then attempt to get the value from it.
+     *
+     * @param ContextKey $key
+     * @param Context|null $ctx
+     *
+     * @return mixed
+     */
+    public static function getValue(ContextKey $key, $ctx=null)
+    {
+        $ctx = $ctx ?? static::getCurrent();
+
+        return $ctx->get($key);
+    }
+
+    /**
+     * This is a static version of set().
+     * This is primarily useful when the caller doesn't already have a reference to a Context that they want to mutate.
+     *
+     * There are two ways to call this function.
+     * 1) With a $parent parameter:
+     *    Context::setValue($key, $value, $ctx) is functionally equivalent to $ctx->set($key, $value)
+     * 2) Without a $parent parameter:
+     *    In this scenario, setValue() will use the `$current_context` reference as supplied by `getCurrent()`
+     *    `getCurrent()` will always return a valid Context. If one does not exist at the global scope,
+     *    an "empty" context will be created.
+     *
+     * @param ContextKey $key
+     * @param mixed $value
+     * @param Context|null $parent
+     *
+     * @return Context a new Context containing the k/v
+     */
+    public static function withValue(ContextKey $key, $value, $parent=null)
+    {
+        if (null === $parent) {
+            return self::$current_context = new self($key, $value, self::getCurrent());
+        }
+
+        return new self($key, $value, $parent);
+    }
+
     /**
      * @var ContextKey|null
      */
@@ -21,18 +126,6 @@ class Context
 
     /** @var self|null */
     protected $parent;
-
-    protected static $current_context = null;
-
-    /**
-     * @param non-empty-string $key
-     *
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#create-a-key
-     */
-    public static function createKey(string $key): ContextKey
-    {
-        return new ContextKey($key);
-    }
 
     /**
      * This is a general purpose read-only key-value store. Read-only in the sense that adding a new value does not
@@ -69,7 +162,7 @@ class Context
      */
     public function with(ContextKey $key, $value)
     {
-        return new static($key, $value, $this);
+        return new self($key, $value, $this);
     }
 
     /**
@@ -91,33 +184,6 @@ class Context
     }
 
     /**
-     * This is a static version of set().
-     * This is primarily useful when the caller doesn't already have a reference to a Context that they want to mutate.
-     *
-     * There are two ways to call this function.
-     * 1) With a $parent parameter:
-     *    Context::setValue($key, $value, $ctx) is functionally equivalent to $ctx->set($key, $value)
-     * 2) Without a $parent parameter:
-     *    In this scenario, setValue() will use the `$current_context` reference as supplied by `getCurrent()`
-     *    `getCurrent()` will always return a valid Context. If one does not exist at the global scope,
-     *    an "empty" context will be created.
-     *
-     * @param ContextKey $key
-     * @param mixed $value
-     * @param Context|null $parent
-     *
-     * @return Context a new Context containing the k/v
-     */
-    public static function withValue(ContextKey $key, $value, $parent=null)
-    {
-        if (null === $parent) {
-            return static::$current_context = new static($key, $value, static::getCurrent());
-        }
-
-        return new static($key, $value, $parent);
-    }
-
-    /**
      * Fetch a value from the Context given a key value.
      *
      * @return mixed|null
@@ -133,67 +199,5 @@ class Context
         }
 
         return $this->parent->get($key);
-    }
-
-    /**
-     * Static version of get()
-     * This is primarily useful when the caller doesn't already have a reference to the Context that they want to mutate.
-     * This will operate on the "current" global context in that scenario.
-     *
-     * There are two ways to call this function:
-     * 1) With a $ctx value:
-     *    Context::getValue($key, $ctx) is functionally equivalent to $ctx->get($key)
-     * 2) Without a $ctx value:
-     *    This will fetch the "current" Context if one exists or create one if not, then attempt to get the value from it.
-     *
-     * @param ContextKey $key
-     * @param Context|null $ctx
-     *
-     * @return mixed
-     */
-    public static function getValue(ContextKey $key, $ctx=null)
-    {
-        $ctx = $ctx ?? static::getCurrent();
-
-        return $ctx->get($key);
-    }
-
-    public static function getCurrent(): Context
-    {
-        if (null === static::$current_context) {
-            static::$current_context = new static();
-        }
-
-        return static::$current_context;
-    }
-
-    /**
-     * This will set the given Context to be the "current" one. We return a token which can be passed to `detach()` to
-     * reset the Current Context back to the previous one.
-     *
-     * @param Context $ctx
-     *
-     * @return callable token for resetting the $current_context back
-     */
-    public static function attach($ctx): callable
-    {
-        $former_ctx = static::$current_context;
-        static::$current_context = $ctx;
-
-        return function () use ($former_ctx) {
-            return $former_ctx;
-        };
-    }
-
-    /**
-     * Given a token, the current context will be set back to the one prior to the token being generated.
-     *
-     * @param callable $token
-     *
-     * @return Context
-     */
-    public static function detach(callable $token)
-    {
-        return static::$current_context = call_user_func($token);
     }
 }

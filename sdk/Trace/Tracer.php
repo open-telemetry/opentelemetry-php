@@ -93,14 +93,11 @@ class Tracer implements API\Tracer
             $spanKind,
             $attributes,
             $links,
-            $this->provider->getSpanProcessor()
+            $this->provider->getSpanProcessor(),
+            $this->provider->getSpanLimits()
         );
 
         $span->setInstrumentationLibrary($this->instrumentationLibrary);
-
-        if ($links) {
-            $span->setLinks($links);
-        }
 
         $this->provider->getSpanProcessor()->onStart($span, $parentContext ?? Context::getCurrent());
 

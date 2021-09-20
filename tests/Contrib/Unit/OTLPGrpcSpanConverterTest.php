@@ -16,8 +16,9 @@ use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Link;
 use OpenTelemetry\Sdk\Trace\Links;
 use OpenTelemetry\Sdk\Trace\Span;
-
 use OpenTelemetry\Sdk\Trace\SpanContext;
+
+use OpenTelemetry\Sdk\Trace\SpanLimitsBuilder;
 use OpenTelemetry\Sdk\Trace\SpanStatus;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 
@@ -272,5 +273,55 @@ class OTLPGrpcSpanConverterTest extends TestCase
         $otlpspan = (new SpanConverter())->as_otlp_resource_span($spans);
 
         $this->assertEquals(new ResourceSpans(), $otlpspan);
+    }
+
+    public function testOtlpDroppedAttributes()
+    {
+        $spanLimits = (new SpanLimitsBuilder())->setAttributeCountLimit(2)->build();
+        $span = new Span('tags.test', SpanContext::generate(), null, null, SpanKind::KIND_INTERNAL, null, null, null, $spanLimits);
+
+        $span->setAttribute('attr-1', '1');
+        $span->setAttribute('attr-2', '2');
+        $span->setAttribute('attr-3', '3');
+
+        $converter = new SpanConverter();
+        $convertedSpan = $converter->as_otlp_span($span);
+
+        $this->assertCount(2, $convertedSpan->getAttributes());
+        $this->assertEquals(1, $convertedSpan->getDroppedAttributesCount());
+    }
+
+    public function testOtlpDroppedEvents()
+    {
+        $spanLimits = (new SpanLimitsBuilder())->setEventCountLimit(2)->build();
+        $span = new Span('tags.test', SpanContext::generate(), null, null, SpanKind::KIND_INTERNAL, null, null, null, $spanLimits);
+
+        $span->addEvent('event-1', Clock::get()->timestamp());
+        $span->addEvent('event-2', Clock::get()->timestamp());
+        $span->addEvent('event-3', Clock::get()->timestamp());
+
+        $converter = new SpanConverter();
+        $convertedSpan = $converter->as_otlp_span($span);
+
+        $this->assertCount(2, $convertedSpan->getEvents());
+        $this->assertEquals(1, $convertedSpan->getDroppedEventsCount());
+    }
+
+    public function testOtlpDroppedLinks()
+    {
+        $spanLimits = (new SpanLimitsBuilder())->setLinkCountLimit(2)->build();
+        $links = new Links([
+            new Link(SpanContext::generate()),
+            new Link(SpanContext::generate()),
+            new Link(SpanContext::generate()),
+        ]);
+
+        $span = new Span('tags.test', SpanContext::generate(), null, null, SpanKind::KIND_INTERNAL, null, $links, null, $spanLimits);
+
+        $converter = new SpanConverter();
+        $convertedSpan = $converter->as_otlp_span($span);
+
+        $this->assertCount(2, $convertedSpan->getLinks());
+        $this->assertEquals(1, $convertedSpan->getDroppedLinksCount());
     }
 }

@@ -16,4 +16,6 @@ interface Attributes extends \IteratorAggregate, \Countable
 
     public function count(): int;
     public function getIterator(): AttributesIterator;
+
+    public function getDroppedAttributesCount(): int;
 }

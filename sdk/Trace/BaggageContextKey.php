@@ -10,9 +10,9 @@ use OpenTelemetry\Context\ContextKey;
 /**
  * @psalm-internal \OpenTelemetry
  */
-final class SpanContextKey extends ContextKey
+final class BaggageContextKey extends ContextKey
 {
-    private const KEY_NAME = 'opentelemetry-trace-span-key';
+    private const KEY_NAME = 'opentelemetry-trace-baggage-key';
 
     /** @var ContextKey */
     private static $instance;
