@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Integration\Trace;
 
+use OpenTelemetry\Sdk\Internal\StringUtil;
+use OpenTelemetry\Sdk\Trace\Attribute;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Link;
 use OpenTelemetry\Sdk\Trace\Links;
@@ -21,15 +23,29 @@ class SpanLimitsTest extends TestCase
     {
         $spanLimits = (new SpanLimitsBuilder())
             ->setAttributeCountLimit(3)
+            ->setAttributeValueLengthLimit(5)
             ->build();
 
         $span = $this->getTracerSpanWithLimits($spanLimits)->startSpan('test.spanlimits');
+        $span->setAttribute('length.test', 'value1234567890');
         for ($i = 0; $i < 4; $i++) {
-            $span->setAttribute('attr' . $i, $i);
+            $span->setAttribute('attr' . $i, 'value' . $i);
         }
 
         $this->assertCount(3, $span->getAttributes());
-        $this->assertEquals(1, $span->getAttributes()->getDroppedAttributesCount());
+        $this->assertEquals(2, $span->getAttributes()->getDroppedAttributesCount());
+
+        // get max length of all string attribute values
+        $maxAttrValueLength = array_reduce(
+            iterator_to_array($span->getAttributes()),
+            function ($max, Attribute $a) {
+                $attrValue = $a->getValue();
+
+                return is_string($attrValue) ? max($max, StringUtil::strlen($attrValue)) : $max;
+            },
+            0
+        );
+        $this->assertEquals(5, $maxAttrValueLength);
     }
 
     public function testSpanEventLimits()
