@@ -8,11 +8,14 @@ use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 
+/**
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/sdk.md#additional-span-interfaces
+ */
 interface ReadableSpan
 {
     public function getSpanName(): string;
 
-    public function getSpanContext(): API\SpanContext;
+    public function getContext(): API\SpanContext;
 
     public function getSpanKind(): int;
 
@@ -35,8 +38,6 @@ interface ReadableSpan
     public function ended(): bool;
 
     // ambiguous methods
-    public function getContext(): API\SpanContext;
-
     public function getDuration(): ?int;
 
     public function getParent(): ?API\SpanContext;

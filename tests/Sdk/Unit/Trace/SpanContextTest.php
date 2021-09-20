@@ -46,7 +46,7 @@ class SpanContextTest extends TestCase
 
         $span = $tracer->startAndActivateSpan('test');
 
-        $this->assertTrue($span->getSpanContext()->isSampled());
+        $this->assertTrue($span->getContext()->isSampled());
     }
 
     /**
@@ -64,7 +64,7 @@ class SpanContextTest extends TestCase
 
         $span = $tracer->startAndActivateSpan('test');
 
-        $this->assertTrue($span->getSpanContext()->isSampled());
+        $this->assertTrue($span->getContext()->isSampled());
     }
     /**
      * @test

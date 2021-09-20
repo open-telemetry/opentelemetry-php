@@ -9,7 +9,6 @@ use OpenTelemetry\Sdk\Trace\NoopSpan;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\Sampler\ParentBased;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
-use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Trace as API;
 use PHPUnit\Framework\TestCase;
@@ -89,13 +88,17 @@ class ParentBasedTest extends TestCase
 
     private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceState $traceState = null): Context
     {
-        return Span::insert(new NoopSpan(SpanContext::restore(
-            '4bf92f3577b34da6a3ce929d0e0e4736',
-            '00f067aa0ba902b7',
-            $sampled,
-            $isRemote,
-            $traceState
-        )), new Context());
+        return (new Context())->withContextValue(
+            new NoopSpan(
+                SpanContext::restore(
+                    '4bf92f3577b34da6a3ce929d0e0e4736',
+                    '00f067aa0ba902b7',
+                    $sampled,
+                    $isRemote,
+                    $traceState
+                )
+            )
+        );
     }
 
     private function createMockSamplerNeverInvoked(): Sampler

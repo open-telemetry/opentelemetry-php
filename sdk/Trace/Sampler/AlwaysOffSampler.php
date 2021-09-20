@@ -8,7 +8,6 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Trace as API;
 
 /**
@@ -33,8 +32,8 @@ class AlwaysOffSampler implements Sampler
         ?API\Attributes $attributes = null,
         ?API\Links $links = null
     ): SamplingResult {
-        $parentSpan = Span::extract($parentContext);
-        $parentSpanContext = $parentSpan !== null ? $parentSpan->getContext() : SpanContext::getInvalid();
+        $parentSpan = Span::fromContext($parentContext);
+        $parentSpanContext = $parentSpan->getContext();
         $traceState = $parentSpanContext->getTraceState();
 
         return new SamplingResult(

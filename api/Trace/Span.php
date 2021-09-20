@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace;
 
+use OpenTelemetry\Context\ImplicitContextKeyed;
 use Throwable;
 
-interface Span extends SpanStatus, SpanKind
+/**
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#span-operations
+ */
+interface Span extends SpanStatus, SpanKind, ImplicitContextKeyed
 {
     /**
      * Attributes SHOULD preserve the order in which they're set. Setting an attribute with the same key as an existing
@@ -54,6 +58,8 @@ interface Span extends SpanStatus, SpanKind
      * @return Span Must return $this
      */
     public function end(int $timestamp = null): Span;
+
+    public function getContext(): SpanContext;
 
     public function isRecording(): bool;
 }

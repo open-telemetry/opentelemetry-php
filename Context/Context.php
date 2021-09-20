@@ -5,63 +5,86 @@ declare(strict_types=1);
 namespace OpenTelemetry\Context;
 
 /**
- * @template TContext of Context
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#overview
  */
-class Context
+final class Context
 {
-    /**
-     * @var ContextKey|null
-     */
-    protected $key;
+    /** @var self|null */
+    private static $current_context;
+
+    /** @var self|null */
+    private static $root;
 
     /**
-     * @var mixed|null
-     */
-    protected $value;
-
-    /**
-     * @var TContext|null
-     */
-    protected $parent;
-
-    protected static $current_context = null;
-
-    /**
-     * This is a general purpose read-only key-value store. Read-only in the sense that adding a new value does not
-     * mutate the existing context, but returns a new Context which has the new value added.
+     * This will set the given Context to be the "current" one. We return a token which can be passed to `detach()` to
+     * reset the Current Context back to the previous one.
      *
-     * In practical terms, this is implemented as a linked list of Context instances, with each one holding a reference
-     * to the key object, the value that corresponds to the key, and an optional reference to the parent Context
-     * (i.e. the next link in the linked list chain)
-     *
-     * If you inherit from this class, you should "shadow" $parent into your subclass so that all operations give
-     * you back an instance of the same type that you are interacting with and different subclasses should NOT be
-     * treated as interoperable. i.e. you should NOT have a Context object chain with both Context instances interleaved
-     * with Baggage instances.
-     *
-     * @param ContextKey|null $key The key object. Should only be null when creating an "empty" context
-     * @param mixed|null $value
-     * @param TContext|null $parent Reference to the parent object
+     * @return callable():Context - token for resetting the $current_context back
      */
-    final public function __construct(?ContextKey $key=null, $value=null, $parent=null)
+    public static function attach(Context $ctx): callable
     {
-        $this->key = $key;
-        $this->value = $value;
-        $this->parent = $parent;
+        $former_ctx = self::getCurrent();
+        self::$current_context = $ctx;
+
+        return static function () use ($former_ctx) {
+            return $former_ctx;
+        };
     }
 
     /**
-     * This adds a k/v pair to this Context. We do this by instantiating a new Context instance with the k/v and pass
-     * a reference to $this as the "parent" creating the linked list chain.
+     * @param non-empty-string $key
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#create-a-key
+     */
+    public static function createKey(string $key): ContextKey
+    {
+        return new ContextKey($key);
+    }
+
+    /**
+     * Given a token, the current context will be set back to the one prior to the token being generated.
+     * @param callable():Context $token
+     */
+    public static function detach(callable $token): Context
+    {
+        return self::$current_context = $token();
+    }
+
+    public static function getCurrent(): Context
+    {
+        return self::$current_context ?? (self::$current_context = self::getRoot());
+    }
+
+    public static function getRoot(): self
+    {
+        if (null === self::$root) {
+            self::$root = new self();
+        }
+
+        return self::$root;
+    }
+
+    /**
+     * Static version of get()
+     * This is primarily useful when the caller doesn't already have a reference to the Context that they want to mutate.
+     * This will operate on the "current" global context in that scenario.
+     *
+     * There are two ways to call this function:
+     * 1) With a $ctx value:
+     *    Context::getValue($key, $ctx) is functionally equivalent to $ctx->get($key)
+     * 2) Without a $ctx value:
+     *    This will fetch the "current" Context if one exists or create one if not, then attempt to get the value from it.
      *
      * @param ContextKey $key
-     * @param mixed $value
+     * @param Context|null $ctx
      *
-     * @return Context a new Context containing the k/v
+     * @return mixed
      */
-    public function set(ContextKey $key, $value)
+    public static function getValue(ContextKey $key, $ctx=null)
     {
-        return new static($key, $value, $this);
+        $ctx = $ctx ?? static::getCurrent();
+
+        return $ctx->get($key);
     }
 
     /**
@@ -82,99 +105,99 @@ class Context
      *
      * @return Context a new Context containing the k/v
      */
-    public static function setValue(ContextKey $key, $value, $parent=null)
+    public static function withValue(ContextKey $key, $value, $parent=null)
     {
         if (null === $parent) {
-            return static::$current_context = new static($key, $value, static::getCurrent());
+            return self::$current_context = new self($key, $value, self::getCurrent());
         }
 
-        return new static($key, $value, $parent);
+        return new self($key, $value, $parent);
+    }
+
+    /**
+     * @var ContextKey|null
+     */
+    protected $key;
+
+    /**
+     * @var mixed|null
+     */
+    protected $value;
+
+    /** @var self|null */
+    protected $parent;
+
+    /**
+     * This is a general purpose read-only key-value store. Read-only in the sense that adding a new value does not
+     * mutate the existing context, but returns a new Context which has the new value added.
+     *
+     * In practical terms, this is implemented as a linked list of Context instances, with each one holding a reference
+     * to the key object, the value that corresponds to the key, and an optional reference to the parent Context
+     * (i.e. the next link in the linked list chain)
+     *
+     * If you inherit from this class, you should "shadow" $parent into your subclass so that all operations give
+     * you back an instance of the same type that you are interacting with and different subclasses should NOT be
+     * treated as interoperable. i.e. you should NOT have a Context object chain with both Context instances interleaved
+     * with Baggage instances.
+     *
+     * @param ContextKey|null $key The key object. Should only be null when creating an "empty" context
+     * @param mixed|null $value
+     * @param self|null $parent Reference to the parent object
+     */
+    final public function __construct(?ContextKey $key=null, $value=null, $parent=null)
+    {
+        $this->key = $key;
+        $this->value = $value;
+        $this->parent = $parent;
+    }
+
+    /**
+     * This adds a k/v pair to this Context. We do this by instantiating a new Context instance with the k/v and pass
+     * a reference to $this as the "parent" creating the linked list chain.
+     *
+     * @param ContextKey $key
+     * @param mixed $value
+     *
+     * @return Context a new Context containing the k/v
+     */
+    public function with(ContextKey $key, $value)
+    {
+        return new self($key, $value, $this);
+    }
+
+    /**
+     * @todo: Implement this on the API side
+     */
+    public function withContextValue(ImplicitContextKeyed $value): Context
+    {
+        return $value->storeInContext($this);
+    }
+
+    /**
+     * Makes `$this` the currently active {@see Context}.
+     *
+     * @todo: Implement this on the API side
+     */
+    public function activate(): Scope
+    {
+        return new Scope(self::attach($this));
     }
 
     /**
      * Fetch a value from the Context given a key value.
      *
-     * @param ContextKey $key
-     *
-     * @throws ContextValueNotFoundException
-     * @return mixed
-     * @suppress PhanUndeclaredClassMethod
+     * @return mixed|null
      */
     public function get(ContextKey $key)
     {
         if ($this->key === $key) {
             return $this->value;
         }
+
         if (null === $this->parent) {
-            throw new ContextValueNotFoundException();
+            return null;
         }
 
         return $this->parent->get($key);
-    }
-
-    /**
-     * Static version of get()
-     * This is primarily useful when the caller doesn't already have a reference to the Context that they want to mutate.
-     * This will operate on the "current" global context in that scenario.
-     *
-     * There are two ways to call this function:
-     * 1) With a $ctx value:
-     *    Context::getValue($key, $ctx) is functionally equivalent to $ctx->get($key)
-     * 2) Without a $ctx value:
-     *    This will fetch the "current" Context if one exists or create one if not, then attempt to get the value from it.
-     *
-     * @param ContextKey $key
-     * @param Context|null $ctx
-     *
-     * @throws ContextValueNotFoundException
-     * @return mixed
-     */
-    public static function getValue(ContextKey $key, $ctx=null)
-    {
-        $ctx = $ctx ?? static::getCurrent();
-
-        return $ctx->get($key);
-    }
-
-    /**
-     * @return Context
-     */
-    public static function getCurrent()
-    {
-        if (null === static::$current_context) {
-            static::$current_context = new static();
-        }
-
-        return static::$current_context;
-    }
-
-    /**
-     * This will set the given Context to be the "current" one. We return a token which can be passed to `detach()` to
-     * reset the Current Context back to the previous one.
-     *
-     * @param Context $ctx
-     *
-     * @return callable token for resetting the $current_context back
-     */
-    public static function attach($ctx): callable
-    {
-        $former_ctx = static::$current_context;
-        static::$current_context = $ctx;
-
-        return function () use ($former_ctx) {
-            return $former_ctx;
-        };
-    }
-
-    /**
-     * Given a token, the current context will be set back to the one prior to the token being generated.
-     *
-     * @param callable $token
-     *
-     * @return Context
-     */
-    public static function detach(callable $token)
-    {
-        return static::$current_context = call_user_func($token);
     }
 }

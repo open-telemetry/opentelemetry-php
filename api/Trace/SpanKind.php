@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Trace;
 
+/**
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#spankind
+ */
 interface SpanKind
 {
-    const KIND_INTERNAL = 0;
-    const KIND_CLIENT = 1;
-    const KIND_SERVER = 2;
-    const KIND_PRODUCER = 3;
-    const KIND_CONSUMER = 4;
+    public const KIND_INTERNAL = 0;
+    public const KIND_CLIENT = 1;
+    public const KIND_SERVER = 2;
+    public const KIND_PRODUCER = 3;
+    public const KIND_CONSUMER = 4;
 
-    const TYPES = [
+    public const TYPES = [
         self::KIND_INTERNAL,
         self::KIND_CLIENT,
         self::KIND_SERVER,

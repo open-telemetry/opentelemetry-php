@@ -23,7 +23,7 @@ class SimpleSpanProcessorTest extends TestCase
         $spanContext = self::createStub(SpanContext::class);
         $spanContext->method('isSampled')->willReturn(true); // only sampled spans are exported
         $span = self::createStub(Span::class);
-        $span->method('getSpanContext')->willReturn($spanContext);
+        $span->method('getContext')->willReturn($spanContext);
 
         (new SimpleSpanProcessor($exporter))->onEnd($span);
     }
@@ -81,7 +81,7 @@ class SimpleSpanProcessorTest extends TestCase
         $spanContext = self::createStub(SpanContext::class);
         $spanContext->method('isSampled')->willReturn(false);
         $span = self::createStub(Span::class);
-        $span->method('getSpanContext')->willReturn($spanContext);
+        $span->method('getContext')->willReturn($spanContext);
 
         (new SimpleSpanProcessor($exporter))->onEnd($span);
     }

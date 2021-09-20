@@ -11,7 +11,7 @@ exporters:
   newrelic:
     apikey: 'ADD_A_LICENSE_KEY_HERE'
     timeout: 30s
-    spans_host_override: "trace-api.newrelic.com"
+    host_override: "trace-api.newrelic.com"
   logging:
     loglevel: debug
 

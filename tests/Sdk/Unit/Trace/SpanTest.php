@@ -28,4 +28,17 @@ class SpanTest extends TestCase
             $span->getEvents()->getIterator()->current()->getTimestamp()
         );
     }
+
+    public function testActivate(): void
+    {
+        $span = new Span('span', new SpanContext(
+            'faa0c74e14bd78114ec2bc447ad94ec9',
+            '50a75f197c3de59a',
+            API\SpanContext::TRACE_FLAG_SAMPLED
+        ));
+
+        $this->assertNotSame($span, Span::getCurrent());
+        $span->activate();
+        $this->assertSame($span, Span::getCurrent());
+    }
 }

@@ -4,122 +4,124 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Baggage;
 
-use OpenTelemetry\Context\ContextKey;
-use OpenTelemetry\Context\ContextValueNotFoundException;
-use OpenTelemetry\Sdk\Baggage;
+use OpenTelemetry\Baggage\Entry;
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\Sdk\Baggage\Baggage;
+use OpenTelemetry\Sdk\Baggage\Metadata;
 use PHPUnit\Framework\TestCase;
 
 class BaggageTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function testRemoveCorrelationFromBeginning()
+    // region contextInteraction
+
+    public function testCurrentEmpty(): void
     {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
-        /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar');
-        /** @var Baggage $cctx_res */
-        $cctx_res = $cctx->removeCorrelation($key2);
-        $this->assertEquals('foo', $cctx_res->get($key1));
-        $this->expectException(ContextValueNotFoundException::class);
-        $cctx_res->get($key2);
+        $scope = Context::getRoot()->activate();
+        $this->assertSame(Baggage::getCurrent(), Baggage::getEmpty());
+        $scope->close();
     }
 
-    /**
-     * @test
-     */
-    public function testRemoveCorrelationFromMiddle()
+    public function testCurrent(): void
     {
-        $key1 = new ContextKey('key1');
-        $key2 = new ContextKey('key2');
-        $key3 = new ContextKey('key3');
-        /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar')->set($key3, 'baz');
-        /** @var Baggage $cctx_res */
-        $cctx_res = $cctx->removeCorrelation($key2);
-        $this->assertEquals('foo', $cctx_res->get($key1));
-        $this->assertEquals('baz', $cctx_res->get($key3));
-        $this->expectException(ContextValueNotFoundException::class);
-        $cctx_res->get($key2);
+        $scope = Context::getRoot()->withContextValue(
+            Baggage::getBuilder()->set('foo', 'bar')->build(),
+        )->activate();
+        $this->assertSame('bar', Baggage::getCurrent()->getValue('foo'));
+        $scope->close();
     }
 
-    /**
-     * @test
-     */
-    public function testRemoveCorrelationFromEnd()
+    public function testGetCurrentBaggageDefault(): void
     {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
-        /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key2, 'bar')->set($key1, 'foo');
-        /** @var Baggage $cctx_res */
-        $cctx_res = $cctx->removeCorrelation($key2);
-        $this->assertEquals('foo', $cctx_res->get($key1));
-        $this->expectException(ContextValueNotFoundException::class);
-        $cctx_res->get($key2);
+        $scope = Context::getRoot()->activate();
+        $baggage = Baggage::getCurrent();
+        $this->assertSame($baggage, Baggage::getEmpty());
+        $scope->close();
     }
 
-    /**
-     * @test
-     */
-    public function testOnlyItemInTheContext()
+    public function testGetCurrentBaggageSetsCorrectContext(): void
     {
-        $key1 = new ContextKey();
-        $cctx = (new Baggage())->set($key1, 'foo');
-        $this->assertEquals('foo', $cctx->get($key1));
+        $baggage = Baggage::getEmpty();
+        $scope = Context::getRoot()->withContextValue($baggage)->activate();
+        $this->assertSame(Baggage::getCurrent(), $baggage);
+        $scope->close();
     }
 
-    /**
-     * @test
-     */
-    public function testWrongKeyValue()
+    public function testBaggageFromContextDefaultContext(): void
     {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
-        $cctx = (new Baggage())->set($key2, 'bar')->set($key1, 'foo');
-        $this->assertNotEquals('bar', $cctx->get($key1));
-        $this->assertNotEquals('foo', $cctx->get($key2));
+        $baggage = Baggage::fromContext(Context::getRoot());
+        $this->assertSame($baggage, Baggage::getEmpty());
     }
 
-    /**
-     * @test
-     */
-    public function testClearCorrelations()
+    public function testGetBaggageExplicitContext(): void
     {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
-
-        /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar');
-
-        $this->assertEquals('foo', $cctx->get($key1));
-        $this->assertEquals('bar', $cctx->get($key2));
-
-        $cctx->clearCorrelations();
-        $this->expectException(ContextValueNotFoundException::class);
-        $cctx->get($key1);
+        $baggage = Baggage::getEmpty();
+        $context = Context::getRoot()->withContextValue($baggage);
+        $this->assertSame(Baggage::fromContext($context), $baggage);
     }
 
-    /**
-     * @test
-     */
-    public function testGetCorrelations()
+    // endregion
+
+    // region functionality
+
+    public function testGetValuePresent(): void
     {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
+        $this->assertSame(10, Baggage::getBuilder()->set('foo', 10)->build()->getValue('foo'));
+    }
 
-        /** @var Baggage $cctx */
-        $cctx = (new Baggage())->set($key1, 'foo')->set($key2, 'bar');
+    public function testGetValueMissing(): void
+    {
+        $this->assertNull(Baggage::getBuilder()->build()->getValue('foo'));
+    }
 
-        $res = [];
-        foreach ($cctx->getCorrelations() as $k => $v) {
-            // I am inverting the k/v pairs in an array here because php does not allow for object keys
-            $res[$v] = $k;
+    public function testGetEntryPresent(): void
+    {
+        /** @var Entry $entry */
+        $entry = Baggage::getBuilder()->set('foo', 10, new Metadata('meta'))->build()->getEntry('foo');
+        $this->assertSame(10, $entry->getValue());
+        $this->assertSame('meta', $entry->getMetadata()->getValue());
+    }
+
+    public function testGetEntryPresentNoMetadata(): void
+    {
+        /** @var Entry $entry */
+        $entry = Baggage::getBuilder()->set('foo', 10)->build()->getEntry('foo');
+        $this->assertSame(10, $entry->getValue());
+        $this->assertEmpty($entry->getMetadata()->getValue());
+    }
+
+    public function testGetEntryMissing(): void
+    {
+        $this->assertNull(Baggage::getBuilder()->build()->getEntry('foo'));
+    }
+
+    public function testToBuilder(): void
+    {
+        $baggage = Baggage::getBuilder()->set('foo', 10)->build();
+        $baggage2 = $baggage->toBuilder()->build();
+
+        $this->assertSame(10, $baggage2->getValue('foo'));
+    }
+
+    public function testGetAll(): void
+    {
+        $baggage = Baggage::getBuilder()
+            ->set('foo', 'bar')
+            ->set('bar', 'baz')
+            ->set('biz', 'fiz')
+            ->remove('biz')
+            ->build();
+
+        $arr = [];
+
+        foreach ($baggage->getAll() as $key => $value) {
+            $arr[$key] = $value->getValue();
         }
 
-        $this->assertSame($key1, $res['foo']);
-        $this->assertSame($key2, $res['bar']);
+        $this->assertEquals(
+            ['foo' => 'bar', 'bar' => 'baz'],
+            $arr
+        );
     }
+
+    // endregion
 }
