@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
+use Mockery\MockInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Sampler;
@@ -13,25 +16,20 @@ use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-class SpanBuilderTest extends TestCase
+class SpanBuilderTest extends MockeryTestCase
 {
     private const SPAN_NAME = 'span_name';
 
-    /** @var API\Tracer */
-    private $tracer;
+    private API\Tracer $tracer;
+    private API\SpanContext $sampledSpanContext;
 
-    /** @var API\SpanContext */
-    private $sampledSpanContext;
-
-    /** @var MockObject&SpanProcessor */
+    /** @var MockInterface&SpanProcessor  */
     private $spanProcessor;
 
     protected function setUp(): void
     {
-        $this->spanProcessor = $this->createMock(SpanProcessor::class);
+        $this->spanProcessor = Mockery::spy(SpanProcessor::class);
         $this->tracer = (new TracerProvider($this->spanProcessor))->getTracer('SpanBuilderTest');
 
         $this->sampledSpanContext = SpanContext::create(
@@ -245,6 +243,14 @@ class SpanBuilderTest extends TestCase
         $span->end();
     }
 
+    public function test_startTimestamp(): void
+    {
+        /** @var Span $span */
+        $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setStartTimestamp(123)->startSpan();
+        $span->end();
+        $this->assertSame(123, $span->toSpanData()->getStartEpochNanos());
+    }
+
     public function test_setNoParent(): void
     {
         $parentSpan = $this->tracer->spanBuilder(self::SPAN_NAME)->startSpan();
@@ -258,6 +264,12 @@ class SpanBuilderTest extends TestCase
             $parentSpan->getContext()->getTraceId()
         );
 
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->with($span, Context::getRoot())
+            ->once();
+
         /** @var Span $spanNoParent */
         $spanNoParent = $this
             ->tracer
@@ -268,6 +280,12 @@ class SpanBuilderTest extends TestCase
             ->startSpan();
 
         $this->assertNotSame($span->getContext()->getTraceId(), $spanNoParent->getContext()->getTraceId());
+
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->with($spanNoParent, Context::getRoot())
+            ->once();
 
         $spanNoParent->end();
         $span->end();
@@ -282,6 +300,12 @@ class SpanBuilderTest extends TestCase
 
         /** @var Span $span */
         $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setNoParent()->setParent($parentContext)->startSpan();
+
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->with($span, $parentContext)
+            ->once();
 
         $this->assertSame(
             $span->getContext()->getTraceId(),
@@ -302,6 +326,12 @@ class SpanBuilderTest extends TestCase
             ->setParent($parentContext2)
             ->startSpan();
 
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->with($span2, $parentContext2)
+            ->once();
+
         $this->assertSame(
             $span2->getContext()->getTraceId(),
             $parentSpan->getContext()->getTraceId()
@@ -321,6 +351,12 @@ class SpanBuilderTest extends TestCase
         /** @var Span $span */
         $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setParent($emptyContext)->startSpan();
 
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->with($span, $emptyContext)
+            ->once();
+
         $this->assertNotSame(
             $span->getContext()->getTraceId(),
             $parentSpan->getContext()->getTraceId()
@@ -332,6 +368,61 @@ class SpanBuilderTest extends TestCase
 
         $span->end();
         $parentScope->close();
+        $parentSpan->end();
+    }
+
+    public function test_setParent_currentSpan(): void
+    {
+        $parentSpan = $this->tracer->spanBuilder(self::SPAN_NAME)->startSpan();
+        $parentScope = $parentSpan->activate();
+        $implicitContext = Context::getCurrent();
+
+        /** @var Span $span */
+        $span = $this->tracer->spanBuilder(self::SPAN_NAME)->startSpan();
+
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->with($span, $implicitContext)
+            ->once();
+
+        $this->assertSame(
+            $span->getContext()->getTraceId(),
+            $parentSpan->getContext()->getTraceId()
+        );
+        $this->assertSame(
+            $span->toSpanData()->getParentSpanId(),
+            $parentSpan->getContext()->getSpanId()
+        );
+
+        $span->end();
+        $parentScope->close();
+        $parentSpan->end();
+    }
+
+    public function test_setParent_invalidContext(): void
+    {
+        $parentSpan = Span::getInvalid();
+
+        $parentContext = Context::getCurrent()->withContextValue($parentSpan);
+
+        /** @var Span $span */
+        $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setParent($parentContext)->startSpan();
+
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->with($span, $parentContext)
+            ->once();
+
+        $this->assertNotSame(
+            $span->getContext()->getTraceId(),
+            $parentSpan->getContext()->getTraceId()
+        );
+
+        $this->assertFalse(SpanContext::isValidSpanId($span->toSpanData()->getParentSpanId()));
+
+        $span->end();
         $parentSpan->end();
     }
 }
