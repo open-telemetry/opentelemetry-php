@@ -60,7 +60,7 @@ class SpanConverter
             ],
             'name' => $span->getName(),
             'timestamp' => $startTimestamp,
-            'duration' => max(1, $endTimestamp - $startTimestamp), // Diff in microseconds
+            'duration' => max(1, $endTimestamp - $startTimestamp),
             'tags' => [
                 self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
                 self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),

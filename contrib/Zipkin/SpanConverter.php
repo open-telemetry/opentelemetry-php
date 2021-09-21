@@ -32,7 +32,7 @@ class SpanConverter
         // Zipkin tags must be strings, but opentelemetry
         // accepts strings, booleans, numbers, and lists of each.
         if (is_array($value)) {
-            return join(',', array_map([$this, 'sanitiseTagValue'], $value));
+            return implode(',', array_map([$this, 'sanitiseTagValue'], $value));
         }
 
         // Floats will lose precision if their string representation
@@ -52,8 +52,8 @@ class SpanConverter
         $endTimestamp = Clock::nanosToMicro($span->getEndEpochNanos());
 
         $row = [
-            'id' => $span->getContext()->getSpanId(),
-            'traceId' => $span->getContext()->getTraceId(),
+            'id' => $span->getSpanId(),
+            'traceId' => $span->getTraceId(),
             'parentId' => $spanParent->isValid() ? $spanParent->getSpanId() : null,
             'localEndpoint' => [
                 'serviceName' => $this->serviceName,

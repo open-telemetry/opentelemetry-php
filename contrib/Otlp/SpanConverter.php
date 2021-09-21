@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use function max;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\SpanData;
 
@@ -58,7 +57,7 @@ class SpanConverter
             ],
             'name' => $span->getName(),
             'timestamp' => $startTimestamp,
-            'duration' => max(1, $endTimestamp - $startTimestamp),
+            'duration' => $endTimestamp - $startTimestamp,
         ];
 
         foreach ($span->getAttributes() as $k => $v) {

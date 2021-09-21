@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Newrelic;
 
-use function max;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\SpanData;
 
@@ -41,7 +40,7 @@ class SpanConverter
                 'service.name' => $this->serviceName,
                 'parent.id' => $spanParent->isValid() ? $spanParent->getSpanId() : null,
                 'timestamp' => $startTimestamp,
-                'duration.ms' => (float) max(1, $endTimestamp - $startTimestamp),
+                'duration.ms' => (float) $endTimestamp - $startTimestamp,
                 self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
                 self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
             ],

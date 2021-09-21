@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use function ctype_space;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Trace as API;
-use function ctype_space;
 
 class Tracer implements API\Tracer
 {

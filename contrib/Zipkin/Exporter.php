@@ -75,12 +75,7 @@ class Exporter implements Trace\Exporter
         $this->spanConverter = $spanConverter ?? new SpanConverter($name);
     }
 
-    /**
-     * Exports the provided Span data via the Zipkin protocol
-     *
-     * @param iterable<Trace\SpanData> $spans Array of Spans
-     * @return int return code, defined on the Exporter interface
-     */
+    /** @inheritDoc */
     public function export(iterable $spans): int
     {
         if (!$this->running) {

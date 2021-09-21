@@ -23,8 +23,8 @@ final class TracerProvider implements API\TracerProvider
     /** @param list<SpanProcessor>|SpanProcessor $spanProcessors */
     public function __construct(
         $spanProcessors = [],
-        ResourceInfo $resource = null,
         Sampler $sampler = null,
+        ResourceInfo $resource = null,
         IdGenerator $idGenerator = null
     ) {
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
