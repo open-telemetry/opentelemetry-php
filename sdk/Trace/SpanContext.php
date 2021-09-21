@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Trace as API;
-use Throwable;
+use OpenTelemetry\Trace\TraceState;
+use function strlen;
+use function strtolower;
 
 final class SpanContext implements API\SpanContext
 {
     public const INVALID_TRACE = '00000000000000000000000000000000';
     public const VALID_TRACE = '/^[0-9a-f]{32}$/';
     public const TRACE_LENGTH = 32;
-    public const TRACE_LENGTH_BYTES = 16;
     public const INVALID_SPAN = '0000000000000000';
     public const VALID_SPAN = '/^[0-9a-f]{16}$/';
     public const SPAN_LENGTH = 16;
@@ -20,147 +21,40 @@ final class SpanContext implements API\SpanContext
     public const SAMPLED_FLAG = 1;
     public const TRACE_FLAG_LENGTH = 2;
 
-    private static ?self $invalidContext = null;
+    private static ?API\SpanContext $invalidContext = null;
 
+    /** @inheritDoc */
+    public static function createFromRemoteParent(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?TraceState $traceState = null): API\SpanContext
+    {
+        return new self(
+            $traceId,
+            $spanId,
+            $traceFlags,
+            true,
+            $traceState,
+        );
+    }
+
+    /** @inheritDoc */
+    public static function create(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?TraceState $traceState = null): API\SpanContext
+    {
+        return new self(
+            $traceId,
+            $spanId,
+            $traceFlags,
+            false,
+            $traceState,
+        );
+    }
+
+    /** @inheritDoc */
     public static function getInvalid(): API\SpanContext
     {
         if (null === self::$invalidContext) {
-            self::$invalidContext = new self(self::INVALID_TRACE, self::INVALID_SPAN, 0);
+            self::$invalidContext = self::create(self::INVALID_TRACE, self::INVALID_SPAN, 0);
         }
 
         return self::$invalidContext;
-    }
-
-    /**
-     * @see https://www.w3.org/TR/trace-context/#trace-flags
-     * @see https://www.w3.org/TR/trace-context/#sampled-flag
-     */
-    private bool $isSampled;
-
-    private string $traceId;
-    private string $spanId;
-    private ?API\TraceState $traceState;
-    private bool $isValid;
-    private bool $isRemote;
-    private int $traceFlags;
-
-    public function __construct(string $traceId, string $spanId, int $traceFlags, ?API\TraceState $traceState = null)
-    {
-        // TraceId must be exactly 16 bytes (32 chars) and at least one non-zero byte
-        // SpanId must be exactly 8 bytes (16 chars) and at least one non-zero byte
-        if (!self::isValidTraceId($traceId) || !self::isValidSpanId($spanId)) {
-            $traceId = self::INVALID_TRACE;
-            $spanId = self::INVALID_SPAN;
-        }
-
-        $this->traceId = $traceId;
-        $this->spanId = $spanId;
-        $this->traceState = $traceState;
-        $this->isRemote = false;
-        $this->isSampled = ($traceFlags & self::SAMPLED_FLAG) === self::SAMPLED_FLAG;
-        $this->traceFlags = $traceFlags;
-        $this->isValid = self::isValidTraceId($this->traceId) && self::isValidSpanId($this->spanId);
-    }
-
-    /**
-     * Creates a new context with random trace
-     *
-     * @param bool $sampled Default: false
-     * @return SpanContext
-     */
-    public static function generate(bool $sampled = false): SpanContext
-    {
-        return self::fork(self::randomHex(self::TRACE_LENGTH_BYTES), $sampled);
-    }
-
-    /**
-     * Creates a new sampled context with random trace
-     *
-     * @return SpanContext
-     */
-    public static function generateSampled(): SpanContext
-    {
-        return self::generate(true);
-    }
-
-    /**
-     * Creates a new context with random span on the same trace
-     *
-     * @param string $traceId Existing trace
-     * @param bool $sampled Default: false
-     * @param bool $isRemote Default: false
-     * @return SpanContext
-     */
-    public static function fork(string $traceId, bool $sampled = false, bool $isRemote = false): SpanContext
-    {
-        return self::restore($traceId, self::randomHex(self::SPAN_LENGTH_BYTES), $sampled, $isRemote);
-    }
-
-    /**
-     * Generates a context from an already existing trace
-     *
-     * @param string $traceId
-     * @param string $spanId
-     * @param bool $sampled
-     * @param bool $isRemote Default: false
-     * @param API\TraceState|null $traceState
-     * @return SpanContext
-     */
-    public static function restore(string $traceId, string $spanId, bool $sampled = false, bool $isRemote = false, ?API\TraceState $traceState = null): SpanContext
-    {
-        $sampleFlag = $sampled ? 1 : 0;
-        $trace = new self($traceId, $spanId, $sampleFlag, $traceState);
-        $trace->isRemote = $isRemote;
-
-        return $trace;
-    }
-
-    /**
-     * @return string Returns the TraceID
-     */
-    public function getTraceId(): string
-    {
-        return $this->traceId;
-    }
-
-    /**
-     * @return string Returns the SpanID
-     */
-    public function getSpanId(): string
-    {
-        return $this->spanId;
-    }
-
-    /**
-     * @return API\TraceState Returns a Tracestate object containing parsed list-members
-     */
-    public function getTraceState(): ?API\TraceState
-    {
-        return $this->traceState;
-    }
-
-    /**
-     * @return bool Returns a value that indicates if the context needs to be exported
-     */
-    public function isSampled(): bool
-    {
-        return $this->isSampled;
-    }
-
-    /**
-     * @return bool Returns a value that indicates if the context has non-zero trace and span
-     */
-    public function isValid(): bool
-    {
-        return $this->isValid;
-    }
-
-    /**
-     * @return bool Returns a value that indicates if the context was created from a previously existing trace
-     */
-    public function isRemote(): bool
-    {
-        return $this->isRemote;
     }
 
     /**
@@ -189,20 +83,69 @@ final class SpanContext implements API\SpanContext
     }
 
     /**
-     * Generates a random hex string
-     *
-     * In case where there is not enough entropy for random_bytes() the generation will use a simpler method.
-     *
-     * @param int $length of bytes
-     * @return string
+     * @see https://www.w3.org/TR/trace-context/#trace-flags
+     * @see https://www.w3.org/TR/trace-context/#sampled-flag
      */
-    private static function randomHex(int $length): string
-    {
-        try {
-            return bin2hex(random_bytes($length));
-        } catch (Throwable $ex) {
-            return substr(str_shuffle(str_repeat('0123456789abcdef', $length)), 1, $length);
+    private bool $isSampled;
+
+    private string $traceId;
+    private string $spanId;
+    private ?API\TraceState $traceState;
+    private bool $isValid;
+    private bool $isRemote;
+    private int $traceFlags;
+
+    private function __construct(
+        string $traceId,
+        string $spanId,
+        int $traceFlags,
+        bool $isRemote,
+        API\TraceState $traceState = null
+    ) {
+        // TraceId must be exactly 16 bytes (32 chars) and at least one non-zero byte
+        // SpanId must be exactly 8 bytes (16 chars) and at least one non-zero byte
+        if (!self::isValidTraceId($traceId) || !self::isValidSpanId($spanId)) {
+            $traceId = self::INVALID_TRACE;
+            $spanId = self::INVALID_SPAN;
         }
+
+        $this->traceId = $traceId;
+        $this->spanId = $spanId;
+        $this->traceState = $traceState;
+        $this->isRemote = $isRemote;
+        $this->isSampled = ($traceFlags & self::SAMPLED_FLAG) === self::SAMPLED_FLAG;
+        $this->traceFlags = $traceFlags;
+        $this->isValid = self::isValidTraceId($this->traceId) && self::isValidSpanId($this->spanId);
+    }
+
+    public function getTraceId(): string
+    {
+        return $this->traceId;
+    }
+
+    public function getSpanId(): string
+    {
+        return $this->spanId;
+    }
+
+    public function getTraceState(): ?API\TraceState
+    {
+        return $this->traceState;
+    }
+
+    public function isSampled(): bool
+    {
+        return $this->isSampled;
+    }
+
+    public function isValid(): bool
+    {
+        return $this->isValid;
+    }
+
+    public function isRemote(): bool
+    {
+        return $this->isRemote;
     }
 
     public function getTraceFlags(): int

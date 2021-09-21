@@ -4,216 +4,84 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
-use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
-use OpenTelemetry\Tests\Sdk\Unit\Support\HasTraceProvider;
+use OpenTelemetry\Sdk\Trace\TraceState;
+use OpenTelemetry\Trace as API;
 use PHPUnit\Framework\TestCase;
 
 class SpanContextTest extends TestCase
 {
-    use HasTraceProvider;
+    private const FIRST_TRACE_ID = '00000000000000000000000000000061';
+    private const SECOND_TRACE_ID = '00000000000000300000000000000000';
+    private const FIRST_SPAN_ID = '0000000000000061';
+    private const SECOND_SPAN_ID = '3000000000000000';
 
-    /**
-     * @test
-     */
-    public function testDefaultSpansFromContextAreNotSampled()
+    /** @var API\SpanContext */
+    private $first;
+
+    /** @var API\SpanContext */
+    private $second;
+
+    /** @var API\SpanContext */
+    private $remote;
+
+    protected function setUp(): void
     {
-        $span = SpanContext::generate();
-
-        $this->assertFalse($span->isSampled());
+        $this->first = SpanContext::create(self::FIRST_TRACE_ID, self::FIRST_SPAN_ID, API\SpanContext::TRACE_FLAG_DEFAULT, new TraceState('foo=bar'));
+        $this->second = SpanContext::create(self::SECOND_TRACE_ID, self::SECOND_SPAN_ID, API\SpanContext::TRACE_FLAG_SAMPLED, new TraceState('foo=baz'));
+        $this->remote = SpanContext::createFromRemoteParent(self::SECOND_TRACE_ID, self::SECOND_SPAN_ID, API\SpanContext::TRACE_FLAG_SAMPLED, new TraceState());
     }
 
-    /**
-     * @test
-     */
-    public function testSpanContextCanCreateSampledSpans()
+    public function test_isValid(): void
     {
-        $span = SpanContext::generate(true);
+        $this->assertFalse(SpanContext::getInvalid()->isValid());
 
-        $this->assertTrue($span->isSampled());
+        $this->assertFalse(
+            SpanContext::create(
+                self::FIRST_TRACE_ID,
+                SpanContext::INVALID_SPAN,
+            )->isValid()
+        );
 
-        $span = SpanContext::generateSampled();
+        $this->assertFalse(
+            SpanContext::create(
+                SpanContext::INVALID_TRACE,
+                self::SECOND_SPAN_ID
+            )->isValid()
+        );
 
-        $this->assertTrue($span->isSampled());
+        $this->assertTrue($this->first->isValid());
+        $this->assertTrue($this->second->isValid());
     }
 
-    /**
-     * @test
-     */
-    public function testDefaultSpansFromTracerAreSampled()
+    public function test_getTraceId(): void
     {
-        $tracer = $this->getTracer();
-
-        $span = $tracer->startAndActivateSpan('test');
-
-        $this->assertTrue($span->getContext()->isSampled());
+        $this->assertSame(self::FIRST_TRACE_ID, $this->first->getTraceId());
+        $this->assertSame(self::SECOND_TRACE_ID, $this->second->getTraceId());
     }
 
-    /**
-     * @test
-     */
-    public function testSpansFromTracerInheritParentIsSampledStatus()
+    public function test_getSpanId(): void
     {
-        $tracer = $this->getTracer();
-
-        $context = SpanContext::generate(true);
-
-        $activeSpan = $tracer->startSpan('test.span');
-
-        $tracer->setActiveSpan($activeSpan);
-
-        $span = $tracer->startAndActivateSpan('test');
-
-        $this->assertTrue($span->getContext()->isSampled());
+        $this->assertSame(self::FIRST_SPAN_ID, $this->first->getSpanId());
+        $this->assertSame(self::SECOND_SPAN_ID, $this->second->getSpanId());
     }
-    /**
-     * @test
-     */
-    public function testSampledSpansFromTracerDoNotInheritParentIsRemoteStatus()
+
+    public function test_getTraceFlags(): void
     {
-        // When creating children from remote spans, their IsRemote flag MUST be set to false.
-        $tracer = $this->getTracer();
-
-        $context = SpanContext::generate(true);
-
-        $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context, true);
-
-        $this->assertTrue($remoteSpan->isRemote());
-
-        $span = $tracer->startAndActivateSpan('test');
-
-        $this->assertFalse($span->isRemote());
+        $this->assertSame(API\SpanContext::TRACE_FLAG_DEFAULT, $this->first->getTraceFlags());
+        $this->assertSame(API\SpanContext::TRACE_FLAG_SAMPLED, $this->second->getTraceFlags());
     }
-    /**
-     * @test
-     */
-    public function testNotSampledSpansFromTracerDoNotInheritParentIsRemoteStatus()
+
+    public function test_getTraceState(): void
     {
-        // When creating children from remote spans, their IsRemote flag MUST be set to false.
-        $tracer = $this->getTracer();
-
-        $context = SpanContext::generate(false);
-
-        $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context, true);
-
-        $this->assertTrue($remoteSpan->isRemote());
-
-        $span = $tracer->startAndActivateSpan('test');
-
-        $this->assertFalse($span->isRemote());
+        $this->assertEquals(new TraceState('foo=bar'), $this->first->getTraceState());
+        $this->assertEquals(new TraceState('foo=baz'), $this->second->getTraceState());
     }
-    /**
-     * @test
-     */
-    public function testValidSpanId()
+
+    public function test_isRemote(): void
     {
-        $spanId = '53995c3f42cd8ad8';
-
-        $this->assertTrue(SpanContext::isValidSpanId($spanId));
-    }
-    /**
-     * @test
-     */
-    public function testInvalidSpanId()
-    {
-        $spanIds = ['0000000000000000', '539g5c3f42cdpad8', '123fgh', ' '];
-
-        foreach ($spanIds as $spanId) {
-            $this->assertFalse(SpanContext::isValidSpanId($spanId));
-        }
-    }
-    /**
-     * @test
-     */
-    public function testValidTraceId()
-    {
-        $traceId = '5759e988bd862e3fe1be46a994272793';
-
-        $this->assertTrue(SpanContext::isValidTraceId($traceId));
-    }
-    /**
-     * @test
-     */
-    public function testInvalidTraceId()
-    {
-        $traceIds = ['00000000000000000000000000000000', ' ', '123fgh', '5759e988bdhjk62e3fe1be46a994272793'];
-
-        foreach ($traceIds as $traceId) {
-            $this->assertFalse(SpanContext::isValidTraceId($traceId));
-        }
-    }
-    /**
-     * @test
-     */
-    public function testValidTraceFlag()
-    {
-        $traceFlags = ['f0', 'ff', '00', '01'];
-
-        foreach ($traceFlags as $traceFlag) {
-            $this->assertTrue(SpanContext::isValidTraceFlag($traceFlag));
-        }
-    }
-    /**
-     * @test
-     */
-    public function testInvalidTraceFlag()
-    {
-        $traceFlags = ['0000000000000000', ' ', 'gg', 'abc123'];
-
-        foreach ($traceFlags as $traceFlag) {
-            $this->assertFalse(SpanContext::isValidTraceFlag($traceFlag));
-        }
-    }
-    /**
-     * @test
-     */
-    public function testIsRemoteStatus()
-    {
-        /*
-         * Test that when creating a sampled span from remote context, the
-         * `isRemote` flag is set to true.
-         */
-        $tracer = $this->getTracer();
-
-        $context1 = SpanContext::generate(true);
-
-        $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context1, true);
-
-        $this->assertTrue($remoteSpan->isRemote());
-        /*
-         * Test that when creating an unsampled span from remote context, the
-         * `isRemote` flag is set to true.
-         */
-        $tracer = $this->getTracer();
-
-        $context2 = SpanContext::generate(false);
-
-        $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context2, true);
-
-        $this->assertTrue($remoteSpan->isRemote());
-        /*
-         * Test that when creating a sampled span from
-         * a non-remote context, the
-         * `isRemote` flag is set to false.
-         */
-        $tracer = $this->getTracer();
-
-        $context3 = SpanContext::generate(true);
-
-        $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context3);
-
-        $this->assertFalse($remoteSpan->isRemote());
-        /*
-         * Test that when creating an unsampled span from
-         * a non-remote context, the
-         * `isRemote` flag is set to false.
-         */
-        $tracer = $this->getTracer();
-
-        $context2 = SpanContext::generate(false);
-
-        $remoteSpan = $tracer->startAndActivateSpanFromContext('test.span', $context2);
-
-        $this->assertFalse($remoteSpan->isRemote());
+        $this->assertFalse($this->first->isRemote());
+        $this->assertFalse($this->second->isRemote());
+        $this->assertTrue($this->remote->isRemote());
     }
 }

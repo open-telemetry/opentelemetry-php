@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
+use OpenTelemetry\Sdk\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SpanMultiProcessor;
 use OpenTelemetry\Trace as API;
 
@@ -38,7 +39,21 @@ final class TracerSharedState
         $this->idGenerator = $idGenerator;
         $this->resource = $resource;
         $this->sampler = $sampler;
-        $this->spanProcessor = new SpanMultiProcessor($spanProcessors);
+
+        switch (count($spanProcessors)) {
+            case 0:
+                $this->spanProcessor = NoopSpanProcessor::getInstance();
+
+                break;
+            case 1:
+                $this->spanProcessor = $spanProcessors[0];
+
+                break;
+            default:
+                $this->spanProcessor = new SpanMultiProcessor($spanProcessors);
+
+                break;
+        }
     }
 
     public function hasShutdown(): bool
