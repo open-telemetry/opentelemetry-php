@@ -101,9 +101,19 @@ class NoopSpan implements ReadWriteSpan
         return $this->links;
     }
 
+    public function getDroppedLinksCount(): int
+    {
+        return 0;
+    }
+
     public function getEvents(): API\Events
     {
         return $this->events;
+    }
+
+    public function getDroppedEventsCount(): int
+    {
+        return 0;
     }
 
     public function getStatus(): API\SpanStatus

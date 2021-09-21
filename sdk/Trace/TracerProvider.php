@@ -38,12 +38,18 @@ final class TracerProvider implements API\TracerProvider
      */
     private $sampler;
 
-    public function __construct(?ResourceInfo $resource = null, ?Sampler $sampler = null, ?IdGenerator $idGenerator = null)
+    /**
+     * @var SpanLimits $spanLimits
+     */
+    private $spanLimits;
+
+    public function __construct(?ResourceInfo $resource = null, ?Sampler $sampler = null, ?IdGenerator $idGenerator = null, ?SpanLimits $spanLimits = null)
     {
         $this->spanProcessors = new SpanMultiProcessor();
         $this->resource = $resource ?? ResourceInfo::emptyResource();
         $this->sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
         $this->idGenerator = $idGenerator ?? new RandomIdGenerator();
+        $this->spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
 
         register_shutdown_function([$this, 'shutdown']);
     }
@@ -100,5 +106,13 @@ final class TracerProvider implements API\TracerProvider
     public function getIdGenerator(): IdGenerator
     {
         return $this->idGenerator;
+    }
+
+    /**
+     * @internal
+     */
+    public function getSpanLimits(): SpanLimits
+    {
+        return $this->spanLimits;
     }
 }
