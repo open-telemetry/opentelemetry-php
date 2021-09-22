@@ -25,7 +25,13 @@ interface SpanData
     public function getEndEpochNanos(): int;
     public function getInstrumentationLibrary(): InstrumentationLibrary;
     public function getResource(): ResourceInfo;
-    public function getTotalRecordedEvents(): int;
-    public function getTotalRecordedLinks(): int;
-    public function getTotalAttributeCount(): int;
+
+    /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/sdk_exporters/non-otlp.md#dropped-events-count */
+    public function getTotalDroppedEvents(): int;
+
+    /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/sdk_exporters/non-otlp.md#dropped-links-count */
+    public function getTotalDroppedLinks(): int;
+
+    /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/sdk_exporters/non-otlp.md#dropped-attributes-count */
+    public function getTotalDroppedAttributes(): int;
 }

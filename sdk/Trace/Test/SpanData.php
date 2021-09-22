@@ -114,9 +114,9 @@ class SpanData implements SDK\SpanData
         return $this;
     }
 
-    public function getTotalAttributeCount(): int
+    public function getTotalDroppedAttributes(): int
     {
-        return $this->totalAttributeCount;
+        return $this->totalAttributeCount - $this->attributes->count();
     }
 
     public function setTotalAttributeCount(int $totalAttributeCount): self
@@ -126,9 +126,9 @@ class SpanData implements SDK\SpanData
         return $this;
     }
 
-    public function getTotalRecordedEvents(): int
+    public function getTotalDroppedEvents(): int
     {
-        return $this->totalRecordedEvents;
+        return $this->totalRecordedEvents - $this->events->count();
     }
 
     public function setTotalRecordedEvents(int $totalRecordedEvents): self
@@ -138,9 +138,9 @@ class SpanData implements SDK\SpanData
         return $this;
     }
 
-    public function getTotalRecordedLinks(): int
+    public function getTotalDroppedLinks(): int
     {
-        return $this->totalRecordedLinks;
+        return $this->totalRecordedLinks = $this->links->count();
     }
 
     public function setTotalRecordedLinks(int $totalRecordedLinks): self

@@ -7,6 +7,7 @@ namespace OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Exporter;
 use OpenTelemetry\Sdk\Trace\ReadableSpan;
+use OpenTelemetry\Sdk\Trace\ReadWriteSpan;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Trace as API;
 
@@ -30,7 +31,7 @@ class SimpleSpanProcessor implements SpanProcessor
     /**
      * @inheritDoc
      */
-    public function onStart(API\Span $span, ?Context $parentContext = null): void
+    public function onStart(ReadWriteSpan $span, ?Context $parentContext = null): void
     {
     }
 

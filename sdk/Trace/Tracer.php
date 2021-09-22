@@ -10,7 +10,7 @@ use OpenTelemetry\Trace as API;
 
 class Tracer implements API\Tracer
 {
-    public const FALLBACK_SPAN_NAME = '<unspecified span name>';
+    public const FALLBACK_SPAN_NAME = 'empty';
 
     /** @readonly */
     private TracerSharedState $tracerSharedState;

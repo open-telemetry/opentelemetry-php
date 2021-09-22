@@ -16,7 +16,7 @@ class BatchSpanProcessorTest extends TestCase
     /**
      * @test
      */
-    public function shouldExportIfBatchLimitIsReachedButDelayNotReached()
+    public function shouldExportIfBatchLimitIsReachedButDelayNotReached(): void
     {
         $batchSize = 3;
         $queueSize = 5; // queue is larger than batch
@@ -28,16 +28,16 @@ class BatchSpanProcessorTest extends TestCase
             $spans[] = $this->createSampledSpanMock();
         }
 
-        $exporter = self::createMock(Exporter::class);
+        $exporter = $this->createMock(Exporter::class);
         $exporter->expects($this->atLeastOnce())->method('export');
 
         // Export will still happen even if clock will never trigger the batch
-        $clock = self::createMock(Clock::class);
-        $clock->method('now')->will($this->returnValue(($exportDelay - 1)));
+        $clock = $this->createMock(Clock::class);
+        $clock->method('now')->willReturn(($exportDelay - 1));
 
-        /** @var \OpenTelemetry\Sdk\Trace\Span[] $spans */
-        /** @var \OpenTelemetry\Sdk\Trace\Exporter $exporter */
-        /** @var \OpenTelemetry\Sdk\Trace\Clock $clock */
+        /** @var Span[] $spans */
+        /** @var Exporter $exporter */
+        /** @var Clock $clock */
         $processor = new BatchSpanProcessor($exporter, $clock, $queueSize, $exportDelay, $timeout, $batchSize);
 
         foreach ($spans as $span) {
@@ -48,7 +48,7 @@ class BatchSpanProcessorTest extends TestCase
     /**
      * @test
      */
-    public function shouldExportIfDelayLimitReachedButBatchSizeNotReached()
+    public function shouldExportIfDelayLimitReachedButBatchSizeNotReached(): void
     {
         $batchSize = 4;
         $queueSize = 5;
@@ -60,11 +60,11 @@ class BatchSpanProcessorTest extends TestCase
             $spans[] = $this->createSampledSpanMock();
         }
 
-        $exporter = self::createMock(Exporter::class);
-        $exporter->expects($this->exactly(1))->method('export')->with($spans);
+        $exporter = $this->createMock(Exporter::class);
+        $exporter->expects($this->once())->method('export')->with($spans);
 
         // The clock will be "before" the delay until the final call, then the timeout will trigger
-        $clock = self::createMock(Clock::class);
+        $clock = $this->createMock(Clock::class);
 
         $timestampReturns = [];
         for ($i = 0; $i < count($spans) - 1; $i++) {
@@ -77,15 +77,15 @@ class BatchSpanProcessorTest extends TestCase
 
         $clock
             ->method('now')
-            ->willReturnOnConsecutiveCalls(...array_map(function ($e) {
+            ->willReturnOnConsecutiveCalls(...array_map(static function ($e) {
                 return (int) $e;
             }, $timestampReturns));
 
-        /** @var \OpenTelemetry\Sdk\Trace\Exporter $exporter */
-        /** @var \OpenTelemetry\Sdk\Trace\Clock $clock */
+        /** @var Exporter $exporter */
+        /** @var Clock $clock */
         $processor = new BatchSpanProcessor($exporter, $clock, $queueSize, $exportDelay, $timeout, $batchSize);
 
-        /** @var \OpenTelemetry\Sdk\Trace\Span $span */
+        /** @var Span $span */
         foreach ($spans as $span) {
             $processor->onEnd($span);
         }
@@ -94,26 +94,26 @@ class BatchSpanProcessorTest extends TestCase
     /**
      * @test
      */
-    public function shouldNotExportIfNotEnoughTimePassedAndBatchNotFull()
+    public function shouldNotExportIfNotEnoughTimePassedAndBatchNotFull(): void
     {
         $batchSize = 3;
         $queueSize = 5;
         $exportDelay = 2;
         $timeout = 3000;
 
-        $clock = self::createMock(Clock::class);
-        $clock->method('timestamp')->will($this->returnValue(($exportDelay - 1)));
+        $clock = $this->createMock(Clock::class);
+        $clock->method('timestamp')->willReturn(($exportDelay - 1));
 
-        $exporter = self::createMock(Exporter::class);
-        $exporter->expects($this->exactly(0))->method('export');
+        $exporter = $this->createMock(Exporter::class);
+        $exporter->expects($this->never())->method('export');
 
-        /** @var \OpenTelemetry\Sdk\Trace\Exporter $exporter */
-        /** @var \OpenTelemetry\Sdk\Trace\Clock $clock */
+        /** @var Exporter $exporter */
+        /** @var Clock $clock */
         $processor = new BatchSpanProcessor($exporter, $clock, $queueSize, $exportDelay, $timeout, $batchSize);
 
         for ($i = 0; $i < $batchSize - 1; $i++) {
             $mock_span = $this->createSampledSpanMock();
-            /** @var \OpenTelemetry\Sdk\Trace\Span $mock_span */
+            /** @var Span $mock_span */
             $processor->onEnd($mock_span);
         }
     }
@@ -121,10 +121,10 @@ class BatchSpanProcessorTest extends TestCase
     /**
      * @test
      */
-    public function shouldAllowNullExporter()
+    public function shouldAllowNullExporter(): void
     {
-        $proc = new BatchSpanProcessor(null, self::createMock(Clock::class));
-        /** @var \OpenTelemetry\Sdk\Trace\Span $span */
+        $proc = new BatchSpanProcessor(null, $this->createMock(Clock::class));
+        /** @var Span $span */
         $span = $this->createSampledSpanMock();
         $proc->onStart($span);
         $proc->onEnd($span);
@@ -136,55 +136,55 @@ class BatchSpanProcessorTest extends TestCase
     /**
      * @test
      */
-    public function forceFlushExportsAllEndedSpans()
+    public function forceFlushExportsAllEndedSpans(): void
     {
         $batchSize = 3;
         $queueSize = 3;
         $exportDelay = 2;
         $timeout = 3000;
 
-        $clock = self::createMock(Clock::class);
-        $clock->method('timestamp')->will($this->returnValue(($exportDelay - 1)));
+        $clock = $this->createMock(Clock::class);
+        $clock->method('timestamp')->willReturn(($exportDelay - 1));
 
-        $exporter = self::createMock(Exporter::class);
+        $exporter = $this->createMock(Exporter::class);
         $processor = new BatchSpanProcessor($exporter, $clock, $queueSize, $exportDelay, $timeout, $batchSize);
 
         $spans = [];
         for ($i = 0; $i < $batchSize - 1; $i++) {
-            /** @var \OpenTelemetry\Sdk\Trace\Span $span */
+            /** @var Span $span */
             $span = $this->createSampledSpanMock();
             $spans[] = $span;
             $processor->onEnd($span);
         }
 
-        $exporter->expects($this->exactly(1))->method('export')->with($spans);
+        $exporter->expects($this->once())->method('export')->with($spans);
         $processor->forceFlush();
     }
 
     /**
      * @test
      */
-    public function shutdownCallsExporterShutdown()
+    public function shutdownCallsExporterShutdown(): void
     {
-        $exporter = self::createMock(Exporter::class);
-        $proc = new BatchSpanProcessor($exporter, self::createMock(Clock::class));
+        $exporter = $this->createMock(Exporter::class);
+        $proc = new BatchSpanProcessor($exporter, $this->createMock(Clock::class));
 
-        $exporter->expects($this->exactly(1))->method('shutdown');
+        $exporter->expects($this->once())->method('shutdown');
         $proc->shutdown();
     }
 
     /**
      * @test
      */
-    public function noExportAfterShutdown()
+    public function noExportAfterShutdown(): void
     {
-        $exporter = self::createMock(Exporter::class);
-        $exporter->expects($this->exactly(1))->method('shutdown');
+        $exporter = $this->createMock(Exporter::class);
+        $exporter->expects($this->once())->method('shutdown');
 
-        $proc = new BatchSpanProcessor($exporter, self::createMock(Clock::class));
+        $proc = new BatchSpanProcessor($exporter, $this->createMock(Clock::class));
         $proc->shutdown();
 
-        /** @var \OpenTelemetry\Sdk\Trace\Span $span */
+        /** @var Span $span */
         $span = $this->createSampledSpanMock();
         $proc->onStart($span);
         $proc->onEnd($span);
@@ -193,15 +193,15 @@ class BatchSpanProcessorTest extends TestCase
     /**
      * @test
      */
-    public function exportsOnlySampledSpans()
+    public function exportsOnlySampledSpans(): void
     {
         $sampledSpan = $this->createSampledSpanMock();
         $nonSampledSpan = $this->createNonSampledSpanMock();
 
-        $exporter = self::createMock(Exporter::class);
-        $exporter->expects($this->exactly(1))->method('export')->with([$sampledSpan]);
+        $exporter = $this->createMock(Exporter::class);
+        $exporter->expects($this->once())->method('export')->with([$sampledSpan]);
 
-        $batchProcessor = new BatchSpanProcessor($exporter, self::createMock(Clock::class));
+        $batchProcessor = new BatchSpanProcessor($exporter, $this->createMock(Clock::class));
         foreach ([$sampledSpan, $nonSampledSpan] as $span) {
             $batchProcessor->onEnd($span);
         }
@@ -211,15 +211,15 @@ class BatchSpanProcessorTest extends TestCase
 
     private function createSampledSpanMock()
     {
-        $spanContext = self::createConfiguredMock(SpanContext::class, ['isSampled' => true]);
+        $spanContext = $this->createConfiguredMock(SpanContext::class, ['isSampled' => true]);
 
-        return self::createConfiguredMock(Span::class, ['getContext' => $spanContext]);
+        return $this->createConfiguredMock(Span::class, ['getContext' => $spanContext]);
     }
 
     private function createNonSampledSpanMock()
     {
-        $spanContext = self::createConfiguredMock(SpanContext::class, ['isSampled' => false]);
+        $spanContext = $this->createConfiguredMock(SpanContext::class, ['isSampled' => false]);
 
-        return self::createConfiguredMock(Span::class, ['getContext' => $spanContext]);
+        return $this->createConfiguredMock(Span::class, ['getContext' => $spanContext]);
     }
 }

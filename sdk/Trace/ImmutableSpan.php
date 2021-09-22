@@ -107,11 +107,6 @@ final class ImmutableSpan implements SpanData
         return $this->span->getResource();
     }
 
-    public function getTotalRecordedLinks(): int
-    {
-        return $this->span->getTotalRecordedLinks();
-    }
-
     public function getName(): string
     {
         return $this->name;
@@ -132,14 +127,19 @@ final class ImmutableSpan implements SpanData
         return $this->attributes;
     }
 
-    public function getTotalAttributeCount(): int
+    public function getTotalDroppedAttributes(): int
     {
-        return $this->totalAttributeCount;
+        return $this->totalAttributeCount - $this->attributes->count();
     }
 
-    public function getTotalRecordedEvents(): int
+    public function getTotalDroppedEvents(): int
     {
-        return $this->totalRecordedEvents;
+        return $this->totalRecordedEvents - $this->events->count();
+    }
+
+    public function getTotalDroppedLinks(): int
+    {
+        return $this->span->getTotalRecordedLinks() - $this->links->count();
     }
 
     public function getStatus(): StatusData
