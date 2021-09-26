@@ -15,6 +15,11 @@ final class TestClock implements API\Clock
         $this->currentEpochNanos = $currentEpochNanos;
     }
 
+    public function advanceSeconds(int $seconds = 1): void
+    {
+        $this->advance($seconds * API\Clock::NANOS_PER_SECOND);
+    }
+
     public function advance(int $nanoSeconds = 1): void
     {
         $this->currentEpochNanos += $nanoSeconds;

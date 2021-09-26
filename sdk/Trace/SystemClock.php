@@ -6,11 +6,10 @@ namespace OpenTelemetry\Sdk\Trace;
 
 use function hrtime;
 use function microtime;
+use OpenTelemetry\Trace as API;
 
 final class SystemClock extends Clock
 {
-    private const NANOSECONDS_PER_SECOND = 1000000000;
-
     private static ?self $instance = null;
 
     public static function getInstance(): self
@@ -25,7 +24,7 @@ final class SystemClock extends Clock
     /** @inheritDoc */
     public function now(): int
     {
-        return (int) (microtime(true) * self::NANOSECONDS_PER_SECOND);
+        return (int) (microtime(true) * API\Clock::NANOS_PER_SECOND);
     }
 
     /** @inheritDoc */

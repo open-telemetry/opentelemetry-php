@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
+use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
@@ -14,12 +15,14 @@ use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Events;
 use OpenTelemetry\Sdk\Trace\IdGenerator;
+use OpenTelemetry\Sdk\Trace\Link;
 use OpenTelemetry\Sdk\Trace\Links;
 use OpenTelemetry\Sdk\Trace\RandomIdGenerator;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanData;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
+use OpenTelemetry\Sdk\Trace\StatusData;
 use OpenTelemetry\Sdk\Trace\Test\TestClock;
 use OpenTelemetry\Trace as API;
 
@@ -37,6 +40,10 @@ class SpanTest extends MockeryTestCase
     private InstrumentationLibrary $instrumentationLibrary;
     private API\SpanContext $spanContext;
     private API\Clock $testClock;
+
+    private API\Attributes $attributes;
+    private API\Attributes $expectedAttributes;
+    private API\Link $link;
 
     private string $traceId;
     private string $spanId;
@@ -56,6 +63,15 @@ class SpanTest extends MockeryTestCase
 
         $this->spanContext = SpanContext::create($this->traceId, $this->spanId);
         $this->testClock = new TestClock(self::START_EPOCH);
+
+        $this->link = new Link($this->spanContext);
+        $this->attributes = new Attributes([
+            'some_string_key' => 'some_string_value',
+            'float_attribute' => 3.14,
+            'bool_attribute' => false,
+        ]);
+
+        $this->expectedAttributes = clone $this->attributes;
 
         Clock::setTestClock($this->testClock);
     }
@@ -148,7 +164,7 @@ class SpanTest extends MockeryTestCase
             $span->toSpanData(),
             new Attributes(),
             new Events(),
-            new Links(),
+            (new Links())->addLink($this->link),
             self::SPAN_NAME,
             self::START_EPOCH,
             self::START_EPOCH,
@@ -157,7 +173,258 @@ class SpanTest extends MockeryTestCase
         );
     }
 
+    public function test_end_twice(): void
+    {
+        $span = $this->createTestSpan();
+        $this->assertFalse($span->hasEnded());
+        $span->end();
+        $this->assertTrue($span->hasEnded());
+        $span->end();
+        $this->assertTrue($span->hasEnded());
+    }
+
+    public function test_toSpanData_activeSpan(): void
+    {
+        $span = $this->createTestSpan();
+
+        $this->assertFalse($span->hasEnded());
+        $this->spanDoWork($span);
+
+        $this->assertSpanData(
+            $span->toSpanData(),
+            $this->expectedAttributes,
+            (new Events())->addEvent('event2', null, self::START_EPOCH + API\Clock::NANOS_PER_SECOND),
+            (new Links())->addLink($this->link),
+            self::NEW_SPAN_NAME,
+            self::START_EPOCH,
+            0,
+            API\StatusCode::STATUS_UNSET,
+            false
+        );
+
+        $this->assertFalse($span->hasEnded());
+        $this->assertTrue($span->isRecording());
+
+        $span->end();
+
+        $this->assertTrue($span->hasEnded());
+        $this->assertFalse($span->isRecording());
+    }
+
+    public function test_toSpanData_endedSpan(): void
+    {
+        $span = $this->createTestSpan();
+        $this->spanDoWork($span, API\StatusCode::STATUS_ERROR, 'ERR');
+        $span->end();
+
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onEnd')
+            ->once()
+            ->with($span);
+
+        $this->assertSpanData(
+            $span->toSpanData(),
+            $this->expectedAttributes,
+            (new Events())->addEvent('event2', null, self::START_EPOCH + API\Clock::NANOS_PER_SECOND),
+            (new Links())->addLink($this->link),
+            self::NEW_SPAN_NAME,
+            self::START_EPOCH,
+            $this->testClock->now(),
+            API\StatusCode::STATUS_ERROR,
+            true
+        );
+    }
+
+    public function test_toSpanData_rootSpan(): void
+    {
+        $span = $this->createTestRootSpan();
+        $this->spanDoWork($span);
+        $span->end();
+
+        $this->assertFalse($span->getParentContext()->isValid());
+        $this->assertFalse(SpanContext::isValidSpanId($span->toSpanData()->getParentSpanId()));
+    }
+
+    public function test_toSpanData_childSpan(): void
+    {
+        $span = $this->createTestSpan();
+        $this->spanDoWork($span);
+        $span->end();
+
+        $this->assertTrue($span->getParentContext()->isValid());
+        $this->assertSame($this->traceId, $span->getParentContext()->getTraceId());
+        $this->assertSame($this->parentSpanId, $span->getParentContext()->getSpanId());
+        $this->assertSame($this->parentSpanId, $span->toSpanData()->getParentSpanId());
+    }
+
+    public function test_toSpanData_initialAttributes(): void
+    {
+        $span = $this->createTestSpanWithAttributes($this->attributes);
+        $span->setAttribute('another_key', 'another_value');
+        $span->end();
+
+        $spanData = $span->toSpanData();
+        $this->assertSame($this->attributes->count() + 1, $spanData->getAttributes()->count());
+        $this->assertSame(0, $spanData->getTotalDroppedAttributes());
+    }
+
+    public function test_toSpanData_isImmutable(): void
+    {
+        $span = $this->createTestSpanWithAttributes($this->attributes);
+
+        $spanData = $span->toSpanData();
+
+        $span->setAttribute('another_key', 'another_value');
+        $span->updateName('a_new_name');
+        $span->addEvent('new_event');
+        $span->end();
+
+        $this->assertSame($this->attributes->count(), $spanData->getAttributes()->count());
+        $this->assertNull($spanData->getAttributes()->get('another_key'));
+        $this->assertFalse($spanData->hasEnded());
+        $this->assertSame(0, $spanData->getEndEpochNanos());
+        $this->assertSame($spanData->getName(), self::SPAN_NAME);
+        $this->assertEmpty($spanData->getEvents());
+
+        $spanData = $span->toSpanData();
+
+        $this->assertSame($this->attributes->count() + 1, $spanData->getAttributes()->count());
+        $this->assertSame('another_value', $spanData->getAttributes()->get('another_key'));
+        $this->assertTrue($spanData->hasEnded());
+        $this->assertGreaterThan(0, $spanData->getEndEpochNanos());
+        $this->assertSame($spanData->getName(), 'a_new_name');
+        $this->assertCount(1, $spanData->getEvents());
+    }
+
+    public function test_toSpanData_status(): void
+    {
+        $span = $this->createTestSpan(API\SpanKind::KIND_CONSUMER);
+        $this->testClock->advanceSeconds();
+        $this->assertSame(StatusData::unset(), $span->toSpanData()->getStatus());
+        $span->setStatus(API\StatusCode::STATUS_ERROR, 'ERR');
+        $this->assertEquals(StatusData::create(API\StatusCode::STATUS_ERROR, 'ERR'), $span->toSpanData()->getStatus());
+        $span->end();
+        $this->assertEquals(StatusData::create(API\StatusCode::STATUS_ERROR, 'ERR'), $span->toSpanData()->getStatus());
+    }
+
+    public function test_toSpanData_kind(): void
+    {
+        $span = $this->createTestSpan(API\SpanKind::KIND_SERVER);
+        $this->assertSame(API\SpanKind::KIND_SERVER, $span->toSpanData()->getKind());
+        $span->end();
+    }
+
+    public function test_getKind(): void
+    {
+        $span = $this->createTestSpan(API\SpanKind::KIND_SERVER);
+        $this->assertSame(API\SpanKind::KIND_SERVER, $span->getKind());
+        $span->end();
+    }
+
+    public function test_getAttribute(): void
+    {
+        $span = $this->createTestSpanWithAttributes($this->attributes);
+        $this->assertSame(3.14, $span->getAttribute('float_attribute'));
+        $span->end();
+    }
+
+    public function test_getInstrumentationLibraryInfo(): void
+    {
+        $span = $this->createTestSpanWithAttributes($this->attributes);
+        $this->assertSame($this->instrumentationLibrary, $span->getInstrumentationLibrary());
+        $span->end();
+    }
+
+    public function test_updateSpanName(): void
+    {
+        $span = $this->createTestRootSpan();
+        $this->assertSame(self::SPAN_NAME, $span->getName());
+        $span->updateName(self::NEW_SPAN_NAME);
+        $this->assertSame(self::NEW_SPAN_NAME, $span->getName());
+        $span->end();
+    }
+
+    public function test_getDuration_activeSpan(): void
+    {
+        $span = $this->createTestSpan();
+        $this->testClock->advanceSeconds();
+        $elapsedNanos1 = $this->testClock->now() - self::START_EPOCH;
+        $this->assertSame($elapsedNanos1, $span->getDuration());
+        $this->testClock->advanceSeconds();
+        $elapsedNanos2 = $this->testClock->now() - self::START_EPOCH;
+        $this->assertSame($elapsedNanos2, $span->getDuration());
+        $span->end();
+    }
+
+    public function test_getDuration_endedSpan(): void
+    {
+        $span = $this->createTestSpan();
+        $this->testClock->advanceSeconds();
+        $span->end();
+
+        $elapsedNanos = $this->testClock->now() - self::START_EPOCH;
+        $this->assertSame($elapsedNanos, $span->getDuration());
+        $this->testClock->advanceSeconds();
+        $this->assertSame($elapsedNanos, $span->getDuration());
+    }
+
+    public function test_setAttributes(): void
+    {
+        $span = $this->createTestSpanWithAttributes($this->attributes);
+        $span->setAttributes(new Attributes(['foo' => 'bar']));
+        $this->assertCount($this->expectedAttributes->count() + 1, $span->toSpanData()->getAttributes());
+    }
+
+    public function test_setAttributes_overridesAttribute(): void
+    {
+        $span = $this->createTestSpanWithAttributes($this->attributes);
+        $this->assertFalse($span->toSpanData()->getAttributes()->get('bool_attribute'));
+        $span->setAttributes(new Attributes(['bool_attribute' => true]));
+        $this->assertTrue($span->toSpanData()->getAttributes()->get('bool_attribute'));
+    }
+
+    public function test_setAttributes_empty(): void
+    {
+        $span = $this->createTestSpanWithAttributes($this->attributes);
+        $span->setAttributes(new Attributes());
+        $this->assertEquals($this->expectedAttributes, $span->toSpanData()->getAttributes());
+    }
+
+    public function test_recordException(): void
+    {
+        $exception = new Exception('ERR');
+        $span = $this->createTestRootSpan();
+
+        $this->testClock->advance(1000);
+        $timestamp = $this->testClock->now();
+
+        $span->recordException($exception);
+
+        $this->assertCount(1, $events = $span->toSpanData()->getEvents());
+        $event = $events->getIterator()->current();
+        $this->assertSame('exception', $event->getName());
+        $this->assertSame($timestamp, $event->getTimestamp());
+        $this->assertEquals(
+            new Attributes([
+                'exception.type' => 'Exception',
+                'exception.message' => 'ERR',
+                'exception.stacktrace' => Span::formatStackTrace($exception),
+            ]),
+            $event->getAttributes()
+        );
+    }
+
     // endregion SDK
+
+    private function createTestRootSpan(): Span
+    {
+        return $this
+            ->createTestSpan(
+                API\SpanKind::KIND_INTERNAL,
+                SpanContext::INVALID_SPAN
+            );
+    }
 
     /**
      * @param API\SpanKind::KIND_* $kind
@@ -171,7 +438,7 @@ class SpanTest extends MockeryTestCase
         API\Links $links = null
     ): Span {
         $parentSpanId = $parentSpanId ?? $this->parentSpanId;
-        $links = $links ?? new Links();
+        $links = $links ?? (new Links())->addLink($this->link);
 
         $span = Span::startSpan(
             self::SPAN_NAME,
@@ -191,18 +458,34 @@ class SpanTest extends MockeryTestCase
         $this
             ->spanProcessor
             ->shouldHaveReceived('onStart')
+            ->once()
             ->with($span, Context::getRoot());
 
         return $span;
+    }
+
+    public function createTestSpanWithAttributes(API\Attributes $attributes): Span
+    {
+        return $this
+            ->createTestSpan(
+                API\SpanKind::KIND_INTERNAL,
+                null,
+                clone $attributes
+            );
     }
 
     /** @param API\StatusCode::STATUS_* $status */
     private function spanDoWork(Span $span, ?string $status = null, ?string $description = null): void
     {
         $span->setAttribute('some_string_key', 'some_string_value');
-        $this->testClock->advance($this->secondsToNanoseconds(1));
+
+        foreach ($this->attributes as $attribute) {
+            $span->setAttribute($attribute->getKey(), $attribute->getValue());
+        }
+
+        $this->testClock->advanceSeconds();
         $span->addEvent('event2');
-        $this->testClock->advance($this->secondsToNanoseconds(1));
+        $this->testClock->advanceSeconds();
         $span->updateName(self::NEW_SPAN_NAME);
         if ($status) {
             $span->setStatus($status, $description);
@@ -235,10 +518,5 @@ class SpanTest extends MockeryTestCase
         $this->assertSame($status, $spanData->getStatus()->getCode());
         $this->assertSame($hasEnded, $spanData->hasEnded());
         $this->assertEquals($attributes, $spanData->getAttributes());
-    }
-
-    private function secondsToNanoseconds(int $seconds): int
-    {
-        return $seconds * 1000000000;
     }
 }
