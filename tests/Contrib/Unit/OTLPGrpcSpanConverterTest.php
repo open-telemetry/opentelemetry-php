@@ -130,7 +130,7 @@ class OTLPGrpcSpanConverterTest extends TestCase
 
         $sdk = (new SpanData())
             ->setContext(
-                new SpanContext(
+                SpanContext::create(
                     bin2hex('0000000000000001'), // traceId
                     bin2hex('00000001'), // spanId
                     0, // traceFlags

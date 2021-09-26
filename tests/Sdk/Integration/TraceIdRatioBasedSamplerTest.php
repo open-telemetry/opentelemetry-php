@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class TraceIdRatioBasedSamplerTest extends TestCase
 {
-    public function testInvalidProbabilityTraceIdRatioBasedSampler()
+    public function testInvalidProbabilityTraceIdRatioBasedSampler(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $sampler = new TraceIdRatioBasedSampler(-0.5);
@@ -24,7 +24,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $sampler = new TraceIdRatioBasedSampler(1.5);
     }
 
-    public function testNeverTraceIdRatioBasedSamplerDecision()
+    public function testNeverTraceIdRatioBasedSamplerDecision(): void
     {
         $sampler = new TraceIdRatioBasedSampler(0.0);
         $decision = $sampler->shouldSample(
@@ -36,7 +36,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::DROP, $decision->getDecision());
     }
 
-    public function testAlwaysTraceIdRatioBasedSamplerDecision()
+    public function testAlwaysTraceIdRatioBasedSamplerDecision(): void
     {
         $sampler = new TraceIdRatioBasedSampler(1.0);
         $decision = $sampler->shouldSample(
@@ -48,7 +48,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLE, $decision->getDecision());
     }
 
-    public function testFailingTraceIdRatioBasedSamplerDecision()
+    public function testFailingTraceIdRatioBasedSamplerDecision(): void
     {
         $sampler = new TraceIdRatioBasedSampler(0.99);
         $decision = $sampler->shouldSample(
@@ -60,7 +60,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::DROP, $decision->getDecision());
     }
 
-    public function testPassingTraceIdRatioBasedSamplerDecision()
+    public function testPassingTraceIdRatioBasedSamplerDecision(): void
     {
         $sampler = new TraceIdRatioBasedSampler(0.01);
         $decision = $sampler->shouldSample(
@@ -72,7 +72,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLE, $decision->getDecision());
     }
 
-    public function testIgnoreParentSampledFlag()
+    public function testIgnoreParentSampledFlag(): void
     {
         $parentTraceState = $this->createMock(TraceState::class);
         $sampler = new TraceIdRatioBasedSampler(0.0);
@@ -87,7 +87,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals($parentTraceState, $samplingResult->getTraceState());
     }
 
-    public function testTraceIdRatioBasedSamplerDescription()
+    public function testTraceIdRatioBasedSamplerDescription(): void
     {
         $sampler = new TraceIdRatioBasedSampler(0.0001);
         $this->assertEquals('TraceIdRatioBasedSampler{0.000100}', $sampler->getDescription());
@@ -95,16 +95,24 @@ class TraceIdRatioBasedSamplerTest extends TestCase
 
     private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceState $traceState = null): Context
     {
-        return (new Context())->withContextValue(
-            new NonRecordingSpan(
-                SpanContext::restore(
-                    '4bf92f3577b34da6a3ce929d0e0e4736',
-                    '00f067aa0ba902b7',
-                    $sampled,
-                    $isRemote,
-                    $traceState
-                )
-            )
-        );
+        $traceFlag = $sampled ? API\SpanContext::TRACE_FLAG_SAMPLED : API\SpanContext::TRACE_FLAG_DEFAULT;
+
+        if ($isRemote) {
+            $spanContext = SpanContext::createFromRemoteParent(
+                '4bf92f3577b34da6a3ce929d0e0e4736',
+                '00f067aa0ba902b7',
+                $traceFlag,
+                $traceState
+            );
+        } else {
+            $spanContext = SpanContext::create(
+                '4bf92f3577b34da6a3ce929d0e0e4736',
+                '00f067aa0ba902b7',
+                $traceFlag,
+                $traceState
+            );
+        }
+
+        return (new Context())->withContextValue(new NonRecordingSpan($spanContext));
     }
 }

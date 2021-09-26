@@ -10,10 +10,11 @@ use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Sdk\Trace\TraceState;
-use OpenTelemetry\Trace\SpanContext;
+use OpenTelemetry\Trace as API;
 use PHPUnit\Framework\TestCase;
 
 class TracerTest extends TestCase
@@ -32,7 +33,7 @@ class TracerTest extends TestCase
         $span = $tracer->spanBuilder('test.span')->startSpan();
 
         $this->assertInstanceOf(NonRecordingSpan::class, $span);
-        $this->assertNotEquals(SpanContext::TRACE_FLAG_SAMPLED, $span->getContext()->getTraceFlags());
+        $this->assertNotEquals(API\SpanContext::TRACE_FLAG_SAMPLED, $span->getContext()->getTraceFlags());
     }
 
     /**
@@ -44,12 +45,10 @@ class TracerTest extends TestCase
         $parentContext = (new Context())
             ->withContextValue(
                 new NonRecordingSpan(
-                    \OpenTelemetry\Sdk\Trace\SpanContext::restore(
+                    SpanContext::create(
                         '4bf92f3577b34da6a3ce929d0e0e4736',
                         '00f067aa0ba902b7',
-                        true,
-                        false,
-                        $parentTraceState
+                        API\SpanContext::TRACE_FLAG_SAMPLED
                     )
                 )
             );
