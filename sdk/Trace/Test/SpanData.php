@@ -198,7 +198,7 @@ class SpanData implements SDK\SpanData
         return $this;
     }
 
-    public function isHasEnded(): bool
+    public function hasEnded(): bool
     {
         return $this->hasEnded;
     }

@@ -8,6 +8,11 @@ use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
 
+/**
+ * Represents an immutable snapshot of a {@see API\Span}.
+ *
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/sdk.md#additional-span-interfaces
+ */
 interface SpanData
 {
     public function getName(): string;

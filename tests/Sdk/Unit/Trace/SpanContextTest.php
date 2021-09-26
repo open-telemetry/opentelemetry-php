@@ -16,14 +16,9 @@ class SpanContextTest extends TestCase
     private const FIRST_SPAN_ID = '0000000000000061';
     private const SECOND_SPAN_ID = '3000000000000000';
 
-    /** @var API\SpanContext */
-    private $first;
-
-    /** @var API\SpanContext */
-    private $second;
-
-    /** @var API\SpanContext */
-    private $remote;
+    private API\SpanContext $first;
+    private API\SpanContext $second;
+    private API\SpanContext $remote;
 
     protected function setUp(): void
     {
@@ -31,6 +26,8 @@ class SpanContextTest extends TestCase
         $this->second = SpanContext::create(self::SECOND_TRACE_ID, self::SECOND_SPAN_ID, API\SpanContext::TRACE_FLAG_SAMPLED, new TraceState('foo=baz'));
         $this->remote = SpanContext::createFromRemoteParent(self::SECOND_TRACE_ID, self::SECOND_SPAN_ID, API\SpanContext::TRACE_FLAG_SAMPLED, new TraceState());
     }
+
+    // region API
 
     public function test_isValid(): void
     {
@@ -84,4 +81,6 @@ class SpanContextTest extends TestCase
         $this->assertFalse($this->second->isRemote());
         $this->assertTrue($this->remote->isRemote());
     }
+
+    // endregion API
 }

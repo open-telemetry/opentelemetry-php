@@ -8,7 +8,6 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\ReadableSpan;
 use OpenTelemetry\Sdk\Trace\ReadWriteSpan;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
-use OpenTelemetry\Trace as API;
 
 /**
  * Class SpanMultiProcessor is a SpanProcessor that forwards all events to an

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Trace as API;
 
 /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/sdk.md#span-processor */
 interface SpanProcessor

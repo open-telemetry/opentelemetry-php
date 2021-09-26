@@ -85,7 +85,7 @@ class BatchSpanProcessor implements SpanProcessor
         if (null !== $this->exporter) {
             $this->exporter->export($this->queue);
             $this->queue = [];
-            $this->lastExportTimestamp = $this->clock->nanoTime();
+            $this->lastExportTimestamp = $this->clock->now();
         }
     }
 
@@ -101,7 +101,7 @@ class BatchSpanProcessor implements SpanProcessor
 
     protected function enoughTimeHasPassed(): bool
     {
-        $now = $this->clock->nanoTime();
+        $now = $this->clock->now();
 
         // if lastExport never occurred let it start from now on
         if (null === $this->lastExportTimestamp) {

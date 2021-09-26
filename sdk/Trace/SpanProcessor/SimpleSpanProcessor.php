@@ -9,7 +9,6 @@ use OpenTelemetry\Sdk\Trace\Exporter;
 use OpenTelemetry\Sdk\Trace\ReadableSpan;
 use OpenTelemetry\Sdk\Trace\ReadWriteSpan;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
-use OpenTelemetry\Trace as API;
 
 class SimpleSpanProcessor implements SpanProcessor
 {

@@ -9,9 +9,20 @@ use OpenTelemetry\Trace as API;
 
 abstract class Clock implements API\Clock
 {
+    private static ?API\Clock $testClock;
+
     public static function getDefault(): API\Clock
     {
-        return SystemClock::getInstance();
+        return self::$testClock ?? SystemClock::getInstance();
+    }
+
+    /**
+     * @internal
+     * @psalm-internal OpenTelemetry
+     */
+    public static function setTestClock(?API\Clock $clock = null): void
+    {
+        self::$testClock = $clock;
     }
 
     /** @psalm-pure */

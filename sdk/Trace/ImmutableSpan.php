@@ -147,7 +147,7 @@ final class ImmutableSpan implements SpanData
         return $this->status;
     }
 
-    public function isHasEnded(): bool
+    public function hasEnded(): bool
     {
         return $this->hasEnded;
     }

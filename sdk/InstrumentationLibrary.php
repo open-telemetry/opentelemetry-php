@@ -11,6 +11,10 @@ class InstrumentationLibrary
 {
     private static ?self $empty = null;
 
+    /**
+     * @internal
+     * @psalm-internal OpenTelemetry
+     */
     public static function getEmpty(): InstrumentationLibrary
     {
         if (null === self::$empty) {
