@@ -12,7 +12,6 @@ use OpenTelemetry\Sdk\Trace\ReadableSpan;
 use OpenTelemetry\Sdk\Trace\ReadWriteSpan;
 use OpenTelemetry\Sdk\Trace\SpanData;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
-use OpenTelemetry\Trace as API;
 
 class BatchSpanProcessor implements SpanProcessor
 {
@@ -21,7 +20,7 @@ class BatchSpanProcessor implements SpanProcessor
     private int $scheduledDelayMillis;
     private int $exporterTimeoutMillis;
     private int $maxExportBatchSize;
-    private int $lastExportTimestamp;
+    private ?int $lastExportTimestamp = null;
     private Clock $clock;
     private bool $running = true;
 
@@ -86,7 +85,7 @@ class BatchSpanProcessor implements SpanProcessor
         if (null !== $this->exporter) {
             $this->exporter->export($this->queue);
             $this->queue = [];
-            $this->lastExportTimestamp = $this->clock->timestamp();
+            $this->lastExportTimestamp = $this->clock->nanoTime();
         }
     }
 
@@ -102,7 +101,7 @@ class BatchSpanProcessor implements SpanProcessor
 
     protected function enoughTimeHasPassed(): bool
     {
-        $now = (int) ($this->clock->now() / 1e6);
+        $now = $this->clock->nanoTime();
 
         // if lastExport never occurred let it start from now on
         if (null === $this->lastExportTimestamp) {

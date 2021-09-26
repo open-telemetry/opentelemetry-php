@@ -34,12 +34,12 @@ $exporter = new JaegerExporter(
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     echo 'Starting AlwaysOnJaegerExample';
     $tracer = (new TracerProvider())
-        ->addSpanProcessor(new BatchSpanProcessor($exporter, Clock::get()))
+        ->addSpanProcessor(new BatchSpanProcessor($exporter, Clock::getDefault()))
         ->getTracer('io.opentelemetry.contrib.php');
 
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
-        $timestamp = Clock::get()->timestamp();
+        $timestamp = Clock::getDefault()->timestamp();
         $span = $tracer->startAndActivateSpan('session.generate.span' . microtime(true));
 
         $spanParent = $span->getParentContext();

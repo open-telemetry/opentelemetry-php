@@ -424,7 +424,7 @@ Caused by: Exception: Thrown from fail2()
             'space' => 'guard.session',
             'id' => 67235,
         ]);
-        $timestamp = Clock::get()->timestamp();
+        $timestamp = Clock::getDefault()->timestamp();
         $span->addEvent('select', $eventAttributes, $timestamp);
 
         $events = $span->getEvents();
@@ -468,7 +468,7 @@ Caused by: Exception: Thrown from fail2()
         $this->assertArrayHasKey('exception.message', iterator_to_array($event->getAttributes()));
         $this->assertArrayHasKey('exception.stacktrace', iterator_to_array($event->getAttributes()));
 
-        $timestamp = Clock::get()->timestamp();
+        $timestamp = Clock::getDefault()->timestamp();
         $span->addEvent('update', null, $timestamp)
                     ->setAttribute('space', 'guard.session')
                     ->setAttribute('id', 67235)

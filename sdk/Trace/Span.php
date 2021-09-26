@@ -44,11 +44,11 @@ class Span implements ReadWriteSpan
         API\Links $links,
         int $totalRecordedLinks,
         int $userStartEpochNanos
-    ): API\Span {
+    ): self {
         if (0 !== $userStartEpochNanos) {
             $startEpochNanos = $userStartEpochNanos;
         } else {
-            $startEpochNanos = Clock::get()->timestamp();
+            $startEpochNanos = Clock::getDefault()->now();
         }
 
         $span = new self(
@@ -301,7 +301,7 @@ class Span implements ReadWriteSpan
     /** @inheritDoc */
     public function recordException(Throwable $exception, API\Attributes $attributes = null): ReadWriteSpan
     {
-        $timestamp = Clock::get()->timestamp();
+        $timestamp = Clock::getDefault()->now();
         $eventAttributes = new Attributes([
                 'exception.type' => get_class($exception),
                 'exception.message' => $exception->getMessage(),
@@ -347,7 +347,7 @@ class Span implements ReadWriteSpan
             return;
         }
 
-        $this->endEpochNanos = $endEpochNanos ?? Clock::get()->timestamp();
+        $this->endEpochNanos = $endEpochNanos ?? Clock::getDefault()->now();
         $this->hasEnded = true;
 
         $this->spanProcessor->onEnd($this);
@@ -393,7 +393,7 @@ class Span implements ReadWriteSpan
     /** @inheritDoc */
     public function getDuration(): int
     {
-        return ($this->hasEnded ? $this->endEpochNanos : Clock::get()->timestamp()) - $this->startEpochNanos;
+        return ($this->hasEnded ? $this->endEpochNanos : Clock::getDefault()->now()) - $this->startEpochNanos;
     }
 
     /** @inheritDoc */

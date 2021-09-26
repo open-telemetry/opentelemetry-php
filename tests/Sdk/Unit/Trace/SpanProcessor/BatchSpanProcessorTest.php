@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace\SpanProcessor;
 
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Exporter;
 use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\SpanData;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\Trace\SpanContext;
-use PHPUnit\Framework\TestCase;
 
-class BatchSpanProcessorTest extends TestCase
+class BatchSpanProcessorTest extends MockeryTestCase
 {
     /**
      * @test
@@ -60,8 +62,19 @@ class BatchSpanProcessorTest extends TestCase
             $spans[] = $this->createSampledSpanMock();
         }
 
-        $exporter = $this->createMock(Exporter::class);
-        $exporter->expects($this->once())->method('export')->with($spans);
+        $exporter = Mockery::mock(Exporter::class);
+        $exporter
+            ->expects('export')
+            ->with(
+                Mockery::on(
+                    function (array $spans) {
+                        $this->assertCount(3, $spans);
+                        $this->assertInstanceOf(SpanData::class, $spans[0]);
+
+                        return true;
+                    }
+                )
+            );
 
         // The clock will be "before" the delay until the final call, then the timeout will trigger
         $clock = $this->createMock(Clock::class);
@@ -101,8 +114,9 @@ class BatchSpanProcessorTest extends TestCase
         $exportDelay = 2;
         $timeout = 3000;
 
+        // TODO: Use TestClock here.
         $clock = $this->createMock(Clock::class);
-        $clock->method('timestamp')->willReturn(($exportDelay - 1));
+        $clock->method('now')->willReturn(($exportDelay - 1));
 
         $exporter = $this->createMock(Exporter::class);
         $exporter->expects($this->never())->method('export');
@@ -143,21 +157,32 @@ class BatchSpanProcessorTest extends TestCase
         $exportDelay = 2;
         $timeout = 3000;
 
+        // TODO: Use TestClock here.
         $clock = $this->createMock(Clock::class);
-        $clock->method('timestamp')->willReturn(($exportDelay - 1));
+        $clock->method('now')->willReturn(($exportDelay - 1));
 
-        $exporter = $this->createMock(Exporter::class);
+        $exporter = Mockery::mock(Exporter::class);
+        $exporter
+            ->expects('export')
+            ->with(
+                Mockery::on(
+                    function (array $spans) {
+                        $this->assertCount(2, $spans);
+                        $this->assertInstanceOf(SpanData::class, $spans[0]);
+
+                        return true;
+                    }
+                )
+            );
+
         $processor = new BatchSpanProcessor($exporter, $clock, $queueSize, $exportDelay, $timeout, $batchSize);
 
-        $spans = [];
         for ($i = 0; $i < $batchSize - 1; $i++) {
             /** @var Span $span */
             $span = $this->createSampledSpanMock();
-            $spans[] = $span;
             $processor->onEnd($span);
         }
 
-        $exporter->expects($this->once())->method('export')->with($spans);
         $processor->forceFlush();
     }
 
@@ -198,8 +223,19 @@ class BatchSpanProcessorTest extends TestCase
         $sampledSpan = $this->createSampledSpanMock();
         $nonSampledSpan = $this->createNonSampledSpanMock();
 
-        $exporter = $this->createMock(Exporter::class);
-        $exporter->expects($this->once())->method('export')->with([$sampledSpan]);
+        $exporter = Mockery::mock(Exporter::class);
+        $exporter
+            ->expects('export')
+            ->with(
+                Mockery::on(
+                    function (array $spans) use ($sampledSpan) {
+                        $this->assertCount(1, $spans);
+                        $this->assertEquals($sampledSpan->toSpanData(), $spans[0]);
+
+                        return true;
+                    }
+                )
+            );
 
         $batchProcessor = new BatchSpanProcessor($exporter, $this->createMock(Clock::class));
         foreach ([$sampledSpan, $nonSampledSpan] as $span) {

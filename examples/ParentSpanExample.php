@@ -17,7 +17,7 @@ use OpenTelemetry\Sdk\Trace\TracerProvider;
 $serviceName = 'ParentSpanExample';
 $resource = ResourceInfo::defaultResource();
 $sampler = new AlwaysOnSampler();
-$tracerProvider = new TracerProvider($resource, null, $sampler);
+$tracerProvider = new TracerProvider($resource, $sampler);
 
 // zipkin exporter
 $zipkinExporter = new ZipkinExporter(

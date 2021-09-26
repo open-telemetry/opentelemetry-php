@@ -36,7 +36,7 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
 
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
-        $timestamp = Clock::get()->timestamp();
+        $timestamp = Clock::getDefault()->timestamp();
         $span = $tracer->startAndActivateSpan('session.generate.span.' . microtime(true));
 
         $spanParent = $span->getParentContext();

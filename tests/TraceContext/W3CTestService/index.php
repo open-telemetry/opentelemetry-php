@@ -32,7 +32,7 @@ $exporter = new JaegerExporter(
 
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     $tracer = (new TracerProvider())
-        ->addSpanProcessor(new BatchSpanProcessor($exporter, Clock::get()))
+        ->addSpanProcessor(new BatchSpanProcessor($exporter, Clock::getDefault()))
         ->getTracer('io.opentelemetry.contrib.php');
 
     $request = Request::createFromGlobals();

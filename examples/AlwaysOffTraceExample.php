@@ -28,7 +28,7 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     $span->setAttribute('remote_ip', '1.2.3.4');
     $span->setAttribute('country', 'USA');
 
-    $timestamp = Clock::get()->timestamp();
+    $timestamp = Clock::getDefault()->timestamp();
     $span->addEvent('found_login', new Attributes([
         'id' => 12345,
         'username' => 'otuser',
