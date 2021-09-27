@@ -11,7 +11,6 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter;
-use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\Test\SpanData;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -202,10 +201,10 @@ class OTLPHttpExporterTest extends TestCase
     public function failsIfNotRunning()
     {
         $exporter = new Exporter(new Client(), new HttpFactory(), new HttpFactory());
-        $span = $this->createMock(Span::class);
+        $span = $this->createMock(SpanData::class);
         $exporter->shutdown();
 
-        $this->assertEquals(\OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
+        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 
     /**

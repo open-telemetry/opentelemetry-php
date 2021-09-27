@@ -25,7 +25,7 @@ interface ReadableSpan
     /**
      * Returns an immutable representation of this instance.
      */
-    public function toSpanData();
+    public function toSpanData(): SpanData;
 
     /**
      * Returns the duration of the {@see API\Span} in nanoseconds.

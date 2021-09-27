@@ -58,7 +58,7 @@ interface Span extends ImplicitContextKeyed
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-attributes
      *
      * @param non-empty-string $key
-     * @param bool|int|float|string|array $value Note: the array MUST be homogeneous, i.e. it MUST NOT contain values of different types.
+     * @param bool|int|float|string|array|null $value Note: the array MUST be homogeneous, i.e. it MUST NOT contain values of different types.
      */
     public function setAttribute(string $key, $value): Span;
 
@@ -87,7 +87,7 @@ interface Span extends ImplicitContextKeyed
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-status
      *
-     * @param StatusCode::STATUS_* $code
+     * @psalm-param StatusCode::STATUS_* $code
      */
     public function setStatus(string $code, string $description = null): Span;
 

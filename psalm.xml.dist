@@ -12,9 +12,11 @@
             <directory name="vendor"/>
             <directory name="proto"/>
             <directory name="tests/TraceContext/W3CTestService"/>
+            <directory name="examples"/> <!--TODO: Remove this once examples are updated-->
         </ignoreFiles>
     </projectFiles>
     <plugins>
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
+        <pluginClass class="Psalm\MockeryPlugin\Plugin"/>
     </plugins>
 </psalm>

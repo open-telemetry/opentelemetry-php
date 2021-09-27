@@ -12,7 +12,7 @@ final class StatusData
     private static ?self $unset = null;
     private static ?self $error = null;
 
-    /** @param API\StatusCode::STATUS_* $code */
+    /** @psalm-param API\StatusCode::STATUS_* $code */
     public static function create(string $code, ?string $description = null): self
     {
         if (empty($description)) {
@@ -31,7 +31,7 @@ final class StatusData
             $description = '';
         }
 
-        return new self($code, $description);
+        return new self($code, $description); /** @phan-suppress-current-line PhanTypeMismatchArgumentNullable */
     }
 
     public static function ok(): self
@@ -64,7 +64,7 @@ final class StatusData
     private string $code;
     private string $description;
 
-    /** @param API\StatusCode::STATUS_* $code */
+    /** @psalm-param API\StatusCode::STATUS_* $code */
     public function __construct(
         string $code,
         string $description

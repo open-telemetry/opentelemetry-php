@@ -1,5 +1,6 @@
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-mockery/extension.neon
 
 parameters:
     tmpDir: var/cache/phpstan
@@ -11,6 +12,7 @@ parameters:
         - vendor
         - proto
         - tests/TraceContext/W3CTestService
+        - examples # TODO: Remove this once examples are updated
     ignoreErrors:
         # PHPStan false positive
         - message: '#Call to an undefined static method OpenTelemetry\\Sdk\\Metrics\\Providers\\GlobalMeterProvider\:\:getMeter\(\)\.#'

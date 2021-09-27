@@ -8,7 +8,7 @@ use function in_array;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Trace as API;
-use OpenTelemetry\Trace\SpanKind;
+use OpenTelemetry\Trace\SpanKind; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
 
 final class SpanBuilder implements API\SpanBuilder
 {
@@ -28,8 +28,10 @@ final class SpanBuilder implements API\SpanBuilder
 
     private ?Context $parentContext = null; // Null means use current context.
 
-    /** @var API\SpanKind::KIND_* */
-    private $spanKind = API\SpanKind::KIND_INTERNAL;
+    /**
+     * @psalm-var API\SpanKind::KIND_*
+     */
+    private int $spanKind = API\SpanKind::KIND_INTERNAL;
     private ?API\Attributes $attributes = null;
     private ?API\Links $links = null;
     private int $totalNumberOfLinksAdded = 0;
@@ -111,7 +113,7 @@ final class SpanBuilder implements API\SpanBuilder
     /**
      * @inheritDoc
      *
-     * @param SpanKind::KIND_* $spanKind
+     * @psalm-param SpanKind::KIND_* $spanKind
      */
     public function setSpanKind(int $spanKind): API\SpanBuilder
     {

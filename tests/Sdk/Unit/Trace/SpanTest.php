@@ -39,7 +39,7 @@ class SpanTest extends MockeryTestCase
     private ResourceInfo $resource;
     private InstrumentationLibrary $instrumentationLibrary;
     private API\SpanContext $spanContext;
-    private API\Clock $testClock;
+    private TestClock $testClock;
 
     private API\Attributes $attributes;
     private API\Attributes $expectedAttributes;
@@ -329,6 +329,14 @@ class SpanTest extends MockeryTestCase
         $span->end();
     }
 
+    public function test_setAttribute_emptyKey(): void
+    {
+        $span = $this->createTestSpan();
+        $this->assertEmpty($span->toSpanData()->getAttributes());
+        $span->setAttribute('  ', 123);
+        $this->assertEmpty($span->toSpanData()->getAttributes());
+    }
+
     public function test_getInstrumentationLibraryInfo(): void
     {
         $span = $this->createTestSpanWithAttributes($this->attributes);
@@ -427,7 +435,7 @@ class SpanTest extends MockeryTestCase
     }
 
     /**
-     * @param API\SpanKind::KIND_* $kind
+     * @psalm-param API\SpanKind::KIND_* $kind
      *
      * @todo: Allow passing in span limits
      */
@@ -474,12 +482,13 @@ class SpanTest extends MockeryTestCase
             );
     }
 
-    /** @param API\StatusCode::STATUS_* $status */
+    /** @psalm-param API\StatusCode::STATUS_* $status */
     private function spanDoWork(Span $span, ?string $status = null, ?string $description = null): void
     {
         $span->setAttribute('some_string_key', 'some_string_value');
 
         foreach ($this->attributes as $attribute) {
+            // @phpstan-ignore-next-line
             $span->setAttribute($attribute->getKey(), $attribute->getValue());
         }
 
@@ -492,7 +501,7 @@ class SpanTest extends MockeryTestCase
         }
     }
 
-    /** @param API\StatusCode::STATUS_* $status */
+    /** @psalm-param API\StatusCode::STATUS_* $status */
     private function assertSpanData(
         SpanData $spanData,
         API\Attributes $attributes,

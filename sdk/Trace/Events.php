@@ -20,6 +20,7 @@ class Events implements API\Events
         return $this;
     }
 
+    /** @psalm-mutation-free */
     public function count(): int
     {
         return \count($this->events);

@@ -128,9 +128,9 @@ class ZipkinExporterTest extends TestCase
     public function failsIfNotRunning()
     {
         $exporter = new Exporter('test.jaeger', 'scheme://host:123/path', new Client(), new HttpFactory(), new HttpFactory());
-        $span = $this->createMock(\OpenTelemetry\Sdk\Trace\SpanData::class);
+        $span = $this->createMock(SpanData::class);
         $exporter->shutdown();
 
-        $this->assertEquals($exporter->export([$span]), \OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE);
+        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 }

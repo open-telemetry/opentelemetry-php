@@ -9,7 +9,6 @@ use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\Newrelic\Exporter;
-use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\Test\SpanData;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -127,9 +126,9 @@ class NewrelicExporterTest extends TestCase
     public function failsIfNotRunning()
     {
         $exporter = new Exporter('test.newrelic', 'scheme://host/path', '', new Client(), new HttpFactory(), new HttpFactory());
-        $span = $this->createMock(Span::class);
+        $span = $this->createMock(SpanData::class);
         $exporter->shutdown();
 
-        $this->assertEquals($exporter->export([$span]), \OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE);
+        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 }

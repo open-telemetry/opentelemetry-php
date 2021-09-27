@@ -13,7 +13,7 @@ class StatusDataTest extends TestCase
     /**
      * @dataProvider getStatuses
      *
-     * @param StatusCode::STATUS_* $code
+     * @psalm-param StatusCode::STATUS_* $code
      */
     public function test_statuses(string $code): void
     {
@@ -38,7 +38,7 @@ class StatusDataTest extends TestCase
     /**
      * @dataProvider getStatuses
      *
-     * @param StatusCode::STATUS_* $code
+     * @psalm-param StatusCode::STATUS_* $code
      */
     public function test_statuses_description(string $code): void
     {

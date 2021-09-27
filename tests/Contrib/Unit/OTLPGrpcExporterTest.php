@@ -7,7 +7,6 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
 
-use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\Test\SpanData;
 use PHPUnit\Framework\TestCase;
 
@@ -65,10 +64,10 @@ class OTLPGrpcExporterTest extends TestCase
     public function failsIfNotRunning()
     {
         $exporter = new Exporter('test.otlp');
-        $span = $this->createMock(Span::class);
+        $span = $this->createMock(SpanData::class);
         $exporter->shutdown();
 
-        $this->assertEquals(\OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
+        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 
     public function testHeadersShouldRefuseArray()

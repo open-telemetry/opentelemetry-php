@@ -8,6 +8,7 @@ use function array_key_exists;
 use function array_shift;
 use function basename;
 use function count;
+use function ctype_space;
 use function get_class;
 use function in_array;
 use OpenTelemetry\Context\Context;
@@ -26,10 +27,10 @@ class Span implements ReadWriteSpan
      * End users should use a {@see Tracer} in order to create spans.
      *
      * @param non-empty-string $name
-     * @param API\SpanKind::KIND_* $kind
+     * @psalm-param API\SpanKind::KIND_* $kind
      *
      * @internal
-     * @psalm-internal OpenTelemetry\Sdk
+     * @psalm-internal OpenTelemetry
      */
     public static function startSpan(
         string $name,
@@ -258,7 +259,7 @@ class Span implements ReadWriteSpan
     /** @inheritDoc */
     public function setAttribute(string $key, $value): ReadWriteSpan
     {
-        if (null === $value || $this->hasEnded) {
+        if (null === $value || $this->hasEnded || ctype_space($key)) {
             return $this;
         }
 
@@ -274,11 +275,12 @@ class Span implements ReadWriteSpan
     /** @inheritDoc */
     public function setAttributes(API\Attributes $attributes): ReadWriteSpan
     {
-        if (0 === $attributes->count()) {
+        if (0 === count($attributes)) {
             return $this;
         }
 
         foreach ($attributes as $attribute) {
+            // @phpstan-ignore-next-line
             $this->setAttribute($attribute->getKey(), $attribute->getValue());
         }
 

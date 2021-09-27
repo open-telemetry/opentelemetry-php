@@ -43,6 +43,7 @@ class Attributes implements API\Attributes
         return $this->attributes[$name] ?? null;
     }
 
+    /** @psalm-mutation-free */
     public function count(): int
     {
         return \count($this->attributes);

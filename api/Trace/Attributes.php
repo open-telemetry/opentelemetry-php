@@ -10,6 +10,5 @@ interface Attributes extends \IteratorAggregate, \Countable
     public function getAttribute(string $name): ?Attribute;
     public function get(string $name);
 
-    public function count(): int;
     public function getIterator(): AttributesIterator;
 }
