@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Newrelic;
 
-use OpenTelemetry\Sdk\Trace\ReadableSpan;
+use OpenTelemetry\Sdk\Trace\Clock;
+use OpenTelemetry\Sdk\Trace\SpanData;
 
+/**
+ * @see https://docs.newrelic.com/docs/distributed-tracing/trace-api/report-new-relic-format-traces-trace-api/#new-relic-guidelines
+ */
 class SpanConverter
 {
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
@@ -21,20 +25,24 @@ class SpanConverter
         $this->serviceName = $serviceName;
     }
 
-    public function convert(ReadableSpan $span)
+    public function convert(SpanData $span)
     {
-        $spanParent = $span->getParent();
+        $spanParent = $span->getParentContext();
+
+        $startTimestamp = Clock::nanosToMilli($span->getStartEpochNanos());
+        $endTimestamp = Clock::nanosToMilli($span->getEndEpochNanos());
+
         $row = [
-            'id' => $span->getContext()->getSpanId(),
-            'trace.id' => $span->getContext()->getTraceId(),
+            'id' => $span->getSpanId(),
+            'trace.id' => $span->getTraceId(),
             'attributes' => [
-                'name' => $span->getSpanName(),
+                'name' => $span->getName(),
                 'service.name' => $this->serviceName,
-                'parent.id' => $spanParent ? $spanParent->getSpanId() : null,
-                'timestamp' => ($span->getStartEpochTimestamp()  / 1e6), // RealtimeClock in milliseconds
-                'duration.ms' => (($span->getEnd() - $span->getStart())  / 1e6), // Diff in milliseconds
-                self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCanonicalStatusCode(),
-                self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getStatusDescription(),
+                'parent.id' => $spanParent->isValid() ? $spanParent->getSpanId() : null,
+                'timestamp' => $startTimestamp,
+                'duration.ms' => (float) $endTimestamp - $startTimestamp,
+                self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
+                self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
             ],
         ];
 

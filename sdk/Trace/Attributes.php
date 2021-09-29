@@ -14,8 +14,7 @@ class Attributes implements API\Attributes
     /** @var AttributeLimits */
     private $attributeLimits;
 
-    /** @var int Counts for attributes dropped due to collection limits */
-    private $droppedAttributeCount = 0;
+    private $totalAddedAttributes = 0;
 
     /** @return Attributes Returns a new instance of Attributes with the limits applied */
     public static function withLimits(API\Attributes $attributes, AttributeLimits $attributeLimits): Attributes
@@ -35,17 +34,19 @@ class Attributes implements API\Attributes
 
     public function setAttribute(string $name, $value): API\Attributes
     {
+        $this->totalAddedAttributes++;
+
         // unset the attribute when null value is passed
         if (null === $value) {
             unset($this->attributes[$name]);
+
+            $this->totalAddedAttributes--;
 
             return $this;
         }
 
         // drop attribute when limit is reached
-        if (!isset($this->attributes[$name]) && $this->count() >= $this->attributeLimits->getAttributeCountLimit()) {
-            $this->droppedAttributeCount++;
-
+        if (!isset($this->attributes[$name]) && count($this) >= $this->attributeLimits->getAttributeCountLimit()) {
             return $this;
         }
 
@@ -68,11 +69,21 @@ class Attributes implements API\Attributes
         return $this;
     }
 
+    public function get(string $name)
+    {
+        if ($attribute = $this->getAttribute($name)) {
+            return $attribute->getValue();
+        }
+
+        return null;
+    }
+
     public function getAttribute(string $name): ?Attribute
     {
         return $this->attributes[$name] ?? null;
     }
 
+    /** @psalm-mutation-free */
     public function count(): int
     {
         return \count($this->attributes);
@@ -114,8 +125,13 @@ class Attributes implements API\Attributes
         };
     }
 
+    public function getTotalAddedValues(): int
+    {
+        return $this->totalAddedAttributes;
+    }
+
     public function getDroppedAttributesCount(): int
     {
-        return $this->droppedAttributeCount;
+        return $this->totalAddedAttributes - count($this);
     }
 }

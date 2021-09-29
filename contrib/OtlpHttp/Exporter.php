@@ -120,16 +120,11 @@ class Exporter implements Trace\Exporter
         }
     }
 
-    /**
-     * Exports the provided Span data via the OTLP protocol
-     *
-     * @param iterable<Trace\ReadableSpan> $spans Array of Spans
-     * @return int return code, defined on the Exporter interface
-     */
+    /** @inheritDoc */
     public function export(iterable $spans): int
     {
         if (!$this->running) {
-            return Exporter::FAILED_NOT_RETRYABLE;
+            return Trace\Exporter::FAILED_NOT_RETRYABLE;
         }
 
         if (empty($spans)) {

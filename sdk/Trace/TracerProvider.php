@@ -4,66 +4,61 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use function is_array;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\Sdk\Trace\Sampler\ParentBased;
-use OpenTelemetry\Sdk\Trace\SpanProcessor\SpanMultiProcessor;
 use OpenTelemetry\Trace as API;
+use function register_shutdown_function;
 
 final class TracerProvider implements API\TracerProvider
 {
-    /**
-     * @var Tracer[]
-     */
-    protected $tracers;
+    /** @var array<string, API\Tracer> */
+    private $tracers;
 
-    /**
-     * @var IdGenerator
-     */
-    protected $idGenerator;
+    /** @readonly */
+    private TracerSharedState $tracerSharedState;
 
-    /**
-     * @var SpanMultiProcessor
-     */
-    protected $spanProcessors;
+    /** @param list<SpanProcessor>|SpanProcessor|null $spanProcessors */
+    public function __construct(
+        $spanProcessors = [],
+        Sampler $sampler = null,
+        ResourceInfo $resource = null,
+        SpanLimits $spanLimits = null,
+        IdGenerator $idGenerator = null
+    ) {
+        if (null === $spanProcessors) {
+            $spanProcessors = [];
+        }
 
-    /**
-     * @var ResourceInfo
-     */
-    private $resource;
+        $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
+        $resource = $resource ?? ResourceInfo::defaultResource();
+        $sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
+        $idGenerator = $idGenerator ?? new RandomIdGenerator();
+        $spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
 
-    /**
-     * @var Sampler
-     */
-    private $sampler;
-
-    /**
-     * @var SpanLimits $spanLimits
-     */
-    private $spanLimits;
-
-    public function __construct(?ResourceInfo $resource = null, ?Sampler $sampler = null, ?IdGenerator $idGenerator = null, ?SpanLimits $spanLimits = null)
-    {
-        $this->spanProcessors = new SpanMultiProcessor();
-        $this->resource = $resource ?? ResourceInfo::emptyResource();
-        $this->sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
-        $this->idGenerator = $idGenerator ?? new RandomIdGenerator();
-        $this->spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
+        $this->tracerSharedState = new TracerSharedState(
+            $idGenerator,
+            $resource,
+            $spanLimits,
+            $sampler,
+            $spanProcessors
+        );
 
         register_shutdown_function([$this, 'shutdown']);
     }
 
     public function shutdown(): void
     {
-        $this->spanProcessors->shutdown();
+        if ($this->tracerSharedState->hasShutdown()) {
+            return;
+        }
+
+        $this->tracerSharedState->shutdown();
     }
 
-    /**
-     * @param string $name
-     * @param string|null $version
-     * @return Tracer
-     */
+    /** @inheritDoc */
     public function getTracer(string $name, ?string $version = null): API\Tracer
     {
         $key = sprintf('%s@%s', $name, ($version ?? 'unknown'));
@@ -75,44 +70,13 @@ final class TracerProvider implements API\TracerProvider
         $instrumentationLibrary = new InstrumentationLibrary($name, $version);
 
         return $this->tracers[$key] = new Tracer(
-            $this,
+            $this->tracerSharedState,
             $instrumentationLibrary,
-            ResourceInfo::merge($this->getResource(), ResourceInfo::defaultResource())
         );
-    }
-
-    public function addSpanProcessor(SpanProcessor $processor): self
-    {
-        $this->spanProcessors->addSpanProcessor($processor);
-
-        return $this;
-    }
-
-    public function getSpanProcessor(): SpanMultiProcessor
-    {
-        return $this->spanProcessors;
     }
 
     public function getSampler(): Sampler
     {
-        return $this->sampler;
-    }
-
-    public function getResource(): ResourceInfo
-    {
-        return clone $this->resource;
-    }
-
-    public function getIdGenerator(): IdGenerator
-    {
-        return $this->idGenerator;
-    }
-
-    /**
-     * @internal
-     */
-    public function getSpanLimits(): SpanLimits
-    {
-        return $this->spanLimits;
+        return $this->tracerSharedState->getSampler();
     }
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Sdk\Integration;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Sdk\Trace\NoopSpan;
+use OpenTelemetry\Sdk\Trace\NonRecordingSpan;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\Sampler\ParentBased;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
@@ -15,10 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class ParentBasedTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function testParentBasedRootSpan()
+    public function testParentBasedRootSpan(): void
     {
         $rootSampler = $this->createMockSamplerInvokedOnce(SamplingResult::RECORD_AND_SAMPLE);
 
@@ -41,7 +38,7 @@ class ParentBasedTest extends TestCase
         ?Sampler $localParentSampled = null,
         ?Sampler $localParentNotSampled = null,
         $expectedDdecision
-    ) {
+    ): void {
         $rootSampler = $this->createMockSamplerNeverInvoked();
 
         $sampler = new ParentBased($rootSampler, $remoteParentSampled, $remoteParentNotSampled, $localParentSampled, $localParentNotSampled);
@@ -76,34 +73,39 @@ class ParentBasedTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     */
-    public function testParentBasedDescription()
+    public function testParentBasedDescription(): void
     {
-        $rootSampler = self::createMock(Sampler::class);
+        $rootSampler = $this->createMock(Sampler::class);
         $sampler = new ParentBased($rootSampler);
         $this->assertEquals('ParentBased', $sampler->getDescription());
     }
 
     private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceState $traceState = null): Context
     {
-        return (new Context())->withContextValue(
-            new NoopSpan(
-                SpanContext::restore(
-                    '4bf92f3577b34da6a3ce929d0e0e4736',
-                    '00f067aa0ba902b7',
-                    $sampled,
-                    $isRemote,
-                    $traceState
-                )
-            )
-        );
+        $traceFlag = $sampled ? API\SpanContext::TRACE_FLAG_SAMPLED : API\SpanContext::TRACE_FLAG_DEFAULT;
+
+        if ($isRemote) {
+            $spanContext = SpanContext::createFromRemoteParent(
+                '4bf92f3577b34da6a3ce929d0e0e4736',
+                '00f067aa0ba902b7',
+                $traceFlag,
+                $traceState
+            );
+        } else {
+            $spanContext = SpanContext::create(
+                '4bf92f3577b34da6a3ce929d0e0e4736',
+                '00f067aa0ba902b7',
+                $traceFlag,
+                $traceState
+            );
+        }
+
+        return (new Context())->withContextValue(new NonRecordingSpan($spanContext));
     }
 
     private function createMockSamplerNeverInvoked(): Sampler
     {
-        $sampler = self::createMock(Sampler::class);
+        $sampler = $this->createMock(Sampler::class);
         $sampler->expects($this->never())->method('shouldSample');
 
         return $sampler;
@@ -111,7 +113,7 @@ class ParentBasedTest extends TestCase
 
     private function createMockSamplerInvokedOnce(int $resultDecision): Sampler
     {
-        $sampler = self::createMock(Sampler::class);
+        $sampler = $this->createMock(Sampler::class);
         $sampler->expects($this->once())->method('shouldSample')
             ->willReturn(new SamplingResult($resultDecision));
 

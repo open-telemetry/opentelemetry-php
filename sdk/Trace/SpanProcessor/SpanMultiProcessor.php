@@ -6,8 +6,8 @@ namespace OpenTelemetry\Sdk\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\ReadableSpan;
+use OpenTelemetry\Sdk\Trace\ReadWriteSpan;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
-use OpenTelemetry\Trace as API;
 
 /**
  * Class SpanMultiProcessor is a SpanProcessor that forwards all events to an
@@ -15,10 +15,17 @@ use OpenTelemetry\Trace as API;
  */
 final class SpanMultiProcessor implements SpanProcessor
 {
-    /**
-     * @var SpanProcessor[]
-     */
+    /** @var list<SpanProcessor> */
     private $processors = [];
+
+    /** @param list<SpanProcessor> $spanProcessors */
+    public function __construct(
+        array $spanProcessors
+    ) {
+        foreach ($spanProcessors as $processor) {
+            $this->addSpanProcessor($processor);
+        }
+    }
 
     public function addSpanProcessor(SpanProcessor $processor)
     {
@@ -33,7 +40,7 @@ final class SpanMultiProcessor implements SpanProcessor
         return $this->processors;
     }
 
-    public function onStart(API\Span $span, ?Context $parentContext = null): void
+    public function onStart(ReadWriteSpan $span, ?Context $parentContext = null): void
     {
         foreach ($this->processors as $processor) {
             $processor->onStart($span, $parentContext);

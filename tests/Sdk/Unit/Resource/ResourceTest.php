@@ -12,18 +12,13 @@ use PHPUnit\Framework\TestCase;
 
 class ResourceTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function testEmptyResource()
+    public function testEmptyResource(): void
     {
         $resource = ResourceInfo::emptyResource();
         $this->assertEmpty($resource->getAttributes());
     }
-    /**
-     * @test
-     */
-    public function testGetAttributes()
+
+    public function testGetAttributes(): void
     {
         $attributes = new Attributes();
         $attributes->setAttribute('name', 'test');
@@ -43,11 +38,10 @@ class ResourceTest extends TestCase
         $attributes->setAttribute(ResourceConstants::TELEMETRY_SDK_VERSION, 'dev');
 
         $this->assertEquals($attributes, $resource->getAttributes());
-        $this->assertEquals('opentelemetry', $sdkname->getValue());
-        $this->assertEquals('php', $sdklanguage->getValue());
-        $this->assertEquals('dev', $sdkversion->getValue());
-        $this->assertEquals($attributes, $resource->getAttributes());
-        $this->assertEquals('test', $name->getValue());
+        $this->assertSame('opentelemetry', $sdkname->getValue());
+        $this->assertSame('php', $sdklanguage->getValue());
+        $this->assertSame('dev', $sdkversion->getValue());
+        $this->assertSame('test', $name->getValue());
     }
 
     /**

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\ZipkinToNewrelic;
 
-use OpenTelemetry\Sdk\Trace\ReadableSpan;
+use function max;
+use OpenTelemetry\Sdk\Trace\Clock;
+use OpenTelemetry\Sdk\Trace\SpanData;
 
 class SpanConverter
 {
@@ -30,7 +32,7 @@ class SpanConverter
         // Zipkin tags must be strings, but opentelemetry
         // accepts strings, booleans, numbers, and lists of each.
         if (is_array($value)) {
-            return join(',', array_map([$this, 'sanitiseTagValue'], $value));
+            return implode(',', array_map([$this, 'sanitiseTagValue'], $value));
         }
 
         // Floats will lose precision if their string representation
@@ -42,22 +44,26 @@ class SpanConverter
         return (string) $value;
     }
 
-    public function convert(ReadableSpan $span)
+    public function convert(SpanData $span)
     {
-        $spanParent = $span->getParent();
+        $spanParent = $span->getParentContext();
+
+        $startTimestamp = Clock::nanosToMicro($span->getStartEpochNanos());
+        $endTimestamp = Clock::nanosToMicro($span->getEndEpochNanos());
+
         $row = [
-            'id' => $span->getContext()->getSpanId(),
-            'traceId' => $span->getContext()->getTraceId(),
-            'parentId' => $spanParent ? $spanParent->getSpanId() : null,
+            'id' => $span->getSpanId(),
+            'traceId' => $span->getTraceId(),
+            'parentId' => $spanParent->isValid() ? $spanParent->getSpanId() : null,
             'localEndpoint' => [
                 'serviceName' => $this->serviceName,
             ],
-            'name' => $span->getSpanName(),
-            'timestamp' => (int) ($span->getStartEpochTimestamp() / 1e3), // RealtimeClock in microseconds
-            'duration' => (int) (($span->getEnd() - $span->getStart()) / 1e3), // Diff in microseconds
+            'name' => $span->getName(),
+            'timestamp' => $startTimestamp,
+            'duration' => max(1, $endTimestamp - $startTimestamp),
             'tags' => [
-                self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCanonicalStatusCode(),
-                self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getStatusDescription(),
+                self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
+                self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
             ],
         ];
 
@@ -70,7 +76,7 @@ class SpanConverter
                 $row['annotations'] = [];
             }
             $row['annotations'][] = [
-                'timestamp' => (int) ($event->getTimestamp() / 1e3), // RealtimeClock in microseconds
+                'timestamp' => Clock::nanosToMicro($event->getTimestamp()),
                 'value' => $event->getName(),
             ];
         }

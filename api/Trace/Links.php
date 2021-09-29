@@ -6,7 +6,6 @@ namespace OpenTelemetry\Trace;
 
 interface Links extends \IteratorAggregate, \Countable
 {
-    public function count(): int;
     public function getIterator(): LinksIterator;
 
     /**

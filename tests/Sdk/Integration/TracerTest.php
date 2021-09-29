@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Sdk\Integration\Trace;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Sdk\Trace\NoopSpan;
+use OpenTelemetry\Sdk\Trace\NonRecordingSpan;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Sdk\Trace\TraceState;
-use OpenTelemetry\Trace\SpanContext;
+use OpenTelemetry\Trace as API;
 use PHPUnit\Framework\TestCase;
 
 class TracerTest extends TestCase
@@ -24,16 +25,15 @@ class TracerTest extends TestCase
     public function noopSpanShouldBeStartedWhenSamplingResultIsDrop(): void
     {
         $alwaysOffSampler = new AlwaysOffSampler();
-        $tracerProvider = new TracerProvider(null, $alwaysOffSampler);
         $processor = $this->createMock(SpanProcessor::class);
-        $tracerProvider->addSpanProcessor($processor);
+        $tracerProvider = new TracerProvider($processor, $alwaysOffSampler);
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
 
         $processor->expects($this->never())->method('onStart');
-        $span = $tracer->startSpan('test.span');
+        $span = $tracer->spanBuilder('test.span')->startSpan();
 
-        $this->assertInstanceOf(NoopSpan::class, $span);
-        $this->assertNotEquals(SpanContext::TRACE_FLAG_SAMPLED, $span->getContext()->getTraceFlags());
+        $this->assertInstanceOf(NonRecordingSpan::class, $span);
+        $this->assertNotEquals(API\SpanContext::TRACE_FLAG_SAMPLED, $span->getContext()->getTraceFlags());
     }
 
     /**
@@ -44,13 +44,11 @@ class TracerTest extends TestCase
         $parentTraceState = new TraceState('orig-key=orig_value');
         $parentContext = (new Context())
             ->withContextValue(
-                new NoopSpan(
-                    \OpenTelemetry\Sdk\Trace\SpanContext::restore(
+                new NonRecordingSpan(
+                    SpanContext::create(
                         '4bf92f3577b34da6a3ce929d0e0e4736',
                         '00f067aa0ba902b7',
-                        true,
-                        false,
-                        $parentTraceState
+                        API\SpanContext::TRACE_FLAG_SAMPLED
                     )
                 )
             );
@@ -65,9 +63,9 @@ class TracerTest extends TestCase
                 $newTraceState
             ));
 
-        $tracerProvider = new TracerProvider(null, $sampler);
+        $tracerProvider = new TracerProvider([], $sampler);
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
-        $span = $tracer->startSpan('test.span', $parentContext);
+        $span = $tracer->spanBuilder('test.span')->setParent($parentContext)->startSpan();
 
         $this->assertNotEquals($parentTraceState, $span->getContext()->getTraceState());
         $this->assertEquals($newTraceState, $span->getContext()->getTraceState());
@@ -81,7 +79,7 @@ class TracerTest extends TestCase
         $tracerProvider = new TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest', 'dev');
         /** @var Span $span */
-        $span = $tracer->startSpan('test.span');
+        $span = $tracer->spanBuilder('test.span')->startSpan();
         $spanInstrumentationLibrary = $span->getInstrumentationLibrary();
 
         $this->assertEquals('OpenTelemetry.TracerTest', $spanInstrumentationLibrary->getName());

@@ -30,10 +30,10 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
 
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
-        $timestamp = Clock::get()->timestamp();
+        $timestamp = Clock::getDefault()->timestamp();
         $span = $tracer->startAndActivateSpan('session.generate.span.' . microtime(true));
 
-        $spanParent = $span->getParent();
+        $spanParent = $span->getParentContext();
         echo sprintf(
             PHP_EOL . 'Exporting Trace: %s, Parent: %s, Span: %s',
             $span->getContext()->getTraceId(),
@@ -44,13 +44,13 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
         $span->setAttribute('remote_ip', '1.2.3.4')
             ->setAttribute('country', 'USA');
 
-        $span->addEvent('found_login' . $i, $timestamp, new Attributes([
+        $span->addEvent('found_login' . $i, new Attributes([
             'id' => $i,
             'username' => 'otuser' . $i,
-        ]));
-        $span->addEvent('generated_session', $timestamp, new Attributes([
+        ]), $timestamp);
+        $span->addEvent('generated_session', new Attributes([
             'id' => md5((string) microtime(true)),
-        ]));
+        ]), $timestamp);
 
         $span->end();
     }

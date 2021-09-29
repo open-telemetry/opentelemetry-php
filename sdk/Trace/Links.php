@@ -27,6 +27,7 @@ class Links implements API\Links
         return $this;
     }
 
+    /** @psalm-mutation-free */
     public function count(): int
     {
         return count($this->links);

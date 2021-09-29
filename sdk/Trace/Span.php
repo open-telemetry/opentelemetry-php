@@ -4,61 +4,77 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use function array_key_exists;
+use function array_shift;
+use function basename;
+use function count;
+use function ctype_space;
+use function get_class;
+use function in_array;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Scope;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
+use function sprintf;
+use function str_replace;
 use Throwable;
 
 class Span implements ReadWriteSpan
 {
-    /** @var NoopSpan|null */
-    private static $invalidSpan;
-
-    private $name;
-    private $spanContext;
-    private $parentSpanContext;
-    private $spanKind;
-
-    private $startEpochTimestamp;
-    private $endEpochTimestamp;
-    private $start;
-    private $end;
-
-    private $spanStatus;
-
     /**
-     * @var ResourceInfo
+     * This method _MUST_ not be used directly.
+     * End users should use a {@see Tracer} in order to create spans.
+     *
+     * @param non-empty-string $name
+     * @psalm-param API\SpanKind::KIND_* $kind
+     *
+     * @internal
+     * @psalm-internal OpenTelemetry
      */
-    private $resource; // An immutable representation of the entity producing telemetry.
+    public static function startSpan(
+        string $name,
+        API\SpanContext $context,
+        InstrumentationLibrary $instrumentationLibrary,
+        int $kind,
+        API\Span $parentSpan,
+        Context $parentContext,
+        SpanLimits $spanLimits,
+        SpanProcessor $spanProcessor,
+        ResourceInfo $resource,
+        ?API\Attributes $attributes,
+        API\Links $links,
+        int $totalRecordedLinks,
+        int $userStartEpochNanos
+    ): self {
+        if (0 !== $userStartEpochNanos) {
+            $startEpochNanos = $userStartEpochNanos;
+        } else {
+            $startEpochNanos = Clock::getDefault()->now();
+        }
 
-    /**
-     * @var InstrumentationLibrary
-     */
-    private $instrumentationLibrary;
+        $span = new self(
+            $name,
+            $context,
+            $instrumentationLibrary,
+            $kind,
+            $parentSpan->getContext(),
+            $spanLimits,
+            $spanProcessor,
+            $resource,
+            $attributes,
+            $links,
+            $totalRecordedLinks,
+            $startEpochNanos
+        );
 
-    private $attributes;
-    private $events;
-    private $links;
+        // Call onStart here to ensure the span is fully initialized.
+        $spanProcessor->onStart($span, $parentContext);
 
-    private $ended = false;
+        return $span;
+    }
 
-    /** @var ?SpanProcessor */
-    private $spanProcessor;
-
-    /** @var SpanLimits */
-    private $spanLimits;
-
-    /** @var int Counts for events dropped due to collection limits */
-    private $droppedEventCount = 0;
-
-    /** @var int Counts for links dropped due to collection limits */
-    private $droppedLinkCount = 0;
-
-    /**
-     * @todo Implement this in the API layer
-     */
+    /** @inheritDoc */
     public static function fromContext(Context $context): API\Span
     {
         if ($span = $context->get(SpanContextKey::instance())) {
@@ -68,353 +84,16 @@ class Span implements ReadWriteSpan
         return self::getInvalid();
     }
 
-    /**
-     * @todo Implement this in the API layer
-     */
+    /** @inheritDoc */
     public static function getCurrent(): API\Span
     {
         return self::fromContext(Context::getCurrent());
     }
 
-    public static function getInvalid(): NoopSpan
-    {
-        if (null === self::$invalidSpan) {
-            self::$invalidSpan = new NoopSpan();
-        }
-
-        return self::$invalidSpan;
-    }
-
-    /**
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#wrapping-a-spancontext-in-a-span
-     * @todo Implement this in the API layer
-     */
-    public static function wrap(API\SpanContext $context): NoopSpan
-    {
-        return new NoopSpan($context);
-    }
-
-    public function __construct(
-        string $name,
-        API\SpanContext $spanContext,
-        ?API\SpanContext $parentSpanContext = null,
-        ?ResourceInfo $resource = null,
-        int $spanKind = API\SpanKind::KIND_INTERNAL,
-        ?API\Attributes $attributes = null,
-        ?API\Links $links = null,
-        ?SpanProcessor $spanProcessor = null,
-        ?SpanLimits $spanLimits = null
-    ) {
-        $this->name = $name;
-        $this->spanContext = $spanContext;
-        $this->parentSpanContext = $parentSpanContext;
-        $this->spanKind = $spanKind;
-        $this->resource =  $resource ?? ResourceInfo::emptyResource();
-        $this->spanProcessor = $spanProcessor;
-        [$this->startEpochTimestamp, $this->start] = Clock::get()->moment();
-        $this->spanStatus = new SpanStatus();
-        $this->spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
-
-        // todo: set these to null until needed
-        $this->attributes = Attributes::withLimits($attributes ?? new Attributes(), $this->spanLimits->getAttributeLimits());
-        $this->events = new Events();
-        $this->setLinks($links);
-    }
-
-    /**
-     * @internal
-     */
-    public function setInstrumentationLibrary(InstrumentationLibrary $instrumentationLibrary)
-    {
-        $this->instrumentationLibrary = $instrumentationLibrary;
-    }
-
-    /**
-     * @internal
-     */
-    public function getInstrumentationLibrary(): InstrumentationLibrary
-    {
-        return $this->instrumentationLibrary;
-    }
-
-    public function getResource(): ResourceInfo
-    {
-        return clone $this->resource;
-    }
-
-    public function getParent(): ?API\SpanContext
-    {
-        // todo: Spec says a parent is a Span, SpanContext, or null -> should we implement this here?
-        return $this->parentSpanContext !== null ? clone $this->parentSpanContext : null;
-    }
-
-    /**
-     * @param string $code
-     * @param string|null $description
-     * @return Span
-     */
-    public function setSpanStatus(string $code, ?string $description = null): API\Span
-    {
-        if ($this->isRecording()) {
-            $this->spanStatus->setStatus($code, $description);
-        }
-
-        return $this;
-    }
-
-    public function getStart(): int
-    {
-        return $this->start;
-    }
-
-    public function setStart(int $start): Span
-    {
-        $this->start = $start;
-
-        return $this;
-    }
-
-    /**
-     * @param int|null $timestamp
-     * @return Span
-     */
-    public function end(?int $timestamp = null): API\Span
-    {
-        if (!isset($this->end)) {
-            $this->end = $timestamp ?? Clock::get()->now();
-            $this->ended = true;
-        }
-
-        if ($this->spanProcessor !== null) {
-            $this->spanProcessor->onEnd($this);
-        }
-
-        return $this;
-    }
-    public function ended(): bool
-    {
-        return $this->ended;
-    }
-    public function setStartEpochTimestamp(int $timestamp): Span
-    {
-        $this->startEpochTimestamp = $timestamp;
-
-        return $this;
-    }
-
-    public function getStartEpochTimestamp(): int
-    {
-        return $this->startEpochTimestamp;
-    }
-
-    public function getEndEpochTimestamp(): ?int
-    {
-        return $this->endEpochTimestamp;
-    }
-
-    public function getEnd(): ?int
-    {
-        return $this->end;
-    }
-
-    public function getStatus(): API\SpanStatus
-    {
-        return $this->spanStatus;
-    }
-
-    public function isRecording(): bool
-    {
-        return null === $this->end;
-    }
-
-    public function getDuration(): ?int
-    {
-        if (!$this->end) {
-            return null;
-        }
-
-        return ($this->end - $this->start);
-    }
-
-    public function getSpanName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
-     * @return Span
-     */
-    public function updateName(string $name): API\Span
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getContext(): API\SpanContext
-    {
-        return $this->spanContext;
-    }
-
-    public function getAttribute(string $key): ?Attribute
-    {
-        return $this->attributes->getAttribute($key);
-    }
-
-    /**
-     * @param string $key
-     * @param array|bool|float|int|string $value
-     * @return Span
-     */
-    public function setAttribute(string $key, $value): API\Span
-    {
-        if ($this->isRecording()) {
-            $this->attributes->setAttribute($key, $value);
-        }
-
-        return $this;
-    }
-
-    public function getAttributes(): API\Attributes
-    {
-        return $this->attributes;
-    }
-
-    public function replaceAttributes(API\Attributes $attributes): self
-    {
-        if ($this->isRecording()) {
-            $this->attributes = $attributes;
-        }
-
-        return $this;
-    }
-
-    // todo: is accepting an Iterator enough to satisfy AddLazyEvent?  -> Looks like the spec might have been updated here: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#add-events
-    /**
-     * @param string $name
-     * @param int $timestamp
-     * @param API\Attributes|null $attributes
-     * @return Span
-     */
-    public function addEvent(string $name, int $timestamp, ?API\Attributes $attributes = null): API\Span
-    {
-        if (!$this->isRecording()) {
-            return $this;
-        }
-
-        if ($this->events->count() >= $this->spanLimits->getEventCountLimit()) {
-            $this->droppedEventCount++;
-
-            return $this;
-        }
-
-        $eventAttributes = null !== $attributes ? Attributes::withLimits($attributes, new AttributeLimits($this->spanLimits->getAttributePerEventCountLimit())) : null;
-        $this->events->addEvent($name, $eventAttributes, $timestamp);
-
-        return $this;
-    }
-
-    /**
-     * @param Throwable $exception
-     * @param API\Attributes|null $attributes
-     * @return Span
-     */
-    public function recordException(Throwable $exception, ?API\Attributes $attributes = null): API\Span
-    {
-        $eventAttributes = new Attributes(
-            [
-                'exception.type' => get_class($exception),
-                'exception.message' => $exception->getMessage(),
-                'exception.stacktrace' => self::getStackTrace($exception),
-            ]
-        );
-        foreach ($attributes ?? [] as $attribute) {
-            $eventAttributes->setAttribute($attribute->getKey(), $attribute->getValue());
-        }
-
-        return $this->addEvent('exception', Clock::get()->timestamp(), $eventAttributes);
-    }
-
-    public function getEvents(): API\Events
-    {
-        return $this->events;
-    }
-
-    public function getDroppedEventsCount(): int
-    {
-        return $this->droppedEventCount;
-    }
-
-    /* A Span is said to have a remote parent if it is the child of a Span
-     * created in another process. Each propagators' deserialization must
-     * set IsRemote to true on a parent
-     * SpanContext so Span creation knows if the parent is remote.
-     * Returns true if the SpanContext was propagated from a
-     * remote parent. When creating children
-     * from remote spans, their IsRemote flag MUST be set to false.
-    */
-    public function isRemote(): bool
-    {
-        return $this->spanContext->isRemote();
-    }
-
-    public function getLinks(): API\Links
-    {
-        return $this->links;
-    }
-
-    private function setLinks(?API\Links $links): void
-    {
-        $this->links = new Links();
-        if (null !== $links) {
-            foreach ($links as $link) {
-                $linkAttributes = Attributes::withLimits($link->getAttributes(), new AttributeLimits($this->spanLimits->getAttributePerLinkCountLimit()));
-                $this->links->addLink(new Link($link->getSpanContext(), $linkAttributes));
-                if (count($this->links) === $this->spanLimits->getLinkCountLimit()) {
-                    $this->droppedLinkCount = count($links) - $this->spanLimits->getLinkCountLimit();
-
-                    break;
-                }
-            }
-        }
-    }
-
-    public function getDroppedLinksCount(): int
-    {
-        return $this->droppedLinkCount;
-    }
-
-    public function getSpanKind(): int
-    {
-        return $this->spanKind;
-    }
-
-    public function getCanonicalStatusCode(): string
-    {
-        return $this->spanStatus->getCanonicalStatusCode();
-    }
-
-    public function getStatusDescription(): string
-    {
-        return $this->spanStatus->getStatusDescription();
-    }
-
-    public function isStatusOk(): bool
-    {
-        return $this->spanStatus->isStatusOK();
-    }
-
     /** @inheritDoc */
-    public function storeInContext(Context $context): Context
+    public static function getInvalid(): API\Span
     {
-        return $context->with(SpanContextKey::instance(), $this);
-    }
-
-    /** @inheritDoc */
-    public function activate(): Scope
-    {
-        return Context::getCurrent()->withContextValue($this)->activate();
+        return NonRecordingSpan::getInvalid();
     }
 
     /**
@@ -430,9 +109,8 @@ class Span implements ReadWriteSpan
      *  at (main)(test.php:62)
      *
      * Credit: https://www.php.net/manual/en/exception.gettraceasstring.php#114980
-     *
      */
-    public static function getStackTrace($e, $seen=null)
+    public static function formatStackTrace(Throwable $e, array &$seen = null): string
     {
         $starter = $seen ? 'Caused by: ' : '';
         $result = [];
@@ -446,7 +124,7 @@ class Span implements ReadWriteSpan
         $line = $e->getLine();
         while (true) {
             $current = "$file:$line";
-            if (is_array($seen) && in_array($current, $seen)) {
+            if (in_array($current, $seen, true)) {
                 $result[] = sprintf(' ... %d more', count($trace)+1);
 
                 break;
@@ -458,11 +136,9 @@ class Span implements ReadWriteSpan
                 count($trace) && array_key_exists('function', $trace[0]) ? str_replace('\\', '.', $trace[0]['function']) : 'main',
                 $line === null ? $file : basename($file),
                 $line === null ? '' : ':',
-                $line === null ? '' : $line
+                $line ?? ''
             );
-            if (is_array($seen)) {
-                $seen[] = "$file:$line";
-            }
+            $seen[] = "$file:$line";
             if (!count($trace)) {
                 break;
             }
@@ -470,11 +146,324 @@ class Span implements ReadWriteSpan
             $line = array_key_exists('file', $trace[0]) && array_key_exists('line', $trace[0]) && $trace[0]['line'] ? $trace[0]['line'] : null;
             array_shift($trace);
         }
-        $result = join("\n", $result);
+        $result = implode("\n", $result);
         if ($prev) {
-            $result  .= "\n" . self::getStackTrace($prev, $seen);
+            $result  .= "\n" . self::formatStackTrace($prev, $seen);
         }
 
         return $result;
+    }
+
+    /** @inheritDoc */
+    public static function wrap(API\SpanContext $spanContext): API\Span
+    {
+        return new NonRecordingSpan($spanContext);
+    }
+
+    /** @readonly */
+    private API\SpanContext $context;
+
+    /** @readonly */
+    private API\SpanContext $parentSpanContext;
+
+    /** @readonly */
+    private SpanLimits $spanLimits;
+
+    /** @readonly */
+    private SpanProcessor $spanProcessor;
+
+    /**
+     * @readonly
+     *
+     * @todo: Java just has this as list<API\Event>, could we just do that?
+     */
+    private API\Events $events;
+
+    /**
+     * @readonly
+     *
+     * @todo: Java just has this as list<API\Link>, could we just do that?
+     */
+    private API\Links $links;
+
+    /** @readonly */
+    private int $totalRecordedLinks;
+
+    /** @readonly */
+    private int $kind;
+
+    /** @readonly */
+    private ResourceInfo $resource;
+
+    /** @readonly */
+    private InstrumentationLibrary $instrumentationLibrary;
+
+    /** @readonly */
+    private int $startEpochNanos;
+
+    /** @var non-empty-string */
+    private string $name;
+
+    private ?API\Attributes $attributes;
+    private int $totalRecordedEvents = 0;
+    private StatusData $status;
+    private int $endEpochNanos = 0;
+    private bool $hasEnded = false;
+
+    /** @param non-empty-string $name */
+    private function __construct(
+        string $name,
+        API\SpanContext $context,
+        InstrumentationLibrary $instrumentationLibrary,
+        int $kind,
+        API\SpanContext $parentSpanContext,
+        SpanLimits $spanLimits,
+        SpanProcessor $spanProcessor,
+        ResourceInfo $resource,
+        ?API\Attributes $attributes,
+        API\Links $links,
+        int $totalRecordedLinks,
+        int $startEpochNanos
+    ) {
+        $this->context = $context;
+        $this->instrumentationLibrary = $instrumentationLibrary;
+        $this->parentSpanContext = $parentSpanContext;
+        $this->links = $links;
+        $this->totalRecordedLinks = $totalRecordedLinks;
+        $this->name = $name;
+        $this->kind = $kind;
+        $this->spanProcessor = $spanProcessor;
+        $this->resource = $resource;
+        $this->startEpochNanos = $startEpochNanos;
+        $this->attributes = Attributes::withLimits($attributes ?? new Attributes(), $spanLimits->getAttributeLimits());
+        $this->events = new Events();
+        $this->status = StatusData::unset();
+        $this->spanLimits = $spanLimits;
+    }
+
+    /** @inheritDoc */
+    public function activate(): Scope
+    {
+        return Context::getCurrent()->withContextValue($this)->activate();
+    }
+
+    /** @inheritDoc */
+    public function getContext(): API\SpanContext
+    {
+        return $this->context;
+    }
+
+    /** @inheritDoc */
+    public function isRecording(): bool
+    {
+        return !$this->hasEnded;
+    }
+
+    /** @inheritDoc */
+    public function setAttribute(string $key, $value): ReadWriteSpan
+    {
+        if ($this->hasEnded || ctype_space($key)) {
+            return $this;
+        }
+
+        if (null === $this->attributes) {
+            $this->attributes = Attributes::withLimits(new Attributes(), $this->spanLimits->getAttributeLimits());
+        }
+
+        $this->attributes->setAttribute($key, $value);
+
+        return $this;
+    }
+
+    /** @inheritDoc */
+    public function setAttributes(API\Attributes $attributes): ReadWriteSpan
+    {
+        if (0 === count($attributes)) {
+            return $this;
+        }
+
+        foreach ($attributes as $attribute) {
+            // @phpstan-ignore-next-line
+            $this->setAttribute($attribute->getKey(), $attribute->getValue());
+        }
+
+        return $this;
+    }
+
+    /** @inheritDoc */
+    public function addEvent(string $name, ?API\Attributes $attributes = null, int $timestamp = null): ReadWriteSpan
+    {
+        if ($this->hasEnded) {
+            return $this;
+        }
+
+        if (count($this->events) < $this->spanLimits->getEventCountLimit()) {
+            $this->events->addEvent(
+                $name,
+                $attributes ? Attributes::withLimits(
+                    $attributes,
+                    new AttributeLimits($this->spanLimits->getAttributePerEventCountLimit())
+                ) : $attributes,
+                $timestamp
+            );
+        }
+
+        $this->totalRecordedEvents++;
+
+        return $this;
+    }
+
+    /** @inheritDoc */
+    public function recordException(Throwable $exception, API\Attributes $attributes = null): ReadWriteSpan
+    {
+        $timestamp = Clock::getDefault()->now();
+        $eventAttributes = new Attributes([
+                'exception.type' => get_class($exception),
+                'exception.message' => $exception->getMessage(),
+                'exception.stacktrace' => self::formatStackTrace($exception),
+            ]);
+
+        if ($attributes) {
+            foreach ($attributes as $attribute) {
+                $eventAttributes->setAttribute($attribute->getKey(), $attribute->getValue());
+            }
+        }
+
+        return $this->addEvent('exception', $eventAttributes, $timestamp);
+    }
+
+    /** @inheritDoc */
+    public function updateName(string $name): ReadWriteSpan
+    {
+        if ($this->hasEnded) {
+            return $this;
+        }
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /** @inheritDoc */
+    public function setStatus(string $code, string $description = null): ReadWriteSpan
+    {
+        if ($this->hasEnded) {
+            return $this;
+        }
+
+        $this->status = StatusData::create($code, $description);
+
+        return $this;
+    }
+
+    /** @inheritDoc */
+    public function end(int $endEpochNanos = null): void
+    {
+        if ($this->hasEnded) {
+            return;
+        }
+
+        $this->endEpochNanos = $endEpochNanos ?? Clock::getDefault()->now();
+        $this->hasEnded = true;
+
+        $this->spanProcessor->onEnd($this);
+    }
+
+    /** @inheritDoc */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getParentContext(): API\SpanContext
+    {
+        return $this->parentSpanContext;
+    }
+
+    public function getInstrumentationLibrary(): InstrumentationLibrary
+    {
+        return $this->instrumentationLibrary;
+    }
+
+    public function hasEnded(): bool
+    {
+        return $this->hasEnded;
+    }
+
+    public function toSpanData(): SpanData
+    {
+        return new ImmutableSpan(
+            $this,
+            $this->name,
+            $this->links,
+            $this->getImmutableEvents(),
+            $this->getImmutableAttributes(),
+            (null === $this->attributes) ? 0 : $this->attributes->getTotalAddedValues(),
+            $this->totalRecordedEvents,
+            $this->status,
+            $this->endEpochNanos,
+            $this->hasEnded
+        );
+    }
+
+    /** @inheritDoc */
+    public function getDuration(): int
+    {
+        return ($this->hasEnded ? $this->endEpochNanos : Clock::getDefault()->now()) - $this->startEpochNanos;
+    }
+
+    /** @inheritDoc */
+    public function getKind(): int
+    {
+        return $this->kind;
+    }
+
+    /** @inheritDoc */
+    public function getAttribute(string $key)
+    {
+        if (null === $this->attributes) {
+            return null;
+        }
+
+        return $this->attributes->get($key);
+    }
+
+    public function getStartEpochNanos(): int
+    {
+        return $this->startEpochNanos;
+    }
+
+    public function getTotalRecordedLinks(): int
+    {
+        return $this->totalRecordedLinks;
+    }
+
+    public function getTotalRecordedEvents(): int
+    {
+        return $this->totalRecordedEvents;
+    }
+
+    public function getResource(): ResourceInfo
+    {
+        return $this->resource;
+    }
+
+    /** @inheritDoc */
+    public function storeInContext(Context $context): Context
+    {
+        return $context->with(SpanContextKey::instance(), $this);
+    }
+
+    private function getImmutableAttributes(): API\Attributes
+    {
+        if (null === $this->attributes) {
+            return new Attributes();
+        }
+
+        return clone $this->attributes;
+    }
+
+    private function getImmutableEvents(): API\Events
+    {
+        return clone $this->events;
     }
 }
