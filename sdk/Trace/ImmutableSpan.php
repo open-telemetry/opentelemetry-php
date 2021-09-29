@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use function max;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Trace as API;
@@ -129,17 +130,17 @@ final class ImmutableSpan implements SpanData
 
     public function getTotalDroppedAttributes(): int
     {
-        return $this->totalAttributeCount - count($this->attributes);
+        return max(0, $this->totalAttributeCount - count($this->attributes));
     }
 
     public function getTotalDroppedEvents(): int
     {
-        return $this->totalRecordedEvents - count($this->events);
+        return max(0, $this->totalRecordedEvents - count($this->events));
     }
 
     public function getTotalDroppedLinks(): int
     {
-        return $this->span->getTotalRecordedLinks() - count($this->links);
+        return max(0, $this->span->getTotalRecordedLinks() - count($this->links));
     }
 
     public function getStatus(): StatusData

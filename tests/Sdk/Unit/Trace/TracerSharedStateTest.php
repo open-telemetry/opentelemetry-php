@@ -10,7 +10,9 @@ use Mockery\MockInterface;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\IdGenerator;
 use OpenTelemetry\Sdk\Trace\Sampler;
+use OpenTelemetry\Sdk\Trace\SpanLimitsBuilder;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
+use OpenTelemetry\Sdk\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerSharedState;
 
 class TracerSharedStateTest extends MockeryTestCase
@@ -84,8 +86,9 @@ class TracerSharedStateTest extends MockeryTestCase
         return new TracerSharedState(
             $this->idGenerator,
             $this->resourceInfo,
+            (new SpanLimitsBuilder())->build(),
             $this->sampler,
-            $spanProcessors
+            empty($spanProcessors) ? [new NoopSpanProcessor()] : $spanProcessors,
         );
     }
 }

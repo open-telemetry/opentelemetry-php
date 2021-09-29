@@ -21,16 +21,26 @@ use OpenTelemetry\Sdk\Trace\RandomIdGenerator;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
 use OpenTelemetry\Sdk\Trace\SpanData;
+use OpenTelemetry\Sdk\Trace\SpanLimits;
+use OpenTelemetry\Sdk\Trace\SpanLimitsBuilder;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Sdk\Trace\StatusData;
 use OpenTelemetry\Sdk\Trace\Test\TestClock;
 use OpenTelemetry\Trace as API;
+use function array_merge;
+use function range;
+use function str_repeat;
 
 class SpanTest extends MockeryTestCase
 {
     private const SPAN_NAME = 'test_span';
     private const NEW_SPAN_NAME = 'new_test_span';
     private const START_EPOCH = 1000123789654;
+    private const ATTRIBUTES = [
+        'string_attribute' => 'some_string_value',
+        'float_attribute' => 3.14,
+        'bool_attribute' => false,
+    ];
 
     /** @var MockInterface&SpanProcessor */
     private $spanProcessor;
@@ -41,7 +51,6 @@ class SpanTest extends MockeryTestCase
     private API\SpanContext $spanContext;
     private TestClock $testClock;
 
-    private API\Attributes $attributes;
     private API\Attributes $expectedAttributes;
     private API\Link $link;
 
@@ -65,13 +74,13 @@ class SpanTest extends MockeryTestCase
         $this->testClock = new TestClock(self::START_EPOCH);
 
         $this->link = new Link($this->spanContext);
-        $this->attributes = new Attributes([
-            'some_string_key' => 'some_string_value',
-            'float_attribute' => 3.14,
-            'bool_attribute' => false,
-        ]);
 
-        $this->expectedAttributes = clone $this->attributes;
+        $this->expectedAttributes = new Attributes(
+            array_merge(
+                ['single_string_attribute' => 'some_string_value'],
+                self::ATTRIBUTES
+            )
+        );
 
         Clock::setTestClock($this->testClock);
     }
@@ -260,18 +269,18 @@ class SpanTest extends MockeryTestCase
 
     public function test_toSpanData_initialAttributes(): void
     {
-        $span = $this->createTestSpanWithAttributes($this->attributes);
+        $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
         $span->setAttribute('another_key', 'another_value');
         $span->end();
 
         $spanData = $span->toSpanData();
-        $this->assertSame($this->attributes->count() + 1, $spanData->getAttributes()->count());
+        $this->assertSame(count(self::ATTRIBUTES) + 1, $spanData->getAttributes()->count());
         $this->assertSame(0, $spanData->getTotalDroppedAttributes());
     }
 
     public function test_toSpanData_isImmutable(): void
     {
-        $span = $this->createTestSpanWithAttributes($this->attributes);
+        $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
 
         $spanData = $span->toSpanData();
 
@@ -280,7 +289,7 @@ class SpanTest extends MockeryTestCase
         $span->addEvent('new_event');
         $span->end();
 
-        $this->assertSame($this->attributes->count(), $spanData->getAttributes()->count());
+        $this->assertSame(count(self::ATTRIBUTES), $spanData->getAttributes()->count());
         $this->assertNull($spanData->getAttributes()->get('another_key'));
         $this->assertFalse($spanData->hasEnded());
         $this->assertSame(0, $spanData->getEndEpochNanos());
@@ -289,7 +298,7 @@ class SpanTest extends MockeryTestCase
 
         $spanData = $span->toSpanData();
 
-        $this->assertSame($this->attributes->count() + 1, $spanData->getAttributes()->count());
+        $this->assertSame(count(self::ATTRIBUTES) + 1, $spanData->getAttributes()->count());
         $this->assertSame('another_value', $spanData->getAttributes()->get('another_key'));
         $this->assertTrue($spanData->hasEnded());
         $this->assertGreaterThan(0, $spanData->getEndEpochNanos());
@@ -324,7 +333,7 @@ class SpanTest extends MockeryTestCase
 
     public function test_getAttribute(): void
     {
-        $span = $this->createTestSpanWithAttributes($this->attributes);
+        $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
         $this->assertSame(3.14, $span->getAttribute('float_attribute'));
         $span->end();
     }
@@ -339,7 +348,7 @@ class SpanTest extends MockeryTestCase
 
     public function test_getInstrumentationLibraryInfo(): void
     {
-        $span = $this->createTestSpanWithAttributes($this->attributes);
+        $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
         $this->assertSame($this->instrumentationLibrary, $span->getInstrumentationLibrary());
         $span->end();
     }
@@ -379,14 +388,28 @@ class SpanTest extends MockeryTestCase
 
     public function test_setAttributes(): void
     {
-        $span = $this->createTestSpanWithAttributes($this->attributes);
-        $span->setAttributes(new Attributes(['foo' => 'bar']));
-        $this->assertCount($this->expectedAttributes->count() + 1, $span->toSpanData()->getAttributes());
+        $span = $this->createTestRootSpan();
+
+        $attributes = new Attributes([
+            'string' => 'str',
+            'empty_str' => '',
+            'null' => null,
+            'str_array' => ['a', 'b'],
+        ]);
+
+        $span->setAttributes($attributes);
+        $span->end();
+
+        $attributes = $span->toSpanData()->getAttributes();
+        $this->assertSame('str', $attributes->get('string'));
+        $this->assertSame('', $attributes->get('empty_str'));
+        $this->assertNull($attributes->get('null'));
+        $this->assertSame(['a', 'b'], $attributes->get('str_array'));
     }
 
     public function test_setAttributes_overridesAttribute(): void
     {
-        $span = $this->createTestSpanWithAttributes($this->attributes);
+        $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
         $this->assertFalse($span->toSpanData()->getAttributes()->get('bool_attribute'));
         $span->setAttributes(new Attributes(['bool_attribute' => true]));
         $this->assertTrue($span->toSpanData()->getAttributes()->get('bool_attribute'));
@@ -394,9 +417,9 @@ class SpanTest extends MockeryTestCase
 
     public function test_setAttributes_empty(): void
     {
-        $span = $this->createTestSpanWithAttributes($this->attributes);
+        $span = $this->createTestRootSpan();
         $span->setAttributes(new Attributes());
-        $this->assertEquals($this->expectedAttributes, $span->toSpanData()->getAttributes());
+        $this->assertEmpty($span->toSpanData()->getAttributes());
     }
 
     public function test_recordException(): void
@@ -423,6 +446,133 @@ class SpanTest extends MockeryTestCase
         );
     }
 
+    public function test_recordException_additionalAttributes(): void
+    {
+        $exception = new Exception('ERR');
+        $span = $this->createTestRootSpan();
+
+        $this->testClock->advance(1000);
+        $timestamp = $this->testClock->now();
+
+        $span->recordException($exception, new Attributes([
+            'foo' => 'bar',
+        ]));
+
+        $this->assertCount(1, $events = $span->toSpanData()->getEvents());
+        $event = $events->getIterator()->current();
+        $this->assertSame('exception', $event->getName());
+        $this->assertSame($timestamp, $event->getTimestamp());
+        $this->assertEquals(
+            new Attributes([
+                'exception.type' => 'Exception',
+                'exception.message' => 'ERR',
+                'exception.stacktrace' => Span::formatStackTrace($exception),
+                'foo' => 'bar',
+            ]),
+            $event->getAttributes()
+        );
+    }
+
+    public function test_attributeLength(): void
+    {
+        $maxLength = 25;
+        $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL, (new SpanLimitsBuilder())->setAttributeValueLengthLimit($maxLength)->build());
+
+        $strVal = str_repeat('a', $maxLength);
+        $tooLongStrVal = "${strVal}${strVal}";
+
+        $span->setAttributes(
+            new Attributes([
+                'string' => $tooLongStrVal,
+                'bool' => true,
+                'string_array' => [$strVal, $tooLongStrVal],
+                'int_array' => [1, 2],
+            ])
+        );
+
+        $attrs = $span->toSpanData()->getAttributes();
+        $this->assertSame($strVal, $attrs->get('string'));
+        $this->assertTrue($attrs->get('bool'));
+        $this->assertSame(
+            [$strVal, $strVal],
+            $attrs->get('string_array')
+        );
+        $this->assertSame(
+            [1, 2],
+            $attrs->get('int_array')
+        );
+
+        $span->end();
+    }
+
+    public function test_droppingAttributes(): void
+    {
+        $maxNumberOfAttributes = 8;
+        $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL, (new SpanLimitsBuilder())->setAttributeCountLimit($maxNumberOfAttributes)->build());
+
+        foreach (range(1, $maxNumberOfAttributes * 2) as $idx) {
+            $span->setAttribute("str_attribute_${idx}", $idx);
+        }
+
+        $spanData = $span->toSpanData();
+
+        $this->assertCount($maxNumberOfAttributes, $spanData->getAttributes());
+        $this->assertSame(8, $spanData->getTotalDroppedAttributes());
+
+        $span->end();
+        $spanData = $span->toSpanData();
+
+        $this->assertCount($maxNumberOfAttributes, $spanData->getAttributes());
+        $this->assertSame(8, $spanData->getTotalDroppedAttributes());
+    }
+
+    public function test_droppingEvents(): void
+    {
+        $maxNumberOfEvents = 8;
+        $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL, (new SpanLimitsBuilder())->setEventCountLimit($maxNumberOfEvents)->build());
+
+        foreach (range(1, $maxNumberOfEvents * 2) as $_idx) {
+            $span->addEvent('event2');
+            $this->testClock->advanceSeconds();
+        }
+
+        $spanData = $span->toSpanData();
+        $this->assertCount($maxNumberOfEvents, $spanData->getEvents());
+        $this->assertSame(8, $spanData->getTotalDroppedEvents());
+
+        $span->end();
+    }
+
+    public function test_droppingLinks(): void
+    {
+        $this->markTestIncomplete('TODO: Enable this when link counts are limited');
+
+        $maxNumberOfLinks = 8;
+
+        $links = new Links();
+
+        foreach (range(1, $maxNumberOfLinks * 2) as $_idx) {
+            $links->addLink(new Link(SpanContext::getInvalid()));
+        }
+
+        $span = $this
+            ->createTestSpan(
+                API\SpanKind::KIND_INTERNAL,
+                (new SpanLimitsBuilder())
+                    ->setLinkCountLimit($maxNumberOfLinks)
+                    ->build(),
+                null,
+                null,
+                $links
+            );
+
+        $spanData = $span->toSpanData();
+        $this->assertCount($maxNumberOfLinks, $spanData->getLinks());
+        $this->assertSame(8, $spanData->getTotalDroppedLinks());
+
+        $span->end();
+    }
+
     // endregion SDK
 
     private function createTestRootSpan(): Span
@@ -430,6 +580,7 @@ class SpanTest extends MockeryTestCase
         return $this
             ->createTestSpan(
                 API\SpanKind::KIND_INTERNAL,
+                null,
                 SpanContext::INVALID_SPAN
             );
     }
@@ -441,11 +592,13 @@ class SpanTest extends MockeryTestCase
      */
     private function createTestSpan(
         int $kind = API\SpanKind::KIND_INTERNAL,
+        SpanLimits $spanLimits = null,
         string $parentSpanId = null,
         ?API\Attributes $attributes = null,
         API\Links $links = null
     ): Span {
         $parentSpanId = $parentSpanId ?? $this->parentSpanId;
+        $spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
         $links = $links ?? (new Links())->addLink($this->link);
 
         $span = Span::startSpan(
@@ -455,6 +608,7 @@ class SpanTest extends MockeryTestCase
             $kind,
             $parentSpanId ? Span::wrap(SpanContext::create($this->traceId, $parentSpanId)) : Span::getInvalid(),
             Context::getRoot(),
+            $spanLimits,
             $this->spanProcessor,
             $this->resource,
             $attributes,
@@ -472,24 +626,25 @@ class SpanTest extends MockeryTestCase
         return $span;
     }
 
-    public function createTestSpanWithAttributes(API\Attributes $attributes): Span
+    public function createTestSpanWithAttributes(array $attributes): Span
     {
         return $this
             ->createTestSpan(
                 API\SpanKind::KIND_INTERNAL,
                 null,
-                clone $attributes
+                null,
+                new Attributes($attributes),
             );
     }
 
     /** @psalm-param API\StatusCode::STATUS_* $status */
     private function spanDoWork(Span $span, ?string $status = null, ?string $description = null): void
     {
-        $span->setAttribute('some_string_key', 'some_string_value');
+        $span->setAttribute('single_string_attribute', 'some_string_value');
 
-        foreach ($this->attributes as $attribute) {
+        foreach (self::ATTRIBUTES as $key => $value) {
             // @phpstan-ignore-next-line
-            $span->setAttribute($attribute->getKey(), $attribute->getValue());
+            $span->setAttribute($key, $value);
         }
 
         $this->testClock->advanceSeconds();

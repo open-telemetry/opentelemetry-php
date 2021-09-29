@@ -39,6 +39,7 @@ class Span implements ReadWriteSpan
         int $kind,
         API\Span $parentSpan,
         Context $parentContext,
+        SpanLimits $spanLimits,
         SpanProcessor $spanProcessor,
         ResourceInfo $resource,
         ?API\Attributes $attributes,
@@ -58,6 +59,7 @@ class Span implements ReadWriteSpan
             $instrumentationLibrary,
             $kind,
             $parentSpan->getContext(),
+            $spanLimits,
             $spanProcessor,
             $resource,
             $attributes,
@@ -158,13 +160,14 @@ class Span implements ReadWriteSpan
         return new NonRecordingSpan($spanContext);
     }
 
-    // TODO: Add a SpanLimits object to the constructor for configuration options.
-
     /** @readonly */
     private API\SpanContext $context;
 
     /** @readonly */
     private API\SpanContext $parentSpanContext;
+
+    /** @readonly */
+    private SpanLimits $spanLimits;
 
     /** @readonly */
     private SpanProcessor $spanProcessor;
@@ -188,8 +191,6 @@ class Span implements ReadWriteSpan
 
     /** @readonly */
     private int $kind;
-
-    // TODO: Store a clock instance on the Span?
 
     /** @readonly */
     private ResourceInfo $resource;
@@ -216,6 +217,7 @@ class Span implements ReadWriteSpan
         InstrumentationLibrary $instrumentationLibrary,
         int $kind,
         API\SpanContext $parentSpanContext,
+        SpanLimits $spanLimits,
         SpanProcessor $spanProcessor,
         ResourceInfo $resource,
         ?API\Attributes $attributes,
@@ -236,6 +238,7 @@ class Span implements ReadWriteSpan
         $this->attributes = $attributes;
         $this->events = new Events();
         $this->status = StatusData::unset();
+        $this->spanLimits = $spanLimits;
     }
 
     /** @inheritDoc */
@@ -259,12 +262,12 @@ class Span implements ReadWriteSpan
     /** @inheritDoc */
     public function setAttribute(string $key, $value): ReadWriteSpan
     {
-        if (null === $value || $this->hasEnded || ctype_space($key)) {
+        if ($this->hasEnded || ctype_space($key)) {
             return $this;
         }
 
         if (null === $this->attributes) {
-            $this->attributes = new Attributes();
+            $this->attributes = Attributes::withLimits(new Attributes(), $this->spanLimits->getAttributeLimits());
         }
 
         $this->attributes->setAttribute($key, $value);
@@ -294,7 +297,17 @@ class Span implements ReadWriteSpan
             return $this;
         }
 
-        $this->events->addEvent($name, $attributes, $timestamp);
+        if (count($this->events) < $this->spanLimits->getEventCountLimit()) {
+            $this->events->addEvent(
+                $name,
+                $attributes ? Attributes::withLimits(
+                    $attributes,
+                    new AttributeLimits($this->spanLimits->getAttributePerEventCountLimit())
+                ) : $attributes,
+                $timestamp
+            );
+        }
+
         $this->totalRecordedEvents++;
 
         return $this;
@@ -384,7 +397,7 @@ class Span implements ReadWriteSpan
             $this->links,
             $this->getImmutableEvents(),
             $this->getImmutableAttributes(),
-            (null === $this->attributes) ? 0 : $this->attributes->count(),
+            (null === $this->attributes) ? 0 : $this->attributes->getTotalAddedValues(),
             $this->totalRecordedEvents,
             $this->status,
             $this->endEpochNanos,

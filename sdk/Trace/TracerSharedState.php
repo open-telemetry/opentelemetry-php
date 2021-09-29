@@ -7,7 +7,9 @@ namespace OpenTelemetry\Sdk\Trace;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SpanMultiProcessor;
-use OpenTelemetry\Trace as API; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
+use OpenTelemetry\Trace as API;
+
+/** @phan-suppress-current-line PhanUnreferencedUseNormal */
 
 /**
  * Stores shared state/config between all {@see API\Tracer} created via the same {@see API\TracerProvider}.
@@ -21,23 +23,26 @@ final class TracerSharedState
     private ResourceInfo $resource;
 
     /** @readonly */
+    private SpanLimits $spanLimits;
+
+    /** @readonly */
     private Sampler $sampler;
 
     /** @readonly */
     private SpanProcessor $spanProcessor;
-
-    // TODO: Add SpanLimits to constructor
 
     private bool $hasShutdown = false;
 
     public function __construct(
         IdGenerator $idGenerator,
         ResourceInfo $resource,
+        SpanLimits $spanLimits,
         Sampler $sampler,
         array $spanProcessors
     ) {
         $this->idGenerator = $idGenerator;
         $this->resource = $resource;
+        $this->spanLimits = $spanLimits;
         $this->sampler = $sampler;
 
         switch (count($spanProcessors)) {
@@ -69,6 +74,11 @@ final class TracerSharedState
     public function getResource(): ResourceInfo
     {
         return $this->resource;
+    }
+
+    public function getSpanLimits(): SpanLimits
+    {
+        return $this->spanLimits;
     }
 
     public function getSampler(): Sampler

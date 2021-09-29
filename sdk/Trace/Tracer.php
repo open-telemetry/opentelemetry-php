@@ -41,6 +41,7 @@ class Tracer implements API\Tracer
             $spanName,
             $this->instrumentationLibrary,
             $this->tracerSharedState,
+            $this->tracerSharedState->getSpanLimits()
         );
     }
 

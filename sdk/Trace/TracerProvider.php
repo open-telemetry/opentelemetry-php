@@ -25,16 +25,23 @@ final class TracerProvider implements API\TracerProvider
         $spanProcessors = [],
         Sampler $sampler = null,
         ResourceInfo $resource = null,
+        SpanLimits $spanLimits = null,
         IdGenerator $idGenerator = null
     ) {
+        if (null === $spanProcessors) {
+            $spanProcessors = [];
+        }
+
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
         $resource = $resource ?? ResourceInfo::defaultResource();
         $sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
         $idGenerator = $idGenerator ?? new RandomIdGenerator();
+        $spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
 
         $this->tracerSharedState = new TracerSharedState(
             $idGenerator,
             $resource,
+            $spanLimits,
             $sampler,
             $spanProcessors
         );

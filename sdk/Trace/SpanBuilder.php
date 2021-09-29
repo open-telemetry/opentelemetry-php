@@ -24,7 +24,8 @@ final class SpanBuilder implements API\SpanBuilder
     /** @readonly */
     private TracerSharedState $tracerSharedState;
 
-    // TODO: Add SpanLimits to constructor
+    /** @readonly */
+    private SpanLimits $spanLimits;
 
     private ?Context $parentContext = null; // Null means use current context.
 
@@ -41,11 +42,13 @@ final class SpanBuilder implements API\SpanBuilder
     public function __construct(
         string $spanName,
         InstrumentationLibrary $instrumentationLibrary,
-        TracerSharedState $tracerSharedState
+        TracerSharedState $tracerSharedState,
+        SpanLimits $spanLimits
     ) {
         $this->spanName = $spanName;
         $this->instrumentationLibrary = $instrumentationLibrary;
         $this->tracerSharedState = $tracerSharedState;
+        $this->spanLimits = $spanLimits;
     }
 
     /** @inheritDoc */
@@ -77,7 +80,9 @@ final class SpanBuilder implements API\SpanBuilder
             $this->links = new Links();
         }
 
-        // TODO: Skip links over the limit.
+        if (count($this->links) === $this->spanLimits->getLinkCountLimit()) {
+            return $this;
+        }
 
         $this->links->addLink(new Link($context, $attributes));
 
@@ -99,7 +104,7 @@ final class SpanBuilder implements API\SpanBuilder
     /** @inheritDoc */
     public function setAttributes(API\Attributes $attributes): API\SpanBuilder
     {
-        if (0 === $attributes->count()) {
+        if (0 === count($attributes)) {
             return $this;
         }
 
@@ -195,6 +200,7 @@ final class SpanBuilder implements API\SpanBuilder
             $this->spanKind,
             $parentSpan,
             $parentContext,
+            $this->spanLimits,
             $this->tracerSharedState->getSpanProcessor(),
             $this->tracerSharedState->getResource(),
             $attributes,

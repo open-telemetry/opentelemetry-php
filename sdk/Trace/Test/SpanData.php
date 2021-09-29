@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace\Test;
 
+use function count;
+use function max;
 use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace as SDK;
@@ -116,7 +118,7 @@ class SpanData implements SDK\SpanData
 
     public function getTotalDroppedAttributes(): int
     {
-        return $this->totalAttributeCount - $this->attributes->count();
+        return max(0, $this->totalAttributeCount - count($this->attributes));
     }
 
     public function setTotalAttributeCount(int $totalAttributeCount): self
@@ -128,7 +130,7 @@ class SpanData implements SDK\SpanData
 
     public function getTotalDroppedEvents(): int
     {
-        return $this->totalRecordedEvents - $this->events->count();
+        return max(0, $this->totalRecordedEvents - count($this->events));
     }
 
     public function setTotalRecordedEvents(int $totalRecordedEvents): self
@@ -140,7 +142,7 @@ class SpanData implements SDK\SpanData
 
     public function getTotalDroppedLinks(): int
     {
-        return $this->totalRecordedLinks = $this->links->count();
+        return max(0, $this->totalRecordedLinks - count($this->links));
     }
 
     public function setTotalRecordedLinks(int $totalRecordedLinks): self
