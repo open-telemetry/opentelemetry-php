@@ -20,7 +20,7 @@ final class TracerProvider implements API\TracerProvider
     /** @readonly */
     private TracerSharedState $tracerSharedState;
 
-    /** @param list<SpanProcessor>|SpanProcessor $spanProcessors */
+    /** @param list<SpanProcessor>|SpanProcessor|null $spanProcessors */
     public function __construct(
         $spanProcessors = [],
         Sampler $sampler = null,

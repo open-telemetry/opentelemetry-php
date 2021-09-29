@@ -6,7 +6,6 @@ namespace OpenTelemetry\Sdk\Trace;
 
 use OpenTelemetry\Sdk\Internal\StringUtil;
 use OpenTelemetry\Trace as API;
-use function array_key_exists;
 
 class Attributes implements API\Attributes
 {
@@ -48,7 +47,6 @@ class Attributes implements API\Attributes
 
         // drop attribute when limit is reached
         if (!isset($this->attributes[$name]) && count($this) >= $this->attributeLimits->getAttributeCountLimit()) {
-
             return $this;
         }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Sdk\Unit\Trace;
 
+use function array_merge;
 use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
@@ -27,7 +28,6 @@ use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Sdk\Trace\StatusData;
 use OpenTelemetry\Sdk\Trace\Test\TestClock;
 use OpenTelemetry\Trace as API;
-use function array_merge;
 use function range;
 use function str_repeat;
 
@@ -547,6 +547,7 @@ class SpanTest extends MockeryTestCase
     {
         $this->markTestIncomplete('TODO: Enable this when link counts are limited');
 
+        /** @phpstan-ignore-next-line */
         $maxNumberOfLinks = 8;
 
         $links = new Links();
@@ -643,7 +644,6 @@ class SpanTest extends MockeryTestCase
         $span->setAttribute('single_string_attribute', 'some_string_value');
 
         foreach (self::ATTRIBUTES as $key => $value) {
-            // @phpstan-ignore-next-line
             $span->setAttribute($key, $value);
         }
 
