@@ -13,9 +13,11 @@ use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
+use OpenTelemetry\Sdk\Trace\SpanLimitsBuilder;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
+use function range;
 
 class SpanBuilderTest extends MockeryTestCase
 {
@@ -137,7 +139,32 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    // TODO: Test dropping attributes over limits
+    public function test_setAttribute_dropping(): void
+    {
+        $maxNumberOfAttributes = 8;
+        $spanBuilder = (new TracerProvider(
+            null,
+            null,
+            null,
+            (new SpanLimitsBuilder())->setAttributeCountLimit($maxNumberOfAttributes)->build()
+        ))->getTracer('test')->spanBuilder(self::SPAN_NAME);
+
+        foreach (range(1, $maxNumberOfAttributes * 2) as $idx) {
+            $spanBuilder->setAttribute("str_attribute_${idx}", $idx);
+        }
+
+        /** @var Span $span */
+        $span = $spanBuilder->startSpan();
+        $attributes = $span->toSpanData()->getAttributes();
+
+        $this->assertCount($maxNumberOfAttributes, $attributes);
+
+        foreach (range(1, $maxNumberOfAttributes) as $idx) {
+            $this->assertSame($idx, $attributes->get("str_attribute_${idx}"));
+        }
+
+        $span->end();
+    }
 
     public function test_addAttributesViaSampler(): void
     {

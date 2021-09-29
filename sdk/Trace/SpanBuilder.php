@@ -93,7 +93,7 @@ final class SpanBuilder implements API\SpanBuilder
     public function setAttribute(string $key, $value): API\SpanBuilder
     {
         if (null === $this->attributes) {
-            $this->attributes = new Attributes();
+            $this->attributes = Attributes::withLimits(new Attributes(), $this->spanLimits->getAttributeLimits());
         }
 
         $this->attributes->setAttribute($key, $value);

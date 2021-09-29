@@ -526,6 +526,35 @@ class SpanTest extends MockeryTestCase
         $this->assertSame(8, $spanData->getTotalDroppedAttributes());
     }
 
+    public function test_droppingAttributes_providedViaSpanBuilder(): void
+    {
+        $maxNumberOfAttributes = 8;
+
+        $attributes = new Attributes();
+
+        foreach (range(1, $maxNumberOfAttributes * 2) as $idx) {
+            $attributes->setAttribute("str_attribute_${idx}", $idx);
+        }
+
+        $span = $this->createTestSpan(
+            API\SpanKind::KIND_INTERNAL,
+            (new SpanLimitsBuilder())->setAttributeCountLimit($maxNumberOfAttributes)->build(),
+            null,
+            $attributes
+        );
+
+        $spanData = $span->toSpanData();
+
+        $this->assertCount($maxNumberOfAttributes, $spanData->getAttributes());
+        $this->assertSame(8, $spanData->getTotalDroppedAttributes());
+
+        $span->end();
+        $spanData = $span->toSpanData();
+
+        $this->assertCount($maxNumberOfAttributes, $spanData->getAttributes());
+        $this->assertSame(8, $spanData->getTotalDroppedAttributes());
+    }
+
     public function test_droppingEvents(): void
     {
         $maxNumberOfEvents = 8;
@@ -588,8 +617,6 @@ class SpanTest extends MockeryTestCase
 
     /**
      * @psalm-param API\SpanKind::KIND_* $kind
-     *
-     * @todo: Allow passing in span limits
      */
     private function createTestSpan(
         int $kind = API\SpanKind::KIND_INTERNAL,

@@ -235,7 +235,7 @@ class Span implements ReadWriteSpan
         $this->spanProcessor = $spanProcessor;
         $this->resource = $resource;
         $this->startEpochNanos = $startEpochNanos;
-        $this->attributes = $attributes;
+        $this->attributes = Attributes::withLimits($attributes ?? new Attributes(), $spanLimits->getAttributeLimits());
         $this->events = new Events();
         $this->status = StatusData::unset();
         $this->spanLimits = $spanLimits;
