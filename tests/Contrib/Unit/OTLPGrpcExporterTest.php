@@ -26,12 +26,12 @@ class OTLPGrpcExporterTest extends MockeryTestCase
             false,
             10,
             $this->createMockTraceServiceClient([
-                "expectations" => [
-                    "num_spans" => 1
+                'expectations' => [
+                    'num_spans' => 1,
                 ],
-                "return_values" => [
-                    "status_code" => \Grpc\STATUS_OK
-                ] 
+                'return_values' => [
+                    'status_code' => \Grpc\STATUS_OK,
+                ],
             ])
         );
                
@@ -51,12 +51,12 @@ class OTLPGrpcExporterTest extends MockeryTestCase
             false,
             10,
             $this->createMockTraceServiceClient([
-                "expectations" => [
-                    "num_spans" => 1
+                'expectations' => [
+                    'num_spans' => 1,
                 ],
-                "return_values" => [
-                    "status_code" => "An unexpected status"
-                ] 
+                'return_values' => [
+                    'status_code' => 'An unexpected status',
+                ],
             ])
         );
                
@@ -180,21 +180,21 @@ class OTLPGrpcExporterTest extends MockeryTestCase
         putenv('OTEL_EXPORTER_OTLP_INSECURE');
     }
 
-    private function createMockTraceServiceClient(array $options = []) 
+    private function createMockTraceServiceClient(array $options = [])
     {
         [
-            "expectations" => [
-                "num_spans" => $expectedNumSpans
+            'expectations' => [
+                'num_spans' => $expectedNumSpans,
             ],
-            "return_values" => [
-                "status_code" => $statusCode
-            ] 
+            'return_values' => [
+                'status_code' => $statusCode,
+            ]
         ] = $options;
 
         /** @var MockInterface&TraceServiceClient */
         $mockClient = Mockery::mock(TraceServiceClient::class)
                         ->shouldReceive('Export')
-                        ->withArgs(function ($request) use($expectedNumSpans) {
+                        ->withArgs(function ($request) use ($expectedNumSpans) {
                             return (count($request->getResourceSpans()) == $expectedNumSpans);
                         })
                         ->andReturn(
