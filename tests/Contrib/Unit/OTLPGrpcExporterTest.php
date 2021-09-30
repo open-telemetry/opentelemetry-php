@@ -82,7 +82,7 @@ class OTLPGrpcExporterTest extends MockeryTestCase
         $this->assertEquals(Exporter::FAILED_NOT_RETRYABLE, $exporterStatusCode);
     }
 
-    public function testExporter()
+    public function testExporterGrpcRespondsAsUnavailable()
     {
         $this->assertEquals(Exporter::FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
     }
