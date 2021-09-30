@@ -17,31 +17,6 @@ class OTLPGrpcExporterTest extends MockeryTestCase
 {
     public function testExporterHappyPath()
     {
-        /** @var MockInterface&TraceServiceClient */
-        $mockClient = Mockery::mock(TraceServiceClient::class)
-                        ->shouldReceive('Export')
-                        ->withArgs(function ($request) {
-                            return (count($request->getResourceSpans()) == 1);
-                        })
-                        ->andReturn(
-                            Mockery::mock(UnaryCall::class)
-                                ->shouldReceive('wait')
-                                ->andReturn(
-                                    [
-                                        'unused response data',
-                                        new class() {
-                                            public $code;
-                        
-                                            public function __construct()
-                                            {
-                                                $this->code = \Grpc\STATUS_OK;
-                                            }
-                                        },
-                                    ]
-                                )
-                                ->getMock()
-                        )
-                        ->getMock();
         $exporter = new Exporter(
             //These first parameters were copied from the constructor's default values
             'localhost:4317',
@@ -50,7 +25,14 @@ class OTLPGrpcExporterTest extends MockeryTestCase
             '',
             false,
             10,
-            $mockClient
+            $this->createMockTraceServiceClient([
+                "expectations" => [
+                    "num_spans" => 1
+                ],
+                "return_values" => [
+                    "status_code" => \Grpc\STATUS_OK
+                ] 
+            ])
         );
                
         $exporterStatusCode = $exporter->export([new SpanData()]);
@@ -60,31 +42,6 @@ class OTLPGrpcExporterTest extends MockeryTestCase
 
     public function testExporterUnexpectedGrpcResponseStatus()
     {
-        /** @var MockInterface&TraceServiceClient */
-        $mockClient = Mockery::mock(TraceServiceClient::class)
-                        ->shouldReceive('Export')
-                        ->withArgs(function ($request) {
-                            return (count($request->getResourceSpans()) == 1);
-                        })
-                        ->andReturn(
-                            Mockery::mock(UnaryCall::class)
-                                ->shouldReceive('wait')
-                                ->andReturn(
-                                    [
-                                        'unused response data',
-                                        new class() {
-                                            public $code;
-                        
-                                            public function __construct()
-                                            {
-                                                $this->code = 'An unexpected status';
-                                            }
-                                        },
-                                    ]
-                                )
-                                ->getMock()
-                        )
-                        ->getMock();
         $exporter = new Exporter(
             //These first parameters were copied from the constructor's default values
             'localhost:4317',
@@ -93,7 +50,14 @@ class OTLPGrpcExporterTest extends MockeryTestCase
             '',
             false,
             10,
-            $mockClient
+            $this->createMockTraceServiceClient([
+                "expectations" => [
+                    "num_spans" => 1
+                ],
+                "return_values" => [
+                    "status_code" => "An unexpected status"
+                ] 
+            ])
         );
                
         $exporterStatusCode = $exporter->export([new SpanData()]);
@@ -214,5 +178,45 @@ class OTLPGrpcExporterTest extends MockeryTestCase
         putenv('OTEL_EXPORTER_OTLP_TIMEOUT');
         putenv('OTEL_EXPORTER_OTLP_COMPRESSION');
         putenv('OTEL_EXPORTER_OTLP_INSECURE');
+    }
+
+    private function createMockTraceServiceClient(array $options = []) 
+    {
+        [
+            "expectations" => [
+                "num_spans" => $expectedNumSpans
+            ],
+            "return_values" => [
+                "status_code" => $statusCode
+            ] 
+        ] = $options;
+
+        /** @var MockInterface&TraceServiceClient */
+        $mockClient = Mockery::mock(TraceServiceClient::class)
+                        ->shouldReceive('Export')
+                        ->withArgs(function ($request) use($expectedNumSpans) {
+                            return (count($request->getResourceSpans()) == $expectedNumSpans);
+                        })
+                        ->andReturn(
+                            Mockery::mock(UnaryCall::class)
+                                ->shouldReceive('wait')
+                                ->andReturn(
+                                    [
+                                        'unused response data',
+                                        new class($statusCode) {
+                                            public $code;
+                        
+                                            public function __construct($code)
+                                            {
+                                                $this->code = $code;
+                                            }
+                                        },
+                                    ]
+                                )
+                                ->getMock()
+                        )
+                        ->getMock();
+        
+        return $mockClient;
     }
 }
