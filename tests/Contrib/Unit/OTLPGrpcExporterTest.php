@@ -18,28 +18,28 @@ class OTLPGrpcExporterTest extends MockeryTestCase
     {
         /** @var MockInterface&TraceServiceClient */
         $mockClient = Mockery::mock(TraceServiceClient::class)
-                        ->shouldReceive("Export")
+                        ->shouldReceive('Export')
                         ->withArgs(function ($request) {
                             return (count($request->getResourceSpans()) == 1);
                         })
                         ->andReturn(
                             Mockery::mock(UnaryCall::class)
-                                ->shouldReceive("wait")
+                                ->shouldReceive('wait')
                                 ->andReturn(
                                     [
-                                        "unused response data",
-                                        new class {
+                                        'unused response data',
+                                        new class() {
                                             public $code;
                         
                                             public function __construct()
                                             {
                                                 $this->code = \Grpc\STATUS_OK;
                                             }
-                                        }
+                                        },
                                     ]
                                 )
                                 ->getMock()
-                            )
+                        )
                         ->getMock();
         $exporter = new Exporter(
             //These first parameters were copied from the constructor's default values
@@ -61,28 +61,28 @@ class OTLPGrpcExporterTest extends MockeryTestCase
     {
         /** @var MockInterface&TraceServiceClient */
         $mockClient = Mockery::mock(TraceServiceClient::class)
-                        ->shouldReceive("Export")
+                        ->shouldReceive('Export')
                         ->withArgs(function ($request) {
                             return (count($request->getResourceSpans()) == 1);
                         })
                         ->andReturn(
                             Mockery::mock(UnaryCall::class)
-                                ->shouldReceive("wait")
+                                ->shouldReceive('wait')
                                 ->andReturn(
                                     [
-                                        "unused response data",
-                                        new class {
+                                        'unused response data',
+                                        new class() {
                                             public $code;
                         
                                             public function __construct()
                                             {
-                                                $this->code = "An unexpected status";
+                                                $this->code = 'An unexpected status';
                                             }
-                                        }
+                                        },
                                     ]
                                 )
                                 ->getMock()
-                            )
+                        )
                         ->getMock();
         $exporter = new Exporter(
             //These first parameters were copied from the constructor's default values
