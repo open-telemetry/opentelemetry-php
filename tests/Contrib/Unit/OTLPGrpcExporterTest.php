@@ -8,6 +8,7 @@ use Grpc\UnaryCall;
 use InvalidArgumentException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
+use Mockery\MockInterface;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\Sdk\Trace\Test\SpanData;
