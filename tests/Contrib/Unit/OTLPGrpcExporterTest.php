@@ -19,6 +19,9 @@ class OTLPGrpcExporterTest extends MockeryTestCase
         /** @var MockInterface&TraceServiceClient */
         $mockClient = Mockery::mock(TraceServiceClient::class)
                         ->shouldReceive("Export")
+                        ->withArgs(function ($request) {
+                            return (count($request->getResourceSpans()) == 1);
+                        })
                         ->andReturn(
                             Mockery::mock(UnaryCall::class)
                                 ->shouldReceive("wait")
@@ -59,6 +62,9 @@ class OTLPGrpcExporterTest extends MockeryTestCase
         /** @var MockInterface&TraceServiceClient */
         $mockClient = Mockery::mock(TraceServiceClient::class)
                         ->shouldReceive("Export")
+                        ->withArgs(function ($request) {
+                            return (count($request->getResourceSpans()) == 1);
+                        })
                         ->andReturn(
                             Mockery::mock(UnaryCall::class)
                                 ->shouldReceive("wait")
