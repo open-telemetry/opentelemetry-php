@@ -17,21 +17,27 @@ class OTLPGrpcExporterTest extends MockeryTestCase
     public function testExporterHappyPath()
     {
         /** @var MockInterface&TraceServiceClient */
-        $mockClient = Mockery::mock(TraceServiceClient::class, [
-            "Export" => Mockery::mock(UnaryCall::class, [
-                "wait" => [
-                    "unused response data",
-                    new class {
-                        public $code;
-    
-                        public function __construct()
-                        {
-                            $this->code = \Grpc\STATUS_OK;
-                        }
-                    }
-                ]
-            ])
-        ]);
+        $mockClient = Mockery::mock(TraceServiceClient::class)
+                        ->shouldReceive("Export")
+                        ->andReturn(
+                            Mockery::mock(UnaryCall::class)
+                                ->shouldReceive("wait")
+                                ->andReturn(
+                                    [
+                                        "unused response data",
+                                        new class {
+                                            public $code;
+                        
+                                            public function __construct()
+                                            {
+                                                $this->code = \Grpc\STATUS_OK;
+                                            }
+                                        }
+                                    ]
+                                )
+                                ->getMock()
+                            )
+                        ->getMock();
         $exporter = new Exporter(
             //These first parameters were copied from the constructor's default values
             'localhost:4317',
@@ -51,21 +57,27 @@ class OTLPGrpcExporterTest extends MockeryTestCase
     public function testExporterUnexpectedGrpcResponseStatus()
     {
         /** @var MockInterface&TraceServiceClient */
-        $mockClient = Mockery::mock(TraceServiceClient::class, [
-            "Export" => Mockery::mock(UnaryCall::class, [
-                "wait" => [
-                    "unused response data",
-                    new class {
-                        public $code;
-    
-                        public function __construct()
-                        {
-                            $this->code = "An unexpected status";
-                        }
-                    }
-                ]
-            ])
-        ]);
+        $mockClient = Mockery::mock(TraceServiceClient::class)
+                        ->shouldReceive("Export")
+                        ->andReturn(
+                            Mockery::mock(UnaryCall::class)
+                                ->shouldReceive("wait")
+                                ->andReturn(
+                                    [
+                                        "unused response data",
+                                        new class {
+                                            public $code;
+                        
+                                            public function __construct()
+                                            {
+                                                $this->code = "An unexpected status";
+                                            }
+                                        }
+                                    ]
+                                )
+                                ->getMock()
+                            )
+                        ->getMock();
         $exporter = new Exporter(
             //These first parameters were copied from the constructor's default values
             'localhost:4317',
