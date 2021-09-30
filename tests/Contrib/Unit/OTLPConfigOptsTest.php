@@ -17,12 +17,12 @@ class OTLPConfigOptsTest extends TestCase
     {
         $otlpConfig = new ConfigOpts([]);
 
-        $otlpConfig->WithEndpoint('https://api.example.com:1337/v1/trace');
-        $otlpConfig->WithHeaders('X-Auth-Wibble=foo,X-Dataset=bar');
-        $otlpConfig->WithProtocol('http/protobuf');
-        $otlpConfig->WithInsecure();
-        $otlpConfig->WithCompression();
-        $otlpConfig->WithTimeout(10);
+        $otlpConfig->WithEndpoint('https://api.example.com:1337/v1/trace')
+                   ->WithHeaders('X-Auth-Wibble=foo,X-Dataset=bar')
+                   ->WithProtocol('http/protobuf')
+                   ->WithInsecure()
+                   ->WithCompression()
+                   ->WithTimeout(10);
 
 
         $this->assertSame([], $otlpConfig);

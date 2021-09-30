@@ -62,6 +62,8 @@ class ConfigOpts {
 
         $this->endpoint = $endpoint;
 
+        return $this;
+
     }
 
     #TODO: Endpoint path for http should be possible
@@ -72,6 +74,8 @@ class ConfigOpts {
         }
 
         $this->protocol = $protocol;
+
+        return $this;
     }
 
     public function WithHeaders(string $headers)
@@ -98,21 +102,32 @@ class ConfigOpts {
 
         $this->headers = $metadata;
 
+        return $this;
+
     }
 
     public function WithCompression()
     {
         $this->compression = 'gzip';
+
+        return $this;
+
     }
 
     public function WithTimeout(int $timeout)
     {
         $this->timeout = $timeout;
+
+        return $this;
+
     }
 
     public function WithInsecure()
     {
         $this->insecure = true;
+
+        return $this;
+
     }
 }
 
