@@ -48,6 +48,40 @@ class OTLPGrpcExporterTest extends MockeryTestCase
         $this->assertEquals(Exporter::SUCCESS, $exporterStatusCode);
     }
 
+    public function testExporterUnexpectedGrpcResponseStatus()
+    {
+        /** @var MockInterface&TraceServiceClient */
+        $mockClient = Mockery::mock(TraceServiceClient::class, [
+            "Export" => Mockery::mock(UnaryCall::class, [
+                "wait" => [
+                    "unused response data",
+                    new class {
+                        public $code;
+    
+                        public function __construct()
+                        {
+                            $this->code = "An unexpected status";
+                        }
+                    }
+                ]
+            ])
+        ]);
+        $exporter = new Exporter(
+            //These first parameters were copied from the constructor's default values
+            'localhost:4317',
+            true,
+            '',
+            '',
+            false,
+            10,
+            $mockClient
+        );
+               
+        $exporterStatusCode = $exporter->export([new SpanData()]);
+
+        $this->assertEquals(Exporter::FAILED_NOT_RETRYABLE, $exporterStatusCode);
+    }
+
     public function testExporter()
     {
         $this->assertEquals(Exporter::FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
