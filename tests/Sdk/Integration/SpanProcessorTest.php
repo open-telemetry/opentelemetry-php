@@ -26,10 +26,9 @@ class SpanProcessorTest extends TestCase
             ->with($this->isInstanceOf(Span::class), $this->equalTo($parentContext))
         ;
 
-        $tracerProvider = new TracerProvider();
-        $tracerProvider->addSpanProcessor($spanProcessor);
+        $tracerProvider = new TracerProvider($spanProcessor);
         $tracer = $tracerProvider->getTracer('OpenTelemetry.Test');
-        $tracer->startSpan('test.span', $parentContext);
+        $tracer->spanBuilder('test.span')->setParent($parentContext)->startSpan();
     }
 
     /**
@@ -46,9 +45,8 @@ class SpanProcessorTest extends TestCase
             ->with($this->isInstanceOf(Span::class), $this->equalTo($currentContext))
         ;
 
-        $tracerProvider = new TracerProvider();
-        $tracerProvider->addSpanProcessor($spanProcessor);
+        $tracerProvider = new TracerProvider($spanProcessor);
         $tracer = $tracerProvider->getTracer('OpenTelemetry.Test');
-        $tracer->startSpan('test.span', null);
+        $tracer->spanBuilder('test.span')->startSpan();
     }
 }

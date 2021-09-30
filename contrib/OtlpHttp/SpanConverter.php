@@ -19,8 +19,8 @@ use Opentelemetry\Proto\Trace\V1\Span\Link;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
-use OpenTelemetry\Sdk\Trace\ReadableSpan;
-use OpenTelemetry\Sdk\Trace\SpanStatus;
+use OpenTelemetry\Sdk\Trace\SpanData;
+use OpenTelemetry\Trace as API;
 
 class SpanConverter
 {
@@ -79,25 +79,23 @@ class SpanConverter
         return SpanKind::SPAN_KIND_UNSPECIFIED;
     }
 
-    public function as_otlp_span(ReadableSpan $span): CollectorSpan
+    public function as_otlp_span(SpanData $span): CollectorSpan
     {
-        $end_timestamp = ($span->getStartEpochTimestamp() + $span->getDuration());
-
-        $parent_span = $span->getParent();
-        $parent_span_id = $parent_span ? $parent_span->getSpanId() : false;
+        $parent_span = $span->getParentContext();
+        $parent_span_id = $parent_span->isValid() ? $parent_span->getSpanId() : null;
 
         $row = [
-            'trace_id' => hex2bin($span->getContext()->getTraceId()),
-            'span_id' => hex2bin($span->getContext()->getSpanId()),
+            'trace_id' => hex2bin($span->getTraceId()),
+            'span_id' => hex2bin($span->getSpanId()),
             'parent_span_id' => $parent_span_id ? hex2bin($parent_span_id) : null,
-            'name' => $span->getSpanName(),
-            'start_time_unix_nano' => $span->getStartEpochTimestamp(),
-            'end_time_unix_nano' => $end_timestamp,
-            'kind' => $this->as_otlp_span_kind($span->getSpanKind()),
+            'name' => $span->getName(),
+            'start_time_unix_nano' => $span->getStartEpochNanos(),
+            'end_time_unix_nano' => $span->getEndEpochNanos(),
+            'kind' => $this->as_otlp_span_kind($span->getKind()),
             'trace_state' => (string) $span->getContext()->getTraceState(),
             'dropped_attributes_count' => $span->getAttributes()->getDroppedAttributesCount(),
-            'dropped_events_count' => $span->getDroppedEventsCount(),
-            'dropped_links_count' => $span->getDroppedLinksCount(),
+            'dropped_events_count' => $span->getTotalDroppedEvents(),
+            'dropped_links_count' => $span->getTotalDroppedLinks(),
         ];
 
         foreach ($span->getEvents() as $event) {
@@ -146,13 +144,13 @@ class SpanConverter
 
         $status = new Status();
 
-        switch ($span->getStatus()->getCanonicalStatusCode()) {
-            case SpanStatus::OK:
+        switch ($span->getStatus()->getCode()) {
+            case API\StatusCode::STATUS_OK:
                 $status->setCode(StatusCode::STATUS_CODE_OK);
 
                 break;
-            case SpanStatus::ERROR:
-                $status->setCode(StatusCode::STATUS_CODE_ERROR)->setMessage($span->getStatus()->getStatusDescription());
+            case API\StatusCode::STATUS_ERROR:
+                $status->setCode(StatusCode::STATUS_CODE_ERROR)->setMessage($span->getStatus()->getDescription());
 
                 break;
             default:

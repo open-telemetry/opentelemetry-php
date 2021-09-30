@@ -8,7 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\Jaeger\Exporter;
-use OpenTelemetry\Sdk\Trace\Span;
+use OpenTelemetry\Sdk\Trace\Test\SpanData;
 use PHPUnit\Framework\TestCase;
 
 class JaegerExporterTest extends TestCase
@@ -51,9 +51,9 @@ class JaegerExporterTest extends TestCase
             new HttpFactory()
         );
 
-        $span = $this->createMock(Span::class);
+        $span = $this->createMock(SpanData::class);
         $exporter->shutdown();
 
-        $this->assertEquals($exporter->export([$span]), \OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE);
+        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 }

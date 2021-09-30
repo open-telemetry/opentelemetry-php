@@ -6,40 +6,15 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
-use OpenTelemetry\Sdk\Resource\ResourceInfo;
-use OpenTelemetry\Sdk\Trace\Attributes;
 
-use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\TracerProvider;
+use OpenTelemetry\Sdk\Trace\Test\SpanData;
 use PHPUnit\Framework\TestCase;
 
 class OTLPGrpcExporterTest extends TestCase
 {
-
-    /**
-     * @test
-     */
     public function testExporter()
     {
-        $provider = new TracerProvider(
-            ResourceInfo::create(
-                new Attributes([
-                    'service.name' => 'my-service',
-                ])
-            )
-        );
-
-        $tracer = $provider->getTracer('io.opentelemetry.contrib.php');
-
-        /** @var \OpenTelemetry\Sdk\Trace\Span $span */
-        $span = $tracer->startAndActivateSpan('test.otlp');
-
-        $span->setAttribute('attr1', 'val1')
-            ->setAttribute('attr2', 'val1');
-
-        $foo = (new Exporter())->export([$span]);
-
-        $this->assertEquals(Exporter::FAILED_RETRYABLE, $foo);
+        $this->assertEquals(Exporter::FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
     }
 
     public function testRefusesInvalidHeaders()
@@ -89,10 +64,10 @@ class OTLPGrpcExporterTest extends TestCase
     public function failsIfNotRunning()
     {
         $exporter = new Exporter('test.otlp');
-        $span = $this->createMock(Span::class);
+        $span = $this->createMock(SpanData::class);
         $exporter->shutdown();
 
-        $this->assertEquals(\OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
+        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 
     public function testHeadersShouldRefuseArray()

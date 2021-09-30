@@ -15,6 +15,5 @@ interface Events extends \IteratorAggregate, \Countable
      */
     public function addEvent(string $name, ?Attributes $attributes = null, ?int $timestamp = null): Events;
 
-    public function count(): int;
     public function getIterator(): EventsIterator;
 }

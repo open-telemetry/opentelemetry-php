@@ -20,7 +20,7 @@ interface Exporter
 
     /**
      * Export trace data (spans)
-     * @param iterable<ReadableSpan> $spans Batch of spans to export
+     * @param iterable<SpanData> $spans Batch of spans to export
      * @return int
      */
     public function export(iterable $spans): int;

@@ -15,11 +15,12 @@ class Events implements API\Events
         ?API\Attributes $attributes = null,
         int $timestamp = null
     ): API\Events {
-        $this->events[] = new Event($name, $timestamp ?? Clock::get()->timestamp(), $attributes);
+        $this->events[] = new Event($name, $timestamp ?? Clock::getDefault()->now(), $attributes);
 
         return $this;
     }
 
+    /** @psalm-mutation-free */
     public function count(): int
     {
         return \count($this->events);

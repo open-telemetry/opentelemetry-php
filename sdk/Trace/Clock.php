@@ -4,46 +4,36 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use function intdiv;
 use OpenTelemetry\Trace as API;
 
-class Clock implements API\Clock
+abstract class Clock implements API\Clock
 {
-    private static $instance;
+    private static ?API\Clock $testClock;
 
-    /** @var API\RealtimeClock */
-    public $realtime_clock;
-
-    /** @var API\MonotonicClock */
-    public $monotonic_clock;
-
-    private function __construct()
+    public static function getDefault(): API\Clock
     {
-        $this->realtime_clock = new RealtimeClock();
-        $this->monotonic_clock = new MonotonicClock();
+        return self::$testClock ?? SystemClock::getInstance();
     }
 
-    public static function get(): Clock
+    /**
+     * @internal
+     * @psalm-internal OpenTelemetry
+     */
+    public static function setTestClock(?API\Clock $clock = null): void
     {
-        if (!self::$instance) {
-            self::$instance = new Clock();
-        }
-
-        return self::$instance;
+        self::$testClock = $clock;
     }
 
-    /** @return array{int, int} */
-    public function moment(): array
+    /** @psalm-pure */
+    public static function nanosToMicro(int $nanoseconds): int
     {
-        return [$this->realtime_clock->now(), $this->monotonic_clock->now()];
+        return intdiv($nanoseconds, 1000);
     }
 
-    public function timestamp(): int
+    /** @psalm-pure */
+    public static function nanosToMilli(int $nanoseconds): int
     {
-        return $this->realtime_clock->now();
-    }
-
-    public function now(): int
-    {
-        return $this->monotonic_clock->now();
+        return intdiv($nanoseconds, 1000000);
     }
 }

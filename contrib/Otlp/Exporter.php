@@ -104,16 +104,11 @@ class Exporter implements Trace\Exporter
         $this->spanConverter =  $spanConverter ?? new SpanConverter($serviceName);
     }
 
-    /**
-     * Exports the provided Span data via the OTLP protocol
-     *
-     * @param iterable<Trace\ReadableSpan> $spans Array of Spans
-     * @return int return code, defined on the Exporter interface
-     */
+    /** @inheritDoc */
     public function export(iterable $spans): int
     {
         if (!$this->running) {
-            return Exporter::FAILED_NOT_RETRYABLE;
+            return Trace\Exporter::FAILED_NOT_RETRYABLE;
         }
 
         if (empty($spans)) {
@@ -122,7 +117,7 @@ class Exporter implements Trace\Exporter
 
         $convertedSpans = [];
         foreach ($spans as $span) {
-            array_push($convertedSpans, $this->spanConverter->convert($span));
+            $convertedSpans[] = $this->spanConverter->convert($span);
         }
 
         try {
@@ -169,13 +164,12 @@ class Exporter implements Trace\Exporter
         }
 
         $factory = new HttpFactory();
-        $exporter = new Exporter(
+
+        return new Exporter(
             $name,
             new Client(),
             $factory,
             $factory
         );
-
-        return $exporter;
     }
 }

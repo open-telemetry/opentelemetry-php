@@ -103,10 +103,19 @@ final class TraceContextPropagator implements API\TextMapPropagator
         if ($rawTracestate !== null) {
             $tracestate = new TraceState($rawTracestate);
 
-            return SpanContext::restore($traceId, $spanId, $isSampled, true, $tracestate);
+            return SpanContext::createFromRemoteParent(
+                $traceId,
+                $spanId,
+                $isSampled ? API\SpanContext::TRACE_FLAG_SAMPLED : API\SpanContext::TRACE_FLAG_DEFAULT,
+                $tracestate
+            );
         }
 
         // Only traceparent header is extracted. No tracestate.
-        return SpanContext::restore($traceId, $spanId, $isSampled, true);
+        return SpanContext::createFromRemoteParent(
+            $traceId,
+            $spanId,
+            $isSampled ? API\SpanContext::TRACE_FLAG_SAMPLED : API\SpanContext::TRACE_FLAG_DEFAULT
+        );
     }
 }

@@ -6,12 +6,17 @@ namespace OpenTelemetry\Trace;
 
 interface Clock
 {
+    public const NANOS_PER_SECOND = 1000000000;
+
     /**
-     * A combination of the Monotonic and Realtime Clocks
-     * Monotonic time value in the first slot, as it'll get accessed more frequently in duration calculations.
-     *
-     * @return array{int, int}
+     * Returns the current epoch wall-clock timestamp in nanoseconds.
+     * This timestamp should _ONLY_ be used to compute a current time.
+     * Use {@see Clock::nanoTime} for calculating durations.
      */
-    public function moment(): array;
     public function now(): int;
+
+    /**
+     * Returns the current epoch monotonic timestamp in nanoseconds that can only be used to calculate elapsed time.
+     */
+    public function nanoTime(): int;
 }

@@ -9,8 +9,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\Zipkin\Exporter;
-use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanContext;
+use OpenTelemetry\Sdk\Trace\Test\SpanData;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -35,7 +34,7 @@ class ZipkinExporterTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $exporter->export([new Span('test.zipkin.span', SpanContext::generate())])
+            $exporter->export([(new SpanData())])
         );
     }
 
@@ -66,7 +65,7 @@ class ZipkinExporterTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $exporter->export([new Span('test.zipkin.span', SpanContext::generate())])
+            $exporter->export([(new SpanData())])
         );
     }
 
@@ -129,9 +128,9 @@ class ZipkinExporterTest extends TestCase
     public function failsIfNotRunning()
     {
         $exporter = new Exporter('test.jaeger', 'scheme://host:123/path', new Client(), new HttpFactory(), new HttpFactory());
-        $span = $this->createMock(Span::class);
+        $span = $this->createMock(SpanData::class);
         $exporter->shutdown();
 
-        $this->assertEquals($exporter->export([$span]), \OpenTelemetry\Sdk\Trace\Exporter::FAILED_NOT_RETRYABLE);
+        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 }
