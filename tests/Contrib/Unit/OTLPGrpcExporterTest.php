@@ -4,14 +4,50 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use Grpc\UnaryCall;
 use InvalidArgumentException;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
-
+use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\Sdk\Trace\Test\SpanData;
-use PHPUnit\Framework\TestCase;
 
-class OTLPGrpcExporterTest extends TestCase
+class OTLPGrpcExporterTest extends MockeryTestCase
 {
+    public function testExporterHappyPath()
+    {
+        /** @var MockInterface&TraceServiceClient */
+        $mockClient = Mockery::mock(TraceServiceClient::class, [
+            "Export" => Mockery::mock(UnaryCall::class, [
+                "wait" => [
+                    "unused response data",
+                    new class {
+                        public $code;
+    
+                        public function __construct()
+                        {
+                            $this->code = \Grpc\STATUS_OK;
+                        }
+                    }
+                ]
+            ])
+        ]);
+        $exporter = new Exporter(
+            //These first parameters were copied from the constructor's default values
+            'localhost:4317',
+            true,
+            '',
+            '',
+            false,
+            10,
+            $mockClient
+        );
+               
+        $exporterStatusCode = $exporter->export([new SpanData()]);
+
+        $this->assertEquals(Exporter::SUCCESS, $exporterStatusCode);
+    }
+
     public function testExporter()
     {
         $this->assertEquals(Exporter::FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
