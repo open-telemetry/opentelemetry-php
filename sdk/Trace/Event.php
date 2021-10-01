@@ -4,26 +4,22 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Sdk\Trace;
 
+use function count;
 use OpenTelemetry\Trace as API;
 
-class Event implements API\Event
+final class Event implements API\Event
 {
-    private $name;
-    private $timestamp;
-    private $attributes;
+    private string $name;
+    private int $timestamp;
+    private API\Attributes $attributes;
+    private int $totalAttributeCount;
 
-    public function __construct(string $name, int $timestamp, ?API\Attributes $attributes = null)
+    public function __construct(string $name, int $timestamp, API\Attributes $attributes = null)
     {
         $this->name = $name;
         $this->timestamp = $timestamp;
         $this->attributes = $attributes ?? new Attributes();
-    }
-
-    public function setAttribute(string $key, $value): self
-    {
-        $this->attributes->setAttribute($key, $value);
-
-        return $this;
+        $this->totalAttributeCount = count($this->attributes);
     }
 
     public function getAttributes(): API\Attributes
@@ -36,8 +32,18 @@ class Event implements API\Event
         return $this->name;
     }
 
-    public function getTimestamp(): int
+    public function getEpochNanos(): int
     {
         return $this->timestamp;
+    }
+
+    public function getTotalAttributeCount(): int
+    {
+        return $this->totalAttributeCount;
+    }
+
+    public function getDroppedAttributesCount(): int
+    {
+        return $this->totalAttributeCount - count($this->attributes);
     }
 }

@@ -1,11 +1,20 @@
 composer.phar
 composer.lock
-var
-vendor
-.idea/
+var/
+vendor/
 coverage.clover
 tests/coverage
 .php-cs-fixer.cache
+
+# IntelliJ IDEA
+.idea
+*.iml
+
+# VS Code
+.vscode
+
+# OS X
+.DS_Store
 
 # W3C Test Service build artifacts
 tests/TraceContext/W3CTestService/test_app

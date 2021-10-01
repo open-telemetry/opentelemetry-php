@@ -76,7 +76,7 @@ class SpanConverter
                 $row['annotations'] = [];
             }
             $row['annotations'][] = [
-                'timestamp' => Clock::nanosToMicro($event->getTimestamp()),
+                'timestamp' => Clock::nanosToMicro($event->getEpochNanos()),
                 'value' => $event->getName(),
             ];
         }

@@ -19,8 +19,12 @@ final class ImmutableSpan implements SpanData
     /** @var non-empty-string */
     private string $name;
 
-    private API\Links $links;
-    private API\Events $events;
+    /** @var list<API\Event> */
+    private array $events;
+
+    /** @var list<API\Link> */
+    private array $links;
+
     private API\Attributes $attributes;
     private int $totalAttributeCount;
     private int $totalRecordedEvents;
@@ -33,12 +37,14 @@ final class ImmutableSpan implements SpanData
      * @psalm-internal OpenTelemetry\Sdk
      *
      * @param non-empty-string $name
+     * @param list<API\Link> $links
+     * @param list<API\Event> $events
      */
     public function __construct(
         Span $span,
         string $name,
-        API\Links $links,
-        API\Events $events,
+        array $links,
+        array $events,
         API\Attributes $attributes,
         int $totalAttributeCount,
         int $totalRecordedEvents,
@@ -113,12 +119,14 @@ final class ImmutableSpan implements SpanData
         return $this->name;
     }
 
-    public function getLinks(): API\Links
+    /** @inheritDoc */
+    public function getLinks(): array
     {
         return $this->links;
     }
 
-    public function getEvents(): API\Events
+    /** @inheritDoc */
+    public function getEvents(): array
     {
         return $this->events;
     }

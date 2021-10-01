@@ -30,7 +30,7 @@ class AlwaysOffSampler implements Sampler
         string $spanName,
         int $spanKind,
         ?API\Attributes $attributes = null,
-        ?API\Links $links = null
+        array $links = []
     ): SamplingResult {
         $parentSpan = Span::fromContext($parentContext);
         $parentSpanContext = $parentSpan->getContext();

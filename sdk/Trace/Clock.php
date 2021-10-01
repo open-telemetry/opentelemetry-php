@@ -36,4 +36,10 @@ abstract class Clock implements API\Clock
     {
         return intdiv($nanoseconds, 1000000);
     }
+
+    /** @psalm-pure */
+    public static function secondsToNanos(int $seconds): int
+    {
+        return $seconds * self::NANOS_PER_SECOND;
+    }
 }

@@ -8,5 +8,6 @@ interface Event
 {
     public function getName(): string;
     public function getAttributes(): Attributes;
-    public function getTimestamp(): int;
+    public function getEpochNanos(): int;
+    public function getTotalAttributeCount(): int;
 }

@@ -33,8 +33,11 @@ final class SpanBuilder implements API\SpanBuilder
      * @psalm-var API\SpanKind::KIND_*
      */
     private int $spanKind = API\SpanKind::KIND_INTERNAL;
+
+    /** @var list<API\Link>|null */
+    private ?array $links = null;
+
     private ?API\Attributes $attributes = null;
-    private ?API\Links $links = null;
     private int $totalNumberOfLinksAdded = 0;
     private int $startEpochNanos = 0;
 
@@ -77,14 +80,23 @@ final class SpanBuilder implements API\SpanBuilder
         $this->totalNumberOfLinksAdded++;
 
         if (null === $this->links) {
-            $this->links = new Links();
+            $this->links = [];
         }
 
         if (count($this->links) === $this->spanLimits->getLinkCountLimit()) {
             return $this;
         }
 
-        $this->links->addLink(new Link($context, $attributes));
+        $this->links[] = new Link(
+            $context,
+            Attributes::withLimits(
+                $attributes ?? new Attributes(),
+                new AttributeLimits(
+                    $this->spanLimits->getAttributePerLinkCountLimit(),
+                    $this->spanLimits->getAttributeLimits()->getAttributeValueLengthLimit()
+                )
+            ),
+        );
 
         return $this;
     }
@@ -155,7 +167,7 @@ final class SpanBuilder implements API\SpanBuilder
         }
 
         // Reset links and attributes back to null to prevent mutation of the started span.
-        $links = $this->links ?? new Links();
+        $links = $this->links ?? [];
         $this->links = null;
 
         $attributes = $this->attributes ?? new Attributes();
