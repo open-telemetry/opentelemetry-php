@@ -11,14 +11,38 @@ use OpenTelemetry\Sdk\Trace\Exporter;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanData;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\BatchSpanProcessor;
-use OpenTelemetry\Trace\SpanContext;
+use OpenTelemetry\Sdk\Trace\Test\TestClock;
+use OpenTelemetry\Trace as API;
 
 class BatchSpanProcessorTest extends MockeryTestCase
 {
-    /**
-     * @test
-     */
-    public function shouldExportIfBatchLimitIsReachedButDelayNotReached(): void
+    private TestClock $testClock;
+
+    protected function setUp(): void
+    {
+        $this->testClock = new TestClock();
+
+        Clock::setTestClock($this->testClock);
+    }
+
+    protected function tearDown(): void
+    {
+        Clock::setTestClock();
+    }
+
+    public function test_allowsNullExporter(): void
+    {
+        $proc = new BatchSpanProcessor(null, $this->testClock);
+        /** @var Span $span */
+        $span = $this->createSampledSpanMock();
+        $proc->onStart($span);
+        $proc->onEnd($span);
+        $proc->forceFlush();
+        $proc->shutdown();
+        $this->assertTrue(true); // phpunit requires an assertion
+    }
+
+    public function test_export_batchSizeMet(): void
     {
         $batchSize = 3;
         $queueSize = 5; // queue is larger than batch
@@ -33,24 +57,23 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $exporter = $this->createMock(Exporter::class);
         $exporter->expects($this->atLeastOnce())->method('export');
 
-        // Export will still happen even if clock will never trigger the batch
-        $clock = $this->createMock(Clock::class);
-        $clock->method('now')->willReturn(($exportDelay - 1));
-
         /** @var Span[] $spans */
         /** @var Exporter $exporter */
-        /** @var Clock $clock */
-        $processor = new BatchSpanProcessor($exporter, $clock, $queueSize, $exportDelay, $timeout, $batchSize);
+        $processor = new BatchSpanProcessor(
+            $exporter,
+            $this->testClock,
+            $queueSize,
+            $exportDelay,
+            $timeout,
+            $batchSize
+        );
 
         foreach ($spans as $span) {
             $processor->onEnd($span);
         }
     }
 
-    /**
-     * @test
-     */
-    public function shouldExportIfDelayLimitReachedButBatchSizeNotReached(): void
+    public function test_export_delayLimitReached_partiallyFilledBatch(): void
     {
         $batchSize = 4;
         $queueSize = 5;
@@ -76,132 +99,56 @@ class BatchSpanProcessorTest extends MockeryTestCase
                 )
             );
 
-        // The clock will be "before" the delay until the final call, then the timeout will trigger
-        $clock = $this->createMock(Clock::class);
-
-        $timestampReturns = [];
-        for ($i = 0; $i < count($spans) - 1; $i++) {
-            $timestampReturns[] = ($exportDelay - 1) * 1e6;
-        }
-        $timestampReturns[count($spans) - 1] = ($exportDelay + 1) * 1e6;
-
-        // forceFlush method will call timestamp once again to set exportedTimestamp
-        $timestampReturns[count($spans)] = ($exportDelay - 1) * 1e6;
-
-        $clock
-            ->method('now')
-            ->willReturnOnConsecutiveCalls(...array_map(static function ($e) {
-                return (int) $e;
-            }, $timestampReturns));
-
         /** @var Exporter $exporter */
         /** @var Clock $clock */
-        $processor = new BatchSpanProcessor($exporter, $clock, $queueSize, $exportDelay, $timeout, $batchSize);
+        $processor = new BatchSpanProcessor(
+            $exporter,
+            $this->testClock,
+            $queueSize,
+            $exportDelay,
+            $timeout,
+            $batchSize
+        );
 
         /** @var Span $span */
-        foreach ($spans as $span) {
+        foreach ($spans as $idx => $span) {
             $processor->onEnd($span);
+
+            if (1 === $idx) {
+                // Advance the clock to force a timeout flush.
+                $this->testClock->advanceSeconds();
+            }
         }
     }
 
-    /**
-     * @test
-     */
-    public function shouldNotExportIfNotEnoughTimePassedAndBatchNotFull(): void
+    public function test_export_delayLimitNotReached_partiallyFilledBatch(): void
     {
         $batchSize = 3;
         $queueSize = 5;
         $exportDelay = 2;
         $timeout = 3000;
 
-        // TODO: Use TestClock here.
-        $clock = $this->createMock(Clock::class);
-        $clock->method('now')->willReturn(($exportDelay - 1));
-
         $exporter = $this->createMock(Exporter::class);
         $exporter->expects($this->never())->method('export');
 
         /** @var Exporter $exporter */
         /** @var Clock $clock */
-        $processor = new BatchSpanProcessor($exporter, $clock, $queueSize, $exportDelay, $timeout, $batchSize);
+        $processor = new BatchSpanProcessor(
+            $exporter,
+            $this->testClock,
+            $queueSize,
+            $exportDelay,
+            $timeout,
+            $batchSize
+        );
 
         for ($i = 0; $i < $batchSize - 1; $i++) {
             $mock_span = $this->createSampledSpanMock();
-            /** @var Span $mock_span */
             $processor->onEnd($mock_span);
         }
     }
 
-    /**
-     * @test
-     */
-    public function shouldAllowNullExporter(): void
-    {
-        $proc = new BatchSpanProcessor(null, $this->createMock(Clock::class));
-        /** @var Span $span */
-        $span = $this->createSampledSpanMock();
-        $proc->onStart($span);
-        $proc->onEnd($span);
-        $proc->forceFlush();
-        $proc->shutdown();
-        $this->assertTrue(true); // phpunit requires an assertion
-    }
-
-    /**
-     * @test
-     */
-    public function forceFlushExportsAllEndedSpans(): void
-    {
-        $batchSize = 3;
-        $queueSize = 3;
-        $exportDelay = 2;
-        $timeout = 3000;
-
-        // TODO: Use TestClock here.
-        $clock = $this->createMock(Clock::class);
-        $clock->method('now')->willReturn(($exportDelay - 1));
-
-        $exporter = Mockery::mock(Exporter::class);
-        $exporter
-            ->expects('export')
-            ->with(
-                Mockery::on(
-                    function (array $spans) {
-                        $this->assertCount(2, $spans);
-                        $this->assertInstanceOf(SpanData::class, $spans[0]);
-
-                        return true;
-                    }
-                )
-            );
-
-        $processor = new BatchSpanProcessor($exporter, $clock, $queueSize, $exportDelay, $timeout, $batchSize);
-
-        for ($i = 0; $i < $batchSize - 1; $i++) {
-            /** @var Span $span */
-            $span = $this->createSampledSpanMock();
-            $processor->onEnd($span);
-        }
-
-        $processor->forceFlush();
-    }
-
-    /**
-     * @test
-     */
-    public function shutdownCallsExporterShutdown(): void
-    {
-        $exporter = $this->createMock(Exporter::class);
-        $proc = new BatchSpanProcessor($exporter, $this->createMock(Clock::class));
-
-        $exporter->expects($this->once())->method('shutdown');
-        $proc->shutdown();
-    }
-
-    /**
-     * @test
-     */
-    public function noExportAfterShutdown(): void
+    public function test_export_afterShutdown(): void
     {
         $exporter = $this->createMock(Exporter::class);
         $exporter->expects($this->once())->method('shutdown');
@@ -215,10 +162,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $proc->onEnd($span);
     }
 
-    /**
-     * @test
-     */
-    public function exportsOnlySampledSpans(): void
+    public function test_export_onlySampledSpans(): void
     {
         $sampledSpan = $this->createSampledSpanMock();
         $nonSampledSpan = $this->createNonSampledSpanMock();
@@ -237,7 +181,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
                 )
             );
 
-        $batchProcessor = new BatchSpanProcessor($exporter, $this->createMock(Clock::class));
+        $batchProcessor = new BatchSpanProcessor($exporter, $this->testClock);
         foreach ([$sampledSpan, $nonSampledSpan] as $span) {
             $batchProcessor->onEnd($span);
         }
@@ -245,16 +189,64 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $batchProcessor->forceFlush();
     }
 
+    public function test_forceFlush_endedSpans(): void
+    {
+        $batchSize = 3;
+        $queueSize = 3;
+        $exportDelay = 2;
+        $timeout = 3000;
+
+        $exporter = Mockery::mock(Exporter::class);
+        $exporter
+            ->expects('export')
+            ->with(
+                Mockery::on(
+                    function (array $spans) {
+                        $this->assertCount(2, $spans);
+                        $this->assertInstanceOf(SpanData::class, $spans[0]);
+
+                        return true;
+                    }
+                )
+            );
+
+        $processor = new BatchSpanProcessor(
+            $exporter,
+            $this->testClock,
+            $queueSize,
+            $exportDelay,
+            $timeout,
+            $batchSize
+        );
+
+        for ($i = 0; $i < $batchSize - 1; $i++) {
+            /** @var Span $span */
+            $span = $this->createSampledSpanMock();
+            $processor->onEnd($span);
+        }
+
+        $processor->forceFlush();
+    }
+
+    public function test_shutdown_shutdownsExporter(): void
+    {
+        $exporter = $this->createMock(Exporter::class);
+        $processor = new BatchSpanProcessor($exporter, $this->testClock);
+
+        $exporter->expects($this->once())->method('shutdown');
+        $processor->shutdown();
+    }
+
     private function createSampledSpanMock()
     {
-        $spanContext = $this->createConfiguredMock(SpanContext::class, ['isSampled' => true]);
+        $spanContext = $this->createConfiguredMock(API\SpanContext::class, ['isSampled' => true]);
 
         return $this->createConfiguredMock(Span::class, ['getContext' => $spanContext]);
     }
 
     private function createNonSampledSpanMock()
     {
-        $spanContext = $this->createConfiguredMock(SpanContext::class, ['isSampled' => false]);
+        $spanContext = $this->createConfiguredMock(API\SpanContext::class, ['isSampled' => false]);
 
         return $this->createConfiguredMock(Span::class, ['getContext' => $spanContext]);
     }
