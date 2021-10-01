@@ -100,7 +100,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
             );
 
         /** @var Exporter $exporter */
-        /** @var Clock $clock */
         $processor = new BatchSpanProcessor(
             $exporter,
             $this->testClock,
@@ -132,7 +131,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $exporter->expects($this->never())->method('export');
 
         /** @var Exporter $exporter */
-        /** @var Clock $clock */
         $processor = new BatchSpanProcessor(
             $exporter,
             $this->testClock,
