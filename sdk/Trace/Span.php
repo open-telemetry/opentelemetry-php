@@ -173,9 +173,6 @@ class Span implements ReadWriteSpan
     /** @readonly */
     private SpanProcessor $spanProcessor;
 
-    /** @var list<API\Event> */
-    private array $events = [];
-
     /**
      * @readonly
      *
@@ -200,6 +197,9 @@ class Span implements ReadWriteSpan
 
     /** @var non-empty-string */
     private string $name;
+
+    /** @var list<API\Event> */
+    private array $events = [];
 
     private ?API\Attributes $attributes;
     private int $totalRecordedEvents = 0;
