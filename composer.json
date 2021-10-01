@@ -33,10 +33,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "OpenTelemetry\\Context\\": "Context",
-            "OpenTelemetry\\": "api",
-            "OpenTelemetry\\Sdk\\": "sdk",
-            "OpenTelemetry\\Contrib\\": "contrib",
+            "OpenTelemetry\\": "src/",
             "Opentelemetry\\Proto\\Collector\\Trace\\V1\\": "proto/Opentelemetry/Proto/Collector/Trace/V1",
             "Opentelemetry\\Proto\\Trace\\V1\\":"proto/Opentelemetry/Proto/Trace/V1",
             "Opentelemetry\\Proto\\Common\\V1\\":"proto/Opentelemetry/Proto/Common/V1",

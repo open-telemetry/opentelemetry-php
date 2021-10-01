@@ -11,7 +11,7 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
-use OpenTelemetry\Sdk\Trace\Test\SpanData;
+use OpenTelemetry\SDK\Trace\Test\SpanData;
 
 class OTLPGrpcExporterTest extends MockeryTestCase
 {
@@ -34,7 +34,7 @@ class OTLPGrpcExporterTest extends MockeryTestCase
                 ],
             ])
         );
-               
+
         $exporterStatusCode = $exporter->export([new SpanData()]);
 
         $this->assertSame(Exporter::SUCCESS, $exporterStatusCode);
@@ -59,7 +59,7 @@ class OTLPGrpcExporterTest extends MockeryTestCase
                 ],
             ])
         );
-               
+
         $exporterStatusCode = $exporter->export([new SpanData()]);
 
         $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporterStatusCode);
@@ -205,7 +205,7 @@ class OTLPGrpcExporterTest extends MockeryTestCase
                                         'unused response data',
                                         new class($statusCode) {
                                             public $code;
-                        
+
                                             public function __construct($code)
                                             {
                                                 $this->code = $code;
@@ -216,7 +216,7 @@ class OTLPGrpcExporterTest extends MockeryTestCase
                                 ->getMock()
                         )
                         ->getMock();
-        
+
         return $mockClient;
     }
 }
