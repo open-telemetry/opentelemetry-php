@@ -8,9 +8,11 @@ use OpenTelemetry\Trace as API;
 
 final class TestClock implements API\Clock
 {
+    public const DEFAULT_START_EPOCH = 1633060331386955008; // Fri Oct 01 2021 03:52:11 UTC
+
     private int $currentEpochNanos;
 
-    public function __construct(int $currentEpochNanos)
+    public function __construct(int $currentEpochNanos = self::DEFAULT_START_EPOCH)
     {
         $this->currentEpochNanos = $currentEpochNanos;
     }

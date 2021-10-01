@@ -6,12 +6,12 @@ namespace OpenTelemetry\Sdk\Trace\SpanProcessor;
 
 use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\Exporter;
 use OpenTelemetry\Sdk\Trace\ReadableSpan;
 use OpenTelemetry\Sdk\Trace\ReadWriteSpan;
 use OpenTelemetry\Sdk\Trace\SpanData;
 use OpenTelemetry\Sdk\Trace\SpanProcessor;
+use OpenTelemetry\Trace as API;
 
 class BatchSpanProcessor implements SpanProcessor
 {
@@ -21,7 +21,7 @@ class BatchSpanProcessor implements SpanProcessor
     private int $exporterTimeoutMillis;
     private int $maxExportBatchSize;
     private ?int $lastExportTimestamp = null;
-    private Clock $clock;
+    private API\Clock $clock;
     private bool $running = true;
 
     /** @var list<SpanData> */
@@ -29,7 +29,7 @@ class BatchSpanProcessor implements SpanProcessor
 
     public function __construct(
         ?Exporter $exporter,
-        Clock $clock,
+        API\Clock $clock,
         int $maxQueueSize = 2048,
         int $scheduledDelayMillis = 5000,
         int $exporterTimeoutMillis = 30000,
@@ -85,7 +85,7 @@ class BatchSpanProcessor implements SpanProcessor
         if (null !== $this->exporter) {
             $this->exporter->export($this->queue);
             $this->queue = [];
-            $this->lastExportTimestamp = $this->clock->now();
+            $this->lastExportTimestamp = $this->clock->nanoTime();
         }
     }
 
@@ -101,7 +101,7 @@ class BatchSpanProcessor implements SpanProcessor
 
     protected function enoughTimeHasPassed(): bool
     {
-        $now = $this->clock->now();
+        $now = $this->clock->nanoTime();
 
         // if lastExport never occurred let it start from now on
         if (null === $this->lastExportTimestamp) {

@@ -16,7 +16,7 @@ interface Clock
     public function now(): int;
 
     /**
-     * Returns the current epoch monotonic timestamp in nanoseconds that can only be used to calculate elapsed time.
+     * Returns a high resolution timestamp that should _ONLY_ be used to calculate elapsed time.
      */
     public function nanoTime(): int;
 }
