@@ -17,8 +17,12 @@ class SpanData implements SDK\SpanData
     /** @var non-empty-string */
     private string $name = 'test-span-data';
 
-    private API\Links $links;
-    private API\Events $events;
+    /** @var list<API\Event> */
+    private array $events = [];
+
+    /** @var list<API\Link> */
+    private array $links = [];
+
     private API\Attributes $attributes;
     private int $kind;
     private StatusData $status;
@@ -35,9 +39,7 @@ class SpanData implements SDK\SpanData
 
     public function __construct()
     {
-        $this->links = new SDK\Links();
         $this->attributes = new SDK\Attributes();
-        $this->events = new SDK\Events();
         $this->kind = API\SpanKind::KIND_INTERNAL;
         $this->status = StatusData::unset();
         $this->resource = ResourceInfo::emptyResource();
@@ -59,31 +61,35 @@ class SpanData implements SDK\SpanData
         return $this;
     }
 
-    public function getLinks(): API\Links
+    /** @inheritDoc */
+    public function getLinks(): array
     {
         return $this->links;
     }
 
-    public function setLinks(API\Links $links): self
+    /** @param list<API\Link> $links */
+    public function setLinks(array $links): self
     {
         $this->links = $links;
 
         return $this;
     }
 
-    public function addLink(API\SpanContext $context, ?API\Attributes $attributes = null): self
+    public function addLink(API\SpanContext $context, API\Attributes $attributes = null): self
     {
-        $this->links->addLink(new SDK\Link($context, $attributes));
+        $this->links[] = new SDK\Link($context, $attributes);
 
         return $this;
     }
 
-    public function getEvents(): API\Events
+    /** @inheritDoc */
+    public function getEvents(): array
     {
         return $this->events;
     }
 
-    public function setEvents(API\Events $events): self
+    /** @param list<API\Event> $events */
+    public function setEvents(array $events): self
     {
         $this->events = $events;
 
@@ -92,7 +98,7 @@ class SpanData implements SDK\SpanData
 
     public function addEvent(string $name, ?API\Attributes $attributes, int $timestamp = null): self
     {
-        $this->events->addEvent($name, $attributes, $timestamp);
+        $this->events[] = new SDK\Event($name, $timestamp ?? SDK\Clock::getDefault()->now(), $attributes);
 
         return $this;
     }

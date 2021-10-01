@@ -28,6 +28,7 @@ class Span implements ReadWriteSpan
      *
      * @param non-empty-string $name
      * @psalm-param API\SpanKind::KIND_* $kind
+     * @param list<API\Link> $links
      *
      * @internal
      * @psalm-internal OpenTelemetry
@@ -43,7 +44,7 @@ class Span implements ReadWriteSpan
         SpanProcessor $spanProcessor,
         ResourceInfo $resource,
         ?API\Attributes $attributes,
-        API\Links $links,
+        array $links,
         int $totalRecordedLinks,
         int $userStartEpochNanos
     ): self {
@@ -172,19 +173,15 @@ class Span implements ReadWriteSpan
     /** @readonly */
     private SpanProcessor $spanProcessor;
 
-    /**
-     * @readonly
-     *
-     * @todo: Java just has this as list<API\Event>, could we just do that?
-     */
-    private API\Events $events;
+    /** @var list<API\Event> */
+    private array $events = [];
 
     /**
      * @readonly
      *
-     * @todo: Java just has this as list<API\Link>, could we just do that?
+     * @var list<API\Link>
      */
-    private API\Links $links;
+    private array $links;
 
     /** @readonly */
     private int $totalRecordedLinks;
@@ -210,7 +207,10 @@ class Span implements ReadWriteSpan
     private int $endEpochNanos = 0;
     private bool $hasEnded = false;
 
-    /** @param non-empty-string $name */
+    /**
+     * @param non-empty-string $name
+     * @param list<API\Link> $links
+     */
     private function __construct(
         string $name,
         API\SpanContext $context,
@@ -221,7 +221,7 @@ class Span implements ReadWriteSpan
         SpanProcessor $spanProcessor,
         ResourceInfo $resource,
         ?API\Attributes $attributes,
-        API\Links $links,
+        array $links,
         int $totalRecordedLinks,
         int $startEpochNanos
     ) {
@@ -236,7 +236,6 @@ class Span implements ReadWriteSpan
         $this->resource = $resource;
         $this->startEpochNanos = $startEpochNanos;
         $this->attributes = Attributes::withLimits($attributes ?? new Attributes(), $spanLimits->getAttributeLimits());
-        $this->events = new Events();
         $this->status = StatusData::unset();
         $this->spanLimits = $spanLimits;
     }
@@ -298,13 +297,16 @@ class Span implements ReadWriteSpan
         }
 
         if (count($this->events) < $this->spanLimits->getEventCountLimit()) {
-            $this->events->addEvent(
+            $this->events[] = new Event(
                 $name,
-                $attributes ? Attributes::withLimits(
-                    $attributes,
-                    new AttributeLimits($this->spanLimits->getAttributePerEventCountLimit())
-                ) : $attributes,
-                $timestamp
+                $timestamp ?? Clock::getDefault()->now(),
+                Attributes::withLimits(
+                    $attributes ?? new Attributes(),
+                    new AttributeLimits(
+                        $this->spanLimits->getAttributePerEventCountLimit(),
+                        $this->spanLimits->getAttributeLimits()->getAttributeValueLengthLimit()
+                    )
+                ),
             );
         }
 
@@ -395,7 +397,7 @@ class Span implements ReadWriteSpan
             $this,
             $this->name,
             $this->links,
-            $this->getImmutableEvents(),
+            $this->events,
             $this->getImmutableAttributes(),
             (null === $this->attributes) ? 0 : $this->attributes->getTotalAddedValues(),
             $this->totalRecordedEvents,
@@ -460,10 +462,5 @@ class Span implements ReadWriteSpan
         }
 
         return clone $this->attributes;
-    }
-
-    private function getImmutableEvents(): API\Events
-    {
-        return clone $this->events;
     }
 }

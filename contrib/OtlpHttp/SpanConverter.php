@@ -109,7 +109,7 @@ class SpanConverter
             }
 
             $row['events'][] = new Event([
-                'time_unix_nano' => $event->getTimestamp(),
+                'time_unix_nano' => $event->getEpochNanos(),
                 'name' => $event->getName(),
                 'attributes' => $attrs,
                 'dropped_attributes_count' => $event->getAttributes()->getDroppedAttributesCount(),

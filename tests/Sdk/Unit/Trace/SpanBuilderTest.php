@@ -9,6 +9,7 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Sdk\Trace\Attributes;
+use OpenTelemetry\Sdk\Trace\Link;
 use OpenTelemetry\Sdk\Trace\Sampler;
 use OpenTelemetry\Sdk\Trace\SamplingResult;
 use OpenTelemetry\Sdk\Trace\Span;
@@ -18,6 +19,7 @@ use OpenTelemetry\Sdk\Trace\SpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 use OpenTelemetry\Trace as API;
 use function range;
+use function str_repeat;
 
 class SpanBuilderTest extends MockeryTestCase
 {
@@ -51,7 +53,7 @@ class SpanBuilderTest extends MockeryTestCase
             ->addLink($this->sampledSpanContext, new Attributes())
             ->startSpan();
 
-        $this->assertSame(2, $span->toSpanData()->getLinks()->count());
+        $this->assertCount(2, $span->toSpanData()->getLinks());
         $span->end();
     }
 
@@ -65,11 +67,95 @@ class SpanBuilderTest extends MockeryTestCase
             ->addLink(Span::getInvalid()->getContext(), new Attributes())
             ->startSpan();
 
-        $this->assertSame(0, $span->toSpanData()->getLinks()->count());
+        $this->assertEmpty($span->toSpanData()->getLinks());
         $span->end();
     }
 
-    // TODO: Test truncating links & link attributes
+    public function test_addLink_droppingLinks(): void
+    {
+        $maxNumberOfLinks = 8;
+        $spanBuilder = (new TracerProvider([], null, null, (new SpanLimitsBuilder())->setLinkCountLimit($maxNumberOfLinks)->build()))
+            ->getTracer('test')
+            ->spanBuilder(self::SPAN_NAME);
+
+        for ($idx = 0; $idx < $maxNumberOfLinks * 2; $idx++) {
+            $spanBuilder->addLink($this->sampledSpanContext);
+        }
+
+        /** @var Span $span */
+        $span = $spanBuilder->startSpan();
+
+        $spanData = $span->toSpanData();
+        $links = $spanData->getLinks();
+
+        $this->assertCount($maxNumberOfLinks, $links);
+        $this->assertSame(8, $spanData->getTotalDroppedLinks());
+
+        for ($idx = 0; $idx < $maxNumberOfLinks; $idx++) {
+            $this->assertEquals(new Link($this->sampledSpanContext), $links[$idx]);
+        }
+
+        $span->end();
+    }
+
+    public function test_addLink_truncateLinkAttributes(): void
+    {
+        /** @var Span $span */
+        $span = (new TracerProvider([], null, null, (new SpanLimitsBuilder())->setAttributePerLinkCountLimit(1)->build()))
+            ->getTracer('test')
+            ->spanBuilder(self::SPAN_NAME)
+            ->addLink(
+                $this->sampledSpanContext,
+                new Attributes([
+                    'key0' => 0,
+                    'key1' => 1,
+                    'key2' => 2,
+                ])
+            )
+            ->startSpan();
+
+        $this->assertCount(1, $span->toSpanData()->getLinks());
+        $this->assertCount(1, $span->toSpanData()->getLinks()[0]->getAttributes());
+
+        $span->end();
+    }
+
+    public function test_addLink_truncateLinkAttributeValue(): void
+    {
+        $maxLength = 25;
+
+        $strVal = str_repeat('a', $maxLength);
+        $tooLongStrVal = "${strVal}${strVal}";
+
+        /** @var Span $span */
+        $span = (new TracerProvider([], null, null, (new SpanLimitsBuilder())->setAttributeValueLengthLimit($maxLength)->build()))
+            ->getTracer('test')
+            ->spanBuilder(self::SPAN_NAME)
+            ->addLink(
+                $this->sampledSpanContext,
+                new Attributes([
+                    'string' => $tooLongStrVal,
+                    'bool' => true,
+                    'string_array' => [$strVal, $tooLongStrVal],
+                    'int_array' => [1, 2],
+                ])
+            )
+            ->startSpan();
+
+        $attrs = $span->toSpanData()->getLinks()[0]->getAttributes();
+        $this->assertSame($strVal, $attrs->get('string'));
+        $this->assertTrue($attrs->get('bool'));
+        $this->assertSame(
+            [$strVal, $strVal],
+            $attrs->get('string_array')
+        );
+        $this->assertSame(
+            [1, 2],
+            $attrs->get('int_array')
+        );
+
+        $span->end();
+    }
 
     public function test_addLink_noEffectAfterStartSpan(): void
     {
@@ -80,7 +166,7 @@ class SpanBuilderTest extends MockeryTestCase
             ->addLink($this->sampledSpanContext)
             ->startSpan();
 
-        $this->assertSame(1, $span->toSpanData()->getLinks()->count());
+        $this->assertCount(1, $span->toSpanData()->getLinks());
 
         $spanBuilder
             ->addLink(
@@ -91,7 +177,7 @@ class SpanBuilderTest extends MockeryTestCase
                 )
             );
 
-        $this->assertSame(1, $span->toSpanData()->getLinks()->count());
+        $this->assertCount(1, $span->toSpanData()->getLinks());
 
         $span->end();
     }
@@ -175,7 +261,7 @@ class SpanBuilderTest extends MockeryTestCase
                 string $spanName,
                 int $spanKind,
                 ?API\Attributes $attributes = null,
-                ?API\Links $links = null
+                array $links = []
             ): SamplingResult {
                 return new SamplingResult(SamplingResult::RECORD_AND_SAMPLE, new Attributes(['cat' => 'meow']));
             }

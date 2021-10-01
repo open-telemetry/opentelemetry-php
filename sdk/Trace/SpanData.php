@@ -25,8 +25,13 @@ interface SpanData
     public function getStatus(): StatusData;
     public function getStartEpochNanos(): int;
     public function getAttributes(): API\Attributes;
-    public function getEvents(): API\Events;
-    public function getLinks(): API\Links;
+
+    /** @return list<API\Event> */
+    public function getEvents(): array;
+
+    /** @return list<API\Link> */
+    public function getLinks(): array;
+
     public function getEndEpochNanos(): int;
     public function hasEnded(): bool;
     public function getInstrumentationLibrary(): InstrumentationLibrary;

@@ -14,10 +14,9 @@ use OpenTelemetry\Sdk\InstrumentationLibrary;
 use OpenTelemetry\Sdk\Resource\ResourceInfo;
 use OpenTelemetry\Sdk\Trace\Attributes;
 use OpenTelemetry\Sdk\Trace\Clock;
-use OpenTelemetry\Sdk\Trace\Events;
+use OpenTelemetry\Sdk\Trace\Event;
 use OpenTelemetry\Sdk\Trace\IdGenerator;
 use OpenTelemetry\Sdk\Trace\Link;
-use OpenTelemetry\Sdk\Trace\Links;
 use OpenTelemetry\Sdk\Trace\RandomIdGenerator;
 use OpenTelemetry\Sdk\Trace\Span;
 use OpenTelemetry\Sdk\Trace\SpanContext;
@@ -172,8 +171,8 @@ class SpanTest extends MockeryTestCase
         $this->assertSpanData(
             $span->toSpanData(),
             new Attributes(),
-            new Events(),
-            (new Links())->addLink($this->link),
+            [],
+            [$this->link],
             self::SPAN_NAME,
             self::START_EPOCH,
             self::START_EPOCH,
@@ -202,8 +201,8 @@ class SpanTest extends MockeryTestCase
         $this->assertSpanData(
             $span->toSpanData(),
             $this->expectedAttributes,
-            (new Events())->addEvent('event2', null, self::START_EPOCH + API\Clock::NANOS_PER_SECOND),
-            (new Links())->addLink($this->link),
+            [new Event('event2', self::START_EPOCH + API\Clock::NANOS_PER_SECOND)],
+            [$this->link],
             self::NEW_SPAN_NAME,
             self::START_EPOCH,
             0,
@@ -235,8 +234,8 @@ class SpanTest extends MockeryTestCase
         $this->assertSpanData(
             $span->toSpanData(),
             $this->expectedAttributes,
-            (new Events())->addEvent('event2', null, self::START_EPOCH + API\Clock::NANOS_PER_SECOND),
-            (new Links())->addLink($this->link),
+            [new Event('event2', self::START_EPOCH + API\Clock::NANOS_PER_SECOND)],
+            [$this->link],
             self::NEW_SPAN_NAME,
             self::START_EPOCH,
             $this->testClock->now(),
@@ -422,6 +421,60 @@ class SpanTest extends MockeryTestCase
         $this->assertEmpty($span->toSpanData()->getAttributes());
     }
 
+    public function test_addEvent(): void
+    {
+        $span = $this->createTestRootSpan();
+        $span->addEvent('event1');
+        $span->addEvent('event2', new Attributes(['key1' => 1]));
+        $span->addEvent('event3', null, Clock::secondsToNanos(10));
+
+        $span->end();
+
+        $events = $span->toSpanData()->getEvents();
+        $this->assertCount(3, $events);
+        $idx = 0;
+
+        $this->assertEvent($events[$idx++], 'event1', new Attributes(), self::START_EPOCH);
+        $this->assertEvent($events[$idx++], 'event2', new Attributes(['key1' => 1]), self::START_EPOCH);
+        $this->assertEvent($events[$idx], 'event3', new Attributes(), Clock::secondsToNanos(10));
+    }
+
+    public function test_addEvent_attributeLength(): void
+    {
+        $maxLength = 25;
+
+        $strVal = str_repeat('a', $maxLength);
+        $tooLongStrVal = "${strVal}${strVal}";
+
+        $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL, (new SpanLimitsBuilder())->setAttributeValueLengthLimit($maxLength)->build());
+
+        $span->addEvent(
+            'event',
+            new Attributes([
+                'string' => $tooLongStrVal,
+                'bool' => true,
+                'string_array' => [$strVal, $tooLongStrVal],
+                'int_array' => [1, 2],
+            ])
+        );
+
+        $this->assertCount(1, $span->toSpanData()->getEvents());
+
+        $attrs = $span->toSpanData()->getEvents()[0]->getAttributes();
+        $this->assertSame($strVal, $attrs->get('string'));
+        $this->assertTrue($attrs->get('bool'));
+        $this->assertSame(
+            [$strVal, $strVal],
+            $attrs->get('string_array')
+        );
+        $this->assertSame(
+            [1, 2],
+            $attrs->get('int_array')
+        );
+
+        $span->end();
+    }
+
     public function test_recordException(): void
     {
         $exception = new Exception('ERR');
@@ -433,9 +486,9 @@ class SpanTest extends MockeryTestCase
         $span->recordException($exception);
 
         $this->assertCount(1, $events = $span->toSpanData()->getEvents());
-        $event = $events->getIterator()->current();
+        $event = $events[0];
         $this->assertSame('exception', $event->getName());
-        $this->assertSame($timestamp, $event->getTimestamp());
+        $this->assertSame($timestamp, $event->getEpochNanos());
         $this->assertEquals(
             new Attributes([
                 'exception.type' => 'Exception',
@@ -459,9 +512,9 @@ class SpanTest extends MockeryTestCase
         ]));
 
         $this->assertCount(1, $events = $span->toSpanData()->getEvents());
-        $event = $events->getIterator()->current();
+        $event = $events[0];
         $this->assertSame('exception', $event->getName());
-        $this->assertSame($timestamp, $event->getTimestamp());
+        $this->assertSame($timestamp, $event->getEpochNanos());
         $this->assertEquals(
             new Attributes([
                 'exception.type' => 'Exception',
@@ -476,12 +529,14 @@ class SpanTest extends MockeryTestCase
     public function test_attributeLength(): void
     {
         $maxLength = 25;
-        $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL, (new SpanLimitsBuilder())->setAttributeValueLengthLimit($maxLength)->build());
 
         $strVal = str_repeat('a', $maxLength);
         $tooLongStrVal = "${strVal}${strVal}";
 
-        $span->setAttributes(
+        $span = $this->createTestSpan(
+            API\SpanKind::KIND_INTERNAL,
+            (new SpanLimitsBuilder())->setAttributeValueLengthLimit($maxLength)->build(),
+            null,
             new Attributes([
                 'string' => $tooLongStrVal,
                 'bool' => true,
@@ -572,37 +627,6 @@ class SpanTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_droppingLinks(): void
-    {
-        $this->markTestIncomplete('TODO: Enable this when link counts are limited');
-
-        /** @phpstan-ignore-next-line */
-        $maxNumberOfLinks = 8;
-
-        $links = new Links();
-
-        foreach (range(1, $maxNumberOfLinks * 2) as $_idx) {
-            $links->addLink(new Link(SpanContext::getInvalid()));
-        }
-
-        $span = $this
-            ->createTestSpan(
-                API\SpanKind::KIND_INTERNAL,
-                (new SpanLimitsBuilder())
-                    ->setLinkCountLimit($maxNumberOfLinks)
-                    ->build(),
-                null,
-                null,
-                $links
-            );
-
-        $spanData = $span->toSpanData();
-        $this->assertCount($maxNumberOfLinks, $spanData->getLinks());
-        $this->assertSame(8, $spanData->getTotalDroppedLinks());
-
-        $span->end();
-    }
-
     // endregion SDK
 
     private function createTestRootSpan(): Span
@@ -617,17 +641,18 @@ class SpanTest extends MockeryTestCase
 
     /**
      * @psalm-param API\SpanKind::KIND_* $kind
+     * @param list<API\Link> $links
      */
     private function createTestSpan(
         int $kind = API\SpanKind::KIND_INTERNAL,
         SpanLimits $spanLimits = null,
         string $parentSpanId = null,
         ?API\Attributes $attributes = null,
-        API\Links $links = null
+        array $links = []
     ): Span {
         $parentSpanId = $parentSpanId ?? $this->parentSpanId;
         $spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
-        $links = $links ?? (new Links())->addLink($this->link);
+        $links = $links ?: [$this->link];
 
         $span = Span::startSpan(
             self::SPAN_NAME,
@@ -683,12 +708,27 @@ class SpanTest extends MockeryTestCase
         }
     }
 
-    /** @psalm-param API\StatusCode::STATUS_* $status */
+    private function assertEvent(
+        API\Event $event,
+        string $expectedName,
+        API\Attributes $expectedAttributes,
+        int $expectedEpochNanos
+    ): void {
+        $this->assertSame($expectedName, $event->getName());
+        $this->assertEquals($expectedAttributes, $event->getAttributes());
+        $this->assertSame($expectedEpochNanos, $event->getEpochNanos());
+    }
+
+    /**
+     * @param list<API\Event> $events
+     * @param list<API\Link> $links
+     * @psalm-param API\StatusCode::STATUS_* $status
+     */
     private function assertSpanData(
         SpanData $spanData,
         API\Attributes $attributes,
-        API\Events $events,
-        API\Links $links,
+        array $events,
+        array $links,
         string $spanName,
         int $startEpochNanos,
         int $endEpochNanos,

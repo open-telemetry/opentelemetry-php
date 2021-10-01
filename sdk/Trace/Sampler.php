@@ -23,8 +23,8 @@ interface Sampler
      * @param string $spanName Name of the Span to be created.
      * @param int $spanKind Span kind.
      * @param API\Attributes|null $attributes Initial set of Attributes for the Span being constructed.
-     * @param API\Links|null $links Collection of links that will be associated with the Span to be created.
-     *                     Typically useful for batch operations.
+     * @param list<API\Link> $links Collection of links that will be associated with the Span to be created.
+     *                     Typically, useful for batch operations.
      *                     @see https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#links-between-spans
      * @return SamplingResult
      */
@@ -34,14 +34,13 @@ interface Sampler
         string $spanName,
         int $spanKind,
         ?API\Attributes $attributes = null,
-        ?API\Links $links = null
+        array $links = []
     ): SamplingResult;
 
     /**
      * Returns the sampler name or short description with the configuration.
      * This may be displayed on debug pages or in the logs.
      * Example: "TraceIdRatioBasedSampler{0.000100}"
-     * @return string
      */
     public function getDescription(): string;
 }

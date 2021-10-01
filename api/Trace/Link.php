@@ -8,4 +8,5 @@ interface Link
 {
     public function getSpanContext(): SpanContext;
     public function getAttributes(): Attributes;
+    public function getTotalAttributeCount(): int;
 }

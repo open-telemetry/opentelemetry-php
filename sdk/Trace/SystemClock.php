@@ -24,6 +24,10 @@ final class SystemClock extends Clock
     /** @inheritDoc */
     public function now(): int
     {
+        /**
+         * `microtime` returns a unix timestamp _WITH_ microseconds, not _IN_ microseconds.
+         * E.g. `1633052992.330921` so we must multiply it by {@see API\Clock::NANOS_PER_SECOND} to get a value _IN_ nanoseconds.
+         */
         return (int) (microtime(true) * API\Clock::NANOS_PER_SECOND);
     }
 
