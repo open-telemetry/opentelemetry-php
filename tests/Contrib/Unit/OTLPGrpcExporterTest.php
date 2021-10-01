@@ -4,15 +4,68 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use Grpc\UnaryCall;
 use InvalidArgumentException;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
+use Mockery\MockInterface;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
-
+use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\Sdk\Trace\Test\SpanData;
-use PHPUnit\Framework\TestCase;
 
-class OTLPGrpcExporterTest extends TestCase
+class OTLPGrpcExporterTest extends MockeryTestCase
 {
-    public function testExporter()
+    public function testExporterHappyPath()
+    {
+        $exporter = new Exporter(
+            //These first parameters were copied from the constructor's default values
+            'localhost:4317',
+            true,
+            '',
+            '',
+            false,
+            10,
+            $this->createMockTraceServiceClient([
+                'expectations' => [
+                    'num_spans' => 1,
+                ],
+                'return_values' => [
+                    'status_code' => \Grpc\STATUS_OK,
+                ],
+            ])
+        );
+               
+        $exporterStatusCode = $exporter->export([new SpanData()]);
+
+        $this->assertSame(Exporter::SUCCESS, $exporterStatusCode);
+    }
+
+    public function testExporterUnexpectedGrpcResponseStatus()
+    {
+        $exporter = new Exporter(
+            //These first parameters were copied from the constructor's default values
+            'localhost:4317',
+            true,
+            '',
+            '',
+            false,
+            10,
+            $this->createMockTraceServiceClient([
+                'expectations' => [
+                    'num_spans' => 1,
+                ],
+                'return_values' => [
+                    'status_code' => 'An unexpected status',
+                ],
+            ])
+        );
+               
+        $exporterStatusCode = $exporter->export([new SpanData()]);
+
+        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporterStatusCode);
+    }
+
+    public function testExporterGrpcRespondsAsUnavailable()
     {
         $this->assertEquals(Exporter::FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
     }
@@ -125,5 +178,45 @@ class OTLPGrpcExporterTest extends TestCase
         putenv('OTEL_EXPORTER_OTLP_TIMEOUT');
         putenv('OTEL_EXPORTER_OTLP_COMPRESSION');
         putenv('OTEL_EXPORTER_OTLP_INSECURE');
+    }
+
+    private function createMockTraceServiceClient(array $options = [])
+    {
+        [
+            'expectations' => [
+                'num_spans' => $expectedNumSpans,
+            ],
+            'return_values' => [
+                'status_code' => $statusCode,
+            ]
+        ] = $options;
+
+        /** @var MockInterface&TraceServiceClient */
+        $mockClient = Mockery::mock(TraceServiceClient::class)
+                        ->shouldReceive('Export')
+                        ->withArgs(function ($request) use ($expectedNumSpans) {
+                            return (count($request->getResourceSpans()) == $expectedNumSpans);
+                        })
+                        ->andReturn(
+                            Mockery::mock(UnaryCall::class)
+                                ->shouldReceive('wait')
+                                ->andReturn(
+                                    [
+                                        'unused response data',
+                                        new class($statusCode) {
+                                            public $code;
+                        
+                                            public function __construct($code)
+                                            {
+                                                $this->code = $code;
+                                            }
+                                        },
+                                    ]
+                                )
+                                ->getMock()
+                        )
+                        ->getMock();
+        
+        return $mockClient;
     }
 }

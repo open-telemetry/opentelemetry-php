@@ -141,7 +141,7 @@ class Exporter implements Trace\Exporter
 
         list($response, $status) = $this->client->Export($request)->wait();
 
-        if ($status->code == \Grpc\STATUS_OK) {
+        if ($status->code === \Grpc\STATUS_OK) {
             return Trace\Exporter::SUCCESS;
         }
 
