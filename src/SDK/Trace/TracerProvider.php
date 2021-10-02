@@ -69,7 +69,7 @@ final class TracerProvider implements API\TracerProviderInterface
 
         $instrumentationLibrary = new InstrumentationLibrary($name, $version);
 
-        return $this->tracers[$key] = new TracerInterface(
+        return $this->tracers[$key] = new Tracer(
             $this->tracerSharedState,
             $instrumentationLibrary,
         );

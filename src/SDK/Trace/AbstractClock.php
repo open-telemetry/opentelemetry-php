@@ -13,7 +13,7 @@ abstract class AbstractClock implements API\ClockInterface
 
     public static function getDefault(): API\ClockInterface
     {
-        return self::$testClock ?? SystemAbstractClock::getInstance();
+        return self::$testClock ?? SystemClock::getInstance();
     }
 
     /**

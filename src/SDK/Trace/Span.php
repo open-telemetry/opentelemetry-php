@@ -24,7 +24,7 @@ class Span implements ReadWriteSpanInterface
 {
     /**
      * This method _MUST_ not be used directly.
-     * End users should use a {@see TracerInterface} in order to create spans.
+     * End users should use a {@see API\TracerInterface} in order to create spans.
      *
      * @param non-empty-string $name
      * @psalm-param API\SpanKind::KIND_* $kind

@@ -10,7 +10,7 @@ use OpenTelemetry\Context\Context;
  * Obtained from a {@see TracerInterface} and used to construct a {@see SpanInterface}.
  *
  * NOTE: A span builder may only be used to construct a single span.
- * Calling {@see SpanBuilder::startSpan} multiple times will lead to undefined behavior.
+ * Calling {@see SpanBuilderInterface::startSpan} multiple times will lead to undefined behavior.
  */
 interface SpanBuilderInterface
 {
@@ -18,9 +18,9 @@ interface SpanBuilderInterface
      * Sets the parent {@see Context} to use.
      *
      * If no {@see SpanInterface} is available in the provided context, the resulting span will become a root span,
-     * as if {@see SpanBuilder::setNoParent} was called.
+     * as if {@see SpanBuilderInterface::setNoParent} was called.
      *
-     * Defaults to {@see Context::getCurrent} when {@see SpanBuilder::startSpan} was called if not explicitly set.
+     * Defaults to {@see Context::getCurrent} when {@see SpanBuilderInterface::startSpan} was called if not explicitly set.
      */
     public function setParent(Context $parentContext): SpanBuilderInterface;
 
@@ -36,7 +36,7 @@ interface SpanBuilderInterface
      * Sets an explicit start timestamp for the newly created {@see SpanInterface}.
      * The provided *$timestamp* is assumed to be in nanoseconds.
      *
-     * Defaults to the timestamp when {@see SpanBuilder::startSpan} was called if not explicitly set.
+     * Defaults to the timestamp when {@see SpanBuilderInterface::startSpan} was called if not explicitly set.
      */
     public function setStartTimestamp(int $timestamp): SpanBuilderInterface;
 

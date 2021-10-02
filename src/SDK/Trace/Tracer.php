@@ -8,7 +8,7 @@ use function ctype_space;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 
-class TracerInterface implements API\TracerInterface
+class Tracer implements API\TracerInterface
 {
     public const FALLBACK_SPAN_NAME = 'empty';
 
