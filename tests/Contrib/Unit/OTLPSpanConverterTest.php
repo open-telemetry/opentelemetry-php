@@ -8,7 +8,7 @@ use function implode;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\Attributes;
-use OpenTelemetry\SDK\Trace\Test\SpanData;
+use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 class OTLPSpanConverterTest extends TestCase

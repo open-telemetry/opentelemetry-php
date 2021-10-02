@@ -11,7 +11,7 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
-use OpenTelemetry\SDK\Trace\Test\SpanData;
+use OpenTelemetry\Tests\SDK\Util\SpanData;
 
 class OTLPGrpcExporterTest extends MockeryTestCase
 {

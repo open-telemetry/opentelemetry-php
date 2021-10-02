@@ -12,7 +12,7 @@ use OpenTelemetry\SDK\Trace\Exporter;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanData;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
-use OpenTelemetry\SDK\Trace\Test\TestClock;
+use OpenTelemetry\Tests\SDK\Util\TestClock;
 
 class BatchSpanProcessorTest extends MockeryTestCase
 {

@@ -26,7 +26,7 @@ use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessor;
 use OpenTelemetry\SDK\Trace\StatusData;
-use OpenTelemetry\SDK\Trace\Test\TestClock;
+use OpenTelemetry\Tests\SDK\Util\TestClock;
 use function range;
 use function str_repeat;
 

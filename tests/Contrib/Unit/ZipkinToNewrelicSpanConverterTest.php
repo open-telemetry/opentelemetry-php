@@ -8,7 +8,7 @@ use function implode;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\SpanConverter;
 use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\Attributes;
-use OpenTelemetry\SDK\Trace\Test\SpanData;
+use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 class ZipkinToNewrelicSpanConverterTest extends TestCase

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace\Test;
+namespace OpenTelemetry\Tests\SDK\Util;
 
 use function count;
 use function max;

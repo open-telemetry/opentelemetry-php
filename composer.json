@@ -2,6 +2,8 @@
     "name": "open-telemetry/opentelemetry",
     "description": "OpenTelemetry makes robust, portable telemetry a built-in feature of cloud-native software.",
     "type": "library",
+    "homepage": "https://opentelemetry.io/docs/php",
+    "readme": "./README.md",
     "license": "Apache-2.0",
     "require": {
         "php": "^7.4 || ^8.0",
@@ -34,14 +36,8 @@
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\": "src/",
-            "Opentelemetry\\Proto\\Collector\\Trace\\V1\\": "proto/Opentelemetry/Proto/Collector/Trace/V1",
-            "Opentelemetry\\Proto\\Trace\\V1\\":"proto/Opentelemetry/Proto/Trace/V1",
-            "Opentelemetry\\Proto\\Common\\V1\\":"proto/Opentelemetry/Proto/Common/V1",
-            "Opentelemetry\\Proto\\Resource\\V1\\":"proto/Opentelemetry/Proto/Resource/V1",
-            "GPBMetadata\\Opentelemetry\\Proto\\Collector\\Trace\\V1\\": "proto/GPBMetadata/Opentelemetry/Proto/Collector/Trace/V1",
-            "GPBMetadata\\Opentelemetry\\Proto\\Trace\\V1\\":"proto/GPBMetadata/Opentelemetry/Proto/Trace/V1",
-            "GPBMetadata\\Opentelemetry\\Proto\\Common\\V1\\":"proto/GPBMetadata/Opentelemetry/Proto/Common/V1",
-            "GPBMetadata\\Opentelemetry\\Proto\\Resource\\V1\\":"proto/GPBMetadata/Opentelemetry/Proto/Resource/V1"
+            "Opentelemetry\\Proto\\": "proto/Opentelemetry/Proto/",
+            "GPBMetadata\\Opentelemetry\\Proto\\": "proto/GPBMetadata/Opentelemetry/Proto/"
         }
     },
     "autoload-dev": {

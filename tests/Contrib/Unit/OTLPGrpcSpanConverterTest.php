@@ -17,7 +17,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\StatusData;
-use OpenTelemetry\SDK\Trace\Test\SpanData;
+use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 class OTLPGrpcSpanConverterTest extends TestCase

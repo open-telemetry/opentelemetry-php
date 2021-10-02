@@ -19,7 +19,7 @@ use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\StatusData;
-use OpenTelemetry\SDK\Trace\Test\SpanData;
+use OpenTelemetry\Tests\SDK\Util\SpanData;
 
 use PHPUnit\Framework\TestCase;
 
