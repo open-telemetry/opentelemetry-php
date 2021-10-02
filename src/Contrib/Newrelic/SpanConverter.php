@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Newrelic;
 
-use OpenTelemetry\SDK\Trace\Clock;
+use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
 /**
@@ -29,8 +29,8 @@ class SpanConverter
     {
         $spanParent = $span->getParentContext();
 
-        $startTimestamp = Clock::nanosToMilli($span->getStartEpochNanos());
-        $endTimestamp = Clock::nanosToMilli($span->getEndEpochNanos());
+        $startTimestamp = AbstractClock::nanosToMilli($span->getStartEpochNanos());
+        $endTimestamp = AbstractClock::nanosToMilli($span->getEndEpochNanos());
 
         $row = [
             'id' => $span->getSpanId(),

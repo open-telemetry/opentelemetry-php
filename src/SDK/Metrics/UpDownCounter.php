@@ -22,7 +22,7 @@ use OpenTelemetry\API\Metrics as API;
  */
 class UpDownCounter extends AbstractMetric implements API\UpDownCounterInterface, API\LabelableMetricInterfaceInterface
 {
-    use HasLabels;
+    use HasLabelsTrait;
 
     /**
      * @var int $value

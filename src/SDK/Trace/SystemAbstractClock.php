@@ -8,7 +8,7 @@ use function hrtime;
 use function microtime;
 use OpenTelemetry\API\Trace as API;
 
-final class SystemClock extends Clock
+final class SystemAbstractClock extends AbstractClock
 {
     private static ?self $instance = null;
 

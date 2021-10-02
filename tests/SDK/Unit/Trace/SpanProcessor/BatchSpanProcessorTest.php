@@ -7,7 +7,7 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace\SpanProcessor;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\Trace\Clock;
+use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\Exporter;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -22,12 +22,12 @@ class BatchSpanProcessorTest extends MockeryTestCase
     {
         $this->testClock = new TestClock();
 
-        Clock::setTestClock($this->testClock);
+        AbstractClock::setTestClock($this->testClock);
     }
 
     protected function tearDown(): void
     {
-        Clock::setTestClock();
+        AbstractClock::setTestClock();
     }
 
     public function test_allowsNullExporter(): void
@@ -151,7 +151,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $exporter = $this->createMock(Exporter::class);
         $exporter->expects($this->once())->method('shutdown');
 
-        $proc = new BatchSpanProcessor($exporter, $this->createMock(Clock::class));
+        $proc = new BatchSpanProcessor($exporter, $this->createMock(AbstractClock::class));
         $proc->shutdown();
 
         /** @var Span $span */

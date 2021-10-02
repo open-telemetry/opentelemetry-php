@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-trait HasLabels
+trait HasLabelsTrait
 {
     /**
      * @var array<string>

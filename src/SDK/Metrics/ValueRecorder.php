@@ -36,7 +36,7 @@ use OpenTelemetry\API\Metrics as API;
  */
 class ValueRecorder extends AbstractMetric implements API\ValueRecorderInterface, API\LabelableMetricInterfaceInterface
 {
-    use HasLabels;
+    use HasLabelsTrait;
 
     /**
      * @var float $valueSum

@@ -11,7 +11,7 @@ interface ClockInterface
     /**
      * Returns the current epoch wall-clock timestamp in nanoseconds.
      * This timestamp should _ONLY_ be used to compute a current time.
-     * Use {@see Clock::nanoTime} for calculating durations.
+     * Use {@see AbstractClock::nanoTime} for calculating durations.
      */
     public function now(): int;
 

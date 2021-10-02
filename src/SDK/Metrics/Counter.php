@@ -9,7 +9,7 @@ use OpenTelemetry\API\Metrics as API;
 
 class Counter extends AbstractMetric implements API\CounterInterface, API\LabelableMetricInterfaceInterface
 {
-    use HasLabels;
+    use HasLabelsTrait;
 
     /**
      * @var int $value

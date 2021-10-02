@@ -51,7 +51,7 @@ class Span implements ReadWriteSpanInterface
         if (0 !== $userStartEpochNanos) {
             $startEpochNanos = $userStartEpochNanos;
         } else {
-            $startEpochNanos = Clock::getDefault()->now();
+            $startEpochNanos = AbstractClock::getDefault()->now();
         }
 
         $span = new self(
@@ -299,7 +299,7 @@ class Span implements ReadWriteSpanInterface
         if (count($this->events) < $this->spanLimits->getEventCountLimit()) {
             $this->events[] = new Event(
                 $name,
-                $timestamp ?? Clock::getDefault()->now(),
+                $timestamp ?? AbstractClock::getDefault()->now(),
                 Attributes::withLimits(
                     $attributes ?? new Attributes(),
                     new AttributeLimits(
@@ -318,7 +318,7 @@ class Span implements ReadWriteSpanInterface
     /** @inheritDoc */
     public function recordException(Throwable $exception, API\AttributesInterface $attributes = null): ReadWriteSpanInterface
     {
-        $timestamp = Clock::getDefault()->now();
+        $timestamp = AbstractClock::getDefault()->now();
         $eventAttributes = new Attributes([
                 'exception.type' => get_class($exception),
                 'exception.message' => $exception->getMessage(),
@@ -364,7 +364,7 @@ class Span implements ReadWriteSpanInterface
             return;
         }
 
-        $this->endEpochNanos = $endEpochNanos ?? Clock::getDefault()->now();
+        $this->endEpochNanos = $endEpochNanos ?? AbstractClock::getDefault()->now();
         $this->hasEnded = true;
 
         $this->spanProcessor->onEnd($this);
@@ -410,7 +410,7 @@ class Span implements ReadWriteSpanInterface
     /** @inheritDoc */
     public function getDuration(): int
     {
-        return ($this->hasEnded ? $this->endEpochNanos : Clock::getDefault()->now()) - $this->startEpochNanos;
+        return ($this->hasEnded ? $this->endEpochNanos : AbstractClock::getDefault()->now()) - $this->startEpochNanos;
     }
 
     /** @inheritDoc */

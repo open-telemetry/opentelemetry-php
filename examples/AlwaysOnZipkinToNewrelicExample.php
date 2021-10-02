@@ -8,7 +8,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter as ZipkinToNewrelicExporter;
 use OpenTelemetry\SDK\Trace\Attributes;
-use OpenTelemetry\SDK\Trace\Clock;
+use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
@@ -67,7 +67,7 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
 
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
-        $timestamp = Clock::getDefault()->timestamp();
+        $timestamp = AbstractClock::getDefault()->timestamp();
         $span = $tracer->startAndActivateSpan('session.generate.span.' . microtime(true));
 
         $spanParent = $span->getParentContext();

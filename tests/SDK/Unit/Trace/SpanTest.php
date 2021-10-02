@@ -14,7 +14,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Attributes;
-use OpenTelemetry\SDK\Trace\Clock;
+use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\SDK\Trace\IdGeneratorInterface;
 use OpenTelemetry\SDK\Trace\Link;
@@ -81,12 +81,12 @@ class SpanTest extends MockeryTestCase
             )
         );
 
-        Clock::setTestClock($this->testClock);
+        AbstractClock::setTestClock($this->testClock);
     }
 
     protected function tearDown(): void
     {
-        Clock::setTestClock();
+        AbstractClock::setTestClock();
     }
 
     // region API
@@ -426,7 +426,7 @@ class SpanTest extends MockeryTestCase
         $span = $this->createTestRootSpan();
         $span->addEvent('event1');
         $span->addEvent('event2', new Attributes(['key1' => 1]));
-        $span->addEvent('event3', null, Clock::secondsToNanos(10));
+        $span->addEvent('event3', null, AbstractClock::secondsToNanos(10));
 
         $span->end();
 
@@ -436,7 +436,7 @@ class SpanTest extends MockeryTestCase
 
         $this->assertEvent($events[$idx++], 'event1', new Attributes(), self::START_EPOCH);
         $this->assertEvent($events[$idx++], 'event2', new Attributes(['key1' => 1]), self::START_EPOCH);
-        $this->assertEvent($events[$idx], 'event3', new Attributes(), Clock::secondsToNanos(10));
+        $this->assertEvent($events[$idx], 'event3', new Attributes(), AbstractClock::secondsToNanos(10));
     }
 
     public function test_addEvent_attributeLength(): void

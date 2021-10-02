@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\ZipkinToNewrelic;
 
 use function max;
-use OpenTelemetry\SDK\Trace\Clock;
+use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
 class SpanConverter
@@ -48,8 +48,8 @@ class SpanConverter
     {
         $spanParent = $span->getParentContext();
 
-        $startTimestamp = Clock::nanosToMicro($span->getStartEpochNanos());
-        $endTimestamp = Clock::nanosToMicro($span->getEndEpochNanos());
+        $startTimestamp = AbstractClock::nanosToMicro($span->getStartEpochNanos());
+        $endTimestamp = AbstractClock::nanosToMicro($span->getEndEpochNanos());
 
         $row = [
             'id' => $span->getSpanId(),
@@ -76,7 +76,7 @@ class SpanConverter
                 $row['annotations'] = [];
             }
             $row['annotations'][] = [
-                'timestamp' => Clock::nanosToMicro($event->getEpochNanos()),
+                'timestamp' => AbstractClock::nanosToMicro($event->getEpochNanos()),
                 'value' => $event->getName(),
             ];
         }

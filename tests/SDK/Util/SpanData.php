@@ -98,7 +98,7 @@ class SpanData implements SDK\SpanDataInterface
 
     public function addEvent(string $name, ?API\AttributesInterface $attributes, int $timestamp = null): self
     {
-        $this->events[] = new SDK\Event($name, $timestamp ?? SDK\Clock::getDefault()->now(), $attributes);
+        $this->events[] = new SDK\Event($name, $timestamp ?? SDK\AbstractClock::getDefault()->now(), $attributes);
 
         return $this;
     }

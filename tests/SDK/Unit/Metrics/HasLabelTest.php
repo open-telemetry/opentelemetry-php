@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Unit\Metrics;
 
-use OpenTelemetry\SDK\Metrics\HasLabels;
+use OpenTelemetry\SDK\Metrics\HasLabelsTrait;
 use PHPUnit\Framework\TestCase;
 
 class HasLabelTest extends TestCase
@@ -14,7 +14,7 @@ class HasLabelTest extends TestCase
     public function setUp(): void
     {
         $this->labelable = new class() {
-            use HasLabels;
+            use HasLabelsTrait;
         };
     }
 

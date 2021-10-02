@@ -8,7 +8,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\SDK\Trace\Attributes;
-use OpenTelemetry\SDK\Trace\Clock;
+use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
@@ -34,12 +34,12 @@ $exporter = new JaegerExporter(
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     echo 'Starting AlwaysOnJaegerExample';
     $tracer = (new TracerProvider())
-        ->addSpanProcessor(new BatchSpanProcessor($exporter, Clock::getDefault()))
+        ->addSpanProcessor(new BatchSpanProcessor($exporter, AbstractClock::getDefault()))
         ->getTracer('io.opentelemetry.contrib.php');
 
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
-        $timestamp = Clock::getDefault()->timestamp();
+        $timestamp = AbstractClock::getDefault()->timestamp();
         $span = $tracer->startAndActivateSpan('session.generate.span' . microtime(true));
 
         $spanParent = $span->getParentContext();
