@@ -6,9 +6,8 @@ namespace OpenTelemetry\SDK\Trace;
 
 use function in_array;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\InstrumentationLibrary; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
+use OpenTelemetry\SDK\InstrumentationLibrary;
 
 final class SpanBuilder implements API\SpanBuilderInterface
 {
@@ -130,7 +129,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     /**
      * @inheritDoc
      *
-     * @psalm-param SpanKind::KIND_* $spanKind
+     * @psalm-param API\SpanKind::KIND_* $spanKind
      */
     public function setSpanKind(int $spanKind): API\SpanBuilderInterface
     {

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\API\Trace as API; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
-use OpenTelemetry\SDK\Trace\SpanProcessor\SpanMultiProcessor; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
+use OpenTelemetry\SDK\Trace\SpanProcessor\SpanMultiProcessor;
 
 /**
  * Stores shared state/config between all {@see API\TracerInterface} created via the same {@see API\TracerProviderInterface}.

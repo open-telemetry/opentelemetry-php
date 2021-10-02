@@ -8,6 +8,8 @@ use OpenTelemetry\API\Metrics as API;
 
 /**
  * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/metrics/api.md#global-meter-provider
+ *
+ * @method static API\MeterInterface getMeter(string $name)
  */
 final class GlobalMeterProvider
 {
