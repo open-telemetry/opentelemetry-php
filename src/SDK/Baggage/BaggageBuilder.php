@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Baggage;
 
 use OpenTelemetry\API\Baggage as API;
 
-final class BaggageBuilder implements API\BaggageBuilder
+final class BaggageBuilder implements API\BaggageBuilderInterface
 {
     /** @var array<string, API\Entry> */
     private $entries;
@@ -18,7 +18,7 @@ final class BaggageBuilder implements API\BaggageBuilder
     }
 
     /** @inheritDoc */
-    public function remove(string $key): API\BaggageBuilder
+    public function remove(string $key): API\BaggageBuilderInterface
     {
         unset($this->entries[$key]);
 
@@ -26,7 +26,7 @@ final class BaggageBuilder implements API\BaggageBuilder
     }
 
     /** @inheritDoc */
-    public function set(string $key, $value, API\Metadata $metadata = null): API\BaggageBuilder
+    public function set(string $key, $value, API\MetadataInterface $metadata = null): API\BaggageBuilderInterface
     {
         $metadata = $metadata ?? Metadata::getEmpty();
 
@@ -35,7 +35,7 @@ final class BaggageBuilder implements API\BaggageBuilder
         return $this;
     }
 
-    public function build(): API\Baggage
+    public function build(): API\BaggageInterface
     {
         return new Baggage($this->entries);
     }

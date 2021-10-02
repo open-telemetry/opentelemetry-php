@@ -16,15 +16,15 @@ class SpanContextTest extends TestCase
     private const FIRST_SPAN_ID = '0000000000000061';
     private const SECOND_SPAN_ID = '3000000000000000';
 
-    private API\SpanContext $first;
-    private API\SpanContext $second;
-    private API\SpanContext $remote;
+    private API\SpanContextInterface $first;
+    private API\SpanContextInterface $second;
+    private API\SpanContextInterface $remote;
 
     protected function setUp(): void
     {
-        $this->first = SpanContext::create(self::FIRST_TRACE_ID, self::FIRST_SPAN_ID, API\SpanContext::TRACE_FLAG_DEFAULT, new TraceState('foo=bar'));
-        $this->second = SpanContext::create(self::SECOND_TRACE_ID, self::SECOND_SPAN_ID, API\SpanContext::TRACE_FLAG_SAMPLED, new TraceState('foo=baz'));
-        $this->remote = SpanContext::createFromRemoteParent(self::SECOND_TRACE_ID, self::SECOND_SPAN_ID, API\SpanContext::TRACE_FLAG_SAMPLED, new TraceState());
+        $this->first = SpanContext::create(self::FIRST_TRACE_ID, self::FIRST_SPAN_ID, API\SpanContextInterface::TRACE_FLAG_DEFAULT, new TraceState('foo=bar'));
+        $this->second = SpanContext::create(self::SECOND_TRACE_ID, self::SECOND_SPAN_ID, API\SpanContextInterface::TRACE_FLAG_SAMPLED, new TraceState('foo=baz'));
+        $this->remote = SpanContext::createFromRemoteParent(self::SECOND_TRACE_ID, self::SECOND_SPAN_ID, API\SpanContextInterface::TRACE_FLAG_SAMPLED, new TraceState());
     }
 
     // region API
@@ -65,8 +65,8 @@ class SpanContextTest extends TestCase
 
     public function test_getTraceFlags(): void
     {
-        $this->assertSame(API\SpanContext::TRACE_FLAG_DEFAULT, $this->first->getTraceFlags());
-        $this->assertSame(API\SpanContext::TRACE_FLAG_SAMPLED, $this->second->getTraceFlags());
+        $this->assertSame(API\SpanContextInterface::TRACE_FLAG_DEFAULT, $this->first->getTraceFlags());
+        $this->assertSame(API\SpanContextInterface::TRACE_FLAG_SAMPLED, $this->second->getTraceFlags());
     }
 
     public function test_getTraceState(): void

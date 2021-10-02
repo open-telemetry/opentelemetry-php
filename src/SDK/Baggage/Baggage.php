@@ -12,13 +12,13 @@ use OpenTelemetry\SDK\Trace\BaggageContextKey;
 /**
  * @todo Implement this in the API layer
  */
-final class Baggage implements API\Baggage
+final class Baggage implements API\BaggageInterface
 {
     /** @var self|null */
     private static $emptyBaggage;
 
     /** @inheritDoc */
-    public static function fromContext(Context $context): API\Baggage
+    public static function fromContext(Context $context): API\BaggageInterface
     {
         if ($baggage = $context->get(BaggageContextKey::instance())) {
             return $baggage;
@@ -28,19 +28,19 @@ final class Baggage implements API\Baggage
     }
 
     /** @inheritDoc */
-    public static function getBuilder(): API\BaggageBuilder
+    public static function getBuilder(): API\BaggageBuilderInterface
     {
         return new BaggageBuilder();
     }
 
     /** @inheritDoc */
-    public static function getCurrent(): API\Baggage
+    public static function getCurrent(): API\BaggageInterface
     {
         return self::fromContext(Context::getCurrent());
     }
 
     /** @inheritDoc */
-    public static function getEmpty(): API\Baggage
+    public static function getEmpty(): API\BaggageInterface
     {
         if (null === self::$emptyBaggage) {
             self::$emptyBaggage = new self();
@@ -89,7 +89,7 @@ final class Baggage implements API\Baggage
     }
 
     /** @inheritDoc */
-    public function toBuilder(): API\BaggageBuilder
+    public function toBuilder(): API\BaggageBuilderInterface
     {
         return new BaggageBuilder($this->entries);
     }

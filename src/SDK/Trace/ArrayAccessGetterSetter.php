@@ -19,10 +19,10 @@ use function strtolower;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/api-propagators.md#textmap-propagator Getter and Setter.
  *
- * Default implementation of {@see API\PropagationGetter} and {@see API\PropagationSetter}.
- * This type is used if no custom getter/setter is provided to {@see API\TextMapPropagator::inject()} or {@see API\TextMapPropagator::extract()}.
+ * Default implementation of {@see API\PropagationGetterInterface} and {@see API\PropagationSetterInterface}.
+ * This type is used if no custom getter/setter is provided to {@see API\TextMapPropagatorInterface::inject()} or {@see API\TextMapPropagatorInterface::extract()}.
  */
-class ArrayAccessGetterSetter implements API\PropagationGetter, API\PropagationSetter
+class ArrayAccessGetterSetter implements API\PropagationGetterInterface, API\PropagationSetterInterface
 {
     /** @var self|null */
     private static $instance;
@@ -46,7 +46,7 @@ class ArrayAccessGetterSetter implements API\PropagationGetter, API\PropagationS
             return array_keys($carrier);
         }
 
-        if ($carrier instanceof KeyedArrayAccess) {
+        if ($carrier instanceof KeyedArrayAccessInterface) {
             return $carrier->keys();
         }
 

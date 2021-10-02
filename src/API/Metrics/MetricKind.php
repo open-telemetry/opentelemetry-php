@@ -4,18 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Metrics;
 
-interface MetricKind
+final class MetricKind
 {
     public const COUNTER = 1;
-
     public const UP_DOWN_COUNTER = 2;
-
     public const VALUE_RECORDER = 3;
-
     public const SUM_OBSERVER = 4;
-
     public const UP_DOWN_SUM_OBSERVER = 4;
-
     public const VALUE_OBSERVER = 5;
 
     public const TYPES = [
@@ -26,4 +21,8 @@ interface MetricKind
         self::UP_DOWN_SUM_OBSERVER,
         self::VALUE_OBSERVER,
     ];
+
+    private function __construct()
+    {
+    }
 }

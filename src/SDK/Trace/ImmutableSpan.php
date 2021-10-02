@@ -12,20 +12,20 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 /**
  * @psalm-immutable
  */
-final class ImmutableSpan implements SpanData
+final class ImmutableSpan implements SpanDataInterface
 {
     private Span $span;
 
     /** @var non-empty-string */
     private string $name;
 
-    /** @var list<API\Event> */
+    /** @var list<API\EventInterface> */
     private array $events;
 
-    /** @var list<API\Link> */
+    /** @var list<API\LinkInterface> */
     private array $links;
 
-    private API\Attributes $attributes;
+    private API\AttributesInterface $attributes;
     private int $totalAttributeCount;
     private int $totalRecordedEvents;
     private StatusData $status;
@@ -33,19 +33,19 @@ final class ImmutableSpan implements SpanData
     private bool $hasEnded;
 
     /**
-     * @internal
+     * @param non-empty-string $name
+     * @param list<API\LinkInterface> $links
+     * @param list<API\EventInterface> $events
+     *@internal
      * @psalm-internal OpenTelemetry\Sdk
      *
-     * @param non-empty-string $name
-     * @param list<API\Link> $links
-     * @param list<API\Event> $events
      */
     public function __construct(
         Span $span,
         string $name,
         array $links,
         array $events,
-        API\Attributes $attributes,
+        API\AttributesInterface $attributes,
         int $totalAttributeCount,
         int $totalRecordedEvents,
         StatusData $status,
@@ -69,12 +69,12 @@ final class ImmutableSpan implements SpanData
         return $this->span->getKind();
     }
 
-    public function getContext(): API\SpanContext
+    public function getContext(): API\SpanContextInterface
     {
         return $this->span->getContext();
     }
 
-    public function getParentContext(): API\SpanContext
+    public function getParentContext(): API\SpanContextInterface
     {
         return $this->span->getParentContext();
     }
@@ -131,7 +131,7 @@ final class ImmutableSpan implements SpanData
         return $this->events;
     }
 
-    public function getAttributes(): API\Attributes
+    public function getAttributes(): API\AttributesInterface
     {
         return $this->attributes;
     }

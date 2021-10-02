@@ -34,7 +34,7 @@ use OpenTelemetry\API\Metrics as API;
  * values, the sum of event values, and the count of events, allowing the rate,
  * the mean, and range of input values to be monitored.
  */
-class ValueRecorder extends AbstractMetric implements API\ValueRecorder, API\LabelableMetric
+class ValueRecorder extends AbstractMetric implements API\ValueRecorderInterface, API\LabelableMetricInterfaceInterface
 {
     use HasLabels;
 

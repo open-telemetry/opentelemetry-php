@@ -20,30 +20,30 @@ use function sprintf;
 use function str_replace;
 use Throwable;
 
-class Span implements ReadWriteSpan
+class Span implements ReadWriteSpanInterface
 {
     /**
      * This method _MUST_ not be used directly.
-     * End users should use a {@see Tracer} in order to create spans.
+     * End users should use a {@see TracerInterface} in order to create spans.
      *
      * @param non-empty-string $name
      * @psalm-param API\SpanKind::KIND_* $kind
-     * @param list<API\Link> $links
+     * @param list<API\LinkInterface> $links
      *
      * @internal
      * @psalm-internal OpenTelemetry
      */
     public static function startSpan(
         string $name,
-        API\SpanContext $context,
+        API\SpanContextInterface $context,
         InstrumentationLibrary $instrumentationLibrary,
         int $kind,
-        API\Span $parentSpan,
+        API\SpanInterface $parentSpan,
         Context $parentContext,
         SpanLimits $spanLimits,
-        SpanProcessor $spanProcessor,
+        SpanProcessorInterface $spanProcessor,
         ResourceInfo $resource,
-        ?API\Attributes $attributes,
+        ?API\AttributesInterface $attributes,
         array $links,
         int $totalRecordedLinks,
         int $userStartEpochNanos
@@ -76,7 +76,7 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public static function fromContext(Context $context): API\Span
+    public static function fromContext(Context $context): API\SpanInterface
     {
         if ($span = $context->get(SpanContextKey::instance())) {
             return $span;
@@ -86,13 +86,13 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public static function getCurrent(): API\Span
+    public static function getCurrent(): API\SpanInterface
     {
         return self::fromContext(Context::getCurrent());
     }
 
     /** @inheritDoc */
-    public static function getInvalid(): API\Span
+    public static function getInvalid(): API\SpanInterface
     {
         return NonRecordingSpan::getInvalid();
     }
@@ -156,27 +156,27 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public static function wrap(API\SpanContext $spanContext): API\Span
+    public static function wrap(API\SpanContextInterface $spanContext): API\SpanInterface
     {
         return new NonRecordingSpan($spanContext);
     }
 
     /** @readonly */
-    private API\SpanContext $context;
+    private API\SpanContextInterface $context;
 
     /** @readonly */
-    private API\SpanContext $parentSpanContext;
+    private API\SpanContextInterface $parentSpanContext;
 
     /** @readonly */
     private SpanLimits $spanLimits;
 
     /** @readonly */
-    private SpanProcessor $spanProcessor;
+    private SpanProcessorInterface $spanProcessor;
 
     /**
      * @readonly
      *
-     * @var list<API\Link>
+     * @var list<API\LinkInterface>
      */
     private array $links;
 
@@ -198,10 +198,10 @@ class Span implements ReadWriteSpan
     /** @var non-empty-string */
     private string $name;
 
-    /** @var list<API\Event> */
+    /** @var list<API\EventInterface> */
     private array $events = [];
 
-    private ?API\Attributes $attributes;
+    private ?API\AttributesInterface $attributes;
     private int $totalRecordedEvents = 0;
     private StatusData $status;
     private int $endEpochNanos = 0;
@@ -209,18 +209,18 @@ class Span implements ReadWriteSpan
 
     /**
      * @param non-empty-string $name
-     * @param list<API\Link> $links
+     * @param list<API\LinkInterface> $links
      */
     private function __construct(
         string $name,
-        API\SpanContext $context,
+        API\SpanContextInterface $context,
         InstrumentationLibrary $instrumentationLibrary,
         int $kind,
-        API\SpanContext $parentSpanContext,
+        API\SpanContextInterface $parentSpanContext,
         SpanLimits $spanLimits,
-        SpanProcessor $spanProcessor,
+        SpanProcessorInterface $spanProcessor,
         ResourceInfo $resource,
-        ?API\Attributes $attributes,
+        ?API\AttributesInterface $attributes,
         array $links,
         int $totalRecordedLinks,
         int $startEpochNanos
@@ -247,7 +247,7 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public function getContext(): API\SpanContext
+    public function getContext(): API\SpanContextInterface
     {
         return $this->context;
     }
@@ -259,7 +259,7 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public function setAttribute(string $key, $value): ReadWriteSpan
+    public function setAttribute(string $key, $value): ReadWriteSpanInterface
     {
         if ($this->hasEnded || ctype_space($key)) {
             return $this;
@@ -275,7 +275,7 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public function setAttributes(API\Attributes $attributes): ReadWriteSpan
+    public function setAttributes(API\AttributesInterface $attributes): ReadWriteSpanInterface
     {
         if (0 === count($attributes)) {
             return $this;
@@ -290,7 +290,7 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public function addEvent(string $name, ?API\Attributes $attributes = null, int $timestamp = null): ReadWriteSpan
+    public function addEvent(string $name, ?API\AttributesInterface $attributes = null, int $timestamp = null): ReadWriteSpanInterface
     {
         if ($this->hasEnded) {
             return $this;
@@ -316,7 +316,7 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public function recordException(Throwable $exception, API\Attributes $attributes = null): ReadWriteSpan
+    public function recordException(Throwable $exception, API\AttributesInterface $attributes = null): ReadWriteSpanInterface
     {
         $timestamp = Clock::getDefault()->now();
         $eventAttributes = new Attributes([
@@ -335,7 +335,7 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public function updateName(string $name): ReadWriteSpan
+    public function updateName(string $name): ReadWriteSpanInterface
     {
         if ($this->hasEnded) {
             return $this;
@@ -346,7 +346,7 @@ class Span implements ReadWriteSpan
     }
 
     /** @inheritDoc */
-    public function setStatus(string $code, string $description = null): ReadWriteSpan
+    public function setStatus(string $code, string $description = null): ReadWriteSpanInterface
     {
         if ($this->hasEnded) {
             return $this;
@@ -376,7 +376,7 @@ class Span implements ReadWriteSpan
         return $this->name;
     }
 
-    public function getParentContext(): API\SpanContext
+    public function getParentContext(): API\SpanContextInterface
     {
         return $this->parentSpanContext;
     }
@@ -391,7 +391,7 @@ class Span implements ReadWriteSpan
         return $this->hasEnded;
     }
 
-    public function toSpanData(): SpanData
+    public function toSpanData(): SpanDataInterface
     {
         return new ImmutableSpan(
             $this,
@@ -455,7 +455,7 @@ class Span implements ReadWriteSpan
         return $context->with(SpanContextKey::instance(), $this);
     }
 
-    private function getImmutableAttributes(): API\Attributes
+    private function getImmutableAttributes(): API\AttributesInterface
     {
         if (null === $this->attributes) {
             return new Attributes();

@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics as API;
 
-abstract class AbstractMetric implements API\Metric
+abstract class AbstractMetric implements API\MetricInterface
 {
     /**
      * @var string $name

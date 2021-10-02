@@ -9,16 +9,16 @@ final class Entry
     /** @var mixed */
     private $value;
 
-    /** @var Metadata */
+    /** @var MetadataInterface */
     private $metadata;
 
     /**
      * @param mixed $value
-     * @param Metadata $metadata
+     * @param MetadataInterface $metadata
      */
     public function __construct(
         $value,
-        Metadata $metadata
+        MetadataInterface $metadata
     ) {
         $this->value = $value;
         $this->metadata = $metadata;
@@ -29,7 +29,7 @@ final class Entry
         return $this->value;
     }
 
-    public function getMetadata(): Metadata
+    public function getMetadata(): MetadataInterface
     {
         return $this->metadata;
     }

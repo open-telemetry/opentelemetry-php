@@ -10,7 +10,7 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\InstrumentationLibrary; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
 
-final class SpanBuilder implements API\SpanBuilder
+final class SpanBuilder implements API\SpanBuilderInterface
 {
     /**
      * @var non-empty-string
@@ -34,10 +34,10 @@ final class SpanBuilder implements API\SpanBuilder
      */
     private int $spanKind = API\SpanKind::KIND_INTERNAL;
 
-    /** @var list<API\Link>|null */
+    /** @var list<API\LinkInterface>|null */
     private ?array $links = null;
 
-    private ?API\Attributes $attributes = null;
+    private ?API\AttributesInterface $attributes = null;
     private int $totalNumberOfLinksAdded = 0;
     private int $startEpochNanos = 0;
 
@@ -55,7 +55,7 @@ final class SpanBuilder implements API\SpanBuilder
     }
 
     /** @inheritDoc */
-    public function setParent(Context $parentContext): API\SpanBuilder
+    public function setParent(Context $parentContext): API\SpanBuilderInterface
     {
         $this->parentContext = $parentContext;
 
@@ -63,7 +63,7 @@ final class SpanBuilder implements API\SpanBuilder
     }
 
     /** @inheritDoc */
-    public function setNoParent(): API\SpanBuilder
+    public function setNoParent(): API\SpanBuilderInterface
     {
         $this->parentContext = Context::getRoot();
 
@@ -71,7 +71,7 @@ final class SpanBuilder implements API\SpanBuilder
     }
 
     /** @inheritDoc */
-    public function addLink(API\SpanContext $context, API\Attributes $attributes = null): API\SpanBuilder
+    public function addLink(API\SpanContextInterface $context, API\AttributesInterface $attributes = null): API\SpanBuilderInterface
     {
         if (!$context->isValid()) {
             return $this;
@@ -102,7 +102,7 @@ final class SpanBuilder implements API\SpanBuilder
     }
 
     /** @inheritDoc */
-    public function setAttribute(string $key, $value): API\SpanBuilder
+    public function setAttribute(string $key, $value): API\SpanBuilderInterface
     {
         if (null === $this->attributes) {
             $this->attributes = Attributes::withLimits(new Attributes(), $this->spanLimits->getAttributeLimits());
@@ -114,7 +114,7 @@ final class SpanBuilder implements API\SpanBuilder
     }
 
     /** @inheritDoc */
-    public function setAttributes(API\Attributes $attributes): API\SpanBuilder
+    public function setAttributes(API\AttributesInterface $attributes): API\SpanBuilderInterface
     {
         if (0 === count($attributes)) {
             return $this;
@@ -132,7 +132,7 @@ final class SpanBuilder implements API\SpanBuilder
      *
      * @psalm-param SpanKind::KIND_* $spanKind
      */
-    public function setSpanKind(int $spanKind): API\SpanBuilder
+    public function setSpanKind(int $spanKind): API\SpanBuilderInterface
     {
         $this->spanKind = $spanKind;
 
@@ -140,7 +140,7 @@ final class SpanBuilder implements API\SpanBuilder
     }
 
     /** @inheritDoc */
-    public function setStartTimestamp(int $timestamp): API\SpanBuilder
+    public function setStartTimestamp(int $timestamp): API\SpanBuilderInterface
     {
         if (0 > $timestamp) {
             return $this;
@@ -152,7 +152,7 @@ final class SpanBuilder implements API\SpanBuilder
     }
 
     /** @inheritDoc */
-    public function startSpan(): API\Span
+    public function startSpan(): API\SpanInterface
     {
         $parentContext = $this->parentContext ?? Context::getCurrent();
         $parentSpan = Span::fromContext($parentContext);
@@ -190,7 +190,7 @@ final class SpanBuilder implements API\SpanBuilder
         $spanContext = SpanContext::create(
             $traceId,
             $spanId,
-            SamplingResult::RECORD_AND_SAMPLE === $samplingDecision ? API\SpanContext::TRACE_FLAG_SAMPLED : API\SpanContext::TRACE_FLAG_DEFAULT,
+            SamplingResult::RECORD_AND_SAMPLE === $samplingDecision ? API\SpanContextInterface::TRACE_FLAG_SAMPLED : API\SpanContextInterface::TRACE_FLAG_DEFAULT,
             $samplingResultTraceState,
         );
 

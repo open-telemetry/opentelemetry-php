@@ -12,7 +12,7 @@ use OpenTelemetry\API\Metrics as API;
 final class GlobalMeterProvider
 {
     /**
-     * @var API\MeterProvider $globalProvider
+     * @var API\MeterProviderInterface $globalProvider
      */
     protected static $globalProvider;
 
@@ -21,9 +21,9 @@ final class GlobalMeterProvider
      * If global instance is missing, new MeterProvider will be lazily created
      *
      * @access	public static
-     * @return	API\MeterProvider
+     * @return	API\MeterProviderInterface
      */
-    public static function getGlobalProvider(): API\MeterProvider
+    public static function getGlobalProvider(): API\MeterProviderInterface
     {
         if (empty(static::$globalProvider)) {
             static::$globalProvider = new MeterProvider();
@@ -36,10 +36,10 @@ final class GlobalMeterProvider
      * Sets a global instance of MeterProvider
      *
      * @access	public static
-     * @param	API\MeterProvider $globalProvider
+     * @param	API\MeterProviderInterface $globalProvider
      * @return	void
      */
-    public static function setGlobalProvider(API\MeterProvider $globalProvider): void
+    public static function setGlobalProvider(API\MeterProviderInterface $globalProvider): void
     {
         static::$globalProvider = $globalProvider;
     }

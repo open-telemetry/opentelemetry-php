@@ -7,7 +7,7 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 use ArrayObject;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Trace\ArrayAccessGetterSetter;
-use OpenTelemetry\SDK\Trace\KeyedArrayAccess;
+use OpenTelemetry\SDK\Trace\KeyedArrayAccessInterface;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -74,7 +74,7 @@ class ArrayAccessGetterSetterTest extends TestCase
 
     public function testKeysKeyedArrayAccessObject(): void
     {
-        $carrier = new class() implements KeyedArrayAccess {
+        $carrier = new class() implements KeyedArrayAccessInterface {
             public function offsetExists($offset): bool
             {
                 return true;

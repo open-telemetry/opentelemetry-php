@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Baggage;
 
 use OpenTelemetry\API\Baggage as API;
 
-final class Metadata implements API\Metadata
+final class Metadata implements API\MetadataInterface
 {
     /** @var self|null */
     private static $instance;

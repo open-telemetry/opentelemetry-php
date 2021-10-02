@@ -29,16 +29,16 @@ final class SamplingResult
     private $decision;
 
     /**
-     * @var ?API\Attributes A set of span Attributes that will also be added to the Span.
+     * @var ?API\AttributesInterface A set of span Attributes that will also be added to the Span.
      */
     private $attributes;
 
     /**
-     * @var ?API\TraceState A Tracestate that will be associated with the Span through the new SpanContext.
+     * @var ?API\TraceStateInterface A Tracestate that will be associated with the Span through the new SpanContext.
      */
     private $traceState;
 
-    public function __construct(int $decision, ?API\Attributes $attributes = null, ?API\TraceState $traceState = null)
+    public function __construct(int $decision, ?API\AttributesInterface $attributes = null, ?API\TraceStateInterface $traceState = null)
     {
         $this->decision = $decision;
         $this->attributes = $attributes;
@@ -56,7 +56,7 @@ final class SamplingResult
     /**
      * Return attributes which will be attached to the span.
      */
-    public function getAttributes(): ?API\Attributes
+    public function getAttributes(): ?API\AttributesInterface
     {
         return $this->attributes;
     }
@@ -64,7 +64,7 @@ final class SamplingResult
     /**
      * Return a collection of links that will be associated with the Span to be created.
      */
-    public function getTraceState(): ?API\TraceState
+    public function getTraceState(): ?API\TraceStateInterface
     {
         return $this->traceState;
     }

@@ -36,9 +36,9 @@ class AlwaysOnSamplerTest extends TestCase
         $this->assertEquals('AlwaysOnSampler', $sampler->getDescription());
     }
 
-    private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceState $traceState = null): Context
+    private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceStateInterface $traceState = null): Context
     {
-        $traceFlag = $sampled ? API\SpanContext::TRACE_FLAG_SAMPLED : API\SpanContext::TRACE_FLAG_DEFAULT;
+        $traceFlag = $sampled ? API\SpanContextInterface::TRACE_FLAG_SAMPLED : API\SpanContextInterface::TRACE_FLAG_DEFAULT;
 
         if ($isRemote) {
             $spanContext = SpanContext::createFromRemoteParent(

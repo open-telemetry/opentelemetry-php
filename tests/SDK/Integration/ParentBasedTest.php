@@ -7,8 +7,8 @@ namespace OpenTelemetry\Tests\SDK\Integration;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\NonRecordingSpan;
-use OpenTelemetry\SDK\Trace\Sampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
+use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\SpanContext;
 use PHPUnit\Framework\TestCase;
@@ -33,10 +33,10 @@ class ParentBasedTest extends TestCase
      */
     public function testParentBased(
         $parentContext,
-        ?Sampler $remoteParentSampled = null,
-        ?Sampler $remoteParentNotSampled = null,
-        ?Sampler $localParentSampled = null,
-        ?Sampler $localParentNotSampled = null,
+        ?SamplerInterface $remoteParentSampled = null,
+        ?SamplerInterface $remoteParentNotSampled = null,
+        ?SamplerInterface $localParentSampled = null,
+        ?SamplerInterface $localParentNotSampled = null,
         $expectedDdecision
     ): void {
         $rootSampler = $this->createMockSamplerNeverInvoked();
@@ -75,14 +75,14 @@ class ParentBasedTest extends TestCase
 
     public function testParentBasedDescription(): void
     {
-        $rootSampler = $this->createMock(Sampler::class);
+        $rootSampler = $this->createMock(SamplerInterface::class);
         $sampler = new ParentBased($rootSampler);
         $this->assertEquals('ParentBased', $sampler->getDescription());
     }
 
-    private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceState $traceState = null): Context
+    private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceStateInterface $traceState = null): Context
     {
-        $traceFlag = $sampled ? API\SpanContext::TRACE_FLAG_SAMPLED : API\SpanContext::TRACE_FLAG_DEFAULT;
+        $traceFlag = $sampled ? API\SpanContextInterface::TRACE_FLAG_SAMPLED : API\SpanContextInterface::TRACE_FLAG_DEFAULT;
 
         if ($isRemote) {
             $spanContext = SpanContext::createFromRemoteParent(
@@ -103,17 +103,17 @@ class ParentBasedTest extends TestCase
         return (new Context())->withContextValue(new NonRecordingSpan($spanContext));
     }
 
-    private function createMockSamplerNeverInvoked(): Sampler
+    private function createMockSamplerNeverInvoked(): SamplerInterface
     {
-        $sampler = $this->createMock(Sampler::class);
+        $sampler = $this->createMock(SamplerInterface::class);
         $sampler->expects($this->never())->method('shouldSample');
 
         return $sampler;
     }
 
-    private function createMockSamplerInvokedOnce(int $resultDecision): Sampler
+    private function createMockSamplerInvokedOnce(int $resultDecision): SamplerInterface
     {
-        $sampler = $this->createMock(Sampler::class);
+        $sampler = $this->createMock(SamplerInterface::class);
         $sampler->expects($this->once())->method('shouldSample')
             ->willReturn(new SamplingResult($resultDecision));
 

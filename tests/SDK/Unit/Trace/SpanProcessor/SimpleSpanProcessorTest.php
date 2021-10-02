@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Unit\Trace\SpanProcessor;
 
-use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\SDK\Trace\Exporter;
-use OpenTelemetry\SDK\Trace\ReadWriteSpan;
+use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use PHPUnit\Framework\TestCase;
@@ -21,7 +21,7 @@ class SimpleSpanProcessorTest extends TestCase
         $exporter = $this->createMock(Exporter::class);
         $exporter->expects($this->atLeastOnce())->method('export');
 
-        $spanContext = $this->createStub(SpanContext::class);
+        $spanContext = $this->createStub(SpanContextInterface::class);
         $spanContext->method('isSampled')->willReturn(true); // only sampled spans are exported
         $span = $this->createStub(Span::class);
         $span->method('getContext')->willReturn($spanContext);
@@ -35,7 +35,7 @@ class SimpleSpanProcessorTest extends TestCase
     public function shouldAllowNullExporter(): void
     {
         $proc = new SimpleSpanProcessor(null);
-        $span = $this->createMock(ReadWriteSpan::class);
+        $span = $this->createMock(ReadWriteSpanInterface::class);
         $proc->onStart($span);
         $proc->onEnd($span);
         $proc->forceFlush();
@@ -66,7 +66,7 @@ class SimpleSpanProcessorTest extends TestCase
         $proc = new SimpleSpanProcessor($exporter);
         $proc->shutdown();
 
-        $span = $this->createMock(ReadWriteSpan::class);
+        $span = $this->createMock(ReadWriteSpanInterface::class);
         $proc->onStart($span);
         $proc->onEnd($span);
     }
@@ -79,7 +79,7 @@ class SimpleSpanProcessorTest extends TestCase
         $exporter = $this->createMock(Exporter::class);
         $exporter->expects($this->never())->method('export');
 
-        $spanContext = $this->createStub(SpanContext::class);
+        $spanContext = $this->createStub(SpanContextInterface::class);
         $spanContext->method('isSampled')->willReturn(false);
         $span = $this->createStub(Span::class);
         $span->method('getContext')->willReturn($spanContext);

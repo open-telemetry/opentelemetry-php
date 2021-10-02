@@ -8,8 +8,8 @@ use function count;
 use function explode;
 use function hexdec;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\API\Trace\PropagationGetter;
-use OpenTelemetry\API\Trace\PropagationSetter;
+use OpenTelemetry\API\Trace\PropagationGetterInterface;
+use OpenTelemetry\API\Trace\PropagationSetterInterface;
 use OpenTelemetry\Context\Context;
 
 /**
@@ -22,7 +22,7 @@ use OpenTelemetry\Context\Context;
  * traceparent header and relevant parts of the tracestate header containing
  * their proprietary information.
  */
-final class TraceContextPropagator implements API\TextMapPropagator
+final class TraceContextPropagator implements API\TextMapPropagatorInterface
 {
     public const TRACEPARENT = 'traceparent';
     public const TRACESTATE = 'tracestate';
@@ -35,7 +35,7 @@ final class TraceContextPropagator implements API\TextMapPropagator
     }
 
     /** {@inheritdoc} */
-    public static function inject(&$carrier, PropagationSetter $setter = null, Context $context = null): void
+    public static function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void
     {
         $setter = $setter ?? ArrayAccessGetterSetter::getInstance();
         $context = $context ?? Context::getCurrent();
@@ -57,7 +57,7 @@ final class TraceContextPropagator implements API\TextMapPropagator
     }
 
     /** {@inheritdoc} */
-    public static function extract($carrier, PropagationGetter $getter = null, Context $context = null): Context
+    public static function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
     {
         $getter = $getter ?? ArrayAccessGetterSetter::getInstance();
         $context = $context ?? Context::getCurrent();
@@ -70,7 +70,7 @@ final class TraceContextPropagator implements API\TextMapPropagator
         return $context->withContextValue(Span::wrap($spanContext));
     }
 
-    private static function extractImpl($carrier, PropagationGetter $getter): API\SpanContext
+    private static function extractImpl($carrier, PropagationGetterInterface $getter): API\SpanContextInterface
     {
         $traceparent = $getter->get($carrier, self::TRACEPARENT);
         if ($traceparent === null) {
@@ -106,7 +106,7 @@ final class TraceContextPropagator implements API\TextMapPropagator
             return SpanContext::createFromRemoteParent(
                 $traceId,
                 $spanId,
-                $isSampled ? API\SpanContext::TRACE_FLAG_SAMPLED : API\SpanContext::TRACE_FLAG_DEFAULT,
+                $isSampled ? API\SpanContextInterface::TRACE_FLAG_SAMPLED : API\SpanContextInterface::TRACE_FLAG_DEFAULT,
                 $tracestate
             );
         }
@@ -115,7 +115,7 @@ final class TraceContextPropagator implements API\TextMapPropagator
         return SpanContext::createFromRemoteParent(
             $traceId,
             $spanId,
-            $isSampled ? API\SpanContext::TRACE_FLAG_SAMPLED : API\SpanContext::TRACE_FLAG_DEFAULT
+            $isSampled ? API\SpanContextInterface::TRACE_FLAG_SAMPLED : API\SpanContextInterface::TRACE_FLAG_DEFAULT
         );
     }
 }

@@ -18,7 +18,7 @@ class NonRecordingSpanTest extends TestCase
     public function testHasInvalidContextAndDefaultSpanOptions(): void
     {
         $context = NonRecordingSpan::getInvalid()->getContext();
-        $this->assertSame(API\SpanContext::TRACE_FLAG_DEFAULT, $context->getTraceFlags());
+        $this->assertSame(API\SpanContextInterface::TRACE_FLAG_DEFAULT, $context->getTraceFlags());
         $this->assertNull($context->getTraceState());
     }
 }

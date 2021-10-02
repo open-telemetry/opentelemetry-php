@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Trace\Sampler;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Trace\Sampler;
+use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
 
@@ -22,49 +22,49 @@ use OpenTelemetry\SDK\Trace\Span;
  * $sampler = new ParentBased($rootSampler);
  * ```
  */
-class ParentBased implements Sampler
+class ParentBased implements SamplerInterface
 {
 
     /**
-     * @var Sampler
+     * @var SamplerInterface
      */
     private $root;
 
     /**
-     * @var Sampler
+     * @var SamplerInterface
      */
     private $remoteParentSampled;
 
     /**
-     * @var Sampler
+     * @var SamplerInterface
      */
     private $remoteParentNotSampled;
 
     /**
-     * @var Sampler
+     * @var SamplerInterface
      */
     private $localParentSampled;
 
     /**
-     * @var Sampler
+     * @var SamplerInterface
      */
     private $localParentNotSampled;
 
     /**
      * ParentBased sampler delegates the sampling decision based on the parent context.
      *
-     * @param Sampler $root Sampler called for the span with no parent (root span).
-     * @param Sampler|null $remoteParentSampled Sampler called for the span with the remote sampled parent. When null, `AlwaysOnSampler` is used.
-     * @param Sampler|null $remoteParentNotSampled Sampler called for the span with the remote not sampled parent. When null, `AlwaysOffSampler` is used.
-     * @param Sampler|null $localParentSampled Sampler called for the span with local the sampled parent. When null, `AlwaysOnSampler` is used.
-     * @param Sampler|null $localParentNotSampled Sampler called for the span with the local not sampled parent. When null, `AlwaysOffSampler` is used.
+     * @param SamplerInterface $root Sampler called for the span with no parent (root span).
+     * @param SamplerInterface|null $remoteParentSampled Sampler called for the span with the remote sampled parent. When null, `AlwaysOnSampler` is used.
+     * @param SamplerInterface|null $remoteParentNotSampled Sampler called for the span with the remote not sampled parent. When null, `AlwaysOffSampler` is used.
+     * @param SamplerInterface|null $localParentSampled Sampler called for the span with local the sampled parent. When null, `AlwaysOnSampler` is used.
+     * @param SamplerInterface|null $localParentNotSampled Sampler called for the span with the local not sampled parent. When null, `AlwaysOffSampler` is used.
      */
     public function __construct(
-        Sampler $root,
-        ?Sampler $remoteParentSampled = null,
-        ?Sampler $remoteParentNotSampled = null,
-        ?Sampler $localParentSampled = null,
-        ?Sampler $localParentNotSampled = null
+        SamplerInterface $root,
+        ?SamplerInterface $remoteParentSampled = null,
+        ?SamplerInterface $remoteParentNotSampled = null,
+        ?SamplerInterface $localParentSampled = null,
+        ?SamplerInterface $localParentNotSampled = null
     ) {
         $this->root = $root;
         $this->remoteParentSampled = $remoteParentSampled ?? new AlwaysOnSampler();
@@ -82,7 +82,7 @@ class ParentBased implements Sampler
         string $traceId,
         string $spanName,
         int $spanKind,
-        ?API\Attributes $attributes = null,
+        ?API\AttributesInterface $attributes = null,
         array $links = []
     ): SamplingResult {
         $parentSpan = Span::fromContext($parentContext);

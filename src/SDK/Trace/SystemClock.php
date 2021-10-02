@@ -26,9 +26,9 @@ final class SystemClock extends Clock
     {
         /**
          * `microtime` returns a unix timestamp _WITH_ microseconds, not _IN_ microseconds.
-         * E.g. `1633052992.330921` so we must multiply it by {@see API\Clock::NANOS_PER_SECOND} to get a value _IN_ nanoseconds.
+         * E.g. `1633052992.330921` so we must multiply it by {@see API\ClockInterface::NANOS_PER_SECOND} to get a value _IN_ nanoseconds.
          */
-        return (int) (microtime(true) * API\Clock::NANOS_PER_SECOND);
+        return (int) (microtime(true) * API\ClockInterface::NANOS_PER_SECOND);
     }
 
     /** @inheritDoc */

@@ -7,11 +7,11 @@ namespace OpenTelemetry\SDK\Trace;
 use function intdiv;
 use OpenTelemetry\API\Trace as API;
 
-abstract class Clock implements API\Clock
+abstract class Clock implements API\ClockInterface
 {
-    private static ?API\Clock $testClock;
+    private static ?API\ClockInterface $testClock;
 
-    public static function getDefault(): API\Clock
+    public static function getDefault(): API\ClockInterface
     {
         return self::$testClock ?? SystemClock::getInstance();
     }
@@ -20,7 +20,7 @@ abstract class Clock implements API\Clock
      * @internal
      * @psalm-internal OpenTelemetry
      */
-    public static function setTestClock(?API\Clock $clock = null): void
+    public static function setTestClock(?API\ClockInterface $clock = null): void
     {
         self::$testClock = $clock;
     }

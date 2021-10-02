@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API;
 
-class Attribute implements API\Attribute
+class Attribute implements API\AttributeInterface
 {
     private $key;
     private $value;

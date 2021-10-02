@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Trace\Sampler;
 use InvalidArgumentException;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Trace\Sampler;
+use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
 
@@ -19,7 +19,7 @@ use OpenTelemetry\SDK\Trace\Span;
  * $sampler = new TraceIdRatioBasedSampler(0.01);
  * ```
  */
-class TraceIdRatioBasedSampler implements Sampler
+class TraceIdRatioBasedSampler implements SamplerInterface
 {
     /**
      * @var float
@@ -47,7 +47,7 @@ class TraceIdRatioBasedSampler implements Sampler
         string $traceId,
         string $spanName,
         int $spanKind,
-        ?API\Attributes $attributes = null,
+        ?API\AttributesInterface $attributes = null,
         array $links = []
     ): SamplingResult {
         // TODO: Add config to adjust which spans get sampled (only default from specification is implemented)

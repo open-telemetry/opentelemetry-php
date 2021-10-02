@@ -8,29 +8,30 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SDK\Trace\IdGenerator;
-use OpenTelemetry\SDK\Trace\Sampler;
+use OpenTelemetry\SDK\Trace\IdGeneratorInterface;
+use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
-use OpenTelemetry\SDK\Trace\SpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SpanMultiProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerSharedState;
 
 class TracerSharedStateTest extends MockeryTestCase
 {
-    /** @var MockInterface&IdGenerator */
+    /** @var MockInterface&IdGeneratorInterface */
     private $idGenerator;
 
     /** @var MockInterface&ResourceInfo */
     private $resourceInfo;
 
-    /** @var MockInterface&Sampler */
+    /** @var MockInterface&SamplerInterface */
     private $sampler;
 
     protected function setUp(): void
     {
-        $this->idGenerator = Mockery::mock(IdGenerator::class);
+        $this->idGenerator = Mockery::mock(IdGeneratorInterface::class);
         $this->resourceInfo = Mockery::mock(ResourceInfo::class);
-        $this->sampler = Mockery::mock(Sampler::class);
+        $this->sampler = Mockery::mock(SamplerInterface::class);
     }
 
     public function test_getters(): void
@@ -55,14 +56,14 @@ class TracerSharedStateTest extends MockeryTestCase
     public function test_construct_noSpanProcessors(): void
     {
         $this->assertInstanceOf(
-            SpanProcessor\NoopSpanProcessor::class,
+            NoopSpanProcessor::class,
             $this->construct()->getSpanProcessor()
         );
     }
 
     public function test_construct_oneSpanProcessor(): void
     {
-        $processor = Mockery::mock(SpanProcessor::class);
+        $processor = Mockery::mock(SpanProcessorInterface::class);
 
         $this->assertSame(
             $processor,
@@ -72,11 +73,11 @@ class TracerSharedStateTest extends MockeryTestCase
 
     public function test_construct_multipleSpanProcessors(): void
     {
-        $processor1 = Mockery::mock(SpanProcessor::class);
-        $processor2 = Mockery::mock(SpanProcessor::class);
+        $processor1 = Mockery::mock(SpanProcessorInterface::class);
+        $processor2 = Mockery::mock(SpanProcessorInterface::class);
 
         $this->assertInstanceOf(
-            SpanProcessor\SpanMultiProcessor::class,
+            SpanMultiProcessor::class,
             $this->construct([$processor1, $processor2])->getSpanProcessor()
         );
     }

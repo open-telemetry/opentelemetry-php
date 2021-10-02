@@ -14,12 +14,12 @@ use Throwable;
  *
  * @todo: Implement this on the API side.
  */
-final class NonRecordingSpan implements API\Span
+final class NonRecordingSpan implements API\SpanInterface
 {
     private static ?self $invalidSpan = null;
 
     /** @inheritDoc */
-    public static function fromContext(Context $context): API\Span
+    public static function fromContext(Context $context): API\SpanInterface
     {
         if ($span = $context->get(SpanContextKey::instance())) {
             return $span;
@@ -29,13 +29,13 @@ final class NonRecordingSpan implements API\Span
     }
 
     /** @inheritDoc */
-    public static function getCurrent(): API\Span
+    public static function getCurrent(): API\SpanInterface
     {
         return self::fromContext(Context::getCurrent());
     }
 
     /** @inheritDoc */
-    public static function getInvalid(): API\Span
+    public static function getInvalid(): API\SpanInterface
     {
         if (null === self::$invalidSpan) {
             self::$invalidSpan = new self(SpanContext::getInvalid());
@@ -45,15 +45,15 @@ final class NonRecordingSpan implements API\Span
     }
 
     /** @inheritDoc */
-    public static function wrap(API\SpanContext $spanContext): API\Span
+    public static function wrap(API\SpanContextInterface $spanContext): API\SpanInterface
     {
         return self::getInvalid();
     }
 
-    private API\SpanContext $context;
+    private API\SpanContextInterface $context;
 
     public function __construct(
-        API\SpanContext $context
+        API\SpanContextInterface $context
     ) {
         $this->context = $context;
     }
@@ -71,7 +71,7 @@ final class NonRecordingSpan implements API\Span
     }
 
     /** @inheritDoc */
-    public function getContext(): API\SpanContext
+    public function getContext(): API\SpanContextInterface
     {
         return $this->context;
     }
@@ -83,37 +83,37 @@ final class NonRecordingSpan implements API\Span
     }
 
     /** @inheritDoc */
-    public function setAttribute(string $key, $value): API\Span
+    public function setAttribute(string $key, $value): API\SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
-    public function setAttributes(API\Attributes $attributes): API\Span
+    public function setAttributes(API\AttributesInterface $attributes): API\SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
-    public function addEvent(string $name, ?API\Attributes $attributes = null, int $timestamp = null): API\Span
+    public function addEvent(string $name, ?API\AttributesInterface $attributes = null, int $timestamp = null): API\SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
-    public function recordException(Throwable $exception, API\Attributes $attributes = null): API\Span
+    public function recordException(Throwable $exception, API\AttributesInterface $attributes = null): API\SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
-    public function updateName(string $name): API\Span
+    public function updateName(string $name): API\SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
-    public function setStatus(string $code, string $description = null): API\Span
+    public function setStatus(string $code, string $description = null): API\SpanInterface
     {
         return $this;
     }

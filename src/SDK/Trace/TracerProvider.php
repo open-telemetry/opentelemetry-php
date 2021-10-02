@@ -12,21 +12,21 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use function register_shutdown_function;
 
-final class TracerProvider implements API\TracerProvider
+final class TracerProvider implements API\TracerProviderInterface
 {
-    /** @var array<string, API\Tracer> */
+    /** @var array<string, API\TracerInterface> */
     private $tracers;
 
     /** @readonly */
     private TracerSharedState $tracerSharedState;
 
-    /** @param list<SpanProcessor>|SpanProcessor|null $spanProcessors */
+    /** @param list<SpanProcessorInterface>|SpanProcessorInterface|null $spanProcessors */
     public function __construct(
         $spanProcessors = [],
-        Sampler $sampler = null,
+        SamplerInterface $sampler = null,
         ResourceInfo $resource = null,
         SpanLimits $spanLimits = null,
-        IdGenerator $idGenerator = null
+        IdGeneratorInterface $idGenerator = null
     ) {
         if (null === $spanProcessors) {
             $spanProcessors = [];
@@ -59,23 +59,23 @@ final class TracerProvider implements API\TracerProvider
     }
 
     /** @inheritDoc */
-    public function getTracer(string $name, ?string $version = null): API\Tracer
+    public function getTracer(string $name, ?string $version = null): API\TracerInterface
     {
         $key = sprintf('%s@%s', $name, ($version ?? 'unknown'));
 
-        if (isset($this->tracers[$key]) && $this->tracers[$key] instanceof API\Tracer) {
+        if (isset($this->tracers[$key]) && $this->tracers[$key] instanceof API\TracerInterface) {
             return $this->tracers[$key];
         }
 
         $instrumentationLibrary = new InstrumentationLibrary($name, $version);
 
-        return $this->tracers[$key] = new Tracer(
+        return $this->tracers[$key] = new TracerInterface(
             $this->tracerSharedState,
             $instrumentationLibrary,
         );
     }
 
-    public function getSampler(): Sampler
+    public function getSampler(): SamplerInterface
     {
         return $this->tracerSharedState->getSampler();
     }

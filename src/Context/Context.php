@@ -168,7 +168,7 @@ final class Context
     /**
      * @todo: Implement this on the API side
      */
-    public function withContextValue(ImplicitContextKeyed $value): Context
+    public function withContextValue(ImplicitContextKeyedInterface $value): Context
     {
         return $value->storeInContext($this);
     }

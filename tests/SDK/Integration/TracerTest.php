@@ -7,12 +7,12 @@ namespace OpenTelemetry\Tests\SDK\Integration;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\NonRecordingSpan;
-use OpenTelemetry\SDK\Trace\Sampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
+use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanContext;
-use OpenTelemetry\SDK\Trace\SpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SDK\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +25,7 @@ class TracerTest extends TestCase
     public function noopSpanShouldBeStartedWhenSamplingResultIsDrop(): void
     {
         $alwaysOffSampler = new AlwaysOffSampler();
-        $processor = $this->createMock(SpanProcessor::class);
+        $processor = $this->createMock(SpanProcessorInterface::class);
         $tracerProvider = new TracerProvider($processor, $alwaysOffSampler);
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
 
@@ -33,7 +33,7 @@ class TracerTest extends TestCase
         $span = $tracer->spanBuilder('test.span')->startSpan();
 
         $this->assertInstanceOf(NonRecordingSpan::class, $span);
-        $this->assertNotEquals(API\SpanContext::TRACE_FLAG_SAMPLED, $span->getContext()->getTraceFlags());
+        $this->assertNotEquals(API\SpanContextInterface::TRACE_FLAG_SAMPLED, $span->getContext()->getTraceFlags());
     }
 
     /**
@@ -48,14 +48,14 @@ class TracerTest extends TestCase
                     SpanContext::create(
                         '4bf92f3577b34da6a3ce929d0e0e4736',
                         '00f067aa0ba902b7',
-                        API\SpanContext::TRACE_FLAG_SAMPLED
+                        API\SpanContextInterface::TRACE_FLAG_SAMPLED
                     )
                 )
             );
 
         $newTraceState = new TraceState('new-key=new_value');
 
-        $sampler = $this->createMock(Sampler::class);
+        $sampler = $this->createMock(SamplerInterface::class);
         $sampler->method('shouldSample')
             ->willReturn(new SamplingResult(
                 SamplingResult::RECORD_AND_SAMPLE,

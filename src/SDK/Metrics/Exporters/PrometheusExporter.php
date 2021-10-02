@@ -44,9 +44,9 @@ class PrometheusExporter extends AbstractExporter
         }
     }
 
-    protected function exportCounter(API\Counter $counter): void
+    protected function exportCounter(API\CounterInterface $counter): void
     {
-        $labels = ($counter instanceof API\LabelableMetric) ? $counter->getLabels() : [];
+        $labels = ($counter instanceof API\LabelableMetricInterfaceInterface) ? $counter->getLabels() : [];
 
         $record = $this->registry->getOrRegisterCounter(
             $this->namespace,

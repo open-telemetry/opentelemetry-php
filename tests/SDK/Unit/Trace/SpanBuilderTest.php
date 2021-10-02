@@ -11,12 +11,13 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\Link;
-use OpenTelemetry\SDK\Trace\Sampler;
+use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
+use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
-use OpenTelemetry\SDK\Trace\SpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use function range;
 use function str_repeat;
@@ -25,21 +26,21 @@ class SpanBuilderTest extends MockeryTestCase
 {
     private const SPAN_NAME = 'span_name';
 
-    private API\Tracer $tracer;
-    private API\SpanContext $sampledSpanContext;
+    private API\TracerInterface $tracer;
+    private API\SpanContextInterface $sampledSpanContext;
 
-    /** @var MockInterface&SpanProcessor  */
+    /** @var MockInterface&SpanProcessorInterface  */
     private $spanProcessor;
 
     protected function setUp(): void
     {
-        $this->spanProcessor = Mockery::spy(SpanProcessor::class);
+        $this->spanProcessor = Mockery::spy(SpanProcessorInterface::class);
         $this->tracer = (new TracerProvider($this->spanProcessor))->getTracer('SpanBuilderTest');
 
         $this->sampledSpanContext = SpanContext::create(
             '12345678876543211234567887654321',
             '8765432112345678',
-            API\SpanContext::TRACE_FLAG_SAMPLED,
+            API\SpanContextInterface::TRACE_FLAG_SAMPLED,
         );
     }
 
@@ -173,7 +174,7 @@ class SpanBuilderTest extends MockeryTestCase
                 SpanContext::create(
                     '00000000000004d20000000000001a85',
                     '0000000000002694',
-                    API\SpanContext::TRACE_FLAG_SAMPLED
+                    API\SpanContextInterface::TRACE_FLAG_SAMPLED
                 )
             );
 
@@ -254,13 +255,13 @@ class SpanBuilderTest extends MockeryTestCase
 
     public function test_addAttributesViaSampler(): void
     {
-        $sampler = new class() implements Sampler {
+        $sampler = new class() implements SamplerInterface {
             public function shouldSample(
                 Context $parentContext,
                 string $traceId,
                 string $spanName,
                 int $spanKind,
-                ?API\Attributes $attributes = null,
+                ?API\AttributesInterface $attributes = null,
                 array $links = []
             ): SamplingResult {
                 return new SamplingResult(SamplingResult::RECORD_AND_SAMPLE, new Attributes(['cat' => 'meow']));
@@ -331,7 +332,7 @@ class SpanBuilderTest extends MockeryTestCase
     public function test_isRecording_sampler(): void
     {
         /** @var Span $span */
-        $span = (new TracerProvider([], new Sampler\AlwaysOffSampler()))
+        $span = (new TracerProvider([], new AlwaysOffSampler()))
             ->getTracer('test')
             ->spanBuilder(self::SPAN_NAME)
             ->startSpan();

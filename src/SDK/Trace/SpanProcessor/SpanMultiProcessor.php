@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Trace\ReadableSpan;
-use OpenTelemetry\SDK\Trace\ReadWriteSpan;
-use OpenTelemetry\SDK\Trace\SpanProcessor;
+use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
+use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 
 /**
  * Class SpanMultiProcessor is a SpanProcessor that forwards all events to an
  * array of SpanProcessors.
  */
-final class SpanMultiProcessor implements SpanProcessor
+final class SpanMultiProcessor implements SpanProcessorInterface
 {
-    /** @var list<SpanProcessor> */
+    /** @var list<SpanProcessorInterface> */
     private $processors = [];
 
-    /** @param list<SpanProcessor> $spanProcessors */
+    /** @param list<SpanProcessorInterface> $spanProcessors */
     public function __construct(
         array $spanProcessors
     ) {
@@ -27,27 +27,27 @@ final class SpanMultiProcessor implements SpanProcessor
         }
     }
 
-    public function addSpanProcessor(SpanProcessor $processor)
+    public function addSpanProcessor(SpanProcessorInterface $processor)
     {
         $this->processors[] = $processor;
     }
 
     /**
-     * @return SpanProcessor[]
+     * @return SpanProcessorInterface[]
      */
     public function getSpanProcessors(): array
     {
         return $this->processors;
     }
 
-    public function onStart(ReadWriteSpan $span, ?Context $parentContext = null): void
+    public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
     {
         foreach ($this->processors as $processor) {
             $processor->onStart($span, $parentContext);
         }
     }
 
-    public function onEnd(ReadableSpan $span): void
+    public function onEnd(ReadableSpanInterface $span): void
     {
         foreach ($this->processors as $processor) {
             $processor->onEnd($span);

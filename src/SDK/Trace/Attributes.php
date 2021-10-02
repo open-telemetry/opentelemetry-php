@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Trace;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Internal\StringUtil;
 
-class Attributes implements API\Attributes
+class Attributes implements API\AttributesInterface
 {
     private $attributes = [];
 
@@ -17,7 +17,7 @@ class Attributes implements API\Attributes
     private $totalAddedAttributes = 0;
 
     /** @return Attributes Returns a new instance of Attributes with the limits applied */
-    public static function withLimits(API\Attributes $attributes, AttributeLimits $attributeLimits): Attributes
+    public static function withLimits(API\AttributesInterface $attributes, AttributeLimits $attributeLimits): Attributes
     {
         return new self($attributes->getIterator(), $attributeLimits);
     }
@@ -32,7 +32,7 @@ class Attributes implements API\Attributes
         }
     }
 
-    public function setAttribute(string $name, $value): API\Attributes
+    public function setAttribute(string $name, $value): API\AttributesInterface
     {
         $this->totalAddedAttributes++;
 
@@ -89,9 +89,9 @@ class Attributes implements API\Attributes
         return \count($this->attributes);
     }
 
-    public function getIterator(): API\AttributesIterator
+    public function getIterator(): API\AttributesIteratorInterface
     {
-        return new class($this->attributes) implements API\AttributesIterator {
+        return new class($this->attributes) implements API\AttributesIteratorInterface {
             private $inner;
             public function __construct($attributes)
             {
@@ -103,7 +103,7 @@ class Attributes implements API\Attributes
                 return (string) $this->inner->key();
             }
 
-            public function current(): API\Attribute
+            public function current(): API\AttributeInterface
             {
                 return $this->inner->current();
             }

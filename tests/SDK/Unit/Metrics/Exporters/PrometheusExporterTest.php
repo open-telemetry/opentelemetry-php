@@ -18,7 +18,7 @@ class PrometheusExporterTest extends TestCase
         $exporter = new PrometheusExporter($this->createMock(CollectorRegistry::class));
 
         $this->assertEquals(
-            API\Exporter::SUCCESS,
+            API\ExporterInterface::SUCCESS,
             $exporter->export([])
         );
     }
@@ -45,7 +45,7 @@ class PrometheusExporterTest extends TestCase
         $exporter = new PrometheusExporter($registry);
 
         $this->assertEquals(
-            API\Exporter::SUCCESS,
+            API\ExporterInterface::SUCCESS,
             $exporter->export([$counter])
         );
     }

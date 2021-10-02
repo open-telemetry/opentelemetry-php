@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Newrelic;
 
 use OpenTelemetry\SDK\Trace\Clock;
-use OpenTelemetry\SDK\Trace\SpanData;
+use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
 /**
  * @see https://docs.newrelic.com/docs/distributed-tracing/trace-api/report-new-relic-format-traces-trace-api/#new-relic-guidelines
@@ -25,7 +25,7 @@ class SpanConverter
         $this->serviceName = $serviceName;
     }
 
-    public function convert(SpanData $span)
+    public function convert(SpanDataInterface $span)
     {
         $spanParent = $span->getParentContext();
 

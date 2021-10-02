@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Metrics;
 use InvalidArgumentException;
 use OpenTelemetry\API\Metrics as API;
 
-class Counter extends AbstractMetric implements API\Counter, API\LabelableMetric
+class Counter extends AbstractMetric implements API\CounterInterface, API\LabelableMetricInterfaceInterface
 {
     use HasLabels;
 
@@ -43,7 +43,7 @@ class Counter extends AbstractMetric implements API\Counter, API\LabelableMetric
      * @access	public
      * @return	self
      */
-    public function increment(): API\Counter
+    public function increment(): API\CounterInterface
     {
         $this->value++;
 
@@ -56,7 +56,7 @@ class Counter extends AbstractMetric implements API\Counter, API\LabelableMetric
      * @access	public
      * @return	self
      */
-    public function add(int $value): API\Counter
+    public function add(int $value): API\CounterInterface
     {
         if ($value <= 0) {
             throw new InvalidArgumentException('Only positive numbers can be added to the Counter');

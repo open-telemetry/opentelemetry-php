@@ -7,14 +7,14 @@ namespace OpenTelemetry\SDK\Trace;
 use function count;
 use OpenTelemetry\API\Trace as API;
 
-final class Event implements API\Event
+final class Event implements API\EventInterface
 {
     private string $name;
     private int $timestamp;
-    private API\Attributes $attributes;
+    private API\AttributesInterface $attributes;
     private int $totalAttributeCount;
 
-    public function __construct(string $name, int $timestamp, API\Attributes $attributes = null)
+    public function __construct(string $name, int $timestamp, API\AttributesInterface $attributes = null)
     {
         $this->name = $name;
         $this->timestamp = $timestamp;
@@ -22,7 +22,7 @@ final class Event implements API\Event
         $this->totalAttributeCount = count($this->attributes);
     }
 
-    public function getAttributes(): API\Attributes
+    public function getAttributes(): API\AttributesInterface
     {
         return $this->attributes;
     }

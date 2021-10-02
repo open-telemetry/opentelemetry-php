@@ -13,7 +13,7 @@ class AbstractExporterTest extends TestCase
     public function testEmptyMetricsExportReturnsSuccess()
     {
         $this->assertEquals(
-            API\Exporter::SUCCESS,
+            API\ExporterInterface::SUCCESS,
             $this->getExporter()->export([])
         );
     }
@@ -26,7 +26,7 @@ class AbstractExporterTest extends TestCase
          */
         $export = $this->getExporter()->export([1]);
 
-        $this->assertEquals(API\Exporter::FAILED_NOT_RETRYABLE, $export);
+        $this->assertEquals(API\ExporterInterface::FAILED_NOT_RETRYABLE, $export);
     }
 
     protected function getExporter(): AbstractExporter

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-class RandomIdGenerator implements IdGenerator
+class RandomIdGenerator implements IdGeneratorInterface
 {
     private const TRACE_ID_HEX_LENGTH = 32;
     private const SPAN_ID_HEX_LENGTH = 16;

@@ -12,24 +12,24 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace as SDK;
 use OpenTelemetry\SDK\Trace\StatusData;
 
-class SpanData implements SDK\SpanData
+class SpanData implements SDK\SpanDataInterface
 {
     /** @var non-empty-string */
     private string $name = 'test-span-data';
 
-    /** @var list<API\Event> */
+    /** @var list<API\EventInterface> */
     private array $events = [];
 
-    /** @var list<API\Link> */
+    /** @var list<API\LinkInterface> */
     private array $links = [];
 
-    private API\Attributes $attributes;
+    private API\AttributesInterface $attributes;
     private int $kind;
     private StatusData $status;
     private ResourceInfo $resource;
     private InstrumentationLibrary $instrumentationLibrary;
-    private API\SpanContext $context;
-    private API\SpanContext $parentContext;
+    private API\SpanContextInterface $context;
+    private API\SpanContextInterface $parentContext;
     private int $totalAttributeCount = 0;
     private int $totalRecordedEvents = 0;
     private int $totalRecordedLinks = 0;
@@ -67,7 +67,7 @@ class SpanData implements SDK\SpanData
         return $this->links;
     }
 
-    /** @param list<API\Link> $links */
+    /** @param list<API\LinkInterface> $links */
     public function setLinks(array $links): self
     {
         $this->links = $links;
@@ -75,7 +75,7 @@ class SpanData implements SDK\SpanData
         return $this;
     }
 
-    public function addLink(API\SpanContext $context, API\Attributes $attributes = null): self
+    public function addLink(API\SpanContextInterface $context, API\AttributesInterface $attributes = null): self
     {
         $this->links[] = new SDK\Link($context, $attributes);
 
@@ -88,7 +88,7 @@ class SpanData implements SDK\SpanData
         return $this->events;
     }
 
-    /** @param list<API\Event> $events */
+    /** @param list<API\EventInterface> $events */
     public function setEvents(array $events): self
     {
         $this->events = $events;
@@ -96,19 +96,19 @@ class SpanData implements SDK\SpanData
         return $this;
     }
 
-    public function addEvent(string $name, ?API\Attributes $attributes, int $timestamp = null): self
+    public function addEvent(string $name, ?API\AttributesInterface $attributes, int $timestamp = null): self
     {
         $this->events[] = new SDK\Event($name, $timestamp ?? SDK\Clock::getDefault()->now(), $attributes);
 
         return $this;
     }
 
-    public function getAttributes(): API\Attributes
+    public function getAttributes(): API\AttributesInterface
     {
         return $this->attributes;
     }
 
-    public function setAttributes(API\Attributes $attributes): self
+    public function setAttributes(API\AttributesInterface $attributes): self
     {
         $this->attributes = $attributes;
 
@@ -242,24 +242,24 @@ class SpanData implements SDK\SpanData
         return $this;
     }
 
-    public function getContext(): API\SpanContext
+    public function getContext(): API\SpanContextInterface
     {
         return $this->context;
     }
 
-    public function setContext(API\SpanContext $context): self
+    public function setContext(API\SpanContextInterface $context): self
     {
         $this->context = $context;
 
         return $this;
     }
 
-    public function getParentContext(): API\SpanContext
+    public function getParentContext(): API\SpanContextInterface
     {
         return $this->parentContext;
     }
 
-    public function setParentContext(API\SpanContext $parentContext): self
+    public function setParentContext(API\SpanContextInterface $parentContext): self
     {
         $this->parentContext = $parentContext;
 

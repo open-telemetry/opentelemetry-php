@@ -16,15 +16,15 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\Clock;
 use OpenTelemetry\SDK\Trace\Event;
-use OpenTelemetry\SDK\Trace\IdGenerator;
+use OpenTelemetry\SDK\Trace\IdGeneratorInterface;
 use OpenTelemetry\SDK\Trace\Link;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanContext;
-use OpenTelemetry\SDK\Trace\SpanData;
+use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
-use OpenTelemetry\SDK\Trace\SpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\SDK\Util\TestClock;
 use function range;
@@ -41,17 +41,17 @@ class SpanTest extends MockeryTestCase
         'bool_attribute' => false,
     ];
 
-    /** @var MockInterface&SpanProcessor */
+    /** @var MockInterface&SpanProcessorInterface */
     private $spanProcessor;
 
-    private IdGenerator $idGenerator;
+    private IdGeneratorInterface $idGenerator;
     private ResourceInfo $resource;
     private InstrumentationLibrary $instrumentationLibrary;
-    private API\SpanContext $spanContext;
+    private API\SpanContextInterface $spanContext;
     private TestClock $testClock;
 
-    private API\Attributes $expectedAttributes;
-    private API\Link $link;
+    private API\AttributesInterface $expectedAttributes;
+    private API\LinkInterface $link;
 
     private string $traceId;
     private string $spanId;
@@ -63,7 +63,7 @@ class SpanTest extends MockeryTestCase
         $this->resource = ResourceInfo::emptyResource();
         $this->instrumentationLibrary = new InstrumentationLibrary('test_library', '0.1.2');
 
-        $this->spanProcessor = Mockery::spy(SpanProcessor::class);
+        $this->spanProcessor = Mockery::spy(SpanProcessorInterface::class);
 
         $this->traceId = $this->idGenerator->generateTraceId();
         $this->spanId = $this->idGenerator->generateSpanId();
@@ -201,7 +201,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSpanData(
             $span->toSpanData(),
             $this->expectedAttributes,
-            [new Event('event2', self::START_EPOCH + API\Clock::NANOS_PER_SECOND)],
+            [new Event('event2', self::START_EPOCH + API\ClockInterface::NANOS_PER_SECOND)],
             [$this->link],
             self::NEW_SPAN_NAME,
             self::START_EPOCH,
@@ -234,7 +234,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSpanData(
             $span->toSpanData(),
             $this->expectedAttributes,
-            [new Event('event2', self::START_EPOCH + API\Clock::NANOS_PER_SECOND)],
+            [new Event('event2', self::START_EPOCH + API\ClockInterface::NANOS_PER_SECOND)],
             [$this->link],
             self::NEW_SPAN_NAME,
             self::START_EPOCH,
@@ -641,13 +641,13 @@ class SpanTest extends MockeryTestCase
 
     /**
      * @psalm-param API\SpanKind::KIND_* $kind
-     * @param list<API\Link> $links
+     * @param list<API\LinkInterface> $links
      */
     private function createTestSpan(
         int $kind = API\SpanKind::KIND_INTERNAL,
         SpanLimits $spanLimits = null,
         string $parentSpanId = null,
-        ?API\Attributes $attributes = null,
+        ?API\AttributesInterface $attributes = null,
         array $links = []
     ): Span {
         $parentSpanId = $parentSpanId ?? $this->parentSpanId;
@@ -709,9 +709,9 @@ class SpanTest extends MockeryTestCase
     }
 
     private function assertEvent(
-        API\Event $event,
+        API\EventInterface $event,
         string $expectedName,
-        API\Attributes $expectedAttributes,
+        API\AttributesInterface $expectedAttributes,
         int $expectedEpochNanos
     ): void {
         $this->assertSame($expectedName, $event->getName());
@@ -720,13 +720,13 @@ class SpanTest extends MockeryTestCase
     }
 
     /**
-     * @param list<API\Event> $events
-     * @param list<API\Link> $links
+     * @param list<API\EventInterface> $events
+     * @param list<API\LinkInterface> $links
      * @psalm-param API\StatusCode::STATUS_* $status
      */
     private function assertSpanData(
-        SpanData $spanData,
-        API\Attributes $attributes,
+        SpanDataInterface $spanData,
+        API\AttributesInterface $attributes,
         array $events,
         array $links,
         string $spanName,

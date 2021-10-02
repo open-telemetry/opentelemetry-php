@@ -8,12 +8,12 @@ use InvalidArgumentException;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Exporter;
-use OpenTelemetry\SDK\Trace\ReadableSpan;
-use OpenTelemetry\SDK\Trace\ReadWriteSpan;
-use OpenTelemetry\SDK\Trace\SpanData;
-use OpenTelemetry\SDK\Trace\SpanProcessor;
+use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
+use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
+use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 
-class BatchSpanProcessor implements SpanProcessor
+class BatchSpanProcessor implements SpanProcessorInterface
 {
     private ?Exporter $exporter;
     private int $maxQueueSize;
@@ -21,15 +21,15 @@ class BatchSpanProcessor implements SpanProcessor
     private int $exporterTimeoutMillis;
     private int $maxExportBatchSize;
     private ?int $lastExportTimestamp = null;
-    private API\Clock $clock;
+    private API\ClockInterface $clock;
     private bool $running = true;
 
-    /** @var list<SpanData> */
+    /** @var list<SpanDataInterface> */
     private array $queue;
 
     public function __construct(
         ?Exporter $exporter,
-        API\Clock $clock,
+        API\ClockInterface $clock,
         int $maxQueueSize = 2048,
         int $scheduledDelayMillis = 5000,
         int $exporterTimeoutMillis = 30000,
@@ -51,14 +51,14 @@ class BatchSpanProcessor implements SpanProcessor
     /**
      * @inheritDoc
      */
-    public function onStart(ReadWriteSpan $span, ?Context $parentContext = null): void
+    public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
     {
     }
 
     /**
      * @inheritDoc
      */
-    public function onEnd(ReadableSpan $span): void
+    public function onEnd(ReadableSpanInterface $span): void
     {
         if (null === $this->exporter) {
             return;

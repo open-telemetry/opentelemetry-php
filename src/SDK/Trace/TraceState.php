@@ -9,7 +9,7 @@ use function array_walk;
 use function implode;
 use OpenTelemetry\API\Trace as API;
 
-class TraceState implements API\TraceState
+class TraceState implements API\TraceStateInterface
 {
     public const MAX_TRACESTATE_LIST_MEMBERS = 32;
     public const MAX_TRACESTATE_LENGTH = 512;
@@ -37,7 +37,7 @@ class TraceState implements API\TraceState
     /**
      * {@inheritdoc}
      */
-    public function with(string $key, string $value): API\TraceState
+    public function with(string $key, string $value): API\TraceStateInterface
     {
         $clonedTracestate = clone $this;
 
@@ -64,7 +64,7 @@ class TraceState implements API\TraceState
     /**
      * {@inheritdoc}
      */
-    public function without(string $key): API\TraceState
+    public function without(string $key): API\TraceStateInterface
     {
         $clonedTracestate = clone $this;
 

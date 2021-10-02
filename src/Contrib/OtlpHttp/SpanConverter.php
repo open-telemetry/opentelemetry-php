@@ -20,7 +20,7 @@ use Opentelemetry\Proto\Trace\V1\Span\Link;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
-use OpenTelemetry\SDK\Trace\SpanData;
+use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
 class SpanConverter
 {
@@ -79,7 +79,7 @@ class SpanConverter
         return SpanKind::SPAN_KIND_UNSPECIFIED;
     }
 
-    public function as_otlp_span(SpanData $span): CollectorSpan
+    public function as_otlp_span(SpanDataInterface $span): CollectorSpan
     {
         $parent_span = $span->getParentContext();
         $parent_span_id = $parent_span->isValid() ? $parent_span->getSpanId() : null;

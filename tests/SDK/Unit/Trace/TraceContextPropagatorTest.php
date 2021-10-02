@@ -220,7 +220,7 @@ class TraceContextPropagatorTest extends TestCase
     {
         $carrier = [];
         $map = new ArrayAccessGetterSetter();
-        $context = (new Context())->withContextValue(Span::wrap(SpanContext::create(self::TRACEID, self::SPANID, API\SpanContext::TRACE_FLAG_SAMPLED)));
+        $context = (new Context())->withContextValue(Span::wrap(SpanContext::create(self::TRACEID, self::SPANID, API\SpanContextInterface::TRACE_FLAG_SAMPLED)));
         TraceContextPropagator::inject($carrier, $map, $context);
 
         $this->assertSame(self::TRACEPARENTVALUE, $map->get($carrier, TraceContextPropagator::TRACEPARENT));
@@ -231,7 +231,7 @@ class TraceContextPropagatorTest extends TestCase
         $carrier = [];
         $map = new ArrayAccessGetterSetter();
         $tracestate = new TraceState('vendor1=opaqueValue1');
-        $context = (new Context())->withContextValue(Span::wrap(SpanContext::create(self::TRACEID, self::SPANID, API\SpanContext::TRACE_FLAG_SAMPLED, $tracestate)));
+        $context = (new Context())->withContextValue(Span::wrap(SpanContext::create(self::TRACEID, self::SPANID, API\SpanContextInterface::TRACE_FLAG_SAMPLED, $tracestate)));
 
         TraceContextPropagator::inject($carrier, $map, $context);
 
@@ -242,7 +242,7 @@ class TraceContextPropagatorTest extends TestCase
     {
         $carrier = [];
         $map = new ArrayAccessGetterSetter();
-        $context = (new Context())->withContextValue(Span::wrap(SpanContext::create(self::TRACEID, self::SPANID, API\SpanContext::TRACE_FLAG_SAMPLED)));
+        $context = (new Context())->withContextValue(Span::wrap(SpanContext::create(self::TRACEID, self::SPANID, API\SpanContextInterface::TRACE_FLAG_SAMPLED)));
         TraceContextPropagator::inject($carrier, $map, $context);
 
         $this->assertNull($map->get($carrier, TraceContextPropagator::TRACESTATE));
@@ -253,7 +253,7 @@ class TraceContextPropagatorTest extends TestCase
         $carrier = [];
         $map = new ArrayAccessGetterSetter();
         $tracestate = new TraceState();
-        $context = (new Context())->withContextValue(Span::wrap(SpanContext::create(self::TRACEID, self::SPANID, API\SpanContext::TRACE_FLAG_SAMPLED, $tracestate)));
+        $context = (new Context())->withContextValue(Span::wrap(SpanContext::create(self::TRACEID, self::SPANID, API\SpanContextInterface::TRACE_FLAG_SAMPLED, $tracestate)));
         TraceContextPropagator::inject($carrier, $map, $context);
 
         $this->assertNull($map->get($carrier, TraceContextPropagator::TRACESTATE));

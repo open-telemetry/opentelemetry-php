@@ -20,7 +20,7 @@ use OpenTelemetry\API\Metrics as API;
  * in an amount of resources used, or any quantity that rises and falls during
  * a request.
  */
-class UpDownCounter extends AbstractMetric implements API\UpDownCounter, API\LabelableMetric
+class UpDownCounter extends AbstractMetric implements API\UpDownCounterInterface, API\LabelableMetricInterfaceInterface
 {
     use HasLabels;
 

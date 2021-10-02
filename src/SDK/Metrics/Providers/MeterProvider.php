@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Metrics\Providers;
 use OpenTelemetry\API\Metrics as API;
 use OpenTelemetry\SDK\Metrics\Meter;
 
-class MeterProvider implements API\MeterProvider
+class MeterProvider implements API\MeterProviderInterface
 {
     /**
      * @var array $meters
@@ -17,7 +17,7 @@ class MeterProvider implements API\MeterProvider
     /**
      * {@inheritDoc}
      */
-    public function getMeter(string $name, ?string $version = null): API\Meter
+    public function getMeter(string $name, ?string $version = null): API\MeterInterface
     {
         if (empty($this->meters[$name . $version])) {
             $this->meters[$name . $version] = $this->getCreatedMeter($name, $version);
@@ -32,9 +32,9 @@ class MeterProvider implements API\MeterProvider
      * @access	protected
      * @param	string	$name
      * @param	string|null	$version Default: null
-     * @return	API\Meter
+     * @return	API\MeterInterface
      */
-    protected function getCreatedMeter(string $name, string $version = null): API\Meter
+    protected function getCreatedMeter(string $name, string $version = null): API\MeterInterface
     {
         // todo: once the Meter interface and an implementation are done, change this
         return new Meter($name, $version);

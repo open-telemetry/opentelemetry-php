@@ -10,7 +10,7 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Trace\Clock;
 use OpenTelemetry\SDK\Trace\Exporter;
 use OpenTelemetry\SDK\Trace\Span;
-use OpenTelemetry\SDK\Trace\SpanData;
+use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\Tests\SDK\Util\TestClock;
 
@@ -92,7 +92,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
                 Mockery::on(
                     function (array $spans) {
                         $this->assertCount(3, $spans);
-                        $this->assertInstanceOf(SpanData::class, $spans[0]);
+                        $this->assertInstanceOf(SpanDataInterface::class, $spans[0]);
 
                         return true;
                     }
@@ -201,7 +201,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
                 Mockery::on(
                     function (array $spans) {
                         $this->assertCount(2, $spans);
-                        $this->assertInstanceOf(SpanData::class, $spans[0]);
+                        $this->assertInstanceOf(SpanDataInterface::class, $spans[0]);
 
                         return true;
                     }
@@ -237,14 +237,14 @@ class BatchSpanProcessorTest extends MockeryTestCase
 
     private function createSampledSpanMock()
     {
-        $spanContext = $this->createConfiguredMock(API\SpanContext::class, ['isSampled' => true]);
+        $spanContext = $this->createConfiguredMock(API\SpanContextInterface::class, ['isSampled' => true]);
 
         return $this->createConfiguredMock(Span::class, ['getContext' => $spanContext]);
     }
 
     private function createNonSampledSpanMock()
     {
-        $spanContext = $this->createConfiguredMock(API\SpanContext::class, ['isSampled' => false]);
+        $spanContext = $this->createConfiguredMock(API\SpanContextInterface::class, ['isSampled' => false]);
 
         return $this->createConfiguredMock(Span::class, ['getContext' => $spanContext]);
     }

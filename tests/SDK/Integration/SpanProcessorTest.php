@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Integration;
 
-use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Trace\SpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -19,11 +19,11 @@ class SpanProcessorTest extends TestCase
     {
         $parentContext = new Context();
 
-        $spanProcessor = $this->createMock(SpanProcessor::class);
+        $spanProcessor = $this->createMock(SpanProcessorInterface::class);
         $spanProcessor
             ->expects($this->once())
             ->method('onStart')
-            ->with($this->isInstanceOf(Span::class), $this->equalTo($parentContext))
+            ->with($this->isInstanceOf(SpanInterface::class), $this->equalTo($parentContext))
         ;
 
         $tracerProvider = new TracerProvider($spanProcessor);
@@ -38,11 +38,11 @@ class SpanProcessorTest extends TestCase
     {
         $currentContext = Context::getCurrent();
 
-        $spanProcessor = $this->createMock(SpanProcessor::class);
+        $spanProcessor = $this->createMock(SpanProcessorInterface::class);
         $spanProcessor
             ->expects($this->once())
             ->method('onStart')
-            ->with($this->isInstanceOf(Span::class), $this->equalTo($currentContext))
+            ->with($this->isInstanceOf(SpanInterface::class), $this->equalTo($currentContext))
         ;
 
         $tracerProvider = new TracerProvider($spanProcessor);

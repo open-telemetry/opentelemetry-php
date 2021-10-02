@@ -6,7 +6,7 @@ namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
 use OpenTelemetry\SDK\Trace\Clock;
-use OpenTelemetry\SDK\Trace\SpanData;
+use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
 class SpanConverter
 {
@@ -44,7 +44,7 @@ class SpanConverter
         return (string) $value;
     }
 
-    public function convert(SpanData $span)
+    public function convert(SpanDataInterface $span)
     {
         $spanParent = $span->getParentContext();
 

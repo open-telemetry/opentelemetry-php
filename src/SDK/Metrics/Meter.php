@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics as API;
 
-class Meter implements API\Meter
+class Meter implements API\MeterInterface
 {
     /**
      * @var string $name
@@ -40,7 +40,7 @@ class Meter implements API\Meter
     /**
      * {@inheritdoc}
      */
-    public function newCounter(string $name, string $description = ''): API\Counter
+    public function newCounter(string $name, string $description = ''): API\CounterInterface
     {
         return new Counter($name, $description);
     }
@@ -48,7 +48,7 @@ class Meter implements API\Meter
     /**
      * {@inheritdoc}
      */
-    public function newUpDownCounter(string $name, string $description = ''): API\UpDownCounter
+    public function newUpDownCounter(string $name, string $description = ''): API\UpDownCounterInterface
     {
         return new UpDownCounter($name, $description);
     }
@@ -56,7 +56,7 @@ class Meter implements API\Meter
     /**
      * {@inheritdoc}
      */
-    public function newValueRecorder(string $name, string $description = ''): API\ValueRecorder
+    public function newValueRecorder(string $name, string $description = ''): API\ValueRecorderInterface
     {
         return new ValueRecorder($name, $description);
     }

@@ -8,7 +8,7 @@ use OpenTelemetry\API\Trace as API;
 use function strlen;
 use function strtolower;
 
-final class SpanContext implements API\SpanContext
+final class SpanContext implements API\SpanContextInterface
 {
     public const INVALID_TRACE = '00000000000000000000000000000000';
     public const VALID_TRACE = '/^[0-9a-f]{32}$/';
@@ -20,10 +20,10 @@ final class SpanContext implements API\SpanContext
     public const SAMPLED_FLAG = 1;
     public const TRACE_FLAG_LENGTH = 2;
 
-    private static ?API\SpanContext $invalidContext = null;
+    private static ?API\SpanContextInterface $invalidContext = null;
 
     /** @inheritDoc */
-    public static function createFromRemoteParent(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?API\TraceState $traceState = null): API\SpanContext
+    public static function createFromRemoteParent(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?API\TraceStateInterface $traceState = null): API\SpanContextInterface
     {
         return new self(
             $traceId,
@@ -35,7 +35,7 @@ final class SpanContext implements API\SpanContext
     }
 
     /** @inheritDoc */
-    public static function create(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?API\TraceState $traceState = null): API\SpanContext
+    public static function create(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?API\TraceStateInterface $traceState = null): API\SpanContextInterface
     {
         return new self(
             $traceId,
@@ -47,7 +47,7 @@ final class SpanContext implements API\SpanContext
     }
 
     /** @inheritDoc */
-    public static function getInvalid(): API\SpanContext
+    public static function getInvalid(): API\SpanContextInterface
     {
         if (null === self::$invalidContext) {
             self::$invalidContext = self::create(self::INVALID_TRACE, self::INVALID_SPAN, 0);
@@ -89,7 +89,7 @@ final class SpanContext implements API\SpanContext
 
     private string $traceId;
     private string $spanId;
-    private ?API\TraceState $traceState;
+    private ?API\TraceStateInterface $traceState;
     private bool $isValid;
     private bool $isRemote;
     private int $traceFlags;
@@ -99,7 +99,7 @@ final class SpanContext implements API\SpanContext
         string $spanId,
         int $traceFlags,
         bool $isRemote,
-        API\TraceState $traceState = null
+        API\TraceStateInterface $traceState = null
     ) {
         // TraceId must be exactly 16 bytes (32 chars) and at least one non-zero byte
         // SpanId must be exactly 8 bytes (16 chars) and at least one non-zero byte
@@ -127,7 +127,7 @@ final class SpanContext implements API\SpanContext
         return $this->spanId;
     }
 
-    public function getTraceState(): ?API\TraceState
+    public function getTraceState(): ?API\TraceStateInterface
     {
         return $this->traceState;
     }

@@ -8,7 +8,7 @@ use Exception;
 use OpenTelemetry\API\Metrics as API;
 use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
 
-abstract class AbstractExporter implements API\Exporter
+abstract class AbstractExporter implements API\ExporterInterface
 {
     /**
      * {@inheritDoc}
@@ -16,23 +16,23 @@ abstract class AbstractExporter implements API\Exporter
     public function export(iterable $metrics): int
     {
         if (empty($metrics)) {
-            return API\Exporter::SUCCESS;
+            return API\ExporterInterface::SUCCESS;
         }
 
         try {
             foreach ($metrics as $metric) {
-                if (! $metric instanceof API\Metric) {
-                    throw new \InvalidArgumentException('Metric must implement ' . API\Metric::class);
+                if (! $metric instanceof API\MetricInterface) {
+                    throw new \InvalidArgumentException('Metric must implement ' . API\MetricInterface::class);
                 }
             }
 
             $this->doExport($metrics);
 
-            return API\Exporter::SUCCESS;
+            return API\ExporterInterface::SUCCESS;
         } catch (RetryableExportException $exception) {
-            return API\Exporter::FAILED_RETRYABLE;
+            return API\ExporterInterface::FAILED_RETRYABLE;
         } catch (Exception $exception) {
-            return API\Exporter::FAILED_NOT_RETRYABLE;
+            return API\ExporterInterface::FAILED_NOT_RETRYABLE;
         }
     }
 
@@ -40,7 +40,7 @@ abstract class AbstractExporter implements API\Exporter
      * Sends metrics to the destination system
      *
      * @access	protected
-     * @param	iterable<API\Metric> $metrics
+     * @param	iterable<API\MetricInterface> $metrics
      * @return	void
      */
     abstract protected function doExport(iterable $metrics): void;

@@ -10,12 +10,12 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SpanMultiProcessor; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
 
 /**
- * Stores shared state/config between all {@see API\Tracer} created via the same {@see API\TracerProvider}.
+ * Stores shared state/config between all {@see API\TracerInterface} created via the same {@see API\TracerProviderInterface}.
  */
 final class TracerSharedState
 {
     /** @readonly */
-    private IdGenerator $idGenerator;
+    private IdGeneratorInterface $idGenerator;
 
     /** @readonly */
     private ResourceInfo $resource;
@@ -24,18 +24,18 @@ final class TracerSharedState
     private SpanLimits $spanLimits;
 
     /** @readonly */
-    private Sampler $sampler;
+    private SamplerInterface $sampler;
 
     /** @readonly */
-    private SpanProcessor $spanProcessor;
+    private SpanProcessorInterface $spanProcessor;
 
     private bool $hasShutdown = false;
 
     public function __construct(
-        IdGenerator $idGenerator,
+        IdGeneratorInterface $idGenerator,
         ResourceInfo $resource,
         SpanLimits $spanLimits,
-        Sampler $sampler,
+        SamplerInterface $sampler,
         array $spanProcessors
     ) {
         $this->idGenerator = $idGenerator;
@@ -64,7 +64,7 @@ final class TracerSharedState
         return $this->hasShutdown;
     }
 
-    public function getIdGenerator(): IdGenerator
+    public function getIdGenerator(): IdGeneratorInterface
     {
         return $this->idGenerator;
     }
@@ -79,12 +79,12 @@ final class TracerSharedState
         return $this->spanLimits;
     }
 
-    public function getSampler(): Sampler
+    public function getSampler(): SamplerInterface
     {
         return $this->sampler;
     }
 
-    public function getSpanProcessor(): SpanProcessor
+    public function getSpanProcessor(): SpanProcessorInterface
     {
         return $this->spanProcessor;
     }

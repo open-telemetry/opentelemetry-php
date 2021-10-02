@@ -6,11 +6,11 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Exporter;
-use OpenTelemetry\SDK\Trace\ReadableSpan;
-use OpenTelemetry\SDK\Trace\ReadWriteSpan;
-use OpenTelemetry\SDK\Trace\SpanProcessor;
+use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
+use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 
-class SimpleSpanProcessor implements SpanProcessor
+class SimpleSpanProcessor implements SpanProcessorInterface
 {
     /**
      * @var Exporter|null
@@ -30,14 +30,14 @@ class SimpleSpanProcessor implements SpanProcessor
     /**
      * @inheritDoc
      */
-    public function onStart(ReadWriteSpan $span, ?Context $parentContext = null): void
+    public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
     {
     }
 
     /**
      * @inheritDoc
      */
-    public function onEnd(ReadableSpan $span): void
+    public function onEnd(ReadableSpanInterface $span): void
     {
         if (!$this->running) {
             return;
