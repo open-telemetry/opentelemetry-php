@@ -7,7 +7,6 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace\SpanProcessor;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\SDK\Trace\Exporter;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
-use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use PHPUnit\Framework\TestCase;
 
@@ -23,7 +22,7 @@ class SimpleSpanProcessorTest extends TestCase
 
         $spanContext = $this->createStub(SpanContextInterface::class);
         $spanContext->method('isSampled')->willReturn(true); // only sampled spans are exported
-        $span = $this->createStub(Span::class);
+        $span = $this->createStub(ReadWriteSpanInterface::class);
         $span->method('getContext')->willReturn($spanContext);
 
         (new SimpleSpanProcessor($exporter))->onEnd($span);
@@ -81,7 +80,7 @@ class SimpleSpanProcessorTest extends TestCase
 
         $spanContext = $this->createStub(SpanContextInterface::class);
         $spanContext->method('isSampled')->willReturn(false);
-        $span = $this->createStub(Span::class);
+        $span = $this->createStub(ReadWriteSpanInterface::class);
         $span->method('getContext')->willReturn($spanContext);
 
         (new SimpleSpanProcessor($exporter))->onEnd($span);

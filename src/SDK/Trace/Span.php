@@ -13,14 +13,13 @@ use function get_class;
 use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\Scope;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use function sprintf;
 use function str_replace;
 use Throwable;
 
-class Span implements ReadWriteSpanInterface
+final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
 {
     /**
      * This method _MUST_ not be used directly.
@@ -73,28 +72,6 @@ class Span implements ReadWriteSpanInterface
         $spanProcessor->onStart($span, $parentContext);
 
         return $span;
-    }
-
-    /** @inheritDoc */
-    public static function fromContext(Context $context): API\SpanInterface
-    {
-        if ($span = $context->get(SpanContextKey::instance())) {
-            return $span;
-        }
-
-        return self::getInvalid();
-    }
-
-    /** @inheritDoc */
-    public static function getCurrent(): API\SpanInterface
-    {
-        return self::fromContext(Context::getCurrent());
-    }
-
-    /** @inheritDoc */
-    public static function getInvalid(): API\SpanInterface
-    {
-        return NonRecordingSpan::getInvalid();
     }
 
     /**
@@ -153,12 +130,6 @@ class Span implements ReadWriteSpanInterface
         }
 
         return $result;
-    }
-
-    /** @inheritDoc */
-    public static function wrap(API\SpanContextInterface $spanContext): API\SpanInterface
-    {
-        return new NonRecordingSpan($spanContext);
     }
 
     /** @readonly */
@@ -241,12 +212,6 @@ class Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function activate(): Scope
-    {
-        return Context::getCurrent()->withContextValue($this)->activate();
-    }
-
-    /** @inheritDoc */
     public function getContext(): API\SpanContextInterface
     {
         return $this->context;
@@ -259,7 +224,7 @@ class Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function setAttribute(string $key, $value): ReadWriteSpanInterface
+    public function setAttribute(string $key, $value): self
     {
         if ($this->hasEnded || ctype_space($key)) {
             return $this;
@@ -275,7 +240,7 @@ class Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function setAttributes(API\AttributesInterface $attributes): ReadWriteSpanInterface
+    public function setAttributes(API\AttributesInterface $attributes): self
     {
         if (0 === count($attributes)) {
             return $this;
@@ -290,7 +255,7 @@ class Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function addEvent(string $name, ?API\AttributesInterface $attributes = null, int $timestamp = null): ReadWriteSpanInterface
+    public function addEvent(string $name, ?API\AttributesInterface $attributes = null, int $timestamp = null): self
     {
         if ($this->hasEnded) {
             return $this;
@@ -316,7 +281,7 @@ class Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function recordException(Throwable $exception, API\AttributesInterface $attributes = null): ReadWriteSpanInterface
+    public function recordException(Throwable $exception, API\AttributesInterface $attributes = null): self
     {
         $timestamp = AbstractClock::getDefault()->now();
         $eventAttributes = new Attributes([
@@ -335,7 +300,7 @@ class Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function updateName(string $name): ReadWriteSpanInterface
+    public function updateName(string $name): self
     {
         if ($this->hasEnded) {
             return $this;
@@ -346,7 +311,7 @@ class Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function setStatus(string $code, string $description = null): ReadWriteSpanInterface
+    public function setStatus(string $code, string $description = null): self
     {
         if ($this->hasEnded) {
             return $this;
@@ -447,12 +412,6 @@ class Span implements ReadWriteSpanInterface
     public function getResource(): ResourceInfo
     {
         return $this->resource;
-    }
-
-    /** @inheritDoc */
-    public function storeInContext(Context $context): Context
-    {
-        return $context->with(SpanContextKey::instance(), $this);
     }
 
     private function getImmutableAttributes(): API\AttributesInterface

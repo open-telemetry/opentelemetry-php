@@ -16,16 +16,12 @@ interface SpanInterface extends ImplicitContextKeyedInterface
     /**
      * Returns the {@see SpanInterface} from the provided *$context*,
      * falling back on {@see SpanInterface::getInvalid()} if there is no span in the provided context.
-     *
-     * @todo Implement this in the API layer
      */
     public static function fromContext(Context $context): SpanInterface;
 
     /**
      * Returns the current {@see SpanInterface} from the current {@see Context},
      * falling back on {@see SpanInterface::getEmpty()} if there is no span in the current context.
-     *
-     * @todo Implement this in the API layer
      */
     public static function getCurrent(): SpanInterface;
 
@@ -39,8 +35,6 @@ interface SpanInterface extends ImplicitContextKeyedInterface
      * It will not be exported and al tracing operations are no-op, but can be used to propagate a valid {@see SpanContext} downstream.
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#wrapping-a-spancontext-in-a-span
-     *
-     * @todo Implement this in the API layer
      */
     public static function wrap(SpanContextInterface $spanContext): SpanInterface;
 

@@ -9,7 +9,7 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\Exporter;
-use OpenTelemetry\SDK\Trace\Span;
+use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\Tests\SDK\Util\TestClock;
@@ -33,7 +33,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
     public function test_allowsNullExporter(): void
     {
         $proc = new BatchSpanProcessor(null, $this->testClock);
-        /** @var Span $span */
         $span = $this->createSampledSpanMock();
         $proc->onStart($span);
         $proc->onEnd($span);
@@ -57,7 +56,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $exporter = $this->createMock(Exporter::class);
         $exporter->expects($this->atLeastOnce())->method('export');
 
-        /** @var Span[] $spans */
         /** @var Exporter $exporter */
         $processor = new BatchSpanProcessor(
             $exporter,
@@ -109,7 +107,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
             $batchSize
         );
 
-        /** @var Span $span */
         foreach ($spans as $idx => $span) {
             $processor->onEnd($span);
 
@@ -154,7 +151,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $proc = new BatchSpanProcessor($exporter, $this->createMock(AbstractClock::class));
         $proc->shutdown();
 
-        /** @var Span $span */
         $span = $this->createSampledSpanMock();
         $proc->onStart($span);
         $proc->onEnd($span);
@@ -218,7 +214,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
         );
 
         for ($i = 0; $i < $batchSize - 1; $i++) {
-            /** @var Span $span */
             $span = $this->createSampledSpanMock();
             $processor->onEnd($span);
         }
@@ -239,13 +234,13 @@ class BatchSpanProcessorTest extends MockeryTestCase
     {
         $spanContext = $this->createConfiguredMock(API\SpanContextInterface::class, ['isSampled' => true]);
 
-        return $this->createConfiguredMock(Span::class, ['getContext' => $spanContext]);
+        return $this->createConfiguredMock(ReadWriteSpanInterface::class, ['getContext' => $spanContext]);
     }
 
     private function createNonSampledSpanMock()
     {
         $spanContext = $this->createConfiguredMock(API\SpanContextInterface::class, ['isSampled' => false]);
 
-        return $this->createConfiguredMock(Span::class, ['getContext' => $spanContext]);
+        return $this->createConfiguredMock(ReadWriteSpanInterface::class, ['getContext' => $spanContext]);
     }
 }
