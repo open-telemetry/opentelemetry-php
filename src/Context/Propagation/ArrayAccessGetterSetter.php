@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace;
+namespace OpenTelemetry\Context\Propagation;
 
 use function array_keys;
 use ArrayAccess;
@@ -12,20 +12,19 @@ use InvalidArgumentException;
 use function is_array;
 use function is_object;
 use function is_string;
-use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\SDK\Trace\KeyedArrayAccessInterface;
 use function sprintf;
 use function strtolower;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/api-propagators.md#textmap-propagator Getter and Setter.
  *
- * Default implementation of {@see API\PropagationGetterInterface} and {@see API\PropagationSetterInterface}.
- * This type is used if no custom getter/setter is provided to {@see API\TextMapPropagatorInterface::inject()} or {@see API\TextMapPropagatorInterface::extract()}.
+ * Default implementation of {@see PropagationGetterInterface} and {@see PropagationSetterInterface}.
+ * This type is used if no custom getter/setter is provided to {@see TextMapPropagatorInterface::inject()} or {@see TextMapPropagatorInterface::extract()}.
  */
-class ArrayAccessGetterSetter implements API\PropagationGetterInterface, API\PropagationSetterInterface
+final class ArrayAccessGetterSetter implements PropagationGetterInterface, PropagationSetterInterface
 {
-    /** @var self|null */
-    private static $instance;
+    private static ?self $instance = null;
 
     /**
      * Returns a singleton instance of `self` to avoid, multiple runtime allocations.

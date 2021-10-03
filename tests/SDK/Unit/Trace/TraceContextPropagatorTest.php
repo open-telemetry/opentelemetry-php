@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Trace\ArrayAccessGetterSetter;
+use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanContext;
-use OpenTelemetry\SDK\Trace\TraceContextPropagator;
 use OpenTelemetry\SDK\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
@@ -36,9 +36,9 @@ class TraceContextPropagatorTest extends TestCase
 
     public function testTraceContextFields(): void
     {
-        $fields = TraceContextPropagator::fields();
-        $this->assertSame($fields[0], TraceContextPropagator::TRACEPARENT);
-        $this->assertSame($fields[1], TraceContextPropagator::TRACESTATE);
+        $fields = API\Propagation\TraceContextPropagator::fields();
+        $this->assertSame($fields[0], API\Propagation\TraceContextPropagator::TRACEPARENT);
+        $this->assertSame($fields[1], API\Propagation\TraceContextPropagator::TRACESTATE);
     }
 
     public function testExtractValidTraceparent(): void
@@ -47,8 +47,8 @@ class TraceContextPropagatorTest extends TestCase
                               self::VERSION . '-' . self::TRACEID . '-' . self::SPANID . '-00', ];  // sampled == false
 
         foreach ($traceparentValues as $traceparentValue) {
-            $carrier = [TraceContextPropagator::TRACEPARENT => $traceparentValue];
-            $context = Span::fromContext(TraceContextPropagator::extract($carrier))->getContext();
+            $carrier = [API\Propagation\TraceContextPropagator::TRACEPARENT => $traceparentValue];
+            $context = Span::fromContext(API\Propagation\TraceContextPropagator::extract($carrier))->getContext();
             $extractedTraceparent = '00-' . $context->getTraceId() . '-' . $context->getSpanId() . '-' . ($context->isSampled() ? '01' : '00');
             $this->assertSame($traceparentValue, $extractedTraceparent);
         }
@@ -60,10 +60,10 @@ class TraceContextPropagatorTest extends TestCase
                              'vendor2=opaqueValue2,vendor3=opaqueValue3', ];
 
         foreach ($tracestateValues as $tracestate) {
-            $carrier = [TraceContextPropagator::TRACEPARENT => self::TRACEPARENTVALUE,
-                        TraceContextPropagator::TRACESTATE => $tracestate, ];
+            $carrier = [API\Propagation\TraceContextPropagator::TRACEPARENT => self::TRACEPARENTVALUE,
+                        API\Propagation\TraceContextPropagator::TRACESTATE => $tracestate, ];
 
-            $context = Span::fromContext(TraceContextPropagator::extract($carrier))->getContext();
+            $context = Span::fromContext(API\Propagation\TraceContextPropagator::extract($carrier))->getContext();
 
             $this->assertSame($tracestate, (string) $context->getTraceState());
         }
@@ -76,7 +76,7 @@ class TraceContextPropagatorTest extends TestCase
         $carrier = ['TrAcEpArEnT' => self::TRACEPARENTVALUE,
                     'TrAcEsTaTe' => $tracestateValue, ];
 
-        $context = Span::fromContext(TraceContextPropagator::extract($carrier))->getContext();
+        $context = Span::fromContext(API\Propagation\TraceContextPropagator::extract($carrier))->getContext();
 
         $extractedTraceparent = '00-' . $context->getTraceId() . '-' . $context->getSpanId() . '-' . ($context->isSampled() ? '01' : '00');
         $this->assertSame(self::TRACEPARENTVALUE, $extractedTraceparent);
@@ -99,19 +99,19 @@ class TraceContextPropagatorTest extends TestCase
     public function testExtractInvalidTracestate(): void
     {
         // Tracestate with an invalid key
-        $carrier = [TraceContextPropagator::TRACEPARENT => self::TRACEPARENTVALUE,
-                    TraceContextPropagator::TRACESTATE => '@vendor1=opaqueValue1,vendor2=opaqueValue2', ];
+        $carrier = [API\Propagation\TraceContextPropagator::TRACEPARENT => self::TRACEPARENTVALUE,
+                    API\Propagation\TraceContextPropagator::TRACESTATE => '@vendor1=opaqueValue1,vendor2=opaqueValue2', ];
 
-        $context = Span::fromContext(TraceContextPropagator::extract($carrier))->getContext();
+        $context = Span::fromContext(API\Propagation\TraceContextPropagator::extract($carrier))->getContext();
 
         // Invalid list-member should be dropped
         $this->assertSame('vendor2=opaqueValue2', (string) $context->getTraceState());
 
         // Tracestate with an invalid value
-        $carrier = [TraceContextPropagator::TRACEPARENT => self::TRACEPARENTVALUE,
-                    TraceContextPropagator::TRACESTATE => 'vendor3=opaqueValue3,vendor4=' . chr(0x7F) . 'opaqueValue4', ];
+        $carrier = [API\Propagation\TraceContextPropagator::TRACEPARENT => self::TRACEPARENTVALUE,
+                    API\Propagation\TraceContextPropagator::TRACESTATE => 'vendor3=opaqueValue3,vendor4=' . chr(0x7F) . 'opaqueValue4', ];
 
-        $context = Span::fromContext(TraceContextPropagator::extract($carrier))->getContext();
+        $context = Span::fromContext(API\Propagation\TraceContextPropagator::extract($carrier))->getContext();
 
         // Invalid list-member should be dropped
         $this->assertSame('vendor3=opaqueValue3', (string) $context->getTraceState());
@@ -123,9 +123,9 @@ class TraceContextPropagatorTest extends TestCase
             self::VERSION . '-' . self::SPANID . '-' . self::SAMPLED, ];  // Length < 4 values
 
         foreach ($invalidValues as $invalidTraceparentValue) {
-            $carrier = [TraceContextPropagator::TRACEPARENT => $invalidTraceparentValue];
+            $carrier = [API\Propagation\TraceContextPropagator::TRACEPARENT => $invalidTraceparentValue];
 
-            $context = Span::fromContext(TraceContextPropagator::extract($carrier))->getContext();
+            $context = Span::fromContext(API\Propagation\TraceContextPropagator::extract($carrier))->getContext();
 
             $this->assertSame(SpanContext::INVALID_TRACE, $context->getTraceId());
             $this->assertSame(SpanContext::INVALID_SPAN, $context->getSpanId());
@@ -145,7 +145,7 @@ class TraceContextPropagatorTest extends TestCase
 
         foreach ($invalidValues as $invalidVersion) {
             $traceparentValue = $invalidVersion . '-' . $buildTraceparent;
-            $carrier = [TraceContextPropagator::TRACEPARENT => $traceparentValue];
+            $carrier = [API\Propagation\TraceContextPropagator::TRACEPARENT => $traceparentValue];
 
             $context = Span::fromContext(TraceContextPropagator::extract($carrier))->getContext();
 
@@ -165,9 +165,9 @@ class TraceContextPropagatorTest extends TestCase
 
         foreach ($invalidValues as $invalidTraceId) {
             $traceparentValue = self::VERSION . '-' . $invalidTraceId . '-' . self::SPANID . '-' . self::SAMPLED;
-            $carrier = [TraceContextPropagator::TRACEPARENT => $traceparentValue];
+            $carrier = [API\Propagation\TraceContextPropagator::TRACEPARENT => $traceparentValue];
 
-            $context = Span::fromContext(TraceContextPropagator::extract($carrier))->getContext();
+            $context = Span::fromContext(API\Propagation\TraceContextPropagator::extract($carrier))->getContext();
 
             $this->assertSame(SpanContext::INVALID_TRACE, $context->getTraceId());
             $this->assertSame(SpanContext::INVALID_SPAN, $context->getSpanId());
@@ -185,9 +185,9 @@ class TraceContextPropagatorTest extends TestCase
 
         foreach ($invalidValues as $invalidSpanId) {
             $traceparentValue = self::VERSION . '-' . self::TRACEID . '-' . $invalidSpanId . '-' . self::SAMPLED;
-            $carrier = [TraceContextPropagator::TRACEPARENT => $traceparentValue];
+            $carrier = [API\Propagation\TraceContextPropagator::TRACEPARENT => $traceparentValue];
 
-            $context = Span::fromContext(TraceContextPropagator::extract($carrier))->getContext();
+            $context = Span::fromContext(API\Propagation\TraceContextPropagator::extract($carrier))->getContext();
 
             $this->assertSame(SpanContext::INVALID_TRACE, $context->getTraceId());
             $this->assertSame(SpanContext::INVALID_SPAN, $context->getSpanId());
@@ -205,9 +205,9 @@ class TraceContextPropagatorTest extends TestCase
         $buildTraceperent = self::VERSION . '-' . self::TRACEID . '-' . self::SPANID;
         foreach ($invalidValues as $invalidTraceFlag) {
             $traceparentValue = $buildTraceperent . '-' . $invalidTraceFlag;
-            $carrier = [TraceContextPropagator::TRACEPARENT => $traceparentValue];
+            $carrier = [API\Propagation\TraceContextPropagator::TRACEPARENT => $traceparentValue];
 
-            $context = Span::fromContext(TraceContextPropagator::extract($carrier))->getContext();
+            $context = Span::fromContext(API\Propagation\TraceContextPropagator::extract($carrier))->getContext();
 
             $this->assertSame(SpanContext::INVALID_TRACE, $context->getTraceId());
             $this->assertSame(SpanContext::INVALID_SPAN, $context->getSpanId());
@@ -221,21 +221,21 @@ class TraceContextPropagatorTest extends TestCase
         $carrier = [];
         $map = new ArrayAccessGetterSetter();
         $context = (new Context())->withContextValue(Span::wrap(SpanContext::create(self::TRACEID, self::SPANID, API\SpanContextInterface::TRACE_FLAG_SAMPLED)));
-        TraceContextPropagator::inject($carrier, $map, $context);
+        API\Propagation\TraceContextPropagator::inject($carrier, $map, $context);
 
-        $this->assertSame(self::TRACEPARENTVALUE, $map->get($carrier, TraceContextPropagator::TRACEPARENT));
+        $this->assertSame(self::TRACEPARENTVALUE, $map->get($carrier, API\Propagation\TraceContextPropagator::TRACEPARENT));
     }
 
     public function testInjectValidTracestate(): void
     {
         $carrier = [];
-        $map = new ArrayAccessGetterSetter();
+        $map = new \OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter();
         $tracestate = new TraceState('vendor1=opaqueValue1');
         $context = (new Context())->withContextValue(Span::wrap(SpanContext::create(self::TRACEID, self::SPANID, API\SpanContextInterface::TRACE_FLAG_SAMPLED, $tracestate)));
 
-        TraceContextPropagator::inject($carrier, $map, $context);
+        API\Propagation\TraceContextPropagator::inject($carrier, $map, $context);
 
-        $this->assertSame('vendor1=opaqueValue1', $map->get($carrier, TraceContextPropagator::TRACESTATE));
+        $this->assertSame('vendor1=opaqueValue1', $map->get($carrier, API\Propagation\TraceContextPropagator::TRACESTATE));
     }
 
     public function testInjectNullTracestate(): void
@@ -243,9 +243,9 @@ class TraceContextPropagatorTest extends TestCase
         $carrier = [];
         $map = new ArrayAccessGetterSetter();
         $context = (new Context())->withContextValue(Span::wrap(SpanContext::create(self::TRACEID, self::SPANID, API\SpanContextInterface::TRACE_FLAG_SAMPLED)));
-        TraceContextPropagator::inject($carrier, $map, $context);
+        API\Propagation\TraceContextPropagator::inject($carrier, $map, $context);
 
-        $this->assertNull($map->get($carrier, TraceContextPropagator::TRACESTATE));
+        $this->assertNull($map->get($carrier, API\Propagation\TraceContextPropagator::TRACESTATE));
     }
 
     public function testInjectEmptyTracestate(): void
@@ -254,8 +254,8 @@ class TraceContextPropagatorTest extends TestCase
         $map = new ArrayAccessGetterSetter();
         $tracestate = new TraceState();
         $context = (new Context())->withContextValue(Span::wrap(SpanContext::create(self::TRACEID, self::SPANID, API\SpanContextInterface::TRACE_FLAG_SAMPLED, $tracestate)));
-        TraceContextPropagator::inject($carrier, $map, $context);
+        API\Propagation\TraceContextPropagator::inject($carrier, $map, $context);
 
-        $this->assertNull($map->get($carrier, TraceContextPropagator::TRACESTATE));
+        $this->assertNull($map->get($carrier, API\Propagation\TraceContextPropagator::TRACESTATE));
     }
 }

@@ -2,15 +2,20 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace;
+namespace OpenTelemetry\API\Trace\Propagation;
 
 use function count;
 use function explode;
 use function hexdec;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\API\Trace\PropagationGetterInterface;
-use OpenTelemetry\API\Trace\PropagationSetterInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
+use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
+use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
+use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use OpenTelemetry\SDK\Trace\Span;
+use OpenTelemetry\SDK\Trace\SpanContext;
+use OpenTelemetry\SDK\Trace\TraceState;
 
 /**
  * TraceContext is a propagator that supports the W3C Trace Context format
@@ -22,20 +27,20 @@ use OpenTelemetry\Context\Context;
  * traceparent header and relevant parts of the tracestate header containing
  * their proprietary information.
  */
-final class TraceContextPropagator implements API\TextMapPropagatorInterface
+final class TraceContextPropagator implements TextMapPropagatorInterface
 {
     public const TRACEPARENT = 'traceparent';
     public const TRACESTATE = 'tracestate';
     private const VERSION = '00'; // Currently, only '00' is supported
 
     /** {@inheritdoc} */
-    public static function fields(): array
+    public function fields(): array
     {
         return [self::TRACEPARENT, self::TRACESTATE];
     }
 
     /** {@inheritdoc} */
-    public static function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void
+    public function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void
     {
         $setter = $setter ?? ArrayAccessGetterSetter::getInstance();
         $context = $context ?? Context::getCurrent();
@@ -57,7 +62,7 @@ final class TraceContextPropagator implements API\TextMapPropagatorInterface
     }
 
     /** {@inheritdoc} */
-    public static function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
+    public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
     {
         $getter = $getter ?? ArrayAccessGetterSetter::getInstance();
         $context = $context ?? Context::getCurrent();

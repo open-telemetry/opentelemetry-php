@@ -2,23 +2,17 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Baggage;
+namespace OpenTelemetry\API\Baggage;
 
-use OpenTelemetry\API\Baggage as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Scope;
-use OpenTelemetry\SDK\Trace\BaggageContextKey;
 
-/**
- * @todo Implement this in the API layer
- */
-final class Baggage implements API\BaggageInterface
+final class Baggage implements BaggageInterface
 {
-    /** @var self|null */
-    private static $emptyBaggage;
+    private static ?self $emptyBaggage = null;
 
     /** @inheritDoc */
-    public static function fromContext(Context $context): API\BaggageInterface
+    public static function fromContext(Context $context): BaggageInterface
     {
         if ($baggage = $context->get(BaggageContextKey::instance())) {
             return $baggage;
@@ -28,19 +22,19 @@ final class Baggage implements API\BaggageInterface
     }
 
     /** @inheritDoc */
-    public static function getBuilder(): API\BaggageBuilderInterface
+    public static function getBuilder(): BaggageBuilderInterface
     {
         return new BaggageBuilder();
     }
 
     /** @inheritDoc */
-    public static function getCurrent(): API\BaggageInterface
+    public static function getCurrent(): BaggageInterface
     {
         return self::fromContext(Context::getCurrent());
     }
 
     /** @inheritDoc */
-    public static function getEmpty(): API\BaggageInterface
+    public static function getEmpty(): BaggageInterface
     {
         if (null === self::$emptyBaggage) {
             self::$emptyBaggage = new self();
@@ -49,10 +43,10 @@ final class Baggage implements API\BaggageInterface
         return self::$emptyBaggage;
     }
 
-    /** @var array<string, API\Entry> */
+    /** @var array<string, Entry> */
     private $entries;
 
-    /** @param array<string, API\Entry> $entries */
+    /** @param array<string, Entry> $entries */
     public function __construct(array $entries = [])
     {
         $this->entries = $entries;
@@ -65,7 +59,7 @@ final class Baggage implements API\BaggageInterface
     }
 
     /** @inheritDoc */
-    public function getEntry(string $key): ?API\Entry
+    public function getEntry(string $key): ?Entry
     {
         return $this->entries[$key] ?? null;
     }
@@ -88,8 +82,13 @@ final class Baggage implements API\BaggageInterface
         }
     }
 
+    public function isEmpty(): bool
+    {
+        return empty($this->entries);
+    }
+
     /** @inheritDoc */
-    public function toBuilder(): API\BaggageBuilderInterface
+    public function toBuilder(): BaggageBuilderInterface
     {
         return new BaggageBuilder($this->entries);
     }
