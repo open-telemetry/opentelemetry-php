@@ -1,11 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
 $finder = PhpCsFixer\Finder::create()
-    ->exclude('vendor')
-    ->exclude('var/cache')
-    ->exclude('proto')
-    ->in(__DIR__);
+    ->in('examples/')
+    ->in('tests/')
+    ->in('src/');
 
 $config = new PhpCsFixer\Config();
+
 return $config->setRules([
     'concat_space' => ['spacing' => 'one'],
     'declare_equal_normalize' => ['space' => 'none'],

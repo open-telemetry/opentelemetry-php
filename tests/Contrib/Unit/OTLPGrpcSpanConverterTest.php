@@ -12,12 +12,12 @@ use Opentelemetry\Proto\Resource\V1\Resource;
 use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
-use OpenTelemetry\Sdk\InstrumentationLibrary;
-use OpenTelemetry\Sdk\Resource\ResourceInfo;
-use OpenTelemetry\Sdk\Trace\Attributes;
-use OpenTelemetry\Sdk\Trace\SpanContext;
-use OpenTelemetry\Sdk\Trace\StatusData;
-use OpenTelemetry\Sdk\Trace\Test\SpanData;
+use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Trace\SpanContext;
+use OpenTelemetry\SDK\Trace\StatusData;
+use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 class OTLPGrpcSpanConverterTest extends TestCase

@@ -6,14 +6,8 @@ parameters:
     tmpDir: var/cache/phpstan
     level: 5
     paths:
-        - .
+        - ./src
+        - ./tests
+        # - ./examples TODO: Uncomment this once examples are updated
     excludes_analyse:
-        - var
-        - vendor
-        - proto
         - tests/TraceContext/W3CTestService
-        - examples # TODO: Remove this once examples are updated
-    ignoreErrors:
-        # PHPStan false positive
-        - message: '#Call to an undefined static method OpenTelemetry\\Sdk\\Metrics\\Providers\\GlobalMeterProvider\:\:getMeter\(\)\.#'
-          path: tests/Sdk/Unit/Metrics/Providers/GlobalMeterProvicerTest.php

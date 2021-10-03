@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-use OpenTelemetry\Sdk\Metrics\Counter;
-use OpenTelemetry\Sdk\Metrics\Exporters\PrometheusExporter;
+use OpenTelemetry\SDK\Metrics\Counter;
+use OpenTelemetry\SDK\Metrics\Exporters\PrometheusExporter;
 use Prometheus\CollectorRegistry;
 use Prometheus\Storage\Redis;
 

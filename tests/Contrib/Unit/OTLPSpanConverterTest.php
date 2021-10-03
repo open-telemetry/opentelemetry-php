@@ -6,9 +6,9 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use function implode;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
-use OpenTelemetry\Sdk\Trace\Attribute;
-use OpenTelemetry\Sdk\Trace\Attributes;
-use OpenTelemetry\Sdk\Trace\Test\SpanData;
+use OpenTelemetry\SDK\Trace\Attribute;
+use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 class OTLPSpanConverterTest extends TestCase

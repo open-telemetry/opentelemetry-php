@@ -6,13 +6,11 @@
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd">
     <projectFiles>
-        <directory name="."/>
+        <directory name="./src"/>
+        <directory name="./tests"/>
+        <!--<directory name="./examples"/> TODO: Uncomment this once examples are updated -->
         <ignoreFiles>
-            <directory name="var"/>
-            <directory name="vendor"/>
-            <directory name="proto"/>
             <directory name="tests/TraceContext/W3CTestService"/>
-            <directory name="examples"/> <!--TODO: Remove this once examples are updated-->
         </ignoreFiles>
     </projectFiles>
     <plugins>

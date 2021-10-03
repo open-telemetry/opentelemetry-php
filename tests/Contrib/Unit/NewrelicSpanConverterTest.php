@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\Contrib\Newrelic\SpanConverter;
-use OpenTelemetry\Sdk\Trace\Attribute;
-use OpenTelemetry\Sdk\Trace\Attributes;
-use OpenTelemetry\Sdk\Trace\Test\SpanData;
+use OpenTelemetry\SDK\Trace\Attribute;
+use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 class NewrelicSpanConverterTest extends TestCase

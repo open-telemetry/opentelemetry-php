@@ -97,13 +97,13 @@ $kernel->terminate($request, $response);
  ```php
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
-use OpenTelemetry\Sdk\Trace\Clock;
+use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\Sdk\Trace\SamplingResult;
-use OpenTelemetry\Sdk\Trace\SpanProcessor\BatchSpanProcessor;
-use OpenTelemetry\Sdk\Trace\TracerProvider;
-use OpenTelemetry\Trace as API;
+use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\SDK\Trace\SamplingResult;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
+use OpenTelemetry\SDK\Trace\TracerProvider;
+use OpenTelemetry\API\Trace as API;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 ```

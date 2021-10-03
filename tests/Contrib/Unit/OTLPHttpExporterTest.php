@@ -11,7 +11,7 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter;
-use OpenTelemetry\Sdk\Trace\Test\SpanData;
+use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;

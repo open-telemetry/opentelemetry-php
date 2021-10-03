@@ -8,7 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\Jaeger\Exporter;
-use OpenTelemetry\Sdk\Trace\Test\SpanData;
+use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 class JaegerExporterTest extends TestCase

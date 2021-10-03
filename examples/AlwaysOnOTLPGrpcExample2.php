@@ -3,16 +3,16 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
+use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPExporter;
-use OpenTelemetry\Sdk\Trace\Attributes;
-use OpenTelemetry\Sdk\Trace\Clock;
-use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\Sdk\Trace\SamplingResult;
-use OpenTelemetry\Sdk\Trace\Span;
-use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
-use OpenTelemetry\Sdk\Trace\TracerProvider;
-use OpenTelemetry\Trace as API;
+use OpenTelemetry\SDK\Trace\AbstractClock;
+use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\SDK\Trace\SamplingResult;
+use OpenTelemetry\SDK\Trace\Span;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Trace\TracerProvider;
 
 $sampler = new AlwaysOnSampler();
 $samplingResult = $sampler->shouldSample(
@@ -36,7 +36,7 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
 
     $rootSpan->setAttribute('remote_ip', '1.2.3.4')
         ->setAttribute('country', 'USA');
-    $timestamp = Clock::getDefault()->timestamp();
+    $timestamp = AbstractClock::getDefault()->timestamp();
     $rootSpan->addEvent('found_login', new Attributes([
         'id' => 1,
         'username' => 'otuser',

@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" 
-    backupGlobals="false" 
-    backupStaticAttributes="false" 
-    bootstrap="./vendor/autoload.php" 
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="./vendor/autoload.php"
     cacheResult="false"
-    colors="false" 
-    convertErrorsToExceptions="true" 
-    convertNoticesToExceptions="true" 
-    convertWarningsToExceptions="true" 
-    forceCoversAnnotation="false" 
-    processIsolation="false" 
+    colors="false"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    forceCoversAnnotation="false"
+    processIsolation="false"
     stopOnError="false"
     stopOnFailure="false"
     stopOnIncomplete="false"
     stopOnSkipped="false"
-    stopOnRisky="false" 
+    stopOnRisky="false"
     timeoutForSmallTests="1"
     timeoutForMediumTests="10"
     timeoutForLargeTests="60"
@@ -25,7 +25,7 @@
 
     <coverage processUncoveredFiles="true">
         <include>
-            <directory>contrib</directory>	
+            <directory>contrib</directory>
             <directory>sdk</directory>
         </include>
     </coverage>
@@ -39,10 +39,10 @@
 
     <testsuites>
         <testsuite name="Sdk Unit Tests">
-            <directory>./tests/Sdk/Unit</directory>
+            <directory>./tests/SDK/Unit</directory>
         </testsuite>
         <testsuite name="Integration Tests">
-            <directory>./tests/Sdk/Integration</directory>
+            <directory>./tests/SDK/Integration</directory>
         </testsuite>
         <testsuite name="Contrib Unit Tests">
             <directory>./tests/Contrib/Unit</directory>

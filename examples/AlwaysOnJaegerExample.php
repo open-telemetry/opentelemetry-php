@@ -5,15 +5,15 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
+use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
-use OpenTelemetry\Sdk\Trace\Attributes;
-use OpenTelemetry\Sdk\Trace\Clock;
-use OpenTelemetry\Sdk\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\Sdk\Trace\SamplingResult;
-use OpenTelemetry\Sdk\Trace\SpanProcessor\BatchSpanProcessor;
-use OpenTelemetry\Sdk\Trace\TracerProvider;
-use OpenTelemetry\Trace as API;
+use OpenTelemetry\SDK\Trace\AbstractClock;
+use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\SDK\Trace\SamplingResult;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
+use OpenTelemetry\SDK\Trace\TracerProvider;
 
 $sampler = new AlwaysOnSampler();
 $samplingResult = $sampler->shouldSample(
@@ -34,12 +34,12 @@ $exporter = new JaegerExporter(
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     echo 'Starting AlwaysOnJaegerExample';
     $tracer = (new TracerProvider())
-        ->addSpanProcessor(new BatchSpanProcessor($exporter, Clock::getDefault()))
+        ->addSpanProcessor(new BatchSpanProcessor($exporter, AbstractClock::getDefault()))
         ->getTracer('io.opentelemetry.contrib.php');
 
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
-        $timestamp = Clock::getDefault()->timestamp();
+        $timestamp = AbstractClock::getDefault()->timestamp();
         $span = $tracer->startAndActivateSpan('session.generate.span' . microtime(true));
 
         $spanParent = $span->getParentContext();
