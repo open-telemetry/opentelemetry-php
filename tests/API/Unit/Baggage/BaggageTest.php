@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Unit\Baggage;
+namespace OpenTelemetry\Tests\API\Unit\Baggage;
 
 use OpenTelemetry\API\Baggage\Baggage;
 use OpenTelemetry\API\Baggage\Entry;
@@ -17,7 +17,7 @@ class BaggageTest extends TestCase
     public function testCurrentEmpty(): void
     {
         $scope = Context::getRoot()->activate();
-        $this->assertSame(Baggage::getCurrent(), \OpenTelemetry\API\Baggage\Baggage::getEmpty());
+        $this->assertSame(Baggage::getCurrent(), Baggage::getEmpty());
         $scope->close();
     }
 
@@ -40,7 +40,7 @@ class BaggageTest extends TestCase
 
     public function testGetCurrentBaggageSetsCorrectContext(): void
     {
-        $baggage = \OpenTelemetry\API\Baggage\Baggage::getEmpty();
+        $baggage = Baggage::getEmpty();
         $scope = Context::getRoot()->withContextValue($baggage)->activate();
         $this->assertSame(Baggage::getCurrent(), $baggage);
         $scope->close();
@@ -96,7 +96,7 @@ class BaggageTest extends TestCase
 
     public function testToBuilder(): void
     {
-        $baggage = \OpenTelemetry\API\Baggage\Baggage::getBuilder()->set('foo', 10)->build();
+        $baggage = Baggage::getBuilder()->set('foo', 10)->build();
         $baggage2 = $baggage->toBuilder()->build();
 
         $this->assertSame(10, $baggage2->getValue('foo'));

@@ -33,6 +33,17 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
     public const TRACESTATE = 'tracestate';
     private const VERSION = '00'; // Currently, only '00' is supported
 
+    private static ?self $instance = null;
+
+    public static function getInstance(): self
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
     /** {@inheritdoc} */
     public function fields(): array
     {

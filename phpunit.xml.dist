@@ -25,8 +25,7 @@
 
     <coverage processUncoveredFiles="true">
         <include>
-            <directory>contrib</directory>
-            <directory>sdk</directory>
+            <directory>src</directory>
         </include>
     </coverage>
 
@@ -38,7 +37,10 @@
     </php>
 
     <testsuites>
-        <testsuite name="Sdk Unit Tests">
+        <testsuite name="API Unit Tests">
+            <directory>./tests/API/Unit</directory>
+        </testsuite>
+        <testsuite name="SDK Unit Tests">
             <directory>./tests/SDK/Unit</directory>
         </testsuite>
         <testsuite name="Integration Tests">
@@ -51,5 +53,4 @@
             <directory>./tests/Context/Unit</directory>
         </testsuite>
     </testsuites>
-
 </phpunit>
