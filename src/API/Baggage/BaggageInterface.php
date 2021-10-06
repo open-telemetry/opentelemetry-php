@@ -57,6 +57,8 @@ interface BaggageInterface extends ImplicitContextKeyedInterface
      */
     public function getAll(): iterable;
 
+    public function isEmpty(): bool;
+
     /**
      * Returns a new {@see API\BaggageBuilderInterface} pre-initialized with the contents of `$this`.
      */

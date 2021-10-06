@@ -2,20 +2,19 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace;
+namespace OpenTelemetry\API\Baggage;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
 
 /**
- * @psalm-internal \OpenTelemetry
+ * @psalm-internal OpenTelemetry
  */
 final class BaggageContextKey extends ContextKey
 {
     private const KEY_NAME = 'opentelemetry-trace-baggage-key';
 
-    /** @var ContextKey */
-    private static $instance;
+    private static ?ContextKey $instance = null;
 
     public static function instance(): ContextKey
     {

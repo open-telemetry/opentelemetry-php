@@ -2,14 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Baggage;
+namespace OpenTelemetry\API\Baggage;
 
-use OpenTelemetry\API\Baggage as API;
-
-final class Metadata implements API\MetadataInterface
+final class Metadata implements MetadataInterface
 {
-    /** @var self|null */
-    private static $instance;
+    private static ?self $instance = null;
 
     public static function getEmpty(): Metadata
     {
@@ -20,8 +17,7 @@ final class Metadata implements API\MetadataInterface
         return self::$instance;
     }
 
-    /** @var string */
-    private $metadata;
+    private string $metadata;
 
     public function __construct(string $metadata)
     {

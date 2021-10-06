@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Unit\Baggage;
+namespace OpenTelemetry\Tests\API\Unit\Baggage;
 
+use OpenTelemetry\API\Baggage\Baggage;
 use OpenTelemetry\API\Baggage\Entry;
+use OpenTelemetry\API\Baggage\Metadata;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Baggage\Baggage;
-use OpenTelemetry\SDK\Baggage\Metadata;
 use PHPUnit\Framework\TestCase;
 
 class BaggageTest extends TestCase

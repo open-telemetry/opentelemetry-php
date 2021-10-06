@@ -146,7 +146,7 @@ class TraceState implements API\TraceStateInterface
             }
 
             foreach ($listMembers as $listMember) {
-                $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, $listMember);
+                $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, trim($listMember));
 
                 // There should only be one list-member per vendor separated by '='
                 if (count($vendor) === 2) {

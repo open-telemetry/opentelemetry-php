@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Unit\Trace;
+namespace OpenTelemetry\Tests\Context\Unit\Propagation;
 
 use ArrayObject;
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Trace\ArrayAccessGetterSetter;
+use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\SDK\Trace\KeyedArrayAccessInterface;
 use PHPUnit\Framework\TestCase;
 use stdClass;
