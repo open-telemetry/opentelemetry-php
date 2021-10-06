@@ -7,6 +7,7 @@ namespace OpenTelemetry\Context\Propagation;
 use function array_map;
 use function array_merge;
 use function array_unique;
+use function array_values;
 use OpenTelemetry\Context\Context;
 
 final class MultiTextMapPropagator implements TextMapPropagatorInterface
@@ -33,7 +34,7 @@ final class MultiTextMapPropagator implements TextMapPropagatorInterface
     public function __construct(array $propagators)
     {
         $this->propagators = $propagators;
-        $this->fields = array_values(array_unique(array_merge(...array_map(static fn (TextMapPropagatorInterface $propagator) => $propagator->fields(), $propagators))));
+        $this->fields = $this->extractFields($propagators);
     }
 
     public function fields(): array
@@ -57,5 +58,23 @@ final class MultiTextMapPropagator implements TextMapPropagatorInterface
         }
 
         return $context;
+    }
+
+    /**
+     * @param list<TextMapPropagatorInterface> $propagators
+     * @return list<string>
+     */
+    private function extractFields(array $propagators): array
+    {
+        return array_values(
+            array_unique(
+                array_merge(
+                    ...array_map(
+                        static fn (TextMapPropagatorInterface $propagator) => $propagator->fields(),
+                        $propagators
+                    )
+                )
+            )
+        );
     }
 }
