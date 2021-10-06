@@ -10,6 +10,7 @@ use OpenTelemetry\API\Baggage\Metadata;
 use function str_contains;
 use function str_replace;
 use function trim;
+use function urldecode;
 
 final class Parser
 {
@@ -51,6 +52,9 @@ final class Parser
             }
 
             [$key, $value] = explode('=', $keyValue, 2);
+
+            $key = urldecode($key);
+            $value = urldecode($value);
 
             $key = str_replace(self::EXCLUDED_KEY_CHARS, '', trim($key), $invalidKeyCharacters);
             if (empty($key) || $invalidKeyCharacters > 0) {

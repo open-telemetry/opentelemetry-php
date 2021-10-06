@@ -13,6 +13,7 @@ use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use function rtrim;
+use function urlencode;
 
 /**
  * @see https://www.w3.org/TR/baggage
@@ -52,7 +53,8 @@ final class BaggagePropagator implements TextMapPropagatorInterface
 
         /** @var Entry $entry */
         foreach ($baggage->getAll() as $key => $entry) {
-            $headerString.= "{$key}={$entry->getValue()}";
+            $value = urlencode($entry->getValue());
+            $headerString.= "{$key}={$value}";
 
             if ($metadata = $entry->getMetadata()->getValue()) {
                 $headerString .= ";{$metadata}";
