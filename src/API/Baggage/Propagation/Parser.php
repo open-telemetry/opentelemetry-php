@@ -7,7 +7,7 @@ namespace OpenTelemetry\API\Baggage\Propagation;
 use function explode;
 use OpenTelemetry\API\Baggage\BaggageBuilderInterface;
 use OpenTelemetry\API\Baggage\Metadata;
-use function str_contains;
+use OpenTelemetry\SDK\Internal\StringUtil;
 use function str_replace;
 use function trim;
 use function urldecode;
@@ -39,7 +39,7 @@ final class Parser
 
             $keyValue = trim($explodedString[0]);
 
-            if (empty($keyValue) || !str_contains($keyValue, '=')) {
+            if (empty($keyValue) || !StringUtil::str_contains($keyValue, '=')) {
                 continue;
             }
 
