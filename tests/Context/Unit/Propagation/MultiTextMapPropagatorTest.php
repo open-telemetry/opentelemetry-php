@@ -27,9 +27,9 @@ class MultiTextMapPropagatorTest extends MockeryTestCase
         $this->propagator2 = Mockery::mock(TextMapPropagatorInterface::class);
         $this->propagator3 = Mockery::mock(TextMapPropagatorInterface::class);
 
-        $this->propagator1->allows(['fields' => []])->byDefault();
-        $this->propagator2->allows(['fields' => []])->byDefault();
-        $this->propagator3->allows(['fields' => []])->byDefault();
+        $this->propagator1->shouldReceive('fields')->andReturn([])->byDefault();
+        $this->propagator2->shouldReceive('fields')->andReturn([])->byDefault();
+        $this->propagator3->shouldReceive('fields')->andReturn([])->byDefault();
     }
 
     public function test_fields(): void

@@ -6,7 +6,7 @@ namespace OpenTelemetry\API\Baggage\Propagation;
 
 use OpenTelemetry\API\Baggage\Baggage;
 use OpenTelemetry\API\Baggage\BaggageBuilderInterface;
-use OpenTelemetry\API\Baggage\Entry;
+use OpenTelemetry\API\Baggage\Entry; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
