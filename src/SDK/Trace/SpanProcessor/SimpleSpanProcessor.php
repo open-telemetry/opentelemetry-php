@@ -53,7 +53,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         $this->running = false;
 
         if (null !== $this->exporter) {
-            return  $this->forceFlush() && $this->exporter->shutdown();
+            return $this->forceFlush() && $this->exporter->shutdown();
         }
 
         return true;

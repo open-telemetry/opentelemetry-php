@@ -60,6 +60,6 @@ final class NoopSpanBuilder implements SpanBuilderInterface
 
     public function startSpan(): SpanInterface
     {
-        Span::getInvalid();
+        return Span::getInvalid();
     }
 }

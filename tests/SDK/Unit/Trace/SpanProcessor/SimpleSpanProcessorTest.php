@@ -4,85 +4,86 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Unit\Trace\SpanProcessor;
 
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
+use Mockery\MockInterface;
 use OpenTelemetry\API\Trace\SpanContextInterface;
-use OpenTelemetry\SDK\Trace\Exporter;
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
+use OpenTelemetry\SDK\Trace\SpanContext;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
-use PHPUnit\Framework\TestCase;
+use OpenTelemetry\Tests\SDK\Util\SpanData;
 
-class SimpleSpanProcessorTest extends TestCase
+class SimpleSpanProcessorTest extends MockeryTestCase
 {
-    /**
-     * @test
-     */
-    public function shouldCallExporterOnEnd(): void
+    private SimpleSpanProcessor $simpleSpanProcessor;
+
+    /** @var MockInterface&SpanExporterInterface */
+    private $spanExporter;
+
+    /** @var MockInterface&ReadWriteSpanInterface */
+    private $readWriteSpan;
+
+    /** @var MockInterface&ReadableSpanInterface */
+    private $readableSpan;
+
+    private SpanContextInterface $sampledSpanContext;
+    private SpanContextInterface $nonSampledSpanContext;
+
+    protected function setUp(): void
     {
-        $exporter = $this->createMock(Exporter::class);
-        $exporter->expects($this->atLeastOnce())->method('export');
+        $this->readWriteSpan = Mockery::mock(ReadWriteSpanInterface::class);
+        $this->readableSpan = Mockery::mock(ReadableSpanInterface::class);
 
-        $spanContext = $this->createStub(SpanContextInterface::class);
-        $spanContext->method('isSampled')->willReturn(true); // only sampled spans are exported
-        $span = $this->createStub(ReadWriteSpanInterface::class);
-        $span->method('getContext')->willReturn($spanContext);
+        $this->sampledSpanContext = SpanContext::create(
+            SpanContext::INVALID_TRACE,
+            SpanContext::INVALID_SPAN,
+            SpanContextInterface::TRACE_FLAG_SAMPLED
+        );
 
-        (new SimpleSpanProcessor($exporter))->onEnd($span);
+        $this->nonSampledSpanContext = SpanContext::getInvalid();
+
+        $this->spanExporter = Mockery::mock(SpanExporterInterface::class);
+        $this->simpleSpanProcessor = new SimpleSpanProcessor($this->spanExporter);
     }
 
-    /**
-     * @test
-     */
-    public function shouldAllowNullExporter(): void
+    public function test_onStart(): void
     {
-        $proc = new SimpleSpanProcessor(null);
-        $span = $this->createMock(ReadWriteSpanInterface::class);
-        $proc->onStart($span);
-        $proc->onEnd($span);
-        $proc->forceFlush();
-        $proc->shutdown();
-        $this->assertTrue(true); // phpunit requires an assertion
+        $this->simpleSpanProcessor->onStart($this->readWriteSpan, Context::getRoot());
+        $this->spanExporter->shouldNotReceive('export');
     }
 
-    /**
-     * @test
-     */
-    public function shutdownCallsExporterShutdown(): void
+    public function test_onEnd_sampledSpan(): void
     {
-        $exporter = $this->createMock(Exporter::class);
-        $proc = new SimpleSpanProcessor($exporter);
-
-        $exporter->expects($this->once())->method('shutdown');
-        $proc->shutdown();
+        $spanData = new SpanData();
+        $this->readableSpan->expects('getContext')->andReturn($this->sampledSpanContext);
+        $this->readableSpan->expects('toSpanData')->andReturn($spanData);
+        $this->spanExporter->expects('export')->with([$spanData]);
+        $this->simpleSpanProcessor->onEnd($this->readableSpan);
     }
 
-    /**
-     * @test
-     */
-    public function noExportAfterShutdown(): void
+    public function test_onEnd_nonSampledSpan(): void
     {
-        $exporter = $this->createMock(Exporter::class);
-        $exporter->expects($this->once())->method('shutdown');
-
-        $proc = new SimpleSpanProcessor($exporter);
-        $proc->shutdown();
-
-        $span = $this->createMock(ReadWriteSpanInterface::class);
-        $proc->onStart($span);
-        $proc->onEnd($span);
+        $this->readableSpan->expects('getContext')->andReturn($this->nonSampledSpanContext);
+        $this->spanExporter->shouldNotReceive('export');
+        $this->readableSpan->shouldReceive('toSpanData');
+        $this->simpleSpanProcessor->onEnd($this->readableSpan);
     }
 
-    /**
-     * @test
-     */
-    public function shouldExportOnlySampledSpans(): void
+    // TODO: Add test to ensure exporter is retried on failure.
+
+    public function test_forceFlush(): void
     {
-        $exporter = $this->createMock(Exporter::class);
-        $exporter->expects($this->never())->method('export');
+        $this->assertTrue($this->simpleSpanProcessor->forceFlush());
+    }
 
-        $spanContext = $this->createStub(SpanContextInterface::class);
-        $spanContext->method('isSampled')->willReturn(false);
-        $span = $this->createStub(ReadWriteSpanInterface::class);
-        $span->method('getContext')->willReturn($spanContext);
+    public function test_shutdown(): void
+    {
+        $this->spanExporter->expects('shutdown')->andReturnTrue();
 
-        (new SimpleSpanProcessor($exporter))->onEnd($span);
+        $this->assertTrue($this->simpleSpanProcessor->shutdown());
+        $this->assertTrue($this->simpleSpanProcessor->shutdown());
     }
 }
