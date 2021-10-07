@@ -33,13 +33,14 @@ class NoopSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
-    public function forceFlush(): void
+    public function forceFlush(): bool
     {
+        return true;
     }
 
     /** @inheritDoc */
-    public function shutdown(): void
+    public function shutdown(): bool
     {
-        $this->forceFlush();
+        return $this->forceFlush();
     }
 }

@@ -16,7 +16,7 @@ use Psr\Http\Client\RequestExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
-class Exporter implements Trace\Exporter
+class Exporter implements Trace\SpanExporterInterface
 {
     /**
      * @var string
@@ -108,11 +108,11 @@ class Exporter implements Trace\Exporter
     public function export(iterable $spans): int
     {
         if (!$this->running) {
-            return Trace\Exporter::FAILED_NOT_RETRYABLE;
+            return Trace\SpanExporterInterface::FAILED_NOT_RETRYABLE;
         }
 
         if (empty($spans)) {
-            return Trace\Exporter::SUCCESS;
+            return Trace\SpanExporterInterface::SUCCESS;
         }
 
         $convertedSpans = [];
@@ -131,25 +131,27 @@ class Exporter implements Trace\Exporter
             }
             $response = $this->client->sendRequest($request);
         } catch (RequestExceptionInterface $e) {
-            return Trace\Exporter::FAILED_NOT_RETRYABLE;
+            return Trace\SpanExporterInterface::FAILED_NOT_RETRYABLE;
         } catch (NetworkExceptionInterface | ClientExceptionInterface $e) {
-            return Trace\Exporter::FAILED_RETRYABLE;
+            return Trace\SpanExporterInterface::FAILED_RETRYABLE;
         }
 
         if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
-            return Trace\Exporter::FAILED_NOT_RETRYABLE;
+            return Trace\SpanExporterInterface::FAILED_NOT_RETRYABLE;
         }
 
         if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
-            return Trace\Exporter::FAILED_RETRYABLE;
+            return Trace\SpanExporterInterface::FAILED_RETRYABLE;
         }
 
-        return Trace\Exporter::SUCCESS;
+        return Trace\SpanExporterInterface::SUCCESS;
     }
 
-    public function shutdown(): void
+    public function shutdown(): bool
     {
         $this->running = false;
+
+        return true;
     }
 
     public static function fromConnectionString(string $endpointUrl, string $name, $args)
