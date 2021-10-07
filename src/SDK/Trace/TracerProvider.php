@@ -58,6 +58,7 @@ final class TracerProvider implements API\TracerProviderInterface
     public function getTracer(string $name, ?string $version = null): API\TracerInterface
     {
         if ($this->tracerSharedState->hasShutdown()) {
+            return NoopTracer::getInstance();
         }
 
         $key = sprintf('%s@%s', $name, ($version ?? 'unknown'));
@@ -85,7 +86,7 @@ final class TracerProvider implements API\TracerProviderInterface
     public function shutdown(): bool
     {
         if ($this->tracerSharedState->hasShutdown()) {
-            return false;
+            return true;
         }
 
         return $this->tracerSharedState->shutdown();
