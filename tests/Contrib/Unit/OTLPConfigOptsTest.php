@@ -15,7 +15,9 @@ class OTLPConfigOptsTest extends TestCase
 
     public function testHappyConfigOps()
     {
-        $otlpConfig = new ConfigOpts([]);
+        $otlpConfig = new ConfigOpts([
+            'endpoint' => 'https://api.foo.com/'
+        ]);
 
         $otlpConfig->WithEndpoint('https://api.example.com:1337/v1/trace')
                    ->WithHeaders('X-Auth-Wibble=foo,X-Dataset=bar')

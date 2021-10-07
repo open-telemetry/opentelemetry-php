@@ -7,40 +7,66 @@ namespace OpenTelemetry\Contrib\Otlp;
 use InvalidArgumentException;
 
 
-class ConfigOpts {
+class ConfigOpts
+{
 
+    /*
+    * @var string
+    */
     private $endpoint;
 
+    /*
+    * @var string
+    */
     private $protocol;
 
-    private $insecure;
-    
-    private $certificateFile;
-
+    /*
+    * @var string
+    */
     private $headers;
 
+    /*
+    * @var bool
+    */
+    private $insecure;
+
+    /*
+    * @var string
+    */
+    private $certificateFile;
+
+    /*
+    * @var string
+    */
     private $compression;
 
+    /*
+    * @var int
+    */
     private $timeout;
-
 
 
     /**
      * Constructor.
      * 
-     * @param array $opts
+     * @param 
      */
     public function __construct(
-        array $opts
-    )
-    {
+        string $endpoint,
+        string $protocol,
+        string $headers,
+        bool $insecure,
+        string $certificateFile,
+        string $compression,
+        int $timeout
+    ) {
         $this->endpoint = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: $this->endpoint;
         $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc';
-        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ? filter_var(getenv('OTEL_EXPORTER_OTLP_INSECURE'), FILTER_VALIDATE_BOOLEAN): $this->insecure;
+        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ? filter_var(getenv('OTEL_EXPORTER_OTLP_INSECURE'), FILTER_VALIDATE_BOOLEAN) : $this->insecure;
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: $this->certificateFile;
         $this->headers = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: $this->headers;
         $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: $this->compression;
-        $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: $this->timeout;
+        $this->timeout = (int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: $this->timeout;
     }
 
     public function WithEndpoint(string $endpoint)
@@ -50,7 +76,7 @@ class ConfigOpts {
         if (!is_array($parsedDsn)) {
             throw new InvalidArgumentException('Unable to parse provided DSN');
         }
-    
+
         if (
             !isset($parsedDsn['scheme'])
             || !isset($parsedDsn['host'])
@@ -63,7 +89,6 @@ class ConfigOpts {
         $this->endpoint = $endpoint;
 
         return $this;
-
     }
 
     #TODO: Endpoint path for http should be possible
@@ -103,7 +128,6 @@ class ConfigOpts {
         $this->headers = $metadata;
 
         return $this;
-
     }
 
     public function WithCompression()
@@ -111,7 +135,6 @@ class ConfigOpts {
         $this->compression = 'gzip';
 
         return $this;
-
     }
 
     public function WithTimeout(int $timeout)
@@ -119,7 +142,6 @@ class ConfigOpts {
         $this->timeout = $timeout;
 
         return $this;
-
     }
 
     public function WithInsecure()
@@ -127,7 +149,6 @@ class ConfigOpts {
         $this->insecure = true;
 
         return $this;
-
     }
 }
 
