@@ -90,7 +90,7 @@ class Exporter implements Trace\Exporter
     ) {
 
         // Set default values based on presence of env variable
-        $this->endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'localhost:4718';
+        $this->endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'localhost:4318';
         $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'json';
         $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ?: 'false';
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
