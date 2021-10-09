@@ -13,33 +13,32 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
  * Class SpanMultiProcessor is a SpanProcessor that forwards all events to an
  * array of SpanProcessors.
  */
-final class SpanMultiProcessor implements SpanProcessorInterface
+final class MultiSpanProcessor implements SpanProcessorInterface
 {
     /** @var list<SpanProcessorInterface> */
-    private $processors = [];
+    private array $processors = [];
 
-    /** @param list<SpanProcessorInterface> $spanProcessors */
-    public function __construct(
-        array $spanProcessors
-    ) {
+    private bool $running = true;
+
+    public function __construct(SpanProcessorInterface ...$spanProcessors)
+    {
         foreach ($spanProcessors as $processor) {
             $this->addSpanProcessor($processor);
         }
     }
 
-    public function addSpanProcessor(SpanProcessorInterface $processor)
+    public function addSpanProcessor(SpanProcessorInterface $processor): void
     {
         $this->processors[] = $processor;
     }
 
-    /**
-     * @return SpanProcessorInterface[]
-     */
+    /** @return list<SpanProcessorInterface> */
     public function getSpanProcessors(): array
     {
         return $this->processors;
     }
 
+    /** @inheritDoc */
     public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
     {
         foreach ($this->processors as $processor) {
@@ -47,6 +46,7 @@ final class SpanMultiProcessor implements SpanProcessorInterface
         }
     }
 
+    /** @inheritDoc */
     public function onEnd(ReadableSpanInterface $span): void
     {
         foreach ($this->processors as $processor) {
@@ -54,17 +54,31 @@ final class SpanMultiProcessor implements SpanProcessorInterface
         }
     }
 
-    public function shutdown(): void
+    /** @inheritDoc */
+    public function shutdown(): bool
     {
-        foreach ($this->processors as $processor) {
-            $processor->shutdown();
+        if (!$this->running) {
+            return true;
         }
+
+        $result = true;
+
+        foreach ($this->processors as $processor) {
+            $result = $result && $processor->shutdown();
+        }
+
+        return $result;
     }
 
-    public function forceFlush(): void
+    /** @inheritDoc */
+    public function forceFlush(): bool
     {
+        $result = true;
+
         foreach ($this->processors as $processor) {
-            $processor->forceFlush();
+            $result = $result && $processor->forceFlush();
         }
+
+        return $result;
     }
 }

@@ -49,18 +49,18 @@ final class TracerProvider implements API\TracerProviderInterface
         register_shutdown_function([$this, 'shutdown']);
     }
 
-    public function shutdown(): void
+    public function forceFlush(): ?bool
     {
-        if ($this->tracerSharedState->hasShutdown()) {
-            return;
-        }
-
-        $this->tracerSharedState->shutdown();
+        return $this->tracerSharedState->getSpanProcessor()->forceFlush();
     }
 
     /** @inheritDoc */
     public function getTracer(string $name, ?string $version = null): API\TracerInterface
     {
+        if ($this->tracerSharedState->hasShutdown()) {
+            return NoopTracer::getInstance();
+        }
+
         $key = sprintf('%s@%s', $name, ($version ?? 'unknown'));
 
         if (isset($this->tracers[$key]) && $this->tracers[$key] instanceof API\TracerInterface) {
@@ -78,5 +78,17 @@ final class TracerProvider implements API\TracerProviderInterface
     public function getSampler(): SamplerInterface
     {
         return $this->tracerSharedState->getSampler();
+    }
+
+    /**
+     * Returns `false` is the provider is already shutdown, otherwise `true`.
+     */
+    public function shutdown(): bool
+    {
+        if ($this->tracerSharedState->hasShutdown()) {
+            return true;
+        }
+
+        return $this->tracerSharedState->shutdown();
     }
 }

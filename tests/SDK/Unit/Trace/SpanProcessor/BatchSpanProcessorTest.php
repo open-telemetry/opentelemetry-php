@@ -8,9 +8,9 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Trace\AbstractClock;
-use OpenTelemetry\SDK\Trace\Exporter;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\Tests\SDK\Util\TestClock;
 
@@ -53,10 +53,10 @@ class BatchSpanProcessorTest extends MockeryTestCase
             $spans[] = $this->createSampledSpanMock();
         }
 
-        $exporter = $this->createMock(Exporter::class);
+        $exporter = $this->createMock(SpanExporterInterface::class);
         $exporter->expects($this->atLeastOnce())->method('export');
 
-        /** @var Exporter $exporter */
+        /** @var SpanExporterInterface $exporter */
         $processor = new BatchSpanProcessor(
             $exporter,
             $this->testClock,
@@ -83,7 +83,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
             $spans[] = $this->createSampledSpanMock();
         }
 
-        $exporter = Mockery::mock(Exporter::class);
+        $exporter = Mockery::mock(SpanExporterInterface::class);
         $exporter
             ->expects('export')
             ->with(
@@ -97,7 +97,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
                 )
             );
 
-        /** @var Exporter $exporter */
+        /** @var SpanExporterInterface $exporter */
         $processor = new BatchSpanProcessor(
             $exporter,
             $this->testClock,
@@ -124,10 +124,10 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $exportDelay = 2;
         $timeout = 3000;
 
-        $exporter = $this->createMock(Exporter::class);
+        $exporter = $this->createMock(SpanExporterInterface::class);
         $exporter->expects($this->never())->method('export');
 
-        /** @var Exporter $exporter */
+        /** @var SpanExporterInterface $exporter */
         $processor = new BatchSpanProcessor(
             $exporter,
             $this->testClock,
@@ -145,7 +145,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
 
     public function test_export_afterShutdown(): void
     {
-        $exporter = $this->createMock(Exporter::class);
+        $exporter = $this->createMock(SpanExporterInterface::class);
         $exporter->expects($this->once())->method('shutdown');
 
         $proc = new BatchSpanProcessor($exporter, $this->createMock(AbstractClock::class));
@@ -161,7 +161,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $sampledSpan = $this->createSampledSpanMock();
         $nonSampledSpan = $this->createNonSampledSpanMock();
 
-        $exporter = Mockery::mock(Exporter::class);
+        $exporter = Mockery::mock(SpanExporterInterface::class);
         $exporter
             ->expects('export')
             ->with(
@@ -190,7 +190,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $exportDelay = 2;
         $timeout = 3000;
 
-        $exporter = Mockery::mock(Exporter::class);
+        $exporter = Mockery::mock(SpanExporterInterface::class);
         $exporter
             ->expects('export')
             ->with(
@@ -223,7 +223,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
 
     public function test_shutdown_shutdownsExporter(): void
     {
-        $exporter = $this->createMock(Exporter::class);
+        $exporter = $this->createMock(SpanExporterInterface::class);
         $processor = new BatchSpanProcessor($exporter, $this->testClock);
 
         $exporter->expects($this->once())->method('shutdown');

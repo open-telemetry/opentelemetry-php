@@ -5,45 +5,30 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Trace\Exporter;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 
 class SimpleSpanProcessor implements SpanProcessorInterface
 {
-    /**
-     * @var Exporter|null
-     */
-    private $exporter;
+    private ?SpanExporterInterface $exporter;
+    private bool $running = true;
 
-    /**
-     * @var bool
-     */
-    private $running = true;
-
-    public function __construct(?Exporter $exporter = null)
+    public function __construct(SpanExporterInterface $exporter = null)
     {
         $this->exporter = $exporter;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
     {
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function onEnd(ReadableSpanInterface $span): void
     {
-        if (!$this->running) {
-            return;
-        }
-
-        if (!$span->getContext()->isSampled()) {
+        if (!$this->running || !$span->getContext()->isSampled()) {
             return;
         }
 
@@ -52,22 +37,25 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function forceFlush(): void
+    /** @inheritDoc */
+    public function forceFlush(): bool
     {
+        return true;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function shutdown(): void
+    /** @inheritDoc */
+    public function shutdown(): bool
     {
+        if (!$this->running) {
+            return true;
+        }
+
         $this->running = false;
 
         if (null !== $this->exporter) {
-            $this->exporter->shutdown();
+            return $this->forceFlush() && $this->exporter->shutdown();
         }
+
+        return true;
     }
 }
