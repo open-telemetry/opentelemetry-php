@@ -6,8 +6,8 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
-use OpenTelemetry\SDK\Trace\SpanProcessor\SpanMultiProcessor;
 
 /**
  * Stores shared state/config between all {@see API\TracerInterface} created via the same {@see API\TracerProviderInterface}.
@@ -29,7 +29,7 @@ final class TracerSharedState
     /** @readonly */
     private SpanProcessorInterface $spanProcessor;
 
-    private bool $hasShutdown = false;
+    private ?bool $shutdownResult = null;
 
     public function __construct(
         IdGeneratorInterface $idGenerator,
@@ -53,7 +53,7 @@ final class TracerSharedState
 
                 break;
             default:
-                $this->spanProcessor = new SpanMultiProcessor($spanProcessors);
+                $this->spanProcessor = new MultiSpanProcessor(...$spanProcessors);
 
                 break;
         }
@@ -61,7 +61,7 @@ final class TracerSharedState
 
     public function hasShutdown(): bool
     {
-        return $this->hasShutdown;
+        return null !== $this->shutdownResult;
     }
 
     public function getIdGenerator(): IdGeneratorInterface
@@ -89,9 +89,11 @@ final class TracerSharedState
         return $this->spanProcessor;
     }
 
-    public function shutdown(): void
+    /**
+     * Returns `false` is the provider is already shutdown, otherwise `true`.
+     */
+    public function shutdown(): bool
     {
-        $this->spanProcessor->shutdown();
-        $this->hasShutdown = true;
+        return $this->shutdownResult ?? ($this->shutdownResult = $this->spanProcessor->shutdown());
     }
 }

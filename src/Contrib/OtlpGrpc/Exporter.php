@@ -10,7 +10,7 @@ use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Trace;
 
-class Exporter implements Trace\Exporter
+class Exporter implements Trace\SpanExporterInterface
 {
     /**
      * @var string
@@ -126,11 +126,11 @@ class Exporter implements Trace\Exporter
     public function export(iterable $spans): int
     {
         if (!$this->running) {
-            return Trace\Exporter::FAILED_NOT_RETRYABLE;
+            return Trace\SpanExporterInterface::FAILED_NOT_RETRYABLE;
         }
 
         if (empty($spans)) {
-            return Trace\Exporter::SUCCESS;
+            return Trace\SpanExporterInterface::SUCCESS;
         }
 
         $resourcespans = [$this->spanConverter->as_otlp_resource_span($spans)];
@@ -139,10 +139,10 @@ class Exporter implements Trace\Exporter
             'resource_spans' => $resourcespans,
         ]);
 
-        list($response, $status) = $this->client->Export($request)->wait();
+        [$response, $status] = $this->client->Export($request)->wait();
 
         if ($status->code === \Grpc\STATUS_OK) {
-            return Trace\Exporter::SUCCESS;
+            return Trace\SpanExporterInterface::SUCCESS;
         }
 
         if (in_array($status->code, [
@@ -156,10 +156,10 @@ class Exporter implements Trace\Exporter
             \Grpc\STATUS_DATA_LOSS,
             \Grpc\STATUS_UNAUTHENTICATED,
         ])) {
-            return Trace\Exporter::FAILED_RETRYABLE;
+            return Trace\SpanExporterInterface::FAILED_RETRYABLE;
         }
 
-        return Trace\Exporter::FAILED_NOT_RETRYABLE;
+        return Trace\SpanExporterInterface::FAILED_NOT_RETRYABLE;
     }
 
     public function setHeader($key, $value)
@@ -196,9 +196,11 @@ class Exporter implements Trace\Exporter
         return $metadata;
     }
 
-    public function shutdown(): void
+    public function shutdown(): bool
     {
         $this->running = false;
+
+        return true;
     }
 
     public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)

@@ -11,8 +11,8 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\IdGeneratorInterface;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
+use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
-use OpenTelemetry\SDK\Trace\SpanProcessor\SpanMultiProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerSharedState;
 
@@ -77,7 +77,7 @@ class TracerSharedStateTest extends MockeryTestCase
         $processor2 = Mockery::mock(SpanProcessorInterface::class);
 
         $this->assertInstanceOf(
-            SpanMultiProcessor::class,
+            MultiSpanProcessor::class,
             $this->construct([$processor1, $processor2])->getSpanProcessor()
         );
     }

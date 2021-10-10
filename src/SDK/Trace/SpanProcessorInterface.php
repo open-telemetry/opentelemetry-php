@@ -10,26 +10,28 @@ use OpenTelemetry\Context\Context;
 interface SpanProcessorInterface
 {
     /**
-     * This method is called when a span is started.
-     * This method is called synchronously on the thread that started the span,
-     * therefore it should not block or throw exceptions.
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#onstart
      */
     public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void;
 
     /**
-     * This method  is called when a span is ended.
-     * This method is called synchronously on the execution thread,
-     * therefore it should not block or throw an exception.
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#onendspan
      */
     public function onEnd(ReadableSpanInterface $span): void;
 
     /**
      * Export all ended spans to the configured Exporter that have not yet been exported.
+     * Returns `true` if the flush was successful, otherwise `false`.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#forceflush-1
      */
-    public function forceFlush(): void;
+    public function forceFlush(): bool;
 
     /**
      * Cleanup; after shutdown, calling onStart, onEnd, or forceFlush is invalid
+     * Returns `false` is the processor is already shutdown, otherwise `true`.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#shutdown-1
      */
-    public function shutdown(): void;
+    public function shutdown(): bool;
 }

@@ -7,15 +7,15 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 use InvalidArgumentException;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Trace\Exporter;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 
 class BatchSpanProcessor implements SpanProcessorInterface
 {
-    private ?Exporter $exporter;
+    private ?SpanExporterInterface $exporter;
     private int $maxQueueSize;
     private int $scheduledDelayMillis;
     private int $exporterTimeoutMillis;
@@ -28,7 +28,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private array $queue;
 
     public function __construct(
-        ?Exporter $exporter,
+        ?SpanExporterInterface $exporter,
         API\ClockInterface $clock,
         int $maxQueueSize = 2048,
         int $scheduledDelayMillis = 5000,
@@ -77,16 +77,35 @@ class BatchSpanProcessor implements SpanProcessorInterface
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function forceFlush(): void
+    /** @inheritDoc */
+    public function forceFlush(): bool
     {
+        if (!$this->running) {
+            return true;
+        }
+
         if (null !== $this->exporter) {
             $this->exporter->export($this->queue);
             $this->queue = [];
             $this->lastExportTimestamp = $this->clock->nanoTime();
         }
+
+        return true;
+    }
+
+    /** @inheritDoc */
+    public function shutdown(): bool
+    {
+        if (!$this->running) {
+            return true;
+        }
+
+        $this->running = false;
+        if (null !== $this->exporter) {
+            return $this->forceFlush() && $this->exporter->shutdown();
+        }
+
+        return true;
     }
 
     protected function bufferReachedExportLimit(): bool
@@ -111,17 +130,5 @@ class BatchSpanProcessor implements SpanProcessorInterface
         }
 
         return $this->scheduledDelayMillis < ($now - $this->lastExportTimestamp);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shutdown(): void
-    {
-        $this->running = false;
-        if (null !== $this->exporter) {
-            $this->forceFlush();
-            $this->exporter->shutdown();
-        }
     }
 }

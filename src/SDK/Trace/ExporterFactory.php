@@ -8,7 +8,6 @@ use Exception;
 use Nyholm\Dsn\DsnParser;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Newrelic\Exporter as NewrelicExporter;
-use OpenTelemetry\Contrib\Otlp\Exporter as OtlpExporter;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OtlpGrpcExporter;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter as OtlpHttpExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
@@ -61,11 +60,15 @@ class ExporterFactory
             case 'newrelic':
                 return NewrelicExporter::fromConnectionString($endpointUrl, $this->name, $args['licenseKey'] ?? null);
             case 'otlp':
-                return OtlpExporter::fromConnectionString('', $this->name, $scheme);
-            case 'otlpgrpc':
-                return OtlpGrpcExporter::fromConnectionString();
-            case 'otlphttp':
-                return OtlpHttpExporter::fromConnectionString();
+                switch ($scheme) {
+                case 'grpc':
+                    return OtlpGrpcExporter::fromConnectionString($endpointUrl);
+                case 'http':
+                    return OtlpHttpExporter::fromConnectionString($endpointUrl);
+                default:
+                    throw new Exception('Invalid otlp scheme');
+                }
+                // no break
             case 'zipkintonewrelic':
                 return ZipkinToNewrelicExporter::fromConnectionString($endpointUrl, $this->name, $args['licenseKey'] ?? null);
             default:
