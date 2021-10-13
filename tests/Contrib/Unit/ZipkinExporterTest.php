@@ -41,14 +41,14 @@ class ZipkinExporterTest extends TestCase
     public function exporterResponseStatusesDataProvider()
     {
         return [
-            'ok'                => [200, Exporter::SUCCESS],
-            'not found'         => [404, Exporter::FAILED_NOT_RETRYABLE],
-            'not authorized'    => [401, Exporter::FAILED_NOT_RETRYABLE],
-            'bad request'       => [402, Exporter::FAILED_NOT_RETRYABLE],
-            'too many requests' => [429, Exporter::FAILED_NOT_RETRYABLE],
-            'server error'      => [500, Exporter::FAILED_RETRYABLE],
-            'timeout'           => [503, Exporter::FAILED_RETRYABLE],
-            'bad gateway'       => [502, Exporter::FAILED_RETRYABLE],
+            'ok'                => [200, Exporter::STATUS_SUCCESS],
+            'not found'         => [404, Exporter::STATUS_FAILED_NOT_RETRYABLE],
+            'not authorized'    => [401, Exporter::STATUS_FAILED_NOT_RETRYABLE],
+            'bad request'       => [402, Exporter::STATUS_FAILED_NOT_RETRYABLE],
+            'too many requests' => [429, Exporter::STATUS_FAILED_NOT_RETRYABLE],
+            'server error'      => [500, Exporter::STATUS_FAILED_RETRYABLE],
+            'timeout'           => [503, Exporter::STATUS_FAILED_RETRYABLE],
+            'bad gateway'       => [502, Exporter::STATUS_FAILED_RETRYABLE],
         ];
     }
 
@@ -74,15 +74,15 @@ class ZipkinExporterTest extends TestCase
         return [
             'client'    => [
                 self::createMock(ClientExceptionInterface::class),
-                Exporter::FAILED_RETRYABLE,
+                Exporter::STATUS_FAILED_RETRYABLE,
             ],
             'network'   => [
                 self::createMock(NetworkExceptionInterface::class),
-                Exporter::FAILED_RETRYABLE,
+                Exporter::STATUS_FAILED_RETRYABLE,
             ],
             'request'   => [
                 self::createMock(RequestExceptionInterface::class),
-                Exporter::FAILED_NOT_RETRYABLE,
+                Exporter::STATUS_FAILED_NOT_RETRYABLE,
             ],
         ];
     }
@@ -93,7 +93,7 @@ class ZipkinExporterTest extends TestCase
     public function shouldBeOkToExporterEmptySpansCollection()
     {
         $this->assertEquals(
-            Exporter::SUCCESS,
+            Exporter::STATUS_SUCCESS,
             (new Exporter('test.zipkin', 'scheme://host:123/path', new Client(), new HttpFactory(), new HttpFactory()))->export([])
         );
     }
@@ -131,6 +131,19 @@ class ZipkinExporterTest extends TestCase
         $span = $this->createMock(SpanData::class);
         $exporter->shutdown();
 
-        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
+        $this->assertSame(Exporter::STATUS_FAILED_NOT_RETRYABLE, $exporter->export([$span]));
+    }
+
+    public function test_shutdown(): void
+    {
+        $exporter = new Exporter('test.jaeger', 'scheme://host:123/path', new Client(), new HttpFactory(), new HttpFactory());
+
+        $this->assertTrue($exporter->shutdown());
+        $this->assertFalse($exporter->shutdown());
+    }
+
+    public function test_forceFlush(): void
+    {
+        $this->assertTrue((new Exporter('test.jaeger', 'scheme://host:123/path', new Client(), new HttpFactory(), new HttpFactory()))->forceFlush());
     }
 }

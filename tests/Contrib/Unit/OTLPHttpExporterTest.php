@@ -56,14 +56,14 @@ class OTLPHttpExporterTest extends TestCase
     public function exporterResponseStatusesDataProvider()
     {
         return [
-            'ok'                => [200, Exporter::SUCCESS],
-            'not found'         => [404, Exporter::FAILED_NOT_RETRYABLE],
-            'not authorized'    => [401, Exporter::FAILED_NOT_RETRYABLE],
-            'bad request'       => [402, Exporter::FAILED_NOT_RETRYABLE],
-            'too many requests' => [429, Exporter::FAILED_NOT_RETRYABLE],
-            'server error'      => [500, Exporter::FAILED_RETRYABLE],
-            'timeout'           => [503, Exporter::FAILED_RETRYABLE],
-            'bad gateway'       => [502, Exporter::FAILED_RETRYABLE],
+            'ok'                => [200, Exporter::STATUS_SUCCESS],
+            'not found'         => [404, Exporter::STATUS_FAILED_NOT_RETRYABLE],
+            'not authorized'    => [401, Exporter::STATUS_FAILED_NOT_RETRYABLE],
+            'bad request'       => [402, Exporter::STATUS_FAILED_NOT_RETRYABLE],
+            'too many requests' => [429, Exporter::STATUS_FAILED_NOT_RETRYABLE],
+            'server error'      => [500, Exporter::STATUS_FAILED_RETRYABLE],
+            'timeout'           => [503, Exporter::STATUS_FAILED_RETRYABLE],
+            'bad gateway'       => [502, Exporter::STATUS_FAILED_RETRYABLE],
         ];
     }
 
@@ -90,11 +90,11 @@ class OTLPHttpExporterTest extends TestCase
         return [
             'client'    => [
                 $this->createMock(ClientExceptionInterface::class),
-                Exporter::FAILED_RETRYABLE,
+                Exporter::STATUS_FAILED_RETRYABLE,
             ],
             'network'   => [
                 $this->createMock(NetworkExceptionInterface::class),
-                Exporter::FAILED_RETRYABLE,
+                Exporter::STATUS_FAILED_RETRYABLE,
             ],
         ];
     }
@@ -191,7 +191,7 @@ class OTLPHttpExporterTest extends TestCase
     public function shouldBeOkToExporterEmptySpansCollection()
     {
         $this->assertEquals(
-            Exporter::SUCCESS,
+            Exporter::STATUS_SUCCESS,
             (new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->export([])
         );
     }
@@ -204,7 +204,7 @@ class OTLPHttpExporterTest extends TestCase
         $span = $this->createMock(SpanData::class);
         $exporter->shutdown();
 
-        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
+        $this->assertSame(Exporter::STATUS_FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 
     /**
@@ -229,5 +229,18 @@ class OTLPHttpExporterTest extends TestCase
 
         $this->expectException(\InvalidArgumentException::class);
         $exporter = new Exporter(new Client(), new HttpFactory(), new HttpFactory());
+    }
+
+    public function test_shutdown(): void
+    {
+        $exporter = new Exporter(new Client(), new HttpFactory(), new HttpFactory());
+
+        $this->assertTrue($exporter->shutdown());
+        $this->assertFalse($exporter->shutdown());
+    }
+
+    public function test_forceFlush(): void
+    {
+        $this->assertTrue((new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->forceFlush());
     }
 }

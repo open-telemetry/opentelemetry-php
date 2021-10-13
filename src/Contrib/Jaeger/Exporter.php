@@ -10,6 +10,7 @@ use OpenTelemetry\Contrib\Zipkin;
 
 class Exporter extends Zipkin\Exporter
 {
+    /** @inheritDoc */
     public static function fromConnectionString(string $endpointUrl, string $name, $args = null)
     {
         $factory = new HttpFactory();
