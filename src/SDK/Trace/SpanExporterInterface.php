@@ -23,7 +23,7 @@ interface SpanExporterInterface
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#exportbatch
      *
-     * @return SpanExporterInterface::STATUS_*
+     * @psalm-return SpanExporterInterface::STATUS_*
      */
     public function export(iterable $spans): int;
 

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use Grpc\UnaryCall;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 use InvalidArgumentException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
