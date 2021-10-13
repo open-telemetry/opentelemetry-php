@@ -37,7 +37,7 @@ class OTLPGrpcExporterTest extends MockeryTestCase
 
         $exporterStatusCode = $exporter->export([new SpanData()]);
 
-        $this->assertSame(Exporter::SUCCESS, $exporterStatusCode);
+        $this->assertSame(Exporter::STATUS_SUCCESS, $exporterStatusCode);
     }
 
     public function testExporterUnexpectedGrpcResponseStatus()
@@ -62,12 +62,12 @@ class OTLPGrpcExporterTest extends MockeryTestCase
 
         $exporterStatusCode = $exporter->export([new SpanData()]);
 
-        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporterStatusCode);
+        $this->assertSame(Exporter::STATUS_FAILED_NOT_RETRYABLE, $exporterStatusCode);
     }
 
     public function testExporterGrpcRespondsAsUnavailable()
     {
-        $this->assertEquals(Exporter::FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
+        $this->assertEquals(Exporter::STATUS_FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
     }
 
     public function testRefusesInvalidHeaders()
@@ -107,7 +107,7 @@ class OTLPGrpcExporterTest extends MockeryTestCase
     public function shouldBeOkToExporterEmptySpansCollection()
     {
         $this->assertEquals(
-            Exporter::SUCCESS,
+            Exporter::STATUS_SUCCESS,
             (new Exporter('test.otlp'))->export([])
         );
     }
@@ -120,7 +120,7 @@ class OTLPGrpcExporterTest extends MockeryTestCase
         $span = $this->createMock(SpanData::class);
         $exporter->shutdown();
 
-        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
+        $this->assertSame(Exporter::STATUS_FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 
     public function testHeadersShouldRefuseArray()
@@ -178,6 +178,16 @@ class OTLPGrpcExporterTest extends MockeryTestCase
         putenv('OTEL_EXPORTER_OTLP_TIMEOUT');
         putenv('OTEL_EXPORTER_OTLP_COMPRESSION');
         putenv('OTEL_EXPORTER_OTLP_INSECURE');
+    }
+
+    public function test_shutdown(): void
+    {
+        $this->assertTrue((new Exporter('localhost:4317'))->shutdown());
+    }
+
+    public function test_forceFlush(): void
+    {
+        $this->assertTrue((new Exporter('localhost:4317'))->forceFlush());
     }
 
     private function createMockTraceServiceClient(array $options = [])

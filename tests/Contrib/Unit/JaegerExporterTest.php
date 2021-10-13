@@ -13,6 +13,16 @@ use PHPUnit\Framework\TestCase;
 
 class JaegerExporterTest extends TestCase
 {
+    public function test_shutdown(): void
+    {
+        $this->assertTrue((new Exporter('test.jaeger', 'https://localhost:1234/foo', new Client(), new HttpFactory(), new HttpFactory()))->shutdown());
+    }
+
+    public function test_forceFlush(): void
+    {
+        $this->assertTrue((new Exporter('test.jaeger', 'https://localhost:1234/foo', new Client(), new HttpFactory(), new HttpFactory()))->forceFlush());
+    }
+
     /**
      * @test
      * @dataProvider invalidDsnDataProvider
@@ -54,6 +64,6 @@ class JaegerExporterTest extends TestCase
         $span = $this->createMock(SpanData::class);
         $exporter->shutdown();
 
-        $this->assertSame(Exporter::FAILED_NOT_RETRYABLE, $exporter->export([$span]));
+        $this->assertSame(Exporter::STATUS_FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 }

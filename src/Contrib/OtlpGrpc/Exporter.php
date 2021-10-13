@@ -126,11 +126,11 @@ class Exporter implements Trace\SpanExporterInterface
     public function export(iterable $spans): int
     {
         if (!$this->running) {
-            return Trace\SpanExporterInterface::FAILED_NOT_RETRYABLE;
+            return self::STATUS_FAILED_NOT_RETRYABLE;
         }
 
         if (empty($spans)) {
-            return Trace\SpanExporterInterface::SUCCESS;
+            return self::STATUS_SUCCESS;
         }
 
         $resourcespans = [$this->spanConverter->as_otlp_resource_span($spans)];
@@ -142,7 +142,7 @@ class Exporter implements Trace\SpanExporterInterface
         [$response, $status] = $this->client->Export($request)->wait();
 
         if ($status->code === \Grpc\STATUS_OK) {
-            return Trace\SpanExporterInterface::SUCCESS;
+            return self::STATUS_SUCCESS;
         }
 
         if (in_array($status->code, [
@@ -155,11 +155,11 @@ class Exporter implements Trace\SpanExporterInterface
             \Grpc\STATUS_UNAVAILABLE,
             \Grpc\STATUS_DATA_LOSS,
             \Grpc\STATUS_UNAUTHENTICATED,
-        ])) {
-            return Trace\SpanExporterInterface::FAILED_RETRYABLE;
+        ], true)) {
+            return self::STATUS_FAILED_RETRYABLE;
         }
 
-        return Trace\SpanExporterInterface::FAILED_NOT_RETRYABLE;
+        return self::STATUS_FAILED_NOT_RETRYABLE;
     }
 
     public function setHeader($key, $value)
@@ -196,6 +196,7 @@ class Exporter implements Trace\SpanExporterInterface
         return $metadata;
     }
 
+    /** @inheritDoc */
     public function shutdown(): bool
     {
         $this->running = false;
@@ -203,12 +204,15 @@ class Exporter implements Trace\SpanExporterInterface
         return true;
     }
 
+    /** @inheritDoc */
+    public function forceFlush(): bool
+    {
+        return true;
+    }
+
+    /** @inheritDoc */
     public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
     {
         return new Exporter();
     }
-    // public function getHeaders()
-    // {
-    //     return $this->metadataFromHeaders($this->headers);
-    // }
 }

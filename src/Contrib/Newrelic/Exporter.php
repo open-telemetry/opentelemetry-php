@@ -108,11 +108,11 @@ class Exporter implements Trace\SpanExporterInterface
     public function export(iterable $spans): int
     {
         if (!$this->running) {
-            return Trace\SpanExporterInterface::FAILED_NOT_RETRYABLE;
+            return self::STATUS_FAILED_NOT_RETRYABLE;
         }
 
         if (empty($spans)) {
-            return Trace\SpanExporterInterface::SUCCESS;
+            return self::STATUS_SUCCESS;
         }
 
         $convertedSpans = [];
@@ -136,22 +136,23 @@ class Exporter implements Trace\SpanExporterInterface
 
             $response = $this->client->sendRequest($request);
         } catch (RequestExceptionInterface $e) {
-            return Trace\SpanExporterInterface::FAILED_NOT_RETRYABLE;
+            return self::STATUS_FAILED_NOT_RETRYABLE;
         } catch (NetworkExceptionInterface | ClientExceptionInterface $e) {
-            return Trace\SpanExporterInterface::FAILED_RETRYABLE;
+            return self::STATUS_FAILED_RETRYABLE;
         }
 
         if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
-            return Trace\SpanExporterInterface::FAILED_NOT_RETRYABLE;
+            return self::STATUS_FAILED_NOT_RETRYABLE;
         }
 
         if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
-            return Trace\SpanExporterInterface::FAILED_RETRYABLE;
+            return self::STATUS_FAILED_RETRYABLE;
         }
 
-        return Trace\SpanExporterInterface::SUCCESS;
+        return self::STATUS_SUCCESS;
     }
 
+    /** @inheritDoc */
     public function shutdown(): bool
     {
         $this->running = false;
@@ -159,6 +160,13 @@ class Exporter implements Trace\SpanExporterInterface
         return true;
     }
 
+    /** @inheritDoc */
+    public function forceFlush(): bool
+    {
+        return true;
+    }
+
+    /** @inheritDoc */
     public static function fromConnectionString(string $endpointUrl, string $name, $args)
     {
         if ($args == false) {
