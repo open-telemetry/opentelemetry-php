@@ -233,10 +233,7 @@ class OTLPHttpExporterTest extends TestCase
 
     public function test_shutdown(): void
     {
-        $exporter = new Exporter(new Client(), new HttpFactory(), new HttpFactory());
-
-        $this->assertTrue($exporter->shutdown());
-        $this->assertFalse($exporter->shutdown());
+        $this->assertTrue((new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->shutdown());
     }
 
     public function test_forceFlush(): void

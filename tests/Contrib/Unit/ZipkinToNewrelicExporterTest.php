@@ -134,10 +134,7 @@ class ZipkinToNewrelicExporterTest extends TestCase
 
     public function test_shutdown(): void
     {
-        $exporter = new Exporter('test.zipkinToNr', 'scheme://host/path', '', new Client(), new HttpFactory(), new HttpFactory());
-
-        $this->assertTrue($exporter->shutdown());
-        $this->assertFalse($exporter->shutdown());
+        $this->assertTrue((new Exporter('test.zipkinToNr', 'scheme://host/path', '', new Client(), new HttpFactory(), new HttpFactory()))->shutdown());
     }
 
     public function test_forceFlush(): void

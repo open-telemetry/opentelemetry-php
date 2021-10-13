@@ -206,10 +206,6 @@ class Exporter implements Trace\SpanExporterInterface
     /** @inheritDoc */
     public function shutdown(): bool
     {
-        if (!$this->running) {
-            return false;
-        }
-
         $this->running = false;
 
         return true;

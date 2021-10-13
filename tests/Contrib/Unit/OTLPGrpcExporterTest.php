@@ -182,10 +182,7 @@ class OTLPGrpcExporterTest extends MockeryTestCase
 
     public function test_shutdown(): void
     {
-        $exporter = new Exporter('localhost:4317');
-
-        $this->assertTrue($exporter->shutdown());
-        $this->assertFalse($exporter->shutdown());
+        $this->assertTrue((new Exporter('localhost:4317'))->shutdown());
     }
 
     public function test_forceFlush(): void

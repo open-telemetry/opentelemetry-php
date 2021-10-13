@@ -101,7 +101,7 @@ class Exporter implements Trace\SpanExporterInterface
     public function export(iterable $spans): int
     {
         if (!$this->running) {
-            return Exporter::STATUS_FAILED_NOT_RETRYABLE;
+            return self::STATUS_FAILED_NOT_RETRYABLE;
         }
 
         if (empty($spans)) {
@@ -144,10 +144,6 @@ class Exporter implements Trace\SpanExporterInterface
     /** @inheritDoc */
     public function shutdown(): bool
     {
-        if (!$this->running) {
-            return false;
-        }
-
         $this->running = false;
 
         return true;
