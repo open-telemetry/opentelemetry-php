@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\Contrib\Newrelic;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\Options;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Usage:
@@ -68,13 +70,13 @@ class Factory
 
     public function configureOptions(array $options = [])
     {
-        foreach (Factory::getOptions() as $option){
+        foreach (Factory::getOptions() as $option) {
             $this->resolver->define($option);
         }
         $this->resolver->setDefaults(array_merge([
-            Factory::OPT_CLIENT  => fn(Options $options) => HttpClientDiscovery::find(),
-            Factory::OPT_REQUEST_FACTORY => fn(Options $options) => Psr17FactoryDiscovery::findRequestFactory(),
-            Factory::OPT_STREAM_FACTORY => fn(Options $options) => Psr17FactoryDiscovery::findStreamFactory(),
+            Factory::OPT_CLIENT  => fn (Options $options) => HttpClientDiscovery::find(),
+            Factory::OPT_REQUEST_FACTORY => fn (Options $options) => Psr17FactoryDiscovery::findRequestFactory(),
+            Factory::OPT_STREAM_FACTORY => fn (Options $options) => Psr17FactoryDiscovery::findStreamFactory(),
             Factory::OPT_SPAN_CONVERTER => null,
         ], $options));
         $this->resolver->setRequired(Factory::REQUIRED_OPTIONS);
@@ -90,4 +92,3 @@ class Factory
         return Factory::REQUIRED_OPTIONS;
     }
 }
-
