@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
+use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
@@ -20,6 +21,10 @@ class ZipkinSpanConverterTest extends TestCase
     {
         $span = (new SpanData())
             ->setName('guard.validate')
+            ->setInstrumentationLibrary(new InstrumentationLibrary(
+                'instrumentation_library_name',
+                'instrumentation_library_version'
+            ))
             ->addAttribute('service', 'guard')
             ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
@@ -37,6 +42,9 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame(5271717, $row['duration']);
 
         $this->assertCount(3, $row['tags']);
+
+        $this->assertSame('instrumentation_library_name', $row['otel.library.name']);
+        $this->assertSame('instrumentation_library_version', $row['otel.library.version']);
 
         /** @var Attribute $attribute */
         $attribute = $span->getAttributes()->getAttribute('service');
