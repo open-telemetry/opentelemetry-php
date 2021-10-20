@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
+use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
@@ -53,6 +54,7 @@ class SpanConverter
 
         $row = [
             'id' => $span->getSpanId(),
+            'kind' => SpanConverter::toSpanKind($span),
             'traceId' => $span->getTraceId(),
             'parentId' => $spanParent->isValid() ? $spanParent->getSpanId() : null,
             'localEndpoint' => [
@@ -82,5 +84,23 @@ class SpanConverter
         }
 
         return $row;
+    }
+
+    private static function toSpanKind(SpanDataInterface $span): ?int
+    {
+        switch ($span->getKind()) {
+          case SpanKind::KIND_SERVER:
+            return SpanKind::KIND_SERVER;
+          case SpanKind::KIND_CLIENT:
+            return SpanKind::KIND_CLIENT;
+          case SpanKind::KIND_PRODUCER:
+            return SpanKind::KIND_PRODUCER;
+          case SpanKind::KIND_CONSUMER:
+            return SpanKind::KIND_CONSUMER;
+          case SpanKind::KIND_INTERNAL:
+            return null;
+        }
+        
+        return null;
     }
 }

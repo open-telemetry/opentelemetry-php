@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
 use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\Attributes;
@@ -45,6 +46,90 @@ class ZipkinSpanConverterTest extends TestCase
         [$annotation] = $row['annotations'];
         $this->assertSame('validators.list', $annotation['value']);
         $this->assertSame(1505855799433901, $annotation['timestamp']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnOTELServerSpanToAZipkinServerSpan()
+    {
+        $span = (new SpanData())
+            ->setKind(SpanKind::KIND_SERVER);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertSame(SpanKind::KIND_SERVER, $row['kind']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnOTELClientSpanToAZipkinClientSpan()
+    {
+        $span = (new SpanData())
+            ->setKind(SpanKind::KIND_CLIENT);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertSame(SpanKind::KIND_CLIENT, $row['kind']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnOTELProducerSpanToAZipkinProducerSpan()
+    {
+        $span = (new SpanData())
+            ->setKind(SpanKind::KIND_PRODUCER);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertSame(SpanKind::KIND_PRODUCER, $row['kind']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnOTELConsumerSpanToAZipkinConsumerSpan()
+    {
+        $span = (new SpanData())
+            ->setKind(SpanKind::KIND_CONSUMER);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertSame(SpanKind::KIND_CONSUMER, $row['kind']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnOTELInternalSpanToAZipkinSpanOfUnspecifiedKind()
+    {
+        $span = (new SpanData())
+            ->setKind(SpanKind::KIND_INTERNAL);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertNull($row['kind']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnOTELSpanOfUnknownKindToAZipkinSpanOfUnspecifiedKind()
+    {
+        $span = (new SpanData())
+            ->setKind(12345); //Some number not in the SpanKind "enum"
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertNull($row['kind']);
     }
 
     /**
