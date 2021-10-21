@@ -107,6 +107,10 @@ class SpanConverter
             ];
         }
 
+        if (empty($row['tags'])) {
+            unset($row['tags']);
+        }
+
         return $row;
     }
 

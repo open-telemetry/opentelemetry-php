@@ -78,6 +78,23 @@ class ZipkinSpanConverterTest extends TestCase
     /**
      * @test
      */
+    public function shouldOmitEmptyKeysFromZipkinSpan()
+    {
+        $span = (new SpanData());
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertArrayNotHasKey('kind', $row);
+        $this->assertArrayNotHasKey('parentId', $row);
+        $this->assertArrayNotHasKey('tags', $row);
+        $this->assertArrayNotHasKey('otel.library.name', $row);
+        $this->assertArrayNotHasKey('otel.library.version', $row);
+    }
+
+    /**
+     * @test
+     */
     public function shouldConvertAnOTELServerSpanToAZipkinServerSpan()
     {
         $span = (new SpanData())
