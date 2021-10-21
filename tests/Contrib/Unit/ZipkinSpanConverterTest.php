@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
@@ -21,6 +23,12 @@ class ZipkinSpanConverterTest extends TestCase
     {
         $span = (new SpanData())
             ->setName('guard.validate')
+            ->setStatus(
+                new StatusData(
+                    StatusCode::STATUS_ERROR,
+                    'status_description'
+                )
+            )
             ->setInstrumentationLibrary(new InstrumentationLibrary(
                 'instrumentation_library_name',
                 'instrumentation_library_version'
@@ -42,6 +50,9 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame(5271717, $row['duration']);
 
         $this->assertCount(3, $row['tags']);
+
+        $this->assertSame('Error', $row['tags']['otel.status_code']);
+        $this->assertSame('status_description', $row['tags']['error']);
 
         $this->assertSame('instrumentation_library_name', $row['otel.library.name']);
         $this->assertSame('instrumentation_library_version', $row['otel.library.version']);
@@ -166,7 +177,7 @@ class ZipkinSpanConverterTest extends TestCase
         $tags = (new SpanConverter('tags.test'))->convert($span)['tags'];
 
         // Check that we can convert all attributes to tags
-        $this->assertCount(12, $tags);
+        $this->assertCount(10, $tags);
 
         // Tags destined for Zipkin must be pairs of strings
         foreach ($tags as $tagKey => $tagValue) {

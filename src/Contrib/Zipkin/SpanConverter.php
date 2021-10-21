@@ -6,13 +6,14 @@ namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
 class SpanConverter
 {
-    const STATUS_CODE_TAG_KEY = 'op.status_code';
-    const STATUS_DESCRIPTION_TAG_KEY = 'op.status_description';
+    const STATUS_CODE_TAG_KEY = 'otel.status_code';
+    const STATUS_DESCRIPTION_TAG_KEY = 'error';
     const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
     const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
 
@@ -66,11 +67,16 @@ class SpanConverter
             'name' => $span->getName(),
             'timestamp' => $startTimestamp,
             'duration' => max(1, $endTimestamp - $startTimestamp),
-            'tags' => [
-                self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
-                self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
-            ],
+            'tags' => [],
         ];
+
+        if ($span->getStatus()->getCode() !== StatusCode::STATUS_UNSET) {
+            $row['tags'][self::STATUS_CODE_TAG_KEY] = $span->getStatus()->getCode();
+        }
+
+        if ($span->getStatus()->getCode() === StatusCode::STATUS_ERROR) {
+            $row['tags'][self::STATUS_DESCRIPTION_TAG_KEY] = $span->getStatus()->getDescription();
+        }
 
         if (!empty($span->getInstrumentationLibrary()->getName())) {
             $row[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_NAME] = $span->getInstrumentationLibrary()->getName();
