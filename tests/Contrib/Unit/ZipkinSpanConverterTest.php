@@ -50,7 +50,7 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame($span->getContext()->getSpanId(), $row['id']);
         $this->assertSame($span->getContext()->getTraceId(), $row['traceId']);
         $this->assertSame('1000000000000000', $row['parentId']);
-        
+
         $this->assertSame('test.name', $row['localEndpoint']['serviceName']);
         $this->assertSame($span->getName(), $row['name']);
 
@@ -142,7 +142,7 @@ class ZipkinSpanConverterTest extends TestCase
         $converter = new SpanConverter('unused');
         $row = $converter->convert($span);
 
-        $this->assertNull($row['kind']);
+        $this->assertArrayNotHasKey('kind', $row);
     }
 
     /**
@@ -156,7 +156,7 @@ class ZipkinSpanConverterTest extends TestCase
         $converter = new SpanConverter('unused');
         $row = $converter->convert($span);
 
-        $this->assertNull($row['kind']);
+        $this->assertArrayNotHasKey('kind', $row);
     }
 
     /**

@@ -58,7 +58,6 @@ class SpanConverter
 
         $row = [
             'id' => $span->getSpanId(),
-            'kind' => SpanConverter::toSpanKind($span),
             'traceId' => $span->getTraceId(),
             'localEndpoint' => [
                 'serviceName' => $this->serviceName,
@@ -68,6 +67,11 @@ class SpanConverter
             'duration' => max(1, $endTimestamp - $startTimestamp),
             'tags' => [],
         ];
+
+        $convertedKind = SpanConverter::toSpanKind($span);
+        if ($convertedKind != null) {
+            $row['kind'] = $convertedKind;
+        }
 
         if ($spanParent->isValid()) {
             $row['parentId'] = $spanParent->getSpanId();
