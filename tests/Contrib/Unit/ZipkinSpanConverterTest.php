@@ -10,6 +10,7 @@ use OpenTelemetry\Contrib\Zipkin\SpanConverter;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
@@ -23,6 +24,12 @@ class ZipkinSpanConverterTest extends TestCase
     {
         $span = (new SpanData())
             ->setName('guard.validate')
+            ->setParentContext(
+                SpanContext::create(
+                    '10000000000000000000000000000000',
+                    '1000000000000000'
+                )
+            )
             ->setStatus(
                 new StatusData(
                     StatusCode::STATUS_ERROR,
@@ -42,7 +49,8 @@ class ZipkinSpanConverterTest extends TestCase
 
         $this->assertSame($span->getContext()->getSpanId(), $row['id']);
         $this->assertSame($span->getContext()->getTraceId(), $row['traceId']);
-
+        $this->assertSame('1000000000000000', $row['parentId']);
+        
         $this->assertSame('test.name', $row['localEndpoint']['serviceName']);
         $this->assertSame($span->getName(), $row['name']);
 
