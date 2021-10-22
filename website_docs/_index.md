@@ -1,8 +1,12 @@
 ---
-title: "PHP"
+title: PHP
+description: A language-specific implementation of OpenTelemetry in PHP.
+cascade:
+  github_repo: &repo https://github.com/open-telemetry/opentelemetry-php
+  github_subdir: website_docs
+  path_base_for_github_subdir: content/en/docs/php/
+  github_project_repo: *repo
 weight: 21
-description: >
-  A language-specific implementation of OpenTelemetry in PHP.
 ---
 
 This is the OpenTelemetry for PHP documentation. OpenTelemetry is an
