@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
+use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
 class SpanConverter
 {
-    const STATUS_CODE_TAG_KEY = 'op.status_code';
-    const STATUS_DESCRIPTION_TAG_KEY = 'op.status_description';
+    const STATUS_CODE_TAG_KEY = 'otel.status_code';
+    const STATUS_DESCRIPTION_TAG_KEY = 'error';
+    const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
+    const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
+
     /**
      * @var string
      */
@@ -54,18 +59,39 @@ class SpanConverter
         $row = [
             'id' => $span->getSpanId(),
             'traceId' => $span->getTraceId(),
-            'parentId' => $spanParent->isValid() ? $spanParent->getSpanId() : null,
             'localEndpoint' => [
                 'serviceName' => $this->serviceName,
             ],
             'name' => $span->getName(),
             'timestamp' => $startTimestamp,
             'duration' => max(1, $endTimestamp - $startTimestamp),
-            'tags' => [
-                self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
-                self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
-            ],
+            'tags' => [],
         ];
+
+        $convertedKind = SpanConverter::toSpanKind($span);
+        if ($convertedKind != null) {
+            $row['kind'] = $convertedKind;
+        }
+
+        if ($spanParent->isValid()) {
+            $row['parentId'] = $spanParent->getSpanId();
+        }
+
+        if ($span->getStatus()->getCode() !== StatusCode::STATUS_UNSET) {
+            $row['tags'][self::STATUS_CODE_TAG_KEY] = $span->getStatus()->getCode();
+        }
+
+        if ($span->getStatus()->getCode() === StatusCode::STATUS_ERROR) {
+            $row['tags'][self::STATUS_DESCRIPTION_TAG_KEY] = $span->getStatus()->getDescription();
+        }
+
+        if (!empty($span->getInstrumentationLibrary()->getName())) {
+            $row[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_NAME] = $span->getInstrumentationLibrary()->getName();
+        }
+
+        if ($span->getInstrumentationLibrary()->getVersion() !== null) {
+            $row[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_VERSION] = $span->getInstrumentationLibrary()->getVersion();
+        }
 
         foreach ($span->getAttributes() as $k => $v) {
             $row['tags'][$k] = $this->sanitiseTagValue($v->getValue());
@@ -81,6 +107,28 @@ class SpanConverter
             ];
         }
 
+        if (empty($row['tags'])) {
+            unset($row['tags']);
+        }
+
         return $row;
+    }
+
+    private static function toSpanKind(SpanDataInterface $span): ?int
+    {
+        switch ($span->getKind()) {
+          case SpanKind::KIND_SERVER:
+            return SpanKind::KIND_SERVER;
+          case SpanKind::KIND_CLIENT:
+            return SpanKind::KIND_CLIENT;
+          case SpanKind::KIND_PRODUCER:
+            return SpanKind::KIND_PRODUCER;
+          case SpanKind::KIND_CONSUMER:
+            return SpanKind::KIND_CONSUMER;
+          case SpanKind::KIND_INTERNAL:
+            return null;
+        }
+        
+        return null;
     }
 }

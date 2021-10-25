@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
+use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Trace\SpanContext;
+use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
@@ -19,6 +24,22 @@ class ZipkinSpanConverterTest extends TestCase
     {
         $span = (new SpanData())
             ->setName('guard.validate')
+            ->setParentContext(
+                SpanContext::create(
+                    '10000000000000000000000000000000',
+                    '1000000000000000'
+                )
+            )
+            ->setStatus(
+                new StatusData(
+                    StatusCode::STATUS_ERROR,
+                    'status_description'
+                )
+            )
+            ->setInstrumentationLibrary(new InstrumentationLibrary(
+                'instrumentation_library_name',
+                'instrumentation_library_version'
+            ))
             ->addAttribute('service', 'guard')
             ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
@@ -28,6 +49,7 @@ class ZipkinSpanConverterTest extends TestCase
 
         $this->assertSame($span->getContext()->getSpanId(), $row['id']);
         $this->assertSame($span->getContext()->getTraceId(), $row['traceId']);
+        $this->assertSame('1000000000000000', $row['parentId']);
 
         $this->assertSame('test.name', $row['localEndpoint']['serviceName']);
         $this->assertSame($span->getName(), $row['name']);
@@ -37,6 +59,12 @@ class ZipkinSpanConverterTest extends TestCase
 
         $this->assertCount(3, $row['tags']);
 
+        $this->assertSame('Error', $row['tags']['otel.status_code']);
+        $this->assertSame('status_description', $row['tags']['error']);
+
+        $this->assertSame('instrumentation_library_name', $row['otel.library.name']);
+        $this->assertSame('instrumentation_library_version', $row['otel.library.version']);
+
         /** @var Attribute $attribute */
         $attribute = $span->getAttributes()->getAttribute('service');
         $this->assertSame($attribute->getValue(), $row['tags']['service']);
@@ -45,6 +73,107 @@ class ZipkinSpanConverterTest extends TestCase
         [$annotation] = $row['annotations'];
         $this->assertSame('validators.list', $annotation['value']);
         $this->assertSame(1505855799433901, $annotation['timestamp']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldOmitEmptyKeysFromZipkinSpan()
+    {
+        $span = (new SpanData());
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertArrayNotHasKey('kind', $row);
+        $this->assertArrayNotHasKey('parentId', $row);
+        $this->assertArrayNotHasKey('tags', $row);
+        $this->assertArrayNotHasKey('otel.library.name', $row);
+        $this->assertArrayNotHasKey('otel.library.version', $row);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnOTELServerSpanToAZipkinServerSpan()
+    {
+        $span = (new SpanData())
+            ->setKind(SpanKind::KIND_SERVER);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertSame(SpanKind::KIND_SERVER, $row['kind']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnOTELClientSpanToAZipkinClientSpan()
+    {
+        $span = (new SpanData())
+            ->setKind(SpanKind::KIND_CLIENT);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertSame(SpanKind::KIND_CLIENT, $row['kind']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnOTELProducerSpanToAZipkinProducerSpan()
+    {
+        $span = (new SpanData())
+            ->setKind(SpanKind::KIND_PRODUCER);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertSame(SpanKind::KIND_PRODUCER, $row['kind']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnOTELConsumerSpanToAZipkinConsumerSpan()
+    {
+        $span = (new SpanData())
+            ->setKind(SpanKind::KIND_CONSUMER);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertSame(SpanKind::KIND_CONSUMER, $row['kind']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnOTELInternalSpanToAZipkinSpanOfUnspecifiedKind()
+    {
+        $span = (new SpanData())
+            ->setKind(SpanKind::KIND_INTERNAL);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertArrayNotHasKey('kind', $row);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnOTELSpanOfUnknownKindToAZipkinSpanOfUnspecifiedKind()
+    {
+        $span = (new SpanData())
+            ->setKind(12345); //Some number not in the SpanKind "enum"
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertArrayNotHasKey('kind', $row);
     }
 
     /**
@@ -73,7 +202,7 @@ class ZipkinSpanConverterTest extends TestCase
         $tags = (new SpanConverter('tags.test'))->convert($span)['tags'];
 
         // Check that we can convert all attributes to tags
-        $this->assertCount(12, $tags);
+        $this->assertCount(10, $tags);
 
         // Tags destined for Zipkin must be pairs of strings
         foreach ($tags as $tagKey => $tagValue) {
