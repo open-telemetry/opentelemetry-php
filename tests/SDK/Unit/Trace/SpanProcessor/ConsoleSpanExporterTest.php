@@ -4,23 +4,19 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Unit\Trace\SpanProcessor;
 
-
-use PHPUnit\Framework\TestCase;
-use OpenTelemetry\SDK\Trace\SpanProcessor\ConsoleSpanExporter;
-use OpenTelemetry\Tests\SDK\Util\SpanData;
-use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\API\Trace\StatusCode;
+use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\SpanContext;
-use Opentelemetry\SDK\InstrumentationLibrary;
-
+use OpenTelemetry\SDK\Trace\SpanProcessor\ConsoleSpanExporter;
+use OpenTelemetry\SDK\Trace\StatusData;
+use OpenTelemetry\Tests\SDK\Util\SpanData;
+use PHPUnit\Framework\TestCase;
 
 class ConsoleSpanExporterTest extends TestCase
 {
-
     public function testConsoleExporterWorks()
     {
-
         $span = (new SpanData())
         ->setName('my.service')
         ->setParentContext(
@@ -45,7 +41,6 @@ class ConsoleSpanExporterTest extends TestCase
 
         $exp = new ConsoleSpanExporter();
         $exp->export([$span]);
-
 
         $expected = <<<EOF
         {

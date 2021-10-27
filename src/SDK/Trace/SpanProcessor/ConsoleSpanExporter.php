@@ -6,17 +6,17 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\SDK\Trace;
-use \ReflectionClass;
+use ReflectionClass;
 
 class ConsoleSpanExporter implements Trace\SpanExporterInterface
 {
     private $running = true;
 
     /**
-     * Exports the provided Span data via the OTLP protocol
+     * Exports the provided Span data via stdout
      *
-     * @param iterable<Trace\ImmutableSpan> $spans Array of Spans
-     * @return int return code, defined on the Exporter interface
+     * @param iterable<Trace\SpanDataInterface> $spans Batch of spans to export
+     * @psalm-return Trace\SpanExporterInterface::STATUS_*
      */
     public function export(iterable $spans): int
     {
@@ -47,36 +47,36 @@ class ConsoleSpanExporter implements Trace\SpanExporterInterface
     }
 
     /**
-     * @param iterable<API\EventInterface> $events
+     * @param iterable<\OpenTelemetry\API\Trace\EventInterface> $events
      * @return array
      */
-    private function friendlyEvents(iterable $events) {
-
+    private function friendlyEvents(iterable $events)
+    {
         $tmp = [];
 
-        foreach($events as $event) {
+        foreach ($events as $event) {
             array_push($tmp, [
                 'name' => $event->getName(),
                 'timestamp' => $event->getEpochNanos(),
-                'attributes' => $this->friendlyAttributes($event->getAttributes())
+                'attributes' => $this->friendlyAttributes($event->getAttributes()),
             ]);
         }
 
         return $tmp;
-
     }
 
     /**
-     * @param iterable<API\AttributesInterface> $attributes
+     * @param \OpenTelemetry\API\Trace\AttributesInterface $attributes
      * @return array
      */
-    private function friendlyAttributes(iterable $attributes) {
+    private function friendlyAttributes(\OpenTelemetry\API\Trace\AttributesInterface $attributes)
+    {
         $tmp = [];
 
-        foreach($attributes as $attribute) {
+        foreach ($attributes as $attribute) {
             array_push($tmp, [
                 'key' => $attribute->getKey(),
-                'value' => $attribute->getValue()
+                'value' => $attribute->getValue(),
             ]);
         }
 
