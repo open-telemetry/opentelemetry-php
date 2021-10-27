@@ -101,9 +101,24 @@ class SpanConverter
             if (!array_key_exists('annotations', $row)) {
                 $row['annotations'] = [];
             }
+
+            $value = $event->getName();
+
+            if (count($event->getAttributes()) > 0) {
+                $attributesArray = [];
+                foreach ($event->getAttributes() as $attr) {
+                    $attributesArray[$attr->getKey()] = $attr->getValue();
+                }
+                
+                $attributesAsJson = json_encode($attributesArray);
+                if (($attributesAsJson !== false) && (strlen($attributesAsJson) > 0)) {
+                    $value = '"' . $event->getName() . '"' . ': ' . $attributesAsJson;
+                }
+            }
+
             $row['annotations'][] = [
                 'timestamp' => AbstractClock::nanosToMicro($event->getEpochNanos()),
-                'value' => $event->getName(),
+                'value' => $value,
             ];
         }
 

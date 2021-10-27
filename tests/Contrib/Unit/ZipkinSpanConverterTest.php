@@ -71,7 +71,7 @@ class ZipkinSpanConverterTest extends TestCase
 
         $this->assertCount(1, $row['annotations']);
         [$annotation] = $row['annotations'];
-        $this->assertSame('validators.list', $annotation['value']);
+        $this->assertSame('"validators.list": {"job":"stage.updateTime"}', $annotation['value']);
         $this->assertSame(1505855799433901, $annotation['timestamp']);
     }
 
