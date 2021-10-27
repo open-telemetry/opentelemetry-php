@@ -12,12 +12,7 @@ class ConsoleSpanExporter implements Trace\SpanExporterInterface
 {
     private $running = true;
 
-    /**
-     * Exports the provided Span data via stdout
-     *
-     * @param iterable<Trace\SpanDataInterface> $spans Batch of spans to export
-     * @psalm-return Trace\SpanExporterInterface::STATUS_*
-     */
+    /** @inheritDoc */
     public function export(iterable $spans): int
     {
         foreach ($spans as $span) {
