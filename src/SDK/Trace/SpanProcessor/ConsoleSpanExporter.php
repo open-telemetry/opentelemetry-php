@@ -78,6 +78,12 @@ class ConsoleSpanExporter implements Trace\SpanExporterInterface
         return $tmp;
     }
 
+    /**
+     * Translates SpanKind from it's integer representation to a more human friendly string.
+     *
+     * @param int $kind
+     * @return string
+     */
     private function friendlyKind(int $kind)
     {
         $spanKinds = (new ReflectionClass(SpanKind::class))->getConstants();
@@ -87,6 +93,12 @@ class ConsoleSpanExporter implements Trace\SpanExporterInterface
         return $kindSpans[$kind];
     }
 
+    /**
+     * friendlySpan does the heavy lifting converting a span into an array
+     *
+     * @param Trace\SpanDataInterface $span
+     * @return array
+     */
     private function friendlySpan(Trace\SpanDataInterface $span)
     {
         $parent_span = $span->getParentContext();
