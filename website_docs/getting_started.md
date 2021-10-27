@@ -20,9 +20,8 @@ This example will use the the ConsoleSpanExporter which, will print the Spans to
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-
-use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\ConsoleSpanExporter;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 echo 'Starting ConsoleSpanExporter' . PHP_EOL;
@@ -40,6 +39,7 @@ $rootSpan->activate();
 
 try {
     $span1 = $tracer->spanBuilder('foo')->startSpan();
+    $span1->activate();
     try {
         $span2 = $tracer->spanBuilder('bar')->startSpan();
         echo 'OpenTelemetry welcomes PHP' . PHP_EOL;
@@ -61,46 +61,55 @@ OpenTelemetry welcomes PHP
 {
     "name": "bar",
     "context": {
-        "trace_id": "a83d0e1fb781490bbd0bbdc4eb9b06dd",
-        "span_id": "a8f34ed2cc48e9a9",
+        "trace_id": "e7bc999fb17f453c6e6445802ba1e558",
+        "span_id": "24afe9c453481636",
         "trace_state": null
     },
-    "parent_span_id": "a83d0e1fb781490bbd0bbdc4eb9b06dd",
-    "kind": 0,
-    "start": 1633643693276375040,
-    "end": 1633643693276495872,
-    "attributes": {},
-    "status": {},
+    "parent_span_id": "c63030cc93c48641",
+    "kind": "KIND_INTERNAL",
+    "start": 1635373538696880128,
+    "end": 1635373538697000960,
+    "attributes": [],
+    "status": {
+        "code": "Unset",
+        "description": ""
+    },
     "events": []
 }
 {
     "name": "foo",
     "context": {
-        "trace_id": "a83d0e1fb781490bbd0bbdc4eb9b06dd",
-        "span_id": "14abaae74adb8545",
+        "trace_id": "e7bc999fb17f453c6e6445802ba1e558",
+        "span_id": "c63030cc93c48641",
         "trace_state": null
     },
-    "parent_span_id": "a83d0e1fb781490bbd0bbdc4eb9b06dd",
-    "kind": 0,
-    "start": 1633643693275846912,
-    "end": 1633643693279785984,
-    "attributes": {},
-    "status": {},
+    "parent_span_id": "4e6396224842fc15",
+    "kind": "KIND_INTERNAL",
+    "start": 1635373538696482048,
+    "end": 1635373538700564992,
+    "attributes": [],
+    "status": {
+        "code": "Unset",
+        "description": ""
+    },
     "events": []
 }
 {
     "name": "root",
     "context": {
-        "trace_id": "a83d0e1fb781490bbd0bbdc4eb9b06dd",
-        "span_id": "7b4df1ad8849c7f1",
+        "trace_id": "e7bc999fb17f453c6e6445802ba1e558",
+        "span_id": "4e6396224842fc15",
         "trace_state": null
     },
     "parent_span_id": "",
-    "kind": 0,
-    "start": 1633643693269499904,
-    "end": 1633643693279921920,
-    "attributes": {},
-    "status": {},
+    "kind": "KIND_INTERNAL",
+    "start": 1635373538691308032,
+    "end": 1635373538700800000,
+    "attributes": [],
+    "status": {
+        "code": "Unset",
+        "description": ""
+    },
     "events": []
 }
 ```

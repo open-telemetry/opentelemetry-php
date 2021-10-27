@@ -22,7 +22,7 @@ $rootSpan->activate();
 
 try {
     $span1 = $tracer->spanBuilder('foo')->startSpan();
-
+    $span1->activate();
     try {
         $span2 = $tracer->spanBuilder('bar')->startSpan();
         echo 'OpenTelemetry welcomes PHP' . PHP_EOL;
