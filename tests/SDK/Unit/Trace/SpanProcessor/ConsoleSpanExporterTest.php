@@ -55,7 +55,7 @@ class ConsoleSpanExporterTest extends TestCase
                 "span_id": "0000000000000000",
                 "trace_state": null
             },
-            "parent_span_id": "10000000000000000000000000000000",
+            "parent_span_id": "1000000000000000",
             "kind": "KIND_INTERNAL",
             "start": 1505855794194009601,
             "end": 1505855799465726528,
