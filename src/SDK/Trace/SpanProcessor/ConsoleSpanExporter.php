@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\SDK\Trace;
 
-class ConsoleSpanExporter implements Trace\Exporter
+class ConsoleSpanExporter implements Trace\SpanExporterInterface
 {
     private $running = true;
 
@@ -22,12 +22,21 @@ class ConsoleSpanExporter implements Trace\Exporter
             print(json_encode($this->friendlySpan($span), JSON_PRETTY_PRINT) . PHP_EOL);
         }
 
-        return Trace\Exporter::SUCCESS;
+        return Trace\SpanExporterInterface::STATUS_SUCCESS;
     }
 
-    public function shutdown(): void
+    /** @inheritDoc */
+    public function shutdown(): bool
     {
         $this->running = false;
+
+        return true;
+    }
+
+    /** @inheritDoc */
+    public function forceFlush(): bool
+    {
+        return true;
     }
 
     public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
