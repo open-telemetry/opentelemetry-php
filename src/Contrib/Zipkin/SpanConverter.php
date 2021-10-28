@@ -122,6 +122,43 @@ class SpanConverter
             ];
         }
 
+        if (($span->getKind() === SpanKind::KIND_CLIENT) || ($span->getKind() === SpanKind::KIND_PRODUCER))
+        {
+            $attributeToRankMap = [
+                "peer.service" => 1,
+                "net.peer.name" => 2,
+                "net.peer.ip" => 3,
+                "net.peer.port" => 3,
+                "peer.hostname" => 4,
+                "peer.address" => 5,
+                "http.host" => 6,
+                "db.name" => 7
+            ];
+    
+            $preferredAttrRank = null;
+            $preferredAttr = null;
+
+            foreach ($span->getAttributes() as $attr) {
+                if (array_key_exists($attr->getKey(), $attributeToRankMap)) {
+                    $attrRank = $attributeToRankMap[$attr->getKey()];
+
+                    if (($preferredAttrRank === null) || ($preferredAttrRank <= $attrRank)) {
+                        $preferredAttr = $attr;
+                        $preferredAttrRank = $attrRank;
+                    }
+                }
+            }
+
+            if ($preferredAttr !== null) {
+                
+                //TODO - incorporate the ip address handling from the spec, like is done here - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/zipkin/model.go#L264-L271
+                
+                $row['remoteEndpoint'] = [
+                    'serviceName' => $preferredAttr->getValue(),
+                ];
+            }
+        }
+
         if (empty($row['tags'])) {
             unset($row['tags']);
         }
