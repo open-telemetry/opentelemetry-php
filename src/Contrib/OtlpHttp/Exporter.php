@@ -7,6 +7,7 @@ namespace OpenTelemetry\Contrib\OtlpHttp;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use InvalidArgumentException;
+use Nyholm\Dsn\DsnParser;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use OpenTelemetry\SDK\Trace;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -88,7 +89,7 @@ class Exporter implements Trace\SpanExporterInterface
     ) {
 
         // Set default values based on presence of env variable
-        $this->endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'https://localhost:4318/v1/traces';
+        $endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'https://localhost:4318/v1/traces';
         $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'http/protobuf';
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
         $this->headers = $this->processHeaders(getenv('OTEL_EXPORTER_OTLP_HEADERS'));
@@ -104,20 +105,7 @@ class Exporter implements Trace\SpanExporterInterface
             throw new InvalidArgumentException('Invalid OTLP Protocol Specified');
         }
 
-        $parsedDsn = parse_url($this->endpointUrl);
-
-        if (!is_array($parsedDsn)) {
-            throw new InvalidArgumentException('Unable to parse provided DSN');
-        }
-
-        if (
-            !isset($parsedDsn['scheme'])
-            || !isset($parsedDsn['host'])
-            || !isset($parsedDsn['port'])
-            || !isset($parsedDsn['path'])
-        ) {
-            throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
-        }
+        $this->endpointUrl = $this->validateEndpoint($endpointUrl);
     }
 
     /** @inheritDoc */
@@ -201,6 +189,32 @@ class Exporter implements Trace\SpanExporterInterface
         }
 
         return $metadata;
+    }
+
+    /**
+     * validateEndpoint does two fuctions, firstly checks that the endpoint is valid
+     *  secondly it appends https:// and /v1/traces should they have been omitted
+     *
+     * @param string $endpoint
+     * @return string
+     */
+    private function validateEndpoint($endpoint)
+    {
+        $dsn = DsnParser::parseUrl($endpoint);
+
+        if ($dsn->getScheme() === null) {
+            $dsn = $dsn->withScheme('https');
+        } elseif (!($dsn->getScheme() === 'https' || $dsn->getScheme() === 'http')) {
+            throw new InvalidArgumentException('Expected scheme of http or https, given: ' . $dsn->getScheme());
+        }
+
+        if ($dsn->getPath() === null) {
+            $dsn = $dsn->withPath('/v1/traces');
+        }
+
+        $dsn = $dsn->__toString();
+
+        return $dsn;
     }
 
     /** @inheritDoc */

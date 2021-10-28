@@ -181,7 +181,8 @@ class OTLPHttpExporterTest extends TestCase
             'Default Endpoint' => ['', 'https://localhost:4318/v1/traces'],
             'Custom Endpoint' => ['https://otel-collector:4318/custom/path', 'https://otel-collector:4318/custom/path'],
             'Insecure Endpoint' => ['http://api.example.com:80/v1/traces', 'http://api.example.com/v1/traces'],
-            //'Without Path' => ['https://api.example.com', 'https://api.example.com/v1/traces'] # TODO: Support a default path of /v1/traces
+            'Without Path' => ['https://api.example.com', 'https://api.example.com/v1/traces'],
+            'Without Scheme' => ['localhost:4318', 'https://localhost:4318/v1/traces'],
         ];
     }
 
@@ -222,13 +223,22 @@ class OTLPHttpExporterTest extends TestCase
 
     /**
      * @testdox Exporter Refuses Invalid Endpoint
+     * @dataProvider exporterInvalidEndpointDataProvider
      */
-    public function testExporterRefusesInvalidEndpoint()
+    public function testExporterRefusesInvalidEndpoint($endpoint)
     {
-        putenv('OTEL_EXPORTER_OTLP_ENDPOINT=not a url');
+        putenv('OTEL_EXPORTER_OTLP_ENDPOINT=' . $endpoint);
 
         $this->expectException(\InvalidArgumentException::class);
         $exporter = new Exporter(new Client(), new HttpFactory(), new HttpFactory());
+    }
+
+    public function exporterInvalidEndpointDataProvider()
+    {
+        return [
+            'Not a url' => ['not a url'],
+            'Grpc Scheme' => ['grpc://localhost:4317'],
+        ];
     }
 
     public function test_shutdown(): void
