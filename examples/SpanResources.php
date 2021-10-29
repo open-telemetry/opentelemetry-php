@@ -19,9 +19,9 @@ $resource = ResourceInfo::create(new Attributes([
     ResourceConstants::SERVICE_INSTANCE_ID => 1,
     ResourceConstants::SERVICE_VERSION => '0.1',
     ResourceConstants::HOST_HOSTNAME => \gethostname(),
-    'deployment.environment' => 'development',
-    'host.arch' => strtolower(php_uname('m')),
-    'host.type' => strtolower(php_uname('s')),
+    ResourceConstants::DEPLOYMENT_ENVIRONMENT => 'development',
+    ResourceConstants::HOST_ARCH => strtolower(php_uname('m')),
+    ResourceConstants::HOST_TYPE => strtolower(php_uname('s')),
 ]));
 
 $tracerProvider =  new TracerProvider(
