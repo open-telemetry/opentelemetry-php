@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
+//TODO - fix this namespace to not pull from OpenTelemetry, but the dependency instead
+use IPLib;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\Trace\AbstractClock;
@@ -152,10 +154,24 @@ class SpanConverter
             if ($preferredAttr !== null) {
                 
                 //TODO - incorporate the ip address handling from the spec, like is done here - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/zipkin/model.go#L264-L271
-                
-                $row['remoteEndpoint'] = [
-                    'serviceName' => $preferredAttr->getValue(),
-                ];
+                if ($preferredAttr->getKey() === "net.peer.ip") {
+
+                    //GO doesn't check if the value is a string here, but it seems like it should based on the comment here - https://github.com/open-telemetry/opentelemetry-go/blob/4ba964bae77d9d32b4bb0167ed5533a0c05dcdf9/attribute/value.go#L200
+
+                    if (is_string($preferredAttr->getValue())) {
+                        $ipString = $preferredAttr->getValue();
+
+                        //TODO - figure out how this needs to be adjusted
+                        $ipObj = \IPLib\Factory::parseAddressString($ipString);
+                    }
+                    
+                } else {
+                    if (is_string($preferredAttr->getValue())) {
+                        $row['remoteEndpoint'] = [
+                            'serviceName' => $preferredAttr->getValue(),
+                        ];
+                    }
+                }
             }
         }
 
