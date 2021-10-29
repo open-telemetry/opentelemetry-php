@@ -69,10 +69,7 @@ class ConsoleSpanExporter implements Trace\SpanExporterInterface
         $tmp = [];
 
         foreach ($attributes as $attribute) {
-            array_push($tmp, [
-                'key' => $attribute->getKey(),
-                'value' => $attribute->getValue(),
-            ]);
+            $tmp[$attribute->getKey()] = $attribute->getValue();
         }
 
         return $tmp;
@@ -119,9 +116,6 @@ class ConsoleSpanExporter implements Trace\SpanExporterInterface
         $parent_span = $span->getParentContext();
 
         $parent_span_id = $parent_span->isValid() ? $parent_span->getSpanId() : null;
-
-        $foo = $span->getEvents();
-        var_dump($span->getResource()->getAttributes());
 
         return [
             'name' => $span->getName(),
