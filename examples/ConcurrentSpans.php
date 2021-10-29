@@ -25,7 +25,7 @@ try {
     $childSpan->activate();
     $spans = [];
     for ($i=1; $i<=4; $i++) {
-        $spans[] = $tracer->spanBuilder('GET example.com/:id')
+        $spans[] = $tracer->spanBuilder('http-' . $i)
             //@see https://github.com/open-telemetry/opentelemetry-collector/blob/main/model/semconv/v1.6.1/trace.go#L834
             ->setAttribute('http.method', 'GET')
             ->setAttribute('http.url', 'example.com/' . $i)
