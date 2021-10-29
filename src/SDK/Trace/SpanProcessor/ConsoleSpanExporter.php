@@ -94,6 +94,21 @@ class ConsoleSpanExporter implements Trace\SpanExporterInterface
     }
 
     /**
+     * @param \OpenTelemetry\SDK\Resource\ResourceInfo $resource
+     * @return array
+     */
+    private function friendlyResource(\OpenTelemetry\SDK\Resource\ResourceInfo $resource): array
+    {
+        $tmp = [];
+
+        foreach ($resource->getAttributes()->getIterator() as $attribute) {
+            $tmp[$attribute->getKey()] = $attribute->getValue();
+        }
+
+        return $tmp;
+    }
+
+    /**
      * friendlySpan does the heavy lifting converting a span into an array
      *
      * @param Trace\SpanDataInterface $span
@@ -106,6 +121,7 @@ class ConsoleSpanExporter implements Trace\SpanExporterInterface
         $parent_span_id = $parent_span->isValid() ? $parent_span->getSpanId() : null;
 
         $foo = $span->getEvents();
+        var_dump($span->getResource()->getAttributes());
 
         return [
             'name' => $span->getName(),
@@ -114,6 +130,7 @@ class ConsoleSpanExporter implements Trace\SpanExporterInterface
                 'span_id' => $span->getContext()->getSpanId(),
                 'trace_state' => $span->getContext()->getTraceState(),
             ],
+            'resource' => $this->friendlyResource($span->getResource()),
             'parent_span_id' => $parent_span_id ? $parent_span_id : '',
             'kind' => $this->friendlyKind($span->getKind()),
             'start' => $span->getStartEpochNanos(),
