@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Context\Unit;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\Context\Scope;
+use OpenTelemetry\Context\ScopeInterface;
 use PHPUnit\Framework\TestCase;
 
 class ScopeTest extends TestCase
@@ -40,5 +41,34 @@ class ScopeTest extends TestCase
 
         $scope1->close();
         $this->assertNull(Context::getValue($key));
+    }
+
+    public function testDetachedScopeDetach(): void
+    {
+        $scope1 = Context::attach(Context::getCurrent());
+
+        $this->assertSame(0, $scope1->detach());
+        $this->assertSame(ScopeInterface::DETACHED, $scope1->detach() & ScopeInterface::DETACHED);
+    }
+
+    public function testOrderMismatchScopeDetach(): void
+    {
+        $scope1 = Context::attach(Context::getCurrent());
+        $scope2 = Context::attach(Context::getCurrent());
+
+        $this->assertSame(ScopeInterface::MISMATCH, $scope1->detach() & ScopeInterface::MISMATCH);
+        $this->assertSame(0, $scope2->detach());
+    }
+
+    public function testInactiveScopeDetach(): void
+    {
+        $scope1 = Context::attach(Context::getCurrent());
+
+        Context::storage()->fork(1);
+        Context::storage()->switch(1);
+        $this->assertSame(ScopeInterface::INACTIVE, $scope1->detach() & ScopeInterface::INACTIVE);
+
+        Context::storage()->switch(0);
+        Context::storage()->destroy(1);
     }
 }

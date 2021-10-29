@@ -6,16 +6,16 @@ namespace OpenTelemetry\Context;
 
 class Scope
 {
-    /** @var callable Context token, result of Context::attach() */
-    private $contextToken;
+    /** @var ScopeInterface Context token, result of Context::attach() */
+    private ScopeInterface $contextToken;
 
-    public function __construct(callable $contextToken)
+    public function __construct(ScopeInterface $contextToken)
     {
         $this->contextToken = $contextToken;
     }
 
     public function close(): void
     {
-        Context::detach($this->contextToken);
+        $this->contextToken->detach();
     }
 }
