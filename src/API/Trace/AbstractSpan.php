@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Trace;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\Scope;
+use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\SpanContextKey;
 
@@ -50,7 +50,7 @@ abstract class AbstractSpan implements SpanInterface
     }
 
     /** @inheritDoc */
-    final public function activate(): Scope
+    final public function activate(): ScopeInterface
     {
         return Context::getCurrent()->withContextValue($this)->activate();
     }

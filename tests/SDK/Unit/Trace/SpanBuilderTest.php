@@ -403,7 +403,7 @@ class SpanBuilderTest extends MockeryTestCase
 
         $spanNoParent->end();
         $span->end();
-        $parentScope->close();
+        $parentScope->detach();
         $parentSpan->end();
     }
 
@@ -481,7 +481,7 @@ class SpanBuilderTest extends MockeryTestCase
         );
 
         $span->end();
-        $parentScope->close();
+        $parentScope->detach();
         $parentSpan->end();
     }
 
@@ -510,7 +510,7 @@ class SpanBuilderTest extends MockeryTestCase
         );
 
         $span->end();
-        $parentScope->close();
+        $parentScope->detach();
         $parentSpan->end();
     }
 

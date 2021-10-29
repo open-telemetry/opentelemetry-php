@@ -182,9 +182,9 @@ final class Context
      *
      * @todo: Implement this on the API side
      */
-    public function activate(): Scope
+    public function activate(): ScopeInterface
     {
-        return new Scope(self::attach($this));
+        return self::attach($this);
     }
 
     /**
