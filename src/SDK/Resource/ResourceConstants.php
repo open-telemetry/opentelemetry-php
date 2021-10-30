@@ -34,6 +34,7 @@ class ResourceConstants
      */
     public const CONTAINER_NAME = 'container.name';
     public const CONTAINER_ID = 'container.id';
+    public const CONTAINER_RUNTIME = 'container.runtime';
     public const CONTAINER_IMAGE_NAME = 'container.image.name';
     public const CONTAINER_IMAGE_TAG = 'container.image.tag';
 
@@ -44,6 +45,7 @@ class ResourceConstants
     public const FAAS_ID = 'faas.id'; // required
     public const FAAS_VERSION = 'faas.version';
     public const FAAS_INSTANCE = 'faas.instance';
+    public const FAAS_MAX_MEMORY = 'faas.max_memory';
 
     /**
      * Kubernetes
@@ -63,6 +65,7 @@ class ResourceConstants
     public const HOST_IMAGE_NAME = 'host.image.name';
     public const HOST_IMAGE_ID = 'host.image.id';
     public const HOST_IMAGE_VERSION = 'host.image.version';
+    public const HOST_ARCH = 'host.arch';
 
     /**
      * Cloud
@@ -70,6 +73,12 @@ class ResourceConstants
     public const CLOUD_PROVIDER = 'cloud.provider';
     public const CLOUD_ACCOUNT_ID = 'cloud.account.id';
     public const CLOUD_REGION = 'cloud.region';
-    public const CLOUD_ZONE = 'cloud.zone';
+    public const CLOUD_ZONE = 'cloud.zone'; //@deprecated
+    public const CLOUD_AVAILABILITY_ZONE = 'cloud.availability_zone';
     public const CLOUD_PLATFORM = 'cloud.platform';
+
+    /**
+     * Deployment
+     */
+    public const DEPLOYMENT_ENVIRONMENT = 'deployment.environment';
 }
