@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
+use function assert;
+
 /**
  * @internal
  */
@@ -31,6 +33,7 @@ final class ContextStorageNode implements ScopeInterface
         }
 
         if ($this === $this->head->node) {
+            assert($this->previous !== null);
             $this->head->node = $this->previous;
             $this->previous = null;
 
@@ -44,6 +47,7 @@ final class ContextStorageNode implements ScopeInterface
         for ($n = $this->head->node, $depth = 1;
              $n->previous !== $this;
              $n = $n->previous, $depth++) {
+            assert($n->previous !== null);
         }
         $n->previous = $this->previous;
         $this->previous = null;

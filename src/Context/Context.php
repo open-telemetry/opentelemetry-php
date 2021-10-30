@@ -9,7 +9,7 @@ namespace OpenTelemetry\Context;
  */
 final class Context
 {
-    private static ContextStorageInterface $storage;
+    private static ?ContextStorageInterface $storage = null;
 
     /** @var self|null */
     private static $root;

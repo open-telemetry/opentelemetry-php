@@ -1,11 +1,13 @@
 <?php
 
 /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
+/** @phan-file-suppress PhanUndeclaredClassReference */
 
 declare(strict_types=1);
 
-use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\FiberNotSupportedContextStorage;
+namespace OpenTelemetry\Context;
+
+use Fiber;
 
 if (!class_exists(Fiber::class)) {
     return;

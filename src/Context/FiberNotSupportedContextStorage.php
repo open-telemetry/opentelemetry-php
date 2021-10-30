@@ -14,6 +14,9 @@ use function trigger_error;
 
 /**
  * @internal
+ *
+ * @phan-file-suppress PhanUndeclaredClassReference
+ * @phan-file-suppress PhanUndeclaredClassMethod
  */
 final class FiberNotSupportedContextStorage implements ContextStorageInterface
 {
