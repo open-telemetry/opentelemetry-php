@@ -17,6 +17,14 @@ final class Context
     /**
      * @internal
      */
+    public static function setStorage(ContextStorageInterface $storage): void
+    {
+        self::$storage = $storage;
+    }
+
+    /**
+     * @internal
+     */
     public static function storage(): ContextStorageInterface
     {
         return self::$storage ??= new ContextStorage(self::getRoot());

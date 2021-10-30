@@ -38,7 +38,10 @@
             "OpenTelemetry\\": "src/",
             "Opentelemetry\\Proto\\": "proto/Opentelemetry/Proto/",
             "GPBMetadata\\Opentelemetry\\Proto\\": "proto/GPBMetadata/Opentelemetry/Proto/"
-        }
+        },
+        "files": [
+            "src/Context/fiber/initialize_fiber_handler.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
