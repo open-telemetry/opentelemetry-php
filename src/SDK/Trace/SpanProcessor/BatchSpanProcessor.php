@@ -88,6 +88,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
             $this->exporter->export($this->queue);
             $this->queue = [];
             $this->lastExportTimestamp = $this->clock->nanoTime();
+            $this->exporter->forceFlush();
         }
 
         return true;
@@ -100,10 +101,10 @@ class BatchSpanProcessor implements SpanProcessorInterface
             return true;
         }
 
-        $this->running = false;
         if (null !== $this->exporter) {
             return $this->forceFlush() && $this->exporter->shutdown();
         }
+        $this->running = false;
 
         return true;
     }
@@ -129,6 +130,6 @@ class BatchSpanProcessor implements SpanProcessorInterface
             return false;
         }
 
-        return $this->scheduledDelayMillis < ($now - $this->lastExportTimestamp);
+        return ($this->scheduledDelayMillis * API\ClockInterface::NANOS_PER_MILLI) < ($now - $this->lastExportTimestamp);
     }
 }

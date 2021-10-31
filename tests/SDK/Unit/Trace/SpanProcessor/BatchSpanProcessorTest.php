@@ -84,6 +84,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
 
         $exporter = Mockery::mock(SpanExporterInterface::class);
+        $exporter->expects('forceFlush');
         $exporter
             ->expects('export')
             ->with(
@@ -143,6 +144,27 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#shutdown-1
+     */
+    public function test_export_includesForceFlushOnShutdown(): void
+    {
+        $batchSize = 3;
+
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->expects($this->once())->method('export');
+        $exporter->expects($this->once())->method('shutdown');
+
+        $proc = new BatchSpanProcessor($exporter, $this->createMock(AbstractClock::class));
+
+        for ($i = 0; $i < $batchSize - 1; $i++) {
+            $mock_span = $this->createSampledSpanMock();
+            $proc->onEnd($mock_span);
+        }
+
+        $proc->shutdown();
+    }
+
     public function test_export_afterShutdown(): void
     {
         $exporter = $this->createMock(SpanExporterInterface::class);
@@ -162,6 +184,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $nonSampledSpan = $this->createNonSampledSpanMock();
 
         $exporter = Mockery::mock(SpanExporterInterface::class);
+        $exporter->expects('forceFlush');
         $exporter
             ->expects('export')
             ->with(
@@ -191,6 +214,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $timeout = 3000;
 
         $exporter = Mockery::mock(SpanExporterInterface::class);
+        $exporter->expects('forceFlush');
         $exporter
             ->expects('export')
             ->with(
