@@ -71,6 +71,27 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
+    public function test_export_batchSizeGreaterThanQueueSize_isRejected(): void
+    {
+        $batchSize = 3;
+        $queueSize = 2; // queue is smaller than batch
+        $exportDelay = 3;
+        $timeout = 3000;
+
+        $exporter = $this->createMock(SpanExporterInterface::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+        /** @var SpanExporterInterface $exporter */
+        $processor = new BatchSpanProcessor(
+            $exporter,
+            $this->testClock,
+            $queueSize,
+            $exportDelay,
+            $timeout,
+            $batchSize
+        );
+    }
+
     /**
      * @dataProvider scheduledDelayProvider
      */
@@ -213,7 +234,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
     public function test_export_afterShutdown(): void
     {
         $exporter = $this->createMock(SpanExporterInterface::class);
-        $exporter->expects($this->once())->method('shutdown');
+        $exporter->expects($this->atLeastOnce())->method('shutdown');
 
         $proc = new BatchSpanProcessor($exporter, $this->createMock(AbstractClock::class));
         $proc->shutdown();
@@ -221,6 +242,8 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $span = $this->createSampledSpanMock();
         $proc->onStart($span);
         $proc->onEnd($span);
+        $proc->forceFlush();
+        $proc->shutdown();
     }
 
     public function test_export_onlySampledSpans(): void
