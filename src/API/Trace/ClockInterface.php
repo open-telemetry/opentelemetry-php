@@ -7,7 +7,7 @@ namespace OpenTelemetry\API\Trace;
 interface ClockInterface
 {
     public const NANOS_PER_SECOND = 1000000000;
-    public const NANOS_PER_MILLI  = 1000000;
+    public const NANOS_PER_MILLISECOND = 1000000;
 
     /**
      * Returns the current epoch wall-clock timestamp in nanoseconds.

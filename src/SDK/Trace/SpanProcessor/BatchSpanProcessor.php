@@ -130,6 +130,6 @@ class BatchSpanProcessor implements SpanProcessorInterface
             return false;
         }
 
-        return ($this->scheduledDelayMillis * API\ClockInterface::NANOS_PER_MILLI) < ($now - $this->lastExportTimestamp);
+        return ($this->scheduledDelayMillis * API\ClockInterface::NANOS_PER_MILLISECOND) < ($now - $this->lastExportTimestamp);
     }
 }
