@@ -250,6 +250,9 @@ class ContextTest extends TestCase
         $this->assertSame($currentCtx, Context::getCurrent());
     }
 
+    /**
+     * @test
+     */
     public function storageSwitchSwitchesContext(): void
     {
         $main = new Context();
@@ -282,6 +285,9 @@ class ContextTest extends TestCase
         $scopeMain->detach();
     }
 
+    /**
+     * @test
+     */
     public function storageForkKeepsForkedRoot(): void
     {
         $main = new Context();
