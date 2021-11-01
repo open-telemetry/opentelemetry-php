@@ -18,7 +18,7 @@ class BaggageTest extends TestCase
     {
         $scope = Context::getRoot()->activate();
         $this->assertSame(Baggage::getCurrent(), Baggage::getEmpty());
-        $scope->close();
+        $scope->detach();
     }
 
     public function testCurrent(): void
@@ -27,7 +27,7 @@ class BaggageTest extends TestCase
             Baggage::getBuilder()->set('foo', 'bar')->build(),
         )->activate();
         $this->assertSame('bar', Baggage::getCurrent()->getValue('foo'));
-        $scope->close();
+        $scope->detach();
     }
 
     public function testGetCurrentBaggageDefault(): void
@@ -35,7 +35,7 @@ class BaggageTest extends TestCase
         $scope = Context::getRoot()->activate();
         $baggage = Baggage::getCurrent();
         $this->assertSame($baggage, Baggage::getEmpty());
-        $scope->close();
+        $scope->detach();
     }
 
     public function testGetCurrentBaggageSetsCorrectContext(): void
@@ -43,7 +43,7 @@ class BaggageTest extends TestCase
         $baggage = Baggage::getEmpty();
         $scope = Context::getRoot()->withContextValue($baggage)->activate();
         $this->assertSame(Baggage::getCurrent(), $baggage);
-        $scope->close();
+        $scope->detach();
     }
 
     public function testBaggageFromContextDefaultContext(): void

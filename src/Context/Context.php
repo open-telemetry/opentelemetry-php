@@ -9,26 +9,34 @@ namespace OpenTelemetry\Context;
  */
 final class Context
 {
-    /** @var self|null */
-    private static $current_context;
+    private static ?ContextStorageInterface $storage = null;
 
     /** @var self|null */
     private static $root;
 
     /**
+     * @internal
+     */
+    public static function setStorage(ContextStorageInterface $storage): void
+    {
+        self::$storage = $storage;
+    }
+
+    /**
+     * @internal
+     */
+    public static function storage(): ContextStorageInterface
+    {
+        return self::$storage ??= new ContextStorage(self::getRoot());
+    }
+
+    /**
      * This will set the given Context to be the "current" one. We return a token which can be passed to `detach()` to
      * reset the Current Context back to the previous one.
-     *
-     * @return callable():Context - token for resetting the $current_context back
      */
-    public static function attach(Context $ctx): callable
+    public static function attach(Context $ctx): ScopeInterface
     {
-        $former_ctx = self::getCurrent();
-        self::$current_context = $ctx;
-
-        return static function () use ($former_ctx) {
-            return $former_ctx;
-        };
+        return self::storage()->attach($ctx);
     }
 
     /**
@@ -43,16 +51,17 @@ final class Context
 
     /**
      * Given a token, the current context will be set back to the one prior to the token being generated.
-     * @param callable():Context $token
      */
-    public static function detach(callable $token): Context
+    public static function detach(ScopeInterface $token): Context
     {
-        return self::$current_context = $token();
+        $token->detach();
+
+        return self::getCurrent();
     }
 
     public static function getCurrent(): Context
     {
-        return self::$current_context ?? (self::$current_context = self::getRoot());
+        return self::storage()->current();
     }
 
     public static function getRoot(): self
@@ -108,7 +117,10 @@ final class Context
     public static function withValue(ContextKey $key, $value, $parent=null)
     {
         if (null === $parent) {
-            return self::$current_context = new self($key, $value, self::getCurrent());
+            // TODO This should not attach, leads to a context that cannot be detached
+            self::storage()->attach(new self($key, $value, self::getCurrent()));
+
+            return self::getCurrent();
         }
 
         return new self($key, $value, $parent);
@@ -178,9 +190,9 @@ final class Context
      *
      * @todo: Implement this on the API side
      */
-    public function activate(): Scope
+    public function activate(): ScopeInterface
     {
-        return new Scope(self::attach($this));
+        return self::attach($this);
     }
 
     /**

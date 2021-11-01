@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Baggage;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\Scope;
+use OpenTelemetry\Context\ScopeInterface;
 
 final class Baggage implements BaggageInterface
 {
@@ -53,7 +53,7 @@ final class Baggage implements BaggageInterface
     }
 
     /** @inheritDoc */
-    public function activate(): Scope
+    public function activate(): ScopeInterface
     {
         return Context::getCurrent()->withContextValue($this)->activate();
     }

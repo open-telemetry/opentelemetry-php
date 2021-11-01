@@ -52,5 +52,8 @@
         <testsuite name="Context Unit Tests">
             <directory>./tests/Context/Unit</directory>
         </testsuite>
+        <testsuite name="Context Fiber Tests">
+            <directory phpVersion="8.1.0RC" suffix=".phpt">./tests/Context/Fiber</directory>
+        </testsuite>
     </testsuites>
 </phpunit>

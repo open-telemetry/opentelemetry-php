@@ -110,7 +110,7 @@ class SpanTest extends MockeryTestCase
             Span::getCurrent()
         );
 
-        $scope->close();
+        $scope->detach();
     }
 
     public function test_getSpan_defaultContext(): void
@@ -147,12 +147,12 @@ class SpanTest extends MockeryTestCase
 
         $this->assertSame($secondSpan, Span::getCurrent());
 
-        $scope2->close();
+        $scope2->detach();
         $secondSpan->end();
 
         $this->assertSame($span, Span::getCurrent());
 
-        $scope->close();
+        $scope->detach();
         $span->end();
     }
 
