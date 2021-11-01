@@ -71,6 +71,51 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
+    /**
+     * @dataProvider scheduledDelayProvider
+     */
+    public function test_export_scheduledDelay(int $exportDelay, int $advanceByNano, bool $expectedFlush): void
+    {
+        $batchSize = 2;
+        $queueSize = 5;
+        $timeout = 3000;
+        $spans = [];
+
+        for ($i = 0; $i < $batchSize; $i++) {
+            $spans[] = $this->createSampledSpanMock();
+        }
+
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->expects($this->exactly($expectedFlush ? 1 : 0))->method('forceFlush');
+
+        /** @var SpanExporterInterface $exporter */
+        $processor = new BatchSpanProcessor(
+            $exporter,
+            $this->testClock,
+            $queueSize,
+            $exportDelay,
+            $timeout,
+            $batchSize + 1
+        );
+
+        foreach ($spans as $i => $span) {
+            if (1 === $i) {
+                $this->testClock->advance($advanceByNano);
+            }
+            $processor->onEnd($span);
+        }
+    }
+
+    public function scheduledDelayProvider()
+    {
+        return [
+            'no clock advance' => [1000, 0, false],
+            'clock advance less than threshold' => [1000, 999 * AbstractClock::NANOS_PER_MILLISECOND, false],
+            'clock advance equals threshold' => [1000, 1000 * AbstractClock::NANOS_PER_MILLISECOND, false],
+            'clock advance exceeds threshold' => [1000, 1001 * AbstractClock::NANOS_PER_MILLISECOND, true],
+        ];
+    }
+
     public function test_export_delayLimitReached_partiallyFilledBatch(): void
     {
         $batchSize = 4;
