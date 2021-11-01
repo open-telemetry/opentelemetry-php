@@ -71,6 +71,72 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
+    public function test_export_batchSizeGreaterThanQueueSize_isRejected(): void
+    {
+        $batchSize = 3;
+        $queueSize = 2; // queue is smaller than batch
+        $exportDelay = 3;
+        $timeout = 3000;
+
+        $exporter = $this->createMock(SpanExporterInterface::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+        /** @var SpanExporterInterface $exporter */
+        $processor = new BatchSpanProcessor(
+            $exporter,
+            $this->testClock,
+            $queueSize,
+            $exportDelay,
+            $timeout,
+            $batchSize
+        );
+    }
+
+    /**
+     * @dataProvider scheduledDelayProvider
+     */
+    public function test_export_scheduledDelay(int $exportDelay, int $advanceByNano, bool $expectedFlush): void
+    {
+        $batchSize = 2;
+        $queueSize = 5;
+        $timeout = 3000;
+        $spans = [];
+
+        for ($i = 0; $i < $batchSize; $i++) {
+            $spans[] = $this->createSampledSpanMock();
+        }
+
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->expects($this->exactly($expectedFlush ? 1 : 0))->method('forceFlush');
+
+        /** @var SpanExporterInterface $exporter */
+        $processor = new BatchSpanProcessor(
+            $exporter,
+            $this->testClock,
+            $queueSize,
+            $exportDelay,
+            $timeout,
+            $batchSize + 1
+        );
+
+        foreach ($spans as $i => $span) {
+            if (1 === $i) {
+                $this->testClock->advance($advanceByNano);
+            }
+            $processor->onEnd($span);
+        }
+    }
+
+    public function scheduledDelayProvider()
+    {
+        return [
+            'no clock advance' => [1000, 0, false],
+            'clock advance less than threshold' => [1000, 999 * AbstractClock::NANOS_PER_MILLISECOND, false],
+            'clock advance equals threshold' => [1000, 1000 * AbstractClock::NANOS_PER_MILLISECOND, false],
+            'clock advance exceeds threshold' => [1000, 1001 * AbstractClock::NANOS_PER_MILLISECOND, true],
+        ];
+    }
+
     public function test_export_delayLimitReached_partiallyFilledBatch(): void
     {
         $batchSize = 4;
@@ -84,6 +150,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
 
         $exporter = Mockery::mock(SpanExporterInterface::class);
+        $exporter->expects('forceFlush');
         $exporter
             ->expects('export')
             ->with(
@@ -143,10 +210,31 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#shutdown-1
+     */
+    public function test_export_includesForceFlushOnShutdown(): void
+    {
+        $batchSize = 3;
+
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->expects($this->once())->method('export');
+        $exporter->expects($this->once())->method('shutdown');
+
+        $proc = new BatchSpanProcessor($exporter, $this->createMock(AbstractClock::class));
+
+        for ($i = 0; $i < $batchSize - 1; $i++) {
+            $mock_span = $this->createSampledSpanMock();
+            $proc->onEnd($mock_span);
+        }
+
+        $proc->shutdown();
+    }
+
     public function test_export_afterShutdown(): void
     {
         $exporter = $this->createMock(SpanExporterInterface::class);
-        $exporter->expects($this->once())->method('shutdown');
+        $exporter->expects($this->atLeastOnce())->method('shutdown');
 
         $proc = new BatchSpanProcessor($exporter, $this->createMock(AbstractClock::class));
         $proc->shutdown();
@@ -154,6 +242,8 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $span = $this->createSampledSpanMock();
         $proc->onStart($span);
         $proc->onEnd($span);
+        $proc->forceFlush();
+        $proc->shutdown();
     }
 
     public function test_export_onlySampledSpans(): void
@@ -162,6 +252,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $nonSampledSpan = $this->createNonSampledSpanMock();
 
         $exporter = Mockery::mock(SpanExporterInterface::class);
+        $exporter->expects('forceFlush');
         $exporter
             ->expects('export')
             ->with(
@@ -191,6 +282,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $timeout = 3000;
 
         $exporter = Mockery::mock(SpanExporterInterface::class);
+        $exporter->expects('forceFlush');
         $exporter
             ->expects('export')
             ->with(
