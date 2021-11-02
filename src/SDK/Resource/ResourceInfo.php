@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Resource;
 
+use OpenTelemetry\API\Trace\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Attributes;
 
 /**
@@ -15,14 +16,14 @@ use OpenTelemetry\SDK\Trace\Attributes;
  */
 class ResourceInfo
 {
-    private $attributes;
+    private AttributesInterface $attributes;
 
-    private function __construct(Attributes $attributes)
+    private function __construct(AttributesInterface $attributes)
     {
         $this->attributes = $attributes;
     }
 
-    public static function create(Attributes $attributes): self
+    public static function create(AttributesInterface $attributes): self
     {
         $resource = self::merge(self::defaultResource(), new ResourceInfo(clone $attributes));
         /*
@@ -77,7 +78,7 @@ class ResourceInfo
         return new ResourceInfo(new Attributes());
     }
 
-    public function getAttributes(): Attributes
+    public function getAttributes(): AttributesInterface
     {
         return $this->attributes;
     }
