@@ -52,6 +52,7 @@
         "guzzlehttp/guzzle": "^7.3",
         "guzzlehttp/psr7": "^2.0@RC",
         "mockery/mockery": "^1.4",
+        "monolog/monolog": "^2.3",
         "nyholm/psr7": "^1.4",
         "phan/phan": "^5.0",
         "phpstan/phpstan": "^0.12.50",
