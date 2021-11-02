@@ -7,14 +7,15 @@
     "license": "Apache-2.0",
     "require": {
         "php": "^7.4 || ^8.0",
-        "ext-json": "*",
         "ext-grpc": "*",
-        "promphp/prometheus_client_php": "^2.2.1",
-        "grpc/grpc": "^1.30",
+        "ext-json": "*",
         "google/protobuf": "^v3.3.0",
+        "grpc/grpc": "^1.30",
+        "nyholm/dsn": "^2.0.0",
+        "promphp/prometheus_client_php": "^2.2.1",
         "psr/http-client-implementation": "^1.0",
         "psr/http-factory-implementation": "^1.0",
-        "nyholm/dsn": "^2.0.0"
+        "psr/log": "^3.0"
     },
     "config": {
         "sort-packages": true
