@@ -28,7 +28,7 @@ final class ImmutableSpan implements SpanDataInterface
     private API\AttributesInterface $attributes;
     private int $totalAttributeCount;
     private int $totalRecordedEvents;
-    private StatusData $status;
+    private StatusDataInterface $status;
     private int $endEpochNanos;
     private bool $hasEnded;
 
@@ -48,7 +48,7 @@ final class ImmutableSpan implements SpanDataInterface
         API\AttributesInterface $attributes,
         int $totalAttributeCount,
         int $totalRecordedEvents,
-        StatusData $status,
+        StatusDataInterface $status,
         int $encEpochNanos,
         bool $hasEnded
     ) {
@@ -151,7 +151,7 @@ final class ImmutableSpan implements SpanDataInterface
         return max(0, $this->span->getTotalRecordedLinks() - count($this->links));
     }
 
-    public function getStatus(): StatusData
+    public function getStatus(): StatusDataInterface
     {
         return $this->status;
     }
