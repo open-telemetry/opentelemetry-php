@@ -51,6 +51,7 @@
         "friendsofphp/php-cs-fixer": "^3.0",
         "guzzlehttp/guzzle": "^7.3",
         "guzzlehttp/psr7": "^2.0@RC",
+        "mikey179/vfsstream": "^1.6",
         "mockery/mockery": "^1.4",
         "monolog/monolog": "^2.3",
         "nyholm/psr7": "^1.4",
