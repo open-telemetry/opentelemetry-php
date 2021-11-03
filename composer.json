@@ -15,7 +15,7 @@
         "promphp/prometheus_client_php": "^2.2.1",
         "psr/http-client-implementation": "^1.0",
         "psr/http-factory-implementation": "^1.0",
-        "psr/log": "^3.0"
+        "psr/log": "^1.1"
     },
     "config": {
         "sort-packages": true
