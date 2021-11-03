@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Unit\Trace\SpanProcessor;
+namespace OpenTelemetry\Tests\SDK\Unit\Trace\SpanExporter;
 
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\SpanContext;
-use OpenTelemetry\SDK\Trace\SpanProcessor\ConsoleSpanExporter;
+use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;

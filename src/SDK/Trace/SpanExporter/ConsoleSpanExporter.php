@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace\SpanProcessor;
+namespace OpenTelemetry\SDK\Trace\SpanExporter;
 
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\SDK\Trace;
