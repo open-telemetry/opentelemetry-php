@@ -1,0 +1,55 @@
+<?php
+
+declare(strict_types=1);
+
+namespace OpenTelemetry\SDK\Trace\Behavior;
+
+use OpenTelemetry\SDK\Trace\SpanConverterInterface;
+use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use OpenTelemetry\SDK\Trace\SpanExporter\NullSpanConverter;
+
+trait UsesSpanConverterTrait
+{
+    private ?SpanConverterInterface $converter = null;
+
+    /**
+     * @param SpanConverterInterface $converter
+     */
+    protected function setSpanConverter(SpanConverterInterface $converter): void
+    {
+        $this->converter = $converter;
+    }
+
+    public function getSpanConverter(): SpanConverterInterface
+    {
+        if (null === $this->converter) {
+            $this->converter = new NullSpanConverter();
+        }
+
+        return $this->converter;
+    }
+
+    /**
+     * @param SpanDataInterface $span
+     * @return array
+     * @psalm-suppress PossiblyNullReference
+     */
+    protected function convertContext(SpanDataInterface $span): array
+    {
+        return $this->getSpanConverter()->convert($span);
+    }
+
+    /**
+     * @param iterable $spans
+     * @return array
+     */
+    protected function convertAggregateContext(iterable $spans): array
+    {
+        $aggregate = [];
+        foreach ($spans as $span) {
+            $aggregate[] = $this->convertContext($span);
+        }
+
+        return $aggregate;
+    }
+}
