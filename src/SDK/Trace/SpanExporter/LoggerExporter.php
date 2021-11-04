@@ -95,7 +95,7 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
     /**
      * @param int $granularity
      */
-    private function setGranularity(int $granularity): void
+    public function setGranularity(int $granularity): void
     {
         $this->granularity = $granularity === self::GRANULARITY_SPAN
             ? self::GRANULARITY_SPAN
