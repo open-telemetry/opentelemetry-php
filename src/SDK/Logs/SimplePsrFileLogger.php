@@ -61,11 +61,12 @@ class SimplePsrFileLogger implements LoggerInterface
         }
 
         return sprintf(
-            '[%s] %s: %s %s',
+            '[%s] %s: %s %s%s',
             date(DATE_RFC3339_EXTENDED),
             $level,
             $message,
-            $encodedContext
+            $encodedContext,
+            PHP_EOL
         );
     }
 
