@@ -15,7 +15,6 @@ require __DIR__ . '/../vendor/autoload.php';
  * will be the last log entry
  */
 
-
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
@@ -34,7 +33,6 @@ $logFile = $logDir . '/otel.log';
 if (!is_dir($logDir) && !mkdir($logDir, 0744, true) && !is_dir($logDir)) {
     throw new \RuntimeException(sprintf('Directory "%s" was not created', $logDir));
 }
-
 
 /**
  * Create the Exporter.
