@@ -171,8 +171,12 @@ class SpanConverter
                             }
 
                             if (filter_var($ipString, FILTER_VALIDATE_IP,FILTER_FLAG_IPV6)) {
-                                //BEWARE: This might not work (how so?) when ipv6 has been disabled for PHP
-                                $remoteEndpointArr["ipv6"] = inet_pton($ipString);
+                                if (defined('AF_INET6')) {
+                                    //This won't work (oddly) if ipv6 has been disabled for PHP and the server it's running on
+                                    //Where this idea came from - https://www.php.net/manual/en/function.inet-pton.php#104917
+                                    $remoteEndpointArr["ipv6"] = inet_pton($ipString);
+                                }
+                                //TODO - does the else case need handling here?
                             }
 
                             //Go comment (but not code...), mentions port = 0 should be the default - https://github.com/open-telemetry/opentelemetry-go/blob/7ce58f355851d0412e45ceb79d977bc612701b3f/exporters/jaeger/internal/gen-go/zipkincore/zipkincore.go#L122
