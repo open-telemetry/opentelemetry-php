@@ -15,16 +15,21 @@ class SimplePsrFileLogger implements LoggerInterface
 {
     use LoggerTrait;
 
+    private const DEFAULT_LOGGER_NAME = 'otel';
+
     private static ?array $logLevels = null;
 
     private string $filename;
 
+    private string $loggerName ;
+
     /**
      * @param string $filename
      */
-    public function __construct(string $filename)
+    public function __construct(string $filename, string $loggerName = self::DEFAULT_LOGGER_NAME)
     {
         $this->filename = $filename;
+        $this->loggerName = $loggerName;
     }
 
     /**
@@ -61,8 +66,9 @@ class SimplePsrFileLogger implements LoggerInterface
         }
 
         return sprintf(
-            '[%s] %s: %s %s%s',
+            '[%s] %s %s: %s %s%s',
             date(DATE_RFC3339_EXTENDED),
+            $this->loggerName,
             $level,
             $message,
             $encodedContext,
