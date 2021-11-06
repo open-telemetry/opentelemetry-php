@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use OpenTelemetry\API\Trace as API;
 use function count;
+use OpenTelemetry\API\Trace as API;
 
 final class Event implements API\EventInterface
 {
