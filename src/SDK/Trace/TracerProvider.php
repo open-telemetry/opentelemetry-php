@@ -14,6 +14,8 @@ use function register_shutdown_function;
 
 final class TracerProvider implements API\TracerProviderInterface
 {
+    private static ?API\TracerInterface $defaultTracer = null;
+
     /** @var array<string, API\TracerInterface> */
     private $tracers;
 
@@ -69,10 +71,28 @@ final class TracerProvider implements API\TracerProviderInterface
 
         $instrumentationLibrary = new InstrumentationLibrary($name, $version);
 
-        return $this->tracers[$key] = new Tracer(
+        $tracer = new Tracer(
             $this->tracerSharedState,
             $instrumentationLibrary,
         );
+        if (null === self::$defaultTracer) {
+            self::$defaultTracer = $tracer;
+        }
+        return $this->tracers[$key] = $tracer;
+    }
+
+    public static function getDefaultTracer(): API\TracerInterface
+    {
+        if (null === self::$defaultTracer) {
+            /* TODO log a warning */
+            return NoopTracer::getInstance();
+        }
+        return self::$defaultTracer;
+    }
+
+    public static function setDefaultTracer(API\TracerInterface $tracer): void
+    {
+        self::$defaultTracer = $tracer;
     }
 
     public function getSampler(): SamplerInterface
