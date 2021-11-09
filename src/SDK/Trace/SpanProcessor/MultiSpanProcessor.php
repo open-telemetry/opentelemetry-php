@@ -18,8 +18,6 @@ final class MultiSpanProcessor implements SpanProcessorInterface
     /** @var list<SpanProcessorInterface> */
     private array $processors = [];
 
-    private bool $running = true;
-
     public function __construct(SpanProcessorInterface ...$spanProcessors)
     {
         foreach ($spanProcessors as $processor) {
@@ -57,10 +55,6 @@ final class MultiSpanProcessor implements SpanProcessorInterface
     /** @inheritDoc */
     public function shutdown(): bool
     {
-        if (!$this->running) {
-            return true;
-        }
-
         $result = true;
 
         foreach ($this->processors as $processor) {
