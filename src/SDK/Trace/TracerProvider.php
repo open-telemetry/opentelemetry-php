@@ -33,7 +33,7 @@ final class TracerProvider implements API\TracerProviderInterface
         }
 
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
-        $resource = $resource ?? ResourceInfo::defaultResource();
+        $resource = $resource ?? ResourceInfo::create(new Attributes());
         $sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
         $idGenerator = $idGenerator ?? new RandomIdGenerator();
         $spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();

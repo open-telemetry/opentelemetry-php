@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Unit\Resource;
 
+use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Resource\ResourceConstants;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Attribute;
@@ -12,6 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 class ResourceTest extends TestCase
 {
+    use EnvironmentVariables;
+
+    public function tearDown(): void
+    {
+        $this->restoreEnvironmentVariables();
+    }
+
     public function testEmptyResource(): void
     {
         $resource = ResourceInfo::emptyResource();
@@ -36,6 +44,7 @@ class ResourceTest extends TestCase
         $attributes->setAttribute(ResourceConstants::TELEMETRY_SDK_NAME, 'opentelemetry');
         $attributes->setAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE, 'php');
         $attributes->setAttribute(ResourceConstants::TELEMETRY_SDK_VERSION, 'dev');
+        $attributes->setAttribute(ResourceConstants::SERVICE_NAME, 'unknown_service');
 
         $this->assertEquals($attributes, $resource->getAttributes());
         $this->assertSame('opentelemetry', $sdkname->getValue());
@@ -54,6 +63,7 @@ class ResourceTest extends TestCase
                 ResourceConstants::TELEMETRY_SDK_NAME => 'opentelemetry',
                 ResourceConstants::TELEMETRY_SDK_LANGUAGE => 'php',
                 ResourceConstants::TELEMETRY_SDK_VERSION => 'dev',
+                ResourceConstants::SERVICE_NAME => 'unknown_service',
             ]
         );
         $resource = ResourceInfo::create(new Attributes());
@@ -86,7 +96,7 @@ class ResourceTest extends TestCase
         /** @var Attribute $empty */
         $empty = $result->getAttributes()->getAttribute('empty');
 
-        $this->assertCount(6, $result->getAttributes());
+        $this->assertCount(7, $result->getAttributes());
         $this->assertEquals('primary', $name->getValue());
         $this->assertEquals('1.0.0', $version->getValue());
         $this->assertEquals('value', $empty->getValue());
@@ -109,5 +119,61 @@ class ResourceTest extends TestCase
         $version = $resource->getAttributes()->getAttribute('version');
 
         $this->assertEquals('1.0.0', $version->getValue());
+    }
+
+    /**
+     * @test
+     * @dataProvider environmentResourceProvider
+     */
+    public function resource_fromEnvironment(string $envAttributes, array $userAttributes, array $expected)
+    {
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', $envAttributes);
+        $resource = ResourceInfo::create(new Attributes($userAttributes));
+        foreach ($expected as $name => $value) {
+            $this->assertEquals($value, $resource->getAttributes()->get($name));
+        }
+    }
+
+    public function environmentResourceProvider()
+    {
+        return [
+            'attributes from env var' => [
+                'foo=foo,bar=bar',
+                [],
+                ['foo' => 'foo'],
+            ],
+            'user attributes have higher priority' => [
+                'foo=env-foo,bar=env-bar,baz=env-baz',
+                ['foo' => 'user-foo', 'bar' => 'user-bar'],
+                ['foo' => 'user-foo', 'bar' => 'user-bar', 'baz' => 'env-baz'],
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     */
+    public function resource_serviceNameDefault()
+    {
+        $resource = ResourceInfo::create(new Attributes([]));
+        $this->assertEquals('unknown_service', $resource->getAttributes()->get('service.name'));
+    }
+
+    /**
+     * @test
+     */
+    public function resource_withEmptyEnvironmentVariable()
+    {
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', '');
+        $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::create(new Attributes([])));
+    }
+
+    /**
+     * @test
+     */
+    public function resource_withInvalidEnvironmentVariable()
+    {
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo');
+        $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::create(new Attributes([])));
     }
 }

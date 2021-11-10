@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Unit\Trace\SpanProcessor;
 
+use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
@@ -16,6 +18,8 @@ use OpenTelemetry\Tests\SDK\Util\TestClock;
 
 class BatchSpanProcessorTest extends MockeryTestCase
 {
+    use EnvironmentVariables;
+
     private TestClock $testClock;
 
     protected function setUp(): void
@@ -28,6 +32,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
     protected function tearDown(): void
     {
         AbstractClock::setTestClock();
+        $this->restoreEnvironmentVariables();
     }
 
     public function test_allowsNullExporter(): void
@@ -320,6 +325,36 @@ class BatchSpanProcessorTest extends MockeryTestCase
 
         $exporter->expects($this->once())->method('shutdown');
         $processor->shutdown();
+    }
+
+    public function test_create_fromEnvironmentVariables(): void
+    {
+        $exporter = $this->createMock(SpanExporterInterface::class);
+
+        $input = [
+            ['OTEL_BSP_MAX_EXPORT_BATCH_SIZE', 'maxExportBatchSize', 1],
+            ['OTEL_BSP_MAX_QUEUE_SIZE', 'maxQueueSize', 2],
+            ['OTEL_BSP_SCHEDULE_DELAY', 'scheduledDelayMillis', 3],
+            ['OTEL_BSP_EXPORT_TIMEOUT', 'exporterTimeoutMillis', 4],
+        ];
+        foreach ($input as $i) {
+            $this->setEnvironmentVariable($i[0], $i[2]);
+        }
+        $processor = new BatchSpanProcessor($exporter);
+        $reflection = new \ReflectionClass(BatchSpanProcessor::class);
+        foreach ($input as $i) {
+            $attr = $reflection->getProperty($i[1]);
+            $attr->setAccessible(true);
+            $this->assertEquals($i[2], $attr->getValue($processor));
+        }
+    }
+
+    public function test_create_nonNumericEnvironmentValue_throwsException()
+    {
+        $this->setEnvironmentVariable('OTEL_BSP_MAX_QUEUE_SIZE', 'fruit');
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $this->expectException(Exception::class);
+        new BatchSpanProcessor($exporter);
     }
 
     private function createSampledSpanMock()

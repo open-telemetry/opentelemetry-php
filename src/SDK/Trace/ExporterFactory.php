@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use Nyholm\Dsn\DsnParser;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Newrelic\Exporter as NewrelicExporter;
@@ -12,11 +14,12 @@ use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OtlpGrpcExporter;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter as OtlpHttpExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter as ZipkinToNewrelicExporter;
+use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 
 class ExporterFactory
 {
     private $name;
-    private $allowedExporters = ['jaeger' => true, 'zipkin' => true, 'newrelic' => true, 'otlp' => true, 'otlpgrpc' => true, 'otlphttp' => true ,'zipkintonewrelic' => true];
+    private $allowedExporters = ['jaeger' => true, 'zipkin' => true, 'newrelic' => true, 'otlp' => true, 'otlpgrpc' => true, 'otlphttp' => true ,'zipkintonewrelic' => true, 'console' => true];
 
     public function __construct(string $name)
     {
@@ -30,7 +33,7 @@ class ExporterFactory
       * Should follow the format: contribType+baseUrl?option1=a
       * Query string is optional and based on the Exporter
       */
-    public function fromConnectionString(string $configurationString)
+    public function fromConnectionString(string $configurationString): SpanExporterInterface
     {
         $strArr = explode('+', $configurationString);
         // checks if input is given with the format type+baseUrl
@@ -71,9 +74,56 @@ class ExporterFactory
                 // no break
             case 'zipkintonewrelic':
                 return ZipkinToNewrelicExporter::fromConnectionString($endpointUrl, $this->name, $args['licenseKey'] ?? null);
+            case 'console':
+                return ConsoleSpanExporter::fromConnectionString($endpointUrl);
             default:
                 throw new Exception('Invalid contrib name.');
-            }
+        }
+    }
+
+    public function fromEnvironment(): ?SpanExporterInterface
+    {
+        $envValue = getenv('OTEL_TRACES_EXPORTER');
+        if (!$envValue) {
+            throw new Exception('OTEL_TRACES_EXPORTER not set');
+        }
+        $exporters = explode(',', $envValue);
+        //TODO "The SDK MAY accept a comma-separated list to enable setting multiple exporters"
+        if (1 !== count($exporters)) {
+            throw new Exception('OTEL_TRACES_EXPORTER requires exactly 1 exporter');
+        }
+        $exporter = $exporters[0];
+        switch ($exporter) {
+            case 'none':
+                return null;
+            case 'jaeger':
+            case 'zipkin':
+            case 'newrelic':
+            case 'zipkintonewrelic':
+                throw new Exception(sprintf('Exporter %s cannot be created from environment', $exporter));
+            case 'otlp':
+                $protocol = getenv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ?: getenv('OTEL_EXPORTER_OTLP_PROTOCOL');
+                if (!$protocol) {
+                    throw new Exception('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL or OTEL_EXPORTER_OTLP_PROTOCOL required');
+                }
+                switch ($protocol) {
+                    case 'grpc':
+                        return new OtlpGrpcExporter();
+                    case 'http/protobuf':
+                        $factory = new HttpFactory();
+
+                        return new OtlpHttpExporter(new Client(), $factory, $factory); //TODO requires discovery
+                    case 'http/json':
+                        throw new Exception('otlp+http/json not implemented');
+                    default:
+                        throw new Exception('Unknown protocol: ' . $protocol);
+                }
+                // no break
+            case 'console':
+                return new ConsoleSpanExporter();
+            default:
+                throw new Exception('Invalid exporter name');
+        }
     }
 
     private function isAllowed(string $exporter)
