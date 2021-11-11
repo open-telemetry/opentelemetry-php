@@ -27,7 +27,6 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
     public const DEFAULT_LOG_LEVEL = LogLevel::DEBUG;
 
     private string $serviceName;
-    private string $logLevel = self::DEFAULT_LOG_LEVEL;
     private int $granularity = self::GRANULARITY_AGGREGATE;
 
     /**

@@ -61,10 +61,8 @@ class Exporter implements Trace\SpanExporterInterface
      */
     private $streamFactory;
 
-    /**
-    * @var string
-    */
-    private $name;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private string $name;
 
     public function __construct(
         $name,
@@ -88,7 +86,8 @@ class Exporter implements Trace\SpanExporterInterface
             throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
         }
 
-        $this->name = $name;
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+        // $this->name = $name;
         $this->endpointUrl = $endpointUrl;
         $this->licenseKey = $licenseKey;
         $this->client = $client;

@@ -29,15 +29,11 @@ class Exporter implements Trace\SpanExporterInterface
      */
     private $protocol;
 
-    /**
-     * @var string
-     */
-    private $insecure;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private string $insecure;
 
-    /**
-     * @var string
-     */
-    private $certificateFile;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private string $certificateFile;
 
     /**
      * @var array
@@ -49,10 +45,9 @@ class Exporter implements Trace\SpanExporterInterface
      */
     private $compression;
 
-    /**
-     * @var int
-     */
-    private $timeout;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private int $timeout;
+
     /**
      * @var SpanConverter
      */
@@ -91,10 +86,12 @@ class Exporter implements Trace\SpanExporterInterface
         // Set default values based on presence of env variable
         $endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'https://localhost:4318/v1/traces';
         $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'http/protobuf';
-        $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+        // $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
         $this->headers = $this->processHeaders(getenv('OTEL_EXPORTER_OTLP_HEADERS'));
         $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: 'none';
-        $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+        // $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
         $this->client = $client;
         $this->requestFactory = $requestFactory;
