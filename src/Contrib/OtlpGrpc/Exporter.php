@@ -20,7 +20,8 @@ class Exporter implements Trace\SpanExporterInterface
     /**
      * @var string
      */
-    private $protocol;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private $protocol;
 
     /**
      * @var bool|string
@@ -79,7 +80,8 @@ class Exporter implements Trace\SpanExporterInterface
 
         // Set default values based on presence of env variable
         $this->endpointURL = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: $endpointURL;
-        $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc'; // I guess this is redundant?
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+        // $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc'; // I guess this is redundant?
         $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ? filter_var(getenv('OTEL_EXPORTER_OTLP_INSECURE'), FILTER_VALIDATE_BOOLEAN): $insecure;
         $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: $certificateFile;
         $this->headers = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: $headers;

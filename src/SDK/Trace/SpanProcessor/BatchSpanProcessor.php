@@ -18,6 +18,8 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private ?SpanExporterInterface $exporter;
     private int $maxQueueSize;
     private int $scheduledDelayMillis;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    /** @phpstan-ignore-next-line */
     private int $exporterTimeoutMillis;
     private int $maxExportBatchSize;
     private ?int $lastExportTimestamp = null;
@@ -32,6 +34,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         API\ClockInterface $clock,
         int $maxQueueSize = 2048,
         int $scheduledDelayMillis = 5000,
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
         int $exporterTimeoutMillis = 30000,
         int $maxExportBatchSize = 512
     ) {
@@ -42,6 +45,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         $this->clock = $clock;
         $this->maxQueueSize = $maxQueueSize;
         $this->scheduledDelayMillis = $scheduledDelayMillis;
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
         $this->exporterTimeoutMillis = $exporterTimeoutMillis;
         $this->maxExportBatchSize = $maxExportBatchSize;
 
