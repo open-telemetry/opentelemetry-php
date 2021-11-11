@@ -18,7 +18,5 @@ class ContextKeyTest extends TestCase
             (new ContextKey($name))
                 ->name()
         );
-
-
     }
 }
