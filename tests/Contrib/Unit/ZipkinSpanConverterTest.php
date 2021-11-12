@@ -184,6 +184,24 @@ class ZipkinSpanConverterTest extends TestCase
     /**
      * @test
      */
+    public function shouldUseOTELIpv4AndPortCorrectlyForZipkinRemoteEndpoint()
+    {
+        $span = (new SpanData())
+            ->addAttribute('net.peer.ip', '255.255.255.255')
+            ->addAttribute('net.peer.port', '80')
+            ->setKind(SpanKind::KIND_PRODUCER);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertSame($row['remoteEndpoint']['serviceName'], 'unknown');
+        $this->assertSame($row['remoteEndpoint']['ipv4'], pow(2,32)-1);
+        $this->assertSame($row['remoteEndpoint']['port'], 80);
+    }
+
+    /**
+     * @test
+     */
     public function tagsAreCoercedCorrectlyToStrings()
     {
         $listOfStrings = ['string-1', 'string-2'];

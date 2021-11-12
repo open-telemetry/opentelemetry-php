@@ -128,7 +128,6 @@ class SpanConverter
                 "peer.service" => 1,
                 "net.peer.name" => 2,
                 "net.peer.ip" => 3,
-                "net.peer.port" => 3,
                 "peer.hostname" => 4,
                 "peer.address" => 5,
                 "http.host" => 6,
@@ -150,7 +149,7 @@ class SpanConverter
             }
 
             if ($preferredAttr !== null) {
-                
+
                 //ip address handling from the spec, like is done here - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/zipkin/model.go#L264-L271
                 if ($preferredAttr->getKey() === "net.peer.ip") {
 
