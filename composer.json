@@ -66,6 +66,7 @@
         "psalm/plugin-mockery": "^0.9.0",
         "psalm/plugin-phpunit": "^0.13.0",
         "psalm/psalm": "^4.0",
+        "qossmic/deptrac-shim": "^0.16.0",
         "symfony/http-client": "^5.2"
     }
 }
