@@ -211,7 +211,7 @@ class ZipkinSpanConverterTest extends TestCase
         $converter = new SpanConverter('unused');
         $row = $converter->convert($span);
 
-        $this->assertEquals('00000000000000000000000000000001', bin2hex($row['remoteEndpoint']['ipv6'])); //Couldn't figure out how to do a direct assertion against binary data
+        $this->assertSame('00000000000000000000000000000001', bin2hex($row['remoteEndpoint']['ipv6'])); //Couldn't figure out how to do a direct assertion against binary data
     }
 
     /**
