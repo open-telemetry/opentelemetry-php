@@ -15,7 +15,8 @@
         "promphp/prometheus_client_php": "^2.2.1",
         "psr/http-client-implementation": "^1.0",
         "psr/http-factory-implementation": "^1.0",
-        "psr/log": "^1.1"
+        "psr/log": "^1.1",
+        "symfony/polyfill-mbstring": "^1.23"
     },
     "config": {
         "sort-packages": true
