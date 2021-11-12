@@ -24,6 +24,7 @@ class ZipkinSpanConverterTest extends TestCase
     {
         $span = (new SpanData())
             ->setName('guard.validate')
+            ->setKind(SpanKind::KIND_CLIENT)
             ->setParentContext(
                 SpanContext::create(
                     '10000000000000000000000000000000',
@@ -41,6 +42,8 @@ class ZipkinSpanConverterTest extends TestCase
                 'instrumentation_library_version'
             ))
             ->addAttribute('service', 'guard')
+            ->addAttribute('net.peer.name', 'authorizationservice.com')
+            ->addAttribute('peer.service', 'AuthService')
             ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
 
@@ -57,7 +60,7 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame(1505855794194009, $row['timestamp']);
         $this->assertSame(5271717, $row['duration']);
 
-        $this->assertCount(3, $row['tags']);
+        $this->assertCount(5, $row['tags']);
 
         $this->assertSame('Error', $row['tags']['otel.status_code']);
         $this->assertSame('status_description', $row['tags']['error']);
@@ -73,6 +76,8 @@ class ZipkinSpanConverterTest extends TestCase
         [$annotation] = $row['annotations'];
         $this->assertSame('"validators.list": {"job":"stage.updateTime"}', $annotation['value']);
         $this->assertSame(1505855799433901, $annotation['timestamp']);
+
+        $this->assertSame('AuthService', $row['remoteEndpoint']['serviceName']);
     }
 
     /**

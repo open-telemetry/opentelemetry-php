@@ -142,7 +142,7 @@ class SpanConverter
                 if (array_key_exists($attr->getKey(), $attributeToRankMap)) {
                     $attrRank = $attributeToRankMap[$attr->getKey()];
 
-                    if (($preferredAttrRank === null) || ($preferredAttrRank <= $attrRank)) {
+                    if (($preferredAttrRank === null) || ($attrRank <= $preferredAttrRank)) {
                         $preferredAttr = $attr;
                         $preferredAttrRank = $attrRank;
                     }
