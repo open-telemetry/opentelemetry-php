@@ -205,14 +205,13 @@ class ZipkinSpanConverterTest extends TestCase
     public function shouldUseOTELIpv6CorrectlyForZipkinRemoteEndpoint()
     {
         $span = (new SpanData())
-            ->addAttribute('net.peer.ip', '2001:0db8:0100:f101:0210:a4ff:fee3:9566') // 'ffff:ffff:ffff:ffff:0fff:a4ff:fee3:9566') //TODO - figure out why the left-most '0' here can't be switched to an 'f'
+            ->addAttribute('net.peer.ip', '::1')
             ->setKind(SpanKind::KIND_PRODUCER);
 
         $converter = new SpanConverter('unused');
         $row = $converter->convert($span);
 
-        //TODO - figure out the right way to get this test working
-        $this->assertSame(b'0xffffffffffffffff0fffa4fffee39566', $row['remoteEndpoint']['ipv6']);
+        $this->assertEquals('00000000000000000000000000000001', bin2hex($row['remoteEndpoint']['ipv6'])); //Couldn't figure out how to do a direct assertion against binary data
     }
 
     /**
