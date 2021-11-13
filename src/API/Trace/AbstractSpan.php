@@ -6,8 +6,6 @@ namespace OpenTelemetry\API\Trace;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ScopeInterface;
-use OpenTelemetry\SDK\Trace\SpanContext;
-use OpenTelemetry\SDK\Trace\SpanContextKey;
 
 abstract class AbstractSpan implements SpanInterface
 {
