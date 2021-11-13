@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\Internal\StringUtil;
 
 class Attributes implements API\AttributesInterface
 {
@@ -51,11 +50,11 @@ class Attributes implements API\AttributesInterface
         }
 
         if (is_string($value)) {
-            $limitedValue = StringUtil::substr($value, 0, $this->attributeLimits->getAttributeValueLengthLimit());
+            $limitedValue = mb_substr($value, 0, $this->attributeLimits->getAttributeValueLengthLimit());
         } elseif (is_array($value)) {
             $limitedValue = array_map(function ($arrayValue) {
                 if (is_string($arrayValue)) {
-                    return StringUtil::substr($arrayValue, 0, $this->attributeLimits->getAttributeValueLengthLimit());
+                    return mb_substr($arrayValue, 0, $this->attributeLimits->getAttributeValueLengthLimit());
                 }
 
                 return $arrayValue;
