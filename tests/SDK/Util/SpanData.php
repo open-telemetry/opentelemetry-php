@@ -44,8 +44,8 @@ class SpanData implements SDK\SpanDataInterface
         $this->status = StatusData::unset();
         $this->resource = ResourceInfo::emptyResource();
         $this->instrumentationLibrary = InstrumentationLibrary::getEmpty(); /** @phan-suppress-current-line PhanAccessMethodInternal */
-        $this->context = SDK\SpanContext::getInvalid();
-        $this->parentContext = SDK\SpanContext::getInvalid();
+        $this->context = API\SpanContext::getInvalid();
+        $this->parentContext = API\SpanContext::getInvalid();
     }
 
     public function getName(): string

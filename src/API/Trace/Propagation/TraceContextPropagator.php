@@ -8,13 +8,13 @@ use function count;
 use function explode;
 use function hexdec;
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Trace\Span;
-use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\TraceState;
 
 /**

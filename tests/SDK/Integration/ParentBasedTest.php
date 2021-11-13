@@ -6,11 +6,11 @@ namespace OpenTelemetry\Tests\SDK\Integration;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
-use OpenTelemetry\SDK\Trace\SpanContext;
 use PHPUnit\Framework\TestCase;
 
 class ParentBasedTest extends TestCase

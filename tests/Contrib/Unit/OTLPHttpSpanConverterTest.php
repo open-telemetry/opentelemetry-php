@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use function bin2hex;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Contrib\OtlpHttp\SpanConverter;
 use Opentelemetry\Proto\Common\V1\AnyValue;
 use Opentelemetry\Proto\Common\V1\ArrayValue;
@@ -17,7 +18,6 @@ use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\Span;
-use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 

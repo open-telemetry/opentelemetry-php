@@ -7,10 +7,10 @@ namespace OpenTelemetry\Tests\SDK\Integration;
 use InvalidArgumentException;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
-use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
