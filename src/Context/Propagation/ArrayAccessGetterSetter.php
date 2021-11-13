@@ -12,7 +12,6 @@ use InvalidArgumentException;
 use function is_array;
 use function is_object;
 use function is_string;
-use OpenTelemetry\SDK\Trace\KeyedArrayAccessInterface;
 use function sprintf;
 use function strtolower;
 
