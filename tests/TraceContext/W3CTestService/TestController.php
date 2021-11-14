@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use GuzzleHttp\Client;
-use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
+use OpenTelemetry\SDK\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\SpanContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

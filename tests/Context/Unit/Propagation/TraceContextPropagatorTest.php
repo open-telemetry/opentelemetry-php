@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Context\Unit\Propagation;
 
-use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
+use OpenTelemetry\SDK\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\TraceStateInterface;
