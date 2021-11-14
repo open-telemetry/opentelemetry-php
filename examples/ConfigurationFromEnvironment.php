@@ -19,7 +19,7 @@ echo 'Creating Exporter From Environment' . PHP_EOL;
 
 $tracerProvider = (new TracerProviderFactory('example'))->create();
 
-$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
+$tracer = $tracerProvider->getTracer();
 
 echo 'Starting Tracer' . PHP_EOL;
 

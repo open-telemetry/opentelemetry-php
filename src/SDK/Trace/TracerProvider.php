@@ -14,6 +14,8 @@ use function register_shutdown_function;
 
 final class TracerProvider implements API\TracerProviderInterface
 {
+    public const DEFAULT_TRACER_NAME = 'io.opentelemetry.contrib.php';
+
     /** @var array<string, API\TracerInterface> */
     private $tracers;
 
@@ -55,7 +57,7 @@ final class TracerProvider implements API\TracerProviderInterface
     }
 
     /** @inheritDoc */
-    public function getTracer(string $name, ?string $version = null): API\TracerInterface
+    public function getTracer(string $name = self::DEFAULT_TRACER_NAME, ?string $version = null): API\TracerInterface
     {
         if ($this->tracerSharedState->hasShutdown()) {
             return NoopTracer::getInstance();
