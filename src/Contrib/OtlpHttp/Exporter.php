@@ -240,4 +240,12 @@ class Exporter implements Trace\SpanExporterInterface
 
         return $exporter;
     }
+
+    /**
+     * TODO not required when http-discovery is added
+     */
+    public static function create()
+    {
+        return self::fromConnectionString();
+    }
 }

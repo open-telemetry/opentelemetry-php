@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
+use InvalidArgumentException;
 use Nyholm\Dsn\DsnParser;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Newrelic\Exporter as NewrelicExporter;
@@ -27,7 +25,7 @@ class ExporterFactory
     }
 
     /**
-      * Returns the coresponding Exporter via the configuration string
+      * Returns the corresponding Exporter via the configuration string
       *
       * @param string $configurationString String containing unextracted information for Exporter creation
       * Should follow the format: contribType+baseUrl?option1=a
@@ -38,14 +36,14 @@ class ExporterFactory
         $strArr = explode('+', $configurationString);
         // checks if input is given with the format type+baseUrl
         if (sizeof($strArr) !== 2) {
-            throw new Exception('Invalid format.');
+            throw new InvalidArgumentException('Invalid format.');
         }
 
         $contribName = strtolower($strArr[0]);
         $endpointUrl = $strArr[1];
 
         if (!$this->isAllowed($contribName)) {
-            throw new Exception('Invalid contrib name.');
+            throw new InvalidArgumentException('Invalid contrib name.');
         }
 
         // @phan-suppress-next-line PhanUndeclaredClassMethod
@@ -69,7 +67,7 @@ class ExporterFactory
                 case 'http':
                     return OtlpHttpExporter::fromConnectionString($endpointUrl);
                 default:
-                    throw new Exception('Invalid otlp scheme');
+                    throw new InvalidArgumentException('Invalid otlp scheme');
                 }
                 // no break
             case 'zipkintonewrelic':
@@ -77,7 +75,7 @@ class ExporterFactory
             case 'console':
                 return ConsoleSpanExporter::fromConnectionString($endpointUrl);
             default:
-                throw new Exception('Invalid contrib name.');
+                throw new InvalidArgumentException('Invalid contrib name.');
         }
     }
 
@@ -85,12 +83,12 @@ class ExporterFactory
     {
         $envValue = getenv('OTEL_TRACES_EXPORTER');
         if (!$envValue) {
-            throw new Exception('OTEL_TRACES_EXPORTER not set');
+            throw new InvalidArgumentException('OTEL_TRACES_EXPORTER not set');
         }
         $exporters = explode(',', $envValue);
         //TODO "The SDK MAY accept a comma-separated list to enable setting multiple exporters"
         if (1 !== count($exporters)) {
-            throw new Exception('OTEL_TRACES_EXPORTER requires exactly 1 exporter');
+            throw new InvalidArgumentException('OTEL_TRACES_EXPORTER requires exactly 1 exporter');
         }
         $exporter = $exporters[0];
         switch ($exporter) {
@@ -100,29 +98,27 @@ class ExporterFactory
             case 'zipkin':
             case 'newrelic':
             case 'zipkintonewrelic':
-                throw new Exception(sprintf('Exporter %s cannot be created from environment', $exporter));
+                throw new InvalidArgumentException(sprintf('Exporter %s cannot be created from environment', $exporter));
             case 'otlp':
                 $protocol = getenv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ?: getenv('OTEL_EXPORTER_OTLP_PROTOCOL');
                 if (!$protocol) {
-                    throw new Exception('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL or OTEL_EXPORTER_OTLP_PROTOCOL required');
+                    throw new InvalidArgumentException('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL or OTEL_EXPORTER_OTLP_PROTOCOL required');
                 }
                 switch ($protocol) {
                     case 'grpc':
                         return new OtlpGrpcExporter();
                     case 'http/protobuf':
-                        $factory = new HttpFactory();
-
-                        return new OtlpHttpExporter(new Client(), $factory, $factory); //TODO requires discovery
+                        return OtlpHttpExporter::create();
                     case 'http/json':
-                        throw new Exception('otlp+http/json not implemented');
+                        throw new InvalidArgumentException('otlp+http/json not implemented');
                     default:
-                        throw new Exception('Unknown protocol: ' . $protocol);
+                        throw new InvalidArgumentException('Unknown protocol: ' . $protocol);
                 }
                 // no break
             case 'console':
                 return new ConsoleSpanExporter();
             default:
-                throw new Exception('Invalid exporter name');
+                throw new InvalidArgumentException('Invalid exporter name');
         }
     }
 
@@ -135,7 +131,7 @@ class ExporterFactory
     private function parseBaseUrl($dsn)
     {
         if ($dsn == false) {
-            throw new Exception('Invalid endpoint');
+            throw new InvalidArgumentException('Invalid endpoint');
         }
         $parsedUrl = '';
         $parsedUrl .= empty($dsn->getScheme()) ? '' : $dsn->getScheme() . '://';

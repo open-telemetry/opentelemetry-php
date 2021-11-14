@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use Exception;
+use InvalidArgumentException;
 
 class SamplerFactory
 {
@@ -12,15 +12,15 @@ class SamplerFactory
     {
         $name = getenv('OTEL_TRACES_SAMPLER');
         if (!$name) {
-            throw new Exception('OTEL_TRACES_SAMPLER not set');
+            throw new InvalidArgumentException('OTEL_TRACES_SAMPLER not set');
         }
         $arg = getenv('OTEL_TRACES_SAMPLER_ARG');
         if (false !== strpos($name, 'traceidratio')) {
             if (!$arg) {
-                throw new Exception('OTEL_TRACES_SAMPLER_ARG required for ratio-based sampler: ' . $name);
+                throw new InvalidArgumentException('OTEL_TRACES_SAMPLER_ARG required for ratio-based sampler: ' . $name);
             }
             if (!is_numeric($arg)) {
-                throw new Exception('OTEL_TRACES_SAMPLER_ARG value is not numeric');
+                throw new InvalidArgumentException('OTEL_TRACES_SAMPLER_ARG value is not numeric');
             }
         }
         switch ($name) {
@@ -37,7 +37,7 @@ class SamplerFactory
             case 'parentbased_traceidratio':
                 return new Sampler\ParentBased(new Sampler\TraceIdRatioBasedSampler((float) $arg));
             default:
-                throw new Exception('Unknown sampler: ' . $name);
+                throw new InvalidArgumentException('Unknown sampler: ' . $name);
         }
     }
 }

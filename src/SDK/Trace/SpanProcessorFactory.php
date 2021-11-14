@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use Exception;
+use InvalidArgumentException;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
@@ -15,7 +15,7 @@ class SpanProcessorFactory
     {
         $name = getenv('OTEL_TRACES_PROCESSOR');
         if (!$name) {
-            throw new Exception('OTEL_TRACES_PROCESSOR not set');
+            throw new InvalidArgumentException('OTEL_TRACES_PROCESSOR not set');
         }
         switch ($name) {
             case 'batch':
@@ -25,7 +25,7 @@ class SpanProcessorFactory
             case 'noop':
                 return NoopSpanProcessor::getInstance();
             default:
-                throw new Exception('Unknown processor: ' . $name);
+                throw new InvalidArgumentException('Unknown processor: ' . $name);
         }
     }
 }
