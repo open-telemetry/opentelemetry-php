@@ -33,7 +33,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private bool $running = true;
 
     /** @var list<SpanDataInterface> */
-    private array $queue;
+    private array $queue = [];
 
     public function __construct(
         ?SpanExporterInterface $exporter,
@@ -55,8 +55,6 @@ class BatchSpanProcessor implements SpanProcessorInterface
         if ($this->maxExportBatchSize > $this->maxQueueSize) {
             throw new InvalidArgumentException("maxExportBatchSize should be smaller or equal to $this->maxQueueSize");
         }
-
-        $this->queue = [];
     }
 
     private function fromEnv(string $key, int $default): int
