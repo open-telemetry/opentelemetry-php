@@ -90,12 +90,12 @@ class SpanLimitsBuilder
     public function build(): SpanLimits
     {
         return new SpanLimits(
-            $this->attributeCountLimit ?: $this->fromEnv('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 128),
-            $this->attributeValueLengthLimit ?: $this->fromEnv('OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT', PHP_INT_MAX),
-            $this->eventCountLimit ?: $this->fromEnv('OTEL_SPAN_EVENT_COUNT_LIMIT', 128),
-            $this->linkCountLimit ?: $this->fromEnv('OTEL_SPAN_LINK_COUNT_LIMIT', 128),
-            $this->attributePerEventCountLimit ?: $this->fromEnv('OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT', 128),
-            $this->attributePerLinkCountLimit ?: $this->fromEnv('OTEL_LINK_ATTRIBUTE_COUNT_LIMIT', 128),
+            $this->attributeCountLimit ?: $this->fromEnv('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', SpanLimits::DEFAULT_SPAN_ATTRIBUTE_COUNT_LIMIT),
+            $this->attributeValueLengthLimit ?: $this->fromEnv('OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT', SpanLimits::DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT),
+            $this->eventCountLimit ?: $this->fromEnv('OTEL_SPAN_EVENT_COUNT_LIMIT', SpanLimits::DEFAULT_SPAN_EVENT_COUNT_LIMIT),
+            $this->linkCountLimit ?: $this->fromEnv('OTEL_SPAN_LINK_COUNT_LIMIT', SpanLimits::DEFAULT_SPAN_LINK_COUNT_LIMIT),
+            $this->attributePerEventCountLimit ?: $this->fromEnv('OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT', SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT),
+            $this->attributePerLinkCountLimit ?: $this->fromEnv('OTEL_LINK_ATTRIBUTE_COUNT_LIMIT', SpanLimits::DEFAULT_LINK_ATTRIBUTE_COUNT_LIMIT),
         );
     }
 

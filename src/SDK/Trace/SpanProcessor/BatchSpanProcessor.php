@@ -16,6 +16,11 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 
 class BatchSpanProcessor implements SpanProcessorInterface
 {
+    public const DEFAULT_SCHEDULE_DELAY = 5000;
+    public const DEFAULT_EXPORT_TIMEOUT = 30000;
+    public const DEFAULT_MAX_QUEUE_SIZE = 2048;
+    public const DEFAULT_MAX_EXPORT_BATCH_SIZE = 512;
+
     private ?SpanExporterInterface $exporter;
     private ?int $maxQueueSize;
     private ?int $scheduledDelayMillis;
@@ -43,10 +48,10 @@ class BatchSpanProcessor implements SpanProcessorInterface
         }
         $this->exporter = $exporter;
         $this->clock = $clock;
-        $this->maxQueueSize = $maxQueueSize ?: $this->fromEnv('OTEL_BSP_MAX_QUEUE_SIZE', 2048);
-        $this->scheduledDelayMillis = $scheduledDelayMillis ?: $this->fromEnv('OTEL_BSP_SCHEDULE_DELAY', 5000);
-        $this->exporterTimeoutMillis = $exporterTimeoutMillis ?: $this->fromEnv('OTEL_BSP_EXPORT_TIMEOUT', 30000);
-        $this->maxExportBatchSize = $maxExportBatchSize ?: $this->fromEnv('OTEL_BSP_MAX_EXPORT_BATCH_SIZE', 512);
+        $this->maxQueueSize = $maxQueueSize ?: $this->fromEnv('OTEL_BSP_MAX_QUEUE_SIZE', self::DEFAULT_MAX_QUEUE_SIZE);
+        $this->scheduledDelayMillis = $scheduledDelayMillis ?: $this->fromEnv('OTEL_BSP_SCHEDULE_DELAY', self::DEFAULT_SCHEDULE_DELAY);
+        $this->exporterTimeoutMillis = $exporterTimeoutMillis ?: $this->fromEnv('OTEL_BSP_EXPORT_TIMEOUT', self::DEFAULT_EXPORT_TIMEOUT);
+        $this->maxExportBatchSize = $maxExportBatchSize ?: $this->fromEnv('OTEL_BSP_MAX_EXPORT_BATCH_SIZE', self::DEFAULT_MAX_EXPORT_BATCH_SIZE);
         if ($this->maxExportBatchSize > $this->maxQueueSize) {
             throw new InvalidArgumentException("maxExportBatchSize should be smaller or equal to $this->maxQueueSize");
         }

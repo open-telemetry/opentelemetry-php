@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
+use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -20,7 +21,7 @@ class SpanLimitsBuilderTest extends TestCase
     {
         $builder = new SpanLimitsBuilder();
         $spanLimits = $builder->build();
-        $this->assertEquals(128, $spanLimits->getAttributeLimits()->getAttributeCountLimit());
+        $this->assertEquals(SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT, $spanLimits->getAttributeLimits()->getAttributeCountLimit());
     }
 
     /**
