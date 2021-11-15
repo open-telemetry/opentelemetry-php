@@ -176,12 +176,13 @@ class SpanConverter
             return null;
         }
 
+        //GO doesn't check if the value is a string here, but it seems like it should based on the comment here - https://github.com/open-telemetry/opentelemetry-go/blob/4ba964bae77d9d32b4bb0167ed5533a0c05dcdf9/attribute/value.go#L200
+        if (!is_string($preferredAttr->getValue())) {
+            return null;
+        }
+
         //ip address handling from the spec, like is done here - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/zipkin/model.go#L264-L271
         if ($preferredAttr->getKey() === "net.peer.ip") {
-
-            //GO doesn't check if the value is a string here, but it seems like it should based on the comment here - https://github.com/open-telemetry/opentelemetry-go/blob/4ba964bae77d9d32b4bb0167ed5533a0c05dcdf9/attribute/value.go#L200
-
-            if (is_string($preferredAttr->getValue())) {
                 $ipString = $preferredAttr->getValue();
 
                 if (filter_var($ipString, FILTER_VALIDATE_IP)) {
@@ -221,14 +222,10 @@ class SpanConverter
 
                     return $remoteEndpointArr;
                 }
-            }
-            
         } else {
-            if (is_string($preferredAttr->getValue())) {
-                return [
-                    'serviceName' => $preferredAttr->getValue(),
-                ];
-            }
+            return [
+                'serviceName' => $preferredAttr->getValue(),
+            ];
         }
 
         return null;
