@@ -25,6 +25,7 @@ class SpanProcessorFactoryTest extends TestCase
     /**
      * @test
      * @dataProvider processorProvider
+     * @psalm-suppress ArgumentTypeCoercion
      */
     public function spanProcessorFactory_createSpanProcessorFromEnvironment(string $processorName, string $expected)
     {

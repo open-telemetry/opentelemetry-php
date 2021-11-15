@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Context\Unit\Propagation;
+namespace OpenTelemetry\Tests\SDK\Unit\Trace\Propagation;
 
-use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\TraceState;
 use PHPUnit\Framework\TestCase;

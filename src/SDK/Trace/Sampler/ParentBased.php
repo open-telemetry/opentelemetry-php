@@ -11,6 +11,11 @@ use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
 
 /**
+ * Phan seems to struggle with the variadic arguments in the latest version
+ * @phan-file-suppress PhanParamTooFewUnpack
+ */
+
+/**
  * This implementation of the SamplerInterface that respects parent context's sampling decision
  * and delegates for the root span.
  * Example:

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Trace\Propagation;
+namespace OpenTelemetry\SDK\Trace\Propagation;
 
 use function count;
 use function explode;

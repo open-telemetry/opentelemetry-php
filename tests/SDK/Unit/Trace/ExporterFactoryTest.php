@@ -6,8 +6,10 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
+use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\Strategy\MockClientStrategy;
 use OpenTelemetry\Contrib as Path;
-use OpenTelemetry\SDK\Trace\ExporterFactory as ExporterFactory;
+use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use PHPUnit\Framework\TestCase;
 
@@ -18,6 +20,11 @@ class ExporterFactoryTest extends TestCase
     public function tearDown(): void
     {
         $this->restoreEnvironmentVariables();
+    }
+
+    public function setUp(): void
+    {
+        HttpClientDiscovery::prependStrategy(MockClientStrategy::class);
     }
 
     /**

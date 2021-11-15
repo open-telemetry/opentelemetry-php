@@ -9,6 +9,11 @@ use Exception;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use PHPUnit\Framework\TestCase;
 
+class MockWithTrait
+{
+    use EnvironmentVariablesTrait;
+}
+
 class EnvironmentVariablesTraitTest extends TestCase
 {
     use EnvironmentVariables;
@@ -23,9 +28,9 @@ class EnvironmentVariablesTraitTest extends TestCase
      */
     public function environmentVariables_integer_get()
     {
-        $mock = $this->getMockForTrait(EnvironmentVariablesTrait::class);
+        $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_FOO', '100');
-        $value = $mock->getIntFromEnvironment('OTEL_FOO', 999); /* @phpstan-ignore-line */
+        $value = $mock->getIntFromEnvironment('OTEL_FOO', 999);
         $this->assertSame(100, $value);
     }
 
@@ -34,10 +39,10 @@ class EnvironmentVariablesTraitTest extends TestCase
      */
     public function environmentVariables_integer_failure()
     {
-        $mock = $this->getMockForTrait(EnvironmentVariablesTrait::class);
+        $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_FOO', 'foo');
         $this->expectException(Exception::class);
-        $mock->getIntFromEnvironment('OTEL_FOO', 99); /* @phpstan-ignore-line */
+        $mock->getIntFromEnvironment('OTEL_FOO', 99);
     }
 
     /**
@@ -45,8 +50,8 @@ class EnvironmentVariablesTraitTest extends TestCase
      */
     public function environmentVariables_integer_usesDefaultIfEnvVarNotDefined()
     {
-        $mock = $this->getMockForTrait(EnvironmentVariablesTrait::class);
-        $this->assertSame(20, $mock->getIntFromEnvironment('OTEL_FOO', 20)); /* @phpstan-ignore-line */
+        $mock = new MockWithTrait();
+        $this->assertSame(20, $mock->getIntFromEnvironment('OTEL_FOO', 20));
     }
 
     /**
@@ -54,22 +59,22 @@ class EnvironmentVariablesTraitTest extends TestCase
      */
     public function environmentVariables_string_get()
     {
-        $mock = $this->getMockForTrait(EnvironmentVariablesTrait::class);
+        $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_FOO', 'foo');
-        $value = $mock->getStringFromEnvironment('OTEL_FOO', 'bar'); /* @phpstan-ignore-line */
+        $value = $mock->getStringFromEnvironment('OTEL_FOO', 'bar');
         $this->assertSame('foo', $value);
     }
 
     /**
+     * The SDK MUST interpret an empty value of an environment variable the same way as when the variable is unset
      * @test
      * @dataProvider emptyProvider
-     * The SDK MUST interpret an empty value of an environment variable the same way as when the variable is unset
      */
     public function environmentVariables_string_usesDefaultWhenEmptyValue(?string $input)
     {
-        $mock = $this->getMockForTrait(EnvironmentVariablesTrait::class);
+        $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_FOO', $input);
-        $value = $mock->getStringFromEnvironment('OTEL_FOO', 'bar'); /* @phpstan-ignore-line */
+        $value = $mock->getStringFromEnvironment('OTEL_FOO', 'bar');
         $this->assertSame('bar', $value);
     }
 
@@ -79,9 +84,9 @@ class EnvironmentVariablesTraitTest extends TestCase
      */
     public function environmentVariables_int_usesDefaultWhenEmptyValue(?int $input)
     {
-        $mock = $this->getMockForTrait(EnvironmentVariablesTrait::class);
+        $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_FOO', $input);
-        $value = $mock->getIntFromEnvironment('OTEL_FOO', 99); /* @phpstan-ignore-line */
+        $value = $mock->getIntFromEnvironment('OTEL_FOO', 99);
         $this->assertSame(99, $value);
     }
 
@@ -91,10 +96,10 @@ class EnvironmentVariablesTraitTest extends TestCase
      */
     public function environmentVariables_bool_usesDefaultWhenEmptyValue(?bool $input)
     {
-        $mock = $this->getMockForTrait(EnvironmentVariablesTrait::class);
+        $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_FOO', $input);
-        $value = $mock->getIntFromEnvironment('OTEL_FOO', true); /* @phpstan-ignore-line */
-        $this->assertSame(true, $value);
+        $value = $mock->getBooleanFromEnvironment('OTEL_FOO', true);
+        $this->assertTrue($value);
     }
 
     public function emptyProvider()
@@ -111,9 +116,9 @@ class EnvironmentVariablesTraitTest extends TestCase
      */
     public function environmentVariables_bool_get(string $input, bool $default, bool $expected)
     {
-        $mock = $this->getMockForTrait(EnvironmentVariablesTrait::class);
+        $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_BOOL', $input);
-        $this->assertSame($expected, $mock->getBooleanFromEnvironment('OTEL_BOOL', $default)); /* @phpstan-ignore-line */
+        $this->assertSame($expected, $mock->getBooleanFromEnvironment('OTEL_BOOL', $default));
     }
 
     public function booleanProvider()
