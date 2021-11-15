@@ -9,6 +9,7 @@ use OpenTelemetry\API\Trace\EventInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\Trace\AbstractClock;
+use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
 class SpanConverter
@@ -159,29 +160,7 @@ class SpanConverter
     }
 
     private static function toRemoteEndpoint(SpanDataInterface $span): ?array {
-        $attributeToRankMap = [
-            "peer.service" => 1,
-            "net.peer.name" => 2,
-            "net.peer.ip" => 3,
-            "peer.hostname" => 4,
-            "peer.address" => 5,
-            "http.host" => 6,
-            "db.name" => 7
-        ];
-
-        $preferredAttrRank = null;
-        $preferredAttr = null;
-
-        foreach ($span->getAttributes() as $attr) {
-            if (array_key_exists($attr->getKey(), $attributeToRankMap)) {
-                $attrRank = $attributeToRankMap[$attr->getKey()];
-
-                if (($preferredAttrRank === null) || ($attrRank <= $preferredAttrRank)) {
-                    $preferredAttr = $attr;
-                    $preferredAttrRank = $attrRank;
-                }
-            }
-        }
+        $preferredAttr = SpanConverter::findRemoteEndpointPreferredAttribute($span);
 
         if ($preferredAttr !== null) {
 
@@ -242,5 +221,33 @@ class SpanConverter
         }
 
         return null;
+    }
+
+    private static function findRemoteEndpointPreferredAttribute(SpanDataInterface $span): ?Attribute {
+        $attributeToRankMap = [
+            "peer.service" => 1,
+            "net.peer.name" => 2,
+            "net.peer.ip" => 3,
+            "peer.hostname" => 4,
+            "peer.address" => 5,
+            "http.host" => 6,
+            "db.name" => 7
+        ];
+
+        $preferredAttrRank = null;
+        $preferredAttr = null;
+
+        foreach ($span->getAttributes() as $attr) {
+            if (array_key_exists($attr->getKey(), $attributeToRankMap)) {
+                $attrRank = $attributeToRankMap[$attr->getKey()];
+
+                if (($preferredAttrRank === null) || ($attrRank <= $preferredAttrRank)) {
+                    $preferredAttr = $attr;
+                    $preferredAttrRank = $attrRank;
+                }
+            }
+        }
+
+        return $preferredAttr;
     }
 }
