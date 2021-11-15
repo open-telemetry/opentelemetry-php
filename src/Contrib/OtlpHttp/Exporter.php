@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpHttp;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
+use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
 use Nyholm\Dsn\DsnParser;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
@@ -231,13 +231,10 @@ class Exporter implements Trace\SpanExporterInterface
     /** @inheritDoc */
     public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
     {
-        $factory = new HttpFactory();
-        $exporter = new Exporter(
-            new Client(),
-            $factory,
-            $factory
+        return new Exporter(
+            HttpClientDiscovery::find(),
+            Psr17FactoryDiscovery::findRequestFactory(),
+            Psr17FactoryDiscovery::findStreamFactory()
         );
-
-        return $exporter;
     }
 }

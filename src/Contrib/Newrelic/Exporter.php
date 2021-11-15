@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Newrelic;
 
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
+use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Trace;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -169,18 +169,17 @@ class Exporter implements Trace\SpanExporterInterface
     /** @inheritDoc */
     public static function fromConnectionString(string $endpointUrl, string $name, $args)
     {
-        if ($args == false) {
+        if (!is_string($args)) {
             throw new Exception('Invalid license key.');
         }
-        $factory = new HttpFactory();
 
         return new Exporter(
             $name,
             $endpointUrl,
             $args,
-            new Client(),
-            $factory,
-            $factory
+            HttpClientDiscovery::find(),
+            Psr17FactoryDiscovery::findRequestFactory(),
+            Psr17FactoryDiscovery::findStreamFactory()
         );
     }
 }

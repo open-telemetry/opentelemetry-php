@@ -12,8 +12,9 @@
         "google/protobuf": "^v3.3.0",
         "grpc/grpc": "^1.30",
         "nyholm/dsn": "^2.0.0",
+        "php-http/async-client-implementation": "^1.0",
+        "php-http/discovery": "^1.14",
         "promphp/prometheus_client_php": "^2.2.1",
-        "psr/http-client-implementation": "^1.0",
         "psr/http-factory-implementation": "^1.0",
         "psr/log": "^1.1",
         "symfony/polyfill-mbstring": "^1.23"
@@ -60,6 +61,7 @@
         "monolog/monolog": "^2.3",
         "nyholm/psr7": "^1.4",
         "phan/phan": "^5.0",
+        "php-http/mock-client": "^1.5",
         "phpstan/phpstan": "^1.1",
         "phpstan/phpstan-mockery": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
