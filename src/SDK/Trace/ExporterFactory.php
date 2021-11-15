@@ -12,10 +12,13 @@ use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OtlpGrpcExporter;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter as OtlpHttpExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter as ZipkinToNewrelicExporter;
+use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 
 class ExporterFactory
 {
+    use EnvironmentVariablesTrait;
+
     private $name;
     private $allowedExporters = ['jaeger' => true, 'zipkin' => true, 'newrelic' => true, 'otlp' => true, 'otlpgrpc' => true, 'otlphttp' => true ,'zipkintonewrelic' => true, 'console' => true];
 
@@ -81,7 +84,7 @@ class ExporterFactory
 
     public function fromEnvironment(): ?SpanExporterInterface
     {
-        $envValue = getenv('OTEL_TRACES_EXPORTER');
+        $envValue = $this->getStringFromEnvironment('OTEL_TRACES_EXPORTER', '');
         if (!$envValue) {
             throw new InvalidArgumentException('OTEL_TRACES_EXPORTER not set');
         }

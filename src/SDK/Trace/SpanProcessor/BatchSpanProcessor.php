@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
-use Exception;
 use InvalidArgumentException;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
@@ -17,6 +17,8 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 
 class BatchSpanProcessor implements SpanProcessorInterface
 {
+    use EnvironmentVariablesTrait;
+
     public const DEFAULT_SCHEDULE_DELAY = 5000;
     public const DEFAULT_EXPORT_TIMEOUT = 30000;
     public const DEFAULT_MAX_QUEUE_SIZE = 2048;
@@ -49,26 +51,13 @@ class BatchSpanProcessor implements SpanProcessorInterface
         }
         $this->exporter = $exporter;
         $this->clock = $clock;
-        $this->maxQueueSize = $maxQueueSize ?: $this->fromEnv('OTEL_BSP_MAX_QUEUE_SIZE', self::DEFAULT_MAX_QUEUE_SIZE);
-        $this->scheduledDelayMillis = $scheduledDelayMillis ?: $this->fromEnv('OTEL_BSP_SCHEDULE_DELAY', self::DEFAULT_SCHEDULE_DELAY);
-        $this->exporterTimeoutMillis = $exporterTimeoutMillis ?: $this->fromEnv('OTEL_BSP_EXPORT_TIMEOUT', self::DEFAULT_EXPORT_TIMEOUT);
-        $this->maxExportBatchSize = $maxExportBatchSize ?: $this->fromEnv('OTEL_BSP_MAX_EXPORT_BATCH_SIZE', self::DEFAULT_MAX_EXPORT_BATCH_SIZE);
+        $this->maxQueueSize = $maxQueueSize ?: $this->getIntFromEnvironment('OTEL_BSP_MAX_QUEUE_SIZE', self::DEFAULT_MAX_QUEUE_SIZE);
+        $this->scheduledDelayMillis = $scheduledDelayMillis ?: $this->getIntFromEnvironment('OTEL_BSP_SCHEDULE_DELAY', self::DEFAULT_SCHEDULE_DELAY);
+        $this->exporterTimeoutMillis = $exporterTimeoutMillis ?: $this->getIntFromEnvironment('OTEL_BSP_EXPORT_TIMEOUT', self::DEFAULT_EXPORT_TIMEOUT);
+        $this->maxExportBatchSize = $maxExportBatchSize ?: $this->getIntFromEnvironment('OTEL_BSP_MAX_EXPORT_BATCH_SIZE', self::DEFAULT_MAX_EXPORT_BATCH_SIZE);
         if ($this->maxExportBatchSize > $this->maxQueueSize) {
             throw new InvalidArgumentException("maxExportBatchSize should be smaller or equal to $this->maxQueueSize");
         }
-    }
-
-    private function fromEnv(string $key, int $default): int
-    {
-        $value = getenv($key);
-        if (false === $value) {
-            return $default;
-        }
-        if (!is_numeric($value)) {
-            throw new Exception($key . ' is not numeric');
-        }
-
-        return (int) $value;
     }
 
     /**

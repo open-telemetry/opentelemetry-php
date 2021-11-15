@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\SDK\EnvironmentVariablesTrait;
+
 class SpanLimitsBuilder
 {
+    use EnvironmentVariablesTrait;
+
     /** @var int Maximum allowed attribute count per record */
     private $attributeCountLimit;
 
@@ -90,25 +94,12 @@ class SpanLimitsBuilder
     public function build(): SpanLimits
     {
         return new SpanLimits(
-            $this->attributeCountLimit ?: $this->fromEnv('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', SpanLimits::DEFAULT_SPAN_ATTRIBUTE_COUNT_LIMIT),
-            $this->attributeValueLengthLimit ?: $this->fromEnv('OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT', SpanLimits::DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT),
-            $this->eventCountLimit ?: $this->fromEnv('OTEL_SPAN_EVENT_COUNT_LIMIT', SpanLimits::DEFAULT_SPAN_EVENT_COUNT_LIMIT),
-            $this->linkCountLimit ?: $this->fromEnv('OTEL_SPAN_LINK_COUNT_LIMIT', SpanLimits::DEFAULT_SPAN_LINK_COUNT_LIMIT),
-            $this->attributePerEventCountLimit ?: $this->fromEnv('OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT', SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT),
-            $this->attributePerLinkCountLimit ?: $this->fromEnv('OTEL_LINK_ATTRIBUTE_COUNT_LIMIT', SpanLimits::DEFAULT_LINK_ATTRIBUTE_COUNT_LIMIT),
+            $this->attributeCountLimit ?: $this->getIntFromEnvironment('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', SpanLimits::DEFAULT_SPAN_ATTRIBUTE_COUNT_LIMIT),
+            $this->attributeValueLengthLimit ?: $this->getIntFromEnvironment('OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT', SpanLimits::DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT),
+            $this->eventCountLimit ?: $this->getIntFromEnvironment('OTEL_SPAN_EVENT_COUNT_LIMIT', SpanLimits::DEFAULT_SPAN_EVENT_COUNT_LIMIT),
+            $this->linkCountLimit ?: $this->getIntFromEnvironment('OTEL_SPAN_LINK_COUNT_LIMIT', SpanLimits::DEFAULT_SPAN_LINK_COUNT_LIMIT),
+            $this->attributePerEventCountLimit ?: $this->getIntFromEnvironment('OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT', SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT),
+            $this->attributePerLinkCountLimit ?: $this->getIntFromEnvironment('OTEL_LINK_ATTRIBUTE_COUNT_LIMIT', SpanLimits::DEFAULT_LINK_ATTRIBUTE_COUNT_LIMIT),
         );
-    }
-
-    private function fromEnv(string $key, int $default): int
-    {
-        $value = getenv($key);
-        if (false === $value) {
-            return $default;
-        }
-        if (!is_numeric($value)) {
-            throw new \Exception($key . ' contains non-numeric value');
-        }
-
-        return (int) $value;
     }
 }

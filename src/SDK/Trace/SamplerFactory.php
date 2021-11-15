@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
+use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 
 class SamplerFactory
 {
+    use EnvironmentVariablesTrait;
+
     public function fromEnvironment(): SamplerInterface
     {
-        $name = getenv('OTEL_TRACES_SAMPLER');
+        $name = $this->getStringFromEnvironment('OTEL_TRACES_SAMPLER', '');
         if (!$name) {
             throw new InvalidArgumentException('OTEL_TRACES_SAMPLER not set');
         }
-        $arg = getenv('OTEL_TRACES_SAMPLER_ARG');
+        $arg = $this->getStringFromEnvironment('OTEL_TRACES_SAMPLER_ARG', '');
         if (false !== strpos($name, 'traceidratio')) {
             if (!$arg) {
                 throw new InvalidArgumentException('OTEL_TRACES_SAMPLER_ARG required for ratio-based sampler: ' . $name);
