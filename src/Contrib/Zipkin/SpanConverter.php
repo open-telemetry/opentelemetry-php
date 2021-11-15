@@ -98,10 +98,6 @@ class SpanConverter
         }
 
         foreach ($span->getEvents() as $event) {
-            if (!array_key_exists('annotations', $row)) {
-                $row['annotations'] = [];
-            }
-
             $value = $event->getName();
 
             if (count($event->getAttributes()) > 0) {
