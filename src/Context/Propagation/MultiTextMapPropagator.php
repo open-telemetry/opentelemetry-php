@@ -68,6 +68,8 @@ final class MultiTextMapPropagator implements TextMapPropagatorInterface
     {
         return array_values(
             array_unique(
+                // Phan seems to struggle here with the variadic argument
+                // @phan-suppress-next-line PhanParamTooFewInternalUnpack
                 array_merge(
                     ...array_map(
                         static fn (TextMapPropagatorInterface $propagator) => $propagator->fields(),
