@@ -15,7 +15,7 @@ trait EnvironmentVariablesTrait
     public function getIntFromEnvironment(string $key, int $default): int
     {
         $value = getenv($key);
-        if (false === $value) {
+        if (false === $value || '' === $value) {
             return $default;
         }
         if (false === \filter_var($value, FILTER_VALIDATE_INT)) {
@@ -28,7 +28,7 @@ trait EnvironmentVariablesTrait
     public function getStringFromEnvironment(string $key, string $default): string
     {
         $value = getenv($key);
-        if (false === $value || empty($value)) {
+        if (false === $value || '' === $value) {
             return $default;
         }
 
@@ -38,7 +38,7 @@ trait EnvironmentVariablesTrait
     public function getBooleanFromEnvironment(string $key, bool $default): bool
     {
         $value = getenv($key);
-        if (false === $value) {
+        if (false === $value || '' === $value) {
             return $default;
         }
         switch (strtolower($value)) {

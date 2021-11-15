@@ -62,9 +62,10 @@ class EnvironmentVariablesTraitTest extends TestCase
 
     /**
      * @test
-     * @dataProvider stringProvider
+     * @dataProvider emptyProvider
+     * The SDK MUST interpret an empty value of an environment variable the same way as when the variable is unset
      */
-    public function environmentVariables_string_usesDefault(?string $input)
+    public function environmentVariables_string_usesDefaultWhenEmptyValue(?string $input)
     {
         $mock = $this->getMockForTrait(EnvironmentVariablesTrait::class);
         $this->setEnvironmentVariable('OTEL_FOO', $input);
@@ -72,7 +73,31 @@ class EnvironmentVariablesTraitTest extends TestCase
         $this->assertSame('bar', $value);
     }
 
-    public function stringProvider()
+    /*
+     * @test
+     * @dataProvider emptyProvider
+     */
+    public function environmentVariables_int_usesDefaultWhenEmptyValue(?int $input)
+    {
+        $mock = $this->getMockForTrait(EnvironmentVariablesTrait::class);
+        $this->setEnvironmentVariable('OTEL_FOO', $input);
+        $value = $mock->getIntFromEnvironment('OTEL_FOO', 99); /* @phpstan-ignore-line */
+        $this->assertSame(99, $value);
+    }
+
+    /*
+     * @test
+     * @dataProvider emptyProvider
+     */
+    public function environmentVariables_bool_usesDefaultWhenEmptyValue(?bool $input)
+    {
+        $mock = $this->getMockForTrait(EnvironmentVariablesTrait::class);
+        $this->setEnvironmentVariable('OTEL_FOO', $input);
+        $value = $mock->getIntFromEnvironment('OTEL_FOO', true); /* @phpstan-ignore-line */
+        $this->assertSame(true, $value);
+    }
+
+    public function emptyProvider()
     {
         return [
             'no value' => [null],
