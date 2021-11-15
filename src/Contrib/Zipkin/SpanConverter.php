@@ -184,7 +184,10 @@ class SpanConverter
         //ip address handling from the spec, like is done here - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/zipkin/model.go#L264-L271
         switch($preferredAttr->getKey()) {
             case "net.peer.ip":
-                return SpanConverter::getRemoteEndpointDataFromIpAddressAndPort($preferredAttr, $span);
+                return SpanConverter::getRemoteEndpointDataFromIpAddressAndPort(
+                    $preferredAttr, 
+                    SpanConverter::getPortNumberFromSpanAttributes($span)
+                );
             default:
                 return [
                     'serviceName' => $preferredAttr->getValue(),
@@ -210,7 +213,7 @@ class SpanConverter
         return $preferredAttr;
     }
 
-    private static function getRemoteEndpointDataFromIpAddressAndPort(Attribute $preferredAttr, SpanDataInterface $span): ?array { //TODO - switch the span out for just the list of attributes
+    private static function getRemoteEndpointDataFromIpAddressAndPort(Attribute $preferredAttr, ?int $portNumber): ?array {
         $ipString = $preferredAttr->getValue();
 
         if (!filter_var($ipString, FILTER_VALIDATE_IP)) {
@@ -236,7 +239,7 @@ class SpanConverter
             //TODO - does the else case need handling here?
         }
 
-        $remoteEndpointArr["port"] = SpanConverter::getPortNumberFromSpanAttributes($span) ?? 0;
+        $remoteEndpointArr["port"] = $portNumber ?? 0;
 
         return $remoteEndpointArr;
     }
