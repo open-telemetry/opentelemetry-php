@@ -7,7 +7,6 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
-use OpenTelemetry\SDK\Trace\SamplerInterface;
 use PHPUnit\Framework\TestCase;
 
 class SamplerFactoryTest extends TestCase
@@ -23,30 +22,31 @@ class SamplerFactoryTest extends TestCase
      * @test
      * @dataProvider samplerProvider
      */
-    public function samplerFactory_createSamplerFromEnvironment(string $sampler, string $arg = null)
+    public function samplerFactory_createSamplerFromEnvironment(string $samplerName, string $expected, string $arg = null)
     {
-        $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $sampler);
+        $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $samplerName);
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);
         $factory = new SamplerFactory();
-        $this->assertInstanceOf(SamplerInterface::class, $factory->fromEnvironment());
+        $sampler = $factory->fromEnvironment();
+        $this->assertStringContainsString($expected, $sampler->getDescription());
     }
 
     public function samplerProvider()
     {
         return [
-            'always on' => ['always_on'],
-            'always off' => ['always_off'],
-            'trace id ratio' => ['traceidratio', '0.95'],
-            'parent based always on' => ['parentbased_always_on'],
-            'parent based always off' => ['parentbased_always_off'],
-            'parent based trade id ratio' => ['parentbased_traceidratio', '0.95'],
+            'always on' => ['always_on', 'AlwaysOn'],
+            'always off' => ['always_off', 'AlwaysOff'],
+            'trace id ratio' => ['traceidratio', 'TraceIdRatio', '0.95'],
+            'parent based always on' => ['parentbased_always_on', 'ParentBased+AlwaysOn'],
+            'parent based always off' => ['parentbased_always_off', 'ParentBased+AlwaysOff'],
+            'parent based trade id ratio' => ['parentbased_traceidratio', 'ParentBased+TraceIdRatio', '0.95'],
         ];
     }
     /**
      * @test
      * @dataProvider invalidSamplerProvider
      */
-    public function samplerFactory_throwsExceptionForInvalidOrUnsupported(string $sampler, string $arg = null)
+    public function samplerFactory_throwsExceptionForInvalidOrUnsupported(?string $sampler, string $arg = null)
     {
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $sampler);
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);
@@ -63,6 +63,7 @@ class SamplerFactoryTest extends TestCase
             'ratio with invalid arg' => ['traceidratio', 'foo'],
             'parent ratio with invalid arg' => ['parentbased_traceidratio', 'foo'],
             'unknown sampler' => ['foo'],
+            'no sampler' => [null],
         ];
     }
 }

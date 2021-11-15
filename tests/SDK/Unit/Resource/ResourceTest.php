@@ -130,7 +130,7 @@ class ResourceTest extends TestCase
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', $envAttributes);
         $resource = ResourceInfo::create(new Attributes($userAttributes));
         foreach ($expected as $name => $value) {
-            $this->assertEquals($value, $resource->getAttributes()->get($name));
+            $this->assertSame($value, $resource->getAttributes()->get($name));
         }
     }
 

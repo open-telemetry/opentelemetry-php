@@ -8,7 +8,6 @@ use OpenTelemetry\API\Trace as API;
 
 final class TracerProviderFactory
 {
-    private string $name;
     private ExporterFactory $exporterFactory;
     private SamplerFactory $samplerFactory;
     private SpanProcessorFactory $spanProcessorFactory;
@@ -19,8 +18,7 @@ final class TracerProviderFactory
         ?SamplerFactory $samplerFactory = null,
         ?SpanProcessorFactory $spanProcessorFactory = null
     ) {
-        $this->name = $name;
-        $this->exporterFactory = $exporterFactory ?: new ExporterFactory($this->name);
+        $this->exporterFactory = $exporterFactory ?: new ExporterFactory($name);
         $this->samplerFactory = $samplerFactory ?: new SamplerFactory();
         $this->spanProcessorFactory = $spanProcessorFactory ?: new SpanProcessorFactory();
     }

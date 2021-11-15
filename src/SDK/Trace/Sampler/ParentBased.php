@@ -106,6 +106,6 @@ class ParentBased implements SamplerInterface
 
     public function getDescription(): string
     {
-        return 'ParentBased';
+        return 'ParentBased+' . $this->root->getDescription();
     }
 }
