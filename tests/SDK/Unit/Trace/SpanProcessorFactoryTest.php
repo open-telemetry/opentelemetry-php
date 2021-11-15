@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use Exception;
+use InvalidArgumentException;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
-use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use PHPUnit\Framework\TestCase;
 
 class SpanProcessorFactoryTest extends TestCase
@@ -23,19 +26,20 @@ class SpanProcessorFactoryTest extends TestCase
      * @test
      * @dataProvider processorProvider
      */
-    public function spanProcessorFactory_createSpanProcessorFromEnvironment(string $processor)
+    public function spanProcessorFactory_createSpanProcessorFromEnvironment(string $processorName, string $expected)
     {
-        $this->setEnvironmentVariable('OTEL_TRACES_PROCESSOR', $processor);
-        $factory = new SpanProcessorFactory();
-        $this->assertInstanceOf(SpanProcessorInterface::class, $factory->fromEnvironment());
+        $this->setEnvironmentVariable('OTEL_TRACES_PROCESSOR', $processorName);
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $factory = new SpanProcessorFactory($exporter);
+        $this->assertInstanceOf($expected, $factory->fromEnvironment());
     }
 
     public function processorProvider()
     {
         return [
-            'batch' => ['batch'],
-            'simple' => ['simple'],
-            'noop' => ['noop'],
+            'batch' => ['batch', BatchSpanProcessor::class],
+            'simple' => ['simple', SimpleSpanProcessor::class],
+            'noop' => ['noop', NoopSpanProcessor::class],
         ];
     }
     /**
@@ -46,8 +50,8 @@ class SpanProcessorFactoryTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_TRACES_PROCESSOR', $processor);
         $factory = new SpanProcessorFactory();
-        $exporter = $this->createMock(\OpenTelemetry\SDK\Trace\SpanExporterInterface::class);
-        $this->expectException(Exception::class);
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $this->expectException(InvalidArgumentException::class);
         $factory->fromEnvironment($exporter);
     }
     public function invalidProcessorProvider()
