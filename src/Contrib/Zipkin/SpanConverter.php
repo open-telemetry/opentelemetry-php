@@ -182,7 +182,8 @@ class SpanConverter
         }
 
         //ip address handling from the spec, like is done here - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/zipkin/model.go#L264-L271
-        if ($preferredAttr->getKey() === "net.peer.ip") {
+        switch($preferredAttr->getKey()) {
+            case "net.peer.ip":
                 $ipString = $preferredAttr->getValue();
 
                 if (filter_var($ipString, FILTER_VALIDATE_IP)) {
@@ -222,13 +223,14 @@ class SpanConverter
 
                     return $remoteEndpointArr;
                 }
-        } else {
-            return [
-                'serviceName' => $preferredAttr->getValue(),
-            ];
+                break;
+            default:
+                return [
+                    'serviceName' => $preferredAttr->getValue(),
+                ];
         }
 
-        return null;
+        return null; //Determine if this is safe to remove
     }
 
     private static function findRemoteEndpointPreferredAttribute(SpanDataInterface $span): ?Attribute {
