@@ -169,7 +169,7 @@ class Exporter implements Trace\SpanExporterInterface
     /** @inheritDoc */
     public static function fromConnectionString(string $endpointUrl, string $name, $args)
     {
-        if ($args === false) {
+        if (!is_string($args)) {
             throw new Exception('Invalid license key.');
         }
 
