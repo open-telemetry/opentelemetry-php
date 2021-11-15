@@ -236,20 +236,23 @@ class SpanConverter
             //TODO - does the else case need handling here?
         }
 
+        $remoteEndpointArr["port"] = SpanConverter::getPortNumberFromSpanAttributes($span) ?? 0;
+
+        return $remoteEndpointArr;
+    }
+
+    private static function getPortNumberFromSpanAttributes(SpanDataInterface $span): ?int {
         //Go comment (but not code...), mentions port = 0 should be the default - https://github.com/open-telemetry/opentelemetry-go/blob/7ce58f355851d0412e45ceb79d977bc612701b3f/exporters/jaeger/internal/gen-go/zipkincore/zipkincore.go#L122
-        $remoteEndpointArr["port"] = 0;
         foreach ($span->getAttributes() as $attr) {
             if ($attr->getKey() === "net.peer.port") {
                 //TODO - take care of the cases where this isn't a string
                 $portVal = $attr->getValue();
                 $portInt = intval($portVal); //TODO - find out if Go's setting of 16 for bit size is implicitly the case here - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/zipkin/model.go#L292
 
-                $remoteEndpointArr["port"] = $portInt;
-
-                break;
+                return $portInt;
             }
         }
 
-        return $remoteEndpointArr;
+        return null;
     }
 }
