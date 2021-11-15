@@ -19,6 +19,16 @@ class SpanConverter
     const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
     const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
 
+    const REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP = [
+        "peer.service" => 1,
+        "net.peer.name" => 2,
+        "net.peer.ip" => 3,
+        "peer.hostname" => 4,
+        "peer.address" => 5,
+        "http.host" => 6,
+        "db.name" => 7
+    ];
+
     /**
      * @var string
      */
@@ -224,22 +234,12 @@ class SpanConverter
     }
 
     private static function findRemoteEndpointPreferredAttribute(SpanDataInterface $span): ?Attribute {
-        $attributeToRankMap = [
-            "peer.service" => 1,
-            "net.peer.name" => 2,
-            "net.peer.ip" => 3,
-            "peer.hostname" => 4,
-            "peer.address" => 5,
-            "http.host" => 6,
-            "db.name" => 7
-        ];
-
         $preferredAttrRank = null;
         $preferredAttr = null;
 
         foreach ($span->getAttributes() as $attr) {
-            if (array_key_exists($attr->getKey(), $attributeToRankMap)) {
-                $attrRank = $attributeToRankMap[$attr->getKey()];
+            if (array_key_exists($attr->getKey(), SpanConverter::REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP)) {
+                $attrRank = SpanConverter::REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP[$attr->getKey()];
 
                 if (($preferredAttrRank === null) || ($attrRank <= $preferredAttrRank)) {
                     $preferredAttr = $attr;
