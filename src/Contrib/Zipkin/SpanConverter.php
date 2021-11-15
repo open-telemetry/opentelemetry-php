@@ -212,7 +212,7 @@ class SpanConverter
         return null;
     }
 
-    private static function toAnnotation(EventInterface $event) {
+    private static function toAnnotation(EventInterface $event): array {
         $value = $event->getName();
 
         if (count($event->getAttributes()) > 0) {
