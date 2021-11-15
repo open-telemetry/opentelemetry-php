@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
+use OpenTelemetry\API\Trace\EventInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\Trace\AbstractClock;
@@ -98,24 +99,7 @@ class SpanConverter
         }
 
         foreach ($span->getEvents() as $event) {
-            $value = $event->getName();
-
-            if (count($event->getAttributes()) > 0) {
-                $attributesArray = [];
-                foreach ($event->getAttributes() as $attr) {
-                    $attributesArray[$attr->getKey()] = $attr->getValue();
-                }
-                
-                $attributesAsJson = json_encode($attributesArray);
-                if (($attributesAsJson !== false) && (strlen($attributesAsJson) > 0)) {
-                    $value = '"' . $event->getName() . '"' . ': ' . $attributesAsJson;
-                }
-            }
-
-            $row['annotations'][] = [
-                'timestamp' => AbstractClock::nanosToMicro($event->getEpochNanos()),
-                'value' => $value,
-            ];
+            $row['annotations'][] = SpanConverter::toAnnotation($event);
         }
 
         if (($span->getKind() === SpanKind::KIND_CLIENT) || ($span->getKind() === SpanKind::KIND_PRODUCER))
@@ -226,5 +210,28 @@ class SpanConverter
         }
         
         return null;
+    }
+
+    private static function toAnnotation(EventInterface $event) {
+        $value = $event->getName();
+
+        if (count($event->getAttributes()) > 0) {
+            $attributesArray = [];
+            foreach ($event->getAttributes() as $attr) {
+                $attributesArray[$attr->getKey()] = $attr->getValue();
+            }
+            
+            $attributesAsJson = json_encode($attributesArray);
+            if (($attributesAsJson !== false) && (strlen($attributesAsJson) > 0)) {
+                $value = '"' . $event->getName() . '"' . ': ' . $attributesAsJson; //TODO - clean this up and make sure it's spec compliant
+            }
+        }
+
+        $annotation = [
+            'timestamp' => AbstractClock::nanosToMicro($event->getEpochNanos()),
+            'value' => $value,
+        ];
+
+        return $annotation;
     }
 }
