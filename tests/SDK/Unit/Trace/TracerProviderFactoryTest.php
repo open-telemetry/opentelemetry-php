@@ -7,43 +7,25 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
-use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @backupGlobals enabled
- */
 class TracerProviderFactoryTest extends TestCase
 {
-    private $factory;
-    private $exporterFactory;
-    private $samplerFactory;
-    private $spanProcessorFactory;
-
-    public function setUp(): void
-    {
-        $this->exporterFactory = $this->createMock(ExporterFactory::class);
-        $this->samplerFactory = $this->createMock(SamplerFactory::class);
-        $this->spanProcessorFactory = $this->createMock(SpanProcessorFactory::class);
-        $this->factory = new TracerProviderFactory('test', $this->exporterFactory, $this->samplerFactory, $this->spanProcessorFactory);
-    }
-
     /**
      * @test
      */
-    public function factory_constructor()
+    public function factory_createsTracer()
     {
-        $factory = new TracerProviderFactory('foo');
-        $this->assertInstanceOf(TracerProviderFactory::class, $factory);
-    }
+        $exporterFactory = $this->createMock(ExporterFactory::class);
+        $samplerFactory = $this->createMock(SamplerFactory::class);
+        $spanProcessorFactory = $this->createMock(SpanProcessorFactory::class);
 
-    /**
-     * @test
-     */
-    public function factory_createsExporter()
-    {
-        $tracer = $this->factory->create();
-        $this->assertInstanceOf(TracerProvider::class, $tracer);
+        $exporterFactory->expects($this->once())->method('fromEnvironment');
+        $samplerFactory->expects($this->once())->method('fromEnvironment');
+        $spanProcessorFactory->expects($this->once())->method('fromEnvironment');
+
+        $factory = new TracerProviderFactory('test', $exporterFactory, $samplerFactory, $spanProcessorFactory);
+        $factory->create();
     }
 }
