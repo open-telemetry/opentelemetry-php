@@ -15,6 +15,7 @@ use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\Tests\SDK\Util\TestClock;
+use ReflectionObject;
 
 class BatchSpanProcessorTest extends MockeryTestCase
 {
@@ -341,7 +342,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
             $this->setEnvironmentVariable($i[0], $i[2]);
         }
         $processor = new BatchSpanProcessor($exporter);
-        $reflection = new \ReflectionClass(BatchSpanProcessor::class);
+        $reflection = new ReflectionObject($processor);
         foreach ($input as $i) {
             $attr = $reflection->getProperty($i[1]);
             $attr->setAccessible(true);
