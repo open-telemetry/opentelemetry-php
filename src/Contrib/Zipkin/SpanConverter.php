@@ -223,6 +223,10 @@ class SpanConverter
     private static function getRemoteEndpointDataFromIpAddressAndPort(Attribute $preferredAttr, ?int $portNumber): ?array {
         $ipString = $preferredAttr->getValue();
 
+        if (!is_string($ipString)) {
+            return null;
+        }
+
         if (!filter_var($ipString, FILTER_VALIDATE_IP)) {
             return null;
         }
