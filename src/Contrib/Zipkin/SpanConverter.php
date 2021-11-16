@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
+
+use OpenTelemetry\API\Trace\AttributeInterface;
 use OpenTelemetry\API\Trace\EventInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\Trace\AbstractClock;
-use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
 class SpanConverter
@@ -202,7 +203,7 @@ class SpanConverter
         }
     }
 
-    private static function findRemoteEndpointPreferredAttribute(SpanDataInterface $span): ?Attribute {
+    private static function findRemoteEndpointPreferredAttribute(SpanDataInterface $span): ?AttributeInterface {
         $preferredAttrRank = null;
         $preferredAttr = null;
 
@@ -220,7 +221,7 @@ class SpanConverter
         return $preferredAttr;
     }
 
-    private static function getRemoteEndpointDataFromIpAddressAndPort(Attribute $preferredAttr, ?int $portNumber): ?array {
+    private static function getRemoteEndpointDataFromIpAddressAndPort(AttributeInterface $preferredAttr, ?int $portNumber): ?array {
         $ipString = $preferredAttr->getValue();
 
         if (!is_string($ipString)) {
