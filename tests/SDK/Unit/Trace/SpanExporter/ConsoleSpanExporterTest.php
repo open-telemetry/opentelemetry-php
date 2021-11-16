@@ -8,10 +8,14 @@ use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use PHPUnit\Framework\TestCase;
 
-class ConsoleSpanExporterTest extends TestCase
+class ConsoleSpanExporterTest extends AbstractExporterTest
 {
+    public function createExporter(): ConsoleSpanExporter
+    {
+        return new ConsoleSpanExporter();
+    }
+
     private const TEST_DATA = [
         'name' => 'my.service',
         'parent_span_id' => '1000000000000000',
@@ -110,15 +114,5 @@ class ConsoleSpanExporterTest extends TestCase
             ConsoleSpanExporter::class,
             ConsoleSpanExporter::fromConnectionString()
         );
-    }
-
-    public function testShutdown(): void
-    {
-        $this->assertTrue((new ConsoleSpanExporter())->shutdown());
-    }
-
-    public function testForceFlush(): void
-    {
-        $this->assertTrue((new ConsoleSpanExporter())->forceFlush());
     }
 }

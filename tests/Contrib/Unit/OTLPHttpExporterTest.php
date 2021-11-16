@@ -12,15 +12,26 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use OpenTelemetry\Tests\SDK\Unit\Trace\SpanExporter\AbstractExporterTest;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
-use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 
-class OTLPHttpExporterTest extends TestCase
+class OTLPHttpExporterTest extends AbstractExporterTest
 {
     use EnvironmentVariables;
+    use UsesHttpClientTrait;
+
+    public function createExporter(): SpanExporterInterface
+    {
+        return new Exporter(
+            $this->getClientInterfaceMock(),
+            $this->getRequestFactoryInterfaceMock(),
+            $this->getStreamFactoryInterfaceMock()
+        );
+    }
 
     /**
      * @after
@@ -31,10 +42,9 @@ class OTLPHttpExporterTest extends TestCase
     }
 
     /**
-     * @test
-     * @dataProvider exporterResponseStatusesDataProvider
+     * @dataProvider exporterResponseStatusDataProvider
      */
-    public function exporterResponseStatuses($responseStatus, $expected)
+    public function testExporterResponseStatus($responseStatus, $expected): void
     {
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn(
@@ -49,25 +59,24 @@ class OTLPHttpExporterTest extends TestCase
         );
     }
 
-    public function exporterResponseStatusesDataProvider()
+    public function exporterResponseStatusDataProvider(): array
     {
         return [
-            'ok'                => [200, Exporter::STATUS_SUCCESS],
-            'not found'         => [404, Exporter::STATUS_FAILED_NOT_RETRYABLE],
-            'not authorized'    => [401, Exporter::STATUS_FAILED_NOT_RETRYABLE],
-            'bad request'       => [402, Exporter::STATUS_FAILED_NOT_RETRYABLE],
-            'too many requests' => [429, Exporter::STATUS_FAILED_NOT_RETRYABLE],
-            'server error'      => [500, Exporter::STATUS_FAILED_RETRYABLE],
-            'timeout'           => [503, Exporter::STATUS_FAILED_RETRYABLE],
-            'bad gateway'       => [502, Exporter::STATUS_FAILED_RETRYABLE],
+            'ok'                => [200, SpanExporterInterface::STATUS_SUCCESS],
+            'not found'         => [404, SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE],
+            'not authorized'    => [401, SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE],
+            'bad request'       => [402, SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE],
+            'too many requests' => [429, SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE],
+            'server error'      => [500, SpanExporterInterface::STATUS_FAILED_RETRYABLE],
+            'timeout'           => [503, SpanExporterInterface::STATUS_FAILED_RETRYABLE],
+            'bad gateway'       => [502, SpanExporterInterface::STATUS_FAILED_RETRYABLE],
         ];
     }
 
     /**
-     * @test
      * @dataProvider clientExceptionsShouldDecideReturnCodeDataProvider
      */
-    public function clientExceptionsShouldDecideReturnCode($exception, $expected)
+    public function testClientExceptionsShouldDecideReturnCode($exception, $expected): void
     {
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willThrowException($exception);
@@ -81,32 +90,31 @@ class OTLPHttpExporterTest extends TestCase
         );
     }
 
-    public function clientExceptionsShouldDecideReturnCodeDataProvider()
+    public function clientExceptionsShouldDecideReturnCodeDataProvider(): array
     {
         return [
             'client'    => [
                 $this->createMock(ClientExceptionInterface::class),
-                Exporter::STATUS_FAILED_RETRYABLE,
+                SpanExporterInterface::STATUS_FAILED_RETRYABLE,
             ],
             'network'   => [
                 $this->createMock(NetworkExceptionInterface::class),
-                Exporter::STATUS_FAILED_RETRYABLE,
+                SpanExporterInterface::STATUS_FAILED_RETRYABLE,
             ],
         ];
     }
 
     /**
-     * @test
      * @dataProvider processHeadersDataHandler
      */
-    public function testProcessHeaders($input, $expected)
+    public function testProcessHeaders($input, $expected): void
     {
         $headers = (new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->processHeaders($input);
 
         $this->assertEquals($expected, $headers);
     }
 
-    public function processHeadersDataHandler()
+    public function processHeadersDataHandler(): array
     {
         return [
             'No Headers' => ['', []],
@@ -122,13 +130,13 @@ class OTLPHttpExporterTest extends TestCase
      * @test
      * @dataProvider invalidHeadersDataHandler
      */
-    public function testInvalidHeaders($input)
+    public function testInvalidHeaders($input): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $headers = (new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->processHeaders($input);
     }
 
-    public function invalidHeadersDataHandler()
+    public function invalidHeadersDataHandler(): array
     {
         return [
             '#1' => ['a:b,c'],
@@ -138,7 +146,6 @@ class OTLPHttpExporterTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider exporterEndpointDataProvider
      */
     public function testExporterWithConfigViaEnvVars(?string $endpoint, string $expectedEndpoint)
@@ -171,7 +178,7 @@ class OTLPHttpExporterTest extends TestCase
         $this->assertNotEquals(0, strlen($request->getBody()->getContents()));
     }
 
-    public function exporterEndpointDataProvider()
+    public function exporterEndpointDataProvider(): array
     {
         return [
             'Default Endpoint' => ['', 'https://localhost:4318/v1/traces'],
@@ -185,23 +192,12 @@ class OTLPHttpExporterTest extends TestCase
     /**
      * @test
      */
-    public function shouldBeOkToExporterEmptySpansCollection()
+    public function shouldBeOkToExporterEmptySpansCollection(): void
     {
         $this->assertEquals(
-            Exporter::STATUS_SUCCESS,
+            SpanExporterInterface::STATUS_SUCCESS,
             (new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->export([])
         );
-    }
-    /**
-     * @test
-     */
-    public function failsIfNotRunning()
-    {
-        $exporter = new Exporter(new Client(), new HttpFactory(), new HttpFactory());
-        $span = $this->createMock(SpanData::class);
-        $exporter->shutdown();
-
-        $this->assertSame(Exporter::STATUS_FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 
     /**
@@ -209,41 +205,41 @@ class OTLPHttpExporterTest extends TestCase
      * @testdox Exporter Refuses OTLP/JSON Protocol
      * https://github.com/open-telemetry/opentelemetry-specification/issues/786
      */
-    public function failsExporterRefusesOTLPJson()
+    public function failsExporterRefusesOTLPJson(): void
     {
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_PROTOCOL', 'http/json');
 
         $this->expectException(\InvalidArgumentException::class);
-        $exporter = new Exporter(new Client(), new HttpFactory(), new HttpFactory());
+
+        new Exporter(
+            $this->getClientInterfaceMock(),
+            $this->getRequestFactoryInterfaceMock(),
+            $this->getStreamFactoryInterfaceMock()
+        );
     }
 
     /**
      * @testdox Exporter Refuses Invalid Endpoint
      * @dataProvider exporterInvalidEndpointDataProvider
      */
-    public function testExporterRefusesInvalidEndpoint($endpoint)
+    public function testExporterRefusesInvalidEndpoint($endpoint): void
     {
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_ENDPOINT', $endpoint);
 
         $this->expectException(\InvalidArgumentException::class);
-        $exporter = new Exporter(new Client(), new HttpFactory(), new HttpFactory());
+
+        new Exporter(
+            $this->getClientInterfaceMock(),
+            $this->getRequestFactoryInterfaceMock(),
+            $this->getStreamFactoryInterfaceMock()
+        );
     }
 
-    public function exporterInvalidEndpointDataProvider()
+    public function exporterInvalidEndpointDataProvider(): array
     {
         return [
             'Not a url' => ['not a url'],
             'Grpc Scheme' => ['grpc://localhost:4317'],
         ];
-    }
-
-    public function test_shutdown(): void
-    {
-        $this->assertTrue((new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->shutdown());
-    }
-
-    public function test_forceFlush(): void
-    {
-        $this->assertTrue((new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->forceFlush());
     }
 }

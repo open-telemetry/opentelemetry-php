@@ -4,141 +4,22 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
-use GuzzleHttp\Psr7\Response;
-use InvalidArgumentException;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter;
-use OpenTelemetry\Tests\SDK\Util\SpanData;
-use PHPUnit\Framework\TestCase;
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Client\NetworkExceptionInterface;
-use Psr\Http\Client\RequestExceptionInterface;
 
-class ZipkinToNewrelicExporterTest extends TestCase
+class ZipkinToNewrelicExporterTest extends AbstractHttpExporterTest
 {
+    protected const EXPORTER_NAME = 'test.zipkinToNR';
+    protected const LICENSE_KEY = 'abc123';
 
-    /**
-     * @test
-     * @dataProvider exporterResponseStatusesDataProvider
-     */
-    public function exporterResponseStatuses($responseStatus, $expected)
+    public function createExporterWithDsn(string $dsn): Exporter
     {
-        $client = self::createMock(ClientInterface::class);
-        $client->method('sendRequest')->willReturn(
-            new Response($responseStatus)
+        return new Exporter(
+            self::EXPORTER_NAME,
+            $dsn,
+            self::LICENSE_KEY,
+            $this->getClientInterfaceMock(),
+            $this->getRequestFactoryInterfaceMock(),
+            $this->getStreamFactoryInterfaceMock()
         );
-
-        $exporter = new Exporter('test.zipkinToNR', 'scheme://host:123/path', '', $client, new HttpFactory(), new HttpFactory());
-
-        $this->assertEquals(
-            $expected,
-            $exporter->export([new SpanData()])
-        );
-    }
-
-    public function exporterResponseStatusesDataProvider()
-    {
-        return [
-            'ok'                => [200, Exporter::STATUS_SUCCESS],
-            'not found'         => [404, Exporter::STATUS_FAILED_NOT_RETRYABLE],
-            'not authorized'    => [401, Exporter::STATUS_FAILED_NOT_RETRYABLE],
-            'bad request'       => [402, Exporter::STATUS_FAILED_NOT_RETRYABLE],
-            'too many requests' => [429, Exporter::STATUS_FAILED_NOT_RETRYABLE],
-            'server error'      => [500, Exporter::STATUS_FAILED_RETRYABLE],
-            'timeout'           => [503, Exporter::STATUS_FAILED_RETRYABLE],
-            'bad gateway'       => [502, Exporter::STATUS_FAILED_RETRYABLE],
-        ];
-    }
-
-    /**~
-     * @test
-     * @dataProvider clientExceptionsShouldDecideReturnCodeDataProvider
-     */
-    public function clientExceptionsShouldDecideReturnCode($exception, $expected)
-    {
-        $client = self::createMock(ClientInterface::class);
-        $client->method('sendRequest')->willThrowException($exception);
-
-        $exporter = new Exporter('test.zipkinToNR', 'scheme://host:123/path', '', $client, new HttpFactory(), new HttpFactory());
-
-        $this->assertEquals(
-            $expected,
-            $exporter->export([new SpanData()])
-        );
-    }
-
-    public function clientExceptionsShouldDecideReturnCodeDataProvider()
-    {
-        return [
-            'client'    => [
-                self::createMock(ClientExceptionInterface::class),
-                Exporter::STATUS_FAILED_RETRYABLE,
-            ],
-            'network'   => [
-                self::createMock(NetworkExceptionInterface::class),
-                Exporter::STATUS_FAILED_RETRYABLE,
-            ],
-            'request'   => [
-                self::createMock(RequestExceptionInterface::class),
-                Exporter::STATUS_FAILED_NOT_RETRYABLE,
-            ],
-        ];
-    }
-
-    /**
-     * @test
-     */
-    public function shouldBeOkToExporterEmptySpansCollection()
-    {
-        $this->assertEquals(
-            Exporter::STATUS_SUCCESS,
-            (new Exporter('test.zipkinToNR', 'scheme://host:123/path', '', new Client(), new HttpFactory(), new HttpFactory()))->export([])
-        );
-    }
-
-    /**
-     * @test
-     * @dataProvider invalidDsnDataProvider
-     */
-    public function shouldThrowExceptionIfInvalidDsnIsPassed(string $invalidDsn)
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        new Exporter('test.zipkinToNR', $invalidDsn, '', new Client(), new HttpFactory(), new HttpFactory());
-    }
-
-    public function invalidDsnDataProvider()
-    {
-        return [
-            'missing scheme' => ['host/path'],
-            'missing host' => ['scheme://path'],
-            'missing path' => ['scheme://host'],
-            'invalid scheme' => ['1234://host:port/path'],
-            'invalid host' => ['scheme:///end:1234/path'],
-        ];
-    }
-
-    /**
-     * @test
-     */
-    public function failsIfNotRunning(): void
-    {
-        $exporter = new Exporter('test.zipkinToNr', 'scheme://host/path', '', new Client(), new HttpFactory(), new HttpFactory());
-        $span = $this->createMock(SpanData::class);
-        $exporter->shutdown();
-
-        $this->assertSame(Exporter::STATUS_FAILED_NOT_RETRYABLE, $exporter->export([$span]));
-    }
-
-    public function test_shutdown(): void
-    {
-        $this->assertTrue((new Exporter('test.zipkinToNr', 'scheme://host/path', '', new Client(), new HttpFactory(), new HttpFactory()))->shutdown());
-    }
-
-    public function test_forceFlush(): void
-    {
-        $this->assertTrue((new Exporter('test.zipkinToNr', 'scheme://host/path', '', new Client(), new HttpFactory(), new HttpFactory()))->forceFlush());
     }
 }
