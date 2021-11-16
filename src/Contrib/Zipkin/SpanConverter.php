@@ -8,9 +8,10 @@ use function max;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\Trace\AbstractClock;
+use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
-class SpanConverter
+class SpanConverter implements SpanConverterInterface
 {
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
     const STATUS_DESCRIPTION_TAG_KEY = 'error';
@@ -49,7 +50,7 @@ class SpanConverter
         return (string) $value;
     }
 
-    public function convert(SpanDataInterface $span)
+    public function convert(SpanDataInterface $span): array
     {
         $spanParent = $span->getParentContext();
 
@@ -128,7 +129,7 @@ class SpanConverter
           case SpanKind::KIND_INTERNAL:
             return null;
         }
-        
+
         return null;
     }
 }
