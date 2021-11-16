@@ -193,7 +193,7 @@ class ZipkinSpanConverterTest extends TestCase
         $row = $converter->convert($span);
 
         [$annotation] = $row['annotations'];
-        $this->assertSame("\"event.name\"", $annotation['value']);
+        $this->assertSame('"event.name"', $annotation['value']);
     }
 
     /**
@@ -210,7 +210,7 @@ class ZipkinSpanConverterTest extends TestCase
         $row = $converter->convert($span);
 
         $this->assertSame('unknown', $row['remoteEndpoint']['serviceName']);
-        $this->assertSame(pow(2,32)-1, $row['remoteEndpoint']['ipv4']);
+        $this->assertSame(pow(2, 32)-1, $row['remoteEndpoint']['ipv4']);
         $this->assertSame(80, $row['remoteEndpoint']['port']);
     }
 

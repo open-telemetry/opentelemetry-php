@@ -21,13 +21,13 @@ class SpanConverter
     const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
 
     const REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP = [
-        "peer.service" => 1,
-        "net.peer.name" => 2,
-        "net.peer.ip" => 3,
-        "peer.hostname" => 4,
-        "peer.address" => 5,
-        "http.host" => 6,
-        "db.name" => 7
+        'peer.service' => 1,
+        'net.peer.name' => 2,
+        'net.peer.ip' => 3,
+        'peer.hostname' => 4,
+        'peer.address' => 5,
+        'http.host' => 6,
+        'db.name' => 7,
     ];
 
     /**
@@ -114,11 +114,10 @@ class SpanConverter
             $row['annotations'][] = SpanConverter::toAnnotation($event);
         }
 
-        if (($span->getKind() === SpanKind::KIND_CLIENT) || ($span->getKind() === SpanKind::KIND_PRODUCER))
-        {
+        if (($span->getKind() === SpanKind::KIND_CLIENT) || ($span->getKind() === SpanKind::KIND_PRODUCER)) {
             $remoteEndpointData = SpanConverter::toRemoteEndpoint($span);
             if ($remoteEndpointData != null) {
-                $row["remoteEndpoint"] = $remoteEndpointData;
+                $row['remoteEndpoint'] = $remoteEndpointData;
             }
         }
 
@@ -147,7 +146,8 @@ class SpanConverter
         return null;
     }
 
-    private static function toAnnotation(EventInterface $event): array {
+    private static function toAnnotation(EventInterface $event): array
+    {
         $eventName = $event->getName();
         $attributesAsJson = SpanConverter::convertEventAttributesToJson($event);
 
@@ -161,7 +161,8 @@ class SpanConverter
         return $annotation;
     }
 
-    private static function convertEventAttributesToJson(EventInterface $event): ?string {
+    private static function convertEventAttributesToJson(EventInterface $event): ?string
+    {
         if (count($event->getAttributes()) === 0) {
             return null;
         }
@@ -179,7 +180,8 @@ class SpanConverter
         return $attributesAsJson;
     }
 
-    private static function toRemoteEndpoint(SpanDataInterface $span): ?array {
+    private static function toRemoteEndpoint(SpanDataInterface $span): ?array
+    {
         $preferredAttr = SpanConverter::findRemoteEndpointPreferredAttribute($span);
 
         if ($preferredAttr === null) {
@@ -190,10 +192,10 @@ class SpanConverter
             return null;
         }
 
-        switch($preferredAttr->getKey()) {
-            case "net.peer.ip":
+        switch ($preferredAttr->getKey()) {
+            case 'net.peer.ip':
                 return SpanConverter::getRemoteEndpointDataFromIpAddressAndPort(
-                    $preferredAttr, 
+                    $preferredAttr,
                     SpanConverter::getPortNumberFromSpanAttributes($span)
                 );
             default:
@@ -203,7 +205,8 @@ class SpanConverter
         }
     }
 
-    private static function findRemoteEndpointPreferredAttribute(SpanDataInterface $span): ?AttributeInterface {
+    private static function findRemoteEndpointPreferredAttribute(SpanDataInterface $span): ?AttributeInterface
+    {
         $preferredAttrRank = null;
         $preferredAttr = null;
 
@@ -221,7 +224,8 @@ class SpanConverter
         return $preferredAttr;
     }
 
-    private static function getRemoteEndpointDataFromIpAddressAndPort(AttributeInterface $preferredAttr, ?int $portNumber): ?array {
+    private static function getRemoteEndpointDataFromIpAddressAndPort(AttributeInterface $preferredAttr, ?int $portNumber): ?array
+    {
         $ipString = $preferredAttr->getValue();
 
         if (!is_string($ipString)) {
@@ -233,29 +237,30 @@ class SpanConverter
         }
 
         $remoteEndpointArr = [
-            'serviceName' => "unknown"
+            'serviceName' => 'unknown',
         ];
 
-        if (filter_var($ipString, FILTER_VALIDATE_IP,FILTER_FLAG_IPV4)) {
-            $remoteEndpointArr["ipv4"] = ip2long($ipString);
+        if (filter_var($ipString, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $remoteEndpointArr['ipv4'] = ip2long($ipString);
         }
 
-        if (filter_var($ipString, FILTER_VALIDATE_IP,FILTER_FLAG_IPV6)) {
-            $remoteEndpointArr["ipv6"] = inet_pton($ipString);
+        if (filter_var($ipString, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $remoteEndpointArr['ipv6'] = inet_pton($ipString);
         }
 
-        $remoteEndpointArr["port"] = $portNumber ?? 0;
+        $remoteEndpointArr['port'] = $portNumber ?? 0;
 
         return $remoteEndpointArr;
     }
 
-    private static function getPortNumberFromSpanAttributes(SpanDataInterface $span): ?int {
+    private static function getPortNumberFromSpanAttributes(SpanDataInterface $span): ?int
+    {
         foreach ($span->getAttributes() as $attr) {
-            if ($attr->getKey() === "net.peer.port") {
+            if ($attr->getKey() === 'net.peer.port') {
                 $portVal = $attr->getValue();
-                $portInt = intval($portVal);
+                $portInt = (int) $portVal;
 
-                if (($portInt > 0) && ($portInt < pow(2,16))) {
+                if (($portInt > 0) && ($portInt < pow(2, 16))) {
                     return $portInt;
                 }
             }
