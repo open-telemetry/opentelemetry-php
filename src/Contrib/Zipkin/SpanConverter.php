@@ -176,12 +176,10 @@ class SpanConverter
             return null;
         }
 
-        //GO doesn't check if the value is a string here, but it seems like it should based on the comment here - https://github.com/open-telemetry/opentelemetry-go/blob/4ba964bae77d9d32b4bb0167ed5533a0c05dcdf9/attribute/value.go#L200
         if (!is_string($preferredAttr->getValue())) {
             return null;
         }
 
-        //ip address handling from the spec, like is done here - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/zipkin/model.go#L264-L271
         switch($preferredAttr->getKey()) {
             case "net.peer.ip":
                 return SpanConverter::getRemoteEndpointDataFromIpAddressAndPort(
@@ -221,12 +219,10 @@ class SpanConverter
         }
 
         $remoteEndpointArr = [
-            //Not in the Go code but mentioned in a comment here - https://github.com/open-telemetry/opentelemetry-go/blob/7ce58f355851d0412e45ceb79d977bc612701b3f/exporters/jaeger/internal/gen-go/zipkincore/zipkincore.go#L125
             'serviceName' => "unknown"
         ];
 
         if (filter_var($ipString, FILTER_VALIDATE_IP,FILTER_FLAG_IPV4)) {
-            //Key casing/value units loosely inferred from Go comments around here - https://github.com/open-telemetry/opentelemetry-go/blob/7ce58f355851d0412e45ceb79d977bc612701b3f/exporters/jaeger/internal/gen-go/zipkincore/zipkincore.go#L127
             $remoteEndpointArr["ipv4"] = ip2long($ipString);
         }
 
@@ -245,14 +241,14 @@ class SpanConverter
     }
 
     private static function getPortNumberFromSpanAttributes(SpanDataInterface $span): ?int {
-        //Go comment (but not code...), mentions port = 0 should be the default - https://github.com/open-telemetry/opentelemetry-go/blob/7ce58f355851d0412e45ceb79d977bc612701b3f/exporters/jaeger/internal/gen-go/zipkincore/zipkincore.go#L122
         foreach ($span->getAttributes() as $attr) {
             if ($attr->getKey() === "net.peer.port") {
-                //TODO - take care of the cases where this isn't a string
                 $portVal = $attr->getValue();
-                $portInt = intval($portVal); //TODO - find out if Go's setting of 16 for bit size is implicitly the case here - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/zipkin/model.go#L292
+                $portInt = intval($portVal);
 
-                return $portInt;
+                if (($portInt > 0) && ($portInt < pow(2,16))) {
+                    return $portInt;
+                }
             }
         }
 
