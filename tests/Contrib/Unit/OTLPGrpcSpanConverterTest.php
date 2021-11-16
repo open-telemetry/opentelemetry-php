@@ -170,14 +170,13 @@ class OTLPGrpcSpanConverterTest extends TestCase
                         'value' => new AnyValue([ 'string_value' => 'dev']),
                     ]),
                     new KeyValue([
-                        'key' => 'service.name',
-                        'value' => new AnyValue([ 'string_value' => 'unknown_service']),
-                    ]),
-                    new KeyValue([
                         'key' => 'instance',
                         'value' => new AnyValue([ 'string_value' => 'test-a']),
                     ]),
-
+                    new KeyValue([
+                        'key' => 'service.name',
+                        'value' => new AnyValue([ 'string_value' => 'unknown_service']),
+                    ]),
                 ],
             ]),
             'instrumentation_library_spans' => [

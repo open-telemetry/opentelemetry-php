@@ -73,7 +73,6 @@ class ResourceInfo
                 ResourceConstants::TELEMETRY_SDK_NAME => 'opentelemetry',
                 ResourceConstants::TELEMETRY_SDK_LANGUAGE => 'php',
                 ResourceConstants::TELEMETRY_SDK_VERSION => 'dev',
-                ResourceConstants::SERVICE_NAME => 'unknown_service',
             ]
         ));
     }
@@ -84,7 +83,9 @@ class ResourceInfo
      */
     public static function environmentResource(): self
     {
-        $attributes = [];
+        $attributes = [
+            ResourceConstants::SERVICE_NAME => 'unknown_service',
+        ];
         $string = getenv('OTEL_RESOURCE_ATTRIBUTES');
         if ($string && false !== strpos($string, '=')) {
             foreach (explode(',', $string) as $pair) {

@@ -19,7 +19,7 @@ class SpanProcessorFactory
         }
         switch ($name) {
             case 'batch':
-                return new BatchSpanProcessor($exporter, SystemClock::getInstance());
+                return new BatchSpanProcessor($exporter);
             case 'simple':
                 return new SimpleSpanProcessor($exporter);
             case 'noop':

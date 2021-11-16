@@ -176,4 +176,25 @@ class ResourceTest extends TestCase
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo');
         $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::create(new Attributes([])));
     }
+
+    /**
+     * @test
+     */
+    public function resource_fromEnvironment_serviceNameTakesPrecedenceOverResourceAttribute()
+    {
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=bar');
+        $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'foo');
+        $resource = ResourceInfo::create(new Attributes([]));
+        $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
+    }
+
+    /**
+     * @test
+     */
+    public function resource_fromEnvironment_resourceAttributeTakesPrecedenceOverDefault()
+    {
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');
+        $resource = ResourceInfo::create(new Attributes([]));
+        $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
+    }
 }
