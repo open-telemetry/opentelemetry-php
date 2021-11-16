@@ -227,12 +227,7 @@ class SpanConverter
         }
 
         if (filter_var($ipString, FILTER_VALIDATE_IP,FILTER_FLAG_IPV6)) {
-            //if (defined('AF_INET6')) { //TODO - figure out why this was never getting dropped into during the tests
-                //This won't work (oddly) if ipv6 has been disabled for PHP and the server it's running on
-                //Where this idea came from - https://www.php.net/manual/en/function.inet-pton.php#104917
-                $remoteEndpointArr["ipv6"] = inet_pton($ipString);
-            //}
-            //TODO - does the else case need handling here?
+            $remoteEndpointArr["ipv6"] = inet_pton($ipString);
         }
 
         $remoteEndpointArr["port"] = $portNumber ?? 0;
