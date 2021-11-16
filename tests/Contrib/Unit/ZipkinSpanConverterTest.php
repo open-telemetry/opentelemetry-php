@@ -184,6 +184,21 @@ class ZipkinSpanConverterTest extends TestCase
     /**
      * @test
      */
+    public function shouldConvertAnEventWithoutAttributesToAnAnnotationWithOnlyItsName()
+    {
+        $span = (new SpanData())
+            ->addEvent('event.name', new Attributes());
+
+        $converter = new SpanConverter('test.name');
+        $row = $converter->convert($span);
+
+        [$annotation] = $row['annotations'];
+        $this->assertSame('event.name', $annotation['value']);
+    }
+
+    /**
+     * @test
+     */
     public function shouldUseOTELIpv4AndPortCorrectlyForZipkinRemoteEndpoint()
     {
         $span = (new SpanData())
