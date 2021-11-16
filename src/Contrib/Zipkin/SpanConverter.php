@@ -157,7 +157,9 @@ class SpanConverter
             
             $attributesAsJson = json_encode($attributesArray);
             if (($attributesAsJson !== false) && (strlen($attributesAsJson) > 0)) {
-                $value = '"' . $event->getName() . '"' . ': ' . $attributesAsJson; //TODO - clean this up and make sure it's spec compliant
+                $eventName = $event->getName();
+
+                $value = "\"{$eventName}\": {$attributesAsJson}";
             }
         }
 
