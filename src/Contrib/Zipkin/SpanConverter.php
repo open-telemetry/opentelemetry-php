@@ -147,24 +147,10 @@ class SpanConverter
     }
 
     private static function toAnnotation(EventInterface $event): array {
-        
+        $eventName = $event->getName();
+        $attributesAsJson = SpanConverter::convertEventAttributesToJson($event);
 
-        if (count($event->getAttributes()) > 0) {
-            $attributesArray = [];
-            foreach ($event->getAttributes() as $attr) {
-                $attributesArray[$attr->getKey()] = $attr->getValue();
-            }
-            
-            $attributesAsJson = json_encode($attributesArray);
-            if (($attributesAsJson !== false) && (strlen($attributesAsJson) > 0)) {
-                $eventName = $event->getName();
-
-                $value = "\"{$eventName}\": {$attributesAsJson}";
-            }
-        } else {
-            $eventName = $event->getName();
-            $value = "\"{$eventName}\"";
-        }
+        $value = ($attributesAsJson !== null) ? "\"{$eventName}\": {$attributesAsJson}" : "\"{$eventName}\"";
 
         $annotation = [
             'timestamp' => AbstractClock::nanosToMicro($event->getEpochNanos()),
@@ -172,6 +158,24 @@ class SpanConverter
         ];
 
         return $annotation;
+    }
+
+    private static function convertEventAttributesToJson(EventInterface $event): ?string {
+        if (count($event->getAttributes()) === 0) {
+            return null;
+        }
+        
+        $attributesArray = [];
+        foreach ($event->getAttributes() as $attr) {
+            $attributesArray[$attr->getKey()] = $attr->getValue();
+        }
+        
+        $attributesAsJson = json_encode($attributesArray);
+        if (($attributesAsJson === false) || (strlen($attributesAsJson) === 0)) {
+            return null;
+        }
+
+        return $attributesAsJson;
     }
 
     private static function toRemoteEndpoint(SpanDataInterface $span): ?array {
