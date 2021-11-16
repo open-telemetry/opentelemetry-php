@@ -8,11 +8,18 @@ use Exception;
 use OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
-class LoggerExporterTest extends AbstractLoggerAwareTest
+class LoggerExporterTest extends AbstractExporterTest
 {
+    use LoggerAwareTestTrait;
+
     private const SERVICE_NAME = 'LoggerExporterTest';
     private const LOG_LEVEL = 'debug';
     private const LOG_FILE = 'debug.log';
+
+    public function createExporter(): LoggerExporter
+    {
+        return new LoggerExporter(self::SERVICE_NAME);
+    }
 
     public function testFromConnectionString(): void
     {
@@ -24,20 +31,6 @@ class LoggerExporterTest extends AbstractLoggerAwareTest
                 self::SERVICE_NAME,
                 self::LOG_LEVEL
             )
-        );
-    }
-
-    public function testShutDown(): void
-    {
-        $this->assertTrue(
-            $this->createLoggerExporter()->shutdown()
-        );
-    }
-
-    public function testForceFlush(): void
-    {
-        $this->assertTrue(
-            $this->createLoggerExporter()->forceFlush()
         );
     }
 
@@ -95,22 +88,6 @@ class LoggerExporterTest extends AbstractLoggerAwareTest
                 ->export(
                     $this->createSpanMocks()
                 )
-        );
-    }
-
-    /**
-     * @psalm-suppress PossiblyInvalidArgument
-     */
-    public function testExportNotRunning(): void
-    {
-        $exporter = $this->createLoggerExporter();
-        $exporter->shutdown();
-
-        $this->assertSame(
-            SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE,
-            $exporter->export(
-                $this->createSpanMocks()
-            )
         );
     }
 
