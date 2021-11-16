@@ -147,7 +147,7 @@ class SpanConverter
     }
 
     private static function toAnnotation(EventInterface $event): array {
-        $value = $event->getName();
+        
 
         if (count($event->getAttributes()) > 0) {
             $attributesArray = [];
@@ -161,6 +161,9 @@ class SpanConverter
 
                 $value = "\"{$eventName}\": {$attributesAsJson}";
             }
+        } else {
+            $eventName = $event->getName();
+            $value = "\"{$eventName}\"";
         }
 
         $annotation = [

@@ -193,7 +193,7 @@ class ZipkinSpanConverterTest extends TestCase
         $row = $converter->convert($span);
 
         [$annotation] = $row['annotations'];
-        $this->assertSame('event.name', $annotation['value']);
+        $this->assertSame("\"event.name\"", $annotation['value']);
     }
 
     /**
