@@ -30,6 +30,8 @@ class SpanConverter
         'db.name' => 7,
     ];
 
+    const NET_PEER_IP_KEY = 'net.peer.ip';
+
     /**
      * @var string
      */
@@ -193,7 +195,7 @@ class SpanConverter
         }
 
         switch ($preferredAttr->getKey()) {
-            case 'net.peer.ip':
+            case SpanConverter::NET_PEER_IP_KEY:
                 return SpanConverter::getRemoteEndpointDataFromIpAddressAndPort(
                     $preferredAttr,
                     SpanConverter::getPortNumberFromSpanAttributes($span)
