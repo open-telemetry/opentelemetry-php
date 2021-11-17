@@ -21,6 +21,9 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         return new Exporter();
     }
 
+    /**
+     * @psalm-suppress UndefinedConstant
+     */
     public function testExporterHappyPath(): void
     {
         $exporter = new Exporter(
@@ -173,6 +176,10 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         putenv('OTEL_EXPORTER_OTLP_INSECURE');
     }
 
+    /**
+     * @psalm-suppress PossiblyUndefinedMethod
+     * @psalm-suppress UndefinedMagicMethod
+     */
     private function createMockTraceServiceClient(array $options = [])
     {
         [

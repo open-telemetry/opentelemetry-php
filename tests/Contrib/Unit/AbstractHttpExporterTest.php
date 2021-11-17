@@ -33,6 +33,7 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
 
     /**
      * @dataProvider exporterResponseStatusDataProvider
+     * @psalm-suppress PossiblyUndefinedMethod
      */
     public function testExporterResponseStatus($responseStatus, $expected): void
     {
@@ -78,7 +79,6 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
         return [
             'missing scheme' => ['host:123/path'],
             'missing host' => ['scheme://'],
-            'missing path' => ['scheme://host:123'],
             'invalid port' => ['scheme://host:port/path'],
             'invalid scheme' => ['1234://host:port/path'],
             'invalid host' => ['scheme:///end:1234/path'],
@@ -88,6 +88,7 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
 
     /**
      * @dataProvider clientExceptionDataProvider
+     * @psalm-suppress PossiblyUndefinedMethod
      */
     public function testClientExceptionDecidesReturnCode($exception, $expected): void
     {

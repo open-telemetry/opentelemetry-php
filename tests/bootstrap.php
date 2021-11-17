@@ -7,3 +7,5 @@ use DG\BypassFinals;
 require_once __DIR__ . '/../vendor/autoload.php';
 
 BypassFinals::enable();
+
+assert_options(ASSERT_ACTIVE, true);

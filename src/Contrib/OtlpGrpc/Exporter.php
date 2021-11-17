@@ -97,6 +97,10 @@ class Exporter implements Trace\SpanExporterInterface
         $this->client = $client ?? new TraceServiceClient($this->endpointURL, $opts);
     }
 
+    /**
+     * @psalm-suppress UndefinedClass
+     * @psalm-suppress UndefinedConstant
+     */
     public function getClientOptions(): array
     {
         $opts = [
@@ -124,7 +128,10 @@ class Exporter implements Trace\SpanExporterInterface
         return $opts;
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     * @psalm-suppress UndefinedConstant
+     */
     public function export(iterable $spans): int
     {
         if (!$this->running) {

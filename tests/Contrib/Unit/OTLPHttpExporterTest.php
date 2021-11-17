@@ -22,6 +22,9 @@ class OTLPHttpExporterTest extends AbstractExporterTest
 {
     use UsesHttpClientTrait;
 
+    /**
+     * @psalm-suppress PossiblyInvalidArgument
+     */
     public function createExporter(): SpanExporterInterface
     {
         return new Exporter(
@@ -195,12 +198,17 @@ class OTLPHttpExporterTest extends AbstractExporterTest
 
     /**
      * @test
+     * @psalm-suppress PossiblyInvalidArgument
      */
     public function shouldBeOkToExporterEmptySpansCollection(): void
     {
         $this->assertEquals(
             SpanExporterInterface::STATUS_SUCCESS,
-            (new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->export([])
+            (new Exporter(
+                $this->getClientInterfaceMock(),
+                $this->getRequestFactoryInterfaceMock(),
+                $this->getStreamFactoryInterfaceMock()
+            ))->export([])
         );
     }
 
@@ -208,6 +216,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
      * @test
      * @testdox Exporter Refuses OTLP/JSON Protocol
      * https://github.com/open-telemetry/opentelemetry-specification/issues/786
+     * @psalm-suppress PossiblyInvalidArgument
      */
     public function failsExporterRefusesOTLPJson(): void
     {
@@ -225,6 +234,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     /**
      * @testdox Exporter Refuses Invalid Endpoint
      * @dataProvider exporterInvalidEndpointDataProvider
+     * @psalm-suppress PossiblyInvalidArgument
      */
     public function testExporterRefusesInvalidEndpoint($endpoint): void
     {
