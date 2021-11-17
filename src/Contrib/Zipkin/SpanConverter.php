@@ -118,7 +118,7 @@ class SpanConverter
 
         if (($span->getKind() === SpanKind::KIND_CLIENT) || ($span->getKind() === SpanKind::KIND_PRODUCER)) {
             $remoteEndpointData = SpanConverter::toRemoteEndpoint($span);
-            if ($remoteEndpointData != null) {
+            if ($remoteEndpointData !== null) {
                 $row['remoteEndpoint'] = $remoteEndpointData;
             }
         }
