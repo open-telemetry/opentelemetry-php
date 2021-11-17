@@ -153,7 +153,7 @@ class SpanConverter
         $eventName = $event->getName();
         $attributesAsJson = SpanConverter::convertEventAttributesToJson($event);
 
-        $value = ($attributesAsJson !== null) ? "\"{$eventName}\": {$attributesAsJson}" : "\"{$eventName}\"";
+        $value = ($attributesAsJson !== null) ? sprintf('"%s": %s', $eventName, $attributesAsJson) : sprintf('"%s"', $eventName);
 
         $annotation = [
             'timestamp' => AbstractClock::nanosToMicro($event->getEpochNanos()),
