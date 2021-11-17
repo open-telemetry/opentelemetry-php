@@ -24,10 +24,15 @@ trait HttpSpanExporterTrait
 
     private function validateEndpointUrl(string $endpointUrl): void
     {
+        /**  Temporarily replacing assert with hard exception
         try {
             assert(filter_var($endpointUrl, FILTER_VALIDATE_URL));
         } catch (Throwable $e) {
             throw new InvalidArgumentException('Invalid Endpoint URL given: ' . $endpointUrl, E_WARNING, $e);
+        }
+        */
+        if (filter_var($endpointUrl, FILTER_VALIDATE_URL) === false) {
+            throw new InvalidArgumentException('Invalid Endpoint URL given: ' . $endpointUrl);
         }
     }
 
