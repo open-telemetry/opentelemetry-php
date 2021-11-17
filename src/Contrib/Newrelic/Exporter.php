@@ -7,8 +7,10 @@ namespace OpenTelemetry\Contrib\Newrelic;
 use Exception;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
-use InvalidArgumentException;
+use JsonException;
 use OpenTelemetry\SDK\Trace;
+use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
+use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
@@ -26,50 +28,17 @@ use Psr\Http\Message\StreamFactoryInterface;
  */
 class Exporter implements Trace\SpanExporterInterface
 {
+    use UsesSpanConverterTrait;
+    use HttpSpanExporterTrait;
+
     private const DATA_FORMAT = 'newrelic';
     private const DATA_FORMAT_VERSION_DEFAULT = '1';
 
-    /**
-     * @var string
-     */
-    private $endpointUrl;
+    private string $licenseKey;
 
-    /**
-     * @var string
-     */
-    private $licenseKey;
+    private string $name;
 
-    /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var SpanConverter
-     */
-    private $spanConverter;
-
-    /**
-     * @var bool
-     */
-    private $running = true;
-
-    /**
-     * @var ClientInterface
-     */
-    private $client;
-
-    /**
-     * @var RequestFactoryInterface
-     */
-    private $requestFactory;
-
-    /**
-     * @var StreamFactoryInterface
-     */
-    private $streamFactory;
-
-    private $dataFormatVersion;
+    private string $dataFormatVersion;
 
     public function __construct(
         $name,
@@ -81,51 +50,23 @@ class Exporter implements Trace\SpanExporterInterface
         SpanConverter $spanConverter = null,
         string $dataFormatVersion = Exporter::DATA_FORMAT_VERSION_DEFAULT
     ) {
-        $parsedDsn = parse_url($endpointUrl);
-
-        if (!is_array($parsedDsn)) {
-            throw new InvalidArgumentException('Unable to parse provided DSN');
-        }
-        if (
-            !isset($parsedDsn['scheme'])
-            || !isset($parsedDsn['host'])
-            || !isset($parsedDsn['path'])
-        ) {
-            throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
-        }
-
         $this->name = $name;
-        $this->endpointUrl = $endpointUrl;
         $this->licenseKey = $licenseKey;
-        $this->client = $client;
-        $this->requestFactory = $requestFactory;
-        $this->streamFactory = $streamFactory;
-        $this->spanConverter = $spanConverter ?? new SpanConverter($name);
         $this->dataFormatVersion = $dataFormatVersion;
+        $this->setEndpointUrl($endpointUrl);
+        $this->setClient($client);
+        $this->setRequestFactory($requestFactory);
+        $this->setStreamFactory($streamFactory);
+        $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
     }
 
     /** @inheritDoc */
-    public function export(iterable $spans): int
+    public function doExport(iterable $spans): int
     {
-        if (!$this->running) {
-            return self::STATUS_FAILED_NOT_RETRYABLE;
-        }
-
-        if (empty($spans)) {
-            return self::STATUS_SUCCESS;
-        }
-
-        $convertedSpans = [];
-        foreach ($spans as $span) {
-            $convertedSpans[] = $this->spanConverter->convert($span);
-        }
-        $commonAttributes = ['attributes' => [ 'service.name' => $this->name,
-                                               'host' => $this->endpointUrl, ]];
-        $payload = [[ 'common' => $commonAttributes,
-                     'spans' => $convertedSpans, ]];
-
         try {
-            $body = $this->streamFactory->createStream(json_encode($payload));
+            $body = $this->streamFactory->createStream(
+                $this->serializePayload($spans)
+            );
             $request = $this->requestFactory
                 ->createRequest('POST', $this->endpointUrl)
                 ->withBody($body)
@@ -135,7 +76,7 @@ class Exporter implements Trace\SpanExporterInterface
                 ->withAddedHeader('Data-Format-Version', $this->dataFormatVersion);
 
             $response = $this->client->sendRequest($request);
-        } catch (RequestExceptionInterface $e) {
+        } catch (RequestExceptionInterface | JsonException $e) {
             return self::STATUS_FAILED_NOT_RETRYABLE;
         } catch (NetworkExceptionInterface | ClientExceptionInterface $e) {
             return self::STATUS_FAILED_RETRYABLE;
@@ -152,18 +93,14 @@ class Exporter implements Trace\SpanExporterInterface
         return self::STATUS_SUCCESS;
     }
 
-    /** @inheritDoc */
-    public function shutdown(): bool
+    private function serializePayload(iterable $spans): string
     {
-        $this->running = false;
+        $commonAttributes = ['attributes' => [ 'service.name' => $this->name,
+            'host' => $this->endpointUrl, ]];
+        $payload = [[ 'common' => $commonAttributes,
+            'spans' => $this->convertSpanCollection($spans), ]];
 
-        return true;
-    }
-
-    /** @inheritDoc */
-    public function forceFlush(): bool
-    {
-        return true;
+        return json_encode($payload, JSON_THROW_ON_ERROR);
     }
 
     /** @inheritDoc */

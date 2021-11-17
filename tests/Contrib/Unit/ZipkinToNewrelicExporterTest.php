@@ -11,6 +11,9 @@ class ZipkinToNewrelicExporterTest extends AbstractHttpExporterTest
     protected const EXPORTER_NAME = 'test.zipkinToNR';
     protected const LICENSE_KEY = 'abc123';
 
+    /**
+     * @psalm-suppress PossiblyInvalidArgument
+     */
     public function createExporterWithDsn(string $dsn): Exporter
     {
         return new Exporter(

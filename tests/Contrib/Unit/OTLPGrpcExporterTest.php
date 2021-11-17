@@ -29,7 +29,10 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->restoreEnvironmentVariables();
     }
 
-    public function testExporterHappyPath()
+    /**
+     * @psalm-suppress UndefinedConstant
+     */
+    public function testExporterHappyPath(): void
     {
         $exporter = new Exporter(
             //These first parameters were copied from the constructor's default values
@@ -176,6 +179,10 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
     }
 
+    /**
+     * @psalm-suppress PossiblyUndefinedMethod
+     * @psalm-suppress UndefinedMagicMethod
+     */
     private function createMockTraceServiceClient(array $options = [])
     {
         [

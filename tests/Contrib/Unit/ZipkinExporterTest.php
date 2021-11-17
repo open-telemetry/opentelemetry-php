@@ -10,6 +10,9 @@ class ZipkinExporterTest extends AbstractHttpExporterTest
 {
     protected const EXPORTER_NAME = 'test.zipkin';
 
+    /**
+     * @psalm-suppress PossiblyInvalidArgument
+     */
     public function createExporterWithDsn(string $dsn): Exporter
     {
         return new Exporter(

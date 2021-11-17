@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\Behavior;
 
-use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 trait SpanExporterTrait
 {
-    private ?SpanConverterInterface $converter = null;
     private bool $running = true;
 
     /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#shutdown-2 */
@@ -35,5 +34,23 @@ trait SpanExporterTrait
      *
      * @psalm-return SpanExporterInterface::STATUS_*
      */
-    abstract public function export(iterable $spans): int;
+    public function export(iterable $spans): int
+    {
+        if (!$this->running) {
+            return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
+        }
+
+        if (empty($spans)) {
+            return SpanExporterInterface::STATUS_SUCCESS;
+        }
+
+        return $this->doExport($spans); /** @phpstan-ignore-line */
+    }
+
+    /**
+     * @param iterable<SpanDataInterface> $spans Batch of spans to export
+     *
+     * @psalm-return SpanExporterInterface::STATUS_*
+     */
+    abstract protected function doExport(iterable $spans): int; /** @phpstan-ignore-line */
 }

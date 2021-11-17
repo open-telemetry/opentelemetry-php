@@ -7,8 +7,10 @@ namespace OpenTelemetry\Contrib\ZipkinToNewrelic;
 use Exception;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
-use InvalidArgumentException;
+use JsonException;
 use OpenTelemetry\SDK\Trace;
+use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
+use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
@@ -26,41 +28,10 @@ use Psr\Http\Message\StreamFactoryInterface;
  */
 class Exporter implements Trace\SpanExporterInterface
 {
-    /**
-     * @var string
-     */
-    private $endpointUrl;
+    use UsesSpanConverterTrait;
+    use HttpSpanExporterTrait;
 
-    /**
-     * @var string
-     */
-    private $licenseKey;
-
-    /**
-     * @var SpanConverter
-     */
-    private $spanConverter;
-
-    /**
-     * @var bool
-     */
-    private $running = true;
-
-    /**
-     * @var ClientInterface
-     */
-    private $client;
-
-    /**
-     * @var RequestFactoryInterface
-     */
-    private $requestFactory;
-
-    /**
-     * @var StreamFactoryInterface
-     */
-    private $streamFactory;
-
+    private string $licenseKey;
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
     // private string $name;
 
@@ -73,47 +44,27 @@ class Exporter implements Trace\SpanExporterInterface
         StreamFactoryInterface $streamFactory,
         SpanConverter $spanConverter = null
     ) {
-        $parsedDsn = parse_url($endpointUrl);
-
-        if (!is_array($parsedDsn)) {
-            throw new InvalidArgumentException('Unable to parse provided DSN');
-        }
-        if (
-            !isset($parsedDsn['scheme'])
-            || !isset($parsedDsn['host'])
-            || !isset($parsedDsn['path'])
-        ) {
-            throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
-        }
-
         // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
         // $this->name = $name;
-        $this->endpointUrl = $endpointUrl;
         $this->licenseKey = $licenseKey;
-        $this->client = $client;
-        $this->requestFactory = $requestFactory;
-        $this->streamFactory = $streamFactory;
-        $this->spanConverter = $spanConverter ?? new SpanConverter($name);
+
+        $this->setEndpointUrl($endpointUrl);
+        $this->setClient($client);
+        $this->setRequestFactory($requestFactory);
+        $this->setStreamFactory($streamFactory);
+        $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
     }
 
     /** @inheritDoc */
-    public function export(iterable $spans): int
+    public function doExport(iterable $spans): int
     {
-        if (!$this->running) {
-            return self::STATUS_FAILED_NOT_RETRYABLE;
-        }
-
-        if (empty($spans)) {
-            return self::STATUS_SUCCESS;
-        }
-
-        $convertedSpans = [];
-        foreach ($spans as $span) {
-            $convertedSpans[] = $this->spanConverter->convert($span);
-        }
-
         try {
-            $body = $this->streamFactory->createStream(json_encode($convertedSpans));
+            $body = $this->getStreamFactory()->createStream(
+                json_encode(
+                    $this->convertSpanCollection($spans),
+                    JSON_THROW_ON_ERROR
+                )
+            );
             $request = $this->requestFactory
                 ->createRequest('POST', $this->endpointUrl)
                 ->withBody($body)
@@ -123,7 +74,7 @@ class Exporter implements Trace\SpanExporterInterface
                 ->withAddedHeader('Data-Format-Version', '2');
 
             $response = $this->client->sendRequest($request);
-        } catch (RequestExceptionInterface $e) {
+        } catch (RequestExceptionInterface | JsonException $e) {
             return self::STATUS_FAILED_NOT_RETRYABLE;
         } catch (NetworkExceptionInterface | ClientExceptionInterface $e) {
             return self::STATUS_FAILED_RETRYABLE;
@@ -138,19 +89,6 @@ class Exporter implements Trace\SpanExporterInterface
         }
 
         return self::STATUS_SUCCESS;
-    }
-
-    /** @inheritDoc */
-    public function shutdown(): bool
-    {
-        $this->running = false;
-
-        return true;
-    }
-
-    public function forceFlush(): bool
-    {
-        return true;
     }
 
     /** @inheritDoc */

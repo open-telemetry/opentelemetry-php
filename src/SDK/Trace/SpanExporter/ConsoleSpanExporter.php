@@ -21,12 +21,8 @@ class ConsoleSpanExporter implements SpanExporterInterface
     }
 
     /** @inheritDoc */
-    public function export(iterable $spans): int
+    public function doExport(iterable $spans): int
     {
-        if (!$this->running) {
-            return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
-        }
-
         try {
             foreach ($spans as $span) {
                 print(json_encode(

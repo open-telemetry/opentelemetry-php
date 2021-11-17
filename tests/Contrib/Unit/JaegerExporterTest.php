@@ -12,6 +12,9 @@ class JaegerExporterTest extends AbstractHttpExporterTest
 
     private const EXPORTER_NAME = 'test.jaeger';
 
+    /**
+     * @psalm-suppress PossiblyInvalidArgument
+     */
     public function createExporterWithDsn(string $dsn): Exporter
     {
         return new Exporter(
