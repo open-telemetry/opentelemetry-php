@@ -15,6 +15,9 @@ use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers SpanConverter
+ */
 class ZipkinSpanConverterTest extends TestCase
 {
     /**
