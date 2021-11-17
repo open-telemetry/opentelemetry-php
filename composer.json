@@ -52,6 +52,7 @@
         }
     },
     "require-dev": {
+        "assertwell/phpunit-global-state": "^0.2",
         "composer/xdebug-handler": "^2.0",
         "friendsofphp/php-cs-fixer": "^3.0",
         "guzzlehttp/guzzle": "^7.3",

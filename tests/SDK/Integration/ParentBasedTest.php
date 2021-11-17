@@ -76,8 +76,9 @@ class ParentBasedTest extends TestCase
     public function testParentBasedDescription(): void
     {
         $rootSampler = $this->createMock(SamplerInterface::class);
+        $rootSampler->expects($this->once())->method('getDescription')->willReturn('Foo');
         $sampler = new ParentBased($rootSampler);
-        $this->assertEquals('ParentBased', $sampler->getDescription());
+        $this->assertEquals('ParentBased+Foo', $sampler->getDescription());
     }
 
     private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceStateInterface $traceState = null): Context

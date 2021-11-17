@@ -9,7 +9,7 @@ test:
 phan:
 	$(DC_RUN_PHP) env PHAN_DISABLE_XDEBUG_WARN=1 php ./vendor/bin/phan
 psalm:
-	$(DC_RUN_PHP) php ./vendor/bin/psalm --threads=1
+	$(DC_RUN_PHP) php ./vendor/bin/psalm --threads=1 --no-cache
 psalm-info:
 	$(DC_RUN_PHP) php ./vendor/bin/psalm --show-info=true --threads=1
 phpstan:
