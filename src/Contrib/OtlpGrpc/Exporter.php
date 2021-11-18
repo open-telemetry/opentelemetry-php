@@ -8,62 +8,31 @@ use grpc;
 use InvalidArgumentException;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
+use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace;
+use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 
 class Exporter implements Trace\SpanExporterInterface
 {
-    /**
-     * @var string
-     */
-    private $endpointURL;
+    use EnvironmentVariablesTrait;
+    use SpanExporterTrait;
 
-    /**
-     * @var string
-     */
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
     // private $protocol;
 
-    /**
-     * @var bool|string
-     */
-    private $insecure;
+    private bool $insecure;
 
-    /**
-     * @var string
-     */
-    private $certificateFile;
+    private string $certificateFile;
 
-    /**
-     * @var string
-     */
-    private $headers;
+    private bool $compression;
 
-    /**
-     * @var bool|string
-     */
-    private $compression;
+    private int $timeout;
 
-    /**
-     * @var int
-     */
-    private $timeout;
-    /**
-     * @var SpanConverter
-     */
-    private $spanConverter;
+    private SpanConverter $spanConverter;
 
-    private $metadata;
+    private array $metadata;
 
-    /**
-    * @var bool
-    */
-    private $running = true;
-
-    /**
-     * @var TraceServiceClient
-     */
-
-    private $client;
+    private TraceServiceClient $client;
 
     /**
      * OTLP GRPC Exporter Constructor
@@ -79,22 +48,25 @@ class Exporter implements Trace\SpanExporterInterface
     ) {
 
         // Set default values based on presence of env variable
-        $this->endpointURL = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: $endpointURL;
         // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
         // $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc'; // I guess this is redundant?
-        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ? filter_var(getenv('OTEL_EXPORTER_OTLP_INSECURE'), FILTER_VALIDATE_BOOLEAN): $insecure;
-        $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: $certificateFile;
-        $this->headers = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: $headers;
-        $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: $compression;
-        $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: $timeout;
+        $this->insecure = $this->getBooleanFromEnvironment('OTEL_EXPORTER_OTLP_INSECURE', $insecure);
+        $this->certificateFile = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_CERTIFICATE', $certificateFile);
+        $this->compression = $this->getBooleanFromEnvironment('OTEL_EXPORTER_OTLP_COMPRESSION', $compression);
+        $this->timeout = $this->getIntFromEnvironment('OTEL_EXPORTER_OTLP_TIMEOUT', $timeout);
 
         $this->spanConverter = new SpanConverter();
 
-        $this->metadata = $this->metadataFromHeaders($this->headers);
+        $this->metadata = $this->metadataFromHeaders(
+            $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', $headers)
+        );
 
         $opts = $this->getClientOptions();
 
-        $this->client = $client ?? new TraceServiceClient($this->endpointURL, $opts);
+        $this->client = $client ?? new TraceServiceClient(
+            $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', $endpointURL),
+            $opts
+        );
     }
 
     /**
@@ -104,21 +76,10 @@ class Exporter implements Trace\SpanExporterInterface
     public function getClientOptions(): array
     {
         $opts = [
-            'update_metadata' => function () {
-                return $this->metadata;
-            },
+            'update_metadata' => fn () => $this->metadata,
             'timeout' => $this->timeout,
+            'credentials' => $this->getCredentials(),
         ];
-
-        if (!$this->insecure && !$this->certificateFile) {
-            // Assumed default
-            $opts['credentials'] = Grpc\ChannelCredentials::createSsl('');
-        } elseif (!$this->insecure && $this->certificateFile !== '') {
-            // Should we validate more?
-            $opts['credentials'] = Grpc\ChannelCredentials::createSsl(file_get_contents($this->certificateFile));
-        } else {
-            $opts['credentials'] = Grpc\ChannelCredentials::createInsecure();
-        }
 
         if ($this->compression) {
             // gzip is the only specified compression method for now
@@ -132,20 +93,12 @@ class Exporter implements Trace\SpanExporterInterface
      * @inheritDoc
      * @psalm-suppress UndefinedConstant
      */
-    public function export(iterable $spans): int
+    protected function doExport(iterable $spans): int
     {
-        if (!$this->running) {
-            return self::STATUS_FAILED_NOT_RETRYABLE;
-        }
-
-        if (empty($spans)) {
-            return self::STATUS_SUCCESS;
-        }
-
-        $resourcespans = [$this->spanConverter->as_otlp_resource_span($spans)];
+        $resourceSpans = [$this->spanConverter->as_otlp_resource_span($spans)];
 
         $request = new ExportTraceServiceRequest([
-            'resource_spans' => $resourcespans,
+            'resource_spans' => $resourceSpans,
         ]);
 
         [$response, $status] = $this->client->Export($request)->wait();
@@ -171,12 +124,12 @@ class Exporter implements Trace\SpanExporterInterface
         return self::STATUS_FAILED_NOT_RETRYABLE;
     }
 
-    public function setHeader($key, $value)
+    public function setHeader($key, $value): void
     {
         $this->metadata[$key] = [$value];
     }
 
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->metadata;
     }
@@ -205,23 +158,20 @@ class Exporter implements Trace\SpanExporterInterface
         return $metadata;
     }
 
-    /** @inheritDoc */
-    public function shutdown(): bool
+    private function getCredentials(): ?\Grpc\ChannelCredentials
     {
-        $this->running = false;
+        if (!$this->insecure) {
+            return $this->certificateFile !== ''
+                ? Grpc\ChannelCredentials::createSsl(file_get_contents($this->certificateFile))
+                : Grpc\ChannelCredentials::createSsl('');
+        }
 
-        return true;
+        return Grpc\ChannelCredentials::createInsecure();
     }
 
     /** @inheritDoc */
-    public function forceFlush(): bool
+    public static function fromConnectionString(string $endpointUrl, string $name = null, $args = null)
     {
-        return true;
-    }
-
-    /** @inheritDoc */
-    public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
-    {
-        return new Exporter();
+        return new Exporter($endpointUrl);
     }
 }

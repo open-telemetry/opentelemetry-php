@@ -11,11 +11,9 @@ use JsonException;
 use OpenTelemetry\SDK\Trace;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
-use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Client\NetworkExceptionInterface;
-use Psr\Http\Client\RequestExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
 /**
@@ -31,8 +29,14 @@ class Exporter implements Trace\SpanExporterInterface
     use UsesSpanConverterTrait;
     use HttpSpanExporterTrait;
 
-    private const DATA_FORMAT = 'newrelic';
     private const DATA_FORMAT_VERSION_DEFAULT = '1';
+    private const REQUEST_METHOD = 'POST';
+    private const HEADER_CONTENT_TYPE = 'content-type';
+    private const HEADER_API_KEY = 'Api-Key';
+    private const HEADER_DATA_FORMAT = 'Data-Format';
+    private const HEADER_DATA_FORMAT_VERSION = 'Data-Format-Version';
+    private const VALUE_CONTENT_TYPE = 'application/json';
+    private const VALUE_DATA_FORMAT = 'newrelic';
 
     private string $licenseKey;
 
@@ -60,47 +64,38 @@ class Exporter implements Trace\SpanExporterInterface
         $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
     }
 
-    /** @inheritDoc */
-    public function doExport(iterable $spans): int
+    /**
+     * @throws JsonException
+     */
+    protected function serializeTrace(iterable $spans): string
     {
-        try {
-            $body = $this->streamFactory->createStream(
-                $this->serializePayload($spans)
-            );
-            $request = $this->requestFactory
-                ->createRequest('POST', $this->endpointUrl)
-                ->withBody($body)
-                ->withHeader('content-type', 'application/json')
-                ->withAddedHeader('Api-Key', $this->licenseKey)
-                ->withAddedHeader('Data-Format', self::DATA_FORMAT)
-                ->withAddedHeader('Data-Format-Version', $this->dataFormatVersion);
-
-            $response = $this->client->sendRequest($request);
-        } catch (RequestExceptionInterface | JsonException $e) {
-            return self::STATUS_FAILED_NOT_RETRYABLE;
-        } catch (NetworkExceptionInterface | ClientExceptionInterface $e) {
-            return self::STATUS_FAILED_RETRYABLE;
-        }
-
-        if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
-            return self::STATUS_FAILED_NOT_RETRYABLE;
-        }
-
-        if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
-            return self::STATUS_FAILED_RETRYABLE;
-        }
-
-        return self::STATUS_SUCCESS;
+        return json_encode($this->convert($spans), JSON_THROW_ON_ERROR);
     }
 
-    private function serializePayload(iterable $spans): string
+    private function convert(iterable $spans): array
     {
         $commonAttributes = ['attributes' => [ 'service.name' => $this->name,
             'host' => $this->endpointUrl, ]];
-        $payload = [[ 'common' => $commonAttributes,
-            'spans' => $this->convertSpanCollection($spans), ]];
 
-        return json_encode($payload, JSON_THROW_ON_ERROR);
+        return [[ 'common' => $commonAttributes,
+            'spans' => $this->convertSpanCollection($spans), ]];
+    }
+
+    /**
+     * @throws JsonException
+     */
+    protected function marshallRequest(iterable $spans): RequestInterface
+    {
+        return $this->createRequest(self::REQUEST_METHOD)
+            ->withBody(
+                $this->createStream(
+                    $this->serializeTrace($spans)
+                )
+            )
+            ->withHeader(self::HEADER_CONTENT_TYPE, self::VALUE_CONTENT_TYPE)
+            ->withAddedHeader(self::HEADER_API_KEY, $this->licenseKey)
+            ->withAddedHeader(self::HEADER_DATA_FORMAT, self::VALUE_DATA_FORMAT)
+            ->withAddedHeader(self::HEADER_DATA_FORMAT_VERSION, $this->dataFormatVersion);
     }
 
     /** @inheritDoc */

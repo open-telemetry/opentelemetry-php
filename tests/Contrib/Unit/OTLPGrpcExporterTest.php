@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Grpc\UnaryCall;
 use InvalidArgumentException;
 use Mockery;
@@ -16,9 +17,16 @@ use OpenTelemetry\Tests\SDK\Util\SpanData;
 
 class OTLPGrpcExporterTest extends AbstractExporterTest
 {
+    use EnvironmentVariables;
+
     public function createExporter(): SpanExporterInterface
     {
         return new Exporter();
+    }
+
+    public function tearDown(): void
+    {
+        $this->restoreEnvironmentVariables();
     }
 
     /**
@@ -88,13 +96,11 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
 
     public function testSetHeadersWithEnvironmentVariables(): void
     {
-        putenv('OTEL_EXPORTER_OTLP_HEADERS=x-aaa=foo,x-bbb=barf');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_HEADERS', 'x-aaa=foo,x-bbb=barf');
 
         $exporter = new Exporter();
 
         $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['barf']], $exporter->getHeaders());
-
-        putenv('OTEL_EXPORTER_OTLP_HEADERS'); // Clear the envvar or it breaks future tests
     }
 
     public function testSetHeadersInConstructor(): void
@@ -163,17 +169,14 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertFalse($this->isInsecure($exporter));
         $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
         // env vars
-        putenv('OTEL_EXPORTER_OTLP_TIMEOUT=1');
-        putenv('OTEL_EXPORTER_OTLP_COMPRESSION=1');
-        putenv('OTEL_EXPORTER_OTLP_INSECURE=false');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_TIMEOUT', '1');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_COMPRESSION', '1');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_INSECURE', 'false');
         $exporter = new Exporter('localhost:4317');
         $opts = $exporter->getClientOptions();
         $this->assertEquals(1, $opts['timeout']);
         $this->assertFalse($this->isInsecure($exporter));
         $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
-        putenv('OTEL_EXPORTER_OTLP_TIMEOUT');
-        putenv('OTEL_EXPORTER_OTLP_COMPRESSION');
-        putenv('OTEL_EXPORTER_OTLP_INSECURE');
     }
 
     /**

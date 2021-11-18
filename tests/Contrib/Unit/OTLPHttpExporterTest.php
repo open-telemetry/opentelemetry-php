@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -20,6 +21,7 @@ use Psr\Http\Client\NetworkExceptionInterface;
 
 class OTLPHttpExporterTest extends AbstractExporterTest
 {
+    use EnvironmentVariables;
     use UsesHttpClientTrait;
 
     /**
@@ -39,13 +41,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
      */
     public function cleanUpEnvVars(): void
     {
-        // Clear all env vars
-        putenv('OTEL_EXPORTER_OTLP_ENDPOINT');
-        putenv('OTEL_EXPORTER_OTLP_PROTOCOL');
-        putenv('OTEL_EXPORTER_OTLP_CERTIFICATE');
-        putenv('OTEL_EXPORTER_OTLP_HEADERS');
-        putenv('OTEL_EXPORTER_OTLP_COMPRESSION');
-        putenv('OTEL_EXPORTER_OTLP_TIMEOUT');
+        $this->restoreEnvironmentVariables();
     }
 
     /**
@@ -155,7 +151,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     /**
      * @dataProvider exporterEndpointDataProvider
      */
-    public function testExporterWithConfigViaEnvVars($endpoint, $expectedEndpoint): void
+    public function testExporterWithConfigViaEnvVars(?string $endpoint, string $expectedEndpoint)
     {
         $mock = new MockHandler([
             new Response(200, [], 'ff'),
@@ -166,9 +162,9 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         $stack = HandlerStack::create($mock);
         $stack->push($history);
 
-        putenv("OTEL_EXPORTER_OTLP_ENDPOINT=$endpoint");
-        putenv('OTEL_EXPORTER_OTLP_HEADERS=x-auth-header=tomato');
-        putenv('OTEL_EXPORTER_OTLP_COMPRESSION=gzip');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_ENDPOINT', $endpoint);
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_HEADERS', 'x-auth-header=tomato');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_COMPRESSION', 'gzip');
 
         $client = new Client(['handler' => $stack]);
         $exporter = new Exporter($client, new HttpFactory(), new HttpFactory());
@@ -220,7 +216,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
      */
     public function failsExporterRefusesOTLPJson(): void
     {
-        putenv('OTEL_EXPORTER_OTLP_PROTOCOL=http/json');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_PROTOCOL', 'http/json');
 
         $this->expectException(\InvalidArgumentException::class);
 
@@ -238,7 +234,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
      */
     public function testExporterRefusesInvalidEndpoint($endpoint): void
     {
-        putenv('OTEL_EXPORTER_OTLP_ENDPOINT=' . $endpoint);
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_ENDPOINT', $endpoint);
 
         $this->expectException(\InvalidArgumentException::class);
 

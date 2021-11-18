@@ -63,7 +63,7 @@ $tracerProvider = new TracerProvider(
     new BatchSpanProcessor($decorator, AbstractClock::getDefault()),
     new AlwaysOnSampler()
 );
-$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
+$tracer = $tracerProvider->getTracer();
 /**
  * Create some tracing data
  */

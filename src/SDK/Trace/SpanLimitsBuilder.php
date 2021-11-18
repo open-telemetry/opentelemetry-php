@@ -4,25 +4,29 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\SDK\EnvironmentVariablesTrait;
+
 class SpanLimitsBuilder
 {
+    use EnvironmentVariablesTrait;
+
     /** @var int Maximum allowed attribute count per record */
-    private $attributeCountLimit = 128;
+    private $attributeCountLimit;
 
     /** @var int Maximum allowed attribute value length */
-    private $attributeValueLengthLimit = PHP_INT_MAX;
+    private $attributeValueLengthLimit;
 
     /** @var int Maximum allowed span event count */
-    private $eventCountLimit = 128;
+    private $eventCountLimit;
 
     /** @var int Maximum allowed span link count */
-    private $linkCountLimit = 128;
+    private $linkCountLimit;
 
     /** @var int Maximum allowed attribute per span event count */
-    private $attributePerEventCountLimit = 128;
+    private $attributePerEventCountLimit;
 
     /** @var int Maximum allowed attribute per span link count */
-    private $attributePerLinkCountLimit = 128;
+    private $attributePerLinkCountLimit;
 
     /**
      * @param int $attributeCountLimit Maximum allowed attribute count per record
@@ -84,15 +88,18 @@ class SpanLimitsBuilder
         return $this;
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#span-limits-
+     */
     public function build(): SpanLimits
     {
         return new SpanLimits(
-            $this->attributeCountLimit,
-            $this->attributeValueLengthLimit,
-            $this->eventCountLimit,
-            $this->linkCountLimit,
-            $this->attributePerEventCountLimit,
-            $this->attributePerLinkCountLimit
+            $this->attributeCountLimit ?: $this->getIntFromEnvironment('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', SpanLimits::DEFAULT_SPAN_ATTRIBUTE_COUNT_LIMIT),
+            $this->attributeValueLengthLimit ?: $this->getIntFromEnvironment('OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT', SpanLimits::DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT),
+            $this->eventCountLimit ?: $this->getIntFromEnvironment('OTEL_SPAN_EVENT_COUNT_LIMIT', SpanLimits::DEFAULT_SPAN_EVENT_COUNT_LIMIT),
+            $this->linkCountLimit ?: $this->getIntFromEnvironment('OTEL_SPAN_LINK_COUNT_LIMIT', SpanLimits::DEFAULT_SPAN_LINK_COUNT_LIMIT),
+            $this->attributePerEventCountLimit ?: $this->getIntFromEnvironment('OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT', SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT),
+            $this->attributePerLinkCountLimit ?: $this->getIntFromEnvironment('OTEL_LINK_ATTRIBUTE_COUNT_LIMIT', SpanLimits::DEFAULT_LINK_ATTRIBUTE_COUNT_LIMIT),
         );
     }
 }

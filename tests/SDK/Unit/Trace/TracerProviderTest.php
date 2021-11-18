@@ -24,6 +24,16 @@ class TracerProviderTest extends TestCase
         $this->assertNotSame($t2, $t3);
     }
 
+    public function testGetTracerWithDefaultName(): void
+    {
+        $provider = new TracerProvider(null);
+
+        $t1 = $provider->getTracer();
+        $t2 = $provider->getTracer();
+
+        $this->assertSame($t1, $t2);
+    }
+
     public function testShutDown(): void
     {
         $provider = new TracerProvider(null);

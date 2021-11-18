@@ -6,10 +6,12 @@ update:
 	$(DC_RUN_PHP) composer update
 test:
 	$(DC_RUN_PHP) php ./vendor/bin/phpunit --colors=always --coverage-text --testdox --coverage-clover coverage.clover
+test-coverage:
+	docker-compose run -e XDEBUG_MODE=coverage --rm php php ./vendor/bin/phpunit --colors=always --testdox --coverage-html=tests/coverage/html
 phan:
 	$(DC_RUN_PHP) env PHAN_DISABLE_XDEBUG_WARN=1 php ./vendor/bin/phan
 psalm:
-	$(DC_RUN_PHP) php ./vendor/bin/psalm --threads=1
+	$(DC_RUN_PHP) php ./vendor/bin/psalm --threads=1 --no-cache
 psalm-info:
 	$(DC_RUN_PHP) php ./vendor/bin/psalm --show-info=true --threads=1
 phpstan:
