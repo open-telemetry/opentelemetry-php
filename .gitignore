@@ -5,6 +5,7 @@ vendor/
 coverage.clover
 tests/coverage
 .php-cs-fixer.cache
+!tests/coverage/html/.gitkeep
 
 # IntelliJ IDEA
 .idea
