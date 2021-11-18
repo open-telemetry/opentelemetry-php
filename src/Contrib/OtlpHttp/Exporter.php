@@ -76,7 +76,6 @@ class Exporter implements Trace\SpanExporterInterface
             throw new InvalidArgumentException('Invalid OTLP Protocol Specified');
         }
     }
-
     protected function serializeTrace(iterable $spans): string
     {
         $bytes = (new ExportTraceServiceRequest([
@@ -140,9 +139,6 @@ class Exporter implements Trace\SpanExporterInterface
     /**
      * validateEndpoint does two functions, firstly checks that the endpoint is valid
      *  secondly it appends https:// and /v1/traces should they have been omitted
-     *
-     * @param string $endpoint
-     * @return string
      */
     private function validateEndpoint(string $endpoint): string
     {
