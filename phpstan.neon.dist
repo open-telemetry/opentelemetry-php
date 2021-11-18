@@ -9,5 +9,5 @@ parameters:
         - ./src
         - ./tests
         # - ./examples TODO: Uncomment this once examples are updated
-    excludes_analyse:
+    excludePaths:
         - tests/TraceContext/W3CTestService

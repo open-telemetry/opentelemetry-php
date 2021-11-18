@@ -6,6 +6,13 @@ namespace OpenTelemetry\SDK\Trace;
 
 final class SpanLimits
 {
+    public const DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT = PHP_INT_MAX;
+    public const DEFAULT_SPAN_ATTRIBUTE_COUNT_LIMIT = 128;
+    public const DEFAULT_SPAN_EVENT_COUNT_LIMIT = 128;
+    public const DEFAULT_SPAN_LINK_COUNT_LIMIT = 128;
+    public const DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT = 128;
+    public const DEFAULT_LINK_ATTRIBUTE_COUNT_LIMIT = 128;
+
     /** @var AttributeLimits */
     private $attributeLimits;
 

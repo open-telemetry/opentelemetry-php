@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\SDK\Integration\Context;
 
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;
-use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 

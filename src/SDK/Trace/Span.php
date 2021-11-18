@@ -21,6 +21,86 @@ use Throwable;
 
 final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
 {
+
+    /** @readonly */
+    private API\SpanContextInterface $context;
+
+    /** @readonly */
+    private API\SpanContextInterface $parentSpanContext;
+
+    /** @readonly */
+    private SpanLimits $spanLimits;
+
+    /** @readonly */
+    private SpanProcessorInterface $spanProcessor;
+
+    /**
+     * @readonly
+     *
+     * @var list<API\LinkInterface>
+     */
+    private array $links;
+
+    /** @readonly */
+    private int $totalRecordedLinks;
+
+    /** @readonly */
+    private int $kind;
+
+    /** @readonly */
+    private ResourceInfo $resource;
+
+    /** @readonly */
+    private InstrumentationLibrary $instrumentationLibrary;
+
+    /** @readonly */
+    private int $startEpochNanos;
+
+    /** @var non-empty-string */
+    private string $name;
+
+    /** @var list<API\EventInterface> */
+    private array $events = [];
+
+    private ?API\AttributesInterface $attributes;
+    private int $totalRecordedEvents = 0;
+    private StatusDataInterface $status;
+    private int $endEpochNanos = 0;
+    private bool $hasEnded = false;
+
+    /**
+     * @param non-empty-string $name
+     * @param list<API\LinkInterface> $links
+     */
+    private function __construct(
+        string $name,
+        API\SpanContextInterface $context,
+        InstrumentationLibrary $instrumentationLibrary,
+        int $kind,
+        API\SpanContextInterface $parentSpanContext,
+        SpanLimits $spanLimits,
+        SpanProcessorInterface $spanProcessor,
+        ResourceInfo $resource,
+        ?API\AttributesInterface $attributes,
+        array $links,
+        int $totalRecordedLinks,
+        int $startEpochNanos
+    ) {
+        $this->context = $context;
+        $this->instrumentationLibrary = $instrumentationLibrary;
+        $this->parentSpanContext = $parentSpanContext;
+        $this->links = $links;
+        $this->totalRecordedLinks = $totalRecordedLinks;
+        $this->name = $name;
+        $this->kind = $kind;
+        $this->spanProcessor = $spanProcessor;
+        $this->resource = $resource;
+        $this->startEpochNanos = $startEpochNanos;
+        $this->attributes = Attributes::withLimits($attributes ?? new Attributes(), $spanLimits->getAttributeLimits());
+        $this->status = StatusData::unset();
+        $this->spanLimits = $spanLimits;
+    }
+
     /**
      * This method _MUST_ not be used directly.
      * End users should use a {@see API\TracerInterface} in order to create spans.
@@ -130,85 +210,6 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         }
 
         return $result;
-    }
-
-    /** @readonly */
-    private API\SpanContextInterface $context;
-
-    /** @readonly */
-    private API\SpanContextInterface $parentSpanContext;
-
-    /** @readonly */
-    private SpanLimits $spanLimits;
-
-    /** @readonly */
-    private SpanProcessorInterface $spanProcessor;
-
-    /**
-     * @readonly
-     *
-     * @var list<API\LinkInterface>
-     */
-    private array $links;
-
-    /** @readonly */
-    private int $totalRecordedLinks;
-
-    /** @readonly */
-    private int $kind;
-
-    /** @readonly */
-    private ResourceInfo $resource;
-
-    /** @readonly */
-    private InstrumentationLibrary $instrumentationLibrary;
-
-    /** @readonly */
-    private int $startEpochNanos;
-
-    /** @var non-empty-string */
-    private string $name;
-
-    /** @var list<API\EventInterface> */
-    private array $events = [];
-
-    private ?API\AttributesInterface $attributes;
-    private int $totalRecordedEvents = 0;
-    private StatusData $status;
-    private int $endEpochNanos = 0;
-    private bool $hasEnded = false;
-
-    /**
-     * @param non-empty-string $name
-     * @param list<API\LinkInterface> $links
-     */
-    private function __construct(
-        string $name,
-        API\SpanContextInterface $context,
-        InstrumentationLibrary $instrumentationLibrary,
-        int $kind,
-        API\SpanContextInterface $parentSpanContext,
-        SpanLimits $spanLimits,
-        SpanProcessorInterface $spanProcessor,
-        ResourceInfo $resource,
-        ?API\AttributesInterface $attributes,
-        array $links,
-        int $totalRecordedLinks,
-        int $startEpochNanos
-    ) {
-        $this->context = $context;
-        $this->instrumentationLibrary = $instrumentationLibrary;
-        $this->parentSpanContext = $parentSpanContext;
-        $this->links = $links;
-        $this->totalRecordedLinks = $totalRecordedLinks;
-        $this->name = $name;
-        $this->kind = $kind;
-        $this->spanProcessor = $spanProcessor;
-        $this->resource = $resource;
-        $this->startEpochNanos = $startEpochNanos;
-        $this->attributes = Attributes::withLimits($attributes ?? new Attributes(), $spanLimits->getAttributeLimits());
-        $this->status = StatusData::unset();
-        $this->spanLimits = $spanLimits;
     }
 
     /** @inheritDoc */

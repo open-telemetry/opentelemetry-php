@@ -6,11 +6,11 @@ namespace OpenTelemetry\Tests\SDK\Integration;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
-use OpenTelemetry\SDK\Trace\SpanContext;
 use PHPUnit\Framework\TestCase;
 
 class ParentBasedTest extends TestCase
@@ -76,8 +76,9 @@ class ParentBasedTest extends TestCase
     public function testParentBasedDescription(): void
     {
         $rootSampler = $this->createMock(SamplerInterface::class);
+        $rootSampler->expects($this->once())->method('getDescription')->willReturn('Foo');
         $sampler = new ParentBased($rootSampler);
-        $this->assertEquals('ParentBased', $sampler->getDescription());
+        $this->assertEquals('ParentBased+Foo', $sampler->getDescription());
     }
 
     private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceStateInterface $traceState = null): Context

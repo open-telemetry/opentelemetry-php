@@ -12,14 +12,12 @@ final class Event implements API\EventInterface
     private string $name;
     private int $timestamp;
     private API\AttributesInterface $attributes;
-    private int $totalAttributeCount;
 
     public function __construct(string $name, int $timestamp, API\AttributesInterface $attributes = null)
     {
         $this->name = $name;
         $this->timestamp = $timestamp;
         $this->attributes = $attributes ?? new Attributes();
-        $this->totalAttributeCount = count($this->attributes);
     }
 
     public function getAttributes(): API\AttributesInterface
@@ -39,11 +37,11 @@ final class Event implements API\EventInterface
 
     public function getTotalAttributeCount(): int
     {
-        return $this->totalAttributeCount;
+        return count($this->attributes);
     }
 
     public function getDroppedAttributesCount(): int
     {
-        return $this->totalAttributeCount - count($this->attributes);
+        return $this->attributes->getDroppedAttributesCount();
     }
 }

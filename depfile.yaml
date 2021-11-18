@@ -1,0 +1,48 @@
+#baseline: depfile.baseline.yml
+paths:
+    - ./src
+exclude_files:
+    - '#.*test.*#'
+layers:
+    -
+        name: API
+        collectors:
+            -
+                type: className
+                regex: OpenTelemetry\\API\\*
+    -
+        name: SDK
+        collectors:
+            -
+                type: className
+                regex: OpenTelemetry\\SDK\\*
+    -
+        name: Context
+        collectors:
+            -
+                type: className
+                regex: OpenTelemetry\\Context\\*
+    -
+        name: Contrib
+        collectors:
+            -
+                type: className
+                regex: OpenTelemetry\\Contrib\\*
+    -
+        name: Proto
+        collectors:
+            -
+                type: className
+                regex: OpenTelemetry\\Proto\\*
+ruleset:
+    Contrib:
+        - API
+        - SDK
+        - Context
+        - Proto
+    Context: ~
+    SDK:
+        - API
+        - Context
+    API:
+        - Context

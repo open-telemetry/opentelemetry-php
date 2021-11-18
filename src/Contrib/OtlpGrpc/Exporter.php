@@ -8,10 +8,13 @@ use grpc;
 use InvalidArgumentException;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
+use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace;
 
 class Exporter implements Trace\SpanExporterInterface
 {
+    use EnvironmentVariablesTrait;
+
     /**
      * @var string
      */
@@ -20,7 +23,8 @@ class Exporter implements Trace\SpanExporterInterface
     /**
      * @var string
      */
-    private $protocol;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private $protocol;
 
     /**
      * @var bool|string
@@ -78,13 +82,14 @@ class Exporter implements Trace\SpanExporterInterface
     ) {
 
         // Set default values based on presence of env variable
-        $this->endpointURL = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: $endpointURL;
-        $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc'; // I guess this is redundant?
-        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ? filter_var(getenv('OTEL_EXPORTER_OTLP_INSECURE'), FILTER_VALIDATE_BOOLEAN): $insecure;
-        $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: $certificateFile;
-        $this->headers = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: $headers;
-        $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: $compression;
-        $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: $timeout;
+        $this->endpointURL = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', $endpointURL);
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+        // $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc'; // I guess this is redundant?
+        $this->insecure = $this->getBooleanFromEnvironment('OTEL_EXPORTER_OTLP_INSECURE', $insecure);
+        $this->certificateFile = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_CERTIFICATE', $certificateFile);
+        $this->headers = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', $headers);
+        $this->compression = $this->getBooleanFromEnvironment('OTEL_EXPORTER_OTLP_COMPRESSION', $compression);
+        $this->timeout = $this->getIntFromEnvironment('OTEL_EXPORTER_OTLP_TIMEOUT', $timeout);
 
         $this->spanConverter = new SpanConverter();
 

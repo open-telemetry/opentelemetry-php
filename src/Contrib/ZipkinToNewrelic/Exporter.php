@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\ZipkinToNewrelic;
 
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
+use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Trace;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -61,10 +61,8 @@ class Exporter implements Trace\SpanExporterInterface
      */
     private $streamFactory;
 
-    /**
-    * @var string
-    */
-    private $name;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private string $name;
 
     public function __construct(
         $name,
@@ -88,7 +86,8 @@ class Exporter implements Trace\SpanExporterInterface
             throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
         }
 
-        $this->name = $name;
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+        // $this->name = $name;
         $this->endpointUrl = $endpointUrl;
         $this->licenseKey = $licenseKey;
         $this->client = $client;
@@ -157,19 +156,17 @@ class Exporter implements Trace\SpanExporterInterface
     /** @inheritDoc */
     public static function fromConnectionString(string $endpointUrl, string $name, $args)
     {
-        if ($args == false) {
+        if (!is_string($args)) {
             throw new Exception('Invalid license key.');
         }
-        $factory = new HttpFactory();
-        $exporter = new Exporter(
+
+        return new Exporter(
             $name,
             $endpointUrl,
             $args,
-            new Client(),
-            $factory,
-            $factory
+            HttpClientDiscovery::find(),
+            Psr17FactoryDiscovery::findRequestFactory(),
+            Psr17FactoryDiscovery::findStreamFactory()
         );
-
-        return $exporter;
     }
 }

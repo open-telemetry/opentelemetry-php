@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpHttp;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
+use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
 use Nyholm\Dsn\DsnParser;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
+use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -19,6 +20,8 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 class Exporter implements Trace\SpanExporterInterface
 {
+    use EnvironmentVariablesTrait;
+
     /**
      * @var string
      */
@@ -29,15 +32,11 @@ class Exporter implements Trace\SpanExporterInterface
      */
     private $protocol;
 
-    /**
-     * @var string
-     */
-    private $insecure;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private string $insecure;
 
-    /**
-     * @var string
-     */
-    private $certificateFile;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private string $certificateFile;
 
     /**
      * @var array
@@ -49,10 +48,9 @@ class Exporter implements Trace\SpanExporterInterface
      */
     private $compression;
 
-    /**
-     * @var int
-     */
-    private $timeout;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private int $timeout;
+
     /**
      * @var SpanConverter
      */
@@ -89,12 +87,14 @@ class Exporter implements Trace\SpanExporterInterface
     ) {
 
         // Set default values based on presence of env variable
-        $endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'https://localhost:4318/v1/traces';
-        $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'http/protobuf';
-        $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
-        $this->headers = $this->processHeaders(getenv('OTEL_EXPORTER_OTLP_HEADERS'));
-        $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: 'none';
-        $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
+        $endpointUrl = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', 'https://localhost:4318/v1/traces');
+        $this->protocol = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_PROTOCOL', 'http/protobuf');
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+        // $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
+        $this->headers = $this->processHeaders($this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', ''));
+        $this->compression = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_COMPRESSION', 'none');
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+        // $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
         $this->client = $client;
         $this->requestFactory = $requestFactory;
@@ -167,7 +167,7 @@ class Exporter implements Trace\SpanExporterInterface
     /**
      * processHeaders converts comma separated headers into an array
      */
-    public function processHeaders($headers): array
+    public function processHeaders(?string $headers): array
     {
         if (empty($headers)) {
             return [];
@@ -234,13 +234,15 @@ class Exporter implements Trace\SpanExporterInterface
     /** @inheritDoc */
     public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
     {
-        $factory = new HttpFactory();
-        $exporter = new Exporter(
-            new Client(),
-            $factory,
-            $factory
+        return new Exporter(
+            HttpClientDiscovery::find(),
+            Psr17FactoryDiscovery::findRequestFactory(),
+            Psr17FactoryDiscovery::findStreamFactory()
         );
+    }
 
-        return $exporter;
+    public static function create()
+    {
+        return self::fromConnectionString();
     }
 }

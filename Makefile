@@ -9,7 +9,7 @@ test:
 phan:
 	$(DC_RUN_PHP) env PHAN_DISABLE_XDEBUG_WARN=1 php ./vendor/bin/phan
 psalm:
-	$(DC_RUN_PHP) php ./vendor/bin/psalm --threads=1
+	$(DC_RUN_PHP) php ./vendor/bin/psalm --threads=1 --no-cache
 psalm-info:
 	$(DC_RUN_PHP) php ./vendor/bin/psalm --show-info=true --threads=1
 phpstan:
@@ -39,6 +39,8 @@ bash:
 	$(DC_RUN_PHP) bash
 style:
 	$(DC_RUN_PHP) php ./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no -vvv
+deptrac:
+	$(DC_RUN_PHP) vendor/bin/deptrac --formatter=table
 w3c-test-service:
 	@docker-compose -f docker-compose.w3cTraceContext.yaml run --rm php ./tests/TraceContext/W3CTestService/symfony-setup
 FORCE:

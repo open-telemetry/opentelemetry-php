@@ -7,7 +7,6 @@ namespace OpenTelemetry\API\Baggage\Propagation;
 use function explode;
 use OpenTelemetry\API\Baggage\BaggageBuilderInterface;
 use OpenTelemetry\API\Baggage\Metadata;
-use OpenTelemetry\SDK\Internal\StringUtil;
 use function str_replace;
 use function trim;
 use function urldecode;
@@ -16,6 +15,7 @@ final class Parser
 {
     private const EXCLUDED_KEY_CHARS = [' ', '(', ')', '<', '>', '@', ',', ';', ':', '\\', '"', '/', '[', ']', '?', '=', '{', '}'];
     private const EXCLUDED_VALUE_CHARS = [' ', '"', ',', ';', '\\'];
+    private const EQUALS = '=';
 
     /** @readonly */
     private string $baggageHeader;
@@ -39,7 +39,7 @@ final class Parser
 
             $keyValue = trim($explodedString[0]);
 
-            if (empty($keyValue) || !StringUtil::str_contains($keyValue, '=')) {
+            if (empty($keyValue) || mb_strpos($keyValue, self::EQUALS) === false) {
                 continue;
             }
 
@@ -51,7 +51,7 @@ final class Parser
                 $metadata = null;
             }
 
-            [$key, $value] = explode('=', $keyValue, 2);
+            [$key, $value] = explode(self::EQUALS, $keyValue, 2);
 
             $key = urldecode($key);
             $value = urldecode($value);
