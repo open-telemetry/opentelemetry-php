@@ -80,15 +80,17 @@ final class TracerProvider implements API\TracerProviderInterface
         if (null === self::$defaultTracer) {
             self::$defaultTracer = $tracer;
         }
+
         return $this->tracers[$key] = $tracer;
     }
 
     public static function getDefaultTracer(): API\TracerInterface
     {
         if (null === self::$defaultTracer) {
-            /* TODO log a warning */
+            // TODO log a warning
             return NoopTracer::getInstance();
         }
+
         return self::$defaultTracer;
     }
 
