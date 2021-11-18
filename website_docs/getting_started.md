@@ -1,18 +1,18 @@
-# Getting Started
+---
+title: Getting Started
+description: Get up and running with OpenTelemetry for PHP.
+---
 
-This guide will help you get up and running with OpenTelemetry for PHP.
+In this page you'll learn how to export traces to the console.
 
-## Basic Example: Exporting Traces to the console
+First, install the OpenTelemetry SDK:
 
-### To being you'll need to install the OpenTelemery SDK
-
-
-```bash
+```console
 $ composer require open-telemetry/opentelemetry
 ```
 
-This example will use the the ConsoleSpanExporter which, will print the Spans to stdout. A Span typically represents a single unit of work, a Trace is a grouping of Spans.
-
+This example uses the `ConsoleSpanExporter`, which prints Spans to stdout. A
+Span typically represents a single unit of work. A Trace is a grouping of Spans.
 
 ```php
 <?php
@@ -52,12 +52,19 @@ try {
 $rootSpan->end();
 ```
 
-Running this script should produce a similar output to this. In this example we have 3 spans within a single trace.
+Run the script:
 
-```bash
+```console
 $ php GettingStarted.php
 Starting ConsoleSpanExporter
 OpenTelemetry welcomes PHP
+...
+```
+
+You'll see output similar to the following, which shows 3 spans within a single
+trace:
+
+```json
 {
     "name": "bar",
     "context": {
@@ -113,6 +120,3 @@ OpenTelemetry welcomes PHP
     "events": []
 }
 ```
-
-
-
