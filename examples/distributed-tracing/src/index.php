@@ -17,9 +17,9 @@ use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Routing\RouteContext;
 
 //create default tracer from environment variables, now available as TracerProvider::getDefaultTracer
@@ -28,10 +28,10 @@ $tracer = (new TracerProviderFactory('example'))->create()->getTracer();
 $cb = new ContainerBuilder();
 $container = $cb->addDefinitions([
     Tracer::class => $tracer,
-    Client::class => function() {
+    Client::class => function () {
         $stack = HandlerStack::create();
         //a guzzle middleware to wrap http calls in a span, and inject trace headers
-        $stack->push(function(callable $handler) {
+        $stack->push(function (callable $handler) {
             return function (RequestInterface $request, array $options) use ($handler): PromiseInterface {
                 $span = TracerProvider::getDefaultTracer()
                     ->spanBuilder(sprintf('%s %s', $request->getMethod(), $request->getUri()))
@@ -47,21 +47,25 @@ $container = $cb->addDefinitions([
                     $request = $request->withAddedHeader($name, $value);
                 }
                 $promise = $handler($request, $options);
-                $promise->then(function(Response $response) use ($span) {
+                $promise->then(function (Response $response) use ($span) {
                     $span->setAttribute('http.status_code', $response->getStatusCode())
                         ->setAttribute('http.response_content_length', $response->getHeaderLine('Content-Length') ?: $response->getBody()->getSize())
                         ->setStatus($response->getStatusCode() < 500 ? StatusCode::STATUS_OK : StatusCode::STATUS_ERROR)
                         ->end();
+
                     return $response;
-                }, function(\Throwable $t) use ($span) {
+                }, function (\Throwable $t) use ($span) {
                     $span->recordException($t)->setStatus(StatusCode::STATUS_ERROR)->end();
+
                     throw $t;
                 });
+
                 return $promise;
             };
         });
+
         return new Client(['handler' => $stack, 'http_errors' => false]);
-    }
+    },
 ])->build();
 $app = Bridge::create($container);
 
@@ -71,7 +75,7 @@ $app->add(function (Request $request, RequestHandler $handler) {
     $routeContext = RouteContext::fromRequest($request);
     $route = $routeContext->getRoute();
     $root = TracerProvider::getDefaultTracer()->spanBuilder($route->getPattern())
-        ->setStartTimestamp((int)($request->getServerParams()['REQUEST_TIME_FLOAT'] * 1e9))
+        ->setStartTimestamp((int) ($request->getServerParams()['REQUEST_TIME_FLOAT'] * 1e9))
         ->setParent($carrier)
         ->setSpanKind(SpanKind::KIND_SERVER)
         ->startSpan();
@@ -79,6 +83,7 @@ $app->add(function (Request $request, RequestHandler $handler) {
     $response = $handler->handle($request);
     $root->setStatus($response->getStatusCode() < 500 ? StatusCode::STATUS_OK : StatusCode::STATUS_ERROR);
     $root->end();
+
     return $response;
 });
 $app->addRoutingMiddleware();
@@ -95,6 +100,7 @@ $app->get('/users/{name}', function ($name, Client $client, Response $response) 
     foreach ($responses as $res) {
         $response->getBody()->write($res->getBody()->getContents());
     }
+
     return $response;
 });
 
@@ -110,6 +116,7 @@ $app->get('/two/{name}', function (Response $response, $name) {
     usleep((int) (0.3 * 1e6));
     $span->setStatus(StatusCode::STATUS_OK)->end();
     $response->getBody()->write(\json_encode(['some' => 'data', 'user' => $name]));
+
     return $response->withAddedHeader('Content-Type', 'application/json');
 });
 
@@ -117,6 +124,7 @@ $app->get('/two/{name}', function (Response $response, $name) {
 $app->get('/three', function (Response $response) {
     usleep((int) (0.2 * 1e6));
     $response->getBody()->write(\json_encode(['error' => 'foo']));
+
     return $response->withStatus(500)->withAddedHeader('Content-Type', 'application/json');
 });
 
