@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Newrelic;
 
 use OpenTelemetry\SDK\Trace\AbstractClock;
+use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
 /**
  * @see https://docs.newrelic.com/docs/distributed-tracing/trace-api/report-new-relic-format-traces-trace-api/#new-relic-guidelines
  */
-class SpanConverter
+class SpanConverter implements SpanConverterInterface
 {
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
     const STATUS_DESCRIPTION_TAG_KEY = 'otel.status_description';
@@ -25,7 +26,7 @@ class SpanConverter
         $this->serviceName = $serviceName;
     }
 
-    public function convert(SpanDataInterface $span)
+    public function convert(SpanDataInterface $span): array
     {
         $spanParent = $span->getParentContext();
 

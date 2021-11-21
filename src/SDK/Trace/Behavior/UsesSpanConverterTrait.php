@@ -34,7 +34,7 @@ trait UsesSpanConverterTrait
      * @return array
      * @psalm-suppress PossiblyNullReference
      */
-    protected function convertContext(SpanDataInterface $span): array
+    protected function convertSpan(SpanDataInterface $span): array
     {
         return $this->getSpanConverter()->convert($span);
     }
@@ -43,11 +43,11 @@ trait UsesSpanConverterTrait
      * @param iterable $spans
      * @return array
      */
-    protected function convertAggregateContext(iterable $spans): array
+    protected function convertSpanCollection(iterable $spans): array
     {
         $aggregate = [];
         foreach ($spans as $span) {
-            $aggregate[] = $this->convertContext($span);
+            $aggregate[] = $this->convertSpan($span);
         }
 
         return $aggregate;

@@ -21,7 +21,7 @@ class ConsoleSpanExporter implements SpanExporterInterface
     }
 
     /** @inheritDoc */
-    public function export(iterable $spans): int
+    public function doExport(iterable $spans): int
     {
         try {
             foreach ($spans as $span) {
