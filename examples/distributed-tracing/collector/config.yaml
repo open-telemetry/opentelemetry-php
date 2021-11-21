@@ -1,0 +1,27 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+
+exporters:
+  logging:
+    logLevel: debug
+  zipkin:
+    endpoint: "http://zipkin:9411/api/v2/spans"
+  jaeger:
+    endpoint: jaeger:14250
+    tls:
+      insecure: true
+
+service:
+  telemetry:
+    logs:
+      level: "debug"
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      exporters:
+        - logging
+        - zipkin
+        - jaeger
