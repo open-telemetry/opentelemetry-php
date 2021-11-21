@@ -19,8 +19,6 @@ services:
       <<: *otel-common
       OTEL_SERVICE_NAME: service-one
       OTEL_RESOURCE_ATTRIBUTES: 'service.version=0.1'
-      XDEBUG_CONFIG: "client_host=172.17.0.1 idekey=netbeans-xdebug"
-      XDEBUG_MODE: "debug"
 
   service-two:
     image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:latest
@@ -31,8 +29,6 @@ services:
       <<: *otel-common
       OTEL_SERVICE_NAME: service-two
       OTEL_RESOURCE_ATTRIBUTES: 'service.version=0.2'
-      XDEBUG_CONFIG: "client_host=172.17.0.1 idekey=netbeans-xdebug"
-      XDEBUG_MODE: "off"
 
   service-three:
     image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:latest
@@ -42,8 +38,6 @@ services:
     environment:
       <<: *otel-common
       OTEL_SERVICE_NAME: service-three
-      XDEBUG_CONFIG: "client_host=172.17.0.1 idekey=netbeans-xdebug"
-      XDEBUG_MODE: "off"
 
   collector:
     image: otel/opentelemetry-collector-contrib:0.39.0
