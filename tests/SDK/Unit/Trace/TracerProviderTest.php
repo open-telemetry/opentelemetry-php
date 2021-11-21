@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 
+use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Trace\NoopTracer;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -22,6 +23,24 @@ class TracerProviderTest extends TestCase
         $this->assertSame($t1, $t2);
         $this->assertNotSame($t1, $t3);
         $this->assertNotSame($t2, $t3);
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function test_tracerProvider_returnsNoopTracerIfNoDefaultIsSet(): void
+    {
+        $this->assertInstanceOf(NoopTracer::class, TracerProvider::getDefaultTracer());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function test_tracerProvider_acceptsDefaultTracer(): void
+    {
+        $tracer = $this->getMockBuilder(API\TracerInterface::class)->getMock();
+        TracerProvider::setDefaultTracer($tracer);
+        $this->assertSame($tracer, TracerProvider::getDefaultTracer());
     }
 
     public function testGetTracerWithDefaultName(): void
