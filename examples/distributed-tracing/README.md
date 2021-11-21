@@ -12,6 +12,14 @@ $ docker-compose up
 # in a separate terminal
 $ curl localhost:8000/users/otel
 ```
+
+## Screenshots
+### Jaeger
+![Jaeger](screenshots/distributed-trace-jaeger.png?raw=true "Jaeger distributed trace")
+
+### Zipkin
+![Zipkin](screenshots/distributed-trace-zipkin.png?raw=true "Zipkin distributed trace")
+
 ## Notes
 * A guzzle middleware is responsible for wrapping each outgoing HTTP request in a span with [http-based attributes](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md), and injecting `traceparent` (and optionally `tracestate`) headers.
 * A slim middleware is responsible for starting the root span, using the route pattern for the span name due to its low cardinality (see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#span). This is also where incoming trace headers are managed.
