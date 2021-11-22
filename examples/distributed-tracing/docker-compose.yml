@@ -1,0 +1,55 @@
+x-otel-common: &otel-common
+  OTEL_LOG_LEVEL: warning
+  OTEL_TRACES_SAMPLER: parentbased_always_on
+  OTEL_TRACES_EXPORTER: otlp
+  OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: grpc
+  OTEL_EXPORTER_OTLP_ENDPOINT: collector:4317
+  OTEL_TRACES_PROCESSOR: simple
+
+version: '3.7'
+services:
+  service-one:
+    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:latest
+    command: ['php', '-S', '0.0.0.0:8000']
+    volumes:
+      - './src:/usr/src/myapp'
+    ports:
+      - '8000:8000'
+    environment:
+      <<: *otel-common
+      OTEL_SERVICE_NAME: service-one
+      OTEL_RESOURCE_ATTRIBUTES: 'service.version=0.1'
+
+  service-two:
+    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:latest
+    command: ['php', '-S', '0.0.0.0:8000']
+    volumes:
+      - './src:/usr/src/myapp'
+    environment:
+      <<: *otel-common
+      OTEL_SERVICE_NAME: service-two
+      OTEL_RESOURCE_ATTRIBUTES: 'service.version=0.2'
+
+  service-three:
+    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:latest
+    command: ['php', '-S', '0.0.0.0:8000']
+    volumes:
+      - './src:/usr/src/myapp'
+    environment:
+      <<: *otel-common
+      OTEL_SERVICE_NAME: service-three
+
+  collector:
+    image: otel/opentelemetry-collector-contrib:0.39.0
+    volumes:
+      - './collector:/etc/otel'
+
+  zipkin:
+    image: openzipkin/zipkin-slim
+    ports:
+      - '9411:9411'
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
