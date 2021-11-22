@@ -3,11 +3,11 @@ This example uses `docker-compose`, and illustrates the distributed tracing func
 
 All trace data is exported via grpc to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/), where they are forwarded to zipkin and jaeger.
 
-The example is presented as a [slim framework](https://www.slimframework.com/) single-page application for simplicity, and uses Guzzle as an HTTP client. The same application source is used for all services.
+The example is presented as a [slim framework](https://www.slimframework.com/) single-file application for simplicity, and uses Guzzle as an HTTP client. The same application source is used for all services.
 
 ## Running the example
 ```bash
-$ docker-compose run service-one composer update
+$ docker-compose run service-one composer install
 $ docker-compose up
 # in a separate terminal
 $ curl localhost:8000/users/otel
