@@ -91,7 +91,7 @@ class OtlpBench
      * @Iterations(10)
      * @OutputTimeUnit("microseconds")
      */
-    public function benchCreateSpansWithoutExporting(): void
+    public function benchCreateSpans(): void
     {
         $span = $this->tracer->spanBuilder('foo')
             ->setAttribute('foo', PHP_INT_MAX)
@@ -101,12 +101,53 @@ class OtlpBench
     }
 
     /**
+     * @BeforeMethods("setUpNoExporter")
+     * @Revs(1000)
+     * @Iterations(10)
+     * @OutputTimeUnit("microseconds")
+     */
+    public function benchCreateSpansWithStackTrace(): void
+    {
+        $span = $this->tracer->spanBuilder('foo')
+            ->setAttribute('foo', PHP_INT_MAX)
+            ->startSpan();
+        $span->recordException(new \Exception('foo'));
+        $span->end();
+    }
+
+    /**
+     * @BeforeMethods("setUpNoExporter")
+     * @ParamProviders("provideEventCounts")
+     * @Revs(1000)
+     * @Iterations(5)
+     * @OutputTimeUnit("microseconds")
+     */
+    public function benchCreateSpansWithMultipleEvents(array $params): void
+    {
+        $span = $this->tracer->spanBuilder('foo')
+            ->setAttribute('foo', PHP_INT_MAX)
+            ->startSpan();
+        for ($i=0; $i < $params[0]; $i++) {
+            $span->addEvent('event-' . $i);
+        }
+        $span->end();
+    }
+
+    public function provideEventCounts(): \Generator
+    {
+        yield [1];
+        yield [4];
+        yield [16];
+        yield [256];
+    }
+
+    /**
      * @BeforeMethods("setUpGrpc")
      * @Revs(1000)
      * @Iterations(10)
      * @OutputTimeUnit("microseconds")
      */
-    public function benchExportSpansViaOltpGrpc(): void
+    public function benchExportSpans_OltpGrpc(): void
     {
         $span = $this->tracer->spanBuilder('foo')
             ->setAttribute('foo', PHP_INT_MAX)
@@ -121,7 +162,7 @@ class OtlpBench
      * @Iterations(10)
      * @OutputTimeUnit("microseconds")
      */
-    public function benchExportSpansViaOtlpHttp(): void
+    public function benchExportSpans_OtlpHttp(): void
     {
         $span = $this->tracer->spanBuilder('foo')
             ->setAttribute('foo', PHP_INT_MAX)
