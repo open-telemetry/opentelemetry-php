@@ -170,11 +170,11 @@ class SpanConverter
         $attrs = [];
         foreach ($spans as $span) {
             foreach ($span->getResource()->getAttributes() as $k => $v) {
-                $attrs[] = $this->as_otlp_key_value($k, $v->getValue());
+                $attrs[$k] = $this->as_otlp_key_value($k, $v->getValue());
             }
         }
 
-        return $attrs;
+        return array_values($attrs);
     }
 
     public function as_otlp_resource_span(iterable $spans): ResourceSpans
