@@ -78,7 +78,7 @@ class OtlpBench
             ->allows(['createRequest' => $request]);
         $streamFactory = Mockery::mock(StreamFactoryInterface::class)
             ->allows(['createStream' => $stream]);
-        /* @phpstan-ignore-next-line */
+        // @phpstan-ignore-next-line
         $exporter = new HttpExporter($client, $requestFactory, $streamFactory);
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
