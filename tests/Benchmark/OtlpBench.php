@@ -22,6 +22,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 
+/**
+ * TODO https://github.com/open-telemetry/opentelemetry-go/blob/051227c9edded2c772a07a4d4e60dda27c3e4b20/sdk/trace/benchmark_test.go
+ */
 class OtlpBench
 {
     private ?TracerInterface $tracer;
