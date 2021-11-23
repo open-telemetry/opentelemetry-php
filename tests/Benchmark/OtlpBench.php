@@ -6,15 +6,16 @@ namespace OpenTelemetry\Tests\Benchmark;
 
 use Grpc\UnaryCall;
 use Mockery;
-use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\API\Trace\TracerInterface;
-use OpenTelemetry\SDK\Trace\TracerProvider;
-use OpenTelemetry\SDK\Trace\Attributes;
-use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as GrpcExporter;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter as HttpExporter;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\SDK\Trace\SamplerInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Trace\TracerProvider;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
@@ -27,7 +28,9 @@ use Psr\Http\Message\StreamInterface;
  */
 class OtlpBench
 {
-    private ?TracerInterface $tracer;
+    private TracerInterface $tracer;
+    private SamplerInterface $sampler;
+    private ResourceInfo $resource;
 
     public function __construct()
     {
@@ -41,7 +44,8 @@ class OtlpBench
 
     public function setUpNoExporter(): void
     {
-        $provider = new TracerProvider([], $this->sampler, $this->resource);
+        $processor = new SimpleSpanProcessor();
+        $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer();
     }
 
@@ -139,7 +143,7 @@ class OtlpBench
                     ->andReturns(
                         [
                             'unused response data',
-                            (object)[
+                            (object) [
                                 'code' => \Grpc\STATUS_OK,
                             ],
                         ]
