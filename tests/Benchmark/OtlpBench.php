@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Benchmark;
 
 use Grpc\UnaryCall;
 use Mockery;
+use Mockery\MockInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as GrpcExporter;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter as HttpExporter;
@@ -58,30 +59,26 @@ class OtlpBench
         $this->tracer = $provider->getTracer();
     }
 
+    /**
+     * @psalm-suppress UndefinedMagicMethod
+     * @psalm-suppress InvalidArgument
+     * @psalm-suppress PossiblyUndefinedMethod
+     */
     public function setUpGrpcHttp(): void
     {
         $response = Mockery::mock(ResponseInterface::class)
-                ->allows('getStatusCode')
-                ->andReturn(200)
-                ->getMock();
+            ->allows(['getStatusCode' => 200]);
         $stream = Mockery::mock(StreamInterface::class);
-        $request = Mockery::mock(RequestInterface::class)
-                ->allows('withBody')
-                ->andReturnSelf()
-                ->getMock();
+        $request = Mockery::mock(RequestInterface::class);
+        $request->allows('withBody')->andReturnSelf();
         $request->allows('withHeader')->andReturnSelf();
         $client = Mockery::mock(ClientInterface::class)
-                ->allows('sendRequest')
-                ->andReturns($response)
-                ->getMock();
+            ->allows(['sendRequest' => $response]);
         $requestFactory = Mockery::mock(RequestFactoryInterface::class)
-                ->allows('createRequest')
-                ->andReturns($request)
-                ->getMock();
+            ->allows(['createRequest' => $request]);
         $streamFactory = Mockery::mock(StreamFactoryInterface::class)
-                ->allows('createStream')
-                ->andReturns($stream)
-                ->getMock();
+            ->allows(['createStream' => $stream]);
+        /* @phpstan-ignore-next-line */
         $exporter = new HttpExporter($client, $requestFactory, $streamFactory);
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
@@ -94,7 +91,7 @@ class OtlpBench
      * @Iterations(10)
      * @OutputTimeUnit("microseconds")
      */
-    public function benchCreateSpansWithoutExporting()
+    public function benchCreateSpansWithoutExporting(): void
     {
         $span = $this->tracer->spanBuilder('foo')
             ->setAttribute('foo', PHP_INT_MAX)
@@ -109,7 +106,7 @@ class OtlpBench
      * @Iterations(10)
      * @OutputTimeUnit("microseconds")
      */
-    public function benchExportSpansViaOltpGrpc()
+    public function benchExportSpansViaOltpGrpc(): void
     {
         $span = $this->tracer->spanBuilder('foo')
             ->setAttribute('foo', PHP_INT_MAX)
@@ -124,7 +121,7 @@ class OtlpBench
      * @Iterations(10)
      * @OutputTimeUnit("microseconds")
      */
-    public function benchExportSpansViaOtlpHttp()
+    public function benchExportSpansViaOtlpHttp(): void
     {
         $span = $this->tracer->spanBuilder('foo')
             ->setAttribute('foo', PHP_INT_MAX)
@@ -133,24 +130,16 @@ class OtlpBench
         $span->end();
     }
 
-    private function createMockTraceServiceClient(): TraceServiceClient
+    private function createMockTraceServiceClient()
     {
+        // @var MockInterface&TraceServiceClient
+        $unaryCall = Mockery::mock(UnaryCall::class)
+            ->allows(['wait' => [
+                'unused response data',
+                (object) ['code' => \Grpc\STATUS_OK],
+            ]]);
         $mockClient = Mockery::mock(TraceServiceClient::class)
-            ->allows('Export')
-            ->andReturns(
-                Mockery::mock(UnaryCall::class)
-                    ->allows('wait')
-                    ->andReturns(
-                        [
-                            'unused response data',
-                            (object) [
-                                'code' => \Grpc\STATUS_OK,
-                            ],
-                        ]
-                    )
-                    ->getMock()
-            )
-            ->getMock();
+            ->allows(['Export'=> $unaryCall]);
 
         return $mockClient;
     }
