@@ -17,6 +17,8 @@ psalm-info:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/psalm --show-info=true --threads=1
 phpstan:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpstan analyse
+benchmark:
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpbench run --report=default
 trace examples: FORCE
 	docker-compose up -d --remove-orphans
 	$(DC_RUN_PHP) php ./examples/AlwaysOnZipkinExample.php
