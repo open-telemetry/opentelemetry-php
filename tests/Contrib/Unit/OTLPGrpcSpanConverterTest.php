@@ -16,6 +16,7 @@ use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
@@ -228,6 +229,21 @@ class OTLPGrpcSpanConverterTest extends TestCase
         $otlpspan = (new SpanConverter())->as_otlp_resource_span([$sdk]);
 
         $this->assertEquals($expected, $otlpspan);
+    }
+
+    /**
+     * @covers OpenTelemetry\Contrib\OtlpGrpc\SpanConverter::as_otlp_resource_attributes
+     */
+    public function testResourcesFromMultipleSpansAreNotDuplicated()
+    {
+        $span = $this->createMock(Span::class);
+        $resource = $this->createMock(ResourceInfo::class);
+        $attributes = new Attributes(['foo' => 'foo', 'bar' => 'bar']);
+        $span->method('getResource')->willReturn($resource);
+        $resource->method('getAttributes')->willReturn($attributes);
+        $converter = new SpanConverter();
+        $result = $converter->as_otlp_resource_attributes([$span, $span, $span]);
+        $this->assertCount(2, $result);
     }
 
     public function testOtlpNoSpans()

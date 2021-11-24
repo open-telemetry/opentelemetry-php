@@ -244,6 +244,21 @@ class OTLPHttpSpanConverterTest extends TestCase
         $this->assertEquals($expected, $otlpspan);
     }
 
+    /**
+     * @covers OpenTelemetry\Contrib\OtlpHttp\SpanConverter::as_otlp_resource_attributes
+     */
+    public function testResourcesFromMultipleSpansAreNotDuplicated()
+    {
+        $span = $this->createMock(Span::class);
+        $resource = $this->createMock(ResourceInfo::class);
+        $attributes = new Attributes(['foo' => 'foo', 'bar' => 'bar']);
+        $span->method('getResource')->willReturn($resource);
+        $resource->method('getAttributes')->willReturn($attributes);
+        $converter = new SpanConverter();
+        $result = $converter->as_otlp_resource_attributes([$span, $span, $span]);
+        $this->assertCount(2, $result);
+    }
+
     public function testOtlpNoSpans()
     {
         $spans = [];
