@@ -6,6 +6,7 @@ coverage.clover
 tests/coverage
 .php-cs-fixer.cache
 !tests/coverage/html/.gitkeep
+.env
 
 # IntelliJ IDEA
 .idea

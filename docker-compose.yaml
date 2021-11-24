@@ -1,9 +1,12 @@
 version: '3.7'
 services:
   php:
-    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:latest
+    build:
+        context: .
+        dockerfile: docker/Dockerfile
     volumes:
     - ./:/usr/src/myapp
+    user: "${PHP_USER}:root"
   zipkin:
     image: openzipkin/zipkin-slim
     ports:
