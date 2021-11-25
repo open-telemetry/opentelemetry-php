@@ -30,6 +30,8 @@ return $config->setRules([
     'new_with_braces' => true,
     'no_extra_blank_lines' => true,
     'no_leading_import_slash' => true,
+    'no_trailing_whitespace' => true,
+    'no_whitespace_in_blank_line' => true,
     'echo_tag_syntax' => true,
     'no_unused_imports' => true,
     'no_useless_else' => true,

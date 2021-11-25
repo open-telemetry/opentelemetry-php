@@ -8,6 +8,7 @@ use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
 use Nyholm\Dsn\DsnParser;
+use OpenTelemetry\Contrib\Otlp\ConfigOpts;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace;
@@ -31,14 +32,10 @@ class Exporter implements Trace\SpanExporterInterface
     private const VALUE_CONTENT_ENCODING = 'gzip';
 
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
-    // private string $insecure;
-
-    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
     // private string $certificateFile;
 
     private array $headers;
-
-    private string $compression;
+    private bool $compression;
 
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
     // private int $timeout;
@@ -49,33 +46,33 @@ class Exporter implements Trace\SpanExporterInterface
      * Exporter constructor.
      */
     public function __construct(
-        ClientInterface $client,
-        RequestFactoryInterface $requestFactory,
-        StreamFactoryInterface $streamFactory,
+        ConfigOpts $config = null,
+        ClientInterface $client = null,
+        RequestFactoryInterface $requestFactory = null,
+        StreamFactoryInterface $streamFactory = null,
         SpanConverter $spanConverter = null
     ) {
-        // Set default values based on presence of env variable
-        $this->setEndpointUrl(
-            $this->validateEndpoint(
-                $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', 'https://localhost:4318/v1/traces')
-            )
-        );
+        if (null === $config) {
+            $config = new ConfigOpts();
+        }
+        $this->setClient($client ?? HttpClientDiscovery::find());
+        $this->setRequestFactory($requestFactory ?? Psr17FactoryDiscovery::findRequestFactory());
+        $this->setStreamFactory($streamFactory ?? Psr17FactoryDiscovery::findStreamFactory());
+        $this->setEndpointUrl($this->validateEndpoint($config->getEndpoint()));
         // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
         // $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
-        $this->headers = $this->processHeaders($this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', ''));
-        $this->compression = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_COMPRESSION', 'none');
+        $this->headers = $config->getHeaders();
+        $this->compression = $config->getCompression();
         // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
         // $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
-        $this->setClient($client);
-        $this->setRequestFactory($requestFactory);
-        $this->setStreamFactory($streamFactory);
         $this->setSpanConverter($spanConverter ?? new SpanConverter());
 
-        if ((getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'http/protobuf') !== 'http/protobuf') {
+        if ($config->getProtocol() !== 'http/protobuf') {
             throw new InvalidArgumentException('Invalid OTLP Protocol Specified');
         }
     }
+
     protected function serializeTrace(iterable $spans): string
     {
         $bytes = (new ExportTraceServiceRequest([
@@ -158,18 +155,16 @@ class Exporter implements Trace\SpanExporterInterface
     }
 
     /** @inheritDoc */
-    public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
+    public static function fromConnectionString(string $endpointUrl, string $name = null, $args = null)
     {
         return new Exporter(
-            HttpClientDiscovery::find(),
-            Psr17FactoryDiscovery::findRequestFactory(),
-            Psr17FactoryDiscovery::findStreamFactory()
+            (new ConfigOpts())->withEndpoint($endpointUrl),
         );
     }
 
     public static function create(): Exporter
     {
-        return self::fromConnectionString();
+        return new self();
     }
 
     public function setSpanConverter(SpanConverter $spanConverter): void
@@ -179,6 +174,6 @@ class Exporter implements Trace\SpanExporterInterface
 
     private function shouldCompress(): bool
     {
-        return $this->compression === 'gzip' && function_exists('gzencode');
+        return $this->compression && function_exists('gzencode');
     }
 }

@@ -8,6 +8,7 @@ use Grpc\UnaryCall;
 use Mockery;
 use Mockery\MockInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
+use OpenTelemetry\Contrib\Otlp\ConfigOpts;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as GrpcExporter;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter as HttpExporter;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
@@ -29,12 +30,14 @@ use Psr\Http\Message\StreamInterface;
  */
 class OtlpBench
 {
+    private ConfigOpts $config;
     private TracerInterface $tracer;
     private SamplerInterface $sampler;
     private ResourceInfo $resource;
 
     public function __construct()
     {
+        $this->config = new ConfigOpts();
         $this->sampler = new AlwaysOnSampler();
         $this->resource = ResourceInfo::create(new Attributes([
             'service.name' => 'A123456789',
@@ -53,7 +56,7 @@ class OtlpBench
     public function setUpGrpc(): void
     {
         $client = $this->createMockTraceServiceClient();
-        $exporter = new GrpcExporter('foo:4317', true, '', '', false, 10, $client);
+        $exporter = new GrpcExporter($this->config->withProtocol('grpc'), $client);
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer();
@@ -79,7 +82,7 @@ class OtlpBench
         $streamFactory = Mockery::mock(StreamFactoryInterface::class)
             ->allows(['createStream' => $stream]);
         // @phpstan-ignore-next-line
-        $exporter = new HttpExporter($client, $requestFactory, $streamFactory);
+        $exporter = new HttpExporter($this->config, $client, $requestFactory, $streamFactory);
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer();

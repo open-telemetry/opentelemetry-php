@@ -4,120 +4,130 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\Otlp\ConfigOpts;
-
 
 use PHPUnit\Framework\TestCase;
 
 class OTLPConfigOptsTest extends TestCase
 {
+    use EnvironmentVariables;
 
-    public function testHappyConfigOps()
+    public function tearDown(): void
     {
-        $otlpConfig = new ConfigOpts([
-            'endpoint' => 'https://api.foo.com/'
-        ]);
-
-        $otlpConfig->WithEndpoint('https://api.example.com:1337/v1/trace')
-                   ->WithHeaders('X-Auth-Wibble=foo,X-Dataset=bar')
-                   ->WithProtocol('http/protobuf')
-                   ->WithInsecure()
-                   ->WithCompression()
-                   ->WithTimeout(10);
-
-
-        $this->assertSame([], $otlpConfig);
-
+        $this->restoreEnvironmentVariables();
     }
 
+    public function testHappyConfigOps(): void
+    {
+        $opts = new ConfigOpts();
 
+        $opts->withEndpoint('https://api.example.com:1337/v1/trace')
+            ->withHeaders('X-Auth-Wibble=foo,X-Dataset=bar')
+            ->withProtocol('http/protobuf')
+            ->withInsecure()
+            ->withCompression()
+            ->withTimeout(10);
 
-    // public function testRefusesInvalidHeaders()
-    // {
-    //     $foo = new ConfigOpts();
+        $this->assertSame('https://api.example.com:1337/v1/trace', $opts->getEndpoint());
+        $this->assertSame('http/protobuf', $opts->getProtocol());
+        $this->assertSame([
+                'X-Auth-Wibble' => 'foo',
+                'X-Dataset' => 'bar',
+            ], $opts->getHeaders());
+        $this->assertTrue($opts->getInsecure());
+        $this->assertSame('', $opts->getCertificateFile());
+        $this->assertTrue($opts->getCompression());
+        $this->assertSame(10, $opts->getTimeout());
+    }
 
-    //     $this->assertEquals([], $foo->getHeaders());
+    public function testRefusesInvalidHeaders(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        (new ConfigOpts())->withHeaders('foo');
+    }
 
-    //     //$this->expectException(InvalidArgumentException::class);
-    // }
+    public function testSetConfigWithEnvironmentVariables(): void
+    {
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_HEADERS', 'x-aaa=foo,x-bbb=barf');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_INSECURE', 'true');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_CERTIFICATE', '/path/to/cacert');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_COMPRESSION', 'gzip');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_TIMEOUT', '20');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_ENDPOINT', 'localhost:4317');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_PROTOCOL', 'grpc');
 
-    // public function testSetHeadersWithEnvironmentVariables()
-    // {
-    //     putenv('OTEL_EXPORTER_OTLP_HEADERS=x-aaa=foo,x-bbb=barf');
+        $opts = new ConfigOpts();
 
-    //     $exporter = new ConfigOpts();
+        $this->assertSame([
+            'x-aaa' => 'foo',
+            'x-bbb' => 'barf',
+        ], $opts->getHeaders());
+        $this->assertTrue($opts->getInsecure());
+        $this->assertSame('/path/to/cacert', $opts->getCertificateFile());
+        $this->assertTrue($opts->getCompression());
+        $this->assertSame(20, $opts->getTimeout());
+        $this->assertSame('localhost:4317', $opts->getEndpoint());
+        $this->assertSame('grpc', $opts->getProtocol());
+        $this->assertTrue($opts->getInsecure());
+    }
 
-    //     $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['barf']], $exporter->getHeaders());
+    /**
+     * @dataProvider protocolProvider
+     */
+    public function testSetProtocol(string $protocol): void
+    {
+        $opts = (new ConfigOpts())->withProtocol($protocol);
+        $this->assertSame($protocol, $opts->getProtocol());
+    }
 
-    //     putenv('OTEL_EXPORTER_OTLP_HEADERS'); // Clear the envvar or it breaks future tests
-    // }
+    public function protocolProvider(): array
+    {
+        return [
+            'protobuf' => ['http/protobuf'],
+            'grpc' => ['grpc'],
+        ];
+    }
 
-    // public function testSetHeadersInConstructor()
-    // {
-    //     $exporter = new ConfigOpts('localhost:4318', true, '', 'x-aaa=foo,x-bbb=bar');
+    /**
+     * @dataProvider processHeadersDataHandler
+     */
+    public function testProcessHeaders($input, $expected): void
+    {
+        $opts = (new ConfigOpts())->withHeaders($input);
 
-    //     $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar']], $exporter->getHeaders());
+        $this->assertEquals($expected, $opts->getHeaders());
+    }
 
-    //     $exporter->setHeader('key', 'value');
+    public function processHeadersDataHandler(): array
+    {
+        return [
+            'No Headers' => ['', []],
+            'Empty Header' => ['empty=', ['empty' => '']],
+            'One Header' => ['header-1=one', ['header-1' => 'one']],
+            'Two Headers' => ['header-1=one,header-2=two', ['header-1' => 'one', 'header-2' => 'two']],
+            'Two Equals' => ['header-1=bWFkZSB5b3UgbG9vaw==,header-2=two', ['header-1' => 'bWFkZSB5b3UgbG9vaw==', 'header-2' => 'two']],
+            'Unicode' => ['héader-1=one', ['héader-1' => 'one']],
+        ];
+    }
 
-    //     $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar'], 'key' => ['value']], $exporter->getHeaders());
-    // }
+    /**
+     * @test
+     * @dataProvider invalidHeadersDataHandler
+     */
+    public function testInvalidHeaders($input): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (new ConfigOpts())->withHeaders($input);
+    }
 
-    // public function testHeadersShouldRefuseArray()
-    // {
-    //     $headers = [
-    //         'key' => ['value'],
-    //     ];
-
-    //     $this->expectException(InvalidArgumentException::class);
-
-    //     $headers_as_string = (new Exporter())->metadataFromHeaders($headers);
-    // }
-
-    // public function testMetadataFromHeaders()
-    // {
-    //     $metadata = (new Exporter())->metadataFromHeaders('key=value');
-    //     $this->assertEquals(['key' => ['value']], $metadata);
-
-    //     $metadata = (new Exporter())->metadataFromHeaders('key=value,key2=value2');
-    //     $this->assertEquals(['key' => ['value'], 'key2' => ['value2']], $metadata);
-    // }
-
-    // private function isInsecure(Exporter $exporter) : bool
-    // {
-    //     $reflection = new \ReflectionClass($exporter);
-    //     $property = $reflection->getProperty('insecure');
-    //     $property->setAccessible(true);
-
-    //     return $property->getValue($exporter);
-    // }
-
-    // public function testClientOptions()
-    // {
-    //     // default options
-    //     $exporter = new Exporter('localhost:4318');
-    //     $opts = $exporter->getClientOptions();
-    //     $this->assertEquals(10, $opts['timeout']);
-    //     $this->assertTrue($this->isInsecure($exporter));
-    //     $this->assertFalse(array_key_exists('grpc.default_compression_algorithm', $opts));
-    //     // method args
-    //     $exporter = new Exporter('localhost:4318', false, '', '', true, 5);
-    //     $opts = $exporter->getClientOptions();
-    //     $this->assertEquals(5, $opts['timeout']);
-    //     $this->assertFalse($this->isInsecure($exporter));
-    //     $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
-    //     // env vars
-    //     putenv('OTEL_EXPORTER_OTLP_TIMEOUT=1');
-    //     putenv('OTEL_EXPORTER_OTLP_COMPRESSION=1');
-    //     putenv('OTEL_EXPORTER_OTLP_INSECURE=false');
-    //     $exporter = new Exporter('localhost:4318');
-    //     $opts = $exporter->getClientOptions();
-    //     $this->assertEquals(1, $opts['timeout']);
-    //     $this->assertFalse($this->isInsecure($exporter));
-    //     $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
-    //     putenv('OTEL_EXPORTER_OTLP_TIMEOUT');
-    //     putenv('OTEL_EXPORTER_OTLP_COMPRESSION');
-    //     putenv('OTEL_EXPORTER_OTLP_INSECURE');
-    // }
+    public function invalidHeadersDataHandler(): array
+    {
+        return [
+            '#1' => ['a:b,c'],
+            '#2' => ['a,,l'],
+            '#3' => ['header-1'],
+        ];
+    }
 }

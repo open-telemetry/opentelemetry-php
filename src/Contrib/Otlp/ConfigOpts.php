@@ -5,97 +5,31 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Otlp;
 
 use InvalidArgumentException;
-
+use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 
 class ConfigOpts
 {
+    use EnvironmentVariablesTrait;
 
-    /*
-    * @var string
-    */
-    private $endpoint;
+    private ?string $endpoint = null;
+    private ?string $protocol = null;
+    private ?array $headers = null;
+    private ?bool $insecure = null;
+    private ?string $certificateFile = null;
+    private ?bool $compression = null;
+    private ?int $timeout = null;
 
-    /*
-    * @var string
-    */
-    private $protocol;
-
-    /*
-    * @var string
-    */
-    private $headers;
-
-    /*
-    * @var bool
-    */
-    private $insecure;
-
-    /*
-    * @var string
-    */
-    private $certificateFile;
-
-    /*
-    * @var string
-    */
-    private $compression;
-
-    /*
-    * @var int
-    */
-    private $timeout;
-
-
-    /**
-     * Constructor.
-     * 
-     * @param 
-     */
-    public function __construct(
-        string $endpoint,
-        string $protocol,
-        string $headers,
-        bool $insecure,
-        string $certificateFile,
-        string $compression,
-        int $timeout
-    ) {
-        $this->endpoint = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: $this->endpoint;
-        $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc';
-        $this->insecure = getenv('OTEL_EXPORTER_OTLP_INSECURE') ? filter_var(getenv('OTEL_EXPORTER_OTLP_INSECURE'), FILTER_VALIDATE_BOOLEAN) : $this->insecure;
-        $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: $this->certificateFile;
-        $this->headers = getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: $this->headers;
-        $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: $this->compression;
-        $this->timeout = (int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: $this->timeout;
-    }
-
-    public function WithEndpoint(string $endpoint)
+    public function withEndpoint(string $endpoint)
     {
-        $parsedDsn = parse_url($endpoint);
-
-        if (!is_array($parsedDsn)) {
-            throw new InvalidArgumentException('Unable to parse provided DSN');
-        }
-
-        if (
-            !isset($parsedDsn['scheme'])
-            || !isset($parsedDsn['host'])
-            || !isset($parsedDsn['port'])
-            || !isset($parsedDsn['path'])
-        ) {
-            throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
-        }
-
         $this->endpoint = $endpoint;
 
         return $this;
     }
 
-    #TODO: Endpoint path for http should be possible
-    public function WithProtocol(string $protocol)
+    public function withProtocol(string $protocol): self
     {
-        if ($protocol != 'http/protobuf') {
-            throw new InvalidArgumentException('Invalid OTLP Protocol Specified');
+        if (!in_array($protocol, ['http/protobuf', 'grpc'])) {
+            throw new InvalidArgumentException('Invalid OTLP protocol specified: ' . $protocol);
         }
 
         $this->protocol = $protocol;
@@ -103,13 +37,18 @@ class ConfigOpts
         return $this;
     }
 
-    public function WithHeaders(string $headers)
+    public function withHeaders(string $headers): self
     {
+        $this->headers = $this->extractHeaders($headers);
 
+        return $this;
+    }
+
+    private function extractHeaders(string $headers): array
+    {
         if (empty($headers)) {
             return [];
         }
-
         $pairs = explode(',', $headers);
 
         $metadata = [];
@@ -125,30 +64,90 @@ class ConfigOpts
             $metadata[$key] = $value;
         }
 
-        $this->headers = $metadata;
-
-        return $this;
+        return $metadata;
     }
 
-    public function WithCompression()
+    public function withCompression(): self
     {
-        $this->compression = 'gzip';
+        $this->compression = true;
 
         return $this;
     }
 
-    public function WithTimeout(int $timeout)
+    public function withTimeout(int $timeout): self
     {
         $this->timeout = $timeout;
 
         return $this;
     }
 
-    public function WithInsecure()
+    public function withInsecure(): self
     {
         $this->insecure = true;
 
         return $this;
+    }
+
+    public function withSecure(): self
+    {
+        $this->insecure = false;
+
+        return $this;
+    }
+
+    public function getEndpoint(): string
+    {
+        return $this->endpoint ?: getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: getenv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT') ?: 'http://localhost:4318';
+    }
+
+    public function getProtocol(): string
+    {
+        return $this->protocol ?: getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: getenv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ?: 'http/protobuf';
+    }
+
+    public function getHeaders(): array
+    {
+        return $this->headers ?: $this->extractHeaders(
+            getenv('OTEL_EXPORTER_OTLP_HEADERS') ?: getenv('OTEL_EXPORTER_OTLP_TRACES_HEADERS') ?: ''
+        );
+    }
+
+    public function getInsecure(): bool
+    {
+        //only applies to grpc
+        return $this->insecure ?: $this->getBooleanFromEnvironment(
+            'OTEL_EXPORTER_OTLP_INSECURE',
+            $this->getBooleanFromEnvironment('OTEL_EXPORTER_OTLP_SPAN_INSECURE', false)
+        );
+    }
+
+    public function getCertificateFile(): string
+    {
+        return $this->certificateFile ?: $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_CERTIFICATE', '');
+    }
+
+    public function getCompression(): bool
+    {
+        if (null !== $this->compression) {
+            return $this->compression;
+        }
+        switch (getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: getenv('OTEL_EXPORTER_OTLP_TRACES_COMPORESSION') ?: 'none') {
+            case 'none':
+                return false;
+            case 'gzip':
+                return true;
+            default:
+                throw new InvalidArgumentException('Unknown compression value');
+        }
+    }
+
+    public function getTimeout(): int
+    {
+        //TODO OTEL_EXPORTER_OTLP_TRACES_TIMEOUT
+        return $this->timeout ?: $this->getIntFromEnvironment(
+            'OTEL_EXPORTER_OTLP_TIMEOUT',
+            $this->getIntFromEnvironment('OTEL_EXPORTER_OTLP_TRACES_TIMEOUT', 10)
+        );
     }
 }
 
