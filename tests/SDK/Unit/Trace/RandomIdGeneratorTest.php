@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;
-use OpenTelemetry\SDK\Trace\SpanContext;
 use PHPUnit\Framework\TestCase;
 
 class RandomIdGeneratorTest extends TestCase

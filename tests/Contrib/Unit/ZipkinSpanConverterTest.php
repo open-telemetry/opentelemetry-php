@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\Attributes;
-use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers SpanConverter
+ */
 class ZipkinSpanConverterTest extends TestCase
 {
     /**
@@ -24,6 +27,7 @@ class ZipkinSpanConverterTest extends TestCase
     {
         $span = (new SpanData())
             ->setName('guard.validate')
+            ->setKind(SpanKind::KIND_CLIENT)
             ->setParentContext(
                 SpanContext::create(
                     '10000000000000000000000000000000',
@@ -41,6 +45,8 @@ class ZipkinSpanConverterTest extends TestCase
                 'instrumentation_library_version'
             ))
             ->addAttribute('service', 'guard')
+            ->addAttribute('net.peer.name', 'authorizationservice.com')
+            ->addAttribute('peer.service', 'AuthService')
             ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
 
@@ -57,7 +63,7 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame(1505855794194009, $row['timestamp']);
         $this->assertSame(5271717, $row['duration']);
 
-        $this->assertCount(3, $row['tags']);
+        $this->assertCount(5, $row['tags']);
 
         $this->assertSame('Error', $row['tags']['otel.status_code']);
         $this->assertSame('status_description', $row['tags']['error']);
@@ -71,8 +77,10 @@ class ZipkinSpanConverterTest extends TestCase
 
         $this->assertCount(1, $row['annotations']);
         [$annotation] = $row['annotations'];
-        $this->assertSame('validators.list', $annotation['value']);
+        $this->assertSame('"validators.list": {"job":"stage.updateTime"}', $annotation['value']);
         $this->assertSame(1505855799433901, $annotation['timestamp']);
+
+        $this->assertSame('AuthService', $row['remoteEndpoint']['serviceName']);
     }
 
     /**
@@ -174,6 +182,54 @@ class ZipkinSpanConverterTest extends TestCase
         $row = $converter->convert($span);
 
         $this->assertArrayNotHasKey('kind', $row);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertAnEventWithoutAttributesToAnAnnotationWithOnlyItsName()
+    {
+        $span = (new SpanData())
+            ->addEvent('event.name', new Attributes());
+
+        $converter = new SpanConverter('test.name');
+        $row = $converter->convert($span);
+
+        [$annotation] = $row['annotations'];
+        $this->assertSame('"event.name"', $annotation['value']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldUseOTELIpv4AndPortCorrectlyForZipkinRemoteEndpoint()
+    {
+        $span = (new SpanData())
+            ->addAttribute('net.peer.ip', '255.255.255.255')
+            ->addAttribute('net.peer.port', '80')
+            ->setKind(SpanKind::KIND_PRODUCER);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertSame('unknown', $row['remoteEndpoint']['serviceName']);
+        $this->assertSame(pow(2, 32)-1, $row['remoteEndpoint']['ipv4']);
+        $this->assertSame(80, $row['remoteEndpoint']['port']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldUseOTELIpv6CorrectlyForZipkinRemoteEndpoint()
+    {
+        $span = (new SpanData())
+            ->addAttribute('net.peer.ip', '::1')
+            ->setKind(SpanKind::KIND_PRODUCER);
+
+        $converter = new SpanConverter('unused');
+        $row = $converter->convert($span);
+
+        $this->assertSame('00000000000000000000000000000001', bin2hex($row['remoteEndpoint']['ipv6'])); //Couldn't figure out how to do a direct assertion against binary data
     }
 
     /**

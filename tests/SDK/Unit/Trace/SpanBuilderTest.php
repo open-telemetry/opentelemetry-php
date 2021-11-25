@@ -8,6 +8,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\Link;
@@ -15,7 +16,6 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
-use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -403,7 +403,7 @@ class SpanBuilderTest extends MockeryTestCase
 
         $spanNoParent->end();
         $span->end();
-        $parentScope->close();
+        $parentScope->detach();
         $parentSpan->end();
     }
 
@@ -481,7 +481,7 @@ class SpanBuilderTest extends MockeryTestCase
         );
 
         $span->end();
-        $parentScope->close();
+        $parentScope->detach();
         $parentSpan->end();
     }
 
@@ -510,7 +510,7 @@ class SpanBuilderTest extends MockeryTestCase
         );
 
         $span->end();
-        $parentScope->close();
+        $parentScope->detach();
         $parentSpan->end();
     }
 

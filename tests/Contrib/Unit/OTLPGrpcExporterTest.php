@@ -4,18 +4,35 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Grpc\UnaryCall;
 use InvalidArgumentException;
 use Mockery;
-use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use OpenTelemetry\Tests\SDK\Unit\Trace\SpanExporter\AbstractExporterTest;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 
-class OTLPGrpcExporterTest extends MockeryTestCase
+class OTLPGrpcExporterTest extends AbstractExporterTest
 {
-    public function testExporterHappyPath()
+    use EnvironmentVariables;
+
+    public function createExporter(): SpanExporterInterface
+    {
+        return new Exporter();
+    }
+
+    public function tearDown(): void
+    {
+        $this->restoreEnvironmentVariables();
+    }
+
+    /**
+     * @psalm-suppress UndefinedConstant
+     */
+    public function testExporterHappyPath(): void
     {
         $exporter = new Exporter(
             //These first parameters were copied from the constructor's default values
@@ -37,10 +54,10 @@ class OTLPGrpcExporterTest extends MockeryTestCase
 
         $exporterStatusCode = $exporter->export([new SpanData()]);
 
-        $this->assertSame(Exporter::STATUS_SUCCESS, $exporterStatusCode);
+        $this->assertSame(SpanExporterInterface::STATUS_SUCCESS, $exporterStatusCode);
     }
 
-    public function testExporterUnexpectedGrpcResponseStatus()
+    public function testExporterUnexpectedGrpcResponseStatus(): void
     {
         $exporter = new Exporter(
             //These first parameters were copied from the constructor's default values
@@ -62,35 +79,31 @@ class OTLPGrpcExporterTest extends MockeryTestCase
 
         $exporterStatusCode = $exporter->export([new SpanData()]);
 
-        $this->assertSame(Exporter::STATUS_FAILED_NOT_RETRYABLE, $exporterStatusCode);
+        $this->assertSame(SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE, $exporterStatusCode);
     }
 
-    public function testExporterGrpcRespondsAsUnavailable()
+    public function testExporterGrpcRespondsAsUnavailable(): void
     {
-        $this->assertEquals(Exporter::STATUS_FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
+        $this->assertEquals(SpanExporterInterface::STATUS_FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
     }
 
-    public function testRefusesInvalidHeaders()
+    public function testRefusesInvalidHeaders(): void
     {
         $foo = new Exporter('localhost:4317', true, '', 'a:bc');
 
         $this->assertEquals([], $foo->getHeaders());
-
-        //$this->expectException(InvalidArgumentException::class);
     }
 
-    public function testSetHeadersWithEnvironmentVariables()
+    public function testSetHeadersWithEnvironmentVariables(): void
     {
-        putenv('OTEL_EXPORTER_OTLP_HEADERS=x-aaa=foo,x-bbb=barf');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_HEADERS', 'x-aaa=foo,x-bbb=barf');
 
         $exporter = new Exporter();
 
         $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['barf']], $exporter->getHeaders());
-
-        putenv('OTEL_EXPORTER_OTLP_HEADERS'); // Clear the envvar or it breaks future tests
     }
 
-    public function testSetHeadersInConstructor()
+    public function testSetHeadersInConstructor(): void
     {
         $exporter = new Exporter('localhost:4317', true, '', 'x-aaa=foo,x-bbb=bar');
 
@@ -104,26 +117,15 @@ class OTLPGrpcExporterTest extends MockeryTestCase
     /**
      * @test
      */
-    public function shouldBeOkToExporterEmptySpansCollection()
+    public function shouldBeOkToExporterEmptySpansCollection(): void
     {
         $this->assertEquals(
-            Exporter::STATUS_SUCCESS,
+            SpanExporterInterface::STATUS_SUCCESS,
             (new Exporter('test.otlp'))->export([])
         );
     }
-    /**
-     * @test
-     */
-    public function failsIfNotRunning()
-    {
-        $exporter = new Exporter('test.otlp');
-        $span = $this->createMock(SpanData::class);
-        $exporter->shutdown();
 
-        $this->assertSame(Exporter::STATUS_FAILED_NOT_RETRYABLE, $exporter->export([$span]));
-    }
-
-    public function testHeadersShouldRefuseArray()
+    public function testHeadersShouldRefuseArray(): void
     {
         $headers = [
             'key' => ['value'],
@@ -131,10 +133,10 @@ class OTLPGrpcExporterTest extends MockeryTestCase
 
         $this->expectException(InvalidArgumentException::class);
 
-        $headers_as_string = (new Exporter())->metadataFromHeaders($headers);
+        (new Exporter())->metadataFromHeaders($headers);
     }
 
-    public function testMetadataFromHeaders()
+    public function testMetadataFromHeaders(): void
     {
         $metadata = (new Exporter())->metadataFromHeaders('key=value');
         $this->assertEquals(['key' => ['value']], $metadata);
@@ -159,7 +161,7 @@ class OTLPGrpcExporterTest extends MockeryTestCase
         $opts = $exporter->getClientOptions();
         $this->assertEquals(10, $opts['timeout']);
         $this->assertTrue($this->isInsecure($exporter));
-        $this->assertFalse(array_key_exists('grpc.default_compression_algorithm', $opts));
+        $this->assertArrayNotHasKey('grpc.default_compression_algorithm', $opts);
         // method args
         $exporter = new Exporter('localhost:4317', false, '', '', true, 5);
         $opts = $exporter->getClientOptions();
@@ -167,29 +169,20 @@ class OTLPGrpcExporterTest extends MockeryTestCase
         $this->assertFalse($this->isInsecure($exporter));
         $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
         // env vars
-        putenv('OTEL_EXPORTER_OTLP_TIMEOUT=1');
-        putenv('OTEL_EXPORTER_OTLP_COMPRESSION=1');
-        putenv('OTEL_EXPORTER_OTLP_INSECURE=false');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_TIMEOUT', '1');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_COMPRESSION', '1');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_INSECURE', 'false');
         $exporter = new Exporter('localhost:4317');
         $opts = $exporter->getClientOptions();
         $this->assertEquals(1, $opts['timeout']);
         $this->assertFalse($this->isInsecure($exporter));
         $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
-        putenv('OTEL_EXPORTER_OTLP_TIMEOUT');
-        putenv('OTEL_EXPORTER_OTLP_COMPRESSION');
-        putenv('OTEL_EXPORTER_OTLP_INSECURE');
     }
 
-    public function test_shutdown(): void
-    {
-        $this->assertTrue((new Exporter('localhost:4317'))->shutdown());
-    }
-
-    public function test_forceFlush(): void
-    {
-        $this->assertTrue((new Exporter('localhost:4317'))->forceFlush());
-    }
-
+    /**
+     * @psalm-suppress PossiblyUndefinedMethod
+     * @psalm-suppress UndefinedMagicMethod
+     */
     private function createMockTraceServiceClient(array $options = [])
     {
         [
@@ -203,14 +196,14 @@ class OTLPGrpcExporterTest extends MockeryTestCase
 
         /** @var MockInterface&TraceServiceClient */
         $mockClient = Mockery::mock(TraceServiceClient::class)
-                        ->shouldReceive('Export')
+                        ->allows('Export')
                         ->withArgs(function ($request) use ($expectedNumSpans) {
-                            return (count($request->getResourceSpans()) == $expectedNumSpans);
+                            return (count($request->getResourceSpans()) === $expectedNumSpans);
                         })
-                        ->andReturn(
+                        ->andReturns(
                             Mockery::mock(UnaryCall::class)
-                                ->shouldReceive('wait')
-                                ->andReturn(
+                                ->allows('wait')
+                                ->andReturns(
                                     [
                                         'unused response data',
                                         new class($statusCode) {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use function bin2hex;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Contrib\OtlpHttp\SpanConverter;
 use Opentelemetry\Proto\Common\V1\AnyValue;
 use Opentelemetry\Proto\Common\V1\ArrayValue;
@@ -17,7 +18,6 @@ use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\Span;
-use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 
@@ -187,7 +187,10 @@ class OTLPHttpSpanConverterTest extends TestCase
                         'key' => 'instance',
                         'value' => new AnyValue([ 'string_value' => 'test-a']),
                     ]),
-
+                    new KeyValue([
+                        'key' => 'service.name',
+                        'value' => new AnyValue([ 'string_value' => 'unknown_service']),
+                    ]),
                 ],
             ]),
             'instrumentation_library_spans' => [
@@ -239,6 +242,21 @@ class OTLPHttpSpanConverterTest extends TestCase
         $otlpspan = (new SpanConverter())->as_otlp_resource_span([$sdk]);
 
         $this->assertEquals($expected, $otlpspan);
+    }
+
+    /**
+     * @covers OpenTelemetry\Contrib\OtlpHttp\SpanConverter::as_otlp_resource_attributes
+     */
+    public function testResourcesFromMultipleSpansAreNotDuplicated()
+    {
+        $span = $this->createMock(Span::class);
+        $resource = $this->createMock(ResourceInfo::class);
+        $attributes = new Attributes(['foo' => 'foo', 'bar' => 'bar']);
+        $span->method('getResource')->willReturn($resource);
+        $resource->method('getAttributes')->willReturn($attributes);
+        $converter = new SpanConverter();
+        $result = $converter->as_otlp_resource_attributes([$span, $span, $span]);
+        $this->assertCount(2, $result);
     }
 
     public function testOtlpNoSpans()

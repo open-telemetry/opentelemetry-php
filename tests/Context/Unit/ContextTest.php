@@ -249,4 +249,57 @@ class ContextTest extends TestCase
         $otherCtx = Context::withValue($key2, '222', new Context());
         $this->assertSame($currentCtx, Context::getCurrent());
     }
+
+    /**
+     * @test
+     */
+    public function storageSwitchSwitchesContext(): void
+    {
+        $main = new Context();
+        $fork = new Context();
+
+        $scopeMain = Context::attach($main);
+
+        // Fiber start
+        Context::storage()->fork(1);
+        Context::storage()->switch(1);
+        $this->assertSame($main, Context::getCurrent());
+
+        $scopeFork = Context::attach($fork);
+        $this->assertSame($fork, Context::getCurrent());
+
+        // Fiber suspend
+        Context::storage()->switch(0);
+        $this->assertSame($main, Context::getCurrent());
+
+        // Fiber resume
+        Context::storage()->switch(1);
+        $this->assertSame($fork, Context::getCurrent());
+
+        $scopeFork->detach();
+
+        // Fiber return
+        Context::storage()->switch(0);
+        Context::storage()->destroy(1);
+
+        $scopeMain->detach();
+    }
+
+    /**
+     * @test
+     */
+    public function storageForkKeepsForkedRoot(): void
+    {
+        $main = new Context();
+
+        $scopeMain = Context::attach($main);
+        Context::storage()->fork(1);
+        $scopeMain->detach();
+
+        Context::storage()->switch(1);
+        $this->assertSame($main, Context::getCurrent());
+
+        Context::storage()->switch(0);
+        Context::storage()->destroy(1);
+    }
 }

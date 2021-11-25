@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\ZipkinToNewrelic;
 
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
-use InvalidArgumentException;
+use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\Psr17FactoryDiscovery;
+use JsonException;
 use OpenTelemetry\SDK\Trace;
-use Psr\Http\Client\ClientExceptionInterface;
+use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
+use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Client\NetworkExceptionInterface;
-use Psr\Http\Client\RequestExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
 /**
@@ -26,45 +26,21 @@ use Psr\Http\Message\StreamFactoryInterface;
  */
 class Exporter implements Trace\SpanExporterInterface
 {
-    /**
-     * @var string
-     */
-    private $endpointUrl;
+    use UsesSpanConverterTrait;
+    use HttpSpanExporterTrait;
 
-    /**
-     * @var string
-     */
-    private $licenseKey;
+    private const REQUEST_METHOD = 'POST';
+    private const HEADER_CONTENT_TYPE = 'content-type';
+    private const HEADER_API_KEY = 'Api-Key';
+    private const HEADER_DATA_FORMAT = 'Data-Format';
+    private const HEADER_DATA_FORMAT_VERSION = 'Data-Format-Version';
+    private const VALUE_CONTENT_TYPE = 'application/json';
+    private const VALUE_DATA_FORMAT = 'zipkin';
+    private const VALUE_DATA_FORMAT_VERSION = '2';
 
-    /**
-     * @var SpanConverter
-     */
-    private $spanConverter;
-
-    /**
-     * @var bool
-     */
-    private $running = true;
-
-    /**
-     * @var ClientInterface
-     */
-    private $client;
-
-    /**
-     * @var RequestFactoryInterface
-     */
-    private $requestFactory;
-
-    /**
-     * @var StreamFactoryInterface
-     */
-    private $streamFactory;
-
-    /**
-    * @var string
-    */
-    private $name;
+    private string $licenseKey;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private string $name;
 
     public function __construct(
         $name,
@@ -75,101 +51,68 @@ class Exporter implements Trace\SpanExporterInterface
         StreamFactoryInterface $streamFactory,
         SpanConverter $spanConverter = null
     ) {
-        $parsedDsn = parse_url($endpointUrl);
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+        // $this->name = $name;
+        $this->setLicenseKey($licenseKey);
+        $this->setEndpointUrl($endpointUrl);
+        $this->setClient($client);
+        $this->setRequestFactory($requestFactory);
+        $this->setStreamFactory($streamFactory);
+        $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
+    }
 
-        if (!is_array($parsedDsn)) {
-            throw new InvalidArgumentException('Unable to parse provided DSN');
-        }
-        if (
-            !isset($parsedDsn['scheme'])
-            || !isset($parsedDsn['host'])
-            || !isset($parsedDsn['path'])
-        ) {
-            throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
-        }
+    /**
+     * @throws JsonException
+     */
+    protected function serializeTrace(iterable $spans): string
+    {
+        return json_encode(
+            $this->convertSpanCollection($spans),
+            JSON_THROW_ON_ERROR
+        );
+    }
 
-        $this->name = $name;
-        $this->endpointUrl = $endpointUrl;
-        $this->licenseKey = $licenseKey;
-        $this->client = $client;
-        $this->requestFactory = $requestFactory;
-        $this->streamFactory = $streamFactory;
-        $this->spanConverter = $spanConverter ?? new SpanConverter($name);
+    /**
+     * @throws JsonException
+     */
+    protected function marshallRequest(iterable $spans): RequestInterface
+    {
+        return $this->createRequest(self::REQUEST_METHOD)
+            ->withBody(
+                $this->createStream(
+                    $this->serializeTrace($spans)
+                )
+            )
+            ->withHeader(self::HEADER_CONTENT_TYPE, self::VALUE_CONTENT_TYPE)
+            ->withAddedHeader(self::HEADER_API_KEY, $this->getLicenseKey())
+            ->withAddedHeader(self::HEADER_DATA_FORMAT, self::VALUE_DATA_FORMAT)
+            ->withAddedHeader(self::HEADER_DATA_FORMAT_VERSION, self::VALUE_DATA_FORMAT_VERSION);
     }
 
     /** @inheritDoc */
-    public function export(iterable $spans): int
+    public static function fromConnectionString(string $endpointUrl, string $name, $args): Exporter
     {
-        if (!$this->running) {
-            return self::STATUS_FAILED_NOT_RETRYABLE;
-        }
-
-        if (empty($spans)) {
-            return self::STATUS_SUCCESS;
-        }
-
-        $convertedSpans = [];
-        foreach ($spans as $span) {
-            $convertedSpans[] = $this->spanConverter->convert($span);
-        }
-
-        try {
-            $body = $this->streamFactory->createStream(json_encode($convertedSpans));
-            $request = $this->requestFactory
-                ->createRequest('POST', $this->endpointUrl)
-                ->withBody($body)
-                ->withHeader('content-type', 'application/json')
-                ->withAddedHeader('Api-Key', $this->licenseKey)
-                ->withAddedHeader('Data-Format', 'zipkin')
-                ->withAddedHeader('Data-Format-Version', '2');
-
-            $response = $this->client->sendRequest($request);
-        } catch (RequestExceptionInterface $e) {
-            return self::STATUS_FAILED_NOT_RETRYABLE;
-        } catch (NetworkExceptionInterface | ClientExceptionInterface $e) {
-            return self::STATUS_FAILED_RETRYABLE;
-        }
-
-        if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
-            return self::STATUS_FAILED_NOT_RETRYABLE;
-        }
-
-        if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
-            return self::STATUS_FAILED_RETRYABLE;
-        }
-
-        return self::STATUS_SUCCESS;
-    }
-
-    /** @inheritDoc */
-    public function shutdown(): bool
-    {
-        $this->running = false;
-
-        return true;
-    }
-
-    public function forceFlush(): bool
-    {
-        return true;
-    }
-
-    /** @inheritDoc */
-    public static function fromConnectionString(string $endpointUrl, string $name, $args)
-    {
-        if ($args == false) {
+        if (!is_string($args)) {
             throw new Exception('Invalid license key.');
         }
-        $factory = new HttpFactory();
-        $exporter = new Exporter(
+
+        return new Exporter(
             $name,
             $endpointUrl,
             $args,
-            new Client(),
-            $factory,
-            $factory
+            HttpClientDiscovery::find(),
+            Psr17FactoryDiscovery::findRequestFactory(),
+            Psr17FactoryDiscovery::findStreamFactory()
         );
+    }
 
-        return $exporter;
+    private function getLicenseKey(): string
+    {
+        return $this->licenseKey;
+    }
+
+    public function setLicenseKey(string $licenseKey): void
+    {
+        $this->licenseKey = $licenseKey;
     }
 }

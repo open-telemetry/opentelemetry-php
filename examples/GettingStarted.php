@@ -3,7 +3,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\SDK\Trace\SpanProcessor\ConsoleSpanExporter;
+use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
@@ -15,7 +15,7 @@ $tracerProvider =  new TracerProvider(
     )
 );
 
-$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
+$tracer = $tracerProvider->getTracer();
 
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
 $rootSpan->activate();

@@ -11,7 +11,7 @@ This project currently lives in a pre-alpha status.  Our current release is not 
 We attempt to keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show which features are available and which have not yet been implemented.  
 
 If you find an inconsistency in the data in the matrix vs. the data in this repository, please let us know in our slack channel and we'll get it rectified.
- 
+
 ## Communication
 Most of our communication is done on CNCF Slack, in the [otel-php](https://cloud-native.slack.com/archives/C01NFPCV44V) channel. To sign up, create a CNCF slack account here http://slack.cncf.io/
 
@@ -51,9 +51,8 @@ To ensure you have all the correct packages installed locally in your dev enviro
 make install
 ```
 
-From your bash compatible shell.  This will install all of the necessary vendored libraries that the project uses to 
-the 
-`/vendor` directory.
+From your bash compatible shell.  This will install all of the necessary vendored libraries that the project uses to
+the `/vendor` directory.
 
 To update these dependencies, you can run
 
@@ -68,46 +67,46 @@ In order to update all the vendored libraries in the `/vendor` directory.
 
 Once you've made the update to the codebase that you'd like to submit, you may [create a pull request](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request) to the opentelemetry-php project.
 
-After you open the pull request, the CI/CD pipeline will run all of the associated [github actions](https://github.com/open-telemetry/opentelemetry-php/actions/workflows/php.yml). 
-  
+After you open the pull request, the CI/CD pipeline will run all of the associated [github actions](https://github.com/open-telemetry/opentelemetry-php/actions/workflows/php.yml).
+
 You can simulate the important github actions locally before you submit your PR by running the following command:
 
 ```bash
-make install && make update && make style && make test && make phan && make psalm && make phpstan
+make all
 ```
 
 from your bash compatible shell.  This does the following things:
 
-* Installs all the required dependencies for the project and ensures they are up to date
+* Installs/updates all the required dependencies for the project
 * Uses [php-cs-fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) to style your code using our style preferences.
 * Runs all of our [phpunit](https://phpunit.de/) unit tests.
 * Performs static analysis with [Phan](https://github.com/phan/phan), [Psalm](https://psalm.dev/) and [PHPStan](https://phpstan.org/user-guide/getting-started)
 
 
 ## Proto Generation
-Our proto files are committed to the repository into the `/proto` folder.  These are used in gRPC connections to the 
-upstream.  These get updated when the [opentelemetry-proto](https://github.com/open-telemetry/opentelemetry-proto) 
+Our proto files are committed to the repository into the `/proto` folder.  These are used in gRPC connections to the
+upstream.  These get updated when the [opentelemetry-proto](https://github.com/open-telemetry/opentelemetry-proto)
 repo has a meaningful update.  The maintainer SIG is discussing a way to make this more automatic in the future.
 
-If you'd like to generate proto files for use with this repository, one can run the following command: 
+If you'd like to generate proto files for use with this repository, one can run the following command:
 
 ```bash
 make proto
 ```
 
-From your bash compatible shell in the root of this directory.  This wil create a `/proto` folder in the root 
-directory of the 
+From your bash compatible shell in the root of this directory.  This wil create a `/proto` folder in the root
+directory of the
 repository.
 
 ## Styling
 We use [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) for our code linting and standards fixer.  The associated configuration for this standards fixer can be found in the root of the repository [here](https://github.com/open-telemetry/opentelemetry-php/blob/master/.php_cs)
 
-To ensure that your code is stylish, you can run the follwing command: 
+To ensure that your code is stylish, you can run the follwing command:
 ```bash
 make style
 ```
 
-from your bash compatible shell.  This process will print out the fixes that it is making to your 
+from your bash compatible shell.  This process will print out the fixes that it is making to your
 associated files.  Usually this process is performed as part of a code checkin.  This process runs during CI and is a required check.  Code that doesn't follow this style pattern will emit a failure in CI.
 
 ## Static Analysis
@@ -119,7 +118,7 @@ make phan
 ```
 from your bash compatible shell.
 This process will return 0 on success.
-Usually this process is performed as part of a code checkin.  This process runs during CI and is a required check.  Code that doesn't match the standards that we have defined in our [phan config](https://github.com/open-telemetry/opentelemetry-php/blob/master/.phan/config.php) will emit a failure in CI. 
+Usually this process is performed as part of a code checkin.  This process runs during CI and is a required check.  Code that doesn't match the standards that we have defined in our [phan config](https://github.com/open-telemetry/opentelemetry-php/blob/master/.phan/config.php) will emit a failure in CI.
 
 We also use [Psalm](https://psalm.dev/) as a second static analysis tool.  
 You can use our psalm docker wrapper to easily perform static analysis on your changes.
@@ -130,7 +129,7 @@ make psalm
 ```
 from your bash compatible shell. This process will return 0 on success. Usually this process is performed as part of a code checkin. This process runs during CI and is a required check. Code that doesn't match the standards that we have defined in our [psalm config](https://github.com/open-telemetry/opentelemetry-php/blob/main/psalm.xml.dist) will emit a failure in CI.
 
-We use [PHPStan](https://github.com/phpstan/phpstan) as our third tool for static analysis. 
+We use [PHPStan](https://github.com/phpstan/phpstan) as our third tool for static analysis.
 You can use our PHPStan docker wrapper to easily perform static analysis on your changes.
 
 Execute `make phpstan` from your bash compatible shell. This process will return 0 on success. Usually this process is
@@ -145,7 +144,7 @@ To run the test suite, execute
 ```bash
 make test
 ```
-from your bash compatible shell.  This will output the test output as well 
+from your bash compatible shell.  This will output the test output as well
 as a test coverage analysis.  Code that doesn't pass our currently defined tests will emit a failure in CI
 
 ## Examples

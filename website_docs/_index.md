@@ -24,7 +24,7 @@ as follows:
 | -------   | -------   | -------             |
 | Pre-Alpha | Pre-Alpha | Not Yet Implemented |
 
-The current release can be found [here](https://github.com/open-telemetry/opentelemetry-php/releases)
+{{% latest_release "php" /%}}
 
 ## Further Reading
 

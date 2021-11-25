@@ -4,78 +4,46 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpHttp;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
+use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
+use Nyholm\Dsn\DsnParser;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
+use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace;
-use Psr\Http\Client\ClientExceptionInterface;
+use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
+use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Client\NetworkExceptionInterface;
-use Psr\Http\Client\RequestExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
 class Exporter implements Trace\SpanExporterInterface
 {
-    /**
-     * @var string
-     */
-    private $endpointUrl;
+    use EnvironmentVariablesTrait;
+    use UsesSpanConverterTrait;
+    use HttpSpanExporterTrait;
 
-    /**
-     * @var string
-     */
-    private $protocol;
+    private const REQUEST_METHOD = 'POST';
+    private const HEADER_CONTENT_TYPE = 'content-type';
+    private const HEADER_CONTENT_ENCODING = 'Content-Encoding';
+    private const VALUE_CONTENT_TYPE = 'application/x-protobuf';
+    private const VALUE_CONTENT_ENCODING = 'gzip';
 
-    /**
-     * @var string
-     */
-    private $insecure;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private string $insecure;
 
-    /**
-     * @var string
-     */
-    private $certificateFile;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private string $certificateFile;
 
-    /**
-     * @var array
-     */
-    private $headers;
+    private array $headers;
 
-    /**
-     * @var string
-     */
-    private $compression;
+    private string $compression;
 
-    /**
-     * @var int
-     */
-    private $timeout;
-    /**
-     * @var SpanConverter
-     */
-    private $spanConverter;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private int $timeout;
 
-    /**
-    * @var bool
-    */
-    private $running = true;
-
-    /**
-     * @var ClientInterface
-     */
-    private $client;
-
-    /**
-     * @var RequestFactoryInterface
-     */
-    private $requestFactory;
-
-    /**
-     * @var StreamFactoryInterface
-     */
-    private $streamFactory;
+    private SpanConverter $spanConverter;
 
     /**
      * Exporter constructor.
@@ -86,100 +54,65 @@ class Exporter implements Trace\SpanExporterInterface
         StreamFactoryInterface $streamFactory,
         SpanConverter $spanConverter = null
     ) {
-
         // Set default values based on presence of env variable
-        $this->endpointUrl = getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: 'https://localhost:4318/v1/traces';
-        $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'http/protobuf';
-        $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
-        $this->headers = $this->processHeaders(getenv('OTEL_EXPORTER_OTLP_HEADERS'));
-        $this->compression = getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: 'none';
-        $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
+        $this->setEndpointUrl(
+            $this->validateEndpoint(
+                $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', 'https://localhost:4318/v1/traces')
+            )
+        );
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+        // $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
+        $this->headers = $this->processHeaders($this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', ''));
+        $this->compression = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_COMPRESSION', 'none');
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+        // $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
-        $this->client = $client;
-        $this->requestFactory = $requestFactory;
-        $this->streamFactory = $streamFactory;
-        $this->spanConverter =  $spanConverter ?? new SpanConverter();
+        $this->setClient($client);
+        $this->setRequestFactory($requestFactory);
+        $this->setStreamFactory($streamFactory);
+        $this->setSpanConverter($spanConverter ?? new SpanConverter());
 
-        if ($this->protocol != 'http/protobuf') {
+        if ((getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'http/protobuf') !== 'http/protobuf') {
             throw new InvalidArgumentException('Invalid OTLP Protocol Specified');
         }
+    }
+    protected function serializeTrace(iterable $spans): string
+    {
+        $bytes = (new ExportTraceServiceRequest([
+            'resource_spans' => [$this->spanConverter->as_otlp_resource_span($spans)],
+        ]))->serializeToString();
 
-        $parsedDsn = parse_url($this->endpointUrl);
-
-        if (!is_array($parsedDsn)) {
-            throw new InvalidArgumentException('Unable to parse provided DSN');
-        }
-
-        if (
-            !isset($parsedDsn['scheme'])
-            || !isset($parsedDsn['host'])
-            || !isset($parsedDsn['port'])
-            || !isset($parsedDsn['path'])
-        ) {
-            throw new InvalidArgumentException('Endpoint should have scheme, host, port and path');
-        }
+        // TODO: Add Tests
+        return $this->shouldCompress()
+            ? gzencode($bytes)
+            : $bytes;
     }
 
-    /** @inheritDoc */
-    public function export(iterable $spans): int
+    protected function marshallRequest(iterable $spans): RequestInterface
     {
-        if (!$this->running) {
-            return self::STATUS_FAILED_NOT_RETRYABLE;
+        $request =  $this->createRequest(self::REQUEST_METHOD)
+            ->withBody(
+                $this->createStream(
+                    $this->serializeTrace($spans)
+                )
+            )
+            ->withHeader(self::HEADER_CONTENT_TYPE, self::VALUE_CONTENT_TYPE);
+
+        foreach ($this->headers as $header => $value) {
+            $request = $request->withHeader($header, $value);
         }
 
-        if (empty($spans)) {
-            return self::STATUS_SUCCESS;
+        if ($this->shouldCompress()) {
+            return $request->withHeader(self::HEADER_CONTENT_ENCODING, self::VALUE_CONTENT_ENCODING);
         }
 
-        $resourcespans = [$this->spanConverter->as_otlp_resource_span($spans)];
-
-        $exportrequest = new ExportTraceServiceRequest([
-            'resource_spans' => $resourcespans,
-        ]);
-
-        $bytes = $exportrequest->serializeToString();
-
-        try {
-            $request = $this->requestFactory
-                ->createRequest('POST', $this->endpointUrl)
-                ->withHeader('content-type', 'application/x-protobuf');
-
-            foreach ($this->headers as $header => $value) {
-                $request = $request->withHeader($header, $value);
-            }
-
-            if ($this->compression === 'gzip') {
-                // TODO: Add Tests
-                $body = $this->streamFactory->createStream(gzencode($bytes));
-                $request = $request->withHeader('Content-Encoding', 'gzip');
-            } else {
-                $body = $this->streamFactory->createStream($bytes);
-            }
-
-            $request = $request->withBody($body);
-
-            $response = $this->client->sendRequest($request);
-        } catch (RequestExceptionInterface $e) {
-            return self::STATUS_FAILED_NOT_RETRYABLE;
-        } catch (NetworkExceptionInterface | ClientExceptionInterface $e) {
-            return self::STATUS_FAILED_RETRYABLE;
-        }
-
-        if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
-            return self::STATUS_FAILED_NOT_RETRYABLE;
-        }
-
-        if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
-            return self::STATUS_FAILED_RETRYABLE;
-        }
-
-        return self::STATUS_SUCCESS;
+        return $request;
     }
 
     /**
      * processHeaders converts comma separated headers into an array
      */
-    public function processHeaders($headers): array
+    public function processHeaders(?string $headers): array
     {
         if (empty($headers)) {
             return [];
@@ -203,30 +136,49 @@ class Exporter implements Trace\SpanExporterInterface
         return $metadata;
     }
 
-    /** @inheritDoc */
-    public function shutdown(): bool
+    /**
+     * validateEndpoint does two functions, firstly checks that the endpoint is valid
+     *  secondly it appends https:// and /v1/traces should they have been omitted
+     */
+    private function validateEndpoint(string $endpoint): string
     {
-        $this->running = false;
+        $dsn = DsnParser::parseUrl($endpoint);
 
-        return true;
-    }
+        if ($dsn->getScheme() === null) {
+            $dsn = $dsn->withScheme('https');
+        } elseif (!($dsn->getScheme() === 'https' || $dsn->getScheme() === 'http')) {
+            throw new InvalidArgumentException('Expected scheme of http or https, given: ' . $dsn->getScheme());
+        }
 
-    /** @inheritDoc */
-    public function forceFlush(): bool
-    {
-        return true;
+        if ($dsn->getPath() === null) {
+            return (string) $dsn->withPath('/v1/traces');
+        }
+
+        return (string) $dsn;
     }
 
     /** @inheritDoc */
     public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
     {
-        $factory = new HttpFactory();
-        $exporter = new Exporter(
-            new Client(),
-            $factory,
-            $factory
+        return new Exporter(
+            HttpClientDiscovery::find(),
+            Psr17FactoryDiscovery::findRequestFactory(),
+            Psr17FactoryDiscovery::findStreamFactory()
         );
+    }
 
-        return $exporter;
+    public static function create(): Exporter
+    {
+        return self::fromConnectionString();
+    }
+
+    public function setSpanConverter(SpanConverter $spanConverter): void
+    {
+        $this->spanConverter = $spanConverter;
+    }
+
+    private function shouldCompress(): bool
+    {
+        return $this->compression === 'gzip' && function_exists('gzencode');
     }
 }

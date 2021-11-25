@@ -5,7 +5,7 @@
     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
     backupGlobals="false"
     backupStaticAttributes="false"
-    bootstrap="./vendor/autoload.php"
+    bootstrap="./tests/bootstrap.php"
     cacheResult="false"
     colors="false"
     convertErrorsToExceptions="true"
@@ -34,6 +34,8 @@
         <ini name="display_errors" value="On" />
         <ini name="display_startup_errors" value="On" />
         <ini name="error_reporting" value="E_ALL" />
+        <ini name="assert.active" value="True" />
+        <ini name="assert.exception" value="True" />
     </php>
 
     <testsuites>
@@ -51,6 +53,9 @@
         </testsuite>
         <testsuite name="Context Unit Tests">
             <directory>./tests/Context/Unit</directory>
+        </testsuite>
+        <testsuite name="Context Fiber Tests">
+            <directory phpVersion="8.1.0RC" suffix=".phpt">./tests/Context/Fiber</directory>
         </testsuite>
     </testsuites>
 </phpunit>

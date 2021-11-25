@@ -10,6 +10,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -20,7 +21,6 @@ use OpenTelemetry\SDK\Trace\IdGeneratorInterface;
 use OpenTelemetry\SDK\Trace\Link;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;
 use OpenTelemetry\SDK\Trace\Span;
-use OpenTelemetry\SDK\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
@@ -110,7 +110,7 @@ class SpanTest extends MockeryTestCase
             Span::getCurrent()
         );
 
-        $scope->close();
+        $scope->detach();
     }
 
     public function test_getSpan_defaultContext(): void
@@ -147,12 +147,12 @@ class SpanTest extends MockeryTestCase
 
         $this->assertSame($secondSpan, Span::getCurrent());
 
-        $scope2->close();
+        $scope2->detach();
         $secondSpan->end();
 
         $this->assertSame($span, Span::getCurrent());
 
-        $scope->close();
+        $scope->detach();
         $span->end();
     }
 

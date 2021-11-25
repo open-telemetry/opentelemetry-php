@@ -14,6 +14,10 @@ use function register_shutdown_function;
 
 final class TracerProvider implements API\TracerProviderInterface
 {
+    public const DEFAULT_TRACER_NAME = 'io.opentelemetry.contrib.php';
+
+    private static ?API\TracerInterface $defaultTracer = null;
+
     /** @var array<string, API\TracerInterface> */
     private $tracers;
 
@@ -33,7 +37,7 @@ final class TracerProvider implements API\TracerProviderInterface
         }
 
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
-        $resource = $resource ?? ResourceInfo::defaultResource();
+        $resource = $resource ?? ResourceInfo::create(new Attributes());
         $sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
         $idGenerator = $idGenerator ?? new RandomIdGenerator();
         $spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
@@ -55,7 +59,7 @@ final class TracerProvider implements API\TracerProviderInterface
     }
 
     /** @inheritDoc */
-    public function getTracer(string $name, ?string $version = null): API\TracerInterface
+    public function getTracer(string $name = self::DEFAULT_TRACER_NAME, ?string $version = null): API\TracerInterface
     {
         if ($this->tracerSharedState->hasShutdown()) {
             return NoopTracer::getInstance();
@@ -69,10 +73,30 @@ final class TracerProvider implements API\TracerProviderInterface
 
         $instrumentationLibrary = new InstrumentationLibrary($name, $version);
 
-        return $this->tracers[$key] = new Tracer(
+        $tracer = new Tracer(
             $this->tracerSharedState,
             $instrumentationLibrary,
         );
+        if (null === self::$defaultTracer) {
+            self::$defaultTracer = $tracer;
+        }
+
+        return $this->tracers[$key] = $tracer;
+    }
+
+    public static function getDefaultTracer(): API\TracerInterface
+    {
+        if (null === self::$defaultTracer) {
+            // TODO log a warning
+            return NoopTracer::getInstance();
+        }
+
+        return self::$defaultTracer;
+    }
+
+    public static function setDefaultTracer(API\TracerInterface $tracer): void
+    {
+        self::$defaultTracer = $tracer;
     }
 
     public function getSampler(): SamplerInterface

@@ -7,7 +7,7 @@ namespace OpenTelemetry\Tests\Context\Unit\Propagation;
 use ArrayObject;
 use InvalidArgumentException;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
-use OpenTelemetry\SDK\Trace\KeyedArrayAccessInterface;
+use OpenTelemetry\Context\Propagation\KeyedArrayAccessInterface;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 

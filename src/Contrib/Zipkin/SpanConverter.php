@@ -5,17 +5,33 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
+
+use OpenTelemetry\API\Trace\AttributeInterface;
+use OpenTelemetry\API\Trace\EventInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\Trace\AbstractClock;
+use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
-class SpanConverter
+class SpanConverter implements SpanConverterInterface
 {
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
     const STATUS_DESCRIPTION_TAG_KEY = 'error';
     const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
     const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
+
+    const REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP = [
+        'peer.service' => 1,
+        'net.peer.name' => 2,
+        'net.peer.ip' => 3,
+        'peer.hostname' => 4,
+        'peer.address' => 5,
+        'http.host' => 6,
+        'db.name' => 7,
+    ];
+
+    const NET_PEER_IP_KEY = 'net.peer.ip';
 
     /**
      * @var string
@@ -49,7 +65,7 @@ class SpanConverter
         return (string) $value;
     }
 
-    public function convert(SpanDataInterface $span)
+    public function convert(SpanDataInterface $span): array
     {
         $spanParent = $span->getParentContext();
 
@@ -98,13 +114,14 @@ class SpanConverter
         }
 
         foreach ($span->getEvents() as $event) {
-            if (!array_key_exists('annotations', $row)) {
-                $row['annotations'] = [];
+            $row['annotations'][] = SpanConverter::toAnnotation($event);
+        }
+
+        if (($span->getKind() === SpanKind::KIND_CLIENT) || ($span->getKind() === SpanKind::KIND_PRODUCER)) {
+            $remoteEndpointData = SpanConverter::toRemoteEndpoint($span);
+            if ($remoteEndpointData !== null) {
+                $row['remoteEndpoint'] = $remoteEndpointData;
             }
-            $row['annotations'][] = [
-                'timestamp' => AbstractClock::nanosToMicro($event->getEpochNanos()),
-                'value' => $event->getName(),
-            ];
         }
 
         if (empty($row['tags'])) {
@@ -128,7 +145,130 @@ class SpanConverter
           case SpanKind::KIND_INTERNAL:
             return null;
         }
+
+        return null;
+    }
+
+    private static function toAnnotation(EventInterface $event): array
+    {
+        $eventName = $event->getName();
+        $attributesAsJson = SpanConverter::convertEventAttributesToJson($event);
+
+        $value = ($attributesAsJson !== null) ? sprintf('"%s": %s', $eventName, $attributesAsJson) : sprintf('"%s"', $eventName);
+
+        $annotation = [
+            'timestamp' => AbstractClock::nanosToMicro($event->getEpochNanos()),
+            'value' => $value,
+        ];
+
+        return $annotation;
+    }
+
+    private static function convertEventAttributesToJson(EventInterface $event): ?string
+    {
+        if (count($event->getAttributes()) === 0) {
+            return null;
+        }
         
+        $attributesArray = [];
+        foreach ($event->getAttributes() as $attr) {
+            $attributesArray[$attr->getKey()] = $attr->getValue();
+        }
+        
+        $attributesAsJson = json_encode($attributesArray);
+        if (($attributesAsJson === false) || (strlen($attributesAsJson) === 0)) {
+            return null;
+        }
+
+        return $attributesAsJson;
+    }
+
+    private static function toRemoteEndpoint(SpanDataInterface $span): ?array
+    {
+        $preferredAttr = SpanConverter::findRemoteEndpointPreferredAttribute($span);
+
+        if ($preferredAttr === null) {
+            return null;
+        }
+
+        if (!is_string($preferredAttr->getValue())) {
+            return null;
+        }
+
+        switch ($preferredAttr->getKey()) {
+            case SpanConverter::NET_PEER_IP_KEY:
+                return SpanConverter::getRemoteEndpointDataFromIpAddressAndPort(
+                    $preferredAttr,
+                    SpanConverter::getPortNumberFromSpanAttributes($span)
+                );
+            default:
+                return [
+                    'serviceName' => $preferredAttr->getValue(),
+                ];
+        }
+    }
+
+    private static function findRemoteEndpointPreferredAttribute(SpanDataInterface $span): ?AttributeInterface
+    {
+        $preferredAttrRank = null;
+        $preferredAttr = null;
+
+        foreach ($span->getAttributes() as $attr) {
+            if (array_key_exists($attr->getKey(), SpanConverter::REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP)) {
+                $attrRank = SpanConverter::REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP[$attr->getKey()];
+
+                if (($preferredAttrRank === null) || ($attrRank <= $preferredAttrRank)) {
+                    $preferredAttr = $attr;
+                    $preferredAttrRank = $attrRank;
+                }
+            }
+        }
+
+        return $preferredAttr;
+    }
+
+    private static function getRemoteEndpointDataFromIpAddressAndPort(AttributeInterface $preferredAttr, ?int $portNumber): ?array
+    {
+        $ipString = $preferredAttr->getValue();
+
+        if (!is_string($ipString)) {
+            return null;
+        }
+
+        if (!filter_var($ipString, FILTER_VALIDATE_IP)) {
+            return null;
+        }
+
+        $remoteEndpointArr = [
+            'serviceName' => 'unknown',
+        ];
+
+        if (filter_var($ipString, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $remoteEndpointArr['ipv4'] = ip2long($ipString);
+        }
+
+        if (filter_var($ipString, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $remoteEndpointArr['ipv6'] = inet_pton($ipString);
+        }
+
+        $remoteEndpointArr['port'] = $portNumber ?? 0;
+
+        return $remoteEndpointArr;
+    }
+
+    private static function getPortNumberFromSpanAttributes(SpanDataInterface $span): ?int
+    {
+        foreach ($span->getAttributes() as $attr) {
+            if ($attr->getKey() === 'net.peer.port') {
+                $portVal = $attr->getValue();
+                $portInt = (int) $portVal;
+
+                if (($portInt > 0) && ($portInt < pow(2, 16))) {
+                    return $portInt;
+                }
+            }
+        }
+
         return null;
     }
 }
