@@ -28,10 +28,6 @@ class ConfigOpts
 
     public function withProtocol(string $protocol): self
     {
-        if (!in_array($protocol, ['http/protobuf', 'grpc'])) {
-            throw new InvalidArgumentException('Invalid OTLP protocol specified: ' . $protocol);
-        }
-
         $this->protocol = $protocol;
 
         return $this;

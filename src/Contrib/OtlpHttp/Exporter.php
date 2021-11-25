@@ -36,6 +36,7 @@ class Exporter implements Trace\SpanExporterInterface
 
     private array $headers;
     private bool $compression;
+    private string $protocol;
 
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
     // private int $timeout;
@@ -63,12 +64,13 @@ class Exporter implements Trace\SpanExporterInterface
         // $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
         $this->headers = $config->getHeaders();
         $this->compression = $config->getCompression();
+        $this->protocol = $config->getProtocol();
         // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
         // $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
         $this->setSpanConverter($spanConverter ?? new SpanConverter());
 
-        if ($config->getProtocol() !== 'http/protobuf') {
+        if ($this->protocol !== 'http/protobuf') {
             throw new InvalidArgumentException('Invalid OTLP Protocol Specified');
         }
     }
@@ -160,11 +162,6 @@ class Exporter implements Trace\SpanExporterInterface
         return new Exporter(
             (new ConfigOpts())->withEndpoint($endpointUrl),
         );
-    }
-
-    public static function create(): Exporter
-    {
-        return new self();
     }
 
     public function setSpanConverter(SpanConverter $spanConverter): void
