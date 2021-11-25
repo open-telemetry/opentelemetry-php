@@ -35,7 +35,7 @@ class Exporter implements Trace\SpanExporterInterface
     // private string $certificateFile;
 
     private array $headers;
-    private bool $compression;
+    private string $compression;
     private string $protocol;
 
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
@@ -171,6 +171,6 @@ class Exporter implements Trace\SpanExporterInterface
 
     private function shouldCompress(): bool
     {
-        return $this->compression && function_exists('gzencode');
+        return $this->compression === 'gzip' && function_exists('gzencode');
     }
 }

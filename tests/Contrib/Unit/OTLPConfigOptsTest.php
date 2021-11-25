@@ -38,7 +38,7 @@ class OTLPConfigOptsTest extends TestCase
             ], $opts->getHeaders());
         $this->assertTrue($opts->getInsecure());
         $this->assertSame('', $opts->getCertificateFile());
-        $this->assertTrue($opts->getCompression());
+        $this->assertSame('gzip', $opts->getCompression());
         $this->assertSame(10, $opts->getTimeout());
     }
 
@@ -66,7 +66,7 @@ class OTLPConfigOptsTest extends TestCase
         ], $opts->getHeaders());
         $this->assertTrue($opts->getInsecure());
         $this->assertSame('/path/to/cacert', $opts->getCertificateFile());
-        $this->assertTrue($opts->getCompression());
+        $this->assertSame('gzip', $opts->getCompression());
         $this->assertSame(20, $opts->getTimeout());
         $this->assertSame('localhost:4317', $opts->getEndpoint());
         $this->assertSame('grpc', $opts->getProtocol());

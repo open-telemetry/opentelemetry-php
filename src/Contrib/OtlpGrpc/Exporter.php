@@ -21,7 +21,7 @@ class Exporter implements Trace\SpanExporterInterface
     private $protocol;
     private bool $insecure;
     private string $certificateFile;
-    private bool $compression;
+    private string $compression;
     private int $timeout;
     private SpanConverter $spanConverter;
     private array $metadata;
@@ -63,7 +63,7 @@ class Exporter implements Trace\SpanExporterInterface
             'credentials' => $this->getCredentials(),
         ];
 
-        if ($this->compression) {
+        if ($this->compression === 'gzip') {
             // gzip is the only specified compression method for now
             $opts['grpc.default_compression_algorithm'] = 2;
         }

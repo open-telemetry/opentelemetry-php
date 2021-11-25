@@ -16,7 +16,7 @@ class ConfigOpts
     private ?array $headers = null;
     private ?bool $insecure = null;
     private ?string $certificateFile = null;
-    private ?bool $compression = null;
+    private ?string $compression = null;
     private ?int $timeout = null;
 
     public function withEndpoint(string $endpoint)
@@ -63,9 +63,9 @@ class ConfigOpts
         return $metadata;
     }
 
-    public function withCompression(): self
+    public function withCompression(string $compression = 'gzip'): self
     {
-        $this->compression = true;
+        $this->compression = $compression;
 
         return $this;
     }
@@ -119,27 +119,16 @@ class ConfigOpts
 
     public function getCertificateFile(): string
     {
-        return $this->certificateFile ?: $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_CERTIFICATE', '');
+        return $this->certificateFile ?: getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: getenv('OTLP_EXPORTER_OTLP_TRACES_CERTIFICATE') ?: '';
     }
 
-    public function getCompression(): bool
+    public function getCompression(): string
     {
-        if (null !== $this->compression) {
-            return $this->compression;
-        }
-        switch (getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: getenv('OTEL_EXPORTER_OTLP_TRACES_COMPORESSION') ?: 'none') {
-            case 'none':
-                return false;
-            case 'gzip':
-                return true;
-            default:
-                throw new InvalidArgumentException('Unknown compression value');
-        }
+        return $this->compression ?: getenv('OTEL_EXPORTER_OTLP_COMPRESSION') ?: getenv('OTEL_EXPORTER_OTLP_TRACES_COMPRESSION') ?: 'none';
     }
 
     public function getTimeout(): int
     {
-        //TODO OTEL_EXPORTER_OTLP_TRACES_TIMEOUT
         return $this->timeout ?: $this->getIntFromEnvironment(
             'OTEL_EXPORTER_OTLP_TIMEOUT',
             $this->getIntFromEnvironment('OTEL_EXPORTER_OTLP_TRACES_TIMEOUT', 10)
