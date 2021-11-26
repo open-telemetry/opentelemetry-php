@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpHttp;
 
-use Http\Discovery\HttpClientDiscovery;
-use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
 use Nyholm\Dsn\DsnParser;
 use OpenTelemetry\Contrib\Otlp\ConfigOpts;
@@ -14,10 +12,7 @@ use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\StreamFactoryInterface;
 
 class Exporter implements Trace\SpanExporterInterface
 {
@@ -48,17 +43,14 @@ class Exporter implements Trace\SpanExporterInterface
      */
     public function __construct(
         ConfigOpts $config = null,
-        ClientInterface $client = null,
-        RequestFactoryInterface $requestFactory = null,
-        StreamFactoryInterface $streamFactory = null,
         SpanConverter $spanConverter = null
     ) {
         if (null === $config) {
             $config = new ConfigOpts();
         }
-        $this->setClient($client ?? HttpClientDiscovery::find());
-        $this->setRequestFactory($requestFactory ?? Psr17FactoryDiscovery::findRequestFactory());
-        $this->setStreamFactory($streamFactory ?? Psr17FactoryDiscovery::findStreamFactory());
+        $this->setClient($config->getHttpClient());
+        $this->setRequestFactory($config->getHttpRequestFactory());
+        $this->setStreamFactory($config->getHttpStreamFactory());
         $this->setEndpointUrl($this->validateEndpoint($config->getEndpoint()));
         // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
         // $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';

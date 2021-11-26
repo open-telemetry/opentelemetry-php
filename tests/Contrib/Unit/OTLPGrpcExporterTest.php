@@ -42,15 +42,18 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
     public function testExporterHappyPath(): void
     {
         $exporter = new Exporter(
-            $this->config->withProtocol('grpc'),
-            $this->createMockTraceServiceClient([
-                'expectations' => [
-                    'num_spans' => 1,
-                ],
-                'return_values' => [
-                    'status_code' => \Grpc\STATUS_OK,
-                ],
-            ])
+            $this->config
+                ->withProtocol('grpc')
+                ->withGrpcTraceServiceClient(
+                    $this->createMockTraceServiceClient([
+                        'expectations' => [
+                            'num_spans' => 1,
+                        ],
+                        'return_values' => [
+                            'status_code' => \Grpc\STATUS_OK,
+                        ],
+                    ])
+                )
         );
 
         $exporterStatusCode = $exporter->export([new SpanData()]);
@@ -61,15 +64,16 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
     public function testExporterUnexpectedGrpcResponseStatus(): void
     {
         $exporter = new Exporter(
-            $this->config,
-            $this->createMockTraceServiceClient([
-                'expectations' => [
-                    'num_spans' => 1,
-                ],
-                'return_values' => [
-                    'status_code' => 'An unexpected status',
-                ],
-            ])
+            $this->config->withGrpcTraceServiceClient(
+                $this->createMockTraceServiceClient([
+                    'expectations' => [
+                        'num_spans' => 1,
+                    ],
+                    'return_values' => [
+                        'status_code' => 'An unexpected status',
+                    ],
+                ])
+            )
         );
 
         $exporterStatusCode = $exporter->export([new SpanData()]);

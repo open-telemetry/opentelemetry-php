@@ -56,7 +56,11 @@ class OtlpBench
     public function setUpGrpc(): void
     {
         $client = $this->createMockTraceServiceClient();
-        $exporter = new GrpcExporter($this->config->withProtocol('grpc'), $client);
+        $exporter = new GrpcExporter(
+            $this->config
+                ->withProtocol('grpc')
+                ->withGrpcTraceServiceClient($client)
+        );
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer();
@@ -81,8 +85,13 @@ class OtlpBench
             ->allows(['createRequest' => $request]);
         $streamFactory = Mockery::mock(StreamFactoryInterface::class)
             ->allows(['createStream' => $stream]);
-        // @phpstan-ignore-next-line
-        $exporter = new HttpExporter($this->config, $client, $requestFactory, $streamFactory);
+
+        $exporter = new HttpExporter(
+            $this->config
+                ->withHttpClient($client) //@phpstan-ignore-line
+                ->withHttpRequestFactory($requestFactory) //@phpstan-ignore-line
+                ->withHttpStreamFactory($streamFactory) //@phpstan-ignore-line
+        );
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer();

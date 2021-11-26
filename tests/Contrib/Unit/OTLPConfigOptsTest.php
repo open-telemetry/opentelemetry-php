@@ -7,8 +7,12 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\Otlp\ConfigOpts;
-
+use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+
+use Psr\Http\Message\StreamFactoryInterface;
 
 class OTLPConfigOptsTest extends TestCase
 {
@@ -129,5 +133,36 @@ class OTLPConfigOptsTest extends TestCase
             '#2' => ['a,,l'],
             '#3' => ['header-1'],
         ];
+    }
+
+    public function testUsesHttpDiscoveryForDefaults(): void
+    {
+        $config = (new ConfigOpts());
+        $this->assertInstanceOf(ClientInterface::class, $config->getHttpClient());
+        $this->assertInstanceOf(RequestFactoryInterface::class, $config->getHttpRequestFactory());
+        $this->assertInstanceOf(StreamFactoryInterface::class, $config->getHttpStreamFactory());
+    }
+
+    public function testAcceptsConcretePsrImplementations(): void
+    {
+        $client = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+
+        $config = (new ConfigOpts())
+            ->withHttpClient($client)
+            ->withHttpRequestFactory($requestFactory)
+            ->withHttpStreamFactory($streamFactory);
+
+        $this->assertInstanceOf(ClientInterface::class, $config->getHttpClient());
+        $this->assertInstanceOf(RequestFactoryInterface::class, $config->getHttpRequestFactory());
+        $this->assertInstanceOf(StreamFactoryInterface::class, $config->getHttpStreamFactory());
+    }
+
+    public function testGrpcTraceServiceClient(): void
+    {
+        $client = $this->createMock(TraceServiceClient::class);
+        $config = (new ConfigOpts())->withGrpcTraceServiceClient($client);
+        $this->assertSame($client, $config->getGrpcTraceServiceClient());
     }
 }

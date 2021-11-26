@@ -31,8 +31,7 @@ class Exporter implements Trace\SpanExporterInterface
      * OTLP GRPC Exporter Constructor
      */
     public function __construct(
-        ConfigOpts $config = null,
-        TraceServiceClient $client = null
+        ConfigOpts $config = null
     ) {
         if (null === $config) {
             $config = new ConfigOpts();
@@ -43,7 +42,7 @@ class Exporter implements Trace\SpanExporterInterface
         $this->timeout = $config->getTimeout();
         $this->setMetadata($config->getHeaders());
         $opts = $this->getClientOptions();
-        $this->client = $client ?? new TraceServiceClient($config->getEndpoint(), $opts);
+        $this->client = $config->getGrpcTraceServiceClient() ?? new TraceServiceClient($config->getEndpoint(), $opts);
         $this->protocol = $config->getProtocol();
         if ($this->protocol !== 'grpc') {
             throw new InvalidArgumentException('Invalid OTLP Protocol Specified');

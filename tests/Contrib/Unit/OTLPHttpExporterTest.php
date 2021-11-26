@@ -27,7 +27,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     public function setUp(): void
     {
         $this->mockClient = new MockClient();
-        $this->config = (new ConfigOpts());
+        $this->config = (new ConfigOpts())->withHttpClient($this->mockClient);
     }
 
     public function tearDown(): void
@@ -50,7 +50,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     {
         $this->mockClient->addResponse(new Response($responseStatus));
 
-        $exporter = new Exporter(null, $this->mockClient);
+        $exporter = new Exporter($this->config);
 
         $this->assertEquals(
             $expected,
@@ -81,7 +81,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         $client->method('sendRequest')->willThrowException($exception);
 
         /** @var ClientInterface $client */
-        $exporter = new Exporter(null, $client);
+        $exporter = new Exporter((new ConfigOpts())->withHttpClient($client));
 
         $this->assertEquals(
             $expected,
@@ -112,7 +112,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_HEADERS', 'x-auth-header=tomato');
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_COMPRESSION', 'gzip');
 
-        $exporter = new Exporter(null, $this->mockClient);
+        $exporter = new Exporter($this->config);
 
         $exporter->export([new SpanData()]);
 

@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
+use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
+use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 
 class ConfigOpts
 {
@@ -18,6 +24,10 @@ class ConfigOpts
     private ?string $certificateFile = null;
     private ?string $compression = null;
     private ?int $timeout = null;
+    private ?ClientInterface $httpClient = null;
+    private ?RequestFactoryInterface $requestFactory = null;
+    private ?StreamFactoryInterface $streamFactory = null;
+    private ?TraceServiceClient $traceServiceClient = null;
 
     public function withEndpoint(string $endpoint)
     {
@@ -91,6 +101,34 @@ class ConfigOpts
         return $this;
     }
 
+    public function withHttpClient(ClientInterface $client): self
+    {
+        $this->httpClient = $client;
+
+        return $this;
+    }
+
+    public function withHttpRequestFactory(RequestFactoryInterface $requestFactory): self
+    {
+        $this->requestFactory = $requestFactory;
+
+        return $this;
+    }
+
+    public function withHttpStreamFactory(StreamFactoryInterface $streamFactory): self
+    {
+        $this->streamFactory = $streamFactory;
+
+        return $this;
+    }
+
+    public function withGrpcTraceServiceClient(TraceServiceClient $client): self
+    {
+        $this->traceServiceClient = $client;
+
+        return $this;
+    }
+
     public function getEndpoint(): string
     {
         return $this->endpoint ?: getenv('OTEL_EXPORTER_OTLP_ENDPOINT') ?: getenv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT') ?: 'http://localhost:4318';
@@ -133,6 +171,25 @@ class ConfigOpts
             'OTEL_EXPORTER_OTLP_TIMEOUT',
             $this->getIntFromEnvironment('OTEL_EXPORTER_OTLP_TRACES_TIMEOUT', 10)
         );
+    }
+    public function getHttpClient(): ClientInterface
+    {
+        return $this->httpClient ?: HttpClientDiscovery::find();
+    }
+
+    public function getHttpRequestFactory(): RequestFactoryInterface
+    {
+        return $this->requestFactory ?: Psr17FactoryDiscovery::findRequestFactory();
+    }
+
+    public function getHttpStreamFactory(): StreamFactoryInterface
+    {
+        return $this->streamFactory ?: Psr17FactoryDiscovery::findStreamFactory();
+    }
+
+    public function getGrpcTraceServiceClient(): ?TraceServiceClient
+    {
+        return $this->traceServiceClient;
     }
 }
 
