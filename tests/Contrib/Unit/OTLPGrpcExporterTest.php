@@ -61,6 +61,14 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertSame(SpanExporterInterface::STATUS_SUCCESS, $exporterStatusCode);
     }
 
+    public function testCreateFromEnvironmentWithInvalidProtocol(): void
+    {
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_PROTOCOL', 'foo');
+        $this->expectException(\InvalidArgumentException::class);
+
+        $exporter = new Exporter();
+    }
+
     public function testExporterUnexpectedGrpcResponseStatus(): void
     {
         $exporter = new Exporter(
