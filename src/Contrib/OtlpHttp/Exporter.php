@@ -42,8 +42,7 @@ class Exporter implements Trace\SpanExporterInterface
      * Exporter constructor.
      */
     public function __construct(
-        ConfigOpts $config = null,
-        SpanConverter $spanConverter = null
+        ConfigOpts $config = null
     ) {
         if (null === $config) {
             $config = new ConfigOpts();
@@ -60,7 +59,7 @@ class Exporter implements Trace\SpanExporterInterface
         // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
         // $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
 
-        $this->setSpanConverter($spanConverter ?? new SpanConverter());
+        $this->setSpanConverter(new SpanConverter());
 
         if ($this->protocol !== 'http/protobuf') {
             throw new InvalidArgumentException('Invalid OTLP Protocol Specified');

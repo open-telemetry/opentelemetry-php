@@ -18,7 +18,7 @@ class Exporter implements Trace\SpanExporterInterface
     use EnvironmentVariablesTrait;
     use SpanExporterTrait;
 
-    private $protocol;
+    private string $protocol;
     private bool $insecure;
     private string $certificateFile;
     private string $compression;
