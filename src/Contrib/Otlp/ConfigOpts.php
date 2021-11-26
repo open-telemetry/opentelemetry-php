@@ -192,11 +192,3 @@ class ConfigOpts
         return $this->traceServiceClient;
     }
 }
-
-/*
-
-Notes:
-otel-go on splitting http/grpc
-https://github.com/open-telemetry/opentelemetry-go/issues/1085#issuecomment-808438423
-
-*/

@@ -100,33 +100,6 @@ class Exporter implements Trace\SpanExporterInterface
     }
 
     /**
-     * processHeaders converts comma separated headers into an array
-     */
-    public function processHeaders(?string $headers): array
-    {
-        if (empty($headers)) {
-            return [];
-        }
-
-        $pairs = explode(',', $headers);
-
-        $metadata = [];
-        foreach ($pairs as $pair) {
-            $kv = explode('=', $pair, 2);
-
-            if (count($kv) !== 2) {
-                throw new InvalidArgumentException('Invalid headers passed');
-            }
-
-            [$key, $value] = $kv;
-
-            $metadata[$key] = $value;
-        }
-
-        return $metadata;
-    }
-
-    /**
      * validateEndpoint does two functions, firstly checks that the endpoint is valid
      *  secondly it appends https:// and /v1/traces should they have been omitted
      */
