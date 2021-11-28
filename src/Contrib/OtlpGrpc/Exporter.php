@@ -6,7 +6,6 @@ namespace OpenTelemetry\Contrib\OtlpGrpc;
 
 use grpc;
 use InvalidArgumentException;
-use OpenTelemetry\Contrib\Otlp\ConfigOpts;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
@@ -18,36 +17,56 @@ class Exporter implements Trace\SpanExporterInterface
     use EnvironmentVariablesTrait;
     use SpanExporterTrait;
 
-    private string $protocol;
+    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+    // private $protocol;
+
     private bool $insecure;
+
     private string $certificateFile;
-    private string $compression;
+
+    private bool $compression;
+
     private int $timeout;
+
     private SpanConverter $spanConverter;
+
     private array $metadata;
+
     private TraceServiceClient $client;
 
     /**
      * OTLP GRPC Exporter Constructor
      */
     public function __construct(
-        ConfigOpts $config = null
+        string $endpointURL = 'localhost:4317',
+        bool $insecure = true,
+        string $certificateFile = '',
+        string $headers = '',
+        bool $compression = false,
+        int $timeout = 10,
+        TraceServiceClient $client = null
     ) {
-        if (null === $config) {
-            $config = new ConfigOpts();
-        }
-        $this->insecure = $config->getInsecure();
-        $this->certificateFile = $config->getCertificateFile();
-        $this->compression = $config->getCompression();
-        $this->timeout = $config->getTimeout();
-        $this->setMetadata($config->getHeaders());
-        $opts = $this->getClientOptions();
-        $this->client = $config->getGrpcTraceServiceClient() ?? new TraceServiceClient($config->getEndpoint(), $opts);
-        $this->protocol = $config->getProtocol();
-        if ($this->protocol !== 'grpc') {
-            throw new InvalidArgumentException('Invalid OTLP Protocol Specified');
-        }
+
+        // Set default values based on presence of env variable
+        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
+        // $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc'; // I guess this is redundant?
+        $this->insecure = $this->getBooleanFromEnvironment('OTEL_EXPORTER_OTLP_INSECURE', $insecure);
+        $this->certificateFile = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_CERTIFICATE', $certificateFile);
+        $this->compression = $this->getBooleanFromEnvironment('OTEL_EXPORTER_OTLP_COMPRESSION', $compression);
+        $this->timeout = $this->getIntFromEnvironment('OTEL_EXPORTER_OTLP_TIMEOUT', $timeout);
+
         $this->spanConverter = new SpanConverter();
+
+        $this->metadata = $this->metadataFromHeaders(
+            $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', $headers)
+        );
+
+        $opts = $this->getClientOptions();
+
+        $this->client = $client ?? new TraceServiceClient(
+            $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', $endpointURL),
+            $opts
+        );
     }
 
     /**
@@ -62,7 +81,7 @@ class Exporter implements Trace\SpanExporterInterface
             'credentials' => $this->getCredentials(),
         ];
 
-        if ($this->compression === 'gzip') {
+        if ($this->compression) {
             // gzip is the only specified compression method for now
             $opts['grpc.default_compression_algorithm'] = 2;
         }
@@ -105,18 +124,38 @@ class Exporter implements Trace\SpanExporterInterface
         return self::STATUS_FAILED_NOT_RETRYABLE;
     }
 
-    private function setMetadata(array $headers): void
+    public function setHeader($key, $value): void
     {
-        $metadata = [];
-        foreach ($headers as $key => $value) {
-            $metadata[$key] = [$value];
-        }
-        $this->metadata = $metadata;
+        $this->metadata[$key] = [$value];
     }
 
-    public function getMetadata(): array
+    public function getHeaders(): array
     {
         return $this->metadata;
+    }
+
+    public function metadataFromHeaders($headers): array
+    {
+        if (is_array($headers)) {
+            throw new InvalidArgumentException('Configuring Headers Via');
+        }
+
+        if (strlen($headers) <= 0) {
+            return [];
+        }
+
+        $pairs = explode(',', $headers);
+
+        $metadata = [];
+        foreach ($pairs as $pair) {
+            if (!strpos($pair, '=')) {
+                continue;
+            }
+            [$key, $value] = explode('=', $pair, 2);
+            $metadata[$key] = [$value];
+        }
+
+        return $metadata;
     }
 
     private function getCredentials(): ?\Grpc\ChannelCredentials
@@ -133,6 +172,6 @@ class Exporter implements Trace\SpanExporterInterface
     /** @inheritDoc */
     public static function fromConnectionString(string $endpointUrl, string $name = null, $args = null)
     {
-        return new Exporter((new ConfigOpts())->withEndpoint($endpointUrl)->withProtocol('grpc'));
+        return new Exporter($endpointUrl);
     }
 }
