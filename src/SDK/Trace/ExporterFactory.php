@@ -8,7 +8,6 @@ use InvalidArgumentException;
 use Nyholm\Dsn\DsnParser;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Newrelic\Exporter as NewrelicExporter;
-use OpenTelemetry\Contrib\Otlp\ConfigOpts;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OtlpGrpcExporter;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter as OtlpHttpExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
@@ -110,9 +109,9 @@ class ExporterFactory
                 }
                 switch ($protocol) {
                     case 'grpc':
-                        return new OtlpGrpcExporter((new ConfigOpts())->withProtocol($protocol));
+                        return new OtlpGrpcExporter();
                     case 'http/protobuf':
-                        return new OtlpHttpExporter((new ConfigOpts())->withProtocol($protocol));
+                        return OtlpHttpExporter::create();
                     case 'http/json':
                         throw new InvalidArgumentException('otlp+http/json not implemented');
                     default:

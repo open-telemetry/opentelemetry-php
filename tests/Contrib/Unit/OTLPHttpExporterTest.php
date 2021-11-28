@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
-use Http\Mock\Client as MockClient;
-use OpenTelemetry\Contrib\Otlp\ConfigOpts;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Tests\SDK\Unit\Trace\SpanExporter\AbstractExporterTest;
@@ -21,26 +24,24 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     use EnvironmentVariables;
     use UsesHttpClientTrait;
 
-    private ConfigOpts $config;
-    private MockClient $mockClient;
-
-    public function setUp(): void
-    {
-        $this->mockClient = new MockClient();
-        $this->config = (new ConfigOpts())->withHttpClient($this->mockClient);
-    }
-
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     /**
      * @psalm-suppress PossiblyInvalidArgument
      */
     public function createExporter(): SpanExporterInterface
     {
-        return new Exporter();
+        return new Exporter(
+            $this->getClientInterfaceMock(),
+            $this->getRequestFactoryInterfaceMock(),
+            $this->getStreamFactoryInterfaceMock()
+        );
+    }
+
+    /**
+     * @after
+     */
+    public function cleanUpEnvVars(): void
+    {
+        $this->restoreEnvironmentVariables();
     }
 
     /**
@@ -48,9 +49,12 @@ class OTLPHttpExporterTest extends AbstractExporterTest
      */
     public function testExporterResponseStatus($responseStatus, $expected): void
     {
-        $this->mockClient->addResponse(new Response($responseStatus));
-
-        $exporter = new Exporter($this->config);
+        $client = $this->createMock(ClientInterface::class);
+        $client->method('sendRequest')->willReturn(
+            new Response($responseStatus)
+        );
+        /** @var ClientInterface $client */
+        $exporter = new Exporter($client, new HttpFactory(), new HttpFactory());
 
         $this->assertEquals(
             $expected,
@@ -81,7 +85,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         $client->method('sendRequest')->willThrowException($exception);
 
         /** @var ClientInterface $client */
-        $exporter = new Exporter((new ConfigOpts())->withHttpClient($client));
+        $exporter = new Exporter($client, new HttpFactory(), new HttpFactory());
 
         $this->assertEquals(
             $expected,
@@ -104,33 +108,83 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     }
 
     /**
+     * @dataProvider processHeadersDataHandler
+     */
+    public function testProcessHeaders($input, $expected): void
+    {
+        $headers = (new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->processHeaders($input);
+
+        $this->assertEquals($expected, $headers);
+    }
+
+    public function processHeadersDataHandler(): array
+    {
+        return [
+            'No Headers' => ['', []],
+            'Empty Header' => ['empty=', ['empty' => '']],
+            'One Header' => ['header-1=one', ['header-1' => 'one']],
+            'Two Headers' => ['header-1=one,header-2=two', ['header-1' => 'one', 'header-2' => 'two']],
+            'Two Equals' => ['header-1=bWFkZSB5b3UgbG9vaw==,header-2=two', ['header-1' => 'bWFkZSB5b3UgbG9vaw==', 'header-2' => 'two']],
+            'Unicode' => ['héader-1=one', ['héader-1' => 'one']],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider invalidHeadersDataHandler
+     */
+    public function testInvalidHeaders($input): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $headers = (new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->processHeaders($input);
+    }
+
+    public function invalidHeadersDataHandler(): array
+    {
+        return [
+            '#1' => ['a:b,c'],
+            '#2' => ['a,,l'],
+            '#3' => ['header-1'],
+        ];
+    }
+
+    /**
      * @dataProvider exporterEndpointDataProvider
      */
     public function testExporterWithConfigViaEnvVars(?string $endpoint, string $expectedEndpoint)
     {
+        $mock = new MockHandler([
+            new Response(200, [], 'ff'),
+        ]);
+
+        $container = [];
+        $history = Middleware::history($container);
+        $stack = HandlerStack::create($mock);
+        $stack->push($history);
+
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_ENDPOINT', $endpoint);
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_HEADERS', 'x-auth-header=tomato');
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_COMPRESSION', 'gzip');
 
-        $exporter = new Exporter($this->config);
+        $client = new Client(['handler' => $stack]);
+        $exporter = new Exporter($client, new HttpFactory(), new HttpFactory());
 
         $exporter->export([new SpanData()]);
 
-        $request = $this->mockClient->getRequests()[0];
+        $request = $container[0]['request'];
 
         $this->assertEquals($expectedEndpoint, $request->getUri()->__toString());
         $this->assertEquals('POST', $request->getMethod());
         $this->assertEquals(['tomato'], $request->getHeader('x-auth-header'));
         $this->assertEquals(['gzip'], $request->getHeader('Content-Encoding'));
         $this->assertEquals(['application/x-protobuf'], $request->getHeader('content-type'));
-        $request->getBody()->rewind();
-        $this->assertNotEquals(0, $request->getBody()->getSize());
+        $this->assertNotEquals(0, strlen($request->getBody()->getContents()));
     }
 
     public function exporterEndpointDataProvider(): array
     {
         return [
-            'Default Endpoint' => ['', 'http://localhost:4318/v1/traces'],
+            'Default Endpoint' => ['', 'https://localhost:4318/v1/traces'],
             'Custom Endpoint' => ['https://otel-collector:4318/custom/path', 'https://otel-collector:4318/custom/path'],
             'Insecure Endpoint' => ['http://api.example.com:80/v1/traces', 'http://api.example.com/v1/traces'],
             'Without Path' => ['https://api.example.com', 'https://api.example.com/v1/traces'],
@@ -146,7 +200,11 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     {
         $this->assertEquals(
             SpanExporterInterface::STATUS_SUCCESS,
-            (new Exporter($this->config))->export([])
+            (new Exporter(
+                $this->getClientInterfaceMock(),
+                $this->getRequestFactoryInterfaceMock(),
+                $this->getStreamFactoryInterfaceMock()
+            ))->export([])
         );
     }
 
@@ -162,7 +220,11 @@ class OTLPHttpExporterTest extends AbstractExporterTest
 
         $this->expectException(\InvalidArgumentException::class);
 
-        new Exporter($this->config);
+        new Exporter(
+            $this->getClientInterfaceMock(),
+            $this->getRequestFactoryInterfaceMock(),
+            $this->getStreamFactoryInterfaceMock()
+        );
     }
 
     /**
@@ -176,7 +238,11 @@ class OTLPHttpExporterTest extends AbstractExporterTest
 
         $this->expectException(\InvalidArgumentException::class);
 
-        new Exporter($this->config);
+        new Exporter(
+            $this->getClientInterfaceMock(),
+            $this->getRequestFactoryInterfaceMock(),
+            $this->getStreamFactoryInterfaceMock()
+        );
     }
 
     public function exporterInvalidEndpointDataProvider(): array

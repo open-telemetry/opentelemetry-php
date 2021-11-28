@@ -3,7 +3,6 @@ x-otel-common: &otel-common
   OTEL_TRACES_SAMPLER: parentbased_always_on
   OTEL_TRACES_EXPORTER: otlp
   OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: grpc
-  OTEL_EXPORTER_OTLP_INSECURE: 'true'
   OTEL_EXPORTER_OTLP_ENDPOINT: collector:4317
   OTEL_TRACES_PROCESSOR: simple
 
