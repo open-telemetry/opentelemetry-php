@@ -44,8 +44,8 @@ class ExporterFactoryTest extends TestCase
             'zipkin' => ['test.zipkin', 'zipkin+http://zipkin:9411/api/v2/spans', Path\Zipkin\Exporter::class],
             'jaeger' => ['test.jaeger', 'jaeger+http://jaeger:9412/api/v2/spans', Path\Jaeger\Exporter::class],
             'newrelic' => ['rest.newrelic', 'newrelic+https://trace-api.newrelic.com/trace/v1?licenseKey="23423423', Path\Newrelic\Exporter::class],
-            'otlp+http' => ['test.otlp', 'otlp+http://', Path\OtlpHttp\Exporter::class],
-            'otlp+grpc' => ['test.otlpgrpc', 'otlp+grpc://', Path\OtlpGrpc\Exporter::class],
+            'otlp+http' => ['test.otlp', 'otlp+http://localhost:4318', Path\OtlpHttp\Exporter::class],
+            'otlp+grpc' => ['test.otlpgrpc', 'otlp+grpc://localhost:4317', Path\OtlpGrpc\Exporter::class],
             'zipkintonewrelic' => ['test.zipkintonewrelic', 'zipkintonewrelic+https://trace-api.newrelic.com/trace/v1?licenseKey="23423423', Path\ZipkinToNewrelic\Exporter::class],
             'console' => ['test.console', 'console+php://stdout', ConsoleSpanExporter::class],
         ];
