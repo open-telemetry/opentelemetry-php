@@ -30,7 +30,7 @@ class SpanConverter implements SpanConverterInterface
         return [$this->as_otlp_resource_span($spans)];
     }
 
-    public function as_otlp_key_value($key, $value): KeyValue
+    private function as_otlp_key_value($key, $value): KeyValue
     {
         return new KeyValue([
             'key' => $key,
@@ -38,7 +38,7 @@ class SpanConverter implements SpanConverterInterface
         ]);
     }
 
-    public function as_otlp_any_value($value): AnyValue
+    private function as_otlp_any_value($value): AnyValue
     {
         $result = new AnyValue();
 
@@ -72,7 +72,7 @@ class SpanConverter implements SpanConverterInterface
         return $result;
     }
 
-    public function as_otlp_span_kind($kind): int
+    private function as_otlp_span_kind($kind): int
     {
         switch ($kind) {
             case 0: return SpanKind::SPAN_KIND_INTERNAL;
@@ -85,7 +85,7 @@ class SpanConverter implements SpanConverterInterface
         return SpanKind::SPAN_KIND_UNSPECIFIED;
     }
 
-    public function as_otlp_span(SpanDataInterface $span): CollectorSpan
+    private function as_otlp_span(SpanDataInterface $span): CollectorSpan
     {
         $parent_span = $span->getParentContext();
         $parent_span_id = $parent_span->isValid() ? $parent_span->getSpanId() : null;
@@ -169,7 +169,7 @@ class SpanConverter implements SpanConverterInterface
     }
 
     // @return KeyValue[]
-    public function as_otlp_resource_attributes(iterable $spans): array
+    private function as_otlp_resource_attributes(iterable $spans): array
     {
         $attrs = [];
         foreach ($spans as $span) {
@@ -181,7 +181,7 @@ class SpanConverter implements SpanConverterInterface
         return array_values($attrs);
     }
 
-    public function as_otlp_resource_span(iterable $spans): ResourceSpans
+    private function as_otlp_resource_span(iterable $spans): ResourceSpans
     {
         $isSpansEmpty = true; //Waiting for the loop to prove otherwise
 
