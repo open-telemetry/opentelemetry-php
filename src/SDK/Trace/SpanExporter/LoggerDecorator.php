@@ -63,7 +63,7 @@ class LoggerDecorator implements SpanExporterInterface, LoggerAwareInterface
     {
         $this->log(
             self::MESSAGE_MAPPING[$exporterResponse],
-            $this->convertSpanCollection($spans),
+            $this->getSpanConverter()->convert($spans),
             self::RESPONSE_MAPPING[$exporterResponse]
         );
     }

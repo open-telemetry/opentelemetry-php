@@ -172,11 +172,6 @@ class Exporter implements Trace\SpanExporterInterface
         return self::fromConnectionString();
     }
 
-    //public function setSpanConverter(SpanConverter $spanConverter): void
-    //{
-    //    $this->spanConverter = $spanConverter;
-    //}
-
     private function shouldCompress(): bool
     {
         return $this->compression === 'gzip' && function_exists('gzencode');

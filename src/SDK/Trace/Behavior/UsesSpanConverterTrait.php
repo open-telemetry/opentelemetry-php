@@ -38,13 +38,4 @@ trait UsesSpanConverterTrait
     {
         return $this->getSpanConverter()->convert([$span]);
     }
-
-    /**
-     * @param iterable $spans
-     * @return array
-     */
-    protected function convertSpanCollection(iterable $spans): array
-    {
-        return $this->getSpanConverter()->convert($spans);
-    }
 }
