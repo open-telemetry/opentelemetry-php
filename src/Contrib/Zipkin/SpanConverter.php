@@ -10,6 +10,7 @@ use OpenTelemetry\API\Trace\AttributeInterface;
 use OpenTelemetry\API\Trace\EventInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
+use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
 use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -131,17 +132,17 @@ class SpanConverter implements SpanConverterInterface
         return $row;
     }
 
-    private static function toSpanKind(SpanDataInterface $span): ?int
+    private static function toSpanKind(SpanDataInterface $span): ?string
     {
         switch ($span->getKind()) {
           case SpanKind::KIND_SERVER:
-            return SpanKind::KIND_SERVER;
+            return ZipkinSpanKind::KIND_SERVER;
           case SpanKind::KIND_CLIENT:
-            return SpanKind::KIND_CLIENT;
+            return ZipkinSpanKind::KIND_CLIENT;
           case SpanKind::KIND_PRODUCER:
-            return SpanKind::KIND_PRODUCER;
+            return ZipkinSpanKind::KIND_PRODUCER;
           case SpanKind::KIND_CONSUMER:
-            return SpanKind::KIND_CONSUMER;
+            return ZipkinSpanKind::KIND_CONSUMER;
           case SpanKind::KIND_INTERNAL:
             return null;
         }
