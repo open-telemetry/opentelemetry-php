@@ -65,7 +65,17 @@ class SpanConverter implements SpanConverterInterface
         return (string) $value;
     }
 
-    public function convert(SpanDataInterface $span): array
+    public function convert(iterable $spans): array
+    {
+        $aggregate = [];
+        foreach ($spans as $span) {
+            $aggregate[] = $this->convertSpan($span);
+        }
+
+        return $aggregate;
+    }
+
+    private function convertSpan(SpanDataInterface $span): array
     {
         $spanParent = $span->getParentContext();
 

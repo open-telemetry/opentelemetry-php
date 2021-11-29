@@ -8,6 +8,7 @@ use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
 use Nyholm\Dsn\DsnParser;
+use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace;
@@ -43,8 +44,6 @@ class Exporter implements Trace\SpanExporterInterface
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
     // private int $timeout;
 
-    private SpanConverter $spanConverter;
-
     /**
      * Exporter constructor.
      */
@@ -76,10 +75,11 @@ class Exporter implements Trace\SpanExporterInterface
             throw new InvalidArgumentException('Invalid OTLP Protocol Specified');
         }
     }
+
     protected function serializeTrace(iterable $spans): string
     {
         $bytes = (new ExportTraceServiceRequest([
-            'resource_spans' => [$this->spanConverter->as_otlp_resource_span($spans)],
+            'resource_spans' => $this->getSpanConverter()->convert($spans),
         ]))->serializeToString();
 
         // TODO: Add Tests
@@ -172,10 +172,10 @@ class Exporter implements Trace\SpanExporterInterface
         return self::fromConnectionString();
     }
 
-    public function setSpanConverter(SpanConverter $spanConverter): void
-    {
-        $this->spanConverter = $spanConverter;
-    }
+    //public function setSpanConverter(SpanConverter $spanConverter): void
+    //{
+    //    $this->spanConverter = $spanConverter;
+    //}
 
     private function shouldCompress(): bool
     {

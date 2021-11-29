@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Contrib\OtlpHttp;
+namespace OpenTelemetry\Contrib\Otlp;
 
 use function array_key_exists;
 use function hex2bin;
@@ -20,10 +20,16 @@ use Opentelemetry\Proto\Trace\V1\Span\Link;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
+use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
-class SpanConverter
+class SpanConverter implements SpanConverterInterface
 {
+    public function convert(iterable $spans): array
+    {
+        return [$this->as_otlp_resource_span($spans)];
+    }
+
     public function as_otlp_key_value($key, $value): KeyValue
     {
         return new KeyValue([

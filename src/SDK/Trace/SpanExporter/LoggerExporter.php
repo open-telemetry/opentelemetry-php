@@ -107,7 +107,7 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
         }
 
         foreach ($spans as $span) {
-            $this->log($this->serviceName, $this->convertSpan($span));
+            $this->log($this->serviceName, $this->convertSpanCollection([$span]));
         }
     }
 }

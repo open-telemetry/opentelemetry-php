@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use function bin2hex;
 use OpenTelemetry\API\Trace\SpanContext;
-use OpenTelemetry\Contrib\OtlpHttp\SpanConverter;
+use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Common\V1\AnyValue;
 use Opentelemetry\Proto\Common\V1\ArrayValue;
 use Opentelemetry\Proto\Common\V1\KeyValue;
@@ -245,7 +245,7 @@ class OTLPHttpSpanConverterTest extends TestCase
     }
 
     /**
-     * @covers OpenTelemetry\Contrib\OtlpHttp\SpanConverter::as_otlp_resource_attributes
+     * @covers OpenTelemetry\Contrib\Otlp\SpanConverter::as_otlp_resource_attributes
      */
     public function testResourcesFromMultipleSpansAreNotDuplicated()
     {
