@@ -8,6 +8,7 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
+use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\Attributes;
@@ -111,7 +112,7 @@ class ZipkinSpanConverterTest extends TestCase
         $converter = new SpanConverter('unused');
         $row = $converter->convert($span);
 
-        $this->assertSame(SpanKind::KIND_SERVER, $row['kind']);
+        $this->assertSame(ZipkinSpanKind::KIND_SERVER, $row['kind']);
     }
 
     /**
@@ -125,7 +126,7 @@ class ZipkinSpanConverterTest extends TestCase
         $converter = new SpanConverter('unused');
         $row = $converter->convert($span);
 
-        $this->assertSame(SpanKind::KIND_CLIENT, $row['kind']);
+        $this->assertSame(ZipkinSpanKind::KIND_CLIENT, $row['kind']);
     }
 
     /**
@@ -139,7 +140,7 @@ class ZipkinSpanConverterTest extends TestCase
         $converter = new SpanConverter('unused');
         $row = $converter->convert($span);
 
-        $this->assertSame(SpanKind::KIND_PRODUCER, $row['kind']);
+        $this->assertSame(ZipkinSpanKind::KIND_PRODUCER, $row['kind']);
     }
 
     /**
@@ -153,7 +154,7 @@ class ZipkinSpanConverterTest extends TestCase
         $converter = new SpanConverter('unused');
         $row = $converter->convert($span);
 
-        $this->assertSame(SpanKind::KIND_CONSUMER, $row['kind']);
+        $this->assertSame(ZipkinSpanKind::KIND_CONSUMER, $row['kind']);
     }
 
     /**
