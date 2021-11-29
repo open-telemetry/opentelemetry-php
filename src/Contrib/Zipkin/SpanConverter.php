@@ -170,12 +170,12 @@ class SpanConverter implements SpanConverterInterface
         if (count($event->getAttributes()) === 0) {
             return null;
         }
-        
+
         $attributesArray = [];
         foreach ($event->getAttributes() as $attr) {
             $attributesArray[$attr->getKey()] = $attr->getValue();
         }
-        
+
         $attributesAsJson = json_encode($attributesArray);
         if (($attributesAsJson === false) || (strlen($attributesAsJson) === 0)) {
             return null;
