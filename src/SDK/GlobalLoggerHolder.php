@@ -19,8 +19,8 @@ final class GlobalLoggerHolder
     public static function get(): LoggerInterface
     {
         if (null === self::$logger) {
-            //TODO build a stdout logger from env vars?
-            $level = getenv('OTEL_LOG_LEVEL') ?: 'info';
+            //TODO a sensible default, instead of NullLogger, could be to log to stdout
+            //$level = getenv('OTEL_LOG_LEVEL') ?: 'info';
 
             return new NullLogger();
         }
