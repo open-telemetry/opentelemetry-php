@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\SDK\GlobalLoggerHolder;
 
 final class TracerProviderFactory
 {
@@ -25,9 +26,26 @@ final class TracerProviderFactory
 
     public function create(): API\TracerProviderInterface
     {
-        $exporter = $this->exporterFactory->fromEnvironment();
-        $sampler = $this->samplerFactory->fromEnvironment();
-        $spanProcessor = $this->spanProcessorFactory->fromEnvironment($exporter);
+        try {
+            $exporter = $this->exporterFactory->fromEnvironment();
+        } catch (\Throwable $t) {
+            GlobalLoggerHolder::get()->warning('Unable to create exporter', ['error' => $t]);
+            $exporter = null;
+        }
+
+        try {
+            $sampler = $this->samplerFactory->fromEnvironment();
+        } catch (\Throwable $t) {
+            GlobalLoggerHolder::get()->warning('Unable to create sampler', ['error' => $t]);
+            $sampler = null;
+        }
+
+        try {
+            $spanProcessor = $this->spanProcessorFactory->fromEnvironment($exporter);
+        } catch (\Throwable $t) {
+            GlobalLoggerHolder::get()->warning('Unable to create span processor', ['error' => $t]);
+            $spanProcessor = null;
+        }
 
         return new TracerProvider(
             $spanProcessor,
