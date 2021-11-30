@@ -112,7 +112,7 @@ class ZipkinSpanConverterTest extends TestCase
         $converter = new SpanConverter('unused');
         $row = $converter->convert($span);
 
-        $this->assertSame(ZipkinSpanKind::KIND_SERVER, $row['kind']);
+        $this->assertSame(ZipkinSpanKind::SERVER, $row['kind']);
     }
 
     /**
@@ -126,7 +126,7 @@ class ZipkinSpanConverterTest extends TestCase
         $converter = new SpanConverter('unused');
         $row = $converter->convert($span);
 
-        $this->assertSame(ZipkinSpanKind::KIND_CLIENT, $row['kind']);
+        $this->assertSame(ZipkinSpanKind::CLIENT, $row['kind']);
     }
 
     /**
@@ -140,7 +140,7 @@ class ZipkinSpanConverterTest extends TestCase
         $converter = new SpanConverter('unused');
         $row = $converter->convert($span);
 
-        $this->assertSame(ZipkinSpanKind::KIND_PRODUCER, $row['kind']);
+        $this->assertSame(ZipkinSpanKind::PRODUCER, $row['kind']);
     }
 
     /**
@@ -154,7 +154,7 @@ class ZipkinSpanConverterTest extends TestCase
         $converter = new SpanConverter('unused');
         $row = $converter->convert($span);
 
-        $this->assertSame(ZipkinSpanKind::KIND_CONSUMER, $row['kind']);
+        $this->assertSame(ZipkinSpanKind::CONSUMER, $row['kind']);
     }
 
     /**

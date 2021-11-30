@@ -136,13 +136,13 @@ class SpanConverter implements SpanConverterInterface
     {
         switch ($span->getKind()) {
           case SpanKind::KIND_SERVER:
-            return ZipkinSpanKind::KIND_SERVER;
+            return ZipkinSpanKind::SERVER;
           case SpanKind::KIND_CLIENT:
-            return ZipkinSpanKind::KIND_CLIENT;
+            return ZipkinSpanKind::CLIENT;
           case SpanKind::KIND_PRODUCER:
-            return ZipkinSpanKind::KIND_PRODUCER;
+            return ZipkinSpanKind::PRODUCER;
           case SpanKind::KIND_CONSUMER:
-            return ZipkinSpanKind::KIND_CONSUMER;
+            return ZipkinSpanKind::CONSUMER;
           case SpanKind::KIND_INTERNAL:
             return null;
         }
