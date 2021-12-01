@@ -12,7 +12,7 @@ putenv('OTEL_LOG_LEVEL=warning');
 putenv('OTEL_TRACES_SAMPLER=traceidratio');
 putenv('OTEL_TRACES_SAMPLER_ARG=0.95');
 putenv('OTEL_TRACES_EXPORTER=console');
-putenv('OTEL_TRACES_PROCESSOR=batch'); //TODO not in spec, @see https://github.com/open-telemetry/opentelemetry-specification/issues/2110
+putenv('OTEL_PHP_TRACES_PROCESSOR=batch');
 putenv('OTEL_BSP_SCHEDULE_DELAY=10000');
 
 echo 'Creating Exporter From Environment' . PHP_EOL;
