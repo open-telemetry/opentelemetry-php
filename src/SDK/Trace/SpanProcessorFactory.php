@@ -13,9 +13,9 @@ class SpanProcessorFactory
 {
     public function fromEnvironment(?SpanExporterInterface $exporter = null): SpanProcessorInterface
     {
-        $name = getenv('OTEL_TRACES_PROCESSOR');
+        $name = getenv('OTEL_PHP_TRACES_PROCESSOR');
         if (!$name) {
-            throw new InvalidArgumentException('OTEL_TRACES_PROCESSOR not set');
+            throw new InvalidArgumentException('OTEL_PHP_TRACES_PROCESSOR not set');
         }
         switch ($name) {
             case 'batch':
@@ -23,6 +23,7 @@ class SpanProcessorFactory
             case 'simple':
                 return new SimpleSpanProcessor($exporter);
             case 'noop':
+            case 'none':
                 return NoopSpanProcessor::getInstance();
             default:
                 throw new InvalidArgumentException('Unknown processor: ' . $name);
