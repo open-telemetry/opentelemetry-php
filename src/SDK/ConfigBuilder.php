@@ -157,6 +157,9 @@ class ConfigBuilder
         return $output;
     }
 
+    /**
+     * Retrieve resource attributes from env var, and organise as key-value array
+     */
     private function resourceAttributes(): array
     {
         $output = [];
