@@ -27,7 +27,7 @@ class ConfigBuilderTest extends TestCase
 
     /**
      * @test
-     * @testdox It splits resource attributes from environment
+     * @testdox It splits resource attributes into an array from environment
      */
     public function resourceAttributes(): void
     {
@@ -45,17 +45,6 @@ class ConfigBuilderTest extends TestCase
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo=foo');
         $config = $this->builder->build(['resource' => ['attributes' => ['bar' => 'bar']]]);
         $this->assertSame(['foo' => 'foo', 'bar' => 'bar'], $config->resource->attributes);
-    }
-
-    /**
-     * @test
-     * @testdox It accepts multiple values for some env vars
-     */
-    public function acceptsMultipleValues(): void
-    {
-        $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', 'exporter_one,exporter_two');
-        $config = $this->builder->build();
-        $this->assertSame('exporter_one,exporter_two', $config->trace->exporter);
     }
 
     /**
