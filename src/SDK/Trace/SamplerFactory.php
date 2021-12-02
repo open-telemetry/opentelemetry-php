@@ -11,19 +11,15 @@ class SamplerFactory
 {
     use EnvironmentVariablesTrait;
 
-    public function fromEnvironment(): SamplerInterface
+    public function fromConfig(object $config): SamplerInterface
     {
-        $name = $this->getStringFromEnvironment('OTEL_TRACES_SAMPLER', '');
-        if (!$name) {
-            throw new InvalidArgumentException('OTEL_TRACES_SAMPLER not set');
-        }
-        $arg = $this->getStringFromEnvironment('OTEL_TRACES_SAMPLER_ARG', '');
+        //@var string $name
+        $name = $config->trace->sampler;
+        //@var float $arg
+        $arg = $config->trace->samplers->traceidratio->probability;
         if (false !== strpos($name, 'traceidratio')) {
             if (!$arg) {
                 throw new InvalidArgumentException('OTEL_TRACES_SAMPLER_ARG required for ratio-based sampler: ' . $name);
-            }
-            if (!is_numeric($arg)) {
-                throw new InvalidArgumentException('OTEL_TRACES_SAMPLER_ARG value is not numeric');
             }
         }
         switch ($name) {

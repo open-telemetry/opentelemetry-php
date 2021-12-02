@@ -21,11 +21,11 @@ class TracerProviderFactoryTest extends TestCase
         $samplerFactory = $this->createMock(SamplerFactory::class);
         $spanProcessorFactory = $this->createMock(SpanProcessorFactory::class);
 
-        $exporterFactory->expects($this->once())->method('fromEnvironment');
-        $samplerFactory->expects($this->once())->method('fromEnvironment');
-        $spanProcessorFactory->expects($this->once())->method('fromEnvironment');
+        $exporterFactory->expects($this->once())->method('fromConfig');
+        $samplerFactory->expects($this->once())->method('fromConfig');
+        $spanProcessorFactory->expects($this->once())->method('fromConfig');
 
         $factory = new TracerProviderFactory('test', $exporterFactory, $samplerFactory, $spanProcessorFactory);
-        $factory->create();
+        $factory->fromConfig((object) []);
     }
 }

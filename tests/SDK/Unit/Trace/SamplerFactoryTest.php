@@ -6,12 +6,20 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
+use OpenTelemetry\SDK\ConfigBuilder;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use PHPUnit\Framework\TestCase;
 
 class SamplerFactoryTest extends TestCase
 {
     use EnvironmentVariables;
+
+    private ConfigBuilder $configBuilder;
+
+    protected function setUp(): void
+    {
+        $this->configBuilder = new ConfigBuilder();
+    }
 
     protected function tearDown(): void
     {
@@ -27,7 +35,7 @@ class SamplerFactoryTest extends TestCase
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $samplerName);
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);
         $factory = new SamplerFactory();
-        $sampler = $factory->fromEnvironment();
+        $sampler = $factory->fromConfig($this->configBuilder->build());
         $this->assertStringContainsString($expected, $sampler->getDescription());
     }
 
@@ -40,6 +48,7 @@ class SamplerFactoryTest extends TestCase
             'parent based always on' => ['parentbased_always_on', 'ParentBased+AlwaysOn'],
             'parent based always off' => ['parentbased_always_off', 'ParentBased+AlwaysOff'],
             'parent based trade id ratio' => ['parentbased_traceidratio', 'ParentBased+TraceIdRatio', '0.95'],
+            'not set' => ['', 'ParentBased+AlwaysOn'],
         ];
     }
     /**
@@ -52,7 +61,7 @@ class SamplerFactoryTest extends TestCase
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);
         $factory = new SamplerFactory();
         $this->expectException(Exception::class);
-        $factory->fromEnvironment();
+        $factory->fromConfig($this->configBuilder->build());
     }
 
     public function invalidSamplerProvider()
@@ -63,7 +72,6 @@ class SamplerFactoryTest extends TestCase
             'ratio with invalid arg' => ['traceidratio', 'foo'],
             'parent ratio with invalid arg' => ['parentbased_traceidratio', 'foo'],
             'unknown sampler' => ['foo'],
-            'no sampler' => [null],
         ];
     }
 }

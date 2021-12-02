@@ -82,13 +82,10 @@ class ExporterFactory
         }
     }
 
-    public function fromEnvironment(): ?SpanExporterInterface
+    public function fromConfig(object $config): ?SpanExporterInterface
     {
-        $envValue = $this->getStringFromEnvironment('OTEL_TRACES_EXPORTER', '');
-        if (!$envValue) {
-            throw new InvalidArgumentException('OTEL_TRACES_EXPORTER not set');
-        }
-        $exporters = explode(',', $envValue);
+        //@array $exporters
+        $exporters = array_filter(explode(',', $config->trace->exporter));
         //TODO "The SDK MAY accept a comma-separated list to enable setting multiple exporters"
         if (1 !== count($exporters)) {
             throw new InvalidArgumentException('OTEL_TRACES_EXPORTER requires exactly 1 exporter');
@@ -103,10 +100,8 @@ class ExporterFactory
             case 'zipkintonewrelic':
                 throw new InvalidArgumentException(sprintf('Exporter %s cannot be created from environment', $exporter));
             case 'otlp':
-                $protocol = getenv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ?: getenv('OTEL_EXPORTER_OTLP_PROTOCOL');
-                if (!$protocol) {
-                    throw new InvalidArgumentException('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL or OTEL_EXPORTER_OTLP_PROTOCOL required');
-                }
+                //@var string $protocol
+                $protocol = $config->trace->exporters->otlp->protocol;
                 switch ($protocol) {
                     case 'grpc':
                         return new OtlpGrpcExporter();
