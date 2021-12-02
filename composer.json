@@ -55,7 +55,7 @@
         "assertwell/phpunit-global-state": "^0.2",
         "composer/xdebug-handler": "^2.0",
         "dg/bypass-finals": "^1.3",
-        "friendsofphp/php-cs-fixer": "dev-master",
+        "friendsofphp/php-cs-fixer": "^3.0",
         "guzzlehttp/guzzle": "^7.3",
         "guzzlehttp/psr7": "^2.0",
         "mikey179/vfsstream": "^1.6",
