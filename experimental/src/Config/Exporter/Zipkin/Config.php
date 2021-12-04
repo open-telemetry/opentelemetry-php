@@ -15,7 +15,7 @@ class Config implements ConfigInterface, ExporterConfigInterface
     public function __construct(array $userConfig, array $environmentConfig)
     {
         $this->endpoint = $userConfig['exporter.zipkin.endpoint'] ?? $environmentConfig['OTEL_EXPORTER_ZIPKIN_ENDPOINT'] ?? null;
-        $this->timeout = (int)($userConfig['exporter.zipkin.timeout'] ?? $environmentConfig['OTEL_EXPORTER_ZIPKIN_TIMEOUT'] ?? null);
+        $this->timeout = (int) ($userConfig['exporter.zipkin.timeout'] ?? $environmentConfig['OTEL_EXPORTER_ZIPKIN_TIMEOUT'] ?? null);
     }
 
     public static function provides(string $exporterName): bool

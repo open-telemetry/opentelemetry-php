@@ -4,8 +4,8 @@ declare(strict_types=1);
 require __DIR__ . '/../../vendor/autoload.php';
 
 use OpenTelemetry\Experimental\Config\ConfigBuilder;
-use OpenTelemetry\Experimental\Config\Exporter\Zipkin\Config as ZipkinConfig;
 use OpenTelemetry\Experimental\Config\Exporter\NewRelic\Config as NewRelicConfig;
+use OpenTelemetry\Experimental\Config\Exporter\Zipkin\Config as ZipkinConfig;
 
 //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md
 putenv('OTEL_RESOURCE_ATTRIBUTES=service.version=1.0.0,service.namespace=my_app');

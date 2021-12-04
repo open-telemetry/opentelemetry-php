@@ -38,18 +38,21 @@ class ConfigBuilder
         foreach ($this->buildSpanProcessors() as $name => $spanProcessorConfig) {
             $config->addSpanProcessor($name, $spanProcessorConfig);
         }
+
         return $config;
     }
 
     public function withUserConfig(array $config): self
     {
         $this->userConfig = $config;
+
         return $this;
     }
 
     public function withExporterConfig(string $klass): self
     {
         $this->exporters[] = $klass;
+
         return $this;
     }
 
@@ -75,6 +78,7 @@ class ConfigBuilder
                 }
             }
         }
+
         return $configs;
     }
 
@@ -88,6 +92,7 @@ class ConfigBuilder
                 }
             }
         }
+
         return $configs;
     }
 }

@@ -12,11 +12,11 @@ class ResourceLimitsConfig implements ConfigInterface
     public function __construct(array $userConfig, array $environmentConfig)
     {
         $this->attributeCount = $this->intOrNull($userConfig['resource.limits.attribute_count'] ?? $environmentConfig['OTEL_ATTRIBUTE_COUNT_LIMIT'] ?? null);
-        $this->attributeValueCount = intval($userConfig['resource.limits.attribute_value_length'] ?? $environmentConfig['OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'] ?? 128);
+        $this->attributeValueCount = (int) ($userConfig['resource.limits.attribute_value_length'] ?? $environmentConfig['OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'] ?? 128);
     }
 
     private function intOrNull($value): ?int
     {
-        return is_null($value) ? null : intval($value);
+        return null === $value ? null : (int) $value;
     }
 }
