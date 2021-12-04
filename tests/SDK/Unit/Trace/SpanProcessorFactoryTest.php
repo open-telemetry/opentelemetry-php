@@ -6,7 +6,6 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use InvalidArgumentException;
-use OpenTelemetry\SDK\ConfigBuilder;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
@@ -18,12 +17,6 @@ class SpanProcessorFactoryTest extends TestCase
 {
     use EnvironmentVariables;
 
-    private ConfigBuilder $configBuilder;
-
-    public function setUp(): void
-    {
-        $this->configBuilder = new ConfigBuilder();
-    }
     protected function tearDown(): void
     {
         $this->restoreEnvironmentVariables();
@@ -34,11 +27,11 @@ class SpanProcessorFactoryTest extends TestCase
      * @dataProvider processorProvider
      * @psalm-suppress ArgumentTypeCoercion
      */
-    public function spanProcessorFactory_createSpanProcessorFromConfig(string $processorName, string $expected)
+    public function spanProcessorFactory_createSpanProcessorFromEnvironment(string $processorName, string $expected)
     {
         $this->setEnvironmentVariable('OTEL_PHP_TRACES_PROCESSOR', $processorName);
         $factory = new SpanProcessorFactory();
-        $this->assertInstanceOf($expected, $factory->fromConfig($this->configBuilder->build()));
+        $this->assertInstanceOf($expected, $factory->fromEnvironment());
     }
 
     public function processorProvider()
@@ -47,7 +40,6 @@ class SpanProcessorFactoryTest extends TestCase
             'batch' => ['batch', BatchSpanProcessor::class],
             'simple' => ['simple', SimpleSpanProcessor::class],
             'noop' => ['noop', NoopSpanProcessor::class],
-            'not set' => ['', BatchSpanProcessor::class],
         ];
     }
     /**
@@ -60,13 +52,13 @@ class SpanProcessorFactoryTest extends TestCase
         $factory = new SpanProcessorFactory();
         $exporter = $this->createMock(SpanExporterInterface::class);
         $this->expectException(InvalidArgumentException::class);
-        $factory->fromConfig($this->configBuilder->build(), $exporter);
+        $factory->fromEnvironment($exporter);
     }
     public function invalidProcessorProvider()
     {
         return [
+            'not set' => [null],
             'invalid processor' => ['foo'],
-            'multiple processors' => ['batch,simple'],
         ];
     }
 }

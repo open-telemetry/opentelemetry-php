@@ -9,7 +9,6 @@ use Exception;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Strategy\MockClientStrategy;
 use OpenTelemetry\Contrib as Path;
-use OpenTelemetry\SDK\ConfigBuilder;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use PHPUnit\Framework\TestCase;
@@ -17,8 +16,6 @@ use PHPUnit\Framework\TestCase;
 class ExporterFactoryTest extends TestCase
 {
     use EnvironmentVariables;
-
-    private ConfigBuilder $configBuilder;
 
     public function tearDown(): void
     {
@@ -28,7 +25,6 @@ class ExporterFactoryTest extends TestCase
     public function setUp(): void
     {
         HttpClientDiscovery::prependStrategy(MockClientStrategy::class);
-        $this->configBuilder = new ConfigBuilder();
     }
 
     /**
@@ -99,7 +95,7 @@ class ExporterFactoryTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', 'none');
         $factory = new ExporterFactory('test.fromEnv');
-        $this->assertNull($factory->fromConfig($this->configBuilder->build()));
+        $this->assertNull($factory->fromEnvironment());
     }
 
     /**
@@ -114,7 +110,7 @@ class ExporterFactoryTest extends TestCase
             $this->setEnvironmentVariable($k, $v);
         }
         $factory = new ExporterFactory('test.fromEnv');
-        $this->assertInstanceOf($expected, $factory->fromConfig($this->configBuilder->build()));
+        $this->assertInstanceOf($expected, $factory->fromEnvironment());
     }
 
     public function envProvider()
@@ -143,11 +139,6 @@ class ExporterFactoryTest extends TestCase
             'console' => [
                 'console', [], ConsoleSpanExporter::class,
             ],
-            'oltp without protocol' => [
-                'otlp',
-                [],
-                Path\OtlpHttp\Exporter::class,
-            ],
         ];
     }
 
@@ -163,7 +154,7 @@ class ExporterFactoryTest extends TestCase
         }
         $factory = new ExporterFactory('test');
         $this->expectException(Exception::class);
-        $factory->fromConfig($this->configBuilder->build());
+        $factory->fromEnvironment();
     }
 
     public function invalidEnvProvider()
@@ -181,6 +172,7 @@ class ExporterFactoryTest extends TestCase
                 'otlp',
                 ['OTEL_EXPORTER_OTLP_PROTOCOL' => 'foo'],
             ],
+            'oltp without protocol' => ['otlp'],
             'unknown exporter' => ['foo'],
             'multiple exporters' => ['jaeger,zipkin'],
         ];

@@ -23,11 +23,11 @@ final class TracerProviderFactory
         $this->spanProcessorFactory = $spanProcessorFactory ?: new SpanProcessorFactory();
     }
 
-    public function fromConfig(object $config): API\TracerProviderInterface
+    public function create(): API\TracerProviderInterface
     {
-        $exporter = $this->exporterFactory->fromConfig($config);
-        $sampler = $this->samplerFactory->fromConfig($config);
-        $spanProcessor = $this->spanProcessorFactory->fromConfig($config, $exporter);
+        $exporter = $this->exporterFactory->fromEnvironment();
+        $sampler = $this->samplerFactory->fromEnvironment();
+        $spanProcessor = $this->spanProcessorFactory->fromEnvironment($exporter);
 
         return new TracerProvider(
             $spanProcessor,

@@ -3,7 +3,6 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\SDK\ConfigBuilder;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 
 //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md
@@ -17,8 +16,8 @@ putenv('OTEL_PHP_TRACES_PROCESSOR=batch');
 putenv('OTEL_BSP_SCHEDULE_DELAY=10000');
 
 echo 'Creating Exporter From Environment' . PHP_EOL;
-$config = (new ConfigBuilder())->build();
-$tracerProvider = (new TracerProviderFactory('example'))->fromConfig($config);
+
+$tracerProvider = (new TracerProviderFactory('example'))->create();
 
 $tracer = $tracerProvider->getTracer();
 

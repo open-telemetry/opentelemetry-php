@@ -11,15 +11,13 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 
 class SpanProcessorFactory
 {
-    public function fromConfig(object $config, ?SpanExporterInterface $exporter = null): SpanProcessorInterface
+    public function fromEnvironment(?SpanExporterInterface $exporter = null): SpanProcessorInterface
     {
-        //@array $processors
-        $processors = array_filter(explode(',', $config->trace->processor));
-        if (1 !== count($processors)) {
-            throw new InvalidArgumentException('Exactly 1 processor required');
+        $name = getenv('OTEL_PHP_TRACES_PROCESSOR');
+        if (!$name) {
+            throw new InvalidArgumentException('OTEL_PHP_TRACES_PROCESSOR not set');
         }
-        $processor = $processors[0];
-        switch ($processor) {
+        switch ($name) {
             case 'batch':
                 return new BatchSpanProcessor($exporter);
             case 'simple':
@@ -28,7 +26,7 @@ class SpanProcessorFactory
             case 'none':
                 return NoopSpanProcessor::getInstance();
             default:
-                throw new InvalidArgumentException('Unknown processor: ' . $processor);
+                throw new InvalidArgumentException('Unknown processor: ' . $name);
         }
     }
 }
