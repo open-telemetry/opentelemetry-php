@@ -11,11 +11,11 @@ use OpenTelemetry\Experimental\Config\SpanProcessor\SimpleSpanProcessorConfig;
 
 class ConfigBuilder
 {
-    //known exporter types (exluding exotic contrib exporters)
+    //initial list of known exporter types (exluding exotic contrib exporters, which must be added)
     private array $exporters = [
         OtlpConfig::class,
     ];
-    //known span processor types
+    //initial list of known span processor types
     private array $spanProcessors = [
         BatchSpanProcessorConfig::class,
         SimpleSpanProcessorConfig::class,
@@ -57,7 +57,7 @@ class ConfigBuilder
     }
 
     /**
-     * Retrieve all OTEL_* environment variables
+     * Retrieve all non-empty OTEL_* environment variables
      */
     private function getEnvironmentConfig(): array
     {
@@ -66,10 +66,12 @@ class ConfigBuilder
         }, ARRAY_FILTER_USE_BOTH);
     }
 
+    /**
+     * Find exporter config provider for requested exporter(s)
+     */
     private function buildExporters(): array
     {
         $configs = [];
-        //@var array $exporter
         foreach ($this->userConfig['exporters'] ?? explode(',', $this->environmentConfig['OTEL_TRACES_EXPORTER'] ?? '') as $name) {
             foreach ($this->exporters as $klass) {
                 //@var ExporterInterface $klass
@@ -82,6 +84,9 @@ class ConfigBuilder
         return $configs;
     }
 
+    /**
+     * Find span processor config provider for requested span processor(s)
+     */
     private function buildSpanProcessors(): array
     {
         $configs = [];
