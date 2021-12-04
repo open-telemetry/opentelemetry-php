@@ -49,6 +49,8 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "OpenTelemetry\\Experimental\\": "experimental/src/",
+            "OpenTelemetry\\Experimental\\Tests\\": "experimental/tests/",
             "OpenTelemetry\\Tests\\": "tests/"
         }
     },

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK;
+namespace OpenTelemetryExperimental\Tests\NetteConfig;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Nette\Schema\ValidationException;
-use OpenTelemetry\SDK\ConfigBuilder;
+use OpenTelemetry\Experimental\NetteConfig\ConfigBuilder;
 use PHPUnit\Framework\TestCase;
 
 class ConfigBuilderTest extends TestCase
