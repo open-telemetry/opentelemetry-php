@@ -11,6 +11,7 @@ namespace OpenTelemetry\SDK\Resource;
  * marked as Required in this document).
  *
  * @link https://github.com/open-telemetry/opentelemetry-specification/tree/master/specification/resource/semantic_conventions
+ * @deprecated Use {@see \OpenTelemetry\SemConv\ResourceAttributes} instead.
  */
 class ResourceConstants
 {

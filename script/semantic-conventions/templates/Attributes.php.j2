@@ -1,0 +1,32 @@
+<?php
+
+// DO NOT EDIT, this is an Auto-generated file from script/semantic-convention{{template}}
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+class {{ class }}Attributes
+{
+{%- for attribute in attributes | unique(attribute="fqn") %}
+    /**
+     * {{ attribute.brief | render_markdown(code="`{0}`", paragraph="{0}", link="{1}") | to_doc_brief | regex_replace(pattern="\n", replace="\n     * ") }}.
+     {%- if attribute.note %}
+     *
+     * {{ attribute.note | render_markdown(code="`{0}`", paragraph="{0}", link="{1}") | trim("\n")| regex_replace(pattern="\n", replace="\n     * ") }}
+     {%- endif %}
+     {%- if attribute.examples or attribute.deprecated %}
+     *
+     {%- if attribute.deprecated %}
+     * @deprecated {{ attribute.deprecated | render_markdown(code="`{0}`", paragraph="{0}", link="{{@link {0} {1}}}") | regex_replace(pattern="\n", replace="\n    * ") }}
+     {%- endif %}
+     {%- for example in attribute.examples if example %}
+     * @example {{ example }}
+     {%- endfor %}
+     {%- endif %}
+     */
+    public const {{ attribute.fqn | to_const_name }} = '{{ attribute.fqn }}';
+{% if not loop.last %}{# blank line #}{% endif %}
+{%- endfor -%}
+}
+{# blank line #}

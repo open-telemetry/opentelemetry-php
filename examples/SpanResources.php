@@ -3,25 +3,25 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\SDK\Resource\ResourceConstants;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\SpanProcessor\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
+use OpenTelemetry\SemConv\ResourceAttributes;
 
 echo 'Starting ConsoleSpanExporter' . PHP_EOL;
 
 $resource = ResourceInfo::create(new Attributes([
     //@see https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/resource/semantic_conventions
-    ResourceConstants::SERVICE_NAMESPACE => 'foo',
-    ResourceConstants::SERVICE_NAME => 'bar',
-    ResourceConstants::SERVICE_INSTANCE_ID => 1,
-    ResourceConstants::SERVICE_VERSION => '0.1',
-    ResourceConstants::HOST_HOSTNAME => \gethostname(),
-    ResourceConstants::DEPLOYMENT_ENVIRONMENT => 'development',
-    ResourceConstants::HOST_ARCH => strtolower(php_uname('m')),
-    ResourceConstants::HOST_TYPE => strtolower(php_uname('s')),
+    ResourceAttributes::SERVICE_NAMESPACE => 'foo',
+    ResourceAttributes::SERVICE_NAME => 'bar',
+    ResourceAttributes::SERVICE_INSTANCE_ID => 1,
+    ResourceAttributes::SERVICE_VERSION => '0.1',
+    ResourceAttributes::HOST_NAME => \gethostname(),
+    ResourceAttributes::DEPLOYMENT_ENVIRONMENT => 'development',
+    ResourceAttributes::HOST_ARCH => strtolower(php_uname('m')),
+    ResourceAttributes::HOST_TYPE => strtolower(php_uname('s')),
 ]));
 
 $tracerProvider =  new TracerProvider(
