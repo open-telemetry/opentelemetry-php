@@ -9,8 +9,7 @@ final class Entry
     /** @var mixed */
     private $value;
 
-    /** @var MetadataInterface */
-    private $metadata;
+    private MetadataInterface $metadata;
 
     /**
      * @param mixed $value

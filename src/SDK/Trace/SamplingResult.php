@@ -26,17 +26,17 @@ final class SamplingResult
     /**
      * @var int A sampling Decision.
      */
-    private $decision;
+    private int $decision;
 
     /**
      * @var ?API\AttributesInterface A set of span Attributes that will also be added to the Span.
      */
-    private $attributes;
+    private ?API\AttributesInterface $attributes;
 
     /**
      * @var ?API\TraceStateInterface A Tracestate that will be associated with the Span through the new SpanContext.
      */
-    private $traceState;
+    private ?API\TraceStateInterface $traceState;
 
     public function __construct(int $decision, ?API\AttributesInterface $attributes = null, ?API\TraceStateInterface $traceState = null)
     {

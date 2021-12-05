@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use ArrayIterator;
 use OpenTelemetry\API\Trace as API;
 
 class Attributes implements API\AttributesInterface
 {
-    private $attributes = [];
+    private array $attributes = [];
 
-    /** @var AttributeLimits */
-    private $attributeLimits;
+    private AttributeLimits $attributeLimits;
 
-    private $totalAddedAttributes = 0;
+    private int $totalAddedAttributes = 0;
 
     /** @return Attributes Returns a new instance of Attributes with the limits applied */
     public static function withLimits(API\AttributesInterface $attributes, AttributeLimits $attributeLimits): Attributes
@@ -91,10 +91,10 @@ class Attributes implements API\AttributesInterface
     public function getIterator(): API\AttributesIteratorInterface
     {
         return new class($this->attributes) implements API\AttributesIteratorInterface {
-            private $inner;
+            private ArrayIterator $inner;
             public function __construct($attributes)
             {
-                $this->inner = new \ArrayIterator($attributes);
+                $this->inner = new ArrayIterator($attributes);
             }
 
             public function key(): string

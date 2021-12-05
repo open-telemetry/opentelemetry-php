@@ -8,7 +8,7 @@ use OpenTelemetry\API\Trace as API;
 
 class Attribute implements API\AttributeInterface
 {
-    private $key;
+    private string $key;
     private $value;
 
     public function __construct(string $key, $value)

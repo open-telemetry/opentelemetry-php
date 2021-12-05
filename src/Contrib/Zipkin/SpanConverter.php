@@ -33,10 +33,7 @@ class SpanConverter implements SpanConverterInterface
 
     const NET_PEER_IP_KEY = 'net.peer.ip';
 
-    /**
-     * @var string
-     */
-    private $serviceName;
+    private string $serviceName;
 
     public function __construct(string $serviceName)
     {

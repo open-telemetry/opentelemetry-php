@@ -7,9 +7,9 @@ namespace OpenTelemetry\Contrib\Zipkin;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use JsonException;
-use OpenTelemetry\SDK\Trace;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
@@ -19,7 +19,7 @@ use Psr\Http\Message\StreamFactoryInterface;
  * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
  * @package OpenTelemetry\Exporter
  */
-class Exporter implements Trace\SpanExporterInterface
+class Exporter implements SpanExporterInterface
 {
     use UsesSpanConverterTrait;
     use HttpSpanExporterTrait;

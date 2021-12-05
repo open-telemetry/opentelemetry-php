@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use Throwable;
+
 class RandomIdGenerator implements IdGeneratorInterface
 {
     private const TRACE_ID_HEX_LENGTH = 32;
@@ -23,7 +25,7 @@ class RandomIdGenerator implements IdGeneratorInterface
     {
         try {
             return bin2hex(random_bytes(intdiv($hexLength, 2)));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->fallbackAlgorithm($hexLength);
         }
     }
