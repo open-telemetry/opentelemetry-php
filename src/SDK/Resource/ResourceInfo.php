@@ -71,7 +71,6 @@ class ResourceInfo
     {
         return new ResourceInfo(new Attributes(
             [
-                ResourceAttributes::SERVICE_NAME => 'unknown',
                 ResourceAttributes::TELEMETRY_SDK_NAME => 'opentelemetry',
                 ResourceAttributes::TELEMETRY_SDK_LANGUAGE => 'php',
                 ResourceAttributes::TELEMETRY_SDK_VERSION => 'dev',
