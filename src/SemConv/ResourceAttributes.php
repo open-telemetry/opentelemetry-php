@@ -9,6 +9,11 @@ namespace OpenTelemetry\SemConv;
 class ResourceAttributes
 {
     /**
+     * The URL of the OpenTelemetry schema for these keys and values.
+     */
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.8.0';
+
+    /**
      * Name of the cloud provider.
      */
     public const CLOUD_PROVIDER = 'cloud.provider';

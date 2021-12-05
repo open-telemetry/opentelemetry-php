@@ -9,6 +9,11 @@ namespace OpenTelemetry\SemConv;
 class TraceAttributes
 {
     /**
+     * The URL of the OpenTelemetry schema for these keys and values.
+     */
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.8.0';
+
+    /**
      * The full invoked ARN as provided on the `Context` passed to the function (`Lambda-Runtime-Invoked-Function-Arn` header on the `/runtime/invocation/next` applicable).
      *
      * This may be different from `faas.id` if an alias is involved.

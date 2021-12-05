@@ -9,6 +9,10 @@ namespace OpenTelemetry\SemConv;
 class TraceAttributeValues
 {
     /**
+     * The URL of the OpenTelemetry schema for these keys and values.
+     */
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.8.0';
+    /**
      * @see TraceAttributes::DB_SYSTEM Some other SQL database. Fallback only. See notes
      */
     public const DB_SYSTEM_OTHER_SQL = 'other_sql';

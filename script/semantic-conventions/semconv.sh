@@ -10,7 +10,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
 
 # freeze the spec & generator tools versions to make SemanticAttributes generation reproducible
-SEMCONV_VERSION=1.8.0
+SEMCONV_VERSION=${SEMCONV_VERSION:=1.8.0}
 SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
 GENERATOR_VERSION=0.8.0
@@ -42,7 +42,8 @@ docker run --rm \
   --template /templates/Attributes.php.j2 \
   --output "/output/TraceAttributes.php" \
   -Dnamespace="OpenTelemetry\\SemConv" \
-  -Dclass="Trace"
+  -Dclass="Trace" \
+  -DschemaUrl=$SCHEMA_URL
 
 docker run --rm \
   -v ${SCRIPT_DIR}/opentelemetry-specification/semantic_conventions/trace:/source \
@@ -54,7 +55,8 @@ docker run --rm \
   --template /templates/AttributeValues.php.j2 \
   --output "/output/TraceAttributeValues.php" \
   -Dnamespace="OpenTelemetry\\SemConv" \
-  -Dclass="Trace"
+  -Dclass="Trace" \
+  -DschemaUrl=$SCHEMA_URL
 
 
 # Resource
@@ -68,7 +70,8 @@ docker run --rm \
   --template /templates/Attributes.php.j2 \
   --output "/output/ResourceAttributes.php" \
   -Dnamespace="OpenTelemetry\\SemConv" \
-  -Dclass="Resource"
+  -Dclass="Resource" \
+  -DschemaUrl=$SCHEMA_URL
 
 docker run --rm \
   -v ${SCRIPT_DIR}/opentelemetry-specification/semantic_conventions/resource:/source \
@@ -80,4 +83,5 @@ docker run --rm \
   --template /templates/AttributeValues.php.j2 \
   --output "/output/ResourceAttributeValues.php" \
   -Dnamespace="OpenTelemetry\\SemConv" \
-  -Dclass="Resource"
+  -Dclass="Resource" \
+  -DschemaUrl=$SCHEMA_URL

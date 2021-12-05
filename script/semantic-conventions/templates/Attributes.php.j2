@@ -8,7 +8,11 @@ namespace {{ namespace }};
 
 class {{ class }}Attributes
 {
-{%- for attribute in attributes | unique(attribute="fqn") %}
+    /**
+     * The URL of the OpenTelemetry schema for these keys and values.
+     */
+    public const SCHEMA_URL = '{{schemaUrl}}';
+{% for attribute in attributes | unique(attribute="fqn") %}
     /**
      * {{ attribute.brief | render_markdown(code="`{0}`", paragraph="{0}", link="{1}") | to_doc_brief | regex_replace(pattern="\n", replace="\n     * ") }}.
      {%- if attribute.note %}

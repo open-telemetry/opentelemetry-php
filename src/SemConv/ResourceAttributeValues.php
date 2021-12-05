@@ -9,6 +9,10 @@ namespace OpenTelemetry\SemConv;
 class ResourceAttributeValues
 {
     /**
+     * The URL of the OpenTelemetry schema for these keys and values.
+     */
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.8.0';
+    /**
      * @see ResourceAttributes::CLOUD_PROVIDER Alibaba Cloud
      */
     public const CLOUD_PROVIDER_ALIBABA_CLOUD = 'alibaba_cloud';
