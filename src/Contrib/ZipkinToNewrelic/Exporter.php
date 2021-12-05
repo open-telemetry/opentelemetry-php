@@ -8,7 +8,6 @@ use Exception;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use JsonException;
-use OpenTelemetry\SDK\Trace;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
