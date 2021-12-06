@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
+use InvalidArgumentException;
+
 /**
  * Centralized methods for retrieving environment variables
  */
@@ -19,7 +21,7 @@ trait EnvironmentVariablesTrait
             return $default;
         }
         if (false === \filter_var($value, FILTER_VALIDATE_INT)) {
-            throw new \InvalidArgumentException($key . ' contains non-numeric value');
+            throw new InvalidArgumentException($key . ' contains non-numeric value');
         }
 
         return (int) $value;
@@ -49,7 +51,7 @@ trait EnvironmentVariablesTrait
             case '0':
                 return false;
             default:
-                throw new \InvalidArgumentException($key . ' contains a non-boolean value');
+                throw new InvalidArgumentException($key . ' contains a non-boolean value');
         }
     }
 }

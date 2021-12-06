@@ -43,27 +43,18 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorderInterface
      */
     protected $valueSum = 0;
 
-    /**
-     * @var float $valueMin
-     */
-    protected $valueMin = INF;
+    protected float $valueMin = INF;
 
-    /**
-     * @var float $valueMax
-     */
-    protected $valueMax = -INF;
+    protected float $valueMax = -INF;
 
-    /**
-     * @var int $valueCount
-     */
-    protected $valueCount = 0;
+    protected int $valueCount = 0;
 
     /*
      * Testing floating point values for equality is problematic, due to
      * the way that they are represented internally.  Therefore, force all
      * precision to a predetermined number, and equality can be determined.
      */
-    private $decimalPointPrecision = 10;
+    private int $decimalPointPrecision = 10;
 
     /**
      * getType: get the type of metric instrument

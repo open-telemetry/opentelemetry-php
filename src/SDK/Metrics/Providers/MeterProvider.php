@@ -9,10 +9,7 @@ use OpenTelemetry\SDK\Metrics\Meter;
 
 class MeterProvider implements API\MeterProviderInterface
 {
-    /**
-     * @var array $meters
-     */
-    protected $meters = [];
+    protected array $meters = [];
 
     /**
      * {@inheritDoc}

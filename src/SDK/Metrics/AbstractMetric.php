@@ -8,15 +8,9 @@ use OpenTelemetry\API\Metrics as API;
 
 abstract class AbstractMetric implements API\MetricInterface
 {
-    /**
-     * @var string $name
-     */
-    protected $name;
+    protected string $name;
 
-    /**
-     * @var string $description
-     */
-    protected $description;
+    protected string $description;
 
     public function __construct(string $name, string $description = '')
     {

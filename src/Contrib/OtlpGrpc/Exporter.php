@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\OtlpGrpc;
 
 use grpc;
+use Grpc\ChannelCredentials;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
-use OpenTelemetry\SDK\Trace;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
-class Exporter implements Trace\SpanExporterInterface
+class Exporter implements SpanExporterInterface
 {
     use EnvironmentVariablesTrait;
     use SpanExporterTrait;
@@ -159,7 +160,7 @@ class Exporter implements Trace\SpanExporterInterface
         return $metadata;
     }
 
-    private function getCredentials(): ?\Grpc\ChannelCredentials
+    private function getCredentials(): ?ChannelCredentials
     {
         if (!$this->insecure) {
             return $this->certificateFile !== ''
