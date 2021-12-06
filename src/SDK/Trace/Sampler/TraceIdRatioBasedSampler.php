@@ -21,10 +21,7 @@ use OpenTelemetry\SDK\Trace\Span;
  */
 class TraceIdRatioBasedSampler implements SamplerInterface
 {
-    /**
-     * @var float
-     */
-    private $probability;
+    private float $probability;
 
     /**
      * TraceIdRatioBasedSampler constructor.

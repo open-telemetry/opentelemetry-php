@@ -7,11 +7,11 @@ namespace OpenTelemetry\Contrib\OtlpGrpc;
 use function array_key_exists;
 use function hex2bin;
 use OpenTelemetry\API\Trace as API;
-use Opentelemetry\Proto;
 use Opentelemetry\Proto\Common\V1\AnyValue;
 use Opentelemetry\Proto\Common\V1\ArrayValue;
 use Opentelemetry\Proto\Common\V1\InstrumentationLibrary;
 use Opentelemetry\Proto\Common\V1\KeyValue;
+use Opentelemetry\Proto\Resource\V1\Resource;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
@@ -196,7 +196,7 @@ class SpanConverter
         }
 
         if ($isSpansEmpty == true) {
-            return new Proto\Trace\V1\ResourceSpans();
+            return new ResourceSpans();
         }
 
         $ilSpans = [];
@@ -207,8 +207,8 @@ class SpanConverter
             ]);
         }
 
-        return new Proto\Trace\V1\ResourceSpans([
-            'resource' => new Proto\Resource\V1\Resource([
+        return new ResourceSpans([
+            'resource' => new Resource([
                 'attributes' => $this->as_otlp_resource_attributes($spans),
             ]),
             'instrumentation_library_spans' => $ilSpans,

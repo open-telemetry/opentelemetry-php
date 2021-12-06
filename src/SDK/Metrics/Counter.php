@@ -11,10 +11,7 @@ class Counter extends AbstractMetric implements API\CounterInterface, API\Labela
 {
     use HasLabelsTrait;
 
-    /**
-     * @var int $value
-     */
-    protected $value = 0;
+    protected int $value = 0;
 
     /**
      * Get $type

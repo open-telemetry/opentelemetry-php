@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\Exporters;
 
 use Exception;
+use InvalidArgumentException;
 use OpenTelemetry\API\Metrics as API;
 use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
 
@@ -22,7 +23,7 @@ abstract class AbstractExporter implements API\ExporterInterface
         try {
             foreach ($metrics as $metric) {
                 if (! $metric instanceof API\MetricInterface) {
-                    throw new \InvalidArgumentException('Metric must implement ' . API\MetricInterface::class);
+                    throw new InvalidArgumentException('Metric must implement ' . API\MetricInterface::class);
                 }
             }
 

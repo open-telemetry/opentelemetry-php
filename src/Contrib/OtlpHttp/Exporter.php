@@ -10,15 +10,15 @@ use InvalidArgumentException;
 use Nyholm\Dsn\DsnParser;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
-use OpenTelemetry\SDK\Trace;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
-class Exporter implements Trace\SpanExporterInterface
+class Exporter implements SpanExporterInterface
 {
     use EnvironmentVariablesTrait;
     use UsesSpanConverterTrait;

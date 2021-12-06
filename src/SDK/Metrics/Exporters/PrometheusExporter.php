@@ -11,15 +11,9 @@ use Prometheus\CollectorRegistry;
 
 class PrometheusExporter extends AbstractExporter
 {
-    /**
-     * @var CollectorRegistry $registry
-     */
-    protected $registry;
+    protected CollectorRegistry $registry;
 
-    /**
-     * @var string $namespace
-     */
-    protected $namespace;
+    protected string $namespace;
 
     public function __construct(CollectorRegistry $registry, string $namespace = '')
     {

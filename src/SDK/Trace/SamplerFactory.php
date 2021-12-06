@@ -6,6 +6,10 @@ namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
+use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
+use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 
 class SamplerFactory
 {
@@ -28,17 +32,17 @@ class SamplerFactory
         }
         switch ($name) {
             case 'always_on':
-                return new Sampler\AlwaysOnSampler();
+                return new AlwaysOnSampler();
             case 'always_off':
-                return new Sampler\AlwaysOffSampler();
+                return new AlwaysOffSampler();
             case 'traceidratio':
-                return new Sampler\TraceIdRatioBasedSampler((float) $arg);
+                return new TraceIdRatioBasedSampler((float) $arg);
             case 'parentbased_always_on':
-                return new Sampler\ParentBased(new Sampler\AlwaysOnSampler());
+                return new ParentBased(new AlwaysOnSampler());
             case 'parentbased_always_off':
-                return new Sampler\ParentBased(new Sampler\AlwaysOffSampler());
+                return new ParentBased(new AlwaysOffSampler());
             case 'parentbased_traceidratio':
-                return new Sampler\ParentBased(new Sampler\TraceIdRatioBasedSampler((float) $arg));
+                return new ParentBased(new TraceIdRatioBasedSampler((float) $arg));
             default:
                 throw new InvalidArgumentException('Unknown sampler: ' . $name);
         }

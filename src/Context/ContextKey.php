@@ -6,10 +6,7 @@ namespace OpenTelemetry\Context;
 
 class ContextKey
 {
-    /**
-     * @var string|null
-     */
-    private $name;
+    private ?string $name;
 
     public function __construct(?string $name=null)
     {

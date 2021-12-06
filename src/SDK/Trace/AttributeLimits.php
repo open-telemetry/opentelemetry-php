@@ -10,9 +10,9 @@ class AttributeLimits
 
     private const DEFAULT_VALUE_LENGTH_LIMIT = PHP_INT_MAX;
 
-    private $attributeCountLimit;
+    private int $attributeCountLimit;
 
-    private $attributeValueLengthLimit;
+    private int $attributeValueLengthLimit;
 
     public function __construct(
         int $attributeCountLimit = self::DEFAULT_COUNT_LIMIT,
