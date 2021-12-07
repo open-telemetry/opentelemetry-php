@@ -8,12 +8,8 @@ use OpenTelemetry\API\Metrics as API;
 
 class Meter implements API\MeterInterface
 {
-    /**
-     * @var string $name
-     * @var string $version
-     */
-    protected $name;
-    protected $version;
+    protected string $name;
+    protected string $version;
 
     public function __construct(string $name, string $version = null)
     {

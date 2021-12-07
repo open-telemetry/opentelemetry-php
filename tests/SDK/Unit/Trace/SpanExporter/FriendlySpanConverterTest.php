@@ -85,8 +85,8 @@ class FriendlySpanConverterTest extends TestCase
         $this->assertEquals(
             self::TEST_DATA,
             (new FriendlySpanConverter())->convert(
-                $this->createSpanDataInterfaceMock()
-            )
+                [$this->createSpanDataInterfaceMock()]
+            )[0]
         );
     }
 

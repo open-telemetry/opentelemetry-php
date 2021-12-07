@@ -6,5 +6,5 @@ namespace OpenTelemetry\SDK\Trace;
 
 interface SpanConverterInterface
 {
-    public function convert(SpanDataInterface $span): array;
+    public function convert(iterable $spans): array;
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use InvalidArgumentException;
+
 trait HasLabelsTrait
 {
     /**
@@ -26,7 +28,7 @@ trait HasLabelsTrait
     {
         foreach ($labels as $label) {
             if (! is_string($label)) {
-                throw new \InvalidArgumentException('The label is expected to be a string');
+                throw new InvalidArgumentException('The label is expected to be a string');
             }
         }
 

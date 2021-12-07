@@ -36,20 +36,6 @@ trait UsesSpanConverterTrait
      */
     protected function convertSpan(SpanDataInterface $span): array
     {
-        return $this->getSpanConverter()->convert($span);
-    }
-
-    /**
-     * @param iterable $spans
-     * @return array
-     */
-    protected function convertSpanCollection(iterable $spans): array
-    {
-        $aggregate = [];
-        foreach ($spans as $span) {
-            $aggregate[] = $this->convertSpan($span);
-        }
-
-        return $aggregate;
+        return $this->getSpanConverter()->convert([$span]);
     }
 }

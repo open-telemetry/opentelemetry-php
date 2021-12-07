@@ -34,10 +34,7 @@ class SpanConverter implements SpanConverterInterface
 
     const NET_PEER_IP_KEY = 'net.peer.ip';
 
-    /**
-     * @var string
-     */
-    private $serviceName;
+    private string $serviceName;
 
     public function __construct(string $serviceName)
     {
@@ -66,7 +63,17 @@ class SpanConverter implements SpanConverterInterface
         return (string) $value;
     }
 
-    public function convert(SpanDataInterface $span): array
+    public function convert(iterable $spans): array
+    {
+        $aggregate = [];
+        foreach ($spans as $span) {
+            $aggregate[] = $this->convertSpan($span);
+        }
+
+        return $aggregate;
+    }
+
+    private function convertSpan(SpanDataInterface $span): array
     {
         $spanParent = $span->getParentContext();
 

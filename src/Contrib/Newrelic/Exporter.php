@@ -8,9 +8,9 @@ use Exception;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use JsonException;
-use OpenTelemetry\SDK\Trace;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
@@ -24,7 +24,7 @@ use Psr\Http\Message\StreamFactoryInterface;
  * It will send PHP Otel trace data end to end across the internet to a functional backend.
  * Needs a license key to connect.  For a free account/key, go to: https://newrelic.com/signup/
  */
-class Exporter implements Trace\SpanExporterInterface
+class Exporter implements SpanExporterInterface
 {
     use UsesSpanConverterTrait;
     use HttpSpanExporterTrait;
@@ -78,7 +78,7 @@ class Exporter implements Trace\SpanExporterInterface
             'host' => $this->endpointUrl, ]];
 
         return [[ 'common' => $commonAttributes,
-            'spans' => $this->convertSpanCollection($spans), ]];
+            'spans' => $this->getSpanConverter()->convert($spans), ]];
     }
 
     /**

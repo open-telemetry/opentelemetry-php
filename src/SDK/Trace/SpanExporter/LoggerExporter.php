@@ -101,13 +101,13 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
     private function doLog(iterable $spans): void
     {
         if ($this->granularity === self::GRANULARITY_AGGREGATE) {
-            $this->log($this->serviceName, $this->convertSpanCollection($spans));
+            $this->log($this->serviceName, $this->getSpanConverter()->convert($spans));
 
             return;
         }
 
         foreach ($spans as $span) {
-            $this->log($this->serviceName, $this->convertSpan($span));
+            $this->log($this->serviceName, $this->getSpanConverter()->convert([$span]));
         }
     }
 }

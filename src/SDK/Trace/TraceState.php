@@ -25,7 +25,7 @@ class TraceState implements API\TraceStateInterface
     /**
      * @var string[]
      */
-    private $traceState = [];
+    private array $traceState = [];
 
     public function __construct(string $rawTracestate = null)
     {

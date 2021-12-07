@@ -24,8 +24,8 @@ class NullSpanConverterTest extends TestCase
         $this->assertSame(
             [],
             (new NullSpanConverter())->convert(
-                $this->createMock(SpanDataInterface::class)
-            )
+                [$this->createMock(SpanDataInterface::class)]
+            )[0]
         );
     }
 }
