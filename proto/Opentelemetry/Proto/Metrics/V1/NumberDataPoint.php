@@ -10,36 +10,42 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * NumberDataPoint is a single data point in a timeseries that describes the
- * time-varying value of a double metric.
+ * time-varying scalar value of a metric.
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.NumberDataPoint</code>
  */
 class NumberDataPoint extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The set of labels that uniquely identify this timeseries.
+     * The set of key/value pairs that uniquely identify the timeseries from
+     * where this point belongs. The list may be empty (may contain 0 elements).
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 7;</code>
+     */
+    private $attributes;
+    /**
+     * Labels is deprecated and will be removed soon.
+     * 1. Old senders and receivers that are not aware of this change will
+     * continue using the `labels` field.
+     * 2. New senders, which are aware of this change MUST send only `attributes`.
+     * 3. New receivers, which are aware of this change MUST convert this into
+     * `labels` by simply converting all int64 values into float.
+     * This field will be removed in ~3 months, on July 1, 2021.
+     *
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];</code>
      */
     private $labels;
     /**
-     * start_time_unix_nano is the last time when the aggregation value was reset
-     * to "zero". For some metric types this is ignored, see data types for more
-     * details.
-     * The aggregation value is over the time interval (start_time_unix_nano,
-     * time_unix_nano].
-     * 
+     * StartTimeUnixNano is optional but strongly encouraged, see the
+     * the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
-     * Value of 0 indicates that the timestamp is unspecified. In that case the
-     * timestamp may be decided by the backend.
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      */
     private $start_time_unix_nano = 0;
     /**
-     * time_unix_nano is the moment when this aggregation value was reported.
-     * 
+     * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
      *
@@ -53,6 +59,13 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.Exemplar exemplars = 5;</code>
      */
     private $exemplars;
+    /**
+     * Flags that apply to this specific data point.  See DataPointFlags
+     * for the available flags and their meaning.
+     *
+     * Generated from protobuf field <code>uint32 flags = 8;</code>
+     */
+    private $flags = 0;
     protected $value;
 
     /**
@@ -61,22 +74,24 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $attributes
+     *           The set of key/value pairs that uniquely identify the timeseries from
+     *           where this point belongs. The list may be empty (may contain 0 elements).
      *     @type \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $labels
-     *           The set of labels that uniquely identify this timeseries.
+     *           Labels is deprecated and will be removed soon.
+     *           1. Old senders and receivers that are not aware of this change will
+     *           continue using the `labels` field.
+     *           2. New senders, which are aware of this change MUST send only `attributes`.
+     *           3. New receivers, which are aware of this change MUST convert this into
+     *           `labels` by simply converting all int64 values into float.
+     *           This field will be removed in ~3 months, on July 1, 2021.
      *     @type int|string $start_time_unix_nano
-     *           start_time_unix_nano is the last time when the aggregation value was reset
-     *           to "zero". For some metric types this is ignored, see data types for more
-     *           details.
-     *           The aggregation value is over the time interval (start_time_unix_nano,
-     *           time_unix_nano].
-     *           
+     *           StartTimeUnixNano is optional but strongly encouraged, see the
+     *           the detailed comments above Metric.
      *           Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      *           1970.
-     *           Value of 0 indicates that the timestamp is unspecified. In that case the
-     *           timestamp may be decided by the backend.
      *     @type int|string $time_unix_nano
-     *           time_unix_nano is the moment when this aggregation value was reported.
-     *           
+     *           TimeUnixNano is required, see the detailed comments above Metric.
      *           Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      *           1970.
      *     @type float $as_double
@@ -84,6 +99,9 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
      *     @type \Opentelemetry\Proto\Metrics\V1\Exemplar[]|\Google\Protobuf\Internal\RepeatedField $exemplars
      *           (Optional) List of exemplars collected from
      *           measurements that were used to form the data point
+     *     @type int $flags
+     *           Flags that apply to this specific data point.  See DataPointFlags
+     *           for the available flags and their meaning.
      * }
      */
     public function __construct($data = NULL) {
@@ -92,9 +110,43 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The set of labels that uniquely identify this timeseries.
+     * The set of key/value pairs that uniquely identify the timeseries from
+     * where this point belongs. The list may be empty (may contain 0 elements).
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 7;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * The set of key/value pairs that uniquely identify the timeseries from
+     * where this point belongs. The list may be empty (may contain 0 elements).
+     *
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 7;</code>
+     * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setAttributes($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Common\V1\KeyValue::class);
+        $this->attributes = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Labels is deprecated and will be removed soon.
+     * 1. Old senders and receivers that are not aware of this change will
+     * continue using the `labels` field.
+     * 2. New senders, which are aware of this change MUST send only `attributes`.
+     * 3. New receivers, which are aware of this change MUST convert this into
+     * `labels` by simply converting all int64 values into float.
+     * This field will be removed in ~3 months, on July 1, 2021.
+     *
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getLabels()
@@ -103,9 +155,15 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The set of labels that uniquely identify this timeseries.
+     * Labels is deprecated and will be removed soon.
+     * 1. Old senders and receivers that are not aware of this change will
+     * continue using the `labels` field.
+     * 2. New senders, which are aware of this change MUST send only `attributes`.
+     * 3. New receivers, which are aware of this change MUST convert this into
+     * `labels` by simply converting all int64 values into float.
+     * This field will be removed in ~3 months, on July 1, 2021.
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];</code>
      * @param \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
@@ -118,16 +176,10 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * start_time_unix_nano is the last time when the aggregation value was reset
-     * to "zero". For some metric types this is ignored, see data types for more
-     * details.
-     * The aggregation value is over the time interval (start_time_unix_nano,
-     * time_unix_nano].
-     * 
+     * StartTimeUnixNano is optional but strongly encouraged, see the
+     * the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
-     * Value of 0 indicates that the timestamp is unspecified. In that case the
-     * timestamp may be decided by the backend.
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      * @return int|string
@@ -138,16 +190,10 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * start_time_unix_nano is the last time when the aggregation value was reset
-     * to "zero". For some metric types this is ignored, see data types for more
-     * details.
-     * The aggregation value is over the time interval (start_time_unix_nano,
-     * time_unix_nano].
-     * 
+     * StartTimeUnixNano is optional but strongly encouraged, see the
+     * the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
-     * Value of 0 indicates that the timestamp is unspecified. In that case the
-     * timestamp may be decided by the backend.
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      * @param int|string $var
@@ -162,8 +208,7 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * time_unix_nano is the moment when this aggregation value was reported.
-     * 
+     * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
      *
@@ -176,8 +221,7 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * time_unix_nano is the moment when this aggregation value was reported.
-     * 
+     * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
      *
@@ -261,6 +305,34 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Metrics\V1\Exemplar::class);
         $this->exemplars = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Flags that apply to this specific data point.  See DataPointFlags
+     * for the available flags and their meaning.
+     *
+     * Generated from protobuf field <code>uint32 flags = 8;</code>
+     * @return int
+     */
+    public function getFlags()
+    {
+        return $this->flags;
+    }
+
+    /**
+     * Flags that apply to this specific data point.  See DataPointFlags
+     * for the available flags and their meaning.
+     *
+     * Generated from protobuf field <code>uint32 flags = 8;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setFlags($var)
+    {
+        GPBUtil::checkUint32($var);
+        $this->flags = $var;
 
         return $this;
     }

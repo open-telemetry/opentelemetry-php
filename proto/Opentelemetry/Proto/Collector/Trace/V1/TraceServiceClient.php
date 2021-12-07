@@ -20,7 +20,7 @@ namespace Opentelemetry\Proto\Collector\Trace\V1;
 
 /**
  * Service that can be used to push spans between one Application instrumented with
- * OpenTelemetry and an collector, or between an collector and a central collector (in this
+ * OpenTelemetry and a collector, or between a collector and a central collector (in this
  * case spans are sent/received to/from multiple Applications).
  */
 class TraceServiceClient extends \Grpc\BaseStub {

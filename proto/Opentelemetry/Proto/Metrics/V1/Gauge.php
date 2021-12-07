@@ -9,10 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Gauge represents the type of a double scalar metric that always exports the
+ * Gauge represents the type of a scalar metric that always exports the
  * "current value" for every data point. It should be used for an "unknown"
  * aggregation.
- * 
  * A Gauge does not support different aggregation temporalities. Given the
  * aggregation is unknown, points cannot be combined using the same
  * aggregation, regardless of aggregation temporalities. Therefore,

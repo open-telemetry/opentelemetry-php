@@ -9,10 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * A representation of an exemplar, which is a sample input int measurement.
- * Exemplars also hold information about the environment when the measurement
- * was recorded, for example the span and trace ID of the active span when the
- * exemplar was recorded.
+ * IntExemplar is deprecated. Use Exemplar with as_int for value
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.IntExemplar</code>
  */

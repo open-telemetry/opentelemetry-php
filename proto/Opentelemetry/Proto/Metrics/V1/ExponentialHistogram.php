@@ -9,15 +9,15 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Sum represents the type of a scalar metric that is calculated as a sum of all
- * reported measurements over a time interval.
+ * ExponentialHistogram represents the type of a metric that is calculated by aggregating
+ * as a ExponentialHistogram of all reported double measurements over a time interval.
  *
- * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.Sum</code>
+ * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.ExponentialHistogram</code>
  */
-class Sum extends \Google\Protobuf\Internal\Message
+class ExponentialHistogram extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.NumberDataPoint data_points = 1;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.ExponentialHistogramDataPoint data_points = 1;</code>
      */
     private $data_points;
     /**
@@ -27,12 +27,6 @@ class Sum extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.AggregationTemporality aggregation_temporality = 2;</code>
      */
     private $aggregation_temporality = 0;
-    /**
-     * If "true" means that the sum is monotonic.
-     *
-     * Generated from protobuf field <code>bool is_monotonic = 3;</code>
-     */
-    private $is_monotonic = false;
 
     /**
      * Constructor.
@@ -40,12 +34,10 @@ class Sum extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Opentelemetry\Proto\Metrics\V1\NumberDataPoint[]|\Google\Protobuf\Internal\RepeatedField $data_points
+     *     @type \Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint[]|\Google\Protobuf\Internal\RepeatedField $data_points
      *     @type int $aggregation_temporality
      *           aggregation_temporality describes if the aggregator reports delta changes
      *           since last report time, or cumulative changes since a fixed start time.
-     *     @type bool $is_monotonic
-     *           If "true" means that the sum is monotonic.
      * }
      */
     public function __construct($data = NULL) {
@@ -54,7 +46,7 @@ class Sum extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.NumberDataPoint data_points = 1;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.ExponentialHistogramDataPoint data_points = 1;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getDataPoints()
@@ -63,13 +55,13 @@ class Sum extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.NumberDataPoint data_points = 1;</code>
-     * @param \Opentelemetry\Proto\Metrics\V1\NumberDataPoint[]|\Google\Protobuf\Internal\RepeatedField $var
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.ExponentialHistogramDataPoint data_points = 1;</code>
+     * @param \Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDataPoints($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Metrics\V1\NumberDataPoint::class);
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint::class);
         $this->data_points = $arr;
 
         return $this;
@@ -99,32 +91,6 @@ class Sum extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkEnum($var, \Opentelemetry\Proto\Metrics\V1\AggregationTemporality::class);
         $this->aggregation_temporality = $var;
-
-        return $this;
-    }
-
-    /**
-     * If "true" means that the sum is monotonic.
-     *
-     * Generated from protobuf field <code>bool is_monotonic = 3;</code>
-     * @return bool
-     */
-    public function getIsMonotonic()
-    {
-        return $this->is_monotonic;
-    }
-
-    /**
-     * If "true" means that the sum is monotonic.
-     *
-     * Generated from protobuf field <code>bool is_monotonic = 3;</code>
-     * @param bool $var
-     * @return $this
-     */
-    public function setIsMonotonic($var)
-    {
-        GPBUtil::checkBool($var);
-        $this->is_monotonic = $var;
 
         return $this;
     }

@@ -28,6 +28,14 @@ class ResourceSpans extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .opentelemetry.proto.trace.v1.InstrumentationLibrarySpans instrumentation_library_spans = 2;</code>
      */
     private $instrumentation_library_spans;
+    /**
+     * This schema_url applies to the data in the "resource" field. It does not apply
+     * to the data in the "instrumentation_library_spans" field which have their own
+     * schema_url field.
+     *
+     * Generated from protobuf field <code>string schema_url = 3;</code>
+     */
+    private $schema_url = '';
 
     /**
      * Constructor.
@@ -40,6 +48,10 @@ class ResourceSpans extends \Google\Protobuf\Internal\Message
      *           If this field is not set then no resource info is known.
      *     @type \Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans[]|\Google\Protobuf\Internal\RepeatedField $instrumentation_library_spans
      *           A list of InstrumentationLibrarySpans that originate from a resource.
+     *     @type string $schema_url
+     *           This schema_url applies to the data in the "resource" field. It does not apply
+     *           to the data in the "instrumentation_library_spans" field which have their own
+     *           schema_url field.
      * }
      */
     public function __construct($data = NULL) {
@@ -97,6 +109,36 @@ class ResourceSpans extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans::class);
         $this->instrumentation_library_spans = $arr;
+
+        return $this;
+    }
+
+    /**
+     * This schema_url applies to the data in the "resource" field. It does not apply
+     * to the data in the "instrumentation_library_spans" field which have their own
+     * schema_url field.
+     *
+     * Generated from protobuf field <code>string schema_url = 3;</code>
+     * @return string
+     */
+    public function getSchemaUrl()
+    {
+        return $this->schema_url;
+    }
+
+    /**
+     * This schema_url applies to the data in the "resource" field. It does not apply
+     * to the data in the "instrumentation_library_spans" field which have their own
+     * schema_url field.
+     *
+     * Generated from protobuf field <code>string schema_url = 3;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setSchemaUrl($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->schema_url = $var;
 
         return $this;
     }

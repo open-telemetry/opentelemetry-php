@@ -29,6 +29,12 @@ class InstrumentationLibraryMetrics extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.Metric metrics = 2;</code>
      */
     private $metrics;
+    /**
+     * This schema_url applies to all metrics in the "metrics" field.
+     *
+     * Generated from protobuf field <code>string schema_url = 3;</code>
+     */
+    private $schema_url = '';
 
     /**
      * Constructor.
@@ -42,6 +48,8 @@ class InstrumentationLibraryMetrics extends \Google\Protobuf\Internal\Message
      *           an empty instrumentation library name (unknown).
      *     @type \Opentelemetry\Proto\Metrics\V1\Metric[]|\Google\Protobuf\Internal\RepeatedField $metrics
      *           A list of metrics that originate from an instrumentation library.
+     *     @type string $schema_url
+     *           This schema_url applies to all metrics in the "metrics" field.
      * }
      */
     public function __construct($data = NULL) {
@@ -101,6 +109,32 @@ class InstrumentationLibraryMetrics extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Metrics\V1\Metric::class);
         $this->metrics = $arr;
+
+        return $this;
+    }
+
+    /**
+     * This schema_url applies to all metrics in the "metrics" field.
+     *
+     * Generated from protobuf field <code>string schema_url = 3;</code>
+     * @return string
+     */
+    public function getSchemaUrl()
+    {
+        return $this->schema_url;
+    }
+
+    /**
+     * This schema_url applies to all metrics in the "metrics" field.
+     *
+     * Generated from protobuf field <code>string schema_url = 3;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setSchemaUrl($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->schema_url = $var;
 
         return $this;
     }

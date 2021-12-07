@@ -11,8 +11,6 @@ use Google\Protobuf\Internal\GPBUtil;
 /**
  * IntHistogram is deprecated, replaced by Histogram points using double-
  * valued exemplars.
- * This represents the type of a metric that is calculated by aggregating as a
- * Histogram of all reported int measurements over a time interval.
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.IntHistogram</code>
  */

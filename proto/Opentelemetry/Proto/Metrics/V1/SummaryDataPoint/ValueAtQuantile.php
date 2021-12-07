@@ -29,6 +29,7 @@ class ValueAtQuantile extends \Google\Protobuf\Internal\Message
     private $quantile = 0.0;
     /**
      * The value at the given quantile of a distribution.
+     * Quantile values must NOT be negative.
      *
      * Generated from protobuf field <code>double value = 2;</code>
      */
@@ -45,6 +46,7 @@ class ValueAtQuantile extends \Google\Protobuf\Internal\Message
      *           [0.0, 1.0].
      *     @type float $value
      *           The value at the given quantile of a distribution.
+     *           Quantile values must NOT be negative.
      * }
      */
     public function __construct($data = NULL) {
@@ -82,6 +84,7 @@ class ValueAtQuantile extends \Google\Protobuf\Internal\Message
 
     /**
      * The value at the given quantile of a distribution.
+     * Quantile values must NOT be negative.
      *
      * Generated from protobuf field <code>double value = 2;</code>
      * @return float
@@ -93,6 +96,7 @@ class ValueAtQuantile extends \Google\Protobuf\Internal\Message
 
     /**
      * The value at the given quantile of a distribution.
+     * Quantile values must NOT be negative.
      *
      * Generated from protobuf field <code>double value = 2;</code>
      * @param float $var
