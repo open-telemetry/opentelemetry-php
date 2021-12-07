@@ -25,7 +25,7 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
             ->setHasEnded(true);
 
         $converter = new SpanConverter('test.name');
-        $row = $converter->convert($span);
+        $row = $converter->convert([$span])[0];
 
         $this->assertSame($span->getContext()->getSpanId(), $row['id']);
         $this->assertSame($span->getContext()->getTraceId(), $row['traceId']);
@@ -71,7 +71,7 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
             ->addAttribute('list-of-booleans', $listOfBooleans)
             ->addAttribute('list-of-random', $listOfRandoms);
 
-        $tags = (new SpanConverter('tags.test'))->convert($span)['tags'];
+        $tags = (new SpanConverter('tags.test'))->convert([$span])[0]['tags'];
 
         // Check that we can convert all attributes to tags
         $this->assertCount(12, $tags);

@@ -5,23 +5,10 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
-use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
-use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\Attributes;
-use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
-
-$sampler = new AlwaysOnSampler();
-$samplingResult = $sampler->shouldSample(
-    Context::getCurrent(),
-    md5((string) microtime(true)),
-    'io.opentelemetry.example',
-    API\SpanKind::KIND_INTERNAL
-);
 
 $zipkinExporter = new ZipkinExporter(
     'alwaysOnZipkinExample',
@@ -30,48 +17,36 @@ $zipkinExporter = new ZipkinExporter(
     new HttpFactory(),
     new HttpFactory()
 );
+$tracerProvider =  new TracerProvider(
+    new SimpleSpanProcessor(
+        $zipkinExporter
+    )
+);
+$tracer = $tracerProvider->getTracer();
 
-if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
-    echo 'Starting AlwaysOnZipkinExample';
-    $tracer = (new TracerProvider())
-        ->addSpanProcessor(new SimpleSpanProcessor($zipkinExporter))
-        ->getTracer('io.opentelemetry.contrib.php');
+echo 'Starting AlwaysOnZipkinExample';
 
-    for ($i = 0; $i < 5; $i++) {
-        // start a span, register some events
-        $timestamp = AbstractClock::getDefault()->timestamp();
-        $span = $tracer->startAndActivateSpan('session.generate.span.' . microtime(true));
+$root = $span = $tracer->spanBuilder('root')->startSpan();
+$span->activate();
 
-        $spanParent = $span->getParentContext();
-        echo sprintf(
-            PHP_EOL . 'Exporting Trace: %s, Parent: %s, Span: %s',
-            $span->getContext()->getTraceId(),
-            $spanParent ? $spanParent->getSpanId() : 'None',
-            $span->getContext()->getSpanId()
-        );
+for ($i = 0; $i < 3; $i++) {
+    // start a span, register some events
+    $span = $tracer->spanBuilder('loop-' . $i)->startSpan();
 
-        $span->setAttribute('remote_ip', '1.2.3.4')
-            ->setAttribute('country', 'USA');
+    $span->setAttribute('remote_ip', '1.2.3.4')
+        ->setAttribute('country', 'USA');
 
-        $span->addEvent('found_login' . $i, new Attributes([
-            'id' => $i,
-            'username' => 'otuser' . $i,
-        ]), $timestamp);
-        $span->addEvent('generated_session', new Attributes([
-            'id' => md5((string) microtime(true)),
-        ]), $timestamp);
+    $span->addEvent('found_login' . $i, new Attributes([
+        'id' => $i,
+        'username' => 'otuser' . $i,
+    ]));
+    $span->addEvent('generated_session', new Attributes([
+        'id' => md5((string) microtime(true)),
+    ]));
 
-        try {
-            throw new Exception('Record exception test event');
-        } catch (Exception $exception) {
-            $span->recordException($exception);
-        }
-
-        $span->end();
-    }
-    echo PHP_EOL . 'AlwaysOnZipkinExample complete!  See the results at http://localhost:9411/';
-} else {
-    echo PHP_EOL . 'AlwaysOnZipkinExample tracing is not enabled';
+    $span->end();
 }
+$root->end();
+echo PHP_EOL . 'AlwaysOnZipkinExample complete!  See the results at http://localhost:9411/';
 
 echo PHP_EOL;

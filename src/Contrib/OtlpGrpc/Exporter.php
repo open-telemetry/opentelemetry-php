@@ -7,16 +7,19 @@ namespace OpenTelemetry\Contrib\OtlpGrpc;
 use grpc;
 use Grpc\ChannelCredentials;
 use InvalidArgumentException;
+use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
+use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class Exporter implements SpanExporterInterface
 {
     use EnvironmentVariablesTrait;
     use SpanExporterTrait;
+    use UsesSpanConverterTrait;
 
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
     // private $protocol;
@@ -28,8 +31,6 @@ class Exporter implements SpanExporterInterface
     private bool $compression;
 
     private int $timeout;
-
-    private SpanConverter $spanConverter;
 
     private array $metadata;
 
@@ -56,7 +57,7 @@ class Exporter implements SpanExporterInterface
         $this->compression = $this->getBooleanFromEnvironment('OTEL_EXPORTER_OTLP_COMPRESSION', $compression);
         $this->timeout = $this->getIntFromEnvironment('OTEL_EXPORTER_OTLP_TIMEOUT', $timeout);
 
-        $this->spanConverter = new SpanConverter();
+        $this->setSpanConverter(new SpanConverter());
 
         $this->metadata = $this->metadataFromHeaders(
             $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', $headers)
@@ -96,7 +97,7 @@ class Exporter implements SpanExporterInterface
      */
     protected function doExport(iterable $spans): int
     {
-        $resourceSpans = [$this->spanConverter->as_otlp_resource_span($spans)];
+        $resourceSpans = $this->getSpanConverter()->convert($spans);
 
         $request = new ExportTraceServiceRequest([
             'resource_spans' => $resourceSpans,

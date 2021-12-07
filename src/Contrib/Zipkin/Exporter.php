@@ -49,7 +49,7 @@ class Exporter implements SpanExporterInterface
     protected function serializeTrace(iterable $spans): string
     {
         return json_encode(
-            $this->convertSpanCollection($spans),
+            $this->getSpanConverter()->convert($spans),
             JSON_THROW_ON_ERROR
         );
     }

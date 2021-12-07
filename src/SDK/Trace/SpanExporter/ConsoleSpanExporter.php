@@ -26,7 +26,7 @@ class ConsoleSpanExporter implements SpanExporterInterface
         try {
             foreach ($spans as $span) {
                 print(json_encode(
-                    $this->getSpanConverter()->convert($span),
+                    $this->getSpanConverter()->convert([$span]),
                     JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT
                 ) . PHP_EOL
                 );

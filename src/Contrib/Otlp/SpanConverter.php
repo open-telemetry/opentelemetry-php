@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Contrib\OtlpGrpc;
+namespace OpenTelemetry\Contrib\Otlp;
 
 use function array_key_exists;
 use function hex2bin;
@@ -20,11 +20,17 @@ use Opentelemetry\Proto\Trace\V1\Span\Link;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
+use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
-class SpanConverter
+class SpanConverter implements SpanConverterInterface
 {
-    public function as_otlp_key_value($key, $value): KeyValue
+    public function convert(iterable $spans): array
+    {
+        return [$this->as_otlp_resource_span($spans)];
+    }
+
+    private function as_otlp_key_value($key, $value): KeyValue
     {
         return new KeyValue([
             'key' => $key,
@@ -32,19 +38,17 @@ class SpanConverter
         ]);
     }
 
-    public function as_otlp_any_value($value): AnyValue
+    private function as_otlp_any_value($value): AnyValue
     {
         $result = new AnyValue();
 
         switch (true) {
             case is_array($value):
-
                 $values = [];
                 foreach ($value as $element) {
-                    $this->as_otlp_any_value($element);
+                    $values[] = $this->as_otlp_any_value($element);
                 }
-
-                $result->setArrayValue(new ArrayValue($values));
+                $result->setArrayValue(new ArrayValue(['values' => $values]));
 
                 break;
             case is_int($value):
@@ -55,7 +59,7 @@ class SpanConverter
                 $result->setBoolValue($value);
 
                 break;
-            case is_float($value):
+            case is_double($value):
                 $result->setDoubleValue($value);
 
                 break;
@@ -68,7 +72,7 @@ class SpanConverter
         return $result;
     }
 
-    public function as_otlp_span_kind($kind): int
+    private function as_otlp_span_kind($kind): int
     {
         switch ($kind) {
             case 0: return SpanKind::SPAN_KIND_INTERNAL;
@@ -81,7 +85,7 @@ class SpanConverter
         return SpanKind::SPAN_KIND_UNSPECIFIED;
     }
 
-    public function as_otlp_span(SpanDataInterface $span): CollectorSpan
+    private function as_otlp_span(SpanDataInterface $span): CollectorSpan
     {
         $parent_span = $span->getParentContext();
         $parent_span_id = $parent_span->isValid() ? $parent_span->getSpanId() : null;
@@ -95,7 +99,7 @@ class SpanConverter
             'end_time_unix_nano' => $span->getEndEpochNanos(),
             'kind' => $this->as_otlp_span_kind($span->getKind()),
             'trace_state' => (string) $span->getContext()->getTraceState(),
-            'dropped_attributes_count' => $span->getTotalDroppedAttributes(),
+            'dropped_attributes_count' => $span->getAttributes()->getDroppedAttributesCount(),
             'dropped_events_count' => $span->getTotalDroppedEvents(),
             'dropped_links_count' => $span->getTotalDroppedLinks(),
         ];
@@ -165,7 +169,7 @@ class SpanConverter
     }
 
     // @return KeyValue[]
-    public function as_otlp_resource_attributes(iterable $spans): array
+    private function as_otlp_resource_attributes(iterable $spans): array
     {
         $attrs = [];
         foreach ($spans as $span) {
@@ -177,7 +181,7 @@ class SpanConverter
         return array_values($attrs);
     }
 
-    public function as_otlp_resource_span(iterable $spans): ResourceSpans
+    private function as_otlp_resource_span(iterable $spans): ResourceSpans
     {
         $isSpansEmpty = true; //Waiting for the loop to prove otherwise
 

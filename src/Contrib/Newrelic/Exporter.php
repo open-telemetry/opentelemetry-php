@@ -78,7 +78,7 @@ class Exporter implements SpanExporterInterface
             'host' => $this->endpointUrl, ]];
 
         return [[ 'common' => $commonAttributes,
-            'spans' => $this->convertSpanCollection($spans), ]];
+            'spans' => $this->getSpanConverter()->convert($spans), ]];
     }
 
     /**
