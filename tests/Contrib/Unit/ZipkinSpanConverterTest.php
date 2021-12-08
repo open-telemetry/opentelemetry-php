@@ -8,6 +8,7 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
+use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\Attributes;
@@ -104,24 +105,24 @@ class ZipkinSpanConverterTest extends TestCase
      * @test
      * @dataProvider spanKindProvider
      */
-    public function shouldConvertOTELSpanToAZipkinSpan($kind)
+    public function shouldConvertOTELSpanToAZipkinSpan(int $internalSpanKind, string $expectedSpanKind)
     {
         $span = (new SpanData())
-            ->setKind($kind);
+            ->setKind($internalSpanKind);
 
         $converter = new SpanConverter('unused');
         $row = $converter->convert([$span])[0];
 
-        $this->assertSame($kind, $row['kind']);
+        $this->assertSame($expectedSpanKind, $row['kind']);
     }
 
     public function spanKindProvider(): array
     {
         return [
-            'server' => [SpanKind::KIND_SERVER],
-            'client' => [SpanKind::KIND_CLIENT],
-            'producer' => [SpanKind::KIND_PRODUCER],
-            'consumer' => [SpanKind::KIND_CONSUMER],
+            'server' => [SpanKind::KIND_SERVER, ZipkinSpanKind::SERVER],
+            'client' => [SpanKind::KIND_CLIENT, ZipkinSpanKind::CLIENT],
+            'producer' => [SpanKind::KIND_PRODUCER, ZipkinSpanKind::PRODUCER],
+            'consumer' => [SpanKind::KIND_CONSUMER, ZipkinSpanKind::CONSUMER],
         ];
     }
 

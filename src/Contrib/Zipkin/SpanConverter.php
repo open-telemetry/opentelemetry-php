@@ -10,6 +10,7 @@ use OpenTelemetry\API\Trace\AttributeInterface;
 use OpenTelemetry\API\Trace\EventInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
+use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
 use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -138,17 +139,17 @@ class SpanConverter implements SpanConverterInterface
         return $row;
     }
 
-    private static function toSpanKind(SpanDataInterface $span): ?int
+    private static function toSpanKind(SpanDataInterface $span): ?string
     {
         switch ($span->getKind()) {
           case SpanKind::KIND_SERVER:
-            return SpanKind::KIND_SERVER;
+            return ZipkinSpanKind::SERVER;
           case SpanKind::KIND_CLIENT:
-            return SpanKind::KIND_CLIENT;
+            return ZipkinSpanKind::CLIENT;
           case SpanKind::KIND_PRODUCER:
-            return SpanKind::KIND_PRODUCER;
+            return ZipkinSpanKind::PRODUCER;
           case SpanKind::KIND_CONSUMER:
-            return SpanKind::KIND_CONSUMER;
+            return ZipkinSpanKind::CONSUMER;
           case SpanKind::KIND_INTERNAL:
             return null;
         }
@@ -176,12 +177,12 @@ class SpanConverter implements SpanConverterInterface
         if (count($event->getAttributes()) === 0) {
             return null;
         }
-        
+
         $attributesArray = [];
         foreach ($event->getAttributes() as $attr) {
             $attributesArray[$attr->getKey()] = $attr->getValue();
         }
-        
+
         $attributesAsJson = json_encode($attributesArray);
         if (($attributesAsJson === false) || (strlen($attributesAsJson) === 0)) {
             return null;
