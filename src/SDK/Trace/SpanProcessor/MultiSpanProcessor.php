@@ -8,6 +8,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use \OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 
 /**
  * Class SpanMultiProcessor is a SpanProcessor that forwards all events to an
@@ -15,6 +16,8 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
  */
 final class MultiSpanProcessor implements SpanProcessorInterface
 {
+    use LoggerAwareTrait;
+
     /** @var list<SpanProcessorInterface> */
     private array $processors = [];
 

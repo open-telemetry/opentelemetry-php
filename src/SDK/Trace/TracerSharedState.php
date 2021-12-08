@@ -8,12 +8,15 @@ use OpenTelemetry\API\Trace as API; /** @phan-suppress-current-line PhanUnrefere
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
+use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 
 /**
  * Stores shared state/config between all {@see API\TracerInterface} created via the same {@see API\TracerProviderInterface}.
  */
 final class TracerSharedState
 {
+    use LoggerAwareTrait;
+
     /** @readonly */
     private IdGeneratorInterface $idGenerator;
 
@@ -36,12 +39,16 @@ final class TracerSharedState
         ResourceInfo $resource,
         SpanLimits $spanLimits,
         SamplerInterface $sampler,
-        array $spanProcessors
+        array $spanProcessors,
+        \Psr\Log\LoggerInterface $logger
     ) {
         $this->idGenerator = $idGenerator;
         $this->resource = $resource;
         $this->spanLimits = $spanLimits;
         $this->sampler = $sampler;
+        foreach($spanProcessors as $spanProcessor) {
+            $this->injectLogger($spanProcessor);
+        }
 
         switch (count($spanProcessors)) {
             case 0:

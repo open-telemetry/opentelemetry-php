@@ -11,12 +11,14 @@ use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class Exporter implements SpanExporterInterface
 {
+    use LoggerAwareTrait;
     use EnvironmentVariablesTrait;
     use SpanExporterTrait;
     use UsesSpanConverterTrait;
@@ -109,6 +111,7 @@ class Exporter implements SpanExporterInterface
             return self::STATUS_SUCCESS;
         }
 
+        $this->log('Error exporting span', ['error' => $status->details], \Psr\Log\LogLevel::ERROR);
         if (in_array($status->code, [
             \Grpc\STATUS_CANCELLED,
             \Grpc\STATUS_DEADLINE_EXCEEDED,
@@ -123,6 +126,7 @@ class Exporter implements SpanExporterInterface
             return self::STATUS_FAILED_RETRYABLE;
         }
 
+        
         return self::STATUS_FAILED_NOT_RETRYABLE;
     }
 

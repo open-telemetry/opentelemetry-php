@@ -8,10 +8,13 @@ use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
+use Psr\Log\LogLevel;
 use Throwable;
 
 class ConsoleSpanExporter implements SpanExporterInterface
 {
+    use LoggerAwareTrait;
     use SpanExporterTrait;
     use UsesSpanConverterTrait;
 
@@ -32,6 +35,7 @@ class ConsoleSpanExporter implements SpanExporterInterface
                 );
             }
         } catch (Throwable $t) {
+            $this->log('Error exporting span', ['error' => $t->getMessage()], LogLevel::ERROR);
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
 

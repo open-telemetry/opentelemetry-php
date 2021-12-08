@@ -7,9 +7,12 @@ namespace OpenTelemetry\SDK\Trace;
 use function ctype_space;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 
 class Tracer implements API\TracerInterface
 {
+    use LoggerAwareTrait;
+
     public const FALLBACK_SPAN_NAME = 'empty';
 
     /** @readonly */
