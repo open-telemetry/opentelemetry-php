@@ -98,6 +98,18 @@ From your bash compatible shell in the root of this directory.  This wil create 
 directory of the
 repository.
 
+
+## Semantic Conventions Generation
+A generated semantic convention files are committed to the repository in the `/src/SemConv` directory. These files
+get updated when new version of [opentelemetry-specification](https://github.com/open-telemetry/opentelemetry-specification)
+released.
+
+```bash
+SEMCONV_VERSION=1.8.0 make semconv
+```
+
+Run it from you bash compatible shell in the root of this repository.
+
 ## Styling
 We use [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) for our code linting and standards fixer.  The associated configuration for this standards fixer can be found in the root of the repository [here](https://github.com/open-telemetry/opentelemetry-php/blob/master/.php_cs)
 
