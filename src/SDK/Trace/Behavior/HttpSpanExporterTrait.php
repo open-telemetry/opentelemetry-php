@@ -7,7 +7,6 @@ namespace OpenTelemetry\SDK\Trace\Behavior;
 use InvalidArgumentException;
 use JsonException;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\RequestExceptionInterface;
@@ -16,7 +15,6 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
-use Psr\Log\LogLevel;
 use Throwable;
 
 /**
@@ -47,17 +45,20 @@ trait HttpSpanExporterTrait
         try {
             $response = $this->dispatchSpans($spans);
         } catch (ClientExceptionInterface $e) {
-            $this->log('Error exporting span', ['error' => $e->getMessage()], LogLevel::ERROR);
+            $this->error('Error exporting span', ['error' => $e->getMessage()]);
+
             return $e instanceof RequestExceptionInterface
                 ? SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE
                 : SpanExporterInterface::STATUS_FAILED_RETRYABLE;
         } catch (Throwable $e) {
-            $this->log('Error exporting span', ['error' => $e->getMessage()], LogLevel::ERROR);
+            $this->error('Error exporting span', ['error' => $e->getMessage()]);
+
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
 
         if ($response->getStatusCode() >= 400) {
-            $this->log('Error exporting span', ['error' => $response->getReasonPhrase(), 'code' => $response->getStatusCode()], LogLevel::ERROR);
+            $this->error('Error exporting span', ['error' => $response->getReasonPhrase(), 'code' => $response->getStatusCode()]);
+
             return $response->getStatusCode() < 500
                 ? SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE
                 : SpanExporterInterface::STATUS_FAILED_RETRYABLE;

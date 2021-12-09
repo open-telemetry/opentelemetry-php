@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 
 final class TracerProviderFactory
 {
+    use LoggerAwareTrait;
+
     private ExporterFactory $exporterFactory;
     private SamplerFactory $samplerFactory;
     private SpanProcessorFactory $spanProcessorFactory;
@@ -25,9 +28,9 @@ final class TracerProviderFactory
 
     public function create(): API\TracerProviderInterface
     {
-        $exporter = $this->exporterFactory->fromEnvironment();
+        $exporter = $this->exporterFactory->withLogger($this->getLogger())->fromEnvironment();
         $sampler = $this->samplerFactory->fromEnvironment();
-        $spanProcessor = $this->spanProcessorFactory->fromEnvironment($exporter);
+        $spanProcessor = $this->spanProcessorFactory->withLogger($this->getLogger())->fromEnvironment($exporter);
 
         return new TracerProvider(
             $spanProcessor,

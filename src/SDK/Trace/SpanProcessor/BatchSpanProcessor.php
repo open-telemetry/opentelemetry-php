@@ -9,15 +9,18 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace\AbstractClock;
+use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use Psr\Log\LoggerAwareInterface;
 
-class BatchSpanProcessor implements SpanProcessorInterface
+class BatchSpanProcessor implements SpanProcessorInterface, LoggerAwareInterface
 {
     use EnvironmentVariablesTrait;
+    use LoggerAwareTrait;
 
     public const DEFAULT_SCHEDULE_DELAY = 5000;
     public const DEFAULT_EXPORT_TIMEOUT = 30000;
@@ -112,6 +115,8 @@ class BatchSpanProcessor implements SpanProcessorInterface
         if (!$this->running) {
             return true;
         }
+
+        $this->debug('Shutting down span processor');
 
         if (null !== $this->exporter) {
             $this->forceFlush() && $this->exporter->shutdown();

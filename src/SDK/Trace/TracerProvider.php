@@ -8,9 +8,9 @@ use function is_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
-use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait; //TODO not just for trace
 
 use function register_shutdown_function;
 
@@ -52,7 +52,7 @@ final class TracerProvider implements API\TracerProviderInterface
             $spanLimits,
             $sampler,
             $spanProcessors,
-            $this->getLogger(),
+            //$this->getLogger(),
         );
 
         register_shutdown_function([$this, 'shutdown']);

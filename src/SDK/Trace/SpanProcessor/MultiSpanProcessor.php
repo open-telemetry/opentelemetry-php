@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
-use \OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 
 /**
  * Class SpanMultiProcessor is a SpanProcessor that forwards all events to an
@@ -58,6 +58,7 @@ final class MultiSpanProcessor implements SpanProcessorInterface
     /** @inheritDoc */
     public function shutdown(): bool
     {
+        $this->debug('Shutting down span processor');
         $result = true;
 
         foreach ($this->processors as $processor) {

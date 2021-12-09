@@ -15,8 +15,9 @@ use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use Psr\Log\LoggerAwareInterface;
 
-class Exporter implements SpanExporterInterface
+class Exporter implements SpanExporterInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
     use EnvironmentVariablesTrait;
@@ -111,7 +112,10 @@ class Exporter implements SpanExporterInterface
             return self::STATUS_SUCCESS;
         }
 
-        $this->log('Error exporting span', ['error' => $status->details], \Psr\Log\LogLevel::ERROR);
+        $this->error('Error exporting span', [
+            'error' => $status->details ?? 'unknown grpc error',
+            'code' => $status->code,
+        ]);
         if (in_array($status->code, [
             \Grpc\STATUS_CANCELLED,
             \Grpc\STATUS_DEADLINE_EXCEEDED,
@@ -126,7 +130,6 @@ class Exporter implements SpanExporterInterface
             return self::STATUS_FAILED_RETRYABLE;
         }
 
-        
         return self::STATUS_FAILED_NOT_RETRYABLE;
     }
 

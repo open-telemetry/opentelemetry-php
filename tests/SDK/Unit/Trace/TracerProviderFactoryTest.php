@@ -20,6 +20,8 @@ class TracerProviderFactoryTest extends TestCase
         $exporterFactory = $this->createMock(ExporterFactory::class);
         $samplerFactory = $this->createMock(SamplerFactory::class);
         $spanProcessorFactory = $this->createMock(SpanProcessorFactory::class);
+        $exporterFactory->method('withLogger')->willReturnSelf();
+        $spanProcessorFactory->method('withLogger')->willReturnSelf();
 
         $exporterFactory->expects($this->once())->method('fromEnvironment');
         $samplerFactory->expects($this->once())->method('fromEnvironment');

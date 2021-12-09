@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
-use \OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
+use Psr\Log\LoggerAwareInterface;
 
-class SimpleSpanProcessor implements SpanProcessorInterface
+class SimpleSpanProcessor implements SpanProcessorInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -54,7 +55,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         }
 
         $this->running = false;
-        $this->log('Shutting down span processor', [], \Psr\Log\LogLevel::DEBUG);
+        $this->debug('Shutting down span processor');
 
         if (null !== $this->exporter) {
             return $this->forceFlush() && $this->exporter->shutdown();

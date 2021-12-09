@@ -13,11 +13,13 @@ use OpenTelemetry\Contrib\OtlpHttp\Exporter as OtlpHttpExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter as ZipkinToNewrelicExporter;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 
 class ExporterFactory
 {
     use EnvironmentVariablesTrait;
+    use LoggerAwareTrait;
 
     private string $name;
     private array $allowedExporters = ['jaeger' => true, 'zipkin' => true, 'newrelic' => true, 'otlp' => true, 'otlpgrpc' => true, 'otlphttp' => true ,'zipkintonewrelic' => true, 'console' => true];
@@ -55,28 +57,29 @@ class ExporterFactory
         // parameters are only retrieved if there was an endpoint given
         $args = empty($dsn) ? [] : $dsn->getParameters();
         $scheme = empty($dsn) ? '' : $dsn->getScheme();
+        $exporter = null;
 
         switch ($contribName) {
             case 'jaeger':
-                return JaegerExporter::fromConnectionString($endpointUrl, $this->name);
+                return $this->injectLogger(JaegerExporter::fromConnectionString($endpointUrl, $this->name));
             case 'zipkin':
-                return ZipkinExporter::fromConnectionString($endpointUrl, $this->name);
+                return $this->injectLogger(ZipkinExporter::fromConnectionString($endpointUrl, $this->name));
             case 'newrelic':
-                return NewrelicExporter::fromConnectionString($endpointUrl, $this->name, $args['licenseKey'] ?? null);
+                return $this->injectLogger(NewrelicExporter::fromConnectionString($endpointUrl, $this->name, $args['licenseKey'] ?? null));
             case 'otlp':
                 switch ($scheme) {
                 case 'grpc':
-                    return OtlpGrpcExporter::fromConnectionString($endpointUrl);
+                    return $this->injectLogger(OtlpGrpcExporter::fromConnectionString($endpointUrl));
                 case 'http':
-                    return OtlpHttpExporter::fromConnectionString($endpointUrl);
+                    return $this->injectLogger(OtlpHttpExporter::fromConnectionString($endpointUrl));
                 default:
                     throw new InvalidArgumentException('Invalid otlp scheme');
                 }
                 // no break
             case 'zipkintonewrelic':
-                return ZipkinToNewrelicExporter::fromConnectionString($endpointUrl, $this->name, $args['licenseKey'] ?? null);
+                return $this->injectLogger(ZipkinToNewrelicExporter::fromConnectionString($endpointUrl, $this->name, $args['licenseKey'] ?? null));
             case 'console':
-                return ConsoleSpanExporter::fromConnectionString($endpointUrl);
+                return $this->injectLogger(ConsoleSpanExporter::fromConnectionString($endpointUrl));
             default:
                 throw new InvalidArgumentException('Invalid contrib name.');
         }
@@ -109,9 +112,9 @@ class ExporterFactory
                 }
                 switch ($protocol) {
                     case 'grpc':
-                        return new OtlpGrpcExporter();
+                        return (new OtlpGrpcExporter())->withLogger($this->getLogger());
                     case 'http/protobuf':
-                        return OtlpHttpExporter::create();
+                        return OtlpHttpExporter::create()->withLogger($this->getLogger());
                     case 'http/json':
                         throw new InvalidArgumentException('otlp+http/json not implemented');
                     default:
@@ -119,7 +122,7 @@ class ExporterFactory
                 }
                 // no break
             case 'console':
-                return new ConsoleSpanExporter();
+                return (new ConsoleSpanExporter())->withLogger($this->getLogger());
             default:
                 throw new InvalidArgumentException('Invalid exporter name');
         }

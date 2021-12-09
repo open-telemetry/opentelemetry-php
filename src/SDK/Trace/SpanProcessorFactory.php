@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
+use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 
 class SpanProcessorFactory
 {
+    use LoggerAwareTrait;
+
     public function fromEnvironment(?SpanExporterInterface $exporter = null): SpanProcessorInterface
     {
         $name = getenv('OTEL_PHP_TRACES_PROCESSOR');
@@ -19,12 +22,12 @@ class SpanProcessorFactory
         }
         switch ($name) {
             case 'batch':
-                return new BatchSpanProcessor($exporter);
+                return $this->injectLogger(new BatchSpanProcessor($exporter));
             case 'simple':
-                return new SimpleSpanProcessor($exporter);
+                return $this->injectLogger(new SimpleSpanProcessor($exporter));
             case 'noop':
             case 'none':
-                return NoopSpanProcessor::getInstance();
+                return $this->injectLogger(NoopSpanProcessor::getInstance());
             default:
                 throw new InvalidArgumentException('Unknown processor: ' . $name);
         }

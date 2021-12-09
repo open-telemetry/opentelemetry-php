@@ -56,6 +56,9 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
         try {
             $this->doLog($spans);
         } catch (Throwable $t) {
+            //TODO log exporter and logger use the same logger, so this might not work
+            //$this->error('error exporting span', ['error' => $t]);
+
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
 
