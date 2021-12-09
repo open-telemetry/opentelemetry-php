@@ -68,6 +68,11 @@ trait LoggerAwareTrait
         $this->log($message, $context, LogLevel::ERROR);
     }
 
+    protected function info(string $message, array $context = []): void
+    {
+        $this->log($message, $context, LogLevel::INFO);
+    }
+
     /**
      * Inject the logger into another class that implements LoggerAwareInterface, and
      * return the instance.
