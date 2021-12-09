@@ -28,9 +28,9 @@ final class TracerProviderFactory
 
     public function create(): API\TracerProviderInterface
     {
-        $exporter = $this->exporterFactory->withLogger($this->getLogger())->fromEnvironment();
+        $exporter = $this->injectLogger($this->exporterFactory)->fromEnvironment();
         $sampler = $this->samplerFactory->fromEnvironment();
-        $spanProcessor = $this->spanProcessorFactory->withLogger($this->getLogger())->fromEnvironment($exporter);
+        $spanProcessor = $this->injectLogger($this->spanProcessorFactory)->fromEnvironment($exporter);
 
         return new TracerProvider(
             $spanProcessor,

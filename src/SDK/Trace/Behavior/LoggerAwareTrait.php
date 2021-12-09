@@ -11,7 +11,7 @@ use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 
 /**
- * TODO this trait is useful in other modules and should be pulled up to OpenTelemetry\SDK
+ * TODO this trait is useful in other modules (eg Metrics) and should be pulled up to OpenTelemetry\SDK
  */
 trait LoggerAwareTrait
 {
@@ -45,7 +45,7 @@ trait LoggerAwareTrait
     protected function log(string $message, array $context = [], ?string $level = null): void
     {
         //TODO basic info on which class created the message, cheaper than calculating from a stack trace
-        $context['caller'] = __CLASS__;
+        $context['source'] = __CLASS__;
         $this->getLogger()->log(
             $level ?? $this->defaultLogLevel,
             $message,
@@ -68,6 +68,10 @@ trait LoggerAwareTrait
         $this->log($message, $context, LogLevel::ERROR);
     }
 
+    /**
+     * Inject the logger into another class that implements LoggerAwareInterface, and
+     * return the instance.
+     */
     protected function injectLogger($instance)
     {
         if ($instance instanceof LoggerAwareInterface) {

@@ -52,7 +52,6 @@ final class TracerProvider implements API\TracerProviderInterface
             $spanLimits,
             $sampler,
             $spanProcessors,
-            //$this->getLogger(),
         );
 
         register_shutdown_function([$this, 'shutdown']);

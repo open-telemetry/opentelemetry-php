@@ -57,7 +57,6 @@ class ExporterFactory
         // parameters are only retrieved if there was an endpoint given
         $args = empty($dsn) ? [] : $dsn->getParameters();
         $scheme = empty($dsn) ? '' : $dsn->getScheme();
-        $exporter = null;
 
         switch ($contribName) {
             case 'jaeger':
@@ -112,9 +111,9 @@ class ExporterFactory
                 }
                 switch ($protocol) {
                     case 'grpc':
-                        return (new OtlpGrpcExporter())->withLogger($this->getLogger());
+                        return $this->injectLogger(new OtlpGrpcExporter());
                     case 'http/protobuf':
-                        return OtlpHttpExporter::create()->withLogger($this->getLogger());
+                        return $this->injectLogger(OtlpHttpExporter::create());
                     case 'http/json':
                         throw new InvalidArgumentException('otlp+http/json not implemented');
                     default:
@@ -122,7 +121,7 @@ class ExporterFactory
                 }
                 // no break
             case 'console':
-                return (new ConsoleSpanExporter())->withLogger($this->getLogger());
+                return $this->injectLogger(new ConsoleSpanExporter());
             default:
                 throw new InvalidArgumentException('Invalid exporter name');
         }

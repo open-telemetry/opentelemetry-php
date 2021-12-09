@@ -51,5 +51,5 @@ $tracerProviderTwo = (new TracerProviderFactory('example'))->withLogger($loggerT
 
 $tracerTwo = $tracerProviderTwo->getTracer();
 
-$spanTwo = $tracerTwo->spanBuilder('three')->startSpan();
+$spanTwo = $tracerTwo->spanBuilder('span-two')->startSpan();
 $spanTwo->end();

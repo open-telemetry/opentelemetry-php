@@ -37,7 +37,8 @@ class Tracer implements API\TracerInterface
         }
 
         if ($this->tracerSharedState->hasShutdown()) {
-            // TODO: Return a noop tracer
+            $this->warning('Tracer has shut down');
+            // TODO: Return a noop tracer (or noop span builder?)
         }
 
         return new SpanBuilder(
