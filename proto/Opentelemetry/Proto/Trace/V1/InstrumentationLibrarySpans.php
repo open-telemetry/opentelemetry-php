@@ -29,6 +29,12 @@ class InstrumentationLibrarySpans extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .opentelemetry.proto.trace.v1.Span spans = 2;</code>
      */
     private $spans;
+    /**
+     * This schema_url applies to all spans and span events in the "spans" field.
+     *
+     * Generated from protobuf field <code>string schema_url = 3;</code>
+     */
+    private $schema_url = '';
 
     /**
      * Constructor.
@@ -42,6 +48,8 @@ class InstrumentationLibrarySpans extends \Google\Protobuf\Internal\Message
      *           an empty instrumentation library name (unknown).
      *     @type \Opentelemetry\Proto\Trace\V1\Span[]|\Google\Protobuf\Internal\RepeatedField $spans
      *           A list of Spans that originate from an instrumentation library.
+     *     @type string $schema_url
+     *           This schema_url applies to all spans and span events in the "spans" field.
      * }
      */
     public function __construct($data = NULL) {
@@ -101,6 +109,32 @@ class InstrumentationLibrarySpans extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Trace\V1\Span::class);
         $this->spans = $arr;
+
+        return $this;
+    }
+
+    /**
+     * This schema_url applies to all spans and span events in the "spans" field.
+     *
+     * Generated from protobuf field <code>string schema_url = 3;</code>
+     * @return string
+     */
+    public function getSchemaUrl()
+    {
+        return $this->schema_url;
+    }
+
+    /**
+     * This schema_url applies to all spans and span events in the "spans" field.
+     *
+     * Generated from protobuf field <code>string schema_url = 3;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setSchemaUrl($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->schema_url = $var;
 
         return $this;
     }

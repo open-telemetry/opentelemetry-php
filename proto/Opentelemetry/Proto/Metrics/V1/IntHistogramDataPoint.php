@@ -10,15 +10,6 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * IntHistogramDataPoint is deprecated; use HistogramDataPoint.
- * This is a single data point in a timeseries that describes
- * the time-varying values of a Histogram of int values. A Histogram contains
- * summary statistics for a population of values, it may optionally contain
- * the distribution of those values across a set of buckets.
- * If the histogram contains the distribution of values, then both
- * "explicit_bounds" and "bucket counts" fields must be defined.   
- * If the histogram does not contain the distribution of values, then both
- * "explicit_bounds" and "bucket_counts" must be omitted and only "count" and
- * "sum" are known.
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.IntHistogramDataPoint</code>
  */
@@ -31,23 +22,16 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
      */
     private $labels;
     /**
-     * start_time_unix_nano is the last time when the aggregation value was reset
-     * to "zero". For some metric types this is ignored, see data types for more
-     * details.
-     * The aggregation value is over the time interval (start_time_unix_nano,
-     * time_unix_nano].
-     * 
+     * StartTimeUnixNano is optional but strongly encouraged, see the
+     * the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
-     * Value of 0 indicates that the timestamp is unspecified. In that case the
-     * timestamp may be decided by the backend.
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      */
     private $start_time_unix_nano = 0;
     /**
-     * time_unix_nano is the moment when this aggregation value was reported.
-     * 
+     * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
      *
@@ -82,12 +66,10 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
     private $bucket_counts;
     /**
      * explicit_bounds specifies buckets with explicitly defined bounds for values.
-     * This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-     * bucket at index i are:
+     * The boundaries for bucket at index i are:
      * (-infinity, explicit_bounds[i]] for i == 0
-     * (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-     * (explicit_bounds[i], +infinity) for i == N-1
-     * 
+     * (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
+     * (explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)
      * The values in the explicit_bounds array must be strictly increasing.
      * Histogram buckets are inclusive of their upper boundary, except the last
      * bucket where the boundary is at infinity. This format is intentionally
@@ -113,19 +95,12 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *     @type \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $labels
      *           The set of labels that uniquely identify this timeseries.
      *     @type int|string $start_time_unix_nano
-     *           start_time_unix_nano is the last time when the aggregation value was reset
-     *           to "zero". For some metric types this is ignored, see data types for more
-     *           details.
-     *           The aggregation value is over the time interval (start_time_unix_nano,
-     *           time_unix_nano].
-     *           
+     *           StartTimeUnixNano is optional but strongly encouraged, see the
+     *           the detailed comments above Metric.
      *           Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      *           1970.
-     *           Value of 0 indicates that the timestamp is unspecified. In that case the
-     *           timestamp may be decided by the backend.
      *     @type int|string $time_unix_nano
-     *           time_unix_nano is the moment when this aggregation value was reported.
-     *           
+     *           TimeUnixNano is required, see the detailed comments above Metric.
      *           Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      *           1970.
      *     @type int|string $count
@@ -144,12 +119,10 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *           the number of elements in explicit_bounds array.
      *     @type float[]|\Google\Protobuf\Internal\RepeatedField $explicit_bounds
      *           explicit_bounds specifies buckets with explicitly defined bounds for values.
-     *           This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-     *           bucket at index i are:
+     *           The boundaries for bucket at index i are:
      *           (-infinity, explicit_bounds[i]] for i == 0
-     *           (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-     *           (explicit_bounds[i], +infinity) for i == N-1
-     *           
+     *           (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
+     *           (explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)
      *           The values in the explicit_bounds array must be strictly increasing.
      *           Histogram buckets are inclusive of their upper boundary, except the last
      *           bucket where the boundary is at infinity. This format is intentionally
@@ -191,16 +164,10 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * start_time_unix_nano is the last time when the aggregation value was reset
-     * to "zero". For some metric types this is ignored, see data types for more
-     * details.
-     * The aggregation value is over the time interval (start_time_unix_nano,
-     * time_unix_nano].
-     * 
+     * StartTimeUnixNano is optional but strongly encouraged, see the
+     * the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
-     * Value of 0 indicates that the timestamp is unspecified. In that case the
-     * timestamp may be decided by the backend.
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      * @return int|string
@@ -211,16 +178,10 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * start_time_unix_nano is the last time when the aggregation value was reset
-     * to "zero". For some metric types this is ignored, see data types for more
-     * details.
-     * The aggregation value is over the time interval (start_time_unix_nano,
-     * time_unix_nano].
-     * 
+     * StartTimeUnixNano is optional but strongly encouraged, see the
+     * the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
-     * Value of 0 indicates that the timestamp is unspecified. In that case the
-     * timestamp may be decided by the backend.
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      * @param int|string $var
@@ -235,8 +196,7 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * time_unix_nano is the moment when this aggregation value was reported.
-     * 
+     * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
      *
@@ -249,8 +209,7 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * time_unix_nano is the moment when this aggregation value was reported.
-     * 
+     * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
      *
@@ -362,12 +321,10 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
 
     /**
      * explicit_bounds specifies buckets with explicitly defined bounds for values.
-     * This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-     * bucket at index i are:
+     * The boundaries for bucket at index i are:
      * (-infinity, explicit_bounds[i]] for i == 0
-     * (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-     * (explicit_bounds[i], +infinity) for i == N-1
-     * 
+     * (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
+     * (explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)
      * The values in the explicit_bounds array must be strictly increasing.
      * Histogram buckets are inclusive of their upper boundary, except the last
      * bucket where the boundary is at infinity. This format is intentionally
@@ -383,12 +340,10 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
 
     /**
      * explicit_bounds specifies buckets with explicitly defined bounds for values.
-     * This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-     * bucket at index i are:
+     * The boundaries for bucket at index i are:
      * (-infinity, explicit_bounds[i]] for i == 0
-     * (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-     * (explicit_bounds[i], +infinity) for i == N-1
-     * 
+     * (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
+     * (explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)
      * The values in the explicit_bounds array must be strictly increasing.
      * Histogram buckets are inclusive of their upper boundary, except the last
      * bucket where the boundary is at infinity. This format is intentionally

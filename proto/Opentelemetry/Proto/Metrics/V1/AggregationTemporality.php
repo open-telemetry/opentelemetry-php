@@ -74,7 +74,7 @@ class AggregationTemporality
      *   12. The 1 second collection cycle ends. A metric is exported for the
      *      number of requests received over the interval of time t_1 to
      *      t_0+1 with a value of 1.
-     * Note: Even though, when reporting changes since last report time, using 
+     * Note: Even though, when reporting changes since last report time, using
      * CUMULATIVE is valid, it is not recommended. This may cause problems for
      * systems that do not use start_time to determine when the aggregation
      * value was reset (e.g. Prometheus).

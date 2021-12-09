@@ -10,15 +10,6 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * IntGauge is deprecated.  Use Gauge with an integer value in NumberDataPoint.
- * IntGauge represents the type of a int scalar metric that always exports the
- * "current value" for every data point. It should be used for an "unknown"
- * aggregation.
- * 
- * A Gauge does not support different aggregation temporalities. Given the
- * aggregation is unknown, points cannot be combined using the same
- * aggregation, regardless of aggregation temporalities. Therefore,
- * AggregationTemporality is not included. Consequently, this also means
- * "StartTimeUnixNano" is ignored for all data points.
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.IntGauge</code>
  */
