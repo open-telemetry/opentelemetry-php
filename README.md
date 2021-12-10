@@ -76,6 +76,7 @@ however most OS` package managers provide a package for the extension.
 In order to use compression in HTTP requests you should install
 the  PHP zlib extension. You can use the same install methods as described for the gRPC extension above,
 however most OS` package managers provide a package for the extension.
+
 ---
 
 ## Installation
