@@ -68,7 +68,7 @@ class TracerProviderFactoryTest extends TestCase
         $spanProcessorFactory->expects($this->once())
             ->method('fromEnvironment')
             ->willThrowException(new \InvalidArgumentException('foo'));
-        $this->logger->expects($this->atLeast(3))->method('warning');
+        $this->logger->expects($this->atLeast(3))->method('log');
 
         $factory = new TracerProviderFactory('test', $exporterFactory, $samplerFactory, $spanProcessorFactory);
         $factory->create();
