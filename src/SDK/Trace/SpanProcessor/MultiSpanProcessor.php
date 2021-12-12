@@ -58,7 +58,7 @@ final class MultiSpanProcessor implements SpanProcessorInterface
     /** @inheritDoc */
     public function shutdown(): bool
     {
-        $this->debug('Shutting down span processor');
+        $this->logDebug('Shutting down span processor');
         $result = true;
 
         foreach ($this->processors as $processor) {

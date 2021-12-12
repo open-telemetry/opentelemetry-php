@@ -29,8 +29,11 @@ trait LoggerAwareTrait
 
     /**
      * @return static
+     * @suppress PhanParamSignatureMismatch
+     * @suppress PhanTypeInvalidTraitReturn
+     * @psalm-suppress ImplementedReturnTypeMismatch
      */
-    public function withLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): self
     {
         $this->logger = $logger;
 
@@ -44,8 +47,7 @@ trait LoggerAwareTrait
      */
     protected function log(string $message, array $context = [], ?string $level = null): void
     {
-        //TODO basic info on which class created the message, cheaper than calculating from a stack trace
-        $context['source'] = __CLASS__;
+        $context['source'] = get_class($this);
         $this->getLogger()->log(
             $level ?? $this->defaultLogLevel,
             $message,
@@ -53,31 +55,36 @@ trait LoggerAwareTrait
         );
     }
 
-    protected function debug(string $message, array $context = []): void
+    protected function logDebug(string $message, array $context = []): void
     {
         $this->log($message, $context, LogLevel::DEBUG);
     }
 
-    protected function warning(string $message, array $context = []): void
+    protected function logWarning(string $message, array $context = []): void
     {
         $this->log($message, $context, LogLevel::WARNING);
     }
 
-    protected function error(string $message, array $context = []): void
+    protected function logError(string $message, array $context = []): void
     {
         $this->log($message, $context, LogLevel::ERROR);
     }
 
-    protected function info(string $message, array $context = []): void
+    protected function logInfo(string $message, array $context = []): void
     {
         $this->log($message, $context, LogLevel::INFO);
+    }
+
+    protected function logNotice(string $message, array $context = []): void
+    {
+        $this->log($message, $context, LogLevel::NOTICE);
     }
 
     /**
      * Inject the logger into another class that implements LoggerAwareInterface, and
      * return the instance.
      */
-    protected function injectLogger($instance)
+    protected function injectLogger(object $instance): object
     {
         if ($instance instanceof LoggerAwareInterface) {
             $instance->setLogger($this->getLogger());

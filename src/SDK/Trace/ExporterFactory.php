@@ -35,6 +35,8 @@ class ExporterFactory
       * @param string $configurationString String containing unextracted information for Exporter creation
       * Should follow the format: contribType+baseUrl?option1=a
       * Query string is optional and based on the Exporter
+      * @psalm-suppress LessSpecificReturnStatement
+      * @psalm-suppress MoreSpecificReturnType
       */
     public function fromConnectionString(string $configurationString): SpanExporterInterface
     {
@@ -84,6 +86,10 @@ class ExporterFactory
         }
     }
 
+    /**
+     * @psalm-suppress LessSpecificReturnStatement
+     * @psalm-suppress MoreSpecificReturnType
+     */
     public function fromEnvironment(): ?SpanExporterInterface
     {
         $envValue = $this->getStringFromEnvironment('OTEL_TRACES_EXPORTER', '');

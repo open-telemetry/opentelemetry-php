@@ -9,6 +9,8 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 trait SpanExporterTrait
 {
+    use LoggerAwareTrait;
+
     private bool $running = true;
 
     /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#shutdown-2 */

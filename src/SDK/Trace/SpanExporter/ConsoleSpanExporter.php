@@ -34,7 +34,7 @@ class ConsoleSpanExporter implements SpanExporterInterface
                 );
             }
         } catch (Throwable $t) {
-            $this->error('Error exporting span', ['error' => $t->getMessage()]);
+            $this->logError('Error exporting span', ['error' => $t->getMessage()]);
 
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }

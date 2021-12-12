@@ -14,6 +14,10 @@ class SpanProcessorFactory
 {
     use LoggerAwareTrait;
 
+    /**
+     * @psalm-suppress LessSpecificReturnStatement
+     * @psalm-suppress MoreSpecificReturnType
+     */
     public function fromEnvironment(?SpanExporterInterface $exporter = null): SpanProcessorInterface
     {
         $name = getenv('OTEL_PHP_TRACES_PROCESSOR');

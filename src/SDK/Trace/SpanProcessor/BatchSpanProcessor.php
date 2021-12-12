@@ -116,7 +116,7 @@ class BatchSpanProcessor implements SpanProcessorInterface, LoggerAwareInterface
             return true;
         }
 
-        $this->debug('Shutting down span processor');
+        $this->logDebug('Shutting down span processor');
 
         if (null !== $this->exporter) {
             $this->forceFlush() && $this->exporter->shutdown();

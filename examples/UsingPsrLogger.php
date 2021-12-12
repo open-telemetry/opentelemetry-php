@@ -25,12 +25,12 @@ $loggerOne = new Logger('otel-one');
 $loggerOne->pushHandler(new StreamHandler(STDOUT, Logger::DEBUG));
 
 $spanProcessor = new MultiSpanProcessor(
-    (new SimpleSpanProcessor(OtlpGrpcExporter::fromConnectionString('localhost:4317')->withLogger($loggerOne)))->withLogger($loggerOne),
-    (new SimpleSpanProcessor(OtlpHttpExporter::fromConnectionString()->withLogger($loggerOne)))->withLogger($loggerOne),
-    (new SimpleSpanProcessor(NewrelicExporter::fromConnectionString('http://newrelic.localhost:9999', 'newrelic', 'fake-key')->withLogger($loggerOne)))->withLogger($loggerOne),
-    (new SimpleSpanProcessor(ZipkinExporter::fromConnectionString('http://zipkin.localhost:9411/v1/spans', 'zipkin')->withLogger($loggerOne)))->withLogger($loggerOne),
-    (new SimpleSpanProcessor(JaegerExporter::fromConnectionString('http://jaeger.localhost:9999/jaeger', 'jaeger')->withLogger($loggerOne)))->withLogger($loggerOne),
-    (new SimpleSpanProcessor(LoggerExporter::fromConnectionString('php://stdout', 'stdout-logger', LogLevel::INFO)->withLogger($loggerOne)))->withLogger($loggerOne),
+    (new SimpleSpanProcessor(OtlpGrpcExporter::fromConnectionString('localhost:4317')->setLogger($loggerOne)))->setLogger($loggerOne),
+    (new SimpleSpanProcessor(OtlpHttpExporter::fromConnectionString()->setLogger($loggerOne)))->setLogger($loggerOne),
+    (new SimpleSpanProcessor(NewrelicExporter::fromConnectionString('http://newrelic.localhost:9999', 'newrelic', 'fake-key')->setLogger($loggerOne)))->setLogger($loggerOne),
+    (new SimpleSpanProcessor(ZipkinExporter::fromConnectionString('http://zipkin.localhost:9411/v1/spans', 'zipkin')->setLogger($loggerOne)))->setLogger($loggerOne),
+    (new SimpleSpanProcessor(JaegerExporter::fromConnectionString('http://jaeger.localhost:9999/jaeger', 'jaeger')->setLogger($loggerOne)))->setLogger($loggerOne),
+    (new SimpleSpanProcessor(LoggerExporter::fromConnectionString('php://stdout', 'stdout-logger', LogLevel::INFO)->setLogger($loggerOne)))->setLogger($loggerOne),
 );
 $spanProcessor->setLogger($loggerOne);
 $tracerProviderOne =  new TracerProvider($spanProcessor);
@@ -47,7 +47,7 @@ putenv('OTEL_TRACES_EXPORTER=otlp');
 putenv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=grpc');
 putenv('OTEL_PHP_TRACES_PROCESSOR=batch');
 
-$tracerProviderTwo = (new TracerProviderFactory('example'))->withLogger($loggerTwo)->create();
+$tracerProviderTwo = (new TracerProviderFactory('example'))->setLogger($loggerTwo)->create();
 
 $tracerTwo = $tracerProviderTwo->getTracer();
 

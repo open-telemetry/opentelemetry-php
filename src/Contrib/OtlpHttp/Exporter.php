@@ -12,7 +12,6 @@ use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
-use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Psr\Http\Client\ClientInterface;
@@ -26,7 +25,6 @@ class Exporter implements SpanExporterInterface, LoggerAwareInterface
     use EnvironmentVariablesTrait;
     use UsesSpanConverterTrait;
     use HttpSpanExporterTrait;
-    use LoggerAwareTrait;
 
     private const REQUEST_METHOD = 'POST';
     private const HEADER_CONTENT_TYPE = 'content-type';

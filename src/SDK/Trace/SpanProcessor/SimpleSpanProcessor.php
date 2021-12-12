@@ -55,7 +55,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface, LoggerAwareInterfac
         }
 
         $this->running = false;
-        $this->debug('Shutting down span processor');
+        $this->logDebug('Shutting down span processor');
 
         if (null !== $this->exporter) {
             return $this->forceFlush() && $this->exporter->shutdown();

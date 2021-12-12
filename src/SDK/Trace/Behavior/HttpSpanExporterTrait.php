@@ -22,7 +22,6 @@ use Throwable;
  */
 trait HttpSpanExporterTrait
 {
-    use LoggerAwareTrait;
     use SpanExporterTrait;
 
     protected string $endpointUrl;
@@ -45,23 +44,31 @@ trait HttpSpanExporterTrait
         try {
             $response = $this->dispatchSpans($spans);
         } catch (ClientExceptionInterface $e) {
-            $this->error('Error exporting span', ['error' => $e->getMessage()]);
+            if ($e instanceof RequestExceptionInterface) {
+                $this->logError('Error exporting span', ['error' => $e]);
 
-            return $e instanceof RequestExceptionInterface
-                ? SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE
-                : SpanExporterInterface::STATUS_FAILED_RETRYABLE;
+                return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
+            }
+            $this->logWarning('Retryable error exporting span', ['error' => $e]);
+
+            return SpanExporterInterface::STATUS_FAILED_RETRYABLE;
         } catch (Throwable $e) {
-            $this->error('Error exporting span', ['error' => $e->getMessage()]);
+            $this->logError('Error exporting span', ['error' => $e]);
 
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
 
         if ($response->getStatusCode() >= 400) {
-            $this->error('Error exporting span', ['error' => $response->getReasonPhrase(), 'code' => $response->getStatusCode()]);
+            $error = ['error' => $response->getReasonPhrase(), 'code' => $response->getStatusCode()];
 
-            return $response->getStatusCode() < 500
-                ? SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE
-                : SpanExporterInterface::STATUS_FAILED_RETRYABLE;
+            if ($response->getStatusCode() < 500) {
+                $this->logError('Error exporting span', ['error' => $error]);
+
+                return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
+            }
+            $this->logWarning('Retryable error exporting span', ['error' => $error]);
+
+            return SpanExporterInterface::STATUS_FAILED_RETRYABLE;
         }
 
         return SpanExporterInterface::STATUS_SUCCESS;
