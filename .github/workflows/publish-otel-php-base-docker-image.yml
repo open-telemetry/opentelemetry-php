@@ -7,9 +7,15 @@ jobs:
   push_to_registry:
     name: OpenTelemetry PHP base docker image creation
     strategy:
+      fail-fast: false
       matrix:
-        php-version: ['7.4', '8.0', '8.1']
+        php-version: ['7.4', '8.0']
+        experimental: [false]
+        include:
+          - php-version: 8.1
+            experimental: true
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     permissions:
       packages: write
       contents: read
@@ -21,12 +27,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      #- name: Login to GitHub Container Registry
-      #  uses: docker/login-action@v1
-      #  with:
-      #    registry: ghcr.io
-      #    username: ${{ github.repository_owner }}
-      #    password: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Login to GitHub Container Registry
+#        uses: docker/login-action@v1
+#        with:
+#          registry: ghcr.io
+#          username: ${{ github.repository_owner }}
+#          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push ${{ matrix.php-version }} to ghcr.io
         uses: docker/build-push-action@v2
