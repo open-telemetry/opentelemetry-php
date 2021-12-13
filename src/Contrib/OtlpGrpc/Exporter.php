@@ -8,6 +8,7 @@ use grpc;
 use InvalidArgumentException;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
@@ -15,6 +16,7 @@ use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 class Exporter implements Trace\SpanExporterInterface
 {
     use EnvironmentVariablesTrait;
+    use LogsMessagesTrait;
     use SpanExporterTrait;
 
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
@@ -107,6 +109,11 @@ class Exporter implements Trace\SpanExporterInterface
             return self::STATUS_SUCCESS;
         }
 
+        $error = [
+            'error' => $status->details ?? 'unknown grpc error',
+            'code' => $status->code,
+        ];
+
         if (in_array($status->code, [
             \Grpc\STATUS_CANCELLED,
             \Grpc\STATUS_DEADLINE_EXCEEDED,
@@ -118,8 +125,12 @@ class Exporter implements Trace\SpanExporterInterface
             \Grpc\STATUS_DATA_LOSS,
             \Grpc\STATUS_UNAUTHENTICATED,
         ], true)) {
+            $this->logWarning('Retryable error exporting grpc span', ['error' => $error]);
+
             return self::STATUS_FAILED_RETRYABLE;
         }
+
+        $this->logError('Error exporting grpc span', ['error' => $error]);
 
         return self::STATUS_FAILED_NOT_RETRYABLE;
     }

@@ -11,7 +11,7 @@ trait LogsMessagesTrait
 {
     private function doLog(string $level, string $message, array $context): void
     {
-        //TODO decorate log to identify that log is library internal?
+        $context['source'] = get_class($this);
         GlobalLoggerHolder::get()->log($level, $message, $context);
     }
 
