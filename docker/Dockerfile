@@ -14,7 +14,7 @@ RUN chmod +x /usr/local/bin/install-php-extensions; \
         @composer \
     ; \
     # strip debug symbols from extensions to reduce size
-    find /usr/local/lib/php-extensions -name grpc.so -exec strip --strip-debug {} \;; \
+    find /usr/local/lib/php/extensions -name grpc.so -exec strip --strip-debug {} \;; \
     find /usr/local/lib/php/extensions -name xdebug.so -exec strip --strip-debug {} \;;
 
 FROM php_build
@@ -31,4 +31,3 @@ RUN   apk add --no-cache bash git; \
         "php";
 
 USER php
-
