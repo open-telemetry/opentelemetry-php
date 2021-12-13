@@ -143,11 +143,13 @@ from your bash compatible shell.  This does the following things:
 
 ### Other PHP versions
 
-We current try to support PHP 7.4, 8.0 and 8.1 - the developer image, `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `7.4`, `8.0` and `8.1` respectively, with `7.4` being the default.
+We current try to support PHP 7.4, 8.0 and 8.1 - the developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `7.4`, `8.0` and `8.1` respectively, with `7.4` being the default.
 You can simulate the important github actions against other PHP versions by running the following command:
 
 ```bash
-PHP_VERSION=<8.0|8.1> make all
+PHP_VERSION=8.0 make all
+#or
+PHP_VERSION=8.1 make all
 ```
 
 ## Proto Generation
