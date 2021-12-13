@@ -8,8 +8,8 @@ jobs:
     name: OpenTelemetry PHP base docker image creation
     strategy:
       matrix:
-        operating-system: [ubuntu-latest]
         php-versions: ['7.4', '8.0', '8.1']
+    runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
