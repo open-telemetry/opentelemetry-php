@@ -7,7 +7,6 @@
     "license": "Apache-2.0",
     "require": {
         "php": "^7.4 || ^8.0",
-        "ext-grpc": "*",
         "ext-json": "*",
         "google/protobuf": "^v3.3.0",
         "grpc/grpc": "^1.30",
@@ -52,6 +51,7 @@
         }
     },
     "require-dev": {
+        "ext-grpc": "*",
         "assertwell/phpunit-global-state": "^0.2",
         "composer/xdebug-handler": "^2.0",
         "dg/bypass-finals": "^1.3",
@@ -74,5 +74,8 @@
         "psalm/psalm": "^4.0",
         "qossmic/deptrac-shim": "^0.17",
         "symfony/http-client": "^5.2"
+    },
+    "suggest": {
+        "ext-grpc": "To use the OTLP GRPC Exporter"
     }
 }

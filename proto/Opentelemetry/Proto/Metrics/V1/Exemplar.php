@@ -19,11 +19,24 @@ use Google\Protobuf\Internal\GPBUtil;
 class Exemplar extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The set of labels that were filtered out by the aggregator, but recorded
-     * alongside the original measurement. Only labels that were filtered out
-     * by the aggregator should be included
+     * The set of key/value pairs that were filtered out by the aggregator, but
+     * recorded alongside the original measurement. Only key/value pairs that were
+     * filtered out by the aggregator should be included
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue filtered_labels = 1;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue filtered_attributes = 7;</code>
+     */
+    private $filtered_attributes;
+    /**
+     * Labels is deprecated and will be removed soon.
+     * 1. Old senders and receivers that are not aware of this change will
+     * continue using the `filtered_labels` field.
+     * 2. New senders, which are aware of this change MUST send only
+     * `filtered_attributes`.
+     * 3. New receivers, which are aware of this change MUST convert this into
+     * `filtered_labels` by simply converting all int64 values into float.
+     * This field will be removed in ~3 months, on July 1, 2021.
+     *
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue filtered_labels = 1 [deprecated = true];</code>
      */
     private $filtered_labels;
     /**
@@ -58,10 +71,19 @@ class Exemplar extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $filtered_attributes
+     *           The set of key/value pairs that were filtered out by the aggregator, but
+     *           recorded alongside the original measurement. Only key/value pairs that were
+     *           filtered out by the aggregator should be included
      *     @type \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $filtered_labels
-     *           The set of labels that were filtered out by the aggregator, but recorded
-     *           alongside the original measurement. Only labels that were filtered out
-     *           by the aggregator should be included
+     *           Labels is deprecated and will be removed soon.
+     *           1. Old senders and receivers that are not aware of this change will
+     *           continue using the `filtered_labels` field.
+     *           2. New senders, which are aware of this change MUST send only
+     *           `filtered_attributes`.
+     *           3. New receivers, which are aware of this change MUST convert this into
+     *           `filtered_labels` by simply converting all int64 values into float.
+     *           This field will be removed in ~3 months, on July 1, 2021.
      *     @type int|string $time_unix_nano
      *           time_unix_nano is the exact time when this exemplar was recorded
      *           Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
@@ -84,11 +106,46 @@ class Exemplar extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The set of labels that were filtered out by the aggregator, but recorded
-     * alongside the original measurement. Only labels that were filtered out
-     * by the aggregator should be included
+     * The set of key/value pairs that were filtered out by the aggregator, but
+     * recorded alongside the original measurement. Only key/value pairs that were
+     * filtered out by the aggregator should be included
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue filtered_labels = 1;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue filtered_attributes = 7;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getFilteredAttributes()
+    {
+        return $this->filtered_attributes;
+    }
+
+    /**
+     * The set of key/value pairs that were filtered out by the aggregator, but
+     * recorded alongside the original measurement. Only key/value pairs that were
+     * filtered out by the aggregator should be included
+     *
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue filtered_attributes = 7;</code>
+     * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setFilteredAttributes($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Common\V1\KeyValue::class);
+        $this->filtered_attributes = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Labels is deprecated and will be removed soon.
+     * 1. Old senders and receivers that are not aware of this change will
+     * continue using the `filtered_labels` field.
+     * 2. New senders, which are aware of this change MUST send only
+     * `filtered_attributes`.
+     * 3. New receivers, which are aware of this change MUST convert this into
+     * `filtered_labels` by simply converting all int64 values into float.
+     * This field will be removed in ~3 months, on July 1, 2021.
+     *
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue filtered_labels = 1 [deprecated = true];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getFilteredLabels()
@@ -97,11 +154,16 @@ class Exemplar extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The set of labels that were filtered out by the aggregator, but recorded
-     * alongside the original measurement. Only labels that were filtered out
-     * by the aggregator should be included
+     * Labels is deprecated and will be removed soon.
+     * 1. Old senders and receivers that are not aware of this change will
+     * continue using the `filtered_labels` field.
+     * 2. New senders, which are aware of this change MUST send only
+     * `filtered_attributes`.
+     * 3. New receivers, which are aware of this change MUST convert this into
+     * `filtered_labels` by simply converting all int64 values into float.
+     * This field will be removed in ~3 months, on July 1, 2021.
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue filtered_labels = 1;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue filtered_labels = 1 [deprecated = true];</code>
      * @param \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */

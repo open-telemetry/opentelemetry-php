@@ -29,7 +29,7 @@ class SpanProcessorFactoryTest extends TestCase
      */
     public function spanProcessorFactory_createSpanProcessorFromEnvironment(string $processorName, string $expected)
     {
-        $this->setEnvironmentVariable('OTEL_TRACES_PROCESSOR', $processorName);
+        $this->setEnvironmentVariable('OTEL_PHP_TRACES_PROCESSOR', $processorName);
         $factory = new SpanProcessorFactory();
         $this->assertInstanceOf($expected, $factory->fromEnvironment());
     }
@@ -48,7 +48,7 @@ class SpanProcessorFactoryTest extends TestCase
      */
     public function spanProcessorFactory_invalidSpanProcessor(?string $processor)
     {
-        $this->setEnvironmentVariable('OTEL_TRACES_PROCESSOR', $processor);
+        $this->setEnvironmentVariable('OTEL_PHP_TRACES_PROCESSOR', $processor);
         $factory = new SpanProcessorFactory();
         $exporter = $this->createMock(SpanExporterInterface::class);
         $this->expectException(InvalidArgumentException::class);

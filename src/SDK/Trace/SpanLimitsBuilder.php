@@ -11,22 +11,22 @@ class SpanLimitsBuilder
     use EnvironmentVariablesTrait;
 
     /** @var int Maximum allowed attribute count per record */
-    private $attributeCountLimit;
+    private ?int $attributeCountLimit = null;
 
     /** @var int Maximum allowed attribute value length */
-    private $attributeValueLengthLimit;
+    private ?int $attributeValueLengthLimit = null;
 
     /** @var int Maximum allowed span event count */
-    private $eventCountLimit;
+    private ?int $eventCountLimit = null;
 
     /** @var int Maximum allowed span link count */
-    private $linkCountLimit;
+    private ?int $linkCountLimit = null;
 
     /** @var int Maximum allowed attribute per span event count */
-    private $attributePerEventCountLimit;
+    private ?int $attributePerEventCountLimit = null;
 
     /** @var int Maximum allowed attribute per span link count */
-    private $attributePerLinkCountLimit;
+    private ?int $attributePerLinkCountLimit = null;
 
     /**
      * @param int $attributeCountLimit Maximum allowed attribute count per record

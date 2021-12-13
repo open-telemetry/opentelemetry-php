@@ -13,16 +13,15 @@ final class SpanLimits
     public const DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT = 128;
     public const DEFAULT_LINK_ATTRIBUTE_COUNT_LIMIT = 128;
 
-    /** @var AttributeLimits */
-    private $attributeLimits;
+    private AttributeLimits $attributeLimits;
 
-    private $eventCountLimit;
+    private int $eventCountLimit;
 
-    private $linkCountLimit;
+    private int $linkCountLimit;
 
-    private $attributePerEventCountLimit;
+    private int $attributePerEventCountLimit;
 
-    private $attributePerLinkCountLimit;
+    private int $attributePerLinkCountLimit;
 
     public function getAttributeLimits(): AttributeLimits
     {

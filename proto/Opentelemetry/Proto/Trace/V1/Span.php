@@ -66,9 +66,7 @@ class Span extends \Google\Protobuf\Internal\Message
      * the same display name at the same call point in an application.
      * This makes it easier to correlate spans in different traces.
      * This field is semantically required to be set to non-empty string.
-     * When null or empty string received - receiver may use string "name"
-     * as a replacement. There might be smarted algorithms implemented by
-     * receiver to fix the empty span name.
+     * Empty value is equivalent to an unknown span name.
      * This field is required.
      *
      * Generated from protobuf field <code>string name = 5;</code>
@@ -103,13 +101,14 @@ class Span extends \Google\Protobuf\Internal\Message
      */
     private $end_time_unix_nano = 0;
     /**
-     * attributes is a collection of key/value pairs. The value can be a string,
-     * an integer, a double or the Boolean values `true` or `false`. Note, global attributes
+     * attributes is a collection of key/value pairs. Note, global attributes
      * like server name can be set using the resource API. Examples of attributes:
      *     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
      *     "/http/server_latency": 300
      *     "abc.com/myattribute": true
      *     "abc.com/score": 10.239
+     * The OpenTelemetry API specification further restricts the allowed value types:
+     * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
      */
@@ -191,9 +190,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *           the same display name at the same call point in an application.
      *           This makes it easier to correlate spans in different traces.
      *           This field is semantically required to be set to non-empty string.
-     *           When null or empty string received - receiver may use string "name"
-     *           as a replacement. There might be smarted algorithms implemented by
-     *           receiver to fix the empty span name.
+     *           Empty value is equivalent to an unknown span name.
      *           This field is required.
      *     @type int $kind
      *           Distinguishes between spans generated in a particular context. For example,
@@ -212,13 +209,14 @@ class Span extends \Google\Protobuf\Internal\Message
      *           Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
      *           This field is semantically required and it is expected that end_time >= start_time.
      *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $attributes
-     *           attributes is a collection of key/value pairs. The value can be a string,
-     *           an integer, a double or the Boolean values `true` or `false`. Note, global attributes
+     *           attributes is a collection of key/value pairs. Note, global attributes
      *           like server name can be set using the resource API. Examples of attributes:
      *               "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
      *               "/http/server_latency": 300
      *               "abc.com/myattribute": true
      *               "abc.com/score": 10.239
+     *           The OpenTelemetry API specification further restricts the allowed value types:
+     *           https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
      *     @type int $dropped_attributes_count
      *           dropped_attributes_count is the number of attributes that were discarded. Attributes
      *           can be discarded because their keys are too long or because there are too many
@@ -381,9 +379,7 @@ class Span extends \Google\Protobuf\Internal\Message
      * the same display name at the same call point in an application.
      * This makes it easier to correlate spans in different traces.
      * This field is semantically required to be set to non-empty string.
-     * When null or empty string received - receiver may use string "name"
-     * as a replacement. There might be smarted algorithms implemented by
-     * receiver to fix the empty span name.
+     * Empty value is equivalent to an unknown span name.
      * This field is required.
      *
      * Generated from protobuf field <code>string name = 5;</code>
@@ -401,9 +397,7 @@ class Span extends \Google\Protobuf\Internal\Message
      * the same display name at the same call point in an application.
      * This makes it easier to correlate spans in different traces.
      * This field is semantically required to be set to non-empty string.
-     * When null or empty string received - receiver may use string "name"
-     * as a replacement. There might be smarted algorithms implemented by
-     * receiver to fix the empty span name.
+     * Empty value is equivalent to an unknown span name.
      * This field is required.
      *
      * Generated from protobuf field <code>string name = 5;</code>
@@ -517,13 +511,14 @@ class Span extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * attributes is a collection of key/value pairs. The value can be a string,
-     * an integer, a double or the Boolean values `true` or `false`. Note, global attributes
+     * attributes is a collection of key/value pairs. Note, global attributes
      * like server name can be set using the resource API. Examples of attributes:
      *     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
      *     "/http/server_latency": 300
      *     "abc.com/myattribute": true
      *     "abc.com/score": 10.239
+     * The OpenTelemetry API specification further restricts the allowed value types:
+     * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -534,13 +529,14 @@ class Span extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * attributes is a collection of key/value pairs. The value can be a string,
-     * an integer, a double or the Boolean values `true` or `false`. Note, global attributes
+     * attributes is a collection of key/value pairs. Note, global attributes
      * like server name can be set using the resource API. Examples of attributes:
      *     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
      *     "/http/server_latency": 300
      *     "abc.com/myattribute": true
      *     "abc.com/score": 10.239
+     * The OpenTelemetry API specification further restricts the allowed value types:
+     * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
      * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var

@@ -7,7 +7,7 @@ namespace OpenTelemetry\API\Baggage;
 final class BaggageBuilder implements BaggageBuilderInterface
 {
     /** @var array<string, Entry> */
-    private $entries;
+    private array $entries;
 
     /** @param array<string, Entry> $entries */
     public function __construct(array $entries = [])

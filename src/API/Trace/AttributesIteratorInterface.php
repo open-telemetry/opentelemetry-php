@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
-interface AttributesIteratorInterface extends \Iterator
+use Iterator;
+
+interface AttributesIteratorInterface extends Iterator
 {
     public function key(): string;
     public function current(): AttributeInterface;

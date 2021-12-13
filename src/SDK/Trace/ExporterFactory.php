@@ -19,8 +19,8 @@ class ExporterFactory
 {
     use EnvironmentVariablesTrait;
 
-    private $name;
-    private $allowedExporters = ['jaeger' => true, 'zipkin' => true, 'newrelic' => true, 'otlp' => true, 'otlpgrpc' => true, 'otlphttp' => true ,'zipkintonewrelic' => true, 'console' => true];
+    private string $name;
+    private array $allowedExporters = ['jaeger' => true, 'zipkin' => true, 'newrelic' => true, 'otlp' => true, 'otlpgrpc' => true, 'otlphttp' => true ,'zipkintonewrelic' => true, 'console' => true];
 
     public function __construct(string $name)
     {

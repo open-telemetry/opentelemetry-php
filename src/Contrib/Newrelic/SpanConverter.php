@@ -16,17 +16,24 @@ class SpanConverter implements SpanConverterInterface
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
     const STATUS_DESCRIPTION_TAG_KEY = 'otel.status_description';
 
-    /**
-     * @var string
-     */
-    private $serviceName;
+    private string $serviceName;
 
     public function __construct(string $serviceName)
     {
         $this->serviceName = $serviceName;
     }
 
-    public function convert(SpanDataInterface $span): array
+    public function convert(iterable $spans): array
+    {
+        $aggregate = [];
+        foreach ($spans as $span) {
+            $aggregate[] = $this->convertSpan($span);
+        }
+
+        return $aggregate;
+    }
+
+    private function convertSpan(SpanDataInterface $span): array
     {
         $spanParent = $span->getParentContext();
 

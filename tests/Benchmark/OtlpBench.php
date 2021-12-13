@@ -6,7 +6,6 @@ namespace OpenTelemetry\Tests\Benchmark;
 
 use Grpc\UnaryCall;
 use Mockery;
-use Mockery\MockInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as GrpcExporter;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter as HttpExporter;

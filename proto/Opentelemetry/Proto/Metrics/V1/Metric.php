@@ -9,15 +9,17 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Defines a Metric which has one or more timeseries.
+ * Defines a Metric which has one or more timeseries.  The following is a
+ * brief summary of the Metric data model.  For more details, see:
+ *   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/datamodel.md
  * The data model and relation between entities is shown in the
  * diagram below. Here, "DataPoint" is the term used to refer to any
  * one of the specific data point value types, and "points" is the term used
  * to refer to any one of the lists of points contained in the Metric.
  * - Metric is composed of a metadata and data.
  * - Metadata part contains a name, description, unit.
- * - Data is one of the possible types (Gauge, Sum, Histogram, etc.).
- * - DataPoint contains timestamps, labels, and one of the possible value type
+ * - Data is one of the possible types (Sum, Gauge, Histogram, Summary).
+ * - DataPoint contains timestamps, attributes, and one of the possible value type
  *   fields.
  *     Metric
  *  +------------+
@@ -54,14 +56,30 @@ use Google\Protobuf\Internal\GPBUtil;
  *                        ||value|                    |
  *                        |+-----+                    |
  *                        +---------------------------+
+ * Each distinct type of DataPoint represents the output of a specific
+ * aggregation function, the result of applying the DataPoint's
+ * associated function of to one or more measurements.
  * All DataPoint types have three common fields:
- * - Labels zero or more key-value pairs associated with the data point.
- * - StartTimeUnixNano MUST be set to the start of the interval when the data's
- *   type includes an AggregationTemporality. This field is not set otherwise.
- * - TimeUnixNano MUST be set to:
- *   - the moment when an aggregation is reported (independent of the
- *     aggregation temporality).
- *   - the instantaneous time of the event.
+ * - Attributes includes key-value pairs associated with the data point
+ * - TimeUnixNano is required, set to the end time of the aggregation
+ * - StartTimeUnixNano is optional, but strongly encouraged for DataPoints
+ *   having an AggregationTemporality field, as discussed below.
+ * Both TimeUnixNano and StartTimeUnixNano values are expressed as
+ * UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+ * # TimeUnixNano
+ * This field is required, having consistent interpretation across
+ * DataPoint types.  TimeUnixNano is the moment corresponding to when
+ * the data point's aggregate value was captured.
+ * Data points with the 0 value for TimeUnixNano SHOULD be rejected
+ * by consumers.
+ * # StartTimeUnixNano
+ * StartTimeUnixNano in general allows detecting when a sequence of
+ * observations is unbroken.  This field indicates to consumers the
+ * start time for points with cumulative and delta
+ * AggregationTemporality, and it should be included whenever possible
+ * to support correct rate calculation.  Although it may be omitted
+ * when the start time is truly unknown, setting StartTimeUnixNano is
+ * strongly encouraged.
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.Metric</code>
  */
@@ -123,6 +141,7 @@ class Metric extends \Google\Protobuf\Internal\Message
      *           `histogram` by simply converting all int64 values into float.
      *           This field will be removed in ~3 months, on July 1, 2021.
      *     @type \Opentelemetry\Proto\Metrics\V1\Histogram $histogram
+     *     @type \Opentelemetry\Proto\Metrics\V1\ExponentialHistogram $exponential_histogram
      *     @type \Opentelemetry\Proto\Metrics\V1\Summary $summary
      * }
      */
@@ -377,6 +396,28 @@ class Metric extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Opentelemetry\Proto\Metrics\V1\Histogram::class);
         $this->writeOneof(9, $var);
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.ExponentialHistogram exponential_histogram = 10;</code>
+     * @return \Opentelemetry\Proto\Metrics\V1\ExponentialHistogram
+     */
+    public function getExponentialHistogram()
+    {
+        return $this->readOneof(10);
+    }
+
+    /**
+     * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.ExponentialHistogram exponential_histogram = 10;</code>
+     * @param \Opentelemetry\Proto\Metrics\V1\ExponentialHistogram $var
+     * @return $this
+     */
+    public function setExponentialHistogram($var)
+    {
+        GPBUtil::checkMessage($var, \Opentelemetry\Proto\Metrics\V1\ExponentialHistogram::class);
+        $this->writeOneof(10, $var);
 
         return $this;
     }

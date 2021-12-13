@@ -9,8 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Histogram represents the type of a metric that is calculated by aggregating as a
- * Histogram of all reported double measurements over a time interval.
+ * Histogram represents the type of a metric that is calculated by aggregating
+ * as a Histogram of all reported measurements over a time interval.
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.Histogram</code>
  */

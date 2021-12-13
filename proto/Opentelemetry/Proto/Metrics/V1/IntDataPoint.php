@@ -9,8 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * IntDataPoint is a single data point in a timeseries that describes the
- * time-varying values of a int64 metric.
+ * IntDataPoint is deprecated. Use integer value in NumberDataPoint.
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.IntDataPoint</code>
  */
@@ -23,23 +22,16 @@ class IntDataPoint extends \Google\Protobuf\Internal\Message
      */
     private $labels;
     /**
-     * start_time_unix_nano is the last time when the aggregation value was reset
-     * to "zero". For some metric types this is ignored, see data types for more
-     * details.
-     * The aggregation value is over the time interval (start_time_unix_nano,
-     * time_unix_nano].
-     * 
+     * StartTimeUnixNano is optional but strongly encouraged, see the
+     * the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
-     * Value of 0 indicates that the timestamp is unspecified. In that case the
-     * timestamp may be decided by the backend.
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      */
     private $start_time_unix_nano = 0;
     /**
-     * time_unix_nano is the moment when this aggregation value was reported.
-     * 
+     * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
      *
@@ -69,19 +61,12 @@ class IntDataPoint extends \Google\Protobuf\Internal\Message
      *     @type \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $labels
      *           The set of labels that uniquely identify this timeseries.
      *     @type int|string $start_time_unix_nano
-     *           start_time_unix_nano is the last time when the aggregation value was reset
-     *           to "zero". For some metric types this is ignored, see data types for more
-     *           details.
-     *           The aggregation value is over the time interval (start_time_unix_nano,
-     *           time_unix_nano].
-     *           
+     *           StartTimeUnixNano is optional but strongly encouraged, see the
+     *           the detailed comments above Metric.
      *           Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      *           1970.
-     *           Value of 0 indicates that the timestamp is unspecified. In that case the
-     *           timestamp may be decided by the backend.
      *     @type int|string $time_unix_nano
-     *           time_unix_nano is the moment when this aggregation value was reported.
-     *           
+     *           TimeUnixNano is required, see the detailed comments above Metric.
      *           Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      *           1970.
      *     @type int|string $value
@@ -123,16 +108,10 @@ class IntDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * start_time_unix_nano is the last time when the aggregation value was reset
-     * to "zero". For some metric types this is ignored, see data types for more
-     * details.
-     * The aggregation value is over the time interval (start_time_unix_nano,
-     * time_unix_nano].
-     * 
+     * StartTimeUnixNano is optional but strongly encouraged, see the
+     * the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
-     * Value of 0 indicates that the timestamp is unspecified. In that case the
-     * timestamp may be decided by the backend.
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      * @return int|string
@@ -143,16 +122,10 @@ class IntDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * start_time_unix_nano is the last time when the aggregation value was reset
-     * to "zero". For some metric types this is ignored, see data types for more
-     * details.
-     * The aggregation value is over the time interval (start_time_unix_nano,
-     * time_unix_nano].
-     * 
+     * StartTimeUnixNano is optional but strongly encouraged, see the
+     * the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
-     * Value of 0 indicates that the timestamp is unspecified. In that case the
-     * timestamp may be decided by the backend.
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      * @param int|string $var
@@ -167,8 +140,7 @@ class IntDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * time_unix_nano is the moment when this aggregation value was reported.
-     * 
+     * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
      *
@@ -181,8 +153,7 @@ class IntDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * time_unix_nano is the moment when this aggregation value was reported.
-     * 
+     * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
      *

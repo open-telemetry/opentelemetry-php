@@ -24,10 +24,7 @@ class UpDownCounter extends AbstractMetric implements API\UpDownCounterInterface
 {
     use HasLabelsTrait;
 
-    /**
-     * @var int $value
-     */
-    protected $value = 0;
+    protected int $value = 0;
 
     /**
      * getType

@@ -31,6 +31,7 @@ class AnyValue extends \Google\Protobuf\Internal\Message
      *     @type float $double_value
      *     @type \Opentelemetry\Proto\Common\V1\ArrayValue $array_value
      *     @type \Opentelemetry\Proto\Common\V1\KeyValueList $kvlist_value
+     *     @type string $bytes_value
      * }
      */
     public function __construct($data = NULL) {
@@ -166,6 +167,28 @@ class AnyValue extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Opentelemetry\Proto\Common\V1\KeyValueList::class);
         $this->writeOneof(6, $var);
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>bytes bytes_value = 7;</code>
+     * @return string
+     */
+    public function getBytesValue()
+    {
+        return $this->readOneof(7);
+    }
+
+    /**
+     * Generated from protobuf field <code>bytes bytes_value = 7;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setBytesValue($var)
+    {
+        GPBUtil::checkString($var, False);
+        $this->writeOneof(7, $var);
 
         return $this;
     }

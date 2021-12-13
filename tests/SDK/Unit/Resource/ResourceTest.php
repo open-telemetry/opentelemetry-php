@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\SDK\Unit\Resource;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\SDK\Resource\ResourceConstants;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
 
 class ResourceTest extends TestCase
@@ -35,16 +35,16 @@ class ResourceTest extends TestCase
         /** @var Attribute $name */
         $name = $resource->getAttributes()->getAttribute('name');
         /** @var Attribute $sdkname */
-        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceAttributes::TELEMETRY_SDK_NAME);
         /** @var Attribute $sdklanguage */
-        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceAttributes::TELEMETRY_SDK_LANGUAGE);
         /** @var Attribute $sdkversion */
-        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceAttributes::TELEMETRY_SDK_VERSION);
 
-        $attributes->setAttribute(ResourceConstants::TELEMETRY_SDK_NAME, 'opentelemetry');
-        $attributes->setAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE, 'php');
-        $attributes->setAttribute(ResourceConstants::TELEMETRY_SDK_VERSION, 'dev');
-        $attributes->setAttribute(ResourceConstants::SERVICE_NAME, 'unknown_service');
+        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_NAME, 'opentelemetry');
+        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_LANGUAGE, 'php');
+        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_VERSION, 'dev');
+        $attributes->setAttribute(ResourceAttributes::SERVICE_NAME, 'unknown_service');
 
         $this->assertEquals($attributes, $resource->getAttributes());
         $this->assertSame('opentelemetry', $sdkname->getValue());
@@ -60,19 +60,19 @@ class ResourceTest extends TestCase
     {
         $attributes = new Attributes(
             [
-                ResourceConstants::TELEMETRY_SDK_NAME => 'opentelemetry',
-                ResourceConstants::TELEMETRY_SDK_LANGUAGE => 'php',
-                ResourceConstants::TELEMETRY_SDK_VERSION => 'dev',
-                ResourceConstants::SERVICE_NAME => 'unknown_service',
+                ResourceAttributes::TELEMETRY_SDK_NAME => 'opentelemetry',
+                ResourceAttributes::TELEMETRY_SDK_LANGUAGE => 'php',
+                ResourceAttributes::TELEMETRY_SDK_VERSION => 'dev',
+                ResourceAttributes::SERVICE_NAME => 'unknown_service',
             ]
         );
         $resource = ResourceInfo::create(new Attributes());
         /** @var Attribute $sdkname */
-        $sdkname = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_NAME);
+        $sdkname = $resource->getAttributes()->getAttribute(ResourceAttributes::TELEMETRY_SDK_NAME);
         /** @var Attribute $sdklanguage */
-        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_LANGUAGE);
+        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceAttributes::TELEMETRY_SDK_LANGUAGE);
         /** @var Attribute $sdkversion */
-        $sdkversion = $resource->getAttributes()->getAttribute(ResourceConstants::TELEMETRY_SDK_VERSION);
+        $sdkversion = $resource->getAttributes()->getAttribute(ResourceAttributes::TELEMETRY_SDK_VERSION);
 
         $this->assertEquals($attributes, $resource->getAttributes());
         $this->assertEquals('opentelemetry', $sdkname->getValue());

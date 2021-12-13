@@ -13,6 +13,7 @@ namespace OpenTelemetry\Context;
 
 use function define;
 use FFI;
+use FFI\Exception;
 
 if (PHP_VERSION_ID < 80100 || !class_exists(FFI::class)) {
     return false;
@@ -22,10 +23,10 @@ if (PHP_VERSION_ID < 80100 || !class_exists(FFI::class)) {
 return (function (): bool {
     try {
         $fibers = FFI::scope('OTEL_ZEND_OBSERVER_FIBER');
-    } catch (FFI\Exception $e) {
+    } catch (Exception $e) {
         try {
             $fibers = FFI::load(__DIR__ . '/zend_observer_fiber.h');
-        } catch (FFI\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
 

@@ -19,7 +19,7 @@ final class TracerProvider implements API\TracerProviderInterface
     private static ?API\TracerInterface $defaultTracer = null;
 
     /** @var array<string, API\TracerInterface> */
-    private $tracers;
+    private ?array $tracers = null;
 
     /** @readonly */
     private TracerSharedState $tracerSharedState;

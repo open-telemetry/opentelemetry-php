@@ -14,8 +14,7 @@ final class SpanContextKey extends ContextKey
 {
     private const KEY_NAME = 'opentelemetry-trace-span-key';
 
-    /** @var ContextKey */
-    private static $instance;
+    private static ?ContextKey $instance = null;
 
     public static function instance(): ContextKey
     {

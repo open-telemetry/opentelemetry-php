@@ -8,6 +8,7 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
+use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Trace\Attribute;
 use OpenTelemetry\SDK\Trace\Attributes;
@@ -16,7 +17,7 @@ use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers SpanConverter
+ * @coversDefaultClass SpanConverter
  */
 class ZipkinSpanConverterTest extends TestCase
 {
@@ -51,7 +52,7 @@ class ZipkinSpanConverterTest extends TestCase
             ->setHasEnded(true);
 
         $converter = new SpanConverter('test.name');
-        $row = $converter->convert($span);
+        $row = $converter->convert([$span])[0];
 
         $this->assertSame($span->getContext()->getSpanId(), $row['id']);
         $this->assertSame($span->getContext()->getTraceId(), $row['traceId']);
@@ -91,7 +92,7 @@ class ZipkinSpanConverterTest extends TestCase
         $span = (new SpanData());
 
         $converter = new SpanConverter('unused');
-        $row = $converter->convert($span);
+        $row = $converter->convert([$span])[0];
 
         $this->assertArrayNotHasKey('kind', $row);
         $this->assertArrayNotHasKey('parentId', $row);
@@ -102,86 +103,50 @@ class ZipkinSpanConverterTest extends TestCase
 
     /**
      * @test
+     * @dataProvider spanKindProvider
      */
-    public function shouldConvertAnOTELServerSpanToAZipkinServerSpan()
+    public function shouldConvertOTELSpanToAZipkinSpan(int $internalSpanKind, string $expectedSpanKind)
     {
         $span = (new SpanData())
-            ->setKind(SpanKind::KIND_SERVER);
+            ->setKind($internalSpanKind);
 
         $converter = new SpanConverter('unused');
-        $row = $converter->convert($span);
+        $row = $converter->convert([$span])[0];
 
-        $this->assertSame(SpanKind::KIND_SERVER, $row['kind']);
+        $this->assertSame($expectedSpanKind, $row['kind']);
+    }
+
+    public function spanKindProvider(): array
+    {
+        return [
+            'server' => [SpanKind::KIND_SERVER, ZipkinSpanKind::SERVER],
+            'client' => [SpanKind::KIND_CLIENT, ZipkinSpanKind::CLIENT],
+            'producer' => [SpanKind::KIND_PRODUCER, ZipkinSpanKind::PRODUCER],
+            'consumer' => [SpanKind::KIND_CONSUMER, ZipkinSpanKind::CONSUMER],
+        ];
     }
 
     /**
      * @test
+     * @dataProvider unmappedSpanKindProvider
      */
-    public function shouldConvertAnOTELClientSpanToAZipkinClientSpan()
+    public function shouldConvertAnUnmappedOTELInternalSpanToAZipkinSpanOfUnspecifiedKind($kind)
     {
         $span = (new SpanData())
-            ->setKind(SpanKind::KIND_CLIENT);
+            ->setKind($kind);
 
         $converter = new SpanConverter('unused');
-        $row = $converter->convert($span);
-
-        $this->assertSame(SpanKind::KIND_CLIENT, $row['kind']);
-    }
-
-    /**
-     * @test
-     */
-    public function shouldConvertAnOTELProducerSpanToAZipkinProducerSpan()
-    {
-        $span = (new SpanData())
-            ->setKind(SpanKind::KIND_PRODUCER);
-
-        $converter = new SpanConverter('unused');
-        $row = $converter->convert($span);
-
-        $this->assertSame(SpanKind::KIND_PRODUCER, $row['kind']);
-    }
-
-    /**
-     * @test
-     */
-    public function shouldConvertAnOTELConsumerSpanToAZipkinConsumerSpan()
-    {
-        $span = (new SpanData())
-            ->setKind(SpanKind::KIND_CONSUMER);
-
-        $converter = new SpanConverter('unused');
-        $row = $converter->convert($span);
-
-        $this->assertSame(SpanKind::KIND_CONSUMER, $row['kind']);
-    }
-
-    /**
-     * @test
-     */
-    public function shouldConvertAnOTELInternalSpanToAZipkinSpanOfUnspecifiedKind()
-    {
-        $span = (new SpanData())
-            ->setKind(SpanKind::KIND_INTERNAL);
-
-        $converter = new SpanConverter('unused');
-        $row = $converter->convert($span);
+        $row = $converter->convert([$span])[0];
 
         $this->assertArrayNotHasKey('kind', $row);
     }
 
-    /**
-     * @test
-     */
-    public function shouldConvertAnOTELSpanOfUnknownKindToAZipkinSpanOfUnspecifiedKind()
+    public function unmappedSpanKindProvider(): array
     {
-        $span = (new SpanData())
-            ->setKind(12345); //Some number not in the SpanKind "enum"
-
-        $converter = new SpanConverter('unused');
-        $row = $converter->convert($span);
-
-        $this->assertArrayNotHasKey('kind', $row);
+        return [
+            'internal' => [SpanKind::KIND_INTERNAL],
+            'undefined' => [12345], //Some number not in the SpanKind "enum"
+        ];
     }
 
     /**
@@ -193,7 +158,7 @@ class ZipkinSpanConverterTest extends TestCase
             ->addEvent('event.name', new Attributes());
 
         $converter = new SpanConverter('test.name');
-        $row = $converter->convert($span);
+        $row = $converter->convert([$span])[0];
 
         [$annotation] = $row['annotations'];
         $this->assertSame('"event.name"', $annotation['value']);
@@ -210,7 +175,7 @@ class ZipkinSpanConverterTest extends TestCase
             ->setKind(SpanKind::KIND_PRODUCER);
 
         $converter = new SpanConverter('unused');
-        $row = $converter->convert($span);
+        $row = $converter->convert([$span])[0];
 
         $this->assertSame('unknown', $row['remoteEndpoint']['serviceName']);
         $this->assertSame(pow(2, 32)-1, $row['remoteEndpoint']['ipv4']);
@@ -227,7 +192,7 @@ class ZipkinSpanConverterTest extends TestCase
             ->setKind(SpanKind::KIND_PRODUCER);
 
         $converter = new SpanConverter('unused');
-        $row = $converter->convert($span);
+        $row = $converter->convert([$span])[0];
 
         $this->assertSame('00000000000000000000000000000001', bin2hex($row['remoteEndpoint']['ipv6'])); //Couldn't figure out how to do a direct assertion against binary data
     }
@@ -255,7 +220,7 @@ class ZipkinSpanConverterTest extends TestCase
             ->addAttribute('list-of-booleans', $listOfBooleans)
             ->addAttribute('list-of-random', $listOfRandoms);
 
-        $tags = (new SpanConverter('tags.test'))->convert($span)['tags'];
+        $tags = (new SpanConverter('tags.test'))->convert([$span])[0]['tags'];
 
         // Check that we can convert all attributes to tags
         $this->assertCount(10, $tags);
