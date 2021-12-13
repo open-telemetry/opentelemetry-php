@@ -8,7 +8,7 @@ jobs:
     name: OpenTelemetry PHP base docker image creation
     strategy:
       matrix:
-        php-versions: ['7.4', '8.0', '8.1']
+        php-version: ['7.4', '8.0', '8.1']
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -28,12 +28,12 @@ jobs:
       #    username: ${{ github.repository_owner }}
       #    password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push {{ matrix.php-versions }} to ghcr.io
+      - name: Build and push ${{ matrix.php-version }} to ghcr.io
         uses: docker/build-push-action@v2
         with:
           push: false #TODO
           file: docker/Dockerfile
-          build-args: PHP_VERSION={{ matrix.php-versions }}
-          tags: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:{{ matrix.php-versions }}
+          build-args: PHP_VERSION=${{ matrix.php-versions }}
+          tags: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${{ matrix.php-version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
