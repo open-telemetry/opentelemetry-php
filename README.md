@@ -31,7 +31,7 @@ The library requires a PHP version of 7.4.x or 8.0.x (PHP 8.1 compability is in 
 #### 1.) Install PSR17/18 implementations
 
 The library has a dependency on both a [HTTP Factories (PSR17)](https://www.php-fig.org/psr/psr-17/)
-and a [php-http/async-client](https://docs.php-http.org/en/latest/clients.html) implementation. 
+and a [php-http/async-client](https://docs.php-http.org/en/latest/clients.html) implementation.
 You can find appropriate composer packages implementing given standards on [packagist.org](https://packagist.org/).
 Follow [this link](https://packagist.org/providers/psr/http-factory-implementation) to find a `PSR17 (HTTP factories)` implementation,
 and [this link](https://packagist.org/providers/php-http/async-client-implementation) to find a `php-http/async-client` implementation.
@@ -46,7 +46,7 @@ and [this link](https://packagist.org/providers/php-http/async-client-implementa
 
 There are basically three ways to install the gRPC extension which will be described below. Keep in mind, that whatever way
 to install the extension you choose, the compilation can take up to 10-15 minutes. (As an alternative you can search for
-a pre-compiled extension binary for your OS and PHP version, or you might be lucky and the package manager of your OS 
+a pre-compiled extension binary for your OS and PHP version, or you might be lucky and the package manager of your OS
 provides a package for the extension)
 - **Installation with pecl installer** (which should come with your PHP installation):
 
@@ -141,6 +141,14 @@ from your bash compatible shell.  This does the following things:
 * Runs all of our [phpunit](https://phpunit.de/) unit tests.
 * Performs static analysis with [Phan](https://github.com/phan/phan), [Psalm](https://psalm.dev/) and [PHPStan](https://phpstan.org/user-guide/getting-started)
 
+### Other PHP versions
+
+We current try to support PHP 7.4, 8.0 and 8.1 - the developer image, `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `7.4`, `8.0` and `8.1` respectively, with `7.4` being the default.
+You can simulate the important github actions against other PHP versions by running the following command:
+
+```bash
+PHP_VERSION=<8.0|8.1> make all
+```
 
 ## Proto Generation
 Our proto files are committed to the repository into the `/proto` folder.  These are used in gRPC connections to the
