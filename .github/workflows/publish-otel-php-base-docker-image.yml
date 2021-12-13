@@ -35,5 +35,5 @@ jobs:
           file: docker/Dockerfile
           build-args: PHP_VERSION=${{ matrix.php-version }}
           tags: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${{ matrix.php-version }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.php-version }}
+          cache-to: type=gha,scope=${{ matrix.php-version }},mode=max
