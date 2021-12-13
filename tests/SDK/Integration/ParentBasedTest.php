@@ -37,7 +37,7 @@ class ParentBasedTest extends TestCase
         ?SamplerInterface $remoteParentNotSampled = null,
         ?SamplerInterface $localParentSampled = null,
         ?SamplerInterface $localParentNotSampled = null,
-        $expectedDdecision
+        ?int $expectedDecision = null
     ): void {
         $rootSampler = $this->createMockSamplerNeverInvoked();
 
@@ -48,7 +48,7 @@ class ParentBasedTest extends TestCase
             'test.opentelemetry.io',
             API\SpanKind::KIND_INTERNAL
         );
-        $this->assertEquals($expectedDdecision, $decision->getDecision());
+        $this->assertEquals($expectedDecision, $decision->getDecision());
     }
 
     public function parentContextData(): array
