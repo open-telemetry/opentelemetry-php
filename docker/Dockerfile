@@ -14,15 +14,14 @@ RUN chmod +x /usr/local/bin/install-php-extensions; \
         @composer \
     ; \
     # strip debug symbols from extensions to reduce size
-    find /usr/local/lib/php/extensions -name grpc.so -exec strip --strip-debug {} \;; \
-    find /usr/local/lib/php/extensions -name xdebug.so -exec strip --strip-debug {} \;;
+    find /usr/local/lib/php/extensions -name "*.so" -exec strip --strip-debug {} \;;
 
 FROM php_build
 
 WORKDIR /usr/src/myapp
 
 RUN   apk add --no-cache bash git; \
-      find /usr/local/lib/php/extensions -type d -name "no-debug-non-zts*" -exec chmod +x -R {} \;; \
+      find /usr/local/lib/php/extensions -type d -exec chmod +x -R {} \;; \
       addgroup -g "1000" -S php; \
       adduser --system \
         --gecos "" \
