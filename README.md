@@ -143,7 +143,7 @@ from your bash compatible shell.  This does the following things:
 
 ### Other PHP versions
 
-We aim to support PHP 7.4, 8.0 and 8.1 - the developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `7.4`, `8.0` and `8.1` respectively, with `7.4` being the default.
+We aim to support officially supported PHP versions, according to https://www.php.net/supported-versions.php. The developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `7.4`, `8.0` and `8.1` respectively, with `7.4` being the default.
 You can execute the test suite against other PHP versions by running the following command:
 
 ```bash
