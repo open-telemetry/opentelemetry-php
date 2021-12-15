@@ -27,7 +27,7 @@ final class GlobalLoggerHolder
 
         return self::$logger;
     }
-    
+
     public static function set(LoggerInterface $logger): void
     {
         self::$logger = $logger;
