@@ -44,7 +44,7 @@ final class Baggage implements BaggageInterface
     }
 
     /** @var array<string, Entry> */
-    private $entries;
+    private array $entries;
 
     /** @param array<string, Entry> $entries */
     public function __construct(array $entries = [])

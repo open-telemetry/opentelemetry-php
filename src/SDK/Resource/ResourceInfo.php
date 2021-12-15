@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Resource;
 
 use OpenTelemetry\API\Trace\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SemConv\ResourceAttributes;
 
 /**
  * A Resource is an immutable representation of the entity producing telemetry. For example, a process producing telemetry
@@ -70,9 +71,9 @@ class ResourceInfo
     {
         return new ResourceInfo(new Attributes(
             [
-                ResourceConstants::TELEMETRY_SDK_NAME => 'opentelemetry',
-                ResourceConstants::TELEMETRY_SDK_LANGUAGE => 'php',
-                ResourceConstants::TELEMETRY_SDK_VERSION => 'dev',
+                ResourceAttributes::TELEMETRY_SDK_NAME => 'opentelemetry',
+                ResourceAttributes::TELEMETRY_SDK_LANGUAGE => 'php',
+                ResourceAttributes::TELEMETRY_SDK_VERSION => 'dev',
             ]
         ));
     }
@@ -84,7 +85,7 @@ class ResourceInfo
     public static function environmentResource(): self
     {
         $attributes = [
-            ResourceConstants::SERVICE_NAME => 'unknown_service',
+            ResourceAttributes::SERVICE_NAME => 'unknown_service',
         ];
         $string = getenv('OTEL_RESOURCE_ATTRIBUTES');
         if ($string && false !== strpos($string, '=')) {
@@ -96,7 +97,7 @@ class ResourceInfo
         //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration
         $serviceName = getenv('OTEL_SERVICE_NAME');
         if ($serviceName) {
-            $attributes[ResourceConstants::SERVICE_NAME] = $serviceName;
+            $attributes[ResourceAttributes::SERVICE_NAME] = $serviceName;
         }
 
         return new ResourceInfo(new Attributes($attributes));

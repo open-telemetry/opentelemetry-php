@@ -20,6 +20,65 @@ A Google calendar invite with the included zoom link can be found [here](https:/
 
 Our open issues can all be found in the [github issues tab](https://github.com/open-telemetry/opentelemetry-php/issues).  Feel free to reach out on Slack if you have any additional questions about these issues; we are always happy to talk through implementation details.
 
+## Requirements
+The library requires a PHP version of 7.4.x or 8.0.x (PHP 8.1 compability is in the works)
+
+### Dependencies
+
+---
+
+#### REQUIRED DEPENDENCIES
+#### 1.) Install PSR17/18 implementations
+
+The library has a dependency on both a [HTTP Factories (PSR17)](https://www.php-fig.org/psr/psr-17/)
+and a [php-http/async-client](https://docs.php-http.org/en/latest/clients.html) implementation.
+You can find appropriate composer packages implementing given standards on [packagist.org](https://packagist.org/).
+Follow [this link](https://packagist.org/providers/psr/http-factory-implementation) to find a `PSR17 (HTTP factories)` implementation,
+and [this link](https://packagist.org/providers/php-http/async-client-implementation) to find a `php-http/async-client` implementation.
+
+---
+
+#### OPTIONAL DEPENDENCIES
+
+#### 1.) Install PHP [ext-grpc](https://pecl.php.net/package/gRPC)
+
+**The PHP gRPC extension is only needed, if you want to use the OTLP GRPC Exporter.**
+
+There are basically three ways to install the gRPC extension which will be described below. Keep in mind, that whatever way
+to install the extension you choose, the compilation can take up to 10-15 minutes. (As an alternative you can search for
+a pre-compiled extension binary for your OS and PHP version, or you might be lucky and the package manager of your OS
+provides a package for the extension)
+- **Installation with pecl installer** (which should come with your PHP installation):
+
+```bash
+[sudo] pecl install grpc
+```
+
+- **Installation with pickle installer** (which you can find [here](https://github.com/FriendsOfPHP/pickle)):
+
+```bash
+[sudo] pickle install grpc
+```
+- **Manually compiling the extension**, which is not really complicated either, but you should know
+   what you are doing, so we won't cover it here.
+
+> Notice: The artifact of the gRPC extension can be as large as 100mb (!!!), there are 'hacks' to reduce that size,
+> which you can find [in this thread](https://github.com/grpc/grpc/issues/23626). Use at your own risk.
+
+#### 2.) Install PHP [ext-mbstring](https://www.php.net/manual/en/book.mbstring.php)
+
+The library will load the `symfony/polyfill-mbstring` package, but for better performance you should install
+the  PHP mbstring extension. You can use the same install methods as described for the gRPC extension above,
+however most OS` package managers provide a package for the extension.
+
+#### 3.) Install PHP [ext-zlib](https://www.php.net/manual/en/book.zlib.php)
+
+In order to use compression in HTTP requests you should install
+the  PHP zlib extension. You can use the same install methods as described for the gRPC extension above,
+however most OS` package managers provide a package for the extension.
+
+---
+
 ## Installation
 The recommended way to install the library is through [Composer](http://getcomposer.org):
 
@@ -82,6 +141,16 @@ from your bash compatible shell.  This does the following things:
 * Runs all of our [phpunit](https://phpunit.de/) unit tests.
 * Performs static analysis with [Phan](https://github.com/phan/phan), [Psalm](https://psalm.dev/) and [PHPStan](https://phpstan.org/user-guide/getting-started)
 
+### Other PHP versions
+
+We aim to support officially supported PHP versions, according to https://www.php.net/supported-versions.php. The developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `7.4`, `8.0` and `8.1` respectively, with `7.4` being the default.
+You can execute the test suite against other PHP versions by running the following command:
+
+```bash
+PHP_VERSION=8.0 make all
+#or
+PHP_VERSION=8.1 make all
+```
 
 ## Proto Generation
 Our proto files are committed to the repository into the `/proto` folder.  These are used in gRPC connections to the
@@ -97,6 +166,18 @@ make proto
 From your bash compatible shell in the root of this directory.  This wil create a `/proto` folder in the root
 directory of the
 repository.
+
+
+## Semantic Conventions Generation
+A generated semantic convention files are committed to the repository in the `/src/SemConv` directory. These files
+get updated when new version of [opentelemetry-specification](https://github.com/open-telemetry/opentelemetry-specification)
+released.
+
+```bash
+SEMCONV_VERSION=1.8.0 make semconv
+```
+
+Run it from you bash compatible shell in the root of this repository.
 
 ## Styling
 We use [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) for our code linting and standards fixer.  The associated configuration for this standards fixer can be found in the root of the repository [here](https://github.com/open-telemetry/opentelemetry-php/blob/master/.php_cs)

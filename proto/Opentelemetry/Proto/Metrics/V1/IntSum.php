@@ -10,8 +10,6 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * IntSum is deprecated.  Use Sum with an integer value in NumberDataPoint.
- * IntSum represents the type of a numeric int scalar metric that is calculated as
- * a sum of all reported measurements over a time interval.
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.IntSum</code>
  */

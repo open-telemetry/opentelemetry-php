@@ -29,31 +29,15 @@ use OpenTelemetry\SDK\Trace\Span;
  */
 class ParentBased implements SamplerInterface
 {
+    private SamplerInterface $root;
 
-    /**
-     * @var SamplerInterface
-     */
-    private $root;
+    private SamplerInterface $remoteParentSampled;
 
-    /**
-     * @var SamplerInterface
-     */
-    private $remoteParentSampled;
+    private SamplerInterface $remoteParentNotSampled;
 
-    /**
-     * @var SamplerInterface
-     */
-    private $remoteParentNotSampled;
+    private SamplerInterface $localParentSampled;
 
-    /**
-     * @var SamplerInterface
-     */
-    private $localParentSampled;
-
-    /**
-     * @var SamplerInterface
-     */
-    private $localParentNotSampled;
+    private SamplerInterface $localParentNotSampled;
 
     /**
      * ParentBased sampler delegates the sampling decision based on the parent context.

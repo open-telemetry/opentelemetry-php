@@ -35,13 +35,23 @@ class FriendlySpanConverter implements SpanConverterInterface
     private const TIMESTAMP_ATTR = 'timestamp';
     private const LINKS_ATTR = 'links';
 
+    public function convert(iterable $spans): array
+    {
+        $aggregate = [];
+        foreach ($spans as $span) {
+            $aggregate[] = $this->convertSpan($span);
+        }
+
+        return $aggregate;
+    }
+
     /**
      * friendlySpan does the heavy lifting converting a span into an array
      *
      * @param SpanDataInterface $span
      * @return array
      */
-    public function convert(SpanDataInterface $span): array
+    private function convertSpan(SpanDataInterface $span): array
     {
         return [
             self::NAME_ATTR => $span->getName(),

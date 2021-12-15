@@ -9,8 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Sum represents the type of a numeric double scalar metric that is calculated
- * as a sum of all reported measurements over a time interval.
+ * Sum represents the type of a scalar metric that is calculated as a sum of all
+ * reported measurements over a time interval.
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.Sum</code>
  */

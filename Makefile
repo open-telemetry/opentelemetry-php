@@ -1,3 +1,4 @@
+PHP_VERSION ?= 7.4
 DC_RUN_PHP = docker-compose run --rm php
 
 all: update style phan psalm phpstan test
@@ -48,4 +49,6 @@ deptrac:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/deptrac --formatter=table
 w3c-test-service:
 	@docker-compose -f docker-compose.w3cTraceContext.yaml run --rm php ./tests/TraceContext/W3CTestService/symfony-setup
+semconv:
+	./script/semantic-conventions/semconv.sh
 FORCE:

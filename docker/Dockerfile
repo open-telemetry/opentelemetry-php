@@ -1,17 +1,32 @@
-FROM php:8-buster
+ARG PHP_VERSION=7.4
+FROM php:${PHP_VERSION}-cli-alpine as php_build
 
-RUN apt-get -y update && apt-get -y install git zip && \
-    curl -sS https://getcomposer.org/installer | php && \
-    mv composer.phar /usr/local/bin/composer && \
-    chmod +x /usr/local/bin/composer && \
-    pecl install ast-1.0.14 xdebug && \
-    docker-php-ext-enable ast xdebug && \
-    # The pcntl extension is used for speeding up `make phan`
-    docker-php-ext-install pcntl
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
-# install GRPC
-RUN apt install -y --no-install-recommends zlib1g-dev && \
-    pecl install grpc && \
-    docker-php-ext-enable grpc
+RUN chmod +x /usr/local/bin/install-php-extensions; \
+    apk add --update binutils; \
+    install-php-extensions \
+        ast-1.0.14 \
+        xdebug \
+        zip \
+        pcntl \
+        grpc \
+        @composer \
+    ; \
+    # strip debug symbols from extensions to reduce size
+    find /usr/local/lib/php/extensions -name "*.so" -exec strip --strip-debug {} \;;
+
+FROM php_build
 
 WORKDIR /usr/src/myapp
+
+RUN   apk add --no-cache bash git; \
+      find /usr/local/lib/php/extensions -type d -exec chmod +x -R {} \;; \
+      addgroup -g "1000" -S php; \
+      adduser --system \
+        --gecos "" \
+        --ingroup "php" \
+        --uid "1000" \
+        "php";
+
+USER php

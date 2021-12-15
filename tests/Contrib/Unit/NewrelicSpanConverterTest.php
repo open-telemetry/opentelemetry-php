@@ -24,7 +24,7 @@ class NewrelicSpanConverterTest extends TestCase
             ->setHasEnded(true);
 
         $converter = new SpanConverter('test.name');
-        $row = $converter->convert($span);
+        $row = $converter->convert([$span])[0];
 
         $this->assertSame($span->getContext()->getSpanId(), $row['id']);
         $this->assertSame($span->getContext()->getTraceId(), $row['trace.id']);
@@ -65,7 +65,7 @@ class NewrelicSpanConverterTest extends TestCase
             ->addAttribute('list-of-booleans', $listOfBooleans)
             ->addAttribute('list-of-random', $listOfRandoms);
 
-        $attributes = (new SpanConverter('tags.test'))->convert($span)['attributes'];
+        $attributes = (new SpanConverter('tags.test'))->convert([$span])[0]['attributes'];
 
         // Check that we can convert all attributes to tags
         $this->assertCount(17, $attributes);

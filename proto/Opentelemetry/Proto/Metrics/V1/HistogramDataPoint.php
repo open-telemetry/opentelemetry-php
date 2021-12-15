@@ -10,11 +10,11 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * HistogramDataPoint is a single data point in a timeseries that describes the
- * time-varying values of a Histogram of double values. A Histogram contains
- * summary statistics for a population of values, it may optionally contain the
- * distribution of those values across a set of buckets.
+ * time-varying values of a Histogram. A Histogram contains summary statistics
+ * for a population of values, it may optionally contain the distribution of
+ * those values across a set of buckets.
  * If the histogram contains the distribution of values, then both
- * "explicit_bounds" and "bucket counts" fields must be defined.   
+ * "explicit_bounds" and "bucket counts" fields must be defined.
  * If the histogram does not contain the distribution of values, then both
  * "explicit_bounds" and "bucket_counts" must be omitted and only "count" and
  * "sum" are known.
@@ -24,29 +24,35 @@ use Google\Protobuf\Internal\GPBUtil;
 class HistogramDataPoint extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The set of labels that uniquely identify this timeseries.
+     * The set of key/value pairs that uniquely identify the timeseries from
+     * where this point belongs. The list may be empty (may contain 0 elements).
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
+     */
+    private $attributes;
+    /**
+     * Labels is deprecated and will be removed soon.
+     * 1. Old senders and receivers that are not aware of this change will
+     * continue using the `labels` field.
+     * 2. New senders, which are aware of this change MUST send only `attributes`.
+     * 3. New receivers, which are aware of this change MUST convert this into
+     * `labels` by simply converting all int64 values into float.
+     * This field will be removed in ~3 months, on July 1, 2021.
+     *
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];</code>
      */
     private $labels;
     /**
-     * start_time_unix_nano is the last time when the aggregation value was reset
-     * to "zero". For some metric types this is ignored, see data types for more
-     * details.
-     * The aggregation value is over the time interval (start_time_unix_nano,
-     * time_unix_nano].
-     * 
+     * StartTimeUnixNano is optional but strongly encouraged, see the
+     * the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
-     * Value of 0 indicates that the timestamp is unspecified. In that case the
-     * timestamp may be decided by the backend.
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      */
     private $start_time_unix_nano = 0;
     /**
-     * time_unix_nano is the moment when this aggregation value was reported.
-     * 
+     * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
      *
@@ -63,8 +69,12 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     private $count = 0;
     /**
      * sum of the values in the population. If count is zero then this field
-     * must be zero. This value must be equal to the sum of the "sum" fields in
-     * buckets if a histogram is provided.
+     * must be zero.
+     * Note: Sum should only be filled out when measuring non-negative discrete
+     * events, and is assumed to be monotonic over the values of these events.
+     * Negative events *can* be recorded, but sum should not be filled out when
+     * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
+     * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *
      * Generated from protobuf field <code>double sum = 5;</code>
      */
@@ -81,12 +91,10 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     private $bucket_counts;
     /**
      * explicit_bounds specifies buckets with explicitly defined bounds for values.
-     * This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-     * bucket at index i are:
+     * The boundaries for bucket at index i are:
      * (-infinity, explicit_bounds[i]] for i == 0
-     * (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-     * (explicit_bounds[i], +infinity) for i == N-1
-     * 
+     * (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
+     * (explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)
      * The values in the explicit_bounds array must be strictly increasing.
      * Histogram buckets are inclusive of their upper boundary, except the last
      * bucket where the boundary is at infinity. This format is intentionally
@@ -102,6 +110,13 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.Exemplar exemplars = 8;</code>
      */
     private $exemplars;
+    /**
+     * Flags that apply to this specific data point.  See DataPointFlags
+     * for the available flags and their meaning.
+     *
+     * Generated from protobuf field <code>uint32 flags = 10;</code>
+     */
+    private $flags = 0;
 
     /**
      * Constructor.
@@ -109,22 +124,24 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $attributes
+     *           The set of key/value pairs that uniquely identify the timeseries from
+     *           where this point belongs. The list may be empty (may contain 0 elements).
      *     @type \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $labels
-     *           The set of labels that uniquely identify this timeseries.
+     *           Labels is deprecated and will be removed soon.
+     *           1. Old senders and receivers that are not aware of this change will
+     *           continue using the `labels` field.
+     *           2. New senders, which are aware of this change MUST send only `attributes`.
+     *           3. New receivers, which are aware of this change MUST convert this into
+     *           `labels` by simply converting all int64 values into float.
+     *           This field will be removed in ~3 months, on July 1, 2021.
      *     @type int|string $start_time_unix_nano
-     *           start_time_unix_nano is the last time when the aggregation value was reset
-     *           to "zero". For some metric types this is ignored, see data types for more
-     *           details.
-     *           The aggregation value is over the time interval (start_time_unix_nano,
-     *           time_unix_nano].
-     *           
+     *           StartTimeUnixNano is optional but strongly encouraged, see the
+     *           the detailed comments above Metric.
      *           Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      *           1970.
-     *           Value of 0 indicates that the timestamp is unspecified. In that case the
-     *           timestamp may be decided by the backend.
      *     @type int|string $time_unix_nano
-     *           time_unix_nano is the moment when this aggregation value was reported.
-     *           
+     *           TimeUnixNano is required, see the detailed comments above Metric.
      *           Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      *           1970.
      *     @type int|string $count
@@ -133,8 +150,12 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      *           histogram is provided.
      *     @type float $sum
      *           sum of the values in the population. If count is zero then this field
-     *           must be zero. This value must be equal to the sum of the "sum" fields in
-     *           buckets if a histogram is provided.
+     *           must be zero.
+     *           Note: Sum should only be filled out when measuring non-negative discrete
+     *           events, and is assumed to be monotonic over the values of these events.
+     *           Negative events *can* be recorded, but sum should not be filled out when
+     *           doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
+     *           see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *     @type int[]|string[]|\Google\Protobuf\Internal\RepeatedField $bucket_counts
      *           bucket_counts is an optional field contains the count values of histogram
      *           for each bucket.
@@ -143,12 +164,10 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      *           the number of elements in explicit_bounds array.
      *     @type float[]|\Google\Protobuf\Internal\RepeatedField $explicit_bounds
      *           explicit_bounds specifies buckets with explicitly defined bounds for values.
-     *           This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-     *           bucket at index i are:
+     *           The boundaries for bucket at index i are:
      *           (-infinity, explicit_bounds[i]] for i == 0
-     *           (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-     *           (explicit_bounds[i], +infinity) for i == N-1
-     *           
+     *           (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
+     *           (explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)
      *           The values in the explicit_bounds array must be strictly increasing.
      *           Histogram buckets are inclusive of their upper boundary, except the last
      *           bucket where the boundary is at infinity. This format is intentionally
@@ -156,6 +175,9 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      *     @type \Opentelemetry\Proto\Metrics\V1\Exemplar[]|\Google\Protobuf\Internal\RepeatedField $exemplars
      *           (Optional) List of exemplars collected from
      *           measurements that were used to form the data point
+     *     @type int $flags
+     *           Flags that apply to this specific data point.  See DataPointFlags
+     *           for the available flags and their meaning.
      * }
      */
     public function __construct($data = NULL) {
@@ -164,9 +186,43 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The set of labels that uniquely identify this timeseries.
+     * The set of key/value pairs that uniquely identify the timeseries from
+     * where this point belongs. The list may be empty (may contain 0 elements).
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * The set of key/value pairs that uniquely identify the timeseries from
+     * where this point belongs. The list may be empty (may contain 0 elements).
+     *
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
+     * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setAttributes($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Common\V1\KeyValue::class);
+        $this->attributes = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Labels is deprecated and will be removed soon.
+     * 1. Old senders and receivers that are not aware of this change will
+     * continue using the `labels` field.
+     * 2. New senders, which are aware of this change MUST send only `attributes`.
+     * 3. New receivers, which are aware of this change MUST convert this into
+     * `labels` by simply converting all int64 values into float.
+     * This field will be removed in ~3 months, on July 1, 2021.
+     *
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getLabels()
@@ -175,9 +231,15 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The set of labels that uniquely identify this timeseries.
+     * Labels is deprecated and will be removed soon.
+     * 1. Old senders and receivers that are not aware of this change will
+     * continue using the `labels` field.
+     * 2. New senders, which are aware of this change MUST send only `attributes`.
+     * 3. New receivers, which are aware of this change MUST convert this into
+     * `labels` by simply converting all int64 values into float.
+     * This field will be removed in ~3 months, on July 1, 2021.
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];</code>
      * @param \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
@@ -190,16 +252,10 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * start_time_unix_nano is the last time when the aggregation value was reset
-     * to "zero". For some metric types this is ignored, see data types for more
-     * details.
-     * The aggregation value is over the time interval (start_time_unix_nano,
-     * time_unix_nano].
-     * 
+     * StartTimeUnixNano is optional but strongly encouraged, see the
+     * the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
-     * Value of 0 indicates that the timestamp is unspecified. In that case the
-     * timestamp may be decided by the backend.
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      * @return int|string
@@ -210,16 +266,10 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * start_time_unix_nano is the last time when the aggregation value was reset
-     * to "zero". For some metric types this is ignored, see data types for more
-     * details.
-     * The aggregation value is over the time interval (start_time_unix_nano,
-     * time_unix_nano].
-     * 
+     * StartTimeUnixNano is optional but strongly encouraged, see the
+     * the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
-     * Value of 0 indicates that the timestamp is unspecified. In that case the
-     * timestamp may be decided by the backend.
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      * @param int|string $var
@@ -234,8 +284,7 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * time_unix_nano is the moment when this aggregation value was reported.
-     * 
+     * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
      *
@@ -248,8 +297,7 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * time_unix_nano is the moment when this aggregation value was reported.
-     * 
+     * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
      * 1970.
      *
@@ -297,8 +345,12 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
 
     /**
      * sum of the values in the population. If count is zero then this field
-     * must be zero. This value must be equal to the sum of the "sum" fields in
-     * buckets if a histogram is provided.
+     * must be zero.
+     * Note: Sum should only be filled out when measuring non-negative discrete
+     * events, and is assumed to be monotonic over the values of these events.
+     * Negative events *can* be recorded, but sum should not be filled out when
+     * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
+     * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *
      * Generated from protobuf field <code>double sum = 5;</code>
      * @return float
@@ -310,8 +362,12 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
 
     /**
      * sum of the values in the population. If count is zero then this field
-     * must be zero. This value must be equal to the sum of the "sum" fields in
-     * buckets if a histogram is provided.
+     * must be zero.
+     * Note: Sum should only be filled out when measuring non-negative discrete
+     * events, and is assumed to be monotonic over the values of these events.
+     * Negative events *can* be recorded, but sum should not be filled out when
+     * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
+     * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *
      * Generated from protobuf field <code>double sum = 5;</code>
      * @param float $var
@@ -361,12 +417,10 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
 
     /**
      * explicit_bounds specifies buckets with explicitly defined bounds for values.
-     * This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-     * bucket at index i are:
+     * The boundaries for bucket at index i are:
      * (-infinity, explicit_bounds[i]] for i == 0
-     * (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-     * (explicit_bounds[i], +infinity) for i == N-1
-     * 
+     * (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
+     * (explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)
      * The values in the explicit_bounds array must be strictly increasing.
      * Histogram buckets are inclusive of their upper boundary, except the last
      * bucket where the boundary is at infinity. This format is intentionally
@@ -382,12 +436,10 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
 
     /**
      * explicit_bounds specifies buckets with explicitly defined bounds for values.
-     * This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-     * bucket at index i are:
+     * The boundaries for bucket at index i are:
      * (-infinity, explicit_bounds[i]] for i == 0
-     * (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-     * (explicit_bounds[i], +infinity) for i == N-1
-     * 
+     * (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
+     * (explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)
      * The values in the explicit_bounds array must be strictly increasing.
      * Histogram buckets are inclusive of their upper boundary, except the last
      * bucket where the boundary is at infinity. This format is intentionally
@@ -429,6 +481,34 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Metrics\V1\Exemplar::class);
         $this->exemplars = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Flags that apply to this specific data point.  See DataPointFlags
+     * for the available flags and their meaning.
+     *
+     * Generated from protobuf field <code>uint32 flags = 10;</code>
+     * @return int
+     */
+    public function getFlags()
+    {
+        return $this->flags;
+    }
+
+    /**
+     * Flags that apply to this specific data point.  See DataPointFlags
+     * for the available flags and their meaning.
+     *
+     * Generated from protobuf field <code>uint32 flags = 10;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setFlags($var)
+    {
+        GPBUtil::checkUint32($var);
+        $this->flags = $var;
 
         return $this;
     }

@@ -29,6 +29,12 @@ class InstrumentationLibraryLogs extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .opentelemetry.proto.logs.v1.LogRecord logs = 2;</code>
      */
     private $logs;
+    /**
+     * This schema_url applies to all logs in the "logs" field.
+     *
+     * Generated from protobuf field <code>string schema_url = 3;</code>
+     */
+    private $schema_url = '';
 
     /**
      * Constructor.
@@ -42,6 +48,8 @@ class InstrumentationLibraryLogs extends \Google\Protobuf\Internal\Message
      *           an empty instrumentation library name (unknown).
      *     @type \Opentelemetry\Proto\Logs\V1\LogRecord[]|\Google\Protobuf\Internal\RepeatedField $logs
      *           A list of log records.
+     *     @type string $schema_url
+     *           This schema_url applies to all logs in the "logs" field.
      * }
      */
     public function __construct($data = NULL) {
@@ -101,6 +109,32 @@ class InstrumentationLibraryLogs extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Logs\V1\LogRecord::class);
         $this->logs = $arr;
+
+        return $this;
+    }
+
+    /**
+     * This schema_url applies to all logs in the "logs" field.
+     *
+     * Generated from protobuf field <code>string schema_url = 3;</code>
+     * @return string
+     */
+    public function getSchemaUrl()
+    {
+        return $this->schema_url;
+    }
+
+    /**
+     * This schema_url applies to all logs in the "logs" field.
+     *
+     * Generated from protobuf field <code>string schema_url = 3;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setSchemaUrl($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->schema_url = $var;
 
         return $this;
     }
