@@ -13,14 +13,11 @@ final class GlobalLoggerHolder
 
     /**
      * @suppress PhanTypeMismatchReturnNullable
-     * Whenever the library suppresses an error that would otherwise have been exposed
-     * to the user, the library SHOULD log the error using language-specific conventions.
      */
     public static function get(): LoggerInterface
     {
         if (null === self::$logger) {
             //TODO a sensible default, instead of NullLogger, could be to log to stdout
-            //$level = getenv('OTEL_LOG_LEVEL') ?: 'info';
 
             return new NullLogger();
         }
