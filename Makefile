@@ -1,3 +1,4 @@
+PHP_VERSION ?= 7.4
 DC_RUN_PHP = docker-compose run --rm php
 
 all: update style phan psalm phpstan test
