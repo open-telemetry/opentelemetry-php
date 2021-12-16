@@ -10,11 +10,20 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
+      fail-fast: false
       matrix:
         operating-system: [ubuntu-latest]
         php-versions: ['7.4', '8.0', '8.1']
+        php-version: ['7.4', '8.0']
+        os: [ubuntu-latest]
+        experimental: [false]
+        include:
+          - php-version: 8.1
+            os: ubuntu-latest
+            experimental: true
 
     steps:
     - uses: actions/checkout@v2
@@ -22,7 +31,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: ${{ matrix.php-versions }}
+        php-version: ${{ matrix.php-version }}
         coverage: xdebug
         tools: php-cs-fixer
         extensions: ast, grpc
