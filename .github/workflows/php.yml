@@ -60,19 +60,15 @@ jobs:
       env:
         PHAN_DISABLE_XDEBUG_WARN: 1
       run: vendor/bin/phan
-      continue-on-error: ${{ matrix.experimental }}
 
     - name: Run Psalm
       run: vendor/bin/psalm --output-format=github
-      continue-on-error: ${{ matrix.experimental }}
 
     - name: Run Phpstan
       run: vendor/bin/phpstan analyse --error-format=github
-      continue-on-error: ${{ matrix.experimental }}
 
     - name: Run PHPUnit
       run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
-      continue-on-error: ${{ matrix.experimental }}
 
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash)
