@@ -10,16 +10,17 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
-        operating-system: [ubuntu-latest]
         php-version: ['7.4', '8.0']
+        os: [ubuntu-latest]
         experimental: [false]
         include:
           - php-version: 8.1
+            os: ubuntu-latest
             experimental: true
 
     steps:
