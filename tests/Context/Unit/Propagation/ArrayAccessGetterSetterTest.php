@@ -80,8 +80,12 @@ class ArrayAccessGetterSetterTest extends TestCase
                 return true;
             }
 
-            public function offsetGet($offset)
+            /**
+             * @psalm-suppress ReservedWord
+             */
+            public function offsetGet($offset): mixed
             {
+                return []; //dummy value
             }
 
             public function offsetSet($offset, $value): void

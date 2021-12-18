@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
-use function define;
 use FFI;
 use FFI\Exception;
 
@@ -30,8 +29,13 @@ return (function (): bool {
             return false;
         }
 
-        // Has to keep reference alive
-        define(__NAMESPACE__ . '\\_ffi_fibers', $fibers);
+        // @internal
+        class FFIFiberHolder
+        {
+            public static FFI $fibers;
+        }
+        // Has to keep reference alive so that it is not garbage collected
+        FFIFiberHolder::$fibers = $fibers;
     }
 
     $fibers->zend_observer_fiber_init_register(fn (int $initializing) => Context::storage()->fork($initializing)); // @phpstan-ignore-line
