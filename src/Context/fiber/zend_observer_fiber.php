@@ -34,7 +34,10 @@ return (function (): bool {
         {
             public static FFI $fibers;
         }
-        // Has to keep reference alive so that it is not garbage collected
+        /**
+         * Keep a reference to FFI instance. If it is garbage collected, future callbacks will segfault
+         * @see https://github.com/open-telemetry/opentelemetry-php/issues/515
+         */
         FFIFiberHolder::$fibers = $fibers;
     }
 
