@@ -82,6 +82,8 @@ however most OS` package managers provide a package for the extension.
 _Experimental_ support for using fibers in PHP 8.1 for Context storage requires the `ffi` extension, and can
 be enabled by setting the `OTEL_PHP_FIBERS_ENABLED` environment variable to a truthy value (`1`, `true`, `on`).
 
+Using fibers with non-`CLI` SAPIs may require pre-loading of bindings. One way to achieve this is setting [`ffi.preload`](https://www.php.net/manual/en/ffi.configuration.php#ini.ffi.preload) to `src/Context/fiber/zend_observer_fiber.h` and setting [`opcache.preload`](https://www.php.net/manual/en/opcache.preloading.php) to `vendor/autoload.php`.
+
 ---
 
 ## Installation
