@@ -36,6 +36,7 @@
         <ini name="error_reporting" value="E_ALL" />
         <ini name="assert.active" value="True" />
         <ini name="assert.exception" value="True" />
+        <env name="OTEL_PHP_FIBERS_ENABLED" value="true" />
     </php>
 
     <testsuites>

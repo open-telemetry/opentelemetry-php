@@ -45,13 +45,15 @@ trait EnvironmentVariablesTrait
         }
         switch (strtolower($value)) {
             case 'true':
+            case 'on':
             case '1':
                 return true;
             case 'false':
+            case 'off':
             case '0':
                 return false;
             default:
-                throw new InvalidArgumentException($key . ' contains a non-boolean value');
+                throw new InvalidArgumentException(sprintf('%s contains a non-boolean value (%s)', $key, $value));
         }
     }
 }

@@ -74,33 +74,8 @@ class ArrayAccessGetterSetterTest extends TestCase
 
     public function testKeysKeyedArrayAccessObject(): void
     {
-        $carrier = new class() implements KeyedArrayAccessInterface {
-            public function offsetExists($offset): bool
-            {
-                return true;
-            }
-
-            /**
-             * @psalm-suppress ReservedWord
-             */
-            public function offsetGet($offset): mixed
-            {
-                return []; //dummy value
-            }
-
-            public function offsetSet($offset, $value): void
-            {
-            }
-
-            public function offsetUnset($offset): void
-            {
-            }
-
-            public function keys(): array
-            {
-                return ['a', 'b'];
-            }
-        };
+        $carrier = $this->createMock(KeyedArrayAccessInterface::class);
+        $carrier->method('keys')->willReturn(['a', 'b']);
 
         $map = new ArrayAccessGetterSetter();
 
