@@ -6,7 +6,7 @@ namespace OpenTelemetry\Contrib\Jaeger;
 
 use InvalidArgumentException;
 use Jaeger\JaegerTransport;
-use OpenTelemetry\Sdk\Trace;
+use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Trace as API;
 
@@ -15,6 +15,7 @@ use OpenTelemetry\Trace as API;
  */
 class AgentExporter implements SpanExporterInterface
 {
+    use SpanExporterTrait;
 
     /**
      * @var string
@@ -52,20 +53,10 @@ class AgentExporter implements SpanExporterInterface
     }
 
     /**
-     *
-     * @param iterable<API\Span> $spans Array of Spans
-     * @return int return code, defined on the Exporter interface
+     * @psalm-return SpanExporterInterface::STATUS_*
      */
-    public function export(iterable $spans): int
+    public function doExport(iterable $spans): int
     {
-        if (!$this->running) {
-            return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
-        }
-
-        if (empty($spans)) {
-            return SpanExporterInterface::STATUS_SUCCESS;
-        }
-
         // UDP Transport begins here after converting to thrift format span
         foreach ($spans as $span) {
             $cSpan = $this->spanConverter->convert($span);
@@ -75,8 +66,12 @@ class AgentExporter implements SpanExporterInterface
         return SpanExporterInterface::STATUS_SUCCESS;
     }
 
-    public function shutdown(): void
+    /** @inheritDoc */
+    public static function fromConnectionString(string $endpointUrl, string $name, $args = null)
     {
-        $this->running = false;
+        return new AgentExporter(
+            $name,
+            $endpointUrl
+        );
     }
 } 
