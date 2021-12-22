@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Jaeger;
 
 use InvalidArgumentException;
-use Jaeger\JaegerTransport;
+use OpenTelemetry\Contrib\Jaeger\JaegerTransport;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use OpenTelemetry\Trace as API;
 
 /**
  * @package OpenTelemetry\Exporter
