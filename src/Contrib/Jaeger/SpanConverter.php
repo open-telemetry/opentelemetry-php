@@ -29,13 +29,12 @@ class SpanConverter
 
     public function convert(SpanDataInterface $span)
     {
-        $spanParent = $parentSpanId = $traceId = $type =  null;
         $references = $tags = $logs = [];
-        $startTime = (int) ($span->getStartEpochTimestamp() / 1e3); // microseconds
-        $duration = (int) (($span->getEnd() - $span->getStart()) / 1e3); // microseconds
+        $startTime = (int) ($span->getStartEpochNanos() / 1e3); // microseconds
+        $duration = (int) (($span->getEndEpochNanos() - $span->getStartEpochNanos()) / 1e3); // microseconds
         $tags = [
-            self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCanonicalStatusCode(),
-            self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getStatusDescription(),
+            self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
+            self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
@@ -43,9 +42,8 @@ class SpanConverter
         }
         $tags = $this->buildTags($tags);
 
-        $spanParent = $span->getParent();
         $traceId = $span->getContext()->getTraceID();
-        $parentSpanId = $spanParent ? $spanParent->getSpanId() : 0;
+        $parentSpanId = $span->getParentSpanId();
         $spanId = $span->getContext()->getSpanID();
 
         // foreach ($span->getEvents() as $event) {
@@ -69,7 +67,7 @@ class SpanConverter
             'traceIdHigh' => (is_array($traceId) ? $traceId['high'] : 0),
             'spanId' => $spanId,
             'parentSpanId' => $parentSpanId,
-            'operationName' => $span->getSpanName(),
+            'operationName' => $span->getName(),
             'references' => $references,
             'flags' => $span->getContext()->getTraceFlags(),
             'startTime' => $startTime,
