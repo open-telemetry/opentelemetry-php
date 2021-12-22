@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jaeger;
+namespace OpenTelemetry\Contrib\Jaeger;
 
 use Thrift\Exception\TTransportException;
 use Thrift\Transport\TTransport;

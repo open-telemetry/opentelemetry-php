@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jaeger\Codec;
+namespace OpenTelemetry\Contrib\Jaeger;
 
 use Throwable;
 

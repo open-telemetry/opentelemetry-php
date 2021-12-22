@@ -1,4 +1,3 @@
-
 <?php
 
 declare(strict_types=1);
@@ -6,11 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Jaeger;
 
 use Jaeger\Thrift\Span as JTSpan;
-use Jaeger\Thrift\SpanRef;
-use Jaeger\Thrift\SpanRefType;
 use Jaeger\Thrift\Tag;
 use Jaeger\Thrift\TagType;
-use OpenTelemetry\Trace\Span;
+use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
 class SpanConverter
 {
@@ -30,7 +27,7 @@ class SpanConverter
     * Convert span to Jaeger Thrift Span format
     */
 
-    public function convert(Span $span)
+    public function convert(SpanDataInterface $span)
     {
         $spanParent = $parentSpanId = $traceId = $type =  null;
         $references = $tags = $logs = [];

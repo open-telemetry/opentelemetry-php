@@ -7,12 +7,13 @@ namespace OpenTelemetry\Contrib\Jaeger;
 use InvalidArgumentException;
 use Jaeger\JaegerTransport;
 use OpenTelemetry\Sdk\Trace;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Trace as API;
 
 /**
  * @package OpenTelemetry\Exporter
  */
-class AgentExporter implements Trace\Exporter
+class AgentExporter implements SpanExporterInterface
 {
 
     /**
@@ -58,11 +59,11 @@ class AgentExporter implements Trace\Exporter
     public function export(iterable $spans): int
     {
         if (!$this->running) {
-            return Exporter::FAILED_NOT_RETRYABLE;
+            return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
 
         if (empty($spans)) {
-            return Trace\Exporter::SUCCESS;
+            return SpanExporterInterface::STATUS_SUCCESS;
         }
 
         // UDP Transport begins here after converting to thrift format span
@@ -71,7 +72,7 @@ class AgentExporter implements Trace\Exporter
             $this->jaegerTransport->append($cSpan, $this->serviceName);
         }
 
-        return Trace\Exporter::SUCCESS;
+        return SpanExporterInterface::STATUS_SUCCESS;
     }
 
     public function shutdown(): void

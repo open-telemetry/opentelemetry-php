@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jaeger;
+namespace OpenTelemetry\Contrib\Jaeger;
 
 use Jaeger\Thrift\Agent\AgentClient;
 use Jaeger\Thrift\Batch;
