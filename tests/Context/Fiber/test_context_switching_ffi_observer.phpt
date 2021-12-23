@@ -36,7 +36,6 @@ $fiber->resume();
 echo 'main:' . Context::getCurrent()->get($key), PHP_EOL;
 
 $scope->detach();
-
 ?>
 --EXPECT--
 main:main

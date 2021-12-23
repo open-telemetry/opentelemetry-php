@@ -13,7 +13,9 @@ if (!class_exists(Fiber::class)) {
     return;
 }
 
-if (require __DIR__ . '/zend_observer_fiber.php') {
+$observer = new ZendObserverFiber();
+
+if ($observer->isEnabled() && $observer->init()) {
     // ffi fiber support enabled
 } else {
     Context::setStorage(new FiberNotSupportedContextStorage(Context::storage()));

@@ -27,6 +27,7 @@ class TracerProviderTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function test_tracerProvider_returnsNoopTracerIfNoDefaultIsSet(): void
     {
@@ -35,6 +36,7 @@ class TracerProviderTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function test_tracerProvider_acceptsDefaultTracer(): void
     {
