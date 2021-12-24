@@ -11,12 +11,12 @@ use function count;
 use function ctype_space;
 use function get_class;
 use function in_array;
-use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\AttributeLimits;
 use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use function sprintf;
@@ -245,12 +245,8 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function setAttributes(AttributesInterface $attributes): self
+    public function setAttributes(iterable $attributes): self
     {
-        if (0 === count($attributes)) {
-            return $this;
-        }
-
         foreach ($attributes as $key => $value) {
             $this->setAttribute($key, $value);
         }
@@ -259,7 +255,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function addEvent(string $name, ?AttributesInterface $attributes = null, int $timestamp = null): self
+    public function addEvent(string $name, iterable $attributes = [], int $timestamp = null): self
     {
         if ($this->hasEnded) {
             return $this;
@@ -270,7 +266,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
                 $name,
                 $timestamp ?? AbstractClock::getDefault()->now(),
                 Attributes::withLimits(
-                    $attributes ?? new Attributes(),
+                    $attributes,
                     new AttributeLimits(
                         $this->spanLimits->getAttributePerEventCountLimit(),
                         $this->spanLimits->getAttributeLimits()->getAttributeValueLengthLimit()
@@ -285,7 +281,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function recordException(Throwable $exception, AttributesInterface $attributes = null): self
+    public function recordException(Throwable $exception, iterable $attributes = []): self
     {
         $timestamp = AbstractClock::getDefault()->now();
         $eventAttributes = new Attributes([
@@ -294,10 +290,8 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
                 'exception.stacktrace' => self::formatStackTrace($exception),
             ]);
 
-        if ($attributes) {
-            foreach ($attributes as $key => $value) {
-                $eventAttributes->setAttribute($key, $value);
-            }
+        foreach ($attributes as $key => $value) {
+            $eventAttributes->setAttribute($key, $value);
         }
 
         return $this->addEvent('exception', $eventAttributes, $timestamp);

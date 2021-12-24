@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\Sampler;
 
 use InvalidArgumentException;
-use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;

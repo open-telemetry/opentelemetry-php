@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\API\Unit\Trace;
 
-use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\NoopSpanBuilder;
 use OpenTelemetry\API\Trace\SpanContextInterface;
@@ -151,9 +150,7 @@ class NoopSpanBuilderTest extends TestCase
 
         $this->assertInstanceOf(
             NoopSpanBuilder::class,
-            (new NoopSpanBuilder($contextStorage))->setAttributes(
-                $this->createMock(AttributesInterface::class)
-            )
+            (new NoopSpanBuilder($contextStorage))->setAttributes([])
         );
     }
 

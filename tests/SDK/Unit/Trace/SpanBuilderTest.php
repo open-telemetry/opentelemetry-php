@@ -261,7 +261,7 @@ class SpanBuilderTest extends MockeryTestCase
                 string $traceId,
                 string $spanName,
                 int $spanKind,
-                ?\OpenTelemetry\API\AttributesInterface $attributes = null,
+                ?\OpenTelemetry\SDK\AttributesInterface $attributes = null,
                 array $links = []
             ): SamplingResult {
                 return new SamplingResult(SamplingResult::RECORD_AND_SAMPLE, new Attributes(['cat' => 'meow']));

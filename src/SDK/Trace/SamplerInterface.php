@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\AttributesInterface;
 
 /**
  * This interface is used to organize sampling logic.

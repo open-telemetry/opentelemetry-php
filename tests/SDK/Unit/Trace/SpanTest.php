@@ -9,12 +9,12 @@ use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
-use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Event;
@@ -429,7 +429,7 @@ class SpanTest extends MockeryTestCase
         $span = $this->createTestRootSpan();
         $span->addEvent('event1');
         $span->addEvent('event2', new Attributes(['key1' => 1]));
-        $span->addEvent('event3', null, AbstractClock::secondsToNanos(10));
+        $span->addEvent('event3', [], AbstractClock::secondsToNanos(10));
 
         $span->end();
 

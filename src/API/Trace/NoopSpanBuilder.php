@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
-use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageInterface;
 
@@ -33,7 +32,7 @@ final class NoopSpanBuilder implements SpanBuilderInterface
         return $this;
     }
 
-    public function addLink(SpanContextInterface $context, AttributesInterface $attributes = null): SpanBuilderInterface
+    public function addLink(SpanContextInterface $context, iterable $attributes = []): SpanBuilderInterface
     {
         return $this;
     }
@@ -43,7 +42,7 @@ final class NoopSpanBuilder implements SpanBuilderInterface
         return $this;
     }
 
-    public function setAttributes(AttributesInterface $attributes): SpanBuilderInterface
+    public function setAttributes(iterable $attributes): SpanBuilderInterface
     {
         return $this;
     }

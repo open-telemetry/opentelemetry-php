@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Resource;
 
-use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SemConv\ResourceAttributes;
 
 /**

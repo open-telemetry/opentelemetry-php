@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK;
 
 use function mb_substr;
-use OpenTelemetry\API\AttributesInterface;
 use Traversable;
 
 class Attributes implements AttributesInterface
@@ -17,9 +16,9 @@ class Attributes implements AttributesInterface
     private int $totalAddedAttributes = 0;
 
     /** @return Attributes Returns a new instance of Attributes with the limits applied */
-    public static function withLimits(AttributesInterface $attributes, AttributeLimits $attributeLimits): Attributes
+    public static function withLimits(iterable $attributes, AttributeLimits $attributeLimits): Attributes
     {
-        return new self($attributes->getIterator(), $attributeLimits);
+        return new self($attributes, $attributeLimits);
     }
 
     public function __construct(iterable $attributes = [], AttributeLimits $attributeLimits = null)

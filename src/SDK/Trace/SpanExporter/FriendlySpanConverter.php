@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\SpanExporter;
 
-use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\LinkInterface;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API;
+namespace OpenTelemetry\SDK;
 
 use Countable;
 use IteratorAggregate;

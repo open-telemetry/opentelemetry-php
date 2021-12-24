@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use function in_array;
-use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\AttributeLimits;
 use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 
 final class SpanBuilder implements API\SpanBuilderInterface
@@ -73,7 +73,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
-    public function addLink(API\SpanContextInterface $context, AttributesInterface $attributes = null): API\SpanBuilderInterface
+    public function addLink(API\SpanContextInterface $context, iterable $attributes = []): API\SpanBuilderInterface
     {
         if (!$context->isValid()) {
             return $this;
@@ -92,7 +92,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
         $this->links[] = new Link(
             $context,
             Attributes::withLimits(
-                $attributes ?? new Attributes(),
+                $attributes,
                 new AttributeLimits(
                     $this->spanLimits->getAttributePerLinkCountLimit(),
                     $this->spanLimits->getAttributeLimits()->getAttributeValueLengthLimit()
@@ -116,12 +116,8 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
-    public function setAttributes(AttributesInterface $attributes): API\SpanBuilderInterface
+    public function setAttributes(iterable $attributes): API\SpanBuilderInterface
     {
-        if (0 === count($attributes)) {
-            return $this;
-        }
-
         foreach ($attributes as $key => $value) {
             $this->setAttribute($key, $value);
         }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\API\Trace\SpanContextInterface;
+use OpenTelemetry\SDK\AttributesInterface;
 
 interface LinkInterface
 {

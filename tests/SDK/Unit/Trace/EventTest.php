@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 
-use OpenTelemetry\API\AttributesInterface;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\Tests\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
