@@ -6,10 +6,9 @@ namespace OpenTelemetry\SDK\Trace;
 
 use function count;
 use OpenTelemetry\API\AttributesInterface;
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Attributes;
 
-final class Event implements API\EventInterface
+final class Event implements EventInterface
 {
     private string $name;
     private int $timestamp;

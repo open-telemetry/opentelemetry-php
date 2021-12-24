@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Trace;
+namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\AttributesInterface;
 

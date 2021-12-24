@@ -41,7 +41,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /**
      * @readonly
      *
-     * @var list<API\LinkInterface>
+     * @var list<LinkInterface>
      */
     private array $links;
 
@@ -63,7 +63,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /** @var non-empty-string */
     private string $name;
 
-    /** @var list<API\EventInterface> */
+    /** @var list<EventInterface> */
     private array $events = [];
 
     private ?AttributesInterface $attributes;
@@ -74,7 +74,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
 
     /**
      * @param non-empty-string $name
-     * @param list<API\LinkInterface> $links
+     * @param list<LinkInterface> $links
      */
     private function __construct(
         string $name,
@@ -111,7 +111,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
      *
      * @param non-empty-string $name
      * @psalm-param API\SpanKind::KIND_* $kind
-     * @param list<API\LinkInterface> $links
+     * @param list<LinkInterface> $links
      *
      * @internal
      * @psalm-internal OpenTelemetry

@@ -10,6 +10,8 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace as SDK;
+use OpenTelemetry\SDK\Trace\EventInterface;
+use OpenTelemetry\SDK\Trace\LinkInterface;
 use OpenTelemetry\SDK\Trace\StatusData;
 
 class SpanData implements SDK\SpanDataInterface
@@ -17,10 +19,11 @@ class SpanData implements SDK\SpanDataInterface
     /** @var non-empty-string */
     private string $name = 'test-span-data';
 
-    /** @var list<API\EventInterface> */
+    /** @var list<EventInterface> */
     private array $events = [];
 
-    /** @var list<API\LinkInterface> */
+    /** @var list<LinkInterface>
+     */
     private array $links = [];
 
     private \OpenTelemetry\API\AttributesInterface $attributes;
@@ -67,7 +70,7 @@ class SpanData implements SDK\SpanDataInterface
         return $this->links;
     }
 
-    /** @param list<API\LinkInterface> $links */
+    /** @param list<LinkInterface> $links */
     public function setLinks(array $links): self
     {
         $this->links = $links;
@@ -88,7 +91,7 @@ class SpanData implements SDK\SpanDataInterface
         return $this->events;
     }
 
-    /** @param list<API\EventInterface> $events */
+    /** @param list<EventInterface> $events */
     public function setEvents(array $events): self
     {
         $this->events = $events;

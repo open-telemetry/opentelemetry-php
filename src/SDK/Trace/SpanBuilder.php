@@ -36,7 +36,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
      */
     private int $spanKind = API\SpanKind::KIND_INTERNAL;
 
-    /** @var list<API\LinkInterface>|null */
+    /** @var list<LinkInterface>|null */
     private ?array $links = null;
 
     private ?AttributesInterface $attributes = null;

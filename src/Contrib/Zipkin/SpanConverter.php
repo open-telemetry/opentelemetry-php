@@ -6,11 +6,11 @@ namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
 use OpenTelemetry\API\AttributeInterface;
-use OpenTelemetry\API\Trace\EventInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
 use OpenTelemetry\SDK\AbstractClock;
+use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 

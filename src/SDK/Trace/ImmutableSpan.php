@@ -20,10 +20,10 @@ final class ImmutableSpan implements SpanDataInterface
     /** @var non-empty-string */
     private string $name;
 
-    /** @var list<API\EventInterface> */
+    /** @var list<EventInterface> */
     private array $events;
 
-    /** @var list<API\LinkInterface> */
+    /** @var list<LinkInterface> */
     private array $links;
 
     private AttributesInterface $attributes;
@@ -35,8 +35,8 @@ final class ImmutableSpan implements SpanDataInterface
 
     /**
      * @param non-empty-string $name
-     * @param list<API\LinkInterface> $links
-     * @param list<API\EventInterface> $events
+     * @param list<LinkInterface> $links
+     * @param list<EventInterface> $events
      *@internal
      * @psalm-internal OpenTelemetry\Sdk
      *

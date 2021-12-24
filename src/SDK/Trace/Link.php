@@ -9,7 +9,7 @@ use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Attributes;
 
-final class Link implements API\LinkInterface
+final class Link implements LinkInterface
 {
     private AttributesInterface $attributes;
     private API\SpanContextInterface $context;

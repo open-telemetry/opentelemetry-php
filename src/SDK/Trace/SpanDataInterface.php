@@ -27,10 +27,10 @@ interface SpanDataInterface
     public function getStartEpochNanos(): int;
     public function getAttributes(): AttributesInterface;
 
-    /** @return list<API\EventInterface> */
+    /** @return list<EventInterface> */
     public function getEvents(): array;
 
-    /** @return list<API\LinkInterface> */
+    /** @return list<LinkInterface> */
     public function getLinks(): array;
 
     public function getEndEpochNanos(): int;
