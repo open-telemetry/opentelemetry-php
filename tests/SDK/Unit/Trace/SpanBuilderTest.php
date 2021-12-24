@@ -11,6 +11,7 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Link;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
@@ -261,7 +262,7 @@ class SpanBuilderTest extends MockeryTestCase
                 string $traceId,
                 string $spanName,
                 int $spanKind,
-                ?\OpenTelemetry\SDK\AttributesInterface $attributes = null,
+                ?AttributesInterface $attributes = null,
                 array $links = []
             ): SamplingResult {
                 return new SamplingResult(SamplingResult::RECORD_AND_SAMPLE, new Attributes(['cat' => 'meow']));

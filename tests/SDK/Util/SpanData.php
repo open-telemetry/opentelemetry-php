@@ -7,6 +7,9 @@ namespace OpenTelemetry\Tests\SDK\Util;
 use function count;
 use function max;
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\SDK\AbstractClock;
+use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace as SDK;
@@ -26,7 +29,7 @@ class SpanData implements SDK\SpanDataInterface
      */
     private array $links = [];
 
-    private \OpenTelemetry\SDK\AttributesInterface $attributes;
+    private AttributesInterface $attributes;
     private int $kind;
     private StatusData $status;
     private ResourceInfo $resource;
@@ -42,7 +45,7 @@ class SpanData implements SDK\SpanDataInterface
 
     public function __construct()
     {
-        $this->attributes = new \OpenTelemetry\SDK\Attributes();
+        $this->attributes = new Attributes();
         $this->kind = API\SpanKind::KIND_INTERNAL;
         $this->status = StatusData::unset();
         $this->resource = ResourceInfo::emptyResource();
@@ -78,7 +81,7 @@ class SpanData implements SDK\SpanDataInterface
         return $this;
     }
 
-    public function addLink(API\SpanContextInterface $context, \OpenTelemetry\SDK\AttributesInterface $attributes = null): self
+    public function addLink(API\SpanContextInterface $context, AttributesInterface $attributes = null): self
     {
         $this->links[] = new SDK\Link($context, $attributes);
 
@@ -99,19 +102,19 @@ class SpanData implements SDK\SpanDataInterface
         return $this;
     }
 
-    public function addEvent(string $name, ?\OpenTelemetry\SDK\AttributesInterface $attributes, int $timestamp = null): self
+    public function addEvent(string $name, ?AttributesInterface $attributes, int $timestamp = null): self
     {
-        $this->events[] = new SDK\Event($name, $timestamp ?? \OpenTelemetry\SDK\AbstractClock::getDefault()->now(), $attributes);
+        $this->events[] = new SDK\Event($name, $timestamp ?? AbstractClock::getDefault()->now(), $attributes);
 
         return $this;
     }
 
-    public function getAttributes(): \OpenTelemetry\SDK\AttributesInterface
+    public function getAttributes(): AttributesInterface
     {
         return $this->attributes;
     }
 
-    public function setAttributes(\OpenTelemetry\SDK\AttributesInterface $attributes): self
+    public function setAttributes(AttributesInterface $attributes): self
     {
         $this->attributes = $attributes;
 
