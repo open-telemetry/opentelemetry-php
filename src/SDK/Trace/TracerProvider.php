@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use function is_array;
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Unit\Trace;
+namespace OpenTelemetry\Tests\SDK\Unit;
 
-use OpenTelemetry\SDK\Trace\AttributeLimits;
-use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\AttributeLimits;
+use OpenTelemetry\SDK\Attributes;
 use PHPUnit\Framework\TestCase;
 
 class AttributesTest extends TestCase

@@ -5,8 +5,8 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Trace\AbstractClock;
-use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\AbstractClock;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\TracerProvider;

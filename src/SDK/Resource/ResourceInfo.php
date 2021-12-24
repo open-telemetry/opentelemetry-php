@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Resource;
 
-use OpenTelemetry\API\Trace\AttributesInterface;
-use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\API\AttributesInterface;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SemConv\ResourceAttributes;
 
 /**
@@ -90,7 +90,7 @@ class ResourceInfo
         $string = getenv('OTEL_RESOURCE_ATTRIBUTES');
         if ($string && false !== strpos($string, '=')) {
             foreach (explode(',', $string) as $pair) {
-                list($key, $value) = explode('=', $pair);
+                [$key, $value] = explode('=', $pair);
                 $attributes[trim($key)] = trim($value);
             }
         }

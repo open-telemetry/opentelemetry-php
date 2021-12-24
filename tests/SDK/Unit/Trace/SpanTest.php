@@ -12,10 +12,10 @@ use Mockery\MockInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\AbstractClock;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SDK\Trace\AbstractClock;
-use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\SDK\Trace\IdGeneratorInterface;
 use OpenTelemetry\SDK\Trace\Link;
@@ -50,7 +50,7 @@ class SpanTest extends MockeryTestCase
     private API\SpanContextInterface $spanContext;
     private TestClock $testClock;
 
-    private API\AttributesInterface $expectedAttributes;
+    private \OpenTelemetry\API\AttributesInterface $expectedAttributes;
     private API\LinkInterface $link;
 
     private string $traceId;
@@ -201,7 +201,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSpanData(
             $span->toSpanData(),
             $this->expectedAttributes,
-            [new Event('event2', self::START_EPOCH + API\ClockInterface::NANOS_PER_SECOND)],
+            [new Event('event2', self::START_EPOCH + \OpenTelemetry\API\ClockInterface::NANOS_PER_SECOND)],
             [$this->link],
             self::NEW_SPAN_NAME,
             self::START_EPOCH,
@@ -234,7 +234,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSpanData(
             $span->toSpanData(),
             $this->expectedAttributes,
-            [new Event('event2', self::START_EPOCH + API\ClockInterface::NANOS_PER_SECOND)],
+            [new Event('event2', self::START_EPOCH + \OpenTelemetry\API\ClockInterface::NANOS_PER_SECOND)],
             [$this->link],
             self::NEW_SPAN_NAME,
             self::START_EPOCH,
@@ -647,7 +647,7 @@ class SpanTest extends MockeryTestCase
         int $kind = API\SpanKind::KIND_INTERNAL,
         SpanLimits $spanLimits = null,
         string $parentSpanId = null,
-        ?API\AttributesInterface $attributes = null,
+        ?\OpenTelemetry\API\AttributesInterface $attributes = null,
         array $links = []
     ): Span {
         $parentSpanId = $parentSpanId ?? $this->parentSpanId;
@@ -711,7 +711,7 @@ class SpanTest extends MockeryTestCase
     private function assertEvent(
         API\EventInterface $event,
         string $expectedName,
-        API\AttributesInterface $expectedAttributes,
+        \OpenTelemetry\API\AttributesInterface $expectedAttributes,
         int $expectedEpochNanos
     ): void {
         $this->assertSame($expectedName, $event->getName());
@@ -726,7 +726,7 @@ class SpanTest extends MockeryTestCase
      */
     private function assertSpanData(
         SpanDataInterface $spanData,
-        API\AttributesInterface $attributes,
+        \OpenTelemetry\API\AttributesInterface $attributes,
         array $events,
         array $links,
         string $spanName,

@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace;
+namespace OpenTelemetry\SDK;
 
 use ArrayIterator;
-use OpenTelemetry\API\Trace as API;
+use function mb_substr;
+use OpenTelemetry\API\AttributeInterface;
+use OpenTelemetry\API\AttributesInterface;
+use OpenTelemetry\API\AttributesIteratorInterface;
 
-class Attributes implements API\AttributesInterface
+class Attributes implements AttributesInterface
 {
     private array $attributes = [];
 
@@ -16,7 +19,7 @@ class Attributes implements API\AttributesInterface
     private int $totalAddedAttributes = 0;
 
     /** @return Attributes Returns a new instance of Attributes with the limits applied */
-    public static function withLimits(API\AttributesInterface $attributes, AttributeLimits $attributeLimits): Attributes
+    public static function withLimits(AttributesInterface $attributes, AttributeLimits $attributeLimits): Attributes
     {
         return new self($attributes->getIterator(), $attributeLimits);
     }
@@ -31,7 +34,7 @@ class Attributes implements API\AttributesInterface
         }
     }
 
-    public function setAttribute(string $name, $value): API\AttributesInterface
+    public function setAttribute(string $name, $value): AttributesInterface
     {
         $this->totalAddedAttributes++;
 
@@ -88,9 +91,9 @@ class Attributes implements API\AttributesInterface
         return \count($this->attributes);
     }
 
-    public function getIterator(): API\AttributesIteratorInterface
+    public function getIterator(): AttributesIteratorInterface
     {
-        return new class($this->attributes) implements API\AttributesIteratorInterface {
+        return new class($this->attributes) implements AttributesIteratorInterface {
             private ArrayIterator $inner;
             public function __construct($attributes)
             {
@@ -102,7 +105,7 @@ class Attributes implements API\AttributesInterface
                 return (string) $this->inner->key();
             }
 
-            public function current(): API\AttributeInterface
+            public function current(): AttributeInterface
             {
                 return $this->inner->current();
             }

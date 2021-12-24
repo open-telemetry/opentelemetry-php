@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace;
+namespace OpenTelemetry\SDK;
 
-use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\API\AttributeInterface;
 
-class Attribute implements API\AttributeInterface
+class Attribute implements AttributeInterface
 {
     private string $key;
     private $value;

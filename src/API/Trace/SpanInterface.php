@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
+use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ImplicitContextKeyedInterface;
 use Throwable;

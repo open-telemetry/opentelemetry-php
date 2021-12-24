@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use function in_array;
+use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\AttributeLimits;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 
 final class SpanBuilder implements API\SpanBuilderInterface
@@ -36,7 +39,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     /** @var list<API\LinkInterface>|null */
     private ?array $links = null;
 
-    private ?API\AttributesInterface $attributes = null;
+    private ?AttributesInterface $attributes = null;
     private int $totalNumberOfLinksAdded = 0;
     private int $startEpochNanos = 0;
 
@@ -70,7 +73,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
-    public function addLink(API\SpanContextInterface $context, API\AttributesInterface $attributes = null): API\SpanBuilderInterface
+    public function addLink(API\SpanContextInterface $context, AttributesInterface $attributes = null): API\SpanBuilderInterface
     {
         if (!$context->isValid()) {
             return $this;
@@ -113,7 +116,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
-    public function setAttributes(API\AttributesInterface $attributes): API\SpanBuilderInterface
+    public function setAttributes(AttributesInterface $attributes): API\SpanBuilderInterface
     {
         if (0 === count($attributes)) {
             return $this;

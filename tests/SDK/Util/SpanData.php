@@ -23,7 +23,7 @@ class SpanData implements SDK\SpanDataInterface
     /** @var list<API\LinkInterface> */
     private array $links = [];
 
-    private API\AttributesInterface $attributes;
+    private \OpenTelemetry\API\AttributesInterface $attributes;
     private int $kind;
     private StatusData $status;
     private ResourceInfo $resource;
@@ -39,7 +39,7 @@ class SpanData implements SDK\SpanDataInterface
 
     public function __construct()
     {
-        $this->attributes = new SDK\Attributes();
+        $this->attributes = new \OpenTelemetry\SDK\Attributes();
         $this->kind = API\SpanKind::KIND_INTERNAL;
         $this->status = StatusData::unset();
         $this->resource = ResourceInfo::emptyResource();
@@ -75,7 +75,7 @@ class SpanData implements SDK\SpanDataInterface
         return $this;
     }
 
-    public function addLink(API\SpanContextInterface $context, API\AttributesInterface $attributes = null): self
+    public function addLink(API\SpanContextInterface $context, \OpenTelemetry\API\AttributesInterface $attributes = null): self
     {
         $this->links[] = new SDK\Link($context, $attributes);
 
@@ -96,19 +96,19 @@ class SpanData implements SDK\SpanDataInterface
         return $this;
     }
 
-    public function addEvent(string $name, ?API\AttributesInterface $attributes, int $timestamp = null): self
+    public function addEvent(string $name, ?\OpenTelemetry\API\AttributesInterface $attributes, int $timestamp = null): self
     {
-        $this->events[] = new SDK\Event($name, $timestamp ?? SDK\AbstractClock::getDefault()->now(), $attributes);
+        $this->events[] = new SDK\Event($name, $timestamp ?? \OpenTelemetry\SDK\AbstractClock::getDefault()->now(), $attributes);
 
         return $this;
     }
 
-    public function getAttributes(): API\AttributesInterface
+    public function getAttributes(): \OpenTelemetry\API\AttributesInterface
     {
         return $this->attributes;
     }
 
-    public function setAttributes(API\AttributesInterface $attributes): self
+    public function setAttributes(\OpenTelemetry\API\AttributesInterface $attributes): self
     {
         $this->attributes = $attributes;
 

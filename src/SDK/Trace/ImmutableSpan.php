@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use function max;
+use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -25,7 +26,7 @@ final class ImmutableSpan implements SpanDataInterface
     /** @var list<API\LinkInterface> */
     private array $links;
 
-    private API\AttributesInterface $attributes;
+    private AttributesInterface $attributes;
     private int $totalAttributeCount;
     private int $totalRecordedEvents;
     private StatusDataInterface $status;
@@ -45,7 +46,7 @@ final class ImmutableSpan implements SpanDataInterface
         string $name,
         array $links,
         array $events,
-        API\AttributesInterface $attributes,
+        AttributesInterface $attributes,
         int $totalAttributeCount,
         int $totalRecordedEvents,
         StatusDataInterface $status,
@@ -131,7 +132,7 @@ final class ImmutableSpan implements SpanDataInterface
         return $this->events;
     }
 
-    public function getAttributes(): API\AttributesInterface
+    public function getAttributes(): AttributesInterface
     {
         return $this->attributes;
     }

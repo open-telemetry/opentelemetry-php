@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Util;
 
-use OpenTelemetry\API\Trace as API;
-
-final class TestClock implements API\ClockInterface
+final class TestClock implements \OpenTelemetry\API\ClockInterface
 {
     public const DEFAULT_START_EPOCH = 1633060331386955008; // Fri Oct 01 2021 03:52:11 UTC
 
@@ -19,7 +17,7 @@ final class TestClock implements API\ClockInterface
 
     public function advanceSeconds(int $seconds = 1): void
     {
-        $this->advance($seconds * API\ClockInterface::NANOS_PER_SECOND);
+        $this->advance($seconds * \OpenTelemetry\API\ClockInterface::NANOS_PER_SECOND);
     }
 
     public function advance(int $nanoSeconds = 1): void

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\Contrib\Newrelic\SpanConverter;
-use OpenTelemetry\SDK\Trace\Attribute;
-use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Attribute;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 

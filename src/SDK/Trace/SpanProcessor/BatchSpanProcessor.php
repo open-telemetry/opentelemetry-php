@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use InvalidArgumentException;
-use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\API\ClockInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
-use OpenTelemetry\SDK\Trace\AbstractClock;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -32,7 +32,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private ?int $exporterTimeoutMillis;
     private ?int $maxExportBatchSize;
     private ?int $lastExportTimestamp = null;
-    private API\ClockInterface $clock;
+    private ClockInterface $clock;
     private bool $running = true;
 
     /** @var list<SpanDataInterface> */
@@ -40,7 +40,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
 
     public function __construct(
         ?SpanExporterInterface $exporter,
-        API\ClockInterface $clock = null,
+        ClockInterface $clock = null,
         int $maxQueueSize = null,
         int $scheduledDelayMillis = null,
         int $exporterTimeoutMillis = null,
@@ -142,6 +142,6 @@ class BatchSpanProcessor implements SpanProcessorInterface
             return false;
         }
 
-        return ($this->scheduledDelayMillis * API\ClockInterface::NANOS_PER_MILLISECOND) < ($now - $this->lastExportTimestamp);
+        return ($this->scheduledDelayMillis * ClockInterface::NANOS_PER_MILLISECOND) < ($now - $this->lastExportTimestamp);
     }
 }

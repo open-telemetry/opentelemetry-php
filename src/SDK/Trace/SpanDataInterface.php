@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -24,7 +25,7 @@ interface SpanDataInterface
     public function getParentSpanId(): string;
     public function getStatus(): StatusDataInterface;
     public function getStartEpochNanos(): int;
-    public function getAttributes(): API\AttributesInterface;
+    public function getAttributes(): AttributesInterface;
 
     /** @return list<API\EventInterface> */
     public function getEvents(): array;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 
@@ -22,7 +23,7 @@ interface SamplerInterface
      *                        Typically in situations when the Span to be created starts a new Trace.
      * @param string $spanName Name of the Span to be created.
      * @param int $spanKind Span kind.
-     * @param API\AttributesInterface|null $attributes Initial set of Attributes for the Span being constructed.
+     * @param AttributesInterface|null $attributes Initial set of Attributes for the Span being constructed.
      * @param list<API\LinkInterface> $links Collection of links that will be associated with the Span to be created.
      *                     Typically, useful for batch operations.
      *                     @see https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#links-between-spans
@@ -33,7 +34,7 @@ interface SamplerInterface
         string $traceId,
         string $spanName,
         int $spanKind,
-        ?API\AttributesInterface $attributes = null,
+        ?AttributesInterface $attributes = null,
         array $links = []
     ): SamplingResult;
 

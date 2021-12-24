@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\API\Unit\Trace;
 
 use Exception;
-use OpenTelemetry\API\Trace\AttributesInterface;
+use OpenTelemetry\API\AttributesInterface;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use PHPUnit\Framework\TestCase;
