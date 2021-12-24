@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace;
+namespace OpenTelemetry\API\Trace;
 
 use OpenTelemetry\API\AttributesInterface;
-use OpenTelemetry\API\Trace\SpanBuilderInterface;
-use OpenTelemetry\API\Trace\SpanContextInterface;
-use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageInterface;
 
@@ -63,9 +60,9 @@ final class NoopSpanBuilder implements SpanBuilderInterface
 
     public function startSpan(): SpanInterface
     {
-        $span = Span::fromContext($this->parent ?? $this->contextStorage->current());
+        $span = AbstractSpan::fromContext($this->parent ?? $this->contextStorage->current());
         if ($span->isRecording()) {
-            $span = Span::wrap($span->getContext());
+            $span = AbstractSpan::wrap($span->getContext());
         }
 
         return $span;
