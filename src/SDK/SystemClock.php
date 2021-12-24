@@ -6,7 +6,6 @@ namespace OpenTelemetry\SDK;
 
 use function hrtime;
 use function microtime;
-use OpenTelemetry\API\ClockInterface;
 
 final class SystemClock extends AbstractClock
 {

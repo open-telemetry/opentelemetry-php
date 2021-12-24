@@ -15,6 +15,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\AttributesInterface;
+use OpenTelemetry\SDK\ClockInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Event;
@@ -204,7 +205,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSpanData(
             $span->toSpanData(),
             $this->expectedAttributes,
-            [new Event('event2', self::START_EPOCH + \OpenTelemetry\API\ClockInterface::NANOS_PER_SECOND)],
+            [new Event('event2', self::START_EPOCH + ClockInterface::NANOS_PER_SECOND)],
             [$this->link],
             self::NEW_SPAN_NAME,
             self::START_EPOCH,
@@ -237,7 +238,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSpanData(
             $span->toSpanData(),
             $this->expectedAttributes,
-            [new Event('event2', self::START_EPOCH + \OpenTelemetry\API\ClockInterface::NANOS_PER_SECOND)],
+            [new Event('event2', self::START_EPOCH + ClockInterface::NANOS_PER_SECOND)],
             [$this->link],
             self::NEW_SPAN_NAME,
             self::START_EPOCH,

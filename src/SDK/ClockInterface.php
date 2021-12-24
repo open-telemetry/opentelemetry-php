@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API;
+namespace OpenTelemetry\SDK;
 
 interface ClockInterface
 {

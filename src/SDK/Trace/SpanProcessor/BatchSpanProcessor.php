@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use InvalidArgumentException;
-use OpenTelemetry\API\ClockInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\AbstractClock;
+use OpenTelemetry\SDK\ClockInterface;
 use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;

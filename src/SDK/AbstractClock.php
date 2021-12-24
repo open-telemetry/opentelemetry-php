@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK;
 
 use function intdiv;
-use OpenTelemetry\API\ClockInterface;
 
 abstract class AbstractClock implements ClockInterface
 {
