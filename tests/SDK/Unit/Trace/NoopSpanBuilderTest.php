@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 
 use OpenTelemetry\API\Trace\AttributesInterface;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\NoopSpanBuilder;
@@ -31,6 +32,41 @@ class NoopSpanBuilderTest extends TestCase
                 new Context()
             )
         );
+    }
+
+    public function testNoopCreatedSpanUsesProvidedContext(): void
+    {
+        $spanContext = SpanContext::create(
+            '0af7651916cd43dd8448eb211c80319c',
+            'b7ad6b7169203331',
+        );
+
+        $span = (new NoopSpanBuilder())
+            ->setParent((new NonRecordingSpan($spanContext))->storeInContext(new Context()))
+            ->startSpan()
+        ;
+
+        $this->assertSame($span->getContext(), $spanContext);
+    }
+
+    public function testNoopCreatedSpanUsesCurrentContext(): void
+    {
+        $spanContext = SpanContext::create(
+            '0af7651916cd43dd8448eb211c80319c',
+            'b7ad6b7169203331',
+        );
+
+        $scope = (new NonRecordingSpan($spanContext))->activate();
+
+        try {
+            $span = (new NoopSpanBuilder())
+                ->startSpan()
+            ;
+        } finally {
+            $scope->detach();
+        }
+
+        $this->assertSame($span->getContext(), $spanContext);
     }
 
     public function testSetNoParent(): void
