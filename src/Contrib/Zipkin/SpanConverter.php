@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
-use OpenTelemetry\API\AttributeInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
@@ -117,7 +116,7 @@ class SpanConverter implements SpanConverterInterface
         }
 
         foreach ($span->getAttributes() as $k => $v) {
-            $row['tags'][$k] = $this->sanitiseTagValue($v->getValue());
+            $row['tags'][$k] = $this->sanitiseTagValue($v);
         }
 
         foreach ($span->getEvents() as $event) {
@@ -177,12 +176,7 @@ class SpanConverter implements SpanConverterInterface
             return null;
         }
 
-        $attributesArray = [];
-        foreach ($event->getAttributes() as $attr) {
-            $attributesArray[$attr->getKey()] = $attr->getValue();
-        }
-
-        $attributesAsJson = json_encode($attributesArray);
+        $attributesAsJson = json_encode($event->getAttributes()->toArray());
         if (($attributesAsJson === false) || (strlen($attributesAsJson) === 0)) {
             return null;
         }
@@ -192,40 +186,40 @@ class SpanConverter implements SpanConverterInterface
 
     private static function toRemoteEndpoint(SpanDataInterface $span): ?array
     {
-        $preferredAttr = SpanConverter::findRemoteEndpointPreferredAttribute($span);
-
-        if ($preferredAttr === null) {
+        $attribute = SpanConverter::findRemoteEndpointPreferredAttribute($span);
+        if (!$attribute) {
             return null;
         }
 
-        if (!is_string($preferredAttr->getValue())) {
+        [$key, $value] = $attribute;
+        if (!is_string($value)) {
             return null;
         }
 
-        switch ($preferredAttr->getKey()) {
+        switch ($key) {
             case SpanConverter::NET_PEER_IP_KEY:
                 return SpanConverter::getRemoteEndpointDataFromIpAddressAndPort(
-                    $preferredAttr,
+                    $value,
                     SpanConverter::getPortNumberFromSpanAttributes($span)
                 );
             default:
                 return [
-                    'serviceName' => $preferredAttr->getValue(),
+                    'serviceName' => $value,
                 ];
         }
     }
 
-    private static function findRemoteEndpointPreferredAttribute(SpanDataInterface $span): ?AttributeInterface
+    private static function findRemoteEndpointPreferredAttribute(SpanDataInterface $span): ?array
     {
         $preferredAttrRank = null;
         $preferredAttr = null;
 
-        foreach ($span->getAttributes() as $attr) {
-            if (array_key_exists($attr->getKey(), SpanConverter::REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP)) {
-                $attrRank = SpanConverter::REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP[$attr->getKey()];
+        foreach ($span->getAttributes() as $key => $value) {
+            if (array_key_exists($key, SpanConverter::REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP)) {
+                $attrRank = SpanConverter::REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP[$key];
 
                 if (($preferredAttrRank === null) || ($attrRank <= $preferredAttrRank)) {
-                    $preferredAttr = $attr;
+                    $preferredAttr = [$key, $value];
                     $preferredAttrRank = $attrRank;
                 }
             }
@@ -234,14 +228,8 @@ class SpanConverter implements SpanConverterInterface
         return $preferredAttr;
     }
 
-    private static function getRemoteEndpointDataFromIpAddressAndPort(AttributeInterface $preferredAttr, ?int $portNumber): ?array
+    private static function getRemoteEndpointDataFromIpAddressAndPort(string $ipString, ?int $portNumber): ?array
     {
-        $ipString = $preferredAttr->getValue();
-
-        if (!is_string($ipString)) {
-            return null;
-        }
-
         if (!filter_var($ipString, FILTER_VALIDATE_IP)) {
             return null;
         }
@@ -265,14 +253,11 @@ class SpanConverter implements SpanConverterInterface
 
     private static function getPortNumberFromSpanAttributes(SpanDataInterface $span): ?int
     {
-        foreach ($span->getAttributes() as $attr) {
-            if ($attr->getKey() === 'net.peer.port') {
-                $portVal = $attr->getValue();
-                $portInt = (int) $portVal;
+        if (($portVal = $span->getAttributes()->get('net.peer.port')) !== null) {
+            $portInt = (int) $portVal;
 
-                if (($portInt > 0) && ($portInt < pow(2, 16))) {
-                    return $portInt;
-                }
+            if (($portInt > 0) && ($portInt < pow(2, 16))) {
+                return $portInt;
             }
         }
 

@@ -111,7 +111,7 @@ class SpanConverter implements SpanConverterInterface
             $attrs = [];
 
             foreach ($event->getAttributes() as $k => $v) {
-                $attrs[] = $this->as_otlp_key_value($k, $v->getValue());
+                $attrs[] = $this->as_otlp_key_value($k, $v);
             }
 
             $row['events'][] = new Event([
@@ -129,7 +129,7 @@ class SpanConverter implements SpanConverterInterface
             $attrs = [];
 
             foreach ($link->getAttributes() as $k => $v) {
-                $attrs[] = $this->as_otlp_key_value($k, $v->getValue());
+                $attrs[] = $this->as_otlp_key_value($k, $v);
             }
 
             $row['links'][] = new Link([
@@ -145,7 +145,7 @@ class SpanConverter implements SpanConverterInterface
             if (!array_key_exists('attributes', $row)) {
                 $row['attributes'] = [];
             }
-            $row['attributes'][] = $this->as_otlp_key_value($k, $v->getValue());
+            $row['attributes'][] = $this->as_otlp_key_value($k, $v);
         }
 
         $status = new Status();
@@ -174,7 +174,7 @@ class SpanConverter implements SpanConverterInterface
         $attrs = [];
         foreach ($spans as $span) {
             foreach ($span->getResource()->getAttributes() as $k => $v) {
-                $attrs[$k] = $this->as_otlp_key_value($k, $v->getValue());
+                $attrs[$k] = $this->as_otlp_key_value($k, $v);
             }
         }
 

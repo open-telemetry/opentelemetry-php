@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\Contrib\Newrelic\SpanConverter;
-use OpenTelemetry\SDK\Attribute;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
@@ -37,9 +36,8 @@ class NewrelicSpanConverterTest extends TestCase
         $this->assertIsFloat($row['attributes']['duration.ms']);
         $this->assertSame(5271.0, $row['attributes']['duration.ms']);
 
-        /** @var Attribute $attribute */
-        $attribute = $span->getAttributes()->getAttribute('service');
-        $this->assertEquals($attribute->getValue(), $row['attributes']['service']);
+        $attribute = $span->getAttributes()->get('service');
+        $this->assertEquals($attribute, $row['attributes']['service']);
     }
 
     /**

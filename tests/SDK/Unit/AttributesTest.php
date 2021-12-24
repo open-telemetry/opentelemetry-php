@@ -25,9 +25,9 @@ class AttributesTest extends TestCase
     {
         $attributes = new Attributes(['1' => '2']);
         $this->assertCount(1, $attributes);
-        foreach ($attributes as $attribute) {
-            $this->assertTrue(is_string($attribute->getKey()));
-            $this->assertTrue(is_string($attribute->getValue()));
+        foreach ($attributes as $key => $value) {
+            $this->assertTrue(is_string($key));
+            $this->assertTrue(is_string($value));
         }
     }
 
@@ -57,15 +57,15 @@ class AttributesTest extends TestCase
             'ignored_key' => 'ignored_value',
         ], $attributeLimits);
 
-        $this->assertEquals($boolValue, $attributes->getAttribute('bool')->getValue());
-        $this->assertEquals($intValue, $attributes->getAttribute('int')->getValue());
-        $this->assertEquals($floatValue, $attributes->getAttribute('float')->getValue());
-        $this->assertEquals($shortStringValue, $attributes->getAttribute('short_string')->getValue());
-        $this->assertEquals($longStringTrimmed, $attributes->getAttribute('long_string')->getValue());
-        $this->assertEquals([$shortStringValue, $longStringTrimmed], $attributes->getAttribute('array')->getValue());
+        $this->assertEquals($boolValue, $attributes->get('bool'));
+        $this->assertEquals($intValue, $attributes->get('int'));
+        $this->assertEquals($floatValue, $attributes->get('float'));
+        $this->assertEquals($shortStringValue, $attributes->get('short_string'));
+        $this->assertEquals($longStringTrimmed, $attributes->get('long_string'));
+        $this->assertEquals([$shortStringValue, $longStringTrimmed], $attributes->get('array'));
 
         $this->assertEquals(6, $attributes->count());
-        $this->assertNull($attributes->getAttribute('ignored_key'));
+        $this->assertNull($attributes->get('ignored_key'));
     }
 
     /**
@@ -80,8 +80,8 @@ class AttributesTest extends TestCase
         ]);
         $limitedAttributes = Attributes::withLimits($attributes, new AttributeLimits(2, 5));
         $this->assertCount(2, $limitedAttributes);
-        $this->assertEquals('123', $limitedAttributes->getAttribute('short')->getValue());
-        $this->assertEquals('12345', $limitedAttributes->getAttribute('long')->getValue());
-        $this->assertNull($limitedAttributes->getAttribute('dropped'));
+        $this->assertEquals('123', $limitedAttributes->get('short'));
+        $this->assertEquals('12345', $limitedAttributes->get('long'));
+        $this->assertNull($limitedAttributes->get('dropped'));
     }
 }

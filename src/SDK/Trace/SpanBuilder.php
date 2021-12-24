@@ -122,8 +122,8 @@ final class SpanBuilder implements API\SpanBuilderInterface
             return $this;
         }
 
-        foreach ($attributes as $attribute) {
-            $this->setAttribute($attribute->getKey(), $attribute->getValue());
+        foreach ($attributes as $key => $value) {
+            $this->setAttribute($key, $value);
         }
 
         return $this;
@@ -202,8 +202,8 @@ final class SpanBuilder implements API\SpanBuilderInterface
 
         $samplingAttributes = $samplingResult->getAttributes();
         if ($samplingAttributes && $samplingAttributes->count() > 0) {
-            foreach ($samplingAttributes as $key => $attribute) {
-                $attributes->setAttribute($key, $attribute->getValue());
+            foreach ($samplingAttributes as $key => $value) {
+                $attributes->setAttribute($key, $value);
             }
         }
 

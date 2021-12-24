@@ -87,13 +87,7 @@ class FriendlySpanConverter implements SpanConverterInterface
      */
     private function convertResource(ResourceInfo $resource): array
     {
-        $tmp = [];
-
-        foreach ($resource->getAttributes() as $attribute) {
-            $tmp[$attribute->getKey()] = $attribute->getValue();
-        }
-
-        return $tmp;
+        return $resource->getAttributes()->toArray();
     }
 
     /**
@@ -125,13 +119,7 @@ class FriendlySpanConverter implements SpanConverterInterface
      */
     private function convertAttributes(AttributesInterface $attributes): array
     {
-        $tmp = [];
-
-        foreach ($attributes as $attribute) {
-            $tmp[$attribute->getKey()] = $attribute->getValue();
-        }
-
-        return $tmp;
+        return $attributes->toArray();
     }
 
     /**

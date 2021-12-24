@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\SDK\Unit\Resource;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\SDK\Attribute;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
@@ -32,14 +31,10 @@ class ResourceTest extends TestCase
         $attributes->setAttribute('name', 'test');
         $resource = ResourceInfo::create($attributes);
 
-        /** @var Attribute $name */
-        $name = $resource->getAttributes()->getAttribute('name');
-        /** @var Attribute $sdkname */
-        $sdkname = $resource->getAttributes()->getAttribute(ResourceAttributes::TELEMETRY_SDK_NAME);
-        /** @var Attribute $sdklanguage */
-        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceAttributes::TELEMETRY_SDK_LANGUAGE);
-        /** @var Attribute $sdkversion */
-        $sdkversion = $resource->getAttributes()->getAttribute(ResourceAttributes::TELEMETRY_SDK_VERSION);
+        $name = $resource->getAttributes()->get('name');
+        $sdkname = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME);
+        $sdklanguage = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE);
+        $sdkversion = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION);
 
         $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_NAME, 'opentelemetry');
         $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_LANGUAGE, 'php');
@@ -47,10 +42,10 @@ class ResourceTest extends TestCase
         $attributes->setAttribute(ResourceAttributes::SERVICE_NAME, 'unknown_service');
 
         $this->assertEquals($attributes, $resource->getAttributes());
-        $this->assertSame('opentelemetry', $sdkname->getValue());
-        $this->assertSame('php', $sdklanguage->getValue());
-        $this->assertSame('dev', $sdkversion->getValue());
-        $this->assertSame('test', $name->getValue());
+        $this->assertSame('opentelemetry', $sdkname);
+        $this->assertSame('php', $sdklanguage);
+        $this->assertSame('dev', $sdkversion);
+        $this->assertSame('test', $name);
     }
 
     /**
@@ -67,17 +62,14 @@ class ResourceTest extends TestCase
             ]
         );
         $resource = ResourceInfo::create(new Attributes());
-        /** @var Attribute $sdkname */
-        $sdkname = $resource->getAttributes()->getAttribute(ResourceAttributes::TELEMETRY_SDK_NAME);
-        /** @var Attribute $sdklanguage */
-        $sdklanguage = $resource->getAttributes()->getAttribute(ResourceAttributes::TELEMETRY_SDK_LANGUAGE);
-        /** @var Attribute $sdkversion */
-        $sdkversion = $resource->getAttributes()->getAttribute(ResourceAttributes::TELEMETRY_SDK_VERSION);
+        $sdkname = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME);
+        $sdklanguage = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE);
+        $sdkversion = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION);
 
         $this->assertEquals($attributes, $resource->getAttributes());
-        $this->assertEquals('opentelemetry', $sdkname->getValue());
-        $this->assertEquals('php', $sdklanguage->getValue());
-        $this->assertEquals('dev', $sdkversion->getValue());
+        $this->assertEquals('opentelemetry', $sdkname);
+        $this->assertEquals('php', $sdklanguage);
+        $this->assertEquals('dev', $sdkversion);
     }
 
     /**
@@ -89,17 +81,14 @@ class ResourceTest extends TestCase
         $secondary = ResourceInfo::create(new Attributes(['version' => '1.0.0', 'empty' => 'value']));
         $result = ResourceInfo::merge($primary, $secondary);
 
-        /** @var Attribute $name */
-        $name = $result->getAttributes()->getAttribute('name');
-        /** @var Attribute $version */
-        $version = $result->getAttributes()->getAttribute('version');
-        /** @var Attribute $empty */
-        $empty = $result->getAttributes()->getAttribute('empty');
+        $name = $result->getAttributes()->get('name');
+        $version = $result->getAttributes()->get('version');
+        $empty = $result->getAttributes()->get('empty');
 
         $this->assertCount(7, $result->getAttributes());
-        $this->assertEquals('primary', $name->getValue());
-        $this->assertEquals('1.0.0', $version->getValue());
-        $this->assertEquals('value', $empty->getValue());
+        $this->assertEquals('primary', $name);
+        $this->assertEquals('1.0.0', $version);
+        $this->assertEquals('value', $empty);
     }
 
     /**
@@ -115,10 +104,9 @@ class ResourceTest extends TestCase
 
         $attributes->setAttribute('version', '2.0.0');
 
-        /** @var Attribute $version */
-        $version = $resource->getAttributes()->getAttribute('version');
+        $version = $resource->getAttributes()->get('version');
 
-        $this->assertEquals('1.0.0', $version->getValue());
+        $this->assertEquals('1.0.0', $version);
     }
 
     /**

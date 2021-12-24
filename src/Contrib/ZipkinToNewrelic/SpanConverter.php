@@ -76,7 +76,7 @@ class SpanConverter implements SpanConverterInterface
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
-            $row['tags'][$k] = $this->sanitiseTagValue($v->getValue());
+            $row['tags'][$k] = $this->sanitiseTagValue($v);
         }
 
         foreach ($span->getEvents() as $event) {

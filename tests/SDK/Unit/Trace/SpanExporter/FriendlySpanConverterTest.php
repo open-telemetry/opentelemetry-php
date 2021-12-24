@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Unit\Trace\SpanExporter;
 
-use ArrayIterator;
-use OpenTelemetry\API\AttributeInterface;
 use OpenTelemetry\API\AttributesInterface;
-use OpenTelemetry\API\AttributesIteratorInterface;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TraceStateInterface;
-use OpenTelemetry\SDK\Attribute;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\LinkInterface;
@@ -221,33 +218,7 @@ class FriendlySpanConverterTest extends TestCase
 
     private function createAttributesInterfaceMock(array $items): AttributesInterface
     {
-        $mock = $this->createMock(AttributesInterface::class);
-
-        $attributes = [];
-        foreach ($items as $key => $value) {
-            $attributes[$key] = $this->createAttributeMock($key, $value);
-        }
-        $mock->method('getIterator')
-        ->willReturn(
-            $this->createAttributesIterator($attributes)
-        );
-
-        return $mock;
-    }
-
-    private function createAttributeMock(string $key, $value): Attribute
-    {
-        $mock = $this->getMockBuilder(Attribute::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mock->method('getKey')
-            ->willReturn($key);
-
-        $mock->method('getValue')
-            ->willReturn($value);
-
-        return $mock;
+        return new Attributes($items);
     }
 
     public function createEventInterfaceMock(string $name, int $timestamp, AttributesInterface $attributes): EventInterface
@@ -269,41 +240,5 @@ class FriendlySpanConverterTest extends TestCase
         $mock->method('getAttributes')->willReturn($attributes);
 
         return $mock;
-    }
-
-    public function createAttributesIterator(array $items): AttributesIteratorInterface
-    {
-        return new class($items) implements AttributesIteratorInterface {
-            private ArrayIterator $iterator;
-            public function __construct($attributes)
-            {
-                $this->iterator = new ArrayIterator($attributes);
-            }
-
-            public function key(): string
-            {
-                return (string) $this->iterator->key();
-            }
-
-            public function current(): AttributeInterface
-            {
-                return $this->iterator->current();
-            }
-
-            public function rewind(): void
-            {
-                $this->iterator->rewind();
-            }
-
-            public function valid(): bool
-            {
-                return $this->iterator->valid();
-            }
-
-            public function next(): void
-            {
-                $this->iterator->next();
-            }
-        };
     }
 }

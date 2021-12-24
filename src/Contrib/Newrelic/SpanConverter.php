@@ -55,7 +55,7 @@ class SpanConverter implements SpanConverterInterface
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
-            $row['attributes'][$k] = $v->getValue();
+            $row['attributes'][$k] = $v;
         }
 
         /*

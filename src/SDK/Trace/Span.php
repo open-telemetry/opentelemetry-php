@@ -251,9 +251,8 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             return $this;
         }
 
-        foreach ($attributes as $attribute) {
-            // @phpstan-ignore-next-line
-            $this->setAttribute($attribute->getKey(), $attribute->getValue());
+        foreach ($attributes as $key => $value) {
+            $this->setAttribute($key, $value);
         }
 
         return $this;
@@ -296,8 +295,8 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             ]);
 
         if ($attributes) {
-            foreach ($attributes as $attribute) {
-                $eventAttributes->setAttribute($attribute->getKey(), $attribute->getValue());
+            foreach ($attributes as $key => $value) {
+                $eventAttributes->setAttribute($key, $value);
             }
         }
 
