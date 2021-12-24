@@ -22,6 +22,6 @@ final class NoopTracer implements TracerInterface
 
     public function spanBuilder(string $spanName): SpanBuilderInterface
     {
-        return NoopSpanBuilder::getInstance();
+        return new NoopSpanBuilder();
     }
 }

@@ -12,24 +12,19 @@ use OpenTelemetry\Context\Context;
 
 final class NoopSpanBuilder implements SpanBuilderInterface
 {
-    private static ?self $instance = null;
-
-    public static function getInstance(): self
-    {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
+    private ?Context $parent = null;
 
     public function setParent(Context $parentContext): SpanBuilderInterface
     {
+        $this->parent = $parentContext;
+
         return $this;
     }
 
     public function setNoParent(): SpanBuilderInterface
     {
+        $this->parent = Context::getRoot();
+
         return $this;
     }
 
@@ -60,6 +55,11 @@ final class NoopSpanBuilder implements SpanBuilderInterface
 
     public function startSpan(): SpanInterface
     {
-        return Span::getInvalid();
+        $span = Span::fromContext($this->parent ?? Context::getCurrent());
+        if ($span->isRecording()) {
+            $span = Span::wrap($span->getContext());
+        }
+
+        return $span;
     }
 }

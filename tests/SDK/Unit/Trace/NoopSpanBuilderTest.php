@@ -15,14 +15,6 @@ use PHPUnit\Framework\TestCase;
 
 class NoopSpanBuilderTest extends TestCase
 {
-    public function testGetInstance(): void
-    {
-        $this->assertSame(
-            NoopSpanBuilder::getInstance(),
-            NoopSpanBuilder::getInstance()
-        );
-    }
-
     public function testSetParent(): void
     {
         $this->assertInstanceOf(
