@@ -12,5 +12,8 @@ trim_trailing_whitespace = true
 [*.md]
 trim_trailing_whitespace = false
 
+[docker-compose.*.yaml]
+indent_size = 2
+
 [Makefile]
 indent_style = tab

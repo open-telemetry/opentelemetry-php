@@ -34,11 +34,13 @@ collector:
 	docker-compose -f docker-compose-collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317 --rm php php ./examples/AlwaysOnOTLPGrpcExample2.php
 	docker-compose -f docker-compose-collector.yaml stop
 
+fiber-ffi-example:
+	@docker-compose -f docker-compose.fiber-ffi.yaml -p opentelemetry-php_fiber-ffi-example up -d web
 metrics-prometheus-example:
-	@docker-compose -f docker-compose.prometheus.yaml up -d web
-	@docker-compose -f docker-compose.prometheus.yaml run php-prometheus php /var/www/public/examples/prometheus/PrometheusMetricsExample.php
+	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example up -d web
+	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example run --rm php php examples/prometheus/PrometheusMetricsExample.php
 stop-prometheus:
-	@docker-compose -f docker-compose.prometheus.yaml stop
+	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example stop
 proto:
 	@docker-compose -f docker-compose.proto.yaml up proto
 bash:

@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - '8080:80'
+    depends_on:
+      - php
+    volumes:
+      - ./docker/examples/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  php:
+    build:
+      context: .
+      dockerfile: docker/examples/Dockerfile
+      args:
+        - PHP_VERSION=8.1-fpm
+        - EXT_ENABLE=ffi
+    environment:
+      - OTEL_PHP_FIBERS_ENABLED=true
+    command:
+      - php-fpm
+      - -d
+      - opcache.preload=/php/vendor/autoload.php
+    volumes:
+      - ./tests/Context/Fiber/test_context_switching_ffi_observer.phpt:/var/www/public/index.php
+      - ./:/php
