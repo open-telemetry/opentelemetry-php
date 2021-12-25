@@ -15,16 +15,19 @@ services:
     ports:
       - 8080:80
     depends_on:
-      - php-prometheus
+      - php
     volumes:
-      - ./docker/prometheus/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./docker/prometheus/index.php:/var/www/public/index.php
-  php-prometheus:
+      - ./docker/examples/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  php:
     build:
       context: .
-      dockerfile: docker/prometheus/Dockerfile
+      dockerfile: docker/examples/Dockerfile
+      args:
+        - PHP_VERSION=7.4-fpm
+        - EXT_ENABLE=redis
     volumes:
-      - ./:/var/www/public
+      - ./examples/prometheus/index.php:/var/www/public/index.php
+      - ./:/php
     depends_on:
       - redis
       - prometheus
