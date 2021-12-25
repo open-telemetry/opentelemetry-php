@@ -7,7 +7,6 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace\SpanExporter;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TraceStateInterface;
-use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\EventInterface;
@@ -218,7 +217,12 @@ class FriendlySpanConverterTest extends TestCase
 
     private function createAttributesInterfaceMock(array $items): AttributesInterface
     {
-        return new Attributes($items);
+        $mock = $this->createMock(AttributesInterface::class);
+
+        $mock->method('toArray')
+            ->willReturn($items);
+
+        return $mock;
     }
 
     public function createEventInterfaceMock(string $name, int $timestamp, AttributesInterface $attributes): EventInterface
