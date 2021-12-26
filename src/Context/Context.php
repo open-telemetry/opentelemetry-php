@@ -7,7 +7,7 @@ namespace OpenTelemetry\Context;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#overview
  */
-final class Context
+class Context
 {
     private static ?ContextStorageInterface $storage = null;
 
