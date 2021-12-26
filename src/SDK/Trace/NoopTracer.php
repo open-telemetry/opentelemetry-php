@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace\SpanBuilderInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
+use OpenTelemetry\Context\Context;
 
 final class NoopTracer implements TracerInterface
 {
@@ -22,6 +23,6 @@ final class NoopTracer implements TracerInterface
 
     public function spanBuilder(string $spanName): SpanBuilderInterface
     {
-        return new NoopSpanBuilder();
+        return new NoopSpanBuilder(Context::storage());
     }
 }

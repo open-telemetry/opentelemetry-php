@@ -9,10 +9,18 @@ use OpenTelemetry\API\Trace\SpanBuilderInterface;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextStorageInterface;
 
 final class NoopSpanBuilder implements SpanBuilderInterface
 {
+    private ContextStorageInterface $contextStorage;
+
     private ?Context $parent = null;
+
+    public function __construct(ContextStorageInterface $contextStorage)
+    {
+        $this->contextStorage = $contextStorage;
+    }
 
     public function setParent(Context $parentContext): SpanBuilderInterface
     {
@@ -55,7 +63,7 @@ final class NoopSpanBuilder implements SpanBuilderInterface
 
     public function startSpan(): SpanInterface
     {
-        $span = Span::fromContext($this->parent ?? Context::getCurrent());
+        $span = Span::fromContext($this->parent ?? $this->contextStorage->current());
         if ($span->isRecording()) {
             $span = Span::wrap($span->getContext());
         }
