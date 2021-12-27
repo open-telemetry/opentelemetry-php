@@ -20,9 +20,9 @@ for f in ${FILES}; do
 done
 
 # move generated files
-rm -rf Jaeger/Thrift
-mkdir -p Jaeger
-mv jaeger-idl/gen-php/Jaeger/Thrift Jaeger/Thrift
+rm -rf thrift
+mkdir -p thrift
+mv jaeger-idl/gen-php/Jaeger/Thrift thrift/jaeger
 
 # remove thrift files
 rm -rf jaeger-idl
