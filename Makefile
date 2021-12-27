@@ -43,6 +43,8 @@ stop-prometheus:
 	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example stop
 proto:
 	@docker-compose -f docker-compose.proto.yaml up proto
+thrift:
+	./script/thrift_gen.sh
 bash:
 	$(DC_RUN_PHP) bash
 style:
