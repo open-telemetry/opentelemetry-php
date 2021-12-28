@@ -26,11 +26,6 @@ class AgentExporter implements SpanExporterInterface
      */
     private $spanConverter;
 
-    /**
-     * @var bool
-     */
-    private $running = true;
-
     public function __construct(
         $name,
         string $endpointUrl
