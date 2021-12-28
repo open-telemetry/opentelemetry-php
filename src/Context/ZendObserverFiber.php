@@ -17,15 +17,13 @@ use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 
 class ZendObserverFiber
 {
-    use EnvironmentVariablesTrait;
-
     protected static $fibers = null;
 
     public function isEnabled(): bool
     {
         return (
             PHP_VERSION_ID >= 80100 &&
-            true === $this->getBooleanFromEnvironment('OTEL_PHP_FIBERS_ENABLED', false) &&
+            (in_array(getenv('OTEL_PHP_FIBERS_ENABLED'), ['true', 'on', '1']) &&
             class_exists(FFI::class)
         );
     }
