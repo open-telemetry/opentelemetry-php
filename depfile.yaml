@@ -23,6 +23,12 @@ layers:
                 type: className
                 regex: OpenTelemetry\\Context\\*
     -
+        name: SemConv
+        collectors:
+            -
+                type: className
+                regex: OpenTelemetry\\SemConv\\*
+    -
         name: Contrib
         collectors:
             -
@@ -40,9 +46,12 @@ ruleset:
         - SDK
         - Context
         - Proto
+        - SemConv
     Context: ~
+    SemConv: ~
     SDK:
         - API
         - Context
+        - SemConv
     API:
         - Context
