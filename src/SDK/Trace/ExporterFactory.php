@@ -51,14 +51,14 @@ class ExporterFactory
 
         $dsn = DsnParser::parseUrl($connectionString);
 
-        self::validateScheme($dsn->getScheme());
+        self::validateScheme((string) $dsn->getScheme());
 
         $endpoint = self::getEndpointFromDsn($dsn);
         $serviceName = $this->resolveServiceName($dsn);
 
-        if (in_array(self::normalizeScheme($dsn->getScheme()), ['newrelic+http', 'zipkintonewrelic+http'])) {
+        if (in_array(self::normalizeScheme((string) $dsn->getScheme()), ['newrelic+http', 'zipkintonewrelic+http'])) {
             return self::buildExporter(
-                $dsn->getScheme(),
+                (string) $dsn->getScheme(),
                 $endpoint,
                 $serviceName,
                 self::getParameterFromDsn($dsn, 'licenseKey')
@@ -66,7 +66,7 @@ class ExporterFactory
         }
 
         return self::buildExporter(
-            $dsn->getScheme(),
+            (string) $dsn->getScheme(),
             $endpoint,
             $serviceName
         );
@@ -136,7 +136,7 @@ class ExporterFactory
     private static function getEndpointFromDsn(Url $dsn): string
     {
         return (string) new Url(
-            self::getProtocolFromScheme($dsn->getScheme()),
+            self::getProtocolFromScheme((string) $dsn->getScheme()),
             $dsn->getHost(),
             $dsn->getPort(),
             $dsn->getPath(),
