@@ -23,7 +23,7 @@ class ZendObserverFiber
     {
         return (
             PHP_VERSION_ID >= 80100 &&
-            (in_array(getenv('OTEL_PHP_FIBERS_ENABLED'), ['true', 'on', '1']) &&
+            (in_array(getenv('OTEL_PHP_FIBERS_ENABLED'), ['true', 'on', '1'])) &&
             class_exists(FFI::class)
         );
     }
