@@ -7,7 +7,7 @@ namespace OpenTelemetry\Context;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#overview
  */
-final class Context
+class Context
 {
     private static ?ContextStorageInterface $storage = null;
 
@@ -21,9 +21,6 @@ final class Context
         self::$storage = $storage;
     }
 
-    /**
-     * @internal
-     */
     public static function storage(): ContextStorageInterface
     {
         return self::$storage ??= new ContextStorage(self::getRoot());

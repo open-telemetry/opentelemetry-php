@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
-/**
- * @internal
- */
 interface ContextStorageInterface
 {
     public function fork(int $id): void;
