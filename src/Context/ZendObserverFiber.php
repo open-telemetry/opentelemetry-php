@@ -13,7 +13,6 @@ namespace OpenTelemetry\Context;
 
 use FFI;
 use FFI\Exception;
-use OpenTelemetry\SDK\EnvironmentVariablesTrait;
 
 class ZendObserverFiber
 {
