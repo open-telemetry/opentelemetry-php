@@ -255,7 +255,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
 
     public function testFromConnectionString(): void
     {
-        $this->assertNotEquals(
+        $this->assertNotSame(
             Exporter::fromConnectionString(),
             Exporter::fromConnectionString()
         );
