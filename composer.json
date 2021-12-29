@@ -40,7 +40,8 @@
         "psr-4": {
             "OpenTelemetry\\": "src/",
             "Opentelemetry\\Proto\\": "proto/Opentelemetry/Proto/",
-            "GPBMetadata\\Opentelemetry\\Proto\\": "proto/GPBMetadata/Opentelemetry/Proto/"
+            "GPBMetadata\\Opentelemetry\\Proto\\": "proto/GPBMetadata/Opentelemetry/Proto/",
+            "Jaeger\\Thrift\\": "thrift/jaeger/"
         },
         "files": [
             "src/Context/fiber/initialize_fiber_handler.php"
