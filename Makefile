@@ -41,7 +41,7 @@ metrics-prometheus-example:
 	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example run --rm php php examples/prometheus/PrometheusMetricsExample.php
 stop-prometheus:
 	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example stop
-proto:
+protobuf:
 	@docker-compose -f docker-compose.proto.yaml up proto
 bash:
 	$(DC_RUN_PHP) bash
