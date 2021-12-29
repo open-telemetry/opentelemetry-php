@@ -11,6 +11,7 @@ RUN chmod +x /usr/local/bin/install-php-extensions; \
         zip \
         pcntl \
         grpc \
+        sockets \
         @composer \
     ; \
     # strip debug symbols from extensions to reduce size
