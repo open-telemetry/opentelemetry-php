@@ -222,4 +222,12 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
 
         return $mockClient;
     }
+
+    public function testFromConnectionString(): void
+    {
+        $this->assertNotSame(
+            Exporter::fromConnectionString(),
+            Exporter::fromConnectionString()
+        );
+    }
 }

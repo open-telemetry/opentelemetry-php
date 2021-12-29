@@ -252,4 +252,12 @@ class OTLPHttpExporterTest extends AbstractExporterTest
             'Grpc Scheme' => ['grpc://localhost:4317'],
         ];
     }
+
+    public function testFromConnectionString(): void
+    {
+        $this->assertNotSame(
+            Exporter::fromConnectionString(),
+            Exporter::fromConnectionString()
+        );
+    }
 }

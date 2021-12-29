@@ -23,4 +23,9 @@ class ZipkinExporterTest extends AbstractHttpExporterTest
             $this->getStreamFactoryInterfaceMock()
         );
     }
+
+    public function getExporterClass(): string
+    {
+        return Exporter::class;
+    }
 }
