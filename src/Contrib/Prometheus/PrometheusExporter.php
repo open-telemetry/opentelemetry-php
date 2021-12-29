@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Metrics\Exporters;
+namespace OpenTelemetry\Contrib\Prometheus;
 
 use OpenTelemetry\API\Metrics as API;
 use OpenTelemetry\SDK\Metrics\Counter;
 use OpenTelemetry\SDK\Metrics\Exceptions\CantBeExported;
+use OpenTelemetry\SDK\Metrics\Exporters\AbstractExporter;
 use Prometheus\CollectorRegistry;
 
 class PrometheusExporter extends AbstractExporter
