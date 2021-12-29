@@ -19,7 +19,10 @@
         "symfony/polyfill-mbstring": "^1.23"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        }
     },
     "authors": [
         {
@@ -38,8 +41,8 @@
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\": "src/",
-            "Opentelemetry\\Proto\\": "proto/Opentelemetry/Proto/",
-            "GPBMetadata\\Opentelemetry\\Proto\\": "proto/GPBMetadata/Opentelemetry/Proto/"
+            "Opentelemetry\\Proto\\": "proto/otel/Opentelemetry/Proto/",
+            "GPBMetadata\\Opentelemetry\\": "proto/otel/GPBMetadata/Opentelemetry/"
         },
         "files": [
             "src/Context/fiber/initialize_fiber_handler.php"
