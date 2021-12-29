@@ -14,9 +14,9 @@ class AgentExporterTest extends TestCase
      */
     public function happyPath() 
     {
-        $exporter = new AgentExporter(
+        $exporter = AgentExporter::fromConnectionString(
+            "http://127.0.0.1:80", //This isn't realistic I imagine
             "serviceName", //This isn't realistic I imagine
-            "http://127.0.0.1:80" //This isn't realistic I imagine
         );
 
         $this->expectNotToPerformAssertions();
