@@ -24,9 +24,9 @@ class ThriftUdpTransport extends TTransport
         $this->port = $port;
 
         // open a UDP socket to somewhere
-        if (!($this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP))) {
-            $errorcode = socket_last_error();
-            $errormsg = socket_strerror($errorcode);
+        if (!($this->socket = \socket_create(AF_INET, SOCK_DGRAM, SOL_UDP))) {
+            $errorcode = \socket_last_error();
+            $errormsg = \socket_strerror($errorcode);
 
             error_log("jaeger: transport: Couldn't create socket: [$errorcode] $errormsg");
 
@@ -47,7 +47,7 @@ class ThriftUdpTransport extends TTransport
 
     public function close()
     {
-        socket_close($this->socket);
+        \socket_close($this->socket);
         $this->socket = null;
     }
 
@@ -78,9 +78,9 @@ class ThriftUdpTransport extends TTransport
         // that this should always be the case for UDP packets, but I could be wrong.
 
         // flush the buffer to the socket
-        if (!socket_sendto($this->socket, $this->buffer, strlen($this->buffer), 0, $this->server, $this->port)) {
-            $errorcode = socket_last_error();
-            $errormsg = socket_strerror($errorcode);
+        if (!\socket_sendto($this->socket, $this->buffer, strlen($this->buffer), 0, $this->server, $this->port)) {
+            $errorcode = \socket_last_error();
+            $errormsg = \socket_strerror($errorcode);
             error_log("jaeger: transport: Could not flush data: [$errorcode] $errormsg");
         }
 
