@@ -129,7 +129,6 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
         ];
     }
 
-
     public function testFromConnectionString(): void
     {
         $exporterClass = static::getExporterClass();
