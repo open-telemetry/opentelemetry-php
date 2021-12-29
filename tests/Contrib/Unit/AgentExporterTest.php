@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\Contrib\Jaeger\AgentExporter;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use PHPUnit\Framework\TestCase;
 
 class AgentExporterTest extends TestCase
@@ -19,6 +20,8 @@ class AgentExporterTest extends TestCase
             "serviceName", //This isn't realistic I imagine
         );
 
-        $this->expectNotToPerformAssertions();
+        $status = $exporter->export([]);
+
+        $this->assertSame(SpanExporterInterface::STATUS_SUCCESS, $status);
     }
 }
