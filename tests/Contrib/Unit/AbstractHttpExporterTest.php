@@ -26,6 +26,13 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
      */
     abstract public function createExporterWithDsn(string $dsn): SpanExporterInterface;
 
+    /**
+     * Must be implemented by concrete TestCases
+     *
+     * @return string
+     */
+    abstract public function getExporterClass(): string;
+
     public function createExporter(): SpanExporterInterface
     {
         return $this->createExporterWithDsn(static::EXPORTER_DSN);
@@ -120,5 +127,16 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
                 SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE,
             ],
         ];
+    }
+
+
+    public function testFromConnectionString(): void
+    {
+        $exporterClass = static::getExporterClass();
+
+        $this->assertNotEquals(
+            call_user_func([$exporterClass, 'fromConnectionString'], self::EXPORTER_DSN, $exporterClass, 'foo'),
+            call_user_func([$exporterClass, 'fromConnectionString'], self::EXPORTER_DSN, $exporterClass, 'foo')
+        );
     }
 }
