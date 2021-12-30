@@ -70,7 +70,7 @@ ruleset:
     SemConv: ~
     API:
         - Context
-        - Grpc
+        - SemConv
     SDK:
         - API
         - Context
