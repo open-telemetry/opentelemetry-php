@@ -1,0 +1,27 @@
+{
+    "name": "open-telemetry/proto-otel",
+    "description": "PHP protobuf files for communication with OpenTelemetry OTLP collectors/servers.",
+    "keywords": ["opentelemetry", "otel", "metrics", "tracing", "logging", "apm", "gRPC", "protobuf", "otlp"],
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "opentelemetry-php contributors",
+            "homepage": "https://github.com/open-telemetry/opentelemetry-php/graphs/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "google/protobuf": "^v3.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Opentelemetry\\Proto\\": "Opentelemetry/Proto/",
+            "GPBMetadata\\Opentelemetry\\": "GPBMetadata/Opentelemetry/"
+        }
+    },
+    "suggest": {
+        "ext-protobuf": "For better performance, when dealing with protobuf file",
+        "ext-grpc": "To use the gRPC based exporters"
+    }
+}

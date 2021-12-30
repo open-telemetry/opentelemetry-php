@@ -1,0 +1,23 @@
+{
+    "name": "open-telemetry/api",
+    "description": "API for OpenTelemetry PHP.",
+    "keywords": ["opentelemetry", "otel", "metrics", "tracing", "logging", "apm", "api"],
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "opentelemetry-php contributors",
+            "homepage": "https://github.com/open-telemetry/opentelemetry-php/graphs/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "open-telemetry/context": "self.version",
+        "open-telemetry/sem-conv": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "OpenTelemetry\\API\\": ""
+        }
+    }
+}
