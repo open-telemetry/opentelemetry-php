@@ -21,7 +21,7 @@
         }
     },
     "suggest": {
-        "ext-protobuf": "For better performance, when dealing with protobuf file",
+        "ext-protobuf": "For better performance, when dealing with the protobuf format",
         "ext-grpc": "To use the gRPC based exporters"
     }
 }
