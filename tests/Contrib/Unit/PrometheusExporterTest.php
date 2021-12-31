@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Unit\Metrics\Exporters;
+namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\API\Metrics as API;
+use OpenTelemetry\Contrib\Prometheus\PrometheusExporter;
 use OpenTelemetry\SDK\Metrics\Counter;
-use OpenTelemetry\SDK\Metrics\Exporters\PrometheusExporter;
 use PHPUnit\Framework\TestCase;
 use Prometheus\CollectorRegistry;
 use Prometheus\Counter as PrometheusCounter;

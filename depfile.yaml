@@ -1,57 +1,96 @@
 #baseline: depfile.baseline.yml
 paths:
     - ./src
+    - ./proto
 exclude_files:
     - '#.*test.*#'
 layers:
-    -
-        name: API
+    -   name: API
         collectors:
-            -
-                type: className
-                regex: OpenTelemetry\\API\\*
-    -
-        name: SDK
+            -   type: className
+                regex: ^OpenTelemetry\\API\\*
+    -   name: SDK
         collectors:
-            -
-                type: className
-                regex: OpenTelemetry\\SDK\\*
-    -
-        name: Context
+            -   type: className
+                regex: ^OpenTelemetry\\SDK\\*
+    -   name: Context
         collectors:
-            -
-                type: className
-                regex: OpenTelemetry\\Context\\*
-    -
-        name: SemConv
+            -   type: className
+                regex: ^OpenTelemetry\\Context\\*
+    -   name: SemConv
         collectors:
-            -
-                type: className
-                regex: OpenTelemetry\\SemConv\\*
-    -
-        name: Contrib
+            -   type: className
+                regex: ^OpenTelemetry\\SemConv\\*
+    -   name: Contrib
         collectors:
-            -
-                type: className
-                regex: OpenTelemetry\\Contrib\\*
-    -
-        name: Proto
+            -   type: className
+                regex: ^OpenTelemetry\\Contrib\\*
+    -   name: OtelProto
         collectors:
-            -
-                type: className
-                regex: OpenTelemetry\\Proto\\*
+            -   type: className
+                regex: ^OpenTelemetry\\Proto\\*
+            -   type: className
+                regex: ^GPBMetadata\\Opentelemetry\\*
+    -   name: GoogleProtobuf
+        collectors:
+            -   type: className
+                regex: ^Google\\Protobuf\\*
+    -   name: Grpc
+        collectors:
+            - type: className
+              regex: ^Grpc\\
+    -   name: PsrLog
+        collectors:
+            - type: className
+              regex: ^Psr\\Log\\
+    -   name: PsrHttp
+        collectors:
+            - type: className
+              regex: ^Psr\\Http\\
+    -   name: Http
+        collectors:
+            - type: className
+              regex: ^Http\\
+    -   name: NyholmDsn
+        collectors:
+            - type: className
+              regex: ^Nyholm\\Dsn\\
+    -   name: Prometheus
+        collectors:
+            - type: className
+              regex: ^Prometheus\\
+    -   name: FFI
+        collectors:
+            - type: className
+              regex: ^FFI\\
+
 ruleset:
-    Contrib:
-        - API
-        - SDK
-        - Context
-        - Proto
-        - SemConv
-    Context: ~
+    Context:
+        - FFI
     SemConv: ~
+    API:
+        - Context
+        - SemConv
     SDK:
         - API
         - Context
         - SemConv
-    API:
+        - PsrLog
+        - PsrHttp
+        - Http
+        - NyholmDsn
+    OtelProto:
+        - GoogleProtobuf
+        - Grpc
+    Contrib:
+        - API
+        - SDK
         - Context
+        - SemConv
+        - OtelProto
+        - Grpc
+        - PsrLog
+        - PsrHttp
+        - Http
+        - NyholmDsn
+        - Prometheus

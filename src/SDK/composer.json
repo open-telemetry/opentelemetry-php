@@ -1,0 +1,34 @@
+{
+    "name": "open-telemetry/sdk",
+    "description": "SDK for OpenTelemetry PHP.",
+    "keywords": ["opentelemetry", "otel", "metrics", "tracing", "logging", "apm", "sdk"],
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "opentelemetry-php contributors",
+            "homepage": "https://github.com/open-telemetry/opentelemetry-php/graphs/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "ext-json": "*",
+        "nyholm/dsn": "^2.0.0",
+        "open-telemetry/api": "self.version",
+        "open-telemetry/context": "self.version",
+        "open-telemetry/sem-conv": "self.version",
+        "php-http/async-client-implementation": "^1.0",
+        "php-http/discovery": "^1.14",
+        "psr/http-factory-implementation": "^1.0",
+        "psr/log": "^1.1",
+        "symfony/polyfill-mbstring": "^1.23"
+    },
+    "autoload": {
+        "psr-4": {
+            "OpenTelemetry\\SDK\\": ""
+        }
+    },
+    "suggest": {
+        "ext-mbstring": "To increase performance of string operations"
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "name": "open-telemetry/context",
+    "description": "Context implementation for OpenTelemetry PHP.",
+    "keywords": ["opentelemetry", "otel", "metrics", "tracing", "logging", "apm", "context"],
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "opentelemetry-php contributors",
+            "homepage": "https://github.com/open-telemetry/opentelemetry-php/graphs/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "OpenTelemetry\\Context\\": ""
+        }
+    },
+    "suggest": {
+        "ext-ffi": "To allow context switching in Fibers"
+    }
+}
