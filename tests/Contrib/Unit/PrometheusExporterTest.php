@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\API\Metrics as API;
+use OpenTelemetry\Contrib\Prometheus\PrometheusExporter;
 use OpenTelemetry\SDK\Metrics\Counter;
 use PHPUnit\Framework\TestCase;
 use Prometheus\CollectorRegistry;
@@ -14,7 +15,7 @@ class PrometheusExporterTest extends TestCase
 {
     public function testEmptyMetricsExportReturnsSuccess()
     {
-        $exporter = new \OpenTelemetry\Contrib\Prometheus\PrometheusExporter($this->createMock(CollectorRegistry::class));
+        $exporter = new PrometheusExporter($this->createMock(CollectorRegistry::class));
 
         $this->assertEquals(
             API\ExporterInterface::SUCCESS,
@@ -41,7 +42,7 @@ class PrometheusExporterTest extends TestCase
             ->method('getOrRegisterCounter')
             ->willReturn($prometheusCouner);
 
-        $exporter = new \OpenTelemetry\Contrib\Prometheus\PrometheusExporter($registry);
+        $exporter = new PrometheusExporter($registry);
 
         $this->assertEquals(
             API\ExporterInterface::SUCCESS,
