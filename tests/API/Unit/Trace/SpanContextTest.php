@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\API\Unit\Trace;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
-use OpenTelemetry\SDK\Trace\TraceState;
+use OpenTelemetry\API\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
 class SpanContextTest extends TestCase
