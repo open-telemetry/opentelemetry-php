@@ -41,19 +41,19 @@ final class NonRecordingSpan extends AbstractSpan
     }
 
     /** @inheritDoc */
-    public function setAttributes(AttributesInterface $attributes): SpanInterface
+    public function setAttributes(iterable $attributes): SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
-    public function addEvent(string $name, ?AttributesInterface $attributes = null, int $timestamp = null): SpanInterface
+    public function addEvent(string $name, iterable $attributes = [], int $timestamp = null): SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
-    public function recordException(Throwable $exception, AttributesInterface $attributes = null): SpanInterface
+    public function recordException(Throwable $exception, iterable $attributes = []): SpanInterface
     {
         return $this;
     }

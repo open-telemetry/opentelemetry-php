@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use GuzzleHttp\Client;
+use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\SpanContext;
-use OpenTelemetry\SDK\Trace\Propagation\TraceContextPropagator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

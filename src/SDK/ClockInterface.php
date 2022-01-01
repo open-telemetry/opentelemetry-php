@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Trace;
+namespace OpenTelemetry\SDK;
 
 interface ClockInterface
 {
@@ -12,7 +12,8 @@ interface ClockInterface
     /**
      * Returns the current epoch wall-clock timestamp in nanoseconds.
      * This timestamp should _ONLY_ be used to compute a current time.
-     * Use {@see AbstractClock::nanoTime} for calculating durations.
+     * Use {@see \OpenTelemetry\SDK\AbstractClock::nanoTime} for calculating
+     * durations.
      */
     public function now(): int;
 

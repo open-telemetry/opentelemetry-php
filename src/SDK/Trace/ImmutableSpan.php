@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use function max;
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
@@ -19,13 +20,13 @@ final class ImmutableSpan implements SpanDataInterface
     /** @var non-empty-string */
     private string $name;
 
-    /** @var list<API\EventInterface> */
+    /** @var list<EventInterface> */
     private array $events;
 
-    /** @var list<API\LinkInterface> */
+    /** @var list<LinkInterface> */
     private array $links;
 
-    private API\AttributesInterface $attributes;
+    private AttributesInterface $attributes;
     private int $totalAttributeCount;
     private int $totalRecordedEvents;
     private StatusDataInterface $status;
@@ -34,8 +35,8 @@ final class ImmutableSpan implements SpanDataInterface
 
     /**
      * @param non-empty-string $name
-     * @param list<API\LinkInterface> $links
-     * @param list<API\EventInterface> $events
+     * @param list<LinkInterface> $links
+     * @param list<EventInterface> $events
      *@internal
      * @psalm-internal OpenTelemetry\Sdk
      *
@@ -45,7 +46,7 @@ final class ImmutableSpan implements SpanDataInterface
         string $name,
         array $links,
         array $events,
-        API\AttributesInterface $attributes,
+        AttributesInterface $attributes,
         int $totalAttributeCount,
         int $totalRecordedEvents,
         StatusDataInterface $status,
@@ -131,7 +132,7 @@ final class ImmutableSpan implements SpanDataInterface
         return $this->events;
     }
 
-    public function getAttributes(): API\AttributesInterface
+    public function getAttributes(): AttributesInterface
     {
         return $this->attributes;
     }

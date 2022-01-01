@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\SpanExporter;
 
-use OpenTelemetry\API\Trace\AttributesInterface;
-use OpenTelemetry\API\Trace\EventInterface;
-use OpenTelemetry\API\Trace\LinkInterface;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Trace\EventInterface;
+use OpenTelemetry\SDK\Trace\LinkInterface;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\StatusDataInterface;
@@ -87,13 +87,7 @@ class FriendlySpanConverter implements SpanConverterInterface
      */
     private function convertResource(ResourceInfo $resource): array
     {
-        $tmp = [];
-
-        foreach ($resource->getAttributes() as $attribute) {
-            $tmp[$attribute->getKey()] = $attribute->getValue();
-        }
-
-        return $tmp;
+        return $resource->getAttributes()->toArray();
     }
 
     /**
@@ -125,13 +119,7 @@ class FriendlySpanConverter implements SpanConverterInterface
      */
     private function convertAttributes(AttributesInterface $attributes): array
     {
-        $tmp = [];
-
-        foreach ($attributes as $attribute) {
-            $tmp[$attribute->getKey()] = $attribute->getValue();
-        }
-
-        return $tmp;
+        return $attributes->toArray();
     }
 
     /**

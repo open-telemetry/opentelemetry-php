@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\SDK\Unit\Trace;
 
 use OpenTelemetry\API\Trace\TraceStateInterface;
-use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
 

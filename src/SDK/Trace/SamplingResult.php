@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\SDK\AttributesInterface;
 
 final class SamplingResult
 {
@@ -29,16 +30,16 @@ final class SamplingResult
     private int $decision;
 
     /**
-     * @var ?API\AttributesInterface A set of span Attributes that will also be added to the Span.
+     * @var ?AttributesInterface A set of span Attributes that will also be added to the Span.
      */
-    private ?API\AttributesInterface $attributes;
+    private ?AttributesInterface $attributes;
 
     /**
      * @var ?API\TraceStateInterface A Tracestate that will be associated with the Span through the new SpanContext.
      */
     private ?API\TraceStateInterface $traceState;
 
-    public function __construct(int $decision, ?API\AttributesInterface $attributes = null, ?API\TraceStateInterface $traceState = null)
+    public function __construct(int $decision, ?AttributesInterface $attributes = null, ?API\TraceStateInterface $traceState = null)
     {
         $this->decision = $decision;
         $this->attributes = $attributes;
@@ -56,7 +57,7 @@ final class SamplingResult
     /**
      * Return attributes which will be attached to the span.
      */
-    public function getAttributes(): ?API\AttributesInterface
+    public function getAttributes(): ?AttributesInterface
     {
         return $this->attributes;
     }

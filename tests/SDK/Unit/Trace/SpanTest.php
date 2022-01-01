@@ -12,13 +12,17 @@ use Mockery\MockInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\AbstractClock;
+use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\AttributesInterface;
+use OpenTelemetry\SDK\ClockInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SDK\Trace\AbstractClock;
-use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\Event;
+use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\IdGeneratorInterface;
 use OpenTelemetry\SDK\Trace\Link;
+use OpenTelemetry\SDK\Trace\LinkInterface;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -50,8 +54,8 @@ class SpanTest extends MockeryTestCase
     private API\SpanContextInterface $spanContext;
     private TestClock $testClock;
 
-    private API\AttributesInterface $expectedAttributes;
-    private API\LinkInterface $link;
+    private AttributesInterface $expectedAttributes;
+    private LinkInterface $link;
 
     private string $traceId;
     private string $spanId;
@@ -201,7 +205,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSpanData(
             $span->toSpanData(),
             $this->expectedAttributes,
-            [new Event('event2', self::START_EPOCH + API\ClockInterface::NANOS_PER_SECOND)],
+            [new Event('event2', self::START_EPOCH + ClockInterface::NANOS_PER_SECOND)],
             [$this->link],
             self::NEW_SPAN_NAME,
             self::START_EPOCH,
@@ -234,7 +238,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSpanData(
             $span->toSpanData(),
             $this->expectedAttributes,
-            [new Event('event2', self::START_EPOCH + API\ClockInterface::NANOS_PER_SECOND)],
+            [new Event('event2', self::START_EPOCH + ClockInterface::NANOS_PER_SECOND)],
             [$this->link],
             self::NEW_SPAN_NAME,
             self::START_EPOCH,
@@ -426,7 +430,7 @@ class SpanTest extends MockeryTestCase
         $span = $this->createTestRootSpan();
         $span->addEvent('event1');
         $span->addEvent('event2', new Attributes(['key1' => 1]));
-        $span->addEvent('event3', null, AbstractClock::secondsToNanos(10));
+        $span->addEvent('event3', [], AbstractClock::secondsToNanos(10));
 
         $span->end();
 
@@ -641,13 +645,13 @@ class SpanTest extends MockeryTestCase
 
     /**
      * @psalm-param API\SpanKind::KIND_* $kind
-     * @param list<API\LinkInterface> $links
+     * @param list<LinkInterface> $links
      */
     private function createTestSpan(
         int $kind = API\SpanKind::KIND_INTERNAL,
         SpanLimits $spanLimits = null,
         string $parentSpanId = null,
-        ?API\AttributesInterface $attributes = null,
+        ?AttributesInterface $attributes = null,
         array $links = []
     ): Span {
         $parentSpanId = $parentSpanId ?? $this->parentSpanId;
@@ -709,9 +713,9 @@ class SpanTest extends MockeryTestCase
     }
 
     private function assertEvent(
-        API\EventInterface $event,
+        EventInterface $event,
         string $expectedName,
-        API\AttributesInterface $expectedAttributes,
+        AttributesInterface $expectedAttributes,
         int $expectedEpochNanos
     ): void {
         $this->assertSame($expectedName, $event->getName());
@@ -720,13 +724,13 @@ class SpanTest extends MockeryTestCase
     }
 
     /**
-     * @param list<API\EventInterface> $events
-     * @param list<API\LinkInterface> $links
+     * @param list<EventInterface> $events
+     * @param list<LinkInterface> $links
      * @psalm-param API\StatusCode::STATUS_* $status
      */
     private function assertSpanData(
         SpanDataInterface $spanData,
-        API\AttributesInterface $attributes,
+        AttributesInterface $attributes,
         array $events,
         array $links,
         string $spanName,

@@ -9,9 +9,8 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
 use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\InstrumentationLibrary;
-use OpenTelemetry\SDK\Trace\Attribute;
-use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
@@ -72,9 +71,8 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame('instrumentation_library_name', $row['otel.library.name']);
         $this->assertSame('instrumentation_library_version', $row['otel.library.version']);
 
-        /** @var Attribute $attribute */
-        $attribute = $span->getAttributes()->getAttribute('service');
-        $this->assertSame($attribute->getValue(), $row['tags']['service']);
+        $attribute = $span->getAttributes()->get('service');
+        $this->assertSame($attribute, $row['tags']['service']);
 
         $this->assertCount(1, $row['annotations']);
         [$annotation] = $row['annotations'];

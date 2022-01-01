@@ -7,6 +7,9 @@ namespace OpenTelemetry\SDK\Trace;
 use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\AttributeLimits;
+use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 
 final class SpanBuilder implements API\SpanBuilderInterface
@@ -33,10 +36,10 @@ final class SpanBuilder implements API\SpanBuilderInterface
      */
     private int $spanKind = API\SpanKind::KIND_INTERNAL;
 
-    /** @var list<API\LinkInterface>|null */
+    /** @var list<LinkInterface>|null */
     private ?array $links = null;
 
-    private ?API\AttributesInterface $attributes = null;
+    private ?AttributesInterface $attributes = null;
     private int $totalNumberOfLinksAdded = 0;
     private int $startEpochNanos = 0;
 
@@ -70,7 +73,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
-    public function addLink(API\SpanContextInterface $context, API\AttributesInterface $attributes = null): API\SpanBuilderInterface
+    public function addLink(API\SpanContextInterface $context, iterable $attributes = []): API\SpanBuilderInterface
     {
         if (!$context->isValid()) {
             return $this;
@@ -89,7 +92,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
         $this->links[] = new Link(
             $context,
             Attributes::withLimits(
-                $attributes ?? new Attributes(),
+                $attributes,
                 new AttributeLimits(
                     $this->spanLimits->getAttributePerLinkCountLimit(),
                     $this->spanLimits->getAttributeLimits()->getAttributeValueLengthLimit()
@@ -113,14 +116,10 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
-    public function setAttributes(API\AttributesInterface $attributes): API\SpanBuilderInterface
+    public function setAttributes(iterable $attributes): API\SpanBuilderInterface
     {
-        if (0 === count($attributes)) {
-            return $this;
-        }
-
-        foreach ($attributes as $attribute) {
-            $this->setAttribute($attribute->getKey(), $attribute->getValue());
+        foreach ($attributes as $key => $value) {
+            $this->setAttribute($key, $value);
         }
 
         return $this;
@@ -199,8 +198,8 @@ final class SpanBuilder implements API\SpanBuilderInterface
 
         $samplingAttributes = $samplingResult->getAttributes();
         if ($samplingAttributes && $samplingAttributes->count() > 0) {
-            foreach ($samplingAttributes as $key => $attribute) {
-                $attributes->setAttribute($key, $attribute->getValue());
+            foreach ($samplingAttributes as $key => $value) {
+                $attributes->setAttribute($key, $value);
             }
         }
 

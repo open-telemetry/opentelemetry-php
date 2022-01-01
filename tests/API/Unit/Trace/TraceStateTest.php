@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Unit\Trace;
+namespace OpenTelemetry\Tests\API\Unit\Trace;
 
-use OpenTelemetry\SDK\Trace\TraceState;
+use OpenTelemetry\API\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
 class TraceStateTest extends TestCase

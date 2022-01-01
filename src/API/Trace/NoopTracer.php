@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace;
+namespace OpenTelemetry\API\Trace;
 
-use OpenTelemetry\API\Trace\SpanBuilderInterface;
-use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 
 final class NoopTracer implements TracerInterface

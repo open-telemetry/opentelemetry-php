@@ -28,9 +28,9 @@ interface SpanBuilderInterface
      * Makes the to be created {@see SpanInterface} a root span of a new trace.
      */
     public function setNoParent(): SpanBuilderInterface;
-    public function addLink(SpanContextInterface $context, AttributesInterface $attributes = null): SpanBuilderInterface;
+    public function addLink(SpanContextInterface $context, iterable $attributes = []): SpanBuilderInterface;
     public function setAttribute(string $key, $value): SpanBuilderInterface;
-    public function setAttributes(AttributesInterface $attributes): SpanBuilderInterface;
+    public function setAttributes(iterable $attributes): SpanBuilderInterface;
 
     /**
      * Sets an explicit start timestamp for the newly created {@see SpanInterface}.

@@ -10,14 +10,13 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
-use OpenTelemetry\SDK\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
 class AlwaysOnSamplerTest extends TestCase
 {
     public function testAlwaysOnSamplerDecision(): void
     {
-        $parentTraceState = $this->createMock(TraceState::class);
+        $parentTraceState = $this->createMock(API\TraceStateInterface::class);
         $sampler = new AlwaysOnSampler();
         $decision = $sampler->shouldSample(
             $this->createParentContext(true, false, $parentTraceState),

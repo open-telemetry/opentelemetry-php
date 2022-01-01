@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace;
+namespace OpenTelemetry\SDK;
 
-use ArrayIterator;
-use OpenTelemetry\API\Trace as API;
+use function mb_substr;
+use Traversable;
 
-class Attributes implements API\AttributesInterface
+class Attributes implements AttributesInterface
 {
     private array $attributes = [];
 
@@ -16,22 +16,20 @@ class Attributes implements API\AttributesInterface
     private int $totalAddedAttributes = 0;
 
     /** @return Attributes Returns a new instance of Attributes with the limits applied */
-    public static function withLimits(API\AttributesInterface $attributes, AttributeLimits $attributeLimits): Attributes
+    public static function withLimits(iterable $attributes, AttributeLimits $attributeLimits): Attributes
     {
-        return new self($attributes->getIterator(), $attributeLimits);
+        return new self($attributes, $attributeLimits);
     }
 
     public function __construct(iterable $attributes = [], AttributeLimits $attributeLimits = null)
     {
         $this->attributeLimits = $attributeLimits ?? new AttributeLimits();
-        foreach ($attributes as $key => $attribute) {
-            $attributeKey = $attribute instanceof Attribute ? $attribute->getKey() : (string) $key;
-            $attributeValue = $attribute instanceof Attribute ? $attribute->getValue() : $attribute;
-            $this->setAttribute($attributeKey, $attributeValue);
+        foreach ($attributes as $key => $value) {
+            $this->setAttribute((string) $key, $value);
         }
     }
 
-    public function setAttribute(string $name, $value): API\AttributesInterface
+    public function setAttribute(string $name, $value): AttributesInterface
     {
         $this->totalAddedAttributes++;
 
@@ -63,21 +61,12 @@ class Attributes implements API\AttributesInterface
             $limitedValue = $value;
         }
 
-        $this->attributes[$name] = new Attribute($name, $limitedValue);
+        $this->attributes[$name] = $limitedValue;
 
         return $this;
     }
 
     public function get(string $name)
-    {
-        if ($attribute = $this->getAttribute($name)) {
-            return $attribute->getValue();
-        }
-
-        return null;
-    }
-
-    public function getAttribute(string $name): ?Attribute
     {
         return $this->attributes[$name] ?? null;
     }
@@ -88,40 +77,16 @@ class Attributes implements API\AttributesInterface
         return \count($this->attributes);
     }
 
-    public function getIterator(): API\AttributesIteratorInterface
+    public function getIterator(): Traversable
     {
-        return new class($this->attributes) implements API\AttributesIteratorInterface {
-            private ArrayIterator $inner;
-            public function __construct($attributes)
-            {
-                $this->inner = new ArrayIterator($attributes);
-            }
+        foreach ($this->attributes as $key => $value) {
+            yield (string) $key => $value;
+        }
+    }
 
-            public function key(): string
-            {
-                return (string) $this->inner->key();
-            }
-
-            public function current(): API\AttributeInterface
-            {
-                return $this->inner->current();
-            }
-
-            public function rewind(): void
-            {
-                $this->inner->rewind();
-            }
-
-            public function valid(): bool
-            {
-                return $this->inner->valid();
-            }
-
-            public function next(): void
-            {
-                $this->inner->next();
-            }
-        };
+    public function toArray(): array
+    {
+        return $this->attributes;
     }
 
     public function getTotalAddedValues(): int

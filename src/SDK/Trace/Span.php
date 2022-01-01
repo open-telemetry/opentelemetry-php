@@ -13,6 +13,10 @@ use function get_class;
 use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\AbstractClock;
+use OpenTelemetry\SDK\AttributeLimits;
+use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use function sprintf;
@@ -37,7 +41,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /**
      * @readonly
      *
-     * @var list<API\LinkInterface>
+     * @var list<LinkInterface>
      */
     private array $links;
 
@@ -59,10 +63,10 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /** @var non-empty-string */
     private string $name;
 
-    /** @var list<API\EventInterface> */
+    /** @var list<EventInterface> */
     private array $events = [];
 
-    private ?API\AttributesInterface $attributes;
+    private ?AttributesInterface $attributes;
     private int $totalRecordedEvents = 0;
     private StatusDataInterface $status;
     private int $endEpochNanos = 0;
@@ -70,7 +74,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
 
     /**
      * @param non-empty-string $name
-     * @param list<API\LinkInterface> $links
+     * @param list<LinkInterface> $links
      */
     private function __construct(
         string $name,
@@ -81,7 +85,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         SpanLimits $spanLimits,
         SpanProcessorInterface $spanProcessor,
         ResourceInfo $resource,
-        ?API\AttributesInterface $attributes,
+        ?AttributesInterface $attributes,
         array $links,
         int $totalRecordedLinks,
         int $startEpochNanos
@@ -107,7 +111,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
      *
      * @param non-empty-string $name
      * @psalm-param API\SpanKind::KIND_* $kind
-     * @param list<API\LinkInterface> $links
+     * @param list<LinkInterface> $links
      *
      * @internal
      * @psalm-internal OpenTelemetry
@@ -122,7 +126,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         SpanLimits $spanLimits,
         SpanProcessorInterface $spanProcessor,
         ResourceInfo $resource,
-        ?API\AttributesInterface $attributes,
+        ?AttributesInterface $attributes,
         array $links,
         int $totalRecordedLinks,
         int $userStartEpochNanos
@@ -241,22 +245,17 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function setAttributes(API\AttributesInterface $attributes): self
+    public function setAttributes(iterable $attributes): self
     {
-        if (0 === count($attributes)) {
-            return $this;
-        }
-
-        foreach ($attributes as $attribute) {
-            // @phpstan-ignore-next-line
-            $this->setAttribute($attribute->getKey(), $attribute->getValue());
+        foreach ($attributes as $key => $value) {
+            $this->setAttribute($key, $value);
         }
 
         return $this;
     }
 
     /** @inheritDoc */
-    public function addEvent(string $name, ?API\AttributesInterface $attributes = null, int $timestamp = null): self
+    public function addEvent(string $name, iterable $attributes = [], int $timestamp = null): self
     {
         if ($this->hasEnded) {
             return $this;
@@ -267,7 +266,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
                 $name,
                 $timestamp ?? AbstractClock::getDefault()->now(),
                 Attributes::withLimits(
-                    $attributes ?? new Attributes(),
+                    $attributes,
                     new AttributeLimits(
                         $this->spanLimits->getAttributePerEventCountLimit(),
                         $this->spanLimits->getAttributeLimits()->getAttributeValueLengthLimit()
@@ -282,7 +281,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function recordException(Throwable $exception, API\AttributesInterface $attributes = null): self
+    public function recordException(Throwable $exception, iterable $attributes = []): self
     {
         $timestamp = AbstractClock::getDefault()->now();
         $eventAttributes = new Attributes([
@@ -291,10 +290,8 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
                 'exception.stacktrace' => self::formatStackTrace($exception),
             ]);
 
-        if ($attributes) {
-            foreach ($attributes as $attribute) {
-                $eventAttributes->setAttribute($attribute->getKey(), $attribute->getValue());
-            }
+        foreach ($attributes as $key => $value) {
+            $eventAttributes->setAttribute($key, $value);
         }
 
         return $this->addEvent('exception', $eventAttributes, $timestamp);
@@ -415,7 +412,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         return $this->resource;
     }
 
-    private function getImmutableAttributes(): API\AttributesInterface
+    private function getImmutableAttributes(): AttributesInterface
     {
         if (null === $this->attributes) {
             return new Attributes();

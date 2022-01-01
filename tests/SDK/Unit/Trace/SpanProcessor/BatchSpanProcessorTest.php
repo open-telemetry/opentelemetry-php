@@ -9,7 +9,7 @@ use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\Trace\AbstractClock;
+use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;

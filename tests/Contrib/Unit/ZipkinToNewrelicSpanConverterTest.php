@@ -6,8 +6,7 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use function implode;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\SpanConverter;
-use OpenTelemetry\SDK\Trace\Attribute;
-use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
@@ -38,9 +37,8 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
 
         $this->assertCount(3, $row['tags']);
 
-        /** @var Attribute $attribute */
-        $attribute = $span->getAttributes()->getAttribute('service');
-        $this->assertSame($attribute->getValue(), $row['tags']['service']);
+        $attribute = $span->getAttributes()->get('service');
+        $this->assertSame($attribute, $row['tags']['service']);
 
         $this->assertCount(1, $row['annotations']);
         [$annotation] = $row['annotations'];

@@ -16,12 +16,11 @@ use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind as ProtoSpanKind;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SDK\Trace\Attributes;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\SDK\Util\SpanData;
-
 use PHPUnit\Framework\TestCase;
 
 class OTLPSpanConverterTest extends TestCase

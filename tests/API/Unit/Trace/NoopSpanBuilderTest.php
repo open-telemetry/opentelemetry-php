@@ -2,21 +2,20 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Unit\Trace;
+namespace OpenTelemetry\Tests\API\Unit\Trace;
 
-use OpenTelemetry\API\Trace\AttributesInterface;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
+use OpenTelemetry\API\Trace\NoopSpanBuilder;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanContextKey;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageInterface;
-use OpenTelemetry\SDK\Trace\NoopSpanBuilder;
 use OpenTelemetry\Tests\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Trace\NoopSpanBuilder
+ * @covers \OpenTelemetry\API\Trace\NoopSpanBuilder
  */
 class NoopSpanBuilderTest extends TestCase
 {
@@ -151,9 +150,7 @@ class NoopSpanBuilderTest extends TestCase
 
         $this->assertInstanceOf(
             NoopSpanBuilder::class,
-            (new NoopSpanBuilder($contextStorage))->setAttributes(
-                $this->createMock(AttributesInterface::class)
-            )
+            (new NoopSpanBuilder($contextStorage))->setAttributes([])
         );
     }
 

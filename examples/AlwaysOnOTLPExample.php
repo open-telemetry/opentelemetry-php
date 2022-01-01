@@ -6,7 +6,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter as OTLPExporter;
-use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 

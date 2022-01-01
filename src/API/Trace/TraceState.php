@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace;
+namespace OpenTelemetry\API\Trace;
 
 use function array_reverse;
 use function array_walk;
 use function implode;
-use OpenTelemetry\API\Trace as API;
 
-class TraceState implements API\TraceStateInterface
+class TraceState implements TraceStateInterface
 {
     public const MAX_TRACESTATE_LIST_MEMBERS = 32;
     public const MAX_TRACESTATE_LENGTH = 512;
@@ -37,7 +36,7 @@ class TraceState implements API\TraceStateInterface
     /**
      * {@inheritdoc}
      */
-    public function with(string $key, string $value): API\TraceStateInterface
+    public function with(string $key, string $value): TraceStateInterface
     {
         $clonedTracestate = clone $this;
 
@@ -64,7 +63,7 @@ class TraceState implements API\TraceStateInterface
     /**
      * {@inheritdoc}
      */
-    public function without(string $key): API\TraceStateInterface
+    public function without(string $key): TraceStateInterface
     {
         $clonedTracestate = clone $this;
 

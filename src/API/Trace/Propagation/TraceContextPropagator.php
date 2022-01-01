@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace\Propagation;
+namespace OpenTelemetry\API\Trace\Propagation;
 
 use function count;
 use function explode;
 use function hexdec;
-use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\API\Trace\SpanContextInterface;
+use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
-use OpenTelemetry\SDK\Trace\Span;
-use OpenTelemetry\SDK\Trace\TraceState;
 
 /**
  * TraceContext is a propagator that supports the W3C Trace Context format
@@ -55,7 +55,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
     {
         $setter = $setter ?? ArrayAccessGetterSetter::getInstance();
         $context = $context ?? Context::getCurrent();
-        $spanContext = Span::fromContext($context)->getContext();
+        $spanContext = AbstractSpan::fromContext($context)->getContext();
 
         if (!$spanContext->isValid()) {
             return;
@@ -83,10 +83,10 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
             return $context;
         }
 
-        return $context->withContextValue(Span::wrap($spanContext));
+        return $context->withContextValue(AbstractSpan::wrap($spanContext));
     }
 
-    private static function extractImpl($carrier, PropagationGetterInterface $getter): API\SpanContextInterface
+    private static function extractImpl($carrier, PropagationGetterInterface $getter): SpanContextInterface
     {
         $traceparent = $getter->get($carrier, self::TRACEPARENT);
         if ($traceparent === null) {
@@ -122,7 +122,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
             return SpanContext::createFromRemoteParent(
                 $traceId,
                 $spanId,
-                $isSampled ? API\SpanContextInterface::TRACE_FLAG_SAMPLED : API\SpanContextInterface::TRACE_FLAG_DEFAULT,
+                $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT,
                 $tracestate
             );
         }
@@ -131,7 +131,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
         return SpanContext::createFromRemoteParent(
             $traceId,
             $spanId,
-            $isSampled ? API\SpanContextInterface::TRACE_FLAG_SAMPLED : API\SpanContextInterface::TRACE_FLAG_DEFAULT
+            $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT
         );
     }
 }

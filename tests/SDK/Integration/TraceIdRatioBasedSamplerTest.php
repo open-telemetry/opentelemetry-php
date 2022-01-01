@@ -11,7 +11,6 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
-use OpenTelemetry\SDK\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
 class TraceIdRatioBasedSamplerTest extends TestCase
@@ -74,7 +73,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
 
     public function testIgnoreParentSampledFlag(): void
     {
-        $parentTraceState = $this->createMock(TraceState::class);
+        $parentTraceState = $this->createMock(API\TraceStateInterface::class);
         $sampler = new TraceIdRatioBasedSampler(0.0);
         $samplingResult = $sampler->shouldSample(
             $this->createParentContext(true, true, $parentTraceState),

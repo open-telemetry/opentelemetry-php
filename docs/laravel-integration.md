@@ -97,7 +97,7 @@ $kernel->terminate($request, $response);
  ```php
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
-use OpenTelemetry\SDK\Trace\AbstractClock;
+use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
