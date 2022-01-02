@@ -34,7 +34,7 @@ class SimplePsrFileLogger implements LoggerInterface
 
     /**
      * @param string $level
-     * @param string $message
+     * @param mixed $message
      * @param array $context
      * @psalm-suppress MoreSpecificImplementedParamType
      */

@@ -23,7 +23,7 @@
         "php-http/discovery": "^1.14",
         "promphp/prometheus_client_php": "^2.2.1",
         "psr/http-factory-implementation": "^1.0",
-        "psr/log": "^1.1",
+        "psr/log": "^1.1|^2.0|^3.0",
         "symfony/polyfill-mbstring": "^1.23"
     },
     "autoload": {
