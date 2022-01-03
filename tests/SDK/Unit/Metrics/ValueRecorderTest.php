@@ -10,9 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class ValueRecorderTest extends TestCase
 {
-    /**
-     * @test
-     */
     public function test_valid_positive_int_record(): void
     {
         $metric = new ValueRecorder('name', 'description');

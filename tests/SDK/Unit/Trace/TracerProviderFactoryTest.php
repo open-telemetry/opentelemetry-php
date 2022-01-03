@@ -31,7 +31,6 @@ class TracerProviderFactoryTest extends TestCase
     }
 
     /**
-     * @test
      * @covers ::create
      * @covers ::__construct
      */
@@ -50,7 +49,6 @@ class TracerProviderFactoryTest extends TestCase
     }
 
     /**
-     * @test
      * @covers ::create
      */
     public function test_factory_logs_warnings_and_continues(): void

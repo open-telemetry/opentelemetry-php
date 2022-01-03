@@ -10,9 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class UpDownCounterTest extends TestCase
 {
-    /**
-     * @test
-     */
     public function test_valid_positive_int_add(): void
     {
         $counter = new UpDownCounter('name', 'description');

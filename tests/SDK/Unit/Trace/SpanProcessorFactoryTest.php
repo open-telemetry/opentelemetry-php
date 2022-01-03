@@ -23,7 +23,6 @@ class SpanProcessorFactoryTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider processorProvider
      * @psalm-suppress ArgumentTypeCoercion
      */
@@ -43,7 +42,6 @@ class SpanProcessorFactoryTest extends TestCase
         ];
     }
     /**
-     * @test
      * @dataProvider invalidProcessorProvider
      */
     public function test_span_processor_factory_invalid_span_processor(?string $processor): void

@@ -20,9 +20,6 @@ use PHPUnit\Framework\TestCase;
  */
 class ZipkinSpanConverterTest extends TestCase
 {
-    /**
-     * @test
-     */
     public function test_should_convert_a_span_to_a_payload_for_zipkin(): void
     {
         $span = (new SpanData())
@@ -82,9 +79,6 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame('AuthService', $row['remoteEndpoint']['serviceName']);
     }
 
-    /**
-     * @test
-     */
     public function test_should_omit_empty_keys_from_zipkin_span(): void
     {
         $span = (new SpanData());
@@ -100,7 +94,6 @@ class ZipkinSpanConverterTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider spanKindProvider
      */
     public function test_should_convert_otel_span_to_a_zipkin_span(int $internalSpanKind, string $expectedSpanKind): void
@@ -125,7 +118,6 @@ class ZipkinSpanConverterTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider unmappedSpanKindProvider
      */
     public function test_should_convert_an_unmapped_otel_internal_span_to_a_zipkin_span_of_unspecified_kind($kind): void
@@ -147,9 +139,6 @@ class ZipkinSpanConverterTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     */
     public function test_should_convert_an_event_without_attributes_to_an_annotation_with_only_its_name(): void
     {
         $span = (new SpanData())
@@ -162,9 +151,6 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame('"event.name"', $annotation['value']);
     }
 
-    /**
-     * @test
-     */
     public function test_should_use_otel_ipv_4_and_port_correctly_for_zipkin_remote_endpoint(): void
     {
         $span = (new SpanData())
@@ -180,9 +166,6 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame(80, $row['remoteEndpoint']['port']);
     }
 
-    /**
-     * @test
-     */
     public function test_should_use_otel_ipv_6_correctly_for_zipkin_remote_endpoint(): void
     {
         $span = (new SpanData())
@@ -195,9 +178,6 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame('00000000000000000000000000000001', bin2hex($row['remoteEndpoint']['ipv6'])); //Couldn't figure out how to do a direct assertion against binary data
     }
 
-    /**
-     * @test
-     */
     public function test_tags_are_coerced_correctly_to_strings(): void
     {
         $listOfStrings = ['string-1', 'string-2'];

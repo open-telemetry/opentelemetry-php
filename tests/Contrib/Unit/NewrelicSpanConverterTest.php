@@ -11,9 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class NewrelicSpanConverterTest extends TestCase
 {
-    /**
-     * @test
-     */
     public function test_should_convert_a_span_to_a_payload_for_newrelic(): void
     {
         $span = (new SpanData())
@@ -40,9 +37,6 @@ class NewrelicSpanConverterTest extends TestCase
         $this->assertEquals($attribute, $row['attributes']['service']);
     }
 
-    /**
-     * @test
-     */
     public function test_attributes_maintain_types(): void
     {
         $listOfStrings = ['string-1', 'string-2'];

@@ -25,9 +25,6 @@ use PHPUnit\Framework\TestCase;
 
 class OTLPSpanConverterTest extends TestCase
 {
-    /**
-     * @test
-     */
     public function test_should_convert_a_span_to_a_payload_for_otlp(): void
     {
         $context = SpanContext::getInvalid();
@@ -59,7 +56,6 @@ class OTLPSpanConverterTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider attributeAreCoercedCorrectlyDataProvider
      */
     public function test_attribute_are_coerced_correctly($actual, $expected): void

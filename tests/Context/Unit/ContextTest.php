@@ -19,9 +19,6 @@ class ContextTest extends TestCase
         $this->assertSame($context, Context::getCurrent());
     }
 
-    /**
-     * @test
-     */
     public function test_ctx_can_store_values_by_key(): void
     {
         $key1 = new ContextKey('key1');
@@ -33,9 +30,6 @@ class ContextTest extends TestCase
         $this->assertSame($ctx->get($key2), 'val2');
     }
 
-    /**
-     * @test
-     */
     public function test_set_does_not_mutate_the_original(): void
     {
         $key1 = new ContextKey();
@@ -51,9 +45,6 @@ class ContextTest extends TestCase
         $this->assertNull($parent->get($key2));
     }
 
-    /**
-     * @test
-     */
     public function test_ctx_key_names_are_not_ids(): void
     {
         $key_name = 'foo';
@@ -67,9 +58,6 @@ class ContextTest extends TestCase
         $this->assertSame($ctx->get($key2), 'val2');
     }
 
-    /**
-     * @test
-     */
     public function test_empty_ctx_keys_are_valid(): void
     {
         $key1 = new ContextKey();
@@ -81,9 +69,6 @@ class ContextTest extends TestCase
         $this->assertSame($ctx->get($key2), 'val2');
     }
 
-    /**
-     * @test
-     */
     public function test_ctx_can_store_scalar_array_null_and_obj(): void
     {
         $scalar_val = 42;
@@ -108,9 +93,6 @@ class ContextTest extends TestCase
         $this->assertSame($ctx->get($obj_key), $obj_val);
     }
 
-    /**
-     * @test
-     */
     public function test_storage_order_doesnt_matter(): void
     {
         $arr = [];
@@ -128,9 +110,6 @@ class ContextTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
     public function test_static_use_of_current_doesnt_interfere_with_other_calls(): void
     {
         $key1 = new ContextKey();
@@ -152,9 +131,6 @@ class ContextTest extends TestCase
         $this->assertNull(Context::getValue($key3));
     }
 
-    /**
-     * @test
-     */
     public function test_reusing_key_overwrites_value(): void
     {
         $key = new ContextKey();
@@ -165,18 +141,12 @@ class ContextTest extends TestCase
         $this->assertSame($ctx->get($key), 'val2');
     }
 
-    /**
-     * @test
-     */
     public function test_ctx_value_not_found_throws(): void
     {
         $ctx = (new Context())->with(new ContextKey('foo'), 'bar');
         $this->assertNull($ctx->get(new ContextKey('baz')));
     }
 
-    /**
-     * @test
-     */
     public function test_attach_and_detach_set_current_ctx(): void
     {
         $key = new ContextKey();
@@ -189,9 +159,6 @@ class ContextTest extends TestCase
         $this->assertSame(Context::getValue($key), '111');
     }
 
-    /**
-     * @test
-     */
     public function test_instance_set_and_static_get_use_same_ctx(): void
     {
         $key = new ContextKey('ofoba');
@@ -204,9 +171,6 @@ class ContextTest extends TestCase
         $this->assertSame(Context::getValue($key, null), $val);
     }
 
-    /**
-     * @test
-     */
     public function test_static_set_and_instance_get_use_same_ctx(): void
     {
         $key1 = new ContextKey();
@@ -221,9 +185,6 @@ class ContextTest extends TestCase
         $this->assertSame($ctx->get($key2), $val2);
     }
 
-    /**
-     * @test
-     */
     public function test_static_without_passed_ctx_uses_current(): void
     {
         $ctx = Context::withValue(new ContextKey(), '111');
@@ -237,9 +198,6 @@ class ContextTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    /**
-     * @test
-     */
     public function test_static_with_passed_ctx_does_not_use_current(): void
     {
         $key1 = new ContextKey();
@@ -250,9 +208,6 @@ class ContextTest extends TestCase
         $this->assertSame($currentCtx, Context::getCurrent());
     }
 
-    /**
-     * @test
-     */
     public function test_storage_switch_switches_context(): void
     {
         $main = new Context();
@@ -285,9 +240,6 @@ class ContextTest extends TestCase
         $scopeMain->detach();
     }
 
-    /**
-     * @test
-     */
     public function test_storage_fork_keeps_forked_root(): void
     {
         $main = new Context();

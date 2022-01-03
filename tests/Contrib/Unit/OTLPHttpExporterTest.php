@@ -130,7 +130,6 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     }
 
     /**
-     * @test
      * @dataProvider invalidHeadersDataHandler
      */
     public function test_invalid_headers($input): void
@@ -193,7 +192,6 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     }
 
     /**
-     * @test
      * @psalm-suppress PossiblyInvalidArgument
      */
     public function test_should_be_ok_to_exporter_empty_spans_collection(): void
@@ -209,7 +207,6 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     }
 
     /**
-     * @test
      * @testdox Exporter Refuses OTLP/JSON Protocol
      * https://github.com/open-telemetry/opentelemetry-specification/issues/786
      * @psalm-suppress PossiblyInvalidArgument

@@ -23,9 +23,6 @@ class EnvironmentVariablesTraitTest extends TestCase
         $this->restoreEnvironmentVariables();
     }
 
-    /**
-     * @test
-     */
     public function test_environment_variables_integer_get(): void
     {
         $mock = new MockWithTrait();
@@ -34,9 +31,6 @@ class EnvironmentVariablesTraitTest extends TestCase
         $this->assertSame(100, $value);
     }
 
-    /**
-     * @test
-     */
     public function test_environment_variables_integer_failure(): void
     {
         $mock = new MockWithTrait();
@@ -45,18 +39,12 @@ class EnvironmentVariablesTraitTest extends TestCase
         $mock->getIntFromEnvironment('OTEL_FOO', 99);
     }
 
-    /**
-     * @test
-     */
     public function environment_variables_integer_uses_default_if_env_var_not_defined()
     {
         $mock = new MockWithTrait();
         $this->assertSame(20, $mock->getIntFromEnvironment('OTEL_FOO', 20));
     }
 
-    /**
-     * @test
-     */
     public function test_environment_variables_string_get(): void
     {
         $mock = new MockWithTrait();
@@ -67,7 +55,6 @@ class EnvironmentVariablesTraitTest extends TestCase
 
     /**
      * The SDK MUST interpret an empty value of an environment variable the same way as when the variable is unset
-     * @test
      * @dataProvider emptyProvider
      */
     public function test_environment_variables_string_uses_default_when_empty_value(?string $input): void
@@ -79,7 +66,6 @@ class EnvironmentVariablesTraitTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider emptyProvider
      */
     public function test_environment_variables_int_uses_default_when_empty_value(?string $input): void
@@ -91,7 +77,6 @@ class EnvironmentVariablesTraitTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider emptyProvider
      */
     public function test_environment_variables_bool_uses_default_when_empty_value(?string $input): void
@@ -111,7 +96,6 @@ class EnvironmentVariablesTraitTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider booleanProvider
      */
     public function environment_variables_bool_get(string $input, bool $default, bool $expected)

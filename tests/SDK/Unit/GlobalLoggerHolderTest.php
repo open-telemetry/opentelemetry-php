@@ -16,9 +16,6 @@ class GlobalLoggerHolderTest extends TestCase
         GlobalLoggerHolder::unset();
     }
 
-    /**
-     * @test
-     */
     public function test_set_and_get(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
@@ -31,9 +28,6 @@ class GlobalLoggerHolderTest extends TestCase
         $this->assertFalse(GlobalLoggerHolder::isSet());
     }
 
-    /**
-     * @test
-     */
     public function test_returns_default_logger_when_not_set(): void
     {
         $this->assertFalse(GlobalLoggerHolder::isSet());
@@ -41,9 +35,6 @@ class GlobalLoggerHolderTest extends TestCase
         $this->assertFalse(GlobalLoggerHolder::isSet());
     }
 
-    /**
-     * @test
-     */
     public function test_disable_creates_null_logger(): void
     {
         $this->assertFalse(GlobalLoggerHolder::isSet());

@@ -28,7 +28,6 @@ class LogsMessagesTraitTest extends TestCase
     }
 
     /**
-     * @test
      * @testdox Proxies logging methods through to logger
      * @dataProvider logLevelProvider
      */
