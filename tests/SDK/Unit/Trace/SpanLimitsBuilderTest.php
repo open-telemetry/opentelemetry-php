@@ -17,7 +17,7 @@ class SpanLimitsBuilderTest extends TestCase
     /**
      * @test
      */
-    public function test_span_limits_builder_uses_default_values()
+    public function test_span_limits_builder_uses_default_values(): void
     {
         $builder = new SpanLimitsBuilder();
         $spanLimits = $builder->build();
@@ -27,7 +27,7 @@ class SpanLimitsBuilderTest extends TestCase
     /**
      * @test
      */
-    public function test_span_limits_builder_uses_environment_variable()
+    public function test_span_limits_builder_uses_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 111);
         $builder = new SpanLimitsBuilder();
@@ -38,7 +38,7 @@ class SpanLimitsBuilderTest extends TestCase
     /**
      * @test
      */
-    public function test_span_limits_builder_uses_configured_value()
+    public function test_span_limits_builder_uses_configured_value(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 111);
         $builder = new SpanLimitsBuilder();
@@ -50,7 +50,7 @@ class SpanLimitsBuilderTest extends TestCase
     /**
      * @test
      */
-    public function test_span_limits_builder_throws_exception_on_invalid_value_from_environment()
+    public function test_span_limits_builder_throws_exception_on_invalid_value_from_environment(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 'fruit');
         $builder = new SpanLimitsBuilder();

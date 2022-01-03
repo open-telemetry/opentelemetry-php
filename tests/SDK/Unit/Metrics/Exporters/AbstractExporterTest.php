@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class AbstractExporterTest extends TestCase
 {
-    public function test_empty_metrics_export_returns_success()
+    public function test_empty_metrics_export_returns_success(): void
     {
         $this->assertEquals(
             API\ExporterInterface::SUCCESS,
@@ -18,7 +18,7 @@ class AbstractExporterTest extends TestCase
         );
     }
 
-    public function test_error_returns_if_trying_to_export_not_a_metric()
+    public function test_error_returns_if_trying_to_export_not_a_metric(): void
     {
         /**
          * @phpstan-ignore-next-line

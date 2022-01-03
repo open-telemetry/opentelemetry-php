@@ -62,7 +62,7 @@ class OTLPSpanConverterTest extends TestCase
      * @test
      * @dataProvider attributeAreCoercedCorrectlyDataProvider
      */
-    public function test_attribute_are_coerced_correctly($actual, $expected)
+    public function test_attribute_are_coerced_correctly($actual, $expected): void
     {
         $span = (new SpanData())
             ->setName('batch.manager')
@@ -138,7 +138,7 @@ class OTLPSpanConverterTest extends TestCase
         ];
     }
 
-    public function test_otlp_happy_path_span()
+    public function test_otlp_happy_path_span(): void
     {
         $start_time = 1617313804325769988;
         $end_time = 1617313804325783095;
@@ -248,7 +248,7 @@ class OTLPSpanConverterTest extends TestCase
     /**
      * @covers OpenTelemetry\Contrib\Otlp\SpanConverter::as_otlp_resource_attributes
      */
-    public function test_resources_from_multiple_spans_are_not_duplicated()
+    public function test_resources_from_multiple_spans_are_not_duplicated(): void
     {
         $span = $this->createMock(SpanData::class);
         $resource = $this->createMock(ResourceInfo::class);
@@ -260,7 +260,7 @@ class OTLPSpanConverterTest extends TestCase
         $this->assertCount(2, $result[0]->getResource()->getAttributes());
     }
 
-    public function test_otlp_no_spans()
+    public function test_otlp_no_spans(): void
     {
         $spans = [];
 

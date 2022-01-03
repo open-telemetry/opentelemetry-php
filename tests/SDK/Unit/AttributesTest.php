@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class AttributesTest extends TestCase
 {
-    public function test_attribute_limits_compare()
+    public function test_attribute_limits_compare(): void
     {
         $attrLimits1 = new AttributeLimits(10, 20);
         $attrLimits2 = new AttributeLimits(10, 20);
@@ -21,7 +21,7 @@ class AttributesTest extends TestCase
     }
 
     /** @test Test numeric attribute key is not cast to integer value */
-    public function test_numeric_attribute_name()
+    public function test_numeric_attribute_name(): void
     {
         $attributes = new Attributes(['1' => '2']);
         $this->assertCount(1, $attributes);
@@ -34,7 +34,7 @@ class AttributesTest extends TestCase
     /**
      * @psalm-suppress PossiblyNullReference
      */
-    public function test_attribute_limits()
+    public function test_attribute_limits(): void
     {
         $boolValue = true;
         $intValue = 42;
@@ -71,7 +71,7 @@ class AttributesTest extends TestCase
     /**
      * @psalm-suppress PossiblyNullReference
      */
-    public function test_apply_limits()
+    public function test_apply_limits(): void
     {
         $attributes = new Attributes([
             'short' => '123',

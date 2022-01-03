@@ -350,7 +350,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
-    public function test_create_non_numeric_environment_value_throws_exception()
+    public function test_create_non_numeric_environment_value_throws_exception(): void
     {
         $this->setEnvironmentVariable('OTEL_BSP_MAX_QUEUE_SIZE', 'fruit');
         $exporter = $this->createMock(SpanExporterInterface::class);

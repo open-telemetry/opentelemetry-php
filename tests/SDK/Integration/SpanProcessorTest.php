@@ -15,7 +15,7 @@ class SpanProcessorTest extends TestCase
     /**
      * @test
      */
-    public function test_parent_context_should_be_passed_to_span_processor()
+    public function test_parent_context_should_be_passed_to_span_processor(): void
     {
         $parentContext = new Context();
 
@@ -34,7 +34,7 @@ class SpanProcessorTest extends TestCase
     /**
      * @test
      */
-    public function test_current_context_should_be_passed_to_span_processor_by_default()
+    public function test_current_context_should_be_passed_to_span_processor_by_default(): void
     {
         $currentContext = Context::getCurrent();
 

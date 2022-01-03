@@ -35,7 +35,7 @@ class TracerProviderFactoryTest extends TestCase
      * @covers ::create
      * @covers ::__construct
      */
-    public function test_factory_creates_tracer()
+    public function test_factory_creates_tracer(): void
     {
         $exporterFactory = $this->createMock(ExporterFactory::class);
         $samplerFactory = $this->createMock(SamplerFactory::class);

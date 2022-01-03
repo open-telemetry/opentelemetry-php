@@ -151,7 +151,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     /**
      * @dataProvider exporterEndpointDataProvider
      */
-    public function test_exporter_with_config_via_env_vars(?string $endpoint, string $expectedEndpoint)
+    public function test_exporter_with_config_via_env_vars(?string $endpoint, string $expectedEndpoint): void
     {
         $mock = new MockHandler([
             new Response(200, [], 'ff'),

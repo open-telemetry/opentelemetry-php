@@ -14,7 +14,7 @@ class NewrelicSpanConverterTest extends TestCase
     /**
      * @test
      */
-    public function test_should_convert_a_span_to_a_payload_for_newrelic()
+    public function test_should_convert_a_span_to_a_payload_for_newrelic(): void
     {
         $span = (new SpanData())
             ->setName('guard.validate')
@@ -43,7 +43,7 @@ class NewrelicSpanConverterTest extends TestCase
     /**
      * @test
      */
-    public function test_attributes_maintain_types()
+    public function test_attributes_maintain_types(): void
     {
         $listOfStrings = ['string-1', 'string-2'];
         $listOfNumbers = [1, 2, 3, 3.1415, 42];

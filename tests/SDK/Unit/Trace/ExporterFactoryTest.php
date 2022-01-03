@@ -73,7 +73,7 @@ class ExporterFactoryTest extends TestCase
         ];
     }
 
-    public function test_accepts_none_exporter_env_var()
+    public function test_accepts_none_exporter_env_var(): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', 'none');
         $factory = new ExporterFactory('test.fromEnv');
@@ -84,7 +84,7 @@ class ExporterFactoryTest extends TestCase
      * @dataProvider envProvider
      * @psalm-param class-string $expected
      */
-    public function test_create_from_environment(string $exporter, array $env, string $expected)
+    public function test_create_from_environment(string $exporter, array $env, string $expected): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', $exporter);
         foreach ($env as $k => $v) {
@@ -126,7 +126,7 @@ class ExporterFactoryTest extends TestCase
     /**
      * @dataProvider invalidEnvProvider
      */
-    public function test_throws_exception_for_invalid_or_unsupported_exporter_configs(string $exporter, array $env = [])
+    public function test_throws_exception_for_invalid_or_unsupported_exporter_configs(string $exporter, array $env = []): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', $exporter);
         foreach ($env as $k => $v) {

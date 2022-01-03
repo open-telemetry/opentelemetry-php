@@ -14,7 +14,7 @@ class SamplingResultTest extends TestCase
     /**
      * @dataProvider provideAttributesAndLinks
      */
-    public function test_attributes_and_links_getters($attributes, $traceState)
+    public function test_attributes_and_links_getters($attributes, $traceState): void
     {
         $result = new SamplingResult(SamplingResult::DROP, $attributes, $traceState);
 

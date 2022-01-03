@@ -27,7 +27,7 @@ class SpanProcessorFactoryTest extends TestCase
      * @dataProvider processorProvider
      * @psalm-suppress ArgumentTypeCoercion
      */
-    public function test_span_processor_factory_create_span_processor_from_environment(string $processorName, string $expected)
+    public function test_span_processor_factory_create_span_processor_from_environment(string $processorName, string $expected): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_TRACES_PROCESSOR', $processorName);
         $factory = new SpanProcessorFactory();
@@ -46,7 +46,7 @@ class SpanProcessorFactoryTest extends TestCase
      * @test
      * @dataProvider invalidProcessorProvider
      */
-    public function test_span_processor_factory_invalid_span_processor(?string $processor)
+    public function test_span_processor_factory_invalid_span_processor(?string $processor): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_TRACES_PROCESSOR', $processor);
         $factory = new SpanProcessorFactory();

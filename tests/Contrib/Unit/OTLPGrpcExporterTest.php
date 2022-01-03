@@ -154,7 +154,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         return $property->getValue($exporter);
     }
 
-    public function test_client_options()
+    public function test_client_options(): void
     {
         // default options
         $exporter = new Exporter('localhost:4317');

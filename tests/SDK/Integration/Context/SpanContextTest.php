@@ -62,7 +62,7 @@ class SpanContextTest extends TestCase
         $this->assertTrue($spanContext->isSampled());
     }
 
-    public function test_getters_work()
+    public function test_getters_work(): void
     {
         $trace = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         $span = 'bbbbbbbbbbbbbbbb';
@@ -74,7 +74,7 @@ class SpanContextTest extends TestCase
         $this->assertFalse($spanContext->isSampled());
     }
 
-    public function test_random_generated_ids_create_valid_context()
+    public function test_random_generated_ids_create_valid_context(): void
     {
         $idGenerator = new RandomIdGenerator();
         $context = SpanContext::create($idGenerator->generateTraceId(), $idGenerator->generateSpanId(), 0);

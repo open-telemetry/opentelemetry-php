@@ -13,7 +13,7 @@ use Prometheus\Counter as PrometheusCounter;
 
 class PrometheusExporterTest extends TestCase
 {
-    public function test_empty_metrics_export_returns_success()
+    public function test_empty_metrics_export_returns_success(): void
     {
         $exporter = new PrometheusExporter($this->createMock(CollectorRegistry::class));
 
@@ -26,7 +26,7 @@ class PrometheusExporterTest extends TestCase
     /**
      * @dataProvider provideCounterData
      */
-    public function test_prometheus_registry_method_is_called_for_counter_export(int $count, array $labels)
+    public function test_prometheus_registry_method_is_called_for_counter_export(int $count, array $labels): void
     {
         $counter = new Counter('prometheus_test_counter');
         $counter->add($count);

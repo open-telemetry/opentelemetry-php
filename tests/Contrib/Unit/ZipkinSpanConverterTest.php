@@ -23,7 +23,7 @@ class ZipkinSpanConverterTest extends TestCase
     /**
      * @test
      */
-    public function test_should_convert_a_span_to_a_payload_for_zipkin()
+    public function test_should_convert_a_span_to_a_payload_for_zipkin(): void
     {
         $span = (new SpanData())
             ->setName('guard.validate')
@@ -85,7 +85,7 @@ class ZipkinSpanConverterTest extends TestCase
     /**
      * @test
      */
-    public function test_should_omit_empty_keys_from_zipkin_span()
+    public function test_should_omit_empty_keys_from_zipkin_span(): void
     {
         $span = (new SpanData());
 
@@ -103,7 +103,7 @@ class ZipkinSpanConverterTest extends TestCase
      * @test
      * @dataProvider spanKindProvider
      */
-    public function test_should_convert_otel_span_to_a_zipkin_span(int $internalSpanKind, string $expectedSpanKind)
+    public function test_should_convert_otel_span_to_a_zipkin_span(int $internalSpanKind, string $expectedSpanKind): void
     {
         $span = (new SpanData())
             ->setKind($internalSpanKind);
@@ -128,7 +128,7 @@ class ZipkinSpanConverterTest extends TestCase
      * @test
      * @dataProvider unmappedSpanKindProvider
      */
-    public function test_should_convert_an_unmapped_otel_internal_span_to_a_zipkin_span_of_unspecified_kind($kind)
+    public function test_should_convert_an_unmapped_otel_internal_span_to_a_zipkin_span_of_unspecified_kind($kind): void
     {
         $span = (new SpanData())
             ->setKind($kind);
@@ -150,7 +150,7 @@ class ZipkinSpanConverterTest extends TestCase
     /**
      * @test
      */
-    public function test_should_convert_an_event_without_attributes_to_an_annotation_with_only_its_name()
+    public function test_should_convert_an_event_without_attributes_to_an_annotation_with_only_its_name(): void
     {
         $span = (new SpanData())
             ->addEvent('event.name', new Attributes());
@@ -165,7 +165,7 @@ class ZipkinSpanConverterTest extends TestCase
     /**
      * @test
      */
-    public function test_should_use_otel_ipv_4_and_port_correctly_for_zipkin_remote_endpoint()
+    public function test_should_use_otel_ipv_4_and_port_correctly_for_zipkin_remote_endpoint(): void
     {
         $span = (new SpanData())
             ->addAttribute('net.peer.ip', '255.255.255.255')
@@ -183,7 +183,7 @@ class ZipkinSpanConverterTest extends TestCase
     /**
      * @test
      */
-    public function test_should_use_otel_ipv_6_correctly_for_zipkin_remote_endpoint()
+    public function test_should_use_otel_ipv_6_correctly_for_zipkin_remote_endpoint(): void
     {
         $span = (new SpanData())
             ->addAttribute('net.peer.ip', '::1')
@@ -198,7 +198,7 @@ class ZipkinSpanConverterTest extends TestCase
     /**
      * @test
      */
-    public function test_tags_are_coerced_correctly_to_strings()
+    public function test_tags_are_coerced_correctly_to_strings(): void
     {
         $listOfStrings = ['string-1', 'string-2'];
         $listOfNumbers = [1, 2, 3, 3.1415, 42];
