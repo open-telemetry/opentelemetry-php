@@ -41,7 +41,7 @@ class SimplePsrFileLoggerTest extends TestCase
     /**
      * @dataProvider logLevelProvider
      */
-    public function testLog(string $logLevel): void
+    public function test_log(string $logLevel): void
     {
         $this->assertFalse($this->root->hasChild(self::LOG_FILE));
 
@@ -62,14 +62,14 @@ class SimplePsrFileLoggerTest extends TestCase
         return $result;
     }
 
-    public function testLogInvalidLogLevel(): void
+    public function test_log_invalid_log_level(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->logger->log('foo', 'foo', ['bar']);
     }
 
-    public function testLogInvalidJson(): void
+    public function test_log_invalid_json(): void
     {
         $this->assertFalse($this->root->hasChild(self::LOG_FILE));
 

@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class ContextTest extends TestCase
 {
-    public function testActivate(): void
+    public function test_activate(): void
     {
         $context = new Context();
 
@@ -22,7 +22,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function ctxCanStoreValuesByKey(): void
+    public function test_ctx_can_store_values_by_key(): void
     {
         $key1 = new ContextKey('key1');
         $key2 = new ContextKey('key2');
@@ -36,7 +36,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function setDoesNotMutateTheOriginal(): void
+    public function test_set_does_not_mutate_the_original(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
@@ -54,7 +54,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function ctxKeyNamesAreNotIds(): void
+    public function test_ctx_key_names_are_not_ids(): void
     {
         $key_name = 'foo';
 
@@ -70,7 +70,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function emptyCtxKeysAreValid(): void
+    public function test_empty_ctx_keys_are_valid(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
@@ -84,7 +84,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function ctxCanStoreScalarArrayNullAndObj(): void
+    public function test_ctx_can_store_scalar_array_null_and_obj(): void
     {
         $scalar_val = 42;
         $array_val = ['foo', 'bar'];
@@ -111,7 +111,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function storageOrderDoesntMatter(): void
+    public function test_storage_order_doesnt_matter(): void
     {
         $arr = [];
         foreach (range(0, 9) as $i) {
@@ -131,7 +131,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function staticUseOfCurrentDoesntInterfereWithOtherCalls(): void
+    public function test_static_use_of_current_doesnt_interfere_with_other_calls(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
@@ -155,7 +155,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function reusingKeyOverwritesValue(): void
+    public function test_reusing_key_overwrites_value(): void
     {
         $key = new ContextKey();
         $ctx = (new Context())->with($key, 'val1');
@@ -168,7 +168,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function ctxValueNotFoundThrows(): void
+    public function test_ctx_value_not_found_throws(): void
     {
         $ctx = (new Context())->with(new ContextKey('foo'), 'bar');
         $this->assertNull($ctx->get(new ContextKey('baz')));
@@ -177,7 +177,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function attachAndDetachSetCurrentCtx(): void
+    public function test_attach_and_detach_set_current_ctx(): void
     {
         $key = new ContextKey();
         Context::attach((new Context())->with($key, '111'));
@@ -192,7 +192,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function instanceSetAndStaticGetUseSameCtx(): void
+    public function test_instance_set_and_static_get_use_same_ctx(): void
     {
         $key = new ContextKey('ofoba');
         $val = 'foobar';
@@ -207,7 +207,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function staticSetAndInstanceGetUseSameCtx(): void
+    public function test_static_set_and_instance_get_use_same_ctx(): void
     {
         $key1 = new ContextKey();
         $key2 = new ContextKey();
@@ -224,7 +224,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function staticWithoutPassedCtxUsesCurrent(): void
+    public function test_static_without_passed_ctx_uses_current(): void
     {
         $ctx = Context::withValue(new ContextKey(), '111');
         $first = Context::getCurrent();
@@ -240,7 +240,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function staticWithPassedCtxDoesNotUseCurrent(): void
+    public function test_static_with_passed_ctx_does_not_use_current(): void
     {
         $key1 = new ContextKey();
         $currentCtx = Context::withValue($key1, '111');
@@ -253,7 +253,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function storageSwitchSwitchesContext(): void
+    public function test_storage_switch_switches_context(): void
     {
         $main = new Context();
         $fork = new Context();
@@ -288,7 +288,7 @@ class ContextTest extends TestCase
     /**
      * @test
      */
-    public function storageForkKeepsForkedRoot(): void
+    public function test_storage_fork_keeps_forked_root(): void
     {
         $main = new Context();
 

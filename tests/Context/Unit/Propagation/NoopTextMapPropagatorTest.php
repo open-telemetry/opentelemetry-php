@@ -15,7 +15,7 @@ class NoopTextMapPropagatorTest extends TestCase
         $this->assertEmpty(NoopTextMapPropagator::getInstance()->fields());
     }
 
-    public function test_extract_contextIsUnchanged(): void
+    public function test_extract_context_is_unchanged(): void
     {
         $this->assertSame(
             Context::getRoot(),
@@ -23,7 +23,7 @@ class NoopTextMapPropagatorTest extends TestCase
         );
     }
 
-    public function test_inject_injectsNothing(): void
+    public function test_inject_injects_nothing(): void
     {
         $carrier = [];
         NoopTextMapPropagator::getInstance()->inject($carrier);

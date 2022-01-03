@@ -26,7 +26,7 @@ class EnvironmentVariablesTraitTest extends TestCase
     /**
      * @test
      */
-    public function environmentVariables_integer_get()
+    public function test_environment_variables_integer_get()
     {
         $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_FOO', '100');
@@ -37,7 +37,7 @@ class EnvironmentVariablesTraitTest extends TestCase
     /**
      * @test
      */
-    public function environmentVariables_integer_failure()
+    public function test_environment_variables_integer_failure()
     {
         $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_FOO', 'foo');
@@ -48,7 +48,7 @@ class EnvironmentVariablesTraitTest extends TestCase
     /**
      * @test
      */
-    public function environmentVariables_integer_usesDefaultIfEnvVarNotDefined()
+    public function environment_variables_integer_uses_default_if_env_var_not_defined()
     {
         $mock = new MockWithTrait();
         $this->assertSame(20, $mock->getIntFromEnvironment('OTEL_FOO', 20));
@@ -57,7 +57,7 @@ class EnvironmentVariablesTraitTest extends TestCase
     /**
      * @test
      */
-    public function environmentVariables_string_get()
+    public function test_environment_variables_string_get()
     {
         $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_FOO', 'foo');
@@ -70,7 +70,7 @@ class EnvironmentVariablesTraitTest extends TestCase
      * @test
      * @dataProvider emptyProvider
      */
-    public function environmentVariables_string_usesDefaultWhenEmptyValue(?string $input)
+    public function test_environment_variables_string_uses_default_when_empty_value(?string $input)
     {
         $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_FOO', $input);
@@ -78,11 +78,11 @@ class EnvironmentVariablesTraitTest extends TestCase
         $this->assertSame('bar', $value);
     }
 
-    /*
+    /**
      * @test
      * @dataProvider emptyProvider
      */
-    public function environmentVariables_int_usesDefaultWhenEmptyValue(?int $input)
+    public function test_environment_variables_int_uses_default_when_empty_value(?string $input)
     {
         $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_FOO', $input);
@@ -90,11 +90,11 @@ class EnvironmentVariablesTraitTest extends TestCase
         $this->assertSame(99, $value);
     }
 
-    /*
+    /**
      * @test
      * @dataProvider emptyProvider
      */
-    public function environmentVariables_bool_usesDefaultWhenEmptyValue(?bool $input)
+    public function test_environment_variables_bool_uses_default_when_empty_value(?string $input)
     {
         $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_FOO', $input);
@@ -114,7 +114,7 @@ class EnvironmentVariablesTraitTest extends TestCase
      * @test
      * @dataProvider booleanProvider
      */
-    public function environmentVariables_bool_get(string $input, bool $default, bool $expected)
+    public function environment_variables_bool_get(string $input, bool $default, bool $expected)
     {
         $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_BOOL', $input);

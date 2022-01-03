@@ -33,7 +33,7 @@ class ExporterFactoryTest extends TestCase
     /**
      * @dataProvider endpointProvider
      */
-    public function testExporterHasCorrectEndpoint($name, $input, $expectedClass): void
+    public function test_exporter_has_correct_endpoint($name, $input, $expectedClass): void
     {
         $factory = new ExporterFactory($name);
         $exporter = $factory->fromConnectionString($input);
@@ -56,7 +56,7 @@ class ExporterFactoryTest extends TestCase
     /**
      * @dataProvider invalidConnectionStringProvider
      */
-    public function testInvalidConnectionString(string $name, string $input): void
+    public function test_invalid_connection_string(string $name, string $input): void
     {
         $this->expectException(Exception::class);
         $factory = new ExporterFactory($name);
@@ -73,7 +73,7 @@ class ExporterFactoryTest extends TestCase
         ];
     }
 
-    public function testAcceptsNoneExporterEnvVar()
+    public function test_accepts_none_exporter_env_var()
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', 'none');
         $factory = new ExporterFactory('test.fromEnv');
@@ -84,7 +84,7 @@ class ExporterFactoryTest extends TestCase
      * @dataProvider envProvider
      * @psalm-param class-string $expected
      */
-    public function testCreateFromEnvironment(string $exporter, array $env, string $expected)
+    public function test_create_from_environment(string $exporter, array $env, string $expected)
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', $exporter);
         foreach ($env as $k => $v) {
@@ -126,7 +126,7 @@ class ExporterFactoryTest extends TestCase
     /**
      * @dataProvider invalidEnvProvider
      */
-    public function testThrowsExceptionForInvalidOrUnsupportedExporterConfigs(string $exporter, array $env = [])
+    public function test_throws_exception_for_invalid_or_unsupported_exporter_configs(string $exporter, array $env = [])
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', $exporter);
         foreach ($env as $k => $v) {
@@ -158,7 +158,7 @@ class ExporterFactoryTest extends TestCase
         ];
     }
 
-    public function testNonExistingExporterEnvVar(): void
+    public function test_non_existing_exporter_env_var(): void
     {
         $this->expectException(Exception::class);
 

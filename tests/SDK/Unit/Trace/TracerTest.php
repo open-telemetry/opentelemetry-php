@@ -20,7 +20,7 @@ class TracerTest extends TestCase
             ->getTracer('name', 'version');
     }
 
-    public function test_spanBuilder_default(): void
+    public function test_span_builder_default(): void
     {
         $this->assertInstanceOf(
             SpanBuilder::class,
@@ -28,7 +28,7 @@ class TracerTest extends TestCase
         );
     }
 
-    public function test_spanBuilder_propagatesInstrumentationLibraryInfoToSpan(): void
+    public function test_span_builder_propagates_instrumentation_library_info_to_span(): void
     {
         /** @var ReadableSpanInterface $span */
         $span = $this->tracer->spanBuilder('span')->startSpan();
@@ -37,7 +37,7 @@ class TracerTest extends TestCase
         $this->assertSame('version', $span->getInstrumentationLibrary()->getVersion());
     }
 
-    public function test_spanBuilder_fallbackSpanName(): void
+    public function test_span_builder_fallback_span_name(): void
     {
         /** @var ReadableSpanInterface $span */
         $span = $this->tracer->spanBuilder('  ')->startSpan();

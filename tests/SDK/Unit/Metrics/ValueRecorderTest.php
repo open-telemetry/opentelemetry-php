@@ -13,7 +13,7 @@ class ValueRecorderTest extends TestCase
     /**
      * @test
      */
-    public function testValidPositiveIntRecord()
+    public function test_valid_positive_int_record()
     {
         $metric = new ValueRecorder('name', 'description');
         $metric->record(5);
@@ -28,7 +28,7 @@ class ValueRecorderTest extends TestCase
         $this->assertEquals(7, $metric->getSum());
     }
 
-    public function testValidNegativeIntRecord()
+    public function test_valid_negative_int_record()
     {
         $metric = new ValueRecorder('name', 'description');
         $metric->record(-5);
@@ -43,7 +43,7 @@ class ValueRecorderTest extends TestCase
         $this->assertEquals(-7, $metric->getSum());
     }
 
-    public function testValidPositiveAndNegativeIntRecord()
+    public function test_valid_positive_and_negative_int_record()
     {
         $metric = new ValueRecorder('name', 'description');
         $metric->record(5);
@@ -58,7 +58,7 @@ class ValueRecorderTest extends TestCase
         $this->assertEquals(3, $metric->getSum());
     }
 
-    public function testValidNegativeAndPositiveRecord()
+    public function test_valid_negative_and_positive_record()
     {
         $metric = new ValueRecorder('name', 'description');
         $metric->record(-5);
@@ -73,7 +73,7 @@ class ValueRecorderTest extends TestCase
         $this->assertEquals(-3, $metric->getSum());
     }
 
-    public function testValidPositiveFloastRecord()
+    public function test_valid_positive_float_record()
     {
         $metric = new ValueRecorder('name', 'description');
         $metric->record(5.2222);
@@ -88,7 +88,7 @@ class ValueRecorderTest extends TestCase
         $this->assertEquals(7.8888, $metric->getSum());
     }
 
-    public function testValidNegativeFloatRecord()
+    public function test_valid_negative_float_record()
     {
         $metric = new ValueRecorder('name', 'description');
         $metric->record(-5.2222);
@@ -103,7 +103,7 @@ class ValueRecorderTest extends TestCase
         $this->assertEquals(-7.8888, $metric->getSum());
     }
 
-    public function testValidPositiveAndNegativeFloatRecord()
+    public function test_valid_positive_and_negative_float_record()
     {
         $metric = new ValueRecorder('name', 'description');
         $metric->record(5.2222);
@@ -118,7 +118,7 @@ class ValueRecorderTest extends TestCase
         $this->assertEquals(2.5556, $metric->getSum());
     }
 
-    public function testValidNegativeAndPositiveFloatRecord()
+    public function test_valid_negative_and_positive_float_record()
     {
         $metric = new ValueRecorder('name', 'description');
         $metric->record(-5.2222);
@@ -133,7 +133,7 @@ class ValueRecorderTest extends TestCase
         $this->assertEquals(-2.5556, $metric->getSum());
     }
 
-    public function testValueRecorderInitialization()
+    public function test_value_recorder_initialization()
     {
         $metric = new ValueRecorder('name', 'description');
         $this->assertEquals(0, $metric->getCount());
@@ -143,7 +143,7 @@ class ValueRecorderTest extends TestCase
         $this->assertEquals(0, $metric->getMean());
     }
 
-    public function testInvalidValueRecorderRecordThrowsException()
+    public function test_invalid_value_recorder_record_throws_exception()
     {
         $metric = new ValueRecorder('name', 'description');
         $this->expectException(InvalidArgumentException::class);

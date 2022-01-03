@@ -13,7 +13,7 @@ class RandomIdGeneratorTest extends TestCase
     /**
      * @test
      */
-    public function GeneratedTraceIdIsValid()
+    public function test_generated_trace_id_is_valid()
     {
         $idGenerator = new RandomIdGenerator();
         $traceId = $idGenerator->generateTraceId();
@@ -24,7 +24,7 @@ class RandomIdGeneratorTest extends TestCase
     /**
      * @test
      */
-    public function generatedSpanIdIsValid()
+    public function test_generated_span_id_is_valid()
     {
         $idGenerator = new RandomIdGenerator();
         $spanId = $idGenerator->generateSpanId();
@@ -35,7 +35,7 @@ class RandomIdGeneratorTest extends TestCase
     /**
      * @test
      */
-    public function fallbackAlgorithm()
+    public function test_fallback_algorithm()
     {
         $idGenerator = new RandomIdGenerator();
         $reflection = new \ReflectionClass(RandomIdGenerator::class);

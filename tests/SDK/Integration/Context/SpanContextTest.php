@@ -17,7 +17,7 @@ class SpanContextTest extends TestCase
      * @param string $traceId
      * @param string $spanId
      */
-    public function testInvalidSpan(string $traceId, string $spanId): void
+    public function test_invalid_span(string $traceId, string $spanId): void
     {
         $spanContext = SpanContext::create($traceId, $spanId);
         $this->assertSame(SpanContext::INVALID_TRACE, $spanContext->getTraceId());
@@ -38,31 +38,31 @@ class SpanContextTest extends TestCase
         ];
     }
 
-    public function testValidSpan(): void
+    public function test_valid_span(): void
     {
         $spanContext = SpanContext::create('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', API\SpanContextInterface::TRACE_FLAG_SAMPLED);
         $this->assertTrue($spanContext->isValid());
     }
 
-    public function testContextIsRemoteFromRestore(): void
+    public function test_context_is_remote_from_restore(): void
     {
         $spanContext = SpanContext::createFromRemoteParent('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', API\SpanContextInterface::TRACE_FLAG_SAMPLED);
         $this->assertTrue($spanContext->isRemote());
     }
 
-    public function testContextIsNotRemoteFromConstructor(): void
+    public function test_context_is_not_remote_from_constructor(): void
     {
         $spanContext = SpanContext::create('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', API\SpanContextInterface::TRACE_FLAG_SAMPLED);
         $this->assertFalse($spanContext->isRemote());
     }
 
-    public function testSampledSpan(): void
+    public function test_sampled_span(): void
     {
         $spanContext = SpanContext::create('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', API\SpanContextInterface::TRACE_FLAG_SAMPLED);
         $this->assertTrue($spanContext->isSampled());
     }
 
-    public function testGettersWork()
+    public function test_getters_work()
     {
         $trace = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         $span = 'bbbbbbbbbbbbbbbb';
@@ -74,7 +74,7 @@ class SpanContextTest extends TestCase
         $this->assertFalse($spanContext->isSampled());
     }
 
-    public function testRandomGeneratedIdsCreateValidContext()
+    public function test_random_generated_ids_create_valid_context()
     {
         $idGenerator = new RandomIdGenerator();
         $context = SpanContext::create($idGenerator->generateTraceId(), $idGenerator->generateSpanId(), 0);

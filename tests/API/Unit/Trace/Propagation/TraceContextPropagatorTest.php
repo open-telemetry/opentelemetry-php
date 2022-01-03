@@ -46,7 +46,7 @@ class TraceContextPropagatorTest extends TestCase
         $this->assertEmpty($carrier);
     }
 
-    public function test_inject_invalidContext(): void
+    public function test_inject_invalid_context(): void
     {
         $carrier = [];
         $this
@@ -66,7 +66,7 @@ class TraceContextPropagatorTest extends TestCase
         $this->assertEmpty($carrier);
     }
 
-    public function test_inject_sampledContext(): void
+    public function test_inject_sampled_context(): void
     {
         $carrier = [];
         $this
@@ -86,7 +86,7 @@ class TraceContextPropagatorTest extends TestCase
         );
     }
 
-    public function test_inject_sampledContext_withTraceState(): void
+    public function test_inject_sampled_context_with_trace_state(): void
     {
         $carrier = [];
         $this
@@ -109,7 +109,7 @@ class TraceContextPropagatorTest extends TestCase
         );
     }
 
-    public function test_inject_nonSampledContext(): void
+    public function test_inject_non_sampled_context(): void
     {
         $carrier = [];
         $this
@@ -129,7 +129,7 @@ class TraceContextPropagatorTest extends TestCase
         );
     }
 
-    public function test_inject_nonSampledContext_withTraceState(): void
+    public function test_inject_non_sampled_context_with_trace_state(): void
     {
         $carrier = [];
         $this
@@ -160,7 +160,7 @@ class TraceContextPropagatorTest extends TestCase
         );
     }
 
-    public function test_extract_sampledContext(): void
+    public function test_extract_sampled_context(): void
     {
         $carrier = [
             TraceContextPropagator::TRACEPARENT => self::TRACEPARENT_HEADER_SAMPLED,
@@ -172,7 +172,7 @@ class TraceContextPropagatorTest extends TestCase
         );
     }
 
-    public function test_extract_sampledContext_withTraceState(): void
+    public function test_extract_sampled_context_with_trace_state(): void
     {
         $carrier = [
             TraceContextPropagator::TRACEPARENT => self::TRACEPARENT_HEADER_SAMPLED,
@@ -185,7 +185,7 @@ class TraceContextPropagatorTest extends TestCase
         );
     }
 
-    public function test_extract_nonSampledContext(): void
+    public function test_extract_non_sampled_context(): void
     {
         $carrier = [
             TraceContextPropagator::TRACEPARENT => self::TRACEPARENT_HEADER_NOT_SAMPLED,
@@ -197,7 +197,7 @@ class TraceContextPropagatorTest extends TestCase
         );
     }
 
-    public function test_extract_nonSampledContext_withTraceState(): void
+    public function test_extract_non_sampled_context_with_trace_state(): void
     {
         $carrier = [
             TraceContextPropagator::TRACEPARENT => self::TRACEPARENT_HEADER_NOT_SAMPLED,
@@ -210,7 +210,7 @@ class TraceContextPropagatorTest extends TestCase
         );
     }
 
-    public function test_extractAndInject(): void
+    public function test_extract_and_inject(): void
     {
         $traceParent = '00-' . self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-01';
         $extractCarrier = [
@@ -222,7 +222,7 @@ class TraceContextPropagatorTest extends TestCase
         $this->assertSame($injectCarrier, $extractCarrier);
     }
 
-    public function test_extract_traceStateWithSpaces(): void
+    public function test_extract_trace_state_with_spaces(): void
     {
         $carrier = [
             TraceContextPropagator::TRACEPARENT => self::TRACEPARENT_HEADER_NOT_SAMPLED,
@@ -235,7 +235,7 @@ class TraceContextPropagatorTest extends TestCase
         );
     }
 
-    public function test_extract_emptyTraceState(): void
+    public function test_extract_empty_trace_state(): void
     {
         $carrier = [
             TraceContextPropagator::TRACEPARENT => self::TRACEPARENT_HEADER_NOT_SAMPLED,
@@ -248,35 +248,35 @@ class TraceContextPropagatorTest extends TestCase
         );
     }
 
-    public function test_extract_emptyHeader(): void
+    public function test_extract_empty_header(): void
     {
         $this->assertInvalid([
             TraceContextPropagator::TRACEPARENT => '',
         ]);
     }
 
-    public function test_invalidTraceId(): void
+    public function test_invalid_trace_id(): void
     {
         $this->assertInvalid([
             TraceContextPropagator::TRACEPARENT => '00-abcdefghijklmnopabcdefghijklmnop-' . self::SPAN_ID_BASE16 . '-01',
         ]);
     }
 
-    public function test_invalidTraceId_size(): void
+    public function test_invalid_trace_id_size(): void
     {
         $this->assertInvalid([
             TraceContextPropagator::TRACEPARENT => '00-' . self::TRACE_ID_BASE16 . '00-' . self::SPAN_ID_BASE16 . '-01',
         ]);
     }
 
-    public function test_invalidSpanId(): void
+    public function test_invalid_span_id(): void
     {
         $this->assertInvalid([
             TraceContextPropagator::TRACEPARENT => '00-' . self::TRACE_ID_BASE16 . 'abcdefghijklmnop-01',
         ]);
     }
 
-    public function test_invalidSpanId_size(): void
+    public function test_invalid_span_id_size(): void
     {
         $this->assertInvalid([
             TraceContextPropagator::TRACEPARENT => '00-' . self::TRACE_ID_BASE16 . 'abcdefghijklmnop-00-01',

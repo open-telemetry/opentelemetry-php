@@ -47,7 +47,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     /**
      * @dataProvider exporterResponseStatusDataProvider
      */
-    public function testExporterResponseStatus($responseStatus, $expected): void
+    public function test_exporter_response_status($responseStatus, $expected): void
     {
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn(
@@ -79,7 +79,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     /**
      * @dataProvider clientExceptionsShouldDecideReturnCodeDataProvider
      */
-    public function testClientExceptionsShouldDecideReturnCode($exception, $expected): void
+    public function test_client_exceptions_should_decide_return_code($exception, $expected): void
     {
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willThrowException($exception);
@@ -110,7 +110,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     /**
      * @dataProvider processHeadersDataHandler
      */
-    public function testProcessHeaders($input, $expected): void
+    public function test_process_headers($input, $expected): void
     {
         $headers = (new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->processHeaders($input);
 
@@ -133,7 +133,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
      * @test
      * @dataProvider invalidHeadersDataHandler
      */
-    public function testInvalidHeaders($input): void
+    public function test_invalid_headers($input): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $headers = (new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->processHeaders($input);
@@ -151,7 +151,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     /**
      * @dataProvider exporterEndpointDataProvider
      */
-    public function testExporterWithConfigViaEnvVars(?string $endpoint, string $expectedEndpoint)
+    public function test_exporter_with_config_via_env_vars(?string $endpoint, string $expectedEndpoint)
     {
         $mock = new MockHandler([
             new Response(200, [], 'ff'),
@@ -196,7 +196,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
      * @test
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function shouldBeOkToExporterEmptySpansCollection(): void
+    public function test_should_be_ok_to_exporter_empty_spans_collection(): void
     {
         $this->assertEquals(
             SpanExporterInterface::STATUS_SUCCESS,
@@ -214,7 +214,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
      * https://github.com/open-telemetry/opentelemetry-specification/issues/786
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function failsExporterRefusesOTLPJson(): void
+    public function test_fails_exporter_refuses_otlp_json(): void
     {
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_PROTOCOL', 'http/json');
 
@@ -232,7 +232,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
      * @dataProvider exporterInvalidEndpointDataProvider
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function testExporterRefusesInvalidEndpoint($endpoint): void
+    public function test_exporter_refuses_invalid_endpoint($endpoint): void
     {
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_ENDPOINT', $endpoint);
 
@@ -253,7 +253,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         ];
     }
 
-    public function testFromConnectionString(): void
+    public function test_from_connection_string(): void
     {
         $this->assertNotSame(
             Exporter::fromConnectionString(),

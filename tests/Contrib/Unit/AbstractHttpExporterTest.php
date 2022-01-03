@@ -42,7 +42,7 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
      * @dataProvider exporterResponseStatusDataProvider
      * @psalm-suppress PossiblyUndefinedMethod
      */
-    public function testExporterResponseStatus($responseStatus, $expected): void
+    public function test_exporter_response_status($responseStatus, $expected): void
     {
         $this->getClientInterfaceMock()->method('sendRequest')
             ->willReturn(
@@ -74,7 +74,7 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
     /**
      * @dataProvider invalidDsnDataProvider
      */
-    public function testThrowsExceptionIfInvalidDsnIsPassed($invalidDsn): void
+    public function test_throws_exception_if_invalid_dsn_is_passed($invalidDsn): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -97,7 +97,7 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
      * @dataProvider clientExceptionDataProvider
      * @psalm-suppress PossiblyUndefinedMethod
      */
-    public function testClientExceptionDecidesReturnCode($exception, $expected): void
+    public function test_client_exception_decides_return_code($exception, $expected): void
     {
         $client = $this->getClientInterfaceMock();
         $client->method('sendRequest')
@@ -129,7 +129,7 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
         ];
     }
 
-    public function testFromConnectionString(): void
+    public function test_from_connection_string(): void
     {
         $exporterClass = static::getExporterClass();
 

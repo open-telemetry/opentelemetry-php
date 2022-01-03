@@ -19,13 +19,13 @@ class ResourceTest extends TestCase
         $this->restoreEnvironmentVariables();
     }
 
-    public function testEmptyResource(): void
+    public function test_empty_resource(): void
     {
         $resource = ResourceInfo::emptyResource();
         $this->assertEmpty($resource->getAttributes());
     }
 
-    public function testGetAttributes(): void
+    public function test_get_attributes(): void
     {
         $attributes = new Attributes();
         $attributes->setAttribute('name', 'test');
@@ -51,7 +51,7 @@ class ResourceTest extends TestCase
     /**
      * @test
      */
-    public function testDefaultResource()
+    public function test_default_resource()
     {
         $attributes = new Attributes(
             [
@@ -75,7 +75,7 @@ class ResourceTest extends TestCase
     /**
      * @test
      */
-    public function testMerge()
+    public function test_merge()
     {
         $primary = ResourceInfo::create(new Attributes(['name' => 'primary', 'empty' => '']));
         $secondary = ResourceInfo::create(new Attributes(['version' => '1.0.0', 'empty' => 'value']));
@@ -94,7 +94,7 @@ class ResourceTest extends TestCase
     /**
      * @test
      */
-    public function testImmutableCreate()
+    public function test_immutable_create()
     {
         $attributes = new Attributes();
         $attributes->setAttribute('name', 'test');
@@ -113,7 +113,7 @@ class ResourceTest extends TestCase
      * @test
      * @dataProvider environmentResourceProvider
      */
-    public function resource_fromEnvironment(string $envAttributes, array $userAttributes, array $expected)
+    public function test_resource_from_environment(string $envAttributes, array $userAttributes, array $expected)
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', $envAttributes);
         $resource = ResourceInfo::create(new Attributes($userAttributes));
@@ -141,7 +141,7 @@ class ResourceTest extends TestCase
     /**
      * @test
      */
-    public function resource_serviceNameDefault()
+    public function test_resource_service_name_default()
     {
         $resource = ResourceInfo::create(new Attributes([]));
         $this->assertEquals('unknown_service', $resource->getAttributes()->get('service.name'));
@@ -150,7 +150,7 @@ class ResourceTest extends TestCase
     /**
      * @test
      */
-    public function resource_withEmptyEnvironmentVariable()
+    public function test_resource_with_empty_environment_variable()
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', '');
         $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::create(new Attributes([])));
@@ -159,7 +159,7 @@ class ResourceTest extends TestCase
     /**
      * @test
      */
-    public function resource_withInvalidEnvironmentVariable()
+    public function test_resource_with_invalid_environment_variable()
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo');
         $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::create(new Attributes([])));
@@ -168,7 +168,7 @@ class ResourceTest extends TestCase
     /**
      * @test
      */
-    public function resource_fromEnvironment_serviceNameTakesPrecedenceOverResourceAttribute()
+    public function test_resource_from_environment_service_name_takes_precedence_over_resource_attribute()
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=bar');
         $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'foo');
@@ -179,7 +179,7 @@ class ResourceTest extends TestCase
     /**
      * @test
      */
-    public function resource_fromEnvironment_resourceAttributeTakesPrecedenceOverDefault()
+    public function test_resource_from_environment_resource_attribute_takes_precedence_over_default()
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');
         $resource = ResourceInfo::create(new Attributes([]));

@@ -14,7 +14,7 @@ class NonRecordingSpanTest extends TestCase
 {
     private ?SpanContextInterface $context = null;
 
-    public function testGetContext(): void
+    public function test_get_context(): void
     {
         $span = $this->createNonRecordingSpan();
 
@@ -24,14 +24,14 @@ class NonRecordingSpanTest extends TestCase
         );
     }
 
-    public function testIsRecording(): void
+    public function test_is_recording(): void
     {
         $this->assertFalse(
             $this->createNonRecordingSpan()->isRecording()
         );
     }
 
-    public function testSetAttribute(): void
+    public function test_set_attribute(): void
     {
         $this->assertInstanceOf(
             NonRecordingSpan::class,
@@ -39,7 +39,7 @@ class NonRecordingSpanTest extends TestCase
         );
     }
 
-    public function testSetAttributes(): void
+    public function test_set_attributes(): void
     {
         $this->assertInstanceOf(
             NonRecordingSpan::class,
@@ -49,7 +49,7 @@ class NonRecordingSpanTest extends TestCase
         );
     }
 
-    public function testAddEvent(): void
+    public function test_add_event(): void
     {
         $this->assertInstanceOf(
             NonRecordingSpan::class,
@@ -57,7 +57,7 @@ class NonRecordingSpanTest extends TestCase
         );
     }
 
-    public function testRecordException(): void
+    public function test_record_exception(): void
     {
         $this->assertInstanceOf(
             NonRecordingSpan::class,
@@ -67,7 +67,7 @@ class NonRecordingSpanTest extends TestCase
         );
     }
 
-    public function testUpdateName(): void
+    public function test_update_name(): void
     {
         $this->assertInstanceOf(
             NonRecordingSpan::class,
@@ -75,7 +75,7 @@ class NonRecordingSpanTest extends TestCase
         );
     }
 
-    public function testSetStatus(): void
+    public function test_set_status(): void
     {
         $this->assertInstanceOf(
             NonRecordingSpan::class,
@@ -83,7 +83,7 @@ class NonRecordingSpanTest extends TestCase
         );
     }
 
-    public function testEnd(): void
+    public function test_end(): void
     {
         $this->assertNull(
             // @phpstan-ignore-next-line

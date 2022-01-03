@@ -28,7 +28,7 @@ class OTLPSpanConverterTest extends TestCase
     /**
      * @test
      */
-    public function shouldConvertASpanToAPayloadForOtlp(): void
+    public function test_should_convert_a_span_to_a_payload_for_otlp(): void
     {
         $context = SpanContext::getInvalid();
 
@@ -62,7 +62,7 @@ class OTLPSpanConverterTest extends TestCase
      * @test
      * @dataProvider attributeAreCoercedCorrectlyDataProvider
      */
-    public function attributeAreCoercedCorrectly($actual, $expected)
+    public function test_attribute_are_coerced_correctly($actual, $expected)
     {
         $span = (new SpanData())
             ->setName('batch.manager')
@@ -138,7 +138,7 @@ class OTLPSpanConverterTest extends TestCase
         ];
     }
 
-    public function testOtlpHappyPathSpan()
+    public function test_otlp_happy_path_span()
     {
         $start_time = 1617313804325769988;
         $end_time = 1617313804325783095;
@@ -248,7 +248,7 @@ class OTLPSpanConverterTest extends TestCase
     /**
      * @covers OpenTelemetry\Contrib\Otlp\SpanConverter::as_otlp_resource_attributes
      */
-    public function testResourcesFromMultipleSpansAreNotDuplicated()
+    public function test_resources_from_multiple_spans_are_not_duplicated()
     {
         $span = $this->createMock(SpanData::class);
         $resource = $this->createMock(ResourceInfo::class);
@@ -260,7 +260,7 @@ class OTLPSpanConverterTest extends TestCase
         $this->assertCount(2, $result[0]->getResource()->getAttributes());
     }
 
-    public function testOtlpNoSpans()
+    public function test_otlp_no_spans()
     {
         $spans = [];
 
@@ -273,7 +273,7 @@ class OTLPSpanConverterTest extends TestCase
      * @dataProvider spanKindProvider
      * @covers OpenTelemetry\Contrib\Otlp\SpanConverter::as_otlp_span_kind
      */
-    public function testSpanKind($kind, $expected): void
+    public function test_span_kind($kind, $expected): void
     {
         $span = (new SpanData())->setKind($kind);
         $row = (new SpanConverter())->convert([$span])[0]->getInstrumentationLibrarySpans()[0]->getSpans()[0];
@@ -295,7 +295,7 @@ class OTLPSpanConverterTest extends TestCase
     /**
      * @covers OpenTelemetry\Contrib\Otlp\SpanConverter::as_otlp_span
      */
-    public function testSpanWithErrorStatus(): void
+    public function test_span_with_error_status(): void
     {
         $span = (new SpanData())->setStatus(StatusData::error());
         $row = (new SpanConverter())->convert([$span])[0]->getInstrumentationLibrarySpans()[0]->getSpans()[0];

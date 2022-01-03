@@ -21,7 +21,7 @@ class LoggerExporterTest extends AbstractExporterTest
         return new LoggerExporter(self::SERVICE_NAME);
     }
 
-    public function testFromConnectionString(): void
+    public function test_from_connection_string(): void
     {
         /** @noinspection UnnecessaryAssertionInspection */
         $this->assertInstanceOf(
@@ -38,7 +38,7 @@ class LoggerExporterTest extends AbstractExporterTest
      * @psalm-suppress PossiblyUndefinedMethod
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function testExportGranularityAggregate(): void
+    public function test_export_granularity_aggregate(): void
     {
         $this->getLoggerInterfaceMock()
             ->expects($this->once())
@@ -57,7 +57,7 @@ class LoggerExporterTest extends AbstractExporterTest
      * @psalm-suppress PossiblyUndefinedMethod
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function testExportGranularitySpan(): void
+    public function test_export_granularity_span(): void
     {
         $spans = $this->createSpanMocks();
 
@@ -76,7 +76,7 @@ class LoggerExporterTest extends AbstractExporterTest
      * @psalm-suppress PossiblyUndefinedMethod
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function testLoggerThrowsException(): void
+    public function test_loggerThrowsException(): void
     {
         $this->getLoggerInterfaceMock()
             ->method('log')

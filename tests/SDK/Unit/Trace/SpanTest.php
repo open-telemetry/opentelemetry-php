@@ -95,7 +95,7 @@ class SpanTest extends MockeryTestCase
 
     // region API
 
-    public function test_getCurrentSpan_default(): void
+    public function test_get_current_span_default(): void
     {
         $this->assertSame(
             Span::getInvalid(),
@@ -103,7 +103,7 @@ class SpanTest extends MockeryTestCase
         );
     }
 
-    public function test_getCurrentSpan_setSpan(): void
+    public function test_get_current_span_set_span(): void
     {
         $span = Span::wrap(SpanContext::getInvalid());
 
@@ -117,7 +117,7 @@ class SpanTest extends MockeryTestCase
         $scope->detach();
     }
 
-    public function test_getSpan_defaultContext(): void
+    public function test_get_span_default_context(): void
     {
         $span = Span::fromContext(Context::getRoot());
 
@@ -127,7 +127,7 @@ class SpanTest extends MockeryTestCase
         );
     }
 
-    public function test_getSpan_explicitContext(): void
+    public function test_get_span_explicit_context(): void
     {
         $span = Span::fromContext(Context::getRoot());
 
@@ -139,7 +139,7 @@ class SpanTest extends MockeryTestCase
         );
     }
 
-    public function test_inProcessContext(): void
+    public function test_in_process_context(): void
     {
         $span = Span::wrap(SpanContext::getInvalid());
         $scope = $span->activate();
@@ -164,7 +164,7 @@ class SpanTest extends MockeryTestCase
 
     // region SDK
 
-    public function test_nothingChangesAfterEnd(): void
+    public function test_nothing_changes_after_end(): void
     {
         $span = $this->createTestSpan();
         $span->end();
@@ -195,7 +195,7 @@ class SpanTest extends MockeryTestCase
         $this->assertTrue($span->hasEnded());
     }
 
-    public function test_toSpanData_activeSpan(): void
+    public function test_to_span_data_active_span(): void
     {
         $span = $this->createTestSpan();
 
@@ -223,7 +223,7 @@ class SpanTest extends MockeryTestCase
         $this->assertFalse($span->isRecording());
     }
 
-    public function test_toSpanData_endedSpan(): void
+    public function test_to_span_data_ended_span(): void
     {
         $span = $this->createTestSpan();
         $this->spanDoWork($span, API\StatusCode::STATUS_ERROR, 'ERR');
@@ -248,7 +248,7 @@ class SpanTest extends MockeryTestCase
         );
     }
 
-    public function test_toSpanData_rootSpan(): void
+    public function test_to_span_data_root_span(): void
     {
         $span = $this->createTestRootSpan();
         $this->spanDoWork($span);
@@ -258,7 +258,7 @@ class SpanTest extends MockeryTestCase
         $this->assertFalse(SpanContext::isValidSpanId($span->toSpanData()->getParentSpanId()));
     }
 
-    public function test_toSpanData_childSpan(): void
+    public function test_to_span_data_child_span(): void
     {
         $span = $this->createTestSpan();
         $this->spanDoWork($span);
@@ -270,7 +270,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSame($this->parentSpanId, $span->toSpanData()->getParentSpanId());
     }
 
-    public function test_toSpanData_initialAttributes(): void
+    public function test_to_span_data_initial_attributes(): void
     {
         $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
         $span->setAttribute('another_key', 'another_value');
@@ -281,7 +281,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSame(0, $spanData->getTotalDroppedAttributes());
     }
 
-    public function test_toSpanData_isImmutable(): void
+    public function test_to_span_data_is_immutable(): void
     {
         $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
 
@@ -309,7 +309,7 @@ class SpanTest extends MockeryTestCase
         $this->assertCount(1, $spanData->getEvents());
     }
 
-    public function test_toSpanData_status(): void
+    public function test_to_span_data_status(): void
     {
         $span = $this->createTestSpan(API\SpanKind::KIND_CONSUMER);
         $this->testClock->advanceSeconds();
@@ -320,28 +320,28 @@ class SpanTest extends MockeryTestCase
         $this->assertEquals(StatusData::create(API\StatusCode::STATUS_ERROR, 'ERR'), $span->toSpanData()->getStatus());
     }
 
-    public function test_toSpanData_kind(): void
+    public function test_to_span_data_kind(): void
     {
         $span = $this->createTestSpan(API\SpanKind::KIND_SERVER);
         $this->assertSame(API\SpanKind::KIND_SERVER, $span->toSpanData()->getKind());
         $span->end();
     }
 
-    public function test_getKind(): void
+    public function test_get_kind(): void
     {
         $span = $this->createTestSpan(API\SpanKind::KIND_SERVER);
         $this->assertSame(API\SpanKind::KIND_SERVER, $span->getKind());
         $span->end();
     }
 
-    public function test_getAttribute(): void
+    public function test_get_attribute(): void
     {
         $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
         $this->assertSame(3.14, $span->getAttribute('float_attribute'));
         $span->end();
     }
 
-    public function test_setAttribute_emptyKey(): void
+    public function test_set_attribute_empty_key(): void
     {
         $span = $this->createTestSpan();
         $this->assertEmpty($span->toSpanData()->getAttributes());
@@ -349,14 +349,14 @@ class SpanTest extends MockeryTestCase
         $this->assertEmpty($span->toSpanData()->getAttributes());
     }
 
-    public function test_getInstrumentationLibraryInfo(): void
+    public function test_get_instrumentation_library_info(): void
     {
         $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
         $this->assertSame($this->instrumentationLibrary, $span->getInstrumentationLibrary());
         $span->end();
     }
 
-    public function test_updateSpanName(): void
+    public function test_update_span_name(): void
     {
         $span = $this->createTestRootSpan();
         $this->assertSame(self::SPAN_NAME, $span->getName());
@@ -365,7 +365,7 @@ class SpanTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_getDuration_activeSpan(): void
+    public function test_get_duration_active_span(): void
     {
         $span = $this->createTestSpan();
         $this->testClock->advanceSeconds();
@@ -377,7 +377,7 @@ class SpanTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_getDuration_endedSpan(): void
+    public function test_get_duration_ended_span(): void
     {
         $span = $this->createTestSpan();
         $this->testClock->advanceSeconds();
@@ -389,7 +389,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSame($elapsedNanos, $span->getDuration());
     }
 
-    public function test_setAttributes(): void
+    public function test_set_attributes(): void
     {
         $span = $this->createTestRootSpan();
 
@@ -410,7 +410,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSame(['a', 'b'], $attributes->get('str_array'));
     }
 
-    public function test_setAttributes_overridesAttribute(): void
+    public function test_set_attributes_overrides_attribute(): void
     {
         $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
         $this->assertFalse($span->toSpanData()->getAttributes()->get('bool_attribute'));
@@ -418,14 +418,14 @@ class SpanTest extends MockeryTestCase
         $this->assertTrue($span->toSpanData()->getAttributes()->get('bool_attribute'));
     }
 
-    public function test_setAttributes_empty(): void
+    public function test_set_attributes_empty(): void
     {
         $span = $this->createTestRootSpan();
         $span->setAttributes(new Attributes());
         $this->assertEmpty($span->toSpanData()->getAttributes());
     }
 
-    public function test_addEvent(): void
+    public function test_add_event(): void
     {
         $span = $this->createTestRootSpan();
         $span->addEvent('event1');
@@ -443,7 +443,7 @@ class SpanTest extends MockeryTestCase
         $this->assertEvent($events[$idx], 'event3', new Attributes(), AbstractClock::secondsToNanos(10));
     }
 
-    public function test_addEvent_attributeLength(): void
+    public function test_add_event_attribute_length(): void
     {
         $maxLength = 25;
 
@@ -479,7 +479,7 @@ class SpanTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_recordException(): void
+    public function test_record_exception(): void
     {
         $exception = new Exception('ERR');
         $span = $this->createTestRootSpan();
@@ -503,7 +503,7 @@ class SpanTest extends MockeryTestCase
         );
     }
 
-    public function test_recordException_additionalAttributes(): void
+    public function test_record_exception_additional_attributes(): void
     {
         $exception = new Exception('ERR');
         $span = $this->createTestRootSpan();
@@ -530,7 +530,7 @@ class SpanTest extends MockeryTestCase
         );
     }
 
-    public function test_attributeLength(): void
+    public function test_attribute_length(): void
     {
         $maxLength = 25;
 
@@ -564,7 +564,7 @@ class SpanTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_droppingAttributes(): void
+    public function test_dropping_attributes(): void
     {
         $maxNumberOfAttributes = 8;
         $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL, (new SpanLimitsBuilder())->setAttributeCountLimit($maxNumberOfAttributes)->build());
@@ -585,7 +585,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSame(8, $spanData->getTotalDroppedAttributes());
     }
 
-    public function test_droppingAttributes_providedViaSpanBuilder(): void
+    public function test_dropping_attributes_provided_via_span_builder(): void
     {
         $maxNumberOfAttributes = 8;
 
@@ -614,7 +614,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSame(8, $spanData->getTotalDroppedAttributes());
     }
 
-    public function test_droppingEvents(): void
+    public function test_dropping_events(): void
     {
         $maxNumberOfEvents = 8;
         $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL, (new SpanLimitsBuilder())->setEventCountLimit($maxNumberOfEvents)->build());

@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  */
 class NoopSpanBuilderTest extends TestCase
 {
-    public function testSetParent(): void
+    public function test_set_parent(): void
     {
         $contextStorage = $this->createMock(ContextStorageInterface::class);
 
@@ -32,7 +32,7 @@ class NoopSpanBuilderTest extends TestCase
         );
     }
 
-    public function testNoopCreatedSpanUsesProvidedContext(): void
+    public function test_noop_created_span_uses_provided_context(): void
     {
         $spanContext = $this->createMock(SpanContextInterface::class);
 
@@ -52,7 +52,7 @@ class NoopSpanBuilderTest extends TestCase
         $this->assertSame($span->getContext(), $spanContext);
     }
 
-    public function testNoopCreatedSpanUsesCurrentContext(): void
+    public function test_noop_created_span_uses_current_context(): void
     {
         $spanContext = $this->createMock(SpanContextInterface::class);
 
@@ -72,7 +72,7 @@ class NoopSpanBuilderTest extends TestCase
         $this->assertSame($span->getContext(), $spanContext);
     }
 
-    public function testNoopCreatedSpanDoesntUseCurrentContextIfNoParent(): void
+    public function test_noop_created_span_doesnt_use_current_context_if_no_parent(): void
     {
         $spanContext = $this->createMock(SpanContextInterface::class);
 
@@ -94,7 +94,7 @@ class NoopSpanBuilderTest extends TestCase
         $this->assertFalse($span->getContext()->isValid());
     }
 
-    public function testNoopCreatedSpanRemovesIsRecordingFlag(): void
+    public function test_noop_created_span_removes_is_recording_flag(): void
     {
         $span = $this->createMock(SpanInterface::class);
         $span->method('isRecording')->willReturn(true);
@@ -112,7 +112,7 @@ class NoopSpanBuilderTest extends TestCase
         $this->assertFalse($span->isRecording());
     }
 
-    public function testSetNoParent(): void
+    public function test_set_no_parent(): void
     {
         $contextStorage = $this->createMock(ContextStorageInterface::class);
 
@@ -122,7 +122,7 @@ class NoopSpanBuilderTest extends TestCase
         );
     }
 
-    public function testAddLink(): void
+    public function test_add_link(): void
     {
         $contextStorage = $this->createMock(ContextStorageInterface::class);
 
@@ -134,7 +134,7 @@ class NoopSpanBuilderTest extends TestCase
         );
     }
 
-    public function testSetAttribute(): void
+    public function test_set_attribute(): void
     {
         $contextStorage = $this->createMock(ContextStorageInterface::class);
 
@@ -144,7 +144,7 @@ class NoopSpanBuilderTest extends TestCase
         );
     }
 
-    public function testSetAttributes(): void
+    public function test_set_attributes(): void
     {
         $contextStorage = $this->createMock(ContextStorageInterface::class);
 
@@ -154,7 +154,7 @@ class NoopSpanBuilderTest extends TestCase
         );
     }
 
-    public function testSetStartTimestamp(): void
+    public function test_set_start_timestamp(): void
     {
         $contextStorage = $this->createMock(ContextStorageInterface::class);
 
@@ -166,7 +166,7 @@ class NoopSpanBuilderTest extends TestCase
         );
     }
 
-    public function testSetSpanKind(): void
+    public function test_set_span_kind(): void
     {
         $contextStorage = $this->createMock(ContextStorageInterface::class);
 
@@ -176,7 +176,7 @@ class NoopSpanBuilderTest extends TestCase
         );
     }
 
-    public function testStartSpan(): void
+    public function test_start_span(): void
     {
         $contextStorage = $this->createMock(ContextStorageInterface::class);
 

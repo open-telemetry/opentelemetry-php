@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class GlobalMeterProviderTest extends TestCase
 {
-    public function testGLobalMeterProviderSettersAndGetters()
+    public function test_global_meter_provider_setters_and_getters()
     {
         $defaultProvider = GlobalMeterProvider::getGlobalProvider();
 

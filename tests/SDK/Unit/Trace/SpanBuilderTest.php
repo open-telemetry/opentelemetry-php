@@ -45,7 +45,7 @@ class SpanBuilderTest extends MockeryTestCase
         );
     }
 
-    public function test_addLink(): void
+    public function test_add_link(): void
     {
         /** @var Span $span */
         $span = $this
@@ -59,7 +59,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_addLink_invalid(): void
+    public function test_add_link_invalid(): void
     {
         /** @var Span $span */
         $span = $this
@@ -73,7 +73,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_addLink_droppingLinks(): void
+    public function test_add_link_dropping_links(): void
     {
         $maxNumberOfLinks = 8;
         $spanBuilder = (new TracerProvider([], null, null, (new SpanLimitsBuilder())->setLinkCountLimit($maxNumberOfLinks)->build()))
@@ -100,7 +100,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_addLink_truncateLinkAttributes(): void
+    public function test_add_link_truncate_link_attributes(): void
     {
         /** @var Span $span */
         $span = (new TracerProvider([], null, null, (new SpanLimitsBuilder())->setAttributePerLinkCountLimit(1)->build()))
@@ -122,7 +122,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_addLink_truncateLinkAttributeValue(): void
+    public function test_add_link_truncate_link_attribute_value(): void
     {
         $maxLength = 25;
 
@@ -159,7 +159,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_addLink_noEffectAfterStartSpan(): void
+    public function test_add_link_no_effect_after_start_span(): void
     {
         $spanBuilder = $this->tracer->spanBuilder(self::SPAN_NAME);
 
@@ -184,7 +184,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_setAttribute(): void
+    public function test_set_attribute(): void
     {
         /** @var Span $span */
         $span = $this
@@ -209,7 +209,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_setAttribute_afterEnd(): void
+    public function test_set_attribute_after_end(): void
     {
         /** @var Span $span */
         $span = $this
@@ -227,7 +227,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_setAttribute_dropping(): void
+    public function test_set_attribute_dropping(): void
     {
         $maxNumberOfAttributes = 8;
         $spanBuilder = (new TracerProvider(
@@ -254,7 +254,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_addAttributesViaSampler(): void
+    public function test_add_attributes_via_sampler(): void
     {
         $sampler = new class() implements SamplerInterface {
             public function shouldSample(
@@ -284,7 +284,7 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame('meow', $attributes->get('cat'));
     }
 
-    public function test_setAttributes(): void
+    public function test_set_attributes(): void
     {
         $attributes = new Attributes(['id' => 1, 'foo' => 'bar']);
 
@@ -300,7 +300,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_setAttributes_overridesValues(): void
+    public function test_set_attributes_overrides_values(): void
     {
         $attributes = new Attributes(['id' => 1, 'foo' => 'bar']);
 
@@ -322,7 +322,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_isRecording_default(): void
+    public function test_is_recording_default(): void
     {
         /** @var Span $span */
         $span = $this->tracer->spanBuilder(self::SPAN_NAME)->startSpan();
@@ -330,7 +330,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_isRecording_sampler(): void
+    public function test_is_recording_sampler(): void
     {
         /** @var Span $span */
         $span = (new TracerProvider([], new AlwaysOffSampler()))
@@ -342,7 +342,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_getKind_default(): void
+    public function test_get_kind_default(): void
     {
         /** @var Span $span */
         $span = $this->tracer->spanBuilder(self::SPAN_NAME)->startSpan();
@@ -350,7 +350,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_getKind(): void
+    public function test_get_kind(): void
     {
         /** @var Span $span */
         $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setSpanKind(API\SpanKind::KIND_CONSUMER)->startSpan();
@@ -358,7 +358,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_startTimestamp(): void
+    public function test_start_timestamp(): void
     {
         /** @var Span $span */
         $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setStartTimestamp(123)->startSpan();
@@ -366,7 +366,7 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame(123, $span->toSpanData()->getStartEpochNanos());
     }
 
-    public function test_setNoParent(): void
+    public function test_set_no_parent(): void
     {
         $parentSpan = $this->tracer->spanBuilder(self::SPAN_NAME)->startSpan();
         $parentScope = $parentSpan->activate();
@@ -408,7 +408,7 @@ class SpanBuilderTest extends MockeryTestCase
         $parentSpan->end();
     }
 
-    public function test_setNoParent_override(): void
+    public function test_set_no_parent_override(): void
     {
         $parentSpan = $this->tracer->spanBuilder(self::SPAN_NAME)->startSpan();
         $parentContext = Context::getCurrent()->withContextValue($parentSpan);
@@ -457,7 +457,7 @@ class SpanBuilderTest extends MockeryTestCase
         $parentSpan->end();
     }
 
-    public function test_setParent_emptyContext(): void
+    public function test_set_parent_empty_context(): void
     {
         $emptyContext = Context::getCurrent();
         $parentSpan = $this->tracer->spanBuilder(self::SPAN_NAME)->startSpan();
@@ -486,7 +486,7 @@ class SpanBuilderTest extends MockeryTestCase
         $parentSpan->end();
     }
 
-    public function test_setParent_currentSpan(): void
+    public function test_set_parent_current_span(): void
     {
         $parentSpan = $this->tracer->spanBuilder(self::SPAN_NAME)->startSpan();
         $parentScope = $parentSpan->activate();
@@ -515,7 +515,7 @@ class SpanBuilderTest extends MockeryTestCase
         $parentSpan->end();
     }
 
-    public function test_setParent_invalidContext(): void
+    public function test_set_parent_invalid_context(): void
     {
         $parentSpan = Span::getInvalid();
 

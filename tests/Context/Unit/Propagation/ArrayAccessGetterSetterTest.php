@@ -13,7 +13,7 @@ use stdClass;
 
 class ArrayAccessGetterSetterTest extends TestCase
 {
-    public function testGetFromMapArray(): void
+    public function test_get_from_map_array(): void
     {
         $carrier = ['a' => 'alpha'];
         $map = new ArrayAccessGetterSetter();
@@ -22,7 +22,7 @@ class ArrayAccessGetterSetterTest extends TestCase
         $this->assertSame(['a'], $map->keys($carrier));
     }
 
-    public function testGetArrayValuesFromCarrier(): void
+    public function test_get_array_values_from_carrier(): void
     {
         // Carrier contains an array as one of the values
         $carrier = [
@@ -35,7 +35,7 @@ class ArrayAccessGetterSetterTest extends TestCase
         $this->assertSame(['a', 'b'], $map->keys($carrier));
     }
 
-    public function testGetNumericalKeyFromCarrier(): void
+    public function test_get_numerical_key_from_carrier(): void
     {
         // Carrier contains an array as one of the values
         $carrier = [
@@ -48,7 +48,7 @@ class ArrayAccessGetterSetterTest extends TestCase
         $this->assertSame([1, 'b'], $map->keys($carrier));
     }
 
-    public function testGetFromUnsupportedCarrier(): void
+    public function test_get_from_unsupported_carrier(): void
     {
         $carrier = new stdClass();
         $map = new ArrayAccessGetterSetter();
@@ -56,7 +56,7 @@ class ArrayAccessGetterSetterTest extends TestCase
         $map->get($carrier, 'a');
     }
 
-    public function testKeysFromMapArrayAccess(): void
+    public function test_keys_from_map_array_access(): void
     {
         $carrier = new ArrayObject(['a' => 'alpha']);
         $map = new ArrayAccessGetterSetter();
@@ -64,7 +64,7 @@ class ArrayAccessGetterSetterTest extends TestCase
         $map->keys($carrier);
     }
 
-    public function testKeysFromUnsupportedCarrier(): void
+    public function test_keys_from_unsupported_carrier(): void
     {
         $carrier = new stdClass();
         $map = new ArrayAccessGetterSetter();
@@ -72,7 +72,7 @@ class ArrayAccessGetterSetterTest extends TestCase
         $map->keys($carrier);
     }
 
-    public function testKeysKeyedArrayAccessObject(): void
+    public function test_keys_keyed_array_access_object(): void
     {
         $carrier = $this->createMock(KeyedArrayAccessInterface::class);
         $carrier->method('keys')->willReturn(['a', 'b']);
@@ -82,7 +82,7 @@ class ArrayAccessGetterSetterTest extends TestCase
         $this->assertSame(['a', 'b'], $map->keys($carrier));
     }
 
-    public function testSetMapArray(): void
+    public function test_set_map_array(): void
     {
         $carrier = ['a' => 'alpha'];
         $map = new ArrayAccessGetterSetter();
@@ -92,7 +92,7 @@ class ArrayAccessGetterSetterTest extends TestCase
         $this->assertSame('bravo', $value);
     }
 
-    public function testSetMapArrayAccess(): void
+    public function test_set_map_array_access(): void
     {
         $carrier = new ArrayObject(['a' => 'alpha']);
         $map = new ArrayAccessGetterSetter();
@@ -102,7 +102,7 @@ class ArrayAccessGetterSetterTest extends TestCase
         $this->assertSame('bravo', $value);
     }
 
-    public function testSetUnsupportedCarrier(): void
+    public function test_set_unsupported_carrier(): void
     {
         $carrier = new stdClass();
         $map = new ArrayAccessGetterSetter();
@@ -111,7 +111,7 @@ class ArrayAccessGetterSetterTest extends TestCase
         $map->set($carrier, 'a', 'alpha');
     }
 
-    public function testSetEmptyKey(): void
+    public function test_set_empty_key(): void
     {
         $carrier = ['a' => 'alpha'];
         $map = new ArrayAccessGetterSetter();

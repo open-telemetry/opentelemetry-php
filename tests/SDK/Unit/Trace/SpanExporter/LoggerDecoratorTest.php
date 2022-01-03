@@ -17,7 +17,7 @@ class LoggerDecoratorTest extends AbstractLoggerAwareTest
      */
     private ?SpanExporterInterface $decorated;
 
-    public function testFromConnectionString(): void
+    public function test_from_connection_string(): void
     {
         $this->expectException(RuntimeException::class);
 
@@ -27,7 +27,7 @@ class LoggerDecoratorTest extends AbstractLoggerAwareTest
     /**
      * @psalm-suppress PossiblyUndefinedMethod
      */
-    public function testShutDown(): void
+    public function test_shut_down(): void
     {
         $this->getSpanExporterInterfaceMock()
             ->expects($this->once())
@@ -42,7 +42,7 @@ class LoggerDecoratorTest extends AbstractLoggerAwareTest
     /**
      * @psalm-suppress PossiblyUndefinedMethod
      */
-    public function testForceFlush(): void
+    public function test_force_flush(): void
     {
         $this->getSpanExporterInterfaceMock()
             ->expects($this->once())
@@ -58,7 +58,7 @@ class LoggerDecoratorTest extends AbstractLoggerAwareTest
      * @psalm-suppress PossiblyUndefinedMethod
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function testExportSuccess(): void
+    public function test_export_success(): void
     {
         $this->getSpanExporterInterfaceMock()
             ->expects($this->once())
@@ -80,7 +80,7 @@ class LoggerDecoratorTest extends AbstractLoggerAwareTest
      * @psalm-suppress PossiblyUndefinedMethod
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function testExportFailedRetryable(): void
+    public function test_export_failed_retryable(): void
     {
         $this->getSpanExporterInterfaceMock()
             ->expects($this->once())
@@ -102,7 +102,7 @@ class LoggerDecoratorTest extends AbstractLoggerAwareTest
      * @psalm-suppress PossiblyUndefinedMethod
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function testExportFailedNotRetryable(): void
+    public function test_export_failed_not_retryable(): void
     {
         $this->getSpanExporterInterfaceMock()
             ->expects($this->once())

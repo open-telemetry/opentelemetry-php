@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class NullSpanConverterTest extends TestCase
 {
-    public function testImplementsSpanConverterInterface(): void
+    public function test_implements_span_converter_interface(): void
     {
         $this->assertInstanceOf(
             SpanConverterInterface::class,
@@ -19,7 +19,7 @@ class NullSpanConverterTest extends TestCase
         );
     }
 
-    public function testConvert(): void
+    public function test_convert(): void
     {
         $this->assertSame(
             [],

@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class MeterTest extends TestCase
 {
-    public function testMeter()
+    public function test_meter()
     {
         $meter = new Meter('Meter', '0.1');
 
@@ -20,7 +20,7 @@ class MeterTest extends TestCase
         $this->assertSame('0.1', $meter->getVersion());
     }
 
-    public function testMeterCounter()
+    public function test_meter_counter()
     {
         $meter = new Meter('Meter', '0.1');
 
@@ -32,7 +32,7 @@ class MeterTest extends TestCase
         $this->assertEquals($counterDescription, $counter->getDescription());
     }
 
-    public function testMeterUpDownCounter()
+    public function test_meter_up_down_counter()
     {
         $meter = new Meter('Meter', '0.1');
 
@@ -44,7 +44,7 @@ class MeterTest extends TestCase
         $this->assertEquals($upDownCounterDescription, $upDownCounter->getDescription());
     }
 
-    public function testMeterValueRecorder()
+    public function test_meter_value_recorder()
     {
         $meter = new Meter('Meter', '0.1');
 

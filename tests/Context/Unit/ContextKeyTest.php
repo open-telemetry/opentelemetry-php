@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ContextKeyTest extends TestCase
 {
-    public function testName()
+    public function test_name()
     {
         $name = 'foo';
 

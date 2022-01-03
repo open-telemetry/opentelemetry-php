@@ -36,7 +36,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $this->restoreEnvironmentVariables();
     }
 
-    public function test_allowsNullExporter(): void
+    public function test_allows_null_exporter(): void
     {
         $proc = new BatchSpanProcessor(null, $this->testClock);
         $span = $this->createSampledSpanMock();
@@ -47,7 +47,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $this->assertTrue(true); // phpunit requires an assertion
     }
 
-    public function test_export_batchSizeMet(): void
+    public function test_export_batch_size_met(): void
     {
         $batchSize = 3;
         $queueSize = 5; // queue is larger than batch
@@ -77,7 +77,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
-    public function test_export_batchSizeGreaterThanQueueSize_isRejected(): void
+    public function test_export_batch_size_greater_than_queue_size_is_rejected(): void
     {
         $batchSize = 3;
         $queueSize = 2; // queue is smaller than batch
@@ -101,7 +101,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
     /**
      * @dataProvider scheduledDelayProvider
      */
-    public function test_export_scheduledDelay(int $exportDelay, int $advanceByNano, bool $expectedFlush): void
+    public function test_export_scheduled_delay(int $exportDelay, int $advanceByNano, bool $expectedFlush): void
     {
         $batchSize = 2;
         $queueSize = 5;
@@ -143,7 +143,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         ];
     }
 
-    public function test_export_delayLimitReached_partiallyFilledBatch(): void
+    public function test_export_delay_limit_reached_partially_filled_batch(): void
     {
         $batchSize = 4;
         $queueSize = 5;
@@ -190,7 +190,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
-    public function test_export_delayLimitNotReached_partiallyFilledBatch(): void
+    public function test_export_delay_limit_not_reached_partially_filled_batch(): void
     {
         $batchSize = 3;
         $queueSize = 5;
@@ -219,7 +219,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#shutdown-1
      */
-    public function test_export_includesForceFlushOnShutdown(): void
+    public function test_export_includes_force_flush_on_shutdown(): void
     {
         $batchSize = 3;
 
@@ -237,7 +237,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $proc->shutdown();
     }
 
-    public function test_export_afterShutdown(): void
+    public function test_export_after_shutdown(): void
     {
         $exporter = $this->createMock(SpanExporterInterface::class);
         $exporter->expects($this->atLeastOnce())->method('shutdown');
@@ -252,7 +252,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $proc->shutdown();
     }
 
-    public function test_export_onlySampledSpans(): void
+    public function test_export_only_sampled_spans(): void
     {
         $sampledSpan = $this->createSampledSpanMock();
         $nonSampledSpan = $this->createNonSampledSpanMock();
@@ -280,7 +280,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $batchProcessor->forceFlush();
     }
 
-    public function test_forceFlush_endedSpans(): void
+    public function test_force_flush_ended_spans(): void
     {
         $batchSize = 3;
         $queueSize = 3;
@@ -319,7 +319,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $processor->forceFlush();
     }
 
-    public function test_shutdown_shutdownsExporter(): void
+    public function test_shutdown_shutdowns_exporter(): void
     {
         $exporter = $this->createMock(SpanExporterInterface::class);
         $processor = new BatchSpanProcessor($exporter, $this->testClock);
@@ -328,7 +328,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $processor->shutdown();
     }
 
-    public function test_create_fromEnvironmentVariables(): void
+    public function test_create_from_environment_variables(): void
     {
         $exporter = $this->createMock(SpanExporterInterface::class);
 
@@ -350,7 +350,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
-    public function test_create_nonNumericEnvironmentValue_throwsException()
+    public function test_create_non_numeric_environment_value_throws_exception()
     {
         $this->setEnvironmentVariable('OTEL_BSP_MAX_QUEUE_SIZE', 'fruit');
         $exporter = $this->createMock(SpanExporterInterface::class);

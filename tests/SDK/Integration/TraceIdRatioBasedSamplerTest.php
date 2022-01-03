@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class TraceIdRatioBasedSamplerTest extends TestCase
 {
-    public function testInvalidProbabilityTraceIdRatioBasedSampler(): void
+    public function test_invalid_probability_trace_id_ratio_based_sampler(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $sampler = new TraceIdRatioBasedSampler(-0.5);
@@ -23,7 +23,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $sampler = new TraceIdRatioBasedSampler(1.5);
     }
 
-    public function testNeverTraceIdRatioBasedSamplerDecision(): void
+    public function test_never_trace_id_ratio_based_sampler_decision(): void
     {
         $sampler = new TraceIdRatioBasedSampler(0.0);
         $decision = $sampler->shouldSample(
@@ -35,7 +35,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::DROP, $decision->getDecision());
     }
 
-    public function testAlwaysTraceIdRatioBasedSamplerDecision(): void
+    public function test_always_trace_id_ratio_based_sampler_decision(): void
     {
         $sampler = new TraceIdRatioBasedSampler(1.0);
         $decision = $sampler->shouldSample(
@@ -47,7 +47,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLE, $decision->getDecision());
     }
 
-    public function testFailingTraceIdRatioBasedSamplerDecision(): void
+    public function test_failing_trace_id_ratio_based_sampler_decision(): void
     {
         $sampler = new TraceIdRatioBasedSampler(0.99);
         $decision = $sampler->shouldSample(
@@ -59,7 +59,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::DROP, $decision->getDecision());
     }
 
-    public function testPassingTraceIdRatioBasedSamplerDecision(): void
+    public function test_passing_trace_id_ratio_based_sampler_decision(): void
     {
         $sampler = new TraceIdRatioBasedSampler(0.01);
         $decision = $sampler->shouldSample(
@@ -71,7 +71,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLE, $decision->getDecision());
     }
 
-    public function testIgnoreParentSampledFlag(): void
+    public function test_ignore_parent_sampled_flag(): void
     {
         $parentTraceState = $this->createMock(API\TraceStateInterface::class);
         $sampler = new TraceIdRatioBasedSampler(0.0);
@@ -86,7 +86,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals($parentTraceState, $samplingResult->getTraceState());
     }
 
-    public function testTraceIdRatioBasedSamplerDescription(): void
+    public function test_trace_id_ratio_based_sampler_description(): void
     {
         $sampler = new TraceIdRatioBasedSampler(0.0001);
         $this->assertEquals('TraceIdRatioBasedSampler{0.000100}', $sampler->getDescription());

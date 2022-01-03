@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 class AlwaysOffSamplerTest extends TestCase
 {
-    public function testAlwaysOffSampler(): void
+    public function test_always_off_sampler(): void
     {
         $parentTraceState = $this->createMock(API\TraceStateInterface::class);
         $sampler = new AlwaysOffSampler();
@@ -29,7 +29,7 @@ class AlwaysOffSamplerTest extends TestCase
         $this->assertEquals($parentTraceState, $decision->getTraceState());
     }
 
-    public function testAlwaysOnSamplerDescription(): void
+    public function test_always_on_sampler_description(): void
     {
         $sampler = new AlwaysOffSampler();
         $this->assertEquals('AlwaysOffSampler', $sampler->getDescription());

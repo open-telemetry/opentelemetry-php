@@ -70,7 +70,7 @@ class MultiTextMapPropagatorTest extends MockeryTestCase
         ]))->inject($carrier, null, $context);
     }
 
-    public function test_extract_noPropagators(): void
+    public function test_extract_no_propagators(): void
     {
         $this->assertSame(
             Context::getRoot(),
@@ -78,7 +78,7 @@ class MultiTextMapPropagatorTest extends MockeryTestCase
         );
     }
 
-    public function test_extract_foundAll(): void
+    public function test_extract_found_all(): void
     {
         $carrier = [];
 
@@ -101,7 +101,7 @@ class MultiTextMapPropagatorTest extends MockeryTestCase
         );
     }
 
-    public function test_extract_notFound(): void
+    public function test_extract_not_found(): void
     {
         $carrier = [];
 

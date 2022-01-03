@@ -17,7 +17,7 @@ class EventTest extends TestCase
 
     private ?AttributesInterface $attributes = null;
 
-    public function testGetName(): void
+    public function test_get_name(): void
     {
         $this->assertSame(
             self::EVENT_NAME,
@@ -25,7 +25,7 @@ class EventTest extends TestCase
         );
     }
 
-    public function testGetAttributes(): void
+    public function test_get_attributes(): void
     {
         $this->assertSame(
             $this->getAttributesInterfaceMock(),
@@ -33,7 +33,7 @@ class EventTest extends TestCase
         );
     }
 
-    public function testGetEpochNanos(): void
+    public function test_get_epoch_nanos(): void
     {
         $this->assertSame(
             $this->getClock()->now(),
@@ -41,7 +41,7 @@ class EventTest extends TestCase
         );
     }
 
-    public function testGetTotalAttributeCount(): void
+    public function test_get_total_attribute_count(): void
     {
         $this->assertSame(
             self::ATTR_CONT,
@@ -49,7 +49,7 @@ class EventTest extends TestCase
         );
     }
 
-    public function testGetDroppedAttributesCount(): void
+    public function test_get_dropped_attributes_count(): void
     {
         $this->assertSame(
             self::DROPPED_ATTR_CONT,
