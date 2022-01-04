@@ -74,4 +74,4 @@ jobs:
       run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
     - name: Code Coverage
-      run: bash <(curl -s https://codecov.io/bash)
+      run: bash <(curl -s https://codecov.io/bash) -F ${{ matrix.php-version }}
