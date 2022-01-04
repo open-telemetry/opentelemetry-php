@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use Composer\InstalledVersions;
 use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
@@ -32,7 +34,14 @@ class ResourceTest extends TestCase
     {
         $attributes = new Attributes();
         $attributes->setAttribute('name', 'test');
-        $resource = ResourceInfo::create($attributes);
+
+        $resource = (new Detectors\Composite([
+            new Detectors\Constant(ResourceInfo::create($attributes)),
+            new Detectors\Sdk(),
+            new Detectors\SdkProvided(),
+        ]))->getResource();
+
+        $version = InstalledVersions::getVersion('open-telemetry/opentelemetry');
 
         $name = $resource->getAttributes()->get('name');
         $sdkname = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME);
@@ -41,35 +50,42 @@ class ResourceTest extends TestCase
 
         $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_NAME, 'opentelemetry');
         $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_LANGUAGE, 'php');
-        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_VERSION, 'dev');
+        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_VERSION, $version);
         $attributes->setAttribute(ResourceAttributes::SERVICE_NAME, 'unknown_service');
 
         $this->assertEquals($attributes, $resource->getAttributes());
         $this->assertSame('opentelemetry', $sdkname);
         $this->assertSame('php', $sdklanguage);
-        $this->assertSame('dev', $sdkversion);
+        $this->assertSame($version, $sdkversion);
         $this->assertSame('test', $name);
     }
 
     public function test_default_resource(): void
     {
-        $attributes = new Attributes(
-            [
-                ResourceAttributes::TELEMETRY_SDK_NAME => 'opentelemetry',
-                ResourceAttributes::TELEMETRY_SDK_LANGUAGE => 'php',
-                ResourceAttributes::TELEMETRY_SDK_VERSION => 'dev',
-                ResourceAttributes::SERVICE_NAME => 'unknown_service',
-            ]
-        );
-        $resource = ResourceInfo::create(new Attributes());
-        $sdkname = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME);
-        $sdklanguage = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE);
-        $sdkversion = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION);
+        $resource = ResourceInfo::defaultResource();
 
-        $this->assertEquals($attributes, $resource->getAttributes());
-        $this->assertEquals('opentelemetry', $sdkname);
-        $this->assertEquals('php', $sdklanguage);
-        $this->assertEquals('dev', $sdkversion);
+        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::OS_TYPE));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::OS_DESCRIPTION));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::OS_NAME));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::OS_VERSION));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+
+        $this->assertEquals('opentelemetry', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
+        $this->assertEquals('php', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
+        $this->assertEquals('unknown_service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 
     public function test_merge(): void
@@ -82,10 +98,10 @@ class ResourceTest extends TestCase
         $version = $result->getAttributes()->get('version');
         $empty = $result->getAttributes()->get('empty');
 
-        $this->assertCount(7, $result->getAttributes());
+        $this->assertCount(3, $result->getAttributes());
         $this->assertEquals('primary', $name);
         $this->assertEquals('1.0.0', $version);
-        $this->assertEquals('value', $empty);
+        $this->assertEquals('', $empty);
     }
 
     public function test_immutable_create(): void
@@ -109,7 +125,10 @@ class ResourceTest extends TestCase
     public function test_resource_from_environment(string $envAttributes, array $userAttributes, array $expected): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', $envAttributes);
-        $resource = ResourceInfo::create(new Attributes($userAttributes));
+        $resource = (new Detectors\Composite([
+            new Detectors\Constant(ResourceInfo::create(new Attributes($userAttributes))),
+            new Detectors\Env(),
+        ]))->getResource();
         foreach ($expected as $name => $value) {
             $this->assertSame($value, $resource->getAttributes()->get($name));
         }
@@ -133,34 +152,34 @@ class ResourceTest extends TestCase
 
     public function test_resource_service_name_default(): void
     {
-        $resource = ResourceInfo::create(new Attributes([]));
+        $resource = ResourceInfo::defaultResource();
         $this->assertEquals('unknown_service', $resource->getAttributes()->get('service.name'));
     }
 
     public function test_resource_with_empty_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', '');
-        $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::create(new Attributes([])));
+        $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::defaultResource());
     }
 
     public function test_resource_with_invalid_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo');
-        $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::create(new Attributes([])));
+        $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::defaultResource());
     }
 
     public function test_resource_from_environment_service_name_takes_precedence_over_resource_attribute(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=bar');
         $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'foo');
-        $resource = ResourceInfo::create(new Attributes([]));
+        $resource = ResourceInfo::defaultResource();
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
 
     public function test_resource_from_environment_resource_attribute_takes_precedence_over_default(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');
-        $resource = ResourceInfo::create(new Attributes([]));
+        $resource = ResourceInfo::defaultResource();
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
 }

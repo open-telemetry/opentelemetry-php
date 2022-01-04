@@ -153,7 +153,11 @@ class OTLPSpanConverterTest extends TestCase
             ->setResource(
                 ResourceInfo::create(
                     new Attributes([
+                        'telemetry.sdk.name' => 'opentelemetry',
+                        'telemetry.sdk.language' => 'php',
+                        'telemetry.sdk.version' => 'dev',
                         'instance' => 'test-a',
+                        'service.name' => 'unknown_service',
                     ])
                 )
             )
