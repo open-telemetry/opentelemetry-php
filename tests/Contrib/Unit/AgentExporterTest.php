@@ -21,7 +21,10 @@ class AgentExporterTest extends TestCase
             "serviceName", //This isn't realistic I imagine
         );
 
-        $status = $exporter->export([new SpanData()]);
+        $span = (new SpanData())
+                    ->addAttribute('someStringKey', 'someStringValue');
+
+        $status = $exporter->export([$span]);
 
         $this->assertSame(SpanExporterInterface::STATUS_SUCCESS, $status);
 
