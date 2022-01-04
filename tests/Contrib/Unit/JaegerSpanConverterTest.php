@@ -57,13 +57,13 @@ class JaegerSpanConverterTest extends TestCase
         $converter = new SpanConverter('test.name');
         $jtSpan = $converter->convert($span);
 
-        $this->assertSame($jtSpan->tags[0]->key, 'op.status_code');
-        $this->assertSame($jtSpan->tags[0]->vStr, 'Error');
-        $this->assertSame($jtSpan->tags[1]->key, 'op.status_description');
-        $this->assertSame($jtSpan->tags[1]->vStr, 'status_description');
-        $this->assertSame($jtSpan->tags[2]->key, 'keyForBoolean');
-        $this->assertSame($jtSpan->tags[2]->vStr, 'true');
-        $this->assertSame($jtSpan->tags[3]->key, 'keyForArray');
-        $this->assertSame($jtSpan->tags[3]->vStr, '1stElement,2ndElement');
+        $this->assertSame('op.status_code', $jtSpan->tags[0]->key);
+        $this->assertSame('Error', $jtSpan->tags[0]->vStr);
+        $this->assertSame('op.status_description', $jtSpan->tags[1]->key);
+        $this->assertSame('status_description', $jtSpan->tags[1]->vStr);
+        $this->assertSame('keyForBoolean', $jtSpan->tags[2]->key);
+        $this->assertSame('true', $jtSpan->tags[2]->vStr);
+        $this->assertSame('keyForArray', $jtSpan->tags[3]->key);
+        $this->assertSame('1stElement,2ndElement', $jtSpan->tags[3]->vStr);
     }
 }
