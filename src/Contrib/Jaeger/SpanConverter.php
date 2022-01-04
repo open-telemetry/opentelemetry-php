@@ -26,8 +26,7 @@ class SpanConverter
     /**
     * Convert span to Jaeger Thrift Span format
     */
-
-    public function convert(SpanDataInterface $span)
+    public function convert(SpanDataInterface $span): JTSpan
     {
         $references = $tags = $logs = [];
         $startTime = (int) ($span->getStartEpochNanos() / 1e3); // microseconds
@@ -77,7 +76,7 @@ class SpanConverter
         ]);
     }
 
-    private function sanitiseTagValue($value)
+    private function sanitiseTagValue($value): string
     {
         // Casting false to string makes an empty string
         if (is_bool($value)) {
