@@ -45,6 +45,8 @@ class SpanConverter
         $parentSpanId = $span->getParentSpanId();
         $spanId = $span->getContext()->getSpanID();
 
+        //TODO - determine if any of the below commented out code is still needed
+
         // foreach ($span->getEvents() as $event) {
         //     $logs = [
         //         'timestamp' => (int) ($event->getTimestamp() / 1e3), // RealtimeClock in microseconds
@@ -98,7 +100,7 @@ class SpanConverter
         return (string) $value;
     }
 
-    private function buildTags($tagPairs)
+    private function buildTags(array $tagPairs)
     {
         $tags = [];
         foreach ($tagPairs as $key => $value) {
@@ -108,42 +110,50 @@ class SpanConverter
         return $tags;
     }
 
-    private function buildTag($key, $value)
+    private function buildTag(string $key, string $value)
     {
-        if (is_bool($value)) {
-            return new Tag([
-                'key' => $key,
-                'vType' => TagType::BOOL,
-                'vBool' => $value,
-            ]);
-        } elseif (is_string($value)) {
-            return new Tag([
-                'key' => $key,
-                'vType' => TagType::STRING,
-                'vStr' => $value,
-            ]);
-        } elseif (null === $value) {
-            return new Tag([
-                'key' => $key,
-                'vType' => TagType::STRING,
-                'vStr' => '',
-            ]);
-        } elseif (is_integer($value)) {
-            return new Tag([
-                'key' => $key,
-                'vType' => TagType::LONG,
-                'vLong' => $value,
-            ]);
-        } elseif (is_numeric($value)) {
-            return new Tag([
-                'key' => $key,
-                'vType' => TagType::DOUBLE,
-                'vDouble' => $value,
-            ]);
-        }
+        return new Tag([
+            'key' => $key,
+            'vType' => TagType::STRING,
+            'vStr' => $value,
+        ]);
 
-        error_log('Cannot build tag for ' . $key . ' of type ' . gettype($value));
+        //TODO - determine if any of this additional handling is still needed, or if it's all dead-code (i.e. $value must be a string at this point always)
 
-        throw new \Exception('unsupported tag type');
+        // if (is_bool($value)) {
+        //     return new Tag([
+        //         'key' => $key,
+        //         'vType' => TagType::BOOL,
+        //         'vBool' => $value,
+        //     ]);
+        // } elseif (is_string($value)) {
+        //     return new Tag([
+        //         'key' => $key,
+        //         'vType' => TagType::STRING,
+        //         'vStr' => $value,
+        //     ]);
+        // } elseif (null === $value) {
+        //     return new Tag([
+        //         'key' => $key,
+        //         'vType' => TagType::STRING,
+        //         'vStr' => '',
+        //     ]);
+        // } elseif (is_integer($value)) {
+        //     return new Tag([
+        //         'key' => $key,
+        //         'vType' => TagType::LONG,
+        //         'vLong' => $value,
+        //     ]);
+        // } elseif (is_numeric($value)) {
+        //     return new Tag([
+        //         'key' => $key,
+        //         'vType' => TagType::DOUBLE,
+        //         'vDouble' => $value,
+        //     ]);
+        // }
+
+        // error_log('Cannot build tag for ' . $key . ' of type ' . gettype($value));
+
+        // throw new \Exception('unsupported tag type');
     }
 } 
