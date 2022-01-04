@@ -23,8 +23,7 @@ class JaegerSpanConverterTest extends TestCase
         $span = (new SpanData())
                     ->setName('otlpSpanName');    
 
-        $converter = new SpanConverter('test.name');
-        $jtSpan = $converter->convert($span);
+        $jtSpan = (new SpanConverter('unused'))->convert($span);
  
         $this->assertSame('00000000000000000000000000000000', $jtSpan->traceIdLow);
         $this->assertSame(0, $jtSpan->traceIdHigh);
@@ -54,8 +53,7 @@ class JaegerSpanConverterTest extends TestCase
             ->addAttribute('keyForBoolean', true)
             ->addAttribute('keyForArray', ['1stElement', '2ndElement']);
 
-        $converter = new SpanConverter('test.name');
-        $jtSpan = $converter->convert($span);
+        $jtSpan = (new SpanConverter('unused'))->convert($span);
 
         $this->assertSame('op.status_code', $jtSpan->tags[0]->key);
         $this->assertSame('Error', $jtSpan->tags[0]->vStr);
