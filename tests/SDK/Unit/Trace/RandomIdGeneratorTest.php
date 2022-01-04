@@ -10,10 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class RandomIdGeneratorTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function GeneratedTraceIdIsValid()
+    public function test_generated_trace_id_is_valid(): void
     {
         $idGenerator = new RandomIdGenerator();
         $traceId = $idGenerator->generateTraceId();
@@ -21,10 +18,7 @@ class RandomIdGeneratorTest extends TestCase
         $this->assertEquals(1, preg_match(SpanContext::VALID_TRACE, $traceId));
     }
 
-    /**
-     * @test
-     */
-    public function generatedSpanIdIsValid()
+    public function test_generated_span_id_is_valid(): void
     {
         $idGenerator = new RandomIdGenerator();
         $spanId = $idGenerator->generateSpanId();
@@ -32,10 +26,7 @@ class RandomIdGeneratorTest extends TestCase
         $this->assertEquals(1, preg_match(SpanContext::VALID_SPAN, $spanId));
     }
 
-    /**
-     * @test
-     */
-    public function fallbackAlgorithm()
+    public function test_fallback_algorithm(): void
     {
         $idGenerator = new RandomIdGenerator();
         $reflection = new \ReflectionClass(RandomIdGenerator::class);

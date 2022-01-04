@@ -19,10 +19,9 @@ class SamplerFactoryTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider samplerProvider
      */
-    public function samplerFactory_createSamplerFromEnvironment(string $samplerName, string $expected, string $arg = null)
+    public function test_sampler_factory_create_sampler_from_environment(string $samplerName, string $expected, string $arg = null): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $samplerName);
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);
@@ -43,10 +42,9 @@ class SamplerFactoryTest extends TestCase
         ];
     }
     /**
-     * @test
      * @dataProvider invalidSamplerProvider
      */
-    public function samplerFactory_throwsExceptionForInvalidOrUnsupported(?string $sampler, string $arg = null)
+    public function test_sampler_factory_throws_exception_for_invalid_or_unsupported(?string $sampler, string $arg = null): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $sampler);
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);

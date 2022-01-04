@@ -19,10 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 class TracerTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function noopSpanShouldBeStartedWhenSamplingResultIsDrop(): void
+    public function test_noop_span_should_be_started_when_sampling_result_is_drop(): void
     {
         $alwaysOffSampler = new AlwaysOffSampler();
         $processor = $this->createMock(SpanProcessorInterface::class);
@@ -36,10 +33,7 @@ class TracerTest extends TestCase
         $this->assertNotEquals(API\SpanContextInterface::TRACE_FLAG_SAMPLED, $span->getContext()->getTraceFlags());
     }
 
-    /**
-     * @test
-     */
-    public function samplerMayOverrideParentsTraceState(): void
+    public function test_sampler_may_override_parents_trace_state(): void
     {
         $parentTraceState = new TraceState('orig-key=orig_value');
         $parentContext = (new Context())
@@ -71,10 +65,7 @@ class TracerTest extends TestCase
         $this->assertEquals($newTraceState, $span->getContext()->getTraceState());
     }
 
-    /**
-     * @test
-     */
-    public function spanShouldReceiveInstrumentationLibrary(): void
+    public function test_span_should_receive_instrumentation_library(): void
     {
         $tracerProvider = new TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest', 'dev');

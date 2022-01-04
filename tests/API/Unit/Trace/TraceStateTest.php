@@ -9,20 +9,14 @@ use PHPUnit\Framework\TestCase;
 
 class TraceStateTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function testGetTracestateValue()
+    public function test_get_tracestate_value(): void
     {
         $tracestate = new TraceState('vendor1=value1');
 
         $this->assertSame('value1', $tracestate->get('vendor1'));
     }
 
-    /**
-     * @test
-     */
-    public function testWithTracestateValue()
+    public function test_with_tracestate_value(): void
     {
         $tracestate = new TraceState('vendor1=value1');
         $tracestateWithNewValue = $tracestate->with('vendor2', 'value2');
@@ -52,10 +46,7 @@ class TraceStateTest extends TestCase
         $this->assertSame((string) $tracestate, (string) $tracestateWithInvalidValue);
     }
 
-    /**
-     * @test
-     */
-    public function testWithoutTracestateValue()
+    public function test_without_tracestate_value(): void
     {
         $tracestate = new TraceState('vendor1=value1,vendor2=value2');
         $tracestateWithoutNewValue = $tracestate->without('vendor1');
@@ -66,10 +57,7 @@ class TraceStateTest extends TestCase
         $this->assertSame('value2', $tracestate->get('vendor2'));
     }
 
-    /**
-     * @test
-     */
-    public function testToStringTracestate()
+    public function test_to_string_tracestate(): void
     {
         $tracestate = new TraceState('vendor1=value1');
         $emptyTracestate = new TraceState();
@@ -79,10 +67,7 @@ class TraceStateTest extends TestCase
         $this->assertEmpty((string) $emptyTracestate);
     }
 
-    /**
-     * @test
-     */
-    public function testMaxTracestateListMembers()
+    public function test_max_tracestate_list_members(): void
     {
         // Build a tracestate with the max 32 values. Ex '0=0,1=1,...,31=31'
         $rawTraceState = range(0, TraceState::MAX_TRACESTATE_LIST_MEMBERS - 1);
@@ -107,10 +92,7 @@ class TraceStateTest extends TestCase
         $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, $truncatedTracestate->getListMemberCount());
     }
 
-    /**
-     * @test
-     */
-    public function testMaxTracestateLength()
+    public function test_max_tracestate_length(): void
     {
         // Build a vendor key with a length of 256 characters. The max characters allowed.
         $vendorKey = \str_repeat('k', TraceState::MAX_TRACESTATE_LENGTH / 2);
@@ -133,10 +115,7 @@ class TraceStateTest extends TestCase
         $this->assertSame($rawTraceState, (string) $validTracestate);
     }
 
-    /**
-     * @test
-     */
-    public function testValidateKey()
+    public function test_validate_key(): void
     {
         // Valid keys
         $validKeys = 'a-b=1,c*d=2,e/f=3,g_h=4,01@i-j=5';
@@ -178,10 +157,7 @@ class TraceStateTest extends TestCase
         $this->assertNull($tracestate->get($invalidKey));
     }
 
-    /**
-     * @test
-     */
-    public function testvalidateValue()
+    public function test_validate_value(): void
     {
         // Tests values are within the range of 0x20 to 0x7E characters
         $tracestate =   'char1=value' . chr(0x19) . '1'

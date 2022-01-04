@@ -48,7 +48,7 @@ class ConsoleSpanExporterTest extends AbstractExporterTest
         ],],
     ];
 
-    public function testExportSuccess(): void
+    public function test_export_success(): void
     {
         $converter = $this->createMock(SpanConverterInterface::class);
         $converter->expects($this->once())
@@ -67,7 +67,7 @@ class ConsoleSpanExporterTest extends AbstractExporterTest
         ob_end_clean();
     }
 
-    public function testExportFailed(): void
+    public function test_export_failed(): void
     {
         $resource = fopen('php://stdin', 'rb');
         $converter = $this->createMock(SpanConverterInterface::class);
@@ -88,7 +88,7 @@ class ConsoleSpanExporterTest extends AbstractExporterTest
         fclose($resource);
     }
 
-    public function testExportOutput(): void
+    public function test_export_output(): void
     {
         try {
             $expected = json_encode(self::TEST_DATA, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT) . PHP_EOL;
@@ -108,7 +108,7 @@ class ConsoleSpanExporterTest extends AbstractExporterTest
         ]);
     }
 
-    public function testFromConnectionString(): void
+    public function test_from_connection_string(): void
     {
         $this->assertInstanceOf(
             ConsoleSpanExporter::class,

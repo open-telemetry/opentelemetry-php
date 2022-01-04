@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class UsesSpanConverterTraitTest extends TestCase
 {
-    public function testAccessors(): void
+    public function test_accessors(): void
     {
         $instance = $this->createInstance();
         $converter = $this->createSpanConverterInterfaceMock();
@@ -24,7 +24,7 @@ class UsesSpanConverterTraitTest extends TestCase
         );
     }
 
-    public function testFallbackConverter(): void
+    public function test_fallback_converter(): void
     {
         $this->assertInstanceOf(
             NullSpanConverter::class,

@@ -76,7 +76,7 @@ class FriendlySpanConverterTest extends TestCase
         ],
     ];
 
-    public function testConvert(): void
+    public function test_convert(): void
     {
         $this->assertEquals(
             self::TEST_DATA,

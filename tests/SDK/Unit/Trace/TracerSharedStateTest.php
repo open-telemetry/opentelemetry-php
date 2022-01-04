@@ -53,7 +53,7 @@ class TracerSharedStateTest extends MockeryTestCase
         );
     }
 
-    public function test_construct_noSpanProcessors(): void
+    public function test_construct_no_span_processors(): void
     {
         $this->assertInstanceOf(
             NoopSpanProcessor::class,
@@ -61,7 +61,7 @@ class TracerSharedStateTest extends MockeryTestCase
         );
     }
 
-    public function test_construct_oneSpanProcessor(): void
+    public function test_construct_one_span_processor(): void
     {
         $processor = Mockery::mock(SpanProcessorInterface::class);
 
@@ -71,7 +71,7 @@ class TracerSharedStateTest extends MockeryTestCase
         );
     }
 
-    public function test_construct_multipleSpanProcessors(): void
+    public function test_construct_multiple_span_processors(): void
     {
         $processor1 = Mockery::mock(SpanProcessorInterface::class);
         $processor2 = Mockery::mock(SpanProcessorInterface::class);

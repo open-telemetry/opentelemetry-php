@@ -12,10 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class ZipkinToNewrelicSpanConverterTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function shouldConvertASpanToAPayloadForZipkin()
+    public function test_should_convert_a_span_to_a_payload_for_zipkin(): void
     {
         $span = (new SpanData())
             ->setName('guard.validate')
@@ -46,10 +43,7 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
         $this->assertSame(1505855799433901, $annotation['timestamp']);
     }
 
-    /**
-     * @test
-     */
-    public function tagsAreCoercedCorrectlyToStrings()
+    public function test_tags_are_coerced_correctly_to_strings(): void
     {
         $listOfStrings = ['string-1', 'string-2'];
         $listOfNumbers = [1, 2, 3, 3.1415, 42];

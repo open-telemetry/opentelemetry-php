@@ -17,21 +17,21 @@ abstract class AbstractExporterTest extends TestCase
      */
     abstract public function createExporter(): SpanExporterInterface;
 
-    public function testShutdown(): void
+    public function test_shutdown(): void
     {
         $this->assertTrue(
             $this->createExporter()->shutdown()
         );
     }
 
-    public function testForceFlush(): void
+    public function test_force_flush(): void
     {
         $this->assertTrue(
             $this->createExporter()->forceFlush()
         );
     }
 
-    public function testFailsIfNotRunning(): void
+    public function test_fails_if_not_test_running(): void
     {
         $exporter = $this->createExporter();
 
@@ -41,7 +41,7 @@ abstract class AbstractExporterTest extends TestCase
         $this->assertSame(SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
 
-    public function testExportEmptySpanCollection(): void
+    public function test_export_empty_span_collection(): void
     {
         $this->assertEquals(
             SpanExporterInterface::STATUS_SUCCESS,

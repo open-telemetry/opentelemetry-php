@@ -18,7 +18,7 @@ class HasLabelTest extends TestCase
         };
     }
 
-    public function testHasLabelAcceptsValues()
+    public function test_has_label_accepts_values(): void
     {
         $this->assertEmpty($this->labelable->getLabels());
 
@@ -29,7 +29,7 @@ class HasLabelTest extends TestCase
         $this->assertSame($expected, $this->labelable->getLabels());
     }
 
-    public function testHasLabelAcceptsOnlyStrings()
+    public function test_has_label_accepts_only_strings(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 

@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class ScopeTest extends TestCase
 {
-    public function testScopeCloseRestoresContext(): void
+    public function test_scope_close_restores_context(): void
     {
         $key = new ContextKey();
         $ctx = (new Context())->with($key, 'test');
@@ -24,7 +24,7 @@ class ScopeTest extends TestCase
         $this->assertNull(Context::getValue($key));
     }
 
-    public function testNestedScope(): void
+    public function test_nested_scope(): void
     {
         $key = new ContextKey();
         $ctx1 = (new Context())->with($key, 'test1');
@@ -42,7 +42,7 @@ class ScopeTest extends TestCase
         $this->assertNull(Context::getValue($key));
     }
 
-    public function testDetachedScopeDetach(): void
+    public function test_detached_scope_detach(): void
     {
         $scope1 = Context::attach(Context::getCurrent());
 
@@ -50,7 +50,7 @@ class ScopeTest extends TestCase
         $this->assertSame(ScopeInterface::DETACHED, $scope1->detach() & ScopeInterface::DETACHED); // @phpstan-ignore-line
     }
 
-    public function testOrderMismatchScopeDetach(): void
+    public function test_order_mismatch_scope_detach(): void
     {
         $scope1 = Context::attach(Context::getCurrent());
         $scope2 = Context::attach(Context::getCurrent());
@@ -59,7 +59,7 @@ class ScopeTest extends TestCase
         $this->assertSame(0, $scope2->detach());
     }
 
-    public function testInactiveScopeDetach(): void
+    public function test_inactive_scope_detach(): void
     {
         $scope1 = Context::attach(Context::getCurrent());
 

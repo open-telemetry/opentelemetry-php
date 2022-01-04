@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class TracerProviderTest extends TestCase
 {
-    public function testReusesSameInstance(): void
+    public function test_reuses_same_instance(): void
     {
         $provider = new TracerProvider(null);
 
@@ -29,7 +29,7 @@ class TracerProviderTest extends TestCase
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function test_tracerProvider_returnsNoopTracerIfNoDefaultIsSet(): void
+    public function test_tracer_provider_returns_noop_tracer_if_no_default_is_set(): void
     {
         $this->assertInstanceOf(NoopTracer::class, TracerProvider::getDefaultTracer());
     }
@@ -38,14 +38,14 @@ class TracerProviderTest extends TestCase
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function test_tracerProvider_acceptsDefaultTracer(): void
+    public function test_tracer_provider_accepts_default_tracer(): void
     {
         $tracer = $this->getMockBuilder(API\TracerInterface::class)->getMock();
         TracerProvider::setDefaultTracer($tracer);
         $this->assertSame($tracer, TracerProvider::getDefaultTracer());
     }
 
-    public function testGetTracerWithDefaultName(): void
+    public function test_get_tracer_with_default_name(): void
     {
         $provider = new TracerProvider(null);
 
@@ -55,7 +55,7 @@ class TracerProviderTest extends TestCase
         $this->assertSame($t1, $t2);
     }
 
-    public function testShutDown(): void
+    public function test_shut_down(): void
     {
         $provider = new TracerProvider(null);
 
@@ -64,7 +64,7 @@ class TracerProviderTest extends TestCase
         $this->assertTrue($provider->shutdown());
     }
 
-    public function testForceFlush(): void
+    public function test_force_flush(): void
     {
         $provider = new TracerProvider([]);
 
@@ -73,7 +73,7 @@ class TracerProviderTest extends TestCase
         $this->assertTrue($provider->forceFlush());
     }
 
-    public function testGetSampler(): void
+    public function test_get_sampler(): void
     {
         $sampler = $this->createMock(SamplerInterface::class);
         $provider = new TracerProvider([], $sampler);
@@ -84,7 +84,7 @@ class TracerProviderTest extends TestCase
         );
     }
 
-    public function testGetTracerAfterShutdown(): void
+    public function test_get_tracer_after_shutdown(): void
     {
         $provider = new TracerProvider([]);
         $provider->shutdown();

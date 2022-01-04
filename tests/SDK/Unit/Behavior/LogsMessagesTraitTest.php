@@ -28,11 +28,10 @@ class LogsMessagesTraitTest extends TestCase
     }
 
     /**
-     * @test
      * @testdox Proxies logging methods through to logger
      * @dataProvider logLevelProvider
      */
-    public function testLogMethods(string $method, string $expectedLogLevel): void
+    public function test_log_methods(string $method, string $expectedLogLevel): void
     {
         $instance = $this->createInstance();
         $this->logger->expects($this->once())->method('log')->with(

@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class CounterTest extends TestCase
 {
-    public function testCounterIncrements()
+    public function test_counter_increments(): void
     {
         $counter = new Counter('some_counter');
 
@@ -20,7 +20,7 @@ class CounterTest extends TestCase
         $this->assertSame(1, $counter->getValue());
     }
 
-    public function testCounterDoesNotAcceptNegativeNumbers()
+    public function test_counter_does_not_accept_negative_numbers(): void
     {
         $counter = new Counter('some_counter');
 

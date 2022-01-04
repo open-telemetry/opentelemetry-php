@@ -14,20 +14,14 @@ class SpanLimitsBuilderTest extends TestCase
 {
     use EnvironmentVariables;
 
-    /**
-     * @test
-     */
-    public function spanLimitsBuilder_usesDefaultValues()
+    public function test_span_limits_builder_uses_default_values(): void
     {
         $builder = new SpanLimitsBuilder();
         $spanLimits = $builder->build();
         $this->assertEquals(SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT, $spanLimits->getAttributeLimits()->getAttributeCountLimit());
     }
 
-    /**
-     * @test
-     */
-    public function spanLimitsBuilder_usesEnvironmentVariable()
+    public function test_span_limits_builder_uses_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 111);
         $builder = new SpanLimitsBuilder();
@@ -35,10 +29,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(111, $spanLimits->getAttributeLimits()->getAttributeCountLimit());
     }
 
-    /**
-     * @test
-     */
-    public function spanLimitsBuilder_usesConfiguredValue()
+    public function test_span_limits_builder_uses_configured_value(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 111);
         $builder = new SpanLimitsBuilder();
@@ -47,10 +38,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(222, $spanLimits->getAttributeLimits()->getAttributeCountLimit());
     }
 
-    /**
-     * @test
-     */
-    public function spanLimitsBuilder_throwsExceptionOnInvalidValueFromEnvironment()
+    public function test_span_limits_builder_throws_exception_on_invalid_value_from_environment(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 'fruit');
         $builder = new SpanLimitsBuilder();

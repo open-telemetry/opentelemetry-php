@@ -23,11 +23,10 @@ class SpanProcessorFactoryTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider processorProvider
      * @psalm-suppress ArgumentTypeCoercion
      */
-    public function spanProcessorFactory_createSpanProcessorFromEnvironment(string $processorName, string $expected)
+    public function test_span_processor_factory_create_span_processor_from_environment(string $processorName, string $expected): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_TRACES_PROCESSOR', $processorName);
         $factory = new SpanProcessorFactory();
@@ -43,10 +42,9 @@ class SpanProcessorFactoryTest extends TestCase
         ];
     }
     /**
-     * @test
      * @dataProvider invalidProcessorProvider
      */
-    public function spanProcessorFactory_invalidSpanProcessor(?string $processor)
+    public function test_span_processor_factory_invalid_span_processor(?string $processor): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_TRACES_PROCESSOR', $processor);
         $factory = new SpanProcessorFactory();
@@ -54,6 +52,7 @@ class SpanProcessorFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $factory->fromEnvironment($exporter);
     }
+
     public function invalidProcessorProvider()
     {
         return [

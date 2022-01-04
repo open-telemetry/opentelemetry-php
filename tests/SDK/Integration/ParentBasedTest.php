@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class ParentBasedTest extends TestCase
 {
-    public function testParentBasedRootSpan(): void
+    public function test_parent_based_root_span(): void
     {
         $rootSampler = $this->createMockSamplerInvokedOnce(SamplingResult::RECORD_AND_SAMPLE);
 
@@ -31,7 +31,7 @@ class ParentBasedTest extends TestCase
     /**
      * @dataProvider parentContextData
      */
-    public function testParentBased(
+    public function test_parent_based(
         $parentContext,
         ?SamplerInterface $remoteParentSampled = null,
         ?SamplerInterface $remoteParentNotSampled = null,
@@ -73,7 +73,7 @@ class ParentBasedTest extends TestCase
         ];
     }
 
-    public function testParentBasedDescription(): void
+    public function test_parent_based_description(): void
     {
         $rootSampler = $this->createMock(SamplerInterface::class);
         $rootSampler->expects($this->once())->method('getDescription')->willReturn('Foo');

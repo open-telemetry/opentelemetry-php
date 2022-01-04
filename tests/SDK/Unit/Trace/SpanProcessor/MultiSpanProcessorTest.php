@@ -15,7 +15,7 @@ class MultiSpanProcessorTest extends TestCase
 {
     private array $spanProcessors = [];
 
-    public function testGetSpanProcessors(): void
+    public function test_get_span_processors(): void
     {
         $this->assertEquals(
             $this->getSpanProcessors(),
@@ -23,7 +23,7 @@ class MultiSpanProcessorTest extends TestCase
         );
     }
 
-    public function testAddSpanProcessor(): void
+    public function test_add_span_processor(): void
     {
         $multiProcessor = $this->createMultiSpanProcessor();
         $processor = $this->createMock(SpanProcessorInterface::class);
@@ -39,7 +39,7 @@ class MultiSpanProcessorTest extends TestCase
         );
     }
 
-    public function testOnStart(): void
+    public function test_on_start(): void
     {
         /** @var MockObject $processor */
         foreach ($this->getSpanProcessors() as $processor) {
@@ -53,7 +53,7 @@ class MultiSpanProcessorTest extends TestCase
             );
     }
 
-    public function testOnEnd(): void
+    public function test_on_end(): void
     {
         /** @var MockObject $processor */
         foreach ($this->getSpanProcessors() as $processor) {
@@ -67,7 +67,7 @@ class MultiSpanProcessorTest extends TestCase
             );
     }
 
-    public function testShutdown(): void
+    public function test_shutdown(): void
     {
         /** @var MockObject $processor */
         foreach ($this->getSpanProcessors() as $processor) {
@@ -82,7 +82,7 @@ class MultiSpanProcessorTest extends TestCase
         );
     }
 
-    public function testShutdownOneFailed(): void
+    public function test_shutdown_one_failed(): void
     {
         /** @var MockObject $processor */
         foreach ($this->getSpanProcessors() as $i => $processor) {
@@ -97,7 +97,7 @@ class MultiSpanProcessorTest extends TestCase
         );
     }
 
-    public function testForceFlush(): void
+    public function test_force_flush(): void
     {
         /** @var MockObject $processor */
         foreach ($this->getSpanProcessors() as $processor) {
@@ -112,7 +112,7 @@ class MultiSpanProcessorTest extends TestCase
         );
     }
 
-    public function testForceFlushOneFailed(): void
+    public function test_force_flush_one_failed(): void
     {
         /** @var MockObject $processor */
         foreach ($this->getSpanProcessors() as $i => $processor) {

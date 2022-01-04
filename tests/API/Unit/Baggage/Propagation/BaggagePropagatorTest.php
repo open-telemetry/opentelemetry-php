@@ -20,7 +20,7 @@ class BaggagePropagatorTest extends TestCase
         );
     }
 
-    public function test_inject_emptyBaggage(): void
+    public function test_inject_empty_baggage(): void
     {
         $carrier = [];
 
@@ -50,7 +50,7 @@ class BaggagePropagatorTest extends TestCase
         );
     }
 
-    public function test_inject_encodesValue(): void
+    public function test_inject_encodes_value(): void
     {
         $carrier = [];
 
@@ -73,7 +73,7 @@ class BaggagePropagatorTest extends TestCase
         );
     }
 
-    public function test_extract_missingHeader(): void
+    public function test_extract_missing_header(): void
     {
         $this->assertEquals(
             Context::getRoot(),

@@ -31,11 +31,10 @@ class TracerProviderFactoryTest extends TestCase
     }
 
     /**
-     * @test
      * @covers ::create
      * @covers ::__construct
      */
-    public function factory_createsTracer()
+    public function test_factory_creates_tracer(): void
     {
         $exporterFactory = $this->createMock(ExporterFactory::class);
         $samplerFactory = $this->createMock(SamplerFactory::class);
@@ -50,10 +49,9 @@ class TracerProviderFactoryTest extends TestCase
     }
 
     /**
-     * @test
      * @covers ::create
      */
-    public function factory_logsWarningsAndContinues(): void
+    public function test_factory_logs_warnings_and_continues(): void
     {
         $exporterFactory = $this->createMock(ExporterFactory::class);
         $samplerFactory = $this->createMock(SamplerFactory::class);

@@ -32,7 +32,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
     /**
      * @psalm-suppress UndefinedConstant
      */
-    public function testExporterHappyPath(): void
+    public function test_exporter_happy_path(): void
     {
         $exporter = new Exporter(
             //These first parameters were copied from the constructor's default values
@@ -57,7 +57,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertSame(SpanExporterInterface::STATUS_SUCCESS, $exporterStatusCode);
     }
 
-    public function testExporterUnexpectedGrpcResponseStatus(): void
+    public function test_exporter_unexpected_grpc_response_status(): void
     {
         $exporter = new Exporter(
             //These first parameters were copied from the constructor's default values
@@ -82,19 +82,19 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertSame(SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE, $exporterStatusCode);
     }
 
-    public function testExporterGrpcRespondsAsUnavailable(): void
+    public function test_exporter_grpc_responds_as_unavailable(): void
     {
         $this->assertEquals(SpanExporterInterface::STATUS_FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
     }
 
-    public function testRefusesInvalidHeaders(): void
+    public function test_refuses_invalid_headers(): void
     {
         $foo = new Exporter('localhost:4317', true, '', 'a:bc');
 
         $this->assertEquals([], $foo->getHeaders());
     }
 
-    public function testSetHeadersWithEnvironmentVariables(): void
+    public function test_set_headers_with_environment_variables(): void
     {
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_HEADERS', 'x-aaa=foo,x-bbb=barf');
 
@@ -103,7 +103,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['barf']], $exporter->getHeaders());
     }
 
-    public function testSetHeadersInConstructor(): void
+    public function test_set_headers_in_constructor(): void
     {
         $exporter = new Exporter('localhost:4317', true, '', 'x-aaa=foo,x-bbb=bar');
 
@@ -114,10 +114,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar'], 'key' => ['value']], $exporter->getHeaders());
     }
 
-    /**
-     * @test
-     */
-    public function shouldBeOkToExporterEmptySpansCollection(): void
+    public function test_should_be_ok_to_exporter_empty_spans_collection(): void
     {
         $this->assertEquals(
             SpanExporterInterface::STATUS_SUCCESS,
@@ -125,7 +122,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         );
     }
 
-    public function testHeadersShouldRefuseArray(): void
+    public function test_headers_should_refuse_array(): void
     {
         $headers = [
             'key' => ['value'],
@@ -136,7 +133,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         (new Exporter())->metadataFromHeaders($headers);
     }
 
-    public function testMetadataFromHeaders(): void
+    public function test_metadata_from_headers(): void
     {
         $metadata = (new Exporter())->metadataFromHeaders('key=value');
         $this->assertEquals(['key' => ['value']], $metadata);
@@ -154,7 +151,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         return $property->getValue($exporter);
     }
 
-    public function testClientOptions()
+    public function test_client_options(): void
     {
         // default options
         $exporter = new Exporter('localhost:4317');
@@ -223,7 +220,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         return $mockClient;
     }
 
-    public function testFromConnectionString(): void
+    public function test_from_connection_string(): void
     {
         $this->assertNotSame(
             Exporter::fromConnectionString(),

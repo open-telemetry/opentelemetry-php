@@ -49,13 +49,13 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $this->simpleSpanProcessor = new SimpleSpanProcessor($this->spanExporter);
     }
 
-    public function test_onStart(): void
+    public function test_on_start(): void
     {
         $this->simpleSpanProcessor->onStart($this->readWriteSpan, Context::getRoot());
         $this->spanExporter->shouldNotReceive('export');
     }
 
-    public function test_onEnd_sampledSpan(): void
+    public function test_on_end_sampled_span(): void
     {
         $spanData = new SpanData();
         $this->readableSpan->expects('getContext')->andReturn($this->sampledSpanContext);
@@ -64,7 +64,7 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $this->simpleSpanProcessor->onEnd($this->readableSpan);
     }
 
-    public function test_onEnd_nonSampledSpan(): void
+    public function test_on_end_non_sampled_span(): void
     {
         $this->readableSpan->expects('getContext')->andReturn($this->nonSampledSpanContext);
         $this->spanExporter->shouldNotReceive('export');
@@ -74,7 +74,7 @@ class SimpleSpanProcessorTest extends MockeryTestCase
 
     // TODO: Add test to ensure exporter is retried on failure.
 
-    public function test_forceFlush(): void
+    public function test_force_flush(): void
     {
         $this->assertTrue($this->simpleSpanProcessor->forceFlush());
     }
