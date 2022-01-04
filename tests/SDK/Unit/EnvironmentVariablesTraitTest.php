@@ -98,7 +98,7 @@ class EnvironmentVariablesTraitTest extends TestCase
     /**
      * @dataProvider booleanProvider
      */
-    public function environment_variables_bool_get(string $input, bool $default, bool $expected)
+    public function test_environment_variables_bool_get(string $input, bool $default, bool $expected)
     {
         $mock = new MockWithTrait();
         $this->setEnvironmentVariable('OTEL_BOOL', $input);

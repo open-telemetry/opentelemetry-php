@@ -81,7 +81,7 @@ class BaggageTest extends TestCase
         $this->assertSame('meta', $entry->getMetadata()->getValue());
     }
 
-    public function test_get_entry_presentNoMetadata(): void
+    public function test_get_entry_present_no_metadata(): void
     {
         /** @var Entry $entry */
         $entry = Baggage::getBuilder()->set('foo', 10)->build()->getEntry('foo');

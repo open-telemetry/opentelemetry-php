@@ -76,7 +76,7 @@ class LoggerExporterTest extends AbstractExporterTest
      * @psalm-suppress PossiblyUndefinedMethod
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function test_loggerThrowsException(): void
+    public function test_logger_throws_exception(): void
     {
         $this->getLoggerInterfaceMock()
             ->method('log')
