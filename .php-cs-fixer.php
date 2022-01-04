@@ -16,6 +16,7 @@ return $config->setRules([
     'modernize_types_casting' => true,
     'ordered_imports' => true,
     'php_unit_construct' => true,
+    'php_unit_method_casing' => ['case' => 'snake_case'],
     'single_line_comment_style' => true,
     'yoda_style' => false,
     '@PSR2' => true,
