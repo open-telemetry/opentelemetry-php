@@ -18,6 +18,30 @@ class JaegerSpanConverterTest extends TestCase
     /**
      * @test
      */
+    public function shouldConvertAnOTLPSpanToAJaegerThriftSpan()
+    {
+        $span = (new SpanData())
+                    ->setName('otlpSpanName');    
+
+        $converter = new SpanConverter('test.name');
+        $jtSpan = $converter->convert($span);
+ 
+        $this->assertSame('00000000000000000000000000000000', $jtSpan->traceIdLow);
+        $this->assertSame(0, $jtSpan->traceIdHigh);
+        $this->assertSame('0000000000000000', $jtSpan->spanId);
+        $this->assertSame('0000000000000000', $jtSpan->parentSpanId);
+        $this->assertSame('otlpSpanName', $jtSpan->operationName);
+        $this->assertSame([], $jtSpan->references);
+        $this->assertSame(0, $jtSpan->flags);
+        $this->assertSame(1505855794194009, $jtSpan->startTime);
+        $this->assertSame(5271716, $jtSpan->duration);
+        //See test below for structure of $jtSpan->tags
+        $this->assertSame([], $jtSpan->logs);
+    }
+
+    /**
+     * @test
+     */
     public function shouldCorrectlyGenerateJaegerThriftTags()
     {
         $span = (new SpanData())
