@@ -70,8 +70,11 @@ jobs:
     - name: Run Phpstan
       run: vendor/bin/phpstan analyse --error-format=github
 
-    - name: Run PHPUnit
-      run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+    - name: Run PHPUnit (unit tests)
+      run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover --testsuite unit
+
+    - name: Run PHPUnit (integration tests)
+      run: vendor/bin/phpunit --testsuite integration
 
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash) -F ${{ matrix.php-version }}
