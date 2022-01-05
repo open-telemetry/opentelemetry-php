@@ -233,7 +233,7 @@ To run the test suite, execute
 make test
 ```
 from your bash compatible shell.  This will output the test output as well
-as a test coverage analysis.  Code that doesn't pass our currently defined tests will emit a failure in CI
+as a test coverage analysis (text + html - see `tests/coverage/html`).  Code that doesn't pass our currently defined tests will emit a failure in CI
 
 ## Examples
 
