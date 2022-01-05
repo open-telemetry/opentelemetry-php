@@ -16,7 +16,7 @@ use function trim;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/sdk.md#specifying-resource-information-via-an-environment-variable
  */
-final class Env implements ResourceDetectorInterface
+final class Environment implements ResourceDetectorInterface
 {
     public function getResource(): ResourceInfo
     {

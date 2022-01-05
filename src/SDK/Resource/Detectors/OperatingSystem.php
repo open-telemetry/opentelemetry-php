@@ -16,7 +16,7 @@ use function strtolower;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.8.0/specification/resource/semantic_conventions/os.md
  */
-final class Os implements ResourceDetectorInterface
+final class OperatingSystem implements ResourceDetectorInterface
 {
     public function getResource(): ResourceInfo
     {

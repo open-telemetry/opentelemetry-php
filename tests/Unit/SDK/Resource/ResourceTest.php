@@ -127,7 +127,7 @@ class ResourceTest extends TestCase
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', $envAttributes);
         $resource = (new Detectors\Composite([
             new Detectors\Constant(ResourceInfo::create(new Attributes($userAttributes))),
-            new Detectors\Env(),
+            new Detectors\Environment(),
         ]))->getResource();
         foreach ($expected as $name => $value) {
             $this->assertSame($value, $resource->getAttributes()->get($name));
@@ -181,5 +181,13 @@ class ResourceTest extends TestCase
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');
         $resource = ResourceInfo::defaultResource();
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
+    }
+
+    public function test_composer_detector(): void
+    {
+        $resource = (new Detectors\Composer())->getResource();
+
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
     }
 }

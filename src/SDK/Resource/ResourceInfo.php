@@ -52,10 +52,10 @@ class ResourceInfo
     public static function defaultResource(): self
     {
         return (new Detectors\Composite([
-            new Detectors\Env(),
+            new Detectors\Environment(),
 
             new Detectors\Host(),
-            new Detectors\Os(),
+            new Detectors\OperatingSystem(),
             new Detectors\Process(),
             new Detectors\ProcessRuntime(),
 
