@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\SDK\Integration;
 
-use InvalidArgumentException;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
@@ -15,14 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class TraceIdRatioBasedSamplerTest extends TestCase
 {
-    public function test_invalid_probability_trace_id_ratio_based_sampler(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $sampler = new TraceIdRatioBasedSampler(-0.5);
-        $this->expectException(InvalidArgumentException::class);
-        $sampler = new TraceIdRatioBasedSampler(1.5);
-    }
-
     public function test_never_trace_id_ratio_based_sampler_decision(): void
     {
         $sampler = new TraceIdRatioBasedSampler(0.0);
@@ -84,12 +75,6 @@ class TraceIdRatioBasedSamplerTest extends TestCase
 
         $this->assertEquals(SamplingResult::DROP, $samplingResult->getDecision());
         $this->assertEquals($parentTraceState, $samplingResult->getTraceState());
-    }
-
-    public function test_trace_id_ratio_based_sampler_description(): void
-    {
-        $sampler = new TraceIdRatioBasedSampler(0.0001);
-        $this->assertEquals('TraceIdRatioBasedSampler{0.000100}', $sampler->getDescription());
     }
 
     private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceStateInterface $traceState = null): Context

@@ -9,6 +9,9 @@ use Exception;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversDefaultClass OpenTelemetry\SDK\Trace\SamplerFactory
+ */
 class SamplerFactoryTest extends TestCase
 {
     use EnvironmentVariables;
@@ -19,6 +22,7 @@ class SamplerFactoryTest extends TestCase
     }
 
     /**
+     * @covers ::fromEnvironment
      * @dataProvider samplerProvider
      */
     public function test_sampler_factory_create_sampler_from_environment(string $samplerName, string $expected, string $arg = null): void
@@ -42,6 +46,7 @@ class SamplerFactoryTest extends TestCase
         ];
     }
     /**
+     * @covers ::fromEnvironment
      * @dataProvider invalidSamplerProvider
      */
     public function test_sampler_factory_throws_exception_for_invalid_or_unsupported(?string $sampler, string $arg = null): void
