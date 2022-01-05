@@ -40,23 +40,12 @@
     </php>
 
     <testsuites>
-        <testsuite name="API Unit Tests">
-            <directory>./tests/API/Unit</directory>
+        <testsuite name="unit">
+            <directory>./tests/Unit</directory>
         </testsuite>
-        <testsuite name="SDK Unit Tests">
-            <directory>./tests/SDK/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration Tests">
-            <directory>./tests/SDK/Integration</directory>
-        </testsuite>
-        <testsuite name="Contrib Unit Tests">
-            <directory>./tests/Contrib/Unit</directory>
-        </testsuite>
-        <testsuite name="Context Unit Tests">
-            <directory>./tests/Context/Unit</directory>
-        </testsuite>
-        <testsuite name="Context Fiber Tests">
-            <directory phpVersion="8.1.0RC" suffix=".phpt">./tests/Context/Fiber</directory>
+        <testsuite name="integration">
+            <directory>./tests/Integration</directory>
+            <directory phpVersion="8.1.0" suffix=".phpt">./tests/Integration/Context/Fiber</directory>
         </testsuite>
     </testsuites>
 </phpunit>
