@@ -3,18 +3,11 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\GlobalLoggerHolder;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
-use Psr\Log\LogLevel;
-
-$logger = new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)]);
-GlobalLoggerHolder::set($logger);
 
 $exporter = JaegerExporter::fromConnectionString('http://jaeger:9412/api/v2/spans', 'AlwaysOnJaegerExample');
 $tracerProvider = new TracerProvider(
@@ -37,7 +30,6 @@ for ($i = 0; $i < 5; $i++) {
         PHP_EOL . 'Exporting Trace: %s, Parent: %s, Span: %s',
         $span->getContext()->getTraceId(),
         $span->getParentContext()->getSpanId() ?: 'None',
-        //$spanParent ? $spanParent->getSpanId() : 'None',
         $span->getContext()->getSpanId()
     );
 
