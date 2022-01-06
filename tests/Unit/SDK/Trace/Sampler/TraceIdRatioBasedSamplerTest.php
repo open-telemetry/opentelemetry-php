@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace\Sampler;
 use InvalidArgumentException;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +28,8 @@ class TraceIdRatioBasedSamplerTest extends TestCase
             new Context(),
             '4bf92f3577b34da6a3ce929d0e0e4736',
             'test.opentelemetry.io',
-            API\SpanKind::KIND_INTERNAL
+            API\SpanKind::KIND_INTERNAL,
+            $this->createMock(AttributesInterface::class),
         );
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLE, $decision->getDecision());
     }

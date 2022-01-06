@@ -17,7 +17,7 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
         $span = (new SpanData())
             ->setName('guard.validate')
             ->addAttribute('service', 'guard')
-            ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
+            ->addEvent('validators.list', Attributes::create(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
 
         $converter = new SpanConverter('test.name');

@@ -53,7 +53,7 @@ final class NonRecordingSpan extends AbstractSpan
     }
 
     /** @inheritDoc */
-    public function recordException(Throwable $exception, iterable $attributes = []): SpanInterface
+    public function recordException(Throwable $exception, iterable $attributes = [], ?int $timestamp = null): SpanInterface
     {
         return $this;
     }

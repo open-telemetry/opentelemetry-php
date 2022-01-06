@@ -52,7 +52,7 @@ class SpanBuilderTest extends MockeryTestCase
             ->tracer
             ->spanBuilder(self::SPAN_NAME)
             ->addLink($this->sampledSpanContext)
-            ->addLink($this->sampledSpanContext, new Attributes())
+            ->addLink($this->sampledSpanContext, ['foo' => 'bar'])
             ->startSpan();
 
         $this->assertCount(2, $span->toSpanData()->getLinks());
@@ -66,7 +66,7 @@ class SpanBuilderTest extends MockeryTestCase
             ->tracer
             ->spanBuilder(self::SPAN_NAME)
             ->addLink(Span::getInvalid()->getContext())
-            ->addLink(Span::getInvalid()->getContext(), new Attributes())
+            ->addLink(Span::getInvalid()->getContext(), ['foo' => 'bar'])
             ->startSpan();
 
         $this->assertEmpty($span->toSpanData()->getLinks());
@@ -94,7 +94,7 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame(8, $spanData->getTotalDroppedLinks());
 
         for ($idx = 0; $idx < $maxNumberOfLinks; $idx++) {
-            $this->assertEquals(new Link($this->sampledSpanContext), $links[$idx]);
+            $this->assertEquals(new Link($this->sampledSpanContext, Attributes::create()), $links[$idx]);
         }
 
         $span->end();
@@ -108,11 +108,11 @@ class SpanBuilderTest extends MockeryTestCase
             ->spanBuilder(self::SPAN_NAME)
             ->addLink(
                 $this->sampledSpanContext,
-                new Attributes([
+                [
                     'key0' => 0,
                     'key1' => 1,
                     'key2' => 2,
-                ])
+                ]
             )
             ->startSpan();
 
@@ -135,12 +135,12 @@ class SpanBuilderTest extends MockeryTestCase
             ->spanBuilder(self::SPAN_NAME)
             ->addLink(
                 $this->sampledSpanContext,
-                new Attributes([
+                [
                     'string' => $tooLongStrVal,
                     'bool' => true,
                     'string_array' => [$strVal, $tooLongStrVal],
                     'int_array' => [1, 2],
-                ])
+                ]
             )
             ->startSpan();
 
@@ -265,7 +265,7 @@ class SpanBuilderTest extends MockeryTestCase
                 ?AttributesInterface $attributes = null,
                 array $links = []
             ): SamplingResult {
-                return new SamplingResult(SamplingResult::RECORD_AND_SAMPLE, new Attributes(['cat' => 'meow']));
+                return new SamplingResult(SamplingResult::RECORD_AND_SAMPLE, ['cat' => 'meow']);
             }
 
             public function getDescription(): string
@@ -286,10 +286,8 @@ class SpanBuilderTest extends MockeryTestCase
 
     public function test_set_attributes(): void
     {
-        $attributes = new Attributes(['id' => 1, 'foo' => 'bar']);
-
         /** @var Span $span */
-        $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setAttributes($attributes)->startSpan();
+        $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setAttributes(['id' => 1, 'foo' => 'bar'])->startSpan();
 
         $attributes = $span->toSpanData()->getAttributes();
 
@@ -302,15 +300,13 @@ class SpanBuilderTest extends MockeryTestCase
 
     public function test_set_attributes_overrides_values(): void
     {
-        $attributes = new Attributes(['id' => 1, 'foo' => 'bar']);
-
         /** @var Span $span */
         $span = $this
             ->tracer
             ->spanBuilder(self::SPAN_NAME)
             ->setAttribute('id', 0)
             ->setAttribute('foo', 'baz')
-            ->setAttributes($attributes)
+            ->setAttributes(['id' => 1, 'foo' => 'bar'])
             ->startSpan();
 
         $attributes = $span->toSpanData()->getAttributes();

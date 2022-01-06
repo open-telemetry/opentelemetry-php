@@ -27,21 +27,13 @@ class ResourceTest extends TestCase
 
     public function test_get_attributes(): void
     {
-        $attributes = new Attributes();
-        $attributes->setAttribute('name', 'test');
-        $resource = ResourceInfo::create($attributes);
+        $resource = ResourceInfo::create(Attributes::create(['name' => 'test']));
 
         $name = $resource->getAttributes()->get('name');
         $sdkname = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME);
         $sdklanguage = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE);
         $sdkversion = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION);
 
-        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_NAME, 'opentelemetry');
-        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_LANGUAGE, 'php');
-        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_VERSION, 'dev');
-        $attributes->setAttribute(ResourceAttributes::SERVICE_NAME, 'unknown_service');
-
-        $this->assertEquals($attributes, $resource->getAttributes());
         $this->assertSame('opentelemetry', $sdkname);
         $this->assertSame('php', $sdklanguage);
         $this->assertSame('dev', $sdkversion);
@@ -50,7 +42,7 @@ class ResourceTest extends TestCase
 
     public function test_default_resource(): void
     {
-        $attributes = new Attributes(
+        $attributes = Attributes::create(
             [
                 ResourceAttributes::TELEMETRY_SDK_NAME => 'opentelemetry',
                 ResourceAttributes::TELEMETRY_SDK_LANGUAGE => 'php',
@@ -58,7 +50,7 @@ class ResourceTest extends TestCase
                 ResourceAttributes::SERVICE_NAME => 'unknown_service',
             ]
         );
-        $resource = ResourceInfo::create(new Attributes());
+        $resource = ResourceInfo::create(Attributes::create());
         $sdkname = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME);
         $sdklanguage = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE);
         $sdkversion = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION);
@@ -71,8 +63,8 @@ class ResourceTest extends TestCase
 
     public function test_merge(): void
     {
-        $primary = ResourceInfo::create(new Attributes(['name' => 'primary', 'empty' => '']));
-        $secondary = ResourceInfo::create(new Attributes(['version' => '1.0.0', 'empty' => 'value']));
+        $primary = ResourceInfo::create(Attributes::create(['name' => 'primary', 'empty' => '']));
+        $secondary = ResourceInfo::create(Attributes::create(['version' => '1.0.0', 'empty' => 'value']));
         $result = ResourceInfo::merge($primary, $secondary);
 
         $name = $result->getAttributes()->get('name');
@@ -85,28 +77,13 @@ class ResourceTest extends TestCase
         $this->assertEquals('value', $empty);
     }
 
-    public function test_immutable_create(): void
-    {
-        $attributes = new Attributes();
-        $attributes->setAttribute('name', 'test');
-        $attributes->setAttribute('version', '1.0.0');
-
-        $resource = ResourceInfo::create($attributes);
-
-        $attributes->setAttribute('version', '2.0.0');
-
-        $version = $resource->getAttributes()->get('version');
-
-        $this->assertEquals('1.0.0', $version);
-    }
-
     /**
      * @dataProvider environmentResourceProvider
      */
     public function test_resource_from_environment(string $envAttributes, array $userAttributes, array $expected): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', $envAttributes);
-        $resource = ResourceInfo::create(new Attributes($userAttributes));
+        $resource = ResourceInfo::create(Attributes::create($userAttributes));
         foreach ($expected as $name => $value) {
             $this->assertSame($value, $resource->getAttributes()->get($name));
         }
@@ -130,34 +107,34 @@ class ResourceTest extends TestCase
 
     public function test_resource_service_name_default(): void
     {
-        $resource = ResourceInfo::create(new Attributes([]));
+        $resource = ResourceInfo::create(Attributes::create());
         $this->assertEquals('unknown_service', $resource->getAttributes()->get('service.name'));
     }
 
     public function test_resource_with_empty_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', '');
-        $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::create(new Attributes([])));
+        $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::create(Attributes::create()));
     }
 
     public function test_resource_with_invalid_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo');
-        $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::create(new Attributes([])));
+        $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::create(Attributes::create()));
     }
 
     public function test_resource_from_environment_service_name_takes_precedence_over_resource_attribute(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=bar');
         $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'foo');
-        $resource = ResourceInfo::create(new Attributes([]));
+        $resource = ResourceInfo::create(Attributes::create());
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
 
     public function test_resource_from_environment_resource_attribute_takes_precedence_over_default(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');
-        $resource = ResourceInfo::create(new Attributes([]));
+        $resource = ResourceInfo::create(Attributes::create());
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
 }

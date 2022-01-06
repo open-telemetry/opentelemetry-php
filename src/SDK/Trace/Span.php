@@ -8,15 +8,13 @@ use function array_key_exists;
 use function array_shift;
 use function basename;
 use function count;
-use function ctype_space;
 use function get_class;
 use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\AbstractClock;
-use OpenTelemetry\SDK\AttributeLimits;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\AttributesInterface;
+use OpenTelemetry\SDK\AttributesBuilderInterface;
+use OpenTelemetry\SDK\AttributesFactoryInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use function sprintf;
@@ -25,7 +23,6 @@ use Throwable;
 
 final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
 {
-
     /** @readonly */
     private API\SpanContextInterface $context;
 
@@ -33,7 +30,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     private API\SpanContextInterface $parentSpanContext;
 
     /** @readonly */
-    private SpanLimits $spanLimits;
+    private AttributesFactoryInterface $eventAttributes;
 
     /** @readonly */
     private SpanProcessorInterface $spanProcessor;
@@ -46,7 +43,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     private array $links;
 
     /** @readonly */
-    private int $totalRecordedLinks;
+    private int $droppedLinksCount;
 
     /** @readonly */
     private int $kind;
@@ -66,10 +63,10 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /** @var list<EventInterface> */
     private array $events = [];
 
-    private ?AttributesInterface $attributes;
-    private int $totalRecordedEvents = 0;
+    private AttributesBuilderInterface $attributes;
+    private int $droppedEventsCount;
     private StatusDataInterface $status;
-    private int $endEpochNanos = 0;
+    private ?int $endEpochNanos = null;
     private bool $hasEnded = false;
 
     /**
@@ -82,27 +79,29 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         InstrumentationLibrary $instrumentationLibrary,
         int $kind,
         API\SpanContextInterface $parentSpanContext,
-        SpanLimits $spanLimits,
+        AttributesFactoryInterface $eventAttributes,
         SpanProcessorInterface $spanProcessor,
         ResourceInfo $resource,
-        ?AttributesInterface $attributes,
+        AttributesBuilderInterface $attributes,
         array $links,
-        int $totalRecordedLinks,
+        int $droppedLinksCount,
+        int $eventCountLimit,
         int $startEpochNanos
     ) {
         $this->context = $context;
         $this->instrumentationLibrary = $instrumentationLibrary;
         $this->parentSpanContext = $parentSpanContext;
         $this->links = $links;
-        $this->totalRecordedLinks = $totalRecordedLinks;
+        $this->droppedLinksCount = $droppedLinksCount;
         $this->name = $name;
         $this->kind = $kind;
         $this->spanProcessor = $spanProcessor;
         $this->resource = $resource;
         $this->startEpochNanos = $startEpochNanos;
-        $this->attributes = Attributes::withLimits($attributes ?? new Attributes(), $spanLimits->getAttributeLimits());
+        $this->attributes = $attributes;
+        $this->eventAttributes = $eventAttributes;
         $this->status = StatusData::unset();
-        $this->spanLimits = $spanLimits;
+        $this->droppedEventsCount = -$eventCountLimit;
     }
 
     /**
@@ -121,34 +120,32 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         API\SpanContextInterface $context,
         InstrumentationLibrary $instrumentationLibrary,
         int $kind,
-        API\SpanInterface $parentSpan,
+        API\SpanContextInterface $parentSpanContext,
         Context $parentContext,
-        SpanLimits $spanLimits,
+        AttributesFactoryInterface $eventAttributes,
         SpanProcessorInterface $spanProcessor,
         ResourceInfo $resource,
-        ?AttributesInterface $attributes,
+        AttributesBuilderInterface $attributes,
         array $links,
-        int $totalRecordedLinks,
-        int $userStartEpochNanos
+        int $droppedLinksCount,
+        int $eventCountLimit,
+        ?int $userStartEpochNanos = null
     ): self {
-        if (0 !== $userStartEpochNanos) {
-            $startEpochNanos = $userStartEpochNanos;
-        } else {
-            $startEpochNanos = AbstractClock::getDefault()->now();
-        }
+        $startEpochNanos = $userStartEpochNanos ?? AbstractClock::getDefault()->now();
 
         $span = new self(
             $name,
             $context,
             $instrumentationLibrary,
             $kind,
-            $parentSpan->getContext(),
-            $spanLimits,
+            $parentSpanContext,
+            $eventAttributes,
             $spanProcessor,
             $resource,
             $attributes,
             $links,
-            $totalRecordedLinks,
+            $droppedLinksCount,
+            $eventCountLimit,
             $startEpochNanos
         );
 
@@ -231,15 +228,11 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /** @inheritDoc */
     public function setAttribute(string $key, $value): self
     {
-        if ($this->hasEnded || ctype_space($key)) {
+        if ($this->hasEnded) {
             return $this;
         }
 
-        if (null === $this->attributes) {
-            $this->attributes = Attributes::withLimits(new Attributes(), $this->spanLimits->getAttributeLimits());
-        }
-
-        $this->attributes->setAttribute($key, $value);
+        $this->attributes[$key] = $value;
 
         return $this;
     }
@@ -248,7 +241,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     public function setAttributes(iterable $attributes): self
     {
         foreach ($attributes as $key => $value) {
-            $this->setAttribute($key, $value);
+            $this->attributes[$key] = $value;
         }
 
         return $this;
@@ -260,41 +253,47 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         if ($this->hasEnded) {
             return $this;
         }
-
-        if (count($this->events) < $this->spanLimits->getEventCountLimit()) {
-            $this->events[] = new Event(
-                $name,
-                $timestamp ?? AbstractClock::getDefault()->now(),
-                Attributes::withLimits(
-                    $attributes,
-                    new AttributeLimits(
-                        $this->spanLimits->getAttributePerEventCountLimit(),
-                        $this->spanLimits->getAttributeLimits()->getAttributeValueLengthLimit()
-                    )
-                ),
-            );
+        if (++$this->droppedEventsCount > 0) {
+            return $this;
         }
 
-        $this->totalRecordedEvents++;
+        $eventAttributes = $this->eventAttributes->builder($attributes);
+
+        $this->events[] = new Event(
+            $name,
+            $timestamp ?? AbstractClock::getDefault()->now(),
+            $eventAttributes->build(),
+        );
 
         return $this;
     }
 
     /** @inheritDoc */
-    public function recordException(Throwable $exception, iterable $attributes = []): self
+    public function recordException(Throwable $exception, iterable $attributes = [], int $timestamp = null): self
     {
-        $timestamp = AbstractClock::getDefault()->now();
-        $eventAttributes = new Attributes([
-                'exception.type' => get_class($exception),
-                'exception.message' => $exception->getMessage(),
-                'exception.stacktrace' => self::formatStackTrace($exception),
-            ]);
-
-        foreach ($attributes as $key => $value) {
-            $eventAttributes->setAttribute($key, $value);
+        if ($this->hasEnded) {
+            return $this;
+        }
+        if (++$this->droppedEventsCount > 0) {
+            return $this;
         }
 
-        return $this->addEvent('exception', $eventAttributes, $timestamp);
+        $eventAttributes = $this->eventAttributes->builder([
+            'exception.type' => get_class($exception),
+            'exception.message' => $exception->getMessage(),
+            'exception.stacktrace' => self::formatStackTrace($exception),
+        ]);
+        foreach ($attributes as $key => $value) {
+            $eventAttributes[$key] = $value;
+        }
+
+        $this->events[] = new Event(
+            'exception',
+            $timestamp ?? AbstractClock::getDefault()->now(),
+            $eventAttributes->build(),
+        );
+
+        return $this;
     }
 
     /** @inheritDoc */
@@ -361,9 +360,9 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             $this->name,
             $this->links,
             $this->events,
-            $this->getImmutableAttributes(),
-            (null === $this->attributes) ? 0 : $this->attributes->getTotalAddedValues(),
-            $this->totalRecordedEvents,
+            $this->attributes->build(),
+            max(0, $this->droppedEventsCount),
+            max(0, $this->droppedLinksCount),
             $this->status,
             $this->endEpochNanos,
             $this->hasEnded
@@ -385,11 +384,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /** @inheritDoc */
     public function getAttribute(string $key)
     {
-        if (null === $this->attributes) {
-            return null;
-        }
-
-        return $this->attributes->get($key);
+        return $this->attributes[$key];
     }
 
     public function getStartEpochNanos(): int
@@ -397,27 +392,8 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         return $this->startEpochNanos;
     }
 
-    public function getTotalRecordedLinks(): int
-    {
-        return $this->totalRecordedLinks;
-    }
-
-    public function getTotalRecordedEvents(): int
-    {
-        return $this->totalRecordedEvents;
-    }
-
     public function getResource(): ResourceInfo
     {
         return $this->resource;
-    }
-
-    private function getImmutableAttributes(): AttributesInterface
-    {
-        if (null === $this->attributes) {
-            return new Attributes();
-        }
-
-        return clone $this->attributes;
     }
 }

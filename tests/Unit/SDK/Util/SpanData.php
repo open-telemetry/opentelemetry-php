@@ -8,7 +8,8 @@ use function count;
 use function max;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\AbstractClock;
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\AttributesBuilder;
+use OpenTelemetry\SDK\AttributesBuilderInterface;
 use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -29,14 +30,13 @@ class SpanData implements SDK\SpanDataInterface
      */
     private array $links = [];
 
-    private AttributesInterface $attributes;
+    private AttributesBuilderInterface $attributes;
     private int $kind;
     private StatusData $status;
     private ResourceInfo $resource;
     private InstrumentationLibrary $instrumentationLibrary;
     private API\SpanContextInterface $context;
     private API\SpanContextInterface $parentContext;
-    private int $totalAttributeCount = 0;
     private int $totalRecordedEvents = 0;
     private int $totalRecordedLinks = 0;
     private int $startEpochNanos = 1505855794194009601;
@@ -45,7 +45,7 @@ class SpanData implements SDK\SpanDataInterface
 
     public function __construct()
     {
-        $this->attributes = new Attributes();
+        $this->attributes = AttributesBuilder::from([]);
         $this->kind = API\SpanKind::KIND_INTERNAL;
         $this->status = StatusData::unset();
         $this->resource = ResourceInfo::emptyResource();
@@ -81,7 +81,7 @@ class SpanData implements SDK\SpanDataInterface
         return $this;
     }
 
-    public function addLink(API\SpanContextInterface $context, AttributesInterface $attributes = null): self
+    public function addLink(API\SpanContextInterface $context, AttributesInterface $attributes): self
     {
         $this->links[] = new SDK\Link($context, $attributes);
 
@@ -102,7 +102,7 @@ class SpanData implements SDK\SpanDataInterface
         return $this;
     }
 
-    public function addEvent(string $name, ?AttributesInterface $attributes, int $timestamp = null): self
+    public function addEvent(string $name, AttributesInterface $attributes, int $timestamp = null): self
     {
         $this->events[] = new SDK\Event($name, $timestamp ?? AbstractClock::getDefault()->now(), $attributes);
 
@@ -111,33 +111,19 @@ class SpanData implements SDK\SpanDataInterface
 
     public function getAttributes(): AttributesInterface
     {
-        return $this->attributes;
-    }
-
-    public function setAttributes(AttributesInterface $attributes): self
-    {
-        $this->attributes = $attributes;
-
-        return $this;
+        return $this->attributes->build();
     }
 
     public function addAttribute(string $key, $value): self
     {
-        $this->attributes->setAttribute($key, $value);
+        $this->attributes[$key] = $value;
 
         return $this;
     }
 
     public function getTotalDroppedAttributes(): int
     {
-        return max(0, $this->totalAttributeCount - count($this->attributes));
-    }
-
-    public function setTotalAttributeCount(int $totalAttributeCount): self
-    {
-        $this->totalAttributeCount = $totalAttributeCount;
-
-        return $this;
+        return $this->attributes->build()->getDroppedAttributesCount();
     }
 
     public function getTotalDroppedEvents(): int

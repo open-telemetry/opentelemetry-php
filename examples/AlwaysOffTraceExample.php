@@ -6,7 +6,6 @@ require __DIR__ . '/../vendor/autoload.php';
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\AbstractClock;
-use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -29,13 +28,13 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     $span->setAttribute('country', 'USA');
 
     $timestamp = AbstractClock::getDefault()->timestamp();
-    $span->addEvent('found_login', new Attributes([
+    $span->addEvent('found_login', [
         'id' => 12345,
         'username' => 'otuser',
-    ]), $timestamp);
-    $span->addEvent('generated_session', new Attributes([
+    ], $timestamp);
+    $span->addEvent('generated_session', [
         'id' => md5((string) microtime(true)),
-    ]), $timestamp);
+    ], $timestamp);
 
     $span->end(); // pass status as an optional argument
     print_r($span);  // print the span as a resulting output

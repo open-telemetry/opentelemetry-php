@@ -8,6 +8,7 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
@@ -24,7 +25,8 @@ class ParentBasedTest extends TestCase
             new Context(),
             '4bf92f3577b34da6a3ce929d0e0e4736',
             'test.opentelemetry.io',
-            API\SpanKind::KIND_INTERNAL
+            API\SpanKind::KIND_INTERNAL,
+            $this->createMock(AttributesInterface::class),
         );
     }
 
@@ -46,7 +48,8 @@ class ParentBasedTest extends TestCase
             $parentContext,
             '4bf92f3577b34da6a3ce929d0e0e4736',
             'test.opentelemetry.io',
-            API\SpanKind::KIND_INTERNAL
+            API\SpanKind::KIND_INTERNAL,
+            $this->createMock(AttributesInterface::class),
         );
         $this->assertEquals($expectedDecision, $decision->getDecision());
     }

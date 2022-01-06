@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\AttributeLimits;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\AttributesInterface;
+use OpenTelemetry\SDK\AttributesBuilderInterface;
+use OpenTelemetry\SDK\AttributesFactoryInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 final class SpanBuilder implements API\SpanBuilderInterface
 {
@@ -20,14 +19,13 @@ final class SpanBuilder implements API\SpanBuilderInterface
      */
     private string $spanName;
 
-    /** @readonly */
     private InstrumentationLibrary $instrumentationLibrary;
-
-    /** @readonly */
-    private TracerSharedState $tracerSharedState;
-
-    /** @readonly */
-    private SpanLimits $spanLimits;
+    private ResourceInfo $resource;
+    private SamplerInterface $sampler;
+    private SpanProcessorInterface $spanProcessor;
+    private IdGeneratorInterface $idGenerator;
+    private AttributesFactoryInterface $linkAttributes;
+    private AttributesFactoryInterface $eventAttributes;
 
     private ?Context $parentContext = null; // Null means use current context.
 
@@ -36,24 +34,39 @@ final class SpanBuilder implements API\SpanBuilderInterface
      */
     private int $spanKind = API\SpanKind::KIND_INTERNAL;
 
-    /** @var list<LinkInterface>|null */
-    private ?array $links = null;
+    /** @var list<LinkInterface> */
+    private array $links = [];
 
-    private ?AttributesInterface $attributes = null;
-    private int $totalNumberOfLinksAdded = 0;
-    private int $startEpochNanos = 0;
+    private AttributesBuilderInterface $attributes;
+    private int $droppedLinksCount;
+    private int $eventCountLimit;
+    private ?int $startEpochNanos = null;
 
     /** @param non-empty-string $spanName */
     public function __construct(
         string $spanName,
         InstrumentationLibrary $instrumentationLibrary,
-        TracerSharedState $tracerSharedState,
-        SpanLimits $spanLimits
+        ResourceInfo $resource,
+        SamplerInterface $sampler,
+        SpanProcessorInterface $spanProcessor,
+        IdGeneratorInterface $idGenerator,
+        AttributesBuilderInterface $attributes,
+        AttributesFactoryInterface $linkAttributes,
+        AttributesFactoryInterface $eventAttributes,
+        int $linkCountLimit,
+        int $eventCountLimit
     ) {
         $this->spanName = $spanName;
         $this->instrumentationLibrary = $instrumentationLibrary;
-        $this->tracerSharedState = $tracerSharedState;
-        $this->spanLimits = $spanLimits;
+        $this->resource = $resource;
+        $this->sampler = $sampler;
+        $this->spanProcessor = $spanProcessor;
+        $this->idGenerator = $idGenerator;
+        $this->attributes = $attributes;
+        $this->linkAttributes = $linkAttributes;
+        $this->eventAttributes = $eventAttributes;
+        $this->droppedLinksCount = -$linkCountLimit;
+        $this->eventCountLimit = $eventCountLimit;
     }
 
     /** @inheritDoc */
@@ -78,26 +91,13 @@ final class SpanBuilder implements API\SpanBuilderInterface
         if (!$context->isValid()) {
             return $this;
         }
-
-        $this->totalNumberOfLinksAdded++;
-
-        if (null === $this->links) {
-            $this->links = [];
-        }
-
-        if (count($this->links) === $this->spanLimits->getLinkCountLimit()) {
+        if (++$this->droppedLinksCount > 0) {
             return $this;
         }
 
         $this->links[] = new Link(
             $context,
-            Attributes::withLimits(
-                $attributes,
-                new AttributeLimits(
-                    $this->spanLimits->getAttributePerLinkCountLimit(),
-                    $this->spanLimits->getAttributeLimits()->getAttributeValueLengthLimit()
-                )
-            ),
+            $this->linkAttributes->builder($attributes)->build(),
         );
 
         return $this;
@@ -106,11 +106,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     /** @inheritDoc */
     public function setAttribute(string $key, $value): API\SpanBuilderInterface
     {
-        if (null === $this->attributes) {
-            $this->attributes = Attributes::withLimits(new Attributes(), $this->spanLimits->getAttributeLimits());
-        }
-
-        $this->attributes->setAttribute($key, $value);
+        $this->attributes[$key] = $value;
 
         return $this;
     }
@@ -119,7 +115,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     public function setAttributes(iterable $attributes): API\SpanBuilderInterface
     {
         foreach ($attributes as $key => $value) {
-            $this->setAttribute($key, $value);
+            $this->attributes[$key] = $value;
         }
 
         return $this;
@@ -140,10 +136,6 @@ final class SpanBuilder implements API\SpanBuilderInterface
     /** @inheritDoc */
     public function setStartTimestamp(int $timestamp): API\SpanBuilderInterface
     {
-        if (0 > $timestamp) {
-            return $this;
-        }
-
         $this->startEpochNanos = $timestamp;
 
         return $this;
@@ -153,54 +145,36 @@ final class SpanBuilder implements API\SpanBuilderInterface
     public function startSpan(): API\SpanInterface
     {
         $parentContext = $this->parentContext ?? Context::getCurrent();
-        $parentSpan = Span::fromContext($parentContext);
-        $parentSpanContext = $parentSpan->getContext();
+        $parentSpanContext = Span::fromContext($parentContext)->getContext();
 
-        $spanId = $this->tracerSharedState->getIdGenerator()->generateSpanId();
+        $spanId = $this->idGenerator->generateSpanId();
+        $traceId = $parentSpanContext->isValid()
+            ? $parentSpanContext->getTraceId()
+            : $this->idGenerator->generateTraceId();
 
-        if (!$parentSpanContext->isValid()) {
-            $traceId = $this->tracerSharedState->getIdGenerator()->generateTraceId();
-        } else {
-            $traceId = $parentSpanContext->getTraceId();
-        }
-
-        // Reset links and attributes back to null to prevent mutation of the started span.
-        $links = $this->links ?? [];
-        $this->links = null;
-
-        $attributes = $this->attributes ?? new Attributes();
-        $this->attributes = null;
-
-        $samplingResult = $this
-            ->tracerSharedState
-            ->getSampler()
-            ->shouldSample(
-                $parentContext,
-                $traceId,
-                $this->spanName,
-                $this->spanKind,
-                $attributes,
-                $links
-            );
-        $samplingDecision = $samplingResult->getDecision();
-        $samplingResultTraceState = $samplingResult->getTraceState();
+        $samplingResult = $this->sampler->shouldSample(
+            $parentContext,
+            $traceId,
+            $this->spanName,
+            $this->spanKind,
+            $this->attributes->build(),
+            $this->links,
+        );
 
         $spanContext = API\SpanContext::create(
             $traceId,
             $spanId,
-            SamplingResult::RECORD_AND_SAMPLE === $samplingDecision ? API\SpanContextInterface::TRACE_FLAG_SAMPLED : API\SpanContextInterface::TRACE_FLAG_DEFAULT,
-            $samplingResultTraceState,
+            $samplingResult->getSpanContextFlags(),
+            $samplingResult->getTraceState(),
         );
 
-        if (!in_array($samplingDecision, [SamplingResult::RECORD_AND_SAMPLE, SamplingResult::RECORD_ONLY], true)) {
+        if (!$samplingResult->isRecording()) {
             return Span::wrap($spanContext);
         }
 
-        $samplingAttributes = $samplingResult->getAttributes();
-        if ($samplingAttributes && $samplingAttributes->count() > 0) {
-            foreach ($samplingAttributes as $key => $value) {
-                $attributes->setAttribute($key, $value);
-            }
+        $attributes = clone $this->attributes;
+        foreach ($samplingResult->getAttributes() as $key => $value) {
+            $attributes[$key] = $value;
         }
 
         return Span::startSpan(
@@ -208,14 +182,15 @@ final class SpanBuilder implements API\SpanBuilderInterface
             $spanContext,
             $this->instrumentationLibrary,
             $this->spanKind,
-            $parentSpan,
+            $parentSpanContext,
             $parentContext,
-            $this->spanLimits,
-            $this->tracerSharedState->getSpanProcessor(),
-            $this->tracerSharedState->getResource(),
+            $this->eventAttributes,
+            $this->spanProcessor,
+            $this->resource,
             $attributes,
-            $links,
-            $this->totalNumberOfLinksAdded,
+            $this->links,
+            $this->droppedLinksCount,
+            $this->eventCountLimit,
             $this->startEpochNanos
         );
     }

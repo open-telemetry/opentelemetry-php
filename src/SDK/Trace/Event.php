@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use function count;
-use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\AttributesInterface;
 
 final class Event implements EventInterface
@@ -14,11 +13,11 @@ final class Event implements EventInterface
     private int $timestamp;
     private AttributesInterface $attributes;
 
-    public function __construct(string $name, int $timestamp, AttributesInterface $attributes = null)
+    public function __construct(string $name, int $timestamp, AttributesInterface $attributes)
     {
         $this->name = $name;
         $this->timestamp = $timestamp;
-        $this->attributes = $attributes ?? new Attributes();
+        $this->attributes = $attributes;
     }
 
     public function getAttributes(): AttributesInterface

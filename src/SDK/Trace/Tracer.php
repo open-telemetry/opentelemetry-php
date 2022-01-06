@@ -40,8 +40,15 @@ class Tracer implements API\TracerInterface
         return new SpanBuilder(
             $spanName,
             $this->instrumentationLibrary,
-            $this->tracerSharedState,
-            $this->tracerSharedState->getSpanLimits()
+            $this->tracerSharedState->getResource(),
+            $this->tracerSharedState->getSampler(),
+            $this->tracerSharedState->getSpanProcessor(),
+            $this->tracerSharedState->getIdGenerator(),
+            $this->tracerSharedState->getSpanLimits()->getSpanAttributes()->builder(),
+            $this->tracerSharedState->getSpanLimits()->getLinkAttributes(),
+            $this->tracerSharedState->getSpanLimits()->getEventAttributes(),
+            $this->tracerSharedState->getSpanLimits()->getLinkCountLimit(),
+            $this->tracerSharedState->getSpanLimits()->getEventCountLimit(),
         );
     }
 

@@ -7,7 +7,6 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPExporter;
 use OpenTelemetry\SDK\AbstractClock;
-use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
@@ -36,13 +35,13 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     $rootSpan->setAttribute('remote_ip', '1.2.3.4')
         ->setAttribute('country', 'USA');
     $timestamp = AbstractClock::getDefault()->timestamp();
-    $rootSpan->addEvent('found_login', new Attributes([
+    $rootSpan->addEvent('found_login', [
         'id' => 1,
         'username' => 'otuser',
-    ]), $timestamp);
-    $rootSpan->addEvent('generated_session', new Attributes([
+    ], $timestamp);
+    $rootSpan->addEvent('generated_session', [
         'id' => md5((string) microtime(true)),
-    ]), $timestamp);
+    ], $timestamp);
     sleep(1);
 
     $rootScope = $rootSpan->activate(); // set the root span active in the current context

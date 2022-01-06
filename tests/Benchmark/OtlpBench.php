@@ -35,7 +35,7 @@ class OtlpBench
     public function __construct()
     {
         $this->sampler = new AlwaysOnSampler();
-        $this->resource = ResourceInfo::create(new Attributes([
+        $this->resource = ResourceInfo::create(Attributes::create([
             'service.name' => 'A123456789',
             'service.version' => '1.34567890',
             'service.instance.id' => '123ab456-a123-12ab-12ab-12340a1abc12',

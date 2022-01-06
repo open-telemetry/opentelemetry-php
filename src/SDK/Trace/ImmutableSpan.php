@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use function max;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
@@ -27,17 +26,17 @@ final class ImmutableSpan implements SpanDataInterface
     private array $links;
 
     private AttributesInterface $attributes;
-    private int $totalAttributeCount;
-    private int $totalRecordedEvents;
+    private int $droppedEventsCount;
+    private int $droppedLinksCount;
     private StatusDataInterface $status;
-    private int $endEpochNanos;
+    private ?int $endEpochNanos;
     private bool $hasEnded;
 
     /**
      * @param non-empty-string $name
      * @param list<LinkInterface> $links
      * @param list<EventInterface> $events
-     *@internal
+     * @internal
      * @psalm-internal OpenTelemetry\Sdk
      *
      */
@@ -47,10 +46,10 @@ final class ImmutableSpan implements SpanDataInterface
         array $links,
         array $events,
         AttributesInterface $attributes,
-        int $totalAttributeCount,
-        int $totalRecordedEvents,
+        int $droppedEventsCount,
+        int $droppedLinksCount,
         StatusDataInterface $status,
-        int $encEpochNanos,
+        ?int $endEpochNanos,
         bool $hasEnded
     ) {
         $this->span = $span;
@@ -58,10 +57,10 @@ final class ImmutableSpan implements SpanDataInterface
         $this->links = $links;
         $this->events = $events;
         $this->attributes = $attributes;
-        $this->totalAttributeCount = $totalAttributeCount;
-        $this->totalRecordedEvents = $totalRecordedEvents;
+        $this->droppedEventsCount = $droppedEventsCount;
+        $this->droppedLinksCount = $droppedLinksCount;
         $this->status = $status;
-        $this->endEpochNanos = $encEpochNanos;
+        $this->endEpochNanos = $endEpochNanos;
         $this->hasEnded = $hasEnded;
     }
 
@@ -102,7 +101,7 @@ final class ImmutableSpan implements SpanDataInterface
 
     public function getEndEpochNanos(): int
     {
-        return $this->endEpochNanos;
+        return $this->endEpochNanos ?? 0;
     }
 
     public function getInstrumentationLibrary(): InstrumentationLibrary
@@ -139,17 +138,17 @@ final class ImmutableSpan implements SpanDataInterface
 
     public function getTotalDroppedAttributes(): int
     {
-        return max(0, $this->totalAttributeCount - count($this->attributes));
+        return $this->attributes->getDroppedAttributesCount();
     }
 
     public function getTotalDroppedEvents(): int
     {
-        return max(0, $this->totalRecordedEvents - count($this->events));
+        return $this->droppedEventsCount;
     }
 
     public function getTotalDroppedLinks(): int
     {
-        return max(0, $this->span->getTotalRecordedLinks() - count($this->links));
+        return $this->droppedLinksCount;
     }
 
     public function getStatus(): StatusDataInterface

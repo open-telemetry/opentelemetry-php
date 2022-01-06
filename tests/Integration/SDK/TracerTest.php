@@ -53,7 +53,7 @@ class TracerTest extends TestCase
         $sampler->method('shouldSample')
             ->willReturn(new SamplingResult(
                 SamplingResult::RECORD_AND_SAMPLE,
-                null,
+                [],
                 $newTraceState
             ));
 

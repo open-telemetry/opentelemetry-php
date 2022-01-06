@@ -8,6 +8,7 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +23,8 @@ class AlwaysOnSamplerTest extends TestCase
             $this->createParentContext(true, false, $parentTraceState),
             '4bf92f3577b34da6a3ce929d0e0e4736',
             'test.opentelemetry.io',
-            API\SpanKind::KIND_INTERNAL
+            API\SpanKind::KIND_INTERNAL,
+            $this->createMock(AttributesInterface::class),
         );
 
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLE, $decision->getDecision());

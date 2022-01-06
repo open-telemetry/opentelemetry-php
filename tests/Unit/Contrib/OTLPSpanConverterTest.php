@@ -33,8 +33,8 @@ class OTLPSpanConverterTest extends TestCase
             ->setName('batch.manager')
             ->addAttribute('attr1', 'apple')
             ->addAttribute('attr2', 'orange')
-            ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
-            ->addLink($context, new Attributes(['foo' => 'bar']))
+            ->addEvent('validators.list', Attributes::create(['job' => 'stage.updateTime']), 1505855799433901068)
+            ->addLink($context, Attributes::create(['foo' => 'bar']))
             ->setHasEnded(true);
 
         $converter = new SpanConverter();
@@ -149,7 +149,7 @@ class OTLPSpanConverterTest extends TestCase
             )
             ->setResource(
                 ResourceInfo::create(
-                    new Attributes([
+                    Attributes::create([
                         'instance' => 'test-a',
                     ])
                 )
@@ -160,7 +160,7 @@ class OTLPSpanConverterTest extends TestCase
             ->setInstrumentationLibrary(new InstrumentationLibrary('lib-test', 'v0.1.0'))
             ->addAttribute('user', 'alice')
             ->addAttribute('authenticated', true)
-            ->addEvent('Event1', new Attributes(['success' => 'yes']), 1617313804325769955)
+            ->addEvent('Event1', Attributes::create(['success' => 'yes']), 1617313804325769955)
             ->setStatus(StatusData::ok())
             ->setHasEnded(true);
 
@@ -248,7 +248,7 @@ class OTLPSpanConverterTest extends TestCase
     {
         $span = $this->createMock(SpanData::class);
         $resource = $this->createMock(ResourceInfo::class);
-        $attributes = new Attributes(['foo' => 'foo', 'bar' => 'bar']);
+        $attributes = Attributes::create(['foo' => 'foo', 'bar' => 'bar']);
         $span->method('getResource')->willReturn($resource);
         $resource->method('getAttributes')->willReturn($attributes);
         $converter = new SpanConverter();

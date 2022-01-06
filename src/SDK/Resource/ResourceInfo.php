@@ -53,18 +53,17 @@ class ResourceInfo
      */
     public static function merge(ResourceInfo $primary, ResourceInfo $secondary): self
     {
-        // clone attributes from the primary resource
-        $mergedAttributes = clone $primary->getAttributes();
+        $mergedAttributes = Attributes::factory()->builder($primary->getAttributes());
 
         // merge attributes from the secondary resource
         foreach ($secondary->getAttributes() as $name => $attribute) {
-            $mergedAttribute = $mergedAttributes->get($name);
+            $mergedAttribute = $mergedAttributes[$name];
             if (null === $mergedAttribute || $mergedAttribute === '') {
-                $mergedAttributes->setAttribute($name, $attribute);
+                $mergedAttributes[$name] = $attribute;
             }
         }
 
-        return new ResourceInfo($mergedAttributes);
+        return new ResourceInfo($mergedAttributes->build());
     }
 
     public static function defaultResource(): self

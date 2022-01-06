@@ -29,7 +29,7 @@ class AlwaysOnSampler implements SamplerInterface
         string $traceId,
         string $spanName,
         int $spanKind,
-        ?AttributesInterface $attributes = null,
+        AttributesInterface $attributes,
         array $links = []
     ): SamplingResult {
         $parentSpan = Span::fromContext($parentContext);
@@ -38,7 +38,7 @@ class AlwaysOnSampler implements SamplerInterface
 
         return new SamplingResult(
             SamplingResult::RECORD_AND_SAMPLE,
-            $attributes,
+            [],
             $traceState
         );
     }

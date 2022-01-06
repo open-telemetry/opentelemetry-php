@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\SDK\AttributeLimits;
+use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\AttributesFactoryInterface;
 
 final class SpanLimits
 {
@@ -24,6 +26,30 @@ final class SpanLimits
     private int $attributePerEventCountLimit;
 
     private int $attributePerLinkCountLimit;
+
+    public function getSpanAttributes(): AttributesFactoryInterface
+    {
+        return Attributes::factory(
+            $this->attributeLimits->getAttributeCountLimit(),
+            $this->attributeLimits->getAttributeValueLengthLimit(),
+        );
+    }
+
+    public function getLinkAttributes(): AttributesFactoryInterface
+    {
+        return Attributes::factory(
+            $this->attributePerLinkCountLimit,
+            $this->attributeLimits->getAttributeValueLengthLimit(),
+        );
+    }
+
+    public function getEventAttributes(): AttributesFactoryInterface
+    {
+        return Attributes::factory(
+            $this->attributePerEventCountLimit,
+            $this->attributeLimits->getAttributeValueLengthLimit(),
+        );
+    }
 
     public function getAttributeLimits(): AttributeLimits
     {

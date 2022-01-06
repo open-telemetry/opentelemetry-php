@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\AttributesInterface;
 
 final class SamplingResult
 {
@@ -30,20 +29,35 @@ final class SamplingResult
     private int $decision;
 
     /**
-     * @var ?AttributesInterface A set of span Attributes that will also be added to the Span.
+     * @var iterable A set of span Attributes that will also be added to the Span.
      */
-    private ?AttributesInterface $attributes;
+    private iterable $attributes;
 
     /**
      * @var ?API\TraceStateInterface A Tracestate that will be associated with the Span through the new SpanContext.
      */
     private ?API\TraceStateInterface $traceState;
 
-    public function __construct(int $decision, ?AttributesInterface $attributes = null, ?API\TraceStateInterface $traceState = null)
+    public function __construct(int $decision, iterable $attributes = [], ?API\TraceStateInterface $traceState = null)
     {
         $this->decision = $decision;
         $this->attributes = $attributes;
         $this->traceState = $traceState;
+    }
+
+    public function getSpanContextFlags(): int
+    {
+        $flags = API\SpanContextInterface::TRACE_FLAG_DEFAULT;
+        if ($this->decision === self::RECORD_AND_SAMPLE) {
+            $flags |= API\SpanContextInterface::TRACE_FLAG_SAMPLED;
+        }
+
+        return $flags;
+    }
+
+    public function isRecording(): bool
+    {
+        return $this->decision !== self::DROP;
     }
 
     /**
@@ -57,7 +71,7 @@ final class SamplingResult
     /**
      * Return attributes which will be attached to the span.
      */
-    public function getAttributes(): ?AttributesInterface
+    public function getAttributes(): iterable
     {
         return $this->attributes;
     }

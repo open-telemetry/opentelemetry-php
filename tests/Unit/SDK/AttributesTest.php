@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
+use ArrayIterator;
 use OpenTelemetry\SDK\AttributeLimits;
 use OpenTelemetry\SDK\Attributes;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +24,7 @@ class AttributesTest extends TestCase
     /** @test Test numeric attribute key is not cast to integer value */
     public function test_numeric_attribute_name(): void
     {
-        $attributes = new Attributes(['1' => '2']);
+        $attributes = Attributes::create(['1' => '2']);
         $this->assertCount(1, $attributes);
         foreach ($attributes as $key => $value) {
             $this->assertTrue(is_string($key));
@@ -43,19 +44,20 @@ class AttributesTest extends TestCase
         $longStringValue = '0123456789abcdefghijklmnopqrstuvwxyz';
         $longStringTrimmed = '0123456789abcdef';
 
-        $attributeLimits = new AttributeLimits(6, 16);
-        $attributes = new Attributes([
-            'bool' => $boolValue,
-            'int' => $intValue,
-            'float' => $floatValue,
-            'short_string' => $shortStringValue,
-            'long_string' => $longStringValue,
-            'array' => [
-                $shortStringValue,
-                $longStringValue,
-            ],
-            'ignored_key' => 'ignored_value',
-        ], $attributeLimits);
+        $attributes = Attributes::factory(6, 16)
+            ->builder([
+                'bool' => $boolValue,
+                'int' => $intValue,
+                'float' => $floatValue,
+                'short_string' => $shortStringValue,
+                'long_string' => $longStringValue,
+                'array' => [
+                    $shortStringValue,
+                    $longStringValue,
+                ],
+                'ignored_key' => 'ignored_value',
+            ])
+            ->build();
 
         $this->assertEquals($boolValue, $attributes->get('bool'));
         $this->assertEquals($intValue, $attributes->get('int'));
@@ -73,15 +75,65 @@ class AttributesTest extends TestCase
      */
     public function test_apply_limits(): void
     {
-        $attributes = new Attributes([
-            'short' => '123',
-            'long' => '1234567890',
-            'dropped' => true,
-        ]);
-        $limitedAttributes = Attributes::withLimits($attributes, new AttributeLimits(2, 5));
+        $limitedAttributes = Attributes::factory(2, 5)
+            ->builder([
+                'short' => '123',
+                'long' => '1234567890',
+                'dropped' => true,
+            ])
+            ->build();
         $this->assertCount(2, $limitedAttributes);
         $this->assertEquals('123', $limitedAttributes->get('short'));
         $this->assertEquals('12345', $limitedAttributes->get('long'));
         $this->assertNull($limitedAttributes->get('dropped'));
+    }
+
+    public function test_builder_from_iterable(): void
+    {
+        $attributes = Attributes::factory()->builder(new ArrayIterator([
+            'key' => 'value',
+        ]));
+
+        $this->assertTrue(isset($attributes['key']));
+        $this->assertSame('value', $attributes['key']);
+
+        $attributes = $attributes->build();
+        $this->assertSame('value', $attributes->get('key'));
+        $this->assertCount(1, $attributes);
+        $this->assertSame(0, $attributes->getDroppedAttributesCount());
+    }
+
+    public function test_builder_ignores_null_values(): void
+    {
+        $attributes = Attributes::factory(1)->builder([
+            'key' => null,
+            'foo' => 'bar',
+        ]);
+
+        $this->assertFalse(isset($attributes['key']));
+        $this->assertSame('bar', $attributes['foo']);
+
+        $attributes = $attributes->build();
+        $this->assertCount(1, $attributes);
+        $this->assertSame(0, $attributes->getDroppedAttributesCount());
+    }
+
+    public function test_unset_after_count_limit_enables_set(): void
+    {
+        $attributes = Attributes::factory(2)->builder([
+            'a' => 'a',
+            'b' => 'b',
+            'c' => 'c',
+        ]);
+
+        unset($attributes['a']);
+        $attributes['d'] = 'd';
+        $attributes['e'] = 'e';
+
+        $attributes = $attributes->build();
+        $this->assertCount(2, $attributes);
+        $this->assertSame('b', $attributes->get('b'));
+        $this->assertSame('d', $attributes->get('d'));
+        $this->assertSame(2, $attributes->getDroppedAttributesCount());
     }
 }

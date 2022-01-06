@@ -7,7 +7,6 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPExporter;
 use OpenTelemetry\SDK\AbstractClock;
-use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
@@ -43,13 +42,13 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
         $span->setAttribute('remote_ip', '1.2.3.4')
             ->setAttribute('country', 'USA');
 
-        $span->addEvent('found_login' . $i, new Attributes([
+        $span->addEvent('found_login' . $i, [
             'id' => $i,
             'username' => 'otuser' . $i,
-        ]), $timestamp);
-        $span->addEvent('generated_session', new Attributes([
+        ], $timestamp);
+        $span->addEvent('generated_session', [
             'id' => md5((string) microtime(true)),
-        ]), $timestamp);
+        ], $timestamp);
 
         // temporarily setting service name here.  It should eventually be pulled from tracer.resources.
         $childSpan->setAttribute('service.name', 'alwaysOnOTLPGrpcExample');
@@ -57,10 +56,10 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
         $childSpan->setAttribute('attr_one', 'one')
             ->setAttribute('attr_two', 'two');
 
-        $childSpan->addEvent('found_event1' . $i, new Attributes([
+        $childSpan->addEvent('found_event1' . $i, [
             'id' => $i,
             'username' => 'child' . $i,
-        ]), $timestamp);
+        ], $timestamp);
 
         $childSpan->end();
         $span->end();

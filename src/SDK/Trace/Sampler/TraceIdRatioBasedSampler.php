@@ -44,7 +44,7 @@ class TraceIdRatioBasedSampler implements SamplerInterface
         string $traceId,
         string $spanName,
         int $spanKind,
-        ?AttributesInterface $attributes = null,
+        AttributesInterface $attributes,
         array $links = []
     ): SamplingResult {
         // TODO: Add config to adjust which spans get sampled (only default from specification is implemented)
@@ -60,7 +60,7 @@ class TraceIdRatioBasedSampler implements SamplerInterface
         $traceIdCondition = $lowerOrderBytes < round($this->probability * $traceIdLimit);
         $decision = $traceIdCondition ? SamplingResult::RECORD_AND_SAMPLE : SamplingResult::DROP;
 
-        return new SamplingResult($decision, $attributes, $traceState);
+        return new SamplingResult($decision, [], $traceState);
     }
 
     public function getDescription(): string

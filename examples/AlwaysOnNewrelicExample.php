@@ -9,7 +9,6 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Newrelic\Exporter as NewrelicExporter;
 use OpenTelemetry\SDK\AbstractClock;
-use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
@@ -81,13 +80,13 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
         $span->setAttribute('remote_ip', '1.2.3.4')
             ->setAttribute('country', 'USA');
 
-        $span->addEvent('found_login' . $i, new Attributes([
+        $span->addEvent('found_login' . $i, [
             'id' => $i,
             'username' => 'otuser' . $i,
-        ]), $timestamp);
-        $span->addEvent('generated_session', new Attributes([
+        ], $timestamp);
+        $span->addEvent('generated_session', [
             'id' => md5((string) microtime(true)),
-        ]), $timestamp);
+        ], $timestamp);
 
         $span->end();
     }
