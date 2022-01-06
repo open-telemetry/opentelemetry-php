@@ -16,7 +16,7 @@ class SystemClockTest extends TestCase
      * @runInSeparateProcess
      * @preserveGlobalState false
      */
-    public function test_get_instance(): void
+    public function test_get_instance_always_returns_same_clock(): void
     {
         $clock = SystemClock::getInstance();
         $this->assertSame($clock, SystemClock::getInstance());

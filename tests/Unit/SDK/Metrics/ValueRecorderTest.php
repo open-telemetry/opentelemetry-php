@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
-use InvalidArgumentException;
 use OpenTelemetry\API\Metrics as API;
 use OpenTelemetry\SDK\Metrics\ValueRecorder;
 use PHPUnit\Framework\TestCase;
+use TypeError;
 
 /**
  * @covers OpenTelemetry\SDK\Metrics\ValueRecorder
@@ -29,113 +29,73 @@ class ValueRecorderTest extends TestCase
     public function test_valid_positive_int_record(): void
     {
         $this->metric->record(5);
-        $this->assertEquals(1, $this->metric->getCount());
-        $this->assertEquals(5, $this->metric->getMax());
-        $this->assertEquals(5, $this->metric->getMin());
-        $this->assertEquals(5, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 1, 5, 5, 5);
         $this->metric->record(2);
-        $this->assertEquals(2, $this->metric->getCount());
-        $this->assertEquals(5, $this->metric->getMax());
-        $this->assertEquals(2, $this->metric->getMin());
-        $this->assertEquals(7, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 2, 5, 2, 7);
     }
 
     public function test_valid_negative_int_record(): void
     {
         $this->metric->record(-5);
-        $this->assertEquals(1, $this->metric->getCount());
-        $this->assertEquals(-5, $this->metric->getMax());
-        $this->assertEquals(-5, $this->metric->getMin());
-        $this->assertEquals(-5, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 1, -5, -5, -5);
         $this->metric->record(-2);
-        $this->assertEquals(2, $this->metric->getCount());
-        $this->assertEquals(-2, $this->metric->getMax());
-        $this->assertEquals(-5, $this->metric->getMin());
-        $this->assertEquals(-7, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 2, -2, -5, -7);
     }
 
     public function test_valid_positive_and_negative_int_record(): void
     {
         $this->metric->record(5);
-        $this->assertEquals(1, $this->metric->getCount());
-        $this->assertEquals(5, $this->metric->getMax());
-        $this->assertEquals(5, $this->metric->getMin());
-        $this->assertEquals(5, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 1, 5, 5, 5);
         $this->metric->record(-2);
-        $this->assertEquals(2, $this->metric->getCount());
-        $this->assertEquals(5, $this->metric->getMax());
-        $this->assertEquals(-2, $this->metric->getMin());
-        $this->assertEquals(3, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 2, 5, -2, 3);
     }
 
     public function test_valid_negative_and_positive_record(): void
     {
         $this->metric->record(-5);
-        $this->assertEquals(1, $this->metric->getCount());
-        $this->assertEquals(-5, $this->metric->getMax());
-        $this->assertEquals(-5, $this->metric->getMin());
-        $this->assertEquals(-5, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 1, -5, -5, -5);
         $this->metric->record(2);
-        $this->assertEquals(2, $this->metric->getCount());
-        $this->assertEquals(2, $this->metric->getMax());
-        $this->assertEquals(-5, $this->metric->getMin());
-        $this->assertEquals(-3, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 2, 2, -5, -3);
     }
 
     public function test_valid_positive_float_record(): void
     {
         $this->metric->record(5.2222);
-        $this->assertEquals(1, $this->metric->getCount());
-        $this->assertEquals(5.2222, $this->metric->getMax());
-        $this->assertEquals(5.2222, $this->metric->getMin());
-        $this->assertEquals(5.2222, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 1, 5.2222, 5.2222, 5.2222);
         $this->metric->record(2.6666);
-        $this->assertEquals(2, $this->metric->getCount());
-        $this->assertEquals(5.2222, $this->metric->getMax());
-        $this->assertEquals(2.6666, $this->metric->getMin());
-        $this->assertEquals(7.8888, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 2, 5.2222, 2.6666, 7.8888);
     }
 
     public function test_valid_negative_float_record(): void
     {
         $this->metric->record(-5.2222);
-        $this->assertEquals(1, $this->metric->getCount());
-        $this->assertEquals(-5.2222, $this->metric->getMax());
-        $this->assertEquals(-5.2222, $this->metric->getMin());
-        $this->assertEquals(-5.2222, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 1, -5.2222, -5.2222, -5.2222);
         $this->metric->record(-2.6666);
-        $this->assertEquals(2, $this->metric->getCount());
-        $this->assertEquals(-2.6666, $this->metric->getMax());
-        $this->assertEquals(-5.2222, $this->metric->getMin());
-        $this->assertEquals(-7.8888, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 2, -2.6666, -5.2222, -7.8888);
     }
 
     public function test_valid_positive_and_negative_float_record(): void
     {
         $this->metric->record(5.2222);
-        $this->assertEquals(1, $this->metric->getCount());
-        $this->assertEquals(5.2222, $this->metric->getMax());
-        $this->assertEquals(5.2222, $this->metric->getMin());
-        $this->assertEquals(5.2222, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 1, 5.2222, 5.2222, 5.2222);
         $this->metric->record(-2.6666);
-        $this->assertEquals(2, $this->metric->getCount());
-        $this->assertEquals(5.2222, $this->metric->getMax());
-        $this->assertEquals(-2.6666, $this->metric->getMin());
-        $this->assertEquals(2.5556, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 2, 5.2222, -2.6666, 2.5556);
     }
 
     public function test_valid_negative_and_positive_float_record(): void
     {
         $this->metric->record(-5.2222);
-        $this->assertEquals(1, $this->metric->getCount());
-        $this->assertEquals(-5.2222, $this->metric->getMax());
-        $this->assertEquals(-5.2222, $this->metric->getMin());
-        $this->assertEquals(-5.2222, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 1, -5.2222, -5.2222, -5.2222);
         $this->metric->record(2.6666);
-        $this->assertEquals(2, $this->metric->getCount());
-        $this->assertEquals(2.6666, $this->metric->getMax());
-        $this->assertEquals(-5.2222, $this->metric->getMin());
-        $this->assertEquals(-2.5556, $this->metric->getSum());
+        $this->assertMetrics($this->metric, 2, 2.6666, -5.2222, -2.5556);
+    }
+
+    private function assertMetrics(ValueRecorder $metric, float $count, float $max, float $min, float $sum): void
+    {
+        $this->assertEquals($count, $metric->getCount());
+        $this->assertEquals($max, $metric->getMax());
+        $this->assertEquals($min, $metric->getMin());
+        $this->assertEquals($sum, $metric->getSum());
     }
 
     public function test_value_recorder_initialization(): void
@@ -147,9 +107,9 @@ class ValueRecorderTest extends TestCase
         $this->assertEquals(0, $this->metric->getMean());
     }
 
-    public function test_invalid_value_recorder_record_throws_exception(): void
+    public function test_invalid_value_recorder_record_throws_type_error(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         /**
          * @phpstan-ignore-next-line
          * @psalm-suppress InvalidScalarArgument
