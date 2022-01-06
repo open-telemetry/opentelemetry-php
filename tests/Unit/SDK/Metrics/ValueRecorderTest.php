@@ -112,7 +112,7 @@ class ValueRecorderTest extends TestCase
         $this->expectException(TypeError::class);
         /**
          * @phpstan-ignore-next-line
-         * @psalm-suppress InvalidScalarArgument
+         * @psalm-suppress InvalidArgument
          */
         $this->metric->record('a');
     }
