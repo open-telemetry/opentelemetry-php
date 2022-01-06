@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-use InvalidArgumentException;
 use OpenTelemetry\API\Metrics as API;
 
 /*
