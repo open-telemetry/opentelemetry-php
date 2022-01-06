@@ -92,7 +92,7 @@ final class AttributesBuilder implements AttributesBuilderInterface
         return $this->attributes[$offset] ?? null;
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if ($value === null) {
             unset($this->attributes[$offset]);
