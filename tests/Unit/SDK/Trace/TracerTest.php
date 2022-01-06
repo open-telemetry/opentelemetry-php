@@ -4,47 +4,53 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
-use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
-use OpenTelemetry\SDK\Trace\SpanBuilder;
-use OpenTelemetry\SDK\Trace\TracerProvider;
+use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Trace\Tracer;
+use OpenTelemetry\SDK\Trace\TracerSharedState;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\Tracer
+ */
 class TracerTest extends TestCase
 {
-    private API\TracerInterface $tracer;
+    private Tracer $tracer;
+    private TracerSharedState $tracerSharedState;
+    private InstrumentationLibrary $instrumentationLibrary;
 
     protected function setUp(): void
     {
-        $this->tracer = (new TracerProvider())
-            ->getTracer('name', 'version');
+        $this->tracerSharedState = $this->createMock(TracerSharedState::class);
+        $this->instrumentationLibrary = $this->createMock(InstrumentationLibrary::class);
+        $this->tracer = (new Tracer($this->tracerSharedState, $this->instrumentationLibrary));
     }
 
-    public function test_span_builder_default(): void
+    /**
+     * @dataProvider nameProvider
+     * @param non-empty-string $name
+     */
+    public function test_span_builder(string $name, string $expected): void
     {
-        $this->assertInstanceOf(
-            SpanBuilder::class,
-            $this->tracer->spanBuilder('name')
-        );
+        $spanBuilder = $this->tracer->spanBuilder($name);
+        $reflection = new \ReflectionClass($spanBuilder);
+        $property = $reflection->getProperty('spanName');
+        $property->setAccessible(true);
+
+        $this->assertSame($expected, $property->getValue($spanBuilder));
     }
 
-    public function test_span_builder_propagates_instrumentation_library_info_to_span(): void
+    public function nameProvider(): array
     {
-        /** @var ReadableSpanInterface $span */
-        $span = $this->tracer->spanBuilder('span')->startSpan();
-
-        $this->assertSame('name', $span->getInstrumentationLibrary()->getName());
-        $this->assertSame('version', $span->getInstrumentationLibrary()->getVersion());
+        return [
+            'valid name' => ['name', 'name'],
+            'invalid name uses fallback' => [' ', Tracer::FALLBACK_SPAN_NAME],
+        ];
     }
 
-    public function test_span_builder_fallback_span_name(): void
+    /**
+     */
+    public function test_get_instrumentation_library(): void
     {
-        /** @var ReadableSpanInterface $span */
-        $span = $this->tracer->spanBuilder('  ')->startSpan();
-
-        $this->assertSame(
-            'empty',
-            $span->getName()
-        );
+        $this->assertSame($this->instrumentationLibrary, $this->tracer->getInstrumentationLibrary());
     }
 }

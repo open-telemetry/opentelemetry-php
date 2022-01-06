@@ -8,6 +8,9 @@ use OpenTelemetry\SDK\AttributeLimits;
 use OpenTelemetry\SDK\Attributes;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Attributes
+ */
 class AttributesTest extends TestCase
 {
     public function test_attribute_limits_compare(): void
@@ -53,6 +56,7 @@ class AttributesTest extends TestCase
             'array' => [
                 $shortStringValue,
                 $longStringValue,
+                $boolValue,
             ],
             'ignored_key' => 'ignored_value',
         ], $attributeLimits);
@@ -62,7 +66,7 @@ class AttributesTest extends TestCase
         $this->assertEquals($floatValue, $attributes->get('float'));
         $this->assertEquals($shortStringValue, $attributes->get('short_string'));
         $this->assertEquals($longStringTrimmed, $attributes->get('long_string'));
-        $this->assertEquals([$shortStringValue, $longStringTrimmed], $attributes->get('array'));
+        $this->assertEquals([$shortStringValue, $longStringTrimmed, $boolValue], $attributes->get('array'));
 
         $this->assertEquals(6, $attributes->count());
         $this->assertNull($attributes->get('ignored_key'));
@@ -83,5 +87,38 @@ class AttributesTest extends TestCase
         $this->assertEquals('123', $limitedAttributes->get('short'));
         $this->assertEquals('12345', $limitedAttributes->get('long'));
         $this->assertNull($limitedAttributes->get('dropped'));
+        $this->assertGreaterThan(0, $limitedAttributes->getDroppedAttributesCount());
+    }
+
+    public function test_null_attribute_removes_existing(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+            'bar' => 'bar',
+            'baz' => 'baz',
+        ]);
+        $this->assertCount(3, $attributes);
+        $attributes->setAttribute('foo', null);
+        $this->assertCount(2, $attributes);
+    }
+
+    public function test_null_missing_attribute_does_nothing(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+        ]);
+        $this->assertCount(1, $attributes);
+        $attributes->setAttribute('bar', null);
+        $this->assertCount(1, $attributes);
+    }
+    public function test_to_array(): void
+    {
+        $values = [
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ];
+        $attributes = new Attributes($values);
+        $this->assertSame($values, $attributes->toArray());
+        $this->assertEquals(2, $attributes->getTotalAddedValues());
     }
 }

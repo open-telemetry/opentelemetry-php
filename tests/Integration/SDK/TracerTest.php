@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Integration;
+namespace OpenTelemetry\Tests\Integration\SDK;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
@@ -17,6 +17,9 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversNothing
+ */
 class TracerTest extends TestCase
 {
     public function test_noop_span_should_be_started_when_sampling_result_is_drop(): void
@@ -75,5 +78,17 @@ class TracerTest extends TestCase
 
         $this->assertEquals('OpenTelemetry.TracerTest', $spanInstrumentationLibrary->getName());
         $this->assertEquals('dev', $spanInstrumentationLibrary->getVersion());
+    }
+
+    public function test_span_builder_propagates_instrumentation_library_info_to_span(): void
+    {
+        /** @var Span $span */
+        $span = (new TracerProvider())
+            ->getTracer('name', 'version')
+            ->spanBuilder('span')
+            ->startSpan();
+
+        $this->assertSame('name', $span->getInstrumentationLibrary()->getName());
+        $this->assertSame('version', $span->getInstrumentationLibrary()->getVersion());
     }
 }

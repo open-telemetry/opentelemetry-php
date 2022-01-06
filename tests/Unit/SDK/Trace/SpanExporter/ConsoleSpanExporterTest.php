@@ -9,6 +9,9 @@ use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter
+ */
 class ConsoleSpanExporterTest extends AbstractExporterTest
 {
     public function createExporter(): ConsoleSpanExporter

@@ -23,9 +23,12 @@ use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\Contrib\Otlp\SpanConverter
+ */
 class OTLPSpanConverterTest extends TestCase
 {
-    public function test_should_convert_a_span_to_a_payload_for_otlp(): void
+    public function test_convert_span_to_payload(): void
     {
         $context = SpanContext::getInvalid();
 
@@ -241,9 +244,6 @@ class OTLPSpanConverterTest extends TestCase
         $this->assertEquals($expected, $row[0]);
     }
 
-    /**
-     * @covers OpenTelemetry\Contrib\Otlp\SpanConverter::as_otlp_resource_attributes
-     */
     public function test_resources_from_multiple_spans_are_not_duplicated(): void
     {
         $span = $this->createMock(SpanData::class);
@@ -267,7 +267,6 @@ class OTLPSpanConverterTest extends TestCase
 
     /**
      * @dataProvider spanKindProvider
-     * @covers OpenTelemetry\Contrib\Otlp\SpanConverter::as_otlp_span_kind
      */
     public function test_span_kind($kind, $expected): void
     {
@@ -288,9 +287,6 @@ class OTLPSpanConverterTest extends TestCase
         ];
     }
 
-    /**
-     * @covers OpenTelemetry\Contrib\Otlp\SpanConverter::as_otlp_span
-     */
     public function test_span_with_error_status(): void
     {
         $span = (new SpanData())->setStatus(StatusData::error());

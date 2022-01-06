@@ -8,6 +8,9 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\Context\Propagation\NoopTextMapPropagator
+ */
 class NoopTextMapPropagatorTest extends TestCase
 {
     public function test_fields(): void

@@ -11,6 +11,9 @@ use OpenTelemetry\Context\Propagation\KeyedArrayAccessInterface;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
+/**
+ * @covers OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter
+ */
 class ArrayAccessGetterSetterTest extends TestCase
 {
     public function test_get_from_map_array(): void

@@ -17,6 +17,9 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use ReflectionObject;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor
+ */
 class BatchSpanProcessorTest extends MockeryTestCase
 {
     use EnvironmentVariables;

@@ -10,8 +10,15 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversDefaultClass OpenTelemetry\SDK\Trace\TracerProvider
+ */
 class TracerProviderTest extends TestCase
 {
+    /**
+     * @covers ::getTracer
+     * @covers ::__construct
+     */
     public function test_reuses_same_instance(): void
     {
         $provider = new TracerProvider(null);
@@ -26,6 +33,7 @@ class TracerProviderTest extends TestCase
     }
 
     /**
+     * @covers ::getDefaultTracer
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
@@ -35,6 +43,8 @@ class TracerProviderTest extends TestCase
     }
 
     /**
+     * @covers ::setDefaultTracer
+     * @covers ::getDefaultTracer
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
@@ -45,6 +55,9 @@ class TracerProviderTest extends TestCase
         $this->assertSame($tracer, TracerProvider::getDefaultTracer());
     }
 
+    /**
+     * @covers ::getTracer
+     */
     public function test_get_tracer_with_default_name(): void
     {
         $provider = new TracerProvider(null);
@@ -55,7 +68,10 @@ class TracerProviderTest extends TestCase
         $this->assertSame($t1, $t2);
     }
 
-    public function test_shut_down(): void
+    /**
+     * @covers ::shutdown
+     */
+    public function test_shutdown(): void
     {
         $provider = new TracerProvider(null);
 
@@ -64,6 +80,9 @@ class TracerProviderTest extends TestCase
         $this->assertTrue($provider->shutdown());
     }
 
+    /**
+     * @covers ::forceFlush
+     */
     public function test_force_flush(): void
     {
         $provider = new TracerProvider([]);
@@ -73,6 +92,9 @@ class TracerProviderTest extends TestCase
         $this->assertTrue($provider->forceFlush());
     }
 
+    /**
+     * @covers ::getSampler
+     */
     public function test_get_sampler(): void
     {
         $sampler = $this->createMock(SamplerInterface::class);
@@ -84,6 +106,9 @@ class TracerProviderTest extends TestCase
         );
     }
 
+    /**
+     * @covers ::getTracer
+     */
     public function test_get_tracer_after_shutdown(): void
     {
         $provider = new TracerProvider([]);

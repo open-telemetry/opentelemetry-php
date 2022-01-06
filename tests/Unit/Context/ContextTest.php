@@ -8,6 +8,9 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\Context\Context
+ */
 class ContextTest extends TestCase
 {
     public function test_activate(): void

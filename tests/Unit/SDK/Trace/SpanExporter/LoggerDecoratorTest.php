@@ -10,6 +10,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 use RuntimeException;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\SpanExporter\LoggerDecorator
+ */
 class LoggerDecoratorTest extends AbstractLoggerAwareTest
 {
     /**

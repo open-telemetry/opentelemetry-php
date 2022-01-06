@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-use InvalidArgumentException;
 use OpenTelemetry\API\Metrics as API;
 
 /*
@@ -38,10 +37,7 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorderInterface
 {
     use HasLabelsTrait;
 
-    /**
-     * @var float $valueSum
-     */
-    protected $valueSum = 0;
+    protected float $valueSum = 0;
 
     protected float $valueMin = INF;
 
@@ -58,8 +54,6 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorderInterface
 
     /**
      * getType: get the type of metric instrument
-     *
-     * @return  int
      */
     public function getType(): int
     {
@@ -70,7 +64,6 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorderInterface
      * Returns the sum of the values
      *
      * @access	public
-     * @return	float
      */
     public function getSum(): float
     {
@@ -81,7 +74,6 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorderInterface
      * Returns the min of the values
      *
      * @access	public
-     * @return	float
      */
     public function getMin(): float
     {
@@ -92,7 +84,6 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorderInterface
      * Returns the max of the values
      *
      * @access	public
-     * @return	float
      */
     public function getMax(): float
     {
@@ -103,7 +94,6 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorderInterface
      * Returns the mean of the values
      *
      * @access	public
-     * @return	float
      */
     public function getMean(): float
     {
@@ -118,7 +108,6 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorderInterface
      * Returns the count of the values
      *
      * @access	public
-     * @return	int
      */
     public function getCount(): int
     {
@@ -126,28 +115,12 @@ class ValueRecorder extends AbstractMetric implements API\ValueRecorderInterface
     }
 
     /**
-     * Updates the ValueRecorder's value with the specified value then returns
-     * the current value count.
+     * Updates the ValueRecorder's value with the specified value.
      *
      * @access	public
-     * @param int|float $value, accepts INTs or FLOATs. If value is an int, it it cast as a float.
-     * @return void
      */
-    public function record($value): void
+    public function record(float $value): void
     {
-        if (is_int($value)) {
-            /*
-             *
-             * todo: send the following message to the log when logger is implemented:
-             *       Integer detected, casting as a float.
-             */
-            $value = (float) $value;
-        }
-        if (!is_float($value)) {
-            throw new InvalidArgumentException('Only numerical values can be used
-                                                to update the ValueRecorder.');
-        }
-
         $value = round($value, $this->decimalPointPrecision);
 
         $this->valueSum += $value;

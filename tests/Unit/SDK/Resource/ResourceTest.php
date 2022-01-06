@@ -10,6 +10,9 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Resource\ResourceInfo
+ */
 class ResourceTest extends TestCase
 {
     use EnvironmentVariables;

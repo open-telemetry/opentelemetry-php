@@ -7,6 +7,9 @@ namespace OpenTelemetry\Tests\Context\Unit;
 use OpenTelemetry\Context\ContextKey;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\Context\ContextKey
+ */
 class ContextKeyTest extends TestCase
 {
     public function test_name(): void

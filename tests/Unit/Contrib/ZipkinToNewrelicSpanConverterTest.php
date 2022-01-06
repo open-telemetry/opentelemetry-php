@@ -10,6 +10,9 @@ use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\Contrib\ZipkinToNewrelic\SpanConverter
+ */
 class ZipkinToNewrelicSpanConverterTest extends TestCase
 {
     public function test_should_convert_a_span_to_a_payload_for_zipkin(): void

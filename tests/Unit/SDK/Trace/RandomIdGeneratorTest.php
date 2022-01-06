@@ -8,6 +8,9 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\RandomIdGenerator
+ */
 class RandomIdGeneratorTest extends TestCase
 {
     public function test_generated_trace_id_is_valid(): void

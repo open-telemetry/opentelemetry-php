@@ -7,6 +7,9 @@ namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 use OpenTelemetry\SDK\Metrics\HasLabelsTrait;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Metrics\HasLabelsTrait
+ */
 class HasLabelTest extends TestCase
 {
     protected $labelable;

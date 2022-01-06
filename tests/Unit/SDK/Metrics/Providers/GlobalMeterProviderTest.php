@@ -9,6 +9,9 @@ use OpenTelemetry\SDK\Metrics\Providers\GlobalMeterProvider;
 use OpenTelemetry\SDK\Metrics\Providers\MeterProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Metrics\Providers\GlobalMeterProvider
+ */
 class GlobalMeterProviderTest extends TestCase
 {
     public function test_global_meter_provider_setters_and_getters(): void

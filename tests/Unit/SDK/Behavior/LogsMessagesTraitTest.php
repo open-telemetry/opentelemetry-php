@@ -11,6 +11,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
+/**
+ * @covers OpenTelemetry\SDK\Behavior\LogsMessagesTrait
+ */
 class LogsMessagesTraitTest extends TestCase
 {
     // @var LoggerInterface|MockObject $logger

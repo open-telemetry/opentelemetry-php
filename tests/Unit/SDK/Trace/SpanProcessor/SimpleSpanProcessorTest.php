@@ -16,6 +16,9 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor
+ */
 class SimpleSpanProcessorTest extends MockeryTestCase
 {
     private SimpleSpanProcessor $simpleSpanProcessor;
@@ -85,5 +88,11 @@ class SimpleSpanProcessorTest extends MockeryTestCase
 
         $this->assertTrue($this->simpleSpanProcessor->shutdown());
         $this->assertTrue($this->simpleSpanProcessor->shutdown());
+    }
+
+    public function test_shutdown_with_no_exporter(): void
+    {
+        $processor = new SimpleSpanProcessor(null);
+        $this->assertTrue($processor->shutdown());
     }
 }

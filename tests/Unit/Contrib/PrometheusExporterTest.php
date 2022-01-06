@@ -11,6 +11,9 @@ use PHPUnit\Framework\TestCase;
 use Prometheus\CollectorRegistry;
 use Prometheus\Counter as PrometheusCounter;
 
+/**
+ * @covers OpenTelemetry\Contrib\Prometheus\PrometheusExporter
+ */
 class PrometheusExporterTest extends TestCase
 {
     public function test_empty_metrics_export_returns_success(): void

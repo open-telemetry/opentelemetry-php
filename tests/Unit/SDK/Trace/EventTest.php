@@ -9,6 +9,9 @@ use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\Event
+ */
 class EventTest extends TestCase
 {
     private const EVENT_NAME = 'test-event';
