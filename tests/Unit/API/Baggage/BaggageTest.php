@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers OpenTelemetry\API\Baggage\Baggage
- * @todo integration tests?
  */
 class BaggageTest extends TestCase
 {
