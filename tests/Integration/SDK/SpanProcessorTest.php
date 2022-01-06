@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Integration;
+namespace OpenTelemetry\Tests\Integration\SDK;
 
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
@@ -10,6 +10,9 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversNothing
+ */
 class SpanProcessorTest extends TestCase
 {
     public function test_parent_context_should_be_passed_to_span_processor(): void

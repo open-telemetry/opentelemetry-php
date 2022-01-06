@@ -9,6 +9,10 @@ use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\Context\ScopeInterface;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\Context\Context
+ * @todo check scope vs context - what should this class be testing?
+ */
 class ScopeTest extends TestCase
 {
     public function test_scope_close_restores_context(): void

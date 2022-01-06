@@ -8,11 +8,13 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\Trace\StatusData;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\StatusData
+ */
 class StatusDataTest extends TestCase
 {
     /**
      * @dataProvider getStatuses
-     *
      * @psalm-param StatusCode::STATUS_* $code
      */
     public function test_statuses(string $code): void
@@ -37,7 +39,6 @@ class StatusDataTest extends TestCase
 
     /**
      * @dataProvider getStatuses
-     *
      * @psalm-param StatusCode::STATUS_* $code
      */
     public function test_statuses_description(string $code): void

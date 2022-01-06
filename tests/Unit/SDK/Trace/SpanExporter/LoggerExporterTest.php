@@ -8,6 +8,9 @@ use Exception;
 use OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter
+ */
 class LoggerExporterTest extends AbstractExporterTest
 {
     use LoggerAwareTestTrait;

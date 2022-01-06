@@ -10,6 +10,9 @@ use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\SpanLimitsBuilder
+ */
 class SpanLimitsBuilderTest extends TestCase
 {
     use EnvironmentVariables;

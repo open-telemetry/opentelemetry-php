@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * @covers OpenTelemetry\SDK\GlobalLoggerHolder
+ */
 class GlobalLoggerHolderTest extends TestCase
 {
     public function tearDown(): void

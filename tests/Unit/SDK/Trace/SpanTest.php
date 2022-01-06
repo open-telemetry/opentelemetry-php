@@ -10,6 +10,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\AbstractClock;
@@ -34,6 +35,9 @@ use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use function range;
 use function str_repeat;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\Span
+ */
 class SpanTest extends MockeryTestCase
 {
     private const SPAN_NAME = 'test_span';
@@ -95,12 +99,42 @@ class SpanTest extends MockeryTestCase
 
     // region API
 
+    public function test_get_invalid_span(): void
+    {
+        $this->assertInstanceOf(NonRecordingSpan::class, Span::getInvalid());
+    }
+
     public function test_get_current_span_default(): void
     {
         $this->assertSame(
             Span::getInvalid(),
             Span::getCurrent()
         );
+    }
+
+    public function test_start_span(): void
+    {
+        $this->createTestSpan(API\SpanKind::KIND_INTERNAL);
+        $this->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->once();
+    }
+
+    public function test_end_span(): void
+    {
+        $span = $this->createTestSpan(API\SpanKind::KIND_CONSUMER);
+        $span->end();
+        $span->end();
+        $this->assertTrue($span->hasEnded());
+        $this->spanProcessor
+            ->shouldHaveReceived('onEnd')
+            ->once();
+    }
+
+    public function test_get_start_epoch_nanos(): void
+    {
+        $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL);
+        $this->assertSame(self::START_EPOCH, $span->getStartEpochNanos());
     }
 
     public function test_get_current_span_set_span(): void

@@ -9,6 +9,9 @@ use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\Contrib\Newrelic\SpanConverter
+ */
 class NewrelicSpanConverterTest extends TestCase
 {
     public function test_should_convert_a_span_to_a_payload_for_newrelic(): void

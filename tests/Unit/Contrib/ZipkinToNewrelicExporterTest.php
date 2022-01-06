@@ -6,6 +6,9 @@ namespace OpenTelemetry\Tests\Unit\Contrib;
 
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter;
 
+/**
+ * @covers OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter
+ */
 class ZipkinToNewrelicExporterTest extends AbstractHttpExporterTest
 {
     protected const EXPORTER_NAME = 'test.zipkinToNR';

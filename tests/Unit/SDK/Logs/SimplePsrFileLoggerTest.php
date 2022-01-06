@@ -11,6 +11,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
 
+/**
+ * @covers OpenTelemetry\SDK\Logs\SimplePsrFileLogger
+ */
 class SimplePsrFileLoggerTest extends TestCase
 {
     private const ROOT_DIR = 'var';

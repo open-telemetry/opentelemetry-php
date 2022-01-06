@@ -19,6 +19,9 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 
+/**
+ * @covers OpenTelemetry\Contrib\OtlpHttp\Exporter
+ */
 class OTLPHttpExporterTest extends AbstractExporterTest
 {
     use EnvironmentVariables;
@@ -36,10 +39,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         );
     }
 
-    /**
-     * @after
-     */
-    public function cleanUpEnvVars(): void
+    public function tearDown(): void
     {
         $this->restoreEnvironmentVariables();
     }
@@ -208,7 +208,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
 
     /**
      * @testdox Exporter Refuses OTLP/JSON Protocol
-     * https://github.com/open-telemetry/opentelemetry-specification/issues/786
+     * @link https://github.com/open-telemetry/opentelemetry-specification/issues/786
      * @psalm-suppress PossiblyInvalidArgument
      */
     public function test_fails_exporter_refuses_otlp_json(): void

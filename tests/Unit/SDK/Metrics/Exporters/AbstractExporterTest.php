@@ -8,6 +8,9 @@ use OpenTelemetry\API\Metrics as API;
 use OpenTelemetry\SDK\Metrics\Exporters\AbstractExporter;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Metrics\Exporters\AbstractExporter
+ */
 class AbstractExporterTest extends TestCase
 {
     public function test_empty_metrics_export_returns_success(): void

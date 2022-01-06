@@ -15,6 +15,9 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 
+/**
+ * @covers OpenTelemetry\Contrib\OtlpGrpc\Exporter
+ */
 class OTLPGrpcExporterTest extends AbstractExporterTest
 {
     use EnvironmentVariables;
@@ -101,6 +104,15 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $exporter = new Exporter();
 
         $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['barf']], $exporter->getHeaders());
+    }
+
+    public function test_set_header(): void
+    {
+        $exporter = new Exporter();
+        $exporter->setHeader('foo', 'bar');
+        $headers = $exporter->getHeaders();
+        $this->assertArrayHasKey('foo', $headers);
+        $this->assertEquals(['bar'], $headers['foo']);
     }
 
     public function test_set_headers_in_constructor(): void

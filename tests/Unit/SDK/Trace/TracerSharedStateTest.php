@@ -4,34 +4,32 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
-use Mockery;
-use Mockery\Adapter\Phpunit\MockeryTestCase;
-use Mockery\MockInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\IdGeneratorInterface;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
-use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
+use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerSharedState;
+use PHPUnit\Framework\TestCase;
 
-class TracerSharedStateTest extends MockeryTestCase
+/**
+ * @covers OpenTelemetry\SDK\Trace\TracerSharedState
+ */
+class TracerSharedStateTest extends TestCase
 {
-    /** @var MockInterface&IdGeneratorInterface */
-    private $idGenerator;
-
-    /** @var MockInterface&ResourceInfo */
-    private $resourceInfo;
-
-    /** @var MockInterface&SamplerInterface */
-    private $sampler;
+    private IdGeneratorInterface $idGenerator;
+    private ResourceInfo $resourceInfo;
+    private SamplerInterface $sampler;
+    private SpanLimits $spanLimits;
 
     protected function setUp(): void
     {
-        $this->idGenerator = Mockery::mock(IdGeneratorInterface::class);
-        $this->resourceInfo = Mockery::mock(ResourceInfo::class);
-        $this->sampler = Mockery::mock(SamplerInterface::class);
+        $this->idGenerator = $this->createMock(IdGeneratorInterface::class);
+        $this->resourceInfo = $this->createMock(ResourceInfo::class);
+        $this->sampler = $this->createMock(SamplerInterface::class);
+        $this->spanLimits = $this->createMock(SpanLimits::class);
     }
 
     public function test_getters(): void
@@ -51,6 +49,11 @@ class TracerSharedStateTest extends MockeryTestCase
             $this->sampler,
             $state->getSampler()
         );
+
+        $this->assertSame(
+            $this->spanLimits,
+            $state->getSpanLimits(),
+        );
     }
 
     public function test_construct_no_span_processors(): void
@@ -63,7 +66,7 @@ class TracerSharedStateTest extends MockeryTestCase
 
     public function test_construct_one_span_processor(): void
     {
-        $processor = Mockery::mock(SpanProcessorInterface::class);
+        $processor = $this->createMock(SpanProcessorInterface::class);
 
         $this->assertSame(
             $processor,
@@ -73,8 +76,8 @@ class TracerSharedStateTest extends MockeryTestCase
 
     public function test_construct_multiple_span_processors(): void
     {
-        $processor1 = Mockery::mock(SpanProcessorInterface::class);
-        $processor2 = Mockery::mock(SpanProcessorInterface::class);
+        $processor1 = $this->createMock(SpanProcessorInterface::class);
+        $processor2 = $this->createMock(SpanProcessorInterface::class);
 
         $this->assertInstanceOf(
             MultiSpanProcessor::class,
@@ -82,12 +85,33 @@ class TracerSharedStateTest extends MockeryTestCase
         );
     }
 
+    public function test_shutdown(): void
+    {
+        $spanProcessor = $this->createMock(SpanProcessorInterface::class);
+        $state = $this->construct([$spanProcessor]);
+        $spanProcessor->expects($this->once())->method('shutdown')->willReturn(true);
+        $this->assertTrue($state->shutdown());
+        $this->assertTrue($state->hasShutdown());
+    }
+
+    public function test_sets_noop_as_default_span_processor(): void
+    {
+        $state = new TracerSharedState(
+            $this->idGenerator,
+            $this->resourceInfo,
+            $this->spanLimits,
+            $this->sampler,
+            [],
+        );
+        $this->assertInstanceOf(NoopSpanProcessor::class, $state->getSpanProcessor());
+    }
+
     private function construct(array $spanProcessors = []): TracerSharedState
     {
         return new TracerSharedState(
             $this->idGenerator,
             $this->resourceInfo,
-            (new SpanLimitsBuilder())->build(),
+            $this->spanLimits,
             $this->sampler,
             empty($spanProcessors) ? [new NoopSpanProcessor()] : $spanProcessors,
         );

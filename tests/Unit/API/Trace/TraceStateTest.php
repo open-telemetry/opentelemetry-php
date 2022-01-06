@@ -7,6 +7,9 @@ namespace OpenTelemetry\Tests\API\Unit\Trace;
 use OpenTelemetry\API\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\API\Trace\TraceState
+ */
 class TraceStateTest extends TestCase
 {
     public function test_get_tracestate_value(): void

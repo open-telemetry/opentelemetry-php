@@ -31,35 +31,35 @@ class ParentBased implements SamplerInterface
 {
     private SamplerInterface $root;
 
-    private SamplerInterface $remoteParentSampled;
+    private SamplerInterface $remoteParentSampler;
 
-    private SamplerInterface $remoteParentNotSampled;
+    private SamplerInterface $remoteParentNotSampler;
 
-    private SamplerInterface $localParentSampled;
+    private SamplerInterface $localParentSampler;
 
-    private SamplerInterface $localParentNotSampled;
+    private SamplerInterface $localParentNotSampler;
 
     /**
      * ParentBased sampler delegates the sampling decision based on the parent context.
      *
      * @param SamplerInterface $root Sampler called for the span with no parent (root span).
-     * @param SamplerInterface|null $remoteParentSampled Sampler called for the span with the remote sampled parent. When null, `AlwaysOnSampler` is used.
-     * @param SamplerInterface|null $remoteParentNotSampled Sampler called for the span with the remote not sampled parent. When null, `AlwaysOffSampler` is used.
-     * @param SamplerInterface|null $localParentSampled Sampler called for the span with local the sampled parent. When null, `AlwaysOnSampler` is used.
-     * @param SamplerInterface|null $localParentNotSampled Sampler called for the span with the local not sampled parent. When null, `AlwaysOffSampler` is used.
+     * @param SamplerInterface|null $remoteParentSampler Sampler called for the span with the remote sampled parent. When null, `AlwaysOnSampler` is used.
+     * @param SamplerInterface|null $remoteParentNotSampler Sampler called for the span with the remote not sampled parent. When null, `AlwaysOffSampler` is used.
+     * @param SamplerInterface|null $localParentSampler Sampler called for the span with local the sampled parent. When null, `AlwaysOnSampler` is used.
+     * @param SamplerInterface|null $localParentNotSampler Sampler called for the span with the local not sampled parent. When null, `AlwaysOffSampler` is used.
      */
     public function __construct(
         SamplerInterface $root,
-        ?SamplerInterface $remoteParentSampled = null,
-        ?SamplerInterface $remoteParentNotSampled = null,
-        ?SamplerInterface $localParentSampled = null,
-        ?SamplerInterface $localParentNotSampled = null
+        ?SamplerInterface $remoteParentSampler = null,
+        ?SamplerInterface $remoteParentNotSampler = null,
+        ?SamplerInterface $localParentSampler = null,
+        ?SamplerInterface $localParentNotSampler = null
     ) {
         $this->root = $root;
-        $this->remoteParentSampled = $remoteParentSampled ?? new AlwaysOnSampler();
-        $this->remoteParentNotSampled = $remoteParentNotSampled ?? new AlwaysOffSampler();
-        $this->localParentSampled = $localParentSampled ?? new AlwaysOnSampler();
-        $this->localParentNotSampled = $localParentNotSampled ?? new AlwaysOffSampler();
+        $this->remoteParentSampler = $remoteParentSampler ?? new AlwaysOnSampler();
+        $this->remoteParentNotSampler = $remoteParentNotSampler ?? new AlwaysOffSampler();
+        $this->localParentSampler = $localParentSampler ?? new AlwaysOnSampler();
+        $this->localParentNotSampler = $localParentNotSampler ?? new AlwaysOffSampler();
     }
 
     /**
@@ -84,13 +84,13 @@ class ParentBased implements SamplerInterface
 
         if ($parentSpanContext->isRemote()) {
             return $parentSpanContext->isSampled()
-                ? $this->remoteParentSampled->shouldSample(...func_get_args())
-                : $this->remoteParentNotSampled->shouldSample(...func_get_args());
+                ? $this->remoteParentSampler->shouldSample(...func_get_args())
+                : $this->remoteParentNotSampler->shouldSample(...func_get_args());
         }
 
         return $parentSpanContext->isSampled()
-            ? $this->localParentSampled->shouldSample(...func_get_args())
-            : $this->localParentNotSampled->shouldSample(...func_get_args());
+            ? $this->localParentSampler->shouldSample(...func_get_args())
+            : $this->localParentNotSampler->shouldSample(...func_get_args());
     }
 
     public function getDescription(): string

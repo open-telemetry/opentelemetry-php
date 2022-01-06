@@ -11,6 +11,9 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor
+ */
 class MultiSpanProcessorTest extends TestCase
 {
     private array $spanProcessors = [];

@@ -10,6 +10,9 @@ use OpenTelemetry\SDK\Metrics\UpDownCounter;
 use OpenTelemetry\SDK\Metrics\ValueRecorder;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Metrics\Meter
+ */
 class MeterTest extends TestCase
 {
     public function test_meter(): void

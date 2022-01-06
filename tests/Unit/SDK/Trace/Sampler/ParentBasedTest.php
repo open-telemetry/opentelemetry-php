@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Integration\SDK;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace\Sampler;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
@@ -14,10 +14,31 @@ use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversNothing
+ * @coversDefaultClass OpenTelemetry\SDK\Trace\Sampler\ParentBased
  */
 class ParentBasedTest extends TestCase
 {
+    private SamplerInterface $rootSampler;
+
+    public function setUp(): void
+    {
+        $this->rootSampler = $this->createMock(SamplerInterface::class);
+        $this->rootSampler->method('getDescription')->willReturn('Foo');
+    }
+
+    /**
+     * @covers ::getDescription
+     */
+    public function test_get_description(): void
+    {
+        $sampler = new ParentBased($this->rootSampler);
+        $this->assertSame('ParentBased+Foo', $sampler->getDescription());
+    }
+
+    /**
+     * @covers ::shouldSample
+     * @covers ::__construct
+     */
     public function test_parent_based_root_span(): void
     {
         $rootSampler = $this->createMockSamplerInvokedOnce(SamplingResult::RECORD_AND_SAMPLE);
@@ -32,9 +53,10 @@ class ParentBasedTest extends TestCase
     }
 
     /**
-     * @dataProvider parentContextData
+     * @covers ::shouldSample
+     * @dataProvider parentContextProvider
      */
-    public function test_parent_based(
+    public function test_should_sample_parent_based(
         $parentContext,
         ?SamplerInterface $remoteParentSampled = null,
         ?SamplerInterface $remoteParentNotSampled = null,
@@ -54,34 +76,18 @@ class ParentBasedTest extends TestCase
         $this->assertEquals($expectedDecision, $decision->getDecision());
     }
 
-    public function parentContextData(): array
+    public function parentContextProvider(): array
     {
         return [
-            // remote, sampled, default sampler
-            [$this->createParentContext(true, true), null, null, null, null, SamplingResult::RECORD_AND_SAMPLE],
-            // remote, not sampled, default sampler
-            [$this->createParentContext(false, true), null, null, null, null, SamplingResult::DROP],
-            // local, sampled, default sampler
-            [$this->createParentContext(true, false), null, null, null, null, SamplingResult::RECORD_AND_SAMPLE],
-            // local, not sampled, default sampler
-            [$this->createParentContext(false, false), null, null, null, null, SamplingResult::DROP],
-            // remote, sampled
-            [$this->createParentContext(true, true), $this->createMockSamplerInvokedOnce(SamplingResult::RECORD_AND_SAMPLE), null, null, null, SamplingResult::RECORD_AND_SAMPLE],
-            // remote, not sampled
-            [$this->createParentContext(false, true), null, $this->createMockSamplerInvokedOnce(SamplingResult::DROP), null, null, SamplingResult::DROP],
-            // local, sampled
-            [$this->createParentContext(true, false), null, null, $this->createMockSamplerInvokedOnce(SamplingResult::RECORD_AND_SAMPLE), null, SamplingResult::RECORD_AND_SAMPLE],
-            // local, not sampled
-            [$this->createParentContext(false, false), null, null, null, $this->createMockSamplerInvokedOnce(SamplingResult::DROP), SamplingResult::DROP],
+            'remote, sampled, default sampler' => [$this->createParentContext(true, true), null, null, null, null, SamplingResult::RECORD_AND_SAMPLE],
+            'remote, not sampled, default sampler' => [$this->createParentContext(false, true), null, null, null, null, SamplingResult::DROP],
+            'local, sampled, default sampler' => [$this->createParentContext(true, false), null, null, null, null, SamplingResult::RECORD_AND_SAMPLE],
+            'local, not sampled, default sampler' => [$this->createParentContext(false, false), null, null, null, null, SamplingResult::DROP],
+            'remote, sampled' => [$this->createParentContext(true, true), $this->createMockSamplerInvokedOnce(SamplingResult::RECORD_AND_SAMPLE), null, null, null, SamplingResult::RECORD_AND_SAMPLE],
+            'remote, not sampled' => [$this->createParentContext(false, true), null, $this->createMockSamplerInvokedOnce(SamplingResult::DROP), null, null, SamplingResult::DROP],
+            'local, sampled' => [$this->createParentContext(true, false), null, null, $this->createMockSamplerInvokedOnce(SamplingResult::RECORD_AND_SAMPLE), null, SamplingResult::RECORD_AND_SAMPLE],
+            'local, not sampled' => [$this->createParentContext(false, false), null, null, null, $this->createMockSamplerInvokedOnce(SamplingResult::DROP), SamplingResult::DROP],
         ];
-    }
-
-    public function test_parent_based_description(): void
-    {
-        $rootSampler = $this->createMock(SamplerInterface::class);
-        $rootSampler->expects($this->once())->method('getDescription')->willReturn('Foo');
-        $sampler = new ParentBased($rootSampler);
-        $this->assertEquals('ParentBased+Foo', $sampler->getDescription());
     }
 
     private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceStateInterface $traceState = null): Context

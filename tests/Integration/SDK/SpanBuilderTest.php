@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Trace;
+namespace OpenTelemetry\Tests\Integration\SDK\Trace;
 
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
@@ -23,6 +23,9 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 use function range;
 use function str_repeat;
 
+/**
+ * @coversNothing
+ */
 class SpanBuilderTest extends MockeryTestCase
 {
     private const SPAN_NAME = 'span_name';

@@ -10,6 +10,9 @@ use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
 use OpenTelemetry\Context\Context;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\API\Baggage\Propagation\BaggagePropagator
+ */
 class BaggagePropagatorTest extends TestCase
 {
     public function test_fields(): void

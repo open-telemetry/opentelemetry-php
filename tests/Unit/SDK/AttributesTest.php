@@ -8,6 +8,9 @@ use OpenTelemetry\SDK\AttributeLimits;
 use OpenTelemetry\SDK\Attributes;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Attributes
+ */
 class AttributesTest extends TestCase
 {
     public function test_attribute_limits_compare(): void
@@ -83,5 +86,27 @@ class AttributesTest extends TestCase
         $this->assertEquals('123', $limitedAttributes->get('short'));
         $this->assertEquals('12345', $limitedAttributes->get('long'));
         $this->assertNull($limitedAttributes->get('dropped'));
+    }
+
+    public function test_null_attribute_removes_existing(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+            'bar' => 'bar',
+            'baz' => 'baz',
+        ]);
+        $this->assertCount(3, $attributes);
+        $attributes->setAttribute('foo', null);
+        $this->assertCount(2, $attributes);
+    }
+
+    public function test_null_missing_attribute_does_nothing(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+        ]);
+        $this->assertCount(1, $attributes);
+        $attributes->setAttribute('bar', null);
+        $this->assertCount(1, $attributes);
     }
 }

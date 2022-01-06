@@ -37,9 +37,6 @@ final class ImmutableSpan implements SpanDataInterface
      * @param non-empty-string $name
      * @param list<LinkInterface> $links
      * @param list<EventInterface> $events
-     *@internal
-     * @psalm-internal OpenTelemetry\Sdk
-     *
      */
     public function __construct(
         Span $span,
@@ -50,7 +47,7 @@ final class ImmutableSpan implements SpanDataInterface
         int $totalAttributeCount,
         int $totalRecordedEvents,
         StatusDataInterface $status,
-        int $encEpochNanos,
+        int $endEpochNanos,
         bool $hasEnded
     ) {
         $this->span = $span;
@@ -61,7 +58,7 @@ final class ImmutableSpan implements SpanDataInterface
         $this->totalAttributeCount = $totalAttributeCount;
         $this->totalRecordedEvents = $totalRecordedEvents;
         $this->status = $status;
-        $this->endEpochNanos = $encEpochNanos;
+        $this->endEpochNanos = $endEpochNanos;
         $this->hasEnded = $hasEnded;
     }
 

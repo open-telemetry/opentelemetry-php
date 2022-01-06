@@ -13,6 +13,9 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\SDK\Trace\SpanProcessorFactory
+ */
 class SpanProcessorFactoryTest extends TestCase
 {
     use EnvironmentVariables;

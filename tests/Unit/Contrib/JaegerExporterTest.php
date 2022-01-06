@@ -6,6 +6,9 @@ namespace OpenTelemetry\Tests\Unit\Contrib;
 
 use OpenTelemetry\Contrib\Jaeger\Exporter;
 
+/**
+ * @covers OpenTelemetry\Contrib\Jaeger\Exporter
+ */
 class JaegerExporterTest extends AbstractHttpExporterTest
 {
     use UsesHttpClientTrait;

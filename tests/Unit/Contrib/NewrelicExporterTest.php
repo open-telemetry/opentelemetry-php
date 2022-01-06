@@ -6,6 +6,9 @@ namespace OpenTelemetry\Tests\Unit\Contrib;
 
 use OpenTelemetry\Contrib\Newrelic\Exporter;
 
+/**
+ * @covers OpenTelemetry\Contrib\Newrelic\Exporter
+ */
 class NewrelicExporterTest extends AbstractHttpExporterTest
 {
     protected const EXPORTER_NAME = 'test.newrelic';

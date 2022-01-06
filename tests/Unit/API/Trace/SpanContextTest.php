@@ -9,6 +9,9 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\API\Trace\SpanContext
+ */
 class SpanContextTest extends TestCase
 {
     private const FIRST_TRACE_ID = '00000000000000000000000000000061';

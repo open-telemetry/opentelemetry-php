@@ -10,6 +10,10 @@ use OpenTelemetry\API\Baggage\Metadata;
 use OpenTelemetry\Context\Context;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\API\Baggage\Baggage
+ * @todo integration tests?
+ */
 class BaggageTest extends TestCase
 {
     // region contextInteraction

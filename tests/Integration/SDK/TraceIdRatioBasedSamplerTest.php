@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Integration;
+namespace OpenTelemetry\Tests\Integration\SDK;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
@@ -12,6 +12,9 @@ use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversNothing
+ */
 class TraceIdRatioBasedSamplerTest extends TestCase
 {
     public function test_never_trace_id_ratio_based_sampler_decision(): void

@@ -13,6 +13,9 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\API\Trace\Propagation\TraceContextPropagator
+ */
 class TraceContextPropagatorTest extends TestCase
 {
     private const TRACE_ID_BASE16 = 'ff000000000000000000000000000041';
