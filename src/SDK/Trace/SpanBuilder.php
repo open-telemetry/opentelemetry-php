@@ -24,8 +24,8 @@ final class SpanBuilder implements API\SpanBuilderInterface
     private SamplerInterface $sampler;
     private SpanProcessorInterface $spanProcessor;
     private IdGeneratorInterface $idGenerator;
-    private AttributesFactoryInterface $linkAttributes;
-    private AttributesFactoryInterface $eventAttributes;
+    private AttributesFactoryInterface $linkAttributesFactory;
+    private AttributesFactoryInterface $eventAttributesFactory;
 
     private ?Context $parentContext = null; // Null means use current context.
 
@@ -37,7 +37,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     /** @var list<LinkInterface> */
     private array $links = [];
 
-    private AttributesBuilderInterface $attributes;
+    private AttributesBuilderInterface $attributesBuilder;
     private int $droppedLinksCount;
     private int $eventCountLimit;
     private ?int $startEpochNanos = null;
@@ -50,9 +50,9 @@ final class SpanBuilder implements API\SpanBuilderInterface
         SamplerInterface $sampler,
         SpanProcessorInterface $spanProcessor,
         IdGeneratorInterface $idGenerator,
-        AttributesBuilderInterface $attributes,
-        AttributesFactoryInterface $linkAttributes,
-        AttributesFactoryInterface $eventAttributes,
+        AttributesBuilderInterface $attributesBuilder,
+        AttributesFactoryInterface $linkAttributesFactory,
+        AttributesFactoryInterface $eventAttributesFactory,
         int $linkCountLimit,
         int $eventCountLimit
     ) {
@@ -62,9 +62,9 @@ final class SpanBuilder implements API\SpanBuilderInterface
         $this->sampler = $sampler;
         $this->spanProcessor = $spanProcessor;
         $this->idGenerator = $idGenerator;
-        $this->attributes = $attributes;
-        $this->linkAttributes = $linkAttributes;
-        $this->eventAttributes = $eventAttributes;
+        $this->attributesBuilder = $attributesBuilder;
+        $this->linkAttributesFactory = $linkAttributesFactory;
+        $this->eventAttributesFactory = $eventAttributesFactory;
         $this->droppedLinksCount = -$linkCountLimit;
         $this->eventCountLimit = $eventCountLimit;
     }
@@ -97,7 +97,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
 
         $this->links[] = new Link(
             $context,
-            $this->linkAttributes->builder($attributes)->build(),
+            $this->linkAttributesFactory->builder($attributes)->build(),
         );
 
         return $this;
@@ -106,7 +106,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     /** @inheritDoc */
     public function setAttribute(string $key, $value): API\SpanBuilderInterface
     {
-        $this->attributes[$key] = $value;
+        $this->attributesBuilder[$key] = $value;
 
         return $this;
     }
@@ -115,7 +115,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     public function setAttributes(iterable $attributes): API\SpanBuilderInterface
     {
         foreach ($attributes as $key => $value) {
-            $this->attributes[$key] = $value;
+            $this->attributesBuilder[$key] = $value;
         }
 
         return $this;
@@ -157,7 +157,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
             $traceId,
             $this->spanName,
             $this->spanKind,
-            $this->attributes->build(),
+            $this->attributesBuilder->build(),
             $this->links,
         );
 
@@ -172,9 +172,9 @@ final class SpanBuilder implements API\SpanBuilderInterface
             return Span::wrap($spanContext);
         }
 
-        $attributes = clone $this->attributes;
+        $attributesBuilder = clone $this->attributesBuilder;
         foreach ($samplingResult->getAttributes() as $key => $value) {
-            $attributes[$key] = $value;
+            $attributesBuilder[$key] = $value;
         }
 
         return Span::startSpan(
@@ -184,10 +184,10 @@ final class SpanBuilder implements API\SpanBuilderInterface
             $this->spanKind,
             $parentSpanContext,
             $parentContext,
-            $this->eventAttributes,
+            $this->eventAttributesFactory,
             $this->spanProcessor,
             $this->resource,
-            $attributes,
+            $attributesBuilder,
             $this->links,
             $this->droppedLinksCount,
             $this->eventCountLimit,
