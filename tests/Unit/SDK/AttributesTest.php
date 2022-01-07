@@ -5,22 +5,11 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use ArrayIterator;
-use OpenTelemetry\SDK\AttributeLimits;
 use OpenTelemetry\SDK\Attributes;
 use PHPUnit\Framework\TestCase;
 
 class AttributesTest extends TestCase
 {
-    public function test_attribute_limits_compare(): void
-    {
-        $attrLimits1 = new AttributeLimits(10, 20);
-        $attrLimits2 = new AttributeLimits(10, 20);
-        $attrLimits3 = new AttributeLimits(20, 30);
-
-        $this->assertTrue($attrLimits1 == $attrLimits2);
-        $this->assertTrue($attrLimits1 != $attrLimits3);
-    }
-
     /** @test Test numeric attribute key is not cast to integer value */
     public function test_numeric_attribute_name(): void
     {

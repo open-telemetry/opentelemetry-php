@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use PHPUnit\Framework\TestCase;
@@ -18,7 +19,10 @@ class SpanLimitsBuilderTest extends TestCase
     {
         $builder = new SpanLimitsBuilder();
         $spanLimits = $builder->build();
-        $this->assertEquals(SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT, $spanLimits->getAttributeLimits()->getAttributeCountLimit());
+        $this->assertEquals(
+            Attributes::factory(SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT, SpanLimits::DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT),
+            $spanLimits->getEventAttributesFactory(),
+        );
     }
 
     public function test_span_limits_builder_uses_environment_variable(): void
@@ -26,7 +30,10 @@ class SpanLimitsBuilderTest extends TestCase
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 111);
         $builder = new SpanLimitsBuilder();
         $spanLimits = $builder->build();
-        $this->assertEquals(111, $spanLimits->getAttributeLimits()->getAttributeCountLimit());
+        $this->assertEquals(
+            Attributes::factory(111, SpanLimits::DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT),
+            $spanLimits->getSpanAttributesFactory(),
+        );
     }
 
     public function test_span_limits_builder_uses_configured_value(): void
@@ -35,7 +42,10 @@ class SpanLimitsBuilderTest extends TestCase
         $builder = new SpanLimitsBuilder();
         $builder->setAttributeCountLimit(222);
         $spanLimits = $builder->build();
-        $this->assertEquals(222, $spanLimits->getAttributeLimits()->getAttributeCountLimit());
+        $this->assertEquals(
+            Attributes::factory(222, SpanLimits::DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT),
+            $spanLimits->getSpanAttributesFactory(),
+        );
     }
 
     public function test_span_limits_builder_throws_exception_on_invalid_value_from_environment(): void

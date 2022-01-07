@@ -44,9 +44,9 @@ class Tracer implements API\TracerInterface
             $this->tracerSharedState->getSampler(),
             $this->tracerSharedState->getSpanProcessor(),
             $this->tracerSharedState->getIdGenerator(),
-            $this->tracerSharedState->getSpanLimits()->getSpanAttributes()->builder(),
-            $this->tracerSharedState->getSpanLimits()->getLinkAttributes(),
-            $this->tracerSharedState->getSpanLimits()->getEventAttributes(),
+            $this->tracerSharedState->getSpanLimits()->getSpanAttributesFactory()->builder(),
+            $this->tracerSharedState->getSpanLimits()->getLinkAttributesFactory(),
+            $this->tracerSharedState->getSpanLimits()->getEventAttributesFactory(),
             $this->tracerSharedState->getSpanLimits()->getLinkCountLimit(),
             $this->tracerSharedState->getSpanLimits()->getEventCountLimit(),
         );

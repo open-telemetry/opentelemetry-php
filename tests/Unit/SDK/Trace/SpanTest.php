@@ -14,7 +14,6 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\AttributesFactory;
 use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\ClockInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
@@ -656,16 +655,10 @@ class SpanTest extends MockeryTestCase
             $kind,
             $parentSpanId ? SpanContext::create($this->traceId, $parentSpanId) : SpanContext::getInvalid(),
             Context::getRoot(),
-            (new AttributesFactory(
-                $spanLimits->getAttributePerEventCountLimit(),
-                $spanLimits->getAttributeLimits()->getAttributeValueLengthLimit(),
-            )),
+            $spanLimits->getEventAttributesFactory(),
             $this->spanProcessor,
             $this->resource,
-            (new AttributesFactory(
-                $spanLimits->getAttributeLimits()->getAttributeCountLimit(),
-                $spanLimits->getAttributeLimits()->getAttributeValueLengthLimit(),
-            ))->builder($attributes ?? []),
+            $spanLimits->getSpanAttributesFactory()->builder($attributes ?? []),
             $links,
             0,
             $spanLimits->getEventCountLimit(),
