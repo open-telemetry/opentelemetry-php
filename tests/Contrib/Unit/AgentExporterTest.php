@@ -11,11 +11,11 @@ use PHPUnit\Framework\TestCase;
 
 class AgentExporterTest extends TestCase
 {
-    public function test_happy_path() 
+    public function test_happy_path()
     {
         $exporter = AgentExporter::fromConnectionString(
-            "http://127.0.0.1:80", //This isn't realistic I imagine
-            "serviceName", //This isn't realistic I imagine
+            'http://127.0.0.1:80', //This isn't realistic I imagine
+            'serviceName', //This isn't realistic I imagine
         );
 
         $status = $exporter->export([new SpanData()]);

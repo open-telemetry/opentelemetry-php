@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Jaeger;
 
 use InvalidArgumentException;
-use OpenTelemetry\Contrib\Jaeger\JaegerTransport;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -68,4 +67,4 @@ class AgentExporter implements SpanExporterInterface
             $endpointUrl
         );
     }
-} 
+}

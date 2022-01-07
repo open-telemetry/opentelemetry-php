@@ -59,4 +59,4 @@ class CodecUtility
             return substr(str_shuffle(str_repeat('0123456789abcdef', $length)), 1, $length);
         }
     }
-} 
+}

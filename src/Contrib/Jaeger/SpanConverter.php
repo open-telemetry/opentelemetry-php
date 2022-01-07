@@ -156,4 +156,4 @@ class SpanConverter
 
         // throw new \Exception('unsupported tag type');
     }
-} 
+}

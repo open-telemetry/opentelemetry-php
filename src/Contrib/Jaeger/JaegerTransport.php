@@ -108,4 +108,4 @@ final class JaegerTransport implements Transport
         $this->flush(true); // flush all remaining data
         $this->transport->close();
     }
-} 
+}

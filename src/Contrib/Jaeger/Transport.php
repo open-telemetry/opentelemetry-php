@@ -30,4 +30,4 @@ interface Transport
     * remain in the internal buffer.
     */
     public function close();
-} 
+}

@@ -86,4 +86,4 @@ class ThriftUdpTransport extends TTransport
 
         $this->buffer = ''; // empty the buffer
     }
-} 
+}

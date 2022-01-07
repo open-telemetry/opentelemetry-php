@@ -18,10 +18,10 @@ class JaegerSpanConverterTest extends TestCase
     public function test_should_convert_an_otlp_span_to_a_jaeger_thrift_span()
     {
         $span = (new SpanData())
-                    ->setName('otlpSpanName');    
+                    ->setName('otlpSpanName');
 
         $jtSpan = (new SpanConverter('unused'))->convert($span);
- 
+
         $this->assertSame('00000000000000000000000000000000', $jtSpan->traceIdLow);
         $this->assertSame(0, $jtSpan->traceIdHigh);
         $this->assertSame('0000000000000000', $jtSpan->spanId);
