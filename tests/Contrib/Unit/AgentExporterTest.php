@@ -22,6 +22,6 @@ class AgentExporterTest extends TestCase
 
         $this->assertSame(SpanExporterInterface::STATUS_SUCCESS, $status);
 
-        $exporter->jaegerTransport->close();
+        $exporter->closeAgentConnection();
     }
 }

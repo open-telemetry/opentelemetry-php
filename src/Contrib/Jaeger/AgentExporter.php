@@ -41,6 +41,11 @@ class AgentExporter implements SpanExporterInterface
         $this->jaegerTransport = new JaegerTransport($parsedDsn['host'], $parsedDsn['port']);
     }
 
+    public function closeAgentConnection(): void
+    {
+        $this->jaegerTransport->close();
+    }
+
     /**
      * @psalm-return SpanExporterInterface::STATUS_*
      */
