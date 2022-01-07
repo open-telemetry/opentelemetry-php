@@ -15,15 +15,13 @@ class AgentExporter implements SpanExporterInterface
 {
     use SpanExporterTrait;
 
-    /**
-     * @var string
-     */
-    private $endpointUrl;
+    private string $serviceName;
 
-    /**
-     * @var SpanConverter
-     */
-    private $spanConverter;
+    private string $endpointUrl;
+
+    private SpanConverter $spanConverter;
+
+    private JaegerTransport $jaegerTransport;
 
     public function __construct(
         $name,
@@ -41,7 +39,8 @@ class AgentExporter implements SpanExporterInterface
 
         $this->endpointUrl = $endpointUrl;
         $this->serviceName = $name;
-        $this->spanConverter = $spanConverter ?? new SpanConverter($name);
+
+        $this->spanConverter = new SpanConverter($name);
         $this->jaegerTransport = new JaegerTransport($parsedDsn['host'], $parsedDsn['port']);
     }
 

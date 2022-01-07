@@ -54,6 +54,7 @@ class ThriftUdpTransport extends TTransport
     public function read($len)
     {
         // not implemented
+        return '';
     }
 
     public function write($buf)

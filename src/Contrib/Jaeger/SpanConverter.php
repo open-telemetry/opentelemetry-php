@@ -64,8 +64,8 @@ class SpanConverter
         // ]);
 
         return new JTSpan([
-            'traceIdLow' => (is_array($traceId) ? $traceId['low'] : $traceId),
-            'traceIdHigh' => (is_array($traceId) ? $traceId['high'] : 0),
+            'traceIdLow' => $traceId,
+            'traceIdHigh' => 0,
             'spanId' => $spanId,
             'parentSpanId' => $parentSpanId,
             'operationName' => $span->getName(),
