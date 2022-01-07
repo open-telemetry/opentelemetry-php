@@ -87,6 +87,7 @@ final class AttributesBuilder implements AttributesBuilderInterface
         return isset($this->attributes[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->attributes[$offset] ?? null;
