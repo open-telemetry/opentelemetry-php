@@ -15,10 +15,7 @@ use PHPUnit\Framework\TestCase;
  */
 class JaegerSpanConverterTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function shouldConvertAnOTLPSpanToAJaegerThriftSpan()
+    public function test_should_convert_an_otlp_span_to_a_jaeger_thrift_span()
     {
         $span = (new SpanData())
                     ->setName('otlpSpanName');    
@@ -38,10 +35,7 @@ class JaegerSpanConverterTest extends TestCase
         $this->assertSame([], $jtSpan->logs);
     }
 
-    /**
-     * @test
-     */
-    public function shouldCorrectlyGenerateJaegerThriftTags()
+    public function test_should_correctly_generate_jaeger_thrift_tags()
     {
         $span = (new SpanData())
             ->setStatus(

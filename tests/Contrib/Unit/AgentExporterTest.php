@@ -11,10 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class AgentExporterTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function happyPath() 
+    public function test_happy_path() 
     {
         $exporter = AgentExporter::fromConnectionString(
             "http://127.0.0.1:80", //This isn't realistic I imagine
