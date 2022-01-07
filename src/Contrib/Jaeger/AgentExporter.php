@@ -17,8 +17,6 @@ class AgentExporter implements SpanExporterInterface
 
     private string $serviceName;
 
-    private string $endpointUrl;
-
     private SpanConverter $spanConverter;
 
     private JaegerTransport $jaegerTransport;
@@ -37,10 +35,9 @@ class AgentExporter implements SpanExporterInterface
             throw new InvalidArgumentException('Endpoint should have host, port');
         }
 
-        $this->endpointUrl = $endpointUrl;
         $this->serviceName = $name;
 
-        $this->spanConverter = new SpanConverter($name);
+        $this->spanConverter = new SpanConverter();
         $this->jaegerTransport = new JaegerTransport($parsedDsn['host'], $parsedDsn['port']);
     }
 

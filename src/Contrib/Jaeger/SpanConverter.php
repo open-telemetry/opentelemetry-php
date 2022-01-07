@@ -13,15 +13,6 @@ class SpanConverter
 {
     const STATUS_CODE_TAG_KEY = 'op.status_code';
     const STATUS_DESCRIPTION_TAG_KEY = 'op.status_description';
-    /**
-     * @var string
-     */
-    private $serviceName;
-
-    public function __construct(string $serviceName)
-    {
-        $this->serviceName = $serviceName;
-    }
 
     /**
     * Convert span to Jaeger Thrift Span format

@@ -59,7 +59,7 @@ final class JaegerTransport implements Transport
     * Flush submits the internal buffer to the remote server. It returns the
     * number of spans flushed.
     *
-    * @param $force bool - force a flush, even on a partial buffer
+    * @param bool $force - force a flush, even on a partial buffer
     */
     public function flush($force = false)
     {
