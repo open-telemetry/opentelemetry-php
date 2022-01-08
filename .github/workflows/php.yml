@@ -17,9 +17,11 @@ jobs:
       matrix:
         php-version: ['7.4', '8.0']
         os: [ubuntu-latest]
+        extensions: ['ast, grpc', 'ast, grpc, protobuf']
         experimental: [false]
         include:
           - php-version: 8.1
+            extensions: ['ast, grpc', 'ast, grpc, protobuf']
             os: ubuntu-latest
             experimental: true
 
@@ -32,7 +34,7 @@ jobs:
         php-version: ${{ matrix.php-version }}
         coverage: xdebug
         tools: php-cs-fixer
-        extensions: ast, grpc
+        extensions: ${{ matrix.extensions }}
 
     - name: Validate composer.json and composer.lock
       run: composer validate
