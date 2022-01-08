@@ -17,11 +17,15 @@ use function mb_substr;
  */
 final class AttributesBuilder implements AttributesBuilderInterface
 {
+    /** @var array<non-empty-string|int, bool|int|float|string|array> */
     private array $attributes;
     private ?int $attributeCountLimit;
     private ?int $attributeValueLengthLimit;
     private int $droppedAttributesCount;
 
+    /**
+     * @param array<non-empty-string|int, bool|int|float|string|array> $attributes
+     */
     private function __construct(array $attributes, ?int $attributeCountLimit, ?int $attributeValueLengthLimit, int $droppedAttributesCount)
     {
         $this->attributes = $attributes;
@@ -30,7 +34,10 @@ final class AttributesBuilder implements AttributesBuilderInterface
         $this->droppedAttributesCount = $droppedAttributesCount;
     }
 
-    public static function from(iterable $attributes, ?int $attributeCountLimit = null, ?int $attributeValueLengthLimit = null): AttributesBuilder
+    /**
+     * @param iterable<non-empty-string, bool|int|float|string|array|null> $attributes
+     */
+    public static function from(iterable $attributes, ?int $attributeCountLimit = null, ?int $attributeValueLengthLimit = null): AttributesBuilderInterface
     {
         if (!$attributes) {
             return new self([], $attributeCountLimit, $attributeValueLengthLimit, 0);
@@ -66,9 +73,11 @@ final class AttributesBuilder implements AttributesBuilderInterface
                 }
             }
 
+            /** @var array<non-empty-string|int, bool|int|float|string|array> $attributes */
             return new self($attributes, $attributeCountLimit, $attributeValueLengthLimit, $droppedAttributesCount);
         }
 
+        /** @var iterable<non-empty-string, bool|int|float|string|array|null> $attributes */
         $sdkAttributes = new self([], $attributeCountLimit, $attributeValueLengthLimit, $droppedAttributesCount);
         foreach ($attributes as $key => $value) {
             $sdkAttributes[$key] = $value;
@@ -93,6 +102,10 @@ final class AttributesBuilder implements AttributesBuilderInterface
         return $this->attributes[$offset] ?? null;
     }
 
+    /**
+     * @param non-empty-string $offset
+     * @param bool|int|float|string|array|null $value
+     */
     public function offsetSet($offset, $value): void
     {
         if ($value === null) {

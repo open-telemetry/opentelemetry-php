@@ -57,16 +57,22 @@ interface SpanInterface extends ImplicitContextKeyedInterface
     public function setAttribute(string $key, $value): SpanInterface;
 
     /**
+     * @param iterable<non-empty-string, bool|int|float|string|array|null> $attributes
+     *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-attributes
      */
     public function setAttributes(iterable $attributes): SpanInterface;
 
     /**
+     * @param iterable<non-empty-string, bool|int|float|string|array|null> $attributes
+     *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#add-events
      */
     public function addEvent(string $name, iterable $attributes = [], int $timestamp = null): SpanInterface;
 
     /**
+     * @param iterable<non-empty-string, bool|int|float|string|array|null> $attributes
+     *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#record-exception
      */
     public function recordException(Throwable $exception, iterable $attributes = [], ?int $timestamp = null): SpanInterface;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
-use ArrayIterator;
 use OpenTelemetry\SDK\Attributes;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +12,7 @@ class AttributesTest extends TestCase
     /** @test Test numeric attribute key is not cast to integer value */
     public function test_numeric_attribute_name(): void
     {
-        $attributes = Attributes::create(['1' => '2']);
+        $attributes = Attributes::create((fn () => yield '1' => '2')());
         $this->assertCount(1, $attributes);
         foreach ($attributes as $key => $value) {
             $this->assertTrue(is_string($key));
@@ -79,9 +78,7 @@ class AttributesTest extends TestCase
 
     public function test_builder_from_iterable(): void
     {
-        $attributes = Attributes::factory()->builder(new ArrayIterator([
-            'key' => 'value',
-        ]));
+        $attributes = Attributes::factory()->builder((fn () => yield 'key' => 'value')());
 
         $this->assertTrue(isset($attributes['key']));
         $this->assertSame('value', $attributes['key']);

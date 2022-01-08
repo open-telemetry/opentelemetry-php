@@ -7,6 +7,7 @@ namespace OpenTelemetry\SDK\Resource;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use function trim;
 
 /**
  * A Resource is an immutable representation of the entity producing telemetry. For example, a process producing telemetry
@@ -90,7 +91,10 @@ class ResourceInfo
         if ($string && false !== strpos($string, '=')) {
             foreach (explode(',', $string) as $pair) {
                 [$key, $value] = explode('=', $pair);
-                $attributes[trim($key)] = trim($value);
+                $key = trim($key);
+                if ($key !== '') {
+                    $attributes[$key] = trim($value);
+                }
             }
         }
         //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration

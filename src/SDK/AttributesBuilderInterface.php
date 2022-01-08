@@ -6,6 +6,9 @@ namespace OpenTelemetry\SDK;
 
 use ArrayAccess;
 
+/**
+ * @template-extends ArrayAccess<non-empty-string, bool|int|float|string|array|null>
+ */
 interface AttributesBuilderInterface extends ArrayAccess
 {
     public function build(): AttributesInterface;

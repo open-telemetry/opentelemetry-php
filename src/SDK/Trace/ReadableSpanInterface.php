@@ -42,6 +42,7 @@ interface ReadableSpanInterface
      * Returns the value of the attribute with the provided *key*.
      * Returns `null` if there are no attributes set, or no attribute with that key exists.
      *
+     * @param non-empty-string $key
      * @return mixed
      */
     public function getAttribute(string $key);

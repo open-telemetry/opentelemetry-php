@@ -28,8 +28,21 @@ interface SpanBuilderInterface
      * Makes the to be created {@see SpanInterface} a root span of a new trace.
      */
     public function setNoParent(): SpanBuilderInterface;
+
+    /**
+     * @param iterable<non-empty-string, bool|int|float|string|array|null> $attributes
+     */
     public function addLink(SpanContextInterface $context, iterable $attributes = []): SpanBuilderInterface;
+
+    /**
+     * @param non-empty-string $key
+     * @param bool|int|float|string|array|null $value
+     */
     public function setAttribute(string $key, $value): SpanBuilderInterface;
+
+    /**
+     * @param iterable<non-empty-string, bool|int|float|string|array|null> $attributes
+     */
     public function setAttributes(iterable $attributes): SpanBuilderInterface;
 
     /**

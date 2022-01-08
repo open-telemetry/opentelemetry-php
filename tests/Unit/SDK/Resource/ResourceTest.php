@@ -79,6 +79,9 @@ class ResourceTest extends TestCase
 
     /**
      * @dataProvider environmentResourceProvider
+     *
+     * @param array<non-empty-string, bool|int|float|string|array> $userAttributes
+     * @param array<non-empty-string, bool|int|float|string|array> $expected
      */
     public function test_resource_from_environment(string $envAttributes, array $userAttributes, array $expected): void
     {

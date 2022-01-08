@@ -30,7 +30,7 @@ class SpanData implements SDK\SpanDataInterface
      */
     private array $links = [];
 
-    private AttributesBuilderInterface $attributes;
+    private AttributesBuilderInterface $attributesBuilder;
     private int $kind;
     private StatusData $status;
     private ResourceInfo $resource;
@@ -45,7 +45,7 @@ class SpanData implements SDK\SpanDataInterface
 
     public function __construct()
     {
-        $this->attributes = AttributesBuilder::from([]);
+        $this->attributesBuilder = AttributesBuilder::from([]);
         $this->kind = API\SpanKind::KIND_INTERNAL;
         $this->status = StatusData::unset();
         $this->resource = ResourceInfo::emptyResource();
@@ -111,19 +111,23 @@ class SpanData implements SDK\SpanDataInterface
 
     public function getAttributes(): AttributesInterface
     {
-        return $this->attributes->build();
+        return $this->attributesBuilder->build();
     }
 
+    /**
+     * @param non-empty-string $key
+     * @param bool|int|float|string|array|null $value
+     */
     public function addAttribute(string $key, $value): self
     {
-        $this->attributes[$key] = $value;
+        $this->attributesBuilder[$key] = $value;
 
         return $this;
     }
 
     public function getTotalDroppedAttributes(): int
     {
-        return $this->attributes->build()->getDroppedAttributesCount();
+        return $this->attributesBuilder->build()->getDroppedAttributesCount();
     }
 
     public function getTotalDroppedEvents(): int

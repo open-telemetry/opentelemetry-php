@@ -8,17 +8,27 @@ use function count;
 use IteratorAggregate;
 use Traversable;
 
+/**
+ * @psalm-immutable
+ */
 final class Attributes implements AttributesInterface, IteratorAggregate
 {
+    /** @var array<non-empty-string|int, bool|int|float|string|array> */
     private array $attributes;
     private int $droppedAttributesCount;
 
+    /**
+     * @param array<non-empty-string|int, bool|int|float|string|array> $attributes
+     */
     public function __construct(array $attributes = [], int $droppedAttributesCount = 0)
     {
         $this->attributes = $attributes;
         $this->droppedAttributesCount = $droppedAttributesCount;
     }
 
+    /**
+     * @param iterable<non-empty-string, bool|int|float|string|array|null> $attributes
+     */
     public static function create(iterable $attributes = []): AttributesInterface
     {
         return AttributesBuilder::from($attributes)->build();

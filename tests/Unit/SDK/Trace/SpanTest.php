@@ -635,13 +635,14 @@ class SpanTest extends MockeryTestCase
 
     /**
      * @psalm-param API\SpanKind::KIND_* $kind
+     * @param iterable<non-empty-string, bool|int|float|string|array|null> $attributes
      * @param list<LinkInterface> $links
      */
     private function createTestSpan(
         int $kind = API\SpanKind::KIND_INTERNAL,
         SpanLimits $spanLimits = null,
         string $parentSpanId = null,
-        ?iterable $attributes = null,
+        iterable $attributes = [],
         array $links = []
     ): Span {
         $parentSpanId = $parentSpanId ?? $this->parentSpanId;
@@ -658,7 +659,7 @@ class SpanTest extends MockeryTestCase
             $spanLimits->getEventAttributesFactory(),
             $this->spanProcessor,
             $this->resource,
-            $spanLimits->getSpanAttributesFactory()->builder($attributes ?? []),
+            $spanLimits->getSpanAttributesFactory()->builder($attributes),
             $links,
             0,
             $spanLimits->getEventCountLimit(),
@@ -673,7 +674,10 @@ class SpanTest extends MockeryTestCase
         return $span;
     }
 
-    public function createTestSpanWithAttributes(array $attributes): Span
+    /**
+     * @param iterable<non-empty-string, bool|int|float|string|array|null> $attributes
+     */
+    public function createTestSpanWithAttributes(iterable $attributes): Span
     {
         return $this
             ->createTestSpan(
