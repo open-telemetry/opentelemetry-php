@@ -87,6 +87,7 @@
         "symfony/http-client": "^5.2"
     },
     "suggest": {
-        "ext-grpc": "To use the OTLP GRPC Exporter"
+        "ext-grpc": "To use the OTLP GRPC Exporter",
+        "ext-protobuf": "For more performant protobuf/grpc exporting"
     }
 }
