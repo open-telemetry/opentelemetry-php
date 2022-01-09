@@ -13,7 +13,6 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
-        "ext-sockets": "*",
         "nyholm/dsn": "^2.0.0",
         "open-telemetry/api": "self.version",
         "open-telemetry/context": "self.version",
@@ -31,5 +30,8 @@
         "psr-4": {
             "OpenTelemetry\\Contrib\\": ""
         }
+    },
+    "suggest": {
+        "ext-sockets": "To use the Thrift UDP Exporter for the Jaeger Agent"
     }
 }
