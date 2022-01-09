@@ -35,7 +35,7 @@ class SpanConverter
         [
             'traceIdLow' => $traceIdLow,
             'traceIdHigh' => $traceIdHigh
-        ] = SpanConverter::convertOtlpToJaegerTraceIds($span->getContext()->getTraceID());
+        ] = self::convertOtlpToJaegerTraceIds($span->getContext()->getTraceID());
         $spanId = intval($span->getContext()->getSpanID(), 16);
         $parentSpanId = intval($span->getParentSpanId(), 16);
 
