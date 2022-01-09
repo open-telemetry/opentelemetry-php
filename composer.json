@@ -10,7 +10,7 @@
         "php-64bit": "^7.4",
         "ext-json": "*",
         "apache/thrift": "^0.15.0",
-        "google/protobuf": "^v3.3.0",
+        "google/protobuf": "^3.3.0",
         "grpc/grpc": "^1.30",
         "nyholm/dsn": "^2.0.0",
         "php-http/async-client-implementation": "^1.0",
@@ -40,8 +40,8 @@
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\": "src/",
-            "Opentelemetry\\Proto\\": "proto/Opentelemetry/Proto/",
-            "GPBMetadata\\Opentelemetry\\Proto\\": "proto/GPBMetadata/Opentelemetry/Proto/",
+            "Opentelemetry\\Proto\\": "proto/otel/Opentelemetry/Proto/",
+            "GPBMetadata\\Opentelemetry\\Proto\\": "proto/otel/GPBMetadata/Opentelemetry/Proto/",
             "Jaeger\\Thrift\\": "thrift/jaeger/"
         },
         "files": [
