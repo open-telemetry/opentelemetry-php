@@ -95,7 +95,7 @@ class SpanConverter
         return (string) $value;
     }
 
-    private function buildTags(array $tagPairs)
+    private function buildTags(array $tagPairs): array
     {
         $tags = [];
         foreach ($tagPairs as $key => $value) {
@@ -105,7 +105,7 @@ class SpanConverter
         return $tags;
     }
 
-    private function buildTag(string $key, string $value)
+    private function buildTag(string $key, string $value): Tag
     {
         return new Tag([
             'key' => $key,

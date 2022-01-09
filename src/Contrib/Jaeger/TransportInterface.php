@@ -17,17 +17,17 @@ interface TransportInterface
     *
     * @param Span $span
     */
-    public function append(Span $span, $serviceName);
+    public function append(Span $span, $serviceName): int;
 
     /**
     * Flush submits the internal buffer to the remote server. It returns the
     * number of spans flushed.
     */
-    public function flush();
+    public function flush(): int;
 
     /**
     * Does a clean shutdown of the transport, flushing any traces that may
     * remain in the internal buffer.
     */
-    public function close();
+    public function close(): void;
 }

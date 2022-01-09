@@ -41,7 +41,7 @@ final class JaegerTransport implements TransportInterface
     *
     * @param Span $span
     */
-    public function append(Span $span, $serviceName)
+    public function append(Span $span, $serviceName): int
     {
         // Grab a copy of the process data, if we didn't already.
         if ($this->process == null) {
@@ -63,7 +63,7 @@ final class JaegerTransport implements TransportInterface
     *
     * @param bool $force - force a flush, even on a partial buffer
     */
-    public function flush($force = false)
+    public function flush($force = false): int
     {
         $spans = count($this->buffer);
 
@@ -105,7 +105,7 @@ final class JaegerTransport implements TransportInterface
     * Does a clean shutdown of the reporter, flushing any traces that may be
     * buffered in memory.
     */
-    public function close()
+    public function close(): void
     {
         $this->flush(true); // flush all remaining data
         $this->transport->close();
