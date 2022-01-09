@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\Contrib\Jaeger\AgentExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use OpenTelemetry\Tests\SDK\Util\SpanData;
+use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 class AgentExporterTest extends TestCase

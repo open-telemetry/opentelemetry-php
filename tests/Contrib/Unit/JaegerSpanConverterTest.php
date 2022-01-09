@@ -7,7 +7,7 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Jaeger\SpanConverter;
 use OpenTelemetry\SDK\Trace\StatusData;
-use OpenTelemetry\Tests\SDK\Util\SpanData;
+use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 /**
