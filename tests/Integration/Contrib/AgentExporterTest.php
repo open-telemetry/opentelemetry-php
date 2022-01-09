@@ -9,6 +9,11 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers OpenTelemetry\Contrib\Jaeger\AgentExporter
+ * @covers OpenTelemetry\Contrib\Jaeger\JaegerTransport
+ * @covers OpenTelemetry\Contrib\Jaeger\ThriftUdpTransport
+ */
 class AgentExporterTest extends TestCase
 {
     public function test_happy_path()

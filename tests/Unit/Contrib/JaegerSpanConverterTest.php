@@ -11,7 +11,7 @@ use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass SpanConverter
+ * @covers OpenTelemetry\Contrib\Jaeger\SpanConverter
  */
 class JaegerSpanConverterTest extends TestCase
 {
