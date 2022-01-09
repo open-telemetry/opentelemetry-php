@@ -32,9 +32,12 @@ class SpanConverter
         }
         $tags = $this->buildTags($tags);
 
-        $traceId = $span->getContext()->getTraceID();
-        $parentSpanId = $span->getParentSpanId();
-        $spanId = $span->getContext()->getSpanID();
+        [
+            'traceIdLow' => $traceIdLow,
+            'traceIdHigh' => $traceIdHigh
+        ] = SpanConverter::convertOtlpToJaegerTraceIds($span->getContext()->getTraceID());
+        $spanId = intval($span->getContext()->getSpanID(), 16);
+        $parentSpanId = intval($span->getParentSpanId(), 16);
 
         //TODO - determine if any of the below commented out code is still needed
 
@@ -55,8 +58,8 @@ class SpanConverter
         // ]);
 
         return new JTSpan([
-            'traceIdLow' => $traceId,
-            'traceIdHigh' => 0,
+            'traceIdLow' => $traceIdLow,
+            'traceIdHigh' => $traceIdHigh,
             'spanId' => $spanId,
             'parentSpanId' => $parentSpanId,
             'operationName' => $span->getName(),
@@ -146,5 +149,20 @@ class SpanConverter
         // error_log('Cannot build tag for ' . $key . ' of type ' . gettype($value));
 
         // throw new \Exception('unsupported tag type');
+    }
+
+    private static function convertOtlpToJaegerTraceIds(string $traceId): array
+    {
+        // if (PHP_INT_SIZE === 4) {
+        //     throw new \LengthException
+        // }
+
+        $traceIdLow = intval(substr($traceId, 0, 16), 16);
+        $traceIdHigh = intval(substr($traceId, 16, 32), 16);
+
+        return [
+            'traceIdLow' => $traceIdLow,
+            'traceIdHigh' => $traceIdHigh,
+        ];
     }
 }

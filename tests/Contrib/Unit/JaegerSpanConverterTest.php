@@ -22,10 +22,10 @@ class JaegerSpanConverterTest extends TestCase
 
         $jtSpan = (new SpanConverter())->convert($span);
 
-        $this->assertSame('00000000000000000000000000000000', $jtSpan->traceIdLow);
+        $this->assertSame(0, $jtSpan->traceIdLow);
         $this->assertSame(0, $jtSpan->traceIdHigh);
-        $this->assertSame('0000000000000000', $jtSpan->spanId);
-        $this->assertSame('0000000000000000', $jtSpan->parentSpanId);
+        $this->assertSame(0, $jtSpan->spanId);
+        $this->assertSame(0, $jtSpan->parentSpanId);
         $this->assertSame('otlpSpanName', $jtSpan->operationName);
         $this->assertSame([], $jtSpan->references);
         $this->assertSame(0, $jtSpan->flags);
