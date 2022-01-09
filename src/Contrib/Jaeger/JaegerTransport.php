@@ -8,11 +8,13 @@ use Jaeger\Thrift\Agent\AgentClient;
 use Jaeger\Thrift\Batch;
 use Jaeger\Thrift\Process;
 use Jaeger\Thrift\Span;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use Thrift\Exception\TTransportException;
 use Thrift\Protocol\TCompactProtocol;
 
 final class JaegerTransport implements TransportInterface
 {
+    use LogsMessagesTrait;
 
     // DEFAULT_BUFFER_SIZE indicates the default maximum buffer size, or the size threshold
     // at which the buffer will be flushed to the agent.
@@ -91,7 +93,7 @@ final class JaegerTransport implements TransportInterface
             // reset the process tag
             $this->process = null;
         } catch (TTransportException $e) {
-            error_log('jaeger: transport failure: ' . $e->getMessage());
+            $this->logError('jaeger: transport failure: ' . $e->getMessage());
 
             return 0;
         }
