@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Jaeger;
 
-use Throwable;
+//use Throwable;
 
 class CodecUtility
 {
@@ -29,19 +29,19 @@ class CodecUtility
      *
      * @return int
      */
-    public static function getValidI64(int $length) : int
-    {
-        $hex = bin2hex(random_bytes($length));
-        // If we're on a 32-bit architecture, fall back to base_convert.
-        // if (PHP_INT_SIZE === 4) {
-        //     return base_convert($hex, 16, 10);
-        // }
+    // public static function getValidI64(int $length) : int
+    // {
+    //     $hex = bin2hex(random_bytes($length));
+    //     // If we're on a 32-bit architecture, fall back to base_convert.
+    //     // if (PHP_INT_SIZE === 4) {
+    //     //     return base_convert($hex, 16, 10);
+    //     // }
 
-        $hi = intval(substr($hex, -16, -8), 16);
-        $lo = intval(substr($hex, -8, 8), 16);
+    //     $hi = intval(substr($hex, -16, -8), 16);
+    //     $lo = intval(substr($hex, -8, 8), 16);
 
-        return $hi << 32 | $lo;
-    }
+    //     return $hi << 32 | $lo;
+    // }
 
     /**
      * Generates a random hex string
@@ -51,12 +51,12 @@ class CodecUtility
      * @param int $length of bytes
      * @return string
      */
-    public static function randomHex(int $length): string
-    {
-        try {
-            return bin2hex(random_bytes($length));
-        } catch (Throwable $ex) {
-            return substr(str_shuffle(str_repeat('0123456789abcdef', $length)), 1, $length);
-        }
-    }
+    // public static function randomHex(int $length): string
+    // {
+    //     try {
+    //         return bin2hex(random_bytes($length));
+    //     } catch (Throwable $ex) {
+    //         return substr(str_shuffle(str_repeat('0123456789abcdef', $length)), 1, $length);
+    //     }
+    // }
 }
