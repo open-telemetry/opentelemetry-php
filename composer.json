@@ -40,7 +40,7 @@
         "psr-4": {
             "OpenTelemetry\\": "src/",
             "Opentelemetry\\Proto\\": "proto/otel/Opentelemetry/Proto/",
-            "GPBMetadata\\Opentelemetry\\Proto\\": "proto/otel/GPBMetadata/Opentelemetry/Proto/",
+            "GPBMetadata\\Opentelemetry\\": "proto/otel/GPBMetadata/Opentelemetry/",
             "Jaeger\\Thrift\\": "thrift/jaeger/"
         },
         "files": [
