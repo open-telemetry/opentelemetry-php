@@ -28,7 +28,7 @@ class SpanConverter
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
-            $tags[$k] = $this->sanitiseTagValue($v->getValue());
+            $tags[$k] = $this->sanitiseTagValue($v);
         }
         $tags = $this->buildTags($tags);
 
