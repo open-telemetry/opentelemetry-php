@@ -6,7 +6,7 @@ namespace OpenTelemetry\Contrib\Jaeger;
 
 use Jaeger\Thrift\Span;
 
-interface Transport
+interface TransportInterface
 {
 
     /**

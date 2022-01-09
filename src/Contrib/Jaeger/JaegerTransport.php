@@ -11,7 +11,7 @@ use Jaeger\Thrift\Span;
 use Thrift\Exception\TTransportException;
 use Thrift\Protocol\TCompactProtocol;
 
-final class JaegerTransport implements Transport
+final class JaegerTransport implements TransportInterface
 {
 
     // DEFAULT_BUFFER_SIZE indicates the default maximum buffer size, or the size threshold
