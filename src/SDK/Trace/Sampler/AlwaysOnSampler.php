@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\Sampler;
 
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
@@ -29,7 +29,7 @@ class AlwaysOnSampler implements SamplerInterface
         string $traceId,
         string $spanName,
         int $spanKind,
-        ?API\AttributesInterface $attributes = null,
+        ?AttributesInterface $attributes = null,
         array $links = []
     ): SamplingResult {
         $parentSpan = Span::fromContext($parentContext);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Newrelic;
 
-use OpenTelemetry\SDK\Trace\AbstractClock;
+use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
@@ -55,7 +55,7 @@ class SpanConverter implements SpanConverterInterface
         ];
 
         foreach ($span->getAttributes() as $k => $v) {
-            $row['attributes'][$k] = $v->getValue();
+            $row['attributes'][$k] = $v;
         }
 
         /*

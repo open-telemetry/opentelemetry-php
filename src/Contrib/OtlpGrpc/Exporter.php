@@ -182,9 +182,8 @@ class Exporter implements SpanExporterInterface
         return Grpc\ChannelCredentials::createInsecure();
     }
 
-    /** @inheritDoc */
-    public static function fromConnectionString(string $endpointUrl, string $name = null, $args = null)
+    public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null): Exporter
     {
-        return new Exporter($endpointUrl);
+        return is_string($endpointUrl) ? new Exporter($endpointUrl) :  new Exporter();
     }
 }

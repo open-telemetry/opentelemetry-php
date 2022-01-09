@@ -65,15 +65,14 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
     /**
      * @param string $endpointUrl
      * @param string $name
-     * @param string $args
+     * @param string|null $args
      * @return LoggerExporter
      */
-    public static function fromConnectionString(string $endpointUrl, string $name, string $args): self
+    public static function fromConnectionString(string $endpointUrl, string $name, string $args = null): self
     {
         return new self(
             $name,
-            new SimplePsrFileLogger($endpointUrl),
-            $args
+            new SimplePsrFileLogger($endpointUrl)
         );
     }
 

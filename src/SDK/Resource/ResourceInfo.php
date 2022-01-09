@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Resource;
 
-use OpenTelemetry\API\Trace\AttributesInterface;
-use OpenTelemetry\SDK\Trace\Attributes;
+use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SemConv\ResourceAttributes;
 
 /**
@@ -58,9 +58,9 @@ class ResourceInfo
 
         // merge attributes from the secondary resource
         foreach ($secondary->getAttributes() as $name => $attribute) {
-            $mergedAttribute = $mergedAttributes->getAttribute($name);
-            if (null === $mergedAttribute || $mergedAttribute->getValue() === '') {
-                $mergedAttributes->setAttribute($name, $attribute->getValue());
+            $mergedAttribute = $mergedAttributes->get($name);
+            if (null === $mergedAttribute || $mergedAttribute === '') {
+                $mergedAttributes->setAttribute($name, $attribute);
             }
         }
 
@@ -90,7 +90,7 @@ class ResourceInfo
         $string = getenv('OTEL_RESOURCE_ATTRIBUTES');
         if ($string && false !== strpos($string, '=')) {
             foreach (explode(',', $string) as $pair) {
-                list($key, $value) = explode('=', $pair);
+                [$key, $value] = explode('=', $pair);
                 $attributes[trim($key)] = trim($value);
             }
         }

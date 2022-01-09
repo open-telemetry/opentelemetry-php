@@ -160,14 +160,14 @@ PHP_VERSION=8.1 make all
 ```
 
 ## Proto Generation
-Our proto files are committed to the repository into the `/proto` folder.  These are used in gRPC connections to the
+Our protobuf files are committed to the repository into the `/proto` folder.  These are used in gRPC connections to the
 upstream.  These get updated when the [opentelemetry-proto](https://github.com/open-telemetry/opentelemetry-proto)
 repo has a meaningful update.  The maintainer SIG is discussing a way to make this more automatic in the future.
 
-If you'd like to generate proto files for use with this repository, one can run the following command:
+If you'd like to generate protobuf files for use with this repository, one can run the following command:
 
 ```bash
-make proto
+make protobuf
 ```
 
 From your bash compatible shell in the root of this directory.  This wil create a `/proto` folder in the root
@@ -233,7 +233,7 @@ To run the test suite, execute
 make test
 ```
 from your bash compatible shell.  This will output the test output as well
-as a test coverage analysis.  Code that doesn't pass our currently defined tests will emit a failure in CI
+as a test coverage analysis (text + html - see `tests/coverage/html`).  Code that doesn't pass our currently defined tests will emit a failure in CI
 
 ## Examples
 

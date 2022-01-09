@@ -157,19 +157,13 @@ class Exporter implements SpanExporterInterface
         return (string) $dsn;
     }
 
-    /** @inheritDoc */
-    public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
+    public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null): Exporter
     {
         return new Exporter(
             HttpClientDiscovery::find(),
             Psr17FactoryDiscovery::findRequestFactory(),
             Psr17FactoryDiscovery::findStreamFactory()
         );
-    }
-
-    public static function create(): Exporter
-    {
-        return self::fromConnectionString();
     }
 
     private function shouldCompress(): bool

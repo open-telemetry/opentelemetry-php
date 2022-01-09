@@ -1,15 +1,18 @@
 PHP_VERSION ?= 7.4
 DC_RUN_PHP = docker-compose run --rm php
 
-all: update style phan psalm phpstan test
+all: update style deptrac phan psalm phpstan test
 install:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer install
 update:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer update
-test:
-	$(DC_RUN_PHP) env XDEBUG_MODE=coverage vendor/bin/phpunit --colors=always --coverage-text --testdox --coverage-clover coverage.clover
+test: test-unit test-integration
+test-unit:
+	$(DC_RUN_PHP) env XDEBUG_MODE=coverage vendor/bin/phpunit --testsuite unit --colors=always --coverage-text --testdox --coverage-clover coverage.clover --coverage-html=tests/coverage/html
+test-integration:
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpunit --testsuite integration --colors=always
 test-coverage:
-	$(DC_RUN_PHP) env XDEBUG_MODE=coverage vendor/bin/phpunit --colors=always --testdox --coverage-html=tests/coverage/html
+	$(DC_RUN_PHP) env XDEBUG_MODE=coverage vendor/bin/phpunit --testsuite unit --coverage-html=tests/coverage/html
 phan:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off env PHAN_DISABLE_XDEBUG_WARN=1 vendor/bin/phan
 psalm:
@@ -41,7 +44,7 @@ metrics-prometheus-example:
 	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example run --rm php php examples/prometheus/PrometheusMetricsExample.php
 stop-prometheus:
 	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example stop
-proto:
+protobuf:
 	@docker-compose -f docker-compose.proto.yaml up proto
 thrift:
 	./script/thrift_gen.sh
@@ -50,7 +53,7 @@ bash:
 style:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no -vvv
 deptrac:
-	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/deptrac --formatter=table
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/deptrac --formatter=table --report-uncovered
 w3c-test-service:
 	@docker-compose -f docker-compose.w3cTraceContext.yaml run --rm php ./tests/TraceContext/W3CTestService/symfony-setup
 semconv:
