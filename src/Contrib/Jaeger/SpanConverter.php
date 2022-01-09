@@ -8,6 +8,7 @@ use Jaeger\Thrift\Span as JTSpan;
 use Jaeger\Thrift\Tag;
 use Jaeger\Thrift\TagType;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use RuntimeException;
 
 class SpanConverter
 {
@@ -151,7 +152,14 @@ class SpanConverter
         // throw new \Exception('unsupported tag type');
     }
 
-    private static function convertOtlpToJaegerIds(SpanDataInterface $span): array {
+    private static function convertOtlpToJaegerIds(SpanDataInterface $span): array
+    {
+        if (PHP_INT_SIZE < 8) {
+            $humanReadableIntSize = PHP_INT_SIZE*8;
+
+            throw new RuntimeException("Integrating with Jaeger requires usage of 64 bit integers, but your current platform is $humanReadableIntSize bit. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#ids for more information.");
+        }
+
         [
             'traceIdLow' => $traceIdLow,
             'traceIdHigh' => $traceIdHigh
@@ -170,10 +178,6 @@ class SpanConverter
 
     private static function convertOtlpToJaegerTraceIds(string $traceId): array
     {
-        // if (PHP_INT_SIZE === 4) {
-        //     throw new \LengthException
-        // }
-
         $traceIdLow = intval(substr($traceId, 0, 16), 16);
         $traceIdHigh = intval(substr($traceId, 16, 32), 16);
 
