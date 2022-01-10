@@ -7,6 +7,7 @@ namespace OpenTelemetry\Contrib\Jaeger;
 use Jaeger\Thrift\Span as JTSpan;
 use Jaeger\Thrift\Tag;
 use Jaeger\Thrift\TagType;
+use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use RuntimeException;
 
@@ -21,8 +22,8 @@ class SpanConverter
     public function convert(SpanDataInterface $span): JTSpan
     {
         $references = $tags = $logs = [];
-        $startTime = (int) ($span->getStartEpochNanos() / 1e3); // microseconds
-        $duration = (int) (($span->getEndEpochNanos() - $span->getStartEpochNanos()) / 1e3); // microseconds
+        $startTime = AbstractClock::nanosToMicro($span->getStartEpochNanos());
+        $duration = AbstractClock::nanosToMicro($span->getEndEpochNanos() - $span->getStartEpochNanos());
         $tags = [
             self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
             self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
