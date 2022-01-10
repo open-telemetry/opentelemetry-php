@@ -20,7 +20,7 @@ class AgentExporterTest extends TestCase
     {
         $exporter = AgentExporter::fromConnectionString(
             'http://127.0.0.1:80',
-            'someServiceName', 
+            'someServiceName',
         );
 
         $status = $exporter->export([new SpanData()]);
