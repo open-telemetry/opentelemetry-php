@@ -41,7 +41,7 @@ class SpanConverter
             'parentSpanId' => $parentSpanId,
         ] = self::convertOtlpToJaegerIds($span);
 
-        //TODO - determine if any of the below commented out code is still needed
+        //NOTE - the below commented out code may be a useful reference when updating this method to be spec compliant
 
         // foreach ($span->getEvents() as $event) {
         //     $logs = [
