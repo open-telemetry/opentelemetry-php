@@ -30,5 +30,8 @@
         "psr-4": {
             "OpenTelemetry\\Contrib\\": ""
         }
+    },
+    "suggest": {
+        "ext-sockets": "To use the Thrift UDP Exporter for the Jaeger Agent"
     }
 }

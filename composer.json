@@ -8,6 +8,7 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
+        "apache/thrift": "^0.15.0",
         "google/protobuf": "^3.3.0",
         "grpc/grpc": "^1.30",
         "nyholm/dsn": "^2.0.0",
@@ -50,7 +51,8 @@
         "psr-4": {
             "OpenTelemetry\\": "src/",
             "Opentelemetry\\Proto\\": "proto/otel/Opentelemetry/Proto/",
-            "GPBMetadata\\Opentelemetry\\": "proto/otel/GPBMetadata/Opentelemetry/"
+            "GPBMetadata\\Opentelemetry\\": "proto/otel/GPBMetadata/Opentelemetry/",
+            "Jaeger\\Thrift\\": "thrift/jaeger/"
         },
         "files": [
             "src/Context/fiber/initialize_fiber_handler.php"
@@ -88,6 +90,7 @@
     },
     "suggest": {
         "ext-grpc": "To use the OTLP GRPC Exporter",
-        "ext-protobuf": "For more performant protobuf/grpc exporting"
+        "ext-protobuf": "For more performant protobuf/grpc exporting",
+        "ext-sockets": "To use the Thrift UDP Exporter for the Jaeger Agent"
     }
 }
