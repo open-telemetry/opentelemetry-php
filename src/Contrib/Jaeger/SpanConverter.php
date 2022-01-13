@@ -119,7 +119,7 @@ class SpanConverter
             'vStr' => $value,
         ]);
 
-        //TODO - determine if any of this additional handling is still needed, or if it's all dead-code (i.e. $value must be a string at this point always)
+        //NOTE - the below commented out code may be a useful reference when updating this method to be spec compliant
 
         // if (is_bool($value)) {
         //     return new Tag([
