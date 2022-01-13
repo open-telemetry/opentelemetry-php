@@ -90,6 +90,7 @@
     },
     "suggest": {
         "ext-grpc": "To use the OTLP GRPC Exporter",
+        "ext-protobuf": "For more performant protobuf/grpc exporting",
         "ext-sockets": "To use the Thrift UDP Exporter for the Jaeger Agent"
     }
 }

@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @covers OpenTelemetry\SDK\AttributeLimits
  */
-class AttributesLimitsTest extends TestCase
+class AttributeLimitsTest extends TestCase
 {
     public function test_default_limits(): void
     {

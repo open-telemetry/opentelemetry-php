@@ -84,6 +84,12 @@ be enabled by setting the `OTEL_PHP_FIBERS_ENABLED` environment variable to a tr
 
 Using fibers with non-`CLI` SAPIs may require pre-loading of bindings. One way to achieve this is setting [`ffi.preload`](https://www.php.net/manual/en/ffi.configuration.php#ini.ffi.preload) to `src/Context/fiber/zend_observer_fiber.h` and setting [`opcache.preload`](https://www.php.net/manual/en/opcache.preloading.php) to `vendor/autoload.php`.
 
+#### 5.) Install PHP [ext-protobuf](https://pecl.php.net/package/protobuf)
+
+** The PHP protobuf extension is optional when using either the `OTLPHttp` or `OTLPGrpc` exporters.**
+
+The protobuf extension makes both exporters more performant. _Note: there are some deprecation warnings with protobuf and PHP 8.1_
+
 ---
 
 ## Installation
