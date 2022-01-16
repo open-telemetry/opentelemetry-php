@@ -310,6 +310,7 @@ return [
     'exclude_analysis_directory_list' => [
         'vendor/',
         'proto/',
+        'thrift/'
     ],
 
     // Enable this to enable checks of require/include statements referring to valid paths.
@@ -359,6 +360,8 @@ return [
     'directory_list' => [
         'src',
         'proto',
+        'thrift',
+        'vendor/apache/thrift',
         'vendor/composer/xdebug-handler/src',
         'vendor/guzzlehttp',
         'vendor/psr',

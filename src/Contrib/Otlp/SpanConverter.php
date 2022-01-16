@@ -165,7 +165,7 @@ class SpanConverter implements SpanConverterInterface
 
         $row['status'] = $status;
 
-        return new CollectorSpan($row);
+        return new CollectorSpan(array_filter($row));
     }
 
     // @return KeyValue[]
