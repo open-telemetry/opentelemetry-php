@@ -15,8 +15,8 @@ use RuntimeException;
 class SpanConverter
 {
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
-    const STATUS_OK_WITH_ALL_UPPERCASE_LETTERS = 'OK';
-    const STATUS_ERROR_WITH_ALL_UPPERCASE_LETTERS = 'ERROR';
+    const STATUS_OK = 'OK';
+    const STATUS_ERROR = 'ERROR';
     const STATUS_DESCRIPTION_TAG_KEY = 'otel.status_description';
     const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
     const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
@@ -40,12 +40,12 @@ class SpanConverter
         if ($span->getStatus()->getCode() !== StatusCode::STATUS_UNSET) {
             switch ($span->getStatus()->getCode()) {
                 case StatusCode::STATUS_OK:
-                    $tags[self::STATUS_CODE_TAG_KEY] = self::STATUS_OK_WITH_ALL_UPPERCASE_LETTERS;
+                    $tags[self::STATUS_CODE_TAG_KEY] = self::STATUS_OK;
 
                     break;
                 case StatusCode::STATUS_ERROR:
                     //This is where the error flag section of the spec should be implemented - https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#error-flag, see Go for reference - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/jaeger/jaeger.go#L154
-                    $tags[self::STATUS_CODE_TAG_KEY] = self::STATUS_ERROR_WITH_ALL_UPPERCASE_LETTERS;
+                    $tags[self::STATUS_CODE_TAG_KEY] = self::STATUS_ERROR;
 
                     break;
             }
