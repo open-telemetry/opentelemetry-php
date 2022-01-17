@@ -15,6 +15,8 @@ class SpanConverter
 {
     const STATUS_CODE_TAG_KEY = 'op.status_code';
     const STATUS_DESCRIPTION_TAG_KEY = 'op.status_description';
+    const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
+    const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
 
     public function __construct()
     {
@@ -33,6 +35,14 @@ class SpanConverter
             self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
             self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
         ];
+
+        if (!empty($span->getInstrumentationLibrary()->getName())) {
+            $tags[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_NAME] = $span->getInstrumentationLibrary()->getName();
+        }
+
+        if ($span->getInstrumentationLibrary()->getVersion() !== null) {
+            $tags[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_VERSION] = $span->getInstrumentationLibrary()->getVersion();
+        }
 
         foreach ($span->getAttributes() as $k => $v) {
             $tags[$k] = $this->sanitiseTagValue($v);
