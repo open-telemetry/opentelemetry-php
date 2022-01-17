@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Jaeger\SpanConverter;
+use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
@@ -40,22 +41,51 @@ class JaegerSpanConverterTest extends TestCase
         $span = (new SpanData())
             ->setStatus(
                 new StatusData(
-                    StatusCode::STATUS_ERROR,
+                    StatusCode::STATUS_OK,
                     'status_description'
                 )
             )
+            ->setInstrumentationLibrary(new InstrumentationLibrary(
+                'instrumentation_library_name',
+                'instrumentation_library_version'
+            ))
             ->addAttribute('keyForBoolean', true)
             ->addAttribute('keyForArray', ['1stElement', '2ndElement']);
 
         $jtSpan = (new SpanConverter())->convert($span);
 
-        $this->assertSame('op.status_code', $jtSpan->tags[0]->key);
-        $this->assertSame('Error', $jtSpan->tags[0]->vStr);
-        $this->assertSame('op.status_description', $jtSpan->tags[1]->key);
+        $this->assertSame('otel.status_code', $jtSpan->tags[0]->key);
+        $this->assertSame('OK', $jtSpan->tags[0]->vStr);
+
+        $this->assertSame('otel.status_description', $jtSpan->tags[1]->key);
         $this->assertSame('status_description', $jtSpan->tags[1]->vStr);
-        $this->assertSame('keyForBoolean', $jtSpan->tags[2]->key);
-        $this->assertSame('true', $jtSpan->tags[2]->vStr);
-        $this->assertSame('keyForArray', $jtSpan->tags[3]->key);
-        $this->assertSame('1stElement,2ndElement', $jtSpan->tags[3]->vStr);
+
+        $this->assertSame('otel.library.name', $jtSpan->tags[2]->key);
+        $this->assertSame('instrumentation_library_name', $jtSpan->tags[2]->vStr);
+
+        $this->assertSame('otel.library.version', $jtSpan->tags[3]->key);
+        $this->assertSame('instrumentation_library_version', $jtSpan->tags[3]->vStr);
+
+        $this->assertSame('keyForBoolean', $jtSpan->tags[4]->key);
+        $this->assertSame('true', $jtSpan->tags[4]->vStr);
+
+        $this->assertSame('keyForArray', $jtSpan->tags[5]->key);
+        $this->assertSame('1stElement,2ndElement', $jtSpan->tags[5]->vStr);
+    }
+
+    public function test_should_correctly_convert_error_status_to_jaeger_thrift_tags()
+    {
+        $span = (new SpanData())
+            ->setStatus(
+                new StatusData(
+                    StatusCode::STATUS_ERROR,
+                    ''
+                )
+            );
+
+        $jtSpan = (new SpanConverter())->convert($span);
+
+        $this->assertSame('otel.status_code', $jtSpan->tags[0]->key);
+        $this->assertSame('ERROR', $jtSpan->tags[0]->vStr);
     }
 }
