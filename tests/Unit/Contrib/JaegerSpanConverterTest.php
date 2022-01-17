@@ -41,7 +41,7 @@ class JaegerSpanConverterTest extends TestCase
         $span = (new SpanData())
             ->setStatus(
                 new StatusData(
-                    StatusCode::STATUS_ERROR,
+                    StatusCode::STATUS_OK,
                     'status_description'
                 )
             )
@@ -54,10 +54,10 @@ class JaegerSpanConverterTest extends TestCase
 
         $jtSpan = (new SpanConverter())->convert($span);
 
-        $this->assertSame('op.status_code', $jtSpan->tags[0]->key);
-        $this->assertSame('Error', $jtSpan->tags[0]->vStr);
+        $this->assertSame('otel.status_code', $jtSpan->tags[0]->key);
+        $this->assertSame('OK', $jtSpan->tags[0]->vStr);
 
-        $this->assertSame('op.status_description', $jtSpan->tags[1]->key);
+        $this->assertSame('otel.status_description', $jtSpan->tags[1]->key);
         $this->assertSame('status_description', $jtSpan->tags[1]->vStr);
 
         $this->assertSame('otel.library.name', $jtSpan->tags[2]->key);

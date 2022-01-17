@@ -7,14 +7,15 @@ namespace OpenTelemetry\Contrib\Jaeger;
 use Jaeger\Thrift\Span as JTSpan;
 use Jaeger\Thrift\Tag;
 use Jaeger\Thrift\TagType;
+use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use RuntimeException;
 
 class SpanConverter
 {
-    const STATUS_CODE_TAG_KEY = 'op.status_code';
-    const STATUS_DESCRIPTION_TAG_KEY = 'op.status_description';
+    const STATUS_CODE_TAG_KEY = 'otel.status_code';
+    const STATUS_DESCRIPTION_TAG_KEY = 'otel.status_description';
     const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
     const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
 
@@ -31,10 +32,26 @@ class SpanConverter
         $references = $tags = $logs = [];
         $startTime = AbstractClock::nanosToMicro($span->getStartEpochNanos());
         $duration = AbstractClock::nanosToMicro($span->getEndEpochNanos() - $span->getStartEpochNanos());
-        $tags = [
-            self::STATUS_CODE_TAG_KEY => $span->getStatus()->getCode(),
-            self::STATUS_DESCRIPTION_TAG_KEY => $span->getStatus()->getDescription(),
-        ];
+
+        $tags = [];
+
+        if ($span->getStatus()->getCode() !== StatusCode::STATUS_UNSET) {
+            switch ($span->getStatus()->getCode()) {
+                case StatusCode::STATUS_OK:
+                    $tags[self::STATUS_CODE_TAG_KEY] = 'OK';
+
+                    break;
+                case StatusCode::STATUS_ERROR:
+                    //This is where the error flag section of the spec should be implemented - https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#error-flag, see Go for reference - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/jaeger/jaeger.go#L154
+                    $tags[self::STATUS_CODE_TAG_KEY] = 'ERROR';
+
+                    break;
+            }
+
+            if (!empty($span->getStatus()->getDescription())) {
+                $tags[self::STATUS_DESCRIPTION_TAG_KEY] = $span->getStatus()->getDescription();
+            }
+        }
 
         if (!empty($span->getInstrumentationLibrary()->getName())) {
             $tags[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_NAME] = $span->getInstrumentationLibrary()->getName();
