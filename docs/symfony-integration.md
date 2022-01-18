@@ -83,7 +83,7 @@ services:
     jaeger:
         image: jaegertracing/all-in-one
         environment:
-            COLLECTOR_ZIPKIN_HTTP_PORT: 9412
+            COLLECTOR_ZIPKIN_HOST_PORT: 9412 # Before version 1.22.0 use COLLECTOR_ZIPKIN_HTTP_PORT
         ports:
             - 9412:9412
             - 16686:16686
