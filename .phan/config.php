@@ -361,7 +361,7 @@ return [
         'src',
         'proto',
         'thrift',
-        'vendor/apache/thrift',
+        'vendor/packaged/thrift',
         'vendor/composer/xdebug-handler/src',
         'vendor/guzzlehttp',
         'vendor/psr',

@@ -8,7 +8,7 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
-        "apache/thrift": "^0.15.0",
+        "packaged/thrift": "^0.15.0",
         "google/protobuf": "^3.3.0",
         "grpc/grpc": "^1.30",
         "nyholm/dsn": "^2.0.0",
