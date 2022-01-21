@@ -362,7 +362,7 @@ return [
         'proto',
         'thrift',
         'vendor/packaged/thrift',
-        'vendor/composer/xdebug-handler/src',
+        'vendor/composer',
         'vendor/guzzlehttp',
         'vendor/psr',
         'vendor/php-http',
