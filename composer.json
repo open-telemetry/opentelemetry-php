@@ -78,6 +78,7 @@
         "phan/phan": "^5.0",
         "php-http/mock-client": "^1.5",
         "phpbench/phpbench": "^1.2",
+        "phpmetrics/phpmetrics": "^2.7",
         "phpstan/phpstan": "^1.1",
         "phpstan/phpstan-mockery": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",

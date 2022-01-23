@@ -7,6 +7,9 @@ tests/coverage
 .php-cs-fixer.cache
 .phpbench
 !tests/coverage/html/.gitkeep
+var/metrics/
+!var/metrics/.gitkeep
+junit.xml
 .env
 
 # IntelliJ IDEA
