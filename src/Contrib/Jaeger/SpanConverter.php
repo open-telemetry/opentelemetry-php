@@ -7,6 +7,7 @@ namespace OpenTelemetry\Contrib\Jaeger;
 use Jaeger\Thrift\Span as JTSpan;
 use Jaeger\Thrift\Tag;
 use Jaeger\Thrift\TagType;
+use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -20,6 +21,11 @@ class SpanConverter
     const STATUS_DESCRIPTION_TAG_KEY = 'otel.status_description';
     const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
     const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
+    const KEY_SPAN_KIND = 'span.kind';
+    const JAEGER_SPAN_KIND_CLIENT = "client";
+    const JAEGER_SPAN_KIND_SERVER = "server";
+    const JAEGER_SPAN_KIND_CONSUMER = "consumer";
+    const JAEGER_SPAN_KIND_PRODUCER = "producer";
 
     public function __construct()
     {
@@ -61,6 +67,11 @@ class SpanConverter
 
         if ($span->getInstrumentationLibrary()->getVersion() !== null) {
             $tags[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_VERSION] = $span->getInstrumentationLibrary()->getVersion();
+        }
+
+        $jaegerSpanKind = self::convertOtlpSpanKindToJaeger($span);
+        if ($jaegerSpanKind !== null) {
+            $tags[self::KEY_SPAN_KIND] = $jaegerSpanKind;
         }
 
         foreach ($span->getAttributes() as $k => $v) {
@@ -106,6 +117,23 @@ class SpanConverter
             'tags' => $tags,
             'logs' => $logs,
         ]);
+    }
+
+    private static function convertOtlpSpanKindToJaeger(SpanDataInterface $span): ?string {
+        switch($span->getKind()) {
+            case SpanKind::KIND_CLIENT:
+                return self::JAEGER_SPAN_KIND_CLIENT;
+            case SpanKind::KIND_SERVER:
+                return self::JAEGER_SPAN_KIND_SERVER;
+            case SpanKind::KIND_CONSUMER:
+                return self::JAEGER_SPAN_KIND_CONSUMER;
+            case SpanKind::KIND_PRODUCER:
+                return self::JAEGER_SPAN_KIND_PRODUCER;
+            case SpanKind::KIND_INTERNAL:
+                return null;
+        }
+
+        return null;
     }
 
     private function sanitiseTagValue($value): string

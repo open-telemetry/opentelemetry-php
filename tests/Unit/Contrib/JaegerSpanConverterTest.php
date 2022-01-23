@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Jaeger\SpanConverter;
 use OpenTelemetry\SDK\InstrumentationLibrary;
@@ -87,5 +88,36 @@ class JaegerSpanConverterTest extends TestCase
 
         $this->assertSame('otel.status_code', $jtSpan->tags[0]->key);
         $this->assertSame('ERROR', $jtSpan->tags[0]->vStr);
+    }
+
+    /**
+     * @dataProvider provideSpanKindInputsAndExpectations
+     */
+    public function test_should_correctly_convert_span_kind_to_jaeger_thrift_tags(int $spanKindInput, string $expectedJaegerTagValue)
+    {
+        $span = (new SpanData())
+            ->setKind($spanKindInput);
+
+        $jtSpan = (new SpanConverter())->convert($span);
+
+        $this->assertSame("span.kind", $jtSpan->tags[0]->key);
+        $this->assertSame($expectedJaegerTagValue, $jtSpan->tags[0]->vStr);
+    }
+
+    public function provideSpanKindInputsAndExpectations() {
+        yield [SpanKind::KIND_CLIENT, "client"];
+        yield [SpanKind::KIND_SERVER, "server"];
+        yield [SpanKind::KIND_CONSUMER, "consumer"];
+        yield [SpanKind::KIND_PRODUCER, "producer"];
+    }
+
+    public function test_span_kind_internal_should_not_create_jaeger_thrift_tag()
+    {
+        $span = (new SpanData())
+            ->setKind(SpanKind::KIND_INTERNAL);
+
+        $jtSpan = (new SpanConverter())->convert($span);
+
+        $this->assertCount(0, $jtSpan->tags);
     }
 }
