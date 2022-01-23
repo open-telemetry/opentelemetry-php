@@ -241,6 +241,13 @@ make test
 from your bash compatible shell.  This will output the test output as well
 as a test coverage analysis (text + html - see `tests/coverage/html`).  Code that doesn't pass our currently defined tests will emit a failure in CI
 
+## PhpMetrics
+To generate a report showing a variety of metrics for the library and its classes, you can run:
+```bash
+make phpmetrics
+```
+This will generate a HTML PhpMetrics report in the `var/metrics` directory. Make sure to run `make test` before to create the test log-file, used by the metrics report.
+
 ## Examples
 
 ### Trace
