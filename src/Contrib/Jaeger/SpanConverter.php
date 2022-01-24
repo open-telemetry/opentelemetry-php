@@ -32,6 +32,15 @@ class SpanConverter
         self::checkIfPHPSupports64BitIntegers();
     }
 
+    private static function checkIfPHPSupports64BitIntegers(): void
+    {
+        if (PHP_INT_SIZE < 8) {
+            $humanReadableIntSize = PHP_INT_SIZE*8;
+
+            throw new RuntimeException("Integrating with Jaeger requires usage of 64 bit integers, but your current platform is $humanReadableIntSize bit. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#ids for more information.");
+        }
+    }
+
     /**
     * Convert span to Jaeger Thrift Span format
     */
@@ -213,15 +222,6 @@ class SpanConverter
         // error_log('Cannot build tag for ' . $key . ' of type ' . gettype($value));
 
         // throw new \Exception('unsupported tag type');
-    }
-
-    private static function checkIfPHPSupports64BitIntegers(): void
-    {
-        if (PHP_INT_SIZE < 8) {
-            $humanReadableIntSize = PHP_INT_SIZE*8;
-
-            throw new RuntimeException("Integrating with Jaeger requires usage of 64 bit integers, but your current platform is $humanReadableIntSize bit. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#ids for more information.");
-        }
     }
 
     private static function convertOtlpToJaegerIds(SpanDataInterface $span): array
