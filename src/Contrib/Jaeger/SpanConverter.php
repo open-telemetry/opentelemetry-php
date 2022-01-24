@@ -51,7 +51,7 @@ class SpanConverter
             'traceIdHigh' => $traceIdHigh,
             'spanId' => $spanId,
             'parentSpanId' => $parentSpanId,
-        ] = self::convertOtlpToJaegerIds($span);
+        ] = self::convertOtelToJaegerIds($span);
 
         $references = $tags = $logs = [];
         $startTime = AbstractClock::nanosToMicro($span->getStartEpochNanos());
@@ -85,7 +85,7 @@ class SpanConverter
             $tags[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_VERSION] = $span->getInstrumentationLibrary()->getVersion();
         }
 
-        $jaegerSpanKind = self::convertOtlpSpanKindToJaeger($span);
+        $jaegerSpanKind = self::convertOtelSpanKindToJaeger($span);
         if ($jaegerSpanKind !== null) {
             $tags[self::KEY_SPAN_KIND] = $jaegerSpanKind;
         }
@@ -128,12 +128,12 @@ class SpanConverter
         ]);
     }
 
-    private static function convertOtlpToJaegerIds(SpanDataInterface $span): array
+    private static function convertOtelToJaegerIds(SpanDataInterface $span): array
     {
         [
             'traceIdLow' => $traceIdLow,
             'traceIdHigh' => $traceIdHigh
-        ] = self::convertOtlpToJaegerTraceIds($span->getContext()->getTraceID());
+        ] = self::convertOtelToJaegerTraceIds($span->getContext()->getTraceID());
 
         $spanId = intval($span->getContext()->getSpanID(), 16);
         $parentSpanId = intval($span->getParentSpanId(), 16);
@@ -146,7 +146,7 @@ class SpanConverter
         ];
     }
 
-    private static function convertOtlpToJaegerTraceIds(string $traceId): array
+    private static function convertOtelToJaegerTraceIds(string $traceId): array
     {
         $traceIdLow = intval(substr($traceId, 0, 16), 16);
         $traceIdHigh = intval(substr($traceId, 16, 32), 16);
@@ -157,7 +157,7 @@ class SpanConverter
         ];
     }
 
-    private static function convertOtlpSpanKindToJaeger(SpanDataInterface $span): ?string {
+    private static function convertOtelSpanKindToJaeger(SpanDataInterface $span): ?string {
         switch($span->getKind()) {
             case SpanKind::KIND_CLIENT:
                 return self::JAEGER_SPAN_KIND_CLIENT;

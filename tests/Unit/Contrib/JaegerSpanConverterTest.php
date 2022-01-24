@@ -17,10 +17,10 @@ use PHPUnit\Framework\TestCase;
  */
 class JaegerSpanConverterTest extends TestCase
 {
-    public function test_should_convert_an_otlp_span_to_a_jaeger_thrift_span()
+    public function test_should_convert_an_otel_span_to_a_jaeger_thrift_span()
     {
         $span = (new SpanData())
-                    ->setName('otlpSpanName');
+                    ->setName('otelSpanName');
 
         $jtSpan = (new SpanConverter())->convert($span);
 
@@ -28,7 +28,7 @@ class JaegerSpanConverterTest extends TestCase
         $this->assertSame(0, $jtSpan->traceIdHigh);
         $this->assertSame(0, $jtSpan->spanId);
         $this->assertSame(0, $jtSpan->parentSpanId);
-        $this->assertSame('otlpSpanName', $jtSpan->operationName);
+        $this->assertSame('otelSpanName', $jtSpan->operationName);
         $this->assertSame([], $jtSpan->references);
         $this->assertSame(0, $jtSpan->flags);
         $this->assertSame(1505855794194009, $jtSpan->startTime);
