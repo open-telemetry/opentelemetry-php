@@ -28,6 +28,8 @@ class SpanConverter
     const JAEGER_SPAN_KIND_SERVER = 'server';
     const JAEGER_SPAN_KIND_CONSUMER = 'consumer';
     const JAEGER_SPAN_KIND_PRODUCER = 'producer';
+    const EVENT_ATTRIBUTE_KEY_NAMED_EVENT = 'event';
+    const JAEGER_KEY_EVENT = 'event';
 
     public function __construct()
     {
@@ -274,9 +276,9 @@ class SpanConverter
     {
         $timestamp = AbstractClock::nanosToMicro($event->getEpochNanos());
 
-        $eventValue = $event->getAttributes()->get('event') ?? $event->getName();
+        $eventValue = $event->getAttributes()->get(self::EVENT_ATTRIBUTE_KEY_NAMED_EVENT) ?? $event->getName();
         $attributes = $event->getAttributes()->toArray();
-        $attributes['event'] = $eventValue;
+        $attributes[self::JAEGER_KEY_EVENT] = $eventValue;
         $attributesAsTags = self::buildTags($attributes);
 
         return new Log([
