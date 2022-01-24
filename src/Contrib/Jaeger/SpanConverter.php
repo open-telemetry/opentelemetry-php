@@ -59,43 +59,7 @@ class SpanConverter
         $startTime = AbstractClock::nanosToMicro($span->getStartEpochNanos());
         $duration = AbstractClock::nanosToMicro($span->getEndEpochNanos() - $span->getStartEpochNanos());
 
-        $tags = [];
-
-        if ($span->getStatus()->getCode() !== StatusCode::STATUS_UNSET) {
-            switch ($span->getStatus()->getCode()) {
-                case StatusCode::STATUS_OK:
-                    $tags[self::STATUS_CODE_TAG_KEY] = self::STATUS_OK;
-
-                    break;
-                case StatusCode::STATUS_ERROR:
-                    //This is where the error flag section of the spec should be implemented - https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#error-flag, see Go for reference - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/jaeger/jaeger.go#L154
-                    $tags[self::STATUS_CODE_TAG_KEY] = self::STATUS_ERROR;
-
-                    break;
-            }
-
-            if (!empty($span->getStatus()->getDescription())) {
-                $tags[self::STATUS_DESCRIPTION_TAG_KEY] = $span->getStatus()->getDescription();
-            }
-        }
-
-        if (!empty($span->getInstrumentationLibrary()->getName())) {
-            $tags[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_NAME] = $span->getInstrumentationLibrary()->getName();
-        }
-
-        if ($span->getInstrumentationLibrary()->getVersion() !== null) {
-            $tags[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_VERSION] = $span->getInstrumentationLibrary()->getVersion();
-        }
-
-        $jaegerSpanKind = self::convertOtelSpanKindToJaeger($span);
-        if ($jaegerSpanKind !== null) {
-            $tags[self::KEY_SPAN_KIND] = $jaegerSpanKind;
-        }
-
-        foreach ($span->getAttributes() as $k => $v) {
-            $tags[$k] = $this->sanitiseTagValue($v);
-        }
-        $tags = self::buildTags($tags);
+        $tags = self::convertOtelSpanDataToJaegerTags($span);
 
         $logs = self::convertOtelEventsToJaegerLogs($span);
 
@@ -171,7 +135,49 @@ class SpanConverter
         return null;
     }
 
-    private function sanitiseTagValue($value): string
+    private static function convertOtelSpanDataToJaegerTags(SpanDataInterface $span): array {
+        $tags = [];
+
+        if ($span->getStatus()->getCode() !== StatusCode::STATUS_UNSET) {
+            switch ($span->getStatus()->getCode()) {
+                case StatusCode::STATUS_OK:
+                    $tags[self::STATUS_CODE_TAG_KEY] = self::STATUS_OK;
+
+                    break;
+                case StatusCode::STATUS_ERROR:
+                    //This is where the error flag section of the spec should be implemented - https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#error-flag, see Go for reference - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/jaeger/jaeger.go#L154
+                    $tags[self::STATUS_CODE_TAG_KEY] = self::STATUS_ERROR;
+
+                    break;
+            }
+
+            if (!empty($span->getStatus()->getDescription())) {
+                $tags[self::STATUS_DESCRIPTION_TAG_KEY] = $span->getStatus()->getDescription();
+            }
+        }
+
+        if (!empty($span->getInstrumentationLibrary()->getName())) {
+            $tags[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_NAME] = $span->getInstrumentationLibrary()->getName();
+        }
+
+        if ($span->getInstrumentationLibrary()->getVersion() !== null) {
+            $tags[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_VERSION] = $span->getInstrumentationLibrary()->getVersion();
+        }
+
+        $jaegerSpanKind = self::convertOtelSpanKindToJaeger($span);
+        if ($jaegerSpanKind !== null) {
+            $tags[self::KEY_SPAN_KIND] = $jaegerSpanKind;
+        }
+
+        foreach ($span->getAttributes() as $k => $v) {
+            $tags[$k] = self::sanitiseTagValue($v);
+        }
+        $tags = self::buildTags($tags);
+
+        return $tags;
+    }
+
+    private static function sanitiseTagValue($value): string
     {
         // Casting false to string makes an empty string
         if (is_bool($value)) {
@@ -181,7 +187,9 @@ class SpanConverter
         // Zipkin tags must be strings, but opentelemetry
         // accepts strings, booleans, numbers, and lists of each.
         if (is_array($value)) {
-            return join(',', array_map([$this, 'sanitiseTagValue'], $value));
+            return join(',', array_map(function($val) {
+                return self::sanitiseTagValue($val);
+            }, $value));
         }
 
         // Floats will lose precision if their string representation
