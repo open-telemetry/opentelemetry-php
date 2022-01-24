@@ -264,15 +264,13 @@ class SpanConverter
         $timestamp = AbstractClock::nanosToMicro($event->getEpochNanos());
 
         $eventValue = $event->getAttributes()->get("event") ?? $event->getName();
-        $allAttributes = [
-            'event' => $eventValue,
-            ...$event->getAttributes()->toArray()
-        ];
-        $allAttributesAsTags = self::buildTags($allAttributes);
+        $attributes = $event->getAttributes()->toArray();
+        $attributes['event'] = $eventValue;
+        $attributesAsTags = self::buildTags($attributes);
 
         return new Log([
             'timestamp' => $timestamp,
-            'fields' => $allAttributesAsTags
+            'fields' => $attributesAsTags
         ]);
     }
 }

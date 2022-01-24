@@ -7,7 +7,9 @@ namespace OpenTelemetry\Tests\Contrib\Unit;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Jaeger\SpanConverter;
+use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
@@ -119,5 +121,41 @@ class JaegerSpanConverterTest extends TestCase
         $jtSpan = (new SpanConverter())->convert($span);
 
         $this->assertCount(0, $jtSpan->tags);
+    }
+
+    public function test_should_correctly_convert_span_event_to_jaeger_log()
+    {
+        $span = (new SpanData())
+                    ->setEvents([
+                        new Event("eventName", 1505855794194009601, new Attributes([
+                            "eventAttributeKey" => "eventAttributeValue"
+                        ]))
+                        ]);
+
+                        $jtSpan = (new SpanConverter())->convert($span);
+
+        $this->assertSame($jtSpan->logs[0]->timestamp, 1505855794194009);
+
+        $this->assertSame($jtSpan->logs[0]->fields[0]->key, "eventAttributeKey");
+        $this->assertSame($jtSpan->logs[0]->fields[0]->vStr, "eventAttributeValue");
+        $this->assertSame($jtSpan->logs[0]->fields[1]->key, "event");
+        $this->assertSame($jtSpan->logs[0]->fields[1]->vStr, "eventName");
+    }
+
+    public function test_should_use_event_attribute_from_event_if_present_for_jaeger_log()
+    {
+        $span = (new SpanData())
+                    ->setEvents([
+                        new Event("eventName", 1505855794194009601, new Attributes([
+                            "event" => "valueForTheEventAttributeOnTheEvent"
+                        ]))
+                        ]);
+
+                        $jtSpan = (new SpanConverter())->convert($span);
+
+        $this->assertSame($jtSpan->logs[0]->timestamp, 1505855794194009);
+
+        $this->assertSame($jtSpan->logs[0]->fields[0]->key, "event");
+        $this->assertSame($jtSpan->logs[0]->fields[0]->vStr, "valueForTheEventAttributeOnTheEvent");
     }
 }
