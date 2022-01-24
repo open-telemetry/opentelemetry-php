@@ -102,15 +102,16 @@ class JaegerSpanConverterTest extends TestCase
 
         $jtSpan = (new SpanConverter())->convert($span);
 
-        $this->assertSame("span.kind", $jtSpan->tags[0]->key);
+        $this->assertSame('span.kind', $jtSpan->tags[0]->key);
         $this->assertSame($expectedJaegerTagValue, $jtSpan->tags[0]->vStr);
     }
 
-    public function provideSpanKindInputsAndExpectations() {
-        yield [SpanKind::KIND_CLIENT, "client"];
-        yield [SpanKind::KIND_SERVER, "server"];
-        yield [SpanKind::KIND_CONSUMER, "consumer"];
-        yield [SpanKind::KIND_PRODUCER, "producer"];
+    public function provideSpanKindInputsAndExpectations()
+    {
+        yield [SpanKind::KIND_CLIENT, 'client'];
+        yield [SpanKind::KIND_SERVER, 'server'];
+        yield [SpanKind::KIND_CONSUMER, 'consumer'];
+        yield [SpanKind::KIND_PRODUCER, 'producer'];
     }
 
     public function test_span_kind_internal_should_not_create_jaeger_thrift_tag()
@@ -126,36 +127,48 @@ class JaegerSpanConverterTest extends TestCase
     public function test_should_correctly_convert_span_event_to_jaeger_log()
     {
         $span = (new SpanData())
-                    ->setEvents([
-                        new Event("eventName", 1505855794194009601, new Attributes([
-                            "eventAttributeKey" => "eventAttributeValue"
-                        ]))
-                        ]);
+                    ->setEvents(
+                        [
+                        new Event(
+                            'eventName',
+                            1505855794194009601,
+                            new Attributes([
+                                    'eventAttributeKey' => 'eventAttributeValue',
+                                ])
+                        ),
+                        ]
+                    );
 
-                        $jtSpan = (new SpanConverter())->convert($span);
+        $jtSpan = (new SpanConverter())->convert($span);
 
         $this->assertSame($jtSpan->logs[0]->timestamp, 1505855794194009);
 
-        $this->assertSame($jtSpan->logs[0]->fields[0]->key, "eventAttributeKey");
-        $this->assertSame($jtSpan->logs[0]->fields[0]->vStr, "eventAttributeValue");
-        $this->assertSame($jtSpan->logs[0]->fields[1]->key, "event");
-        $this->assertSame($jtSpan->logs[0]->fields[1]->vStr, "eventName");
+        $this->assertSame($jtSpan->logs[0]->fields[0]->key, 'eventAttributeKey');
+        $this->assertSame($jtSpan->logs[0]->fields[0]->vStr, 'eventAttributeValue');
+        $this->assertSame($jtSpan->logs[0]->fields[1]->key, 'event');
+        $this->assertSame($jtSpan->logs[0]->fields[1]->vStr, 'eventName');
     }
 
     public function test_should_use_event_attribute_from_event_if_present_for_jaeger_log()
     {
         $span = (new SpanData())
-                    ->setEvents([
-                        new Event("eventName", 1505855794194009601, new Attributes([
-                            "event" => "valueForTheEventAttributeOnTheEvent"
-                        ]))
-                        ]);
+                    ->setEvents(
+                        [
+                        new Event(
+                            'eventName',
+                            1505855794194009601,
+                            new Attributes([
+                                    'event' => 'valueForTheEventAttributeOnTheEvent',
+                                ])
+                        ),
+                        ]
+                    );
 
-                        $jtSpan = (new SpanConverter())->convert($span);
+        $jtSpan = (new SpanConverter())->convert($span);
 
         $this->assertSame($jtSpan->logs[0]->timestamp, 1505855794194009);
 
-        $this->assertSame($jtSpan->logs[0]->fields[0]->key, "event");
-        $this->assertSame($jtSpan->logs[0]->fields[0]->vStr, "valueForTheEventAttributeOnTheEvent");
+        $this->assertSame($jtSpan->logs[0]->fields[0]->key, 'event');
+        $this->assertSame($jtSpan->logs[0]->fields[0]->vStr, 'valueForTheEventAttributeOnTheEvent');
     }
 }

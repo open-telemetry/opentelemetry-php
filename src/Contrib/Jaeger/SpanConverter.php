@@ -24,10 +24,10 @@ class SpanConverter
     const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
     const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
     const KEY_SPAN_KIND = 'span.kind';
-    const JAEGER_SPAN_KIND_CLIENT = "client";
-    const JAEGER_SPAN_KIND_SERVER = "server";
-    const JAEGER_SPAN_KIND_CONSUMER = "consumer";
-    const JAEGER_SPAN_KIND_PRODUCER = "producer";
+    const JAEGER_SPAN_KIND_CLIENT = 'client';
+    const JAEGER_SPAN_KIND_SERVER = 'server';
+    const JAEGER_SPAN_KIND_CONSUMER = 'consumer';
+    const JAEGER_SPAN_KIND_PRODUCER = 'producer';
 
     public function __construct()
     {
@@ -118,8 +118,9 @@ class SpanConverter
         ];
     }
 
-    private static function convertOtelSpanKindToJaeger(SpanDataInterface $span): ?string {
-        switch($span->getKind()) {
+    private static function convertOtelSpanKindToJaeger(SpanDataInterface $span): ?string
+    {
+        switch ($span->getKind()) {
             case SpanKind::KIND_CLIENT:
                 return self::JAEGER_SPAN_KIND_CLIENT;
             case SpanKind::KIND_SERVER:
@@ -135,7 +136,8 @@ class SpanConverter
         return null;
     }
 
-    private static function convertOtelSpanDataToJaegerTags(SpanDataInterface $span): array {
+    private static function convertOtelSpanDataToJaegerTags(SpanDataInterface $span): array
+    {
         $tags = [];
 
         if ($span->getStatus()->getCode() !== StatusCode::STATUS_UNSET) {
@@ -187,7 +189,7 @@ class SpanConverter
         // Zipkin tags must be strings, but opentelemetry
         // accepts strings, booleans, numbers, and lists of each.
         if (is_array($value)) {
-            return join(',', array_map(function($val) {
+            return join(',', array_map(function ($val) {
                 return self::sanitiseTagValue($val);
             }, $value));
         }
@@ -260,25 +262,26 @@ class SpanConverter
 
     private static function convertOtelEventsToJaegerLogs(SpanDataInterface $span): array
     {
-        return array_map(function($event) {
+        return array_map(
+            function ($event) {
                 return self::convertSingleOtelEventToJaegerLog($event);
-            }, 
+            },
             $span->getEvents()
         );
     }
 
-    private static function convertSingleOtelEventToJaegerLog(EventInterface $event): Log 
+    private static function convertSingleOtelEventToJaegerLog(EventInterface $event): Log
     {
         $timestamp = AbstractClock::nanosToMicro($event->getEpochNanos());
 
-        $eventValue = $event->getAttributes()->get("event") ?? $event->getName();
+        $eventValue = $event->getAttributes()->get('event') ?? $event->getName();
         $attributes = $event->getAttributes()->toArray();
         $attributes['event'] = $eventValue;
         $attributesAsTags = self::buildTags($attributes);
 
         return new Log([
             'timestamp' => $timestamp,
-            'fields' => $attributesAsTags
+            'fields' => $attributesAsTags,
         ]);
     }
 }
