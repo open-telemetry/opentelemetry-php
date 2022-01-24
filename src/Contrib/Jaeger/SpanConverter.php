@@ -46,6 +46,13 @@ class SpanConverter
     */
     public function convert(SpanDataInterface $span): JTSpan
     {
+        [
+            'traceIdLow' => $traceIdLow,
+            'traceIdHigh' => $traceIdHigh,
+            'spanId' => $spanId,
+            'parentSpanId' => $parentSpanId,
+        ] = self::convertOtlpToJaegerIds($span);
+
         $references = $tags = $logs = [];
         $startTime = AbstractClock::nanosToMicro($span->getStartEpochNanos());
         $duration = AbstractClock::nanosToMicro($span->getEndEpochNanos() - $span->getStartEpochNanos());
@@ -88,13 +95,6 @@ class SpanConverter
         }
         $tags = $this->buildTags($tags);
 
-        [
-            'traceIdLow' => $traceIdLow,
-            'traceIdHigh' => $traceIdHigh,
-            'spanId' => $spanId,
-            'parentSpanId' => $parentSpanId,
-        ] = self::convertOtlpToJaegerIds($span);
-
         //NOTE - the below commented out code may be a useful reference when updating this method to be spec compliant
 
         // foreach ($span->getEvents() as $event) {
@@ -126,6 +126,35 @@ class SpanConverter
             'tags' => $tags,
             'logs' => $logs,
         ]);
+    }
+
+    private static function convertOtlpToJaegerIds(SpanDataInterface $span): array
+    {
+        [
+            'traceIdLow' => $traceIdLow,
+            'traceIdHigh' => $traceIdHigh
+        ] = self::convertOtlpToJaegerTraceIds($span->getContext()->getTraceID());
+
+        $spanId = intval($span->getContext()->getSpanID(), 16);
+        $parentSpanId = intval($span->getParentSpanId(), 16);
+
+        return [
+            'traceIdLow' => $traceIdLow,
+            'traceIdHigh' => $traceIdHigh,
+            'spanId' => $spanId,
+            'parentSpanId' => $parentSpanId,
+        ];
+    }
+
+    private static function convertOtlpToJaegerTraceIds(string $traceId): array
+    {
+        $traceIdLow = intval(substr($traceId, 0, 16), 16);
+        $traceIdHigh = intval(substr($traceId, 16, 32), 16);
+
+        return [
+            'traceIdLow' => $traceIdLow,
+            'traceIdHigh' => $traceIdHigh,
+        ];
     }
 
     private static function convertOtlpSpanKindToJaeger(SpanDataInterface $span): ?string {
@@ -222,34 +251,5 @@ class SpanConverter
         // error_log('Cannot build tag for ' . $key . ' of type ' . gettype($value));
 
         // throw new \Exception('unsupported tag type');
-    }
-
-    private static function convertOtlpToJaegerIds(SpanDataInterface $span): array
-    {
-        [
-            'traceIdLow' => $traceIdLow,
-            'traceIdHigh' => $traceIdHigh
-        ] = self::convertOtlpToJaegerTraceIds($span->getContext()->getTraceID());
-
-        $spanId = intval($span->getContext()->getSpanID(), 16);
-        $parentSpanId = intval($span->getParentSpanId(), 16);
-
-        return [
-            'traceIdLow' => $traceIdLow,
-            'traceIdHigh' => $traceIdHigh,
-            'spanId' => $spanId,
-            'parentSpanId' => $parentSpanId,
-        ];
-    }
-
-    private static function convertOtlpToJaegerTraceIds(string $traceId): array
-    {
-        $traceIdLow = intval(substr($traceId, 0, 16), 16);
-        $traceIdHigh = intval(substr($traceId, 16, 32), 16);
-
-        return [
-            'traceIdLow' => $traceIdLow,
-            'traceIdHigh' => $traceIdHigh,
-        ];
     }
 }
