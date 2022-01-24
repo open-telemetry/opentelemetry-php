@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Jaeger;
 
+use Jaeger\Thrift\Log;
 use Jaeger\Thrift\Span as JTSpan;
 use Jaeger\Thrift\Tag;
 use Jaeger\Thrift\TagType;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\AbstractClock;
+use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use RuntimeException;
 
@@ -53,7 +55,7 @@ class SpanConverter
             'parentSpanId' => $parentSpanId,
         ] = self::convertOtelToJaegerIds($span);
 
-        $references = $tags = $logs = [];
+        $references = [];
         $startTime = AbstractClock::nanosToMicro($span->getStartEpochNanos());
         $duration = AbstractClock::nanosToMicro($span->getEndEpochNanos() - $span->getStartEpochNanos());
 
@@ -93,16 +95,11 @@ class SpanConverter
         foreach ($span->getAttributes() as $k => $v) {
             $tags[$k] = $this->sanitiseTagValue($v);
         }
-        $tags = $this->buildTags($tags);
+        $tags = self::buildTags($tags);
+
+        $logs = self::convertOtelEventsToJaegerLogs($span);
 
         //NOTE - the below commented out code may be a useful reference when updating this method to be spec compliant
-
-        // foreach ($span->getEvents() as $event) {
-        //     $logs = [
-        //         'timestamp' => (int) ($event->getTimestamp() / 1e3), // RealtimeClock in microseconds
-        //         'fields' => $event->getName(),
-        //     ];
-        // }
 
         //$type = ($parentSpanId != null) ? SpanRefType::CHILD_OF : SpanRefType::FOLLOWS_FROM;
 
@@ -196,17 +193,17 @@ class SpanConverter
         return (string) $value;
     }
 
-    private function buildTags(array $tagPairs): array
+    private static function buildTags(array $tagPairs): array
     {
         $tags = [];
         foreach ($tagPairs as $key => $value) {
-            $tags[] = $this->buildTag($key, $value);
+            $tags[] = self::buildTag($key, $value);
         }
 
         return $tags;
     }
 
-    private function buildTag(string $key, string $value): Tag
+    private static function buildTag(string $key, string $value): Tag
     {
         return new Tag([
             'key' => $key,
@@ -251,5 +248,31 @@ class SpanConverter
         // error_log('Cannot build tag for ' . $key . ' of type ' . gettype($value));
 
         // throw new \Exception('unsupported tag type');
+    }
+
+    private static function convertOtelEventsToJaegerLogs(SpanDataInterface $span): array
+    {
+        return array_map(function($event) {
+                return self::convertSingleOtelEventToJaegerLog($event);
+            }, 
+            $span->getEvents()
+        );
+    }
+
+    private static function convertSingleOtelEventToJaegerLog(EventInterface $event): Log 
+    {
+        $timestamp = AbstractClock::nanosToMicro($event->getEpochNanos());
+
+        $eventValue = $event->getAttributes()->get("event") ?? $event->getName();
+        $allAttributes = [
+            'event' => $eventValue,
+            ...$event->getAttributes()->toArray()
+        ];
+        $allAttributesAsTags = self::buildTags($allAttributes);
+
+        return new Log([
+            'timestamp' => $timestamp,
+            'fields' => $allAttributesAsTags
+        ]);
     }
 }
