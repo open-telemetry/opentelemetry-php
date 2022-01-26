@@ -203,12 +203,6 @@ class SpanConverter
                 'vType' => TagType::BOOL,
                 'vBool' => $value,
             ]);
-        } elseif (null === $value) {
-            return new Tag([
-                'key' => $key,
-                'vType' => TagType::STRING,
-                'vStr' => '',
-            ]);
         } elseif (is_integer($value)) {
             return new Tag([
                 'key' => $key,
