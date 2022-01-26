@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Contrib\Unit;
 
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Jaeger\SpanConverter;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Trace\Event;
+use OpenTelemetry\SDK\Trace\Link;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
@@ -180,5 +182,24 @@ class JaegerSpanConverterTest extends TestCase
 
         $this->assertSame($jtSpan->logs[0]->fields[0]->key, 'event');
         $this->assertSame($jtSpan->logs[0]->fields[0]->vStr, 'valueForTheEventAttributeOnTheEvent');
+    }
+
+    public function test_should_correctly_convert_span_link_to_jaeger_span_reference()
+    {
+        $span = (new SpanData())
+                    ->setLinks(
+                        [
+                            new Link(
+                                SpanContext::getInvalid()
+                            )
+                        ]
+                        );
+
+        $jtSpan = (new SpanConverter())->convert($span);
+
+        $this->assertSame($jtSpan->references[0]->refType, 1);
+        $this->assertSame($jtSpan->references[0]->traceIdLow, 0);
+        $this->assertSame($jtSpan->references[0]->traceIdHigh, 0);
+        $this->assertSame($jtSpan->references[0]->spanId, 0);
     }
 }

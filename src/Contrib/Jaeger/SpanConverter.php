@@ -6,12 +6,15 @@ namespace OpenTelemetry\Contrib\Jaeger;
 
 use Jaeger\Thrift\Log;
 use Jaeger\Thrift\Span as JTSpan;
+use Jaeger\Thrift\SpanRef;
+use Jaeger\Thrift\SpanRefType;
 use Jaeger\Thrift\Tag;
 use Jaeger\Thrift\TagType;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\Trace\EventInterface;
+use OpenTelemetry\SDK\Trace\LinkInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use RuntimeException;
 
@@ -58,7 +61,6 @@ class SpanConverter
             'parentSpanId' => $parentSpanId,
         ] = self::convertOtelToJaegerIds($span);
 
-        $references = [];
         $startTime = AbstractClock::nanosToMicro($span->getStartEpochNanos());
         $duration = AbstractClock::nanosToMicro($span->getEndEpochNanos() - $span->getStartEpochNanos());
 
@@ -66,16 +68,7 @@ class SpanConverter
 
         $logs = self::convertOtelEventsToJaegerLogs($span);
 
-        //NOTE - the below commented out code may be a useful reference when updating this method to be spec compliant
-
-        //$type = ($parentSpanId != null) ? SpanRefType::CHILD_OF : SpanRefType::FOLLOWS_FROM;
-
-        // $references = (array) new SpanRef([
-        //     "refType" => $type,
-        //     "traceIdLow" => (is_array($traceId) ? $traceId["low"] : $traceId),
-        //     "traceIdHigh" => (is_array($traceId) ? $traceId["high"] : $traceId),
-        //     "spanId" => $span->getContext()->getSpanID(),
-        // ]);
+        $references = self::convertOtelLinksToJaegerSpanReferences($span);
 
         return new JTSpan([
             'traceIdLow' => $traceIdLow,
@@ -83,12 +76,12 @@ class SpanConverter
             'spanId' => $spanId,
             'parentSpanId' => $parentSpanId,
             'operationName' => $span->getName(),
-            'references' => $references,
             'flags' => $span->getContext()->getTraceFlags(),
             'startTime' => $startTime,
             'duration' => ($duration < 0) ? 0 : $duration,
             'tags' => $tags,
             'logs' => $logs,
+            'references' => $references,
         ]);
     }
 
@@ -288,6 +281,31 @@ class SpanConverter
         return new Log([
             'timestamp' => $timestamp,
             'fields' => $attributesAsTags,
+        ]);
+    }
+
+    private static function convertOtelLinksToJaegerSpanReferences(SpanDataInterface $span): array
+    {
+        return array_map(
+            function ($link) {
+                return self::convertSingleOtelLinkToJaegerSpanReference($link);
+            },
+            $span->getLinks()
+        );
+    }
+
+    private static function convertSingleOtelLinkToJaegerSpanReference(LinkInterface $link): SpanRef
+    {
+        [
+            'traceIdLow' => $traceIdLow,
+            'traceIdHigh' => $traceIdHigh,
+        ] = self::convertOtelToJaegerTraceIds($link->getSpanContext()->getTraceId());
+
+        return new SpanRef([
+            'refType' => SpanRefType::FOLLOWS_FROM,
+            'traceIdLow' => $traceIdLow,
+            'traceIdHigh' => $traceIdHigh,
+            'spanId' => intval($link->getSpanContext()->getSpanId(), 16),
         ]);
     }
 }
