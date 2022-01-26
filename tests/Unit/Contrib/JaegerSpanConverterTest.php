@@ -74,7 +74,7 @@ class JaegerSpanConverterTest extends TestCase
         $this->assertSame('instrumentation_library_version', $jtSpan->tags[3]->vStr);
 
         $this->assertSame('keyForBoolean', $jtSpan->tags[4]->key);
-        $this->assertSame(true, $jtSpan->tags[4]->vBool);
+        $this->assertTrue($jtSpan->tags[4]->vBool);
 
         $this->assertSame('keyForArray', $jtSpan->tags[5]->key);
         $this->assertSame('1stElement,2ndElement', $jtSpan->tags[5]->vStr);
@@ -99,7 +99,7 @@ class JaegerSpanConverterTest extends TestCase
         $jtSpan = (new SpanConverter())->convert($span);
 
         $this->assertSame('error', $jtSpan->tags[0]->key);
-        $this->assertSame(true, $jtSpan->tags[0]->vBool);
+        $this->assertTrue($jtSpan->tags[0]->vBool);
         $this->assertSame('otel.status_code', $jtSpan->tags[1]->key);
         $this->assertSame('ERROR', $jtSpan->tags[1]->vStr);
     }
@@ -191,9 +191,9 @@ class JaegerSpanConverterTest extends TestCase
                         [
                             new Link(
                                 SpanContext::getInvalid()
-                            )
+                            ),
                         ]
-                        );
+                    );
 
         $jtSpan = (new SpanConverter())->convert($span);
 

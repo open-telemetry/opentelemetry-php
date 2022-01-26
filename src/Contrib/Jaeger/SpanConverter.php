@@ -231,7 +231,7 @@ class SpanConverter
         return new Tag([
             'key' => $key,
             'vType' => TagType::STRING,
-            'vStr' => (string)$value,
+            'vStr' => (string) $value,
         ]);
     }
 
