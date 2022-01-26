@@ -153,12 +153,12 @@ class JaegerSpanConverterTest extends TestCase
 
         $jtSpan = (new SpanConverter())->convert($span);
 
-        $this->assertSame($jtSpan->logs[0]->timestamp, 1505855794194009);
+        $this->assertSame(1505855794194009, $jtSpan->logs[0]->timestamp);
 
-        $this->assertSame($jtSpan->logs[0]->fields[0]->key, 'eventAttributeKey');
-        $this->assertSame($jtSpan->logs[0]->fields[0]->vStr, 'eventAttributeValue');
-        $this->assertSame($jtSpan->logs[0]->fields[1]->key, 'event');
-        $this->assertSame($jtSpan->logs[0]->fields[1]->vStr, 'eventName');
+        $this->assertSame('eventAttributeKey', $jtSpan->logs[0]->fields[0]->key);
+        $this->assertSame('eventAttributeValue', $jtSpan->logs[0]->fields[0]->vStr);
+        $this->assertSame('event', $jtSpan->logs[0]->fields[1]->key);
+        $this->assertSame('eventName', $jtSpan->logs[0]->fields[1]->vStr);
     }
 
     public function test_should_use_event_attribute_from_event_if_present_for_jaeger_log()
@@ -178,10 +178,10 @@ class JaegerSpanConverterTest extends TestCase
 
         $jtSpan = (new SpanConverter())->convert($span);
 
-        $this->assertSame($jtSpan->logs[0]->timestamp, 1505855794194009);
+        $this->assertSame(1505855794194009, $jtSpan->logs[0]->timestamp);
 
-        $this->assertSame($jtSpan->logs[0]->fields[0]->key, 'event');
-        $this->assertSame($jtSpan->logs[0]->fields[0]->vStr, 'valueForTheEventAttributeOnTheEvent');
+        $this->assertSame('event', $jtSpan->logs[0]->fields[0]->key);
+        $this->assertSame('valueForTheEventAttributeOnTheEvent', $jtSpan->logs[0]->fields[0]->vStr);
     }
 
     public function test_should_correctly_convert_span_link_to_jaeger_span_reference()
@@ -197,9 +197,9 @@ class JaegerSpanConverterTest extends TestCase
 
         $jtSpan = (new SpanConverter())->convert($span);
 
-        $this->assertSame($jtSpan->references[0]->refType, 1);
-        $this->assertSame($jtSpan->references[0]->traceIdLow, 0);
-        $this->assertSame($jtSpan->references[0]->traceIdHigh, 0);
-        $this->assertSame($jtSpan->references[0]->spanId, 0);
+        $this->assertSame(1, $jtSpan->references[0]->refType);
+        $this->assertSame(0, $jtSpan->references[0]->traceIdLow);
+        $this->assertSame(0, $jtSpan->references[0]->traceIdHigh);
+        $this->assertSame(0, $jtSpan->references[0]->spanId);
     }
 }
