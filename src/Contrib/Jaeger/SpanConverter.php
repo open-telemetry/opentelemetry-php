@@ -217,49 +217,41 @@ class SpanConverter
 
     private static function buildTag(string $key, string $value): Tag
     {
-        return new Tag([
-            'key' => $key,
-            'vType' => TagType::STRING,
-            'vStr' => $value,
-        ]);
+        if (is_bool($value)) {
+            return new Tag([
+                'key' => $key,
+                'vType' => TagType::BOOL,
+                'vBool' => $value,
+            ]);
+        } elseif (is_string($value)) {
+            return new Tag([
+                'key' => $key,
+                'vType' => TagType::STRING,
+                'vStr' => $value,
+            ]);
+        } elseif (null === $value) {
+            return new Tag([
+                'key' => $key,
+                'vType' => TagType::STRING,
+                'vStr' => '',
+            ]);
+        } elseif (is_integer($value)) {
+            return new Tag([
+                'key' => $key,
+                'vType' => TagType::LONG,
+                'vLong' => $value,
+            ]);
+        } elseif (is_numeric($value)) {
+            return new Tag([
+                'key' => $key,
+                'vType' => TagType::DOUBLE,
+                'vDouble' => $value,
+            ]);
+        }
 
-        //NOTE - the below commented out code may be a useful reference when updating this method to be spec compliant
+        error_log('Cannot build tag for ' . $key . ' of type ' . gettype($value));
 
-        // if (is_bool($value)) {
-        //     return new Tag([
-        //         'key' => $key,
-        //         'vType' => TagType::BOOL,
-        //         'vBool' => $value,
-        //     ]);
-        // } elseif (is_string($value)) {
-        //     return new Tag([
-        //         'key' => $key,
-        //         'vType' => TagType::STRING,
-        //         'vStr' => $value,
-        //     ]);
-        // } elseif (null === $value) {
-        //     return new Tag([
-        //         'key' => $key,
-        //         'vType' => TagType::STRING,
-        //         'vStr' => '',
-        //     ]);
-        // } elseif (is_integer($value)) {
-        //     return new Tag([
-        //         'key' => $key,
-        //         'vType' => TagType::LONG,
-        //         'vLong' => $value,
-        //     ]);
-        // } elseif (is_numeric($value)) {
-        //     return new Tag([
-        //         'key' => $key,
-        //         'vType' => TagType::DOUBLE,
-        //         'vDouble' => $value,
-        //     ]);
-        // }
-
-        // error_log('Cannot build tag for ' . $key . ' of type ' . gettype($value));
-
-        // throw new \Exception('unsupported tag type');
+        throw new \Exception('unsupported tag type');
     }
 
     private static function convertOtelEventsToJaegerLogs(SpanDataInterface $span): array
