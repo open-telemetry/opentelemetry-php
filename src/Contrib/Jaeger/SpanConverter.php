@@ -223,12 +223,6 @@ class SpanConverter
                 'vType' => TagType::BOOL,
                 'vBool' => $value,
             ]);
-        } elseif (is_string($value)) {
-            return new Tag([
-                'key' => $key,
-                'vType' => TagType::STRING,
-                'vStr' => $value,
-            ]);
         } elseif (null === $value) {
             return new Tag([
                 'key' => $key,
@@ -249,9 +243,11 @@ class SpanConverter
             ]);
         }
 
-        error_log('Cannot build tag for ' . $key . ' of type ' . gettype($value));
-
-        throw new \Exception('unsupported tag type');
+        return new Tag([
+            'key' => $key,
+            'vType' => TagType::STRING,
+            'vStr' => (string)$value,
+        ]);
     }
 
     private static function convertOtelEventsToJaegerLogs(SpanDataInterface $span): array
