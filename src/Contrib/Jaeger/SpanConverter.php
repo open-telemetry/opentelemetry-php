@@ -193,10 +193,22 @@ class SpanConverter
 
     private static function buildTag(string $key, $value): Tag
     {
+        $valueToCreateTagFrom = self::convertValueToTypeJaegerTagsSupport($value);
+
+        return self::createJaegerTagInstance($key, $valueToCreateTagFrom);
+    }
+
+    private static function convertValueToTypeJaegerTagsSupport($value)
+    {
         if (is_array($value)) {
-            $value = self::serializeArrayToString($value);
+            return self::serializeArrayToString($value);
         }
 
+        return $value;
+    }
+
+    private static function createJaegerTagInstance(string $key, $value)
+    {
         if (is_bool($value)) {
             return new Tag([
                 'key' => $key,
