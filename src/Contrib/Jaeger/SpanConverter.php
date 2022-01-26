@@ -114,6 +114,11 @@ class SpanConverter
         ];
     }
 
+    private static function convertOtelToJaegerSpanId(string $spanId): int
+    {
+        return intval($spanId, 16);
+    }
+
     private static function convertOtelSpanKindToJaeger(SpanDataInterface $span): ?string
     {
         switch ($span->getKind()) {
@@ -301,11 +306,13 @@ class SpanConverter
             'traceIdHigh' => $traceIdHigh,
         ] = self::convertOtelToJaegerTraceIds($link->getSpanContext()->getTraceId());
 
+        $integerSpanId = self::convertOtelToJaegerSpanId($link->getSpanContext()->getSpanId());
+
         return new SpanRef([
             'refType' => SpanRefType::FOLLOWS_FROM,
             'traceIdLow' => $traceIdLow,
             'traceIdHigh' => $traceIdHigh,
-            'spanId' => intval($link->getSpanContext()->getSpanId(), 16),
+            'spanId' => $integerSpanId,
         ]);
     }
 }
