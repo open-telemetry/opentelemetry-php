@@ -96,8 +96,10 @@ class JaegerSpanConverterTest extends TestCase
 
         $jtSpan = (new SpanConverter())->convert($span);
 
-        $this->assertSame('otel.status_code', $jtSpan->tags[0]->key);
-        $this->assertSame('ERROR', $jtSpan->tags[0]->vStr);
+        $this->assertSame('error', $jtSpan->tags[0]->key);
+        $this->assertSame(true, $jtSpan->tags[0]->vBool);
+        $this->assertSame('otel.status_code', $jtSpan->tags[1]->key);
+        $this->assertSame('ERROR', $jtSpan->tags[1]->vStr);
     }
 
     /**

@@ -20,6 +20,7 @@ class SpanConverter
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
     const STATUS_OK = 'OK';
     const STATUS_ERROR = 'ERROR';
+    const KEY_ERROR_FLAG = 'error';
     const STATUS_DESCRIPTION_TAG_KEY = 'otel.status_description';
     const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
     const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
@@ -149,7 +150,7 @@ class SpanConverter
 
                     break;
                 case StatusCode::STATUS_ERROR:
-                    //This is where the error flag section of the spec should be implemented - https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#error-flag, see Go for reference - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/jaeger/jaeger.go#L154
+                    $tags[self::KEY_ERROR_FLAG] = true;
                     $tags[self::STATUS_CODE_TAG_KEY] = self::STATUS_ERROR;
 
                     break;
