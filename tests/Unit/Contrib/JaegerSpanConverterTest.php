@@ -53,7 +53,9 @@ class JaegerSpanConverterTest extends TestCase
                 'instrumentation_library_version'
             ))
             ->addAttribute('keyForBoolean', true)
-            ->addAttribute('keyForArray', ['1stElement', '2ndElement']);
+            ->addAttribute('keyForArray', ['1stElement', '2ndElement'])
+            ->addAttribute('keyForInteger', 123)
+            ->addAttribute('keyForFloat', 1.00);
 
         $jtSpan = (new SpanConverter())->convert($span);
 
@@ -74,6 +76,12 @@ class JaegerSpanConverterTest extends TestCase
 
         $this->assertSame('keyForArray', $jtSpan->tags[5]->key);
         $this->assertSame('1stElement,2ndElement', $jtSpan->tags[5]->vStr);
+
+        $this->assertSame('keyForInteger', $jtSpan->tags[6]->key);
+        $this->assertSame(123, $jtSpan->tags[6]->vLong);
+
+        $this->assertSame('keyForFloat', $jtSpan->tags[7]->key);
+        $this->assertSame(1.00, $jtSpan->tags[7]->vDouble);
     }
 
     public function test_should_correctly_convert_error_status_to_jaeger_thrift_tags()
