@@ -181,19 +181,24 @@ class SpanConverter
         return $tags;
     }
 
-    private static function sanitiseTagValue($value): string
+    private static function serializeArrayToString(array $arrayToSerialize): string
     {
-        // Casting false to string makes an empty string
-        if (is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
+        return self::recursivelySerializeArray($arrayToSerialize);
+    }
 
+    private static function recursivelySerializeArray($value): string
+    {
         // Zipkin tags must be strings, but opentelemetry
         // accepts strings, booleans, numbers, and lists of each.
         if (is_array($value)) {
             return join(',', array_map(function ($val) {
-                return self::sanitiseTagValue($val);
+                return self::recursivelySerializeArray($val);
             }, $value));
+        }
+
+        // Casting false to string makes an empty string
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
         }
 
         // Floats will lose precision if their string representation
@@ -217,6 +222,10 @@ class SpanConverter
 
     private static function buildTag(string $key, string $value): Tag
     {
+        if (is_array($value)) {
+            $value = self::serializeArrayToString($value);
+        }
+
         if (is_bool($value)) {
             return new Tag([
                 'key' => $key,
