@@ -70,7 +70,7 @@ class JaegerSpanConverterTest extends TestCase
         $this->assertSame('instrumentation_library_version', $jtSpan->tags[3]->vStr);
 
         $this->assertSame('keyForBoolean', $jtSpan->tags[4]->key);
-        $this->assertSame('true', $jtSpan->tags[4]->vStr);
+        $this->assertSame(true, $jtSpan->tags[4]->vBool);
 
         $this->assertSame('keyForArray', $jtSpan->tags[5]->key);
         $this->assertSame('1stElement,2ndElement', $jtSpan->tags[5]->vStr);

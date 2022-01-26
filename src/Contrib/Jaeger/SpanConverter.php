@@ -191,7 +191,7 @@ class SpanConverter
         return $tags;
     }
 
-    private static function buildTag(string $key, mixed $value): Tag
+    private static function buildTag(string $key, $value): Tag
     {
         if (is_array($value)) {
             $value = self::serializeArrayToString($value);
