@@ -174,7 +174,7 @@ class SpanConverter
         }
 
         foreach ($span->getAttributes() as $k => $v) {
-            $tags[$k] = self::sanitiseTagValue($v);
+            $tags[$k] = $v;
         }
         $tags = self::buildTags($tags);
 
@@ -220,7 +220,7 @@ class SpanConverter
         return $tags;
     }
 
-    private static function buildTag(string $key, string $value): Tag
+    private static function buildTag(string $key, mixed $value): Tag
     {
         if (is_array($value)) {
             $value = self::serializeArrayToString($value);
