@@ -215,13 +215,17 @@ class SpanConverter
                 'vType' => TagType::BOOL,
                 'vBool' => $value,
             ]);
-        } elseif (is_integer($value)) {
+        }
+
+        if (is_integer($value)) {
             return new Tag([
                 'key' => $key,
                 'vType' => TagType::LONG,
                 'vLong' => $value,
             ]);
-        } elseif (is_numeric($value)) {
+        }
+
+        if (is_numeric($value)) {
             return new Tag([
                 'key' => $key,
                 'vType' => TagType::DOUBLE,
