@@ -51,17 +51,23 @@ class Exporter implements SpanExporterInterface
         ClientInterface $client,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
-        SpanConverter $spanConverter = null
+        SpanConverter $spanConverter = null,
+        string $endpointUrl = null,
+        string $headers = null
     ) {
-        // Set default values based on presence of env variable
-        $this->setEndpointUrl(
-            $this->validateEndpoint(
-                $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', 'https://localhost:4318/v1/traces')
-            )
-        );
+        if(!$endpointUrl){
+            $endpointUrl = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', 'https://localhost:4318/v1/traces');
+        }
+
+        $this->setEndpointUrl($this->validateEndpoint($endpointUrl));
         // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
         // $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
-        $this->headers = $this->processHeaders($this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', ''));
+        if($headers){
+            $this->headers = $this->processHeaders($headers);
+        }else{
+            $this->headers = $this->processHeaders($this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', ''));
+        }
+
         $this->compression = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_COMPRESSION', 'none');
         // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
         // $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
@@ -162,7 +168,10 @@ class Exporter implements SpanExporterInterface
         return new Exporter(
             HttpClientDiscovery::find(),
             Psr17FactoryDiscovery::findRequestFactory(),
-            Psr17FactoryDiscovery::findStreamFactory()
+            Psr17FactoryDiscovery::findStreamFactory(),
+            null,
+            $endpointUrl,
+            $args
         );
     }
 
