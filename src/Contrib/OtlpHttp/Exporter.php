@@ -52,21 +52,16 @@ class Exporter implements SpanExporterInterface
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
         SpanConverter $spanConverter = null,
-        string $endpointUrl = null,
+        string $endpointUrl = 'https://localhost:4318/v1/traces',
         string $headers = null
     ) {
-        if(!$endpointUrl){
-            $endpointUrl = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', 'https://localhost:4318/v1/traces');
-        }
+        $endpointUrl = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', $endpointUrl);
 
         $this->setEndpointUrl($this->validateEndpoint($endpointUrl));
         // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
         // $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
-        if($headers){
-            $this->headers = $this->processHeaders($headers);
-        }else{
-            $this->headers = $this->processHeaders($this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', ''));
-        }
+
+        $this->headers = $this->processHeaders($this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', $headers));
 
         $this->compression = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_COMPRESSION', 'none');
         // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
