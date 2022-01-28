@@ -53,7 +53,7 @@ class Exporter implements SpanExporterInterface
         StreamFactoryInterface $streamFactory,
         SpanConverter $spanConverter = null,
         string $endpointUrl = 'https://localhost:4318/v1/traces',
-        string $headers = null
+        string $headers = ''
     ) {
         $endpointUrl = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', $endpointUrl);
 
