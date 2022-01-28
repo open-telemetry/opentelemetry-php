@@ -247,8 +247,6 @@ class SpanConverter
 
     private static function recursivelySerializeArray($value): string
     {
-        // Zipkin tags must be strings, but opentelemetry
-        // accepts strings, booleans, numbers, and lists of each.
         if (is_array($value)) {
             return join(',', array_map(function ($val) {
                 return self::recursivelySerializeArray($val);

@@ -55,7 +55,7 @@ class JaegerSpanConverterTest extends TestCase
                 'instrumentation_library_version'
             ))
             ->addAttribute('keyForBoolean', true)
-            ->addAttribute('keyForArray', ['1stElement', '2ndElement'])
+            ->addAttribute('keyForArray', ['1stElement', '2ndElement', true])
             ->addAttribute('keyForInteger', 123)
             ->addAttribute('keyForFloat', 1.00);
 
@@ -77,7 +77,7 @@ class JaegerSpanConverterTest extends TestCase
         $this->assertTrue($jtSpan->tags[4]->vBool);
 
         $this->assertSame('keyForArray', $jtSpan->tags[5]->key);
-        $this->assertSame('1stElement,2ndElement', $jtSpan->tags[5]->vStr);
+        $this->assertSame('1stElement,2ndElement,true', $jtSpan->tags[5]->vStr);
 
         $this->assertSame('keyForInteger', $jtSpan->tags[6]->key);
         $this->assertSame(123, $jtSpan->tags[6]->vLong);
