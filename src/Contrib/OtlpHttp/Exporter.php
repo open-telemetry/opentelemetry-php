@@ -158,15 +158,22 @@ class Exporter implements SpanExporterInterface
         return (string) $dsn;
     }
 
-    public static function fromConnectionString(string $endpointUrl = 'https://localhost:4318/v1/traces', string $name = null, $args = null): Exporter
+    public static function fromConnectionString(?string $endpointUrl = null, string $name = null, $args = null): Exporter
     {
+        if (is_string($endpointUrl)) {
+            return new Exporter(
+                HttpClientDiscovery::find(),
+                Psr17FactoryDiscovery::findRequestFactory(),
+                Psr17FactoryDiscovery::findStreamFactory(),
+                null,
+                $endpointUrl
+            );
+        }
+
         return new Exporter(
             HttpClientDiscovery::find(),
             Psr17FactoryDiscovery::findRequestFactory(),
-            Psr17FactoryDiscovery::findStreamFactory(),
-            null,
-            $endpointUrl,
-            $args
+            Psr17FactoryDiscovery::findStreamFactory()
         );
     }
 
