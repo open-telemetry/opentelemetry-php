@@ -6,12 +6,15 @@ namespace OpenTelemetry\Contrib\Jaeger;
 
 use Jaeger\Thrift\Log;
 use Jaeger\Thrift\Span as JTSpan;
+use Jaeger\Thrift\SpanRef;
+use Jaeger\Thrift\SpanRefType;
 use Jaeger\Thrift\Tag;
 use Jaeger\Thrift\TagType;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\Trace\EventInterface;
+use OpenTelemetry\SDK\Trace\LinkInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use RuntimeException;
 
@@ -20,6 +23,7 @@ class SpanConverter
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
     const STATUS_OK = 'OK';
     const STATUS_ERROR = 'ERROR';
+    const KEY_ERROR_FLAG = 'error';
     const STATUS_DESCRIPTION_TAG_KEY = 'otel.status_description';
     const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
     const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
@@ -57,7 +61,6 @@ class SpanConverter
             'parentSpanId' => $parentSpanId,
         ] = self::convertOtelToJaegerIds($span);
 
-        $references = [];
         $startTime = AbstractClock::nanosToMicro($span->getStartEpochNanos());
         $duration = AbstractClock::nanosToMicro($span->getEndEpochNanos() - $span->getStartEpochNanos());
 
@@ -65,16 +68,7 @@ class SpanConverter
 
         $logs = self::convertOtelEventsToJaegerLogs($span);
 
-        //NOTE - the below commented out code may be a useful reference when updating this method to be spec compliant
-
-        //$type = ($parentSpanId != null) ? SpanRefType::CHILD_OF : SpanRefType::FOLLOWS_FROM;
-
-        // $references = (array) new SpanRef([
-        //     "refType" => $type,
-        //     "traceIdLow" => (is_array($traceId) ? $traceId["low"] : $traceId),
-        //     "traceIdHigh" => (is_array($traceId) ? $traceId["high"] : $traceId),
-        //     "spanId" => $span->getContext()->getSpanID(),
-        // ]);
+        $references = self::convertOtelLinksToJaegerSpanReferences($span);
 
         return new JTSpan([
             'traceIdLow' => $traceIdLow,
@@ -82,12 +76,12 @@ class SpanConverter
             'spanId' => $spanId,
             'parentSpanId' => $parentSpanId,
             'operationName' => $span->getName(),
-            'references' => $references,
             'flags' => $span->getContext()->getTraceFlags(),
             'startTime' => $startTime,
             'duration' => ($duration < 0) ? 0 : $duration,
             'tags' => $tags,
             'logs' => $logs,
+            'references' => $references,
         ]);
     }
 
@@ -120,6 +114,11 @@ class SpanConverter
         ];
     }
 
+    private static function convertOtelToJaegerSpanId(string $spanId): int
+    {
+        return intval($spanId, 16);
+    }
+
     private static function convertOtelSpanKindToJaeger(SpanDataInterface $span): ?string
     {
         switch ($span->getKind()) {
@@ -149,7 +148,7 @@ class SpanConverter
 
                     break;
                 case StatusCode::STATUS_ERROR:
-                    //This is where the error flag section of the spec should be implemented - https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#error-flag, see Go for reference - https://github.com/open-telemetry/opentelemetry-go/blob/main/exporters/jaeger/jaeger.go#L154
+                    $tags[self::KEY_ERROR_FLAG] = true;
                     $tags[self::STATUS_CODE_TAG_KEY] = self::STATUS_ERROR;
 
                     break;
@@ -174,35 +173,11 @@ class SpanConverter
         }
 
         foreach ($span->getAttributes() as $k => $v) {
-            $tags[$k] = self::sanitiseTagValue($v);
+            $tags[$k] = $v;
         }
         $tags = self::buildTags($tags);
 
         return $tags;
-    }
-
-    private static function sanitiseTagValue($value): string
-    {
-        // Casting false to string makes an empty string
-        if (is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        // Zipkin tags must be strings, but opentelemetry
-        // accepts strings, booleans, numbers, and lists of each.
-        if (is_array($value)) {
-            return join(',', array_map(function ($val) {
-                return self::sanitiseTagValue($val);
-            }, $value));
-        }
-
-        // Floats will lose precision if their string representation
-        // is >=14 or >=17 digits, depending on PHP settings.
-        // Can also throw E_RECOVERABLE_ERROR if $value is an object
-        // without a __toString() method.
-        // This is possible because OpenTelemetry\Trace\Span does not verify
-        // setAttribute() $value input.
-        return (string) $value;
     }
 
     private static function buildTags(array $tagPairs): array
@@ -215,51 +190,81 @@ class SpanConverter
         return $tags;
     }
 
-    private static function buildTag(string $key, string $value): Tag
+    private static function buildTag(string $key, $value): Tag
     {
+        return self::createJaegerTagInstance(
+            $key,
+            self::convertValueToTypeJaegerTagsSupport($value)
+        );
+    }
+
+    private static function convertValueToTypeJaegerTagsSupport($value)
+    {
+        if (is_array($value)) {
+            return self::serializeArrayToString($value);
+        }
+
+        return $value;
+    }
+
+    private static function createJaegerTagInstance(string $key, $value)
+    {
+        if (is_bool($value)) {
+            return new Tag([
+                'key' => $key,
+                'vType' => TagType::BOOL,
+                'vBool' => $value,
+            ]);
+        }
+
+        if (is_integer($value)) {
+            return new Tag([
+                'key' => $key,
+                'vType' => TagType::LONG,
+                'vLong' => $value,
+            ]);
+        }
+
+        if (is_numeric($value)) {
+            return new Tag([
+                'key' => $key,
+                'vType' => TagType::DOUBLE,
+                'vDouble' => $value,
+            ]);
+        }
+
         return new Tag([
             'key' => $key,
             'vType' => TagType::STRING,
-            'vStr' => $value,
+            'vStr' => (string) $value,
         ]);
+    }
 
-        //NOTE - the below commented out code may be a useful reference when updating this method to be spec compliant
+    private static function serializeArrayToString(array $arrayToSerialize): string
+    {
+        return self::recursivelySerializeArray($arrayToSerialize);
+    }
 
-        // if (is_bool($value)) {
-        //     return new Tag([
-        //         'key' => $key,
-        //         'vType' => TagType::BOOL,
-        //         'vBool' => $value,
-        //     ]);
-        // } elseif (is_string($value)) {
-        //     return new Tag([
-        //         'key' => $key,
-        //         'vType' => TagType::STRING,
-        //         'vStr' => $value,
-        //     ]);
-        // } elseif (null === $value) {
-        //     return new Tag([
-        //         'key' => $key,
-        //         'vType' => TagType::STRING,
-        //         'vStr' => '',
-        //     ]);
-        // } elseif (is_integer($value)) {
-        //     return new Tag([
-        //         'key' => $key,
-        //         'vType' => TagType::LONG,
-        //         'vLong' => $value,
-        //     ]);
-        // } elseif (is_numeric($value)) {
-        //     return new Tag([
-        //         'key' => $key,
-        //         'vType' => TagType::DOUBLE,
-        //         'vDouble' => $value,
-        //     ]);
-        // }
+    private static function recursivelySerializeArray($value): string
+    {
+        if (is_array($value)) {
+            return join(',', array_map(function ($val) {
+                return self::recursivelySerializeArray($val);
+            }, $value));
+        }
 
-        // error_log('Cannot build tag for ' . $key . ' of type ' . gettype($value));
+        // Casting false to string makes an empty string
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
 
-        // throw new \Exception('unsupported tag type');
+        // Floats will lose precision if their string representation
+        // is >=14 or >=17 digits, depending on PHP settings.
+        // Can also throw E_RECOVERABLE_ERROR if $value is an object
+        // without a __toString() method.
+        // This is possible because OpenTelemetry\Trace\Span does not verify
+        // setAttribute() $value input.
+        return (string) $value;
     }
 
     private static function convertOtelEventsToJaegerLogs(SpanDataInterface $span): array
@@ -284,6 +289,33 @@ class SpanConverter
         return new Log([
             'timestamp' => $timestamp,
             'fields' => $attributesAsTags,
+        ]);
+    }
+
+    private static function convertOtelLinksToJaegerSpanReferences(SpanDataInterface $span): array
+    {
+        return array_map(
+            function ($link) {
+                return self::convertSingleOtelLinkToJaegerSpanReference($link);
+            },
+            $span->getLinks()
+        );
+    }
+
+    private static function convertSingleOtelLinkToJaegerSpanReference(LinkInterface $link): SpanRef
+    {
+        [
+            'traceIdLow' => $traceIdLow,
+            'traceIdHigh' => $traceIdHigh,
+        ] = self::convertOtelToJaegerTraceIds($link->getSpanContext()->getTraceId());
+
+        $integerSpanId = self::convertOtelToJaegerSpanId($link->getSpanContext()->getSpanId());
+
+        return new SpanRef([
+            'refType' => SpanRefType::FOLLOWS_FROM,
+            'traceIdLow' => $traceIdLow,
+            'traceIdHigh' => $traceIdHigh,
+            'spanId' => $integerSpanId,
         ]);
     }
 }
