@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Environment;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\EnvironmentVariablesTrait
+ * @covers \OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait
  */
 class EnvironmentVariablesTraitTest extends TestCase
 {
