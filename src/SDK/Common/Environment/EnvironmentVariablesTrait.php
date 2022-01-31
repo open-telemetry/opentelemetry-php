@@ -27,7 +27,7 @@ trait EnvironmentVariablesTrait
         return (int) $value;
     }
 
-    public function getStringFromEnvironment(string $key, string $default): string
+    public function getStringFromEnvironment(string $key, string $default = ''): string
     {
         $value = getenv($key);
         if (false === $value || '' === $value) {
