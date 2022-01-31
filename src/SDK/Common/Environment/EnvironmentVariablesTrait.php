@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK;
+namespace OpenTelemetry\SDK\Common\Environment;
 
 use InvalidArgumentException;
 

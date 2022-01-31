@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\ClockInterface;
-use OpenTelemetry\SDK\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;

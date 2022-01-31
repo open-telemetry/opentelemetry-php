@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
-use OpenTelemetry\SDK\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use PHPUnit\Framework\TestCase;
 
 /**

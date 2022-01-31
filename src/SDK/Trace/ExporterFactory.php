@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use Nyholm\Dsn\Configuration\Dsn;
 use Nyholm\Dsn\Configuration\Url;
 use Nyholm\Dsn\DsnParser;
-use OpenTelemetry\SDK\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 
 class ExporterFactory
 {
