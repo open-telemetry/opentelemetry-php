@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
@@ -15,19 +16,25 @@ class SamplerFactory
 {
     use EnvironmentVariablesTrait;
 
+    private const TRACEIDRATIO_PREFIX = 'traceidratio';
+
     public function fromEnvironment(): SamplerInterface
     {
-        $name = $this->getStringFromEnvironment('OTEL_TRACES_SAMPLER', '');
-        if (!$name) {
-            throw new InvalidArgumentException('OTEL_TRACES_SAMPLER not set');
+        $name = $this->getStringFromEnvironment(Env::OTEL_TRACES_SAMPLER);
+        if ($name === '') {
+            throw new InvalidArgumentException(sprintf('Env Var %s not set', Env::OTEL_TRACES_SAMPLER));
         }
-        $arg = $this->getStringFromEnvironment('OTEL_TRACES_SAMPLER_ARG', '');
-        if (false !== strpos($name, 'traceidratio')) {
-            if (!$arg) {
-                throw new InvalidArgumentException('OTEL_TRACES_SAMPLER_ARG required for ratio-based sampler: ' . $name);
+        $arg = $this->getStringFromEnvironment(Env::OTEL_TRACES_SAMPLER_ARG);
+        if (strpos($name, self::TRACEIDRATIO_PREFIX) !== false) {
+            if ($arg === '') {
+                throw new InvalidArgumentException(sprintf(
+                    'Env Var %s required for ratio-based sampler: %s',
+                    Env::OTEL_TRACES_SAMPLER_ARG,
+                    $name
+                ));
             }
             if (!is_numeric($arg)) {
-                throw new InvalidArgumentException('OTEL_TRACES_SAMPLER_ARG value is not numeric');
+                throw new InvalidArgumentException(sprintf('Env Var %s  value is not numeric', Env::OTEL_TRACES_SAMPLER_ARG));
             }
         }
         switch ($name) {
@@ -44,7 +51,7 @@ class SamplerFactory
             case 'parentbased_traceidratio':
                 return new ParentBased(new TraceIdRatioBasedSampler((float) $arg));
             default:
-                throw new InvalidArgumentException('Unknown sampler: ' . $name);
+                throw new InvalidArgumentException(sprintf('Unknown sampler: %s', $name));
         }
     }
 }

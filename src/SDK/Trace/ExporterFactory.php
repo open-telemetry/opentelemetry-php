@@ -9,6 +9,7 @@ use Nyholm\Dsn\Configuration\Dsn;
 use Nyholm\Dsn\Configuration\Url;
 use Nyholm\Dsn\DsnParser;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 
 class ExporterFactory
 {
@@ -74,14 +75,14 @@ class ExporterFactory
 
     public function fromEnvironment(): ?SpanExporterInterface
     {
-        $envValue = $this->getStringFromEnvironment('OTEL_TRACES_EXPORTER', '');
+        $envValue = $this->getStringFromEnvironment(Env::OTEL_TRACES_EXPORTER, '');
         if (!$envValue) {
-            throw new InvalidArgumentException('OTEL_TRACES_EXPORTER not set');
+            throw new InvalidArgumentException(sprintf('Env Var %s not set', Env::OTEL_TRACES_EXPORTER));
         }
         $exporters = explode(',', $envValue);
         //TODO "The SDK MAY accept a comma-separated list to enable setting multiple exporters"
         if (1 !== count($exporters)) {
-            throw new InvalidArgumentException('OTEL_TRACES_EXPORTER requires exactly 1 exporter');
+            throw new InvalidArgumentException(sprintf('Env Var %s requires exactly 1 exporter', Env::OTEL_TRACES_EXPORTER));
         }
         $exporter = $exporters[0];
         switch ($exporter) {
@@ -93,9 +94,16 @@ class ExporterFactory
             case 'zipkintonewrelic':
                 throw new InvalidArgumentException(sprintf('Exporter %s cannot be created from environment', $exporter));
             case 'otlp':
-                $protocol = getenv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ?: getenv('OTEL_EXPORTER_OTLP_PROTOCOL');
-                if (!$protocol) {
-                    throw new InvalidArgumentException('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL or OTEL_EXPORTER_OTLP_PROTOCOL required');
+                $protocol = $this->getStringFromEnvironment(
+                    Env::OTEL_EXPORTER_OTLP_PROTOCOL,
+                    $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, '')
+                );
+                if ($protocol === '') {
+                    throw new InvalidArgumentException(sprintf(
+                        'Env Var %s or $%s required',
+                        Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL,
+                        Env::OTEL_EXPORTER_OTLP_PROTOCOL
+                    ));
                 }
                 switch ($protocol) {
                     case 'grpc':

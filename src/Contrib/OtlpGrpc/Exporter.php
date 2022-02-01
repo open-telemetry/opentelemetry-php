@@ -7,21 +7,18 @@ namespace OpenTelemetry\Contrib\OtlpGrpc;
 use grpc;
 use Grpc\ChannelCredentials;
 use InvalidArgumentException;
+use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
-use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
-use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class Exporter implements SpanExporterInterface
 {
-    use EnvironmentVariablesTrait;
-    use LogsMessagesTrait;
+    use ExporterTrait;
     use SpanExporterTrait;
-    use UsesSpanConverterTrait;
 
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
     // private $protocol;
@@ -50,25 +47,22 @@ class Exporter implements SpanExporterInterface
         int $timeout = 10,
         TraceServiceClient $client = null
     ) {
-
         // Set default values based on presence of env variable
-        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
-        // $this->protocol = getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'grpc'; // I guess this is redundant?
-        $this->insecure = $this->getBooleanFromEnvironment('OTEL_EXPORTER_OTLP_INSECURE', $insecure);
-        $this->certificateFile = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_CERTIFICATE', $certificateFile);
-        $this->compression = $this->getBooleanFromEnvironment('OTEL_EXPORTER_OTLP_COMPRESSION', $compression);
-        $this->timeout = $this->getIntFromEnvironment('OTEL_EXPORTER_OTLP_TIMEOUT', $timeout);
+        $this->insecure = $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
+        $this->certificateFile = $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
+        $this->compression = $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_COMPRESSION, $compression);
+        $this->timeout = $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
         $this->setSpanConverter(new SpanConverter());
 
         $this->metadata = $this->metadataFromHeaders(
-            $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', $headers)
+            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers)
         );
 
         $opts = $this->getClientOptions();
 
         $this->client = $client ?? new TraceServiceClient(
-            $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', $endpointURL),
+            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, $endpointURL),
             $opts
         );
     }

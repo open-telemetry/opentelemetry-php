@@ -8,11 +8,11 @@ use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
 use Nyholm\Dsn\DsnParser;
+use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
-use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -21,8 +21,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 class Exporter implements SpanExporterInterface
 {
-    use EnvironmentVariablesTrait;
-    use UsesSpanConverterTrait;
+    use ExporterTrait;
     use HttpSpanExporterTrait;
 
     private const REQUEST_METHOD = 'POST';
@@ -56,22 +55,18 @@ class Exporter implements SpanExporterInterface
         // Set default values based on presence of env variable
         $this->setEndpointUrl(
             $this->validateEndpoint(
-                $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', 'https://localhost:4318/v1/traces')
+                $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, 'https://localhost:4318/v1/traces')
             )
         );
-        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
-        // $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
-        $this->headers = $this->processHeaders($this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', ''));
-        $this->compression = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_COMPRESSION', 'none');
-        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
-        // $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
+        $this->headers = $this->processHeaders($this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, ''));
+        $this->compression = $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_COMPRESSION, 'none');
 
         $this->setClient($client);
         $this->setRequestFactory($requestFactory);
         $this->setStreamFactory($streamFactory);
         $this->setSpanConverter($spanConverter ?? new SpanConverter());
 
-        if ((getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'http/protobuf') !== 'http/protobuf') {
+        if ((getenv(Env::OTEL_EXPORTER_OTLP_PROTOCOL) ?: 'http/protobuf') !== 'http/protobuf') {
             throw new InvalidArgumentException('Invalid OTLP Protocol Specified');
         }
     }
