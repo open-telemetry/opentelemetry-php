@@ -104,7 +104,7 @@ class Accessor
     {
         $variableType = Resolver::getType($variableName);
 
-        if ($variableType !== $type && $variableType !== VariableTypes::MIXED) {
+        if ($variableType !== null && $variableType !== $type && $variableType !== VariableTypes::MIXED) {
             throw new UnexpectedValueException(
                 sprintf('Variable %s is not supposed to be of type %s', $variableName, $type)
             );
