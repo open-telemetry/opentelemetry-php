@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use RangeException;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Environment\Parser\RatioParserTest
+ * @covers \OpenTelemetry\SDK\Common\Environment\Parser\RatioParser
  */
 class RatioParserTest extends TestCase
 {
