@@ -54,18 +54,24 @@ interface KnownValues
     public const OTEL_EXPORTER_OTLP_INSECURE = [
         'true',
         'false',
+        'on',
+        'off',
         1,
         0,
     ];
     public const OTEL_EXPORTER_OTLP_SPAN_INSECURE = [
         'true',
         'false',
+        'on',
+        'off',
         1,
         0,
     ];
     public const OTEL_EXPORTER_OTLP_METRIC_INSECURE = [
         'true',
         'false',
+        'on',
+        'off',
         1,
         0,
     ];
