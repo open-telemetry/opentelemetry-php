@@ -14,7 +14,7 @@ interface ValueTypes
      * General SDK Configuration
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration
      */
-    public const OTEL_RESOURCE_ATTRIBUTES = VariableTypes::KEY_VALUE;
+    public const OTEL_RESOURCE_ATTRIBUTES = VariableTypes::MAP;
     public const OTEL_SERVICE_NAME = VariableTypes::STRING;
     public const OTEL_LOG_LEVEL = VariableTypes::ENUM;
     public const OTEL_PROPAGATORS = VariableTypes::LIST;
@@ -61,9 +61,9 @@ interface ValueTypes
     public const OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = VariableTypes::STRING;
     public const OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE = VariableTypes::STRING;
     // Headers
-    public const OTEL_EXPORTER_OTLP_HEADERS = VariableTypes::KEY_VALUE;
-    public const OTEL_EXPORTER_OTLP_TRACES_HEADERS = VariableTypes::KEY_VALUE;
-    public const OTEL_EXPORTER_OTLP_METRICS_HEADERS = VariableTypes::KEY_VALUE;
+    public const OTEL_EXPORTER_OTLP_HEADERS = VariableTypes::MAP;
+    public const OTEL_EXPORTER_OTLP_TRACES_HEADERS = VariableTypes::MAP;
+    public const OTEL_EXPORTER_OTLP_METRICS_HEADERS = VariableTypes::MAP;
     // Compression
     public const OTEL_EXPORTER_OTLP_COMPRESSION = VariableTypes::ENUM;
     public const OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = VariableTypes::ENUM;

@@ -47,7 +47,7 @@ interface VariableTypes
      * A comma separated list of key-value pairs
      * example: key1=value1,key2=value2
      */
-    public const KEY_VALUE = 'key-value';
+    public const MAP = 'map';
 
     /**
      * Values of mixed type
