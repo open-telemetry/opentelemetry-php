@@ -28,6 +28,7 @@ class Resolver
 
     public static function getRawValue(string $variableName): ?string
     {
+        /** @psalm-suppress FalsableReturnStatement **/
         return self::hasVariable($variableName) ? getenv($variableName) : null;
     }
 
