@@ -158,6 +158,11 @@ class Exporter implements SpanExporterInterface
         return Grpc\ChannelCredentials::createInsecure();
     }
 
+    public function getCertificateFile(): string
+    {
+        return $this->certificateFile;
+    }
+
     public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null): Exporter
     {
         return is_string($endpointUrl) ? new Exporter($endpointUrl) :  new Exporter();

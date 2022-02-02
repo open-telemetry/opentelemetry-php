@@ -13,6 +13,7 @@ use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
+use org\bovigo\vfs\vfsStream;
 
 /**
  * @covers OpenTelemetry\Contrib\OtlpGrpc\Exporter
@@ -209,6 +210,23 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertNotSame(
             Exporter::fromConnectionString(),
             Exporter::fromConnectionString()
+        );
+    }
+
+    public function test_create_with_cert_file(): void
+    {
+        $certDir = 'var';
+        $certFile = 'file.cert';
+        vfsStream::setup($certDir);
+        $certPath = vfsStream::url(sprintf('%s/%s', $certDir, $certFile));
+        file_put_contents($certPath, 'foo');
+
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_INSECURE', 'false');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_CERTIFICATE', $certPath);
+
+        $this->assertSame(
+            $certPath,
+            (new Exporter())->getCertificateFile()
         );
     }
 }
