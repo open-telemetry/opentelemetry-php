@@ -76,9 +76,6 @@ class ExporterFactory
     public function fromEnvironment(): ?SpanExporterInterface
     {
         $envValue = $this->getStringFromEnvironment(Env::OTEL_TRACES_EXPORTER, '');
-        if (!$envValue) {
-            throw new InvalidArgumentException(sprintf('Env Var %s not set', Env::OTEL_TRACES_EXPORTER));
-        }
         $exporters = explode(',', $envValue);
         //TODO "The SDK MAY accept a comma-separated list to enable setting multiple exporters"
         if (1 !== count($exporters)) {
@@ -98,13 +95,6 @@ class ExporterFactory
                     Env::OTEL_EXPORTER_OTLP_PROTOCOL,
                     $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, '')
                 );
-                if ($protocol === '') {
-                    throw new InvalidArgumentException(sprintf(
-                        'Env Var %s or $%s required',
-                        Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL,
-                        Env::OTEL_EXPORTER_OTLP_PROTOCOL
-                    ));
-                }
                 switch ($protocol) {
                     case 'grpc':
                         return self::buildExporter('otlp+grpc');
@@ -119,7 +109,7 @@ class ExporterFactory
             case 'console':
                 return self::buildExporter('console');
             default:
-                throw new InvalidArgumentException('Invalid exporter name');
+                throw new InvalidArgumentException(sprintf('Invalid exporter name "%s"', $exporter));
         }
     }
 
