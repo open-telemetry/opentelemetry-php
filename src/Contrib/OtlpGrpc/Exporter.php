@@ -148,30 +148,6 @@ class Exporter implements SpanExporterInterface
         return $this->metadata;
     }
 
-    public function metadataFromHeaders($headers): array
-    {
-        if (is_array($headers)) {
-            throw new InvalidArgumentException('Configuring Headers Via');
-        }
-
-        if (strlen($headers) <= 0) {
-            return [];
-        }
-
-        $pairs = explode(',', $headers);
-
-        $metadata = [];
-        foreach ($pairs as $pair) {
-            if (!strpos($pair, '=')) {
-                continue;
-            }
-            [$key, $value] = explode('=', $pair, 2);
-            $metadata[$key] = [$value];
-        }
-
-        return $metadata;
-    }
-
     private function getCredentials(): ?ChannelCredentials
     {
         if (!$this->insecure) {

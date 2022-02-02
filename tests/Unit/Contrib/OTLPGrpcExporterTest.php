@@ -127,26 +127,6 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         );
     }
 
-    public function test_headers_should_refuse_array(): void
-    {
-        $headers = [
-            'key' => ['value'],
-        ];
-
-        $this->expectException(InvalidArgumentException::class);
-
-        (new Exporter())->metadataFromHeaders($headers);
-    }
-
-    public function test_metadata_from_headers(): void
-    {
-        $metadata = (new Exporter())->metadataFromHeaders('key=value');
-        $this->assertEquals(['key' => ['value']], $metadata);
-
-        $metadata = (new Exporter())->metadataFromHeaders('key=value,key2=value2');
-        $this->assertEquals(['key' => ['value'], 'key2' => ['value2']], $metadata);
-    }
-
     private function isInsecure(Exporter $exporter) : bool
     {
         $reflection = new \ReflectionClass($exporter);
