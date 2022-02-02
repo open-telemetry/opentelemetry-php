@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Environment\Parser;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Environment\Parser\BooleanParser;
 use PHPUnit\Framework\TestCase;

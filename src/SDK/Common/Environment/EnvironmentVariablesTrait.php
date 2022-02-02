@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Environment;
 
-use InvalidArgumentException;
-
 /**
  * Centralized methods for retrieving environment variables
  */
