@@ -152,16 +152,8 @@ class ExporterFactoryTest extends TestCase
                 'otlp',
                 ['OTEL_EXPORTER_OTLP_PROTOCOL' => 'foo'],
             ],
-            'oltp without protocol' => ['otlp'],
             'unknown exporter' => ['foo'],
             'multiple exporters' => ['jaeger,zipkin'],
         ];
-    }
-
-    public function test_non_existing_exporter_env_var(): void
-    {
-        $this->expectException(Exception::class);
-
-        (new ExporterFactory())->fromEnvironment();
     }
 }

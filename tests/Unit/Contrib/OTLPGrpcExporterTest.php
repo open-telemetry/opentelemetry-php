@@ -90,20 +90,13 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertEquals(SpanExporterInterface::STATUS_FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
     }
 
-    public function test_refuses_invalid_headers(): void
-    {
-        $foo = new Exporter('localhost:4317', true, '', 'a:bc');
-
-        $this->assertEquals([], $foo->getHeaders());
-    }
-
     public function test_set_headers_with_environment_variables(): void
     {
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_HEADERS', 'x-aaa=foo,x-bbb=barf');
 
         $exporter = new Exporter();
 
-        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['barf']], $exporter->getHeaders());
+        $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'barf'], $exporter->getHeaders());
     }
 
     public function test_set_header(): void
@@ -112,18 +105,18 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $exporter->setHeader('foo', 'bar');
         $headers = $exporter->getHeaders();
         $this->assertArrayHasKey('foo', $headers);
-        $this->assertEquals(['bar'], $headers['foo']);
+        $this->assertEquals('bar', $headers['foo']);
     }
 
     public function test_set_headers_in_constructor(): void
     {
         $exporter = new Exporter('localhost:4317', true, '', 'x-aaa=foo,x-bbb=bar');
 
-        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar']], $exporter->getHeaders());
+        $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'bar'], $exporter->getHeaders());
 
         $exporter->setHeader('key', 'value');
 
-        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar'], 'key' => ['value']], $exporter->getHeaders());
+        $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'bar', 'key' => 'value'], $exporter->getHeaders());
     }
 
     public function test_should_be_ok_to_exporter_empty_spans_collection(): void
@@ -179,7 +172,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
         // env vars
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_TIMEOUT', '1');
-        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_COMPRESSION', '1');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_COMPRESSION', 'gzip');
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_INSECURE', 'false');
         $exporter = new Exporter('localhost:4317');
         $opts = $exporter->getClientOptions();

@@ -16,44 +16,26 @@ trait EnvironmentVariablesTrait
      */
     public function getIntFromEnvironment(string $key, int $default): int
     {
-        $value = getenv($key);
-        if (false === $value || '' === $value) {
-            return $default;
-        }
-        if (false === \filter_var($value, FILTER_VALIDATE_INT)) {
-            throw new InvalidArgumentException($key . ' contains non-numeric value');
-        }
-
-        return (int) $value;
+        return Accessor::getInt($key, (string) $default);
     }
 
     public function getStringFromEnvironment(string $key, string $default = ''): string
     {
-        $value = getenv($key);
-        if (false === $value || '' === $value) {
-            return $default;
-        }
-
-        return $value;
+        return Accessor::getString($key, $default);
     }
 
     public function getBooleanFromEnvironment(string $key, bool $default): bool
     {
-        $value = getenv($key);
-        if (false === $value || '' === $value) {
-            return $default;
-        }
-        switch (strtolower($value)) {
-            case 'true':
-            case 'on':
-            case '1':
-                return true;
-            case 'false':
-            case 'off':
-            case '0':
-                return false;
-            default:
-                throw new InvalidArgumentException(sprintf('%s contains a non-boolean value (%s)', $key, $value));
-        }
+        return Accessor::getBool($key, $default ? 'true' : 'false');
+    }
+
+    public function getMapFromEnvironment(string $key, string $default = null): array
+    {
+        return Accessor::getMap($key, $default);
+    }
+
+    public function getEnumFromEnvironment(string $key, string $default = ''): string
+    {
+        return Accessor::getEnum($key, $default);
     }
 }

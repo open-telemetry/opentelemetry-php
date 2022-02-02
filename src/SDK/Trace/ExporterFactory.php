@@ -94,9 +94,9 @@ class ExporterFactory
             case 'zipkintonewrelic':
                 throw new InvalidArgumentException(sprintf('Exporter %s cannot be created from environment', $exporter));
             case 'otlp':
-                $protocol = $this->getStringFromEnvironment(
+                $protocol = $this->getEnumFromEnvironment(
                     Env::OTEL_EXPORTER_OTLP_PROTOCOL,
-                    $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, '')
+                    $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, '')
                 );
                 if ($protocol === '') {
                     throw new InvalidArgumentException(sprintf(

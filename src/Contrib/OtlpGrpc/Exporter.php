@@ -11,6 +11,8 @@ use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
+use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
+use OpenTelemetry\SDK\Common\Environment\Resolver as EnvResolver;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -25,9 +27,9 @@ class Exporter implements SpanExporterInterface
 
     private bool $insecure;
 
-    private string $certificateFile;
+    private string $certificateFile = '';
 
-    private bool $compression;
+    private string $compression;
 
     private int $timeout;
 
@@ -49,15 +51,18 @@ class Exporter implements SpanExporterInterface
     ) {
         // Set default values based on presence of env variable
         $this->insecure = $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
-        $this->certificateFile = $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
-        $this->compression = $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_COMPRESSION, $compression);
+        if (!empty($certificateFile) || EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_CERTIFICATE)) {
+            $this->certificateFile = $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
+        }
+        $this->compression = $this->getEnumFromEnvironment(
+            Env::OTEL_EXPORTER_OTLP_COMPRESSION,
+            $compression ? Values::VALUE_GZIP : Values::VALUE_NONE
+        );
         $this->timeout = $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
         $this->setSpanConverter(new SpanConverter());
 
-        $this->metadata = $this->metadataFromHeaders(
-            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers)
-        );
+        $this->metadata = $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers);
 
         $opts = $this->getClientOptions();
 
@@ -79,7 +84,7 @@ class Exporter implements SpanExporterInterface
             'credentials' => $this->getCredentials(),
         ];
 
-        if ($this->compression) {
+        if ($this->compression === Values::VALUE_GZIP) {
             // gzip is the only specified compression method for now
             $opts['grpc.default_compression_algorithm'] = 2;
         }
@@ -133,7 +138,9 @@ class Exporter implements SpanExporterInterface
 
     public function setHeader($key, $value): void
     {
-        $this->metadata[$key] = [$value];
+        // metadata is supposed to be key-value pairs
+        // @see https://grpc.io/docs/what-is-grpc/core-concepts/#metadata
+        $this->metadata[$key] = $value;
     }
 
     public function getHeaders(): array
