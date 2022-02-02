@@ -76,9 +76,9 @@ interface KnownValues
         0,
     ];
     // Compression
-    public const OTEL_EXPORTER_OTLP_COMPRESSION = ['gzip'];
-    public const OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = ['gzip'];
-    public const OTEL_EXPORTER_OTLP_METRICS_COMPRESSION = ['gzip'];
+    public const OTEL_EXPORTER_OTLP_COMPRESSION = ['gzip', 'none'];
+    public const OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = ['gzip', 'none'];
+    public const OTEL_EXPORTER_OTLP_METRICS_COMPRESSION = ['gzip', 'none'];
     // Protocol
     public const OTEL_EXPORTER_OTLP_PROTOCOL = [
         'grpc',
