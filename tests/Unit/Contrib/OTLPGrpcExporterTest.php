@@ -6,7 +6,6 @@ namespace OpenTelemetry\Tests\Unit\Contrib;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Grpc\UnaryCall;
-use InvalidArgumentException;
 use Mockery;
 use Mockery\MockInterface;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
@@ -14,6 +13,7 @@ use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
+use org\bovigo\vfs\vfsStream;
 
 /**
  * @covers OpenTelemetry\Contrib\OtlpGrpc\Exporter
@@ -90,20 +90,13 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertEquals(SpanExporterInterface::STATUS_FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
     }
 
-    public function test_refuses_invalid_headers(): void
-    {
-        $foo = new Exporter('localhost:4317', true, '', 'a:bc');
-
-        $this->assertEquals([], $foo->getHeaders());
-    }
-
     public function test_set_headers_with_environment_variables(): void
     {
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_HEADERS', 'x-aaa=foo,x-bbb=barf');
 
         $exporter = new Exporter();
 
-        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['barf']], $exporter->getHeaders());
+        $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'barf'], $exporter->getHeaders());
     }
 
     public function test_set_header(): void
@@ -112,18 +105,18 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $exporter->setHeader('foo', 'bar');
         $headers = $exporter->getHeaders();
         $this->assertArrayHasKey('foo', $headers);
-        $this->assertEquals(['bar'], $headers['foo']);
+        $this->assertEquals('bar', $headers['foo']);
     }
 
     public function test_set_headers_in_constructor(): void
     {
         $exporter = new Exporter('localhost:4317', true, '', 'x-aaa=foo,x-bbb=bar');
 
-        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar']], $exporter->getHeaders());
+        $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'bar'], $exporter->getHeaders());
 
         $exporter->setHeader('key', 'value');
 
-        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar'], 'key' => ['value']], $exporter->getHeaders());
+        $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'bar', 'key' => 'value'], $exporter->getHeaders());
     }
 
     public function test_should_be_ok_to_exporter_empty_spans_collection(): void
@@ -132,26 +125,6 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
             SpanExporterInterface::STATUS_SUCCESS,
             (new Exporter('test.otlp'))->export([])
         );
-    }
-
-    public function test_headers_should_refuse_array(): void
-    {
-        $headers = [
-            'key' => ['value'],
-        ];
-
-        $this->expectException(InvalidArgumentException::class);
-
-        (new Exporter())->metadataFromHeaders($headers);
-    }
-
-    public function test_metadata_from_headers(): void
-    {
-        $metadata = (new Exporter())->metadataFromHeaders('key=value');
-        $this->assertEquals(['key' => ['value']], $metadata);
-
-        $metadata = (new Exporter())->metadataFromHeaders('key=value,key2=value2');
-        $this->assertEquals(['key' => ['value'], 'key2' => ['value2']], $metadata);
     }
 
     private function isInsecure(Exporter $exporter) : bool
@@ -179,7 +152,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertEquals(2, $opts['grpc.default_compression_algorithm']);
         // env vars
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_TIMEOUT', '1');
-        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_COMPRESSION', '1');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_COMPRESSION', 'gzip');
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_INSECURE', 'false');
         $exporter = new Exporter('localhost:4317');
         $opts = $exporter->getClientOptions();
@@ -237,6 +210,23 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertNotSame(
             Exporter::fromConnectionString(),
             Exporter::fromConnectionString()
+        );
+    }
+
+    public function test_create_with_cert_file(): void
+    {
+        $certDir = 'var';
+        $certFile = 'file.cert';
+        vfsStream::setup($certDir);
+        $certPath = vfsStream::url(sprintf('%s/%s', $certDir, $certFile));
+        file_put_contents($certPath, 'foo');
+
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_INSECURE', 'false');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_CERTIFICATE', $certPath);
+
+        $this->assertSame(
+            $certPath,
+            (new Exporter())->getCertificateFile()
         );
     }
 }

@@ -25,7 +25,7 @@ class SamplerFactoryTest extends TestCase
      * @covers ::fromEnvironment
      * @dataProvider samplerProvider
      */
-    public function test_sampler_factory_create_sampler_from_environment(string $samplerName, string $expected, string $arg = null): void
+    public function test_create_sampler_from_environment(string $samplerName, string $expected, string $arg = null): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $samplerName);
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);
@@ -34,9 +34,10 @@ class SamplerFactoryTest extends TestCase
         $this->assertStringContainsString($expected, $sampler->getDescription());
     }
 
-    public function samplerProvider()
+    public function samplerProvider(): array
     {
         return [
+            'default sampler' => ['', 'ParentBased+AlwaysOn'],
             'always on' => ['always_on', 'AlwaysOn'],
             'always off' => ['always_off', 'AlwaysOff'],
             'trace id ratio' => ['traceidratio', 'TraceIdRatio', '0.95'],
@@ -49,7 +50,7 @@ class SamplerFactoryTest extends TestCase
      * @covers ::fromEnvironment
      * @dataProvider invalidSamplerProvider
      */
-    public function test_sampler_factory_throws_exception_for_invalid_or_unsupported(?string $sampler, string $arg = null): void
+    public function test_throws_exception_for_invalid_or_unsupported(?string $sampler, string $arg = null): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $sampler);
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);
@@ -58,7 +59,7 @@ class SamplerFactoryTest extends TestCase
         $factory->fromEnvironment();
     }
 
-    public function invalidSamplerProvider()
+    public function invalidSamplerProvider(): array
     {
         return [
             'ratio without arg' => ['traceidratio'],
@@ -66,7 +67,6 @@ class SamplerFactoryTest extends TestCase
             'ratio with invalid arg' => ['traceidratio', 'foo'],
             'parent ratio with invalid arg' => ['parentbased_traceidratio', 'foo'],
             'unknown sampler' => ['foo'],
-            'no sampler' => [null],
         ];
     }
 }
