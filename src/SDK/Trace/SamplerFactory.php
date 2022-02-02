@@ -37,20 +37,24 @@ class SamplerFactory
             if (!is_numeric($arg)) {
                 throw new InvalidArgumentException(sprintf('Env Var %s  value is not numeric', Env::OTEL_TRACES_SAMPLER_ARG));
             }
+
+            switch ($name) {
+                case 'traceidratio':
+                    return new TraceIdRatioBasedSampler((float) $arg);
+                case 'parentbased_traceidratio':
+                    return new ParentBased(new TraceIdRatioBasedSampler((float) $arg));
+            }
         }
+
         switch ($name) {
             case 'always_on':
                 return new AlwaysOnSampler();
             case 'always_off':
                 return new AlwaysOffSampler();
-            case 'traceidratio':
-                return new TraceIdRatioBasedSampler((float) $arg);
             case 'parentbased_always_on':
                 return new ParentBased(new AlwaysOnSampler());
             case 'parentbased_always_off':
                 return new ParentBased(new AlwaysOffSampler());
-            case 'parentbased_traceidratio':
-                return new ParentBased(new TraceIdRatioBasedSampler((float) $arg));
             default:
                 throw new InvalidArgumentException(sprintf('Unknown sampler: %s', $name));
         }
