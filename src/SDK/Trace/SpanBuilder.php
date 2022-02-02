@@ -11,6 +11,8 @@ use OpenTelemetry\SDK\AttributeLimits;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Subscriber\Listener;
+use OpenTelemetry\SDK\Subscriber\SubscribedEvent;
 
 final class SpanBuilder implements API\SpanBuilderInterface
 {
@@ -42,6 +44,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     private ?AttributesInterface $attributes = null;
     private int $totalNumberOfLinksAdded = 0;
     private int $startEpochNanos = 0;
+    private array $listener = [];
 
     /** @param non-empty-string $spanName */
     public function __construct(
@@ -100,6 +103,18 @@ final class SpanBuilder implements API\SpanBuilderInterface
             ),
         );
 
+        return $this;
+    }
+
+    public function addListener(string $subscribedEvent, string $listener): self
+    {
+        if(count($this->listener)==0){
+            $this->listener = [$subscribedEvent => $listener];
+        }
+        else
+        {
+            $this->listener[$subscribedEvent] = $this->listener[$listener];
+        }
         return $this;
     }
 
@@ -216,7 +231,8 @@ final class SpanBuilder implements API\SpanBuilderInterface
             $attributes,
             $links,
             $this->totalNumberOfLinksAdded,
-            $this->startEpochNanos
+            $this->startEpochNanos,
+            $this->listener
         );
     }
 }
