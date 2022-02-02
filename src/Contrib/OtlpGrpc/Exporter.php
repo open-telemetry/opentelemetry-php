@@ -147,7 +147,7 @@ class Exporter implements SpanExporterInterface
         return $this->metadata;
     }
 
-    private function getCredentials(): ChannelCredentials
+    private function getCredentials(): ?ChannelCredentials
     {
         if (!$this->insecure) {
             return $this->certificateFile !== ''
