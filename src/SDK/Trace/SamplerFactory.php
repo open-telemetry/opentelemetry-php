@@ -23,16 +23,13 @@ class SamplerFactory
         $name = $this->getStringFromEnvironment(Env::OTEL_TRACES_SAMPLER);
 
         if (strpos($name, self::TRACEIDRATIO_PREFIX) !== false) {
-            $arg = $this->getStringFromEnvironment(Env::OTEL_TRACES_SAMPLER_ARG);
-            if (!is_numeric($arg)) {
-                throw new InvalidArgumentException(sprintf('Env Var %s  value is not numeric', Env::OTEL_TRACES_SAMPLER_ARG));
-            }
+            $arg = $this->getRatioFromEnvironment(Env::OTEL_TRACES_SAMPLER_ARG);
 
             switch ($name) {
                 case 'traceidratio':
-                    return new TraceIdRatioBasedSampler((float) $arg);
+                    return new TraceIdRatioBasedSampler($arg);
                 case 'parentbased_traceidratio':
-                    return new ParentBased(new TraceIdRatioBasedSampler((float) $arg));
+                    return new ParentBased(new TraceIdRatioBasedSampler($arg));
             }
         }
 

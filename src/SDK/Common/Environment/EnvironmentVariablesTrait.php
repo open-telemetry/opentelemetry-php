@@ -32,8 +32,18 @@ trait EnvironmentVariablesTrait
         return Accessor::getMap($key, $default);
     }
 
-    public function getEnumFromEnvironment(string $key, string $default = ''): string
+    public function getListFromEnvironment(string $key, string $default = null): array
+    {
+        return Accessor::getList($key, $default);
+    }
+
+    public function getEnumFromEnvironment(string $key, string $default = null): string
     {
         return Accessor::getEnum($key, $default);
+    }
+
+    public function getRatioFromEnvironment(string $key, float $default = null): float
+    {
+        return Accessor::getRatio($key, $default ? (string) $default : null);
     }
 }

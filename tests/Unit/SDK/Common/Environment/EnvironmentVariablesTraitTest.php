@@ -29,14 +29,14 @@ class EnvironmentVariablesTraitTest extends TestCase
         $this->restoreEnvironmentVariables();
     }
 
-    public function test_environment_variables_integer_get(): void
+    public function test_integer_get(): void
     {
         $this->setEnvironmentVariable('OTEL_FOO', '100');
         $value = $this->mock->getIntFromEnvironment('OTEL_FOO', 999);
         $this->assertSame(100, $value);
     }
 
-    public function test_environment_variables_integer_failure(): void
+    public function test_integer_failure(): void
     {
         $this->setEnvironmentVariable('OTEL_FOO', 'foo');
         $this->expectException(Exception::class);
@@ -48,7 +48,7 @@ class EnvironmentVariablesTraitTest extends TestCase
         $this->assertSame(20, $this->mock->getIntFromEnvironment('OTEL_FOO', 20));
     }
 
-    public function test_environment_variables_string_get(): void
+    public function test_string_get(): void
     {
         $this->setEnvironmentVariable('OTEL_FOO', 'foo');
         $value = $this->mock->getStringFromEnvironment('OTEL_FOO', 'bar');
@@ -59,7 +59,7 @@ class EnvironmentVariablesTraitTest extends TestCase
      * The SDK MUST interpret an empty value of an environment variable the same way as when the variable is unset
      * @dataProvider emptyProvider
      */
-    public function test_environment_variables_string_uses_default_when_empty_value(?string $input): void
+    public function test_string_uses_default_when_empty_value(?string $input): void
     {
         $this->setEnvironmentVariable('OTEL_FOO', $input);
         $value = $this->mock->getStringFromEnvironment('OTEL_FOO', 'bar');
@@ -69,7 +69,7 @@ class EnvironmentVariablesTraitTest extends TestCase
     /**
      * @dataProvider emptyProvider
      */
-    public function test_environment_variables_int_uses_default_when_empty_value(?string $input): void
+    public function test_int_uses_default_when_empty_value(?string $input): void
     {
         $this->setEnvironmentVariable('OTEL_FOO', $input);
         $value = $this->mock->getIntFromEnvironment('OTEL_FOO', 99);
@@ -79,7 +79,7 @@ class EnvironmentVariablesTraitTest extends TestCase
     /**
      * @dataProvider emptyProvider
      */
-    public function test_environment_variables_bool_uses_default_when_empty_value(?string $input): void
+    public function test_bool_uses_default_when_empty_value(?string $input): void
     {
         $this->setEnvironmentVariable('OTEL_FOO', $input);
         $value = $this->mock->getBooleanFromEnvironment('OTEL_FOO', true);
@@ -97,7 +97,7 @@ class EnvironmentVariablesTraitTest extends TestCase
     /**
      * @dataProvider booleanProvider
      */
-    public function test_environment_variables_bool_get(string $input, bool $default, bool $expected)
+    public function test_bool_get(string $input, bool $default, bool $expected)
     {
         $this->setEnvironmentVariable('OTEL_BOOL', $input);
         $this->assertSame($expected, $this->mock->getBooleanFromEnvironment('OTEL_BOOL', $default));
@@ -113,5 +113,29 @@ class EnvironmentVariablesTraitTest extends TestCase
             'TRUE' => ['TRUE', false, true],
             'FALSE' => ['FALSE', true, false],
         ];
+    }
+
+    public function test_list_get()
+    {
+        $this->setEnvironmentVariable('OTEL_LIST', 'a,b,c');
+        $this->assertSame(['a', 'b', 'c'], $this->mock->getListFromEnvironment('OTEL_LIST'));
+    }
+
+    public function test_map_get()
+    {
+        $this->setEnvironmentVariable('OTEL_MAP', 'a=b,c=d');
+        $this->assertSame(['a'=>'b', 'c'=>'d'], $this->mock->getMapFromEnvironment('OTEL_MAP'));
+    }
+
+    public function test_enum_get()
+    {
+        $this->setEnvironmentVariable('OTEL_ENUM', 'foo');
+        $this->assertSame('foo', $this->mock->getEnumFromEnvironment('OTEL_ENUM'));
+    }
+
+    public function test_ratio_get()
+    {
+        $this->setEnvironmentVariable('OTEL_RATIO', '0.5');
+        $this->assertSame(0.5, $this->mock->getRatioFromEnvironment('OTEL_RATIO'));
     }
 }
