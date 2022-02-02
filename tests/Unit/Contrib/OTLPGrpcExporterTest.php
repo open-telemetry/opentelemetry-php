@@ -6,7 +6,6 @@ namespace OpenTelemetry\Tests\Unit\Contrib;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Grpc\UnaryCall;
-use InvalidArgumentException;
 use Mockery;
 use Mockery\MockInterface;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;

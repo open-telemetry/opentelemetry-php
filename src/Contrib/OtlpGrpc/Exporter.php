@@ -6,7 +6,6 @@ namespace OpenTelemetry\Contrib\OtlpGrpc;
 
 use grpc;
 use Grpc\ChannelCredentials;
-use InvalidArgumentException;
 use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
@@ -148,7 +147,7 @@ class Exporter implements SpanExporterInterface
         return $this->metadata;
     }
 
-    private function getCredentials(): ?ChannelCredentials
+    private function getCredentials(): ChannelCredentials
     {
         if (!$this->insecure) {
             return $this->certificateFile !== ''
