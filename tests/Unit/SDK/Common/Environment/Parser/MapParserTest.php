@@ -14,6 +14,10 @@ use PHPUnit\Framework\TestCase;
 class MapParserTest extends TestCase
 {
     private const MAP_VALUES = [
+        'empty' => [
+            '',
+            [],
+        ],
         'single pair' => [
             'foo=bar',
             ['foo' => 'bar'],

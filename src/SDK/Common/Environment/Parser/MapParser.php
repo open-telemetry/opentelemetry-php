@@ -15,6 +15,10 @@ class MapParser
     {
         $result = [];
 
+        if (trim($value) === '') {
+            return $result;
+        }
+
         foreach (explode(self::VARIABLE_SEPARATOR, $value) as $pair) {
             self::validateKeyValuePair($pair);
 

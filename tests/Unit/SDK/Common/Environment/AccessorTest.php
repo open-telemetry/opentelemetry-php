@@ -8,7 +8,6 @@ use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Generator;
 use OpenTelemetry\SDK\Common\Environment\Accessor;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
-use OpenTelemetry\SDK\Common\Environment\Defaults;
 use OpenTelemetry\SDK\Common\Environment\VariableTypes;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
@@ -19,6 +18,12 @@ use UnexpectedValueException;
 class AccessorTest extends TestCase
 {
     use EnvironmentVariables;
+
+    private const ALLOW_EMPTY = [
+        VariableTypes::LIST,
+        VariableTypes::MAP,
+        VariableTypes::MIXED,
+    ];
 
     private const METHOD_NAMES = [
         VariableTypes::STRING => ['getString'],
@@ -107,7 +112,7 @@ class AccessorTest extends TestCase
     }
 
     /**
-     * @dataProvider typedMethodNameProvider
+     * @dataProvider nonEmptyMethodNameProvider
      */
     public function test_no_value_throws_exception(string $methodName)
     {
@@ -163,10 +168,10 @@ class AccessorTest extends TestCase
         }
     }
 
-    public function typedMethodNameProvider(): Generator
+    public function nonEmptyMethodNameProvider(): Generator
     {
         foreach (self::METHOD_NAMES as $varType => $names) {
-            if ($varType === VariableTypes::MIXED) {
+            if (in_array($varType, self::ALLOW_EMPTY)) {
                 continue;
             }
 
@@ -195,6 +200,10 @@ class AccessorTest extends TestCase
     public function noDefaultProvider(): Generator
     {
         foreach (self::NO_DEFAULTS as $varType => $values) {
+            if (in_array($varType, self::ALLOW_EMPTY)) {
+                continue;
+            }
+
             yield $varType => [self::METHOD_NAMES[$varType][0], $values[0]];
         }
     }

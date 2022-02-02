@@ -70,11 +70,9 @@ class Accessor
     public static function getList(string $variableName, string $default = null): array
     {
         return ListParser::parse(
-            self::validateVariableValue(
-                Resolver::resolveValue(
-                    self::validateVariableType($variableName, VariableTypes::LIST),
-                    $default
-                )
+            Resolver::resolveValue(
+                self::validateVariableType($variableName, VariableTypes::LIST),
+                $default
             )
         );
     }
@@ -82,11 +80,9 @@ class Accessor
     public static function getMap(string $variableName, string $default = null): array
     {
         return MapParser::parse(
-            self::validateVariableValue(
-                Resolver::resolveValue(
-                    self::validateVariableType($variableName, VariableTypes::MAP),
-                    $default
-                )
+            Resolver::resolveValue(
+                self::validateVariableType($variableName, VariableTypes::MAP),
+                $default
             )
         );
     }

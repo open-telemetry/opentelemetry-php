@@ -13,7 +13,11 @@ use PHPUnit\Framework\TestCase;
 class ListParserTest extends TestCase
 {
     private const LIST_VALUES = [
-        'single item ' => [
+        'empty' => [
+            '',
+            [],
+        ],
+        'single item' => [
             'foo',
             ['foo'],
         ],
