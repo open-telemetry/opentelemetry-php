@@ -40,7 +40,8 @@ class Accessor
             Resolver::resolveValue(
                 self::validateVariableType($variableName, VariableTypes::INTEGER),
                 $default
-            )
+            ),
+            FILTER_VALIDATE_INT
         );
     }
 
@@ -106,15 +107,19 @@ class Accessor
 
         if ($variableType !== null && $variableType !== $type && $variableType !== VariableTypes::MIXED) {
             throw new UnexpectedValueException(
-                sprintf('Variable %s is not supposed to be of type %s', $variableName, $type)
+                sprintf('Variable "%s" is not supposed to be of type "%s" but type "%s"', $variableName, $type, $variableType)
             );
         }
 
         return $variableName;
     }
 
-    private static function validateVariableValue($value)
+    private static function validateVariableValue($value, ?int $filterType = null)
     {
+        if ($filterType !== null && filter_var($value, $filterType) === false) {
+            throw new UnexpectedValueException(sprintf('Value has invalid type "%s"', gettype($value)));
+        }
+
         if ($value === null || $value === '') {
             throw new UnexpectedValueException(
                 'Variable must not be null or empty'
