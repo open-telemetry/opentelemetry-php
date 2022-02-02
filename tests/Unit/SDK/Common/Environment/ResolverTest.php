@@ -102,6 +102,19 @@ class ResolverTest extends TestCase
     }
 
     /**
+     * @dataProvider defaultValueProvider
+     */
+    public function test_get_default_value_with_empty_var(string $varName, $varValue): void
+    {
+        $this->setEnvironmentVariable($varName, '');
+
+        $this->assertSame(
+            $varValue,
+            Resolver::getDefault($varName)
+        );
+    }
+
+    /**
      * @dataProvider typeProvider
      */
     public function test_get_type(string $varName, string $type): void

@@ -8,15 +8,15 @@ use OpenTelemetry\SDK\Common\Util\ClassConstantAccessor;
 
 class Resolver
 {
-    public static function resolveValue(string $variableName, $default = null): ?string
+    public static function resolveValue(string $variableName, $default = null): string
     {
         $value = self::getValue($variableName);
 
-        if ($value === null) {
-            return $default === null ? (string) self::getDefault($variableName) : $default;
+        if (self::isEmpty($value)) {
+            return self::isEmpty($default) ? (string) self::getDefault($variableName) : (string) $default;
         }
 
-        return $value;
+        return (string) $value;
     }
 
     public static function getValue(string $variableName): ?string
@@ -41,7 +41,7 @@ class Resolver
         return ClassConstantAccessor::getValue(Defaults::class, $variableName);
     }
 
-    public static function getType(string $variableName)
+    public static function getType(string $variableName): ?string
     {
         return ClassConstantAccessor::getValue(ValueTypes::class, $variableName);
     }
@@ -49,5 +49,11 @@ class Resolver
     public static function getKnownValues(string $variableName): ?array
     {
         return ClassConstantAccessor::getValue(KnownValues::class, $variableName);
+    }
+
+    private static function isEmpty($value): bool
+    {
+        // don't use 'empty()', since '0' is not considered to be empty
+        return $value === null || $value === '';
     }
 }
