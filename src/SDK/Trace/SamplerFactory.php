@@ -21,19 +21,9 @@ class SamplerFactory
     public function fromEnvironment(): SamplerInterface
     {
         $name = $this->getStringFromEnvironment(Env::OTEL_TRACES_SAMPLER);
-        if ($name === '') {
-            throw new InvalidArgumentException(sprintf('Env Var %s not set', Env::OTEL_TRACES_SAMPLER));
-        }
 
         if (strpos($name, self::TRACEIDRATIO_PREFIX) !== false) {
             $arg = $this->getStringFromEnvironment(Env::OTEL_TRACES_SAMPLER_ARG);
-            if ($arg === '') {
-                throw new InvalidArgumentException(sprintf(
-                    'Env Var %s required for ratio-based sampler: %s',
-                    Env::OTEL_TRACES_SAMPLER_ARG,
-                    $name
-                ));
-            }
             if (!is_numeric($arg)) {
                 throw new InvalidArgumentException(sprintf('Env Var %s  value is not numeric', Env::OTEL_TRACES_SAMPLER_ARG));
             }
