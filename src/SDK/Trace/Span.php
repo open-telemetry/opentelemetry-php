@@ -19,6 +19,8 @@ use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Subscriber\Listener;
+use OpenTelemetry\SDK\Subscriber\SubscribedEvent;
 use function sprintf;
 use function str_replace;
 use Throwable;
@@ -71,6 +73,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     private StatusDataInterface $status;
     private int $endEpochNanos = 0;
     private bool $hasEnded = false;
+    private array $listener = [];
 
     /**
      * @param non-empty-string $name
@@ -88,7 +91,8 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         ?AttributesInterface $attributes,
         array $links,
         int $totalRecordedLinks,
-        int $startEpochNanos
+        int $startEpochNanos,
+        array $listener
     ) {
         $this->context = $context;
         $this->instrumentationLibrary = $instrumentationLibrary;
@@ -103,6 +107,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         $this->attributes = Attributes::withLimits($attributes ?? new Attributes(), $spanLimits->getAttributeLimits());
         $this->status = StatusData::unset();
         $this->spanLimits = $spanLimits;
+        $this->listener = $listener;
     }
 
     /**
@@ -129,7 +134,8 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         ?AttributesInterface $attributes,
         array $links,
         int $totalRecordedLinks,
-        int $userStartEpochNanos
+        int $userStartEpochNanos,
+        array $listener = []
     ): self {
         if (0 !== $userStartEpochNanos) {
             $startEpochNanos = $userStartEpochNanos;
@@ -149,11 +155,16 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             $attributes,
             $links,
             $totalRecordedLinks,
-            $startEpochNanos
+            $startEpochNanos,
+            $listener
         );
 
         // Call onStart here to ensure the span is fully initialized.
         $spanProcessor->onStart($span, $parentContext);
+
+        // Create a event and dispatch
+        $subscribedevent = new SubscribedEvent($span);
+        $subscribedevent->dispatch();
 
         return $span;
     }
@@ -410,6 +421,11 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     public function getResource(): ResourceInfo
     {
         return $this->resource;
+    }
+
+    public function getListener(string $event): string
+    {
+        return $this->listener[$event];
     }
 
     private function getImmutableAttributes(): AttributesInterface
