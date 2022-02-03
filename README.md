@@ -8,6 +8,9 @@
 
 This project currently lives in a pre-alpha status.  Our current release is not production ready; it has been created in order to receive feedback from the community.
 
+There is a supplemental repository for OpenTelemetry PHP contributions that are not part of the core distribution of the library. Typically, these contributions are vendor specific receivers/exporters and/or components that are only useful to a relatively small number of users.  This repository can be found here:
+https://github.com/open-telemetry/opentelemetry-php-contrib/
+
 We attempt to keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show which features are available and which have not yet been implemented.  
 
 If you find an inconsistency in the data in the matrix vs. the data in this repository, please let us know in our slack channel and we'll get it rectified.
