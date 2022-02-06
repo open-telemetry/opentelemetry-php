@@ -24,7 +24,7 @@ class ThriftHttpSender
     public function __construct(
         string $serviceName,
         string $host,
-        string $port
+        int $port
     ) {
         $this->serviceName = $serviceName;
         
