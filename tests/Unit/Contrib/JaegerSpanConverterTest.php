@@ -26,7 +26,7 @@ class JaegerSpanConverterTest extends TestCase
         $span = (new SpanData())
                     ->setName('otelSpanName');
 
-        $jtSpan = (new SpanConverter())->convert($span);
+        [$jtSpan] = (new SpanConverter())->convert([$span]);
 
         $this->assertSame(0, $jtSpan->traceIdLow);
         $this->assertSame(0, $jtSpan->traceIdHigh);
@@ -59,7 +59,7 @@ class JaegerSpanConverterTest extends TestCase
             ->addAttribute('keyForInteger', 123)
             ->addAttribute('keyForFloat', 1.00);
 
-        $jtSpan = (new SpanConverter())->convert($span);
+        [$jtSpan] = (new SpanConverter())->convert([$span]);
 
         $this->assertSame('otel.status_code', $jtSpan->tags[0]->key);
         $this->assertSame('OK', $jtSpan->tags[0]->vStr);
@@ -96,7 +96,7 @@ class JaegerSpanConverterTest extends TestCase
                 )
             );
 
-        $jtSpan = (new SpanConverter())->convert($span);
+        [$jtSpan] = (new SpanConverter())->convert([$span]);
 
         $this->assertSame('error', $jtSpan->tags[0]->key);
         $this->assertTrue($jtSpan->tags[0]->vBool);
@@ -112,7 +112,7 @@ class JaegerSpanConverterTest extends TestCase
         $span = (new SpanData())
             ->setKind($spanKindInput);
 
-        $jtSpan = (new SpanConverter())->convert($span);
+        [$jtSpan] = (new SpanConverter())->convert([$span]);
 
         $this->assertSame('span.kind', $jtSpan->tags[0]->key);
         $this->assertSame($expectedJaegerTagValue, $jtSpan->tags[0]->vStr);
@@ -131,7 +131,7 @@ class JaegerSpanConverterTest extends TestCase
         $span = (new SpanData())
             ->setKind(SpanKind::KIND_INTERNAL);
 
-        $jtSpan = (new SpanConverter())->convert($span);
+        [$jtSpan] = (new SpanConverter())->convert([$span]);
 
         $this->assertCount(0, $jtSpan->tags);
     }
@@ -151,7 +151,7 @@ class JaegerSpanConverterTest extends TestCase
                         ]
                     );
 
-        $jtSpan = (new SpanConverter())->convert($span);
+        [$jtSpan] = (new SpanConverter())->convert([$span]);
 
         $this->assertSame(1505855794194009, $jtSpan->logs[0]->timestamp);
 
@@ -176,7 +176,7 @@ class JaegerSpanConverterTest extends TestCase
                         ]
                     );
 
-        $jtSpan = (new SpanConverter())->convert($span);
+        [$jtSpan] = (new SpanConverter())->convert([$span]);
 
         $this->assertSame(1505855794194009, $jtSpan->logs[0]->timestamp);
 
@@ -195,7 +195,7 @@ class JaegerSpanConverterTest extends TestCase
                         ]
                     );
 
-        $jtSpan = (new SpanConverter())->convert($span);
+        [$jtSpan] = (new SpanConverter())->convert([$span]);
 
         $this->assertSame(1, $jtSpan->references[0]->refType);
         $this->assertSame(0, $jtSpan->references[0]->traceIdLow);

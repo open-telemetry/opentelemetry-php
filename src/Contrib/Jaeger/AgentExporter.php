@@ -53,7 +53,7 @@ class AgentExporter implements SpanExporterInterface
     {
         // UDP Transport begins here after converting to thrift format span
         foreach ($spans as $span) {
-            $cSpan = $this->spanConverter->convert($span);
+            [$cSpan] = $this->spanConverter->convert([$span]);
             $this->jaegerTransport->append($cSpan, $this->serviceName);
         }
 

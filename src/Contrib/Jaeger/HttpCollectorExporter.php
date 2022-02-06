@@ -47,10 +47,7 @@ class HttpCollectorExporter implements SpanExporterInterface
      */
     public function doExport(iterable $spans): int
     {
-        $thriftSpans = [];
-        foreach ($spans as $span) {
-            $thriftSpans[] = $this->spanConverter->convert($span);
-        }
+        $thriftSpans = $this->spanConverter->convert($spans);
 
         $this->sender->send($thriftSpans);
 
