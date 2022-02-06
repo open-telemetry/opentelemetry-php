@@ -40,10 +40,6 @@ class ThriftHttpSender
      */
     public function send(array $spans): void
     {
-        if (empty($spans)) {
-            return;
-        }
-
         /** @var Tag[] $tags */
         $tags = [];
 
