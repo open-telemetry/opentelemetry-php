@@ -7,7 +7,6 @@ namespace OpenTelemetry\Contrib\Jaeger;
 use Jaeger\Thrift\Batch;
 use Jaeger\Thrift\Process;
 use Jaeger\Thrift\Span as JTSpan;
-use Jaeger\Thrift\Tag;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use Thrift\Protocol\TBinaryProtocol;
 use Thrift\Protocol\TProtocol;
@@ -44,7 +43,7 @@ class ThriftHttpSender
      */
     public function send(array $spans): void
     {
-        /** @var Tag[] $tags */
+        ///** @var Tag[] $tags */ TODO - uncomment this once the code below is uncommented/adapted
         $tags = [];
 
         //TODO - determine what of this is still needed and how to adapt it for spec compliance
