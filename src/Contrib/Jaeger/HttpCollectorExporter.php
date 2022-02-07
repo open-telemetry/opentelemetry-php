@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Jaeger;
 
 use InvalidArgumentException;
-use OpenTelemetry\Contrib\Jaeger\ThriftHttpSender;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -32,10 +31,10 @@ class HttpCollectorExporter implements SpanExporterInterface
         if (!isset($parsedDsn['host']) || !isset($parsedDsn['port'])) {
             throw new InvalidArgumentException('Endpoint should have host, port');
         }
-        
+
         $this->sender = new ThriftHttpSender(
             $name,
-            $parsedDsn['host'], 
+            $parsedDsn['host'],
             $parsedDsn['port'],
             isset($parsedDsn['path']) ? $parsedDsn['path'] : '', //Matching THttpClient's default
             isset($parsedDsn['scheme']) ? $parsedDsn['scheme'] : 'http' //Matching THttpClient's default

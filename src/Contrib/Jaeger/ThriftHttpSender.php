@@ -28,7 +28,7 @@ class ThriftHttpSender
         string $scheme
     ) {
         $this->serviceName = $serviceName;
-        
+
         $transport = new THttpClient(
             $host,
             $port,
@@ -81,11 +81,11 @@ class ThriftHttpSender
         // ]);
 
         $batch = new Batch([
-            "spans" => $spans,
-            "process" => new Process([
-                "serviceName" => $this->serviceName,
-                "tags" => $tags
-            ])
+            'spans' => $spans,
+            'process' => new Process([
+                'serviceName' => $this->serviceName,
+                'tags' => $tags,
+            ]),
         ]);
 
         $batch->write($this->protocol);
