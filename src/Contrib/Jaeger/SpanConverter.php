@@ -50,10 +50,6 @@ class SpanConverter implements SpanConverterInterface
         }
     }
 
-    /**
-     * @param SpanDataInterface[] $spans
-     * @return JTSpan[] 
-     */
     public function convert(iterable $spans): array
     {
         $aggregate = [];
