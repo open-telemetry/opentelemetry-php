@@ -37,6 +37,8 @@ class HttpCollectorExporter implements SpanExporterInterface
             $name,
             $parsedDsn['host'], 
             $parsedDsn['port'],
+            isset($parsedDsn['path']) ? $parsedDsn['path'] : '', //Matching THttpClient's default
+            isset($parsedDsn['scheme']) ? $parsedDsn['scheme'] : 'http' //Matching THttpClient's default
         );
 
         $this->spanConverter = new SpanConverter();

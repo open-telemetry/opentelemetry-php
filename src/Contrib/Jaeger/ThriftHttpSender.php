@@ -24,13 +24,17 @@ class ThriftHttpSender
     public function __construct(
         string $serviceName,
         string $host,
-        int $port
+        int $port,
+        string $path,
+        string $scheme
     ) {
         $this->serviceName = $serviceName;
         
         $transport = new THttpClient(
             $host,
             $port,
+            $path,
+            $scheme
         );
         $this->protocol = new TBinaryProtocol($transport);
     }
