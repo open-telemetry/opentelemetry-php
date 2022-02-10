@@ -1,6 +1,7 @@
 ---
 title: Getting Started
 description: Get up and running with OpenTelemetry for PHP.
+aliases: [/docs/instrumentation/php/getting_started]
 ---
 
 In this page you'll learn how to export traces to the console.
