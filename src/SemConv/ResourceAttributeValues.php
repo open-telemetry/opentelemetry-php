@@ -11,7 +11,7 @@ class ResourceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.8.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.9.0';
     /**
      * @see ResourceAttributes::CLOUD_PROVIDER Alibaba Cloud
      */
