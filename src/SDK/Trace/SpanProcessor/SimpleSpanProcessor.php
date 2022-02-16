@@ -26,6 +26,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
     /** @inheritDoc */
     public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
     {
+        $span->addResourceToAttributes();
     }
 
     /** @inheritDoc */

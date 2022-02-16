@@ -412,6 +412,11 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         return $this->resource;
     }
 
+    public function addResourceToAttributes(): void
+    {
+        $this->setAttributes($this->resource->getAttributes());
+    }
+
     private function getImmutableAttributes(): AttributesInterface
     {
         if (null === $this->attributes) {

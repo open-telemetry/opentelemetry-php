@@ -72,6 +72,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
      */
     public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
     {
+        $span->addResourceToAttributes();
     }
 
     /**
