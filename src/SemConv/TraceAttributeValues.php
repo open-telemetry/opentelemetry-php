@@ -11,7 +11,17 @@ class TraceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.8.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.9.0';
+    /**
+     * @see TraceAttributes::OPENTRACING_REF_TYPE The parent Span depends on the child Span in some capacity
+     */
+    public const OPENTRACING_REF_TYPE_CHILD_OF = 'child_of';
+
+    /**
+     * @see TraceAttributes::OPENTRACING_REF_TYPE The parent Span does not depend in any way on the result of the child Span
+     */
+    public const OPENTRACING_REF_TYPE_FOLLOWS_FROM = 'follows_from';
+
     /**
      * @see TraceAttributes::DB_SYSTEM Some other SQL database. Fallback only. See notes
      */

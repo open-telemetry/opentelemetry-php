@@ -11,7 +11,7 @@ class ResourceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.8.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.9.0';
 
     /**
      * Name of the cloud provider.
@@ -208,6 +208,16 @@ class ResourceAttributes
      * @example Samsung Galaxy S6
      */
     public const DEVICE_MODEL_NAME = 'device.model.name';
+
+    /**
+     * The name of the device manufacturer.
+     *
+     * The Android OS provides this field via Build. iOS apps SHOULD hardcode the value `Apple`.
+     *
+     * @example Apple
+     * @example Samsung
+     */
+    public const DEVICE_MANUFACTURER = 'device.manufacturer';
 
     /**
      * The name of the single function that this runtime instance executes.
