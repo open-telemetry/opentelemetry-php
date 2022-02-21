@@ -6,7 +6,6 @@ namespace OpenTelemetry\SDK\Resource;
 
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\AttributesInterface;
-use OpenTelemetry\SemConv\ResourceAttributes;
 
 /**
  * A Resource is an immutable representation of the entity producing telemetry. For example, a process producing telemetry
@@ -18,89 +17,51 @@ use OpenTelemetry\SemConv\ResourceAttributes;
 class ResourceInfo
 {
     private AttributesInterface $attributes;
+    private ?string $schemaUrl;
 
-    private function __construct(AttributesInterface $attributes)
+    private function __construct(AttributesInterface $attributes, ?string $schemaUrl = null)
     {
         $this->attributes = $attributes;
+        $this->schemaUrl = $schemaUrl;
     }
 
-    public static function create(AttributesInterface $attributes): self
+    public static function create(AttributesInterface $attributes, ?string $schemaUrl = null): self
     {
-        /*
-         * The SDK MUST extract information from the OTEL_RESOURCE_ATTRIBUTES environment
-         * variable and merge this.
-         */
-        $resource = self::merge(
-            self::defaultResource(),
-            self::merge(
-                new ResourceInfo(clone $attributes),
-                self::environmentResource()
-            ),
-        );
-
-        return $resource;
+        return new ResourceInfo(clone $attributes, $schemaUrl);
     }
 
     /**
-     * Merges two resources into a new one.
-     * Conflicts (i.e. a key for which attributes exist on both the primary and secondary resource) are handled as follows:
-     * - If the value on the primary resource is an empty string, the result has the value of the secondary resource.
-     * - Otherwise, the value of the primary resource is used.
+     * Merges resources into a new one.
      *
-     * @param ResourceInfo $primary
-     * @param ResourceInfo $secondary
+     * @param ResourceInfo ...$resources
      * @return ResourceInfo
      */
-    public static function merge(ResourceInfo $primary, ResourceInfo $secondary): self
+    public static function merge(ResourceInfo ...$resources): self
     {
-        // clone attributes from the primary resource
-        $mergedAttributes = clone $primary->getAttributes();
+        $attributes = [];
+        $schemaUrl = null;
 
-        // merge attributes from the secondary resource
-        foreach ($secondary->getAttributes() as $name => $attribute) {
-            $mergedAttribute = $mergedAttributes->get($name);
-            if (null === $mergedAttribute || $mergedAttribute === '') {
-                $mergedAttributes->setAttribute($name, $attribute);
-            }
+        foreach ($resources as $resource) {
+            $attributes += $resource->getAttributes()->toArray();
+            $schemaUrl ??= $resource->getSchemaUrl();
         }
 
-        return new ResourceInfo($mergedAttributes);
+        return new ResourceInfo(new Attributes($attributes), $schemaUrl);
     }
 
     public static function defaultResource(): self
     {
-        return new ResourceInfo(new Attributes(
-            [
-                ResourceAttributes::TELEMETRY_SDK_NAME => 'opentelemetry',
-                ResourceAttributes::TELEMETRY_SDK_LANGUAGE => 'php',
-                ResourceAttributes::TELEMETRY_SDK_VERSION => 'dev',
-            ]
-        ));
-    }
+        return (new Detectors\Composite([
+            new Detectors\Environment(),
 
-    /**
-     * Create resource attributes from OTEL_RESOURCE_ATTRIBUTES key=value comma-separated entries
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/sdk.md#specifying-resource-information-via-an-environment-variable
-     */
-    public static function environmentResource(): self
-    {
-        $attributes = [
-            ResourceAttributes::SERVICE_NAME => 'unknown_service',
-        ];
-        $string = getenv('OTEL_RESOURCE_ATTRIBUTES');
-        if ($string && false !== strpos($string, '=')) {
-            foreach (explode(',', $string) as $pair) {
-                [$key, $value] = explode('=', $pair);
-                $attributes[trim($key)] = trim($value);
-            }
-        }
-        //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration
-        $serviceName = getenv('OTEL_SERVICE_NAME');
-        if ($serviceName) {
-            $attributes[ResourceAttributes::SERVICE_NAME] = $serviceName;
-        }
+            new Detectors\Host(),
+            new Detectors\OperatingSystem(),
+            new Detectors\Process(),
+            new Detectors\ProcessRuntime(),
 
-        return new ResourceInfo(new Attributes($attributes));
+            new Detectors\Sdk(),
+            new Detectors\SdkProvided(),
+        ]))->getResource();
     }
 
     public static function emptyResource(): self
@@ -111,5 +72,10 @@ class ResourceInfo
     public function getAttributes(): AttributesInterface
     {
         return $this->attributes;
+    }
+
+    public function getSchemaUrl(): ?string
+    {
+        return $this->schemaUrl;
     }
 }

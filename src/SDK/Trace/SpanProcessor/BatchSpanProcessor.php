@@ -8,7 +8,8 @@ use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\ClockInterface;
-use OpenTelemetry\SDK\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -51,12 +52,18 @@ class BatchSpanProcessor implements SpanProcessorInterface
         }
         $this->exporter = $exporter;
         $this->clock = $clock;
-        $this->maxQueueSize = $maxQueueSize ?: $this->getIntFromEnvironment('OTEL_BSP_MAX_QUEUE_SIZE', self::DEFAULT_MAX_QUEUE_SIZE);
-        $this->scheduledDelayMillis = $scheduledDelayMillis ?: $this->getIntFromEnvironment('OTEL_BSP_SCHEDULE_DELAY', self::DEFAULT_SCHEDULE_DELAY);
-        $this->exporterTimeoutMillis = $exporterTimeoutMillis ?: $this->getIntFromEnvironment('OTEL_BSP_EXPORT_TIMEOUT', self::DEFAULT_EXPORT_TIMEOUT);
-        $this->maxExportBatchSize = $maxExportBatchSize ?: $this->getIntFromEnvironment('OTEL_BSP_MAX_EXPORT_BATCH_SIZE', self::DEFAULT_MAX_EXPORT_BATCH_SIZE);
+        $this->maxQueueSize = $maxQueueSize
+            ?: $this->getIntFromEnvironment(Env::OTEL_BSP_MAX_QUEUE_SIZE, self::DEFAULT_MAX_QUEUE_SIZE);
+        $this->scheduledDelayMillis = $scheduledDelayMillis
+            ?: $this->getIntFromEnvironment(Env::OTEL_BSP_SCHEDULE_DELAY, self::DEFAULT_SCHEDULE_DELAY);
+        $this->exporterTimeoutMillis = $exporterTimeoutMillis
+            ?: $this->getIntFromEnvironment(Env::OTEL_BSP_EXPORT_TIMEOUT, self::DEFAULT_EXPORT_TIMEOUT);
+        $this->maxExportBatchSize = $maxExportBatchSize
+            ?: $this->getIntFromEnvironment(Env::OTEL_BSP_MAX_EXPORT_BATCH_SIZE, self::DEFAULT_MAX_EXPORT_BATCH_SIZE);
         if ($this->maxExportBatchSize > $this->maxQueueSize) {
-            throw new InvalidArgumentException("maxExportBatchSize should be smaller or equal to $this->maxQueueSize");
+            throw new InvalidArgumentException(
+                sprintf('maxExportBatchSize should be smaller or equal to %s', $this->maxQueueSize)
+            );
         }
     }
 

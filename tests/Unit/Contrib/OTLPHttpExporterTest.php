@@ -108,46 +108,6 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     }
 
     /**
-     * @dataProvider processHeadersDataHandler
-     */
-    public function test_process_headers($input, $expected): void
-    {
-        $headers = (new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->processHeaders($input);
-
-        $this->assertEquals($expected, $headers);
-    }
-
-    public function processHeadersDataHandler(): array
-    {
-        return [
-            'No Headers' => ['', []],
-            'Empty Header' => ['empty=', ['empty' => '']],
-            'One Header' => ['header-1=one', ['header-1' => 'one']],
-            'Two Headers' => ['header-1=one,header-2=two', ['header-1' => 'one', 'header-2' => 'two']],
-            'Two Equals' => ['header-1=bWFkZSB5b3UgbG9vaw==,header-2=two', ['header-1' => 'bWFkZSB5b3UgbG9vaw==', 'header-2' => 'two']],
-            'Unicode' => ['héader-1=one', ['héader-1' => 'one']],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidHeadersDataHandler
-     */
-    public function test_invalid_headers($input): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $headers = (new Exporter(new Client(), new HttpFactory(), new HttpFactory()))->processHeaders($input);
-    }
-
-    public function invalidHeadersDataHandler(): array
-    {
-        return [
-            '#1' => ['a:b,c'],
-            '#2' => ['a,,l'],
-            '#3' => ['header-1'],
-        ];
-    }
-
-    /**
      * @dataProvider exporterEndpointDataProvider
      */
     public function test_exporter_with_config_via_env_vars(?string $endpoint, string $expectedEndpoint): void

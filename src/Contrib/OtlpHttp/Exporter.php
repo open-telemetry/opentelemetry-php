@@ -8,11 +8,11 @@ use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
 use Nyholm\Dsn\DsnParser;
+use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
-use OpenTelemetry\SDK\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
-use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -21,8 +21,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 class Exporter implements SpanExporterInterface
 {
-    use EnvironmentVariablesTrait;
-    use UsesSpanConverterTrait;
+    use ExporterTrait;
     use HttpSpanExporterTrait;
 
     private const REQUEST_METHOD = 'POST';
@@ -30,6 +29,9 @@ class Exporter implements SpanExporterInterface
     private const HEADER_CONTENT_ENCODING = 'Content-Encoding';
     private const VALUE_CONTENT_TYPE = 'application/x-protobuf';
     private const VALUE_CONTENT_ENCODING = 'gzip';
+    private const DEFAULT_ENDPOINT = 'https://localhost:4318/v1/traces';
+    private const DEFAULT_COMPRESSION = 'none';
+    private const OTLP_PROTOCOL = 'http/protobuf';
 
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
     // private string $insecure;
@@ -56,23 +58,21 @@ class Exporter implements SpanExporterInterface
         // Set default values based on presence of env variable
         $this->setEndpointUrl(
             $this->validateEndpoint(
-                $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_ENDPOINT', 'https://localhost:4318/v1/traces')
+                $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, self::DEFAULT_ENDPOINT)
             )
         );
-        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
-        // $this->certificateFile = getenv('OTEL_EXPORTER_OTLP_CERTIFICATE') ?: 'none';
-        $this->headers = $this->processHeaders($this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_HEADERS', ''));
-        $this->compression = $this->getStringFromEnvironment('OTEL_EXPORTER_OTLP_COMPRESSION', 'none');
-        // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
-        // $this->timeout =(int) getenv('OTEL_EXPORTER_OTLP_TIMEOUT') ?: 10;
+        $this->headers = $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS);
+        $this->compression = $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
 
         $this->setClient($client);
         $this->setRequestFactory($requestFactory);
         $this->setStreamFactory($streamFactory);
         $this->setSpanConverter($spanConverter ?? new SpanConverter());
 
-        if ((getenv('OTEL_EXPORTER_OTLP_PROTOCOL') ?: 'http/protobuf') !== 'http/protobuf') {
-            throw new InvalidArgumentException('Invalid OTLP Protocol Specified');
+        $protocol = $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_PROTOCOL, self::OTLP_PROTOCOL);
+
+        if ($protocol !== self::OTLP_PROTOCOL) {
+            throw new InvalidArgumentException(sprintf('Invalid OTLP Protocol "%s" specified', $protocol));
         }
     }
 
@@ -107,33 +107,6 @@ class Exporter implements SpanExporterInterface
         }
 
         return $request;
-    }
-
-    /**
-     * processHeaders converts comma separated headers into an array
-     */
-    public function processHeaders(?string $headers): array
-    {
-        if (empty($headers)) {
-            return [];
-        }
-
-        $pairs = explode(',', $headers);
-
-        $metadata = [];
-        foreach ($pairs as $pair) {
-            $kv = explode('=', $pair, 2);
-
-            if (count($kv) !== 2) {
-                throw new InvalidArgumentException('Invalid headers passed');
-            }
-
-            [$key, $value] = $kv;
-
-            $metadata[$key] = $value;
-        }
-
-        return $metadata;
     }
 
     /**

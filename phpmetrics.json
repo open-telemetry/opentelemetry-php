@@ -1,0 +1,47 @@
+{
+    "includes": [
+        "src"
+    ],
+    "exclude": [
+        "tests",
+        "proto",
+        "thrift"
+    ],
+    "report": {
+        "html": "var/metrics",
+        "csv": "var/metrics/metrics.csv",
+        "json": "var/metrics/metrics.json",
+        "violations": "var/metrics/violations.xml"
+    },
+    "groups": [
+        {
+            "name": "API",
+            "match": "!^OpenTelemetry\\\\API\\\\!i"
+        },
+        {
+            "name": "Context",
+            "match": "!^OpenTelemetry\\\\Context\\\\!i"
+        },
+        {
+            "name": "SDK",
+            "match": "!^OpenTelemetry\\\\SDK\\\\!i"
+        },
+        {
+            "name": "SemConv",
+            "match": "!^OpenTelemetry\\\\SemConv\\\\!i"
+        },
+        {
+            "name": "Contrib",
+            "match": "!^OpenTelemetry\\\\Contrib\\\\!i"
+        }
+    ],
+    "plugins": {
+        "git": {
+            "binary": "git"
+        },
+        "junit": {
+            "file": "junit.xml"
+        }
+    },
+    "extensions": [ "php" ]
+}
