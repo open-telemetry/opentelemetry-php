@@ -42,25 +42,23 @@ class SpanProcessorFactoryTest extends TestCase
             'batch' => ['batch', BatchSpanProcessor::class],
             'simple' => ['simple', SimpleSpanProcessor::class],
             'noop' => ['noop', NoopSpanProcessor::class],
+            'none' => ['none', NoopSpanProcessor::class],
         ];
     }
-    /**
-     * @dataProvider invalidProcessorProvider
-     */
-    public function test_span_processor_factory_invalid_span_processor(?string $processor): void
+
+    public function test_span_processor_factory_default_span_processor(): void
     {
-        $this->setEnvironmentVariable('OTEL_PHP_TRACES_PROCESSOR', $processor);
+        $factory = new SpanProcessorFactory();
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $this->assertInstanceOf(BatchSpanProcessor::class, $factory->fromEnvironment($exporter));
+    }
+
+    public function test_span_processor_factory_invalid_span_processor(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_TRACES_PROCESSOR', 'foo');
         $factory = new SpanProcessorFactory();
         $exporter = $this->createMock(SpanExporterInterface::class);
         $this->expectException(InvalidArgumentException::class);
         $factory->fromEnvironment($exporter);
-    }
-
-    public function invalidProcessorProvider()
-    {
-        return [
-            'not set' => [null],
-            'invalid processor' => ['foo'],
-        ];
     }
 }
