@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Composer\InstalledVersions;
+use InvalidArgumentException;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -165,6 +166,7 @@ class ResourceTest extends TestCase
     public function test_resource_with_invalid_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo');
+        $this->expectException(InvalidArgumentException::class);
         $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::defaultResource());
     }
 
