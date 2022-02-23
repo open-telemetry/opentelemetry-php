@@ -11,6 +11,7 @@ use OpenTelemetry\Contrib\Zipkin\SpanConverter;
 use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
@@ -44,6 +45,17 @@ class ZipkinSpanConverterTest extends TestCase
             ->addAttribute('service', 'guard')
             ->addAttribute('net.peer.name', 'authorizationservice.com')
             ->addAttribute('peer.service', 'AuthService')
+            ->setResource(
+                ResourceInfo::create(
+                    new Attributes([
+                        'telemetry.sdk.name' => 'opentelemetry',
+                        'telemetry.sdk.language' => 'php',
+                        'telemetry.sdk.version' => 'dev',
+                        'instance' => 'test-a',
+                        'service.name' => 'unknown_service',
+                    ])
+                )
+            )
             ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
 
@@ -60,10 +72,18 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame(1505855794194009, $row['timestamp']);
         $this->assertSame(5271717, $row['duration']);
 
-        $this->assertCount(5, $row['tags']);
+        $this->assertCount(10, $row['tags']);
 
         $this->assertSame('Error', $row['tags']['otel.status_code']);
         $this->assertSame('status_description', $row['tags']['error']);
+        $this->assertSame('guard', $row['tags']['service']);
+        $this->assertSame('authorizationservice.com', $row['tags']['net.peer.name']);
+        $this->assertSame('AuthService', $row['tags']['peer.service']);
+        $this->assertSame('opentelemetry', $row['tags']['telemetry.sdk.name']);
+        $this->assertSame('php', $row['tags']['telemetry.sdk.language']);
+        $this->assertSame('dev', $row['tags']['telemetry.sdk.version']);
+        $this->assertSame('test-a', $row['tags']['instance']);
+        $this->assertSame('unknown_service', $row['tags']['service.name']);
 
         $this->assertSame('instrumentation_library_name', $row['otel.library.name']);
         $this->assertSame('instrumentation_library_version', $row['otel.library.version']);

@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\Contrib;
 
 use OpenTelemetry\Contrib\Newrelic\SpanConverter;
 use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
@@ -19,6 +20,15 @@ class NewrelicSpanConverterTest extends TestCase
         $span = (new SpanData())
             ->setName('guard.validate')
             ->addAttribute('service', 'guard')
+            ->setResource(
+                ResourceInfo::create(
+                    new Attributes([
+                        'telemetry.sdk.name' => 'opentelemetry',
+                        'telemetry.sdk.language' => 'php',
+                        'telemetry.sdk.version' => 'dev',
+                    ])
+                )
+            )
             ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
 
@@ -31,13 +41,16 @@ class NewrelicSpanConverterTest extends TestCase
         $this->assertSame('test.name', $row['attributes']['service.name']);
         $this->assertSame($span->getName(), $row['attributes']['name']);
         $this->assertNull($row['attributes']['parent.id']);
-        $this->assertSame($span->getName(), $row['attributes']['name']);
         $this->assertSame(1505855794194, $row['attributes']['timestamp']);
         $this->assertIsFloat($row['attributes']['duration.ms']);
         $this->assertSame(5271.0, $row['attributes']['duration.ms']);
 
         $attribute = $span->getAttributes()->get('service');
         $this->assertEquals($attribute, $row['attributes']['service']);
+
+        $this->assertSame('opentelemetry', $row['attributes']['telemetry.sdk.name']);
+        $this->assertSame('php', $row['attributes']['telemetry.sdk.language']);
+        $this->assertSame('dev', $row['attributes']['telemetry.sdk.version']);
     }
 
     public function test_attributes_maintain_types(): void

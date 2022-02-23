@@ -10,6 +10,7 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Jaeger\SpanConverter;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\SDK\Trace\Link;
 use OpenTelemetry\SDK\Trace\StatusData;
@@ -57,7 +58,18 @@ class JaegerSpanConverterTest extends TestCase
             ->addAttribute('keyForBoolean', true)
             ->addAttribute('keyForArray', ['1stElement', '2ndElement', true])
             ->addAttribute('keyForInteger', 123)
-            ->addAttribute('keyForFloat', 1.00);
+            ->addAttribute('keyForFloat', 1.00)
+            ->setResource(
+                ResourceInfo::create(
+                    new Attributes([
+                        'telemetry.sdk.name' => 'opentelemetry',
+                        'telemetry.sdk.language' => 'php',
+                        'telemetry.sdk.version' => 'dev',
+                        'instance' => 'test-a',
+                        'service.name' => 'unknown_service',
+                    ])
+                )
+            );
 
         $jtSpan = (new SpanConverter())->convert($span);
 
@@ -84,6 +96,21 @@ class JaegerSpanConverterTest extends TestCase
 
         $this->assertSame('keyForFloat', $jtSpan->tags[7]->key);
         $this->assertSame(1.00, $jtSpan->tags[7]->vDouble);
+
+        $this->assertSame('telemetry.sdk.name', $jtSpan->tags[8]->key);
+        $this->assertSame('opentelemetry', $jtSpan->tags[8]->vStr);
+
+        $this->assertSame('telemetry.sdk.language', $jtSpan->tags[9]->key);
+        $this->assertSame('php', $jtSpan->tags[9]->vStr);
+
+        $this->assertSame('telemetry.sdk.version', $jtSpan->tags[10]->key);
+        $this->assertSame('dev', $jtSpan->tags[10]->vStr);
+
+        $this->assertSame('instance', $jtSpan->tags[11]->key);
+        $this->assertSame('test-a', $jtSpan->tags[11]->vStr);
+
+        $this->assertSame('service.name', $jtSpan->tags[12]->key);
+        $this->assertSame('unknown_service', $jtSpan->tags[12]->vStr);
     }
 
     public function test_should_correctly_convert_error_status_to_jaeger_thrift_tags()
