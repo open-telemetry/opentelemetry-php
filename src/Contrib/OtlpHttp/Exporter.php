@@ -11,6 +11,7 @@ use Nyholm\Dsn\DsnParser;
 use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
+use OpenTelemetry\SDK\Common\Environment\Resolver as EnvResolver;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -55,21 +56,31 @@ class Exporter implements SpanExporterInterface
         StreamFactoryInterface $streamFactory,
         SpanConverter $spanConverter = null
     ) {
-        // Set default values based on presence of env variable
+        $tracesEndpoint = $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) ?:
+            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, self::DEFAULT_ENDPOINT);
+
         $this->setEndpointUrl(
             $this->validateEndpoint(
-                $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, self::DEFAULT_ENDPOINT)
+                $tracesEndpoint
             )
         );
-        $this->headers = $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS);
-        $this->compression = $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
+
+        $this->headers = EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
+            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) :
+            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS);
+
+        $this->compression = EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
+            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION, self::DEFAULT_COMPRESSION) :
+            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
 
         $this->setClient($client);
         $this->setRequestFactory($requestFactory);
         $this->setStreamFactory($streamFactory);
         $this->setSpanConverter($spanConverter ?? new SpanConverter());
 
-        $protocol = $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_PROTOCOL, self::OTLP_PROTOCOL);
+        $protocol = EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
+            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, self::OTLP_PROTOCOL) :
+            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_PROTOCOL, self::OTLP_PROTOCOL);
 
         if ($protocol !== self::OTLP_PROTOCOL) {
             throw new InvalidArgumentException(sprintf('Invalid OTLP Protocol "%s" specified', $protocol));
