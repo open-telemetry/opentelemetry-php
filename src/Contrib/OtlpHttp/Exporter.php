@@ -11,7 +11,6 @@ use Nyholm\Dsn\DsnParser;
 use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
-use OpenTelemetry\SDK\Common\Environment\Resolver as EnvResolver;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -65,11 +64,11 @@ class Exporter implements SpanExporterInterface
             )
         );
 
-        $this->headers = EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
+        $this->headers = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) :
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS);
 
-        $this->compression = EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
+        $this->compression = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
             $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION, self::DEFAULT_COMPRESSION) :
             $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
 
@@ -78,7 +77,7 @@ class Exporter implements SpanExporterInterface
         $this->setStreamFactory($streamFactory);
         $this->setSpanConverter($spanConverter ?? new SpanConverter());
 
-        $protocol = EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
+        $protocol = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
             $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, self::OTLP_PROTOCOL) :
             $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_PROTOCOL, self::OTLP_PROTOCOL);
 

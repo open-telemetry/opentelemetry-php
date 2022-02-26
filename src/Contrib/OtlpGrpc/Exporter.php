@@ -11,7 +11,6 @@ use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
-use OpenTelemetry\SDK\Common\Environment\Resolver as EnvResolver;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -53,20 +52,20 @@ class Exporter implements SpanExporterInterface
         $this->certificateFile = $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE)
             ?: $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
 
-        $this->compression = EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
+        $this->compression = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
             $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
             $this->getEnumFromEnvironment(
                 Env::OTEL_EXPORTER_OTLP_COMPRESSION,
                 $compression ? Values::VALUE_GZIP : Values::VALUE_NONE
             );
 
-        $this->timeout = EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT) ?
+        $this->timeout = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT) ?
             $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, $timeout) :
             $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
         $this->setSpanConverter(new SpanConverter());
 
-        $this->metadata = EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
+        $this->metadata = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers);
 
