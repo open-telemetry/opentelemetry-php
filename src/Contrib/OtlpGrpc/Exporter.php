@@ -48,9 +48,7 @@ class Exporter implements SpanExporterInterface
         int $timeout = 10,
         TraceServiceClient $client = null
     ) {
-        $this->insecure = EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_TRACES_INSECURE) ?
-            $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_INSECURE, $insecure) :
-            $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
+        $this->insecure = $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
 
         $this->certificateFile = $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE)
             ?: $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
