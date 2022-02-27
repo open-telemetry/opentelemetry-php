@@ -31,7 +31,7 @@ class ThriftHttpSender
         int $port,
         string $path,
         string $scheme,
-        string $endpointURL //TODO - clean this up as it's obv duplicating the params above it
+        string $endpointURL //This could be cleaned up to not be duplicative of the parameters above it if needed
     ) {
         $this->serviceName = $serviceName;
 
