@@ -41,7 +41,7 @@ class HttpCollectorExporter implements SpanExporterInterface
         }
 
         if (!isset($parsedDsn['port'])) {
-            if ($parsedDsn['scheme'] === 'https') {
+            if (isset($parsedDsn['scheme']) && ($parsedDsn['scheme'] === 'https')) {
                 $parsedDsn['port'] = 443;
             } else {
                 $parsedDsn['port'] = 80;
