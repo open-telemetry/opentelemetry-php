@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Jaeger;
 
 use Psr\Http\Client\ClientInterface;
-use Thrift\Transport\THttpClient;
-use Thrift\Exception\TTransportException;
-use Thrift\Factory\TStringFuncFactory;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Thrift\Exception\TTransportException;
+use Thrift\Factory\TStringFuncFactory;
+use Thrift\Transport\THttpClient;
 
-class CustomizedTHttpClient extends THttpClient {
-
+class CustomizedTHttpClient extends THttpClient
+{
     private ClientInterface $psr18Client;
 
     private RequestFactoryInterface $requestFactory;
@@ -42,7 +42,7 @@ class CustomizedTHttpClient extends THttpClient {
         return $this;
     }
 
-    public function setEndpointURL(string $endpointUrl): self 
+    public function setEndpointURL(string $endpointUrl): self
     {
         $this->endpointUrl = $endpointUrl;
 
@@ -63,7 +63,7 @@ class CustomizedTHttpClient extends THttpClient {
             'Accept' => 'application/x-thrift',
             'User-Agent' => 'PHP/THttpClient',
             'Content-Type' => 'application/x-thrift',
-            'Content-Length' => TStringFuncFactory::create()->strlen($this->buf_)
+            'Content-Length' => TStringFuncFactory::create()->strlen($this->buf_),
         ];
         foreach ($headers as $key => $value) {
             $request = $request->withAddedHeader($key, $value);

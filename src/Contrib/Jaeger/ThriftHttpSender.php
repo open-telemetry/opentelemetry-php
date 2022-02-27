@@ -9,10 +9,10 @@ use Jaeger\Thrift\Process;
 use Jaeger\Thrift\Span as JTSpan;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use Psr\Http\Client\ClientInterface;
-use Thrift\Protocol\TBinaryProtocol;
-use Thrift\Protocol\TProtocol;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Thrift\Protocol\TBinaryProtocol;
+use Thrift\Protocol\TProtocol;
 
 class ThriftHttpSender
 {
