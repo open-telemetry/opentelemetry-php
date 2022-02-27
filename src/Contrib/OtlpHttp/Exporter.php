@@ -18,6 +18,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use OpenTelemetry\SDK\Common\Environment\Resolver as EnvResolver;
 
 class Exporter implements SpanExporterInterface
 {

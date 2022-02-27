@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use OpenTelemetry\SDK\Common\Environment\Resolver as EnvResolver;
 
 class Exporter implements SpanExporterInterface
 {
@@ -47,11 +48,18 @@ class Exporter implements SpanExporterInterface
         int $timeout = 10,
         TraceServiceClient $client = null
     ) {
-        $this->insecure = $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
 
-        $this->certificateFile = $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE)
-            ?: $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
+        $this->insecure = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_INSECURE) ?
+            $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure) :
+            $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
 
+        if (!empty($certificateFile) || EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_CERTIFICATE)) 
+            {
+                $this->certificateFile = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) ?
+                    $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) :
+                    $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
+            }
+        
         $this->compression = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
             $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
             $this->getEnumFromEnvironment(
