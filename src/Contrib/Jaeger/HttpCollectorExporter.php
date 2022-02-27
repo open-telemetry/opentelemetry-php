@@ -8,6 +8,9 @@ use InvalidArgumentException;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 
 class HttpCollectorExporter implements SpanExporterInterface
 {
@@ -19,8 +22,11 @@ class HttpCollectorExporter implements SpanExporterInterface
     private ThriftHttpSender $sender;
 
     public function __construct(
-        string $name,
-        string $endpointUrl
+        $name,
+        string $endpointUrl,
+        ClientInterface $client,
+        RequestFactoryInterface $requestFactory,
+        StreamFactoryInterface $streamFactory
     ) {
         $parsedDsn = parse_url($endpointUrl);
 
@@ -41,11 +47,15 @@ class HttpCollectorExporter implements SpanExporterInterface
         }
 
         $this->sender = new ThriftHttpSender(
+            $client,
+            $requestFactory,
+            $streamFactory,
             $name,
             $parsedDsn['host'],
             $parsedDsn['port'],
             isset($parsedDsn['path']) ? $parsedDsn['path'] : '', //Matching THttpClient's default
-            isset($parsedDsn['scheme']) ? $parsedDsn['scheme'] : 'http' //Matching THttpClient's default
+            isset($parsedDsn['scheme']) ? $parsedDsn['scheme'] : 'http', //Matching THttpClient's default
+            $endpointUrl
         );
 
         $this->spanConverter = new SpanConverter();

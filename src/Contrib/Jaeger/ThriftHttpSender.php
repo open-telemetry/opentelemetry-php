@@ -8,9 +8,11 @@ use Jaeger\Thrift\Batch;
 use Jaeger\Thrift\Process;
 use Jaeger\Thrift\Span as JTSpan;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use Psr\Http\Client\ClientInterface;
 use Thrift\Protocol\TBinaryProtocol;
 use Thrift\Protocol\TProtocol;
-use Thrift\Transport\THttpClient;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 
 class ThriftHttpSender
 {
@@ -21,20 +23,29 @@ class ThriftHttpSender
     private TProtocol $protocol;
 
     public function __construct(
+        ClientInterface $client,
+        RequestFactoryInterface $requestFactory,
+        StreamFactoryInterface $streamFactory,
         string $serviceName,
         string $host,
         int $port,
         string $path,
-        string $scheme
+        string $scheme,
+        string $endpointURL //TODO - clean this up as it's obv duplicating the params above it
     ) {
         $this->serviceName = $serviceName;
 
-        $transport = new THttpClient(
+        $transport = (new CustomizedTHttpClient(
             $host,
             $port,
             $path,
             $scheme
-        );
+        ))
+        ->setPsr18HttpClient($client)
+        ->setPsr7RequestFactory($requestFactory)
+        ->setPsr7StreamFactory($streamFactory)
+        ->setEndpointURL($endpointURL);
+
         $this->protocol = new TBinaryProtocol($transport);
     }
 
