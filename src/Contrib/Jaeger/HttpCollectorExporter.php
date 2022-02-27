@@ -48,9 +48,7 @@ class HttpCollectorExporter implements SpanExporterInterface
      */
     public function doExport(iterable $spans): int
     {
-        $thriftSpans = $this->spanConverter->convert($spans);
-
-        $this->sender->send($thriftSpans);
+        $this->sender->send($this->spanConverter->convert($spans));
 
         return SpanExporterInterface::STATUS_SUCCESS;
     }
