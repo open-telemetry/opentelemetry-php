@@ -20,6 +20,9 @@ class JaegerHttpCollectorExporterTest extends TestCase
 
     public function test_happy_path()
     {
+        /**
+         * @psalm-suppress PossiblyInvalidArgument
+         */
         $exporter = new HttpCollectorExporter(
             'https://hostOfJaegerCollector.com/post',
             'nameOfThisService',
