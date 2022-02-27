@@ -19,7 +19,7 @@ class HttpCollectorExporter implements SpanExporterInterface
     private ThriftHttpSender $sender;
 
     public function __construct(
-        $name,
+        string $name,
         string $endpointUrl
     ) {
         $parsedDsn = parse_url($endpointUrl);
