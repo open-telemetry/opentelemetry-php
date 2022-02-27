@@ -18,7 +18,7 @@ class JaegerHttpCollectorExporterTest extends TestCase
     public function test_happy_path()
     {
         $exporter = HttpCollectorExporter::fromConnectionString(
-            'https://httpbin.org:443/post', //FYI this will actually end up making a network request
+            'https://httpbin.org/post', //FYI this will actually end up making a network request
             'someServiceName',
         );
 
