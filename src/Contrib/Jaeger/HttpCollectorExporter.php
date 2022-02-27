@@ -24,8 +24,8 @@ class HttpCollectorExporter implements SpanExporterInterface
     private ThriftHttpSender $sender;
 
     public function __construct(
-        $name,
         string $endpointUrl,
+        string $name,
         ClientInterface $client,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory
@@ -77,8 +77,8 @@ class HttpCollectorExporter implements SpanExporterInterface
     public static function fromConnectionString(string $endpointUrl, string $name, $args = null): HttpCollectorExporter
     {
         return new HttpCollectorExporter(
-            $name,
             $endpointUrl,
+            $name,
             HttpClientDiscovery::find(),
             Psr17FactoryDiscovery::findRequestFactory(),
             Psr17FactoryDiscovery::findStreamFactory()

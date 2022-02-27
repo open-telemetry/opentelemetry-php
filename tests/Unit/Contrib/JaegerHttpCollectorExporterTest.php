@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Contrib\Unit;
+namespace OpenTelemetry\Tests\Unit\Contrib;
 
 use OpenTelemetry\Contrib\Jaeger\HttpCollectorExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -12,14 +12,20 @@ use PHPUnit\Framework\TestCase;
 /**
  * @covers OpenTelemetry\Contrib\Jaeger\HttpCollectorExporter
  * @covers OpenTelemetry\Contrib\Jaeger\ThriftHttpSender
+ * @covers OpenTelemetry\Contrib\Jaeger\CustomizedTHttpClient
  */
 class JaegerHttpCollectorExporterTest extends TestCase
 {
+    use UsesHttpClientTrait;
+
     public function test_happy_path()
     {
-        $exporter = HttpCollectorExporter::fromConnectionString(
-            'https://httpbin.org/post', //FYI this will actually end up making a network request
-            'someServiceName',
+        $exporter = new HttpCollectorExporter(
+            'https://hostOfJaegerCollector.com/post',
+            'nameOfThisService',
+            $this->getClientInterfaceMock(),
+            $this->getRequestFactoryInterfaceMock(),
+            $this->getStreamFactoryInterfaceMock()
         );
 
         $status = $exporter->export([new SpanData()]);
