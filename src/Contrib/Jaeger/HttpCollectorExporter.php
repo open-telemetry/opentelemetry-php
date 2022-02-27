@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Jaeger;
 
 use InvalidArgumentException;
+use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\Psr17FactoryDiscovery;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -76,7 +78,10 @@ class HttpCollectorExporter implements SpanExporterInterface
     {
         return new HttpCollectorExporter(
             $name,
-            $endpointUrl
+            $endpointUrl,
+            HttpClientDiscovery::find(),
+            Psr17FactoryDiscovery::findRequestFactory(),
+            Psr17FactoryDiscovery::findStreamFactory()
         );
     }
 }
