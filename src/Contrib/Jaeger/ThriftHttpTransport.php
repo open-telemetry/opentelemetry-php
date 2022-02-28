@@ -72,8 +72,6 @@ class ThriftHttpTransport extends TTransport
 
     /**
      * Opens and sends the actual request over the HTTP connection
-     *
-     * @throws TTransportException if a writing error occurs
      */
     public function flush()
     {
