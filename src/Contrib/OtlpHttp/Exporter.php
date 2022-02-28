@@ -18,7 +18,6 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use OpenTelemetry\SDK\Common\Environment\Resolver as EnvResolver;
 
 class Exporter implements SpanExporterInterface
 {
@@ -56,7 +55,8 @@ class Exporter implements SpanExporterInterface
         StreamFactoryInterface $streamFactory,
         SpanConverter $spanConverter = null
     ) {
-        $tracesEndpoint = $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) ?:
+        $tracesEndpoint = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) ?
+            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) :
             $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, self::DEFAULT_ENDPOINT);
 
         $this->setEndpointUrl(
