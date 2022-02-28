@@ -6,7 +6,6 @@ namespace OpenTelemetry\Contrib\Jaeger;
 
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
-use InvalidArgumentException;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -30,22 +29,15 @@ class HttpCollectorExporter implements SpanExporterInterface
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory
     ) {
-        $parsedDsn = parse_url($endpointUrl);
-
-        if (!is_array($parsedDsn)) {
-            throw new InvalidArgumentException('Unable to parse provided DSN');
-        }
-
-        if (!isset($parsedDsn['host'])) {
-            throw new InvalidArgumentException('Endpoint should have host');
-        }
+        $parsedEndpoint = (new ParsedEndpointUrl($endpointUrl))
+                                ->validateHost(); //This is because the host is required downstream
 
         $this->sender = new HttpSender(
             $client,
             $requestFactory,
             $streamFactory,
             $name,
-            $endpointUrl
+            $parsedEndpoint
         );
 
         $this->spanConverter = new SpanConverter();

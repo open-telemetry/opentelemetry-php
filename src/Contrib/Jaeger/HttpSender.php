@@ -27,7 +27,7 @@ class HttpSender
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
         string $serviceName,
-        string $endpointURL
+        ParsedEndpointUrl $parsedEndpoint
     ) {
         $this->serviceName = $serviceName;
 
@@ -35,7 +35,7 @@ class HttpSender
             $client,
             $requestFactory,
             $streamFactory,
-            $endpointURL
+            $parsedEndpoint
         ));
 
         $this->protocol = new TBinaryProtocol($transport);

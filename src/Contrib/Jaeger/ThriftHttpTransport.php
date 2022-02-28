@@ -22,7 +22,7 @@ class ThriftHttpTransport extends TTransport
 
     private StreamFactoryInterface $streamFactory;
 
-    private string $endpointUrl;
+    private ParsedEndpointUrl $parsedEndpoint;
 
     private string $buffer = '';
 
@@ -30,13 +30,13 @@ class ThriftHttpTransport extends TTransport
         ClientInterface $client,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
-        string $endpointUrl
+        ParsedEndpointUrl $parsedEndpoint
     ) {
         $this->psr18Client = $client;
         $this->requestFactory = $requestFactory;
         $this->streamFactory = $streamFactory;
 
-        $this->endpointUrl = $endpointUrl;
+        $this->parsedEndpoint = $parsedEndpoint;
     }
 
     public function isOpen()
@@ -74,10 +74,10 @@ class ThriftHttpTransport extends TTransport
      */
     public function flush()
     {
-        $parsedDsn = parse_url($this->endpointUrl);
-        $host = $parsedDsn['host'];
+        $endpointUrl = $this->parsedEndpoint->getEndpointUrl();
+        $host = $this->parsedEndpoint->getHost();
 
-        $request = $this->requestFactory->createRequest('POST', $this->endpointUrl);
+        $request = $this->requestFactory->createRequest('POST', $endpointUrl);
 
         $headers = [
             'Host' => $host, //Port will be implied - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host
