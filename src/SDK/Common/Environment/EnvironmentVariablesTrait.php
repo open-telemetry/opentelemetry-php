@@ -46,4 +46,9 @@ trait EnvironmentVariablesTrait
     {
         return Accessor::getRatio($key, $default ? (string) $default : null);
     }
+
+    public function hasEnvironmentVariable(string $key): bool
+    {
+        return Resolver::hasVariable($key);
+    }
 }

@@ -11,7 +11,6 @@ use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
-use OpenTelemetry\SDK\Common\Environment\Resolver as EnvResolver;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -48,24 +47,37 @@ class Exporter implements SpanExporterInterface
         int $timeout = 10,
         TraceServiceClient $client = null
     ) {
-        // Set default values based on presence of env variable
-        $this->insecure = $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
-        if (!empty($certificateFile) || EnvResolver::hasVariable(Env::OTEL_EXPORTER_OTLP_CERTIFICATE)) {
-            $this->certificateFile = $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
+        $this->insecure = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_INSECURE) ?
+            $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure) :
+            $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
+
+        if (!empty($certificateFile) || $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_CERTIFICATE)) {
+            $this->certificateFile = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) ?
+                    $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) :
+                    $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
         }
-        $this->compression = $this->getEnumFromEnvironment(
-            Env::OTEL_EXPORTER_OTLP_COMPRESSION,
-            $compression ? Values::VALUE_GZIP : Values::VALUE_NONE
-        );
-        $this->timeout = $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
+
+        $this->compression = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
+            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
+            $this->getEnumFromEnvironment(
+                Env::OTEL_EXPORTER_OTLP_COMPRESSION,
+                $compression ? Values::VALUE_GZIP : Values::VALUE_NONE
+            );
+
+        $this->timeout = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT) ?
+            $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, $timeout) :
+            $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
         $this->setSpanConverter(new SpanConverter());
 
-        $this->metadata = $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers);
+        $this->metadata = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
+            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
+            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers);
 
         $opts = $this->getClientOptions();
 
         $this->client = $client ?? new TraceServiceClient(
+            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) ?:
             $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, $endpointURL),
             $opts
         );
