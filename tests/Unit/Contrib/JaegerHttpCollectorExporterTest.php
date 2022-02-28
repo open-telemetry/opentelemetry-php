@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
  * @covers OpenTelemetry\Contrib\Jaeger\HttpCollectorExporter
  * @covers OpenTelemetry\Contrib\Jaeger\HttpSender
  * @covers OpenTelemetry\Contrib\Jaeger\ThriftHttpTransport
+ * @covers OpenTelemetry\Contrib\Jaeger\ParsedEndpointUrl
  */
 class JaegerHttpCollectorExporterTest extends TestCase
 {
