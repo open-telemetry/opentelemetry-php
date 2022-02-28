@@ -18,10 +18,10 @@ class ThriftUdpTransport extends TTransport
     protected $buffer = '';
 
     // this implements a TTransport over UDP
-    public function __construct($server, $port)
+    public function __construct(ParsedEndpointUrl $parsedEndpoint)
     {
-        $this->server = $server;
-        $this->port = $port;
+        $this->server = $parsedEndpoint->getHost() ?? '127.0.0.1';
+        $this->port = $parsedEndpoint->getPort() ?? 6831;
 
         // open a UDP socket to somewhere
         if (!($this->socket = \socket_create(AF_INET, SOCK_DGRAM, SOL_UDP))) {

@@ -30,9 +30,7 @@ class ParsedEndpointUrl
 
     public function validateHost(): self
     {
-        if (!isset($this->parsedDsn['host'])) {
-            throw new InvalidArgumentException($this->endpointUrl . ' is missing the host');
-        }
+        $this->validateUrlComponent('host');
 
         return $this;
     }
@@ -42,5 +40,26 @@ class ParsedEndpointUrl
         $this->validateHost();
 
         return $this->parsedDsn['host'];
+    }
+
+    public function validatePort(): self
+    {
+        $this->validateUrlComponent('port');
+
+        return $this;
+    }
+
+    public function getPort(): int
+    {
+        $this->validatePort();
+
+        return $this->parsedDsn['port'];
+    }
+
+    private function validateUrlComponent(string $componentName): void
+    {
+        if (!isset($this->parsedDsn[$componentName])) {
+            throw new InvalidArgumentException($this->endpointUrl . ' is missing the ' . $componentName);
+        }
     }
 }
