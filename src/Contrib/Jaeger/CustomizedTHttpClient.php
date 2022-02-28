@@ -22,7 +22,7 @@ class CustomizedTHttpClient extends TTransport
 
     private string $endpointUrl;
 
-    private string $buf_ = '';
+    private string $buffer = '';
 
     public function __construct(
         ClientInterface $client,
@@ -64,7 +64,7 @@ class CustomizedTHttpClient extends TTransport
      */
     public function write($buf)
     {
-        $this->buf_ .= $buf;
+        $this->buffer .= $buf;
     }
 
     /**
@@ -84,18 +84,18 @@ class CustomizedTHttpClient extends TTransport
             'Accept' => 'application/x-thrift',
             'User-Agent' => 'PHP/THttpClient',
             'Content-Type' => 'application/x-thrift',
-            'Content-Length' => TStringFuncFactory::create()->strlen($this->buf_),
+            'Content-Length' => TStringFuncFactory::create()->strlen($this->buffer),
         ];
         foreach ($headers as $key => $value) {
             $request = $request->withAddedHeader($key, $value);
         }
 
         $request = $request->withBody(
-            $this->streamFactory->createStream($this->buf_)
+            $this->streamFactory->createStream($this->buffer)
         );
 
         $this->psr18Client->sendRequest($request);
 
-        $this->buf_ = '';
+        $this->buffer = '';
     }
 }
