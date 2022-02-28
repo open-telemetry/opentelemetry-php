@@ -45,7 +45,6 @@ class HttpCollectorExporter implements SpanExporterInterface
             $requestFactory,
             $streamFactory,
             $name,
-            $parsedDsn['host'],
             $endpointUrl
         );
 

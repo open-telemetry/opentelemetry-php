@@ -14,10 +14,6 @@ use Thrift\Transport\TTransport;
 
 class CustomizedTHttpClient extends TTransport
 {
-    private string $host_;
-
-    private string $buf_ = '';
-
     private ClientInterface $psr18Client;
 
     private RequestFactoryInterface $requestFactory;
@@ -26,24 +22,19 @@ class CustomizedTHttpClient extends TTransport
 
     private string $endpointUrl;
 
+    private string $buf_ = '';
+
     public function __construct(
         ClientInterface $client,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
-        string $host
+        string $endpointUrl
     ) {
         $this->psr18Client = $client;
         $this->requestFactory = $requestFactory;
         $this->streamFactory = $streamFactory;
 
-        $this->host_ = $host;
-    }
-
-    public function setEndpointURL(string $endpointUrl): self
-    {
         $this->endpointUrl = $endpointUrl;
-
-        return $this;
     }
 
     public function isOpen()
@@ -83,10 +74,13 @@ class CustomizedTHttpClient extends TTransport
      */
     public function flush()
     {
+        $parsedDsn = parse_url($this->endpointUrl);
+        $host = $parsedDsn['host'];
+
         $request = $this->requestFactory->createRequest('POST', $this->endpointUrl);
 
         $headers = [
-            'Host' => $this->host_, //Port will be implied - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host
+            'Host' => $host, //Port will be implied - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host
             'Accept' => 'application/x-thrift',
             'User-Agent' => 'PHP/THttpClient',
             'Content-Type' => 'application/x-thrift',

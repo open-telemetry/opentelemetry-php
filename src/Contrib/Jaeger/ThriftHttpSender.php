@@ -27,8 +27,7 @@ class ThriftHttpSender
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
         string $serviceName,
-        string $host,
-        string $endpointURL //This could be cleaned up to not be duplicative of the parameters above it if needed
+        string $endpointURL
     ) {
         $this->serviceName = $serviceName;
 
@@ -36,9 +35,8 @@ class ThriftHttpSender
             $client,
             $requestFactory,
             $streamFactory,
-            $host
-        ))
-        ->setEndpointURL($endpointURL);
+            $endpointURL
+        ));
 
         $this->protocol = new TBinaryProtocol($transport);
     }
