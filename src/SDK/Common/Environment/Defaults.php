@@ -49,8 +49,8 @@ interface Defaults
     public const OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://localhost:4318';
     // Insecure
     public const OTEL_EXPORTER_OTLP_INSECURE = 'false';
-    public const OTEL_EXPORTER_OTLP_SPAN_INSECURE = 'false';
-    public const OTEL_EXPORTER_OTLP_METRIC_INSECURE = 'false';
+    public const OTEL_EXPORTER_OTLP_TRACES_INSECURE = 'false';
+    public const OTEL_EXPORTER_OTLP_METRICS_INSECURE = 'false';
     // Timeout (seconds)
     public const OTEL_EXPORTER_OTLP_TIMEOUT = 10;
     public const OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = 10;

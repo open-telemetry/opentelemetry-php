@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\Contrib;
 use function implode;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\SpanConverter;
 use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
@@ -20,6 +21,15 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
         $span = (new SpanData())
             ->setName('guard.validate')
             ->addAttribute('service', 'guard')
+            ->setResource(
+                ResourceInfo::create(
+                    new Attributes([
+                        'telemetry.sdk.name' => 'opentelemetry',
+                        'telemetry.sdk.language' => 'php',
+                        'telemetry.sdk.version' => 'dev',
+                    ])
+                )
+            )
             ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
 
@@ -35,10 +45,14 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
         $this->assertSame(1505855794194009, $row['timestamp']);
         $this->assertSame(5271717, $row['duration']);
 
-        $this->assertCount(3, $row['tags']);
+        $this->assertCount(6, $row['tags']);
 
         $attribute = $span->getAttributes()->get('service');
         $this->assertSame($attribute, $row['tags']['service']);
+
+        $this->assertSame('opentelemetry', $row['tags']['telemetry.sdk.name']);
+        $this->assertSame('php', $row['tags']['telemetry.sdk.language']);
+        $this->assertSame('dev', $row['tags']['telemetry.sdk.version']);
 
         $this->assertCount(1, $row['annotations']);
         [$annotation] = $row['annotations'];

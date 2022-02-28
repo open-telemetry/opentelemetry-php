@@ -183,6 +183,11 @@ class SpanConverter implements SpanConverterInterface
         foreach ($span->getAttributes() as $k => $v) {
             $tags[$k] = $v;
         }
+
+        foreach ($span->getResource()->getAttributes() as $k => $v) {
+            $tags[$k] = $v;
+        }
+
         $tags = self::buildTags($tags);
 
         return $tags;

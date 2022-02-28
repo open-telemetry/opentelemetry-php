@@ -54,8 +54,8 @@ interface ValueTypes
     public const OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = VariableTypes::STRING;
     // Insecure
     public const OTEL_EXPORTER_OTLP_INSECURE = VariableTypes::BOOL;
-    public const OTEL_EXPORTER_OTLP_SPAN_INSECURE = VariableTypes::BOOL;
-    public const OTEL_EXPORTER_OTLP_METRIC_INSECURE = VariableTypes::BOOL;
+    public const OTEL_EXPORTER_OTLP_TRACES_INSECURE = VariableTypes::BOOL;
+    public const OTEL_EXPORTER_OTLP_METRICS_INSECURE = VariableTypes::BOOL;
     // Certificate File
     public const OTEL_EXPORTER_OTLP_CERTIFICATE = VariableTypes::STRING;
     public const OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = VariableTypes::STRING;

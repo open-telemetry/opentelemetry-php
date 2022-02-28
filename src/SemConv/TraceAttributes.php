@@ -11,7 +11,7 @@ class TraceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.8.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.9.0';
 
     /**
      * The full invoked ARN as provided on the `Context` passed to the function (`Lambda-Runtime-Invoked-Function-Arn` header on the `/runtime/invocation/next` applicable).
@@ -21,6 +21,13 @@ class TraceAttributes
      * @example arn:aws:lambda:us-east-1:123456:function:myfunction:myalias
      */
     public const AWS_LAMBDA_INVOKED_ARN = 'aws.lambda.invoked_arn';
+
+    /**
+     * Parent-child Reference type.
+     *
+     * The causal relationship between a child Span and a parent Span.
+     */
+    public const OPENTRACING_REF_TYPE = 'opentracing.ref_type';
 
     /**
      * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.

@@ -115,8 +115,8 @@ interface KnownValues
      */
     // Insecure
     public const OTEL_EXPORTER_OTLP_INSECURE  = self::VALUES_BOOLEAN;
-    public const OTEL_EXPORTER_OTLP_SPAN_INSECURE = self::VALUES_BOOLEAN;
-    public const OTEL_EXPORTER_OTLP_METRIC_INSECURE  = self::VALUES_BOOLEAN;
+    public const OTEL_EXPORTER_OTLP_TRACES_INSECURE = self::VALUES_BOOLEAN;
+    public const OTEL_EXPORTER_OTLP_METRICS_INSECURE  = self::VALUES_BOOLEAN;
     // Compression
     public const OTEL_EXPORTER_OTLP_COMPRESSION = self::VALUES_COMPRESSION;
     public const OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = self::VALUES_COMPRESSION;

@@ -10,6 +10,7 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Jaeger\SpanConverter;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\SDK\Trace\Link;
 use OpenTelemetry\SDK\Trace\StatusData;
@@ -57,7 +58,18 @@ class JaegerSpanConverterTest extends TestCase
             ->addAttribute('keyForBoolean', true)
             ->addAttribute('keyForArray', ['1stElement', '2ndElement', true])
             ->addAttribute('keyForInteger', 123)
-            ->addAttribute('keyForFloat', 1.00);
+            ->addAttribute('keyForFloat', 1.00)
+            ->setResource(
+                ResourceInfo::create(
+                    new Attributes([
+                        'telemetry.sdk.name' => 'opentelemetry',
+                        'telemetry.sdk.language' => 'php',
+                        'telemetry.sdk.version' => 'dev',
+                        'instance' => 'test-a',
+                        'service.name' => 'unknown_service',
+                    ])
+                )
+            );
 
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 
@@ -84,6 +96,21 @@ class JaegerSpanConverterTest extends TestCase
 
         $this->assertSame('keyForFloat', $convertedSpan->tags[7]->key);
         $this->assertSame(1.00, $convertedSpan->tags[7]->vDouble);
+
+        $this->assertSame('telemetry.sdk.name', $convertedSpan->tags[8]->key);
+        $this->assertSame('opentelemetry', $convertedSpan->tags[8]->vStr);
+
+        $this->assertSame('telemetry.sdk.language', $convertedSpan->tags[9]->key);
+        $this->assertSame('php', $convertedSpan->tags[9]->vStr);
+
+        $this->assertSame('telemetry.sdk.version', $convertedSpan->tags[10]->key);
+        $this->assertSame('dev', $convertedSpan->tags[10]->vStr);
+
+        $this->assertSame('instance', $convertedSpan->tags[11]->key);
+        $this->assertSame('test-a', $convertedSpan->tags[11]->vStr);
+
+        $this->assertSame('service.name', $convertedSpan->tags[12]->key);
+        $this->assertSame('unknown_service', $convertedSpan->tags[12]->vStr);
     }
 
     public function test_should_correctly_convert_error_status_to_jaeger_thrift_tags()
