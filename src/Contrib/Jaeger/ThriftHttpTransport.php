@@ -8,7 +8,6 @@ use BadMethodCallException;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use Thrift\Exception\TTransportException;
 use Thrift\Factory\TStringFuncFactory;
 use Thrift\Transport\TTransport;
 
