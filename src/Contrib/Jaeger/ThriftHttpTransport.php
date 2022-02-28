@@ -12,7 +12,10 @@ use Thrift\Exception\TTransportException;
 use Thrift\Factory\TStringFuncFactory;
 use Thrift\Transport\TTransport;
 
-class CustomizedTHttpClient extends TTransport
+/**
+ * This was created in lieu of Thrift\Transport\THttpClient because of it's usage of fopen for making network requests
+ */
+class ThriftHttpTransport extends TTransport
 {
     private ClientInterface $psr18Client;
 

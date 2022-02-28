@@ -21,7 +21,7 @@ class HttpCollectorExporter implements SpanExporterInterface
 
     private SpanConverter $spanConverter;
 
-    private ThriftHttpSender $sender;
+    private HttpSender $sender;
 
     public function __construct(
         string $endpointUrl,
@@ -40,7 +40,7 @@ class HttpCollectorExporter implements SpanExporterInterface
             throw new InvalidArgumentException('Endpoint should have host');
         }
 
-        $this->sender = new ThriftHttpSender(
+        $this->sender = new HttpSender(
             $client,
             $requestFactory,
             $streamFactory,

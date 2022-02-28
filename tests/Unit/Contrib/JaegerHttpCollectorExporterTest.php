@@ -11,8 +11,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers OpenTelemetry\Contrib\Jaeger\HttpCollectorExporter
- * @covers OpenTelemetry\Contrib\Jaeger\ThriftHttpSender
- * @covers OpenTelemetry\Contrib\Jaeger\CustomizedTHttpClient
+ * @covers OpenTelemetry\Contrib\Jaeger\HttpSender
+ * @covers OpenTelemetry\Contrib\Jaeger\ThriftHttpTransport
  */
 class JaegerHttpCollectorExporterTest extends TestCase
 {

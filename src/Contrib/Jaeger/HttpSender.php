@@ -14,7 +14,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Thrift\Protocol\TBinaryProtocol;
 use Thrift\Protocol\TProtocol;
 
-class ThriftHttpSender
+class HttpSender
 {
     use LogsMessagesTrait;
 
@@ -31,7 +31,7 @@ class ThriftHttpSender
     ) {
         $this->serviceName = $serviceName;
 
-        $transport = (new CustomizedTHttpClient(
+        $transport = (new ThriftHttpTransport(
             $client,
             $requestFactory,
             $streamFactory,
