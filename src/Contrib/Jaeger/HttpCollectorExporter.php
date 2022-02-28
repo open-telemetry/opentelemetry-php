@@ -40,23 +40,12 @@ class HttpCollectorExporter implements SpanExporterInterface
             throw new InvalidArgumentException('Endpoint should have host');
         }
 
-        if (!isset($parsedDsn['port'])) {
-            if (isset($parsedDsn['scheme']) && ($parsedDsn['scheme'] === 'https')) {
-                $parsedDsn['port'] = 443;
-            } else {
-                $parsedDsn['port'] = 80;
-            }
-        }
-
         $this->sender = new ThriftHttpSender(
             $client,
             $requestFactory,
             $streamFactory,
             $name,
             $parsedDsn['host'],
-            $parsedDsn['port'],
-            $parsedDsn['path'] ?? '', //Matching THttpClient's default
-            $parsedDsn['scheme'] ?? 'http', //Matching THttpClient's default
             $endpointUrl
         );
 

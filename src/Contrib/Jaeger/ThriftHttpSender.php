@@ -28,19 +28,16 @@ class ThriftHttpSender
         StreamFactoryInterface $streamFactory,
         string $serviceName,
         string $host,
-        int $port,
-        string $path,
-        string $scheme,
         string $endpointURL //This could be cleaned up to not be duplicative of the parameters above it if needed
     ) {
         $this->serviceName = $serviceName;
 
         $transport = (new CustomizedTHttpClient(
+            $client,
+            $requestFactory,
+            $streamFactory,
             $host
         ))
-        ->setPsr18HttpClient($client)
-        ->setPsr7RequestFactory($requestFactory)
-        ->setPsr7StreamFactory($streamFactory)
         ->setEndpointURL($endpointURL);
 
         $this->protocol = new TBinaryProtocol($transport);

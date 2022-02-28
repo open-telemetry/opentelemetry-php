@@ -26,30 +26,17 @@ class CustomizedTHttpClient extends TTransport
 
     private string $endpointUrl;
 
-    public function __construct(string $host)
-    {
-        $this->host_ = $host;
-    }
-
-    public function setPsr18HttpClient(ClientInterface $client): self
-    {
+    public function __construct(
+        ClientInterface $client,
+        RequestFactoryInterface $requestFactory,
+        StreamFactoryInterface $streamFactory,
+        string $host
+    ) {
         $this->psr18Client = $client;
-
-        return $this;
-    }
-
-    public function setPsr7RequestFactory(RequestFactoryInterface $requestFactory): self
-    {
         $this->requestFactory = $requestFactory;
-
-        return $this;
-    }
-
-    public function setPsr7StreamFactory(StreamFactoryInterface $streamFactory): self
-    {
         $this->streamFactory = $streamFactory;
 
-        return $this;
+        $this->host_ = $host;
     }
 
     public function setEndpointURL(string $endpointUrl): self
@@ -59,7 +46,7 @@ class CustomizedTHttpClient extends TTransport
         return $this;
     }
 
-    public function isOpen() 
+    public function isOpen()
     {
         throw new BadMethodCallException(__FUNCTION__ . " is unused as of this writing. See Thrift\Transport\THttpClient for a reference implementation.");
     }
