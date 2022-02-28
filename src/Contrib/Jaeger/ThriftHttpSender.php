@@ -36,10 +36,7 @@ class ThriftHttpSender
         $this->serviceName = $serviceName;
 
         $transport = (new CustomizedTHttpClient(
-            $host,
-            $port,
-            $path,
-            $scheme
+            $host
         ))
         ->setPsr18HttpClient($client)
         ->setPsr7RequestFactory($requestFactory)

@@ -11,8 +11,6 @@
         <!--<directory name="./examples"/> TODO: Uncomment this once examples are updated -->
         <ignoreFiles>
             <directory name="tests/TraceContext/W3CTestService"/>
-            <!-- Only needed becaues CustomizedTHttpClient's subclassing of THttpClient from this dependency was causing psalm to flag errors in THttpClient-->
-            <directory name="vendor/packaged/thrift" />
         </ignoreFiles>
     </projectFiles>
     <plugins>

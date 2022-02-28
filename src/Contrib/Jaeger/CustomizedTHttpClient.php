@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Jaeger;
 
+use BadMethodCallException;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Thrift\Exception\TTransportException;
 use Thrift\Factory\TStringFuncFactory;
-use Thrift\Transport\THttpClient;
+use Thrift\Transport\TTransport;
 
-class CustomizedTHttpClient extends THttpClient
+class CustomizedTHttpClient extends TTransport
 {
+    private string $host_;
+
+    private string $buf_ = '';
+
     private ClientInterface $psr18Client;
 
     private RequestFactoryInterface $requestFactory;
@@ -20,6 +25,11 @@ class CustomizedTHttpClient extends THttpClient
     private StreamFactoryInterface $streamFactory;
 
     private string $endpointUrl;
+
+    public function __construct(string $host)
+    {
+        $this->host_ = $host;
+    }
 
     public function setPsr18HttpClient(ClientInterface $client): self
     {
@@ -47,6 +57,36 @@ class CustomizedTHttpClient extends THttpClient
         $this->endpointUrl = $endpointUrl;
 
         return $this;
+    }
+
+    public function isOpen() 
+    {
+        throw new BadMethodCallException(__FUNCTION__ . " is unused as of this writing. See Thrift\Transport\THttpClient for a reference implementation.");
+    }
+
+    public function open()
+    {
+        throw new BadMethodCallException(__FUNCTION__ . " is unused as of this writing. See Thrift\Transport\THttpClient for a reference implementation.");
+    }
+
+    public function close()
+    {
+        throw new BadMethodCallException(__FUNCTION__ . " is unused as of this writing. See Thrift\Transport\THttpClient for a reference implementation.");
+    }
+
+    public function read($len)
+    {
+        throw new BadMethodCallException(__FUNCTION__ . " is unused as of this writing. See Thrift\Transport\THttpClient for a reference implementation.");
+    }
+
+    /**
+     * Writes some data into the pending buffer
+     *
+     * @param string $buf The data to write
+     */
+    public function write($buf)
+    {
+        $this->buf_ .= $buf;
     }
 
     /**
