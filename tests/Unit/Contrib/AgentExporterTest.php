@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
  * @covers OpenTelemetry\Contrib\Jaeger\AgentExporter
  * @covers OpenTelemetry\Contrib\Jaeger\JaegerTransport
  * @covers OpenTelemetry\Contrib\Jaeger\ThriftUdpTransport
+ * @covers OpenTelemetry\Contrib\Jaeger\ParsedEndpointUrl
  */
 class AgentExporterTest extends TestCase
 {
