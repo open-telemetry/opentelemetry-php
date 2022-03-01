@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Resource;
 
+use function in_array;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\AttributesInterface;
+use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 
 /**
  * A Resource is an immutable representation of the entity producing telemetry. For example, a process producing telemetry
@@ -16,6 +19,8 @@ use OpenTelemetry\SDK\AttributesInterface;
  */
 class ResourceInfo
 {
+    use EnvironmentVariablesTrait;
+
     private AttributesInterface $attributes;
     private ?string $schemaUrl;
 
@@ -51,17 +56,57 @@ class ResourceInfo
 
     public static function defaultResource(): self
     {
-        return (new Detectors\Composite([
-            new Detectors\Environment(),
+        $detectors = (new ResourceInfo(new Attributes()))->getListFromEnvironment(Env::OTEL_PHP_DETECTORS);
 
-            new Detectors\Host(),
-            new Detectors\OperatingSystem(),
-            new Detectors\Process(),
-            new Detectors\ProcessRuntime(),
+        if (in_array('all', $detectors)) {
+            return (new Detectors\Composite([
+                new Detectors\Environment(),
+                new Detectors\Host(),
+                new Detectors\OperatingSystem(),
+                new Detectors\Process(),
+                new Detectors\ProcessRuntime(),
+                new Detectors\Sdk(),
+                new Detectors\SdkProvided(),
+            ]))->getResource();
+        }
 
-            new Detectors\Sdk(),
-            new Detectors\SdkProvided(),
-        ]))->getResource();
+        $resourceDetectors = [];
+
+        foreach ($detectors as $detector) {
+            switch ($detector) {
+                case 'env':
+                    $resourceDetectors[] = new Detectors\Environment();
+
+                    break;
+                case 'host':
+                    $resourceDetectors[] = new Detectors\Host();
+
+                    break;
+                case 'os':
+                    $resourceDetectors[] = new Detectors\OperatingSystem();
+
+                    break;
+                case 'process':
+                    $resourceDetectors[] = new Detectors\Process();
+
+                    break;
+                case 'process_runtime':
+                    $resourceDetectors[] = new Detectors\ProcessRuntime();
+
+                    break;
+                case 'sdk':
+                    $resourceDetectors[] = new Detectors\Sdk();
+
+                    break;
+                case 'sdk_provided':
+                    $resourceDetectors[] = new Detectors\SdkProvided();
+
+                    break;
+                default:
+            }
+        }
+
+        return (new Detectors\Composite($resourceDetectors))->getResource();
     }
 
     public static function emptyResource(): self

@@ -118,4 +118,5 @@ interface Variables
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#language-specific-environment-variables
      */
     public const OTEL_PHP_TRACES_PROCESSOR = 'OTEL_PHP_TRACES_PROCESSOR';
+    public const OTEL_PHP_DETECTORS = 'OTEL_PHP_DETECTORS';
 }
