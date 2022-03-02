@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -26,21 +27,21 @@ class SamplerFactory
             $arg = $this->getRatioFromEnvironment(Env::OTEL_TRACES_SAMPLER_ARG);
 
             switch ($name) {
-                case 'traceidratio':
+                case Values::VALUE_TRACE_ID_RATIO:
                     return new TraceIdRatioBasedSampler($arg);
-                case 'parentbased_traceidratio':
+                case Values::VALUE_PARENT_BASED_TRACE_ID_RATIO:
                     return new ParentBased(new TraceIdRatioBasedSampler($arg));
             }
         }
 
         switch ($name) {
-            case 'always_on':
+            case Values::VALUE_ALWAYS_ON:
                 return new AlwaysOnSampler();
-            case 'always_off':
+            case Values::VALUE_ALWAYS_OFF:
                 return new AlwaysOffSampler();
-            case 'parentbased_always_on':
+            case Values::VALUE_PARENT_BASED_ALWAYS_ON:
                 return new ParentBased(new AlwaysOnSampler());
-            case 'parentbased_always_off':
+            case Values::VALUE_PARENT_BASED_ALWAYS_OFF:
                 return new ParentBased(new AlwaysOffSampler());
             default:
                 throw new InvalidArgumentException(sprintf('Unknown sampler: %s', $name));
