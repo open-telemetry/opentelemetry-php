@@ -118,4 +118,5 @@ interface ValueTypes
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#language-specific-environment-variables
      */
     public const OTEL_PHP_TRACES_PROCESSOR = VariableTypes::ENUM;
+    public const OTEL_PHP_DETECTORS = VariableTypes::LIST;
 }
