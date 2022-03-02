@@ -15,6 +15,8 @@ use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use OpenTelemetry\SDK\Subscriber\Event\StartSpanEvent;
+use OpenTelemetry\SDK\Subscriber\Dispatcher;
 
 class BatchSpanProcessor implements SpanProcessorInterface
 {
@@ -72,6 +74,8 @@ class BatchSpanProcessor implements SpanProcessorInterface
      */
     public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
     {
+        $event = new StartSpanEvent($span);
+        Dispatcher::getinstance()->dispatch($event);
     }
 
     /**
