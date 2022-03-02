@@ -7,7 +7,8 @@ namespace OpenTelemetry\SDK\Resource;
 use function in_array;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\AttributesInterface;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\Accessor;
+use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 
 /**
@@ -19,8 +20,6 @@ use OpenTelemetry\SDK\Common\Environment\Variables as Env;
  */
 class ResourceInfo
 {
-    use EnvironmentVariablesTrait;
-
     private AttributesInterface $attributes;
     private ?string $schemaUrl;
 
@@ -56,9 +55,9 @@ class ResourceInfo
 
     public static function defaultResource(): self
     {
-        $detectors = (new ResourceInfo(new Attributes()))->getListFromEnvironment(Env::OTEL_PHP_DETECTORS);
+        $detectors = Accessor::getList(Env::OTEL_PHP_DETECTORS);
 
-        if (in_array('all', $detectors)) {
+        if (in_array(Values::VALUE_ALL, $detectors)) {
             return (new Detectors\Composite([
                 new Detectors\Environment(),
                 new Detectors\Host(),
@@ -74,31 +73,31 @@ class ResourceInfo
 
         foreach ($detectors as $detector) {
             switch ($detector) {
-                case 'env':
+                case Values::VALUE_DETECTORS_ENVIRONMENT:
                     $resourceDetectors[] = new Detectors\Environment();
 
                     break;
-                case 'host':
+                case Values::VALUE_DETECTORS_HOST:
                     $resourceDetectors[] = new Detectors\Host();
 
                     break;
-                case 'os':
+                case Values::VALUE_DETECTORS_OS:
                     $resourceDetectors[] = new Detectors\OperatingSystem();
 
                     break;
-                case 'process':
+                case Values::VALUE_DETECTORS_PROCESS:
                     $resourceDetectors[] = new Detectors\Process();
 
                     break;
-                case 'process_runtime':
+                case Values::VALUE_DETECTORS_PROCESS_RUNTIME:
                     $resourceDetectors[] = new Detectors\ProcessRuntime();
 
                     break;
-                case 'sdk':
+                case Values::VALUE_DETECTORS_SDK:
                     $resourceDetectors[] = new Detectors\Sdk();
 
                     break;
-                case 'sdk_provided':
+                case Values::VALUE_DETECTORS_SDK_PROVIDED:
                     $resourceDetectors[] = new Detectors\SdkProvided();
 
                     break;
