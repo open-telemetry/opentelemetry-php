@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Subscriber\Event;
 
 use OpenTelemetry\SDK\Subscriber\EventInterface;
 
-class StartSpanEvent implements EventInterface
+class EndSpanEvent implements EventInterface
 {
     private array $array ;
     public function __construct(array $array)

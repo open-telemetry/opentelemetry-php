@@ -10,13 +10,14 @@ use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\ClockInterface;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SDK\Subscriber\Dispatcher;
+use OpenTelemetry\SDK\Subscriber\Event\EndSpanEvent;
+use OpenTelemetry\SDK\Subscriber\Event\StartSpanEvent;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
-use OpenTelemetry\SDK\Subscriber\Event\StartSpanEvent;
-use OpenTelemetry\SDK\Subscriber\Dispatcher;
 
 class BatchSpanProcessor implements SpanProcessorInterface
 {
@@ -74,7 +75,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
      */
     public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
     {
-        $event = new StartSpanEvent($span);
+        $event = new StartSpanEvent([$span]);
         Dispatcher::getinstance()->dispatch($event);
     }
 
@@ -98,6 +99,8 @@ class BatchSpanProcessor implements SpanProcessorInterface
         if ($this->bufferReachedExportLimit() || $this->enoughTimeHasPassed()) {
             $this->forceFlush();
         }
+        $event = new EndSpanEvent([$span]);
+        Dispatcher::getinstance()->dispatch($event);
     }
 
     /** @inheritDoc */

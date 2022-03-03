@@ -6,11 +6,11 @@ namespace OpenTelemetry\SDK\Subscriber\Listener;
 
 use OpenTelemetry\SDK\Subscriber\ListenerInterface;
 
-class StartSpanListener implements ListenerInterface
+class EndSpanListener implements ListenerInterface
 {
     public function takeAction(array $array):void
     {
         $span = $array[0];
-        $span->setAttribute('Listener', 'StartSpanListener');
+        echo 'End Span Attribute can be used';
     }
 }

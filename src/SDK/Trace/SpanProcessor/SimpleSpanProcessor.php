@@ -6,12 +6,13 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Subscriber\Dispatcher;
+use OpenTelemetry\SDK\Subscriber\Event\EndSpanEvent;
+use OpenTelemetry\SDK\Subscriber\Event\StartSpanEvent;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
-use OpenTelemetry\SDK\Subscriber\Event\StartSpanEvent;
-use OpenTelemetry\SDK\Subscriber\Dispatcher;
 
 class SimpleSpanProcessor implements SpanProcessorInterface
 {
@@ -28,7 +29,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
     /** @inheritDoc */
     public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
     {
-        $event = new StartSpanEvent($span);
+        $event = new StartSpanEvent([$span]);
         Dispatcher::getinstance()->dispatch($event);
     }
 
@@ -42,6 +43,9 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         if (null !== $this->exporter) {
             $this->exporter->export([$span->toSpanData()]);
         }
+
+        $event = new EndSpanEvent([$span]);
+        Dispatcher::getinstance()->dispatch($event);
     }
 
     /** @inheritDoc */
