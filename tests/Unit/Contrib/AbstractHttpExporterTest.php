@@ -133,6 +133,7 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
     {
         $exporterClass = static::getExporterClass();
 
+        // @phpstan-ignore-next-line
         $this->assertNotSame(
             call_user_func([$exporterClass, 'fromConnectionString'], self::EXPORTER_DSN, $exporterClass, 'foo'),
             call_user_func([$exporterClass, 'fromConnectionString'], self::EXPORTER_DSN, $exporterClass, 'foo')
