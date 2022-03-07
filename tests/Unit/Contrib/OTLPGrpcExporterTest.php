@@ -207,6 +207,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
 
     public function test_from_connection_string(): void
     {
+        // @phpstan-ignore-next-line
         $this->assertNotSame(
             Exporter::fromConnectionString(),
             Exporter::fromConnectionString()
