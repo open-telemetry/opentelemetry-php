@@ -9,6 +9,7 @@ use Nyholm\Dsn\Configuration\Dsn;
 use Nyholm\Dsn\Configuration\Url;
 use Nyholm\Dsn\DsnParser;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 
 class ExporterFactory
@@ -83,24 +84,24 @@ class ExporterFactory
         }
         $exporter = $exporters[0];
         switch ($exporter) {
-            case 'none':
+            case Values::VALUE_NONE:
                 return null;
-            case 'jaeger':
-            case 'zipkin':
-            case 'newrelic':
+            case Values::VALUE_JAEGER:
+            case Values::VALUE_ZIPKIN:
+            case Values::VALUE_NEWRELIC:
             case 'zipkintonewrelic':
                 throw new InvalidArgumentException(sprintf('Exporter %s cannot be created from environment', $exporter));
-            case 'otlp':
+            case Values::VALUE_OTLP:
                 $protocol = $this->getEnumFromEnvironment(
                     Env::OTEL_EXPORTER_OTLP_PROTOCOL,
                     $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, '')
                 );
                 switch ($protocol) {
-                    case 'grpc':
+                    case Values::VALUE_GRPC:
                         return self::buildExporter('otlp+grpc');
-                    case 'http/protobuf':
+                    case Values::VALUE_HTTP_PROTOBUF:
                         return self::buildExporter('otlp+http');
-                    case 'http/json':
+                    case Values::VALUE_HTTP_JSON:
                         throw new InvalidArgumentException('otlp+http/json not implemented');
                     default:
                         throw new InvalidArgumentException('Unknown protocol: ' . $protocol);
