@@ -6,14 +6,15 @@ require __DIR__ . '/../vendor/autoload.php';
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
+use OpenTelemetry\EventHandler\Dispatcher;
+use OpenTelemetry\EventHandler\Events;
 use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\Subscriber\Dispatcher;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 //Register the event listener pair, The dispatcher here is a global Class
-Dispatcher::getinstance()->setListener('StartSpanEvent', 'StartSpanListener');
-Dispatcher::getinstance()->setListener('EndSpanEvent', 'EndSpanListener');
+Dispatcher::getinstance()->listen(Events::START, 'OpenTelemetry\EventHandler\Listener\StartSpanListener::handle');
+Dispatcher::getinstance()->listen(Events::END, 'OpenTelemetry\EventHandler\Listener\EndSpanListener::handle');
 
 $zipkinExporter = new ZipkinExporter(
     'alwaysOnZipkinExample',
