@@ -185,16 +185,17 @@ class SpanConverter implements SpanConverterInterface
     {
         $isSpansEmpty = true; //Waiting for the loop to prove otherwise
 
-        $ils = $convertedSpans = [];
+        $ils = $convertedSpans = $schemas = [];
         foreach ($spans as $span) {
             $isSpansEmpty = false;
 
             /** @var \OpenTelemetry\SDK\InstrumentationLibrary $il */
             $il = $span->getInstrumentationLibrary();
-            $ilKey = sprintf('%s@%s', $il->getName(), $il->getVersion()??'');
+            $ilKey = sprintf('%s@%s %s', $il->getName(), $il->getVersion()??'', $il->getSchemaUrl()??'');
             if (!isset($ils[$ilKey])) {
                 $convertedSpans[$ilKey] = [];
                 $ils[$ilKey] = new InstrumentationLibrary(['name' => $il->getName(), 'version' => $il->getVersion()??'']);
+                $schemas[$ilKey] = $il->getSchemaUrl();
             }
             $convertedSpans[$ilKey][] = $this->as_otlp_span($span);
         }
@@ -208,6 +209,7 @@ class SpanConverter implements SpanConverterInterface
             $ilSpans[] = new InstrumentationLibrarySpans([
                 'instrumentation_library' => $il,
                 'spans' => $convertedSpans[$ilKey],
+                'schema_url' => $schemas[$ilKey] ?? '',
             ]);
         }
 

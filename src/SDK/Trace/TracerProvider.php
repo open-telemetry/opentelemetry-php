@@ -60,19 +60,19 @@ final class TracerProvider implements API\TracerProviderInterface
     }
 
     /** @inheritDoc */
-    public function getTracer(string $name = self::DEFAULT_TRACER_NAME, ?string $version = null): API\TracerInterface
+    public function getTracer(string $name = self::DEFAULT_TRACER_NAME, ?string $version = null, ?string $schemaUrl = null): API\TracerInterface
     {
         if ($this->tracerSharedState->hasShutdown()) {
             return NoopTracer::getInstance();
         }
 
-        $key = sprintf('%s@%s', $name, ($version ?? 'unknown'));
+        $key = sprintf('%s@%s %s', $name, ($version ?? 'unknown'), ($schemaUrl ?? ''));
 
         if (isset($this->tracers[$key]) && $this->tracers[$key] instanceof API\TracerInterface) {
             return $this->tracers[$key];
         }
 
-        $instrumentationLibrary = new InstrumentationLibrary($name, $version);
+        $instrumentationLibrary = new InstrumentationLibrary($name, $version, $schemaUrl);
 
         $tracer = new Tracer(
             $this->tracerSharedState,
