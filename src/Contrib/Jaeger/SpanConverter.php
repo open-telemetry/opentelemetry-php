@@ -15,10 +15,11 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\LinkInterface;
+use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use RuntimeException;
 
-class SpanConverter
+class SpanConverter implements SpanConverterInterface
 {
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
     const STATUS_OK = 'OK';
@@ -49,10 +50,17 @@ class SpanConverter
         }
     }
 
-    /**
-    * Convert span to Jaeger Thrift Span format
-    */
-    public function convert(SpanDataInterface $span): JTSpan
+    public function convert(iterable $spans): array
+    {
+        $aggregate = [];
+        foreach ($spans as $span) {
+            $aggregate[] = $this->convertSpan($span);
+        }
+
+        return $aggregate;
+    }
+
+    private function convertSpan(SpanDataInterface $span): JTSpan
     {
         [
             'traceIdLow' => $traceIdLow,
@@ -175,6 +183,11 @@ class SpanConverter
         foreach ($span->getAttributes() as $k => $v) {
             $tags[$k] = $v;
         }
+
+        foreach ($span->getResource()->getAttributes() as $k => $v) {
+            $tags[$k] = $v;
+        }
+
         $tags = self::buildTags($tags);
 
         return $tags;

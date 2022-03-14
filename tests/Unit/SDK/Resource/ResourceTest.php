@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Composer\InstalledVersions;
+use InvalidArgumentException;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -60,7 +61,7 @@ class ResourceTest extends TestCase
         $this->assertSame('test', $name);
     }
 
-    public function test_default_resource(): void
+    public function test_all_default_resources(): void
     {
         $resource = ResourceInfo::defaultResource();
 
@@ -78,6 +79,142 @@ class ResourceTest extends TestCase
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+
+        $this->assertEquals('opentelemetry', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
+        $this->assertEquals('php', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
+        $this->assertEquals('unknown_service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+    }
+
+    public function test_none_default_resources(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'none');
+
+        $resource = ResourceInfo::defaultResource();
+
+        $this->assertNull($resource->getSchemaUrl());
+
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_TYPE));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_DESCRIPTION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_VERSION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+    }
+
+    public function test_env_default_resources(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'env');
+        $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'test-service');
+
+        $resource = ResourceInfo::defaultResource();
+
+        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_TYPE));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_DESCRIPTION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_VERSION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION));
+
+        $this->assertEquals('test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+    }
+
+    public function test_os_and_host_default_resources(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'os,host');
+
+        $resource = ResourceInfo::defaultResource();
+
+        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::OS_TYPE));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::OS_DESCRIPTION));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::OS_NAME));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::OS_VERSION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+    }
+
+    public function test_process_and_process_runtime_default_resources(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'process,process_runtime');
+
+        $resource = ResourceInfo::defaultResource();
+
+        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_TYPE));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_DESCRIPTION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_VERSION));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+    }
+
+    public function test_sdk_and_sdk_provided_default_resources(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'sdk,sdk_provided');
+
+        $resource = ResourceInfo::defaultResource();
+
+        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_TYPE));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_DESCRIPTION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::OS_VERSION));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION));
@@ -165,6 +302,7 @@ class ResourceTest extends TestCase
     public function test_resource_with_invalid_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo');
+        $this->expectException(InvalidArgumentException::class);
         $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::defaultResource());
     }
 

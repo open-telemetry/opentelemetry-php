@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Jaeger;
 
-use InvalidArgumentException;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -25,20 +24,14 @@ class AgentExporter implements SpanExporterInterface
         $name,
         string $endpointUrl
     ) {
-        $parsedDsn = parse_url($endpointUrl);
-
-        if (!is_array($parsedDsn)) {
-            throw new InvalidArgumentException('Unable to parse provided DSN');
-        }
-
-        if (!isset($parsedDsn['host']) || !isset($parsedDsn['port'])) {
-            throw new InvalidArgumentException('Endpoint should have host, port');
-        }
+        $parsedEndpoint = (new ParsedEndpointUrl($endpointUrl))
+                                ->validateHost() //This is because the host is required downstream
+                                ->validatePort(); //This is because the port is required downstream
 
         $this->serviceName = $name;
 
         $this->spanConverter = new SpanConverter();
-        $this->jaegerTransport = new JaegerTransport($parsedDsn['host'], $parsedDsn['port']);
+        $this->jaegerTransport = new JaegerTransport($parsedEndpoint);
     }
 
     public function closeAgentConnection(): void
@@ -53,8 +46,10 @@ class AgentExporter implements SpanExporterInterface
     {
         // UDP Transport begins here after converting to thrift format span
         foreach ($spans as $span) {
-            $cSpan = $this->spanConverter->convert($span);
-            $this->jaegerTransport->append($cSpan, $this->serviceName);
+            $this->jaegerTransport->append(
+                $this->spanConverter->convert([$span])[0],
+                $this->serviceName
+            );
         }
 
         return SpanExporterInterface::STATUS_SUCCESS;

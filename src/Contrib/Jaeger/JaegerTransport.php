@@ -27,9 +27,9 @@ final class JaegerTransport implements TransportInterface
     private $process = null;
     private $maxBufferSize = 0;
 
-    public function __construct($address = '127.0.0.1', $port = 6831, $maxBufferSize = 0)
+    public function __construct(ParsedEndpointUrl $parsedEndpoint, $maxBufferSize = 0)
     {
-        $this->transport = new ThriftUdpTransport($address, $port);
+        $this->transport = new ThriftUdpTransport($parsedEndpoint);
         $p = new TCompactProtocol($this->transport);
         $this->client = new AgentClient($p, $p);
 

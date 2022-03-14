@@ -79,6 +79,10 @@ class SpanConverter implements SpanConverterInterface
             $row['tags'][$k] = $this->sanitiseTagValue($v);
         }
 
+        foreach ($span->getResource()->getAttributes() as $k => $v) {
+            $row['tags'][$k] = $this->sanitiseTagValue($v);
+        }
+
         foreach ($span->getEvents() as $event) {
             if (!array_key_exists('annotations', $row)) {
                 $row['annotations'] = [];

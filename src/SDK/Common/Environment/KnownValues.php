@@ -164,4 +164,22 @@ interface KnownValues
         self::VALUE_NOOP,
         self::VALUE_NONE,
     ];
+    public const VALUE_DETECTORS_ENVIRONMENT = 'env';
+    public const VALUE_DETECTORS_HOST = 'host';
+    public const VALUE_DETECTORS_OS = 'os';
+    public const VALUE_DETECTORS_PROCESS = 'process';
+    public const VALUE_DETECTORS_PROCESS_RUNTIME = 'process_runtime';
+    public const VALUE_DETECTORS_SDK = 'sdk';
+    public const VALUE_DETECTORS_SDK_PROVIDED = 'sdk_provided';
+    public const OTEL_PHP_DETECTORS = [
+        self::VALUE_ALL,
+        self::VALUE_DETECTORS_ENVIRONMENT,
+        self::VALUE_DETECTORS_HOST,
+        self::VALUE_DETECTORS_OS,
+        self::VALUE_DETECTORS_PROCESS,
+        self::VALUE_DETECTORS_PROCESS_RUNTIME,
+        self::VALUE_DETECTORS_SDK,
+        self::VALUE_DETECTORS_SDK_PROVIDED,
+        self::VALUE_NONE,
+    ];
 }

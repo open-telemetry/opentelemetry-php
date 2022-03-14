@@ -58,6 +58,10 @@ class SpanConverter implements SpanConverterInterface
             $row['attributes'][$k] = $v;
         }
 
+        foreach ($span->getResource()->getAttributes() as $k => $v) {
+            $row['attributes'][$k] = $v;
+        }
+
         /*
         foreach ($span->getEvents() as $event) {
             if (!array_key_exists('annotations', $row)) {
