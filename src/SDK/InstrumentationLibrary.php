@@ -18,7 +18,7 @@ class InstrumentationLibrary
     public static function getEmpty(): InstrumentationLibrary
     {
         if (null === self::$empty) {
-            self::$empty = new self('', null);
+            self::$empty = new self('', null, null);
         }
 
         return self::$empty;
@@ -26,11 +26,13 @@ class InstrumentationLibrary
 
     private string $name;
     private ?string $version;
+    private ?string $schemaUrl;
 
-    public function __construct(string $name, ?string $version = null)
+    public function __construct(string $name, ?string $version = null, ?string $schemaUrl = null)
     {
         $this->name = $name;
         $this->version = $version;
+        $this->schemaUrl = $schemaUrl;
     }
 
     public function getName(): string
@@ -41,5 +43,10 @@ class InstrumentationLibrary
     public function getVersion(): ?string
     {
         return $this->version;
+    }
+
+    public function getSchemaUrl(): ?string
+    {
+        return $this->schemaUrl;
     }
 }

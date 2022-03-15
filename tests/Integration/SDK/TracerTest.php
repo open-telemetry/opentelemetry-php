@@ -71,13 +71,14 @@ class TracerTest extends TestCase
     public function test_span_should_receive_instrumentation_library(): void
     {
         $tracerProvider = new TracerProvider();
-        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest', 'dev');
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest', 'dev', 'http://url');
         /** @var Span $span */
         $span = $tracer->spanBuilder('test.span')->startSpan();
         $spanInstrumentationLibrary = $span->getInstrumentationLibrary();
 
         $this->assertEquals('OpenTelemetry.TracerTest', $spanInstrumentationLibrary->getName());
         $this->assertEquals('dev', $spanInstrumentationLibrary->getVersion());
+        $this->assertEquals('http://url', $spanInstrumentationLibrary->getSchemaUrl());
     }
 
     public function test_span_builder_propagates_instrumentation_library_info_to_span(): void

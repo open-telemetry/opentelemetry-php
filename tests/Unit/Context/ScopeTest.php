@@ -51,7 +51,7 @@ class ScopeTest extends TestCase
         $scope1 = Context::attach(Context::getCurrent());
 
         $this->assertSame(0, $scope1->detach());
-        $this->assertSame(ScopeInterface::DETACHED, $scope1->detach() & ScopeInterface::DETACHED); // @phpstan-ignore-line
+        $this->assertSame(ScopeInterface::DETACHED, $scope1->detach() & ScopeInterface::DETACHED);
     }
 
     public function test_order_mismatch_scope_detach(): void

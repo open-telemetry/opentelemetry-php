@@ -25,7 +25,41 @@ class TracerProviderTest extends TestCase
 
         $t1 = $provider->getTracer('foo');
         $t2 = $provider->getTracer('foo');
+        $t3 = $provider->getTracer('bar');
+
+        $this->assertSame($t1, $t2);
+        $this->assertNotSame($t1, $t3);
+        $this->assertNotSame($t2, $t3);
+    }
+
+    /**
+     * @covers ::getTracer
+     * @covers ::__construct
+     */
+    public function test_reuses_same_instance_with_version(): void
+    {
+        $provider = new TracerProvider(null);
+
+        $t1 = $provider->getTracer('foo', '1.0.0');
+        $t2 = $provider->getTracer('foo', '1.0.0');
         $t3 = $provider->getTracer('foo', '2.0.0');
+
+        $this->assertSame($t1, $t2);
+        $this->assertNotSame($t1, $t3);
+        $this->assertNotSame($t2, $t3);
+    }
+
+    /**
+     * @covers ::getTracer
+     * @covers ::__construct
+     */
+    public function test_reuses_same_instance_with_schema(): void
+    {
+        $provider = new TracerProvider(null);
+
+        $t1 = $provider->getTracer('foo', '2.0.0', 'http://url');
+        $t2 = $provider->getTracer('foo', '2.0.0', 'http://url');
+        $t3 = $provider->getTracer('foo', '2.0.0', 'http://schemaurl');
 
         $this->assertSame($t1, $t2);
         $this->assertNotSame($t1, $t3);
