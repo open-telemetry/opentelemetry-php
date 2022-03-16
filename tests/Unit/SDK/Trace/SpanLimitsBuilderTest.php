@@ -25,7 +25,7 @@ class SpanLimitsBuilderTest extends TestCase
     }
 
     /**
-     * @group compliance
+     * @group trace-compliance
      */
     public function test_span_limits_builder_uses_environment_variable(): void
     {
@@ -36,7 +36,7 @@ class SpanLimitsBuilderTest extends TestCase
     }
 
     /**
-     * @group compliance
+     * @group trace-compliance
      */
     public function test_span_limits_builder_uses_configured_value(): void
     {
@@ -48,7 +48,7 @@ class SpanLimitsBuilderTest extends TestCase
     }
 
     /**
-     * @group compliance
+     * @group trace-compliance
      */
     public function test_span_limits_builder_throws_exception_on_invalid_value_from_environment(): void
     {

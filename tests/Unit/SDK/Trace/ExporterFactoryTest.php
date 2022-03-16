@@ -74,7 +74,7 @@ class ExporterFactoryTest extends TestCase
     }
 
     /**
-     * @group compliance
+     * @group trace-compliance
      */
     public function test_accepts_none_exporter_env_var(): void
     {
@@ -86,7 +86,7 @@ class ExporterFactoryTest extends TestCase
     /**
      * @dataProvider envProvider
      * @psalm-param class-string $expected
-     * @group compliance
+     * @group trace-compliance
      */
     public function test_create_from_environment(string $exporter, array $env, string $expected): void
     {
@@ -129,7 +129,7 @@ class ExporterFactoryTest extends TestCase
 
     /**
      * @dataProvider invalidEnvProvider
-     * @group compliance
+     * @group trace-compliance
      */
     public function test_throws_exception_for_invalid_or_unsupported_exporter_configs(string $exporter, array $env = []): void
     {
