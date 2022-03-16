@@ -15,8 +15,20 @@ Approvers ([@open-telemetry/php-approvers](https://github.com/orgs/open-telemetr
 
 Find more information about the approver role in the [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver)
 
-Triagers ([@open-telemetry/php-triagers](https://github.com/orgs/open-telemetry/teams/php-triagers):
+Triagers ([@open-telemetry/php-triagers](https://github.com/orgs/open-telemetry/teams/php-triagers)):
 
 - [Jodee Varney](https://github.com/jodeev)
 
 Find more information about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#triager)
+
+Members:
+
+- [Kishan Sangani](https://github.com/kishannsangani)
+
+Find more information about the member role in the [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#member)
+
+### Thanks to all the people who already contributed!
+
+<a href="https://github.com/open-telemetry/opentelemetry-php/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-php" />
+</a>
