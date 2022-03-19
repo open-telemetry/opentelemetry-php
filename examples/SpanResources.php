@@ -3,7 +3,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
