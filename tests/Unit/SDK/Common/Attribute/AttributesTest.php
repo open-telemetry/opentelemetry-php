@@ -39,7 +39,6 @@ class AttributesTest extends TestCase
      */
     public function test_attribute_limits(): void
     {
-        $boolValue = true;
         $intValue = 42;
         $floatValue = 3.14;
         $shortStringValue = '0123';
@@ -110,6 +109,7 @@ class AttributesTest extends TestCase
         $attributes->setAttribute('bar', null);
         $this->assertCount(1, $attributes);
     }
+
     public function test_to_array(): void
     {
         $values = [
@@ -118,6 +118,55 @@ class AttributesTest extends TestCase
         ];
         $attributes = new Attributes($values);
         $this->assertSame($values, $attributes->toArray());
+    }
+
+    public function test_get_total_added_values(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ]);
         $this->assertEquals(2, $attributes->getTotalAddedValues());
+
+        $attributes->setAttribute('baz', 'baz');
+        $this->assertEquals(3, $attributes->getTotalAddedValues());
+    }
+
+    public function test_null_get_total_added_values(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ]);
+        $this->assertEquals(2, $attributes->getTotalAddedValues());
+
+        $attributes->setAttribute('foo', null);
+        $this->assertEquals(1, $attributes->getTotalAddedValues());
+    }
+
+    public function test_limit_get_total_added_values(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ], new AttributeLimits(1));
+        $this->assertEquals(2, $attributes->getTotalAddedValues());
+
+        $attributes->setAttribute('baz', 'baz');
+        $this->assertEquals(3, $attributes->getTotalAddedValues());
+    }
+
+    public function test_count_dropped_attributes(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ], new AttributeLimits(1));
+
+        $this->assertEquals(1, $attributes->getTotalAddedValues() - count($attributes));
+
+        $attributes->setAttribute('baz', 'baz');
+
+        $this->assertEquals(2, $attributes->getTotalAddedValues() - count($attributes));
     }
 }

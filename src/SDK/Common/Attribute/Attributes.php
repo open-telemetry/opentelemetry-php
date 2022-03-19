@@ -31,8 +31,6 @@ class Attributes implements AttributesInterface
 
     public function setAttribute(string $name, $value): AttributesInterface
     {
-        $this->totalAddedAttributes++;
-
         // unset the attribute when null value is passed
         if (null === $value) {
             unset($this->attributes[$name]);
@@ -41,6 +39,8 @@ class Attributes implements AttributesInterface
 
             return $this;
         }
+
+        $this->totalAddedAttributes++;
 
         // drop attribute when limit is reached
         if (!isset($this->attributes[$name]) && count($this) >= $this->attributeLimits->getAttributeCountLimit()) {
