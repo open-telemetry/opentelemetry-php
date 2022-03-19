@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Behavior;
 
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\GlobalLoggerHolder;
+use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
- * @covers OpenTelemetry\SDK\Behavior\LogsMessagesTrait
+ * @covers \OpenTelemetry\SDK\Behavior\LogsMessagesTrait
  */
 class LogsMessagesTraitTest extends TestCase
 {
@@ -22,12 +22,12 @@ class LogsMessagesTraitTest extends TestCase
     public function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
-        GlobalLoggerHolder::set($this->logger);
+        LoggerHolder::set($this->logger);
     }
 
     public function tearDown(): void
     {
-        GlobalLoggerHolder::unset();
+        LoggerHolder::unset();
     }
 
     /**

@@ -2,27 +2,29 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK;
+namespace OpenTelemetry\SDK\Common\Log;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-final class GlobalLoggerHolder
+final class LoggerHolder
 {
     private static ?LoggerInterface $logger = null;
+
+    /**
+     * This constructor is a temporary solution to ease the setup of the logger with DI libraries
+     */
+    public function __construct(?LoggerInterface $logger = null)
+    {
+        self::$logger = $logger;
+    }
 
     /**
      * @suppress PhanTypeMismatchReturnNullable
      */
     public static function get(): LoggerInterface
     {
-        if (null === self::$logger) {
-            //TODO a sensible default, instead of NullLogger, could be to log to stdout
-
-            return new NullLogger();
-        }
-
-        return self::$logger;
+        return self::$logger ?? new NullLogger();
     }
 
     public static function set(LoggerInterface $logger): void
