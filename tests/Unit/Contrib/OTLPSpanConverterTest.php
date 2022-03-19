@@ -16,7 +16,7 @@ use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind as ProtoSpanKind;
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\StatusData;

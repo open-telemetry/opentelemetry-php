@@ -7,9 +7,9 @@ namespace OpenTelemetry\SDK\Trace;
 use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\AttributeLimits;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\AttributesInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 
 final class SpanBuilder implements API\SpanBuilderInterface

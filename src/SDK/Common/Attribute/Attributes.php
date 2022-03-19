@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK;
+namespace OpenTelemetry\SDK\Common\Attribute;
 
+use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use function mb_substr;
 use Traversable;
 

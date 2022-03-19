@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use function count;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\AttributesInterface;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class Event implements EventInterface
 {

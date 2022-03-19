@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Attribute;
 
-use OpenTelemetry\SDK\AttributeLimits;
+use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\AttributeLimits
+ * @covers \OpenTelemetry\SDK\Common\Attribute\AttributeLimits
  */
 class AttributeLimitsTest extends TestCase
 {

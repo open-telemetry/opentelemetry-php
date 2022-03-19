@@ -7,7 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Composer\InstalledVersions;
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;

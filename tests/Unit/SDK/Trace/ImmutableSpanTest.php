@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanKind;
-use OpenTelemetry\SDK\AttributesInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\ImmutableSpan;
