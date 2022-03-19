@@ -19,18 +19,18 @@ class AttributesTest extends TestCase
         $attrLimits2 = new AttributeLimits(10, 20);
         $attrLimits3 = new AttributeLimits(20, 30);
 
-        $this->assertTrue($attrLimits1 == $attrLimits2);
-        $this->assertTrue($attrLimits1 != $attrLimits3);
+        $this->assertEquals($attrLimits1, $attrLimits2);
+        $this->assertNotEquals($attrLimits1, $attrLimits3);
     }
 
-    /** @test Test numeric attribute key is not cast to integer value */
+    /** Test numeric attribute key is not cast to integer value */
     public function test_numeric_attribute_name(): void
     {
-        $attributes = new \OpenTelemetry\SDK\Common\Attribute\Attributes(['1' => '2']);
+        $attributes = new Attributes(['1' => '2']);
         $this->assertCount(1, $attributes);
         foreach ($attributes as $key => $value) {
-            $this->assertTrue(is_string($key));
-            $this->assertTrue(is_string($value));
+            $this->assertIsString($key);
+            $this->assertIsString($value);
         }
     }
 
@@ -48,7 +48,7 @@ class AttributesTest extends TestCase
 
         $attributeLimits = new AttributeLimits(6, 16);
         $attributes = new Attributes([
-            'bool' => $boolValue,
+            'bool' => true,
             'int' => $intValue,
             'float' => $floatValue,
             'short_string' => $shortStringValue,
@@ -56,18 +56,17 @@ class AttributesTest extends TestCase
             'array' => [
                 $shortStringValue,
                 $longStringValue,
-                $boolValue,
+                true,
             ],
             'ignored_key' => 'ignored_value',
         ], $attributeLimits);
 
-        $this->assertEquals($boolValue, $attributes->get('bool'));
+        $this->assertTrue($attributes->get('bool'));
         $this->assertEquals($intValue, $attributes->get('int'));
         $this->assertEquals($floatValue, $attributes->get('float'));
         $this->assertEquals($shortStringValue, $attributes->get('short_string'));
         $this->assertEquals($longStringTrimmed, $attributes->get('long_string'));
-        $this->assertEquals([$shortStringValue, $longStringTrimmed, $boolValue], $attributes->get('array'));
-
+        $this->assertEquals([$shortStringValue, $longStringTrimmed, true], $attributes->get('array'));
         $this->assertEquals(6, $attributes->count());
         $this->assertNull($attributes->get('ignored_key'));
     }
@@ -77,12 +76,12 @@ class AttributesTest extends TestCase
      */
     public function test_apply_limits(): void
     {
-        $attributes = new \OpenTelemetry\SDK\Common\Attribute\Attributes([
+        $attributes = new Attributes([
             'short' => '123',
             'long' => '1234567890',
             'dropped' => true,
         ]);
-        $limitedAttributes = \OpenTelemetry\SDK\Common\Attribute\Attributes::withLimits($attributes, new \OpenTelemetry\SDK\Common\Attribute\AttributeLimits(2, 5));
+        $limitedAttributes = Attributes::withLimits($attributes, new AttributeLimits(2, 5));
         $this->assertCount(2, $limitedAttributes);
         $this->assertEquals('123', $limitedAttributes->get('short'));
         $this->assertEquals('12345', $limitedAttributes->get('long'));
@@ -92,7 +91,7 @@ class AttributesTest extends TestCase
 
     public function test_null_attribute_removes_existing(): void
     {
-        $attributes = new \OpenTelemetry\SDK\Common\Attribute\Attributes([
+        $attributes = new Attributes([
             'foo' => 'foo',
             'bar' => 'bar',
             'baz' => 'baz',
@@ -104,7 +103,7 @@ class AttributesTest extends TestCase
 
     public function test_null_missing_attribute_does_nothing(): void
     {
-        $attributes = new \OpenTelemetry\SDK\Common\Attribute\Attributes([
+        $attributes = new Attributes([
             'foo' => 'foo',
         ]);
         $this->assertCount(1, $attributes);
@@ -117,7 +116,7 @@ class AttributesTest extends TestCase
             'foo' => 'foo',
             'bar' => 'bar',
         ];
-        $attributes = new \OpenTelemetry\SDK\Common\Attribute\Attributes($values);
+        $attributes = new Attributes($values);
         $this->assertSame($values, $attributes->toArray());
         $this->assertEquals(2, $attributes->getTotalAddedValues());
     }
