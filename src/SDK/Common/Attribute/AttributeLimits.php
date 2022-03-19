@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Attribute;
 
-class AttributeLimits
+final class AttributeLimits implements AttributeLimitsInterface
 {
     private const DEFAULT_COUNT_LIMIT = 128;
 
