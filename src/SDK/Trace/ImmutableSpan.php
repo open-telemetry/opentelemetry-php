@@ -6,8 +6,8 @@ namespace OpenTelemetry\SDK\Trace;
 
 use function max;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 /**
