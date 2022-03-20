@@ -15,12 +15,6 @@ class Attributes implements AttributesInterface
 
     private int $totalAddedAttributes = 0;
 
-    /** @return Attributes Returns a new instance of Attributes with the limits applied */
-    public static function withLimits(iterable $attributes, AttributeLimitsInterface $attributeLimits): Attributes
-    {
-        return new self($attributes, $attributeLimits);
-    }
-
     public function __construct(iterable $attributes = [], AttributeLimitsInterface $attributeLimits = null)
     {
         $this->attributeLimits = $attributeLimits ?? new AttributeLimits();
@@ -29,39 +23,43 @@ class Attributes implements AttributesInterface
         }
     }
 
+    /** @return Attributes Returns a new instance of Attributes with the limits applied */
+    public static function withLimits(iterable $attributes, AttributeLimitsInterface $attributeLimits): Attributes
+    {
+        return new self($attributes, $attributeLimits);
+    }
+
+    public function hasAttribute(string $name): bool
+    {
+        return isset($this->attributes[$name]);
+    }
+
     public function setAttribute(string $name, $value): AttributesInterface
     {
         // unset the attribute when null value is passed
-        if (null === $value) {
-            unset($this->attributes[$name]);
-
-            $this->totalAddedAttributes--;
-
-            return $this;
+        if ($value === null) {
+            return $this->unsetAttribute($name);
         }
 
         $this->totalAddedAttributes++;
 
         // drop attribute when limit is reached
-        if (!isset($this->attributes[$name]) && count($this) >= $this->attributeLimits->getAttributeCountLimit()) {
+        if (!$this->hasAttribute($name) && $this->isLimitReached()) {
             return $this;
         }
 
-        if (is_string($value)) {
-            $limitedValue = mb_substr($value, 0, $this->attributeLimits->getAttributeValueLengthLimit());
-        } elseif (is_array($value)) {
-            $limitedValue = array_map(function ($arrayValue) {
-                if (is_string($arrayValue)) {
-                    return mb_substr($arrayValue, 0, $this->attributeLimits->getAttributeValueLengthLimit());
-                }
+        $this->attributes[$name] = $this->normalizeValue($value);
 
-                return $arrayValue;
-            }, $value);
-        } else {
-            $limitedValue = $value;
+        return $this;
+    }
+
+    public function unsetAttribute(string $name): AttributesInterface
+    {
+        if ($this->hasAttribute($name)) {
+            unset($this->attributes[$name]);
+
+            $this->totalAddedAttributes--;
         }
-
-        $this->attributes[$name] = $limitedValue;
 
         return $this;
     }
@@ -97,5 +95,30 @@ class Attributes implements AttributesInterface
     public function getDroppedAttributesCount(): int
     {
         return $this->totalAddedAttributes - count($this);
+    }
+
+    public function isLimitReached(): bool
+    {
+        return count($this) >= $this->attributeLimits->getAttributeCountLimit();
+    }
+
+    private function truncateStringValue(string $value): string
+    {
+        return mb_substr($value, 0, $this->attributeLimits->getAttributeValueLengthLimit());
+    }
+
+    private function normalizeValue($value)
+    {
+        if (is_string($value)) {
+            return  $this->truncateStringValue($value);
+        }
+
+        if (is_array($value)) {
+            return array_map(function ($value) {
+                return $this->normalizeValue($value);
+            }, $value);
+        }
+
+        return $value;
     }
 }

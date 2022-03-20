@@ -13,14 +13,17 @@ use PHPUnit\Framework\TestCase;
  */
 class AttributesTest extends TestCase
 {
-    public function test_attribute_limits_compare(): void
+    public function test_has_attribute(): void
     {
-        $attrLimits1 = new AttributeLimits(10, 20);
-        $attrLimits2 = new AttributeLimits(10, 20);
-        $attrLimits3 = new AttributeLimits(20, 30);
+        $attributes = new Attributes([
+            'foo' => 'foo',
+        ]);
 
-        $this->assertEquals($attrLimits1, $attrLimits2);
-        $this->assertNotEquals($attrLimits1, $attrLimits3);
+        $this->assertFalse($attributes->hasAttribute('bar'));
+
+        $attributes->setAttribute('bar', 'bar');
+
+        $this->assertTrue($attributes->hasAttribute('bar'));
     }
 
     /** Test numeric attribute key is not cast to integer value */
@@ -132,7 +135,7 @@ class AttributesTest extends TestCase
         $this->assertEquals(3, $attributes->getTotalAddedValues());
     }
 
-    public function test_null_get_total_added_values(): void
+    public function test_unset_get_total_added_values(): void
     {
         $attributes = new Attributes([
             'foo' => 'foo',
@@ -140,7 +143,7 @@ class AttributesTest extends TestCase
         ]);
         $this->assertEquals(2, $attributes->getTotalAddedValues());
 
-        $attributes->setAttribute('foo', null);
+        $attributes->unsetAttribute('foo');
         $this->assertEquals(1, $attributes->getTotalAddedValues());
     }
 
@@ -168,5 +171,19 @@ class AttributesTest extends TestCase
         $attributes->setAttribute('baz', 'baz');
 
         $this->assertEquals(2, $attributes->getTotalAddedValues() - count($attributes));
+    }
+
+    public function test_is_limit_reached(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ], new AttributeLimits(3));
+
+        $this->assertFalse($attributes->isLimitReached());
+
+        $attributes->setAttribute('baz', 'baz');
+
+        $this->assertTrue($attributes->isLimitReached());
     }
 }
