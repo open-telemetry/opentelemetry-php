@@ -20,6 +20,7 @@ use Opentelemetry\Proto\Trace\V1\Span\Link;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibraryInterface;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
@@ -189,7 +190,7 @@ class SpanConverter implements SpanConverterInterface
         foreach ($spans as $span) {
             $isSpansEmpty = false;
 
-            /** @var \OpenTelemetry\SDK\InstrumentationLibrary $il */
+            /** @var InstrumentationLibraryInterface $il */
             $il = $span->getInstrumentationLibrary();
             $ilKey = sprintf('%s@%s %s', $il->getName(), $il->getVersion()??'', $il->getSchemaUrl()??'');
             if (!isset($ils[$ilKey])) {
