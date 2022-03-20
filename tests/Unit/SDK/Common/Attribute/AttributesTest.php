@@ -2,35 +2,38 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Attribute;
 
-use OpenTelemetry\SDK\AttributeLimits;
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Attributes
+ * @covers \OpenTelemetry\SDK\Common\Attribute\Attributes
  */
 class AttributesTest extends TestCase
 {
-    public function test_attribute_limits_compare(): void
+    public function test_has_attribute(): void
     {
-        $attrLimits1 = new AttributeLimits(10, 20);
-        $attrLimits2 = new AttributeLimits(10, 20);
-        $attrLimits3 = new AttributeLimits(20, 30);
+        $attributes = new Attributes([
+            'foo' => 'foo',
+        ]);
 
-        $this->assertTrue($attrLimits1 == $attrLimits2);
-        $this->assertTrue($attrLimits1 != $attrLimits3);
+        $this->assertFalse($attributes->hasAttribute('bar'));
+
+        $attributes->setAttribute('bar', 'bar');
+
+        $this->assertTrue($attributes->hasAttribute('bar'));
     }
 
-    /** @test Test numeric attribute key is not cast to integer value */
+    /** Test numeric attribute key is not cast to integer value */
     public function test_numeric_attribute_name(): void
     {
         $attributes = new Attributes(['1' => '2']);
         $this->assertCount(1, $attributes);
         foreach ($attributes as $key => $value) {
-            $this->assertTrue(is_string($key));
-            $this->assertTrue(is_string($value));
+            $this->assertIsString($key);
+            $this->assertIsString($value);
         }
     }
 
@@ -39,7 +42,6 @@ class AttributesTest extends TestCase
      */
     public function test_attribute_limits(): void
     {
-        $boolValue = true;
         $intValue = 42;
         $floatValue = 3.14;
         $shortStringValue = '0123';
@@ -48,7 +50,7 @@ class AttributesTest extends TestCase
 
         $attributeLimits = new AttributeLimits(6, 16);
         $attributes = new Attributes([
-            'bool' => $boolValue,
+            'bool' => true,
             'int' => $intValue,
             'float' => $floatValue,
             'short_string' => $shortStringValue,
@@ -56,18 +58,17 @@ class AttributesTest extends TestCase
             'array' => [
                 $shortStringValue,
                 $longStringValue,
-                $boolValue,
+                true,
             ],
             'ignored_key' => 'ignored_value',
         ], $attributeLimits);
 
-        $this->assertEquals($boolValue, $attributes->get('bool'));
+        $this->assertTrue($attributes->get('bool'));
         $this->assertEquals($intValue, $attributes->get('int'));
         $this->assertEquals($floatValue, $attributes->get('float'));
         $this->assertEquals($shortStringValue, $attributes->get('short_string'));
         $this->assertEquals($longStringTrimmed, $attributes->get('long_string'));
-        $this->assertEquals([$shortStringValue, $longStringTrimmed, $boolValue], $attributes->get('array'));
-
+        $this->assertEquals([$shortStringValue, $longStringTrimmed, true], $attributes->get('array'));
         $this->assertEquals(6, $attributes->count());
         $this->assertNull($attributes->get('ignored_key'));
     }
@@ -111,6 +112,7 @@ class AttributesTest extends TestCase
         $attributes->setAttribute('bar', null);
         $this->assertCount(1, $attributes);
     }
+
     public function test_to_array(): void
     {
         $values = [
@@ -119,6 +121,69 @@ class AttributesTest extends TestCase
         ];
         $attributes = new Attributes($values);
         $this->assertSame($values, $attributes->toArray());
+    }
+
+    public function test_get_total_added_values(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ]);
         $this->assertEquals(2, $attributes->getTotalAddedValues());
+
+        $attributes->setAttribute('baz', 'baz');
+        $this->assertEquals(3, $attributes->getTotalAddedValues());
+    }
+
+    public function test_unset_get_total_added_values(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ]);
+        $this->assertEquals(2, $attributes->getTotalAddedValues());
+
+        $attributes->unsetAttribute('foo');
+        $this->assertEquals(1, $attributes->getTotalAddedValues());
+    }
+
+    public function test_limit_get_total_added_values(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ], new AttributeLimits(1));
+        $this->assertEquals(2, $attributes->getTotalAddedValues());
+
+        $attributes->setAttribute('baz', 'baz');
+        $this->assertEquals(3, $attributes->getTotalAddedValues());
+    }
+
+    public function test_count_dropped_attributes(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ], new AttributeLimits(1));
+
+        $this->assertEquals(1, $attributes->getTotalAddedValues() - count($attributes));
+
+        $attributes->setAttribute('baz', 'baz');
+
+        $this->assertEquals(2, $attributes->getTotalAddedValues() - count($attributes));
+    }
+
+    public function test_is_limit_reached(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ], new AttributeLimits(3));
+
+        $this->assertFalse($attributes->isLimitReached());
+
+        $attributes->setAttribute('baz', 'baz');
+
+        $this->assertTrue($attributes->isLimitReached());
     }
 }

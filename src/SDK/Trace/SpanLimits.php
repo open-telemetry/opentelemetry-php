@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use OpenTelemetry\SDK\AttributeLimits;
+use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
 
 final class SpanLimits
 {
