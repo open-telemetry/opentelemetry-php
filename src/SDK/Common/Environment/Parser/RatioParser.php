@@ -25,10 +25,10 @@ class RatioParser
         if ($result > self::MAX_VALUE || $result < self::MIN_VALUE) {
             throw new RangeException(
                 sprintf(
-                    'Value "%s" is not between %s and %s',
-                    $value,
+                    'Value must not be lower than %s or higher than %s. Given: %s',
                     self::MIN_VALUE,
-                    self::MAX_VALUE
+                    self::MAX_VALUE,
+                    $value
                 )
             );
         }
