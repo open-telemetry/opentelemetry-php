@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass OpenTelemetry\SDK\Trace\TracerProvider
+ * @coversDefaultClass \OpenTelemetry\SDK\Trace\TracerProvider
  */
 class TracerProviderTest extends TestCase
 {

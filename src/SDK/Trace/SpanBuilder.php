@@ -10,7 +10,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibraryInterface;
 
 final class SpanBuilder implements API\SpanBuilderInterface
 {
@@ -21,7 +21,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     private string $spanName;
 
     /** @readonly */
-    private InstrumentationLibrary $instrumentationLibrary;
+    private InstrumentationLibraryInterface $instrumentationLibrary;
 
     /** @readonly */
     private TracerSharedState $tracerSharedState;
@@ -46,7 +46,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     /** @param non-empty-string $spanName */
     public function __construct(
         string $spanName,
-        InstrumentationLibrary $instrumentationLibrary,
+        InstrumentationLibraryInterface $instrumentationLibrary,
         TracerSharedState $tracerSharedState,
         SpanLimits $spanLimits
     ) {

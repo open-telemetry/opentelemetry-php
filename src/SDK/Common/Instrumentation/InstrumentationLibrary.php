@@ -2,27 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK;
+namespace OpenTelemetry\SDK\Common\Instrumentation;
 
 /**
  * Represents the instrumentation library information associated with the Tracer or Meter
  */
-class InstrumentationLibrary
+final class InstrumentationLibrary implements InstrumentationLibraryInterface
 {
     private static ?self $empty = null;
-
-    /**
-     * @internal
-     * @psalm-internal OpenTelemetry
-     */
-    public static function getEmpty(): InstrumentationLibrary
-    {
-        if (null === self::$empty) {
-            self::$empty = new self('', null, null);
-        }
-
-        return self::$empty;
-    }
 
     private string $name;
     private ?string $version;
@@ -33,6 +20,15 @@ class InstrumentationLibrary
         $this->name = $name;
         $this->version = $version;
         $this->schemaUrl = $schemaUrl;
+    }
+
+    /**
+     * @internal
+     * @psalm-internal OpenTelemetry
+     */
+    public static function getEmpty(): InstrumentationLibrary
+    {
+        return self::$empty ?? self::$empty = new self('', null, null);
     }
 
     public function getName(): string

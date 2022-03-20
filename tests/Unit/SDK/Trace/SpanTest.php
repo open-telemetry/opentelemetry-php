@@ -17,7 +17,7 @@ use OpenTelemetry\SDK\AbstractClock;
 use OpenTelemetry\SDK\ClockInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\SDK\Trace\EventInterface;

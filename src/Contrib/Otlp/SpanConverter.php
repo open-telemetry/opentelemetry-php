@@ -189,7 +189,6 @@ class SpanConverter implements SpanConverterInterface
         foreach ($spans as $span) {
             $isSpansEmpty = false;
 
-            /** @var \OpenTelemetry\SDK\InstrumentationLibrary $il */
             $il = $span->getInstrumentationLibrary();
             $ilKey = sprintf('%s@%s %s', $il->getName(), $il->getVersion()??'', $il->getSchemaUrl()??'');
             if (!isset($ils[$ilKey])) {
