@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Attribute;
 
 use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
+use OpenTelemetry\SDK\Common\Attribute\AttributeLimitsInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -25,8 +26,8 @@ class AttributeLimitsTest extends TestCase
     public function test_default_limits(): void
     {
         $limits = new AttributeLimits();
-        $this->assertNotNull($limits->getAttributeCountLimit());
-        $this->assertNotNull($limits->getAttributeValueLengthLimit());
+        $this->assertSame(AttributeLimitsInterface::DEFAULT_COUNT_LIMIT, $limits->getAttributeCountLimit());
+        $this->assertSame(AttributeLimitsInterface::DEFAULT_VALUE_LENGTH_LIMIT, $limits->getAttributeValueLengthLimit());
     }
 
     public function test_limits(): void

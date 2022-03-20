@@ -6,17 +6,13 @@ namespace OpenTelemetry\SDK\Common\Attribute;
 
 final class AttributeLimits implements AttributeLimitsInterface
 {
-    private const DEFAULT_COUNT_LIMIT = 128;
-
-    private const DEFAULT_VALUE_LENGTH_LIMIT = PHP_INT_MAX;
-
     private int $attributeCountLimit;
 
     private int $attributeValueLengthLimit;
 
     public function __construct(
-        int $attributeCountLimit = self::DEFAULT_COUNT_LIMIT,
-        int $attributeValueLengthLimit = self::DEFAULT_VALUE_LENGTH_LIMIT
+        int $attributeCountLimit = AttributeLimitsInterface::DEFAULT_COUNT_LIMIT,
+        int $attributeValueLengthLimit = AttributeLimitsInterface::DEFAULT_VALUE_LENGTH_LIMIT
     ) {
         $this->attributeCountLimit = $attributeCountLimit;
         $this->attributeValueLengthLimit = $attributeValueLengthLimit;
