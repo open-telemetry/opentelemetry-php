@@ -102,11 +102,22 @@ class HttpSender
 
     private function createProcessFromResource(ResourceInfo $resource): Process
     {
-        $serviceName = $this->serviceName; //TODO - figure out if this really comes from the default resource in practice - https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/sdk.md#sdk-provided-resource-attributes
+        $serviceName = $this->serviceName; //Defaulting to the default resource's service name //TODO - figure out if this really comes from the default resource in practice - https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/sdk.md#sdk-provided-resource-attributes
         
+        $tags = [];
         foreach ($resource->getAttributes() as $key => $value) {
+            if ($key === "service.name") {
+                $serviceName = (string) $value;
+                continue;
+            }
 
+            $tags[] = SpanConverter::createJaegerTagInstance($key, $value);
         }
+
+        return new Process([
+            'serviceName' => $serviceName,
+            'tags' => $tags,
+        ]);
     }
 
     private function sendBatch(Batch $batch): void 
@@ -114,60 +125,4 @@ class HttpSender
         $batch->write($this->protocol);
         $this->protocol->getTransport()->flush();
     }
-
-
-    //TODO - delete this
-    // /**
-    //  * @param JTSpan[] $spans
-    //  */
-    // public function sendOld(array $spans): void
-    // {
-    //     ///** @var Tag[] $tags */ TODO - uncomment this once the code below is uncommented/adapted
-    //     $tags = [];
-
-    //     //TODO - determine what of this is still needed and how to adapt it for spec compliance
-    //     // foreach ($this->tracer->getTags() as $k => $v) {
-    //     //     if (!in_array($k, $this->mapper->getSpecialSpanTags())) {
-    //     //         if (strpos($k, $this->mapper->getProcessTagsPrefix()) !== 0) {
-    //     //             continue ;
-    //     //         }
-
-    //     //         $quoted = preg_quote($this->mapper->getProcessTagsPrefix());
-    //     //         $k = preg_replace(sprintf('/^%s/', $quoted), '', $k);
-    //     //     }
-
-    //     //     if ($k === JAEGER_HOSTNAME_TAG_KEY) {
-    //     //         $k = "hostname";
-    //     //     }
-
-    //     //     $tags[] = new Tag([
-    //     //         "key" => $k,
-    //     //         "vType" => TagType::STRING,
-    //     //         "vStr" => $v
-    //     //     ]);
-    //     // }
-
-    //     // $tags[] = new Tag([
-    //     //     "key" => "format",
-    //     //     "vType" => TagType::STRING,
-    //     //     "vStr" => "jaeger.thrift"
-    //     // ]);
-
-    //     // $tags[] = new Tag([
-    //     //     "key" => "ip",
-    //     //     "vType" => TagType::STRING,
-    //     //     "vStr" => $this->tracer->getIpAddress()
-    //     // ]);
-
-    //     $batch = new Batch([
-    //         'spans' => $spans,
-    //         'process' => new Process([
-    //             'serviceName' => $this->serviceName,
-    //             'tags' => $tags,
-    //         ]),
-    //     ]);
-
-    //     $batch->write($this->protocol);
-    //     $this->protocol->getTransport()->flush();
-    // }
 }

@@ -220,7 +220,7 @@ class SpanConverter implements SpanConverterInterface
         return $value;
     }
 
-    private static function createJaegerTagInstance(string $key, $value)
+    public static function createJaegerTagInstance(string $key, $value) //TODO - split this out into a helper class to avoid the weird dependency HttpSender now has on this class
     {
         if (is_bool($value)) {
             return new Tag([
