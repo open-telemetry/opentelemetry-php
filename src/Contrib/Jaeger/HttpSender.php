@@ -43,10 +43,7 @@ class HttpSender
         $this->protocol = new TBinaryProtocol($transport);
     }
 
-    /**
-     * @param SpanDataInterface[] $spans
-     */
-    public function send(array $spans): void
+    public function send(iterable $spans): void
     {
         $spansGroupedByResource = self::groupSpansByResource($spans);
         $batchArray = $this->createBatchesPerResource($spansGroupedByResource);
@@ -56,7 +53,7 @@ class HttpSender
         }
     }
 
-    private static function groupSpansByResource(array $spans): array
+    private static function groupSpansByResource(iterable $spans): array
     {
         $spansGroupedByResource = [];
         foreach ($spans as $span) {
