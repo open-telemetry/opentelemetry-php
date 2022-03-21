@@ -277,7 +277,7 @@ class ResourceTest extends TestCase
             'attributes from env var' => [
                 'foo=foo,bar=bar',
                 [],
-                ['foo' => 'foo'],
+                ['foo' => 'foo', 'bar' => 'bar'],
             ],
             'user attributes have higher priority' => [
                 'foo=env-foo,bar=env-bar,baz=env-baz',
