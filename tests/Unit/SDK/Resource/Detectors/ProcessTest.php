@@ -19,9 +19,9 @@ class ProcessTest extends TestCase
         $resource = $resouceDetector->getResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
+        $this->assertIsInt($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
+        $this->assertIsArray($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
     }
 }

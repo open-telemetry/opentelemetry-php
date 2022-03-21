@@ -19,9 +19,9 @@ class OperatingSystemTest extends TestCase
         $resource = $resouceDetector->getResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::OS_TYPE));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::OS_DESCRIPTION));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::OS_NAME));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::OS_VERSION));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::OS_TYPE));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::OS_DESCRIPTION));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::OS_NAME));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::OS_VERSION));
     }
 }

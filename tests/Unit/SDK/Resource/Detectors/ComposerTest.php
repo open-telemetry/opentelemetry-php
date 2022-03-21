@@ -22,8 +22,6 @@ class ComposerTest extends TestCase
         $version = InstalledVersions::getPrettyVersion($name);
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
         $this->assertSame($name, $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
         $this->assertSame($version, $resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
     }

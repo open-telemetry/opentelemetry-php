@@ -19,7 +19,7 @@ class ProcessRuntimeTest extends TestCase
         $resource = $resouceDetector->getResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
     }
 }

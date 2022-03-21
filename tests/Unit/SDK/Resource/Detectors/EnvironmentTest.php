@@ -38,10 +38,8 @@ class EnvironmentTest extends TestCase
         $resouceDetector = new Detectors\Environment();
         $resource = $resouceDetector->getResource();
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertSame('value_foo', $resource->getAttributes()->get('key_foo'));
         $this->assertSame('value_bar', $resource->getAttributes()->get('key_bar'));
-        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 
     public function test_environment_get_resource_with_service_name(): void
@@ -51,7 +49,6 @@ class EnvironmentTest extends TestCase
         $resouceDetector = new Detectors\Environment();
         $resource = $resouceDetector->getResource();
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertNotEmpty($resource->getAttributes());
         $this->assertSame('test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
@@ -63,7 +60,6 @@ class EnvironmentTest extends TestCase
         $resouceDetector = new Detectors\Environment();
         $resource = $resouceDetector->getResource();
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertNotEmpty($resource->getAttributes());
         $this->assertSame('test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
@@ -76,7 +72,6 @@ class EnvironmentTest extends TestCase
         $resouceDetector = new Detectors\Environment();
         $resource = $resouceDetector->getResource();
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertNotEmpty($resource->getAttributes());
         $this->assertSame('user-test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }

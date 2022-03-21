@@ -6,8 +6,8 @@ namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\Detectors;
+use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -24,43 +24,17 @@ class CompositeTest extends TestCase
         $this->assertEmpty($resource->getAttributes());
     }
 
-    /**
-     * @dataProvider resourceDetectorProvider
-     */
-    public function test_composite_get_resource(iterable $resourceDetectors, array $expectedAttributes, ?string $expectedSchemaURL): void
+    public function test_composite_get_resource(): void
     {
-        $resource = (new Detectors\Composite($resourceDetectors))->getResource();
-        foreach ($expectedAttributes as $name => $value) {
-            $this->assertSame($value, $resource->getAttributes()->get($name));
-        }
-        $this->assertSame($expectedSchemaURL, $resource->getSchemaUrl());
-    }
+        $resource = ResourceInfo::create(new Attributes(['foo' => 'user-foo', 'bar' => 'user-bar']));
 
-    public function resourceDetectorProvider()
-    {
-        return [
-            'Sdks' => [
-                [
-                    new Detectors\Sdk(),
-                    new Detectors\SdkProvided(),
-                ],
-                [
-                    ResourceAttributes::TELEMETRY_SDK_NAME => 'opentelemetry',
-                    ResourceAttributes::TELEMETRY_SDK_LANGUAGE => 'php',
-                    ResourceAttributes::SERVICE_NAME => 'unknown_service',
-                ],
-                ResourceAttributes::SCHEMA_URL,
-            ],
-            'Constant' => [
-                [
-                    new Detectors\Constant(ResourceInfo::create(new Attributes(['foo' => 'constant-foo', 'bar' => 'constant-bar']))),
-                ],
-                [
-                    'foo' => 'constant-foo',
-                    'bar' => 'constant-bar',
-                ],
-                null,
-            ],
-        ];
+        $resourceDetector = $this->createMock(ResourceDetectorInterface::class);
+        $resourceDetector->method('getResource')->willReturn($resource);
+
+        $resource = (new Detectors\Composite([$resourceDetector]))->getResource();
+
+        $this->assertSame('user-foo', $resource->getAttributes()->get('foo'));
+        $this->assertSame('user-bar', $resource->getAttributes()->get('bar'));
+        $this->assertNull($resource->getSchemaUrl());
     }
 }

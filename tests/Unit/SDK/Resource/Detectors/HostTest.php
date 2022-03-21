@@ -19,7 +19,7 @@ class HostTest extends TestCase
         $resource = $resouceDetector->getResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
     }
 }
