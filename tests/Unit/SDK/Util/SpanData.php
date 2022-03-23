@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace as SDK;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\LinkInterface;
@@ -48,7 +49,7 @@ class SpanData implements SDK\SpanDataInterface
         $this->attributes = new Attributes();
         $this->kind = API\SpanKind::KIND_INTERNAL;
         $this->status = StatusData::unset();
-        $this->resource = ResourceInfo::emptyResource();
+        $this->resource = ResourceInfoFactory::emptyResource();
         $this->instrumentationLibrary = InstrumentationLibrary::getEmpty(); /** @phan-suppress-current-line PhanAccessMethodInternal */
         $this->context = API\SpanContext::getInvalid();
         $this->parentContext = API\SpanContext::getInvalid();
