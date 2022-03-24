@@ -6,10 +6,10 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\AbstractClock;
-use OpenTelemetry\SDK\ClockInterface;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SDK\Common\Time\AbstractClock;
+use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
