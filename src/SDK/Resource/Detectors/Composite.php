@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Resource\Detectors;
 
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
 final class Composite implements ResourceDetectorInterface
 {
@@ -26,6 +27,6 @@ final class Composite implements ResourceDetectorInterface
             $resources[] = $resourceDetector->getResource();
         }
 
-        return ResourceInfo::merge(...$resources);
+        return ResourceInfoFactory::merge(...$resources);
     }
 }

@@ -19,6 +19,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\IdGeneratorInterface;
@@ -68,7 +69,7 @@ class SpanTest extends MockeryTestCase
     protected function setUp():void
     {
         $this->idGenerator = new RandomIdGenerator();
-        $this->resource = ResourceInfo::emptyResource();
+        $this->resource = ResourceInfoFactory::emptyResource();
         $this->instrumentationLibrary = new InstrumentationLibrary('test_library', '0.1.2');
 
         $this->spanProcessor = Mockery::spy(SpanProcessorInterface::class);
