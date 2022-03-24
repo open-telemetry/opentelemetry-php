@@ -12,7 +12,7 @@ use Jaeger\Thrift\Tag;
 use Jaeger\Thrift\TagType;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
-use OpenTelemetry\SDK\Common\Time\AbstractClock;
+use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\LinkInterface;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
@@ -69,8 +69,8 @@ class SpanConverter implements SpanConverterInterface
             'parentSpanId' => $parentSpanId,
         ] = self::convertOtelToJaegerIds($span);
 
-        $startTime = AbstractClock::nanosToMicro($span->getStartEpochNanos());
-        $duration = AbstractClock::nanosToMicro($span->getEndEpochNanos() - $span->getStartEpochNanos());
+        $startTime = TimeUtil::nanosToMicro($span->getStartEpochNanos());
+        $duration = TimeUtil::nanosToMicro($span->getEndEpochNanos() - $span->getStartEpochNanos());
 
         $tags = self::convertOtelSpanDataToJaegerTags($span);
 
@@ -292,7 +292,7 @@ class SpanConverter implements SpanConverterInterface
 
     private static function convertSingleOtelEventToJaegerLog(EventInterface $event): Log
     {
-        $timestamp = AbstractClock::nanosToMicro($event->getEpochNanos());
+        $timestamp = TimeUtil::nanosToMicro($event->getEpochNanos());
 
         $eventValue = $event->getAttributes()->get(self::EVENT_ATTRIBUTE_KEY_NAMED_EVENT) ?? $event->getName();
         $attributes = $event->getAttributes()->toArray();

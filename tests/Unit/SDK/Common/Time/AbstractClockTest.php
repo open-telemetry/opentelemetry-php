@@ -30,11 +30,4 @@ class AbstractClockTest extends TestCase
         AbstractClock::setTestClock($testClock);
         $this->assertSame($testClock, AbstractClock::getDefault());
     }
-
-    public function test_conversions(): void
-    {
-        $this->assertEquals(1, AbstractClock::nanosToMicro((int) 1e3));
-        $this->assertEquals(1, AbstractClock::nanosToMilli((int) 1e6));
-        $this->assertEquals((int) 1e9, AbstractClock::secondsToNanos(1));
-    }
 }

@@ -18,6 +18,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
 use OpenTelemetry\SDK\Common\Time\AbstractClock;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\SDK\Trace\EventInterface;
@@ -464,7 +465,7 @@ class SpanTest extends MockeryTestCase
         $span = $this->createTestRootSpan();
         $span->addEvent('event1');
         $span->addEvent('event2', new Attributes(['key1' => 1]));
-        $span->addEvent('event3', [], AbstractClock::secondsToNanos(10));
+        $span->addEvent('event3', [], TimeUtil::secondsToNanos(10));
 
         $span->end();
 
@@ -474,7 +475,7 @@ class SpanTest extends MockeryTestCase
 
         $this->assertEvent($events[$idx++], 'event1', new Attributes(), self::START_EPOCH);
         $this->assertEvent($events[$idx++], 'event2', new Attributes(['key1' => 1]), self::START_EPOCH);
-        $this->assertEvent($events[$idx], 'event3', new Attributes(), AbstractClock::secondsToNanos(10));
+        $this->assertEvent($events[$idx], 'event3', new Attributes(), TimeUtil::secondsToNanos(10));
     }
 
     public function test_add_event_attribute_length(): void
