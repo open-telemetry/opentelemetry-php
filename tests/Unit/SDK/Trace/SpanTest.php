@@ -16,7 +16,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
-use OpenTelemetry\SDK\Common\Time\AbstractClock;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -90,12 +90,12 @@ class SpanTest extends MockeryTestCase
             )
         );
 
-        AbstractClock::setTestClock($this->testClock);
+        ClockFactory::setDefault($this->testClock);
     }
 
     protected function tearDown(): void
     {
-        AbstractClock::setTestClock();
+        ClockFactory::setDefault(null);
     }
 
     // region API

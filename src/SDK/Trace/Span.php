@@ -17,7 +17,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibraryInterface;
-use OpenTelemetry\SDK\Common\Time\AbstractClock;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use function sprintf;
 use function str_replace;
@@ -129,14 +129,8 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         ?AttributesInterface $attributes,
         array $links,
         int $totalRecordedLinks,
-        int $userStartEpochNanos
+        int $startEpochNanos
     ): self {
-        if (0 !== $userStartEpochNanos) {
-            $startEpochNanos = $userStartEpochNanos;
-        } else {
-            $startEpochNanos = AbstractClock::getDefault()->now();
-        }
-
         $span = new self(
             $name,
             $context,
@@ -149,7 +143,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             $attributes,
             $links,
             $totalRecordedLinks,
-            $startEpochNanos
+            $startEpochNanos !== 0 ? $startEpochNanos : ClockFactory::getDefault()->now()
         );
 
         // Call onStart here to ensure the span is fully initialized.
@@ -264,7 +258,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         if (count($this->events) < $this->spanLimits->getEventCountLimit()) {
             $this->events[] = new Event(
                 $name,
-                $timestamp ?? AbstractClock::getDefault()->now(),
+                $timestamp ?? ClockFactory::getDefault()->now(),
                 Attributes::withLimits(
                     $attributes,
                     new AttributeLimits(
@@ -283,7 +277,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /** @inheritDoc */
     public function recordException(Throwable $exception, iterable $attributes = []): self
     {
-        $timestamp = AbstractClock::getDefault()->now();
+        $timestamp = ClockFactory::getDefault()->now();
         $eventAttributes = new Attributes([
                 'exception.type' => get_class($exception),
                 'exception.message' => $exception->getMessage(),
@@ -327,7 +321,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             return;
         }
 
-        $this->endEpochNanos = $endEpochNanos ?? AbstractClock::getDefault()->now();
+        $this->endEpochNanos = $endEpochNanos ?? ClockFactory::getDefault()->now();
         $this->hasEnded = true;
 
         $this->spanProcessor->onEnd($this);
@@ -373,7 +367,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /** @inheritDoc */
     public function getDuration(): int
     {
-        return ($this->hasEnded ? $this->endEpochNanos : AbstractClock::getDefault()->now()) - $this->startEpochNanos;
+        return ($this->hasEnded ? $this->endEpochNanos : ClockFactory::getDefault()->now()) - $this->startEpochNanos;
     }
 
     /** @inheritDoc */
