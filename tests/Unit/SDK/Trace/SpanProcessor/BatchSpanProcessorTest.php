@@ -9,8 +9,8 @@ use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\Common\Time\AbstractClock;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -141,9 +141,9 @@ class BatchSpanProcessorTest extends MockeryTestCase
     {
         return [
             'no clock advance' => [1000, 0, false],
-            'clock advance less than threshold' => [1000, 999 * AbstractClock::NANOS_PER_MILLISECOND, false],
-            'clock advance equals threshold' => [1000, 1000 * AbstractClock::NANOS_PER_MILLISECOND, false],
-            'clock advance exceeds threshold' => [1000, 1001 * AbstractClock::NANOS_PER_MILLISECOND, true],
+            'clock advance less than threshold' => [1000, 999 * ClockInterface::NANOS_PER_MILLISECOND, false],
+            'clock advance equals threshold' => [1000, 1000 * ClockInterface::NANOS_PER_MILLISECOND, false],
+            'clock advance exceeds threshold' => [1000, 1001 * ClockInterface::NANOS_PER_MILLISECOND, true],
         ];
     }
 
@@ -231,7 +231,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $exporter->expects($this->once())->method('export');
         $exporter->expects($this->once())->method('shutdown');
 
-        $proc = new BatchSpanProcessor($exporter, $this->createMock(AbstractClock::class));
+        $proc = new BatchSpanProcessor($exporter, $this->createMock(ClockInterface::class));
 
         for ($i = 0; $i < $batchSize - 1; $i++) {
             $mock_span = $this->createSampledSpanMock();
@@ -246,7 +246,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $exporter = $this->createMock(SpanExporterInterface::class);
         $exporter->expects($this->atLeastOnce())->method('shutdown');
 
-        $proc = new BatchSpanProcessor($exporter, $this->createMock(AbstractClock::class));
+        $proc = new BatchSpanProcessor($exporter, $this->createMock(ClockInterface::class));
         $proc->shutdown();
 
         $span = $this->createSampledSpanMock();
