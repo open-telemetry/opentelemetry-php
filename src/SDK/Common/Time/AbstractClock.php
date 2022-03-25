@@ -14,7 +14,7 @@ abstract class AbstractClock implements ClockInterface
 
     public static function getDefault(): ClockInterface
     {
-        return self::$testClock ?? SystemClock::getInstance();
+        return self::$testClock ?? SystemClock::create();
     }
 
     /**
