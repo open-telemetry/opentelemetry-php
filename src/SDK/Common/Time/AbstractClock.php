@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Time;
 
+/**
+ * @deprecated
+ * Use {@see \OpenTelemetry\SDK\Common\Time\ClockFactory} and {@see \OpenTelemetry\SDK\Common\Time\Util} instead.
+ */
 abstract class AbstractClock implements ClockInterface
 {
     private static ?ClockInterface $testClock;
@@ -21,4 +25,28 @@ abstract class AbstractClock implements ClockInterface
     {
         self::$testClock = $clock;
     }
+
+    /** @psalm-pure */
+    public static function nanosToMicro(int $nanoseconds): int
+    {
+        return intdiv($nanoseconds, 1000);
+    }
+
+    /** @psalm-pure */
+    public static function nanosToMilli(int $nanoseconds): int
+    {
+        return intdiv($nanoseconds, 1000000);
+    }
+
+    /** @psalm-pure */
+    public static function secondsToNanos(int $seconds): int
+    {
+        return $seconds * self::NANOS_PER_SECOND;
+    }
 }
+
+/**
+ * BC class alias
+ * @todo: remove in future release
+ */
+class_alias(AbstractClock::class, 'OpenTelemetry\SDK\AbstractClock');
