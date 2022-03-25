@@ -10,7 +10,16 @@ use function microtime;
 final class SystemClock implements ClockInterface
 {
     private static ?self $instance = null;
+    private static int $referenceTime;
 
+    public function __construct()
+    {
+        self::init();
+    }
+
+    /**
+     * @deprecated
+     */
     public static function getInstance(): self
     {
         if (null === self::$instance) {
@@ -20,20 +29,43 @@ final class SystemClock implements ClockInterface
         return self::$instance;
     }
 
-    /** @inheritDoc */
-    public function now(): int
+    public static function create(): self
     {
-        /**
-         * `microtime` returns a unix timestamp _WITH_ microseconds, not _IN_ microseconds.
-         * E.g. `1633052992.330921` so we must multiply it by {@see ClockInterface::NANOS_PER_SECOND} to get a value _IN_ nanoseconds.
-         */
-        return (int) (microtime(true) * ClockInterface::NANOS_PER_SECOND);
+        return new self();
     }
 
     /** @inheritDoc */
+    public function now(): int
+    {
+        return self::$referenceTime + hrtime(true);
+    }
+
+    /**
+     * @deprecated
+     */
     public function nanoTime(): int
     {
-        return hrtime(true);
+        return $this->now();
+    }
+
+    private static function init(): void
+    {
+        if (isset(self::$referenceTime)) {
+            return;
+        }
+
+        self::$referenceTime = self::calculateReferenceTime(
+            microtime(true),
+            hrtime(true)
+        );
+    }
+
+    /**
+     * Calculates the reference time which is later used to calculate the current wall clock time in nanoseconds by adding the current uptime.
+     */
+    private static function calculateReferenceTime(float $wallClockMicroTime, int $upTime): int
+    {
+        return ((int) ($wallClockMicroTime * ClockInterface::NANOS_PER_SECOND)) - $upTime;
     }
 }
 

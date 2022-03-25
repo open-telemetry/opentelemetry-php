@@ -76,7 +76,7 @@ final class StopWatch implements StopWatchInterface
 
     private function time(): int
     {
-        return $this->clock->nanoTime();
+        return $this->clock->now();
     }
 
     private function hasBeenStarted(): bool
