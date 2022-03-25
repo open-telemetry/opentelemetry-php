@@ -55,7 +55,10 @@
             "Jaeger\\Thrift\\": "thrift/jaeger/"
         },
         "files": [
-            "src/Context/fiber/initialize_fiber_handler.php"
+            "src/Context/fiber/initialize_fiber_handler.php",
+            "src/SDK/Common/Time/ClockInterface.php",
+            "src/SDK/Common/Time/AbstractClock.php",
+            "src/SDK/Common/Time/SystemClock.php"
         ]
     },
     "autoload-dev": {
