@@ -47,11 +47,8 @@ class BatchSpanProcessor implements SpanProcessorInterface
         int $exporterTimeoutMillis = null,
         int $maxExportBatchSize = null
     ) {
-        if (null === $clock) {
-            $clock = ClockFactory::getDefault();
-        }
         $this->exporter = $exporter;
-        $this->clock = $clock;
+        $this->clock = $clock ?? ClockFactory::getDefault();
         $this->maxQueueSize = $maxQueueSize
             ?: $this->getIntFromEnvironment(Env::OTEL_BSP_MAX_QUEUE_SIZE, self::DEFAULT_MAX_QUEUE_SIZE);
         $this->scheduledDelayMillis = $scheduledDelayMillis
