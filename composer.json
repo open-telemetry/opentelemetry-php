@@ -22,7 +22,8 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "composer/package-versions-deprecated": true
+            "composer/package-versions-deprecated": true,
+            "sllh/composer-versions-check": false
         }
     },
     "authors": [
@@ -55,7 +56,10 @@
             "Jaeger\\Thrift\\": "thrift/jaeger/"
         },
         "files": [
-            "src/Context/fiber/initialize_fiber_handler.php"
+            "src/Context/fiber/initialize_fiber_handler.php",
+            "src/SDK/Common/Time/ClockInterface.php",
+            "src/SDK/Common/Time/AbstractClock.php",
+            "src/SDK/Common/Time/SystemClock.php"
         ]
     },
     "autoload-dev": {

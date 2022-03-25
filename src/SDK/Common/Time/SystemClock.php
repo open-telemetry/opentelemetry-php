@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Common\Time;
 use function hrtime;
 use function microtime;
 
-final class SystemClock extends AbstractClock
+final class SystemClock implements ClockInterface
 {
     private static ?self $instance = null;
 
@@ -25,7 +25,7 @@ final class SystemClock extends AbstractClock
     {
         /**
          * `microtime` returns a unix timestamp _WITH_ microseconds, not _IN_ microseconds.
-         * E.g. `1633052992.330921` so we must multiply it by {@see \OpenTelemetry\API\ClockInterface::NANOS_PER_SECOND} to get a value _IN_ nanoseconds.
+         * E.g. `1633052992.330921` so we must multiply it by {@see ClockInterface::NANOS_PER_SECOND} to get a value _IN_ nanoseconds.
          */
         return (int) (microtime(true) * ClockInterface::NANOS_PER_SECOND);
     }
@@ -36,3 +36,9 @@ final class SystemClock extends AbstractClock
         return hrtime(true);
     }
 }
+
+/**
+ * BC class alias
+ * @todo: remove in future release. Also in composer.json autoload/files.
+ */
+class_alias(SystemClock::class, 'OpenTelemetry\SDK\SystemClock');
