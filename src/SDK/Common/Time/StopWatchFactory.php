@@ -8,7 +8,7 @@ final class StopWatchFactory implements StopWatchFactoryInterface
 {
     private static ?StopWatchInterface $default;
 
-    private ?ClockInterface $clock;
+    private ClockInterface $clock;
     private ?int $initialStartTime;
 
     public function __construct(?ClockInterface $clock = null, ?int $initialStartTime = null)

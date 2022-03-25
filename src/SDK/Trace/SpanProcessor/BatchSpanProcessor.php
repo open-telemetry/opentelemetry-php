@@ -139,6 +139,6 @@ class BatchSpanProcessor implements SpanProcessorInterface
 
     protected function enoughTimeHasPassed(): bool
     {
-        return TimeUtil::millisToNanos($this->scheduledDelayMillis) < $this->stopwatch->getLastElapsedTime();
+        return TimeUtil::millisToNanos((int) $this->scheduledDelayMillis) < $this->stopwatch->getLastElapsedTime();
     }
 }

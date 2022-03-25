@@ -50,7 +50,7 @@ final class SystemClock implements ClockInterface
 
     private static function init(): void
     {
-        if (isset(self::$referenceTime)) {
+        if (self::$referenceTime > 0) {
             return;
         }
 
