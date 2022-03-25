@@ -34,7 +34,7 @@ class StopWatchFactoryTest extends TestCase
         $stopwatch = $this->createMock(StopWatchInterface::class);
         StopWatchFactory::setDefault($stopwatch);
 
-        $this->assertEquals($stopwatch, StopWatchFactory::getDefault());
+        $this->assertSame($stopwatch, StopWatchFactory::getDefault());
     }
 
     public function test_default_is_resettable(): void
