@@ -10,7 +10,7 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
-use OpenTelemetry\SDK\Common\Time\AbstractClock;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace as SDK;
 use OpenTelemetry\SDK\Trace\EventInterface;
@@ -104,7 +104,7 @@ class SpanData implements SDK\SpanDataInterface
 
     public function addEvent(string $name, ?AttributesInterface $attributes, int $timestamp = null): self
     {
-        $this->events[] = new SDK\Event($name, $timestamp ?? AbstractClock::getDefault()->now(), $attributes);
+        $this->events[] = new SDK\Event($name, $timestamp ?? ClockFactory::getDefault()->now(), $attributes);
 
         return $this;
     }
