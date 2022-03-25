@@ -22,8 +22,7 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "composer/package-versions-deprecated": true,
-            "sllh/composer-versions-check": false
+            "composer/package-versions-deprecated": true
         }
     },
     "authors": [
