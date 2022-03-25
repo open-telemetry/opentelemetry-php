@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Time;
 
-class ClockFactory
+final class ClockFactory implements ClockFactoryInterface
 {
     private static ?ClockInterface $default;
 
