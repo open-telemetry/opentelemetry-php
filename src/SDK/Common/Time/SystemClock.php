@@ -10,7 +10,7 @@ use function microtime;
 final class SystemClock implements ClockInterface
 {
     private static ?self $instance = null;
-    private static int $referenceTime;
+    private static int $referenceTime = 0;
 
     public function __construct()
     {
