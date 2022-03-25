@@ -69,8 +69,8 @@ class SpanConverter implements SpanConverterInterface
             'parentSpanId' => $parentSpanId,
         ] = self::convertOtelToJaegerIds($span);
 
-        $startTime = TimeUtil::nanosToMicro($span->getStartEpochNanos());
-        $duration = TimeUtil::nanosToMicro($span->getEndEpochNanos() - $span->getStartEpochNanos());
+        $startTime = TimeUtil::nanosToMicros($span->getStartEpochNanos());
+        $duration = TimeUtil::nanosToMicros($span->getEndEpochNanos() - $span->getStartEpochNanos());
 
         $tags = self::convertOtelSpanDataToJaegerTags($span);
 
@@ -292,7 +292,7 @@ class SpanConverter implements SpanConverterInterface
 
     private static function convertSingleOtelEventToJaegerLog(EventInterface $event): Log
     {
-        $timestamp = TimeUtil::nanosToMicro($event->getEpochNanos());
+        $timestamp = TimeUtil::nanosToMicros($event->getEpochNanos());
 
         $eventValue = $event->getAttributes()->get(self::EVENT_ATTRIBUTE_KEY_NAMED_EVENT) ?? $event->getName();
         $attributes = $event->getAttributes()->toArray();

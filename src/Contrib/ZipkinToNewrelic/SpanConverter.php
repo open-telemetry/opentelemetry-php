@@ -56,8 +56,8 @@ class SpanConverter implements SpanConverterInterface
     {
         $spanParent = $span->getParentContext();
 
-        $startTimestamp = TimeUtil::nanosToMicro($span->getStartEpochNanos());
-        $endTimestamp = TimeUtil::nanosToMicro($span->getEndEpochNanos());
+        $startTimestamp = TimeUtil::nanosToMicros($span->getStartEpochNanos());
+        $endTimestamp = TimeUtil::nanosToMicros($span->getEndEpochNanos());
 
         $row = [
             'id' => $span->getSpanId(),
@@ -88,7 +88,7 @@ class SpanConverter implements SpanConverterInterface
                 $row['annotations'] = [];
             }
             $row['annotations'][] = [
-                'timestamp' => TimeUtil::nanosToMicro($event->getEpochNanos()),
+                'timestamp' => TimeUtil::nanosToMicros($event->getEpochNanos()),
                 'value' => $event->getName(),
             ];
         }

@@ -37,8 +37,8 @@ class SpanConverter implements SpanConverterInterface
     {
         $spanParent = $span->getParentContext();
 
-        $startTimestamp = TimeUtil::nanosToMilli($span->getStartEpochNanos());
-        $endTimestamp = TimeUtil::nanosToMilli($span->getEndEpochNanos());
+        $startTimestamp = TimeUtil::nanosToMillis($span->getStartEpochNanos());
+        $endTimestamp = TimeUtil::nanosToMillis($span->getEndEpochNanos());
 
         $row = [
             'id' => $span->getSpanId(),
