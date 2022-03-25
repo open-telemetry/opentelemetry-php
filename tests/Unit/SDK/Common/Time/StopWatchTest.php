@@ -18,9 +18,14 @@ class StopWatchTest extends TestCase
 
     public function setUp(): void
     {
-        $this->testClock = new TestClock();
+        $this->init();
+    }
+
+    private function init(?int $initialStartTime = null): void
+    {
         $this->stopwatch = new StopWatch(
-            $this->testClock
+            $this->testClock = new TestClock(),
+            $initialStartTime
         );
     }
 
@@ -109,6 +114,17 @@ class StopWatchTest extends TestCase
         $this->stopwatch->stop();
 
         $this->assertSame($elapsed, $this->stopwatch->getElapsedTime());
+    }
+
+    public function test_get_elapsed_time_with_initial_start_time(): void
+    {
+        $elapsed = 500;
+        $this->init(TestClock::DEFAULT_START_EPOCH - $elapsed);
+
+        $this->stopwatch->start();
+        $this->testClock->advance($elapsed);
+
+        $this->assertSame($elapsed * 2, $this->stopwatch->getElapsedTime());
     }
 
     public function test_get_last_elapsed_time_initially(): void

@@ -10,13 +10,14 @@ final class StopWatch implements StopWatchInterface
 
     private ClockInterface $clock;
     private bool $running = false;
-    private ?int $initialStartTime = null;
+    private ?int $initialStartTime;
     private ?int $startTime = null;
     private ?int $stopTime = null;
 
-    public function __construct(ClockInterface $clock)
+    public function __construct(ClockInterface $clock, ?int $initialStartTime = null)
     {
         $this->clock = $clock;
+        $this->initialStartTime = $initialStartTime;
     }
 
     public function isRunning(): bool
@@ -26,13 +27,16 @@ final class StopWatch implements StopWatchInterface
 
     public function start(): void
     {
+        // resolve start time as early as possible
+        $startTime = $this->time();
+
         if ($this->isRunning()) {
             return;
         }
 
-        $this->startTime = $this->time();
+        $this->startTime = $startTime;
         if (!$this->hasBeenStarted()) {
-            $this->initialStartTime = $this->startTime;
+            $this->initialStartTime = $startTime;
         }
         $this->running = true;
     }

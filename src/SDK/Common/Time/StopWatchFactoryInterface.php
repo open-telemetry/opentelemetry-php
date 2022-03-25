@@ -6,9 +6,9 @@ namespace OpenTelemetry\SDK\Common\Time;
 
 interface StopWatchFactoryInterface
 {
-    public static function create(?ClockInterface $clock = null): self;
+    public static function create(?ClockInterface $clock = null, ?int $initialStartTime = null): self;
 
-    public static function createFromClockFactory(ClockFactoryInterface $factory): self;
+    public static function fromClockFactory(ClockFactoryInterface $factory, ?int $initialStartTime = null): self;
 
     public function build(): StopWatchInterface;
 

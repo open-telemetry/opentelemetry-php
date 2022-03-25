@@ -16,12 +16,12 @@ use PHPUnit\Framework\TestCase;
 
 class StopWatchFactoryTest extends TestCase
 {
-    public function test_create_from_clock_factory(): void
+    public function test_from_clock_factory(): void
     {
         $clockFactory = $this->createMock(ClockFactoryInterface::class);
         $clockFactory->expects($this->once())->method('build');
 
-        StopWatchFactory::createFromClockFactory($clockFactory);
+        StopWatchFactory::fromClockFactory($clockFactory);
     }
 
     public function test_default_is_system_clock(): void
