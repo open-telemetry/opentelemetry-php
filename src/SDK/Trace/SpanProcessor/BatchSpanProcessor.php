@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
-use OpenTelemetry\SDK\Common\Time\AbstractClock;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
@@ -48,7 +48,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         int $maxExportBatchSize = null
     ) {
         if (null === $clock) {
-            $clock = AbstractClock::getDefault();
+            $clock = ClockFactory::getDefault();
         }
         $this->exporter = $exporter;
         $this->clock = $clock;

@@ -10,6 +10,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Common\Time\AbstractClock;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -30,12 +31,12 @@ class BatchSpanProcessorTest extends MockeryTestCase
     {
         $this->testClock = new TestClock();
 
-        AbstractClock::setTestClock($this->testClock);
+        ClockFactory::setDefault($this->testClock);
     }
 
     protected function tearDown(): void
     {
-        AbstractClock::setTestClock();
+        ClockFactory::setDefault(null);
         $this->restoreEnvironmentVariables();
     }
 
