@@ -34,11 +34,12 @@ class ClockFactoryTest extends TestCase
 
     public function test_default_is_resettable(): void
     {
+        $clock = $this->createMock(ClockInterface::class);
         ClockFactory::setDefault(
-            $this->createMock(ClockInterface::class)
+            $clock
         );
         ClockFactory::setDefault(null);
 
-        $this->assertInstanceOf(SystemClock::class, ClockFactory::getDefault());
+        $this->assertNotSame($clock, ClockFactory::getDefault());
     }
 }
