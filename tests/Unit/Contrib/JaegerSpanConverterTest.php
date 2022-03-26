@@ -30,10 +30,10 @@ class JaegerSpanConverterTest extends TestCase
 
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 
-        $this->assertSame(0, $convertedSpan->traceIdLow);
-        $this->assertSame(0, $convertedSpan->traceIdHigh);
-        $this->assertSame(0, $convertedSpan->spanId);
-        $this->assertSame(0, $convertedSpan->parentSpanId);
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->traceIdLow); //For some reason hardcoding -9223372036854775808 (-2^63) instead of PHP_INT_MIN isn't liked by PHPUnit. Might be a high precision arithmetic issue?
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->traceIdHigh);
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->spanId);
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->parentSpanId);
         $this->assertSame('otelSpanName', $convertedSpan->operationName);
         $this->assertSame([], $convertedSpan->references);
         $this->assertSame(0, $convertedSpan->flags);
@@ -226,8 +226,8 @@ class JaegerSpanConverterTest extends TestCase
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 
         $this->assertSame(1, $convertedSpan->references[0]->refType);
-        $this->assertSame(0, $convertedSpan->references[0]->traceIdLow);
-        $this->assertSame(0, $convertedSpan->references[0]->traceIdHigh);
-        $this->assertSame(0, $convertedSpan->references[0]->spanId);
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->references[0]->traceIdLow); //For some reason hardcoding -9223372036854775808 (-2^63) instead of PHP_INT_MIN isn't liked by PHPUnit. Might be a high precision arithmetic issue?
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->references[0]->traceIdHigh);
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->references[0]->spanId);
     }
 }
