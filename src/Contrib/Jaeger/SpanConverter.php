@@ -100,8 +100,8 @@ class SpanConverter implements SpanConverterInterface
             'traceIdHigh' => $traceIdHigh
         ] = IdConverter::convertOtelToJaegerTraceIds($span->getContext()->getTraceID());
 
-        $spanId = intval($span->getContext()->getSpanID(), 16);
-        $parentSpanId = intval($span->getParentSpanId(), 16);
+        $spanId = IdConverter::convertOtelToJaegerSpanId($span->getContext()->getSpanID());
+        $parentSpanId = IdConverter::convertOtelToJaegerSpanId($span->getParentSpanId());
 
         return [
             'traceIdLow' => $traceIdLow,
