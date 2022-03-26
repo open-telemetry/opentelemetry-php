@@ -22,11 +22,11 @@ class IdConverterTest extends TestCase
 
     public function edgeCaseData(): iterable 
     {
-        yield ['0000000000000000', PHP_INT_MIN]; //Output should be -2^63 //For some reason hardcoding -9223372036854775808 (-2^63) instead of PHP_INT_MIN isn't liked by PHPUnit. Might be a high precision arithmetic issue?
-        yield ['0000000000000001', -9223372036854775807]; //Output is -2^63 + 1
-        yield ['7FFFFFFFFFFFFFFF', -1]; //Input is 2^63 - 1
-        yield ['8000000000000000', 0]; //Input is 2^63
-        yield ['FFFFFFFFFFFFFFFE', 9223372036854775806]; //Input is 2^64 - 2, Output is 2^63 - 2
-        yield ['FFFFFFFFFFFFFFFF', 9223372036854775807]; //Input is 2^64 - 1, Output is 2^63 - 1
+        yield '0 -> -2^63' => ['0000000000000000', PHP_INT_MIN]; //For some reason hardcoding -9223372036854775808 (-2^63) instead of PHP_INT_MIN isn't liked by PHPUnit. Might be a high precision arithmetic issue?
+        yield '1 -> -2^63 + 1' => ['0000000000000001', -9223372036854775807];
+        yield '2^63 - 1 -> -1' => ['7FFFFFFFFFFFFFFF', -1];
+        yield '2^63 -> 0' => ['8000000000000000', 0];
+        yield '2^64 - 2 -> 2^63 - 2' => ['FFFFFFFFFFFFFFFE', 9223372036854775806];
+        yield '2^64 - 1 -> 2^63 - 1' => ['FFFFFFFFFFFFFFFF', 9223372036854775807];
     }
 }
