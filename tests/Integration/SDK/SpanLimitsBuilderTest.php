@@ -56,7 +56,7 @@ class SpanLimitsBuilderTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_SPAN_EVENT_COUNT_LIMIT', 200);
         $builder = new SpanLimitsBuilder();
-        $builder->setAttributeValueLengthLimit(185);
+        $builder->setEventCountLimit(185);
         $spanLimits = $builder->build();
         $this->assertEquals(185, $spanLimits->getEventCountLimit());
     }
