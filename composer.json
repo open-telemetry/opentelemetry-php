@@ -8,10 +8,11 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
-        "packaged/thrift": "^0.15.0",
+        "brick/math": "^0.9.3",
         "google/protobuf": "^3.3.0",
         "grpc/grpc": "^1.30",
         "nyholm/dsn": "^2.0.0",
+        "packaged/thrift": "^0.15.0",
         "php-http/async-client-implementation": "^1.0",
         "php-http/discovery": "^1.14",
         "promphp/prometheus_client_php": "^2.2.1",
