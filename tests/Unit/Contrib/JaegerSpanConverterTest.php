@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers OpenTelemetry\Contrib\Jaeger\SpanConverter
+ * @covers OpenTelemetry\Contrib\Jaeger\IdConverter
  */
 class JaegerSpanConverterTest extends TestCase
 {

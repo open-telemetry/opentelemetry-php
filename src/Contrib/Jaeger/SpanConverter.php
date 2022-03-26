@@ -98,7 +98,7 @@ class SpanConverter implements SpanConverterInterface
         [
             'traceIdLow' => $traceIdLow,
             'traceIdHigh' => $traceIdHigh
-        ] = self::convertOtelToJaegerTraceIds($span->getContext()->getTraceID());
+        ] = IdConverter::convertOtelToJaegerTraceIds($span->getContext()->getTraceID());
 
         $spanId = intval($span->getContext()->getSpanID(), 16);
         $parentSpanId = intval($span->getParentSpanId(), 16);
@@ -109,22 +109,6 @@ class SpanConverter implements SpanConverterInterface
             'spanId' => $spanId,
             'parentSpanId' => $parentSpanId,
         ];
-    }
-
-    private static function convertOtelToJaegerTraceIds(string $traceId): array
-    {
-        $traceIdLow = intval(substr($traceId, 0, 16), 16);
-        $traceIdHigh = intval(substr($traceId, 16, 32), 16);
-
-        return [
-            'traceIdLow' => $traceIdLow,
-            'traceIdHigh' => $traceIdHigh,
-        ];
-    }
-
-    private static function convertOtelToJaegerSpanId(string $spanId): int
-    {
-        return intval($spanId, 16);
     }
 
     private static function convertOtelSpanKindToJaeger(SpanDataInterface $span): ?string
@@ -320,9 +304,9 @@ class SpanConverter implements SpanConverterInterface
         [
             'traceIdLow' => $traceIdLow,
             'traceIdHigh' => $traceIdHigh,
-        ] = self::convertOtelToJaegerTraceIds($link->getSpanContext()->getTraceId());
+        ] = IdConverter::convertOtelToJaegerTraceIds($link->getSpanContext()->getTraceId());
 
-        $integerSpanId = self::convertOtelToJaegerSpanId($link->getSpanContext()->getSpanId());
+        $integerSpanId = IdConverter::convertOtelToJaegerSpanId($link->getSpanContext()->getSpanId());
 
         return new SpanRef([
             'refType' => SpanRefType::FOLLOWS_FROM,
