@@ -58,7 +58,8 @@
             "src/Context/fiber/initialize_fiber_handler.php",
             "src/SDK/Common/Time/ClockInterface.php",
             "src/SDK/Common/Time/AbstractClock.php",
-            "src/SDK/Common/Time/SystemClock.php"
+            "src/SDK/Common/Time/SystemClock.php",
+            "src/SDK/Common/Attribute/Attributes.php"
         ]
     },
     "autoload-dev": {
