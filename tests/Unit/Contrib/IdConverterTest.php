@@ -20,7 +20,7 @@ class IdConverterTest extends TestCase
         $this->assertSame($convertedSpanId, IdConverter::convertOtelToJaegerSpanId($spanId));
     }
 
-    public function edgeCaseData(): iterable 
+    public function edgeCaseData(): iterable
     {
         yield '0 -> -2^63' => ['0000000000000000', PHP_INT_MIN]; //For some reason hardcoding -9223372036854775808 (-2^63) instead of PHP_INT_MIN isn't liked by PHPUnit. Might be a high precision arithmetic issue?
         yield '1 -> -2^63 + 1' => ['0000000000000001', -9223372036854775807];
