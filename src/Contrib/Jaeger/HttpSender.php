@@ -9,6 +9,7 @@ use Jaeger\Thrift\Span as JTSpan;
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactory;
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactoryInterface;
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterInterface;
+use OpenTelemetry\Contrib\Jaeger\TagFactory\TagFactory;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -117,7 +118,7 @@ class HttpSender
                 continue;
             }
 
-            $tags[] = SpanConverter::createJaegerTagInstance($key, $value);
+            $tags[] = TagFactory::createTag($key, $value);
         }
 
         return new Process([
