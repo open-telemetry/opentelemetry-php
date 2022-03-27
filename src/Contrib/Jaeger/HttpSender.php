@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Jaeger;
 
-use Jaeger\Thrift\Batch;
 use Jaeger\Thrift\Process;
 use Jaeger\Thrift\Span as JTSpan;
+use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactory;
+use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactoryInterface;
+use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterInterface;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -24,23 +26,28 @@ class HttpSender
 
     private TProtocol $protocol;
 
+    private BatchAdapterFactoryInterface $batchAdapterFactory;
+
     public function __construct(
         ClientInterface $client,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
         string $serviceName,
-        ParsedEndpointUrl $parsedEndpoint
+        ParsedEndpointUrl $parsedEndpoint,
+        BatchAdapterFactoryInterface $batchAdapterFactory = null
     ) {
         $this->serviceName = $serviceName;
 
-        $transport = (new ThriftHttpTransport(
-            $client,
-            $requestFactory,
-            $streamFactory,
-            $parsedEndpoint
-        ));
+        $this->protocol = new TBinaryProtocol(
+            new ThriftHttpTransport(
+                $client,
+                $requestFactory,
+                $streamFactory,
+                $parsedEndpoint
+            )
+        );
 
-        $this->protocol = new TBinaryProtocol($transport);
+        $this->batchAdapterFactory = $batchAdapterFactory ?? new BatchAdapterFactory();
     }
 
     public function send(iterable $spans): void
@@ -87,9 +94,9 @@ class HttpSender
             /** @var JTSpan[] */
             $convertedSpans = (new SpanConverter())->convert($spans);
 
-            $batch = new Batch([
+            $batch = $this->batchAdapterFactory->createBatchAdapter([
                 'spans' => $convertedSpans,
-                'process' => $process
+                'process' => $process,
             ]);
 
             $batches[] = $batch;
@@ -118,7 +125,7 @@ class HttpSender
         ]);
     }
 
-    private function sendBatch(Batch $batch): void 
+    private function sendBatch(BatchAdapterInterface $batch): void 
     {
         $batch->write($this->protocol);
         $this->protocol->getTransport()->flush();
