@@ -31,7 +31,7 @@ class Util
         );
 
         if ($alternativeMethodName !== null) {
-            $method = $alternativeClassName !== null
+            $method = $alternativeClassName === null
                 ? $alternativeMethodName
                 : sprintf('%s::%s', $alternativeClassName, $alternativeMethodName);
 
