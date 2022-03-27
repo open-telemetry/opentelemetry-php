@@ -85,11 +85,11 @@ class HttpSender
     private function createBatchesPerResource(array $spansGroupedByResource): array
     {
         $batches = [];
-        foreach ($spansGroupedByResource as $resourceKey => $data) { //TODO - name this better
+        foreach ($spansGroupedByResource as $unused => $dataForBatch) {
             /** @var SpanDataInterface[] */
-            $spans = $data['spans'];
+            $spans = $dataForBatch['spans'];
             /** @var ResourceInfo */
-            $resource = $data['resource'];
+            $resource = $dataForBatch['resource'];
 
             $process = $this->createProcessFromResource($resource);
             /** @var JTSpan[] */
