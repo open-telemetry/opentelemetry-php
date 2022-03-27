@@ -360,4 +360,16 @@ class ResourceInfoTest extends TestCase
             ResourceInfo::create(new Attributes(), "someSchemaUrl")
         ];
     }
+
+    public function test_serialize_incorporates_all_properties(): void
+    {
+        $resource = ResourceInfo::emptyResource();
+        $properties = (new \ReflectionClass($resource))->getProperties();
+
+        $serializedResource = $resource->serialize();
+
+        foreach ($properties as $property) {
+            $this->assertStringContainsString($property->getName(), $serializedResource);
+        }
+    }
 }
