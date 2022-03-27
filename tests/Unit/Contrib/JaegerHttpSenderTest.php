@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib;
 
-use OpenTelemetry\Contrib\Jaeger\HttpSender;
-use OpenTelemetry\Contrib\Jaeger\ParsedEndpointUrl;
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactoryInterface;
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterInterface;
+use OpenTelemetry\Contrib\Jaeger\HttpSender;
+use OpenTelemetry\Contrib\Jaeger\ParsedEndpointUrl;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
@@ -43,7 +43,7 @@ class JaegerHttpSenderTest extends TestCase
 
         return [
             'sender' => $sender,
-            'mockBatchAdapterFactory' => $mockBatchAdapterFactory
+            'mockBatchAdapterFactory' => $mockBatchAdapterFactory,
         ];
     }
 
@@ -57,8 +57,7 @@ class JaegerHttpSenderTest extends TestCase
 
     private function createBatchAdapterFactoryMock(): BatchAdapterFactoryInterface
     {
-        return new class implements BatchAdapterFactoryInterface
-        {
+        return new class() implements BatchAdapterFactoryInterface {
             //Just enough spy functionality for what was needed for now. Generalize and extend as needed
             private array $interceptedVals = [];
 
@@ -67,13 +66,14 @@ class JaegerHttpSenderTest extends TestCase
                 return $this->interceptedVals;
             }
 
-            public function createBatchAdapter(array $vals): BatchAdapterInterface 
+            public function createBatchAdapter(array $vals): BatchAdapterInterface
             {
                 $this->interceptedVals[] = $vals;
 
-                $mockBatchAdapter = new class implements BatchAdapterInterface
-                {
-                    public function write(TProtocol $output): void { }
+                $mockBatchAdapter = new class() implements BatchAdapterInterface {
+                    public function write(TProtocol $output): void
+                    {
+                    }
                 };
 
                 return $mockBatchAdapter;
@@ -87,7 +87,7 @@ class JaegerHttpSenderTest extends TestCase
             'sender' => $sender,
             'mockBatchAdapterFactory' => $mockBatchAdapterFactory
         ] = $this->createSenderAndMocks([
-            'serviceName' => 'nameOfThe1stLogicalApp'
+            'serviceName' => 'nameOfThe1stLogicalApp',
         ]);
 
         $spans = [
@@ -97,9 +97,9 @@ class JaegerHttpSenderTest extends TestCase
             (new SpanData())->setResource(ResourceInfo::create(
                 new Attributes([
                     'service.name' => 'nameOfThe2ndLogicalApp',
-                    'telemetry.sdk.name' => 'opentelemetry'
+                    'telemetry.sdk.name' => 'opentelemetry',
                 ]),
-            ))
+            )),
         ];
 
         $sender->send($spans);

@@ -68,10 +68,10 @@ class HttpSender
             $resource = $span->getResource();
             $resourceAsKey = $resource->serialize();
 
-            if(!isset($spansGroupedByResource[$resourceAsKey])) {
+            if (!isset($spansGroupedByResource[$resourceAsKey])) {
                 $spansGroupedByResource[$resourceAsKey] = [
                     'spans' => [],
-                    'resource' => $resource
+                    'resource' => $resource,
                 ];
             }
 
@@ -105,11 +105,12 @@ class HttpSender
     private function createProcessFromResource(ResourceInfo $resource): Process
     {
         $serviceName = $this->serviceName; //Defaulting to (what should be) the default resource's service name
-        
+
         $tags = [];
         foreach ($resource->getAttributes() as $key => $value) {
             if ($key === ResourceAttributes::SERVICE_NAME) {
                 $serviceName = (string) $value;
+
                 continue;
             }
 
@@ -122,7 +123,7 @@ class HttpSender
         ]);
     }
 
-    private function sendBatch(BatchAdapterInterface $batch): void 
+    private function sendBatch(BatchAdapterInterface $batch): void
     {
         $batch->write($this->protocol);
         $this->protocol->getTransport()->flush();

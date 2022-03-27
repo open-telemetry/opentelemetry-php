@@ -335,13 +335,13 @@ class ResourceInfoTest extends TestCase
             ResourceInfo::create(new Attributes([
                 'a' => 'someValue',
                 'b' => 'someValue',
-                'c' => 'someValue'
+                'c' => 'someValue',
             ])),
             ResourceInfo::create(new Attributes([
                 'c' => 'someValue',
                 'b' => 'someValue',
-                'a' => 'someValue'
-            ]))
+                'a' => 'someValue',
+            ])),
         ];
     }
 
@@ -357,7 +357,7 @@ class ResourceInfoTest extends TestCase
     {
         yield 'Null schema url vs Some schema url' => [
             ResourceInfo::create(new Attributes(), null),
-            ResourceInfo::create(new Attributes(), "someSchemaUrl")
+            ResourceInfo::create(new Attributes(), 'someSchemaUrl'),
         ];
     }
 

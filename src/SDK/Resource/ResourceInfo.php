@@ -130,7 +130,7 @@ class ResourceInfo
 
         $dehydratedAsArray = [
             'schemaUrl' => $this->schemaUrl,
-            'attributes' => $copyOfAttributesAsArray
+            'attributes' => $copyOfAttributesAsArray,
         ];
 
         $serializedAsString = serialize($dehydratedAsArray);
