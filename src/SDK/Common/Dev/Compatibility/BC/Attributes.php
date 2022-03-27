@@ -13,7 +13,7 @@ use OpenTelemetry\SDK\Common\Dev\Compatibility\Util;
  */
 const OpenTelemetry_SDK_Attributes = 'OpenTelemetry\SDK\Attributes';
 
-final class Attributes extends Moved
+final class Attributes extends Moved implements AttributesInterface
 {
     public function __construct(iterable $attributes = [], AttributeLimitsInterface $attributeLimits = null)
     {
