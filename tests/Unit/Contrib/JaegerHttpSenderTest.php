@@ -21,19 +21,11 @@ class JaegerHttpSenderTest extends TestCase
 {
     use UsesHttpClientTrait;
 
-    private function createParsedEndpointUrlMock(): ParsedEndpointUrl
-    {
-        /** @var ParsedEndpointUrl */
-        $mock = $this->createMock(ParsedEndpointUrl::class);
-
-        return $mock;
-    }
-
-    public function test_span_and_process_data_are_batched_by_resource()
+    private function createSenderAndMocks(): array
     {
         //TODO - refactor this into a helper
 
-         $mockBatchAdapterFactory = new class implements BatchAdapterFactoryInterface
+        $mockBatchAdapterFactory = new class implements BatchAdapterFactoryInterface
         {
             private array $interceptedVals = [];
 
@@ -55,8 +47,6 @@ class JaegerHttpSenderTest extends TestCase
             }
         };
 
-        //TODO - refactor this into a helper
-
         /**
          * @psalm-suppress PossiblyInvalidArgument
          */
@@ -68,6 +58,27 @@ class JaegerHttpSenderTest extends TestCase
             $this->createParsedEndpointUrlMock(),
             $mockBatchAdapterFactory
         );
+
+        return [
+            'sender' => $sender,
+            'mockBatchAdapterFactory' => $mockBatchAdapterFactory
+        ];
+    }
+
+    private function createParsedEndpointUrlMock(): ParsedEndpointUrl
+    {
+        /** @var ParsedEndpointUrl */
+        $mock = $this->createMock(ParsedEndpointUrl::class);
+
+        return $mock;
+    }
+
+    public function test_span_and_process_data_are_batched_by_resource()
+    {
+        [
+            'sender' => $sender,
+            'mockBatchAdapterFactory' => $mockBatchAdapterFactory
+        ] = $this->createSenderAndMocks();
 
         $spans = [
             (new SpanData())->setResource(ResourceInfo::create(
