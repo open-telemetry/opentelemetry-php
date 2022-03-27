@@ -123,7 +123,6 @@ class ResourceInfo
         return $this->schemaUrl;
     }
 
-    //TODO - figure out how to ensure this doesn't get out of sync as new properties are added (a test using reflection perhaps?)
     public function serialize(): string
     {
         $copyOfAttributesAsArray = array_slice($this->attributes->toArray(), 0); //This may be overly cautious (in trying to avoid mutating the source array)
@@ -136,6 +135,6 @@ class ResourceInfo
 
         $serializedAsString = serialize($dehydratedAsArray);
 
-        return $serializedAsString;
+        return $serializedAsString; //The exact value doesn't matter, as long as it can distingusih between instances that represent the same/different resources
     }
 }
