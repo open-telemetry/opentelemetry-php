@@ -12,6 +12,7 @@ use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterInterface;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use OpenTelemetry\SemConv\ResourceAttributes;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -111,7 +112,7 @@ class HttpSender
         
         $tags = [];
         foreach ($resource->getAttributes() as $key => $value) {
-            if ($key === "service.name") {
+            if ($key === ResourceAttributes::SERVICE_NAME) {
                 $serviceName = (string) $value;
                 continue;
             }
