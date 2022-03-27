@@ -27,29 +27,7 @@ class JaegerHttpSenderTest extends TestCase
             'serviceName' => $serviceName
         ] = $inputs;
 
-        //TODO - refactor this into a helper
-
-        $mockBatchAdapterFactory = new class implements BatchAdapterFactoryInterface
-        {
-            private array $interceptedVals = [];
-
-            public function getInterceptedVals()
-            {
-                return $this->interceptedVals;
-            }
-
-            public function createBatchAdapter(array $vals): BatchAdapterInterface 
-            {
-                $this->interceptedVals[] = $vals;
-
-                $mockBatchAdapter = new class implements BatchAdapterInterface
-                {
-                    public function write(TProtocol $output): void { }
-                };
-
-                return $mockBatchAdapter;
-            }
-        };
+        $mockBatchAdapterFactory = $this->createBatchAdapterFactoryMock();
 
         /**
          * @psalm-suppress PossiblyInvalidArgument
@@ -75,6 +53,32 @@ class JaegerHttpSenderTest extends TestCase
         $mock = $this->createMock(ParsedEndpointUrl::class);
 
         return $mock;
+    }
+
+    private function createBatchAdapterFactoryMock(): BatchAdapterFactoryInterface
+    {
+        return new class implements BatchAdapterFactoryInterface
+        {
+            //Just enough spy functionality for what was needed for now. Generalize and extend as needed
+            private array $interceptedVals = [];
+
+            public function getInterceptedVals()
+            {
+                return $this->interceptedVals;
+            }
+
+            public function createBatchAdapter(array $vals): BatchAdapterInterface 
+            {
+                $this->interceptedVals[] = $vals;
+
+                $mockBatchAdapter = new class implements BatchAdapterInterface
+                {
+                    public function write(TProtocol $output): void { }
+                };
+
+                return $mockBatchAdapter;
+            }
+        };
     }
 
     public function test_span_and_process_data_are_batched_by_resource()
