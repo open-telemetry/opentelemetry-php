@@ -8,7 +8,6 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibraryInterface as 
 
 interface InstrumentationLibraryInterface extends Moved
 {
-
 }
 
 /**

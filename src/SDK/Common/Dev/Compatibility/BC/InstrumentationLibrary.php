@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Dev\Compatibility\BC;
 
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary as Moved;
 use OpenTelemetry\SDK\Common\Dev\Compatibility\Util;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary as Moved;
 
 /**
  * @codeCoverageIgnoreStart
