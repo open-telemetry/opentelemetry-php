@@ -126,9 +126,12 @@ class ResourceInfo
     //TODO - figure out how to ensure this doesn't get out of sync as new properties are added (a test using reflection perhaps?)
     public function serialize(): string
     {
+        $copyOfAttributesAsArray = [...$this->attributes->toArray()];
+        ksort($copyOfAttributesAsArray); //sort the associative array by keys since the serializer will consider equal arrays different otherwise
+
         $dehydratedAsArray = [
             'schemaUrl' => $this->schemaUrl,
-            'attributes' => ksort([...$this->attributes->toArray()]) //sort the associative array by keys since the serializer will consider equal arrays different otherwise
+            'attributes' => $copyOfAttributesAsArray
         ];
 
         $serializedAsString = serialize($dehydratedAsArray);
