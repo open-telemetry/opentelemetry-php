@@ -108,7 +108,7 @@ class HttpSender
 
     private function createProcessFromResource(ResourceInfo $resource): Process
     {
-        $serviceName = $this->serviceName; //Defaulting to the default resource's service name //TODO - figure out if this really comes from the default resource in practice - https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/sdk.md#sdk-provided-resource-attributes
+        $serviceName = $this->serviceName; //Defaulting to (what should be) the default resource's service name
         
         $tags = [];
         foreach ($resource->getAttributes() as $key => $value) {
