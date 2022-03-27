@@ -44,7 +44,7 @@ class ResourceInfo
     /**
      * Backward compatibility methods
      *
-     * @codeCoverageIgnoreStart
+     * @codeCoverageIgnore
      */
     public static function merge(ResourceInfo ...$resources): ResourceInfo
     {
@@ -57,6 +57,9 @@ class ResourceInfo
         return ResourceInfoFactory::merge(...$resources);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function defaultResource(): ResourceInfo
     {
         BcUtil::triggerMethodDeprecationNotice(
@@ -68,6 +71,9 @@ class ResourceInfo
         return ResourceInfoFactory::defaultResource();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function emptyResource(): ResourceInfo
     {
         BcUtil::triggerMethodDeprecationNotice(
@@ -78,7 +84,4 @@ class ResourceInfo
 
         return ResourceInfoFactory::emptyResource();
     }
-    /**
-     * @codeCoverageIgnoreEnd
-     */
 }
