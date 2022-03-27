@@ -12,6 +12,8 @@ use Brick\Math\BigInteger;
  */
 class IdConverter
 {
+    const HEX_STR_FOR_2_TO_THE_POWER_63 = '8000000000000000';
+
     public static function convertOtelToJaegerTraceIds(string $traceId): array
     {
         $traceIdLow = self::convertHexStringToSignedInt(substr($traceId, 0, 16));
@@ -34,7 +36,7 @@ class IdConverter
         //But the input 16-digit hexadecimal number can represent any number between 0 and 2^64 - 1, which built-ins like intval can't handle without capping outputs at 2^63 - 1
         $hexStringAsInteger = BigInteger::fromBase($hexString, 16);
 
-        $shiftedInteger = $hexStringAsInteger->minus(BigInteger::fromBase('8000000000000000', 16)); //The number being subtracted is 2^63
+        $shiftedInteger = $hexStringAsInteger->minus(BigInteger::fromBase(self::HEX_STR_FOR_2_TO_THE_POWER_63, 16));
 
         $signedInt = $shiftedInteger->toInt();
 
