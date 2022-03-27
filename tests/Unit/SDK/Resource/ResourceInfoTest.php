@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @covers OpenTelemetry\SDK\Resource\ResourceInfo
  */
-class ResourceTest extends TestCase
+class ResourceInfoTest extends TestCase
 {
     use EnvironmentVariables;
 
