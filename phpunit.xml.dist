@@ -27,6 +27,9 @@
         <include>
             <directory>src</directory>
         </include>
+        <exclude>
+            <directory suffix=".php">src/SDK/Common/Dev/Compatibility/BC</directory>
+        </exclude>
     </coverage>
 
     <php>
