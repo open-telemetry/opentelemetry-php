@@ -320,12 +320,4 @@ class ResourceInfoTest extends TestCase
         $resource = ResourceInfo::defaultResource();
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
-
-    public function test_composer_detector(): void
-    {
-        $resource = (new Detectors\Composer())->getResource();
-
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
-    }
 }
