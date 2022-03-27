@@ -68,9 +68,3 @@ final class SystemClock implements ClockInterface
         return ((int) ($wallClockMicroTime * ClockInterface::NANOS_PER_SECOND)) - $upTime;
     }
 }
-
-/**
- * BC class alias
- * @todo: remove in future release. Also in composer.json autoload/files.
- */
-class_alias(SystemClock::class, 'OpenTelemetry\SDK\SystemClock');

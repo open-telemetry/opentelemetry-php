@@ -22,9 +22,3 @@ interface ClockInterface
      */
     public function nanoTime(): int;
 }
-
-/**
- * BC class alias
- * @todo: remove in future release. Also in composer.json autoload/files.
- */
-class_alias(ClockInterface::class, 'OpenTelemetry\SDK\ClockInterface');
