@@ -21,8 +21,12 @@ class JaegerHttpSenderTest extends TestCase
 {
     use UsesHttpClientTrait;
 
-    private function createSenderAndMocks(): array
+    private function createSenderAndMocks(array $inputs): array
     {
+        [
+            'serviceName' => $serviceName
+        ] = $inputs;
+
         //TODO - refactor this into a helper
 
         $mockBatchAdapterFactory = new class implements BatchAdapterFactoryInterface
@@ -54,7 +58,7 @@ class JaegerHttpSenderTest extends TestCase
             $this->getClientInterfaceMock(),
             $this->getRequestFactoryInterfaceMock(),
             $this->getStreamFactoryInterfaceMock(),
-            'nameOfThe1stLogicalApp',
+            $serviceName,
             $this->createParsedEndpointUrlMock(),
             $mockBatchAdapterFactory
         );
@@ -78,7 +82,9 @@ class JaegerHttpSenderTest extends TestCase
         [
             'sender' => $sender,
             'mockBatchAdapterFactory' => $mockBatchAdapterFactory
-        ] = $this->createSenderAndMocks();
+        ] = $this->createSenderAndMocks([
+            'serviceName' => 'nameOfThe1stLogicalApp'
+        ]);
 
         $spans = [
             (new SpanData())->setResource(ResourceInfo::create(
