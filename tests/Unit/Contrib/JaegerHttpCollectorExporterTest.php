@@ -14,6 +14,9 @@ use PHPUnit\Framework\TestCase;
  * @covers OpenTelemetry\Contrib\Jaeger\HttpSender
  * @covers OpenTelemetry\Contrib\Jaeger\ThriftHttpTransport
  * @covers OpenTelemetry\Contrib\Jaeger\ParsedEndpointUrl
+ * @covers OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapter
+ * @covers OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactory
+ * 
  */
 class JaegerHttpCollectorExporterTest extends TestCase
 {
