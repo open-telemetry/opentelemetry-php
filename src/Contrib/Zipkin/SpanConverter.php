@@ -8,7 +8,7 @@ use function max;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
-use OpenTelemetry\SDK\AbstractClock;
+use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -75,8 +75,8 @@ class SpanConverter implements SpanConverterInterface
     {
         $spanParent = $span->getParentContext();
 
-        $startTimestamp = AbstractClock::nanosToMicro($span->getStartEpochNanos());
-        $endTimestamp = AbstractClock::nanosToMicro($span->getEndEpochNanos());
+        $startTimestamp = TimeUtil::nanosToMicros($span->getStartEpochNanos());
+        $endTimestamp = TimeUtil::nanosToMicros($span->getEndEpochNanos());
 
         $row = [
             'id' => $span->getSpanId(),
@@ -167,7 +167,7 @@ class SpanConverter implements SpanConverterInterface
         $value = ($attributesAsJson !== null) ? sprintf('"%s": %s', $eventName, $attributesAsJson) : sprintf('"%s"', $eventName);
 
         $annotation = [
-            'timestamp' => AbstractClock::nanosToMicro($event->getEpochNanos()),
+            'timestamp' => TimeUtil::nanosToMicros($event->getEpochNanos()),
             'value' => $value,
         ];
 

@@ -2,17 +2,19 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK;
+namespace OpenTelemetry\SDK\Common\Time;
 
-use function intdiv;
-
+/**
+ * @deprecated
+ * Use {@see \OpenTelemetry\SDK\Common\Time\ClockFactory} and {@see \OpenTelemetry\SDK\Common\Time\Util} instead.
+ */
 abstract class AbstractClock implements ClockInterface
 {
     private static ?ClockInterface $testClock;
 
     public static function getDefault(): ClockInterface
     {
-        return self::$testClock ?? SystemClock::getInstance();
+        return self::$testClock ?? SystemClock::create();
     }
 
     /**
@@ -42,3 +44,9 @@ abstract class AbstractClock implements ClockInterface
         return $seconds * self::NANOS_PER_SECOND;
     }
 }
+
+/**
+ * BC class alias
+ * @todo: remove in future release. Also in composer.json autoload/files.
+ */
+class_alias(AbstractClock::class, 'OpenTelemetry\SDK\AbstractClock');

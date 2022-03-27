@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Time;
 
-use OpenTelemetry\SDK\AbstractClock;
-use OpenTelemetry\SDK\ClockInterface;
-use OpenTelemetry\SDK\SystemClock;
+use OpenTelemetry\SDK\Common\Time\AbstractClock;
+use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Common\Time\SystemClock;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\AbstractClock
+ * @covers \OpenTelemetry\SDK\Common\Time\AbstractClock
  */
 class AbstractClockTest extends TestCase
 {

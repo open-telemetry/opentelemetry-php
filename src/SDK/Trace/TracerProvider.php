@@ -9,6 +9,7 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use function register_shutdown_function;
@@ -38,7 +39,7 @@ final class TracerProvider implements API\TracerProviderInterface
         }
 
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
-        $resource = $resource ?? ResourceInfo::defaultResource();
+        $resource = $resource ?? ResourceInfoFactory::defaultResource();
         $sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
         $idGenerator = $idGenerator ?? new RandomIdGenerator();
         $spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
