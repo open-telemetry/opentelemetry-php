@@ -364,7 +364,7 @@ class ResourceInfoTest extends TestCase
 
     public function test_serialize_incorporates_all_properties(): void
     {
-        $resource = ResourceInfo::emptyResource();
+        $resource = ResourceInfoFactory::emptyResource();
         $properties = (new \ReflectionClass($resource))->getProperties();
 
         $serializedResource = $resource->serialize();
