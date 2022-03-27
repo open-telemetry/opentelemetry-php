@@ -320,4 +320,44 @@ class ResourceInfoTest extends TestCase
         $resource = ResourceInfo::defaultResource();
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
+
+    /**
+     * @dataProvider sameResourcesProvider
+     */
+    public function test_serialize_returns_same_output_for_objects_representing_the_same_resource(ResourceInfo $resource1, ResourceInfo $resource2): void
+    {
+        $this->assertSame($resource1->serialize(), $resource2->serialize());
+    }
+
+    public function sameResourcesProvider(): iterable
+    {
+        yield 'Attribute keys sorted in ascending order vs Attribute keys sorted in descending order' => [
+            ResourceInfo::create(new Attributes([
+                'a' => 'someValue',
+                'b' => 'someValue',
+                'c' => 'someValue'
+            ])),
+            ResourceInfo::create(new Attributes([
+                'c' => 'someValue',
+                'b' => 'someValue',
+                'a' => 'someValue'
+            ]))
+        ];
+    }
+
+    /**
+     * @dataProvider differentResourcesProvider
+     */
+    public function test_serialize_returns_different_output_for_objects_representing_different_resources(ResourceInfo $resource1, ResourceInfo $resource2): void
+    {
+        $this->assertNotSame($resource1->serialize(), $resource2->serialize());
+    }
+
+    public function differentResourcesProvider(): iterable
+    {
+        yield 'Null schema url vs Some schema url' => [
+            ResourceInfo::create(new Attributes(), null),
+            ResourceInfo::create(new Attributes(), "someSchemaUrl")
+        ];
+    }
 }
