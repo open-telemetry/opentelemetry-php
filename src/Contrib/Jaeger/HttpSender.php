@@ -57,8 +57,9 @@ class HttpSender
     {
         $spansGroupedByResource = [];
         foreach ($spans as $span) {
+            /** @var ResourceInfo */
             $resource = $span->getResource();
-            $resourceAsKey = json_encode($resource); //TODO - find a better way to make these work as keys in a map for deduplication
+            $resourceAsKey = $resource->serialize();
 
             if(!isset($spansGroupedByResource[$resourceAsKey])) {
                 $spansGroupedByResource[$resourceAsKey] = [
