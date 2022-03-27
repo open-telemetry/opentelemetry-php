@@ -65,7 +65,7 @@ class ResourceInfo
             ResourceInfoFactory::class
         );
 
-        ResourceInfoFactory::defaultResource();
+        return ResourceInfoFactory::defaultResource();
     }
 
     public static function emptyResource(): ResourceInfo
