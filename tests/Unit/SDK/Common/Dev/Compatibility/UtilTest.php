@@ -16,6 +16,20 @@ class UtilTest extends TestCase
     {
         $this->expectNotice();
 
-        Util::triggerClassDeprecationNotice(Util::class);
+        Util::triggerClassDeprecationNotice(Util::class, self::class);
+    }
+
+    public function test_trigger_method_deprecation_notice_without_class(): void
+    {
+        $this->expectNotice();
+
+        Util::triggerMethodDeprecationNotice(Util::class, __METHOD__);
+    }
+
+    public function test_trigger_method_deprecation_notice_with_class(): void
+    {
+        $this->expectNotice();
+
+        Util::triggerMethodDeprecationNotice(Util::class, 'foo', self::class);
     }
 }
