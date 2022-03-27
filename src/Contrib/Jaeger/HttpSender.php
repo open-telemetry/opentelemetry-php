@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Jaeger;
 
 use Jaeger\Thrift\Process;
-use Jaeger\Thrift\Span as JTSpan;
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactory;
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactoryInterface;
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterInterface;
 use OpenTelemetry\Contrib\Jaeger\TagFactory\TagFactory;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -87,13 +85,10 @@ class HttpSender
     {
         $batches = [];
         foreach ($spansGroupedByResource as $unused => $dataForBatch) {
-            /** @var SpanDataInterface[] */
             $spans = $dataForBatch['spans'];
-            /** @var ResourceInfo */
             $resource = $dataForBatch['resource'];
 
             $process = $this->createProcessFromResource($resource);
-            /** @var JTSpan[] */
             $convertedSpans = (new SpanConverter())->convert($spans);
 
             $batch = $this->batchAdapterFactory->createBatchAdapter([
