@@ -30,7 +30,8 @@ class IdConverter
 
     private static function convertHexStringToSignedInt(string $hexString): int
     {
-        //This is using high precision arithmetic because PHP by default won't do subtraction correctly for large integers (e.g. (2^63 - 1) - (2^63))
+        //This is using high precision arithmetic because PHP doesn't support integers greater than 2^63 - 1 (PHP_INT_MAX on a 64-bit system)
+        //But the input 16-digit hexadecimal number can represent any number between 0 and 2^64 - 1, which built-ins like intval can't handle without capping outputs at 2^63 - 1
         $hexStringAsInteger = BigInteger::fromBase($hexString, 16);
 
         $shiftedInteger = $hexStringAsInteger->minus(BigInteger::fromBase('8000000000000000', 16)); //The number being subtracted is 2^63
