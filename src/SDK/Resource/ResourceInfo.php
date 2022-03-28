@@ -6,6 +6,8 @@ namespace OpenTelemetry\SDK\Resource;
 
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
+use OpenTelemetry\SDK\Common\Dev\Compatibility\Util as BcUtil;
+
 /**
  * A Resource is an immutable representation of the entity producing telemetry. For example, a process producing telemetry
  * that is running in a container on Kubernetes has a Pod name, it is in a namespace and possibly is part of a Deployment
@@ -49,5 +51,49 @@ class ResourceInfo
             'schemaUrl' => $this->schemaUrl,
             'attributes' => $copyOfAttributesAsArray,
         ]);
+    }
+
+    /**
+     * Backward compatibility methods
+     *
+     * @codeCoverageIgnore
+     */
+    public static function merge(ResourceInfo ...$resources): ResourceInfo
+    {
+        BcUtil::triggerMethodDeprecationNotice(
+            __METHOD__,
+            'merge',
+            ResourceInfoFactory::class
+        );
+
+        return ResourceInfoFactory::merge(...$resources);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function defaultResource(): ResourceInfo
+    {
+        BcUtil::triggerMethodDeprecationNotice(
+            __METHOD__,
+            'defaultResource',
+            ResourceInfoFactory::class
+        );
+
+        return ResourceInfoFactory::defaultResource();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function emptyResource(): ResourceInfo
+    {
+        BcUtil::triggerMethodDeprecationNotice(
+            __METHOD__,
+            'emptyResource',
+            ResourceInfoFactory::class
+        );
+
+        return ResourceInfoFactory::emptyResource();
     }
 }

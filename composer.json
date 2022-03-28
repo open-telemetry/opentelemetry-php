@@ -56,9 +56,7 @@
         },
         "files": [
             "src/Context/fiber/initialize_fiber_handler.php",
-            "src/SDK/Common/Time/ClockInterface.php",
-            "src/SDK/Common/Time/AbstractClock.php",
-            "src/SDK/Common/Time/SystemClock.php"
+            "src/SDK/Common/Dev/Compatibility/_load.php"
         ]
     },
     "autoload-dev": {
