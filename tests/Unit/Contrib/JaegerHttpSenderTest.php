@@ -81,7 +81,7 @@ class JaegerHttpSenderTest extends TestCase
         };
     }
 
-    public function test_span_and_process_data_are_batched_by_resource()
+    public function test_span_and_process_data_are_batched_by_resource(): void
     {
         [
             'sender' => $sender,
@@ -97,7 +97,6 @@ class JaegerHttpSenderTest extends TestCase
             (new SpanData())->setResource(ResourceInfo::create(
                 new Attributes([
                     'service.name' => 'nameOfThe2ndLogicalApp',
-                    'telemetry.sdk.name' => 'opentelemetry',
                 ]),
             )),
         ];
@@ -108,18 +107,73 @@ class JaegerHttpSenderTest extends TestCase
         $this->assertSame(2, count($interceptedVals));
 
         //1st batch
-        $this->assertSame(1, count($interceptedVals[0]['spans'])); //Detailed tests for the conversion live elsewhere
+        $this->assertSame(1, count($interceptedVals[0]['spans'])); //Detailed tests for the span conversion live elsewhere
 
+        //2nd batch
+        $this->assertSame(1, count($interceptedVals[1]['spans'])); //Detailed tests for the span conversion live elsewhere
+    }
+
+    public function test_process_service_names_are_correctly_set_from_resource_attributes_or_the_default_service_name(): void
+    {
+        [
+            'sender' => $sender,
+            'mockBatchAdapterFactory' => $mockBatchAdapterFactory
+        ] = $this->createSenderAndMocks([
+            'serviceName' => 'nameOfThe1stLogicalApp',
+        ]);
+
+        $spans = [
+            (new SpanData())->setResource(ResourceInfo::create(
+                new Attributes(), //code should default service.name from how its set above
+            )),
+            (new SpanData())->setResource(ResourceInfo::create(
+                new Attributes([
+                    'service.name' => 'nameOfThe2ndLogicalApp',
+                ]),
+            )),
+        ];
+
+        $sender->send($spans);
+
+        $interceptedVals = $mockBatchAdapterFactory->getInterceptedVals();
+
+        //1st batch
         $this->assertSame('nameOfThe1stLogicalApp', $interceptedVals[0]['process']->serviceName);
 
+        //2nd batch
+        $this->assertSame('nameOfThe2ndLogicalApp', $interceptedVals[1]['process']->serviceName);
+    }
+
+    public function test_tags_are_correctly_set_from_resource_attributes(): void
+    {
+        [
+            'sender' => $sender,
+            'mockBatchAdapterFactory' => $mockBatchAdapterFactory
+        ] = $this->createSenderAndMocks([
+            'serviceName' => 'someServiceName',
+        ]);
+
+        $spans = [
+            (new SpanData())->setResource(ResourceInfo::create(
+                new Attributes(),
+            )),
+            (new SpanData())->setResource(ResourceInfo::create(
+                new Attributes([
+                    'telemetry.sdk.name' => 'opentelemetry',
+                ]),
+            )),
+        ];
+
+        $sender->send($spans);
+
+        $interceptedVals = $mockBatchAdapterFactory->getInterceptedVals();
+
+        //1st batch
         $this->assertSame(0, count($interceptedVals[0]['process']->tags));
 
         //2nd batch
-        $this->assertSame(1, count($interceptedVals[1]['spans'])); //Detailed tests for the conversion live elsewhere
-
-        $this->assertSame('nameOfThe2ndLogicalApp', $interceptedVals[1]['process']->serviceName);
-
         $this->assertSame(1, count($interceptedVals[1]['process']->tags));
+
         $this->assertSame('telemetry.sdk.name', $interceptedVals[1]['process']->tags[0]->key);
         $this->assertSame('opentelemetry', $interceptedVals[1]['process']->tags[0]->vStr);
     }
