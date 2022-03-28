@@ -25,4 +25,12 @@ class ComposerTest extends TestCase
         $this->assertSame($name, $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
         $this->assertSame($version, $resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
     }
+
+    public function test_composer_detector(): void
+    {
+        $resource = (new Detectors\Composer())->getResource();
+
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
+    }
 }

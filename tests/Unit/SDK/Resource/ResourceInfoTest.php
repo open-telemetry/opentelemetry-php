@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @covers OpenTelemetry\SDK\Resource\ResourceInfo
  */
-class ResourceTest extends TestCase
+class ResourceInfoTest extends TestCase
 {
     use EnvironmentVariables;
 
@@ -322,11 +322,55 @@ class ResourceTest extends TestCase
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
 
-    public function test_composer_detector(): void
+    /**
+     * @dataProvider sameResourcesProvider
+     */
+    public function test_serialize_returns_same_output_for_objects_representing_the_same_resource(ResourceInfo $resource1, ResourceInfo $resource2): void
     {
-        $resource = (new Detectors\Composer())->getResource();
+        $this->assertSame($resource1->serialize(), $resource2->serialize());
+    }
 
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
+    public function sameResourcesProvider(): iterable
+    {
+        yield 'Attribute keys sorted in ascending order vs Attribute keys sorted in descending order' => [
+            ResourceInfo::create(new Attributes([
+                'a' => 'someValue',
+                'b' => 'someValue',
+                'c' => 'someValue',
+            ])),
+            ResourceInfo::create(new Attributes([
+                'c' => 'someValue',
+                'b' => 'someValue',
+                'a' => 'someValue',
+            ])),
+        ];
+    }
+
+    /**
+     * @dataProvider differentResourcesProvider
+     */
+    public function test_serialize_returns_different_output_for_objects_representing_different_resources(ResourceInfo $resource1, ResourceInfo $resource2): void
+    {
+        $this->assertNotSame($resource1->serialize(), $resource2->serialize());
+    }
+
+    public function differentResourcesProvider(): iterable
+    {
+        yield 'Null schema url vs Some schema url' => [
+            ResourceInfo::create(new Attributes(), null),
+            ResourceInfo::create(new Attributes(), 'someSchemaUrl'),
+        ];
+    }
+
+    public function test_serialize_incorporates_all_properties(): void
+    {
+        $resource = ResourceInfoFactory::emptyResource();
+        $properties = (new \ReflectionClass($resource))->getProperties();
+
+        $serializedResource = $resource->serialize();
+
+        foreach ($properties as $property) {
+            $this->assertStringContainsString($property->getName(), $serializedResource);
+        }
     }
 }
