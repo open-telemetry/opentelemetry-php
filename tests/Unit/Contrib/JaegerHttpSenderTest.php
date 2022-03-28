@@ -59,16 +59,16 @@ class JaegerHttpSenderTest extends TestCase
     {
         return new class() implements BatchAdapterFactoryInterface {
             //Just enough spy functionality for what was needed for now. Generalize and extend as needed
-            private array $interceptedVals = [];
+            private array $interceptedValues = [];
 
-            public function getInterceptedVals()
+            public function getInterceptedValues()
             {
-                return $this->interceptedVals;
+                return $this->interceptedValues;
             }
 
-            public function create(array $vals): BatchAdapterInterface
+            public function create(array $values): BatchAdapterInterface
             {
-                $this->interceptedVals[] = $vals;
+                $this->interceptedValues[] = $values;
 
                 $mockBatchAdapter = new class() implements BatchAdapterInterface {
                     public function write(TProtocol $output): void
@@ -103,14 +103,14 @@ class JaegerHttpSenderTest extends TestCase
 
         $sender->send($spans);
 
-        $interceptedVals = $mockBatchAdapterFactory->getInterceptedVals();
-        $this->assertSame(2, count($interceptedVals));
+        $interceptedValues = $mockBatchAdapterFactory->getInterceptedValues();
+        $this->assertSame(2, count($interceptedValues));
 
         //1st batch
-        $this->assertSame(1, count($interceptedVals[0]['spans'])); //Detailed tests for the span conversion live elsewhere
+        $this->assertSame(1, count($interceptedValues[0]['spans'])); //Detailed tests for the span conversion live elsewhere
 
         //2nd batch
-        $this->assertSame(1, count($interceptedVals[1]['spans'])); //Detailed tests for the span conversion live elsewhere
+        $this->assertSame(1, count($interceptedValues[1]['spans'])); //Detailed tests for the span conversion live elsewhere
     }
 
     public function test_process_service_names_are_correctly_set_from_resource_attributes_or_the_default_service_name(): void
@@ -135,13 +135,13 @@ class JaegerHttpSenderTest extends TestCase
 
         $sender->send($spans);
 
-        $interceptedVals = $mockBatchAdapterFactory->getInterceptedVals();
+        $interceptedValues = $mockBatchAdapterFactory->getInterceptedValues();
 
         //1st batch
-        $this->assertSame('nameOfThe1stLogicalApp', $interceptedVals[0]['process']->serviceName);
+        $this->assertSame('nameOfThe1stLogicalApp', $interceptedValues[0]['process']->serviceName);
 
         //2nd batch
-        $this->assertSame('nameOfThe2ndLogicalApp', $interceptedVals[1]['process']->serviceName);
+        $this->assertSame('nameOfThe2ndLogicalApp', $interceptedValues[1]['process']->serviceName);
     }
 
     public function test_tags_are_correctly_set_from_resource_attributes(): void
@@ -166,15 +166,15 @@ class JaegerHttpSenderTest extends TestCase
 
         $sender->send($spans);
 
-        $interceptedVals = $mockBatchAdapterFactory->getInterceptedVals();
+        $interceptedValues = $mockBatchAdapterFactory->getInterceptedValues();
 
         //1st batch
-        $this->assertSame(0, count($interceptedVals[0]['process']->tags));
+        $this->assertSame(0, count($interceptedValues[0]['process']->tags));
 
         //2nd batch
-        $this->assertSame(1, count($interceptedVals[1]['process']->tags));
+        $this->assertSame(1, count($interceptedValues[1]['process']->tags));
 
-        $this->assertSame('telemetry.sdk.name', $interceptedVals[1]['process']->tags[0]->key);
-        $this->assertSame('opentelemetry', $interceptedVals[1]['process']->tags[0]->vStr);
+        $this->assertSame('telemetry.sdk.name', $interceptedValues[1]['process']->tags[0]->key);
+        $this->assertSame('opentelemetry', $interceptedValues[1]['process']->tags[0]->vStr);
     }
 }
