@@ -44,13 +44,10 @@ class ResourceInfo
         $copyOfAttributesAsArray = array_slice($this->attributes->toArray(), 0); //This may be overly cautious (in trying to avoid mutating the source array)
         ksort($copyOfAttributesAsArray); //sort the associative array by keys since the serializer will consider equal arrays different otherwise
 
-        $dehydratedAsArray = [
+        //The exact return value doesn't matter, as long as it can distingusih between instances that represent the same/different resources
+        return serialize([
             'schemaUrl' => $this->schemaUrl,
             'attributes' => $copyOfAttributesAsArray,
-        ];
-
-        $serializedAsString = serialize($dehydratedAsArray);
-
-        return $serializedAsString; //The exact value doesn't matter, as long as it can distingusih between instances that represent the same/different resources
+        ]);
     }
 }
