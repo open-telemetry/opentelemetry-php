@@ -6,5 +6,5 @@ namespace OpenTelemetry\Contrib\Jaeger\BatchAdapter;
 
 interface BatchAdapterFactoryInterface
 {
-    public function createBatchAdapter(array $values): BatchAdapterInterface;
+    public function create(array $values): BatchAdapterInterface;
 }

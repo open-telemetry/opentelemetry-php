@@ -6,7 +6,7 @@ namespace OpenTelemetry\Contrib\Jaeger\BatchAdapter;
 
 class BatchAdapterFactory implements BatchAdapterFactoryInterface
 {
-    public function createBatchAdapter(array $values): BatchAdapterInterface
+    public function create(array $values): BatchAdapterInterface
     {
         return new BatchAdapter($values);
     }

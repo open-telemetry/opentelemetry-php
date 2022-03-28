@@ -91,7 +91,7 @@ class HttpSender
             $process = $this->createProcessFromResource($resource);
             $convertedSpans = (new SpanConverter())->convert($spans);
 
-            $batch = $this->batchAdapterFactory->createBatchAdapter([
+            $batch = $this->batchAdapterFactory->create([
                 'spans' => $convertedSpans,
                 'process' => $process,
             ]);

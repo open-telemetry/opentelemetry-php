@@ -66,7 +66,7 @@ class JaegerHttpSenderTest extends TestCase
                 return $this->interceptedVals;
             }
 
-            public function createBatchAdapter(array $vals): BatchAdapterInterface
+            public function create(array $vals): BatchAdapterInterface
             {
                 $this->interceptedVals[] = $vals;
 
