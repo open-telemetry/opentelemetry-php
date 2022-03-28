@@ -11,9 +11,9 @@ class BatchAdapter implements BatchAdapterInterface
 {
     private Batch $batchInstance;
 
-    public function __construct(array $vals)
+    public function __construct(array $values)
     {
-        $this->batchInstance = new Batch($vals);
+        $this->batchInstance = new Batch($values);
     }
 
     public function write(TProtocol $output): void
