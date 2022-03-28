@@ -52,10 +52,11 @@ class HttpSender
 
     public function send(iterable $spans): void
     {
-        $spansGroupedByResource = self::groupSpansByResource($spans);
-        $batchArray = $this->createBatchesPerResource($spansGroupedByResource);
+        $batches = $this->createBatchesPerResource(
+            self::groupSpansByResource($spans)
+        );
 
-        foreach ($batchArray as $batch) {
+        foreach ($batches as $batch) {
             $this->sendBatch($batch);
         }
     }
