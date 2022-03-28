@@ -86,15 +86,13 @@ class HttpSender
     {
         $batches = [];
         foreach ($spansGroupedByResource as $unused => $dataForBatch) {
-            $spans = $dataForBatch['spans'];
-            $resource = $dataForBatch['resource'];
-
-            $process = $this->createProcessFromResource($resource);
-            $convertedSpans = (new SpanConverter())->convert($spans);
-
             $batch = $this->batchAdapterFactory->create([
-                'spans' => $convertedSpans,
-                'process' => $process,
+                'spans' => (new SpanConverter())->convert(
+                    $dataForBatch['spans']
+                ),
+                'process' => $this->createProcessFromResource(
+                    $dataForBatch['resource']
+                ),
             ]);
 
             $batches[] = $batch;
