@@ -113,7 +113,7 @@ class HttpSender
                 continue;
             }
 
-            $tags[] = TagFactory::createTag($key, $value);
+            $tags[] = TagFactory::create($key, $value);
         }
 
         return new Process([

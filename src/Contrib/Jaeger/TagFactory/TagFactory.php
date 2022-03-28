@@ -9,7 +9,7 @@ use Jaeger\Thrift\TagType;
 
 class TagFactory
 {
-    public static function createTag(string $key, $value): Tag
+    public static function create(string $key, $value): Tag
     {
         return self::createJaegerTagInstance(
             $key,

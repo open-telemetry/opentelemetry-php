@@ -196,7 +196,7 @@ class SpanConverter implements SpanConverterInterface
     {
         $tags = [];
         foreach ($tagPairs as $key => $value) {
-            $tags[] = TagFactory::createTag($key, $value);
+            $tags[] = TagFactory::create($key, $value);
         }
 
         return $tags;
