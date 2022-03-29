@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @covers OpenTelemetry\Contrib\Jaeger\SpanConverter
  * @covers OpenTelemetry\Contrib\Jaeger\IdConverter
+ * @covers OpenTelemetry\Contrib\Jaeger\TagFactory\TagFactory
  */
 class JaegerSpanConverterTest extends TestCase
 {
