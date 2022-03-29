@@ -8,11 +8,10 @@ use Jaeger\Thrift\Log;
 use Jaeger\Thrift\Span as JTSpan;
 use Jaeger\Thrift\SpanRef;
 use Jaeger\Thrift\SpanRefType;
-use Jaeger\Thrift\Tag;
-use Jaeger\Thrift\TagType;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
-use OpenTelemetry\SDK\AbstractClock;
+use OpenTelemetry\Contrib\Jaeger\TagFactory\TagFactory;
+use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\LinkInterface;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
@@ -69,8 +68,8 @@ class SpanConverter implements SpanConverterInterface
             'parentSpanId' => $parentSpanId,
         ] = self::convertOtelToJaegerIds($span);
 
-        $startTime = AbstractClock::nanosToMicro($span->getStartEpochNanos());
-        $duration = AbstractClock::nanosToMicro($span->getEndEpochNanos() - $span->getStartEpochNanos());
+        $startTime = TimeUtil::nanosToMicros($span->getStartEpochNanos());
+        $duration = TimeUtil::nanosToMicros($span->getEndEpochNanos() - $span->getStartEpochNanos());
 
         $tags = self::convertOtelSpanDataToJaegerTags($span);
 
@@ -181,87 +180,10 @@ class SpanConverter implements SpanConverterInterface
     {
         $tags = [];
         foreach ($tagPairs as $key => $value) {
-            $tags[] = self::buildTag($key, $value);
+            $tags[] = TagFactory::create($key, $value);
         }
 
         return $tags;
-    }
-
-    private static function buildTag(string $key, $value): Tag
-    {
-        return self::createJaegerTagInstance(
-            $key,
-            self::convertValueToTypeJaegerTagsSupport($value)
-        );
-    }
-
-    private static function convertValueToTypeJaegerTagsSupport($value)
-    {
-        if (is_array($value)) {
-            return self::serializeArrayToString($value);
-        }
-
-        return $value;
-    }
-
-    private static function createJaegerTagInstance(string $key, $value)
-    {
-        if (is_bool($value)) {
-            return new Tag([
-                'key' => $key,
-                'vType' => TagType::BOOL,
-                'vBool' => $value,
-            ]);
-        }
-
-        if (is_integer($value)) {
-            return new Tag([
-                'key' => $key,
-                'vType' => TagType::LONG,
-                'vLong' => $value,
-            ]);
-        }
-
-        if (is_numeric($value)) {
-            return new Tag([
-                'key' => $key,
-                'vType' => TagType::DOUBLE,
-                'vDouble' => $value,
-            ]);
-        }
-
-        return new Tag([
-            'key' => $key,
-            'vType' => TagType::STRING,
-            'vStr' => (string) $value,
-        ]);
-    }
-
-    private static function serializeArrayToString(array $arrayToSerialize): string
-    {
-        return self::recursivelySerializeArray($arrayToSerialize);
-    }
-
-    private static function recursivelySerializeArray($value): string
-    {
-        if (is_array($value)) {
-            return join(',', array_map(function ($val) {
-                return self::recursivelySerializeArray($val);
-            }, $value));
-        }
-
-        // Casting false to string makes an empty string
-        if (is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        // Floats will lose precision if their string representation
-        // is >=14 or >=17 digits, depending on PHP settings.
-        // Can also throw E_RECOVERABLE_ERROR if $value is an object
-        // without a __toString() method.
-        // This is possible because OpenTelemetry\Trace\Span does not verify
-        // setAttribute() $value input.
-        return (string) $value;
     }
 
     private static function convertOtelEventsToJaegerLogs(SpanDataInterface $span): array
@@ -276,7 +198,7 @@ class SpanConverter implements SpanConverterInterface
 
     private static function convertSingleOtelEventToJaegerLog(EventInterface $event): Log
     {
-        $timestamp = AbstractClock::nanosToMicro($event->getEpochNanos());
+        $timestamp = TimeUtil::nanosToMicros($event->getEpochNanos());
 
         $eventValue = $event->getAttributes()->get(self::EVENT_ATTRIBUTE_KEY_NAMED_EVENT) ?? $event->getName();
         $attributes = $event->getAttributes()->toArray();

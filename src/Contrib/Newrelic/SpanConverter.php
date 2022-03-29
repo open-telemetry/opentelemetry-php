@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Newrelic;
 
-use OpenTelemetry\SDK\AbstractClock;
+use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
@@ -37,8 +37,8 @@ class SpanConverter implements SpanConverterInterface
     {
         $spanParent = $span->getParentContext();
 
-        $startTimestamp = AbstractClock::nanosToMilli($span->getStartEpochNanos());
-        $endTimestamp = AbstractClock::nanosToMilli($span->getEndEpochNanos());
+        $startTimestamp = TimeUtil::nanosToMillis($span->getStartEpochNanos());
+        $endTimestamp = TimeUtil::nanosToMillis($span->getEndEpochNanos());
 
         $row = [
             'id' => $span->getSpanId(),

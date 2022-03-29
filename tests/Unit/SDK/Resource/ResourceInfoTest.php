@@ -10,13 +10,14 @@ use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @covers OpenTelemetry\SDK\Resource\ResourceInfo
  */
-class ResourceTest extends TestCase
+class ResourceInfoTest extends TestCase
 {
     use EnvironmentVariables;
 
@@ -27,7 +28,7 @@ class ResourceTest extends TestCase
 
     public function test_empty_resource(): void
     {
-        $resource = ResourceInfo::emptyResource();
+        $resource = ResourceInfoFactory::emptyResource();
         $this->assertEmpty($resource->getAttributes());
     }
 
@@ -63,7 +64,7 @@ class ResourceTest extends TestCase
 
     public function test_all_default_resources(): void
     {
-        $resource = ResourceInfo::defaultResource();
+        $resource = ResourceInfoFactory::defaultResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
 
@@ -93,7 +94,7 @@ class ResourceTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'none');
 
-        $resource = ResourceInfo::defaultResource();
+        $resource = ResourceInfoFactory::defaultResource();
 
         $this->assertNull($resource->getSchemaUrl());
 
@@ -120,7 +121,7 @@ class ResourceTest extends TestCase
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'env');
         $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'test-service');
 
-        $resource = ResourceInfo::defaultResource();
+        $resource = ResourceInfoFactory::defaultResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
 
@@ -147,7 +148,7 @@ class ResourceTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'os,host');
 
-        $resource = ResourceInfo::defaultResource();
+        $resource = ResourceInfoFactory::defaultResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
 
@@ -173,7 +174,7 @@ class ResourceTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'process,process_runtime');
 
-        $resource = ResourceInfo::defaultResource();
+        $resource = ResourceInfoFactory::defaultResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
 
@@ -199,7 +200,7 @@ class ResourceTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'sdk,sdk_provided');
 
-        $resource = ResourceInfo::defaultResource();
+        $resource = ResourceInfoFactory::defaultResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
 
@@ -229,7 +230,7 @@ class ResourceTest extends TestCase
     {
         $primary = ResourceInfo::create(new Attributes(['name' => 'primary', 'empty' => '']));
         $secondary = ResourceInfo::create(new Attributes(['version' => '1.0.0', 'empty' => 'value']));
-        $result = ResourceInfo::merge($primary, $secondary);
+        $result = ResourceInfoFactory::merge($primary, $secondary);
 
         $name = $result->getAttributes()->get('name');
         $version = $result->getAttributes()->get('version');
@@ -289,43 +290,87 @@ class ResourceTest extends TestCase
 
     public function test_resource_service_name_default(): void
     {
-        $resource = ResourceInfo::defaultResource();
+        $resource = ResourceInfoFactory::defaultResource();
         $this->assertEquals('unknown_service', $resource->getAttributes()->get('service.name'));
     }
 
     public function test_resource_with_empty_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', '');
-        $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::defaultResource());
+        $this->assertInstanceOf(ResourceInfo::class, ResourceInfoFactory::defaultResource());
     }
 
     public function test_resource_with_invalid_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo');
         $this->expectException(InvalidArgumentException::class);
-        $this->assertInstanceOf(ResourceInfo::class, ResourceInfo::defaultResource());
+        $this->assertInstanceOf(ResourceInfo::class, ResourceInfoFactory::defaultResource());
     }
 
     public function test_resource_from_environment_service_name_takes_precedence_over_resource_attribute(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=bar');
         $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'foo');
-        $resource = ResourceInfo::defaultResource();
+        $resource = ResourceInfoFactory::defaultResource();
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
 
     public function test_resource_from_environment_resource_attribute_takes_precedence_over_default(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');
-        $resource = ResourceInfo::defaultResource();
+        $resource = ResourceInfoFactory::defaultResource();
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
 
-    public function test_composer_detector(): void
+    /**
+     * @dataProvider sameResourcesProvider
+     */
+    public function test_serialize_returns_same_output_for_objects_representing_the_same_resource(ResourceInfo $resource1, ResourceInfo $resource2): void
     {
-        $resource = (new Detectors\Composer())->getResource();
+        $this->assertSame($resource1->serialize(), $resource2->serialize());
+    }
 
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
+    public function sameResourcesProvider(): iterable
+    {
+        yield 'Attribute keys sorted in ascending order vs Attribute keys sorted in descending order' => [
+            ResourceInfo::create(new Attributes([
+                'a' => 'someValue',
+                'b' => 'someValue',
+                'c' => 'someValue',
+            ])),
+            ResourceInfo::create(new Attributes([
+                'c' => 'someValue',
+                'b' => 'someValue',
+                'a' => 'someValue',
+            ])),
+        ];
+    }
+
+    /**
+     * @dataProvider differentResourcesProvider
+     */
+    public function test_serialize_returns_different_output_for_objects_representing_different_resources(ResourceInfo $resource1, ResourceInfo $resource2): void
+    {
+        $this->assertNotSame($resource1->serialize(), $resource2->serialize());
+    }
+
+    public function differentResourcesProvider(): iterable
+    {
+        yield 'Null schema url vs Some schema url' => [
+            ResourceInfo::create(new Attributes(), null),
+            ResourceInfo::create(new Attributes(), 'someSchemaUrl'),
+        ];
+    }
+
+    public function test_serialize_incorporates_all_properties(): void
+    {
+        $resource = ResourceInfoFactory::emptyResource();
+        $properties = (new \ReflectionClass($resource))->getProperties();
+
+        $serializedResource = $resource->serialize();
+
+        foreach ($properties as $property) {
+            $this->assertStringContainsString($property->getName(), $serializedResource);
+        }
     }
 }

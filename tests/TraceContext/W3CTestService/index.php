@@ -7,7 +7,7 @@ use App\Kernel;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
-use OpenTelemetry\SDK\AbstractClock;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
@@ -32,7 +32,7 @@ $exporter = new JaegerExporter(
 
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     $tracer = (new TracerProvider())
-        ->addSpanProcessor(new BatchSpanProcessor($exporter, AbstractClock::getDefault()))
+        ->addSpanProcessor(new BatchSpanProcessor($exporter, ClockFactory::getDefault()))
         ->getTracer('io.opentelemetry.contrib.php');
 
     $request = Request::createFromGlobals();
