@@ -27,14 +27,14 @@ class JaegerSpanConverterTest extends TestCase
     public function test_should_convert_an_otel_span_to_a_jaeger_thrift_span()
     {
         $span = (new SpanData())
-                    ->setName('otelSpanName');
+            ->setName('otelSpanName');
 
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 
-        $this->assertSame(PHP_INT_MIN, $convertedSpan->traceIdLow);
-        $this->assertSame(PHP_INT_MIN, $convertedSpan->traceIdHigh);
-        $this->assertSame(PHP_INT_MIN, $convertedSpan->spanId);
-        $this->assertSame(PHP_INT_MIN, $convertedSpan->parentSpanId);
+        $this->assertSame(0, $convertedSpan->traceIdLow);
+        $this->assertSame(0, $convertedSpan->traceIdHigh);
+        $this->assertSame(0, $convertedSpan->spanId);
+        $this->assertSame(0, $convertedSpan->parentSpanId);
         $this->assertSame('otelSpanName', $convertedSpan->operationName);
         $this->assertSame([], $convertedSpan->references);
         $this->assertSame(0, $convertedSpan->flags);
@@ -168,17 +168,17 @@ class JaegerSpanConverterTest extends TestCase
     public function test_should_correctly_convert_span_event_to_jaeger_log()
     {
         $span = (new SpanData())
-                    ->setEvents(
-                        [
-                        new Event(
-                            'eventName',
-                            1505855794194009601,
-                            new Attributes([
-                                    'eventAttributeKey' => 'eventAttributeValue',
-                                ])
-                        ),
-                        ]
-                    );
+            ->setEvents(
+                [
+                    new Event(
+                        'eventName',
+                        1505855794194009601,
+                        new Attributes([
+                            'eventAttributeKey' => 'eventAttributeValue',
+                        ])
+                    ),
+                ]
+            );
 
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 
@@ -193,17 +193,17 @@ class JaegerSpanConverterTest extends TestCase
     public function test_should_use_event_attribute_from_event_if_present_for_jaeger_log()
     {
         $span = (new SpanData())
-                    ->setEvents(
-                        [
-                        new Event(
-                            'eventName',
-                            1505855794194009601,
-                            new Attributes([
-                                    'event' => 'valueForTheEventAttributeOnTheEvent',
-                                ])
-                        ),
-                        ]
-                    );
+            ->setEvents(
+                [
+                    new Event(
+                        'eventName',
+                        1505855794194009601,
+                        new Attributes([
+                            'event' => 'valueForTheEventAttributeOnTheEvent',
+                        ])
+                    ),
+                ]
+            );
 
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 
@@ -216,19 +216,19 @@ class JaegerSpanConverterTest extends TestCase
     public function test_should_correctly_convert_span_link_to_jaeger_span_reference()
     {
         $span = (new SpanData())
-                    ->setLinks(
-                        [
-                            new Link(
-                                SpanContext::getInvalid()
-                            ),
-                        ]
-                    );
+            ->setLinks(
+                [
+                    new Link(
+                        SpanContext::getInvalid()
+                    ),
+                ]
+            );
 
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 
         $this->assertSame(1, $convertedSpan->references[0]->refType);
-        $this->assertSame(PHP_INT_MIN, $convertedSpan->references[0]->traceIdLow);
-        $this->assertSame(PHP_INT_MIN, $convertedSpan->references[0]->traceIdHigh);
-        $this->assertSame(PHP_INT_MIN, $convertedSpan->references[0]->spanId);
+        $this->assertSame(0, $convertedSpan->references[0]->traceIdLow);
+        $this->assertSame(0, $convertedSpan->references[0]->traceIdHigh);
+        $this->assertSame(0, $convertedSpan->references[0]->spanId);
     }
 }
