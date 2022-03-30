@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Resource\Detectors;
 
 use function class_exists;
 use Composer\InstalledVersions;
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;

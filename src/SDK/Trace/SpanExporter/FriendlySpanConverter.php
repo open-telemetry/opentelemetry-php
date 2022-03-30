@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Trace\SpanExporter;
 
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanKind;
-use OpenTelemetry\SDK\AttributesInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\LinkInterface;
@@ -114,7 +114,7 @@ class FriendlySpanConverter implements SpanConverterInterface
     }
 
     /**
-     * @param AttributesInterface $attributes
+     * @param \OpenTelemetry\SDK\Common\Attribute\AttributesInterface $attributes
      * @return array
      */
     private function convertAttributes(AttributesInterface $attributes): array

@@ -6,8 +6,8 @@ namespace OpenTelemetry\SDK\Trace;
 
 use function max;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\AttributesInterface;
-use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibraryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 /**
@@ -102,7 +102,7 @@ final class ImmutableSpan implements SpanDataInterface
         return $this->endEpochNanos;
     }
 
-    public function getInstrumentationLibrary(): InstrumentationLibrary
+    public function getInstrumentationLibrary(): InstrumentationLibraryInterface
     {
         return $this->span->getInstrumentationLibrary();
     }

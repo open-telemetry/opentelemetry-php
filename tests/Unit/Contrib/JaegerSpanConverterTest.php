@@ -8,8 +8,8 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Jaeger\SpanConverter;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\SDK\Trace\Link;
@@ -19,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers OpenTelemetry\Contrib\Jaeger\SpanConverter
+ * @covers OpenTelemetry\Contrib\Jaeger\IdConverter
+ * @covers OpenTelemetry\Contrib\Jaeger\TagFactory\TagFactory
  */
 class JaegerSpanConverterTest extends TestCase
 {
@@ -29,10 +31,10 @@ class JaegerSpanConverterTest extends TestCase
 
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 
-        $this->assertSame(0, $convertedSpan->traceIdLow);
-        $this->assertSame(0, $convertedSpan->traceIdHigh);
-        $this->assertSame(0, $convertedSpan->spanId);
-        $this->assertSame(0, $convertedSpan->parentSpanId);
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->traceIdLow);
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->traceIdHigh);
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->spanId);
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->parentSpanId);
         $this->assertSame('otelSpanName', $convertedSpan->operationName);
         $this->assertSame([], $convertedSpan->references);
         $this->assertSame(0, $convertedSpan->flags);
@@ -225,8 +227,8 @@ class JaegerSpanConverterTest extends TestCase
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 
         $this->assertSame(1, $convertedSpan->references[0]->refType);
-        $this->assertSame(0, $convertedSpan->references[0]->traceIdLow);
-        $this->assertSame(0, $convertedSpan->references[0]->traceIdHigh);
-        $this->assertSame(0, $convertedSpan->references[0]->spanId);
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->references[0]->traceIdLow);
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->references[0]->traceIdHigh);
+        $this->assertSame(PHP_INT_MIN, $convertedSpan->references[0]->spanId);
     }
 }

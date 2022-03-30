@@ -29,12 +29,12 @@ class Resolver
     public static function getRawValue(string $variableName): ?string
     {
         /** @psalm-suppress FalsableReturnStatement **/
-        return self::hasVariable($variableName) ? getenv($variableName) : null;
+        return self::hasVariable($variableName) ? self::retrieveValue($variableName) : null;
     }
 
     public static function hasVariable(string $variableName): bool
     {
-        return getenv($variableName) !== false;
+        return getenv($variableName) !== false || isset($_ENV[$variableName]);
     }
 
     public static function getDefault(string $variableName)
@@ -56,5 +56,15 @@ class Resolver
     {
         // don't use 'empty()', since '0' is not considered to be empty
         return $value === null || $value === '';
+    }
+
+    private static function retrieveValue(string $variableName)
+    {
+        $value = getenv($variableName);
+        if ($value === false) {
+            $value = $_ENV[$variableName] ?? false;
+        }
+
+        return $value;
     }
 }

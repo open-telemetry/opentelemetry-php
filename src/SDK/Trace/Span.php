@@ -13,11 +13,11 @@ use function get_class;
 use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\AbstractClock;
-use OpenTelemetry\SDK\AttributeLimits;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\AttributesInterface;
-use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibraryInterface;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use function sprintf;
 use function str_replace;
@@ -55,7 +55,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     private ResourceInfo $resource;
 
     /** @readonly */
-    private InstrumentationLibrary $instrumentationLibrary;
+    private InstrumentationLibraryInterface $instrumentationLibrary;
 
     /** @readonly */
     private int $startEpochNanos;
@@ -79,7 +79,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     private function __construct(
         string $name,
         API\SpanContextInterface $context,
-        InstrumentationLibrary $instrumentationLibrary,
+        InstrumentationLibraryInterface $instrumentationLibrary,
         int $kind,
         API\SpanContextInterface $parentSpanContext,
         SpanLimits $spanLimits,
@@ -119,7 +119,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     public static function startSpan(
         string $name,
         API\SpanContextInterface $context,
-        InstrumentationLibrary $instrumentationLibrary,
+        InstrumentationLibraryInterface $instrumentationLibrary,
         int $kind,
         API\SpanInterface $parentSpan,
         Context $parentContext,
@@ -129,14 +129,8 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         ?AttributesInterface $attributes,
         array $links,
         int $totalRecordedLinks,
-        int $userStartEpochNanos
+        int $startEpochNanos
     ): self {
-        if (0 !== $userStartEpochNanos) {
-            $startEpochNanos = $userStartEpochNanos;
-        } else {
-            $startEpochNanos = AbstractClock::getDefault()->now();
-        }
-
         $span = new self(
             $name,
             $context,
@@ -149,7 +143,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             $attributes,
             $links,
             $totalRecordedLinks,
-            $startEpochNanos
+            $startEpochNanos !== 0 ? $startEpochNanos : ClockFactory::getDefault()->now()
         );
 
         // Call onStart here to ensure the span is fully initialized.
@@ -264,7 +258,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         if (count($this->events) < $this->spanLimits->getEventCountLimit()) {
             $this->events[] = new Event(
                 $name,
-                $timestamp ?? AbstractClock::getDefault()->now(),
+                $timestamp ?? ClockFactory::getDefault()->now(),
                 Attributes::withLimits(
                     $attributes,
                     new AttributeLimits(
@@ -283,7 +277,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /** @inheritDoc */
     public function recordException(Throwable $exception, iterable $attributes = []): self
     {
-        $timestamp = AbstractClock::getDefault()->now();
+        $timestamp = ClockFactory::getDefault()->now();
         $eventAttributes = new Attributes([
                 'exception.type' => get_class($exception),
                 'exception.message' => $exception->getMessage(),
@@ -327,7 +321,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             return;
         }
 
-        $this->endEpochNanos = $endEpochNanos ?? AbstractClock::getDefault()->now();
+        $this->endEpochNanos = $endEpochNanos ?? ClockFactory::getDefault()->now();
         $this->hasEnded = true;
 
         $this->spanProcessor->onEnd($this);
@@ -344,7 +338,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         return $this->parentSpanContext;
     }
 
-    public function getInstrumentationLibrary(): InstrumentationLibrary
+    public function getInstrumentationLibrary(): InstrumentationLibraryInterface
     {
         return $this->instrumentationLibrary;
     }
@@ -373,7 +367,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /** @inheritDoc */
     public function getDuration(): int
     {
-        return ($this->hasEnded ? $this->endEpochNanos : AbstractClock::getDefault()->now()) - $this->startEpochNanos;
+        return ($this->hasEnded ? $this->endEpochNanos : ClockFactory::getDefault()->now()) - $this->startEpochNanos;
     }
 
     /** @inheritDoc */

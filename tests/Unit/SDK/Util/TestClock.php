@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Util;
 
-use OpenTelemetry\SDK\ClockInterface;
+use OpenTelemetry\SDK\Common\Time\ClockInterface;
 
 final class TestClock implements ClockInterface
 {

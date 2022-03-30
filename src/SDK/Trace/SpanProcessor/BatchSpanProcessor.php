@@ -6,10 +6,13 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\AbstractClock;
-use OpenTelemetry\SDK\ClockInterface;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Common\Time\StopWatch;
+use OpenTelemetry\SDK\Common\Time\StopWatchFactory;
+use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -32,9 +35,8 @@ class BatchSpanProcessor implements SpanProcessorInterface
     /** @phpstan-ignore-next-line */
     private ?int $exporterTimeoutMillis;
     private ?int $maxExportBatchSize;
-    private ?int $lastExportTimestamp = null;
-    private ClockInterface $clock;
     private bool $running = true;
+    private StopWatch $stopwatch;
 
     /** @var list<SpanDataInterface> */
     private array $queue = [];
@@ -47,11 +49,10 @@ class BatchSpanProcessor implements SpanProcessorInterface
         int $exporterTimeoutMillis = null,
         int $maxExportBatchSize = null
     ) {
-        if (null === $clock) {
-            $clock = AbstractClock::getDefault();
-        }
         $this->exporter = $exporter;
-        $this->clock = $clock;
+        // @todo make the stopwatch a dependency rather than using the factory?
+        $this->stopwatch = StopWatchFactory::create($clock ?? ClockFactory::getDefault())->build();
+        $this->stopwatch->start();
         $this->maxQueueSize = $maxQueueSize
             ?: $this->getIntFromEnvironment(Env::OTEL_BSP_MAX_QUEUE_SIZE, self::DEFAULT_MAX_QUEUE_SIZE);
         $this->scheduledDelayMillis = $scheduledDelayMillis
@@ -99,16 +100,14 @@ class BatchSpanProcessor implements SpanProcessorInterface
     /** @inheritDoc */
     public function forceFlush(): bool
     {
-        if (!$this->running) {
+        if (!$this->running || $this->exporter === null) {
             return true;
         }
 
-        if (null !== $this->exporter) {
-            $this->exporter->export($this->queue);
-            $this->queue = [];
-            $this->lastExportTimestamp = $this->clock->nanoTime();
-            $this->exporter->forceFlush();
-        }
+        $this->exporter->export($this->queue);
+        $this->queue = [];
+        $this->stopwatch->reset();
+        $this->exporter->forceFlush();
 
         return true;
     }
@@ -140,15 +139,6 @@ class BatchSpanProcessor implements SpanProcessorInterface
 
     protected function enoughTimeHasPassed(): bool
     {
-        $now = $this->clock->nanoTime();
-
-        // if lastExport never occurred let it start from now on
-        if (null === $this->lastExportTimestamp) {
-            $this->lastExportTimestamp = $now;
-
-            return false;
-        }
-
-        return ($this->scheduledDelayMillis * ClockInterface::NANOS_PER_MILLISECOND) < ($now - $this->lastExportTimestamp);
+        return TimeUtil::millisToNanos((int) $this->scheduledDelayMillis) < $this->stopwatch->getLastElapsedTime();
     }
 }

@@ -7,8 +7,9 @@ namespace OpenTelemetry\SDK\Trace;
 use function is_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
-use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use function register_shutdown_function;
@@ -38,7 +39,7 @@ final class TracerProvider implements API\TracerProviderInterface
         }
 
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
-        $resource = $resource ?? ResourceInfo::defaultResource();
+        $resource = $resource ?? ResourceInfoFactory::defaultResource();
         $sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
         $idGenerator = $idGenerator ?? new RandomIdGenerator();
         $spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
@@ -60,19 +61,19 @@ final class TracerProvider implements API\TracerProviderInterface
     }
 
     /** @inheritDoc */
-    public function getTracer(string $name = self::DEFAULT_TRACER_NAME, ?string $version = null): API\TracerInterface
+    public function getTracer(string $name = self::DEFAULT_TRACER_NAME, ?string $version = null, ?string $schemaUrl = null): API\TracerInterface
     {
         if ($this->tracerSharedState->hasShutdown()) {
             return NoopTracer::getInstance();
         }
 
-        $key = sprintf('%s@%s', $name, ($version ?? 'unknown'));
+        $key = sprintf('%s@%s %s', $name, ($version ?? 'unknown'), ($schemaUrl ?? ''));
 
         if (isset($this->tracers[$key]) && $this->tracers[$key] instanceof API\TracerInterface) {
             return $this->tracers[$key];
         }
 
-        $instrumentationLibrary = new InstrumentationLibrary($name, $version);
+        $instrumentationLibrary = new InstrumentationLibrary($name, $version, $schemaUrl);
 
         $tracer = new Tracer(
             $this->tracerSharedState,

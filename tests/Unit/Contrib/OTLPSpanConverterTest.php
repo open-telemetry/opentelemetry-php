@@ -16,8 +16,8 @@ use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind as ProtoSpanKind;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
@@ -164,7 +164,7 @@ class OTLPSpanConverterTest extends TestCase
             ->setStartEpochNanos($start_time)
             ->setEndEpochNanos($end_time)
             ->setName('http_get')
-            ->setInstrumentationLibrary(new InstrumentationLibrary('lib-test', 'v0.1.0'))
+            ->setInstrumentationLibrary(new InstrumentationLibrary('lib-test', 'v0.1.0', 'http://url'))
             ->addAttribute('user', 'alice')
             ->addAttribute('authenticated', true)
             ->addEvent('Event1', new Attributes(['success' => 'yes']), 1617313804325769955)
@@ -239,6 +239,7 @@ class OTLPSpanConverterTest extends TestCase
                             'dropped_links_count' => 0,
                         ]),
                     ],
+                    'schema_url' => 'http://url',
                 ]),
             ],
         ]);
