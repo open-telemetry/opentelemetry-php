@@ -1,7 +1,12 @@
+---
 name: Psalm Security Analysis
 
-on: [push, pull_request]
-
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
 jobs:
   psalm:
     name: Psalm
