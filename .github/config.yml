@@ -1,0 +1,5 @@
+# configuration for new-issue-welcome bot https://github.com/behaviorbot/new-issue-welcome
+newPRWelcomeComment: >
+    Thanks for opening your first pull request! If you haven't yet signed our Contributor License Agreement (CLA),
+    then please do so that we can accept your contribution.
+    A link should appear shortly in this PR if you have not already signed one.
