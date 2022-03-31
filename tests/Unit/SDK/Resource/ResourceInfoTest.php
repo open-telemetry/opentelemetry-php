@@ -259,6 +259,7 @@ class ResourceInfoTest extends TestCase
 
     /**
      * @dataProvider environmentResourceProvider
+     * @group compliance
      */
     public function test_resource_from_environment(string $envAttributes, array $userAttributes, array $expected): void
     {
@@ -294,12 +295,18 @@ class ResourceInfoTest extends TestCase
         $this->assertEquals('unknown_service', $resource->getAttributes()->get('service.name'));
     }
 
+    /**
+     * @group compliance
+     */
     public function test_resource_with_empty_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', '');
         $this->assertInstanceOf(ResourceInfo::class, ResourceInfoFactory::defaultResource());
     }
 
+    /**
+     * @group compliance
+     */
     public function test_resource_with_invalid_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo');
@@ -307,6 +314,9 @@ class ResourceInfoTest extends TestCase
         $this->assertInstanceOf(ResourceInfo::class, ResourceInfoFactory::defaultResource());
     }
 
+    /**
+     * @group compliance
+     */
     public function test_resource_from_environment_service_name_takes_precedence_over_resource_attribute(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=bar');
@@ -315,6 +325,9 @@ class ResourceInfoTest extends TestCase
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
 
+    /**
+     * @group compliance
+     */
     public function test_resource_from_environment_resource_attribute_takes_precedence_over_default(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');
