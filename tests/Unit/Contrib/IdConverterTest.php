@@ -25,7 +25,7 @@ class IdConverterTest extends TestCase
         // 16 char hex string
         $hex = bin2hex(random_bytes(8));
 
-        $this->assertEquals($hex, dechex(IdConverter::convertOtelToJaegerSpanId($hex)));
+        $this->assertEquals($hex, $this->dechexWithLeadingZeroes(IdConverter::convertOtelToJaegerSpanId($hex)));
     }
 
     public function test_correctly_converted_trace_id()
@@ -34,8 +34,13 @@ class IdConverterTest extends TestCase
         $hex = bin2hex(random_bytes(16));
 
         $traceId = IdConverter::convertOtelToJaegerTraceIds($hex);
-        $convertedTraceId = dechex((int) $traceId['traceIdHigh']);
-        $convertedTraceId .= dechex((int) $traceId['traceIdLow']);
+        $convertedTraceId = $this->dechexWithLeadingZeroes((int) $traceId['traceIdHigh']);
+        $convertedTraceId .= $this->dechexWithLeadingZeroes((int) $traceId['traceIdLow']);
         $this->assertEquals($hex, $convertedTraceId);
+    }
+
+    private function dechexWithLeadingZeroes(int $num)
+    {
+        return str_pad(dechex($num), 16, '0', STR_PAD_LEFT);
     }
 }
