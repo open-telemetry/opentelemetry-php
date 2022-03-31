@@ -6,9 +6,10 @@ namespace OpenTelemetry\SDK\Resource\Detectors;
 
 use function class_exists;
 use Composer\InstalledVersions;
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 
 final class Composer implements ResourceDetectorInterface
@@ -16,7 +17,7 @@ final class Composer implements ResourceDetectorInterface
     public function getResource(): ResourceInfo
     {
         if (!class_exists(InstalledVersions::class)) {
-            return ResourceInfo::emptyResource();
+            return ResourceInfoFactory::emptyResource();
         }
 
         $attributes = [

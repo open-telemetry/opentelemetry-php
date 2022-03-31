@@ -6,8 +6,8 @@ namespace OpenTelemetry\SDK\Trace;
 
 use function count;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\AttributesInterface;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class Link implements LinkInterface
 {
