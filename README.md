@@ -6,14 +6,34 @@
 ## Current Project Status
 ![Current Version](https://img.shields.io/github/v/tag/open-telemetry/opentelemetry-php)
 
-This project currently lives in a pre-alpha status.  Our current release is not production ready; it has been created in order to receive feedback from the community.
+This project currently lives in a **alpha status**.  Our current release is not production ready; it has been created in order to receive feedback from the community. \
+As long as this project is in alpha status, things may and probably will break once in a while.  \
+We aim to provide backward compatibility (without any guarantee) even for alpha releases, however the library will raise notices indicating breaking changes and what to do about them. \
+If you don't want these notices to appear or change the error message level, you can do so by calling:
+```php
+OpenTelemetry\SDK\Common\Dev\Compatibility\Util::setErrorLevel(0)
+``` 
+to turn messages off completely, or (for example)
+```php
+OpenTelemetry\SDK\Common\Dev\Compatibility\Util::setErrorLevel(E_USER_DEPRECATED)
+``` 
+to trigger only deprecation notices. Valid error levels are `0` (none), `E_USER_DEPRECATED`, `E_USER_NOTICE`, `E_USER_WARNING` and `E_USER_ERROR`  \
+However (as long as in alpha) it is safer to pin a dependency on the library to a specific version and/or make the adjustments 
+mentioned in the provided messages, since doing otherwise may break things completely for you in the future!
+
+---
+
 
 There is a supplemental repository for OpenTelemetry PHP contributions that are not part of the core distribution of the library. Typically, these contributions are vendor specific receivers/exporters and/or components that are only useful to a relatively small number of users.  This repository can be found here:
 https://github.com/open-telemetry/opentelemetry-php-contrib/
 
+---
+
 We attempt to keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show which features are available and which have not yet been implemented.  
 
 If you find an inconsistency in the data in the matrix vs. the data in this repository, please let us know in our slack channel and we'll get it rectified.
+
+---
 
 ## Communication
 Most of our communication is done on CNCF Slack, in the [otel-php](https://cloud-native.slack.com/archives/C01NFPCV44V) channel. To sign up, create a CNCF slack account here http://slack.cncf.io/
