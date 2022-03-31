@@ -17,7 +17,7 @@ class Util
             $notice .= sprintf('Please, use "%s" instead.', $alternativeClassName);
         }
 
-        trigger_error($notice, E_USER_DEPRECATED);
+        trigger_error($notice, \E_USER_DEPRECATED);
     }
 
     public static function triggerMethodDeprecationNotice(
@@ -38,6 +38,6 @@ class Util
             $notice .= sprintf('Please, use "%s" instead.', $method);
         }
 
-        trigger_error($notice, E_USER_DEPRECATED);
+        trigger_error($notice, \E_USER_DEPRECATED);
     }
 }
