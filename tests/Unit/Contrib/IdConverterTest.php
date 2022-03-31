@@ -20,7 +20,7 @@ class IdConverterTest extends TestCase
         $this->assertEquals(-72057594037927936, IdConverter::convertOtelToJaegerSpanId($hex));
     }
 
-    public function test_correctly_converted_span_id()
+    public function test_correctly_converted_random_span_id()
     {
         // 16 char hex string
         $hex = bin2hex(random_bytes(8));
@@ -28,7 +28,7 @@ class IdConverterTest extends TestCase
         $this->assertEquals($hex, $this->dechexWithLeadingZeroes(IdConverter::convertOtelToJaegerSpanId($hex)));
     }
 
-    public function test_correctly_converted_trace_id()
+    public function test_correctly_converted_random_trace_id()
     {
         // 32 char hex string
         $hex = bin2hex(random_bytes(16));
