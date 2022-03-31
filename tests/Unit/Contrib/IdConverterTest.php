@@ -30,7 +30,7 @@ class IdConverterTest extends TestCase
 
     public function test_correctly_converts_trace_id()
     {
-        $hex = "0102030405060708090a0b0c0d0e0f10";
+        $hex = '0102030405060708090a0b0c0d0e0f10';
 
         $traceId = IdConverter::convertOtelToJaegerTraceIds($hex);
 
