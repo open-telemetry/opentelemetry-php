@@ -2,18 +2,20 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Integration\SDK\Trace;
+namespace OpenTelemetry\Tests\Integration\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers OpenTelemetry\SDK\Trace\SpanLimitsBuilder
- */
 class SpanLimitsBuilderTest extends TestCase
 {
     use EnvironmentVariables;
+
+    public function tearDown(): void
+    {
+        $this->restoreEnvironmentVariables();
+    }
 
     /**
      * @group trace-compliance
