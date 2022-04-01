@@ -242,6 +242,29 @@ class ResourceInfoTest extends TestCase
         $this->assertEquals('', $empty);
     }
 
+    /**
+     * @dataProvider schemaUrlsToMergeProvider
+     */
+    public function test_merge_schema_url(array $schemaUrlsToMerge, ?string $expectedSchemaUrl): void
+    {
+        $resourcesToMerge = [];
+        foreach ($schemaUrlsToMerge as $schemaUrl) {
+            $resourcesToMerge[] = ResourceInfo::create(new Attributes([]), $schemaUrl);
+        }
+        $result = ResourceInfoFactory::merge(...$resourcesToMerge);
+
+        $this->assertEquals($expectedSchemaUrl, $result->getSchemaUrl());
+    }
+
+    public function schemaUrlsToMergeProvider()
+    {
+        yield 'Should keep old schemaUrl when the updating one is empty' => [['http://url', null], 'http://url'];
+        yield 'Should override empty old schemaUrl with non-empty updating one' => [[null, 'http://url'], 'http://url'];
+        yield 'Should keep matching schemaUrls' => [['http://url', 'http://url'], 'http://url'];
+        yield 'Should resolve an empty schemaUrl when the old and the updating are not equal' => [['http://url-1', 'http://url-2'], null];
+        yield 'Should keep empty schemaUrl when not equal schemas have been merged before' => [['http://url-1', 'http://url-2', 'http://url-2'], null];
+    }
+
     public function test_immutable_create(): void
     {
         $attributes = new Attributes();
