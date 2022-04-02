@@ -116,7 +116,7 @@ $ composer require open-telemetry/opentelemetry
 ```
 
 ## Development
-For repeatable and consistency across different operating systems, we use the [3 Musketeers pattern](https://3musketeers.io/). If you're on Windows, it might be a good idea to use Git bash for following the steps below.
+For repeatability and consistency across different operating systems, we use the [3 Musketeers pattern](https://3musketeers.io/). If you're on Windows, it might be a good idea to use Git bash for following the steps below.
 
 We use `docker` and `docker-compose` to perform a lot of our static analysis and testing. If you're planning to develop for this library, it'll help to install `docker engine` and `docker-compose`.
 
