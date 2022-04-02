@@ -8,6 +8,9 @@ use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversNothing
+ */
 class SpanLimitsBuilderTest extends TestCase
 {
     use EnvironmentVariables;
