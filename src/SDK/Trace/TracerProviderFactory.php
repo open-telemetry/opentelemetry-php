@@ -31,21 +31,21 @@ final class TracerProviderFactory
         try {
             $exporter = $this->exporterFactory->fromEnvironment();
         } catch (\Throwable $t) {
-            $this->logWarning('Unable to create exporter', ['error' => $t]);
+            self::logWarning('Unable to create exporter', ['error' => $t]);
             $exporter = null;
         }
 
         try {
             $sampler = $this->samplerFactory->fromEnvironment();
         } catch (\Throwable $t) {
-            $this->logWarning('Unable to create sampler', ['error' => $t]);
+            self::logWarning('Unable to create sampler', ['error' => $t]);
             $sampler = null;
         }
 
         try {
             $spanProcessor = $this->spanProcessorFactory->fromEnvironment($exporter);
         } catch (\Throwable $t) {
-            $this->logWarning('Unable to create span processor', ['error' => $t]);
+            self::logWarning('Unable to create span processor', ['error' => $t]);
             $spanProcessor = null;
         }
 
