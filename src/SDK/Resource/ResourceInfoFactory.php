@@ -24,12 +24,12 @@ class ResourceInfoFactory
     public static function merge(ResourceInfo ...$resources): ResourceInfo
     {
         $attributes = [];
-        $schemaUrl = null;
 
         foreach ($resources as $resource) {
             $attributes += $resource->getAttributes()->toArray();
-            $schemaUrl ??= $resource->getSchemaUrl();
         }
+
+        $schemaUrl = self::mergeSchemaUrl(...$resources);
 
         return ResourceInfo::create(new Attributes($attributes), $schemaUrl);
     }
@@ -92,5 +92,19 @@ class ResourceInfoFactory
     public static function emptyResource(): ResourceInfo
     {
         return ResourceInfo::create(new Attributes());
+    }
+
+    private static function mergeSchemaUrl(ResourceInfo ...$resources): ?string
+    {
+        $schemaUrl = null;
+        foreach ($resources as $resource) {
+            if ($schemaUrl !== null && $resource->getSchemaUrl() !== null && $schemaUrl !== $resource->getSchemaUrl()) {
+                // stop the merging if non-empty conflicting schemas are detected
+                return null;
+            }
+            $schemaUrl ??= $resource->getSchemaUrl();
+        }
+
+        return $schemaUrl;
     }
 }
