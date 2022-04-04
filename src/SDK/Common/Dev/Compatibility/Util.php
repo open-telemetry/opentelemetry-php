@@ -30,6 +30,9 @@ class Util
         return self::$errorLevel;
     }
 
+    /**
+     * @psalm-suppress ArgumentTypeCoercion
+     */
     public static function triggerClassDeprecationNotice(string $className, string $alternativeClassName = null): void
     {
         if (self::getErrorLevel() === self::E_NONE) {
@@ -48,6 +51,9 @@ class Util
         trigger_error($notice, self::$errorLevel);
     }
 
+    /**
+     * @psalm-suppress ArgumentTypeCoercion
+     */
     public static function triggerMethodDeprecationNotice(
         string $methodName,
         string $alternativeMethodName = null,
