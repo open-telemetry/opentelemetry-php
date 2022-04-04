@@ -24,7 +24,7 @@ A Google calendar invite with the included zoom link can be found [here](https:/
 Our open issues can all be found in the [github issues tab](https://github.com/open-telemetry/opentelemetry-php/issues).  Feel free to reach out on Slack if you have any additional questions about these issues; we are always happy to talk through implementation details.
 
 ## Requirements
-The library requires a PHP version of 7.4.x or 8.0.x (PHP 8.1 compability is in the works)
+The library requires a PHP version of 7.4.x, 8.0.x or 8.1.x
 
 ### Dependencies
 
@@ -91,7 +91,7 @@ Using fibers with non-`CLI` SAPIs may require pre-loading of bindings. One way t
 
 ** The PHP protobuf extension is optional when using either the `OTLPHttp` or `OTLPGrpc` exporters.**
 
-The protobuf extension makes both exporters more performant. _Note: there are some deprecation warnings with protobuf and PHP 8.1_
+The protobuf extension makes both exporters more performant. _Note that protobuf 3.20.0+ is required for php 8.1 support_
 
 ---
 
