@@ -34,6 +34,16 @@ class UtilTest extends TestCase
     /**
      * @dataProvider errorLevelProvider
      */
+    public function test_set_error_level_throws_exception_on_in_correct_level(int $level): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Util::setErrorLevel(1);
+    }
+
+    /**
+     * @dataProvider errorLevelProvider
+     */
     public function test_trigger_class_deprecation_notice(int $level, string $expectedError): void
     {
         Util::setErrorLevel($level);
