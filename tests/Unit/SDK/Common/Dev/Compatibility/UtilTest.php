@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Dev\Compatibility;
 
+use Generator;
 use OpenTelemetry\SDK\Common\Dev\Compatibility\Util;
 use PHPUnit\Framework\TestCase;
 
@@ -12,24 +13,83 @@ use PHPUnit\Framework\TestCase;
  */
 class UtilTest extends TestCase
 {
-    public function test_trigger_class_deprecation_notice(): void
+    public function tearDown(): void
     {
-        $this->expectNotice();
+        Util::setErrorLevel();
+    }
+
+    /**
+     * @dataProvider errorLevelProvider
+     */
+    public function test_set_error_level(int $level): void
+    {
+        Util::setErrorLevel($level);
+
+        $this->assertSame(
+            $level,
+            Util::getErrorLevel()
+        );
+    }
+
+    public function test_set_error_level_throws_exception_on_incorrect_level(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Util::setErrorLevel(1);
+    }
+
+    /**
+     * @dataProvider errorLevelProvider
+     */
+    public function test_trigger_class_deprecation_notice(int $level, string $expectedError): void
+    {
+        Util::setErrorLevel($level);
+
+        $this->{$expectedError}();
 
         Util::triggerClassDeprecationNotice(Util::class, self::class);
     }
 
-    public function test_trigger_method_deprecation_notice_without_class(): void
+    /**
+     * @dataProvider errorLevelProvider
+     */
+    public function test_trigger_method_deprecation_notice_without_class(int $level, string $expectedError): void
     {
-        $this->expectNotice();
+        Util::setErrorLevel($level);
+
+        $this->{$expectedError}();
 
         Util::triggerMethodDeprecationNotice(Util::class, __METHOD__);
     }
 
-    public function test_trigger_method_deprecation_notice_with_class(): void
+    /**
+     * @dataProvider errorLevelProvider
+     */
+    public function test_trigger_method_deprecation_notice_with_class(int $level, string $expectedError): void
     {
-        $this->expectNotice();
+        Util::setErrorLevel($level);
 
+        $this->{$expectedError}();
+
+        Util::triggerMethodDeprecationNotice(Util::class, 'foo', self::class);
+    }
+
+    public function errorLevelProvider(): Generator
+    {
+        yield [E_USER_DEPRECATED, 'expectDeprecation'];
+        yield [E_USER_NOTICE, 'expectNotice'];
+        yield [E_USER_WARNING, 'expectWarning'];
+        yield [E_USER_ERROR, 'expectError'];
+    }
+
+    public function test_turn_errors_off(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        Util::setErrorLevel(Util::E_NONE);
+
+        Util::triggerClassDeprecationNotice(Util::class, self::class);
+        Util::triggerMethodDeprecationNotice(Util::class, __METHOD__);
         Util::triggerMethodDeprecationNotice(Util::class, 'foo', self::class);
     }
 }
