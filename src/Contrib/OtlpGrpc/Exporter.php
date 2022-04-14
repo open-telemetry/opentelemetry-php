@@ -138,12 +138,12 @@ class Exporter implements SpanExporterInterface
             \Grpc\STATUS_DATA_LOSS,
             \Grpc\STATUS_UNAUTHENTICATED,
         ], true)) {
-            $this->logWarning('Retryable error exporting grpc span', ['error' => $error]);
+            self::logWarning('Retryable error exporting grpc span', ['error' => $error]);
 
             return self::STATUS_FAILED_RETRYABLE;
         }
 
-        $this->logError('Error exporting grpc span', ['error' => $error]);
+        self::logError('Error exporting grpc span', ['error' => $error]);
 
         return self::STATUS_FAILED_NOT_RETRYABLE;
     }
