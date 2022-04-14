@@ -53,7 +53,7 @@ The library requires a PHP version of 7.4.x, 8.0.x or 8.1.x
 ---
 
 #### REQUIRED DEPENDENCIES
-####1) Install PSR17/18 implementations
+#### 1) Install PSR17/18 implementations
 
 The library has a dependency on both a [HTTP Factories (PSR17)](https://www.php-fig.org/psr/psr-17/)
 and a [php-http/async-client](https://docs.php-http.org/en/latest/clients.html) implementation.
