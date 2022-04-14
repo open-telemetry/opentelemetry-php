@@ -47,7 +47,7 @@ class SpanBuilderTest extends MockeryTestCase
             API\SpanContextInterface::TRACE_FLAG_SAMPLED,
         );
     }
-    
+
     /**
      * @group trace-compliance
      */
@@ -279,13 +279,13 @@ class SpanBuilderTest extends MockeryTestCase
             ->setAttribute('foo', 'bar')
             ->setAttribute('bar', 123)
             ->startSpan();
-            
+
         $attributes = $span->toSpanData()->getAttributes();
         $this->assertSame(2, $attributes->count());
 
         $spanBuilder
             ->setAttribute('bar1', 77);
-        
+
         $attributes = $span->toSpanData()->getAttributes();
         $this->assertSame(2, $attributes->count());
 
@@ -377,7 +377,7 @@ class SpanBuilderTest extends MockeryTestCase
             ->setAttribute('key1', 'val1')
             ->setAttributes($attributes)
             ->startSpan();
-        
+
         $attributes = $span->toSpanData()->getAttributes();
 
         $this->assertSame(5, $attributes->count());
@@ -388,7 +388,6 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame('val1', $attributes->get('key1'));
 
         $span->end();
-
     }
 
     public function test_set_attributes_overrides_values(): void
