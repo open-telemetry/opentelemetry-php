@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Util;
 
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
-
 class Helpers
 {
     /**
-     * Generate a unique key for an instance of {@see InstrumentationLibrary}, with parameters matching those of the
+     * Generate a unique key for an instance of InstrumentationLibrary, with parameters matching those of the
      * class' constructor.
      * @param string $name
      * @param ?string $version
