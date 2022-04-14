@@ -21,6 +21,7 @@ to trigger only deprecation notices. Valid error levels are `0` (none), `E_USER_
 However (as long as in alpha) it is safer to pin a dependency on the library to a specific version and/or make the adjustments 
 mentioned in the provided messages, since doing otherwise may break things completely for you in the future!
 
+
 ---
 
 There is a supplemental repository for OpenTelemetry PHP contributions that are not part of the core 
