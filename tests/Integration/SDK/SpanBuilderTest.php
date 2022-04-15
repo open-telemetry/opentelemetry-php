@@ -62,7 +62,6 @@ class SpanBuilderTest extends MockeryTestCase
             ->startSpan();
 
         $this->assertCount(2, $span->toSpanData()->getLinks());
-        $span->end();
     }
 
     public function test_add_link_invalid(): void
@@ -189,8 +188,6 @@ class SpanBuilderTest extends MockeryTestCase
             );
 
         $this->assertCount(1, $span->toSpanData()->getLinks());
-
-        $span->end();
     }
 
     /**
@@ -217,14 +214,12 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame([], $attributes->get('empty-arr'));
         $this->assertSame([1, 2, 3], $attributes->get('int-arr'));
         $this->assertNull($attributes->get('nil'));
-
-        $span->end();
     }
 
     /**
      * @group trace-compliance
      */
-    public function test_set_attribute_after_end(): void
+    public function test_set_attribute_no_effect_after_end(): void
     {
         /** @var Span $span */
         $span = $this
@@ -240,6 +235,11 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame(123, $attributes->get('bar'));
 
         $span->end();
+
+        $span->setAttribute('doo', 'baz');
+
+        $this->assertSame(2, $attributes->count());
+        $this->assertFalse($attributes->hasAttribute('doo'));
     }
 
     /**
@@ -278,8 +278,6 @@ class SpanBuilderTest extends MockeryTestCase
         $attributes = $span->toSpanData()->getAttributes();
         $this->assertEmpty($span->toSpanData()->getAttributes());
         $this->assertNull($attributes->get('nil'));
-
-        $span->end();
     }
 
     /**
@@ -303,8 +301,7 @@ class SpanBuilderTest extends MockeryTestCase
 
         $attributes = $span->toSpanData()->getAttributes();
         $this->assertSame(2, $attributes->count());
-
-        $span->end();
+        $this->assertFalse($attributes->hasAttribute('bar1'));
     }
 
     public function test_set_attribute_dropping(): void
@@ -330,8 +327,6 @@ class SpanBuilderTest extends MockeryTestCase
         foreach (range(1, $maxNumberOfAttributes) as $idx) {
             $this->assertSame($idx, $attributes->get("str_attribute_${idx}"));
         }
-
-        $span->end();
     }
 
     public function test_add_attributes_via_sampler(): void
@@ -376,8 +371,6 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame(2, $attributes->count());
         $this->assertSame('bar', $attributes->get('foo'));
         $this->assertSame(1, $attributes->get('id'));
-
-        $span->end();
     }
 
     /**
@@ -404,8 +397,6 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame('val', $attributes->get('key'));
         $this->assertSame('val2', $attributes->get('key2'));
         $this->assertSame('val1', $attributes->get('key1'));
-
-        $span->end();
     }
 
     public function test_set_attributes_overrides_values(): void
@@ -426,8 +417,6 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame(2, $attributes->count());
         $this->assertSame('bar', $attributes->get('foo'));
         $this->assertSame(1, $attributes->get('id'));
-
-        $span->end();
     }
 
     public function test_is_recording_default(): void
