@@ -8,6 +8,7 @@ use function is_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Instrumentation\KeyGenerator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -67,7 +68,7 @@ final class TracerProvider implements API\TracerProviderInterface
             return NoopTracer::getInstance();
         }
 
-        $key = sprintf('%s@%s %s', $name, ($version ?? 'unknown'), ($schemaUrl ?? ''));
+        $key = KeyGenerator::generateInstanceKey($name, $version, $schemaUrl);
 
         if (isset($this->tracers[$key]) && $this->tracers[$key] instanceof API\TracerInterface) {
             return $this->tracers[$key];
