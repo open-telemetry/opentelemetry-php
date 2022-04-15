@@ -127,7 +127,7 @@ class SpanBuilderTest extends MockeryTestCase
 
         $span->end();
     }
-
+    
     public function test_add_link_truncate_link_attribute_value(): void
     {
         $maxLength = 25;
@@ -164,7 +164,10 @@ class SpanBuilderTest extends MockeryTestCase
 
         $span->end();
     }
-
+    
+    /**
+     * @group trace-compliance
+     */
     public function test_add_link_no_effect_after_start_span(): void
     {
         $spanBuilder = $this->tracer->spanBuilder(self::SPAN_NAME);
@@ -218,6 +221,9 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_set_attribute_after_end(): void
     {
         /** @var Span $span */
@@ -236,25 +242,31 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_set_attribute_null_string_value(): void
-    {
-        /** @var Span $span */
-        $span = $this
-            ->tracer
-            ->spanBuilder(self::SPAN_NAME)
-            ->setAttribute('nil', null)
-            ->setAttribute('empty-string', '')
-            ->startSpan();
+    /**
+     * @group trace-compliance
+     */
+    // public function test_set_attribute_empty_string_value_is_set(): void
+    // {
+    //     /** @var Span $span */
+    //     $span = $this
+    //         ->tracer
+    //         ->spanBuilder(self::SPAN_NAME)
+    //         ->setAttribute('nil', null)
+    //         ->setAttribute('empty-string', '')
+    //         ->startSpan();
 
-        $attributes = $span->toSpanData()->getAttributes();
-        $this->assertSame(1, $attributes->count());
-        $this->assertSame('', $attributes->get('empty-string'));
-        $this->assertNull($attributes->get('nil'));
+    //     $attributes = $span->toSpanData()->getAttributes();
+    //     $this->assertSame(1, $attributes->count());
+    //     $this->assertSame('', $attributes->get('empty-string'));
+    //     $this->assertNull($attributes->get('nil'));
 
-        $span->end();
-    }
+    //     $span->end();
+    // }
 
-    public function test_set_attribute_only_null_string_value(): void
+    /**
+     * @group trace-compliance
+     */
+    public function test_set_attribute_only_null_string_value_should_not_be_set(): void
     {
         /** @var Span $span */
         $span = $this
@@ -270,6 +282,9 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_set_attribute_no_effect_after_start_span(): void
     {
         $spanBuilder = $this->tracer->spanBuilder(self::SPAN_NAME);
@@ -365,7 +380,10 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_set_attributes_merge_attributes(): void
+    /**
+     * @group trace-compliance
+     */
+    public function test_setAttributes_merges_attributes_correctly(): void
     {
         $attributes = new Attributes(['id' => 2, 'foo' => 'bar', 'key' => 'val']);
 
