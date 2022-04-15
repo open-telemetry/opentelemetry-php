@@ -123,8 +123,6 @@ class SpanBuilderTest extends MockeryTestCase
 
         $this->assertCount(1, $span->toSpanData()->getLinks());
         $this->assertCount(1, $span->toSpanData()->getLinks()[0]->getAttributes());
-
-        $span->end();
     }
 
     public function test_add_link_truncate_link_attribute_value(): void
@@ -160,8 +158,6 @@ class SpanBuilderTest extends MockeryTestCase
             [1, 2],
             $attrs->get('int_array')
         );
-
-        $span->end();
     }
 
     /**
