@@ -127,7 +127,7 @@ class SpanBuilderTest extends MockeryTestCase
 
         $span->end();
     }
-    
+
     public function test_add_link_truncate_link_attribute_value(): void
     {
         $maxLength = 25;
@@ -164,7 +164,7 @@ class SpanBuilderTest extends MockeryTestCase
 
         $span->end();
     }
-    
+
     /**
      * @group trace-compliance
      */
@@ -383,7 +383,7 @@ class SpanBuilderTest extends MockeryTestCase
     /**
      * @group trace-compliance
      */
-    public function test_setAttributes_merges_attributes_correctly(): void
+    public function test_set_attributes_merges_attributes_correctly(): void
     {
         $attributes = new Attributes(['id' => 2, 'foo' => 'bar', 'key' => 'val']);
 
