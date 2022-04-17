@@ -48,6 +48,9 @@ class SpanBuilderTest extends MockeryTestCase
         );
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_add_link(): void
     {
         /** @var Span $span */
@@ -59,7 +62,6 @@ class SpanBuilderTest extends MockeryTestCase
             ->startSpan();
 
         $this->assertCount(2, $span->toSpanData()->getLinks());
-        $span->end();
     }
 
     public function test_add_link_invalid(): void
@@ -121,8 +123,6 @@ class SpanBuilderTest extends MockeryTestCase
 
         $this->assertCount(1, $span->toSpanData()->getLinks());
         $this->assertCount(1, $span->toSpanData()->getLinks()[0]->getAttributes());
-
-        $span->end();
     }
 
     public function test_add_link_truncate_link_attribute_value(): void
@@ -158,10 +158,11 @@ class SpanBuilderTest extends MockeryTestCase
             [1, 2],
             $attrs->get('int_array')
         );
-
-        $span->end();
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_add_link_no_effect_after_start_span(): void
     {
         $spanBuilder = $this->tracer->spanBuilder(self::SPAN_NAME);
@@ -183,10 +184,11 @@ class SpanBuilderTest extends MockeryTestCase
             );
 
         $this->assertCount(1, $span->toSpanData()->getLinks());
-
-        $span->end();
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_set_attribute(): void
     {
         /** @var Span $span */
@@ -208,11 +210,12 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame([], $attributes->get('empty-arr'));
         $this->assertSame([1, 2, 3], $attributes->get('int-arr'));
         $this->assertNull($attributes->get('nil'));
-
-        $span->end();
     }
 
-    public function test_set_attribute_after_end(): void
+    /**
+     * @group trace-compliance
+     */
+    public function test_set_attribute_no_effect_after_end(): void
     {
         /** @var Span $span */
         $span = $this
@@ -228,6 +231,73 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame(123, $attributes->get('bar'));
 
         $span->end();
+
+        $span->setAttribute('doo', 'baz');
+
+        $this->assertSame(2, $attributes->count());
+        $this->assertFalse($attributes->hasAttribute('doo'));
+    }
+
+    /**
+     * @group trace-compliance
+     */
+    // public function test_set_attribute_empty_string_value_is_set(): void
+    // {
+    //     /** @var Span $span */
+    //     $span = $this
+    //         ->tracer
+    //         ->spanBuilder(self::SPAN_NAME)
+    //         ->setAttribute('nil', null)
+    //         ->setAttribute('empty-string', '')
+    //         ->startSpan();
+
+    //     $attributes = $span->toSpanData()->getAttributes();
+    //     $this->assertSame(1, $attributes->count());
+    //     $this->assertSame('', $attributes->get('empty-string'));
+    //     $this->assertNull($attributes->get('nil'));
+
+    //     $span->end();
+    // }
+
+    /**
+     * @group trace-compliance
+     */
+    public function test_set_attribute_only_null_string_value_should_not_be_set(): void
+    {
+        /** @var Span $span */
+        $span = $this
+            ->tracer
+            ->spanBuilder(self::SPAN_NAME)
+            ->setAttribute('nil', null)
+            ->startSpan();
+
+        $attributes = $span->toSpanData()->getAttributes();
+        $this->assertEmpty($span->toSpanData()->getAttributes());
+        $this->assertNull($attributes->get('nil'));
+    }
+
+    /**
+     * @group trace-compliance
+     */
+    public function test_set_attribute_no_effect_after_start_span(): void
+    {
+        $spanBuilder = $this->tracer->spanBuilder(self::SPAN_NAME);
+
+        /** @var Span $span */
+        $span = $spanBuilder
+            ->setAttribute('foo', 'bar')
+            ->setAttribute('bar', 123)
+            ->startSpan();
+
+        $attributes = $span->toSpanData()->getAttributes();
+        $this->assertSame(2, $attributes->count());
+
+        $spanBuilder
+            ->setAttribute('bar1', 77);
+
+        $attributes = $span->toSpanData()->getAttributes();
+        $this->assertSame(2, $attributes->count());
+        $this->assertFalse($attributes->hasAttribute('bar1'));
     }
 
     public function test_set_attribute_dropping(): void
@@ -253,8 +323,6 @@ class SpanBuilderTest extends MockeryTestCase
         foreach (range(1, $maxNumberOfAttributes) as $idx) {
             $this->assertSame($idx, $attributes->get("str_attribute_${idx}"));
         }
-
-        $span->end();
     }
 
     public function test_add_attributes_via_sampler(): void
@@ -299,8 +367,32 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame(2, $attributes->count());
         $this->assertSame('bar', $attributes->get('foo'));
         $this->assertSame(1, $attributes->get('id'));
+    }
 
-        $span->end();
+    /**
+     * @group trace-compliance
+     */
+    public function test_set_attributes_merges_attributes_correctly(): void
+    {
+        $attributes = new Attributes(['id' => 2, 'foo' => 'bar', 'key' => 'val']);
+
+        /** @var Span $span */
+        $span = $this
+            ->tracer
+            ->spanBuilder(self::SPAN_NAME)
+            ->setAttribute('key2', 'val2')
+            ->setAttribute('key1', 'val1')
+            ->setAttributes($attributes)
+            ->startSpan();
+
+        $attributes = $span->toSpanData()->getAttributes();
+
+        $this->assertSame(5, $attributes->count());
+        $this->assertSame('bar', $attributes->get('foo'));
+        $this->assertSame(2, $attributes->get('id'));
+        $this->assertSame('val', $attributes->get('key'));
+        $this->assertSame('val2', $attributes->get('key2'));
+        $this->assertSame('val1', $attributes->get('key1'));
     }
 
     public function test_set_attributes_overrides_values(): void
@@ -321,8 +413,6 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame(2, $attributes->count());
         $this->assertSame('bar', $attributes->get('foo'));
         $this->assertSame(1, $attributes->get('id'));
-
-        $span->end();
     }
 
     public function test_is_recording_default(): void

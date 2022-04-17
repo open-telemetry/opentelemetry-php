@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
+use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -19,7 +20,7 @@ class TracerProviderTest extends TestCase
      * @covers ::getTracer
      * @covers ::__construct
      */
-    public function test_reuses_same_instance(): void
+    public function test_reuses_instance_for_same_name_without_version(): void
     {
         $provider = new TracerProvider(null);
 
@@ -30,6 +31,20 @@ class TracerProviderTest extends TestCase
         $this->assertSame($t1, $t2);
         $this->assertNotSame($t1, $t3);
         $this->assertNotSame($t2, $t3);
+    }
+
+    /**
+     * @covers ::getTracer
+     * @covers ::__construct
+     * @group trace-compliance
+     */
+    public function test_get_tracer_default(): void
+    {
+        $provider = new TracerProvider(null);
+
+        $t1 = $provider->getTracer();
+
+        $this->assertInstanceOf(Tracer::class, $t1);
     }
 
     /**
@@ -52,8 +67,9 @@ class TracerProviderTest extends TestCase
     /**
      * @covers ::getTracer
      * @covers ::__construct
+     * @group trace-compliance
      */
-    public function test_reuses_same_instance_with_schema(): void
+    public function test_reuses_same_instance_with_schema_and_version(): void
     {
         $provider = new TracerProvider(null);
 
@@ -70,6 +86,7 @@ class TracerProviderTest extends TestCase
      * @covers ::getDefaultTracer
      * @runInSeparateProcess
      * @preserveGlobalState disabled
+     * @group trace-compliance
      */
     public function test_tracer_provider_returns_noop_tracer_if_no_default_is_set(): void
     {
@@ -91,6 +108,7 @@ class TracerProviderTest extends TestCase
 
     /**
      * @covers ::getTracer
+     * @group trace-compliance
      */
     public function test_get_tracer_with_default_name(): void
     {
@@ -104,6 +122,7 @@ class TracerProviderTest extends TestCase
 
     /**
      * @covers ::shutdown
+     * @group trace-compliance
      */
     public function test_shutdown(): void
     {
@@ -116,6 +135,7 @@ class TracerProviderTest extends TestCase
 
     /**
      * @covers ::forceFlush
+     * @group trace-compliance
      */
     public function test_force_flush(): void
     {
@@ -142,8 +162,9 @@ class TracerProviderTest extends TestCase
 
     /**
      * @covers ::getTracer
+     * @group trace-compliance
      */
-    public function test_get_tracer_after_shutdown(): void
+    public function test_get_tracer_returns_noop_tracer_after_shutdown(): void
     {
         $provider = new TracerProvider([]);
         $provider->shutdown();
