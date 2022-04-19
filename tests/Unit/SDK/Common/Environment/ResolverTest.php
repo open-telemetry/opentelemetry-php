@@ -48,9 +48,14 @@ class ResolverTest extends TestCase
         'trace processor' => ['OTEL_PHP_TRACES_PROCESSOR', KnownValues::OTEL_PHP_TRACES_PROCESSOR],
     ];
 
+    /**
+     * All injected environment variables.
+     */
+    private array $injectedEnvironmentVariables = [];
+
     public function tearDown(): void
     {
-        $this->restoreEnvironmentVariables();
+        $this->resetEnvironmentVariables();
     }
 
     public function test_has_variable(): void
@@ -66,12 +71,38 @@ class ResolverTest extends TestCase
         );
     }
 
+    public function test_has_variable_with_injected_value(): void
+    {
+        $this->assertFalse(
+            Resolver::hasVariable('FOO_VAR')
+        );
+
+        $this->injectEnvironmentVariable('FOO_VAR', 'FOO');
+
+        $this->assertTrue(
+            Resolver::hasVariable('FOO_VAR')
+        );
+    }
+
     /**
      * @dataProvider rawValueProvider
      */
     public function test_get_raw_value(string $varName, string $varValue): void
     {
         $this->setEnvironmentVariable($varName, $varValue);
+
+        $this->assertSame(
+            $varValue,
+            Resolver::getRawValue($varName)
+        );
+    }
+
+    /**
+     * @dataProvider rawValueProvider
+     */
+    public function test_get_raw_value_with_injected_value(string $varName, string $varValue): void
+    {
+        $this->injectEnvironmentVariable($varName, $varValue);
 
         $this->assertSame(
             $varValue,
@@ -153,6 +184,23 @@ class ResolverTest extends TestCase
         );
     }
 
+    public function test_resolve_value_with_injected_value(): void
+    {
+        $value = 'simple';
+        $variable = 'OTEL_PHP_TRACES_PROCESSOR';
+
+        $this->assertFalse(
+            Resolver::hasVariable($variable)
+        );
+
+        $this->injectEnvironmentVariable($variable, $value);
+
+        $this->assertSame(
+            $value,
+            Resolver::resolveValue($variable)
+        );
+    }
+
     public function test_resolve_value_library_default(): void
     {
         $value = 'simple';
@@ -201,5 +249,23 @@ class ResolverTest extends TestCase
     public function knownValuesProvider(): array
     {
         return self::KNOWN_VALUES;
+    }
+
+    private function injectEnvironmentVariable(string $name, string $value): void
+    {
+        if (!in_array($name, $this->injectedEnvironmentVariables, true)) {
+            $this->injectedEnvironmentVariables[] = $name;
+        }
+
+        $_ENV[$name] = $value;
+    }
+
+    private function resetEnvironmentVariables(): void
+    {
+        $this->restoreEnvironmentVariables();
+
+        foreach ($this->injectedEnvironmentVariables as $variable) {
+            unset($_ENV[$variable]);
+        }
     }
 }

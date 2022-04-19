@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
-use OpenTelemetry\SDK\GlobalLoggerHolder;
+use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
- * @coversDefaultClass OpenTelemetry\SDK\Trace\TracerProviderFactory
+ * @coversDefaultClass \OpenTelemetry\SDK\Trace\TracerProviderFactory
  */
 class TracerProviderFactoryTest extends TestCase
 {
@@ -22,12 +22,12 @@ class TracerProviderFactoryTest extends TestCase
     public function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
-        GlobalLoggerHolder::set($this->logger);
+        LoggerHolder::set($this->logger);
     }
 
     public function tearDown(): void
     {
-        GlobalLoggerHolder::unset();
+        LoggerHolder::unset();
     }
 
     /**

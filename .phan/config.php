@@ -370,7 +370,7 @@ return [
         'vendor/phpunit/phpunit/src',
         'vendor/promphp/prometheus_client_php/src',
         'vendor/google/protobuf/src',
-        'vendor/nyholm/dsn/src'
+        'vendor/nyholm/dsn/src',
     ],
 
     // A list of individual files to include in analysis

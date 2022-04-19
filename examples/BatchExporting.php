@@ -15,7 +15,7 @@ echo sprintf('Sending batches every %dms and on shutdown', $delayMillis) . PHP_E
 $tracerProvider =  new TracerProvider(
     new BatchSpanProcessor(
         new ConsoleSpanExporter(),
-        \OpenTelemetry\SDK\SystemClock::getDefault(),
+        \OpenTelemetry\SDK\Common\Time\SystemClock::getDefault(),
         2048, //max spans to queue before sending to exporter
         $delayMillis, //batch delay milliseconds
     )

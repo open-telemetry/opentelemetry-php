@@ -24,6 +24,9 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT, $spanLimits->getAttributeLimits()->getAttributeCountLimit());
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_span_limits_builder_uses_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 111);
@@ -32,6 +35,9 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(111, $spanLimits->getAttributeLimits()->getAttributeCountLimit());
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_span_limits_builder_uses_configured_value(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 111);
@@ -41,6 +47,9 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(222, $spanLimits->getAttributeLimits()->getAttributeCountLimit());
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_span_limits_builder_throws_exception_on_invalid_value_from_environment(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 'fruit');

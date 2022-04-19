@@ -47,8 +47,8 @@ class Exporter implements SpanExporterInterface
         int $timeout = 10,
         TraceServiceClient $client = null
     ) {
-        $this->insecure = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_INSECURE) ?
-            $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure) :
+        $this->insecure = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_INSECURE) ?
+            $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_INSECURE, $insecure) :
             $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
 
         if (!empty($certificateFile) || $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_CERTIFICATE)) {
@@ -77,8 +77,9 @@ class Exporter implements SpanExporterInterface
         $opts = $this->getClientOptions();
 
         $this->client = $client ?? new TraceServiceClient(
-            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) ?:
-            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, $endpointURL),
+            $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) ?
+                $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) :
+                $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, $endpointURL),
             $opts
         );
     }
@@ -137,12 +138,12 @@ class Exporter implements SpanExporterInterface
             \Grpc\STATUS_DATA_LOSS,
             \Grpc\STATUS_UNAUTHENTICATED,
         ], true)) {
-            $this->logWarning('Retryable error exporting grpc span', ['error' => $error]);
+            self::logWarning('Retryable error exporting grpc span', ['error' => $error]);
 
             return self::STATUS_FAILED_RETRYABLE;
         }
 
-        $this->logError('Error exporting grpc span', ['error' => $error]);
+        self::logError('Error exporting grpc span', ['error' => $error]);
 
         return self::STATUS_FAILED_NOT_RETRYABLE;
     }

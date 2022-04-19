@@ -7,11 +7,12 @@ namespace OpenTelemetry\Tests\Unit\SDK\Util;
 use function count;
 use function max;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\AbstractClock;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\AttributesInterface;
-use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace as SDK;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\LinkInterface;
@@ -48,7 +49,7 @@ class SpanData implements SDK\SpanDataInterface
         $this->attributes = new Attributes();
         $this->kind = API\SpanKind::KIND_INTERNAL;
         $this->status = StatusData::unset();
-        $this->resource = ResourceInfo::emptyResource();
+        $this->resource = ResourceInfoFactory::emptyResource();
         $this->instrumentationLibrary = InstrumentationLibrary::getEmpty(); /** @phan-suppress-current-line PhanAccessMethodInternal */
         $this->context = API\SpanContext::getInvalid();
         $this->parentContext = API\SpanContext::getInvalid();
@@ -104,7 +105,7 @@ class SpanData implements SDK\SpanDataInterface
 
     public function addEvent(string $name, ?AttributesInterface $attributes, int $timestamp = null): self
     {
-        $this->events[] = new SDK\Event($name, $timestamp ?? AbstractClock::getDefault()->now(), $attributes);
+        $this->events[] = new SDK\Event($name, $timestamp ?? ClockFactory::getDefault()->now(), $attributes);
 
         return $this;
     }

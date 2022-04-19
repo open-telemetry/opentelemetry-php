@@ -9,8 +9,9 @@
     cacheResult="false"
     colors="false"
     convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
     convertWarningsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertDeprecationsToExceptions="true"
     forceCoversAnnotation="true"
     processIsolation="false"
     stopOnError="false"
@@ -27,6 +28,9 @@
         <include>
             <directory>src</directory>
         </include>
+        <exclude>
+            <directory suffix=".php">src/SDK/Common/Dev/Compatibility/BC</directory>
+        </exclude>
     </coverage>
 
     <php>

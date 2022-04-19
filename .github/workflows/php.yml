@@ -15,19 +15,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.4', '8.0']
+        php-version: ['7.4', '8.0', '8.1']
         os: [ubuntu-latest]
-        extensions: ['ast, grpc', 'ast, grpc, protobuf']
+        extensions: ['ast, grpc', 'ast, grpc, protobuf-3.20.0']
         experimental: [false]
-        include:
-          - php-version: 8.1
-            extensions: 'ast, grpc'
-            os: ubuntu-latest
-            experimental: true
-          - php-version: 8.1
-            extensions: 'ast, grpc, protobuf'
-            os: ubuntu-latest
-            experimental: true
 
     steps:
     - uses: actions/checkout@v2
