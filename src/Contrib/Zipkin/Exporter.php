@@ -9,6 +9,7 @@ use Http\Discovery\Psr17FactoryDiscovery;
 use JsonException;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
+use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -34,7 +35,7 @@ class Exporter implements SpanExporterInterface
         ClientInterface $client,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
-        SpanConverter $spanConverter = null
+        SpanConverterInterface $spanConverter = null
     ) {
         $this->setEndpointUrl($endpointUrl);
         $this->setClient($client);
