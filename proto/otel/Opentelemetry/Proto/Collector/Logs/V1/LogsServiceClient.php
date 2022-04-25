@@ -40,6 +40,7 @@ class LogsServiceClient extends \Grpc\BaseStub {
      * @param \Opentelemetry\Proto\Collector\Logs\V1\ExportLogsServiceRequest $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
+     * @return \Grpc\UnaryCall
      */
     public function Export(\Opentelemetry\Proto\Collector\Logs\V1\ExportLogsServiceRequest $argument,
       $metadata = [], $options = []) {

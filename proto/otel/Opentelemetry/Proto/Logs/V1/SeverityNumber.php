@@ -4,6 +4,8 @@
 
 namespace Opentelemetry\Proto\Logs\V1;
 
+use UnexpectedValueException;
+
 /**
  * Possible values for LogRecord.SeverityNumber.
  *
@@ -113,5 +115,53 @@ class SeverityNumber
      * Generated from protobuf enum <code>SEVERITY_NUMBER_FATAL4 = 24;</code>
      */
     const SEVERITY_NUMBER_FATAL4 = 24;
+
+    private static $valueToName = [
+        self::SEVERITY_NUMBER_UNSPECIFIED => 'SEVERITY_NUMBER_UNSPECIFIED',
+        self::SEVERITY_NUMBER_TRACE => 'SEVERITY_NUMBER_TRACE',
+        self::SEVERITY_NUMBER_TRACE2 => 'SEVERITY_NUMBER_TRACE2',
+        self::SEVERITY_NUMBER_TRACE3 => 'SEVERITY_NUMBER_TRACE3',
+        self::SEVERITY_NUMBER_TRACE4 => 'SEVERITY_NUMBER_TRACE4',
+        self::SEVERITY_NUMBER_DEBUG => 'SEVERITY_NUMBER_DEBUG',
+        self::SEVERITY_NUMBER_DEBUG2 => 'SEVERITY_NUMBER_DEBUG2',
+        self::SEVERITY_NUMBER_DEBUG3 => 'SEVERITY_NUMBER_DEBUG3',
+        self::SEVERITY_NUMBER_DEBUG4 => 'SEVERITY_NUMBER_DEBUG4',
+        self::SEVERITY_NUMBER_INFO => 'SEVERITY_NUMBER_INFO',
+        self::SEVERITY_NUMBER_INFO2 => 'SEVERITY_NUMBER_INFO2',
+        self::SEVERITY_NUMBER_INFO3 => 'SEVERITY_NUMBER_INFO3',
+        self::SEVERITY_NUMBER_INFO4 => 'SEVERITY_NUMBER_INFO4',
+        self::SEVERITY_NUMBER_WARN => 'SEVERITY_NUMBER_WARN',
+        self::SEVERITY_NUMBER_WARN2 => 'SEVERITY_NUMBER_WARN2',
+        self::SEVERITY_NUMBER_WARN3 => 'SEVERITY_NUMBER_WARN3',
+        self::SEVERITY_NUMBER_WARN4 => 'SEVERITY_NUMBER_WARN4',
+        self::SEVERITY_NUMBER_ERROR => 'SEVERITY_NUMBER_ERROR',
+        self::SEVERITY_NUMBER_ERROR2 => 'SEVERITY_NUMBER_ERROR2',
+        self::SEVERITY_NUMBER_ERROR3 => 'SEVERITY_NUMBER_ERROR3',
+        self::SEVERITY_NUMBER_ERROR4 => 'SEVERITY_NUMBER_ERROR4',
+        self::SEVERITY_NUMBER_FATAL => 'SEVERITY_NUMBER_FATAL',
+        self::SEVERITY_NUMBER_FATAL2 => 'SEVERITY_NUMBER_FATAL2',
+        self::SEVERITY_NUMBER_FATAL3 => 'SEVERITY_NUMBER_FATAL3',
+        self::SEVERITY_NUMBER_FATAL4 => 'SEVERITY_NUMBER_FATAL4',
+    ];
+
+    public static function name($value)
+    {
+        if (!isset(self::$valueToName[$value])) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no name defined for value %s', __CLASS__, $value));
+        }
+        return self::$valueToName[$value];
+    }
+
+
+    public static function value($name)
+    {
+        $const = __CLASS__ . '::' . strtoupper($name);
+        if (!defined($const)) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no value defined for name %s', __CLASS__, $name));
+        }
+        return constant($const);
+    }
 }
 

@@ -205,9 +205,8 @@ To generate protobuf files for use with this repository, you can run the followi
 make protobuf
 ```
 
-Change into the root of this directory.  This will create a `/proto` folder in the root
-directory of the
-repository.
+This will replace `proto/otel/Opentelemetry` and `proto/otel/GPBMetadata` with freshly generated code based on the latest
+tag from `opentelemetry-proto`, which can then be committed.
 
 
 ## Semantic Conventions Generation

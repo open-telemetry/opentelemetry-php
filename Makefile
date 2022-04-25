@@ -51,7 +51,7 @@ metrics-prometheus-example:
 stop-prometheus:
 	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example stop
 protobuf:
-	@docker-compose -f docker-compose.proto.yaml up proto
+	./script/proto_gen.sh
 thrift:
 	./script/thrift_gen.sh
 bash:

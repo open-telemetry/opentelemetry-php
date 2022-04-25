@@ -4,6 +4,8 @@
 
 namespace Opentelemetry\Proto\Trace\V1\Span;
 
+use UnexpectedValueException;
+
 /**
  * SpanKind is the type of span. Can be used to specify additional relationships between spans
  * in addition to a parent/child relationship.
@@ -56,6 +58,35 @@ class SpanKind
      * Generated from protobuf enum <code>SPAN_KIND_CONSUMER = 5;</code>
      */
     const SPAN_KIND_CONSUMER = 5;
+
+    private static $valueToName = [
+        self::SPAN_KIND_UNSPECIFIED => 'SPAN_KIND_UNSPECIFIED',
+        self::SPAN_KIND_INTERNAL => 'SPAN_KIND_INTERNAL',
+        self::SPAN_KIND_SERVER => 'SPAN_KIND_SERVER',
+        self::SPAN_KIND_CLIENT => 'SPAN_KIND_CLIENT',
+        self::SPAN_KIND_PRODUCER => 'SPAN_KIND_PRODUCER',
+        self::SPAN_KIND_CONSUMER => 'SPAN_KIND_CONSUMER',
+    ];
+
+    public static function name($value)
+    {
+        if (!isset(self::$valueToName[$value])) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no name defined for value %s', __CLASS__, $value));
+        }
+        return self::$valueToName[$value];
+    }
+
+
+    public static function value($name)
+    {
+        $const = __CLASS__ . '::' . strtoupper($name);
+        if (!defined($const)) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no value defined for name %s', __CLASS__, $name));
+        }
+        return constant($const);
+    }
 }
 
 // Adding a class alias for backwards compatibility with the previous class name.

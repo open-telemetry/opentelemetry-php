@@ -4,6 +4,8 @@
 
 namespace Opentelemetry\Proto\Metrics\V1;
 
+use UnexpectedValueException;
+
 /**
  * AggregationTemporality defines how a metric aggregator reports aggregated
  * values. It describes how those values relate to the time interval over
@@ -82,5 +84,31 @@ class AggregationTemporality
      * Generated from protobuf enum <code>AGGREGATION_TEMPORALITY_CUMULATIVE = 2;</code>
      */
     const AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
+
+    private static $valueToName = [
+        self::AGGREGATION_TEMPORALITY_UNSPECIFIED => 'AGGREGATION_TEMPORALITY_UNSPECIFIED',
+        self::AGGREGATION_TEMPORALITY_DELTA => 'AGGREGATION_TEMPORALITY_DELTA',
+        self::AGGREGATION_TEMPORALITY_CUMULATIVE => 'AGGREGATION_TEMPORALITY_CUMULATIVE',
+    ];
+
+    public static function name($value)
+    {
+        if (!isset(self::$valueToName[$value])) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no name defined for value %s', __CLASS__, $value));
+        }
+        return self::$valueToName[$value];
+    }
+
+
+    public static function value($name)
+    {
+        $const = __CLASS__ . '::' . strtoupper($name);
+        if (!defined($const)) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no value defined for name %s', __CLASS__, $name));
+        }
+        return constant($const);
+    }
 }
 

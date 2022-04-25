@@ -22,6 +22,8 @@ class KeyValueList extends \Google\Protobuf\Internal\Message
     /**
      * A collection of key/value pairs of key-value pairs. The list may be empty (may
      * contain 0 elements).
+     * The keys MUST be unique (it is not allowed to have more than one
+     * value with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue values = 1;</code>
      */
@@ -36,6 +38,8 @@ class KeyValueList extends \Google\Protobuf\Internal\Message
      *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $values
      *           A collection of key/value pairs of key-value pairs. The list may be empty (may
      *           contain 0 elements).
+     *           The keys MUST be unique (it is not allowed to have more than one
+     *           value with the same key).
      * }
      */
     public function __construct($data = NULL) {
@@ -46,6 +50,8 @@ class KeyValueList extends \Google\Protobuf\Internal\Message
     /**
      * A collection of key/value pairs of key-value pairs. The list may be empty (may
      * contain 0 elements).
+     * The keys MUST be unique (it is not allowed to have more than one
+     * value with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue values = 1;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -58,6 +64,8 @@ class KeyValueList extends \Google\Protobuf\Internal\Message
     /**
      * A collection of key/value pairs of key-value pairs. The list may be empty (may
      * contain 0 elements).
+     * The keys MUST be unique (it is not allowed to have more than one
+     * value with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue values = 1;</code>
      * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
