@@ -9,29 +9,18 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * HistogramDataPoint is a single data point in a timeseries that describes the
- * time-varying values of a Histogram. A Histogram contains summary statistics
- * for a population of values, it may optionally contain the distribution of
- * those values across a set of buckets.
- * If the histogram contains the distribution of values, then both
- * "explicit_bounds" and "bucket counts" fields must be defined.
- * If the histogram does not contain the distribution of values, then both
- * "explicit_bounds" and "bucket_counts" must be omitted and only "count" and
- * "sum" are known.
+ * IntHistogramDataPoint is deprecated; use HistogramDataPoint.
  *
- * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.HistogramDataPoint</code>
+ * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.IntHistogramDataPoint</code>
  */
-class HistogramDataPoint extends \Google\Protobuf\Internal\Message
+class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The set of key/value pairs that uniquely identify the timeseries from
-     * where this point belongs. The list may be empty (may contain 0 elements).
-     * Attribute keys MUST be unique (it is not allowed to have more than one
-     * attribute with the same key).
+     * The set of labels that uniquely identify this timeseries.
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1;</code>
      */
-    private $attributes;
+    private $labels;
     /**
      * StartTimeUnixNano is optional but strongly encouraged, see the
      * the detailed comments above Metric.
@@ -59,16 +48,12 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     protected $count = 0;
     /**
      * sum of the values in the population. If count is zero then this field
-     * must be zero.
-     * Note: Sum should only be filled out when measuring non-negative discrete
-     * events, and is assumed to be monotonic over the values of these events.
-     * Negative events *can* be recorded, but sum should not be filled out when
-     * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-     * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
+     * must be zero. This value must be equal to the sum of the "sum" fields in
+     * buckets if a histogram is provided.
      *
-     * Generated from protobuf field <code>double sum = 5;</code>
+     * Generated from protobuf field <code>sfixed64 sum = 5;</code>
      */
-    protected $sum = 0.0;
+    protected $sum = 0;
     /**
      * bucket_counts is an optional field contains the count values of histogram
      * for each bucket.
@@ -97,16 +82,9 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * (Optional) List of exemplars collected from
      * measurements that were used to form the data point
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.Exemplar exemplars = 8;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.IntExemplar exemplars = 8;</code>
      */
     private $exemplars;
-    /**
-     * Flags that apply to this specific data point.  See DataPointFlags
-     * for the available flags and their meaning.
-     *
-     * Generated from protobuf field <code>uint32 flags = 10;</code>
-     */
-    protected $flags = 0;
 
     /**
      * Constructor.
@@ -114,11 +92,8 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $attributes
-     *           The set of key/value pairs that uniquely identify the timeseries from
-     *           where this point belongs. The list may be empty (may contain 0 elements).
-     *           Attribute keys MUST be unique (it is not allowed to have more than one
-     *           attribute with the same key).
+     *     @type \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $labels
+     *           The set of labels that uniquely identify this timeseries.
      *     @type int|string $start_time_unix_nano
      *           StartTimeUnixNano is optional but strongly encouraged, see the
      *           the detailed comments above Metric.
@@ -132,14 +107,10 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      *           count is the number of values in the population. Must be non-negative. This
      *           value must be equal to the sum of the "count" fields in buckets if a
      *           histogram is provided.
-     *     @type float $sum
+     *     @type int|string $sum
      *           sum of the values in the population. If count is zero then this field
-     *           must be zero.
-     *           Note: Sum should only be filled out when measuring non-negative discrete
-     *           events, and is assumed to be monotonic over the values of these events.
-     *           Negative events *can* be recorded, but sum should not be filled out when
-     *           doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-     *           see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
+     *           must be zero. This value must be equal to the sum of the "sum" fields in
+     *           buckets if a histogram is provided.
      *     @type int[]|string[]|\Google\Protobuf\Internal\RepeatedField $bucket_counts
      *           bucket_counts is an optional field contains the count values of histogram
      *           for each bucket.
@@ -156,12 +127,9 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      *           Histogram buckets are inclusive of their upper boundary, except the last
      *           bucket where the boundary is at infinity. This format is intentionally
      *           compatible with the OpenMetrics histogram definition.
-     *     @type \Opentelemetry\Proto\Metrics\V1\Exemplar[]|\Google\Protobuf\Internal\RepeatedField $exemplars
+     *     @type \Opentelemetry\Proto\Metrics\V1\IntExemplar[]|\Google\Protobuf\Internal\RepeatedField $exemplars
      *           (Optional) List of exemplars collected from
      *           measurements that were used to form the data point
-     *     @type int $flags
-     *           Flags that apply to this specific data point.  See DataPointFlags
-     *           for the available flags and their meaning.
      * }
      */
     public function __construct($data = NULL) {
@@ -170,33 +138,27 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The set of key/value pairs that uniquely identify the timeseries from
-     * where this point belongs. The list may be empty (may contain 0 elements).
-     * Attribute keys MUST be unique (it is not allowed to have more than one
-     * attribute with the same key).
+     * The set of labels that uniquely identify this timeseries.
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
-    public function getAttributes()
+    public function getLabels()
     {
-        return $this->attributes;
+        return $this->labels;
     }
 
     /**
-     * The set of key/value pairs that uniquely identify the timeseries from
-     * where this point belongs. The list may be empty (may contain 0 elements).
-     * Attribute keys MUST be unique (it is not allowed to have more than one
-     * attribute with the same key).
+     * The set of labels that uniquely identify this timeseries.
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
-     * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1;</code>
+     * @param \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
-    public function setAttributes($var)
+    public function setLabels($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Common\V1\KeyValue::class);
-        $this->attributes = $arr;
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Common\V1\StringKeyValue::class);
+        $this->labels = $arr;
 
         return $this;
     }
@@ -295,15 +257,11 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
 
     /**
      * sum of the values in the population. If count is zero then this field
-     * must be zero.
-     * Note: Sum should only be filled out when measuring non-negative discrete
-     * events, and is assumed to be monotonic over the values of these events.
-     * Negative events *can* be recorded, but sum should not be filled out when
-     * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-     * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
+     * must be zero. This value must be equal to the sum of the "sum" fields in
+     * buckets if a histogram is provided.
      *
-     * Generated from protobuf field <code>double sum = 5;</code>
-     * @return float
+     * Generated from protobuf field <code>sfixed64 sum = 5;</code>
+     * @return int|string
      */
     public function getSum()
     {
@@ -312,20 +270,16 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
 
     /**
      * sum of the values in the population. If count is zero then this field
-     * must be zero.
-     * Note: Sum should only be filled out when measuring non-negative discrete
-     * events, and is assumed to be monotonic over the values of these events.
-     * Negative events *can* be recorded, but sum should not be filled out when
-     * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-     * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
+     * must be zero. This value must be equal to the sum of the "sum" fields in
+     * buckets if a histogram is provided.
      *
-     * Generated from protobuf field <code>double sum = 5;</code>
-     * @param float $var
+     * Generated from protobuf field <code>sfixed64 sum = 5;</code>
+     * @param int|string $var
      * @return $this
      */
     public function setSum($var)
     {
-        GPBUtil::checkDouble($var);
+        GPBUtil::checkInt64($var);
         $this->sum = $var;
 
         return $this;
@@ -411,7 +365,7 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * (Optional) List of exemplars collected from
      * measurements that were used to form the data point
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.Exemplar exemplars = 8;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.IntExemplar exemplars = 8;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getExemplars()
@@ -423,42 +377,14 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * (Optional) List of exemplars collected from
      * measurements that were used to form the data point
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.Exemplar exemplars = 8;</code>
-     * @param \Opentelemetry\Proto\Metrics\V1\Exemplar[]|\Google\Protobuf\Internal\RepeatedField $var
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.IntExemplar exemplars = 8;</code>
+     * @param \Opentelemetry\Proto\Metrics\V1\IntExemplar[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setExemplars($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Metrics\V1\Exemplar::class);
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Metrics\V1\IntExemplar::class);
         $this->exemplars = $arr;
-
-        return $this;
-    }
-
-    /**
-     * Flags that apply to this specific data point.  See DataPointFlags
-     * for the available flags and their meaning.
-     *
-     * Generated from protobuf field <code>uint32 flags = 10;</code>
-     * @return int
-     */
-    public function getFlags()
-    {
-        return $this->flags;
-    }
-
-    /**
-     * Flags that apply to this specific data point.  See DataPointFlags
-     * for the available flags and their meaning.
-     *
-     * Generated from protobuf field <code>uint32 flags = 10;</code>
-     * @param int $var
-     * @return $this
-     */
-    public function setFlags($var)
-    {
-        GPBUtil::checkUint32($var);
-        $this->flags = $var;
 
         return $this;
     }

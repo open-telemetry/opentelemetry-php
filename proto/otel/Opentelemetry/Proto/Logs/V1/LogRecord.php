@@ -57,6 +57,17 @@ class LogRecord extends \Google\Protobuf\Internal\Message
      */
     protected $severity_text = '';
     /**
+     * Short event identifier that does not contain varying parts. Name describes
+     * what happened (e.g. "ProcessStarted"). Recommended to be no longer than 50
+     * characters. Not guaranteed to be unique in any way. [Optional].
+     * This deprecated field is planned to be removed March 15, 2022. Receivers can
+     * ignore this field.
+     *
+     * Generated from protobuf field <code>string name = 4 [deprecated = true];</code>
+     * @deprecated
+     */
+    protected $name = '';
+    /**
      * A value containing the body of the log record. Can be for example a human-readable
      * string message (including multi-line) describing the event in a free form or it can
      * be a structured data composed of arrays and maps of other values. [Optional].
@@ -135,6 +146,12 @@ class LogRecord extends \Google\Protobuf\Internal\Message
      *     @type string $severity_text
      *           The severity text (also known as log level). The original string representation as
      *           it is known at the source. [Optional].
+     *     @type string $name
+     *           Short event identifier that does not contain varying parts. Name describes
+     *           what happened (e.g. "ProcessStarted"). Recommended to be no longer than 50
+     *           characters. Not guaranteed to be unique in any way. [Optional].
+     *           This deprecated field is planned to be removed March 15, 2022. Receivers can
+     *           ignore this field.
      *     @type \Opentelemetry\Proto\Common\V1\AnyValue $body
      *           A value containing the body of the log record. Can be for example a human-readable
      *           string message (including multi-line) describing the event in a free form or it can
@@ -299,6 +316,44 @@ class LogRecord extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->severity_text = $var;
+
+        return $this;
+    }
+
+    /**
+     * Short event identifier that does not contain varying parts. Name describes
+     * what happened (e.g. "ProcessStarted"). Recommended to be no longer than 50
+     * characters. Not guaranteed to be unique in any way. [Optional].
+     * This deprecated field is planned to be removed March 15, 2022. Receivers can
+     * ignore this field.
+     *
+     * Generated from protobuf field <code>string name = 4 [deprecated = true];</code>
+     * @return string
+     * @deprecated
+     */
+    public function getName()
+    {
+        @trigger_error('name is deprecated.', E_USER_DEPRECATED);
+        return $this->name;
+    }
+
+    /**
+     * Short event identifier that does not contain varying parts. Name describes
+     * what happened (e.g. "ProcessStarted"). Recommended to be no longer than 50
+     * characters. Not guaranteed to be unique in any way. [Optional].
+     * This deprecated field is planned to be removed March 15, 2022. Receivers can
+     * ignore this field.
+     *
+     * Generated from protobuf field <code>string name = 4 [deprecated = true];</code>
+     * @param string $var
+     * @return $this
+     * @deprecated
+     */
+    public function setName($var)
+    {
+        @trigger_error('name is deprecated.', E_USER_DEPRECATED);
+        GPBUtil::checkString($var, True);
+        $this->name = $var;
 
         return $this;
     }

@@ -10,9 +10,6 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * A collection of Metrics produced by an InstrumentationLibrary.
- * InstrumentationLibraryMetrics is wire-compatible with ScopeMetrics for binary
- * Protobuf format.
- * This message is deprecated and will be removed on June 15, 2022.
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.InstrumentationLibraryMetrics</code>
  */
