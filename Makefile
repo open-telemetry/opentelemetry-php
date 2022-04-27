@@ -39,9 +39,9 @@ trace examples: FORCE
 	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/AlwaysOnZipkinToNewrelicExample.php
 	docker-compose stop
 collector:
-	docker-compose -f docker-compose-collector.yaml up -d --remove-orphans
-	docker-compose -f docker-compose-collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=collector:4317 --rm php php ./examples/AlwaysOnOTLPGrpcExample.php
-	docker-compose -f docker-compose-collector.yaml stop
+	docker-compose -f docker-compose.collector.yaml up -d --remove-orphans
+	docker-compose -f docker-compose.collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=collector:4317 --rm php php ./examples/AlwaysOnOTLPGrpcExample.php
+	docker-compose -f docker-compose.collector.yaml stop
 
 fiber-ffi-example:
 	@docker-compose -f docker-compose.fiber-ffi.yaml -p opentelemetry-php_fiber-ffi-example up -d web
