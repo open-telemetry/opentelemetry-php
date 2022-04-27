@@ -19,11 +19,11 @@ class KeyValue extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string key = 1;</code>
      */
-    private $key = '';
+    protected $key = '';
     /**
      * Generated from protobuf field <code>.opentelemetry.proto.common.v1.AnyValue value = 2;</code>
      */
-    private $value = null;
+    protected $value = null;
 
     /**
      * Constructor.
@@ -64,11 +64,21 @@ class KeyValue extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>.opentelemetry.proto.common.v1.AnyValue value = 2;</code>
-     * @return \Opentelemetry\Proto\Common\V1\AnyValue
+     * @return \Opentelemetry\Proto\Common\V1\AnyValue|null
      */
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function hasValue()
+    {
+        return isset($this->value);
+    }
+
+    public function clearValue()
+    {
+        unset($this->value);
     }
 
     /**

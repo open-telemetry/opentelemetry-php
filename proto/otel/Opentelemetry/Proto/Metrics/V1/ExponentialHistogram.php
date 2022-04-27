@@ -26,7 +26,7 @@ class ExponentialHistogram extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.AggregationTemporality aggregation_temporality = 2;</code>
      */
-    private $aggregation_temporality = 0;
+    protected $aggregation_temporality = 0;
 
     /**
      * Constructor.

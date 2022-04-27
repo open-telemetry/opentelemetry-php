@@ -4,6 +4,8 @@
 
 namespace Opentelemetry\Proto\Trace\V1\Status;
 
+use UnexpectedValueException;
+
 /**
  * Protobuf type <code>opentelemetry.proto.trace.v1.Status.DeprecatedStatusCode</code>
  */
@@ -77,6 +79,46 @@ class DeprecatedStatusCode
      * Generated from protobuf enum <code>DEPRECATED_STATUS_CODE_UNAUTHENTICATED = 16;</code>
      */
     const DEPRECATED_STATUS_CODE_UNAUTHENTICATED = 16;
+
+    private static $valueToName = [
+        self::DEPRECATED_STATUS_CODE_OK => 'DEPRECATED_STATUS_CODE_OK',
+        self::DEPRECATED_STATUS_CODE_CANCELLED => 'DEPRECATED_STATUS_CODE_CANCELLED',
+        self::DEPRECATED_STATUS_CODE_UNKNOWN_ERROR => 'DEPRECATED_STATUS_CODE_UNKNOWN_ERROR',
+        self::DEPRECATED_STATUS_CODE_INVALID_ARGUMENT => 'DEPRECATED_STATUS_CODE_INVALID_ARGUMENT',
+        self::DEPRECATED_STATUS_CODE_DEADLINE_EXCEEDED => 'DEPRECATED_STATUS_CODE_DEADLINE_EXCEEDED',
+        self::DEPRECATED_STATUS_CODE_NOT_FOUND => 'DEPRECATED_STATUS_CODE_NOT_FOUND',
+        self::DEPRECATED_STATUS_CODE_ALREADY_EXISTS => 'DEPRECATED_STATUS_CODE_ALREADY_EXISTS',
+        self::DEPRECATED_STATUS_CODE_PERMISSION_DENIED => 'DEPRECATED_STATUS_CODE_PERMISSION_DENIED',
+        self::DEPRECATED_STATUS_CODE_RESOURCE_EXHAUSTED => 'DEPRECATED_STATUS_CODE_RESOURCE_EXHAUSTED',
+        self::DEPRECATED_STATUS_CODE_FAILED_PRECONDITION => 'DEPRECATED_STATUS_CODE_FAILED_PRECONDITION',
+        self::DEPRECATED_STATUS_CODE_ABORTED => 'DEPRECATED_STATUS_CODE_ABORTED',
+        self::DEPRECATED_STATUS_CODE_OUT_OF_RANGE => 'DEPRECATED_STATUS_CODE_OUT_OF_RANGE',
+        self::DEPRECATED_STATUS_CODE_UNIMPLEMENTED => 'DEPRECATED_STATUS_CODE_UNIMPLEMENTED',
+        self::DEPRECATED_STATUS_CODE_INTERNAL_ERROR => 'DEPRECATED_STATUS_CODE_INTERNAL_ERROR',
+        self::DEPRECATED_STATUS_CODE_UNAVAILABLE => 'DEPRECATED_STATUS_CODE_UNAVAILABLE',
+        self::DEPRECATED_STATUS_CODE_DATA_LOSS => 'DEPRECATED_STATUS_CODE_DATA_LOSS',
+        self::DEPRECATED_STATUS_CODE_UNAUTHENTICATED => 'DEPRECATED_STATUS_CODE_UNAUTHENTICATED',
+    ];
+
+    public static function name($value)
+    {
+        if (!isset(self::$valueToName[$value])) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no name defined for value %s', __CLASS__, $value));
+        }
+        return self::$valueToName[$value];
+    }
+
+
+    public static function value($name)
+    {
+        $const = __CLASS__ . '::' . strtoupper($name);
+        if (!defined($const)) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no value defined for name %s', __CLASS__, $name));
+        }
+        return constant($const);
+    }
 }
 
 // Adding a class alias for backwards compatibility with the previous class name.

@@ -19,22 +19,12 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
     /**
      * The set of key/value pairs that uniquely identify the timeseries from
      * where this point belongs. The list may be empty (may contain 0 elements).
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 7;</code>
      */
     private $attributes;
-    /**
-     * Labels is deprecated and will be removed soon.
-     * 1. Old senders and receivers that are not aware of this change will
-     * continue using the `labels` field.
-     * 2. New senders, which are aware of this change MUST send only `attributes`.
-     * 3. New receivers, which are aware of this change MUST convert this into
-     * `labels` by simply converting all int64 values into float.
-     * This field will be removed in ~3 months, on July 1, 2021.
-     *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];</code>
-     */
-    private $labels;
     /**
      * StartTimeUnixNano is optional but strongly encouraged, see the
      * the detailed comments above Metric.
@@ -43,7 +33,7 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      */
-    private $start_time_unix_nano = 0;
+    protected $start_time_unix_nano = 0;
     /**
      * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
@@ -51,7 +41,7 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 time_unix_nano = 3;</code>
      */
-    private $time_unix_nano = 0;
+    protected $time_unix_nano = 0;
     /**
      * (Optional) List of exemplars collected from
      * measurements that were used to form the data point
@@ -65,7 +55,7 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>uint32 flags = 8;</code>
      */
-    private $flags = 0;
+    protected $flags = 0;
     protected $value;
 
     /**
@@ -77,14 +67,8 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
      *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $attributes
      *           The set of key/value pairs that uniquely identify the timeseries from
      *           where this point belongs. The list may be empty (may contain 0 elements).
-     *     @type \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $labels
-     *           Labels is deprecated and will be removed soon.
-     *           1. Old senders and receivers that are not aware of this change will
-     *           continue using the `labels` field.
-     *           2. New senders, which are aware of this change MUST send only `attributes`.
-     *           3. New receivers, which are aware of this change MUST convert this into
-     *           `labels` by simply converting all int64 values into float.
-     *           This field will be removed in ~3 months, on July 1, 2021.
+     *           Attribute keys MUST be unique (it is not allowed to have more than one
+     *           attribute with the same key).
      *     @type int|string $start_time_unix_nano
      *           StartTimeUnixNano is optional but strongly encouraged, see the
      *           the detailed comments above Metric.
@@ -112,6 +96,8 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
     /**
      * The set of key/value pairs that uniquely identify the timeseries from
      * where this point belongs. The list may be empty (may contain 0 elements).
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 7;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -124,6 +110,8 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
     /**
      * The set of key/value pairs that uniquely identify the timeseries from
      * where this point belongs. The list may be empty (may contain 0 elements).
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 7;</code>
      * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
@@ -133,44 +121,6 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Common\V1\KeyValue::class);
         $this->attributes = $arr;
-
-        return $this;
-    }
-
-    /**
-     * Labels is deprecated and will be removed soon.
-     * 1. Old senders and receivers that are not aware of this change will
-     * continue using the `labels` field.
-     * 2. New senders, which are aware of this change MUST send only `attributes`.
-     * 3. New receivers, which are aware of this change MUST convert this into
-     * `labels` by simply converting all int64 values into float.
-     * This field will be removed in ~3 months, on July 1, 2021.
-     *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
-     */
-    public function getLabels()
-    {
-        return $this->labels;
-    }
-
-    /**
-     * Labels is deprecated and will be removed soon.
-     * 1. Old senders and receivers that are not aware of this change will
-     * continue using the `labels` field.
-     * 2. New senders, which are aware of this change MUST send only `attributes`.
-     * 3. New receivers, which are aware of this change MUST convert this into
-     * `labels` by simply converting all int64 values into float.
-     * This field will be removed in ~3 months, on July 1, 2021.
-     *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];</code>
-     * @param \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
-     */
-    public function setLabels($var)
-    {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Common\V1\StringKeyValue::class);
-        $this->labels = $arr;
 
         return $this;
     }
@@ -246,6 +196,11 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
         return $this->readOneof(4);
     }
 
+    public function hasAsDouble()
+    {
+        return $this->hasOneof(4);
+    }
+
     /**
      * Generated from protobuf field <code>double as_double = 4;</code>
      * @param float $var
@@ -266,6 +221,11 @@ class NumberDataPoint extends \Google\Protobuf\Internal\Message
     public function getAsInt()
     {
         return $this->readOneof(6);
+    }
+
+    public function hasAsInt()
+    {
+        return $this->hasOneof(6);
     }
 
     /**

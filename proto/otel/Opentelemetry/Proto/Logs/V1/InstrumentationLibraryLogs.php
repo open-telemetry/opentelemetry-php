@@ -10,6 +10,9 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * A collection of Logs produced by an InstrumentationLibrary.
+ * InstrumentationLibraryLogs is wire-compatible with ScopeLogs for binary
+ * Protobuf format.
+ * This message is deprecated and will be removed on June 15, 2022.
  *
  * Generated from protobuf message <code>opentelemetry.proto.logs.v1.InstrumentationLibraryLogs</code>
  */
@@ -22,19 +25,19 @@ class InstrumentationLibraryLogs extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.opentelemetry.proto.common.v1.InstrumentationLibrary instrumentation_library = 1;</code>
      */
-    private $instrumentation_library = null;
+    protected $instrumentation_library = null;
     /**
-     * A list of log records.
+     * A list of logs that originate from an instrumentation library.
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.logs.v1.LogRecord logs = 2;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.logs.v1.LogRecord log_records = 2;</code>
      */
-    private $logs;
+    private $log_records;
     /**
      * This schema_url applies to all logs in the "logs" field.
      *
      * Generated from protobuf field <code>string schema_url = 3;</code>
      */
-    private $schema_url = '';
+    protected $schema_url = '';
 
     /**
      * Constructor.
@@ -46,8 +49,8 @@ class InstrumentationLibraryLogs extends \Google\Protobuf\Internal\Message
      *           The instrumentation library information for the logs in this message.
      *           Semantically when InstrumentationLibrary isn't set, it is equivalent with
      *           an empty instrumentation library name (unknown).
-     *     @type \Opentelemetry\Proto\Logs\V1\LogRecord[]|\Google\Protobuf\Internal\RepeatedField $logs
-     *           A list of log records.
+     *     @type \Opentelemetry\Proto\Logs\V1\LogRecord[]|\Google\Protobuf\Internal\RepeatedField $log_records
+     *           A list of logs that originate from an instrumentation library.
      *     @type string $schema_url
      *           This schema_url applies to all logs in the "logs" field.
      * }
@@ -63,11 +66,21 @@ class InstrumentationLibraryLogs extends \Google\Protobuf\Internal\Message
      * an empty instrumentation library name (unknown).
      *
      * Generated from protobuf field <code>.opentelemetry.proto.common.v1.InstrumentationLibrary instrumentation_library = 1;</code>
-     * @return \Opentelemetry\Proto\Common\V1\InstrumentationLibrary
+     * @return \Opentelemetry\Proto\Common\V1\InstrumentationLibrary|null
      */
     public function getInstrumentationLibrary()
     {
         return $this->instrumentation_library;
+    }
+
+    public function hasInstrumentationLibrary()
+    {
+        return isset($this->instrumentation_library);
+    }
+
+    public function clearInstrumentationLibrary()
+    {
+        unset($this->instrumentation_library);
     }
 
     /**
@@ -88,27 +101,27 @@ class InstrumentationLibraryLogs extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A list of log records.
+     * A list of logs that originate from an instrumentation library.
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.logs.v1.LogRecord logs = 2;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.logs.v1.LogRecord log_records = 2;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
-    public function getLogs()
+    public function getLogRecords()
     {
-        return $this->logs;
+        return $this->log_records;
     }
 
     /**
-     * A list of log records.
+     * A list of logs that originate from an instrumentation library.
      *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.logs.v1.LogRecord logs = 2;</code>
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.logs.v1.LogRecord log_records = 2;</code>
      * @param \Opentelemetry\Proto\Logs\V1\LogRecord[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
-    public function setLogs($var)
+    public function setLogRecords($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Logs\V1\LogRecord::class);
-        $this->logs = $arr;
+        $this->log_records = $arr;
 
         return $this;
     }

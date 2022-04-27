@@ -7,7 +7,7 @@ services:
     volumes:
     - ./:/usr/src/myapp
     depends_on:
-      - otel-collector
+      - collector
   zipkin:
     image: openzipkin/zipkin-slim
     ports:
@@ -19,8 +19,7 @@ services:
     ports:
     - 9412:9412
     - 16686:16686
-  otel-collector:
-    platform: linux/amd64
+  collector:
     image: otel/opentelemetry-collector-contrib
     command: ["--config=/etc/otel-collector-config.yml"]
     volumes:

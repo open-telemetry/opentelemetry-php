@@ -17,8 +17,8 @@ class SpanConverter implements SpanConverterInterface
 {
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
     const STATUS_DESCRIPTION_TAG_KEY = 'error';
-    const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
-    const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
+    const KEY_INSTRUMENTATION_SCOPE_NAME = 'otel.scope.name';
+    const KEY_INSTRUMENTATION_SCOPE_VERSION = 'otel.scope.version';
 
     const REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP = [
         'peer.service' => 1,
@@ -107,12 +107,12 @@ class SpanConverter implements SpanConverterInterface
             $row['tags'][self::STATUS_DESCRIPTION_TAG_KEY] = $span->getStatus()->getDescription();
         }
 
-        if (!empty($span->getInstrumentationLibrary()->getName())) {
-            $row[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_NAME] = $span->getInstrumentationLibrary()->getName();
+        if (!empty($span->getInstrumentationScope()->getName())) {
+            $row[SpanConverter::KEY_INSTRUMENTATION_SCOPE_NAME] = $span->getInstrumentationScope()->getName();
         }
 
-        if ($span->getInstrumentationLibrary()->getVersion() !== null) {
-            $row[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_VERSION] = $span->getInstrumentationLibrary()->getVersion();
+        if ($span->getInstrumentationScope()->getVersion() !== null) {
+            $row[SpanConverter::KEY_INSTRUMENTATION_SCOPE_VERSION] = $span->getInstrumentationScope()->getVersion();
         }
 
         foreach ($span->getAttributes() as $k => $v) {

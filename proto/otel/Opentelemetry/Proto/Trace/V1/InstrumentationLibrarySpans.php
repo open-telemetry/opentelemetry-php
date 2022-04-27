@@ -10,6 +10,9 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * A collection of Spans produced by an InstrumentationLibrary.
+ * InstrumentationLibrarySpans is wire-compatible with ScopeSpans for binary
+ * Protobuf format.
+ * This message is deprecated and will be removed on June 15, 2022.
  *
  * Generated from protobuf message <code>opentelemetry.proto.trace.v1.InstrumentationLibrarySpans</code>
  */
@@ -22,7 +25,7 @@ class InstrumentationLibrarySpans extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.opentelemetry.proto.common.v1.InstrumentationLibrary instrumentation_library = 1;</code>
      */
-    private $instrumentation_library = null;
+    protected $instrumentation_library = null;
     /**
      * A list of Spans that originate from an instrumentation library.
      *
@@ -34,7 +37,7 @@ class InstrumentationLibrarySpans extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string schema_url = 3;</code>
      */
-    private $schema_url = '';
+    protected $schema_url = '';
 
     /**
      * Constructor.
@@ -63,11 +66,21 @@ class InstrumentationLibrarySpans extends \Google\Protobuf\Internal\Message
      * an empty instrumentation library name (unknown).
      *
      * Generated from protobuf field <code>.opentelemetry.proto.common.v1.InstrumentationLibrary instrumentation_library = 1;</code>
-     * @return \Opentelemetry\Proto\Common\V1\InstrumentationLibrary
+     * @return \Opentelemetry\Proto\Common\V1\InstrumentationLibrary|null
      */
     public function getInstrumentationLibrary()
     {
         return $this->instrumentation_library;
+    }
+
+    public function hasInstrumentationLibrary()
+    {
+        return isset($this->instrumentation_library);
+    }
+
+    public function clearInstrumentationLibrary()
+    {
+        unset($this->instrumentation_library);
     }
 
     /**

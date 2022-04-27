@@ -29,7 +29,7 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      */
-    private $start_time_unix_nano = 0;
+    protected $start_time_unix_nano = 0;
     /**
      * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
@@ -37,7 +37,7 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 time_unix_nano = 3;</code>
      */
-    private $time_unix_nano = 0;
+    protected $time_unix_nano = 0;
     /**
      * count is the number of values in the population. Must be non-negative. This
      * value must be equal to the sum of the "count" fields in buckets if a
@@ -45,7 +45,7 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 count = 4;</code>
      */
-    private $count = 0;
+    protected $count = 0;
     /**
      * sum of the values in the population. If count is zero then this field
      * must be zero. This value must be equal to the sum of the "sum" fields in
@@ -53,7 +53,7 @@ class IntHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>sfixed64 sum = 5;</code>
      */
-    private $sum = 0;
+    protected $sum = 0;
     /**
      * bucket_counts is an optional field contains the count values of histogram
      * for each bucket.

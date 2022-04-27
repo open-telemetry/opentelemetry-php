@@ -25,13 +25,13 @@ class IntSum extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.AggregationTemporality aggregation_temporality = 2;</code>
      */
-    private $aggregation_temporality = 0;
+    protected $aggregation_temporality = 0;
     /**
      * If "true" means that the sum is monotonic.
      *
      * Generated from protobuf field <code>bool is_monotonic = 3;</code>
      */
-    private $is_monotonic = false;
+    protected $is_monotonic = false;
 
     /**
      * Constructor.

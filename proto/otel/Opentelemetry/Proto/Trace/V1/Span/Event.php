@@ -21,16 +21,18 @@ class Event extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 time_unix_nano = 1;</code>
      */
-    private $time_unix_nano = 0;
+    protected $time_unix_nano = 0;
     /**
      * name of the event.
      * This field is semantically required to be set to non-empty string.
      *
      * Generated from protobuf field <code>string name = 2;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * attributes is a collection of attribute key/value pairs on the event.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
@@ -41,7 +43,7 @@ class Event extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>uint32 dropped_attributes_count = 4;</code>
      */
-    private $dropped_attributes_count = 0;
+    protected $dropped_attributes_count = 0;
 
     /**
      * Constructor.
@@ -56,6 +58,8 @@ class Event extends \Google\Protobuf\Internal\Message
      *           This field is semantically required to be set to non-empty string.
      *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $attributes
      *           attributes is a collection of attribute key/value pairs on the event.
+     *           Attribute keys MUST be unique (it is not allowed to have more than one
+     *           attribute with the same key).
      *     @type int $dropped_attributes_count
      *           dropped_attributes_count is the number of dropped attributes. If the value is 0,
      *           then no attributes were dropped.
@@ -122,6 +126,8 @@ class Event extends \Google\Protobuf\Internal\Message
 
     /**
      * attributes is a collection of attribute key/value pairs on the event.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -133,6 +139,8 @@ class Event extends \Google\Protobuf\Internal\Message
 
     /**
      * attributes is a collection of attribute key/value pairs on the event.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var

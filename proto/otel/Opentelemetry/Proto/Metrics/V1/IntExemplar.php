@@ -30,13 +30,13 @@ class IntExemplar extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 time_unix_nano = 2;</code>
      */
-    private $time_unix_nano = 0;
+    protected $time_unix_nano = 0;
     /**
      * Numerical int value of the measurement that was recorded.
      *
      * Generated from protobuf field <code>sfixed64 value = 3;</code>
      */
-    private $value = 0;
+    protected $value = 0;
     /**
      * (Optional) Span ID of the exemplar trace.
      * span_id may be missing if the measurement is not recorded inside a trace
@@ -44,7 +44,7 @@ class IntExemplar extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bytes span_id = 4;</code>
      */
-    private $span_id = '';
+    protected $span_id = '';
     /**
      * (Optional) Trace ID of the exemplar trace.
      * trace_id may be missing if the measurement is not recorded inside a trace
@@ -52,7 +52,7 @@ class IntExemplar extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bytes trace_id = 5;</code>
      */
-    private $trace_id = '';
+    protected $trace_id = '';
 
     /**
      * Constructor.

@@ -29,7 +29,7 @@ class MetricConfigResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bytes fingerprint = 1;</code>
      */
-    private $fingerprint = '';
+    protected $fingerprint = '';
     /**
      * A single metric may match multiple schedules. In such cases, the schedule
      * that specifies the smallest period is applied.
@@ -47,7 +47,7 @@ class MetricConfigResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 suggested_wait_time_sec = 3;</code>
      */
-    private $suggested_wait_time_sec = 0;
+    protected $suggested_wait_time_sec = 0;
 
     /**
      * Constructor.

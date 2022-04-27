@@ -9,7 +9,7 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Jaeger\SpanConverter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\SDK\Trace\Link;
@@ -53,9 +53,9 @@ class JaegerSpanConverterTest extends TestCase
                     'status_description'
                 )
             )
-            ->setInstrumentationLibrary(new InstrumentationLibrary(
-                'instrumentation_library_name',
-                'instrumentation_library_version'
+            ->setInstrumentationScope(new InstrumentationScope(
+                'instrumentation_scope_name',
+                'instrumentation_scope_version'
             ))
             ->addAttribute('keyForBoolean', true)
             ->addAttribute('keyForArray', ['1stElement', '2ndElement', true])
@@ -81,11 +81,11 @@ class JaegerSpanConverterTest extends TestCase
         $this->assertSame('otel.status_description', $convertedSpan->tags[1]->key);
         $this->assertSame('status_description', $convertedSpan->tags[1]->vStr);
 
-        $this->assertSame('otel.library.name', $convertedSpan->tags[2]->key);
-        $this->assertSame('instrumentation_library_name', $convertedSpan->tags[2]->vStr);
+        $this->assertSame('otel.scope.name', $convertedSpan->tags[2]->key);
+        $this->assertSame('instrumentation_scope_name', $convertedSpan->tags[2]->vStr);
 
-        $this->assertSame('otel.library.version', $convertedSpan->tags[3]->key);
-        $this->assertSame('instrumentation_library_version', $convertedSpan->tags[3]->vStr);
+        $this->assertSame('otel.scope.version', $convertedSpan->tags[3]->key);
+        $this->assertSame('instrumentation_scope_version', $convertedSpan->tags[3]->vStr);
 
         $this->assertSame('keyForBoolean', $convertedSpan->tags[4]->key);
         $this->assertTrue($convertedSpan->tags[4]->vBool);

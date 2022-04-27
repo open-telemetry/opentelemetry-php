@@ -40,6 +40,7 @@ class TraceServiceClient extends \Grpc\BaseStub {
      * @param \Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
+     * @return \Grpc\UnaryCall
      */
     public function Export(\Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest $argument,
       $metadata = [], $options = []) {

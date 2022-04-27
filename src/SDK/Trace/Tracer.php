@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use function ctype_space;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibraryInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
 class Tracer implements API\TracerInterface
 {
@@ -16,14 +16,14 @@ class Tracer implements API\TracerInterface
     private TracerSharedState $tracerSharedState;
 
     /** @readonly */
-    private InstrumentationLibraryInterface $instrumentationLibrary;
+    private InstrumentationScopeInterface $instrumentationScope;
 
     public function __construct(
         TracerSharedState $tracerSharedState,
-        InstrumentationLibraryInterface $instrumentationLibrary
+        InstrumentationScopeInterface $instrumentationScope
     ) {
         $this->tracerSharedState = $tracerSharedState;
-        $this->instrumentationLibrary = $instrumentationLibrary;
+        $this->instrumentationScope = $instrumentationScope;
     }
 
     /** @inheritDoc */
@@ -39,14 +39,14 @@ class Tracer implements API\TracerInterface
 
         return new SpanBuilder(
             $spanName,
-            $this->instrumentationLibrary,
+            $this->instrumentationScope,
             $this->tracerSharedState,
             $this->tracerSharedState->getSpanLimits()
         );
     }
 
-    public function getInstrumentationLibrary(): InstrumentationLibraryInterface
+    public function getInstrumentationScope(): InstrumentationScopeInterface
     {
-        return $this->instrumentationLibrary;
+        return $this->instrumentationScope;
     }
 }

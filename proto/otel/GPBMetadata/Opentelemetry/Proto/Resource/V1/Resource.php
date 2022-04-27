@@ -15,19 +15,16 @@ class Resource
           return;
         }
         \GPBMetadata\Opentelemetry\Proto\Common\V1\Common::initOnce();
-        $pool->internalAddGeneratedFile(hex2bin(
-            "0abd020a2e6f70656e74656c656d657472792f70726f746f2f7265736f75" .
-            "7263652f76312f7265736f757263652e70726f746f121f6f70656e74656c" .
-            "656d657472792e70726f746f2e7265736f757263652e763122690a085265" .
-            "736f75726365123b0a0a6174747269627574657318012003280b32272e6f" .
-            "70656e74656c656d657472792e70726f746f2e636f6d6d6f6e2e76312e4b" .
-            "657956616c756512200a1864726f707065645f617474726962757465735f" .
-            "636f756e7418022001280d42770a22696f2e6f70656e74656c656d657472" .
-            "792e70726f746f2e7265736f757263652e7631420d5265736f7572636550" .
-            "726f746f50015a406769746875622e636f6d2f6f70656e2d74656c656d65" .
-            "7472792f6f70656e74656c656d657472792d70726f746f2f67656e2f676f" .
-            "2f7265736f757263652f7631620670726f746f33"
-        ));
+        $pool->internalAddGeneratedFile(
+            '
+§
+.opentelemetry/proto/resource/v1/resource.protoopentelemetry.proto.resource.v1"i
+Resource;
+
+attributes (2\'.opentelemetry.proto.common.v1.KeyValue 
+dropped_attributes_count (Ba
+"io.opentelemetry.proto.resource.v1BResourceProtoPZ*go.opentelemetry.io/proto/otlp/resource/v1bproto3'
+        , true);
 
         static::$is_initialized = true;
     }

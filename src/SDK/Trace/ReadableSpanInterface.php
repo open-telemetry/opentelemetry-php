@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibraryInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/sdk.md#additional-span-interfaces
@@ -18,7 +18,7 @@ interface ReadableSpanInterface
 
     public function getParentContext(): API\SpanContextInterface;
 
-    public function getInstrumentationLibrary(): InstrumentationLibraryInterface;
+    public function getInstrumentationScope(): InstrumentationScopeInterface;
 
     public function hasEnded(): bool;
 

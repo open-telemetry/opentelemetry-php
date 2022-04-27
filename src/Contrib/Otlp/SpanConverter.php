@@ -9,11 +9,11 @@ use function hex2bin;
 use OpenTelemetry\API\Trace as API;
 use Opentelemetry\Proto\Common\V1\AnyValue;
 use Opentelemetry\Proto\Common\V1\ArrayValue;
-use Opentelemetry\Proto\Common\V1\InstrumentationLibrary;
+use Opentelemetry\Proto\Common\V1\InstrumentationScope;
 use Opentelemetry\Proto\Common\V1\KeyValue;
 use Opentelemetry\Proto\Resource\V1\Resource;
-use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
+use Opentelemetry\Proto\Trace\V1\ScopeSpans;
 use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
 use Opentelemetry\Proto\Trace\V1\Span\Event;
 use Opentelemetry\Proto\Trace\V1\Span\Link;
@@ -186,30 +186,30 @@ class SpanConverter implements SpanConverterInterface
     {
         $isSpansEmpty = true; //Waiting for the loop to prove otherwise
 
-        $ils = $convertedSpans = $schemas = [];
+        $instrumentationScopes = $convertedSpans = $schemas = [];
         foreach ($spans as /** @var SpanDataInterface $span */  $span) {
             $isSpansEmpty = false;
 
-            $il = $span->getInstrumentationLibrary();
-            $ilKey = KeyGenerator::generateInstanceKey($il->getName(), $il->getVersion(), $il->getSchemaUrl());
-            if (!isset($ils[$ilKey])) {
-                $convertedSpans[$ilKey] = [];
-                $ils[$ilKey] = new InstrumentationLibrary(['name' => $il->getName(), 'version' => $il->getVersion() ?? '']);
-                $schemas[$ilKey] = $il->getSchemaUrl();
+            $scope = $span->getInstrumentationScope();
+            $isKey = KeyGenerator::generateInstanceKey($scope->getName(), $scope->getVersion(), $scope->getSchemaUrl());
+            if (!isset($instrumentationScopes[$isKey])) {
+                $convertedSpans[$isKey] = [];
+                $instrumentationScopes[$isKey] = new InstrumentationScope(['name' => $scope->getName(), 'version' => $scope->getVersion() ?? '']);
+                $schemas[$isKey] = $scope->getSchemaUrl();
             }
-            $convertedSpans[$ilKey][] = $this->as_otlp_span($span);
+            $convertedSpans[$isKey][] = $this->as_otlp_span($span);
         }
 
         if ($isSpansEmpty == true) {
             return new ResourceSpans();
         }
 
-        $ilSpans = [];
-        foreach ($ils as $ilKey => $il) {
-            $ilSpans[] = new InstrumentationLibrarySpans([
-                'instrumentation_library' => $il,
-                'spans' => $convertedSpans[$ilKey],
-                'schema_url' => $schemas[$ilKey] ?? '',
+        $isSpans = [];
+        foreach ($instrumentationScopes as $isKey => $scope) {
+            $isSpans[] = new ScopeSpans([
+                'scope' => $scope,
+                'spans' => $convertedSpans[$isKey],
+                'schema_url' => $schemas[$isKey] ?? '',
             ]);
         }
 
@@ -217,7 +217,7 @@ class SpanConverter implements SpanConverterInterface
             'resource' => new Resource([
                 'attributes' => $this->as_otlp_resource_attributes($spans),
             ]),
-            'instrumentation_library_spans' => $ilSpans,
+            'scope_spans' => $isSpans,
         ]);
     }
 }

@@ -16,7 +16,9 @@ use Google\Protobuf\Internal\GPBUtil;
 class Resource extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Set of labels that describe the resource.
+     * Set of attributes that describe the resource.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 1;</code>
      */
@@ -27,7 +29,7 @@ class Resource extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>uint32 dropped_attributes_count = 2;</code>
      */
-    private $dropped_attributes_count = 0;
+    protected $dropped_attributes_count = 0;
 
     /**
      * Constructor.
@@ -36,7 +38,9 @@ class Resource extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $attributes
-     *           Set of labels that describe the resource.
+     *           Set of attributes that describe the resource.
+     *           Attribute keys MUST be unique (it is not allowed to have more than one
+     *           attribute with the same key).
      *     @type int $dropped_attributes_count
      *           dropped_attributes_count is the number of dropped attributes. If the value is 0, then
      *           no attributes were dropped.
@@ -48,7 +52,9 @@ class Resource extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Set of labels that describe the resource.
+     * Set of attributes that describe the resource.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 1;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -59,7 +65,9 @@ class Resource extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Set of labels that describe the resource.
+     * Set of attributes that describe the resource.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 1;</code>
      * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var

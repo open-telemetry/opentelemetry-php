@@ -4,6 +4,8 @@
 
 namespace Opentelemetry\Proto\Trace\V1\ConstantSampler;
 
+use UnexpectedValueException;
+
 /**
  * How spans should be sampled:
  * - Always off
@@ -26,6 +28,32 @@ class ConstantDecision
      * Generated from protobuf enum <code>ALWAYS_PARENT = 2;</code>
      */
     const ALWAYS_PARENT = 2;
+
+    private static $valueToName = [
+        self::ALWAYS_OFF => 'ALWAYS_OFF',
+        self::ALWAYS_ON => 'ALWAYS_ON',
+        self::ALWAYS_PARENT => 'ALWAYS_PARENT',
+    ];
+
+    public static function name($value)
+    {
+        if (!isset(self::$valueToName[$value])) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no name defined for value %s', __CLASS__, $value));
+        }
+        return self::$valueToName[$value];
+    }
+
+
+    public static function value($name)
+    {
+        $const = __CLASS__ . '::' . strtoupper($name);
+        if (!defined($const)) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no value defined for name %s', __CLASS__, $name));
+        }
+        return constant($const);
+    }
 }
 
 // Adding a class alias for backwards compatibility with the previous class name.

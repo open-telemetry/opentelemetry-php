@@ -4,6 +4,8 @@
 
 namespace Opentelemetry\Proto\Trace\V1\Status;
 
+use UnexpectedValueException;
+
 /**
  * For the semantics of status codes see
  * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#set-status
@@ -31,6 +33,32 @@ class StatusCode
      * Generated from protobuf enum <code>STATUS_CODE_ERROR = 2;</code>
      */
     const STATUS_CODE_ERROR = 2;
+
+    private static $valueToName = [
+        self::STATUS_CODE_UNSET => 'STATUS_CODE_UNSET',
+        self::STATUS_CODE_OK => 'STATUS_CODE_OK',
+        self::STATUS_CODE_ERROR => 'STATUS_CODE_ERROR',
+    ];
+
+    public static function name($value)
+    {
+        if (!isset(self::$valueToName[$value])) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no name defined for value %s', __CLASS__, $value));
+        }
+        return self::$valueToName[$value];
+    }
+
+
+    public static function value($name)
+    {
+        $const = __CLASS__ . '::' . strtoupper($name);
+        if (!defined($const)) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no value defined for name %s', __CLASS__, $name));
+        }
+        return constant($const);
+    }
 }
 
 // Adding a class alias for backwards compatibility with the previous class name.
