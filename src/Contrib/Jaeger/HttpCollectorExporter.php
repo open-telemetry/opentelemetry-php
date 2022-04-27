@@ -18,8 +18,6 @@ class HttpCollectorExporter implements SpanExporterInterface
     use UsesSpanConverterTrait;
     use SpanExporterTrait;
 
-    private SpanConverter $spanConverter;
-
     private HttpSender $sender;
 
     public function __construct(
@@ -39,8 +37,6 @@ class HttpCollectorExporter implements SpanExporterInterface
             $name,
             $parsedEndpoint
         );
-
-        $this->spanConverter = new SpanConverter();
     }
 
     /**
@@ -48,9 +44,7 @@ class HttpCollectorExporter implements SpanExporterInterface
      */
     public function doExport(iterable $spans): int
     {
-        $this->sender->send(
-            $this->spanConverter->convert($spans)
-        );
+        $this->sender->send($spans);
 
         return SpanExporterInterface::STATUS_SUCCESS;
     }

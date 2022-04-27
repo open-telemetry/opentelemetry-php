@@ -6,8 +6,8 @@ require __DIR__ . '/../vendor/autoload.php';
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPExporter;
-use OpenTelemetry\SDK\AbstractClock;
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
@@ -35,7 +35,7 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
 
     $rootSpan->setAttribute('remote_ip', '1.2.3.4')
         ->setAttribute('country', 'USA');
-    $timestamp = AbstractClock::getDefault()->timestamp();
+    $timestamp = ClockFactory::getDefault()->now();
     $rootSpan->addEvent('found_login', new Attributes([
         'id' => 1,
         'username' => 'otuser',

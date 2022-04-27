@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Resource\Detectors;
 
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
-use OpenTelemetry\SDK\Common\Environment\Resolver as EnvResolver;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -24,7 +23,9 @@ final class Environment implements ResourceDetectorInterface
         $attributes = $this->getMapFromEnvironment(Env::OTEL_RESOURCE_ATTRIBUTES, '');
 
         //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration
-        $serviceName = EnvResolver::hasVariable(Env::OTEL_SERVICE_NAME) ? $this->getStringFromEnvironment(Env::OTEL_SERVICE_NAME) : null;
+        $serviceName = $this->hasEnvironmentVariable(Env::OTEL_SERVICE_NAME) ?
+                       $this->getStringFromEnvironment(Env::OTEL_SERVICE_NAME) :
+                       null;
         if ($serviceName) {
             $attributes[ResourceAttributes::SERVICE_NAME] = $serviceName;
         }

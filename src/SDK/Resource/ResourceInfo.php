@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Resource;
 
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\AttributesInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+
+use OpenTelemetry\SDK\Common\Dev\Compatibility\Util as BcUtil;
 
 /**
  * A Resource is an immutable representation of the entity producing telemetry. For example, a process producing telemetry
@@ -30,45 +31,6 @@ class ResourceInfo
         return new ResourceInfo(clone $attributes, $schemaUrl);
     }
 
-    /**
-     * Merges resources into a new one.
-     *
-     * @param ResourceInfo ...$resources
-     * @return ResourceInfo
-     */
-    public static function merge(ResourceInfo ...$resources): self
-    {
-        $attributes = [];
-        $schemaUrl = null;
-
-        foreach ($resources as $resource) {
-            $attributes += $resource->getAttributes()->toArray();
-            $schemaUrl ??= $resource->getSchemaUrl();
-        }
-
-        return new ResourceInfo(new Attributes($attributes), $schemaUrl);
-    }
-
-    public static function defaultResource(): self
-    {
-        return (new Detectors\Composite([
-            new Detectors\Environment(),
-
-            new Detectors\Host(),
-            new Detectors\OperatingSystem(),
-            new Detectors\Process(),
-            new Detectors\ProcessRuntime(),
-
-            new Detectors\Sdk(),
-            new Detectors\SdkProvided(),
-        ]))->getResource();
-    }
-
-    public static function emptyResource(): self
-    {
-        return new ResourceInfo(new Attributes());
-    }
-
     public function getAttributes(): AttributesInterface
     {
         return $this->attributes;
@@ -77,5 +39,61 @@ class ResourceInfo
     public function getSchemaUrl(): ?string
     {
         return $this->schemaUrl;
+    }
+
+    public function serialize(): string
+    {
+        $copyOfAttributesAsArray = array_slice($this->attributes->toArray(), 0); //This may be overly cautious (in trying to avoid mutating the source array)
+        ksort($copyOfAttributesAsArray); //sort the associative array by keys since the serializer will consider equal arrays different otherwise
+
+        //The exact return value doesn't matter, as long as it can distingusih between instances that represent the same/different resources
+        return serialize([
+            'schemaUrl' => $this->schemaUrl,
+            'attributes' => $copyOfAttributesAsArray,
+        ]);
+    }
+
+    /**
+     * Backward compatibility methods
+     *
+     * @codeCoverageIgnore
+     */
+    public static function merge(ResourceInfo ...$resources): ResourceInfo
+    {
+        BcUtil::triggerMethodDeprecationNotice(
+            __METHOD__,
+            'merge',
+            ResourceInfoFactory::class
+        );
+
+        return ResourceInfoFactory::merge(...$resources);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function defaultResource(): ResourceInfo
+    {
+        BcUtil::triggerMethodDeprecationNotice(
+            __METHOD__,
+            'defaultResource',
+            ResourceInfoFactory::class
+        );
+
+        return ResourceInfoFactory::defaultResource();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function emptyResource(): ResourceInfo
+    {
+        BcUtil::triggerMethodDeprecationNotice(
+            __METHOD__,
+            'emptyResource',
+            ResourceInfoFactory::class
+        );
+
+        return ResourceInfoFactory::emptyResource();
     }
 }

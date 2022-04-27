@@ -8,8 +8,8 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Jaeger\SpanConverter;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\SDK\Trace\Link;
@@ -19,13 +19,15 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers OpenTelemetry\Contrib\Jaeger\SpanConverter
+ * @covers OpenTelemetry\Contrib\Jaeger\IdConverter
+ * @covers OpenTelemetry\Contrib\Jaeger\TagFactory\TagFactory
  */
 class JaegerSpanConverterTest extends TestCase
 {
     public function test_should_convert_an_otel_span_to_a_jaeger_thrift_span()
     {
         $span = (new SpanData())
-                    ->setName('otelSpanName');
+            ->setName('otelSpanName');
 
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 
@@ -166,17 +168,17 @@ class JaegerSpanConverterTest extends TestCase
     public function test_should_correctly_convert_span_event_to_jaeger_log()
     {
         $span = (new SpanData())
-                    ->setEvents(
-                        [
-                        new Event(
-                            'eventName',
-                            1505855794194009601,
-                            new Attributes([
-                                    'eventAttributeKey' => 'eventAttributeValue',
-                                ])
-                        ),
-                        ]
-                    );
+            ->setEvents(
+                [
+                    new Event(
+                        'eventName',
+                        1505855794194009601,
+                        new Attributes([
+                            'eventAttributeKey' => 'eventAttributeValue',
+                        ])
+                    ),
+                ]
+            );
 
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 
@@ -191,17 +193,17 @@ class JaegerSpanConverterTest extends TestCase
     public function test_should_use_event_attribute_from_event_if_present_for_jaeger_log()
     {
         $span = (new SpanData())
-                    ->setEvents(
-                        [
-                        new Event(
-                            'eventName',
-                            1505855794194009601,
-                            new Attributes([
-                                    'event' => 'valueForTheEventAttributeOnTheEvent',
-                                ])
-                        ),
-                        ]
-                    );
+            ->setEvents(
+                [
+                    new Event(
+                        'eventName',
+                        1505855794194009601,
+                        new Attributes([
+                            'event' => 'valueForTheEventAttributeOnTheEvent',
+                        ])
+                    ),
+                ]
+            );
 
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 
@@ -214,13 +216,13 @@ class JaegerSpanConverterTest extends TestCase
     public function test_should_correctly_convert_span_link_to_jaeger_span_reference()
     {
         $span = (new SpanData())
-                    ->setLinks(
-                        [
-                            new Link(
-                                SpanContext::getInvalid()
-                            ),
-                        ]
-                    );
+            ->setLinks(
+                [
+                    new Link(
+                        SpanContext::getInvalid()
+                    ),
+                ]
+            );
 
         [$convertedSpan] = (new SpanConverter())->convert([$span]);
 

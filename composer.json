@@ -8,10 +8,10 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
-        "packaged/thrift": "^0.15.0",
         "google/protobuf": "^3.3.0",
         "grpc/grpc": "^1.30",
         "nyholm/dsn": "^2.0.0",
+        "packaged/thrift": "^0.15.0",
         "php-http/async-client-implementation": "^1.0",
         "php-http/discovery": "^1.14",
         "promphp/prometheus_client_php": "^2.2.1",
@@ -55,7 +55,8 @@
             "Jaeger\\Thrift\\": "thrift/jaeger/"
         },
         "files": [
-            "src/Context/fiber/initialize_fiber_handler.php"
+            "src/Context/fiber/initialize_fiber_handler.php",
+            "src/SDK/Common/Dev/Compatibility/_load.php"
         ]
     },
     "autoload-dev": {

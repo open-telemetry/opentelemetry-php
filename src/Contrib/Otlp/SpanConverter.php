@@ -20,6 +20,7 @@ use Opentelemetry\Proto\Trace\V1\Span\Link;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
+use OpenTelemetry\SDK\Common\Instrumentation\KeyGenerator;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 
@@ -185,16 +186,16 @@ class SpanConverter implements SpanConverterInterface
     {
         $isSpansEmpty = true; //Waiting for the loop to prove otherwise
 
-        $ils = $convertedSpans = [];
-        foreach ($spans as $span) {
+        $ils = $convertedSpans = $schemas = [];
+        foreach ($spans as /** @var SpanDataInterface $span */  $span) {
             $isSpansEmpty = false;
 
-            /** @var \OpenTelemetry\SDK\InstrumentationLibrary $il */
             $il = $span->getInstrumentationLibrary();
-            $ilKey = sprintf('%s@%s', $il->getName(), $il->getVersion()??'');
+            $ilKey = KeyGenerator::generateInstanceKey($il->getName(), $il->getVersion(), $il->getSchemaUrl());
             if (!isset($ils[$ilKey])) {
                 $convertedSpans[$ilKey] = [];
-                $ils[$ilKey] = new InstrumentationLibrary(['name' => $il->getName(), 'version' => $il->getVersion()??'']);
+                $ils[$ilKey] = new InstrumentationLibrary(['name' => $il->getName(), 'version' => $il->getVersion() ?? '']);
+                $schemas[$ilKey] = $il->getSchemaUrl();
             }
             $convertedSpans[$ilKey][] = $this->as_otlp_span($span);
         }
@@ -208,6 +209,7 @@ class SpanConverter implements SpanConverterInterface
             $ilSpans[] = new InstrumentationLibrarySpans([
                 'instrumentation_library' => $il,
                 'spans' => $convertedSpans[$ilKey],
+                'schema_url' => $schemas[$ilKey] ?? '',
             ]);
         }
 

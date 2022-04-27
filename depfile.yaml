@@ -63,6 +63,18 @@ layers:
         collectors:
             - type: className
               regex: ^FFI\\
+    -   name: Composer
+        collectors:
+            - type: className
+              regex: ^Composer\\
+    -   name: Thrift
+        collectors:
+            - type: className
+              regex: ^Thrift\\
+    -   name: JaegerThrift
+        collectors:
+            - type: className
+              regex: ^Jaeger\\Thrift\\
 
 ruleset:
     Context:
@@ -79,6 +91,7 @@ ruleset:
         - PsrHttp
         - Http
         - NyholmDsn
+        - Composer
     OtelProto:
         - GoogleProtobuf
         - Grpc
@@ -94,3 +107,5 @@ ruleset:
         - Http
         - NyholmDsn
         - Prometheus
+        - Thrift
+        - JaegerThrift

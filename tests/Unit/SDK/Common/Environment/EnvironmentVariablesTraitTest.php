@@ -29,6 +29,13 @@ class EnvironmentVariablesTraitTest extends TestCase
         $this->restoreEnvironmentVariables();
     }
 
+    public function test_has_environment_variable(): void
+    {
+        $this->assertFalse($this->mock->hasEnvironmentVariable('FOO_VAR'));
+        $this->setEnvironmentVariable('FOO_VAR', 'FOO');
+        $this->assertTrue($this->mock->hasEnvironmentVariable('FOO_VAR'));
+    }
+
     public function test_integer_get(): void
     {
         $this->setEnvironmentVariable('OTEL_FOO', '100');

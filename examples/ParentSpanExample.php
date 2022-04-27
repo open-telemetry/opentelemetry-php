@@ -1,21 +1,20 @@
 <?php
 
 declare(strict_types=1);
-
 require __DIR__ . '/../vendor/autoload.php';
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
-use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 $serviceName = 'ParentSpanExample';
-$resource = ResourceInfo::defaultResource();
+$resource = ResourceInfoFactory::defaultResource();
 $sampler = new AlwaysOnSampler();
 $tracerProvider = new TracerProvider($resource, $sampler);
 
