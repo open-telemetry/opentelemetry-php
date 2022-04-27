@@ -10,6 +10,9 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * A collection of Spans produced by an InstrumentationLibrary.
+ * InstrumentationLibrarySpans is wire-compatible with ScopeSpans for binary
+ * Protobuf format.
+ * This message is deprecated and will be removed on June 15, 2022.
  *
  * Generated from protobuf message <code>opentelemetry.proto.trace.v1.InstrumentationLibrarySpans</code>
  */

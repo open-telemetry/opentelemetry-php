@@ -10,6 +10,9 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * A collection of Logs produced by an InstrumentationLibrary.
+ * InstrumentationLibraryLogs is wire-compatible with ScopeLogs for binary
+ * Protobuf format.
+ * This message is deprecated and will be removed on June 15, 2022.
  *
  * Generated from protobuf message <code>opentelemetry.proto.logs.v1.InstrumentationLibraryLogs</code>
  */
@@ -24,7 +27,7 @@ class InstrumentationLibraryLogs extends \Google\Protobuf\Internal\Message
      */
     protected $instrumentation_library = null;
     /**
-     * A list of log records.
+     * A list of logs that originate from an instrumentation library.
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.logs.v1.LogRecord log_records = 2;</code>
      */
@@ -47,7 +50,7 @@ class InstrumentationLibraryLogs extends \Google\Protobuf\Internal\Message
      *           Semantically when InstrumentationLibrary isn't set, it is equivalent with
      *           an empty instrumentation library name (unknown).
      *     @type \Opentelemetry\Proto\Logs\V1\LogRecord[]|\Google\Protobuf\Internal\RepeatedField $log_records
-     *           A list of log records.
+     *           A list of logs that originate from an instrumentation library.
      *     @type string $schema_url
      *           This schema_url applies to all logs in the "logs" field.
      * }
@@ -98,7 +101,7 @@ class InstrumentationLibraryLogs extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A list of log records.
+     * A list of logs that originate from an instrumentation library.
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.logs.v1.LogRecord log_records = 2;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -109,7 +112,7 @@ class InstrumentationLibraryLogs extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A list of log records.
+     * A list of logs that originate from an instrumentation library.
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.logs.v1.LogRecord log_records = 2;</code>
      * @param \Opentelemetry\Proto\Logs\V1\LogRecord[]|\Google\Protobuf\Internal\RepeatedField $var

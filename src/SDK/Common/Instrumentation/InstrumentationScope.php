@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Instrumentation;
 
 /**
- * Represents the instrumentation library information associated with the Tracer or Meter
+ * Represents the instrumentation scope information associated with the Tracer or Meter
  */
-final class InstrumentationLibrary implements InstrumentationLibraryInterface
+final class InstrumentationScope implements InstrumentationScopeInterface
 {
     private static ?self $empty = null;
 
@@ -26,7 +26,7 @@ final class InstrumentationLibrary implements InstrumentationLibraryInterface
      * @internal
      * @psalm-internal OpenTelemetry
      */
-    public static function getEmpty(): InstrumentationLibrary
+    public static function getEmpty(): InstrumentationScope
     {
         return self::$empty ?? self::$empty = new self('', null, null);
     }

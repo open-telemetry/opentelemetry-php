@@ -16,7 +16,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibraryInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use function sprintf;
@@ -55,7 +55,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     private ResourceInfo $resource;
 
     /** @readonly */
-    private InstrumentationLibraryInterface $instrumentationLibrary;
+    private InstrumentationScopeInterface $instrumentationScope;
 
     /** @readonly */
     private int $startEpochNanos;
@@ -79,7 +79,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     private function __construct(
         string $name,
         API\SpanContextInterface $context,
-        InstrumentationLibraryInterface $instrumentationLibrary,
+        InstrumentationScopeInterface $instrumentationScope,
         int $kind,
         API\SpanContextInterface $parentSpanContext,
         SpanLimits $spanLimits,
@@ -91,7 +91,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         int $startEpochNanos
     ) {
         $this->context = $context;
-        $this->instrumentationLibrary = $instrumentationLibrary;
+        $this->instrumentationScope = $instrumentationScope;
         $this->parentSpanContext = $parentSpanContext;
         $this->links = $links;
         $this->totalRecordedLinks = $totalRecordedLinks;
@@ -119,7 +119,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     public static function startSpan(
         string $name,
         API\SpanContextInterface $context,
-        InstrumentationLibraryInterface $instrumentationLibrary,
+        InstrumentationScopeInterface $instrumentationScope,
         int $kind,
         API\SpanInterface $parentSpan,
         Context $parentContext,
@@ -134,7 +134,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         $span = new self(
             $name,
             $context,
-            $instrumentationLibrary,
+            $instrumentationScope,
             $kind,
             $parentSpan->getContext(),
             $spanLimits,
@@ -338,9 +338,9 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         return $this->parentSpanContext;
     }
 
-    public function getInstrumentationLibrary(): InstrumentationLibraryInterface
+    public function getInstrumentationScope(): InstrumentationScopeInterface
     {
-        return $this->instrumentationLibrary;
+        return $this->instrumentationScope;
     }
 
     public function hasEnded(): bool

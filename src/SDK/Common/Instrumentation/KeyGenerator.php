@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Common\Instrumentation;
 class KeyGenerator
 {
     /**
-     * Generate a unique key for an instance of InstrumentationLibrary, with parameters matching those of the
+     * Generate a unique key for an instance of InstrumentationScope, with parameters matching those of the
      * class' constructor.
      * @param string $name
      * @param ?string $version

@@ -24,7 +24,7 @@ psalm:
 psalm-info:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/psalm --show-info=true --threads=1
 phpstan:
-	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpstan analyse
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpstan analyse --memory-limit=256M
 benchmark:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpbench run --report=default
 phpmetrics:
@@ -40,7 +40,7 @@ trace examples: FORCE
 	docker-compose stop
 collector:
 	docker-compose -f docker-compose-collector.yaml up -d --remove-orphans
-	docker-compose -f docker-compose-collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317 --rm php php ./examples/AlwaysOnOTLPGrpcExample2.php
+	docker-compose -f docker-compose-collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=collector:4317 --rm php php ./examples/AlwaysOnOTLPGrpcExample.php
 	docker-compose -f docker-compose-collector.yaml stop
 
 fiber-ffi-example:

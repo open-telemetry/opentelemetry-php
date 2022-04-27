@@ -9,7 +9,7 @@ use function max;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
@@ -34,7 +34,7 @@ class SpanData implements SDK\SpanDataInterface
     private int $kind;
     private StatusData $status;
     private ResourceInfo $resource;
-    private InstrumentationLibrary $instrumentationLibrary;
+    private InstrumentationScope $instrumentationScope;
     private API\SpanContextInterface $context;
     private API\SpanContextInterface $parentContext;
     private int $totalAttributeCount = 0;
@@ -50,7 +50,7 @@ class SpanData implements SDK\SpanDataInterface
         $this->kind = API\SpanKind::KIND_INTERNAL;
         $this->status = StatusData::unset();
         $this->resource = ResourceInfoFactory::emptyResource();
-        $this->instrumentationLibrary = InstrumentationLibrary::getEmpty(); /** @phan-suppress-current-line PhanAccessMethodInternal */
+        $this->instrumentationScope = InstrumentationScope::getEmpty(); /** @phan-suppress-current-line PhanAccessMethodInternal */
         $this->context = API\SpanContext::getInvalid();
         $this->parentContext = API\SpanContext::getInvalid();
     }
@@ -237,14 +237,14 @@ class SpanData implements SDK\SpanDataInterface
         return $this;
     }
 
-    public function getInstrumentationLibrary(): InstrumentationLibrary
+    public function getInstrumentationScope(): InstrumentationScope
     {
-        return $this->instrumentationLibrary;
+        return $this->instrumentationScope;
     }
 
-    public function setInstrumentationLibrary(InstrumentationLibrary $instrumentationLibrary): self
+    public function setInstrumentationScope(InstrumentationScope $instrumentationScope): self
     {
-        $this->instrumentationLibrary = $instrumentationLibrary;
+        $this->instrumentationScope = $instrumentationScope;
 
         return $this;
     }

@@ -5,7 +5,7 @@ OTEL_DIR="Opentelemetry"
 REPO_DIR=opentelemetry-proto
 
 cd "${DESTINATION_DIR}" || exit
-rm -rf ./${REPO_DIR}
+[[ -d ./${REPO_DIR} ]] && rm -rf ./${REPO_DIR}
 git clone https://github.com/open-telemetry/${REPO_DIR}
 
 (
@@ -21,7 +21,8 @@ git clone https://github.com/open-telemetry/${REPO_DIR}
 
   echo "Generating protobuf files for version ${TAG} ..."
   make gen-php
-  rm -rf ${GPBMETA_DIR} ${OTEL_DIR}
+  [[ -d ${GPBMETA_DIR} ]] && rm -rf ${GPBMETA_DIR}
+  [[ -d ${OTEL_DIR} ]] && rm -rf ${OTEL_DIR}
   echo "${TAG}" > "${DESTINATION_DIR}/VERSION"
 )
 

@@ -25,8 +25,8 @@ class SpanConverter implements SpanConverterInterface
     const STATUS_ERROR = 'ERROR';
     const KEY_ERROR_FLAG = 'error';
     const STATUS_DESCRIPTION_TAG_KEY = 'otel.status_description';
-    const KEY_INSTRUMENTATION_LIBRARY_NAME = 'otel.library.name';
-    const KEY_INSTRUMENTATION_LIBRARY_VERSION = 'otel.library.version';
+    const KEY_INSTRUMENTATION_SCOPE_NAME = 'otel.scope.name';
+    const KEY_INSTRUMENTATION_SCOPE_VERSION = 'otel.scope.version';
     const KEY_SPAN_KIND = 'span.kind';
     const JAEGER_SPAN_KIND_CLIENT = 'client';
     const JAEGER_SPAN_KIND_SERVER = 'server';
@@ -150,12 +150,12 @@ class SpanConverter implements SpanConverterInterface
             }
         }
 
-        if (!empty($span->getInstrumentationLibrary()->getName())) {
-            $tags[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_NAME] = $span->getInstrumentationLibrary()->getName();
+        if (!empty($span->getInstrumentationScope()->getName())) {
+            $tags[SpanConverter::KEY_INSTRUMENTATION_SCOPE_NAME] = $span->getInstrumentationScope()->getName();
         }
 
-        if ($span->getInstrumentationLibrary()->getVersion() !== null) {
-            $tags[SpanConverter::KEY_INSTRUMENTATION_LIBRARY_VERSION] = $span->getInstrumentationLibrary()->getVersion();
+        if ($span->getInstrumentationScope()->getVersion() !== null) {
+            $tags[SpanConverter::KEY_INSTRUMENTATION_SCOPE_VERSION] = $span->getInstrumentationScope()->getVersion();
         }
 
         $jaegerSpanKind = self::convertOtelSpanKindToJaeger($span);

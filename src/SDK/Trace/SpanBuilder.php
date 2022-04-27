@@ -10,7 +10,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibraryInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
 final class SpanBuilder implements API\SpanBuilderInterface
 {
@@ -21,7 +21,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     private string $spanName;
 
     /** @readonly */
-    private InstrumentationLibraryInterface $instrumentationLibrary;
+    private InstrumentationScopeInterface $instrumentationScope;
 
     /** @readonly */
     private TracerSharedState $tracerSharedState;
@@ -46,12 +46,12 @@ final class SpanBuilder implements API\SpanBuilderInterface
     /** @param non-empty-string $spanName */
     public function __construct(
         string $spanName,
-        InstrumentationLibraryInterface $instrumentationLibrary,
+        InstrumentationScopeInterface $instrumentationScope,
         TracerSharedState $tracerSharedState,
         SpanLimits $spanLimits
     ) {
         $this->spanName = $spanName;
-        $this->instrumentationLibrary = $instrumentationLibrary;
+        $this->instrumentationScope = $instrumentationScope;
         $this->tracerSharedState = $tracerSharedState;
         $this->spanLimits = $spanLimits;
     }
@@ -206,7 +206,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
         return Span::startSpan(
             $this->spanName,
             $spanContext,
-            $this->instrumentationLibrary,
+            $this->instrumentationScope,
             $this->spanKind,
             $parentSpan,
             $parentContext,

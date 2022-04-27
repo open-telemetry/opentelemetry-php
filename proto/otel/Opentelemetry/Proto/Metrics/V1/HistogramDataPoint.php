@@ -66,9 +66,9 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
      * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *
-     * Generated from protobuf field <code>double sum = 5;</code>
+     * Generated from protobuf field <code>optional double sum = 5;</code>
      */
-    protected $sum = 0.0;
+    protected $sum = null;
     /**
      * bucket_counts is an optional field contains the count values of histogram
      * for each bucket.
@@ -302,12 +302,22 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
      * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *
-     * Generated from protobuf field <code>double sum = 5;</code>
+     * Generated from protobuf field <code>optional double sum = 5;</code>
      * @return float
      */
     public function getSum()
     {
-        return $this->sum;
+        return isset($this->sum) ? $this->sum : 0.0;
+    }
+
+    public function hasSum()
+    {
+        return isset($this->sum);
+    }
+
+    public function clearSum()
+    {
+        unset($this->sum);
     }
 
     /**
@@ -319,7 +329,7 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
      * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *
-     * Generated from protobuf field <code>double sum = 5;</code>
+     * Generated from protobuf field <code>optional double sum = 5;</code>
      * @param float $var
      * @return $this
      */

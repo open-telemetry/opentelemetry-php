@@ -15,7 +15,7 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
@@ -56,7 +56,7 @@ class SpanTest extends MockeryTestCase
 
     private IdGeneratorInterface $idGenerator;
     private ResourceInfo $resource;
-    private InstrumentationLibrary $instrumentationLibrary;
+    private InstrumentationScope $instrumentationScope;
     private API\SpanContextInterface $spanContext;
     private TestClock $testClock;
 
@@ -71,7 +71,7 @@ class SpanTest extends MockeryTestCase
     {
         $this->idGenerator = new RandomIdGenerator();
         $this->resource = ResourceInfoFactory::emptyResource();
-        $this->instrumentationLibrary = new InstrumentationLibrary('test_library', '0.1.2');
+        $this->instrumentationScope = new InstrumentationScope('test_scope', '0.1.2');
 
         $this->spanProcessor = Mockery::spy(SpanProcessorInterface::class);
 
@@ -385,10 +385,10 @@ class SpanTest extends MockeryTestCase
         $this->assertEmpty($span->toSpanData()->getAttributes());
     }
 
-    public function test_get_instrumentation_library_info(): void
+    public function test_get_instrumentation_scope_info(): void
     {
         $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
-        $this->assertSame($this->instrumentationLibrary, $span->getInstrumentationLibrary());
+        $this->assertSame($this->instrumentationScope, $span->getInstrumentationScope());
         $span->end();
     }
 
@@ -697,7 +697,7 @@ class SpanTest extends MockeryTestCase
         $span = Span::startSpan(
             self::SPAN_NAME,
             $this->spanContext,
-            $this->instrumentationLibrary,
+            $this->instrumentationScope,
             $kind,
             $parentSpanId ? Span::wrap(SpanContext::create($this->traceId, $parentSpanId)) : Span::getInvalid(),
             Context::getRoot(),
@@ -781,7 +781,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSame($this->parentSpanId, $spanData->getParentSpanId());
         $this->assertNull($spanData->getContext()->getTraceState());
         $this->assertSame($this->resource, $spanData->getResource());
-        $this->assertSame($this->instrumentationLibrary, $spanData->getInstrumentationLibrary());
+        $this->assertSame($this->instrumentationScope, $spanData->getInstrumentationScope());
         $this->assertEquals($events, $spanData->getEvents());
         $this->assertEquals($links, $spanData->getLinks());
         $this->assertSame($startEpochNanos, $spanData->getStartEpochNanos());
