@@ -17,27 +17,17 @@ use Google\Protobuf\Internal\GPBUtil;
 class Status extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The deprecated status code. This is an optional field.
-     * This field is deprecated and is replaced by the `code` field below. See backward
-     * compatibility notes below. According to our stability guarantees this field
-     * will be removed in 12 months, on Oct 22, 2021. All usage of old senders and
-     * receivers that do not understand the `code` field MUST be phased out by then.
-     *
-     * Generated from protobuf field <code>.opentelemetry.proto.trace.v1.Status.DeprecatedStatusCode deprecated_code = 1 [deprecated = true];</code>
-     */
-    private $deprecated_code = 0;
-    /**
      * A developer-facing human readable error message.
      *
      * Generated from protobuf field <code>string message = 2;</code>
      */
-    private $message = '';
+    protected $message = '';
     /**
      * The status code.
      *
      * Generated from protobuf field <code>.opentelemetry.proto.trace.v1.Status.StatusCode code = 3;</code>
      */
-    private $code = 0;
+    protected $code = 0;
 
     /**
      * Constructor.
@@ -45,12 +35,6 @@ class Status extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type int $deprecated_code
-     *           The deprecated status code. This is an optional field.
-     *           This field is deprecated and is replaced by the `code` field below. See backward
-     *           compatibility notes below. According to our stability guarantees this field
-     *           will be removed in 12 months, on Oct 22, 2021. All usage of old senders and
-     *           receivers that do not understand the `code` field MUST be phased out by then.
      *     @type string $message
      *           A developer-facing human readable error message.
      *     @type int $code
@@ -60,40 +44,6 @@ class Status extends \Google\Protobuf\Internal\Message
     public function __construct($data = NULL) {
         \GPBMetadata\Opentelemetry\Proto\Trace\V1\Trace::initOnce();
         parent::__construct($data);
-    }
-
-    /**
-     * The deprecated status code. This is an optional field.
-     * This field is deprecated and is replaced by the `code` field below. See backward
-     * compatibility notes below. According to our stability guarantees this field
-     * will be removed in 12 months, on Oct 22, 2021. All usage of old senders and
-     * receivers that do not understand the `code` field MUST be phased out by then.
-     *
-     * Generated from protobuf field <code>.opentelemetry.proto.trace.v1.Status.DeprecatedStatusCode deprecated_code = 1 [deprecated = true];</code>
-     * @return int
-     */
-    public function getDeprecatedCode()
-    {
-        return $this->deprecated_code;
-    }
-
-    /**
-     * The deprecated status code. This is an optional field.
-     * This field is deprecated and is replaced by the `code` field below. See backward
-     * compatibility notes below. According to our stability guarantees this field
-     * will be removed in 12 months, on Oct 22, 2021. All usage of old senders and
-     * receivers that do not understand the `code` field MUST be phased out by then.
-     *
-     * Generated from protobuf field <code>.opentelemetry.proto.trace.v1.Status.DeprecatedStatusCode deprecated_code = 1 [deprecated = true];</code>
-     * @param int $var
-     * @return $this
-     */
-    public function setDeprecatedCode($var)
-    {
-        GPBUtil::checkEnum($var, \Opentelemetry\Proto\Trace\V1\Status_DeprecatedStatusCode::class);
-        $this->deprecated_code = $var;
-
-        return $this;
     }
 
     /**
@@ -142,7 +92,7 @@ class Status extends \Google\Protobuf\Internal\Message
      */
     public function setCode($var)
     {
-        GPBUtil::checkEnum($var, \Opentelemetry\Proto\Trace\V1\Status_StatusCode::class);
+        GPBUtil::checkEnum($var, \Opentelemetry\Proto\Trace\V1\Status\StatusCode::class);
         $this->code = $var;
 
         return $this;

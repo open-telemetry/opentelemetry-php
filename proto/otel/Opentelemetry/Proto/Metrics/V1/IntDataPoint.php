@@ -29,7 +29,7 @@ class IntDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      */
-    private $start_time_unix_nano = 0;
+    protected $start_time_unix_nano = 0;
     /**
      * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
@@ -37,13 +37,13 @@ class IntDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 time_unix_nano = 3;</code>
      */
-    private $time_unix_nano = 0;
+    protected $time_unix_nano = 0;
     /**
      * value itself.
      *
      * Generated from protobuf field <code>sfixed64 value = 4;</code>
      */
-    private $value = 0;
+    protected $value = 0;
     /**
      * (Optional) List of exemplars collected from
      * measurements that were used to form the data point

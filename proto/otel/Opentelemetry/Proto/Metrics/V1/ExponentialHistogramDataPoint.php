@@ -21,6 +21,8 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
     /**
      * The set of key/value pairs that uniquely identify the timeseries from
      * where this point belongs. The list may be empty (may contain 0 elements).
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 1;</code>
      */
@@ -33,7 +35,7 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      */
-    private $start_time_unix_nano = 0;
+    protected $start_time_unix_nano = 0;
     /**
      * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
@@ -41,7 +43,7 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 time_unix_nano = 3;</code>
      */
-    private $time_unix_nano = 0;
+    protected $time_unix_nano = 0;
     /**
      * count is the number of values in the population. Must be
      * non-negative. This value must be equal to the sum of the "bucket_counts"
@@ -49,7 +51,7 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 count = 4;</code>
      */
-    private $count = 0;
+    protected $count = 0;
     /**
      * sum of the values in the population. If count is zero then this field
      * must be zero.
@@ -61,7 +63,7 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>double sum = 5;</code>
      */
-    private $sum = 0.0;
+    protected $sum = 0.0;
     /**
      * scale describes the resolution of the histogram.  Boundaries are
      * located at powers of the base, where:
@@ -77,7 +79,7 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>sint32 scale = 6;</code>
      */
-    private $scale = 0;
+    protected $scale = 0;
     /**
      * zero_count is the count of values that are either exactly zero or
      * within the region considered zero by the instrumentation at the
@@ -89,26 +91,26 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 zero_count = 7;</code>
      */
-    private $zero_count = 0;
+    protected $zero_count = 0;
     /**
      * positive carries the positive range of exponential bucket counts.
      *
      * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.ExponentialHistogramDataPoint.Buckets positive = 8;</code>
      */
-    private $positive = null;
+    protected $positive = null;
     /**
      * negative carries the negative range of exponential bucket counts.
      *
      * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.ExponentialHistogramDataPoint.Buckets negative = 9;</code>
      */
-    private $negative = null;
+    protected $negative = null;
     /**
      * Flags that apply to this specific data point.  See DataPointFlags
      * for the available flags and their meaning.
      *
      * Generated from protobuf field <code>uint32 flags = 10;</code>
      */
-    private $flags = 0;
+    protected $flags = 0;
     /**
      * (Optional) List of exemplars collected from
      * measurements that were used to form the data point
@@ -126,6 +128,8 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $attributes
      *           The set of key/value pairs that uniquely identify the timeseries from
      *           where this point belongs. The list may be empty (may contain 0 elements).
+     *           Attribute keys MUST be unique (it is not allowed to have more than one
+     *           attribute with the same key).
      *     @type int|string $start_time_unix_nano
      *           StartTimeUnixNano is optional but strongly encouraged, see the
      *           the detailed comments above Metric.
@@ -187,6 +191,8 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
     /**
      * The set of key/value pairs that uniquely identify the timeseries from
      * where this point belongs. The list may be empty (may contain 0 elements).
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 1;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -199,6 +205,8 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
     /**
      * The set of key/value pairs that uniquely identify the timeseries from
      * where this point belongs. The list may be empty (may contain 0 elements).
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 1;</code>
      * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
@@ -430,11 +438,21 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      * positive carries the positive range of exponential bucket counts.
      *
      * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.ExponentialHistogramDataPoint.Buckets positive = 8;</code>
-     * @return \Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint\Buckets
+     * @return \Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint\Buckets|null
      */
     public function getPositive()
     {
         return $this->positive;
+    }
+
+    public function hasPositive()
+    {
+        return isset($this->positive);
+    }
+
+    public function clearPositive()
+    {
+        unset($this->positive);
     }
 
     /**
@@ -446,7 +464,7 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      */
     public function setPositive($var)
     {
-        GPBUtil::checkMessage($var, \Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint_Buckets::class);
+        GPBUtil::checkMessage($var, \Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint\Buckets::class);
         $this->positive = $var;
 
         return $this;
@@ -456,11 +474,21 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      * negative carries the negative range of exponential bucket counts.
      *
      * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.ExponentialHistogramDataPoint.Buckets negative = 9;</code>
-     * @return \Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint\Buckets
+     * @return \Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint\Buckets|null
      */
     public function getNegative()
     {
         return $this->negative;
+    }
+
+    public function hasNegative()
+    {
+        return isset($this->negative);
+    }
+
+    public function clearNegative()
+    {
+        unset($this->negative);
     }
 
     /**
@@ -472,7 +500,7 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      */
     public function setNegative($var)
     {
-        GPBUtil::checkMessage($var, \Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint_Buckets::class);
+        GPBUtil::checkMessage($var, \Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint\Buckets::class);
         $this->negative = $var;
 
         return $this;

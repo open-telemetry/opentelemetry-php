@@ -18,14 +18,14 @@ class MetricConfigRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.opentelemetry.proto.resource.v1.Resource resource = 1;</code>
      */
-    private $resource = null;
+    protected $resource = null;
     /**
      * Optional. The value of MetricConfigResponse.fingerprint for the last
      * configuration that the caller received and successfully applied.
      *
      * Generated from protobuf field <code>bytes last_known_fingerprint = 2;</code>
      */
-    private $last_known_fingerprint = '';
+    protected $last_known_fingerprint = '';
 
     /**
      * Constructor.
@@ -53,7 +53,17 @@ class MetricConfigRequest extends \Google\Protobuf\Internal\Message
      */
     public function getResource()
     {
-        return $this->resource;
+        return isset($this->resource) ? $this->resource : null;
+    }
+
+    public function hasResource()
+    {
+        return isset($this->resource);
+    }
+
+    public function clearResource()
+    {
+        unset($this->resource);
     }
 
     /**

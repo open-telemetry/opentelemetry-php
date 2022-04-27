@@ -48,6 +48,11 @@ class AnyValue extends \Google\Protobuf\Internal\Message
         return $this->readOneof(1);
     }
 
+    public function hasStringValue()
+    {
+        return $this->hasOneof(1);
+    }
+
     /**
      * Generated from protobuf field <code>string string_value = 1;</code>
      * @param string $var
@@ -68,6 +73,11 @@ class AnyValue extends \Google\Protobuf\Internal\Message
     public function getBoolValue()
     {
         return $this->readOneof(2);
+    }
+
+    public function hasBoolValue()
+    {
+        return $this->hasOneof(2);
     }
 
     /**
@@ -92,6 +102,11 @@ class AnyValue extends \Google\Protobuf\Internal\Message
         return $this->readOneof(3);
     }
 
+    public function hasIntValue()
+    {
+        return $this->hasOneof(3);
+    }
+
     /**
      * Generated from protobuf field <code>int64 int_value = 3;</code>
      * @param int|string $var
@@ -114,6 +129,11 @@ class AnyValue extends \Google\Protobuf\Internal\Message
         return $this->readOneof(4);
     }
 
+    public function hasDoubleValue()
+    {
+        return $this->hasOneof(4);
+    }
+
     /**
      * Generated from protobuf field <code>double double_value = 4;</code>
      * @param float $var
@@ -129,11 +149,16 @@ class AnyValue extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>.opentelemetry.proto.common.v1.ArrayValue array_value = 5;</code>
-     * @return \Opentelemetry\Proto\Common\V1\ArrayValue
+     * @return \Opentelemetry\Proto\Common\V1\ArrayValue|null
      */
     public function getArrayValue()
     {
         return $this->readOneof(5);
+    }
+
+    public function hasArrayValue()
+    {
+        return $this->hasOneof(5);
     }
 
     /**
@@ -151,11 +176,16 @@ class AnyValue extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>.opentelemetry.proto.common.v1.KeyValueList kvlist_value = 6;</code>
-     * @return \Opentelemetry\Proto\Common\V1\KeyValueList
+     * @return \Opentelemetry\Proto\Common\V1\KeyValueList|null
      */
     public function getKvlistValue()
     {
         return $this->readOneof(6);
+    }
+
+    public function hasKvlistValue()
+    {
+        return $this->hasOneof(6);
     }
 
     /**
@@ -178,6 +208,11 @@ class AnyValue extends \Google\Protobuf\Internal\Message
     public function getBytesValue()
     {
         return $this->readOneof(7);
+    }
+
+    public function hasBytesValue()
+    {
+        return $this->hasOneof(7);
     }
 
     /**

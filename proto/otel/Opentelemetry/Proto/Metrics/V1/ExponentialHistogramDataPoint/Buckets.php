@@ -23,7 +23,7 @@ class Buckets extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>sint32 offset = 1;</code>
      */
-    private $offset = 0;
+    protected $offset = 0;
     /**
      * Count is an array of counts, where count[i] carries the count
      * of the bucket at index (offset+i).  count[i] is the count of

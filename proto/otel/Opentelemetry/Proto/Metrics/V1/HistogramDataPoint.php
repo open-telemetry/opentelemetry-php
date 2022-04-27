@@ -26,22 +26,12 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     /**
      * The set of key/value pairs that uniquely identify the timeseries from
      * where this point belongs. The list may be empty (may contain 0 elements).
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
      */
     private $attributes;
-    /**
-     * Labels is deprecated and will be removed soon.
-     * 1. Old senders and receivers that are not aware of this change will
-     * continue using the `labels` field.
-     * 2. New senders, which are aware of this change MUST send only `attributes`.
-     * 3. New receivers, which are aware of this change MUST convert this into
-     * `labels` by simply converting all int64 values into float.
-     * This field will be removed in ~3 months, on July 1, 2021.
-     *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];</code>
-     */
-    private $labels;
     /**
      * StartTimeUnixNano is optional but strongly encouraged, see the
      * the detailed comments above Metric.
@@ -50,7 +40,7 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 2;</code>
      */
-    private $start_time_unix_nano = 0;
+    protected $start_time_unix_nano = 0;
     /**
      * TimeUnixNano is required, see the detailed comments above Metric.
      * Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
@@ -58,7 +48,7 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 time_unix_nano = 3;</code>
      */
-    private $time_unix_nano = 0;
+    protected $time_unix_nano = 0;
     /**
      * count is the number of values in the population. Must be non-negative. This
      * value must be equal to the sum of the "count" fields in buckets if a
@@ -66,7 +56,7 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 count = 4;</code>
      */
-    private $count = 0;
+    protected $count = 0;
     /**
      * sum of the values in the population. If count is zero then this field
      * must be zero.
@@ -76,9 +66,9 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
      * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *
-     * Generated from protobuf field <code>double sum = 5;</code>
+     * Generated from protobuf field <code>optional double sum = 5;</code>
      */
-    private $sum = 0.0;
+    protected $sum = null;
     /**
      * bucket_counts is an optional field contains the count values of histogram
      * for each bucket.
@@ -116,7 +106,7 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>uint32 flags = 10;</code>
      */
-    private $flags = 0;
+    protected $flags = 0;
 
     /**
      * Constructor.
@@ -127,14 +117,8 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $attributes
      *           The set of key/value pairs that uniquely identify the timeseries from
      *           where this point belongs. The list may be empty (may contain 0 elements).
-     *     @type \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $labels
-     *           Labels is deprecated and will be removed soon.
-     *           1. Old senders and receivers that are not aware of this change will
-     *           continue using the `labels` field.
-     *           2. New senders, which are aware of this change MUST send only `attributes`.
-     *           3. New receivers, which are aware of this change MUST convert this into
-     *           `labels` by simply converting all int64 values into float.
-     *           This field will be removed in ~3 months, on July 1, 2021.
+     *           Attribute keys MUST be unique (it is not allowed to have more than one
+     *           attribute with the same key).
      *     @type int|string $start_time_unix_nano
      *           StartTimeUnixNano is optional but strongly encouraged, see the
      *           the detailed comments above Metric.
@@ -188,6 +172,8 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     /**
      * The set of key/value pairs that uniquely identify the timeseries from
      * where this point belongs. The list may be empty (may contain 0 elements).
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -200,6 +186,8 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     /**
      * The set of key/value pairs that uniquely identify the timeseries from
      * where this point belongs. The list may be empty (may contain 0 elements).
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
      * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
@@ -209,44 +197,6 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Common\V1\KeyValue::class);
         $this->attributes = $arr;
-
-        return $this;
-    }
-
-    /**
-     * Labels is deprecated and will be removed soon.
-     * 1. Old senders and receivers that are not aware of this change will
-     * continue using the `labels` field.
-     * 2. New senders, which are aware of this change MUST send only `attributes`.
-     * 3. New receivers, which are aware of this change MUST convert this into
-     * `labels` by simply converting all int64 values into float.
-     * This field will be removed in ~3 months, on July 1, 2021.
-     *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
-     */
-    public function getLabels()
-    {
-        return $this->labels;
-    }
-
-    /**
-     * Labels is deprecated and will be removed soon.
-     * 1. Old senders and receivers that are not aware of this change will
-     * continue using the `labels` field.
-     * 2. New senders, which are aware of this change MUST send only `attributes`.
-     * 3. New receivers, which are aware of this change MUST convert this into
-     * `labels` by simply converting all int64 values into float.
-     * This field will be removed in ~3 months, on July 1, 2021.
-     *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];</code>
-     * @param \Opentelemetry\Proto\Common\V1\StringKeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
-     */
-    public function setLabels($var)
-    {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Common\V1\StringKeyValue::class);
-        $this->labels = $arr;
 
         return $this;
     }
@@ -352,12 +302,22 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
      * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *
-     * Generated from protobuf field <code>double sum = 5;</code>
+     * Generated from protobuf field <code>optional double sum = 5;</code>
      * @return float
      */
     public function getSum()
     {
-        return $this->sum;
+        return isset($this->sum) ? $this->sum : 0.0;
+    }
+
+    public function hasSum()
+    {
+        return isset($this->sum);
+    }
+
+    public function clearSum()
+    {
+        unset($this->sum);
     }
 
     /**
@@ -369,7 +329,7 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
      * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *
-     * Generated from protobuf field <code>double sum = 5;</code>
+     * Generated from protobuf field <code>optional double sum = 5;</code>
      * @param float $var
      * @return $this
      */

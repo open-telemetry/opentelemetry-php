@@ -90,20 +90,20 @@ class Metric extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * description of the metric, which can be used in documentation.
      *
      * Generated from protobuf field <code>string description = 2;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * unit in which the metric value is reported. Follows the format
      * described by http://unitsofmeasure.org/ucum.html.
      *
      * Generated from protobuf field <code>string unit = 3;</code>
      */
-    private $unit = '';
+    protected $unit = '';
     protected $data;
 
     /**
@@ -119,27 +119,8 @@ class Metric extends \Google\Protobuf\Internal\Message
      *     @type string $unit
      *           unit in which the metric value is reported. Follows the format
      *           described by http://unitsofmeasure.org/ucum.html.
-     *     @type \Opentelemetry\Proto\Metrics\V1\IntGauge $int_gauge
-     *           IntGauge and IntSum are deprecated and will be removed soon.
-     *           1. Old senders and receivers that are not aware of this change will
-     *           continue using the `int_gauge` and `int_sum` fields.
-     *           2. New senders, which are aware of this change MUST send only `gauge`
-     *           and `sum` fields.
-     *           3. New receivers, which are aware of this change MUST convert these into
-     *           `gauge` and `sum` by using the provided as_int field in the oneof values.
-     *           This field will be removed in ~3 months, on July 1, 2021.
      *     @type \Opentelemetry\Proto\Metrics\V1\Gauge $gauge
-     *     @type \Opentelemetry\Proto\Metrics\V1\IntSum $int_sum
-     *           This field will be removed in ~3 months, on July 1, 2021.
      *     @type \Opentelemetry\Proto\Metrics\V1\Sum $sum
-     *     @type \Opentelemetry\Proto\Metrics\V1\IntHistogram $int_histogram
-     *           IntHistogram is deprecated and will be removed soon.
-     *           1. Old senders and receivers that are not aware of this change will
-     *           continue using the `int_histogram` field.
-     *           2. New senders, which are aware of this change MUST send only `histogram`.
-     *           3. New receivers, which are aware of this change MUST convert this into
-     *           `histogram` by simply converting all int64 values into float.
-     *           This field will be removed in ~3 months, on July 1, 2021.
      *     @type \Opentelemetry\Proto\Metrics\V1\Histogram $histogram
      *     @type \Opentelemetry\Proto\Metrics\V1\ExponentialHistogram $exponential_histogram
      *     @type \Opentelemetry\Proto\Metrics\V1\Summary $summary
@@ -231,52 +212,17 @@ class Metric extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * IntGauge and IntSum are deprecated and will be removed soon.
-     * 1. Old senders and receivers that are not aware of this change will
-     * continue using the `int_gauge` and `int_sum` fields.
-     * 2. New senders, which are aware of this change MUST send only `gauge`
-     * and `sum` fields.
-     * 3. New receivers, which are aware of this change MUST convert these into
-     * `gauge` and `sum` by using the provided as_int field in the oneof values.
-     * This field will be removed in ~3 months, on July 1, 2021.
-     *
-     * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.IntGauge int_gauge = 4 [deprecated = true];</code>
-     * @return \Opentelemetry\Proto\Metrics\V1\IntGauge
-     */
-    public function getIntGauge()
-    {
-        return $this->readOneof(4);
-    }
-
-    /**
-     * IntGauge and IntSum are deprecated and will be removed soon.
-     * 1. Old senders and receivers that are not aware of this change will
-     * continue using the `int_gauge` and `int_sum` fields.
-     * 2. New senders, which are aware of this change MUST send only `gauge`
-     * and `sum` fields.
-     * 3. New receivers, which are aware of this change MUST convert these into
-     * `gauge` and `sum` by using the provided as_int field in the oneof values.
-     * This field will be removed in ~3 months, on July 1, 2021.
-     *
-     * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.IntGauge int_gauge = 4 [deprecated = true];</code>
-     * @param \Opentelemetry\Proto\Metrics\V1\IntGauge $var
-     * @return $this
-     */
-    public function setIntGauge($var)
-    {
-        GPBUtil::checkMessage($var, \Opentelemetry\Proto\Metrics\V1\IntGauge::class);
-        $this->writeOneof(4, $var);
-
-        return $this;
-    }
-
-    /**
      * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.Gauge gauge = 5;</code>
-     * @return \Opentelemetry\Proto\Metrics\V1\Gauge
+     * @return \Opentelemetry\Proto\Metrics\V1\Gauge|null
      */
     public function getGauge()
     {
         return $this->readOneof(5);
+    }
+
+    public function hasGauge()
+    {
+        return $this->hasOneof(5);
     }
 
     /**
@@ -293,38 +239,17 @@ class Metric extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * This field will be removed in ~3 months, on July 1, 2021.
-     *
-     * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.IntSum int_sum = 6 [deprecated = true];</code>
-     * @return \Opentelemetry\Proto\Metrics\V1\IntSum
-     */
-    public function getIntSum()
-    {
-        return $this->readOneof(6);
-    }
-
-    /**
-     * This field will be removed in ~3 months, on July 1, 2021.
-     *
-     * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.IntSum int_sum = 6 [deprecated = true];</code>
-     * @param \Opentelemetry\Proto\Metrics\V1\IntSum $var
-     * @return $this
-     */
-    public function setIntSum($var)
-    {
-        GPBUtil::checkMessage($var, \Opentelemetry\Proto\Metrics\V1\IntSum::class);
-        $this->writeOneof(6, $var);
-
-        return $this;
-    }
-
-    /**
      * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.Sum sum = 7;</code>
-     * @return \Opentelemetry\Proto\Metrics\V1\Sum
+     * @return \Opentelemetry\Proto\Metrics\V1\Sum|null
      */
     public function getSum()
     {
         return $this->readOneof(7);
+    }
+
+    public function hasSum()
+    {
+        return $this->hasOneof(7);
     }
 
     /**
@@ -341,50 +266,17 @@ class Metric extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * IntHistogram is deprecated and will be removed soon.
-     * 1. Old senders and receivers that are not aware of this change will
-     * continue using the `int_histogram` field.
-     * 2. New senders, which are aware of this change MUST send only `histogram`.
-     * 3. New receivers, which are aware of this change MUST convert this into
-     * `histogram` by simply converting all int64 values into float.
-     * This field will be removed in ~3 months, on July 1, 2021.
-     *
-     * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.IntHistogram int_histogram = 8 [deprecated = true];</code>
-     * @return \Opentelemetry\Proto\Metrics\V1\IntHistogram
-     */
-    public function getIntHistogram()
-    {
-        return $this->readOneof(8);
-    }
-
-    /**
-     * IntHistogram is deprecated and will be removed soon.
-     * 1. Old senders and receivers that are not aware of this change will
-     * continue using the `int_histogram` field.
-     * 2. New senders, which are aware of this change MUST send only `histogram`.
-     * 3. New receivers, which are aware of this change MUST convert this into
-     * `histogram` by simply converting all int64 values into float.
-     * This field will be removed in ~3 months, on July 1, 2021.
-     *
-     * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.IntHistogram int_histogram = 8 [deprecated = true];</code>
-     * @param \Opentelemetry\Proto\Metrics\V1\IntHistogram $var
-     * @return $this
-     */
-    public function setIntHistogram($var)
-    {
-        GPBUtil::checkMessage($var, \Opentelemetry\Proto\Metrics\V1\IntHistogram::class);
-        $this->writeOneof(8, $var);
-
-        return $this;
-    }
-
-    /**
      * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.Histogram histogram = 9;</code>
-     * @return \Opentelemetry\Proto\Metrics\V1\Histogram
+     * @return \Opentelemetry\Proto\Metrics\V1\Histogram|null
      */
     public function getHistogram()
     {
         return $this->readOneof(9);
+    }
+
+    public function hasHistogram()
+    {
+        return $this->hasOneof(9);
     }
 
     /**
@@ -402,11 +294,16 @@ class Metric extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.ExponentialHistogram exponential_histogram = 10;</code>
-     * @return \Opentelemetry\Proto\Metrics\V1\ExponentialHistogram
+     * @return \Opentelemetry\Proto\Metrics\V1\ExponentialHistogram|null
      */
     public function getExponentialHistogram()
     {
         return $this->readOneof(10);
+    }
+
+    public function hasExponentialHistogram()
+    {
+        return $this->hasOneof(10);
     }
 
     /**
@@ -424,11 +321,16 @@ class Metric extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>.opentelemetry.proto.metrics.v1.Summary summary = 11;</code>
-     * @return \Opentelemetry\Proto\Metrics\V1\Summary
+     * @return \Opentelemetry\Proto\Metrics\V1\Summary|null
      */
     public function getSummary()
     {
         return $this->readOneof(11);
+    }
+
+    public function hasSummary()
+    {
+        return $this->hasOneof(11);
     }
 
     /**

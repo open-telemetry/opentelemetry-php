@@ -9,23 +9,20 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * A collection of Metrics produced by an InstrumentationLibrary.
- * InstrumentationLibraryMetrics is wire-compatible with ScopeMetrics for binary
- * Protobuf format.
- * This message is deprecated and will be removed on June 15, 2022.
+ * A collection of Metrics produced by an Scope.
  *
- * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.InstrumentationLibraryMetrics</code>
+ * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.ScopeMetrics</code>
  */
-class InstrumentationLibraryMetrics extends \Google\Protobuf\Internal\Message
+class ScopeMetrics extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The instrumentation library information for the metrics in this message.
-     * Semantically when InstrumentationLibrary isn't set, it is equivalent with
-     * an empty instrumentation library name (unknown).
+     * The instrumentation scope information for the metrics in this message.
+     * Semantically when InstrumentationScope isn't set, it is equivalent with
+     * an empty instrumentation scope name (unknown).
      *
-     * Generated from protobuf field <code>.opentelemetry.proto.common.v1.InstrumentationLibrary instrumentation_library = 1;</code>
+     * Generated from protobuf field <code>.opentelemetry.proto.common.v1.InstrumentationScope scope = 1;</code>
      */
-    protected $instrumentation_library = null;
+    protected $scope = null;
     /**
      * A list of metrics that originate from an instrumentation library.
      *
@@ -45,10 +42,10 @@ class InstrumentationLibraryMetrics extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Opentelemetry\Proto\Common\V1\InstrumentationLibrary $instrumentation_library
-     *           The instrumentation library information for the metrics in this message.
-     *           Semantically when InstrumentationLibrary isn't set, it is equivalent with
-     *           an empty instrumentation library name (unknown).
+     *     @type \Opentelemetry\Proto\Common\V1\InstrumentationScope $scope
+     *           The instrumentation scope information for the metrics in this message.
+     *           Semantically when InstrumentationScope isn't set, it is equivalent with
+     *           an empty instrumentation scope name (unknown).
      *     @type \Opentelemetry\Proto\Metrics\V1\Metric[]|\Google\Protobuf\Internal\RepeatedField $metrics
      *           A list of metrics that originate from an instrumentation library.
      *     @type string $schema_url
@@ -61,41 +58,41 @@ class InstrumentationLibraryMetrics extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The instrumentation library information for the metrics in this message.
-     * Semantically when InstrumentationLibrary isn't set, it is equivalent with
-     * an empty instrumentation library name (unknown).
+     * The instrumentation scope information for the metrics in this message.
+     * Semantically when InstrumentationScope isn't set, it is equivalent with
+     * an empty instrumentation scope name (unknown).
      *
-     * Generated from protobuf field <code>.opentelemetry.proto.common.v1.InstrumentationLibrary instrumentation_library = 1;</code>
-     * @return \Opentelemetry\Proto\Common\V1\InstrumentationLibrary|null
+     * Generated from protobuf field <code>.opentelemetry.proto.common.v1.InstrumentationScope scope = 1;</code>
+     * @return \Opentelemetry\Proto\Common\V1\InstrumentationScope|null
      */
-    public function getInstrumentationLibrary()
+    public function getScope()
     {
-        return $this->instrumentation_library;
+        return $this->scope;
     }
 
-    public function hasInstrumentationLibrary()
+    public function hasScope()
     {
-        return isset($this->instrumentation_library);
+        return isset($this->scope);
     }
 
-    public function clearInstrumentationLibrary()
+    public function clearScope()
     {
-        unset($this->instrumentation_library);
+        unset($this->scope);
     }
 
     /**
-     * The instrumentation library information for the metrics in this message.
-     * Semantically when InstrumentationLibrary isn't set, it is equivalent with
-     * an empty instrumentation library name (unknown).
+     * The instrumentation scope information for the metrics in this message.
+     * Semantically when InstrumentationScope isn't set, it is equivalent with
+     * an empty instrumentation scope name (unknown).
      *
-     * Generated from protobuf field <code>.opentelemetry.proto.common.v1.InstrumentationLibrary instrumentation_library = 1;</code>
-     * @param \Opentelemetry\Proto\Common\V1\InstrumentationLibrary $var
+     * Generated from protobuf field <code>.opentelemetry.proto.common.v1.InstrumentationScope scope = 1;</code>
+     * @param \Opentelemetry\Proto\Common\V1\InstrumentationScope $var
      * @return $this
      */
-    public function setInstrumentationLibrary($var)
+    public function setScope($var)
     {
-        GPBUtil::checkMessage($var, \Opentelemetry\Proto\Common\V1\InstrumentationLibrary::class);
-        $this->instrumentation_library = $var;
+        GPBUtil::checkMessage($var, \Opentelemetry\Proto\Common\V1\InstrumentationScope::class);
+        $this->scope = $var;
 
         return $this;
     }

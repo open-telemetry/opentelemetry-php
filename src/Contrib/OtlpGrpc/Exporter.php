@@ -119,6 +119,8 @@ class Exporter implements SpanExporterInterface
         [$response, $status] = $this->client->Export($request)->wait();
 
         if ($status->code === \Grpc\STATUS_OK) {
+            self::logDebug('Exported span(s)', ['spans' => $resourceSpans]);
+
             return self::STATUS_SUCCESS;
         }
 

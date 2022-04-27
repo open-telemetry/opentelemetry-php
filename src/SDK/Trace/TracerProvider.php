@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Trace;
 use function is_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Instrumentation\KeyGenerator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
@@ -74,11 +74,11 @@ final class TracerProvider implements API\TracerProviderInterface
             return $this->tracers[$key];
         }
 
-        $instrumentationLibrary = new InstrumentationLibrary($name, $version, $schemaUrl);
+        $instrumentationScope = new InstrumentationScope($name, $version, $schemaUrl);
 
         $tracer = new Tracer(
             $this->tracerSharedState,
-            $instrumentationLibrary,
+            $instrumentationScope,
         );
         if (null === self::$defaultTracer) {
             self::$defaultTracer = $tracer;

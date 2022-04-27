@@ -20,7 +20,7 @@ class RateLimitingSampler extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 qps = 1;</code>
      */
-    private $qps = 0;
+    protected $qps = 0;
 
     /**
      * Constructor.

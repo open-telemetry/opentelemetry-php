@@ -47,6 +47,11 @@ class Pattern extends \Google\Protobuf\Internal\Message
         return $this->readOneof(1);
     }
 
+    public function hasEquals()
+    {
+        return $this->hasOneof(1);
+    }
+
     /**
      * matches the metric name exactly
      *
@@ -71,6 +76,11 @@ class Pattern extends \Google\Protobuf\Internal\Message
     public function getStartsWith()
     {
         return $this->readOneof(2);
+    }
+
+    public function hasStartsWith()
+    {
+        return $this->hasOneof(2);
     }
 
     /**

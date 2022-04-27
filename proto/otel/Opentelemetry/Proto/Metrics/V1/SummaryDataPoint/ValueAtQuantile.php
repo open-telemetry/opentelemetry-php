@@ -26,14 +26,14 @@ class ValueAtQuantile extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>double quantile = 1;</code>
      */
-    private $quantile = 0.0;
+    protected $quantile = 0.0;
     /**
      * The value at the given quantile of a distribution.
      * Quantile values must NOT be negative.
      *
      * Generated from protobuf field <code>double value = 2;</code>
      */
-    private $value = 0.0;
+    protected $value = 0.0;
 
     /**
      * Constructor.

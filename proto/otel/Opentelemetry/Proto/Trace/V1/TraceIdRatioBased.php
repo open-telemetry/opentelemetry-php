@@ -21,7 +21,7 @@ class TraceIdRatioBased extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>double samplingRatio = 1;</code>
      */
-    private $samplingRatio = 0.0;
+    protected $samplingRatio = 0.0;
 
     /**
      * Constructor.

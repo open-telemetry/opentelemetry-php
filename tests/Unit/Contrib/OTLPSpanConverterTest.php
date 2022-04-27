@@ -13,11 +13,11 @@ use Opentelemetry\Proto\Common\V1\ArrayValue;
 use Opentelemetry\Proto\Common\V1\KeyValue;
 use Opentelemetry\Proto\Resource\V1\Resource;
 use Opentelemetry\Proto\Trace\V1;
-use Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
+use Opentelemetry\Proto\Trace\V1\ScopeSpans;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind as ProtoSpanKind;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
@@ -41,7 +41,7 @@ class OTLPSpanConverterTest extends TestCase
             ->setHasEnded(true);
 
         $converter = new SpanConverter();
-        $row = $converter->convert([$span])[0]->getInstrumentationLibrarySpans()[0]->getSpans()[0];
+        $row = $converter->convert([$span])[0]->getScopeSpans()[0]->getSpans()[0];
 
         $this->assertSame($span->getContext()->getSpanId(), bin2hex($row->getSpanId()));
         $this->assertSame($span->getContext()->getTraceId(), bin2hex($row->getTraceId()));
@@ -69,7 +69,7 @@ class OTLPSpanConverterTest extends TestCase
 
         $converter = new SpanConverter();
         $converted = $converter->convert([$span])[0];
-        $attributes = $converted->getInstrumentationLibrarySpans()[0]->getSpans()[0]->getAttributes();
+        $attributes = $converted->getScopeSpans()[0]->getSpans()[0]->getAttributes();
 
         // Check that we can convert all attributes to tags
         $this->assertCount(1, $attributes);
@@ -164,7 +164,7 @@ class OTLPSpanConverterTest extends TestCase
             ->setStartEpochNanos($start_time)
             ->setEndEpochNanos($end_time)
             ->setName('http_get')
-            ->setInstrumentationLibrary(new InstrumentationLibrary('lib-test', 'v0.1.0', 'http://url'))
+            ->setInstrumentationScope(new InstrumentationScope('lib-test', 'v0.1.0', 'http://url'))
             ->addAttribute('user', 'alice')
             ->addAttribute('authenticated', true)
             ->addEvent('Event1', new Attributes(['success' => 'yes']), 1617313804325769955)
@@ -197,9 +197,9 @@ class OTLPSpanConverterTest extends TestCase
                     ]),
                 ],
             ]),
-            'instrumentation_library_spans' => [
-                new InstrumentationLibrarySpans([
-                    'instrumentation_library' => new \Opentelemetry\Proto\Common\V1\InstrumentationLibrary([
+            'scope_spans' => [
+                new ScopeSpans([
+                    'scope' => new \Opentelemetry\Proto\Common\V1\InstrumentationScope([
                         'name' => 'lib-test',
                         'version' => 'v0.1.0',
                     ]),
@@ -276,7 +276,7 @@ class OTLPSpanConverterTest extends TestCase
     public function test_span_kind($kind, $expected): void
     {
         $span = (new SpanData())->setKind($kind);
-        $row = (new SpanConverter())->convert([$span])[0]->getInstrumentationLibrarySpans()[0]->getSpans()[0];
+        $row = (new SpanConverter())->convert([$span])[0]->getScopeSpans()[0]->getSpans()[0];
         $this->assertSame($expected, $row->getKind());
     }
 
@@ -295,7 +295,7 @@ class OTLPSpanConverterTest extends TestCase
     public function test_span_with_error_status(): void
     {
         $span = (new SpanData())->setStatus(StatusData::error());
-        $row = (new SpanConverter())->convert([$span])[0]->getInstrumentationLibrarySpans()[0]->getSpans()[0];
+        $row = (new SpanConverter())->convert([$span])[0]->getScopeSpans()[0]->getSpans()[0];
         $this->assertSame(V1\Status\StatusCode::STATUS_CODE_ERROR, $row->getStatus()->getCode());
     }
 }

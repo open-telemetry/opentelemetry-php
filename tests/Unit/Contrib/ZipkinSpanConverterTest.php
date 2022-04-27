@@ -10,7 +10,7 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
 use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
@@ -38,9 +38,9 @@ class ZipkinSpanConverterTest extends TestCase
                     'status_description'
                 )
             )
-            ->setInstrumentationLibrary(new InstrumentationLibrary(
-                'instrumentation_library_name',
-                'instrumentation_library_version'
+            ->setInstrumentationScope(new InstrumentationScope(
+                'instrumentation_scope_name',
+                'instrumentation_scope_version'
             ))
             ->addAttribute('service', 'guard')
             ->addAttribute('net.peer.name', 'authorizationservice.com')
@@ -85,8 +85,8 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame('test-a', $row['tags']['instance']);
         $this->assertSame('unknown_service', $row['tags']['service.name']);
 
-        $this->assertSame('instrumentation_library_name', $row['otel.library.name']);
-        $this->assertSame('instrumentation_library_version', $row['otel.library.version']);
+        $this->assertSame('instrumentation_scope_name', $row['otel.scope.name']);
+        $this->assertSame('instrumentation_scope_version', $row['otel.scope.version']);
 
         $attribute = $span->getAttributes()->get('service');
         $this->assertSame($attribute, $row['tags']['service']);
@@ -109,8 +109,8 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertArrayNotHasKey('kind', $row);
         $this->assertArrayNotHasKey('parentId', $row);
         $this->assertArrayNotHasKey('tags', $row);
-        $this->assertArrayNotHasKey('otel.library.name', $row);
-        $this->assertArrayNotHasKey('otel.library.version', $row);
+        $this->assertArrayNotHasKey('otel.scope.name', $row);
+        $this->assertArrayNotHasKey('otel.scope.version', $row);
     }
 
     /**

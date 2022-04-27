@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Instrumentation;
 
-interface InstrumentationLibraryInterface
+interface InstrumentationScopeInterface
 {
     public function getName(): string;
 

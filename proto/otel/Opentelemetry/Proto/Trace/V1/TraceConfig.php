@@ -21,31 +21,31 @@ class TraceConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 max_number_of_attributes = 4;</code>
      */
-    private $max_number_of_attributes = 0;
+    protected $max_number_of_attributes = 0;
     /**
      * The global default max number of annotation events per span.
      *
      * Generated from protobuf field <code>int64 max_number_of_timed_events = 5;</code>
      */
-    private $max_number_of_timed_events = 0;
+    protected $max_number_of_timed_events = 0;
     /**
      * The global default max number of attributes per timed event.
      *
      * Generated from protobuf field <code>int64 max_number_of_attributes_per_timed_event = 6;</code>
      */
-    private $max_number_of_attributes_per_timed_event = 0;
+    protected $max_number_of_attributes_per_timed_event = 0;
     /**
      * The global default max number of link entries per span.
      *
      * Generated from protobuf field <code>int64 max_number_of_links = 7;</code>
      */
-    private $max_number_of_links = 0;
+    protected $max_number_of_links = 0;
     /**
      * The global default max number of attributes per span.
      *
      * Generated from protobuf field <code>int64 max_number_of_attributes_per_link = 8;</code>
      */
-    private $max_number_of_attributes_per_link = 0;
+    protected $max_number_of_attributes_per_link = 0;
     protected $sampler;
 
     /**
@@ -76,11 +76,16 @@ class TraceConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>.opentelemetry.proto.trace.v1.ConstantSampler constant_sampler = 1;</code>
-     * @return \Opentelemetry\Proto\Trace\V1\ConstantSampler
+     * @return \Opentelemetry\Proto\Trace\V1\ConstantSampler|null
      */
     public function getConstantSampler()
     {
         return $this->readOneof(1);
+    }
+
+    public function hasConstantSampler()
+    {
+        return $this->hasOneof(1);
     }
 
     /**
@@ -98,11 +103,16 @@ class TraceConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>.opentelemetry.proto.trace.v1.TraceIdRatioBased trace_id_ratio_based = 2;</code>
-     * @return \Opentelemetry\Proto\Trace\V1\TraceIdRatioBased
+     * @return \Opentelemetry\Proto\Trace\V1\TraceIdRatioBased|null
      */
     public function getTraceIdRatioBased()
     {
         return $this->readOneof(2);
+    }
+
+    public function hasTraceIdRatioBased()
+    {
+        return $this->hasOneof(2);
     }
 
     /**
@@ -120,11 +130,16 @@ class TraceConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>.opentelemetry.proto.trace.v1.RateLimitingSampler rate_limiting_sampler = 3;</code>
-     * @return \Opentelemetry\Proto\Trace\V1\RateLimitingSampler
+     * @return \Opentelemetry\Proto\Trace\V1\RateLimitingSampler|null
      */
     public function getRateLimitingSampler()
     {
         return $this->readOneof(3);
+    }
+
+    public function hasRateLimitingSampler()
+    {
+        return $this->hasOneof(3);
     }
 
     /**

@@ -24,21 +24,23 @@ class Link extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bytes trace_id = 1;</code>
      */
-    private $trace_id = '';
+    protected $trace_id = '';
     /**
      * A unique identifier for the linked span. The ID is an 8-byte array.
      *
      * Generated from protobuf field <code>bytes span_id = 2;</code>
      */
-    private $span_id = '';
+    protected $span_id = '';
     /**
      * The trace_state associated with the link.
      *
      * Generated from protobuf field <code>string trace_state = 3;</code>
      */
-    private $trace_state = '';
+    protected $trace_state = '';
     /**
      * attributes is a collection of attribute key/value pairs on the link.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 4;</code>
      */
@@ -49,7 +51,7 @@ class Link extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>uint32 dropped_attributes_count = 5;</code>
      */
-    private $dropped_attributes_count = 0;
+    protected $dropped_attributes_count = 0;
 
     /**
      * Constructor.
@@ -66,6 +68,8 @@ class Link extends \Google\Protobuf\Internal\Message
      *           The trace_state associated with the link.
      *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $attributes
      *           attributes is a collection of attribute key/value pairs on the link.
+     *           Attribute keys MUST be unique (it is not allowed to have more than one
+     *           attribute with the same key).
      *     @type int $dropped_attributes_count
      *           dropped_attributes_count is the number of dropped attributes. If the value is 0,
      *           then no attributes were dropped.
@@ -158,6 +162,8 @@ class Link extends \Google\Protobuf\Internal\Message
 
     /**
      * attributes is a collection of attribute key/value pairs on the link.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 4;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -169,6 +175,8 @@ class Link extends \Google\Protobuf\Internal\Message
 
     /**
      * attributes is a collection of attribute key/value pairs on the link.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 4;</code>
      * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var

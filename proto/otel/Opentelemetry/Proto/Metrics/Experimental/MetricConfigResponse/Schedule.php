@@ -36,7 +36,7 @@ class Schedule extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 period_sec = 3;</code>
      */
-    private $period_sec = 0;
+    protected $period_sec = 0;
 
     /**
      * Constructor.

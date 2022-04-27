@@ -9,18 +9,15 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * InstrumentationLibrary is a message representing the instrumentation library information
- * such as the fully qualified name and version.
- * InstrumentationLibrary is wire-compatible with InstrumentationScope for binary
- * Protobuf format.
- * This message is deprecated and will be removed on June 15, 2022.
+ * InstrumentationScope is a message representing the instrumentation scope information
+ * such as the fully qualified name and version. 
  *
- * Generated from protobuf message <code>opentelemetry.proto.common.v1.InstrumentationLibrary</code>
+ * Generated from protobuf message <code>opentelemetry.proto.common.v1.InstrumentationScope</code>
  */
-class InstrumentationLibrary extends \Google\Protobuf\Internal\Message
+class InstrumentationScope extends \Google\Protobuf\Internal\Message
 {
     /**
-     * An empty instrumentation library name means the name is unknown.
+     * An empty instrumentation scope name means the name is unknown.
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
@@ -37,7 +34,7 @@ class InstrumentationLibrary extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           An empty instrumentation library name means the name is unknown.
+     *           An empty instrumentation scope name means the name is unknown.
      *     @type string $version
      * }
      */
@@ -47,7 +44,7 @@ class InstrumentationLibrary extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * An empty instrumentation library name means the name is unknown.
+     * An empty instrumentation scope name means the name is unknown.
      *
      * Generated from protobuf field <code>string name = 1;</code>
      * @return string
@@ -58,7 +55,7 @@ class InstrumentationLibrary extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * An empty instrumentation library name means the name is unknown.
+     * An empty instrumentation scope name means the name is unknown.
      *
      * Generated from protobuf field <code>string name = 1;</code>
      * @param string $var

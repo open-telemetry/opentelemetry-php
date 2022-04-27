@@ -68,20 +68,20 @@ class TracerTest extends TestCase
         $this->assertEquals($newTraceState, $span->getContext()->getTraceState());
     }
 
-    public function test_span_should_receive_instrumentation_library(): void
+    public function test_span_should_receive_instrumentation_scope(): void
     {
         $tracerProvider = new TracerProvider();
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest', 'dev', 'http://url');
         /** @var Span $span */
         $span = $tracer->spanBuilder('test.span')->startSpan();
-        $spanInstrumentationLibrary = $span->getInstrumentationLibrary();
+        $spanInstrumentationScope = $span->getInstrumentationScope();
 
-        $this->assertEquals('OpenTelemetry.TracerTest', $spanInstrumentationLibrary->getName());
-        $this->assertEquals('dev', $spanInstrumentationLibrary->getVersion());
-        $this->assertEquals('http://url', $spanInstrumentationLibrary->getSchemaUrl());
+        $this->assertEquals('OpenTelemetry.TracerTest', $spanInstrumentationScope->getName());
+        $this->assertEquals('dev', $spanInstrumentationScope->getVersion());
+        $this->assertEquals('http://url', $spanInstrumentationScope->getSchemaUrl());
     }
 
-    public function test_span_builder_propagates_instrumentation_library_info_to_span(): void
+    public function test_span_builder_propagates_instrumentation_scope_info_to_span(): void
     {
         /** @var Span $span */
         $span = (new TracerProvider())
@@ -89,7 +89,7 @@ class TracerTest extends TestCase
             ->spanBuilder('span')
             ->startSpan();
 
-        $this->assertSame('name', $span->getInstrumentationLibrary()->getName());
-        $this->assertSame('version', $span->getInstrumentationLibrary()->getVersion());
+        $this->assertSame('name', $span->getInstrumentationScope()->getName());
+        $this->assertSame('version', $span->getInstrumentationScope()->getVersion());
     }
 }

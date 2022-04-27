@@ -4,6 +4,8 @@
 
 namespace Opentelemetry\Proto\Metrics\V1;
 
+use UnexpectedValueException;
+
 /**
  * DataPointFlags is defined as a protobuf 'uint32' type and is to be used as a
  * bit-field representing 32 distinct boolean flags.  Each flag defined in this
@@ -27,5 +29,30 @@ class DataPointFlags
      * Generated from protobuf enum <code>FLAG_NO_RECORDED_VALUE = 1;</code>
      */
     const FLAG_NO_RECORDED_VALUE = 1;
+
+    private static $valueToName = [
+        self::FLAG_NONE => 'FLAG_NONE',
+        self::FLAG_NO_RECORDED_VALUE => 'FLAG_NO_RECORDED_VALUE',
+    ];
+
+    public static function name($value)
+    {
+        if (!isset(self::$valueToName[$value])) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no name defined for value %s', __CLASS__, $value));
+        }
+        return self::$valueToName[$value];
+    }
+
+
+    public static function value($name)
+    {
+        $const = __CLASS__ . '::' . strtoupper($name);
+        if (!defined($const)) {
+            throw new UnexpectedValueException(sprintf(
+                    'Enum %s has no value defined for name %s', __CLASS__, $name));
+        }
+        return constant($const);
+    }
 }
 

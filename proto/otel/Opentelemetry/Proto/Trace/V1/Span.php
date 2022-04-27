@@ -32,7 +32,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bytes trace_id = 1;</code>
      */
-    private $trace_id = '';
+    protected $trace_id = '';
     /**
      * A unique identifier for a span within a trace, assigned when the span
      * is created. The ID is an 8-byte array. An ID with all zeroes is considered
@@ -43,7 +43,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bytes span_id = 2;</code>
      */
-    private $span_id = '';
+    protected $span_id = '';
     /**
      * trace_state conveys information about request position in multiple distributed tracing graphs.
      * It is a trace_state in w3c-trace-context format: https://www.w3.org/TR/trace-context/#tracestate-header
@@ -51,14 +51,14 @@ class Span extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string trace_state = 3;</code>
      */
-    private $trace_state = '';
+    protected $trace_state = '';
     /**
      * The `span_id` of this span's parent span. If this is a root span, then this
      * field must be empty. The ID is an 8-byte array.
      *
      * Generated from protobuf field <code>bytes parent_span_id = 4;</code>
      */
-    private $parent_span_id = '';
+    protected $parent_span_id = '';
     /**
      * A description of the span's operation.
      * For example, the name can be a qualified method name or a file name
@@ -71,7 +71,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 5;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Distinguishes between spans generated in a particular context. For example,
      * two spans with the same name may be distinguished using `CLIENT` (caller)
@@ -79,7 +79,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.opentelemetry.proto.trace.v1.Span.SpanKind kind = 6;</code>
      */
-    private $kind = 0;
+    protected $kind = 0;
     /**
      * start_time_unix_nano is the start time of the span. On the client side, this is the time
      * kept by the local machine where the span execution starts. On the server side, this
@@ -89,7 +89,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 start_time_unix_nano = 7;</code>
      */
-    private $start_time_unix_nano = 0;
+    protected $start_time_unix_nano = 0;
     /**
      * end_time_unix_nano is the end time of the span. On the client side, this is the time
      * kept by the local machine where the span execution ends. On the server side, this
@@ -99,7 +99,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>fixed64 end_time_unix_nano = 8;</code>
      */
-    private $end_time_unix_nano = 0;
+    protected $end_time_unix_nano = 0;
     /**
      * attributes is a collection of key/value pairs. Note, global attributes
      * like server name can be set using the resource API. Examples of attributes:
@@ -109,6 +109,8 @@ class Span extends \Google\Protobuf\Internal\Message
      *     "abc.com/score": 10.239
      * The OpenTelemetry API specification further restricts the allowed value types:
      * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
      */
@@ -120,7 +122,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>uint32 dropped_attributes_count = 10;</code>
      */
-    private $dropped_attributes_count = 0;
+    protected $dropped_attributes_count = 0;
     /**
      * events is a collection of Event items.
      *
@@ -133,7 +135,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>uint32 dropped_events_count = 12;</code>
      */
-    private $dropped_events_count = 0;
+    protected $dropped_events_count = 0;
     /**
      * links is a collection of Links, which are references from this span to a span
      * in the same or different trace.
@@ -147,14 +149,14 @@ class Span extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>uint32 dropped_links_count = 14;</code>
      */
-    private $dropped_links_count = 0;
+    protected $dropped_links_count = 0;
     /**
      * An optional final status for this span. Semantically when Status isn't set, it means
      * span's status code is unset, i.e. assume STATUS_CODE_UNSET (code = 0).
      *
      * Generated from protobuf field <code>.opentelemetry.proto.trace.v1.Status status = 15;</code>
      */
-    private $status = null;
+    protected $status = null;
 
     /**
      * Constructor.
@@ -217,6 +219,8 @@ class Span extends \Google\Protobuf\Internal\Message
      *               "abc.com/score": 10.239
      *           The OpenTelemetry API specification further restricts the allowed value types:
      *           https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
+     *           Attribute keys MUST be unique (it is not allowed to have more than one
+     *           attribute with the same key).
      *     @type int $dropped_attributes_count
      *           dropped_attributes_count is the number of attributes that were discarded. Attributes
      *           can be discarded because their keys are too long or because there are too many
@@ -436,7 +440,7 @@ class Span extends \Google\Protobuf\Internal\Message
      */
     public function setKind($var)
     {
-        GPBUtil::checkEnum($var, \Opentelemetry\Proto\Trace\V1\Span_SpanKind::class);
+        GPBUtil::checkEnum($var, \Opentelemetry\Proto\Trace\V1\Span\SpanKind::class);
         $this->kind = $var;
 
         return $this;
@@ -519,6 +523,8 @@ class Span extends \Google\Protobuf\Internal\Message
      *     "abc.com/score": 10.239
      * The OpenTelemetry API specification further restricts the allowed value types:
      * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -537,6 +543,8 @@ class Span extends \Google\Protobuf\Internal\Message
      *     "abc.com/score": 10.239
      * The OpenTelemetry API specification further restricts the allowed value types:
      * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 9;</code>
      * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
@@ -695,11 +703,21 @@ class Span extends \Google\Protobuf\Internal\Message
      * span's status code is unset, i.e. assume STATUS_CODE_UNSET (code = 0).
      *
      * Generated from protobuf field <code>.opentelemetry.proto.trace.v1.Status status = 15;</code>
-     * @return \Opentelemetry\Proto\Trace\V1\Status
+     * @return \Opentelemetry\Proto\Trace\V1\Status|null
      */
     public function getStatus()
     {
         return $this->status;
+    }
+
+    public function hasStatus()
+    {
+        return isset($this->status);
+    }
+
+    public function clearStatus()
+    {
+        unset($this->status);
     }
 
     /**

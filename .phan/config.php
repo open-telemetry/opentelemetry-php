@@ -359,10 +359,12 @@ return [
     // your application should be included in this list.
     'directory_list' => [
         'src',
-        'proto',
+        'proto/otel/GPBMetadata',
+        'proto/otel/Opentelemetry',
         'thrift',
         'vendor/packaged/thrift',
         'vendor/composer',
+        'vendor/grpc/grpc/src/lib',
         'vendor/guzzlehttp',
         'vendor/psr',
         'vendor/php-http',

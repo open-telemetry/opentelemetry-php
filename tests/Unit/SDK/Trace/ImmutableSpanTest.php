@@ -7,7 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\ImmutableSpan;
 use OpenTelemetry\SDK\Trace\Span;
@@ -22,7 +22,7 @@ class ImmutableSpanTest extends TestCase
     private Span $span;
     private AttributesInterface $attributes;
     private StatusDataInterface $status;
-    private InstrumentationLibrary $instrumentationLibrary;
+    private InstrumentationScope $instrumentationScope;
     private ResourceInfo $resource;
     private API\SpanContextInterface $context;
     private API\SpanContextInterface $parentContext;
@@ -40,7 +40,7 @@ class ImmutableSpanTest extends TestCase
     {
         $this->context = $this->createMock(API\SpanContextInterface::class);
         $this->parentContext = $this->createMock(API\SpanContextInterface::class);
-        $this->instrumentationLibrary = $this->createMock(InstrumentationLibrary::class);
+        $this->instrumentationScope = $this->createMock(InstrumentationScope::class);
         $this->resource = $this->createMock(ResourceInfo::class);
 
         $this->span = $this->createMock(Span::class);
@@ -50,7 +50,7 @@ class ImmutableSpanTest extends TestCase
         $this->span->method('getKind')->willReturn(SpanKind::KIND_INTERNAL);
         $this->span->method('getContext')->willReturn($this->context);
         $this->span->method('getParentContext')->willReturn($this->parentContext);
-        $this->span->method('getInstrumentationLibrary')->willReturn($this->instrumentationLibrary);
+        $this->span->method('getInstrumentationScope')->willReturn($this->instrumentationScope);
         $this->span->method('getResource')->willReturn($this->resource);
         $this->span->method('getStartEpochNanos')->willReturn($this->startEpochNanes);
         $this->span->method('getTotalRecordedLinks')->willReturn($this->totalRecordedLinks);
@@ -82,7 +82,7 @@ class ImmutableSpanTest extends TestCase
         $this->assertSame($this->parentSpanId, $span->getParentSpanId());
         $this->assertSame($this->startEpochNanes, $span->getStartEpochNanos());
         $this->assertSame($this->endEpochNanos, $span->getEndEpochNanos());
-        $this->assertSame($this->instrumentationLibrary, $span->getInstrumentationLibrary());
+        $this->assertSame($this->instrumentationScope, $span->getInstrumentationScope());
         $this->assertSame($this->resource, $span->getResource());
         $this->assertSame('name', $span->getName());
         $this->assertSame([], $span->getLinks());

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibrary;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerSharedState;
 use PHPUnit\Framework\TestCase;
@@ -16,13 +16,13 @@ class TracerTest extends TestCase
 {
     private Tracer $tracer;
     private TracerSharedState $tracerSharedState;
-    private InstrumentationLibrary $instrumentationLibrary;
+    private InstrumentationScope $instrumentationScope;
 
     protected function setUp(): void
     {
         $this->tracerSharedState = $this->createMock(TracerSharedState::class);
-        $this->instrumentationLibrary = $this->createMock(InstrumentationLibrary::class);
-        $this->tracer = (new Tracer($this->tracerSharedState, $this->instrumentationLibrary));
+        $this->instrumentationScope = $this->createMock(InstrumentationScope::class);
+        $this->tracer = (new Tracer($this->tracerSharedState, $this->instrumentationScope));
     }
 
     /**
@@ -49,8 +49,8 @@ class TracerTest extends TestCase
 
     /**
      */
-    public function test_get_instrumentation_library(): void
+    public function test_get_instrumentation_scope(): void
     {
-        $this->assertSame($this->instrumentationLibrary, $this->tracer->getInstrumentationLibrary());
+        $this->assertSame($this->instrumentationScope, $this->tracer->getInstrumentationScope());
     }
 }

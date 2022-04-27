@@ -40,6 +40,7 @@ class MetricsServiceClient extends \Grpc\BaseStub {
      * @param \Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsServiceRequest $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
+     * @return \Grpc\UnaryCall
      */
     public function Export(\Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsServiceRequest $argument,
       $metadata = [], $options = []) {

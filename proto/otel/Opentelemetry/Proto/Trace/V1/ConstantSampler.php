@@ -18,7 +18,7 @@ class ConstantSampler extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.opentelemetry.proto.trace.v1.ConstantSampler.ConstantDecision decision = 1;</code>
      */
-    private $decision = 0;
+    protected $decision = 0;
 
     /**
      * Constructor.
@@ -50,7 +50,7 @@ class ConstantSampler extends \Google\Protobuf\Internal\Message
      */
     public function setDecision($var)
     {
-        GPBUtil::checkEnum($var, \Opentelemetry\Proto\Trace\V1\ConstantSampler_ConstantDecision::class);
+        GPBUtil::checkEnum($var, \Opentelemetry\Proto\Trace\V1\ConstantSampler\ConstantDecision::class);
         $this->decision = $var;
 
         return $this;
