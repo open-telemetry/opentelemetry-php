@@ -29,8 +29,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
     /** @inheritDoc */
     public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
     {
-        $event = new StartSpanEvent([$span]);
-        Dispatcher::getinstance()->dispatch($event);
+        Dispatcher::getinstance()->dispatch(new StartSpanEvent($span));
     }
 
     /** @inheritDoc */
@@ -44,8 +43,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
             $this->exporter->export([$span->toSpanData()]);
         }
 
-        $event = new EndSpanEvent([$span]);
-        Dispatcher::getinstance()->dispatch($event);
+        Dispatcher::getinstance()->dispatch(new EndSpanEvent($span));
     }
 
     /** @inheritDoc */

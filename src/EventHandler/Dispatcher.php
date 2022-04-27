@@ -29,8 +29,8 @@ class Dispatcher
 
     public function dispatch(EventInterface $event):void
     {
-        $eventClassname = $event->getClassName();
-        $listenerCallable = self::$listeners[$eventClassname];
+        $eventName = $event->getEventName();
+        $listenerCallable = self::$listeners[$eventName];
         if ($listenerCallable == null) {
             return;
         }

@@ -6,6 +6,6 @@ namespace OpenTelemetry\EventHandler;
 
 interface Events
 {
-    public const START = 'StartSpanEvent';
-    public const END = 'EndSpanEvent';
+    public const SPAN_START = 'StartSpanEvent';
+    public const SPAN_END = 'EndSpanEvent';
 }

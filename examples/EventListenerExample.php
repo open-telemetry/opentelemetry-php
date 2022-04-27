@@ -13,9 +13,15 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 //Register the event listener pair, The dispatcher here is a global Class
-Dispatcher::getinstance()->listen(Events::START, 'OpenTelemetry\EventHandler\Listener\StartSpanListener::handle');
-Dispatcher::getinstance()->listen(Events::END, 'OpenTelemetry\EventHandler\Listener\EndSpanListener::handle');
+Dispatcher::getinstance()->listen(Events::SPAN_START, function ($event) {
+    $span = $event->getTarget();
+    $span->setAttribute('Listener', 'StartSpanListener');
+});
 
+Dispatcher::getinstance()->listen(Events::SPAN_END, function ($event) {
+    $span = $event->getTarget();
+    echo 'End Span Attribute can be used';
+});
 $zipkinExporter = new ZipkinExporter(
     'alwaysOnZipkinExample',
     'http://zipkin:9411/api/v2/spans',

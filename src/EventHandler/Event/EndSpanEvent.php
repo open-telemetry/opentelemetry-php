@@ -5,21 +5,22 @@ declare(strict_types=1);
 namespace OpenTelemetry\EventHandler\Event;
 
 use OpenTelemetry\EventHandler\EventInterface;
+use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 
 class EndSpanEvent implements EventInterface
 {
-    private array $eventArray ;
-    public function __construct(array $eventArray)
+    private ReadableSpanInterface $target ;
+    public function __construct(ReadableSpanInterface $target)
     {
-        $this->eventArray = $eventArray;
+        $this->target = $target;
     }
 
-    public function getArray():array
+    public function getTarget():ReadableSpanInterface
     {
-        return $this->eventArray;
+        return $this->target;
     }
 
-    public function getClassName():string
+    public function getEventName():string
     {
         return 'EndSpanEvent';
     }

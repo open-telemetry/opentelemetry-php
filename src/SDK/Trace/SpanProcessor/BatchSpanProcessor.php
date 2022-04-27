@@ -6,6 +6,9 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\EventHandler\Dispatcher;
+use OpenTelemetry\EventHandler\Event\EndSpanEvent;
+use OpenTelemetry\EventHandler\Event\StartSpanEvent;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
@@ -73,6 +76,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
      */
     public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
     {
+        Dispatcher::getinstance()->dispatch(new StartSpanEvent($span));
     }
 
     /**
@@ -95,6 +99,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         if ($this->bufferReachedExportLimit() || $this->enoughTimeHasPassed()) {
             $this->forceFlush();
         }
+        Dispatcher::getinstance()->dispatch(new EndSpanEvent($span));
     }
 
     /** @inheritDoc */

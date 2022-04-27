@@ -6,7 +6,7 @@ namespace OpenTelemetry\EventHandler;
 
 interface EventInterface
 {
-    public function getArray():array;
+    public function getTarget():object;
 
-    public function getClassName():string;
+    public function getEventName():string;
 }
