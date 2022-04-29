@@ -533,7 +533,7 @@ class SpanTest extends MockeryTestCase
         $span->addEvent('a');
         $span->addEvent('b');
         $span->addEvent('c', new Attributes(['key' => 2]));
-        
+
         $span->end();
 
         $events = $span->toSpanData()->getEvents();

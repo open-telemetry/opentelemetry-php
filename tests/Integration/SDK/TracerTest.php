@@ -13,8 +13,8 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
-use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -92,7 +92,7 @@ class TracerTest extends TestCase
         $this->assertSame('name', $span->getInstrumentationLibrary()->getName());
         $this->assertSame('version', $span->getInstrumentationLibrary()->getVersion());
     }
-    
+
     public function test_span_fall_back_name(): void
     {
         /** @var Span $span */
