@@ -28,6 +28,7 @@ class TracerTest extends TestCase
     /**
      * @dataProvider nameProvider
      * @param non-empty-string $name
+     * @group trace-compliance
      */
     public function test_span_builder(string $name, string $expected): void
     {

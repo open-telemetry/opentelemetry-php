@@ -18,6 +18,7 @@ class TracerProviderTest extends TestCase
     /**
      * @covers ::getTracer
      * @covers ::__construct
+     * @group trace-compliance
      */
     public function test_reuses_same_instance(): void
     {
@@ -70,6 +71,7 @@ class TracerProviderTest extends TestCase
 
     /**
      * @covers ::shutdown
+     * @group trace-compliance
      */
     public function test_shutdown(): void
     {
@@ -82,6 +84,7 @@ class TracerProviderTest extends TestCase
 
     /**
      * @covers ::forceFlush
+     * @group trace-compliance
      */
     public function test_force_flush(): void
     {
@@ -107,6 +110,7 @@ class TracerProviderTest extends TestCase
     }
 
     /**
+     * @group trace-compliance
      * @covers ::getTracer
      */
     public function test_get_tracer_after_shutdown(): void

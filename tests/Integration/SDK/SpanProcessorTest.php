@@ -39,8 +39,7 @@ class SpanProcessorTest extends TestCase
         $spanProcessor
             ->expects($this->once())
             ->method('onStart')
-            ->with($this->isInstanceOf(SpanInterface::class), $this->equalTo($currentContext))
-        ;
+            ->with($this->isInstanceOf(SpanInterface::class), $this->equalTo($currentContext));
 
         $tracerProvider = new TracerProvider($spanProcessor);
         $tracer = $tracerProvider->getTracer('OpenTelemetry.Test');
