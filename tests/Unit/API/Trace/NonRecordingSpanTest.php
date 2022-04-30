@@ -88,10 +88,8 @@ class NonRecordingSpanTest extends TestCase
 
     public function test_end(): void
     {
-        $this->assertNull(
-            // @phpstan-ignore-next-line
-            $this->createNonRecordingSpan()->end()
-        );
+        // @phpstan-ignore-next-line
+        $this->assertNull($this->createNonRecordingSpan()->end());
     }
 
     private function createNonRecordingSpan(): NonRecordingSpan
