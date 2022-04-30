@@ -1,6 +1,7 @@
 version: '3.7'
 services:
   php:
+    user: root
     build:
       context: .
       dockerfile: docker/Dockerfile
