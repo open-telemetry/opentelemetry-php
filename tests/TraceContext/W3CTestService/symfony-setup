@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+set -x
+
+git config --global user.email "otel@open-telemetry.example.com"
 
 # Install Symfony
 curl -sS https://get.symfony.com/cli/installer | bash
@@ -21,16 +24,18 @@ composer require open-telemetry/opentelemetry "*"
 composer config repositories.local \
     '{"type": "path", "url": "/usr/src/open-telemetry/", "options": {"symLink": true }}' \
     --file composer.json
+composer config minimum-stability dev --file composer.json
+composer require php-http/mock-client "*"
+composer require nyholm/psr7 "*"
 rm composer.lock
 composer clearcache
 composer install
 
 # Start the server to start listening in the background
-symfony server:start -d --port=8001
+symfony server:start -d --port=8001 --no-tls
 
 # Setup the TraceContext Test Service
-apt-get install -y python3-pip 
-pip3 install aiohttp
+apk add --no-cache py3-pip py3-aiohttp
 
 cd ..
 rm -rf trace-context
