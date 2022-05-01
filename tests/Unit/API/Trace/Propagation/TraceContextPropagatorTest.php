@@ -286,6 +286,8 @@ class TraceContextPropagatorTest extends TestCase
         ]);
     }
 
+    
+
     private function assertInvalid(array $carrier): void
     {
         $this->assertSame(

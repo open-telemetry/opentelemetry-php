@@ -97,7 +97,7 @@ class TracerTest extends TestCase
     {
         /** @var Span $span */
         $span = (new TracerProvider())
-            ->getTracer('  ', 'version')
+            ->getTracer('', 'version')
             ->spanBuilder('span')
             ->startSpan();
 

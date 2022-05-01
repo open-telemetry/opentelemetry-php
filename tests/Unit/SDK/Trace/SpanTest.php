@@ -470,11 +470,9 @@ class SpanTest extends MockeryTestCase
         $attributes = new Attributes([
             'string' => 'str_val',
             'empty_key' => '',
-            'null' => null,
             'str_array' => ['f', 'b'],
         ]);
 
-        $span->setAttribute('null', 'new_not_null');
         $span->setAttribute('str_array', ['a', 'b']);
         $span->setAttribute('string', 'str');
 
@@ -484,7 +482,6 @@ class SpanTest extends MockeryTestCase
         $attributes = $span->toSpanData()->getAttributes();
         $this->assertSame('str_val', $attributes->get('string'));
         $this->assertSame('', $attributes->get('empty_key'));
-        $this->assertNull($attributes->get('null'));
         $this->assertSame(['f', 'b'], $attributes->get('str_array'));
     }
 
@@ -540,7 +537,7 @@ class SpanTest extends MockeryTestCase
         $c = 0;
 
         $this->assertEvent($events[$c++], 'a', new Attributes(), self::START_EPOCH);
-        $this->assertEvent($events[$c++], 'b', new Attributes(), AbstractClock::secondsToNanos(10));
+        $this->assertEvent($events[$c++], 'b', new Attributes(), self::START_EPOCH);
         $this->assertEvent($events[$c], 'c', new Attributes(['key' => 2]), self::START_EPOCH);
     }
 
