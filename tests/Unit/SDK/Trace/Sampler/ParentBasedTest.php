@@ -38,6 +38,7 @@ class ParentBasedTest extends TestCase
     /**
      * @covers ::shouldSample
      * @covers ::__construct
+     * @group trace-compliance
      */
     public function test_parent_based_root_span(): void
     {

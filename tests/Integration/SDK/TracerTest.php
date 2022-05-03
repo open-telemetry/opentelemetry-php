@@ -16,6 +16,7 @@ use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
+use OpenTelemetry\SDK\Trace\Tracer;
 
 /**
  * @coversNothing
@@ -91,5 +92,16 @@ class TracerTest extends TestCase
 
         $this->assertSame('name', $span->getInstrumentationScope()->getName());
         $this->assertSame('version', $span->getInstrumentationScope()->getVersion());
+    }
+
+    public function test_span_fall_back_name(): void
+    {
+        /** @var Span $span */
+        $span = (new TracerProvider())
+            ->getTracer(' ', 'version')
+            ->spanBuilder('span')
+            ->startSpan();
+
+        $this->assertSame(Tracer::FALLBACK_SPAN_NAME, $span->getInstrumentationScope()->getName());
     }
 }

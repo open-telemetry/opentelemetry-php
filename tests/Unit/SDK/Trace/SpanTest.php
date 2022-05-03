@@ -461,6 +461,9 @@ class SpanTest extends MockeryTestCase
         $this->assertEmpty($span->toSpanData()->getAttributes());
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_add_event(): void
     {
         $span = $this->createTestRootSpan();
@@ -667,7 +670,52 @@ class SpanTest extends MockeryTestCase
         $span->end();
     }
 
-    // endregion SDK
+        // endregion SDK
+
+     /**
+     * @group trace-compliance
+     */
+    public function test_set_attributes_merges_attributes(): void
+    {
+        $span = $this->createTestRootSpan();
+
+        $attributes = new Attributes([
+            'string' => 'str_val',
+            'empty_key' => '',
+            'str_array' => ['f', 'b'],
+        ]);
+
+        $span->setAttribute('str_array', ['a', 'b']);
+        $span->setAttribute('string', 'str');
+
+        $span->setAttributes($attributes);
+        $span->end();
+
+        $attributes = $span->toSpanData()->getAttributes();
+        $this->assertSame('str_val', $attributes->get('string'));
+        $this->assertSame('', $attributes->get('empty_key'));
+        $this->assertSame(['f', 'b'], $attributes->get('str_array'));
+    }
+
+    /**
+     * @group trace-compliance
+     */
+    public function test_add_event_order_preserved(): void
+    {
+        $span = $this->createTestRootSpan();
+        $span->addEvent('a');
+        $span->addEvent('b');
+        $span->addEvent('c', new Attributes(['key' => 2]));
+
+        $span->end();
+
+        $events = $span->toSpanData()->getEvents();
+        $c = 0;
+
+        $this->assertEvent($events[$c++], 'a', new Attributes(), self::START_EPOCH);
+        $this->assertEvent($events[$c++], 'b', new Attributes(), self::START_EPOCH);
+        $this->assertEvent($events[$c], 'c', new Attributes(['key' => 2]), self::START_EPOCH);
+    }
 
     private function createTestRootSpan(): Span
     {

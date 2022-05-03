@@ -123,6 +123,7 @@ class TracerProviderTest extends TestCase
     /**
      * @covers ::shutdown
      * @group trace-compliance
+     * @group trace-compliance
      */
     public function test_shutdown(): void
     {
@@ -135,6 +136,7 @@ class TracerProviderTest extends TestCase
 
     /**
      * @covers ::forceFlush
+     * @group trace-compliance
      * @group trace-compliance
      */
     public function test_force_flush(): void
@@ -162,6 +164,7 @@ class TracerProviderTest extends TestCase
 
     /**
      * @covers ::getTracer
+     * @group trace-compliance
      * @group trace-compliance
      */
     public function test_get_tracer_returns_noop_tracer_after_shutdown(): void
