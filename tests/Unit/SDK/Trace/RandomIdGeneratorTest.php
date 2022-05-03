@@ -23,7 +23,7 @@ class RandomIdGeneratorTest extends TestCase
 
         $this->assertEquals(1, preg_match(SpanContext::VALID_TRACE, $traceId));
     }
-    
+
     /**
      * @group trace-compliance
      */

@@ -670,11 +670,11 @@ class SpanTest extends MockeryTestCase
         $span->end();
     }
 
-        // endregion SDK
+    // endregion SDK
 
-     /**
-     * @group trace-compliance
-     */
+    /**
+    * @group trace-compliance
+    */
     public function test_set_attributes_merges_attributes(): void
     {
         $span = $this->createTestRootSpan();
