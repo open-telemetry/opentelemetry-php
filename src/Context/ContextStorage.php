@@ -14,6 +14,11 @@ final class ContextStorage implements ContextStorageInterface
     /** @var array<int, ContextStorageHead> */
     private array $forks = [];
 
+    public static function create(): self
+    {
+        return new self(new Context());
+    }
+
     public function __construct(Context $context)
     {
         $this->current = $this->main = new ContextStorageHead($this);

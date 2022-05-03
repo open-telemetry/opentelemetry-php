@@ -10,6 +10,7 @@ use Mockery\MockInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextStorage;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Link;
@@ -632,5 +633,45 @@ class SpanBuilderTest extends MockeryTestCase
 
         $span->end();
         $parentSpan->end();
+    }
+
+    /**
+     * @group concurrency
+     */
+    public function test_custom_storage_does_not_use_shared_storage(): void
+    {
+        $sharedStorage = Context::storage();
+        $storage = ContextStorage::create();
+        $rootShared = $this->tracer->spanBuilder('root.shared')->startSpan();
+        $rootShared->activate();
+        $rootCustom = $this->tracer->spanBuilder('root.custom')->setStorage($storage)->startSpan();
+        $rootCustom->activate();
+
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->with($rootShared, $sharedStorage->current())
+            ->once();
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->with($rootCustom, $storage->current());
+        $this->assertNotSame($storage->current(), $sharedStorage->current());
+
+        $this->assertNotSame($sharedStorage->current(), $storage->current(), 'current context is different in different storages');
+
+        $childOne = $this->tracer->spanBuilder('one')->startSpan(); //child span of root.shared
+        $childTwo = $this->tracer->spanBuilder('two')->setStorage($storage)->startSpan(); //child span of root.custom
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->with($childOne, $sharedStorage->current());
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->with($childTwo, $storage->current());
+
+        //$this->assertSame($storage->current(), $rootTwo);
+        //$this->assertSame($sharedStorage->current(), $rootOne);
     }
 }

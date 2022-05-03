@@ -27,6 +27,11 @@ final class FiberNotSupportedContextStorage implements ContextStorageInterface
         $this->storage = $storage;
     }
 
+    public static function create(): self
+    {
+        return new self(ContextStorage::create());
+    }
+
     public function fork(int $id): void
     {
         $this->storage->fork($id);

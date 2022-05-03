@@ -6,6 +6,8 @@ namespace OpenTelemetry\Context;
 
 interface ContextStorageInterface
 {
+    public static function create(): self;
+
     public function fork(int $id): void;
 
     public function switch(int $id): void;

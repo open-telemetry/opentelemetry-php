@@ -11,7 +11,7 @@ class Context
 {
     private static ?ContextStorageInterface $storage = null;
 
-    private static ?\OpenTelemetry\Context\Context $root = null;
+    private static ?Context $root = null;
 
     /**
      * @internal
@@ -129,7 +129,7 @@ class Context
      */
     protected $value;
 
-    protected ?\OpenTelemetry\Context\Context $parent;
+    protected ?Context $parent;
 
     /**
      * This is a general purpose read-only key-value store. Read-only in the sense that adding a new value does not

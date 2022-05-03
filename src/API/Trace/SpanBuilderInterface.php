@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Trace;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextStorageInterface;
 
 /**
  * Obtained from a {@see TracerInterface} and used to construct a {@see SpanInterface}.
@@ -44,6 +45,11 @@ interface SpanBuilderInterface
      * @psalm-param SpanKind::KIND_* $spanKind
      */
     public function setSpanKind(int $spanKind): SpanBuilderInterface;
+
+    /**
+     * Set custom context storage
+     */
+    public function setStorage(ContextStorageInterface $storage): SpanBuilderInterface;
 
     /**
      * Starts and returns a new {@see SpanInterface}.

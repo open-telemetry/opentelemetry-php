@@ -57,6 +57,11 @@ final class NoopSpanBuilder implements SpanBuilderInterface
         return $this;
     }
 
+    public function setStorage(ContextStorageInterface $storage): SpanBuilderInterface
+    {
+        return $this;
+    }
+
     public function startSpan(): SpanInterface
     {
         $span = AbstractSpan::fromContext($this->parent ?? $this->contextStorage->current());

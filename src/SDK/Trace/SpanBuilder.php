@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\API\Trace\SpanBuilderInterface;
+use OpenTelemetry\Context\ContextStorageInterface;
 use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
@@ -31,6 +33,8 @@ final class SpanBuilder implements API\SpanBuilderInterface
 
     private ?Context $parentContext = null; // Null means use current context.
 
+    private ?ContextStorageInterface $storage;
+
     /**
      * @psalm-var API\SpanKind::KIND_*
      */
@@ -54,6 +58,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
         $this->instrumentationScope = $instrumentationScope;
         $this->tracerSharedState = $tracerSharedState;
         $this->spanLimits = $spanLimits;
+        $this->storage = Context::storage(); //default to shared storage, see self::setStorage()
     }
 
     /** @inheritDoc */
@@ -150,9 +155,17 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
+    public function setStorage(ContextStorageInterface $storage): SpanBuilderInterface
+    {
+        $this->storage = $storage;
+
+        return $this;
+    }
+
+    /** @inheritDoc */
     public function startSpan(): API\SpanInterface
     {
-        $parentContext = $this->parentContext ?? Context::getCurrent();
+        $parentContext = $this->parentContext ?? $this->storage->current();
         $parentSpan = Span::fromContext($parentContext);
         $parentSpanContext = $parentSpan->getContext();
 
