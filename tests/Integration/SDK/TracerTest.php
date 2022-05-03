@@ -101,6 +101,6 @@ class TracerTest extends TestCase
             ->spanBuilder('span')
             ->startSpan();
 
-        $this->assertSame(Tracer::FALLBACK_SPAN_NAME, $span->getInstrumentationLibrary()->getName());
+        $this->assertSame(Tracer::FALLBACK_SPAN_NAME, $span->getInstrumentationScope()->getName());
     }
 }
