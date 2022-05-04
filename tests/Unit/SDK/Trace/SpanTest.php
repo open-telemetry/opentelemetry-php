@@ -489,6 +489,7 @@ class SpanTest extends MockeryTestCase
         $span->setAttributes(new Attributes());
         $this->assertEmpty($span->toSpanData()->getAttributes());
     }
+
     /**
      * @group trace-compliance
      * @covers ::addEvent
