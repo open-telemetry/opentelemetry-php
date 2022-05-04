@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -68,6 +69,9 @@ class TracerTest extends TestCase
         $this->assertEquals($newTraceState, $span->getContext()->getTraceState());
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_span_should_receive_instrumentation_scope(): void
     {
         $tracerProvider = new TracerProvider();
@@ -81,6 +85,9 @@ class TracerTest extends TestCase
         $this->assertEquals('http://url', $spanInstrumentationScope->getSchemaUrl());
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_span_builder_propagates_instrumentation_scope_info_to_span(): void
     {
         /** @var Span $span */
@@ -92,4 +99,5 @@ class TracerTest extends TestCase
         $this->assertSame('name', $span->getInstrumentationScope()->getName());
         $this->assertSame('version', $span->getInstrumentationScope()->getVersion());
     }
+
 }

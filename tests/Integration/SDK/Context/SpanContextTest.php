@@ -39,12 +39,20 @@ class SpanContextTest extends TestCase
         ];
     }
 
+    /**
+     * @group trace-compliance
+     * @covers ::isValid
+     */
     public function test_valid_span(): void
     {
         $spanContext = SpanContext::create('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', API\SpanContextInterface::TRACE_FLAG_SAMPLED);
         $this->assertTrue($spanContext->isValid());
     }
 
+    /**
+     * @group trace-compliance
+     * @covers ::isRemote
+     */
     public function test_context_is_remote_from_restore(): void
     {
         $spanContext = SpanContext::createFromRemoteParent('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', API\SpanContextInterface::TRACE_FLAG_SAMPLED);
