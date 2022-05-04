@@ -94,14 +94,4 @@ class TracerTest extends TestCase
         $this->assertSame('version', $span->getInstrumentationScope()->getVersion());
     }
 
-    public function test_span_fall_back_name(): void
-    {
-        /** @var Span $span */
-        $span = (new TracerProvider())
-            ->getTracer(' ', 'version')
-            ->spanBuilder('span')
-            ->startSpan();
-
-        $this->assertSame(Tracer::FALLBACK_SPAN_NAME, $span->getInstrumentationScope()->getName());
-    }
 }
