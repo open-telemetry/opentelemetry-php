@@ -165,6 +165,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
      *  at (main)(test.php:62)
      *
      * Credit: https://www.php.net/manual/en/exception.gettraceasstring.php#114980
+     *
      */
     public static function formatStackTrace(Throwable $e, array &$seen = null): string
     {
@@ -185,11 +186,21 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
 
                 break;
             }
+
+            // Lambda to format traces -- we want to format the trace with '.' separators
+            $slashToDot = function ($str) {
+                return str_replace('\\', '.', $str);
+            };
+
+            $traceHasKey = array_key_exists(0, $trace);
+            $traceKeyHasClass = $traceHasKey && array_key_exists('class', $trace[0]);
+            $traceKeyHasFunction = $traceKeyHasClass && array_key_exists('function', $trace[0]);
+
             $result[] = sprintf(
                 ' at %s%s%s(%s%s%s)',
-                count($trace) && array_key_exists('class', $trace[0]) ? str_replace('\\', '.', $trace[0]['class']) : '',
-                count($trace) && array_key_exists('class', $trace[0]) && array_key_exists('function', $trace[0]) ? '.' : '',
-                count($trace) && array_key_exists('function', $trace[0]) ? str_replace('\\', '.', $trace[0]['function']) : 'main',
+                $traceKeyHasClass ? $slashToDot($trace[0]['class']) : '',
+                $traceKeyHasFunction ? '.' : '',
+                $traceKeyHasFunction ? $slashToDot($trace[0]['function']) : 'main',
                 $line === null ? $file : basename($file),
                 $line === null ? '' : ':',
                 $line ?? ''
