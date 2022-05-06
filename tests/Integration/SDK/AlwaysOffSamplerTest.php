@@ -32,7 +32,7 @@ class AlwaysOffSamplerTest extends TestCase
         $this->assertEquals($parentTraceState, $decision->getTraceState());
     }
 
-    public function test_always_on_sampler_description(): void
+    public function test_always_off_sampler_description(): void
     {
         $sampler = new AlwaysOffSampler();
         $this->assertEquals('AlwaysOffSampler', $sampler->getDescription());
