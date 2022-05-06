@@ -40,6 +40,7 @@ class StatusDataTest extends TestCase
     /**
      * @dataProvider getStatuses
      * @psalm-param StatusCode::STATUS_* $code
+     * @group trace-compliance
      */
     public function test_statuses_description(string $code): void
     {
