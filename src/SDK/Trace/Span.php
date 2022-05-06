@@ -13,6 +13,8 @@ use function get_class;
 use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextStorage;
+use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
@@ -86,6 +88,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         SpanProcessorInterface $spanProcessor,
         ResourceInfo $resource,
         ?AttributesInterface $attributes,
+        ?ContextStorageInterface $storage,
         array $links,
         int $totalRecordedLinks,
         int $startEpochNanos
@@ -103,6 +106,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         $this->attributes = Attributes::withLimits($attributes ?? new Attributes(), $spanLimits->getAttributeLimits());
         $this->status = StatusData::unset();
         $this->spanLimits = $spanLimits;
+        $this->storage = $storage ?? ContextStorage::default();
     }
 
     /**
@@ -127,6 +131,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         SpanProcessorInterface $spanProcessor,
         ResourceInfo $resource,
         ?AttributesInterface $attributes,
+        ?ContextStorageInterface $storage,
         array $links,
         int $totalRecordedLinks,
         int $startEpochNanos
@@ -141,6 +146,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             $spanProcessor,
             $resource,
             $attributes,
+            $storage,
             $links,
             $totalRecordedLinks,
             $startEpochNanos !== 0 ? $startEpochNanos : ClockFactory::getDefault()->now()

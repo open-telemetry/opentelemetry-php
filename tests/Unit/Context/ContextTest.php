@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Context\Unit;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
+use OpenTelemetry\Context\ContextStorage;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,6 +21,19 @@ class ContextTest extends TestCase
         $this->assertNotSame($context, Context::getCurrent());
         $context->activate();
         $this->assertSame($context, Context::getCurrent());
+    }
+
+    public function test_create_and_activate_in_custom_storage(): void
+    {
+        $key = new ContextKey();
+        $context = (new Context())->with($key, '111');
+        $storage = ContextStorage::create('custom');
+        $context->setStorage($storage);
+        $this->assertNotSame($context, $storage->current());
+        $context->activate();
+        $this->assertSame($context, $storage->current());
+        $current = $storage->current();
+        $this->assertSame('111', $current->get($key));
     }
 
     public function test_ctx_can_store_values_by_key(): void
@@ -219,26 +233,26 @@ class ContextTest extends TestCase
         $scopeMain = Context::attach($main);
 
         // Fiber start
-        Context::storage()->fork(1);
-        Context::storage()->switch(1);
+        Context::defaultStorage()->fork(1);
+        Context::defaultStorage()->switch(1);
         $this->assertSame($main, Context::getCurrent());
 
         $scopeFork = Context::attach($fork);
         $this->assertSame($fork, Context::getCurrent());
 
         // Fiber suspend
-        Context::storage()->switch(0);
+        Context::defaultStorage()->switch(0);
         $this->assertSame($main, Context::getCurrent());
 
         // Fiber resume
-        Context::storage()->switch(1);
+        Context::defaultStorage()->switch(1);
         $this->assertSame($fork, Context::getCurrent());
 
         $scopeFork->detach();
 
         // Fiber return
-        Context::storage()->switch(0);
-        Context::storage()->destroy(1);
+        Context::defaultStorage()->switch(0);
+        Context::defaultStorage()->destroy(1);
 
         $scopeMain->detach();
     }
@@ -248,13 +262,13 @@ class ContextTest extends TestCase
         $main = new Context();
 
         $scopeMain = Context::attach($main);
-        Context::storage()->fork(1);
+        Context::defaultStorage()->fork(1);
         $scopeMain->detach();
 
-        Context::storage()->switch(1);
+        Context::defaultStorage()->switch(1);
         $this->assertSame($main, Context::getCurrent());
 
-        Context::storage()->switch(0);
-        Context::storage()->destroy(1);
+        Context::defaultStorage()->switch(0);
+        Context::defaultStorage()->destroy(1);
     }
 }

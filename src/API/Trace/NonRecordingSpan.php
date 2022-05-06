@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
+use OpenTelemetry\Context\ContextStorage;
 use Throwable;
 
 /**
@@ -20,6 +21,7 @@ final class NonRecordingSpan extends AbstractSpan
         SpanContextInterface $context
     ) {
         $this->context = $context;
+        $this->storage = ContextStorage::default();
     }
 
     /** @inheritDoc */

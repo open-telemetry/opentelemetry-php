@@ -9,20 +9,46 @@ namespace OpenTelemetry\Context;
  */
 final class ContextStorage implements ContextStorageInterface
 {
+    private static ?self $default = null;
+    private static string $defaultStorageClass = ContextStorage::class;
+
     public ContextStorageHead $current;
     private ContextStorageHead $main;
     /** @var array<int, ContextStorageHead> */
     private array $forks = [];
+    public string $name; //debugging
 
-    public static function create(): self
+    public static function setDefaultStorageClass(string $class): void
     {
-        return new self(new Context());
+        self::$defaultStorageClass = $class;
     }
 
-    public function __construct(Context $context)
+    public static function create(string $name = 'default'): ContextStorageInterface
+    {
+        $context = new Context();
+        $self = new self($context, $name);
+        $context->setStorage($self);
+        if (self::$defaultStorageClass === FiberNotSupportedContextStorage::class) {
+            return new FiberNotSupportedContextStorage($self);
+        }
+
+        return $self;
+    }
+
+    public static function default(): self
+    {
+        if (self::$default === null) {
+            self::$default = self::create();
+        }
+
+        return self::$default;
+    }
+
+    public function __construct(Context $context, string $name)
     {
         $this->current = $this->main = new ContextStorageHead($this);
         $this->current->node = new ContextStorageNode($context, $this->current);
+        $this->name = $name;
     }
 
     public function fork(int $id): void

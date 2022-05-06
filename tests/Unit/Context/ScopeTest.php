@@ -67,11 +67,11 @@ class ScopeTest extends TestCase
     {
         $scope1 = Context::attach(Context::getCurrent());
 
-        Context::storage()->fork(1);
-        Context::storage()->switch(1);
+        Context::defaultStorage()->fork(1);
+        Context::defaultStorage()->switch(1);
         $this->assertSame(ScopeInterface::INACTIVE, $scope1->detach() & ScopeInterface::INACTIVE);
 
-        Context::storage()->switch(0);
-        Context::storage()->destroy(1);
+        Context::defaultStorage()->switch(0);
+        Context::defaultStorage()->destroy(1);
     }
 }

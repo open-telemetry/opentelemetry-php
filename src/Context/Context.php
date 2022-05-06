@@ -9,21 +9,21 @@ namespace OpenTelemetry\Context;
  */
 class Context
 {
-    private static ?ContextStorageInterface $storage = null;
-
+    private static int $counter = 0; //debugging
+    private static ?ContextStorageInterface $defaultStorage = null;
     private static ?Context $root = null;
 
     /**
      * @internal
      */
-    public static function setStorage(ContextStorageInterface $storage): void
+    public static function defaultStorage(): ContextStorageInterface
     {
-        self::$storage = $storage;
+        return self::$defaultStorage ??= ContextStorage::create();
     }
 
-    public static function storage(): ContextStorageInterface
+    public function getStorage(): ContextStorageInterface
     {
-        return self::$storage ??= new ContextStorage(self::getRoot());
+        return $this->storage ?? self::defaultStorage();
     }
 
     /**
@@ -32,7 +32,8 @@ class Context
      */
     public static function attach(Context $ctx): ScopeInterface
     {
-        return self::storage()->attach($ctx);
+        return $ctx->getStorage()->attach($ctx);
+        //return self::defaultStorage()->attach($ctx);
     }
 
     /**
@@ -50,16 +51,24 @@ class Context
      */
     public static function detach(ScopeInterface $token): Context
     {
+        //todo this probably won't work with non-default storage
         $token->detach();
 
         return self::getCurrent();
     }
 
-    public static function getCurrent(): Context
+    /**
+     * Retrieve current context from storage
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/context.md#get-current-context
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/glossary.md#execution-unit
+     *
+     */
+    public static function getCurrent(?ContextStorageInterface $storage = null): Context
     {
-        return self::storage()->current();
+        return $storage ? $storage->current() : self::defaultStorage()->current();
     }
 
+    //@todo root context per storage? It probably has to live in Storage
     public static function getRoot(): self
     {
         if (null === self::$root) {
@@ -114,7 +123,7 @@ class Context
     {
         if (null === $parent) {
             // TODO This should not attach, leads to a context that cannot be detached
-            self::storage()->attach(new self($key, $value, self::getCurrent()));
+            self::defaultStorage()->attach(new self($key, $value, self::getCurrent()));
 
             return self::getCurrent();
         }
@@ -130,6 +139,8 @@ class Context
     protected $value;
 
     protected ?Context $parent;
+    protected ?ContextStorageInterface $storage;
+    public int $id;
 
     /**
      * This is a general purpose read-only key-value store. Read-only in the sense that adding a new value does not
@@ -148,11 +159,25 @@ class Context
      * @param mixed|null $value
      * @param self|null $parent Reference to the parent object
      */
-    final public function __construct(?ContextKey $key=null, $value=null, $parent=null)
+    final public function __construct(?ContextKey $key=null, $value=null, ?self $parent=null, ?ContextStorageInterface $storage = null)
     {
         $this->key = $key;
         $this->value = $value;
         $this->parent = $parent;
+        $this->id = ++self::$counter; //debugging
+        $this->storage = $storage;
+    }
+
+    public function setStorage(ContextStorageInterface $storage): self
+    {
+        $this->storage = $storage;
+
+        return $this;
+    }
+
+    public function storage(): ContextStorageInterface
+    {
+        return $this->storage ?? self::defaultStorage();
     }
 
     /**
@@ -166,7 +191,7 @@ class Context
      */
     public function with(ContextKey $key, $value)
     {
-        return new self($key, $value, $this);
+        return (new self($key, $value, $this))->setStorage($this->storage());
     }
 
     /**
@@ -184,7 +209,7 @@ class Context
      */
     public function activate(): ScopeInterface
     {
-        return self::attach($this);
+        return $this->storage()->attach($this);
     }
 
     /**
