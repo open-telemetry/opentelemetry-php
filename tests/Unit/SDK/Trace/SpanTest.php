@@ -710,11 +710,10 @@ class SpanTest extends MockeryTestCase
         $span->end();
 
         $events = $span->toSpanData()->getEvents();
-        $c = 0;
 
-        $this->assertEvent($events[$c++], 'a', new Attributes(), self::START_EPOCH);
-        $this->assertEvent($events[$c++], 'b', new Attributes(), self::START_EPOCH);
-        $this->assertEvent($events[$c], 'c', new Attributes(['key' => 2]), self::START_EPOCH);
+        $this->assertEvent($events[0], 'a', new Attributes(), self::START_EPOCH);
+        $this->assertEvent($events[1], 'b', new Attributes(), self::START_EPOCH);
+        $this->assertEvent($events[2], 'c', new Attributes(['key' => 2]), self::START_EPOCH);
     }
 
     private function createTestRootSpan(): Span
