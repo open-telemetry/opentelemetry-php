@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
  * This example demonstrates how to have multiple concurrent spans active in the same trace, for
  * example if there were async/parallel http calls or database queries.
  */
-echo 'Starting ConsoleSpanExporter' . PHP_EOL;
+echo 'Starting ConsoleSpanExporter with concurrent spans' . PHP_EOL;
 
 $tracerProvider =  new TracerProvider(
     new SimpleSpanProcessor(

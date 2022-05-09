@@ -3,7 +3,6 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\ContextStorage;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
@@ -16,7 +15,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
  * Although this example uses the default storage for one of the traces, in practise you would either use only the default
  * storage (eg in a shared-nothing webserver or single-task CLI process), or you would use only individual storages.
  */
-echo 'Starting Concurrent Trace Example' . PHP_EOL;
+echo 'Starting ConsoleSpanExporter with concurrent traces' . PHP_EOL;
 
 $tracerProvider =  new TracerProvider(
     new SimpleSpanProcessor(
