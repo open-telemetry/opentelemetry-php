@@ -13,6 +13,9 @@ use PHPUnit\Framework\TestCase;
  */
 class RandomIdGeneratorTest extends TestCase
 {
+    /**
+     * @group trace-compliance
+     */
     public function test_generated_trace_id_is_valid(): void
     {
         $idGenerator = new RandomIdGenerator();
@@ -21,6 +24,9 @@ class RandomIdGeneratorTest extends TestCase
         $this->assertEquals(1, preg_match(SpanContext::VALID_TRACE, $traceId));
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_generated_span_id_is_valid(): void
     {
         $idGenerator = new RandomIdGenerator();

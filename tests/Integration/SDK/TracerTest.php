@@ -68,6 +68,9 @@ class TracerTest extends TestCase
         $this->assertEquals($newTraceState, $span->getContext()->getTraceState());
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_span_should_receive_instrumentation_scope(): void
     {
         $tracerProvider = new TracerProvider();
@@ -81,6 +84,9 @@ class TracerTest extends TestCase
         $this->assertEquals('http://url', $spanInstrumentationScope->getSchemaUrl());
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_span_builder_propagates_instrumentation_scope_info_to_span(): void
     {
         /** @var Span $span */

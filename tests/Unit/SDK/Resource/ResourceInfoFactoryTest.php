@@ -68,6 +68,9 @@ class ResourceInfoFactoryTest extends TestCase
         yield 'Should keep empty schemaUrl when not equal schemas have been merged before' => [['http://url-1', 'http://url-2', 'http://url-2'], null];
     }
 
+    /**
+     * @group trace-compliance
+     */
     public function test_resource_service_name_default(): void
     {
         $resource = ResourceInfoFactory::defaultResource();
