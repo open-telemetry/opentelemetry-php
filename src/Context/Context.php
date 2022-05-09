@@ -33,7 +33,6 @@ class Context
     public static function attach(Context $ctx): ScopeInterface
     {
         return $ctx->getStorage()->attach($ctx);
-        //return self::defaultStorage()->attach($ctx);
     }
 
     /**
@@ -51,7 +50,7 @@ class Context
      */
     public static function detach(ScopeInterface $token): Context
     {
-        //todo this probably won't work with non-default storage
+        //@todo what will this do with non-default storage?
         $token->detach();
 
         return self::getCurrent();
@@ -68,7 +67,6 @@ class Context
         return $storage ? $storage->current() : self::defaultStorage()->current();
     }
 
-    //@todo root context per storage? It probably has to live in Storage
     public static function getRoot(): self
     {
         if (null === self::$root) {
@@ -94,7 +92,7 @@ class Context
      *
      * @return mixed
      */
-    public static function getValue(ContextKey $key, $ctx=null)
+    public static function getValue(ContextKey $key, ?self $ctx=null)
     {
         $ctx = $ctx ?? static::getCurrent();
 

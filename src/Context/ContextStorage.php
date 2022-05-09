@@ -9,7 +9,7 @@ namespace OpenTelemetry\Context;
  */
 final class ContextStorage implements ContextStorageInterface
 {
-    private static ?self $default = null;
+    private static ?ContextStorageInterface $default = null;
     private static string $defaultStorageClass = ContextStorage::class;
 
     public ContextStorageHead $current;
@@ -35,7 +35,7 @@ final class ContextStorage implements ContextStorageInterface
         return $self;
     }
 
-    public static function default(): self
+    public static function default(): ContextStorageInterface
     {
         if (self::$default === null) {
             self::$default = self::create();

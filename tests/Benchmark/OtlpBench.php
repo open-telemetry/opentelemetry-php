@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Benchmark;
 use Grpc\UnaryCall;
 use Mockery;
 use OpenTelemetry\API\Trace\TracerInterface;
+use OpenTelemetry\Context\ContextStorage;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as GrpcExporter;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter as HttpExporter;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
@@ -168,6 +169,22 @@ class OtlpBench
             ->startSpan();
         $span->addEvent('my_event');
         $span->end();
+    }
+
+    /**
+     * @BeforeMethods("setUpNoExporter")
+     * @Revs(1000)
+     * @Iterations(10)
+     * @OutputTimeUnit("microseconds")
+     */
+    public function benchCreateSpansInOwnStorage(): void
+    {
+        $storage = ContextStorage::create(uniqid());
+        $root = $this->tracer->spanBuilder('root')->setStorage($storage)->startSpan();
+        $root->activate();
+        $child = $this->tracer->spanBuilder('child')->setStorage($storage)->startSpan();
+        $child->end();
+        $root->end();
     }
 
     private function createMockTraceServiceClient()
