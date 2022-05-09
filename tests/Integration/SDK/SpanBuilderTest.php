@@ -658,7 +658,7 @@ class SpanBuilderTest extends MockeryTestCase
             ->with($rootCustom, $storage->current());
         $this->assertNotSame($storage->current(), $sharedStorage->current());
 
-        $this->assertNotSame($sharedStorage->current(), $storage->current(), 'current context is different in different storages');
+        $this->assertNotSame($sharedStorage->current(), $storage->current(), 'current context is different in each storage');
 
         $childOne = $this->tracer->spanBuilder('one')->startSpan(); //child span of root.shared
         $childTwo = $this->tracer->spanBuilder('two')->setStorage($storage)->startSpan(); //child span of root.custom
@@ -670,8 +670,5 @@ class SpanBuilderTest extends MockeryTestCase
             ->spanProcessor
             ->shouldHaveReceived('onStart')
             ->with($childTwo, $storage->current());
-
-        //$this->assertSame($storage->current(), $rootTwo);
-        //$this->assertSame($sharedStorage->current(), $rootOne);
     }
 }

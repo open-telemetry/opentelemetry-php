@@ -9,7 +9,6 @@ namespace OpenTelemetry\Context;
  */
 class Context
 {
-    private static int $counter = 0; //debugging
     private static ?ContextStorageInterface $defaultStorage = null;
     private static ?Context $root = null;
 
@@ -50,7 +49,7 @@ class Context
      */
     public static function detach(ScopeInterface $token): Context
     {
-        //@todo what will this do with non-default storage?
+        //@todo what will this do with non-default storage? Do we need a non-static version?
         $token->detach();
 
         return self::getCurrent();
@@ -162,7 +161,6 @@ class Context
         $this->key = $key;
         $this->value = $value;
         $this->parent = $parent;
-        $this->id = ++self::$counter; //debugging
         $this->storage = $storage;
     }
 

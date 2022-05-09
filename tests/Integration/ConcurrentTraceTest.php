@@ -18,6 +18,9 @@ use PHPUnit\Framework\TestCase;
  */
 class ConcurrentTraceTest extends TestCase
 {
+    /**
+     * @group concurrency
+     */
     public function test_concurrent_traces_are_independent(): void
     {
         $tracerProvider =  new TracerProvider();
