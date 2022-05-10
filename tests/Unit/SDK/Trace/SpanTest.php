@@ -13,6 +13,8 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextStorage;
+use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
@@ -62,6 +64,7 @@ class SpanTest extends MockeryTestCase
 
     private AttributesInterface $expectedAttributes;
     private LinkInterface $link;
+    private ContextStorageInterface $storage;
 
     private string $traceId;
     private string $spanId;
@@ -71,6 +74,7 @@ class SpanTest extends MockeryTestCase
     {
         $this->idGenerator = new RandomIdGenerator();
         $this->resource = ResourceInfoFactory::emptyResource();
+        $this->storage = ContextStorage::default();
         $this->instrumentationScope = new InstrumentationScope('test_scope', '0.1.2');
 
         $this->spanProcessor = Mockery::spy(SpanProcessorInterface::class);
@@ -108,10 +112,8 @@ class SpanTest extends MockeryTestCase
 
     public function test_get_current_span_default(): void
     {
-        $this->assertSame(
-            Span::getInvalid(),
-            Span::getCurrent()
-        );
+        $this->assertInstanceOf(NonRecordingSpan::class, Span::getCurrent());
+        $this->assertSame(SpanContext::INVALID_TRACE, Span::getCurrent()->getContext()->getTraceId());
     }
 
     /**
@@ -166,7 +168,7 @@ class SpanTest extends MockeryTestCase
     {
         $span = Span::fromContext(Context::getRoot());
 
-        $this->assertSame(
+        $this->assertEquals(
             $span,
             Span::getInvalid()
         );
@@ -788,6 +790,7 @@ class SpanTest extends MockeryTestCase
             $this->spanProcessor,
             $this->resource,
             $attributes,
+            $this->storage,
             $links,
             1,
             0

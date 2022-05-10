@@ -21,7 +21,7 @@ final class NonRecordingSpan extends AbstractSpan
         SpanContextInterface $context
     ) {
         $this->context = $context;
-        $this->storage = ContextStorage::default();
+        $this->storage = ContextStorage::default(); //@todo could be in another storage??
     }
 
     /** @inheritDoc */

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Trace;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\Context\ImplicitContextKeyedInterface;
 use Throwable;
 
@@ -28,7 +29,7 @@ interface SpanInterface extends ImplicitContextKeyedInterface
     /**
      * Returns an invalid {@see SpanInterface} that is used when tracing is disabled, such s when there is no available SDK.
      */
-    public static function getInvalid(): SpanInterface;
+    public static function getInvalid(?ContextStorageInterface $storage = null): SpanInterface;
 
     /**
      * Returns a non-recording {@see SpanInterface} that hold the provided *$spanContext* but has no functionality.
@@ -89,4 +90,6 @@ interface SpanInterface extends ImplicitContextKeyedInterface
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#end
      */
     public function end(int $endEpochNanos = null): void;
+
+    public function setStorage(ContextStorageInterface $storage): SpanInterface;
 }

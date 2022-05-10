@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Context;
 
 /**
- * @internal
+ * @ internal //@todo internal or not?
  */
 final class ContextStorage implements ContextStorageInterface
 {
@@ -23,10 +23,10 @@ final class ContextStorage implements ContextStorageInterface
         self::$defaultStorageClass = $class;
     }
 
-    public static function create(string $name = 'default'): ContextStorageInterface
+    public static function create(?string $name = null): ContextStorageInterface
     {
         $context = new Context();
-        $self = new self($context, $name);
+        $self = new self($context, $name ?? uniqid());
         $context->setStorage($self);
         if (self::$defaultStorageClass === FiberNotSupportedContextStorage::class) {
             return new FiberNotSupportedContextStorage($self);
@@ -38,7 +38,7 @@ final class ContextStorage implements ContextStorageInterface
     public static function default(): ContextStorageInterface
     {
         if (self::$default === null) {
-            self::$default = self::create();
+            self::$default = self::create('default');
         }
 
         return self::$default;

@@ -43,9 +43,12 @@ class SpanBuilderTest extends TestCase
         $this->spanBuilder = new SpanBuilder('span', $this->instrumentationScope, $this->tracerSharedState, $this->spanLimits);
     }
 
+    /**
+     * @psalm-suppress UndefinedMethod
+     */
     public function test_start_span(): void
     {
-        $this->samplingResult->method('getDecision')->willReturn(SamplingResult::RECORD_AND_SAMPLE);
+        $this->samplingResult->method('getDecision')->willReturn(SamplingResult::RECORD_AND_SAMPLE); //@phpstan-ignore-line
         $span = $this->spanBuilder->startSpan();
         $this->assertInstanceOf(SpanInterface::class, $span);
     }

@@ -33,7 +33,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
 
     private ?Context $parentContext = null; // Null means use current context.
 
-    private ?ContextStorageInterface $storage;
+    private ContextStorageInterface $storage;
 
     /**
      * @psalm-var API\SpanKind::KIND_*

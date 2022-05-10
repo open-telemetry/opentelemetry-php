@@ -13,11 +13,11 @@ class Context
     private static ?Context $root = null;
 
     /**
-     * @internal
+     * @ internal //@todo internal or not?
      */
     public static function defaultStorage(): ContextStorageInterface
     {
-        return self::$defaultStorage ??= ContextStorage::create();
+        return self::$defaultStorage ??= ContextStorage::default();
     }
 
     public function getStorage(): ContextStorageInterface
@@ -70,6 +70,7 @@ class Context
     {
         if (null === self::$root) {
             self::$root = new self();
+            self::$root->setStorage(self::defaultStorage());
         }
 
         return self::$root;

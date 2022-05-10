@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration;
 
-use OpenTelemetry\API\Trace\SpanContext;
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorage;
-use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
-use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 

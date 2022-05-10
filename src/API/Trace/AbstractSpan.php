@@ -11,7 +11,6 @@ use OpenTelemetry\Context\ScopeInterface;
 
 abstract class AbstractSpan implements SpanInterface
 {
-    private static ?self $invalidSpan = null;
     protected ContextStorageInterface $storage;
 
     /** @inheritDoc */
@@ -31,9 +30,9 @@ abstract class AbstractSpan implements SpanInterface
     }
 
     /** @inheritDoc */
-    final public static function getInvalid(): SpanInterface
+    final public static function getInvalid(?ContextStorageInterface $storage = null): SpanInterface
     {
-        return new NonRecordingSpan(SpanContext::getInvalid());
+        return (new NonRecordingSpan(SpanContext::getInvalid()))->setStorage($storage ?? Context::defaultStorage());
     }
 
     /** @inheritDoc */

@@ -553,7 +553,7 @@ class SpanBuilderTest extends MockeryTestCase
 
     public function test_set_parent_empty_context(): void
     {
-        $emptyContext = Context::getCurrent();
+        $emptyContext = Context::getRoot();
         $parentSpan = $this->tracer->spanBuilder(self::SPAN_NAME)->startSpan();
         $parentScope = $parentSpan->activate();
 
@@ -567,8 +567,8 @@ class SpanBuilderTest extends MockeryTestCase
             ->once();
 
         $this->assertNotSame(
-            $span->getContext()->getTraceId(),
-            $parentSpan->getContext()->getTraceId()
+            $span->getContext()->getSpanId(),
+            $parentSpan->getContext()->getSpanId()
         );
         $this->assertNotSame(
             $span->toSpanData()->getParentSpanId(),
@@ -640,23 +640,25 @@ class SpanBuilderTest extends MockeryTestCase
      */
     public function test_custom_storage_does_not_use_shared_storage(): void
     {
-        $sharedStorage = Context::storage();
-        $storage = ContextStorage::create();
+        $sharedStorage = Context::defaultStorage();
+        $sharedParent = $sharedStorage->current();
+        $storage = ContextStorage::create(uniqid());
+        $parent = $storage->current();
         $rootShared = $this->tracer->spanBuilder('root.shared')->startSpan();
         $rootShared->activate();
+        $this
+            ->spanProcessor
+            ->shouldHaveReceived('onStart')
+            ->with($rootShared, $sharedParent)
+            ->once();
+
         $rootCustom = $this->tracer->spanBuilder('root.custom')->setStorage($storage)->startSpan();
         $rootCustom->activate();
-
         $this
             ->spanProcessor
             ->shouldHaveReceived('onStart')
-            ->with($rootShared, $sharedStorage->current())
+            ->with($rootCustom, $parent)
             ->once();
-        $this
-            ->spanProcessor
-            ->shouldHaveReceived('onStart')
-            ->with($rootCustom, $storage->current());
-        $this->assertNotSame($storage->current(), $sharedStorage->current());
 
         $this->assertNotSame($sharedStorage->current(), $storage->current(), 'current context is different in each storage');
 

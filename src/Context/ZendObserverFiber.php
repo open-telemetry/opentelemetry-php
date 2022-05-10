@@ -42,9 +42,9 @@ class ZendObserverFiber
                     return false;
                 }
             }
-            $fibers->zend_observer_fiber_init_register(fn (int $initializing) => Context::storage()->fork($initializing)); //@phpstan-ignore-line
-            $fibers->zend_observer_fiber_switch_register(fn (int $from, int $to) => Context::storage()->switch($to)); //@phpstan-ignore-line
-            $fibers->zend_observer_fiber_destroy_register(fn (int $destroying) => Context::storage()->destroy($destroying)); //@phpstan-ignore-line
+            $fibers->zend_observer_fiber_init_register(fn (int $initializing) => Context::defaultStorage()->fork($initializing)); //@phpstan-ignore-line
+            $fibers->zend_observer_fiber_switch_register(fn (int $from, int $to) => Context::defaultStorage()->switch($to)); //@phpstan-ignore-line
+            $fibers->zend_observer_fiber_destroy_register(fn (int $destroying) => Context::defaultStorage()->destroy($destroying)); //@phpstan-ignore-line
             self::$fibers = $fibers;
         }
 
