@@ -27,7 +27,7 @@ final class ContextStorage implements ContextStorageInterface
     public static function create(?string $name = null): ContextStorageInterface
     {
         $context = new Context();
-        $self = new self($context, $name ?? 'storage-'.++self::$id);
+        $self = new self($context, $name ?? 'storage-' . ++self::$id);
         $context->setStorage($self);
         if (self::$defaultStorageClass === FiberNotSupportedContextStorage::class) {
             return new FiberNotSupportedContextStorage($self);
