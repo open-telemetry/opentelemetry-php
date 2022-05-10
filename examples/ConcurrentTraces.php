@@ -26,18 +26,18 @@ $storage = ContextStorage::create('custom');
 $tracer = $tracerProvider->getTracer();
 
 //start and activate a root span in $storage
-$traceOneRootSpan = $tracer->spanBuilder('trace-one-root')->setStorage($storage)->startSpan();
+$traceOneRootSpan = $tracer->spanBuilder('trace-one.root')->setStorage($storage)->startSpan();
 $traceOneRootSpan->activate();
 
 //start and activate a root span in default storage
-$traceTwoRootSpan = $tracer->spanBuilder('trace-two-root')->startSpan();
+$traceTwoRootSpan = $tracer->spanBuilder('trace-two.root')->startSpan();
 $traceTwoRootSpan->activate();
 
 //start a child span, which will have a parent of the active node from $storage
-$childSpanOne = $tracer->spanBuilder('child-span-one')->setStorage($storage)->startSpan();
+$childSpanOne = $tracer->spanBuilder('trace-one.child')->setStorage($storage)->startSpan();
 
 //start another child span, which will have a parent of the active node from default storage
-$childSpanTwo = $tracer->spanBuilder('child-span-two')->startSpan();
+$childSpanTwo = $tracer->spanBuilder('trace-two.child')->startSpan();
 
 $childSpanOne->end();
 $childSpanTwo->end();
