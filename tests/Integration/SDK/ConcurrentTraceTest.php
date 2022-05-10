@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Integration;
+namespace OpenTelemetry\Tests\Integration\SDK;
 
 use OpenTelemetry\Context\ContextStorage;
 use OpenTelemetry\SDK\Trace\TracerProvider;

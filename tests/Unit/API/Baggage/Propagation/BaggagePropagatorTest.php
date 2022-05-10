@@ -79,7 +79,7 @@ class BaggagePropagatorTest extends TestCase
     public function test_extract_missing_header(): void
     {
         $this->assertEquals(
-            Context::getRoot(),
+            Context::getCurrent(),
             BaggagePropagator::getInstance()->extract([])
         );
     }

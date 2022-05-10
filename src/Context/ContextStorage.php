@@ -11,6 +11,7 @@ final class ContextStorage implements ContextStorageInterface
 {
     private static ?ContextStorageInterface $default = null;
     private static string $defaultStorageClass = ContextStorage::class;
+    private static int $id = 0;
 
     public ContextStorageHead $current;
     private ContextStorageHead $main;
@@ -26,7 +27,7 @@ final class ContextStorage implements ContextStorageInterface
     public static function create(?string $name = null): ContextStorageInterface
     {
         $context = new Context();
-        $self = new self($context, $name ?? uniqid());
+        $self = new self($context, $name ?? 'storage-'.++self::$id);
         $context->setStorage($self);
         if (self::$defaultStorageClass === FiberNotSupportedContextStorage::class) {
             return new FiberNotSupportedContextStorage($self);
