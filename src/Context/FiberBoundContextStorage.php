@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
-use function assert;
-use function class_exists;
 use const E_USER_WARNING;
 use Fiber;
 use function trigger_error;
@@ -18,7 +16,7 @@ use function trigger_error;
  * @phan-file-suppress PhanUndeclaredClassReference
  * @phan-file-suppress PhanUndeclaredClassMethod
  */
-final class FiberNotSupportedContextStorage implements ContextStorageInterface
+final class FiberBoundContextStorage implements ContextStorageInterface
 {
     private ContextStorageInterface $storage;
 
@@ -43,26 +41,34 @@ final class FiberNotSupportedContextStorage implements ContextStorageInterface
     }
 
     public function scope(): ?ContextStorageScopeInterface {
-        return $this->storage->scope();
+        $this->checkFiberMismatch();
+
+        if (!$scope = $this->storage->scope()) {
+            return null;
+        }
+
+        return new FiberBoundContextStorageScope($scope);
     }
 
     public function current(): Context
     {
-        assert(class_exists(Fiber::class));
-        if (Fiber::getCurrent()) {
-            trigger_error('Fiber context switching not supported', E_USER_WARNING);
-        }
+        $this->checkFiberMismatch();
 
         return $this->storage->current();
     }
 
     public function attach(Context $context): ContextStorageScopeInterface
     {
-        assert(class_exists(Fiber::class));
-        if (Fiber::getCurrent()) {
+        $scope = $this->storage->attach($context);
+        $scope[Fiber::class] = Fiber::getCurrent();
+
+        return new FiberBoundContextStorageScope($scope);
+    }
+
+    private function checkFiberMismatch(): void {
+        $scope = $this->storage->scope();
+        if ($scope && $scope[Fiber::class] !== Fiber::getCurrent()) {
             trigger_error('Fiber context switching not supported', E_USER_WARNING);
         }
-
-        return $this->storage->attach($context);
     }
 }

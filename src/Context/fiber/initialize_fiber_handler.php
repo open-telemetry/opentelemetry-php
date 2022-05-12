@@ -18,5 +18,5 @@ $observer = new ZendObserverFiber();
 if ($observer->isEnabled() && $observer->init()) {
     // ffi fiber support enabled
 } else {
-    Context::setStorage(new FiberNotSupportedContextStorage(Context::storage()));
+    Context::setStorage(new FiberBoundContextStorage(Context::storage()));
 }
