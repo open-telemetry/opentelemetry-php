@@ -644,7 +644,7 @@ class SpanBuilderTest extends MockeryTestCase
         $sharedParent = $sharedStorage->current();
         $storage = ContextStorage::create(uniqid());
         $parent = $storage->current();
-        $rootShared = $this->tracer->spanBuilder('root.shared')->startSpan();
+        $rootShared = $this->tracer->spanBuilder('shared.root')->startSpan();
         $rootShared->activate();
         $this
             ->spanProcessor
@@ -652,7 +652,7 @@ class SpanBuilderTest extends MockeryTestCase
             ->with($rootShared, $sharedParent)
             ->once();
 
-        $rootCustom = $this->tracer->spanBuilder('root.custom')->setStorage($storage)->startSpan();
+        $rootCustom = $this->tracer->spanBuilder('custom.root')->setStorage($storage)->startSpan();
         $rootCustom->activate();
         $this
             ->spanProcessor
@@ -662,8 +662,8 @@ class SpanBuilderTest extends MockeryTestCase
 
         $this->assertNotSame($sharedStorage->current(), $storage->current(), 'current context is different in each storage');
 
-        $childOne = $this->tracer->spanBuilder('one')->startSpan(); //child span of root.shared
-        $childTwo = $this->tracer->spanBuilder('two')->setStorage($storage)->startSpan(); //child span of root.custom
+        $childOne = $this->tracer->spanBuilder('shared.one')->startSpan(); //child span of root.shared
+        $childTwo = $this->tracer->spanBuilder('custom.one')->setStorage($storage)->startSpan(); //child span of root.custom
         $this
             ->spanProcessor
             ->shouldHaveReceived('onStart')

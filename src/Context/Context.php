@@ -138,7 +138,6 @@ class Context
 
     protected ?Context $parent;
     protected ?ContextStorageInterface $storage;
-    public int $id;
 
     /**
      * This is a general purpose read-only key-value store. Read-only in the sense that adding a new value does not
