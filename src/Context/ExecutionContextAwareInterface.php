@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Context;
 
-interface ExecutionContextAwareInterface {
-
+interface ExecutionContextAwareInterface
+{
     public function fork(int $id): void;
 
     public function switch(int $id): void;

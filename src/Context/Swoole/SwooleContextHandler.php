@@ -12,18 +12,21 @@ use Swoole\Coroutine;
 /**
  * @internal
  */
-final class SwooleContextHandler {
-
+final class SwooleContextHandler
+{
     private ExecutionContextAwareInterface $storage;
 
-    public function __construct(ExecutionContextAwareInterface $storage) {
+    public function __construct(ExecutionContextAwareInterface $storage)
+    {
         $this->storage = $storage;
     }
 
-    public function switchToActiveCoroutine(): void {
+    public function switchToActiveCoroutine(): void
+    {
         $cid = Coroutine::getCid();
         if ($cid !== -1 && !$this->isForked($cid)) {
-            for ($pcid = $cid; ($pcid = Coroutine::getPcid($pcid)) !== -1 && !$this->isForked($pcid);) {}
+            for ($pcid = $cid; ($pcid = Coroutine::getPcid($pcid)) !== -1 && !$this->isForked($pcid);) {
+            }
 
             $this->storage->switch($pcid);
             $this->forkCoroutine($cid);
@@ -32,7 +35,8 @@ final class SwooleContextHandler {
         $this->storage->switch($cid);
     }
 
-    public function splitOffChildCoroutines(): void {
+    public function splitOffChildCoroutines(): void
+    {
         $pcid = Coroutine::getCid();
         foreach (Coroutine::listCoroutines() as $cid) {
             if ($pcid === Coroutine::getPcid($cid) && !$this->isForked($cid)) {
@@ -41,11 +45,13 @@ final class SwooleContextHandler {
         }
     }
 
-    private function isForked(int $cid): bool {
+    private function isForked(int $cid): bool
+    {
         return isset(Coroutine::getContext($cid)[__CLASS__]);
     }
 
-    private function forkCoroutine(int $cid): void {
+    private function forkCoroutine(int $cid): void
+    {
         $this->storage->fork($cid);
         Coroutine::getContext($cid)[__CLASS__] = new SwooleContextDestructor($this->storage, $cid);
     }

@@ -34,7 +34,8 @@ final class ContextStorage implements ContextStorageInterface, ExecutionContextA
         unset($this->forks[$id]);
     }
 
-    public function scope(): ?ContextStorageScopeInterface {
+    public function scope(): ?ContextStorageScopeInterface
+    {
         return ($this->current->node->head ?? null) === $this->current
             ? $this->current->node
             : null;

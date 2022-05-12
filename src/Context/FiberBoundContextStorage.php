@@ -25,7 +25,8 @@ final class FiberBoundContextStorage implements ContextStorageInterface
         $this->storage = $storage;
     }
 
-    public function scope(): ?ContextStorageScopeInterface {
+    public function scope(): ?ContextStorageScopeInterface
+    {
         $this->checkFiberMismatch();
 
         if (!$scope = $this->storage->scope()) {
@@ -50,7 +51,8 @@ final class FiberBoundContextStorage implements ContextStorageInterface
         return new FiberBoundContextStorageScope($scope);
     }
 
-    private function checkFiberMismatch(): void {
+    private function checkFiberMismatch(): void
+    {
         $scope = $this->storage->scope();
         if ($scope && $scope[Fiber::class] !== Fiber::getCurrent()) {
             trigger_error('Fiber context switching not supported', E_USER_WARNING);
