@@ -46,8 +46,6 @@ main:main
 Warning: Fiber context switching not supported in %s
 
 Warning: Fiber context switching not supported in %s
-
-Warning: Fiber context switching not supported in %s
 fiber:fiber
 main:fiber
 
