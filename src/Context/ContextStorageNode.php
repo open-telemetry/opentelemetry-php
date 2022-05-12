@@ -9,10 +9,10 @@ use function assert;
 /**
  * @internal
  */
-final class ContextStorageNode implements ScopeInterface
+final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInterface
 {
     public Context $context;
-    private ContextStorageHead $head;
+    public ContextStorageHead $head;
     private ?ContextStorageNode $previous;
 
     public function __construct(
@@ -23,6 +23,10 @@ final class ContextStorageNode implements ScopeInterface
         $this->context = $context;
         $this->head = $head;
         $this->previous = $previous;
+    }
+
+    public function context(): Context {
+        return $this->context;
     }
 
     public function detach(): int

@@ -12,7 +12,9 @@ interface ContextStorageInterface
 
     public function destroy(int $id): void;
 
+    public function scope(): ?ContextStorageScopeInterface;
+
     public function current(): Context;
 
-    public function attach(Context $context): ScopeInterface;
+    public function attach(Context $context): ContextStorageScopeInterface;
 }

@@ -34,12 +34,18 @@ final class ContextStorage implements ContextStorageInterface
         unset($this->forks[$id]);
     }
 
+    public function scope(): ?ContextStorageScopeInterface {
+        return ($this->current->node->head ?? null) === $this->current
+            ? $this->current->node
+            : null;
+    }
+
     public function current(): Context
     {
         return $this->current->node->context ?? Context::getRoot();
     }
 
-    public function attach(Context $context): ScopeInterface
+    public function attach(Context $context): ContextStorageScopeInterface
     {
         return $this->current->node = new ContextStorageNode($context, $this->current, $this->current->node);
     }

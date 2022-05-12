@@ -42,6 +42,10 @@ final class FiberNotSupportedContextStorage implements ContextStorageInterface
         $this->storage->destroy($id);
     }
 
+    public function scope(): ?ContextStorageScopeInterface {
+        return $this->storage->scope();
+    }
+
     public function current(): Context
     {
         assert(class_exists(Fiber::class));
@@ -52,7 +56,7 @@ final class FiberNotSupportedContextStorage implements ContextStorageInterface
         return $this->storage->current();
     }
 
-    public function attach(Context $context): ScopeInterface
+    public function attach(Context $context): ContextStorageScopeInterface
     {
         assert(class_exists(Fiber::class));
         if (Fiber::getCurrent()) {
