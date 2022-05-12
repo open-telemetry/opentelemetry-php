@@ -14,10 +14,9 @@ final class ContextStorage implements ContextStorageInterface
     /** @var array<int, ContextStorageHead> */
     private array $forks = [];
 
-    public function __construct(Context $context)
+    public function __construct()
     {
         $this->current = $this->main = new ContextStorageHead($this);
-        $this->current->node = new ContextStorageNode($context, $this->current);
     }
 
     public function fork(int $id): void
@@ -37,7 +36,7 @@ final class ContextStorage implements ContextStorageInterface
 
     public function current(): Context
     {
-        return $this->current->node->context;
+        return $this->current->node->context ?? Context::getRoot();
     }
 
     public function attach(Context $context): ScopeInterface

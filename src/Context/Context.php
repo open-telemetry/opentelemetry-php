@@ -23,7 +23,7 @@ class Context
 
     public static function storage(): ContextStorageInterface
     {
-        return self::$storage ??= new ContextStorage(self::getRoot());
+        return self::$storage ??= new ContextStorage();
     }
 
     /**

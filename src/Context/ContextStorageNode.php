@@ -33,14 +33,14 @@ final class ContextStorageNode implements ScopeInterface
         }
 
         if ($this === $this->head->node) {
-            assert($this->previous !== null);
+            assert($this->previous !== $this);
             $this->head->node = $this->previous;
-            $this->previous = null;
+            $this->previous = $this;
 
             return $flags;
         }
 
-        if (!$this->previous) {
+        if ($this->previous === $this) {
             return $flags | ScopeInterface::DETACHED;
         }
 
@@ -50,7 +50,7 @@ final class ContextStorageNode implements ScopeInterface
             assert($n->previous !== null);
         }
         $n->previous = $this->previous;
-        $this->previous = null;
+        $this->previous = $this;
 
         return $flags | ScopeInterface::MISMATCH | $depth;
     }
