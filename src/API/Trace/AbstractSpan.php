@@ -32,7 +32,7 @@ abstract class AbstractSpan implements SpanInterface
     /** @inheritDoc */
     final public static function getInvalid(?ContextStorageInterface $storage = null): SpanInterface
     {
-        return (new NonRecordingSpan(SpanContext::getInvalid()))->setStorage($storage ?? Context::defaultStorage());
+        return (new NonRecordingSpan(SpanContext::getInvalid()))->setStorage($storage ?? ContextStorage::default());
     }
 
     /** @inheritDoc */

@@ -8,6 +8,7 @@ use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanBuilderInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextStorage;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -58,7 +59,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
         $this->instrumentationScope = $instrumentationScope;
         $this->tracerSharedState = $tracerSharedState;
         $this->spanLimits = $spanLimits;
-        $this->storage = Context::defaultStorage(); //default to shared storage, see self::setStorage()
+        $this->storage = ContextStorage::default(); //default to shared storage, see self::setStorage()
     }
 
     /** @inheritDoc */

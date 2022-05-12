@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextStorage;
 
 final class NoopTracer implements TracerInterface
 {
@@ -21,6 +21,6 @@ final class NoopTracer implements TracerInterface
 
     public function spanBuilder(string $spanName): SpanBuilderInterface
     {
-        return new NoopSpanBuilder(Context::defaultStorage());
+        return new NoopSpanBuilder(ContextStorage::default());
     }
 }

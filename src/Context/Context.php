@@ -13,7 +13,7 @@ class Context
     private static ?Context $root = null;
 
     /**
-     * @ internal //@todo internal or not?
+     * @internal
      */
     public static function defaultStorage(): ContextStorageInterface
     {
