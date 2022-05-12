@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
-/**
- * @ internal //@todo internal or not?
- */
 final class ContextStorage implements ContextStorageInterface
 {
     public const DEFAULT = 'default';
