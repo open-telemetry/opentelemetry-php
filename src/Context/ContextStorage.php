@@ -7,7 +7,7 @@ namespace OpenTelemetry\Context;
 /**
  * @internal
  */
-final class ContextStorage implements ContextStorageInterface
+final class ContextStorage implements ContextStorageInterface, ExecutionContextAwareInterface
 {
     public ContextStorageHead $current;
     private ContextStorageHead $main;

@@ -25,21 +25,6 @@ final class FiberBoundContextStorage implements ContextStorageInterface
         $this->storage = $storage;
     }
 
-    public function fork(int $id): void
-    {
-        $this->storage->fork($id);
-    }
-
-    public function switch(int $id): void
-    {
-        $this->storage->switch($id);
-    }
-
-    public function destroy(int $id): void
-    {
-        $this->storage->destroy($id);
-    }
-
     public function scope(): ?ContextStorageScopeInterface {
         $this->checkFiberMismatch();
 

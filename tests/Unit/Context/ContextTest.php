@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Context\Unit;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
+use OpenTelemetry\Context\ContextStorage;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -213,48 +214,50 @@ class ContextTest extends TestCase
 
     public function test_storage_switch_switches_context(): void
     {
+        $storage = new ContextStorage();
         $main = new Context();
         $fork = new Context();
 
-        $scopeMain = Context::attach($main);
+        $scopeMain = $storage->attach($main);
 
         // Fiber start
-        Context::storage()->fork(1);
-        Context::storage()->switch(1);
-        $this->assertSame($main, Context::getCurrent());
+        $storage->fork(1);
+        $storage->switch(1);
+        $this->assertSame($main, $storage->current());
 
-        $scopeFork = Context::attach($fork);
-        $this->assertSame($fork, Context::getCurrent());
+        $scopeFork = $storage->attach($fork);
+        $this->assertSame($fork, $storage->current());
 
         // Fiber suspend
-        Context::storage()->switch(0);
-        $this->assertSame($main, Context::getCurrent());
+        $storage->switch(0);
+        $this->assertSame($main, $storage->current());
 
         // Fiber resume
-        Context::storage()->switch(1);
-        $this->assertSame($fork, Context::getCurrent());
+        $storage->switch(1);
+        $this->assertSame($fork, $storage->current());
 
         $scopeFork->detach();
 
         // Fiber return
-        Context::storage()->switch(0);
-        Context::storage()->destroy(1);
+        $storage->switch(0);
+        $storage->destroy(1);
 
         $scopeMain->detach();
     }
 
     public function test_storage_fork_keeps_forked_root(): void
     {
+        $storage = new ContextStorage();
         $main = new Context();
 
-        $scopeMain = Context::attach($main);
-        Context::storage()->fork(1);
+        $scopeMain = $storage->attach($main);
+        $storage->fork(1);
         $scopeMain->detach();
 
-        Context::storage()->switch(1);
-        $this->assertSame($main, Context::getCurrent());
+        $storage->switch(1);
+        $this->assertSame($main, $storage->current());
 
-        Context::storage()->switch(0);
-        Context::storage()->destroy(1);
+        $storage->switch(0);
+        $storage->destroy(1);
     }
 }
