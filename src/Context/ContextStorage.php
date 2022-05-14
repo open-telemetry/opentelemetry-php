@@ -11,7 +11,7 @@ final class ContextStorage implements ContextStorageInterface, ExecutionContextA
 {
     public ContextStorageHead $current;
     private ContextStorageHead $main;
-    /** @var array<int, ContextStorageHead> */
+    /** @var array<int|string, ContextStorageHead> */
     private array $forks = [];
 
     public function __construct()
@@ -19,17 +19,17 @@ final class ContextStorage implements ContextStorageInterface, ExecutionContextA
         $this->current = $this->main = new ContextStorageHead($this);
     }
 
-    public function fork(int $id): void
+    public function fork($id): void
     {
         $this->forks[$id] = clone $this->current;
     }
 
-    public function switch(int $id): void
+    public function switch($id): void
     {
         $this->current = $this->forks[$id] ?? $this->main;
     }
 
-    public function destroy(int $id): void
+    public function destroy($id): void
     {
         unset($this->forks[$id]);
     }

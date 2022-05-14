@@ -16,13 +16,28 @@ use function trigger_error;
  * @phan-file-suppress PhanUndeclaredClassReference
  * @phan-file-suppress PhanUndeclaredClassMethod
  */
-final class FiberBoundContextStorage implements ContextStorageInterface
+final class FiberBoundContextStorage implements ContextStorageInterface, ExecutionContextAwareInterface
 {
     private ContextStorageInterface $storage;
 
     public function __construct(ContextStorageInterface $storage)
     {
         $this->storage = $storage;
+    }
+
+    public function fork($id): void
+    {
+        $this->storage->fork($id);
+    }
+
+    public function switch($id): void
+    {
+        $this->storage->switch($id);
+    }
+
+    public function destroy($id): void
+    {
+        $this->storage->destroy($id);
     }
 
     public function scope(): ?ContextStorageScopeInterface

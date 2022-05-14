@@ -6,18 +6,15 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context\Swoole;
 
-use function class_exists;
-use Fiber;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\Context\ContextStorageScopeInterface;
 use OpenTelemetry\Context\ExecutionContextAwareInterface;
-use OpenTelemetry\Context\FiberBoundContextStorage;
 
 /**
  * @internal
  */
-final class SwooleContextStorage implements ContextStorageInterface
+final class SwooleContextStorage implements ContextStorageInterface, ExecutionContextAwareInterface
 {
     private ContextStorageInterface $storage;
     private SwooleContextHandler $handler;
@@ -27,10 +24,29 @@ final class SwooleContextStorage implements ContextStorageInterface
      */
     public function __construct(ContextStorageInterface $storage)
     {
-        $this->storage = class_exists(Fiber::class)
-            ? new FiberBoundContextStorage($storage)
-            : $storage;
+        $this->storage = $storage;
         $this->handler = new SwooleContextHandler($storage);
+    }
+
+    public function fork($id): void
+    {
+        $this->handler->switchToActiveCoroutine();
+
+        $this->storage->fork($id);
+    }
+
+    public function switch($id): void
+    {
+        $this->handler->switchToActiveCoroutine();
+
+        $this->storage->switch($id);
+    }
+
+    public function destroy($id): void
+    {
+        $this->handler->switchToActiveCoroutine();
+
+        $this->storage->destroy($id);
     }
 
     public function scope(): ?ContextStorageScopeInterface
