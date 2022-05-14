@@ -6,8 +6,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
+use function assert;
+use function class_exists;
 use Fiber;
 
+/**
+ * @internal
+ *
+ * @phan-file-suppress PhanUndeclaredClassReference
+ * @phan-file-suppress PhanUndeclaredClassMethod
+ */
 final class FiberBoundContextStorageScope implements ScopeInterface, ContextStorageScopeInterface
 {
     private ContextStorageScopeInterface $scope;
@@ -22,6 +30,9 @@ final class FiberBoundContextStorageScope implements ScopeInterface, ContextStor
         return $this->scope->offsetExists($offset);
     }
 
+    /**
+     * @phan-suppress PhanUndeclaredClassAttribute
+     */
     #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
@@ -46,6 +57,7 @@ final class FiberBoundContextStorageScope implements ScopeInterface, ContextStor
     public function detach(): int
     {
         $flags = $this->scope->detach();
+        assert(class_exists(Fiber::class, false));
         if ($this->scope[Fiber::class] !== Fiber::getCurrent()) {
             $flags |= ScopeInterface::INACTIVE;
         }

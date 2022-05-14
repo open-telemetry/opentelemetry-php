@@ -9,4 +9,9 @@ use ArrayAccess;
 interface ContextStorageScopeInterface extends ScopeInterface, ArrayAccess
 {
     public function context(): Context;
+
+    /**
+     * @param string $offset
+     */
+    public function offsetSet($offset, $value): void;
 }

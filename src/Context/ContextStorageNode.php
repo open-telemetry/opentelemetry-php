@@ -31,6 +31,9 @@ final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInt
         return isset($this->localStorage[$offset]);
     }
 
+    /**
+     * @phan-suppress PhanUndeclaredClassAttribute
+     */
     #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
@@ -71,6 +74,7 @@ final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInt
             return $flags | ScopeInterface::DETACHED;
         }
 
+        assert($this->head->node !== null);
         for ($n = $this->head->node, $depth = 1;
              $n->previous !== $this;
              $n = $n->previous, $depth++) {

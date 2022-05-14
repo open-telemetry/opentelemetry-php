@@ -27,6 +27,9 @@ final class SwooleContextScope implements ScopeInterface, ContextStorageScopeInt
         return $this->scope->offsetExists($offset);
     }
 
+    /**
+     * @phan-suppress PhanUndeclaredClassAttribute
+     */
     #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {

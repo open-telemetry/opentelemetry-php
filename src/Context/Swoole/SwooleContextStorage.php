@@ -16,6 +16,7 @@ use OpenTelemetry\Context\ExecutionContextAwareInterface;
  */
 final class SwooleContextStorage implements ContextStorageInterface, ExecutionContextAwareInterface
 {
+    /** @var ContextStorageInterface&ExecutionContextAwareInterface */
     private ContextStorageInterface $storage;
     private SwooleContextHandler $handler;
 

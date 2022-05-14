@@ -11,6 +11,9 @@ use Swoole\Coroutine;
 
 /**
  * @internal
+ *
+ * @phan-file-suppress PhanUndeclaredClassMethod
+ * @psalm-suppress UndefinedClass
  */
 final class SwooleContextHandler
 {
