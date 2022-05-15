@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Context\Unit;
+namespace OpenTelemetry\Tests\Unit\Context;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
-use OpenTelemetry\Context\ContextStorage;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\Context\Context
+ * @covers \OpenTelemetry\Context\Context
  */
 class ContextTest extends TestCase
 {
@@ -210,54 +209,5 @@ class ContextTest extends TestCase
         $key2 = new ContextKey();
         $otherCtx = Context::withValue($key2, '222', new Context());
         $this->assertSame($currentCtx, Context::getCurrent());
-    }
-
-    public function test_storage_switch_switches_context(): void
-    {
-        $storage = new ContextStorage();
-        $main = new Context();
-        $fork = new Context();
-
-        $scopeMain = $storage->attach($main);
-
-        // Fiber start
-        $storage->fork(1);
-        $storage->switch(1);
-        $this->assertSame($main, $storage->current());
-
-        $scopeFork = $storage->attach($fork);
-        $this->assertSame($fork, $storage->current());
-
-        // Fiber suspend
-        $storage->switch(0);
-        $this->assertSame($main, $storage->current());
-
-        // Fiber resume
-        $storage->switch(1);
-        $this->assertSame($fork, $storage->current());
-
-        $scopeFork->detach();
-
-        // Fiber return
-        $storage->switch(0);
-        $storage->destroy(1);
-
-        $scopeMain->detach();
-    }
-
-    public function test_storage_fork_keeps_forked_root(): void
-    {
-        $storage = new ContextStorage();
-        $main = new Context();
-
-        $scopeMain = $storage->attach($main);
-        $storage->fork(1);
-        $scopeMain->detach();
-
-        $storage->switch(1);
-        $this->assertSame($main, $storage->current());
-
-        $storage->switch(0);
-        $storage->destroy(1);
     }
 }
