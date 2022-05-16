@@ -39,14 +39,14 @@ final class ScopeBoundPromise
 
         return $promise instanceof ScopeBoundPromise && $storage === $promise->storage
             ? $promise
-            : new ScopeBoundPromise($storage, new ContextHolder($storage->current()), $promise);
+            : new self($storage, new ContextHolder($storage->current()), $promise);
     }
 
     public function then(callable $onFulfilled = null, callable $onRejected = null): ScopeBoundPromise
     {
         $contextHolder = new ContextHolder($this->storage->current());
 
-        return new ScopeBoundPromise($this->storage, $contextHolder, $this->promise->then(
+        return new self($this->storage, $contextHolder, $this->promise->then(
             $this->wrapCallback($onFulfilled, $contextHolder),
             $this->wrapCallback($onRejected, $contextHolder),
         ));

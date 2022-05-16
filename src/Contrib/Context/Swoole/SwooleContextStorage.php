@@ -4,16 +4,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Context\Swoole;
+namespace OpenTelemetry\Contrib\Context\Swoole;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\Context\ContextStorageScopeInterface;
 use OpenTelemetry\Context\ExecutionContextAwareInterface;
 
-/**
- * @internal
- */
 final class SwooleContextStorage implements ContextStorageInterface, ExecutionContextAwareInterface
 {
     /** @var ContextStorageInterface&ExecutionContextAwareInterface */

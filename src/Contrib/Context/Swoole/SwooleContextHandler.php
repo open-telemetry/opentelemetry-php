@@ -4,7 +4,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Context\Swoole;
+namespace OpenTelemetry\Contrib\Context\Swoole;
 
 use OpenTelemetry\Context\ExecutionContextAwareInterface;
 use Swoole\Coroutine;
