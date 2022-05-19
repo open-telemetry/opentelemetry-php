@@ -12,6 +12,7 @@ use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SDK\Common\Retry\ExponentialWithJitterRetryPolicy;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -69,6 +70,18 @@ class Exporter implements SpanExporterInterface
             $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
         $this->setSpanConverter(new SpanConverter());
+        $this->setRetryPolicy(ExponentialWithJitterRetryPolicy::getDefault());
+        $this->setRetryableStatusCodes([
+            \Grpc\STATUS_CANCELLED,
+            \Grpc\STATUS_DEADLINE_EXCEEDED,
+            \Grpc\STATUS_PERMISSION_DENIED,
+            \Grpc\STATUS_RESOURCE_EXHAUSTED,
+            \Grpc\STATUS_ABORTED,
+            \Grpc\STATUS_OUT_OF_RANGE,
+            \Grpc\STATUS_UNAVAILABLE,
+            \Grpc\STATUS_DATA_LOSS,
+            \Grpc\STATUS_UNAUTHENTICATED,
+        ]);
 
         $this->metadata = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
@@ -116,38 +129,23 @@ class Exporter implements SpanExporterInterface
             'resource_spans' => $resourceSpans,
         ]);
 
-        [$response, $status] = $this->client->Export($request)->wait();
+            [$response, $status] = $this->client->Export($request)->wait();
+            if ($status->code === \Grpc\STATUS_OK) {
+                self::logDebug('Exported span(s)', ['spans' => $resourceSpans]);
+                return self::STATUS_SUCCESS;
+            }
 
-        if ($status->code === \Grpc\STATUS_OK) {
-            self::logDebug('Exported span(s)', ['spans' => $resourceSpans]);
-
-            return self::STATUS_SUCCESS;
-        }
-
-        $error = [
-            'error' => $status->details ?? 'unknown grpc error',
-            'code' => $status->code,
-        ];
-
-        if (in_array($status->code, [
-            \Grpc\STATUS_CANCELLED,
-            \Grpc\STATUS_DEADLINE_EXCEEDED,
-            \Grpc\STATUS_PERMISSION_DENIED,
-            \Grpc\STATUS_RESOURCE_EXHAUSTED,
-            \Grpc\STATUS_ABORTED,
-            \Grpc\STATUS_OUT_OF_RANGE,
-            \Grpc\STATUS_UNAVAILABLE,
-            \Grpc\STATUS_DATA_LOSS,
-            \Grpc\STATUS_UNAUTHENTICATED,
-        ], true)) {
-            self::logWarning('Retryable error exporting grpc span', ['error' => $error]);
-
-            return self::STATUS_FAILED_RETRYABLE;
-        }
-
-        self::logError('Error exporting grpc span', ['error' => $error]);
-
-        return self::STATUS_FAILED_NOT_RETRYABLE;
+            $error = [
+                'error' => $status->details ?? 'unknown grpc error',
+                'code' => $status->code,
+            ];
+            if (in_array($status->code, $this->retryPolicy->getRetryableStatusCodes(), true)) {
+                self::logWarning('Retryable error exporting grpc span', ['error' => $error]);
+    
+                return self::STATUS_FAILED_RETRYABLE;
+            }
+            self::logError('Error exporting grpc span', ['error' => $error]);
+            return self::STATUS_FAILED_NOT_RETRYABLE;
     }
 
     public function setHeader($key, $value): void
@@ -182,4 +180,5 @@ class Exporter implements SpanExporterInterface
     {
         return is_string($endpointUrl) ? new Exporter($endpointUrl) :  new Exporter();
     }
+
 }
