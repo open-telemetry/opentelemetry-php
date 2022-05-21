@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Common\Retry;
 
 // use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse;
@@ -9,12 +11,11 @@ interface RetryPolicyInterface
 {
     public const DEFAULT_MAX_ATTEMPTS = 5;
     public const DEFAULT_INITIAL_BACKOFF = 1;
-    public const DEFAULT_MAX_BACKOFF = 10; 
+    public const DEFAULT_MAX_BACKOFF = 10;
     public const DEFAULT_BACKOFF_MULTIPLIER = 1.5;
     public const DEFAULT_JITTER = 0.1;
 
-    
-    /**  
+    /**
      * Returns whether the request should be retried.
      *
      * @param int $attempt - current number of retry attempt
@@ -32,7 +33,7 @@ interface RetryPolicyInterface
     /**
      * Returns the time to wait in seconds.
      * @param int $attempt: current number of retry attempt
-     * 
+     *
      * @return int
      */
     public function getDelay(int $attempt): int;
@@ -60,6 +61,6 @@ interface RetryPolicyInterface
     public function setJitter(float $jitter);
 
     public function setRetryableStatusCodes(array $statusCodes);
-    
+
     public function getRetryableStatusCodes(): ?array;
 }

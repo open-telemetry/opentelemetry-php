@@ -129,23 +129,25 @@ class Exporter implements SpanExporterInterface
             'resource_spans' => $resourceSpans,
         ]);
 
-            [$response, $status] = $this->client->Export($request)->wait();
-            if ($status->code === \Grpc\STATUS_OK) {
-                self::logDebug('Exported span(s)', ['spans' => $resourceSpans]);
-                return self::STATUS_SUCCESS;
-            }
+        [$response, $status] = $this->client->Export($request)->wait();
+        if ($status->code === \Grpc\STATUS_OK) {
+            self::logDebug('Exported span(s)', ['spans' => $resourceSpans]);
 
-            $error = [
+            return self::STATUS_SUCCESS;
+        }
+
+        $error = [
                 'error' => $status->details ?? 'unknown grpc error',
                 'code' => $status->code,
             ];
-            if (in_array($status->code, $this->retryPolicy->getRetryableStatusCodes(), true)) {
-                self::logWarning('Retryable error exporting grpc span', ['error' => $error]);
-    
-                return self::STATUS_FAILED_RETRYABLE;
-            }
-            self::logError('Error exporting grpc span', ['error' => $error]);
-            return self::STATUS_FAILED_NOT_RETRYABLE;
+        if (in_array($status->code, $this->retryPolicy->getRetryableStatusCodes(), true)) {
+            self::logWarning('Retryable error exporting grpc span', ['error' => $error]);
+
+            return self::STATUS_FAILED_RETRYABLE;
+        }
+        self::logError('Error exporting grpc span', ['error' => $error]);
+
+        return self::STATUS_FAILED_NOT_RETRYABLE;
     }
 
     public function setHeader($key, $value): void
@@ -180,5 +182,4 @@ class Exporter implements SpanExporterInterface
     {
         return is_string($endpointUrl) ? new Exporter($endpointUrl) :  new Exporter();
     }
-
 }

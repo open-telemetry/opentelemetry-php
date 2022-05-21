@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Common\Retry;
 
-use grpc;
 use InvalidArgumentException;
-use \OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
+use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
@@ -17,32 +18,31 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
     public $retryableStatusCodes;
 
     private function __construct(
-        int $max_attempts = self::DEFAULT_MAX_ATTEMPTS, 
+        int $max_attempts = self::DEFAULT_MAX_ATTEMPTS,
         float $initial_backoff = self::DEFAULT_INITIAL_BACKOFF,
         int $max_backoff = self::DEFAULT_MAX_BACKOFF,
         float $backoff_multiplier = self::DEFAULT_BACKOFF_MULTIPLIER,
         float $jitter = self::DEFAULT_JITTER,
-        array $retryableStatusCodes = null)
-    {
+        array $retryableStatusCodes = null
+    ) {
         $this->setMaxAttempts($max_attempts);
         $this->setInitialBackoff($initial_backoff);
         $this->setMaxBackoff($max_backoff);
         $this->setBackoffMultipler($backoff_multiplier);
         $this->setJitter($jitter);
         $this->retryableStatusCodes = $retryableStatusCodes;
-        
     }
 
     public function shouldRetry(
         int $attempt,
         int $status,
         RetryableExportException $exception = null
-    ): bool
-    {
-        if ($attempt >= $this->maxAttempts && !is_null($exception)) {
+    ): bool {
+        if ($attempt >= $this->maxAttempts && null !== $exception) {
             throw $exception;
         }
-        return $attempt < $this->maxAttempts && 
+
+        return $attempt < $this->maxAttempts &&
             $status == SpanExporterInterface::STATUS_FAILED_RETRYABLE;
     }
 
@@ -75,13 +75,14 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
     }
 
     public function setMaxAttempts(
-        int $max_attempts = self::DEFAULT_MAX_ATTEMPTS)
-    {
+        int $max_attempts = self::DEFAULT_MAX_ATTEMPTS
+    ) {
         $this->checkArgument(
             is_int($max_attempts) && $max_attempts > 0,
             sprintf('Max attempts value must be > 0 and of int type. "%s" is given.', $max_attempts)
         );
         $this->maxAttempts = $max_attempts;
+
         return $this;
     }
 
@@ -91,13 +92,14 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
     }
 
     public function setInitialBackoff(
-        float $initial_backoff = self::DEFAULT_INITIAL_BACKOFF)
-    {
+        float $initial_backoff = self::DEFAULT_INITIAL_BACKOFF
+    ) {
         $this->checkArgument(
             $initial_backoff > 0,
             sprintf('Initial backoff must be greater than 0: "%s" value provided', $initial_backoff)
         );
         $this->initial_backoff = $initial_backoff;
+
         return $this;
     }
 
@@ -113,6 +115,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
             sprintf('Max backoff must be greater than 0: "%s" value provided', $max_backoff)
         );
         $this->max_backoff = $max_backoff;
+
         return $this;
     }
 
@@ -123,13 +126,13 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
 
     public function setBackoffMultipler(
         float $backoff_multiplier = self::DEFAULT_BACKOFF_MULTIPLIER
-    )
-    {
+    ) {
         $this->checkArgument(
             $backoff_multiplier > 0,
             sprintf('Backoff multiplier must be greater than 0: "%s" value provided', $backoff_multiplier)
         );
         $this->backoff_multiplier = $backoff_multiplier;
+
         return $this;
     }
 
@@ -145,6 +148,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
             sprintf('Jitter value must be between 0 and 1: "%s" value provided', $jitter)
         );
         $this->jitter = $jitter;
+
         return $this;
     }
 
@@ -154,20 +158,21 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
             count($statusCodes) > 0 &&
             array_reduce(
                 $statusCodes,
-                function ($result, $item) { 
-                    return $result && is_int($item); 
+                function ($result, $item) {
+                    return $result && is_int($item);
                 },
                 true
             ),
-            sprintf("Retryable Status Code array should not be empty 
-                    and each value should be valid status code")
+            sprintf('Retryable Status Code array should not be empty 
+                    and each value should be valid status code')
         );
-        if(is_array($statusCodes)) {
+        if (is_array($statusCodes)) {
             $this->retryableStatusCodes = $statusCodes;
         }
+
         return $this;
     }
-    
+
     public function getRetryableStatusCodes(): ?array
     {
         return $this->retryableStatusCodes;
