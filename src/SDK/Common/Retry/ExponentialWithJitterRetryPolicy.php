@@ -12,7 +12,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
 {
     private $maxAttempts;
     private $initial_backoff;
-    private $max_backoff;
+    private $maxBackoff;
     private $backoff_multiplier;
     private $jitter;
     public $retryableStatusCodes;
@@ -36,7 +36,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
     public function shouldRetry(
         int $attempt,
         int $status,
-        RetryableExportException $exception = null
+        ?RetryableExportException $exception = null
     ): bool {
         if ($attempt >= $this->maxAttempts && null !== $exception) {
             throw $exception;
@@ -61,7 +61,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
             $delay = $delay + random_int(-$randomness, +$randomness);
         }
 
-        return $delay < $this->max_backoff ? round($delay) : $this->getMaxBackoff;
+        return $delay < $this->maxBackoff ? intval($delay) : $this->maxBackoff;
     }
 
     public static function getDefault(): ExponentialWithJitterRetryPolicy
@@ -105,7 +105,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
 
     public function getMaxBackoff(): int
     {
-        return $this->max_backoff;
+        return $this->maxBackoff;
     }
 
     public function setMaxBackoff(int $max_backoff = self::DEFAULT_MAX_BACKOFF)
@@ -114,7 +114,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
             $max_backoff > 0,
             sprintf('Max backoff must be greater than 0: "%s" value provided', $max_backoff)
         );
-        $this->max_backoff = $max_backoff;
+        $this->maxBackoff = $max_backoff;
 
         return $this;
     }

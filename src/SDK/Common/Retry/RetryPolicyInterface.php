@@ -20,14 +20,14 @@ interface RetryPolicyInterface
      *
      * @param int $attempt - current number of retry attempt
      * @param int $status - SpanExporterStatusInterface
-     * @param RetryableExportException $exception: exception caught while retrying
+     * @param RetryableExportException|null $exception: exception caught while retrying
      *
      * @return bool
      */
     public function shouldRetry(
         int $attempt,
         int $status,
-        RetryableExportException $exception
+        ?RetryableExportException $exception
     ): ?bool;
 
     /**
