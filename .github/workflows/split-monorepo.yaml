@@ -1,0 +1,23 @@
+name: gitsplit
+on:
+  push:
+    branches:
+      - main
+      - split
+  release:
+    types: [published]
+  create:
+  workflow_dispatch:
+
+jobs:
+  gitsplit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        run: git clone "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" "$GITHUB_WORKSPACE" && cd "$GITHUB_WORKSPACE" && git checkout $GITHUB_SHA
+      - name: Split repositories
+        uses: docker://jderusse/gitsplit:latest
+        with:
+          args: gitsplit
+        env:
+          GH_TOKEN: ${{ secrets.GITSPLIT_TOKEN }}
