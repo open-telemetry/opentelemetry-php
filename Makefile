@@ -64,4 +64,6 @@ w3c-test-service:
 	@docker-compose -f docker-compose.w3cTraceContext.yaml run --rm php ./tests/TraceContext/W3CTestService/symfony-setup
 semconv:
 	./script/semantic-conventions/semconv.sh
+split:
+	docker-compose -f docker/gitsplit/docker-compose.yaml --env-file ./.env up
 FORCE:
