@@ -1,5 +1,5 @@
 {
-    "name": "open-telemetry/proto-otel",
+    "name": "open-telemetry/gen-otlp-protobuf",
     "description": "PHP protobuf files for communication with OpenTelemetry OTLP collectors/servers.",
     "keywords": ["opentelemetry", "otel", "metrics", "tracing", "logging", "apm", "gRPC", "protobuf", "otlp"],
     "type": "library",
