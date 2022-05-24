@@ -40,12 +40,13 @@
         }
     ],
     "replace": {
-        "open-telemetry/api": "self.version",
         "open-telemetry/context": "self.version",
-        "open-telemetry/proto-otel": "self.version",
+        "open-telemetry/sem-conv": "self.version",
+        "open-telemetry/api": "self.version",
         "open-telemetry/sdk": "self.version",
         "open-telemetry/sdk-contrib": "self.version",
-        "open-telemetry/sem-conv": "self.version"
+        "open-telemetry/gen-otlp-protobuf": "self.version",
+        "open-telemetry/gen-jaeger-thrift": "self.version"
     },
     "autoload": {
         "psr-4": {
