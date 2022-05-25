@@ -13,7 +13,12 @@ use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 
-class B3MultiPropagator implements TextMapPropagatorInterface
+/**
+ * B3Multi is a propagator that supports the specification for the header
+ * "b3" used for trace context propagation across service boundaries.
+ * (https://github.com/openzipkin/b3-propagation)
+ */
+final class B3MultiPropagator implements TextMapPropagatorInterface
 {
     /**
      * The X-B3-TraceId header is required and is encoded as 32 or 16 lower-hex characters.
