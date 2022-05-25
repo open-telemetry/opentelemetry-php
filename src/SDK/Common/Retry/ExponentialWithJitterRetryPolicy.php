@@ -52,16 +52,16 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         if ($attempt == 0) {
             return 0;
         }
-        // Initial exponential backoff
-        $delay = ($this->backoff_multiplier ** $attempt) * $this->initial_backoff;
-
+        // Initial exponential backoff in milli seconds
+        $delay = ($this->backoff_multiplier ** $attempt) * $this->initial_backoff * 1000;
         // Adding jitter to exponential backoff
         if ($this->jitter > 0) {
-            $randomness = $delay * $this->jitter;
+            $randomness = intval($delay * $this->jitter);
             $delay = $delay + random_int(-$randomness, +$randomness);
         }
 
-        return $delay < $this->maxBackoff ? (int) $delay : $this->maxBackoff;
+        // return $delay < $this->maxBackoff * 1000 ? (int) $delay : $this->maxBackoff;
+        return min(intval($delay), $this->maxBackoff * 1000);
     }
 
     public static function getDefault(): ExponentialWithJitterRetryPolicy
@@ -78,7 +78,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         int $max_attempts = self::DEFAULT_MAX_ATTEMPTS
     ) {
         $this->checkArgument(
-            is_int($max_attempts) && $max_attempts > 0,
+            $max_attempts > 0,
             sprintf('Max attempts value must be > 0 and of int type. "%s" is given.', $max_attempts)
         );
         $this->maxAttempts = $max_attempts;
@@ -166,14 +166,12 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
             sprintf('Retryable Status Code array should not be empty 
                     and each value should be valid status code')
         );
-        if (is_array($statusCodes)) {
-            $this->retryableStatusCodes = $statusCodes;
-        }
+        $this->retryableStatusCodes = $statusCodes;
 
         return $this;
     }
 
-    public function getRetryableStatusCodes(): ?array
+    public function getRetryableStatusCodes(): array
     {
         return $this->retryableStatusCodes;
     }

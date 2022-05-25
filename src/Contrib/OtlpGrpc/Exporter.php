@@ -140,7 +140,7 @@ class Exporter implements SpanExporterInterface
                 'error' => $status->details ?? 'unknown grpc error',
                 'code' => $status->code,
             ];
-        if (in_array($status->code, $this->retryPolicy->getRetryableStatusCodes(), true)) {
+        if ($this->retryPolicy && in_array($status->code, $this->retryPolicy->getRetryableStatusCodes(), false)) {
             self::logWarning('Retryable error exporting grpc span', ['error' => $error]);
 
             return self::STATUS_FAILED_RETRYABLE;

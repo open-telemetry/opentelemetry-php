@@ -38,6 +38,7 @@ trait SpanExporterTrait
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#exportbatch
      *
+     * @psalm-suppress ArgumentTypeCoercion
      * @psalm-return SpanExporterInterface::STATUS_*
      */
     public function export(iterable $spans): int
@@ -56,20 +57,21 @@ trait SpanExporterTrait
 
         // If retryPolicy is not set then just doExport once and return the status
         if ($this->retryPolicy === null) {
-            return $this->doExport($spans);
+            return $this->doExport($spans); /** @phpstan-ignore-line */
         }
 
         while ($shouldRetry) {
             // find the delay time before retry (it is 0 for the first attempt)
-            $delay = $this->retryPolicy->getDelay($attempt++);
+            $delay = $this->retryPolicy->getDelay($attempt);
             if ($attempt > 0) {
                 self::logDebug('Waiting for ' . $delay . ' seconds before retrying export');
-                sleep($delay);
+                usleep($delay * 1000);
                 self::logDebug('Retrying span export for ' . $attempt . ' time');
             }
+            $attempt++;
 
             try {
-                $status = $this->doExport($spans); /** @phpstan-ignore-line */
+                $status = $this->doExport($spans);
             } catch (Throwable $e) {
                 if ($e instanceof \Error) {
                     self::logError('Exception occured while retrying export
@@ -90,7 +92,7 @@ trait SpanExporterTrait
             );
         }
 
-        return $status;
+        return $status; /** @phpstan-ignore-line */
     }
 
     /**
@@ -100,9 +102,7 @@ trait SpanExporterTrait
      */
     public function setRetryPolicy(RetryPolicyInterface $retryPolicy)
     {
-        if (null !== $retryPolicy) {
-            $this->retryPolicy = $retryPolicy;
-        }
+        $this->retryPolicy = $retryPolicy;
     }
 
     /**
@@ -112,7 +112,9 @@ trait SpanExporterTrait
      */
     public function setRetryableStatusCodes(array $statusCode)
     {
-        $this->retryPolicy->setRetryableStatusCodes($statusCode);
+        if ($this->retryPolicy) {
+            $this->retryPolicy->setRetryableStatusCodes($statusCode);
+        }
     }
 
     /**

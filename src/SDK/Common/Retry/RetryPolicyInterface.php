@@ -62,5 +62,5 @@ interface RetryPolicyInterface
 
     public function setRetryableStatusCodes(array $statusCodes);
 
-    public function getRetryableStatusCodes(): ?array;
+    public function getRetryableStatusCodes(): array;
 }
