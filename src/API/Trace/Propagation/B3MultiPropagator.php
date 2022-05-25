@@ -74,6 +74,17 @@ class B3MultiPropagator implements TextMapPropagatorInterface
         self::DEBUG_FLAG,
     ];
 
+    private static ?self $instance = null;
+
+    public static function getInstance(): self
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
     /** {@inheritdoc} */
     public function fields(): array
     {
@@ -109,14 +120,9 @@ class B3MultiPropagator implements TextMapPropagatorInterface
         return $context->withContextValue(AbstractSpan::wrap($spanContext));
     }
 
-    private static function getCaseInsensitiveValue($carrier, string $key, PropagationGetterInterface $getter): ?string
-    {
-        return $getter->get($carrier, $key) ?? $getter->get($carrier, strtolower($key));
-    }
-
     private static function getSampledValue($carrier, PropagationGetterInterface $getter): ?int
     {
-        $value = self::getCaseInsensitiveValue($carrier, self::SAMPLED, $getter);
+        $value = $getter->get($carrier, self::SAMPLED);
 
         if ($value === null) {
             return null;
@@ -138,8 +144,8 @@ class B3MultiPropagator implements TextMapPropagatorInterface
 
     private static function extractImpl($carrier, PropagationGetterInterface $getter): SpanContextInterface
     {
-        $traceId = self::getCaseInsensitiveValue($carrier, self::TRACE_ID, $getter);
-        $spanId = self::getCaseInsensitiveValue($carrier, self::SPAN_ID, $getter);
+        $traceId = $getter->get($carrier, self::TRACE_ID);
+        $spanId = $getter->get($carrier, self::SPAN_ID);
         $sampled = self::getSampledValue($carrier, $getter);
 
         if ($traceId === null || $spanId === null) {
