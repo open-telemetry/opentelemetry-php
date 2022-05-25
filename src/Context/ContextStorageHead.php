@@ -10,7 +10,7 @@ namespace OpenTelemetry\Context;
 final class ContextStorageHead
 {
     public ContextStorage $storage;
-    public ContextStorageNode $node;
+    public ?ContextStorageNode $node = null;
 
     public function __construct(ContextStorage $storage)
     {

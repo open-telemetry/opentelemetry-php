@@ -9,11 +9,12 @@ use function assert;
 /**
  * @internal
  */
-final class ContextStorageNode implements ScopeInterface
+final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInterface
 {
     public Context $context;
-    private ContextStorageHead $head;
+    public ContextStorageHead $head;
     private ?ContextStorageNode $previous;
+    private array $localStorage = [];
 
     public function __construct(
         Context $context,
@@ -25,6 +26,35 @@ final class ContextStorageNode implements ScopeInterface
         $this->previous = $previous;
     }
 
+    public function offsetExists($offset): bool
+    {
+        return isset($this->localStorage[$offset]);
+    }
+
+    /**
+     * @phan-suppress PhanUndeclaredClassAttribute
+     */
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset)
+    {
+        return $this->localStorage[$offset];
+    }
+
+    public function offsetSet($offset, $value): void
+    {
+        $this->localStorage[$offset] = $value;
+    }
+
+    public function offsetUnset($offset): void
+    {
+        unset($this->localStorage[$offset]);
+    }
+
+    public function context(): Context
+    {
+        return $this->context;
+    }
+
     public function detach(): int
     {
         $flags = 0;
@@ -33,24 +63,25 @@ final class ContextStorageNode implements ScopeInterface
         }
 
         if ($this === $this->head->node) {
-            assert($this->previous !== null);
+            assert($this->previous !== $this);
             $this->head->node = $this->previous;
-            $this->previous = null;
+            $this->previous = $this;
 
             return $flags;
         }
 
-        if (!$this->previous) {
+        if ($this->previous === $this) {
             return $flags | ScopeInterface::DETACHED;
         }
 
+        assert($this->head->node !== null);
         for ($n = $this->head->node, $depth = 1;
              $n->previous !== $this;
              $n = $n->previous, $depth++) {
             assert($n->previous !== null);
         }
         $n->previous = $this->previous;
-        $this->previous = null;
+        $this->previous = $this;
 
         return $flags | ScopeInterface::MISMATCH | $depth;
     }

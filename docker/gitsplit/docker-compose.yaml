@@ -1,0 +1,9 @@
+version: '3.7'
+services:
+  gitsplit:
+    image: jderusse/gitsplit
+    volumes:
+    - ../../:/srv
+    - ../../var/cache/gitsplit:/cache/gitsplit
+    environment:
+      GH_TOKEN: ${GITSPLIT_TOKEN:-''}

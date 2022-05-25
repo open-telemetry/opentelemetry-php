@@ -9,21 +9,31 @@ namespace OpenTelemetry\Context;
  */
 class Context
 {
-    private static ?ContextStorageInterface $storage = null;
+
+    /**
+     * @var ContextStorageInterface&ExecutionContextAwareInterface
+     */
+    private static ContextStorageInterface $storage;
 
     private static ?\OpenTelemetry\Context\Context $root = null;
 
     /**
      * @internal
+     *
+     * @param ContextStorageInterface&ExecutionContextAwareInterface $storage
      */
     public static function setStorage(ContextStorageInterface $storage): void
     {
         self::$storage = $storage;
     }
 
+    /**
+     * @return ContextStorageInterface&ExecutionContextAwareInterface
+     */
     public static function storage(): ContextStorageInterface
     {
-        return self::$storage ??= new ContextStorage(self::getRoot());
+        /** @psalm-suppress RedundantPropertyInitializationCheck */
+        return self::$storage ??= new ContextStorage();
     }
 
     /**

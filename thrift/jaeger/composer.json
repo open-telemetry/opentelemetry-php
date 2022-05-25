@@ -1,7 +1,7 @@
 {
-    "name": "open-telemetry/api",
-    "description": "API for OpenTelemetry PHP.",
-    "keywords": ["opentelemetry", "otel", "metrics", "tracing", "logging", "apm", "api"],
+    "name": "open-telemetry/gen-jaeger-thrift",
+    "description": "PHP Thrift files for communication with Jaeger.",
+    "keywords": ["opentelemetry", "otel", "tracing", "jaeger", "thrift"],
     "type": "library",
     "license": "Apache-2.0",
     "authors": [
@@ -12,12 +12,11 @@
     ],
     "require": {
         "php": "^7.4 || ^8.0",
-        "open-telemetry/context": "self.version",
-        "open-telemetry/sem-conv": "self.version"
+        "packaged/thrift": "^0.15.0"
     },
     "autoload": {
         "psr-4": {
-            "OpenTelemetry\\API\\": "."
+            "Jaeger\\Thrift\\": "."
         }
     }
 }

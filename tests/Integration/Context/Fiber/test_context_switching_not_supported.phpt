@@ -44,13 +44,9 @@ $scope->detach();
 main:main
 
 Warning: Fiber context switching not supported in %s
-
-Warning: Fiber context switching not supported in %s
-
-Warning: Fiber context switching not supported in %s
 fiber:fiber
-main:fiber
 
 Warning: Fiber context switching not supported in %s
+main:fiber
 fiber:fiber
 main:main

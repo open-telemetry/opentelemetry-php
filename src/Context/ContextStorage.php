@@ -7,40 +7,46 @@ namespace OpenTelemetry\Context;
 /**
  * @internal
  */
-final class ContextStorage implements ContextStorageInterface
+final class ContextStorage implements ContextStorageInterface, ExecutionContextAwareInterface
 {
     public ContextStorageHead $current;
     private ContextStorageHead $main;
-    /** @var array<int, ContextStorageHead> */
+    /** @var array<int|string, ContextStorageHead> */
     private array $forks = [];
 
-    public function __construct(Context $context)
+    public function __construct()
     {
         $this->current = $this->main = new ContextStorageHead($this);
-        $this->current->node = new ContextStorageNode($context, $this->current);
     }
 
-    public function fork(int $id): void
+    public function fork($id): void
     {
         $this->forks[$id] = clone $this->current;
     }
 
-    public function switch(int $id): void
+    public function switch($id): void
     {
         $this->current = $this->forks[$id] ?? $this->main;
     }
 
-    public function destroy(int $id): void
+    public function destroy($id): void
     {
         unset($this->forks[$id]);
     }
 
-    public function current(): Context
+    public function scope(): ?ContextStorageScopeInterface
     {
-        return $this->current->node->context;
+        return ($this->current->node->head ?? null) === $this->current
+            ? $this->current->node
+            : null;
     }
 
-    public function attach(Context $context): ScopeInterface
+    public function current(): Context
+    {
+        return $this->current->node->context ?? Context::getRoot();
+    }
+
+    public function attach(Context $context): ContextStorageScopeInterface
     {
         return $this->current->node = new ContextStorageNode($context, $this->current, $this->current->node);
     }
