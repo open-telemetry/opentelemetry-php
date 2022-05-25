@@ -158,7 +158,7 @@ class B3MultiPropagator implements TextMapPropagatorInterface
             return SpanContext::getInvalid();
         }
 
-        $isSampled = ($sampled && $sampled === SpanContext::SAMPLED_FLAG);
+        $isSampled = ($sampled === SpanContext::SAMPLED_FLAG);
 
         // Only traceparent header is extracted. No tracestate.
         return SpanContext::createFromRemoteParent(

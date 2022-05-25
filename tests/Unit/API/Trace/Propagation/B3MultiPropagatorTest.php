@@ -119,12 +119,15 @@ class B3MultiPropagatorTest extends TestCase
         );
     }
 
-    public function test_extract_sampled_context(): void
+    /**
+     * @dataProvider sampledValueProvider
+     */
+    public function test_extract_sampled_context($sampledValue): void
     {
         $carrier = $this->getLowerCaseKeys([
             B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
             B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+            B3MultiPropagator::SAMPLED => $sampledValue,
         ]);
 
         $this->assertEquals(
@@ -133,18 +136,67 @@ class B3MultiPropagatorTest extends TestCase
         );
     }
 
-    public function test_extract_non_sampled_context(): void
+    public function sampledValueProvider()
+    {
+        return [
+            'String sampled value' => ['1'],
+            'Boolean(lower string) sampled value' => ['true'],
+            'Boolean(upper string) sampled value' => ['TRUE'],
+            'Boolean(camel string) sampled value' => ['True'],
+        ];
+    }
+
+    /**
+     * @dataProvider notSampledValueProvider
+     */
+    public function test_extract_non_sampled_context($sampledValue): void
     {
         $carrier = $this->getLowerCaseKeys([
             B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
             B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_NOT_SAMPLED,
+            B3MultiPropagator::SAMPLED => $sampledValue,
         ]);
 
         $this->assertEquals(
             SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),
             $this->getSpanContext($this->b3MultiPropagator->extract($carrier))
         );
+    }
+
+    public function notSampledValueProvider()
+    {
+        return [
+            'String sampled value' => ['0'],
+            'Boolean(lower string) sampled value' => ['false'],
+            'Boolean(upper string) sampled value' => ['FALSE'],
+            'Boolean(camel string) sampled value' => ['False'],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidSampledValueProvider
+     */
+    public function test_extract_invalid_sampled_context($sampledValue): void
+    {
+        $carrier = $this->getLowerCaseKeys([
+            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
+            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
+            B3MultiPropagator::SAMPLED => $sampledValue,
+        ]);
+
+        $this->assertEquals(
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),
+            $this->getSpanContext($this->b3MultiPropagator->extract($carrier))
+        );
+    }
+
+    public function invalidSampledValueProvider()
+    {
+        return [
+            'wrong sampled value' => ['wrong'],
+            'null sampled value' => [null],
+            'empty sampled value' => [[]],
+        ];
     }
 
     public function test_extract_and_inject(): void
