@@ -13,7 +13,12 @@ use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\ErrorHandler\Debug;
+
+// @todo remove
+Debug::enable();
 
 (new Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
 
@@ -25,18 +30,26 @@ $samplingResult = $sampler->shouldSample(
     API\SpanKind::KIND_INTERNAL
 );
 
+$httpClient = new Psr18Client();
+
 $exporter = new JaegerExporter(
     'W3C Trace-Context Test Service',
-    'http://localhost:9412/api/v2/spans'
+    'http://localhost:9412/api/v2/spans',
+    $httpClient,
+    $httpClient,
+    $httpClient,
 );
 
-if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
-    $tracer = (new TracerProvider())
-        ->addSpanProcessor(new BatchSpanProcessor($exporter, ClockFactory::getDefault()))
+$shouldRecordAndSampleSpan = $samplingResult->getDecision() === SamplingResult::RECORD_AND_SAMPLE;
+
+if ($shouldRecordAndSampleSpan) {
+    $spanProcessor = new BatchSpanProcessor($exporter, ClockFactory::getDefault());
+    $tracer = (new TracerProvider([$spanProcessor]))
         ->getTracer('io.opentelemetry.contrib.php');
 
     $request = Request::createFromGlobals();
-    $span = $tracer->startAndActivateSpan($request->getUri());
+    $span = $tracer->spanBuilder($request->getUri())->startSpan();
+    $span->activate();
 }
 
 $kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
@@ -44,6 +57,6 @@ $response = $kernel->handle($request);
 $response->send();
 $kernel->terminate($request, $response);
 
-if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
+if ($shouldRecordAndSampleSpan) {
     $span->end();
 }

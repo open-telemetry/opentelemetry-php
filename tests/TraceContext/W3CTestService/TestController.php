@@ -25,18 +25,21 @@ class TestController
 
         foreach ($body as $case) {
             if ($tracer) {
+                $traceCtxPropagator = TraceContextPropagator::getInstance();
+
                 $headers = ['content-type' => 'application/json'];
                 $url = $case['url'];
                 $arguments = $case['arguments'];
 
                 try {
-                    $context = TraceContextPropagator::extract($request->headers->all());
+                    $context = $traceCtxPropagator->extract($request->headers->all());
                 } catch (\InvalidArgumentException $th) {
-                    $context = SpanContext::generate();
+                    $context = SpanContext::getInvalid();
                 }
 
-                $span = $tracer->startAndActivateSpanFromContext($url, $context, true);
-                TraceContextPropagator::inject($carrier, null, $context);
+                $span = $tracer->spanBuilder($url)->setParent($context)->startSpan();
+                $span->activate();
+                $traceCtxPropagator->inject($carrier, null, $context);
 
                 $client = new Client([
                     'base_uri' => $url,

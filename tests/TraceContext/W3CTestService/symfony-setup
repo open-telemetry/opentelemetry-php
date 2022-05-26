@@ -17,6 +17,7 @@ cp index.php test_app/public/index.php
 cp TestController.php test_app/src/Controller/TestController.php
 cd test_app
 
+symfony composer require symfony/http-client
 composer require annotations
 
 # Link the local opentelemetry changes to vendor/open-telemetry
