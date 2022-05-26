@@ -13,9 +13,9 @@ use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\ErrorHandler\Debug;
 
 // @todo remove
 Debug::enable();
