@@ -22,7 +22,8 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "composer/package-versions-deprecated": true
+            "composer/package-versions-deprecated": true,
+            "symfony/runtime": true
         }
     },
     "authors": [
@@ -76,6 +77,7 @@
         "mockery/mockery": "^1.4",
         "monolog/monolog": "^2.3",
         "nyholm/psr7": "^1.4",
+        "open-telemetry/dev-tools": "dev-main",
         "phan/phan": "^5.0",
         "php-http/mock-client": "^1.5",
         "phpbench/phpbench": "^1.2",
