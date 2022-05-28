@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use GuzzleHttp\Client;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\SpanContext;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -39,14 +40,20 @@ class TestController
 
                 $span = $tracer->spanBuilder($url)->setParent($context)->startSpan();
                 $span->activate();
+
+                // ? Shouldn't we be doing something with the carrier?
+                $carrier = [];
                 $traceCtxPropagator->inject($carrier, null, $context);
 
-                $client = new Client([
-                    'base_uri' => $url,
-                    'timeout'  => 2.0,
-                ]);
+                $client = new Psr18Client(HttpClient::create(
+                    [
+                        'base_uri' => $url,
+                        'timeout'  => 2.0,
+                    ]
+                ));
 
-                $testServiceRequest = new \GuzzleHttp\Psr7\Request('POST', $url, $headers, json_encode($arguments));
+                $testServiceRequest = new \Nyholm\Psr7\Request('POST', $url, $headers, json_encode($arguments));
+
                 $response = $client->sendRequest($testServiceRequest);
 
                 $span->end();
