@@ -121,6 +121,8 @@ use OpenTelemetry\API\Trace as API;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 ```
 
 Next, we create a sample recording trace using the [AlwaysOnSampler](https://github.com/open-telemetry/opentelemetry-php/blob/main/src/SDK/Trace/Sampler/AlwaysOnSampler.php) class, just before the Kernel instance is created like below:
@@ -139,20 +141,23 @@ $samplingResult = $sampler->shouldSample(
 Since we are looking to export traces to both Zipkin and Jaeger we have to make use of their individual exporters;
 
 ```php
+$httpClient = new Client();
+$httpFactory = new HttpFactory();
+
 $jaegerExporter = new JaegerExporter(
     'Hello World Web Server Jaeger',
     'http://localhost:9412/api/v2/spans'
-    new \GuzzleHttp\Client();
-    new \GuzzleHttp\Psr7\HttpFactory();
-    new \GuzzleHttp\Psr7\HttpFactory();
+    $httpClient,
+    $httpFactory,
+    $httpFactory,
 );
 
 $zipkinExporter = new ZipkinExporter(
     'Hello World Web Server Zipkin',
     'http://localhost:9411/api/v2/spans'
-    new \GuzzleHttp\Client();
-    new \GuzzleHttp\Psr7\HttpFactory();
-    new \GuzzleHttp\Psr7\HttpFactory();
+    $httpClient,
+    $httpFactory,
+    $httpFactory,
 );
 ```
 
@@ -171,7 +176,7 @@ if (SamplingResult::RECORD_AND_SAMPLED === $samplingResult->getDecision()) {
 
     $request = Request::createFromGlobals();
     $jaegerSpan = $jaegerTracer->spanBuilder($request->getUri())->startSpan();
-    $jaegarSpan->activate();
+    $jaegerSpan->activate();
     $zipkinSpan = $zipkinTracer->spanBuilder($request->getUri())->startSpan();
     $zipkinSpan->activate();
 }

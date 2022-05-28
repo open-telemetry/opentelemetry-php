@@ -7,7 +7,7 @@ To follow this guide you will need:
 
 * PHP Installed; this example uses PHP 7.4.
 * [Composer](https://getcomposer.org/download/ ) for dependency management. 
-* [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools. We have set up instructions for docker on this project's [readme](https://github.com/open-telemetry/opentelemetry-php#development).
+* [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools. We have setup instructions for docker on this project's [readme](https://github.com/open-telemetry/opentelemetry-php#development).
 
 This example uses Laravel version 8.40 .
 
@@ -124,20 +124,23 @@ $samplingResult = $sampler->shouldSample(
 Since we are looking to export traces to both Zipkin and Jaeger we have to make use of their  exporters;
 
 ```php
+$httpClient = new Client();
+$httpFactory = new HttpFactory();
+
 $jaegerExporter = new JaegerExporter(
     'Hello World Web Server Jaeger',
-    'http://localhost:9412/api/v2/spans',
-    new Client(),
-    new HttpFactory(),
-    new HttpFactory()
+    'http://localhost:9412/api/v2/spans'
+    $httpClient,
+    $httpFactory,
+    $httpFactory,
 );
 
 $zipkinExporter = new ZipkinExporter(
     'Hello World Web Server Zipkin',
-    'http://localhost:9411/api/v2/spans',
-    new Client(),
-    new HttpFactory(),
-    new HttpFactory()
+    'http://localhost:9411/api/v2/spans'
+    $httpClient,
+    $httpFactory,
+    $httpFactory,
 );
 ```
 
@@ -156,7 +159,7 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
 
     $request = Request::createFromGlobals();
     $jaegerSpan = $jaegerTracer->spanBuilder($request->getUri())->startSpan();
-    $jaegarSpan->activate();
+    $jaegerSpan->activate();
     $zipkinSpan = $zipkinTracer->spanBuilder($request->getUri())->startSpan();
     $zipkinSpan->activate();
 }
