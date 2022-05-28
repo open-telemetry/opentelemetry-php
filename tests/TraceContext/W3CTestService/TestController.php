@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
-use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\Context\Context;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +35,7 @@ class TestController
                 try {
                     $context = $traceCtxPropagator->extract($request->headers->all());
                 } catch (\InvalidArgumentException $th) {
-                    $context = SpanContext::getInvalid();
+                    $context = new Context();
                 }
 
                 $span = $tracer->spanBuilder($url)->setParent($context)->startSpan();
