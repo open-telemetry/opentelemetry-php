@@ -7,7 +7,7 @@ To follow this guide you will need:
 
 * PHP Installed; this example uses PHP 7.4.
 * [Composer](https://getcomposer.org/download/ ) for dependency management. 
-* [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools. We have setup instructions for docker on this project's [readme](https://github.com/open-telemetry/opentelemetry-php#development).
+* [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools. We have set up instructions for docker on this project's [readme](https://github.com/open-telemetry/opentelemetry-php#development).
 
 This example uses Laravel version 8.40 .
 
@@ -71,7 +71,7 @@ We can confirm that Zipkin is up by navigating to `http://localhost:9411/` on ou
 
 For this step, we will utilize our OpenTelemetry PHP Library to export traces to both Zipkin and Jaeger.
 
-The default entry point for Laravel applications is the `index.php` file located in the `public` folder. If we navigate to `public\index.php` we can see that the index file autoloads classes from packages within our vendor folder, making them easily useable within our application. 
+The default entry point for Laravel applications is the `index.php` file located in the `public` folder. If we navigate to `public\index.php` we can see that the index file autoloads classes from packages within our vendor folder, making them easily usable within our application. 
 
 ```php
 require __DIR__.'/../vendor/autoload.php';
@@ -155,8 +155,11 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     ->getTracer('io.opentelemetry.contrib.php');
 
     $request = Request::createFromGlobals();
-    $jaegerSpan = $jaegerTracer->startAndActivateSpan($request->getUri());
-    $zipkinSpan = $zipkinTracer->startAndActivateSpan($request->getUri());
+    $jaegerSpan = $jaegerTracer->spanBuilder($request->getUri())->startSpan();
+    $jaegarSpan->activate();
+    $zipkinSpan = $zipkinTracer->spanBuilder($request->getUri())->startSpan();
+    $zipkinSpan->activate();
+}
 
 }
 ```
@@ -235,11 +238,12 @@ if ($zipkinTracer) {
     $span->setAttribute('foo', 'bar');
     $span->updateName('New name');
 
-    $childSpan = $zipkinTracer->startAndActivateSpan('Child span');
+    $childSpan = $zipkinTracer->spanBuilder('Child span')->startSpan();
+    $childSpan->activate();
     try {
         throw new \Exception('Exception Example');
     } catch (\Exception $exception) {
-        $span->setSpanStatus($exception->getCode(), $exception->getMessage());
+        $childSpan->setSpanStatus($exception->getCode(), $exception->getMessage());
     }
     $childSpan->end();
 }
