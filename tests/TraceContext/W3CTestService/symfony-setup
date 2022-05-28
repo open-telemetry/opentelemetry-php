@@ -44,7 +44,7 @@ cd ..
 rm -rf trace-context
 git clone https://github.com/w3c/trace-context.git
 
-cd trace-context/test || error "Failed to cd to trace-context/test" ; exit
+cd trace-context/test || { printf "Failed to cd to trace-context/test" ; exit; }
 
 # Run the test
 python3 test.py http://127.0.0.1:8001/test
