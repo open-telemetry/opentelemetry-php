@@ -223,17 +223,6 @@ class B3MultiPropagatorTest extends TestCase
         );
     }
 
-    public function test_extract_empty_span_id(): void
-    {
-        $this->assertInvalid(
-            $this->getLowerCaseKeys([
-                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-                B3MultiPropagator::SPAN_ID => '',
-                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
-            ])
-        );
-    }
-
     public function test_invalid_trace_id(): void
     {
         $this->assertInvalid(
@@ -251,6 +240,17 @@ class B3MultiPropagatorTest extends TestCase
             $this->getLowerCaseKeys([
                 B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16 . '00',
                 B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
+                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+            ])
+        );
+    }
+
+    public function test_extract_empty_span_id(): void
+    {
+        $this->assertInvalid(
+            $this->getLowerCaseKeys([
+                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
+                B3MultiPropagator::SPAN_ID => '',
                 B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
             ])
         );
