@@ -18,7 +18,6 @@
         "open-telemetry/context": "self.version",
         "open-telemetry/gen-jaeger-thrift": "self.version",
         "open-telemetry/gen-otlp-protobuf": "self.version",
-        "open-telemetry/proto-otel": "self.version",
         "open-telemetry/sdk": "self.version",
         "open-telemetry/sem-conv": "self.version",
         "php-http/async-client-implementation": "^1.0",
