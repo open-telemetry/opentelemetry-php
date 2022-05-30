@@ -109,71 +109,57 @@ use GuzzleHttp\Psr7\HttpFactory;
 
 Remember that these imports should go side by side with the default class imports that come with the `index.php` file.
 
-Next, we create a sample recording trace using the [AlwaysOnSampler](https://github.com/open-telemetry/opentelemetry-php/blob/main/sdk/Trace/Sampler/AlwaysOnSampler.php) class, just before the app instance is created like below:
+Next, we create a sample recording trace using
+the [AlwaysOnSampler](https://github.com/open-telemetry/opentelemetry-php/blob/main/sdk/Trace/Sampler/AlwaysOnSampler.php)
+class, just before the app instance is created like below:
 
-```php
-$sampler = new AlwaysOnSampler();
-$samplingResult = $sampler->shouldSample(
-    new Context(),
-    md5((string) microtime(true)),
-    'io.opentelemetry.example',
-    API\SpanKind::KIND_INTERNAL
-);
-```
-
-Since we are looking to export traces to both Zipkin and Jaeger we have to make use of their  exporters;
+Since we are looking to export traces to both Zipkin and Jaeger, we configure a tracer with exporters for both the
+services;
 
 ```php
 $httpClient = new Client();
 $httpFactory = new HttpFactory();
 
-$jaegerExporter = new JaegerExporter(
-    'Hello World Web Server Jaeger',
-    'http://localhost:9412/api/v2/spans'
-    $httpClient,
-    $httpFactory,
-    $httpFactory,
-);
-
-$zipkinExporter = new ZipkinExporter(
-    'Hello World Web Server Zipkin',
-    'http://localhost:9411/api/v2/spans'
-    $httpClient,
-    $httpFactory,
-    $httpFactory,
-);
+$tracer = (new TracerProvider(
+    [
+        new SimpleSpanProcessor(
+            new OpenTelemetry\Contrib\Jaeger\Exporter(
+                'Hello World Web Server Jaeger',
+                'http://localhost:9412/api/v2/spans',
+                $httpClient,
+                $httpFactory,
+                $httpFactory,
+            ),
+        ),
+        new SimpleSpanProcessor(
+            new OpenTelemetry\Contrib\Zipkin\Exporter(
+                'Hello World Web Server Zipkin',
+                'http://localhost:9411/api/v2/spans',
+                $httpClient,
+                $httpFactory,
+                $httpFactory,
+            ),
+        ),
+    ],
+    new AlwaysOnSampler(),
+))->getTracer('Hello World Laravel Web Server');
 ```
 
-Next, we create a trace then add processors for each trace(One for Jaeger and another for Zipkin). Then we proceed to start and activate a span for each trace. We create a trace only if the RECORD AND SAMPLED sampling result condition passes as follows;
+Next we create a span from our tracer. We don't need to bother with sampling here, since it is handled by the sampler
+configured as an internal component of the tracer above.
 
 ```php
-if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
-
-    $jaegerTracer = (new TracerProvider(null, $sampler))
-        ->addSpanProcessor(new BatchSpanProcessor($jaegerExporter, Clock::get()))
-        ->getTracer('io.opentelemetry.contrib.php');
-
-    $zipkinTracer = (new TracerProvider(null, $sampler))
-    ->addSpanProcessor(new BatchSpanProcessor($zipkinExporter, Clock::get()))
-    ->getTracer('io.opentelemetry.contrib.php');
-
-    $request = Request::createFromGlobals();
-    $jaegerSpan = $jaegerTracer->spanBuilder($request->getUri())->startSpan();
-    $jaegerSpan->activate();
-    $zipkinSpan = $zipkinTracer->spanBuilder($request->getUri())->startSpan();
-    $zipkinSpan->activate();
-}
-
-}
+$request = Request::capture();
+$span = $tracer->spanBuilder($request->url())->startSpan();
+$spanScope = $span->activate();
 ```
 
-Finally, we end the active spans if sampling is complete, by adding the following block at the end of the `index.php` file;
+Finally, we end the active spans once and detach the span scope by adding the following block at the end of
+the `index.php` file;
 
 ```php
-if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
-    $zipkinSpan->end();
-    $jaegerSpan->end();
-}
+$span->end();
+$spanScope->detach();
 ```
 
 Let's confirm that we can see exported traces on both Zipkin and Jaeger. To do that, we need to reload `http://127.0.0.1:8000` on our browser;
