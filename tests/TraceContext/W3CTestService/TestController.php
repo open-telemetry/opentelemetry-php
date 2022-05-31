@@ -41,9 +41,7 @@ class TestController
                 $span = $tracer->spanBuilder($url)->setParent($context)->startSpan();
                 $span->activate();
 
-                // ? Shouldn't we be doing something with the carrier?
-                $carrier = [];
-                $traceCtxPropagator->inject($carrier, null, $context);
+                $traceCtxPropagator->inject($headers, null, $context);
 
                 $client = new Psr18Client(HttpClient::create(
                     [
