@@ -143,6 +143,9 @@ This is what our imports look like:
 
 ```php
 use App\Kernel;
+use OpenTelemetry\API\Trace\AbstractSpan;
+use OpenTelemetry\API\Trace\StatusCode;
+use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -238,20 +241,21 @@ properties, methods and events.
 Let's try using the `addEvent` method, to capture errors within our controller as follows:
 
 ```php
-global $zipkinTracer;
-if ($zipkinTracer) {
+/** @var TracerInterface $tracer */
+global $tracer;
+if ($tracer) {
     /** @var Span $span */
-    $span = $zipkinTracer->getActiveSpan();
-    
+    $span = AbstractSpan::getCurrent();
+
     $span->setAttribute('foo', 'bar');
     $span->updateName('New name');
 
-    $childSpan = $zipkinTracer->spanBuilder('Child span')->startSpan();
+    $childSpan = $tracer->spanBuilder('Child span')->startSpan();
     $childScope = $childSpan->activate();
     try {
         throw new \Exception('Exception Example');
     } catch (\Exception $exception) {
-        $childSpan->setSpanStatus($exception->getCode(), $exception->getMessage());
+        $childSpan->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
     }
     $childSpan->end();
     $childScope->detach();
