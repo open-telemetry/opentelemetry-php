@@ -1,4 +1,4 @@
-# Integrating Opentelemetry PHP into Symfony Applications
+# Exploring Opentelemetry in Symfony Applications
 
 ## Introduction
 
@@ -7,6 +7,10 @@ usefulness of distributed tracing can be difficult to grasp for persons without 
 background. This user guide shows how OpenTelemetry could be useful to gain insights into exceptions happening within an
 application. This example uses the OpenTelemetry PHP library integrated into a Symfony application, bundled with Jaeger
 and Zipkin, for visualizing data.
+
+> ⚠ This example is only intended to introduce how OpenTelemetry can be used in a Symfony application. The
+> example code is not suited for production applications, and must not be consulted for any code that goes into
+> production.
 
 ## Prerequisites
 

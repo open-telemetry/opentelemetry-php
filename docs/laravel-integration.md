@@ -1,4 +1,4 @@
-# Integrating Opentelemetry PHP into Laravel Applications
+# Exploring Opentelemetry in Laravel Applications
 
 ## Introduction
 
@@ -14,7 +14,11 @@ To follow this guide you will need:
 * [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools. We have setup instructions for
   docker on this project's [readme](https://github.com/open-telemetry/opentelemetry-php#development).
 
-This example uses Laravel version 8.40 .
+This example uses Laravel version 8.40.
+
+> ⚠ This example is only intended to introduce how OpenTelemetry can be used in a Laravel application. The
+> example code is not suited for production applications, and must not be consulted for any code that goes into
+> production.
 
 ## Step 1 - Creating a Laravel Application
 
