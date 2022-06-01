@@ -3,9 +3,13 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
-use OpenTelemetry\SDK\Trace\SpanProcessor\ConsoleSpanExporter;
+use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
+
+/**
+ *
+ */
 
 echo 'Starting ConsoleSpanExporter' . PHP_EOL;
 
@@ -18,13 +22,12 @@ $tracerProvider =  new TracerProvider(
 $tracer = $tracerProvider->getTracer();
 
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
-$rootSpan->activate();
+$scope = $rootSpan->activate();
 
+//because the root span is active, each of the following spans will be parented to the root span
 try {
-    $childSpan = $tracer->spanBuilder('child-span')->startSpan();
-    $childSpan->activate();
     $spans = [];
-    for ($i=1; $i<=4; $i++) {
+    for ($i = 1; $i <= 4; $i++) {
         $spans[] = $tracer->spanBuilder('http-' . $i)
             //@see https://github.com/open-telemetry/opentelemetry-collector/blob/main/model/semconv/v1.6.1/trace.go#L834
             ->setAttribute('http.method', 'GET')
@@ -38,7 +41,6 @@ try {
         $span->end();
     }
 } finally {
-    $childSpan->end();
+    $scope->detach();
+    $rootSpan->end();
 }
-
-$rootSpan->end();
