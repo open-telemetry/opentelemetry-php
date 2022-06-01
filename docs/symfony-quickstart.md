@@ -195,8 +195,7 @@ $tracer = (new TracerProvider(
 ))->getTracer('Hello World Symfony Web Server');
 ```
 
-Next we create a span from our tracer. We don't need to bother with sampling here, since it is handled by the sampler
-configured as an internal component of the tracer above.
+Next we create a span from our tracer;
 
 ```php
 $request = Request::createFromGlobals();
@@ -266,7 +265,7 @@ if ($tracer) {
 }
 ```
 
-In the above snippet we change the span name and attributes for our Zipkin trace, we also add an exception event to the
+In the above snippet we change the span name and attributes for our trace, we also add an exception event to the
 span.
 
 We need to reload our `http://127.0.0.1:8000/hello` route, then navigate to Zipkin like before to see that our span name

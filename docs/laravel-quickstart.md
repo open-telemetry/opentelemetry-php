@@ -173,8 +173,7 @@ $tracer = (new TracerProvider(
 ))->getTracer('Hello World Laravel Web Server');
 ```
 
-Next we create a span from our tracer. We don't need to bother with sampling here, since it is handled by the sampler
-configured as an internal component of the tracer above.
+Next we create a span from our tracer;
 
 ```php
 $request = Request::capture();
@@ -234,7 +233,7 @@ Route::get('/hello', [HelloController::class, 'index']);
 ```  
 
 The above snippet routes every GET request from the `/hello` route on the browser to an index method within
-the `HelloController` class. For now, this method does not exist, so we have to add it to our controller as follows
+the `HelloController` class. For now, this method does not exist, so we have to add it to our controller as follows:
 
 ```php
 public function index(){
@@ -246,7 +245,7 @@ Let's confirm that everything works well by visiting the `/hello` route on our b
 
 ![](https://user-images.githubusercontent.com/22311928/115635323-5c145d80-a303-11eb-869f-6fe18f7f01a4.png)
 
-Now that we have the `index` method working, we can simulate adding an exception event to our Zipkin trace as follows:
+Now that we have the `index` method working, we can simulate adding an exception event to our trace as follows:
 
 ```php
 /** @var TracerInterface $tracer */
@@ -270,7 +269,7 @@ if ($tracer) {
 }
 ```
 
-In the above snippet we change the span name and attributes for our Zipkin trace, we also add an exception event to the
+In the above snippet we change the span name and attributes for our trace, we also add an exception event to the
 span.
 
 We need to reload our `http://127.0.0.1:8000/hello` route, then navigate to Zipkin like before, to see that our span
