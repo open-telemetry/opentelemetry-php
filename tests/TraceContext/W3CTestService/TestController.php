@@ -16,35 +16,32 @@ class TestController
 {
     /**
      * @Route("/test")
+     * @throws \Psr\Http\Client\ClientExceptionInterface
      */
     public function index(Request $request): Response
     {
         global $tracer;
+        if (!$tracer) {
+            return new Response('internal error', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
-        // ? What are we doing with the parameters?
-        $parameters = $request->request->all();
+        $traceCtxPropagator = TraceContextPropagator::getInstance();
+
+        try {
+            $context = $traceCtxPropagator->extract($request->headers->all());
+        } catch (\InvalidArgumentException $th) {
+            $context = new Context();
+        }
+
         $body = json_decode($request->getContent(), true);
-
         if (!$body) {
             return new Response('Invalid JSON', Response::HTTP_BAD_REQUEST);
         }
 
         foreach ($body as $case) {
-            if (!$tracer) {
-                continue;
-            }
-
-            $traceCtxPropagator = TraceContextPropagator::getInstance();
-
             $headers = ['content-type' => 'application/json'];
             $url = $case['url'];
             $arguments = $case['arguments'];
-
-            try {
-                $context = $traceCtxPropagator->extract($request->headers->all());
-            } catch (\InvalidArgumentException $th) {
-                $context = new Context();
-            }
 
             $span = $tracer->spanBuilder($url)->setParent($context)->startSpan();
             $spanScope = $span->activate();
@@ -60,7 +57,7 @@ class TestController
 
             $testServiceRequest = new \Nyholm\Psr7\Request('POST', $url, $headers, json_encode($arguments));
 
-            $response = $client->sendRequest($testServiceRequest);
+            $client->sendRequest($testServiceRequest);
 
             $span->end();
             $spanScope->detach();
