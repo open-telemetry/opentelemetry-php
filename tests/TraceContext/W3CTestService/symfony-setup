@@ -8,7 +8,7 @@ curl -sS https://get.symfony.com/cli/installer | bash
 mv /root/.symfony/bin/symfony /usr/local/bin/symfony
 
 # Set up Symfony test application
-cd tests/TraceContext/W3CTestService || exit
+cd tests/TraceContext/W3CTestService || { printf "Something went wrong: could not cd into W3CTestService directory."; exit 1; }
 rm -rf test_app
 symfony new test_app --version=5.2
 
@@ -16,7 +16,7 @@ symfony new test_app --version=5.2
 cp index.php test_app/public/index.php
 cp TestController.php test_app/src/Controller/TestController.php
 
-cd test_app || exit
+cd test_app || { printf "Something went wrong: could not cd into test_app."; exit 1; }
 
 # Link the local opentelemetry changes to vendor/open-telemetry
 composer config repositories.local \
