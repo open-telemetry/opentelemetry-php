@@ -21,41 +21,49 @@ class TestController
     {
         global $tracer;
 
-        $array = $request->request->all();
+        // ? What are we doing with the parameters?
+        $parameters = $request->request->all();
         $body = json_decode($request->getContent(), true);
 
+        if (!$body) {
+            return new Response('Invalid JSON', Response::HTTP_BAD_REQUEST);
+        }
+
         foreach ($body as $case) {
-            if ($tracer) {
-                $traceCtxPropagator = TraceContextPropagator::getInstance();
-
-                $headers = ['content-type' => 'application/json'];
-                $url = $case['url'];
-                $arguments = $case['arguments'];
-
-                try {
-                    $context = $traceCtxPropagator->extract($request->headers->all());
-                } catch (\InvalidArgumentException $th) {
-                    $context = new Context();
-                }
-
-                $span = $tracer->spanBuilder($url)->setParent($context)->startSpan();
-                $span->activate();
-
-                $traceCtxPropagator->inject($headers, null, $context);
-
-                $client = new Psr18Client(HttpClient::create(
-                    [
-                        'base_uri' => $url,
-                        'timeout'  => 2.0,
-                    ]
-                ));
-
-                $testServiceRequest = new \Nyholm\Psr7\Request('POST', $url, $headers, json_encode($arguments));
-
-                $response = $client->sendRequest($testServiceRequest);
-
-                $span->end();
+            if (!$tracer) {
+                continue;
             }
+
+            $traceCtxPropagator = TraceContextPropagator::getInstance();
+
+            $headers = ['content-type' => 'application/json'];
+            $url = $case['url'];
+            $arguments = $case['arguments'];
+
+            try {
+                $context = $traceCtxPropagator->extract($request->headers->all());
+            } catch (\InvalidArgumentException $th) {
+                $context = new Context();
+            }
+
+            $span = $tracer->spanBuilder($url)->setParent($context)->startSpan();
+            $spanScope = $span->activate();
+
+            $traceCtxPropagator->inject($headers, null, $context);
+
+            $client = new Psr18Client(HttpClient::create(
+                [
+                    'base_uri' => $url,
+                    'timeout'  => 2.0,
+                ]
+            ));
+
+            $testServiceRequest = new \Nyholm\Psr7\Request('POST', $url, $headers, json_encode($arguments));
+
+            $response = $client->sendRequest($testServiceRequest);
+
+            $span->end();
+            $spanScope->detach();
         }
 
         return new Response(
