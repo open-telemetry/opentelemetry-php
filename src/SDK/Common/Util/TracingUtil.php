@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Util;
 
+use function array_key_exists;
+use function array_shift;
+use function basename;
+use function sprintf;
+use function str_replace;
+use function in_array;
+
 use Throwable;
 
 class TracingUtil
