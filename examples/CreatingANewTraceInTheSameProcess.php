@@ -28,6 +28,7 @@ $rootScope->detach();
 
 // This creates a new span as a parent/root, however regardless of calling "activate" on it, it will have a new TraceId
 $span = $tracer->spanBuilder('baz')->startSpan();
-$span->activate();
+$scope = $span->activate();
 
 $span->end();
+$scope->detach();

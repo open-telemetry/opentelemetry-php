@@ -17,20 +17,27 @@ $tracerProvider =  new TracerProvider(
 
 $tracer = $tracerProvider->getTracer();
 
+//start a root span
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
-$rootSpan->activate();
+//future spans will be parented to the currently active span
+$rootScope = $rootSpan->activate();
 
 try {
     $span1 = $tracer->spanBuilder('foo')->startSpan();
-    $span1->activate();
+    $span1Scope = $span1->activate();
 
     try {
         $span2 = $tracer->spanBuilder('bar')->startSpan();
         echo 'OpenTelemetry welcomes PHP' . PHP_EOL;
-    } finally {
         $span2->end();
+    } finally {
+        $span1Scope->detach();
+        $span1->end();
     }
+} catch (Throwable $t) {
+    $rootSpan->recordException($t);
 } finally {
-    $span1->end();
+    //ensure span ends and scope is detached
+    $rootScope->detach();
+    $rootSpan->end();
 }
-$rootSpan->end();

@@ -50,7 +50,7 @@ $tracer = $tracerProvider->getTracer();
  */
 echo 'Start Logging ...' . PHP_EOL;
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
-$rootSpan->activate();
+$scope = $rootSpan->activate();
 
 $spans = [];
 
@@ -75,4 +75,5 @@ foreach ($spans as $span) {
 }
 
 $rootSpan->end();
+$scope->detach();
 echo 'Finished!' . PHP_EOL;

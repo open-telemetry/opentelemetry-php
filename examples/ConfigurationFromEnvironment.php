@@ -24,6 +24,7 @@ $tracer = $tracerProvider->getTracer();
 echo 'Starting Tracer' . PHP_EOL;
 
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
-$rootSpan->activate();
+$scope = $rootSpan->activate();
 $rootSpan->addEvent('my_event')->setAttribute('fruit', 'apple');
 $rootSpan->end();
+$scope->detach();
