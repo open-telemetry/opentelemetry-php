@@ -22,7 +22,7 @@ To follow this guide you will need:
 * [Docker](https://docs.docker.com/get-docker/) for bundling our visualization tools. We have set up instructions for
   docker on this project's [readme](https://github.com/open-telemetry/opentelemetry-php#development).
 
-This example uses Symfony version 5.2 .
+This example uses Symfony version `5.4` and OpenTelemetry PHP SDK version `0.0.11`.
 
 ## Step 1 - Creating a Symfony Application
 
@@ -30,6 +30,12 @@ Create a Symfony application by running the command `symfony new my_project_name
 example `otel-php-symfony-basic-example`, so the command is as follows;
 
 `symfony new otel-php-symfony-basic-example` .
+
+* The above command uses name and email from git configs. If you have not set them, you set them as per the error you see,
+delete the folder and run the command again. If you want to skip the git info, run with `--no-git` flag, i.e.
+`symfony new otel-php-symfony-basic-example --no-git`
+
+Go into the folder created by `cd otel-php-symfony-basic-example`.
 
 ## Step 2 - Require and Test Symfony Dependencies
 
@@ -60,6 +66,9 @@ class HelloController extends AbstractController
 }
 ```
 
+The above snippet routes every GET request from the `/hello` route on the browser to an index method within
+the `HelloController` class.
+
 To check out the routes available in our current project run `php bin/console debug:router`.
 
 ![image](https://user-images.githubusercontent.com/22311928/115637047-3e48f780-a307-11eb-9f75-2a5d033b572a.png)
@@ -78,20 +87,23 @@ HelloController index method above.
 Starting from version `v.0.0.2`, the open-telemetry php package allows users to use their preferred HTTP layers for
 exporting traces. The benefit of this is that users can reuse already existing HTTP configurations for their
 applications. Hence, there is need to require packages that satisfy both `psr/http-client-implementation`
-and `psr/http-factory-implementation` before requiring the opentelemetry-php package.
+and `psr/http-factory-implementation` before requiring the opentelemetry-php package. Starting from version `v.0.0.4`,
+opentelemetry-php package also requires `php-http/async-client-implementation`.
 
-To satisfy these requirements, we'll use the `guzzlehttp/guzzle` to satisfy the `psr/http-client-implementation` and
-`guzzlehttp/psr7` to satisfy the `psr/http-factory-implementation`;
+To satisfy these requirements, we'll use the `guzzlehttp/guzzle` to satisfy the `psr/http-client-implementation`,
+`guzzlehttp/psr7` to satisfy the `psr/http-factory-implementation`, and `php-http/guzzle7-adapter` to satisfy the
+`php-http/async-client-implementation`;
 
 ```bash
 composer require guzzlehttp/guzzle
 composer require guzzlehttp/psr7
+composer require php-http/guzzle7-adapter
 ```
 
 Finally, we require the OpenTelemetry PHP library;
 
 ```bash
-composer require opentelemetry/opentelemetry-php
+composer require open-telemetry/opentelemetry
 ```
 
 It is worthy of note that this command pulls in the last stable release for the library.
@@ -146,18 +158,18 @@ To use open-telemetry specific classes we have to import them at the top of our 
 This is what our imports look like:
 
 ```php
-use App\Kernel;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use Symfony\Component\HttpFoundation\Request;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 ```
 
 Remember that these imports should go side by side with the default class imports that come with the `index.php` file.
@@ -181,7 +193,7 @@ $tracer = (new TracerProvider(
                 $httpFactory,
             ),
         ),
-        new SimpleSpanProcessor(
+        new BatchSpanProcessor(
             new OpenTelemetry\Contrib\Zipkin\Exporter(
                 'Hello World Web Server Zipkin',
                 'http://localhost:9411/api/v2/spans',
@@ -203,13 +215,21 @@ $span = $tracer->spanBuilder($request->getUri())->startSpan();
 $spanScope = $span->activate();
 ```
 
-Finally, we end the active spans and detach the span scope by adding the following block at the end of
-the `index.php` file;
+Finally, we end the active spans by adding the following block in the `terminal` function in the file
+`vendor\symfony\http-kernel\index.php`;
+
 
 ```php
+global $span, $spanScope;
 $span->end();
 $spanScope->detach();
 ```
+
+* Unlike [quickstart with Laravel application](https://github.com/open-telemetry/opentelemetry-php/blob/main/docs/laravel-quickstart.md),
+`kernel->terminate` is not called in `index.php` and thus we need to place the root span end in the terminate function of
+Kernel class itself. We use global variable to access `$span` and `$spanScope`. `$span` can be access via internal
+functions as `$span = AbstractSpan::getCurrent();`(import `use OpenTelemetry\API\Trace\AbstractSpan;` in the file
+`vendor\symfony\http-kernel\index.php`), but `$spanScope` can't be accessed via internal functions as of now.
 
 Let's confirm that we can see exported traces on both Zipkin and Jaeger. To do that we need to
 reload `http://127.0.0.1:8000/hello` or any other route on our symfony server;
@@ -238,19 +258,32 @@ For Zipkin, we can visualize our trace by clicking on `Run Query`
 ![image](https://user-images.githubusercontent.com/22311928/115637078-45700580-a307-11eb-9867-aa0c1a69f9fe.png)
 
 Since resources in Symfony's `public\index.php` file are available to the entire application, we can use any of the
-already instantiated tracers within `HelloController`. In addition to the tracers, we can also utilize associated
-properties, methods and events.
+already instantiated tracers within `HelloController` in file `src\ControllerHelloController.php`. In addition to the
+tracers, we can also utilize associated properties, methods and events.
 
-Let's try using the `addEvent` method, to capture errors within our controller as follows:
+Now that we have the `index` method working, let's make changes to the existing root span and create an exception in
+a child span of the root span. We can do the same as follows:
+
+- Import the required functions on top of the file:
 
 ```php
-/** @var TracerInterface $tracer */
-global $tracer;
+use OpenTelemetry\API\Trace\AbstractSpan;
+use OpenTelemetry\API\Trace\StatusCode;
+use OpenTelemetry\SDK\Trace\TracerProvider;
+```
+
+- Put the below snippet in `index()` function before the `return` statement:
+
+```php
+/** @var TracerProvider $tracer */
+$tracer = TracerProvider::getDefaultTracer();
 if ($tracer) {
     /** @var Span $span */
     $span = AbstractSpan::getCurrent();
 
     $span->setAttribute('foo', 'bar');
+    $span->setAttribute('Application', 'Laravel');
+    $span->setAttribute('foo', 'bar1');
     $span->updateName('New name');
 
     $childSpan = $tracer->spanBuilder('Child span')->startSpan();
@@ -265,16 +298,20 @@ if ($tracer) {
 }
 ```
 
-In the above snippet we change the span name and attributes for our trace, we also add an exception event to the
-span.
+In the above snippet, we set two new attributes for the current span, and then change the value for one of the attribute
+and the trace reflects the latest value. We also change the name of our current span and add an exception event to the
+child span.
 
-We need to reload our `http://127.0.0.1:8000/hello` route, then navigate to Zipkin like before to see that our span name
-gets updated to `new name` and our `Exception Example` is visible
+* Point to note: all the variables in `index.php` are available in this file. But we use inbuilt functions to get `$tracer`
+  rather than using the global variables.
+
+We need to reload our `http://127.0.0.1:8000/hello` route, then navigate to Zipkin and Jaeger like before to see that our
+span name gets updated to `new name` and our `Exception Example` is visible.
 
 ![image](https://user-images.githubusercontent.com/22311928/115637079-46089c00-a307-11eb-9d9d-b5c0f941baeb.png)
 
 ## Summary
-
+[//]: # (@todo: add otel-php-symfony-basic-example to our git repo)
 With the above example we have been able to instrument a Symfony application using the OpenTelemetry php library. You
 can fork the example project [here](https://github.com/prondubuisi/otel-php-symfony-basic-example). You can also check
 out the original test application [here](https://github.com/dkarlovi/opentelemetry-php-user-test).
