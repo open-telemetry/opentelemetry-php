@@ -7,9 +7,9 @@ namespace OpenTelemetry\SDK\Common\Util;
 use function array_key_exists;
 use function array_shift;
 use function basename;
+use function in_array;
 use function sprintf;
 use function str_replace;
-use function in_array;
 
 use Throwable;
 
