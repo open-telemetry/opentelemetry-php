@@ -311,7 +311,7 @@ span name gets updated to `new name` and our `Exception Example` is visible.
 ![image](https://user-images.githubusercontent.com/22311928/115637079-46089c00-a307-11eb-9d9d-b5c0f941baeb.png)
 
 ## Summary
-[//]: # (@todo: add otel-php-symfony-basic-example to our git repo)
+
 With the above example we have been able to instrument a Symfony application using the OpenTelemetry php library. You
 can fork the example project [here](https://github.com/prondubuisi/otel-php-symfony-basic-example). You can also check
 out the original test application [here](https://github.com/dkarlovi/opentelemetry-php-user-test).

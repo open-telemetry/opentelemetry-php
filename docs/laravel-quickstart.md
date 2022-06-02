@@ -299,6 +299,6 @@ span name gets updated to `new name` and our `Exception Example` is visible.
 ![image](https://user-images.githubusercontent.com/22311928/115635324-5cacf400-a303-11eb-947d-cf8205c0e93b.png)
 
 ## Summary
-[//]: # (@todo: add otel-php-laravel-basic-example to our git repo)
+
 With the above example we have been able to instrument a Laravel application using the OpenTelemetry PHP library. You
 can fork the example project [here](https://github.com/prondubuisi/otel-php-laravel-basic-example).
