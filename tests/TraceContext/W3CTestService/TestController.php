@@ -44,7 +44,8 @@ class TestController
             $arguments = $case['arguments'];
 
             $span = $tracer->spanBuilder($url)->setParent($context)->startSpan();
-            $spanScope = $span->activate();
+            $context = $span->storeInContext($context);
+            $scope = $context->activate();
 
             $traceCtxPropagator->inject($headers, null, $context);
 
@@ -60,7 +61,7 @@ class TestController
             $client->sendRequest($testServiceRequest);
 
             $span->end();
-            $spanScope->detach();
+            $scope->detach();
         }
 
         return new Response(
