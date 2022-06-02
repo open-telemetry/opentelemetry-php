@@ -291,7 +291,7 @@ if ($tracer) {
     try {
         throw new \Exception('Exception Example');
     } catch (\Exception $exception) {
-        $childSpan->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
+        $childSpan->recordException($exception);
     }
     $childSpan->end();
     $childScope->detach();
