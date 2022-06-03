@@ -7,6 +7,7 @@ namespace OpenTelemetry\API\Trace;
 use function array_reverse;
 use function array_walk;
 use function implode;
+use function strlen;
 
 class TraceState implements TraceStateInterface
 {
@@ -20,6 +21,8 @@ class TraceState implements TraceStateInterface
     private const VALID_KEY_REGEX = '/^(?:' . self::VALID_KEY . '|' . self::VALID_VENDOR_KEY . ')$/';
     private const VALID_VALUE_BASE_REGEX = '/^[ -~]{0,255}[!-~]$/';
     private const INVALID_VALUE_COMMA_EQUAL_REGEX = '/,|=/';
+    private const SERVER_CONCAT_HEADERS_REGEX = '/;(?=[^,=;]*=|$)/';
+    private const TRAILING_LEADING_SEPARATOR_REGEX = '/^' . self::LIST_MEMBERS_SEPARATOR . '+|' . self::LIST_MEMBERS_SEPARATOR . '+$/';
 
     /**
      * @var string[]
@@ -134,16 +137,28 @@ class TraceState implements TraceStateInterface
     {
         $parsedTracestate = [];
 
-        if (\strlen($rawTracestate) <= self::MAX_TRACESTATE_LENGTH) {
-            $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
+        /**
+         * Some servers concatenate multiple headers with ';' -- we need to replace these with ','
+         * This is still a workaround and doesn't get around the problem fully, specifically it doesn't
+         * handle edge cases where the header has a trailing ';' or an empty trace state.
+         * We also need to trim trailing separators from the header, found when a header is empty.
+         * @var string $sanitizedTraceState
+         */
+        $sanitizedTraceState = (function () use ($rawTracestate) {
+            $fixedSeparators = preg_replace(self::SERVER_CONCAT_HEADERS_REGEX, self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
+            return preg_replace(self::TRAILING_LEADING_SEPARATOR_REGEX, '', $fixedSeparators);
+        })();
 
+        if (strlen($sanitizedTraceState) <= self::MAX_TRACESTATE_LENGTH) {
+            $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $sanitizedTraceState);
+
+            // Discard tracestate if entries exceed max length.
             if (count($listMembers) > self::MAX_TRACESTATE_LIST_MEMBERS) {
-
-                // Truncate the tracestate if it exceeds the maximum list-members allowed
-                // TODO: Log a message when truncation occurs
-                $listMembers = array_slice($listMembers, 0, self::MAX_TRACESTATE_LIST_MEMBERS);
+                // TODO: Log a message when we discard.
+                return [];
             }
 
+            $invalid = false;
             foreach ($listMembers as $listMember) {
                 $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, trim($listMember));
 
@@ -153,8 +168,15 @@ class TraceState implements TraceStateInterface
                     // TODO: Log if we can't validate the key and value
                     if ($this->validateKey($vendor[0]) && $this->validateValue($vendor[1])) {
                         $parsedTracestate[$vendor[0]] = $vendor[1];
+                        continue;
                     }
                 }
+                $invalid = true;
+                break;
+            }
+            // Discard tracestate if any member is invalid.
+            if ($invalid) {
+                return [];
             }
         }
 

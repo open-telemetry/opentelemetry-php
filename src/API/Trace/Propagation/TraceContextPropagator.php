@@ -16,7 +16,6 @@ use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
-use function preg_replace;
 
 /**
  * TraceContext is a propagator that supports the W3C Trace Context format
@@ -118,13 +117,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
         // Tracestate = 'Vendor1=Value1,...,VendorN=ValueN'
         $rawTracestate = $getter->get($carrier, self::TRACESTATE);
         if ($rawTracestate !== null) {
-            /*
-             * Some servers concatenate multiple headers with ';' -- we need to replace these with ','
-             * This is still a workaround and doesn't get around the problem fully, specifically it doesn't
-             * handle edge cases where the header has a trailing ';' or an empty trace state.
-             */
-            $sanitizedTraceState = preg_replace('/;(?=[^,=;]*=|$)/', ',', $rawTracestate);
-            $tracestate = new TraceState($sanitizedTraceState);
+            $tracestate = new TraceState($rawTracestate);
 
             return SpanContext::createFromRemoteParent(
                 $traceId,
