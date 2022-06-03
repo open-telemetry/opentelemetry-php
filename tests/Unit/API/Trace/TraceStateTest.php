@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\API\Unit\Trace;
 use OpenTelemetry\API\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 use function str_repeat;
+use function strlen;
 
 /**
  * @covers OpenTelemetry\API\Trace\TraceState
@@ -106,14 +107,14 @@ class TraceStateTest extends TestCase
 
         // tracestate length = 513 characters (not accepted).
         $rawTraceState = $vendorKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $vendorValue . 'v';
-        $this->assertGreaterThan(TraceState::MAX_TRACESTATE_LENGTH, \strlen($rawTraceState));
+        $this->assertGreaterThan(TraceState::MAX_TRACESTATE_LENGTH, strlen($rawTraceState));
 
         $validTracestate = new TraceState($rawTraceState);
         $this->assertNull($validTracestate->get($vendorKey));
 
         // tracestate length = 512 characters (accepted).
         $rawTraceState = $vendorKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $vendorValue;
-        $this->assertSame(TraceState::MAX_TRACESTATE_LENGTH, \strlen($rawTraceState));
+        $this->assertSame(TraceState::MAX_TRACESTATE_LENGTH, strlen($rawTraceState));
 
         $validTracestate = new TraceState($rawTraceState);
         $this->assertSame($rawTraceState, (string) $validTracestate);
@@ -144,7 +145,7 @@ class TraceStateTest extends TestCase
         $validValue = 'v';
         $tracestate = new TraceState($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue);
 
-        $this->assertSame(256, \strlen($validKey));
+        $this->assertSame(256, strlen($validKey));
         $this->assertSame($validValue, $tracestate->get($validKey));
         $this->assertSame($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue, (string) $tracestate);
 
@@ -152,7 +153,7 @@ class TraceStateTest extends TestCase
         $invalidKey = str_repeat('k', 257);
         $tracestate = new TraceState($invalidKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue);
 
-        $this->assertSame(257, \strlen($invalidKey));
+        $this->assertSame(257, strlen($invalidKey));
         $this->assertNull($tracestate->get($invalidKey));
     }
 
@@ -174,7 +175,7 @@ class TraceStateTest extends TestCase
         $validKey = 'k';
         $tracestate = new TraceState($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue);
 
-        $this->assertSame(256, \strlen($validValue));
+        $this->assertSame(256, strlen($validValue));
         $this->assertSame($validValue, $tracestate->get($validKey));
         $this->assertSame($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue, (string) $tracestate);
 
@@ -182,7 +183,7 @@ class TraceStateTest extends TestCase
         $invalidValue = str_repeat('v', 257);
         $tracestate = new TraceState($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $invalidValue);
 
-        $this->assertSame(257, \strlen($invalidValue));
+        $this->assertSame(257, strlen($invalidValue));
         $this->assertNull($tracestate->get($validKey));
     }
 }
