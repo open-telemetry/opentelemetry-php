@@ -146,6 +146,7 @@ class TraceState implements TraceStateInterface
          */
         $sanitizedTraceState = (function () use ($rawTracestate) {
             $fixedSeparators = preg_replace(self::SERVER_CONCAT_HEADERS_REGEX, self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
+
             return preg_replace(self::TRAILING_LEADING_SEPARATOR_REGEX, '', $fixedSeparators);
         })();
 
@@ -168,10 +169,12 @@ class TraceState implements TraceStateInterface
                     // TODO: Log if we can't validate the key and value
                     if ($this->validateKey($vendor[0]) && $this->validateValue($vendor[1])) {
                         $parsedTracestate[$vendor[0]] = $vendor[1];
+
                         continue;
                     }
                 }
                 $invalid = true;
+
                 break;
             }
             // Discard tracestate if any member is invalid.

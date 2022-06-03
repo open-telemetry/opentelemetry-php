@@ -32,6 +32,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
     public const TRACEPARENT = 'traceparent';
     public const TRACESTATE = 'tracestate';
     private const VERSION = '00'; // Currently, only '00' is supported
+    private const HEX_REGEX = '/^[\da-f_]+$/';
 
     private static ?self $instance = null;
 
@@ -93,20 +94,27 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
             return SpanContext::getInvalid();
         }
 
-        // Traceparent = {version}-{trace-id}-{parent-id}-{trace-flags}
+        // traceParent = {version}-{trace-id}-{parent-id}-{trace-flags}
         $pieces = explode('-', $traceparent);
-
-        // Unable to extract traceparent. Expected 4 values
-        if (count($pieces) !== 4) {
-            return SpanContext::getInvalid();
-        }
 
         [$version, $traceId, $spanId, $traceFlags] = $pieces;
 
-        // Validates the version, traceId, spanId and traceFlags
-        // Returns an invalid spanContext if any of the checks fail
-        if ($version !== self::VERSION || !SpanContext::isValidTraceId($traceId) ||
-            !SpanContext::isValidSpanId($spanId) || !SpanContext::isValidTraceFlag($traceFlags)) {
+        $versionIsFuture = hexdec($version) > hexdec(self::VERSION);
+        $versionIsInvalid = !preg_match(self::HEX_REGEX, $version)
+            || ($version !== self::VERSION && !$versionIsFuture);
+
+        /**
+         * Restart trace if:
+         * - Version is invalid (not hex)
+         * - Trace doesn't have 4 pieces and is not a future version
+         * - Trace ID, Span ID or Trace Flag are invalid
+         */
+        if ($versionIsInvalid
+            || (count($pieces) !== 4 && !$versionIsFuture)
+            || !SpanContext::isValidTraceId($traceId)
+            || !SpanContext::isValidSpanId($spanId)
+            || !SpanContext::isValidTraceFlag($traceFlags)
+        ) {
             return SpanContext::getInvalid();
         }
 
