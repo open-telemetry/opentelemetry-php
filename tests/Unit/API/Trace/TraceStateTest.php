@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\API\Unit\Trace;
 
 use OpenTelemetry\API\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
+use function str_repeat;
 
 /**
  * @covers OpenTelemetry\API\Trace\TraceState
@@ -87,21 +88,21 @@ class TraceStateTest extends TestCase
         $validTracestate = new TraceState(implode(TraceState::LIST_MEMBERS_SEPARATOR, $rawTraceState));
         $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, $validTracestate->getListMemberCount());
 
-        // Add a list-member to the tracestate that exceeds the max of 32. This will cause it to be truncated
+        // Add a list-member to the tracestate that exceeds the max of 32. This will the tracestate to be discarded.
         $rawTraceState[32] = 'k32' . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . 'v32';
         $this->assertCount(TraceState::MAX_TRACESTATE_LIST_MEMBERS + 1, $rawTraceState);
 
         $truncatedTracestate = new TraceState(implode(TraceState::LIST_MEMBERS_SEPARATOR, $rawTraceState));
-        $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, $truncatedTracestate->getListMemberCount());
+        $this->assertSame(0, $truncatedTracestate->getListMemberCount());
     }
 
     public function test_max_tracestate_length(): void
     {
         // Build a vendor key with a length of 256 characters. The max characters allowed.
-        $vendorKey = \str_repeat('k', TraceState::MAX_TRACESTATE_LENGTH / 2);
+        $vendorKey = str_repeat('k', TraceState::MAX_TRACESTATE_LENGTH / 2);
 
         // Build a vendor value with a length of 255 characters. One below the max allowed.
-        $vendorValue = \str_repeat('v', TraceState::MAX_TRACESTATE_LENGTH / 2 - 1);
+        $vendorValue = str_repeat('v', TraceState::MAX_TRACESTATE_LENGTH / 2 - 1);
 
         // tracestate length = 513 characters (not accepted).
         $rawTraceState = $vendorKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $vendorValue . 'v';
@@ -135,16 +136,11 @@ class TraceStateTest extends TestCase
         $mixedInvalidKeys = 'a=1=,c*d=2,@e/f=3,g_h=4,I-j=5,k&l=6';
         $tracestate = new TraceState($mixedInvalidKeys);
 
-        $this->assertNull($tracestate->get('a=1'));
-        $this->assertNull($tracestate->get('@e'));
-        $this->assertNull($tracestate->get('I-j'));
-        $this->assertNull($tracestate->get('k&l'));
-        $this->assertSame('2', $tracestate->get('c*d'));
-        $this->assertSame('4', $tracestate->get('g_h'));
-        $this->assertSame('c*d=2,g_h=4', (string) $tracestate);
+        // Drop all keys on an invalid key
+        $this->assertSame(0, $tracestate->getListMemberCount());
 
         // Tests a valid key with a length of 256 characters. The max characters allowed.
-        $validKey = \str_repeat('k', 256);
+        $validKey = str_repeat('k', 256);
         $validValue = 'v';
         $tracestate = new TraceState($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue);
 
@@ -153,7 +149,7 @@ class TraceStateTest extends TestCase
         $this->assertSame($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue, (string) $tracestate);
 
         // Tests an invalid key with a length of 257 characters. One more than the max characters allowed.
-        $invalidKey = \str_repeat('k', 257);
+        $invalidKey = str_repeat('k', 257);
         $tracestate = new TraceState($invalidKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue);
 
         $this->assertSame(257, \strlen($invalidKey));
@@ -163,21 +159,18 @@ class TraceStateTest extends TestCase
     public function test_validate_value(): void
     {
         // Tests values are within the range of 0x20 to 0x7E characters
-        $tracestate =   'char1=value' . chr(0x19) . '1'
+        $tracestate =    'char1=value' . chr(0x19) . '1'
                       . ',char2=value' . chr(0x20) . '2'
                       . ',char3=value' . chr(0x7E) . '3'
                       . ',char4=value' . chr(0x7F) . '4';
 
         $parsedTracestate = new TraceState($tracestate);
 
-        $this->assertNull($parsedTracestate->get('char1'));
-        $this->assertNull($parsedTracestate->get('char4'));
-        $this->assertSame('value' . chr(0x20) . '2', $parsedTracestate->get('char2'));
-        $this->assertSame('value' . chr(0x7E) . '3', $parsedTracestate->get('char3'));
-        $this->assertSame('char2=value' . chr(0x20) . '2,char3=value' . chr(0x7E) . '3', (string) $parsedTracestate);
+        // Entire tracestate is dropped since the value for char1 is invalid.
+        $this->assertSame(0, $parsedTracestate->getListMemberCount());
 
         // Tests a valid value with a length of 256 characters. The max allowed.
-        $validValue = \str_repeat('v', 256);
+        $validValue = str_repeat('v', 256);
         $validKey = 'k';
         $tracestate = new TraceState($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue);
 
@@ -186,7 +179,7 @@ class TraceStateTest extends TestCase
         $this->assertSame($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue, (string) $tracestate);
 
         // Tests an invalid value with a length of 257 characters. One more than the max allowed.
-        $invalidValue = \str_repeat('v', 257);
+        $invalidValue = str_repeat('v', 257);
         $tracestate = new TraceState($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $invalidValue);
 
         $this->assertSame(257, \strlen($invalidValue));
