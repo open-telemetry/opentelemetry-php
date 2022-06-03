@@ -161,7 +161,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             TracingUtil::class
         );
 
-        return TracingUtil::formatStackTrace($e, $seen);
+        return TracingUtil::formatStackTrace($e);
     }
 
     /** @inheritDoc */

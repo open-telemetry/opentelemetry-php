@@ -4,83 +4,148 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Util;
 
-use function array_key_exists;
-use function array_shift;
 use function basename;
-use function in_array;
+use function count;
+use function get_class;
 use function sprintf;
-use function str_replace;
+use function str_repeat;
 
 use Throwable;
 
+/**
+ * @psalm-type Frame = array{
+ *     function: string,
+ *     class: ?class-string,
+ *     file: ?string,
+ *     line: ?int,
+ * }
+ * @psalm-type Frames = non-empty-list<Frame>
+ */
 class TracingUtil
 {
+
     /**
-         * This function provides a more java-like stacktrace
-         * that supports exception chaining and provides exact
-         * lines of where exceptions are thrown
-         *
-         * Example:
-         * Exception: Thrown from grandparent
-         *  at grandparent_func(test.php:56)
-         *  at parent_func(test.php:51)
-         *  at child_func(test.php:44)
-         *  at (main)(test.php:62)
-         *
-         * Credit: https://www.php.net/manual/en/exception.gettraceasstring.php#114980
-         *
-         */
-    public static function formatStackTrace(Throwable $e, array &$seen = null): string
+     * Formats an exception in a java-like format.
+     *
+     * @param Throwable $e exception to format
+     * @return string formatted exception
+     *
+     * @see https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Throwable.html#printStackTrace()
+     */
+    public static function formatStackTrace(Throwable $e): string
     {
-        $starter = $seen ? 'Caused by: ' : '';
-        $result = [];
-        if (!$seen) {
-            $seen = [];
-        }
-        $trace  = $e->getTrace();
-        $prev   = $e->getPrevious();
-        $result[] = sprintf('%s%s: %s', $starter, get_class($e), $e->getMessage());
-        $file = $e->getFile();
-        $line = $e->getLine();
-        while (true) {
-            $current = "$file:$line";
-            if (in_array($current, $seen, true)) {
-                $result[] = sprintf(' ... %d more', count($trace)+1);
+        $s = '';
+        $seen = [];
+
+        /** @var Frames|null $enclosing */
+        $enclosing = null;
+        do {
+            if ($enclosing) {
+                self::writeNewline($s);
+                $s .= 'Caused by: ';
+            }
+            if (isset($seen[spl_object_id($e)])) {
+                $s .= '[CIRCULAR REFERENCE: ';
+                self::writeInlineHeader($s, $e);
+                $s .= ']';
 
                 break;
             }
+            $seen[spl_object_id($e)] = $e;
 
-            // Lambda to format traces -- we want to format the trace with '.' separators
-            $slashToDot = function ($str) {
-                return str_replace('\\', '.', $str);
-            };
+            $frames = self::frames($e);
+            self::writeInlineHeader($s, $e);
+            self::writeFrames($s, $frames, $enclosing);
 
-            $traceHasKey = array_key_exists(0, $trace);
-            $traceKeyHasClass = $traceHasKey && array_key_exists('class', $trace[0]);
-            $traceKeyHasFunction = $traceKeyHasClass && array_key_exists('function', $trace[0]);
+            $enclosing = $frames;
+        } while ($e = $e->getPrevious());
 
-            $result[] = sprintf(
-                ' at %s%s%s(%s%s%s)',
-                $traceKeyHasClass ? $slashToDot($trace[0]['class']) : '',
-                $traceKeyHasFunction ? '.' : '',
-                $traceKeyHasFunction ? $slashToDot($trace[0]['function']) : 'main',
-                $line === null ? $file : basename($file),
-                $line === null ? '' : ':',
-                $line ?? ''
-            );
-            $seen[] = "$file:$line";
-            if (!count($trace)) {
-                break;
+        return $s;
+    }
+
+    /**
+     * @phan-suppress-next-line PhanTypeMismatchDeclaredParam
+     * @param Frames $frames
+     * @phan-suppress-next-line PhanTypeMismatchDeclaredParam
+     * @param Frames|null $enclosing
+     */
+    private static function writeFrames(string &$s, array $frames, ?array $enclosing): void
+    {
+        $n = count($frames);
+        if ($enclosing) {
+            for ($m = count($enclosing);
+                 $n && $m && $frames[$n - 1] === $enclosing[$m - 1];
+                 $n--, $m--) {
             }
-            $file = array_key_exists('file', $trace[0]) ? $trace[0]['file'] : 'Unknown Source';
-            $line = array_key_exists('file', $trace[0]) && array_key_exists('line', $trace[0]) && $trace[0]['line'] ? $trace[0]['line'] : null;
-            array_shift($trace);
         }
-        $result = implode("\n", $result);
-        if ($prev) {
-            $result  .= "\n" . self::formatStackTrace($prev, $seen);
+        for ($i = 0; $i < $n; $i++) {
+            $frame = $frames[$i];
+            self::writeNewline($s, 1);
+            $s .= 'at ';
+            if ($frame['class'] !== null) {
+                $s .= self::formatName($frame['class']);
+                $s .= '.';
+            }
+            $s .= self::formatName($frame['function']);
+            $s .= '(';
+            if ($frame['file'] !== null) {
+                $s .= basename($frame['file']);
+                if ($frame['line']) {
+                    $s .= ':';
+                    $s .= $frame['line'];
+                }
+            } else {
+                $s .= 'Unknown Source';
+            }
+            $s .= ')';
         }
+        if ($n !== count($frames)) {
+            self::writeNewline($s, 1);
+            $s .= sprintf('... %d more', count($frames) - $n);
+        }
+    }
 
-        return $result;
+    private static function writeInlineHeader(string &$s, Throwable $e): void
+    {
+        $s .= self::formatName(get_class($e));
+        if ($e->getMessage() !== '') {
+            $s .= ': ';
+            $s .= $e->getMessage();
+        }
+    }
+
+    private static function writeNewline(string &$s, int $indent = 0): void
+    {
+        $s .= "\n";
+        $s .= str_repeat("\t", $indent);
+    }
+
+    /**
+     * @return Frames
+     *
+     * @psalm-suppress PossiblyUndefinedArrayOffset
+     */
+    private static function frames(Throwable $e): array
+    {
+        $frames = [];
+        $trace = $e->getTrace();
+        for ($i = 0; $i < count($trace) + 1; $i++) {
+            $frames[] = [
+                'function' => $trace[$i]['function'] ?? '{main}',
+                'class' => $trace[$i]['class'] ?? null,
+                'file' => $trace[$i - 1]['file'] ?? null,
+                'line' => $trace[$i - 1]['line'] ?? null,
+            ];
+        }
+        $frames[0]['file'] = $e->getFile();
+        $frames[0]['line'] = $e->getLine();
+
+        /** @var Frames $frames */
+        return $frames;
+    }
+
+    private static function formatName(string $name): string
+    {
+        return strtr($name, ['\\' => '.']);
     }
 }
