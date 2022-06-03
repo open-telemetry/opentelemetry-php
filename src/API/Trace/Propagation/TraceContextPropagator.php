@@ -32,7 +32,6 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
     public const TRACEPARENT = 'traceparent';
     public const TRACESTATE = 'tracestate';
     private const VERSION = '00'; // Currently, only '00' is supported
-    private const VERSION_REGEX = '/^(?!ff)[\da-f]{2}$/';
 
     private static ?self $instance = null;
 
@@ -104,22 +103,22 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
 
         [$version, $traceId, $spanId, $traceFlags] = $pieces;
 
-        $versionIsFuture = hexdec($version) > hexdec(self::VERSION);
-        $versionIsInvalid = !preg_match(self::VERSION_REGEX, $version)
-            || ($version !== self::VERSION && !$versionIsFuture);
-
         /**
-         * Restart trace if:
+         * Return invalid if:
          * - Version is invalid (not 2 char hex or 'ff')
-         * - Trace doesn't have 4 pieces and is not a future version
-         * - Trace ID, Span ID or Trace Flag are invalid
+         * - Trace version, trace ID, span ID or trace flag are invalid
          */
-        if ($versionIsInvalid
-            || (count($pieces) !== 4 && !$versionIsFuture)
+        if (!SpanContext::isValidTraceVersion($version)
             || !SpanContext::isValidTraceId($traceId)
             || !SpanContext::isValidSpanId($spanId)
             || !SpanContext::isValidTraceFlag($traceFlags)
         ) {
+            return SpanContext::getInvalid();
+        }
+
+        // Return invalid if the trace version is not a future version but still has > 4 pieces.
+        $versionIsFuture = hexdec($version) > hexdec(self::VERSION);
+        if (count($pieces) > 4 && !$versionIsFuture) {
             return SpanContext::getInvalid();
         }
 
