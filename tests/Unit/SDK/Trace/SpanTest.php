@@ -19,6 +19,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
+use OpenTelemetry\SDK\Common\Util\TracingUtil;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Event;
@@ -34,6 +35,7 @@ use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
+
 use function range;
 use function str_repeat;
 
@@ -569,7 +571,7 @@ class SpanTest extends MockeryTestCase
             new Attributes([
                 'exception.type' => 'Exception',
                 'exception.message' => 'ERR',
-                'exception.stacktrace' => Span::formatStackTrace($exception),
+                'exception.stacktrace' => TracingUtil::formatStackTrace($exception),
             ]),
             $event->getAttributes()
         );
@@ -595,7 +597,7 @@ class SpanTest extends MockeryTestCase
             new Attributes([
                 'exception.type' => 'Exception',
                 'exception.message' => 'ERR',
-                'exception.stacktrace' => Span::formatStackTrace($exception),
+                'exception.stacktrace' => TracingUtil::formatStackTrace($exception),
                 'foo' => 'bar',
             ]),
             $event->getAttributes()

@@ -4,23 +4,19 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use function array_key_exists;
-use function array_shift;
-use function basename;
 use function count;
 use function ctype_space;
 use function get_class;
-use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Common\Dev\Compatibility\Util as BcUtil;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Common\Util\TracingUtil;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use function sprintf;
-use function str_replace;
 use Throwable;
 
 final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
@@ -153,72 +149,19 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     }
 
     /**
-     * This function provides a more java-like stacktrace
-     * that supports exception chaining and provides exact
-     * lines of where exceptions are thrown
+     * Backward compatibility methods
      *
-     * Example:
-     * Exception: Thrown from grandparent
-     *  at grandparent_func(test.php:56)
-     *  at parent_func(test.php:51)
-     *  at child_func(test.php:44)
-     *  at (main)(test.php:62)
-     *
-     * Credit: https://www.php.net/manual/en/exception.gettraceasstring.php#114980
-     *
+     * @codeCoverageIgnore
      */
     public static function formatStackTrace(Throwable $e, array &$seen = null): string
     {
-        $starter = $seen ? 'Caused by: ' : '';
-        $result = [];
-        if (!$seen) {
-            $seen = [];
-        }
-        $trace  = $e->getTrace();
-        $prev   = $e->getPrevious();
-        $result[] = sprintf('%s%s: %s', $starter, get_class($e), $e->getMessage());
-        $file = $e->getFile();
-        $line = $e->getLine();
-        while (true) {
-            $current = "$file:$line";
-            if (in_array($current, $seen, true)) {
-                $result[] = sprintf(' ... %d more', count($trace)+1);
+        BcUtil::triggerMethodDeprecationNotice(
+            __METHOD__,
+            'formatStackTrace',
+            TracingUtil::class
+        );
 
-                break;
-            }
-
-            // Lambda to format traces -- we want to format the trace with '.' separators
-            $slashToDot = function ($str) {
-                return str_replace('\\', '.', $str);
-            };
-
-            $traceHasKey = array_key_exists(0, $trace);
-            $traceKeyHasClass = $traceHasKey && array_key_exists('class', $trace[0]);
-            $traceKeyHasFunction = $traceKeyHasClass && array_key_exists('function', $trace[0]);
-
-            $result[] = sprintf(
-                ' at %s%s%s(%s%s%s)',
-                $traceKeyHasClass ? $slashToDot($trace[0]['class']) : '',
-                $traceKeyHasFunction ? '.' : '',
-                $traceKeyHasFunction ? $slashToDot($trace[0]['function']) : 'main',
-                $line === null ? $file : basename($file),
-                $line === null ? '' : ':',
-                $line ?? ''
-            );
-            $seen[] = "$file:$line";
-            if (!count($trace)) {
-                break;
-            }
-            $file = array_key_exists('file', $trace[0]) ? $trace[0]['file'] : 'Unknown Source';
-            $line = array_key_exists('file', $trace[0]) && array_key_exists('line', $trace[0]) && $trace[0]['line'] ? $trace[0]['line'] : null;
-            array_shift($trace);
-        }
-        $result = implode("\n", $result);
-        if ($prev) {
-            $result  .= "\n" . self::formatStackTrace($prev, $seen);
-        }
-
-        return $result;
+        return TracingUtil::formatStackTrace($e, $seen);
     }
 
     /** @inheritDoc */
@@ -292,7 +235,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         $eventAttributes = new Attributes([
                 'exception.type' => get_class($exception),
                 'exception.message' => $exception->getMessage(),
-                'exception.stacktrace' => self::formatStackTrace($exception),
+                'exception.stacktrace' => TracingUtil::formatStackTrace($exception),
             ]);
 
         foreach ($attributes as $key => $value) {
