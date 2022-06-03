@@ -301,6 +301,14 @@ class TraceContextPropagatorTest extends TestCase
         ]);
     }
 
+    public function test_invalid_trace_format(): void
+    {
+        // More than 4 parts to the trace but not a future version.
+        $this->assertInvalid([
+            TraceContextPropagator::TRACEPARENT => '00-' . self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-' . '00' . '-000-this-is-not-the-future',
+        ]);
+    }
+
     public function test_invalid_trace_id(): void
     {
         $this->assertInvalid([
