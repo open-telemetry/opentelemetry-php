@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Util;
+namespace OpenTelemetry\SDK\Common\Exception;
 
 use function basename;
 use function count;
@@ -21,8 +21,11 @@ use Throwable;
  * }
  * @psalm-type Frames = non-empty-list<Frame>
  */
-class TracingUtil
+final class StackTraceFormatter
 {
+    private function __construct()
+    {
+    }
 
     /**
      * Formats an exception in a java-like format.
@@ -32,7 +35,7 @@ class TracingUtil
      *
      * @see https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Throwable.html#printStackTrace()
      */
-    public static function formatStackTrace(Throwable $e): string
+    public static function format(Throwable $e): string
     {
         $s = '';
         $seen = [];

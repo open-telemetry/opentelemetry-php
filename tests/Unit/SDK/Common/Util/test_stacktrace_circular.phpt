@@ -2,7 +2,7 @@
 Circular reference in exception
 --FILE--
 <?php
-use OpenTelemetry\SDK\Common\Util\TracingUtil;
+use OpenTelemetry\SDK\Common\Exception\StackTraceFormatter;
 
 require_once 'vendor/autoload.php';
 
@@ -12,8 +12,8 @@ class TestException extends Exception {
     }
 }
 
-echo TracingUtil::formatStackTrace(new TestException()), "\n", "\n";
-echo TracingUtil::formatStackTrace(new TestException('message')), "\n", "\n";
+echo StackTraceFormatter::format(new TestException()), "\n", "\n";
+echo StackTraceFormatter::format(new TestException('message')), "\n", "\n";
 ?>
 --EXPECTF--
 TestException

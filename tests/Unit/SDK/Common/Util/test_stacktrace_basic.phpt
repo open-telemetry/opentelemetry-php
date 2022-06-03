@@ -2,7 +2,7 @@
 Basic stacktrace format
 --FILE--
 <?php
-use OpenTelemetry\SDK\Common\Util\TracingUtil;
+use OpenTelemetry\SDK\Common\Exception\StackTraceFormatter;
 
 require_once 'vendor/autoload.php';
 
@@ -19,13 +19,13 @@ function create(): Throwable {
     return new Exception();
 }
 
-echo TracingUtil::formatStackTrace(new Exception()), "\n", "\n";
-echo TracingUtil::formatStackTrace(new Exception('message')), "\n", "\n";
-echo TracingUtil::formatStackTrace(new Exception('outer', 0, new Exception('inner'))), "\n", "\n";
+echo StackTraceFormatter::format(new Exception()), "\n", "\n";
+echo StackTraceFormatter::format(new Exception('message')), "\n", "\n";
+echo StackTraceFormatter::format(new Exception('outer', 0, new Exception('inner'))), "\n", "\n";
 
-echo TracingUtil::formatStackTrace(create()), "\n", "\n";
-echo TracingUtil::formatStackTrace((new Test)->create()), "\n", "\n";
-echo TracingUtil::formatStackTrace(Test::createStatic()), "\n", "\n";
+echo StackTraceFormatter::format(create()), "\n", "\n";
+echo StackTraceFormatter::format((new Test)->create()), "\n", "\n";
+echo StackTraceFormatter::format(Test::createStatic()), "\n", "\n";
 ?>
 --EXPECTF--
 Exception

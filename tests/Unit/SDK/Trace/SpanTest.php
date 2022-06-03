@@ -15,11 +15,11 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Common\Exception\StackTraceFormatter;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
-use OpenTelemetry\SDK\Common\Util\TracingUtil;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Event;
@@ -571,7 +571,7 @@ class SpanTest extends MockeryTestCase
             new Attributes([
                 'exception.type' => 'Exception',
                 'exception.message' => 'ERR',
-                'exception.stacktrace' => TracingUtil::formatStackTrace($exception),
+                'exception.stacktrace' => StackTraceFormatter::format($exception),
             ]),
             $event->getAttributes()
         );
@@ -597,7 +597,7 @@ class SpanTest extends MockeryTestCase
             new Attributes([
                 'exception.type' => 'Exception',
                 'exception.message' => 'ERR',
-                'exception.stacktrace' => TracingUtil::formatStackTrace($exception),
+                'exception.stacktrace' => StackTraceFormatter::format($exception),
                 'foo' => 'bar',
             ]),
             $event->getAttributes()

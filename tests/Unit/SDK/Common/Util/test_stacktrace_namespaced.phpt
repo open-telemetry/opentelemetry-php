@@ -5,7 +5,7 @@ Namespaced stacktrace format
 namespace Abc\Def;
 
 use Exception;
-use OpenTelemetry\SDK\Common\Util\TracingUtil;
+use OpenTelemetry\SDK\Common\Exception\StackTraceFormatter;
 use Throwable;
 
 require_once 'vendor/autoload.php';
@@ -26,12 +26,12 @@ function create(): Throwable {
     return new Exception();
 }
 
-echo TracingUtil::formatStackTrace(new TestException()), "\n", "\n";
-echo TracingUtil::formatStackTrace(new Exception('outer', 0, new TestException('inner'))), "\n", "\n";
+echo StackTraceFormatter::format(new TestException()), "\n", "\n";
+echo StackTraceFormatter::format(new Exception('outer', 0, new TestException('inner'))), "\n", "\n";
 
-echo TracingUtil::formatStackTrace(create()), "\n", "\n";
-echo TracingUtil::formatStackTrace((new Test)->create()), "\n", "\n";
-echo TracingUtil::formatStackTrace(Test::createStatic()), "\n", "\n";
+echo StackTraceFormatter::format(create()), "\n", "\n";
+echo StackTraceFormatter::format((new Test)->create()), "\n", "\n";
+echo StackTraceFormatter::format(Test::createStatic()), "\n", "\n";
 ?>
 --EXPECTF--
 Abc.Def.TestException
