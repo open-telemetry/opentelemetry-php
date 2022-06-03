@@ -308,8 +308,8 @@ The easy way to test the example out with docker and docker-compose is:
 4) In order to stop docker containers for this example just run `make stop-prometheus`
 
 ## User Quickstarts
-* [Exploring Opentelemetry in Laravel Applications](./docs/laravel-quickstart.md)
-* [Exploring Openetelemetry in Symfony Applications](./docs/symfony-quickstart.md)
+* [Exploring OpenTelemetry in Laravel Applications](./docs/laravel-quickstart.md)
+* [Exploring OpenTelemetry in Symfony Applications](./docs/symfony-quickstart.md)
 
 ## Versioning
 
