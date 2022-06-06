@@ -13,9 +13,9 @@ use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Dev\Compatibility\Util as BcUtil;
+use OpenTelemetry\SDK\Common\Exception\StackTraceFormatter;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
-use OpenTelemetry\SDK\Common\Util\TracingUtil;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use Throwable;
 
@@ -157,11 +157,11 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     {
         BcUtil::triggerMethodDeprecationNotice(
             __METHOD__,
-            'formatStackTrace',
-            TracingUtil::class
+            'format',
+            StackTraceFormatter::class
         );
 
-        return TracingUtil::formatStackTrace($e, $seen);
+        return StackTraceFormatter::format($e);
     }
 
     /** @inheritDoc */
@@ -235,7 +235,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         $eventAttributes = new Attributes([
                 'exception.type' => get_class($exception),
                 'exception.message' => $exception->getMessage(),
-                'exception.stacktrace' => TracingUtil::formatStackTrace($exception),
+                'exception.stacktrace' => StackTraceFormatter::format($exception),
             ]);
 
         foreach ($attributes as $key => $value) {
