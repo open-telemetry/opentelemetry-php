@@ -89,7 +89,7 @@ class TraceStateTest extends TestCase
         $validTracestate = new TraceState(implode(TraceState::LIST_MEMBERS_SEPARATOR, $rawTraceState));
         $this->assertSame(TraceState::MAX_TRACESTATE_LIST_MEMBERS, $validTracestate->getListMemberCount());
 
-        // Add a list-member to the tracestate that exceeds the max of 32. This will the tracestate to be discarded.
+        // Add a list-member to the tracestate that exceeds the max of 32. This will cause the tracestate to be discarded.
         $rawTraceState[32] = 'k32' . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . 'v32';
         $this->assertCount(TraceState::MAX_TRACESTATE_LIST_MEMBERS + 1, $rawTraceState);
 

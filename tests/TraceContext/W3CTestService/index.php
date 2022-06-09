@@ -12,8 +12,6 @@ use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpFoundation\Request;
 
-// @todo remove
-Debug::enable();
 
 (new Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
 
