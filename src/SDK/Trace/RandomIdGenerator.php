@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\API\Trace\SpanContext;
 use Throwable;
 
 class RandomIdGenerator implements IdGeneratorInterface
@@ -13,12 +14,20 @@ class RandomIdGenerator implements IdGeneratorInterface
 
     public function generateTraceId(): string
     {
-        return $this->randomHex(self::TRACE_ID_HEX_LENGTH);
+        do {
+            $traceId = $this->randomHex(self::TRACE_ID_HEX_LENGTH);
+        } while (!SpanContext::isValidTraceId($traceId));
+
+        return $traceId;
     }
 
     public function generateSpanId(): string
     {
-        return $this->randomHex(self::SPAN_ID_HEX_LENGTH);
+        do {
+            $spanId = $this->randomHex(self::SPAN_ID_HEX_LENGTH);
+        } while (!SpanContext::isValidSpanId($spanId));
+
+        return $spanId;
     }
 
     /**
