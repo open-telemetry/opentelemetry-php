@@ -3,8 +3,8 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
+use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
-use OpenTelemetry\SDK\Trace\SpanProcessor\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 $delayMillis = 3000;
@@ -15,7 +15,7 @@ echo sprintf('Sending batches every %dms and on shutdown', $delayMillis) . PHP_E
 $tracerProvider =  new TracerProvider(
     new BatchSpanProcessor(
         new ConsoleSpanExporter(),
-        \OpenTelemetry\SDK\Common\Time\SystemClock::getDefault(),
+        null,
         2048, //max spans to queue before sending to exporter
         $delayMillis, //batch delay milliseconds
     )
@@ -24,7 +24,7 @@ $tracerProvider =  new TracerProvider(
 $tracer = $tracerProvider->getTracer();
 
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
-$rootSpan->activate();
+$scope = $rootSpan->activate();
 
 //3 spans should be sent at 3 seconds
 for ($i=1;$i<=4;$i++) {
@@ -34,4 +34,5 @@ for ($i=1;$i<=4;$i++) {
 }
 //4th span and root span should be sent on shutdown
 $rootSpan->end();
+$scope->detach();
 sleep(1);

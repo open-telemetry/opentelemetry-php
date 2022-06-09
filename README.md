@@ -307,9 +307,10 @@ The easy way to test the example out with docker and docker-compose is:
 
 4) In order to stop docker containers for this example just run `make stop-prometheus`
 
-## User Integration Guides
-* [Integrating OpenTelemetry PHP into Laravel Applications](./docs/laravel-integration.md)
-* [Integrating OpenTelemetry PHP into Symfony Applications](./docs/symfony-integration.md)
+## User Quickstarts
+* [Exploring OpenTelemetry in Laravel Applications](./docs/laravel-quickstart.md)
+* [Exploring OpenTelemetry in Symfony Applications](./docs/symfony-quickstart.md)
+
 ## Versioning
 
 Versioning rationale can be found in the [Versioning Documentation](/docs/versioning.md)
