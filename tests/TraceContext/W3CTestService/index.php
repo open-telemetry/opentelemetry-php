@@ -11,7 +11,6 @@ use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpFoundation\Request;
 
-
 (new Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
 
 $httpClient = new Psr18Client();
