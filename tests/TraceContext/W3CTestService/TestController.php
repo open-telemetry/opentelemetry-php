@@ -6,6 +6,8 @@ namespace App\Controller;
 
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
+use OpenTelemetry\Context\Propagation\SanitizeCombinedHeadersPropagationGetter;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,9 +28,10 @@ class TestController
         }
 
         $traceCtxPropagator = TraceContextPropagator::getInstance();
+        $propagationGetter = new SanitizeCombinedHeadersPropagationGetter(new ArrayAccessGetterSetter());
 
         try {
-            $context = $traceCtxPropagator->extract($request->headers->all());
+            $context = $traceCtxPropagator->extract($request->headers->all(), $propagationGetter);
         } catch (\InvalidArgumentException $th) {
             $context = new Context();
         }
