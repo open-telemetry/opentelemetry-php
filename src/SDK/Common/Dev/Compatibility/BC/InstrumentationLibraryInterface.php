@@ -13,7 +13,7 @@ interface InstrumentationLibraryInterface extends Moved
 /**
  * @codeCoverageIgnoreStart
  */
-class_alias(Moved::class, 'OpenTelemetry\SDK\InstrumentationLibraryInterface');
+class_alias(InstrumentationLibraryInterface::class, 'OpenTelemetry\SDK\Common\Instrumentation\InstrumentationLibraryInterface');
 /**
  * @codeCoverageIgnoreEnd
  */
