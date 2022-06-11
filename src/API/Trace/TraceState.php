@@ -21,8 +21,6 @@ class TraceState implements TraceStateInterface
     private const VALID_KEY_REGEX = '/^(?:' . self::VALID_KEY . '|' . self::VALID_VENDOR_KEY . ')$/';
     private const VALID_VALUE_BASE_REGEX = '/^[ -~]{0,255}[!-~]$/';
     private const INVALID_VALUE_COMMA_EQUAL_REGEX = '/,|=/';
-    private const SERVER_CONCAT_HEADERS_REGEX = '/;(?=[^,=;]*=|$)/';
-    private const TRAILING_LEADING_SEPARATOR_REGEX = '/^' . self::LIST_MEMBERS_SEPARATOR . '+|' . self::LIST_MEMBERS_SEPARATOR . '+$/';
 
     /**
      * @var string[]
@@ -137,21 +135,8 @@ class TraceState implements TraceStateInterface
     {
         $parsedTracestate = [];
 
-        /**
-         * Some servers concatenate multiple headers with ';' -- we need to replace these with ','
-         * This is still a workaround and doesn't get around the problem fully, specifically it doesn't
-         * handle edge cases where the header has a trailing ';' or an empty trace state.
-         * We also need to trim trailing separators from the header, found when a header is empty.
-         * @var string $sanitizedTraceState
-         */
-        $sanitizedTraceState = (function () use ($rawTracestate) {
-            $fixedSeparators = preg_replace(self::SERVER_CONCAT_HEADERS_REGEX, self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
-
-            return preg_replace(self::TRAILING_LEADING_SEPARATOR_REGEX, '', $fixedSeparators);
-        })();
-
-        if (strlen($sanitizedTraceState) <= self::MAX_TRACESTATE_LENGTH) {
-            $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $sanitizedTraceState);
+        if (strlen($rawTracestate) <= self::MAX_TRACESTATE_LENGTH) {
+            $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
 
             // Discard tracestate if entries exceed max length.
             if (count($listMembers) > self::MAX_TRACESTATE_LIST_MEMBERS) {
