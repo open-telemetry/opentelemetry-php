@@ -12,8 +12,8 @@ class ErrorEvent implements StoppableEventInterface
 {
     use StoppableEventTrait;
 
-    private string $message;
-    private Throwable $error;
+    protected string $message;
+    protected Throwable $error;
 
     public function __construct(string $message, Throwable $error)
     {
