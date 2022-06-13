@@ -13,6 +13,6 @@ class DebugEventHandler
 
     public function __invoke(DebugEvent $event): void
     {
-        self::logDebug($event->getMessage());
+        self::logDebug($event->getMessage(), $event->getExtra());
     }
 }

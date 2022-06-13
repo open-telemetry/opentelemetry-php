@@ -57,7 +57,6 @@ class SimpleSpanProcessor implements SpanProcessorInterface
 
         $this->running = false;
         Dispatcher::getInstance()->dispatch(new DebugEvent('Shutting down span processor'));
-        //self::logDebug('Shutting down span processor');
 
         if (null !== $this->exporter) {
             return $this->forceFlush() && $this->exporter->shutdown();
