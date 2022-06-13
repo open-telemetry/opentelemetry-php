@@ -60,6 +60,7 @@ trait HttpSpanExporterTrait
 
         if ($response->getStatusCode() >= 400) {
             Dispatcher::getInstance()->dispatch(new ErrorEvent('40x error exporting span', new Exception('', $response->getStatusCode())));
+
             return $response->getStatusCode() < 500
                 ? SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE
                 : SpanExporterInterface::STATUS_FAILED_RETRYABLE;

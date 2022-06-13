@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\Tests\Unit\SDK\Trace\Behavior;
 
 use GuzzleHttp\Exception\ClientException;
-use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\SDK\Common\Event\Dispatcher;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
+use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -22,14 +24,17 @@ class HttpSpanExporterTraitTest extends TestCase
     private ClientInterface $client;
     private EventDispatcherInterface $dispatcher;
 
+    /**
+     * @psalm-suppress UndefinedInterfaceMethod
+     */
     public function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $request = $this->createMock(RequestInterface::class);
         $this->client = $this->createMock(ClientInterface::class);
         $this->exporter = $this->createExporter();
-        $this->exporter->setRequest($request);
-        $this->exporter->setClient($this->client);
+        $this->exporter->setRequest($request); //@phpstan-ignore-line
+        $this->exporter->setClient($this->client); //@phpstan-ignore-line
         Dispatcher::setInstance($this->dispatcher);
     }
 
@@ -38,23 +43,29 @@ class HttpSpanExporterTraitTest extends TestCase
         Dispatcher::unset();
     }
 
+    /**
+     * @psalm-suppress UndefinedInterfaceMethod
+     */
     public function test_export_with_client_exception_generates_error_event(): void
     {
-        $this->client->expects($this->once())->method('sendRequest')->willThrowException($this->createMock(ClientException::class));
-        $this->dispatcher->expects($this->once())->method('dispatch');
-        $this->exporter->export([$this->createMock(SpanInterface::class)]);
+        $this->client->expects($this->once())->method('sendRequest')->willThrowException($this->createMock(ClientException::class)); //@phpstan-ignore-line
+        $this->dispatcher->expects($this->once())->method('dispatch'); //@phpstan-ignore-line
+        $this->exporter->export([$this->createMock(SpanDataInterface::class)]);
     }
 
+    /**
+     * @psalm-suppress UndefinedInterfaceMethod
+     */
     public function test_export_with_throwable_generates_error_event(): void
     {
-        $this->client->expects($this->once())->method('sendRequest')->willThrowException($this->createMock(Throwable::class));
-        $this->dispatcher->expects($this->once())->method('dispatch');
-        $this->exporter->export([$this->createMock(SpanInterface::class)]);
+        $this->client->expects($this->once())->method('sendRequest')->willThrowException($this->createMock(Throwable::class)); //@phpstan-ignore-line
+        $this->dispatcher->expects($this->once())->method('dispatch'); //@phpstan-ignore-line
+        $this->exporter->export([$this->createMock(SpanDataInterface::class)]);
     }
 
     private function createExporter(): SpanExporterInterface
     {
-        return new class extends TestCase implements SpanExporterInterface {
+        return new class() implements SpanExporterInterface {
             use HttpSpanExporterTrait;
             private RequestInterface $request;
             public function setRequest(RequestInterface $request): void
@@ -65,7 +76,6 @@ class HttpSpanExporterTraitTest extends TestCase
             {
                 $this->client = $client;
             }
-
             public function serializeTrace(iterable $spans): string
             {
                 return '';

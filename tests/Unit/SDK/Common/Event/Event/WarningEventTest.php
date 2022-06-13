@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Event\Event;
 
 use OpenTelemetry\SDK\Common\Event\Event\WarningEvent;
