@@ -15,7 +15,7 @@ class WarningEvent implements StoppableEventInterface
     protected string $message;
     protected ?Throwable $error = null;
 
-    public function __construct(string $message, ?Throwable $error)
+    public function __construct(string $message, ?Throwable $error = null)
     {
         $this->message = $message;
         $this->error = $error;

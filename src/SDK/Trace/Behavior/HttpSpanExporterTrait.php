@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\Behavior;
 
+use Exception;
 use InvalidArgumentException;
 use JsonException;
 use OpenTelemetry\SDK\Common\Event\Dispatcher;
@@ -18,8 +19,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Throwable;
-
-//use Throwable;
 
 /**
  * @phan-file-suppress PhanTypeInvalidThrowsIsInterface
@@ -60,6 +59,7 @@ trait HttpSpanExporterTrait
         }
 
         if ($response->getStatusCode() >= 400) {
+            Dispatcher::getInstance()->dispatch(new ErrorEvent('40x error exporting span', new Exception('', $response->getStatusCode())));
             return $response->getStatusCode() < 500
                 ? SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE
                 : SpanExporterInterface::STATUS_FAILED_RETRYABLE;
