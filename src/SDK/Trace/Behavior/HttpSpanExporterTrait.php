@@ -6,6 +6,8 @@ namespace OpenTelemetry\SDK\Trace\Behavior;
 
 use InvalidArgumentException;
 use JsonException;
+use OpenTelemetry\SDK\Common\Event\Dispatcher;
+use OpenTelemetry\SDK\Common\Event\Event\ErrorEvent;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -46,10 +48,14 @@ trait HttpSpanExporterTrait
         try {
             $response = $this->dispatchSpans($spans);
         } catch (ClientExceptionInterface $e) {
+            Dispatcher::getInstance()->dispatch(new ErrorEvent('Error exporting span', $e));
+
             return $e instanceof RequestExceptionInterface
                 ? SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE
                 : SpanExporterInterface::STATUS_FAILED_RETRYABLE;
         } catch (Throwable $e) {
+            Dispatcher::getInstance()->dispatch(new ErrorEvent('Error exporting span', $e));
+
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
 

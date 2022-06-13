@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpGrpc;
 
+use Exception;
 use grpc;
 use Grpc\ChannelCredentials;
 use OpenTelemetry\Contrib\Otlp\ExporterTrait;
@@ -12,6 +13,9 @@ use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SDK\Common\Event\Dispatcher;
+use OpenTelemetry\SDK\Common\Event\Event\ErrorEvent;
+use OpenTelemetry\SDK\Common\Event\Event\WarningEvent;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -140,12 +144,12 @@ class Exporter implements SpanExporterInterface
             \Grpc\STATUS_DATA_LOSS,
             \Grpc\STATUS_UNAUTHENTICATED,
         ], true)) {
-            self::logWarning('Retryable error exporting grpc span', ['error' => $error]);
+            Dispatcher::getInstance()->dispatch(new WarningEvent('Retryable error exporting grpc span', new Exception($error['error'], $error['code'])));
 
             return self::STATUS_FAILED_RETRYABLE;
         }
 
-        self::logError('Error exporting grpc span', ['error' => $error]);
+        Dispatcher::getInstance()->dispatch(new ErrorEvent('Error exporting grpc span', new Exception($error['error'])));
 
         return self::STATUS_FAILED_NOT_RETRYABLE;
     }

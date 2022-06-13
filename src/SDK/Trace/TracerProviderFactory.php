@@ -6,6 +6,8 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Common\Event\Dispatcher;
+use OpenTelemetry\SDK\Common\Event\Event\WarningEvent;
 
 final class TracerProviderFactory
 {
@@ -31,21 +33,21 @@ final class TracerProviderFactory
         try {
             $exporter = $this->exporterFactory->fromEnvironment();
         } catch (\Throwable $t) {
-            self::logWarning('Unable to create exporter', ['error' => $t]);
+            Dispatcher::getInstance()->dispatch(new WarningEvent('Unable to create exporter', $t));
             $exporter = null;
         }
 
         try {
             $sampler = $this->samplerFactory->fromEnvironment();
         } catch (\Throwable $t) {
-            self::logWarning('Unable to create sampler', ['error' => $t]);
+            Dispatcher::getInstance()->dispatch(new WarningEvent('Unable to create sampler', $t));
             $sampler = null;
         }
 
         try {
             $spanProcessor = $this->spanProcessorFactory->fromEnvironment($exporter);
         } catch (\Throwable $t) {
-            self::logWarning('Unable to create span processor', ['error' => $t]);
+            Dispatcher::getInstance()->dispatch(new WarningEvent('Unable to create span processor', $t));
             $spanProcessor = null;
         }
 
