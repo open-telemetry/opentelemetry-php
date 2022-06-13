@@ -25,22 +25,10 @@ class SimpleListenerProvider implements ListenerProviderInterface
                 }
             }
         }
-        /*        $eventListeners = $this->listeners[get_class($event)] ?? [[]];
-                foreach ($eventListeners as $listeners) {
-                    foreach ($listeners as $listener) {
-                        yield $listener;
-                    }
-                }*/
     }
 
     public function listen(string $event, callable $listener, int $priority = 0): void
     {
-        /*if (!array_key_exists($event, $this->listeners)) {
-            $this->listeners[$event] = [];
-        }
-        if (!array_key_exists($priority, $this->listeners[$event])) {
-            $this->listeners[$event][$priority] = [];
-        }*/
         $this->listeners[$event][$priority][] = $listener;
         ksort($this->listeners[$event]);
     }
