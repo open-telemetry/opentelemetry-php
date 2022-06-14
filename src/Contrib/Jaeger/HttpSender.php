@@ -9,7 +9,6 @@ use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactory;
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactoryInterface;
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterInterface;
 use OpenTelemetry\Contrib\Jaeger\TagFactory\TagFactory;
-use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use Psr\Http\Client\ClientInterface;
@@ -20,8 +19,6 @@ use Thrift\Protocol\TProtocol;
 
 class HttpSender
 {
-    use LogsMessagesTrait;
-
     private string $serviceName;
 
     private TProtocol $protocol;

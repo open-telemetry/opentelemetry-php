@@ -11,9 +11,10 @@ use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
+use OpenTelemetry\SDK\Behavior\EmitsEventsTrait;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
-use OpenTelemetry\SDK\Common\Event\Dispatcher;
+use OpenTelemetry\SDK\Common\Event\Event\DebugEvent;
 use OpenTelemetry\SDK\Common\Event\Event\ErrorEvent;
 use OpenTelemetry\SDK\Common\Event\Event\WarningEvent;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
@@ -21,6 +22,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class Exporter implements SpanExporterInterface
 {
+    use EmitsEventsTrait;
     use ExporterTrait;
     use SpanExporterTrait;
 
@@ -123,7 +125,7 @@ class Exporter implements SpanExporterInterface
         [$response, $status] = $this->client->Export($request)->wait();
 
         if ($status->code === \Grpc\STATUS_OK) {
-            self::logDebug('Exported span(s)', ['spans' => $resourceSpans]);
+            self::emit(new DebugEvent('Exported span(s)', ['spans' => $resourceSpans]));
 
             return self::STATUS_SUCCESS;
         }
@@ -144,12 +146,12 @@ class Exporter implements SpanExporterInterface
             \Grpc\STATUS_DATA_LOSS,
             \Grpc\STATUS_UNAUTHENTICATED,
         ], true)) {
-            Dispatcher::getInstance()->dispatch(new WarningEvent('Retryable error exporting grpc span', new Exception($error['error'], $error['code'])));
+            self::emit(new WarningEvent('Retryable error exporting grpc span', new Exception($error['error'], $error['code'])));
 
             return self::STATUS_FAILED_RETRYABLE;
         }
 
-        Dispatcher::getInstance()->dispatch(new ErrorEvent('Error exporting grpc span', new Exception($error['error'])));
+        self::emit(new ErrorEvent('Error exporting grpc span', new Exception($error['error'])));
 
         return self::STATUS_FAILED_NOT_RETRYABLE;
     }

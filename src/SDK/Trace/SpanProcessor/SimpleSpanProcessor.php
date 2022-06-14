@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Event\Dispatcher;
+use OpenTelemetry\SDK\Behavior\EmitsEventsTrait;
 use OpenTelemetry\SDK\Common\Event\Event\DebugEvent;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
@@ -15,7 +14,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 
 class SimpleSpanProcessor implements SpanProcessorInterface
 {
-    use LogsMessagesTrait;
+    use EmitsEventsTrait;
 
     private ?SpanExporterInterface $exporter;
     private bool $running = true;
@@ -56,7 +55,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         }
 
         $this->running = false;
-        Dispatcher::getInstance()->dispatch(new DebugEvent('Shutting down span processor'));
+        self::emit(new DebugEvent('Shutting down span processor'));
 
         if (null !== $this->exporter) {
             return $this->forceFlush() && $this->exporter->shutdown();
