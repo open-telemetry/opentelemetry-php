@@ -13,6 +13,6 @@ class ErrorEventHandler
 
     public function __invoke(ErrorEvent $event): void
     {
-        self::logError($event->getError()->getMessage(), ['error' => $event->getError()]);
+        self::logError($event->getMessage(), ['exception' => $event->getException()]);
     }
 }

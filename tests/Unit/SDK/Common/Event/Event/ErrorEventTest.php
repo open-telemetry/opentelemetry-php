@@ -18,6 +18,6 @@ class ErrorEventTest extends TestCase
         $exception = new \Exception();
         $event = new ErrorEvent($message, $exception);
         $this->assertSame($message, $event->getMessage());
-        $this->assertSame($exception, $event->getError());
+        $this->assertSame($exception, $event->getException());
     }
 }

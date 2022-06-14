@@ -19,7 +19,7 @@ class WarningEventTest extends TestCase
         $event = new WarningEvent($message, $exception);
         $this->assertSame($message, $event->getMessage());
         $this->assertTrue($event->hasError());
-        $this->assertSame($exception, $event->getError());
+        $this->assertSame($exception, $event->getException());
     }
 
     public function test_warning_event_without_throwable(): void
@@ -28,6 +28,6 @@ class WarningEventTest extends TestCase
         $event = new WarningEvent($message);
         $this->assertSame($message, $event->getMessage());
         $this->assertFalse($event->hasError());
-        $this->assertNull($event->getError());
+        $this->assertNull($event->getException());
     }
 }

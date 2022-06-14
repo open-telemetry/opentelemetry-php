@@ -13,17 +13,17 @@ class ErrorEvent implements StoppableEventInterface
     use StoppableEventTrait;
 
     protected string $message;
-    protected Throwable $error;
+    protected Throwable $exception;
 
     public function __construct(string $message, Throwable $error)
     {
         $this->message = $message;
-        $this->error = $error;
+        $this->exception = $error;
     }
 
-    public function getError(): Throwable
+    public function getException(): Throwable
     {
-        return $this->error;
+        return $this->exception;
     }
 
     public function getMessage(): string

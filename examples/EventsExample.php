@@ -38,11 +38,11 @@ LoggerHolder::set(
  */
 $listenerProvider = new SimpleListenerProvider();
 $listenerProvider->listen(EventType::ERROR, function (ErrorEvent $event) {
-    echo 'Custom handling of an error event: ' . $event->getError()->getMessage() . PHP_EOL;
+    echo 'Custom handling of an error event: ' . $event->getException()->getMessage() . PHP_EOL;
 }, -10); //runs before built-in handler
 $listenerProvider->listen(EventType::ERROR, function (ErrorEvent $event) {
     echo 'Another custom handling of an error event: ' . $event->getMessage() . PHP_EOL;
-    echo json_encode($event->getError()->getTrace()) . PHP_EOL;
+    echo json_encode($event->getException()->getTrace()) . PHP_EOL;
     echo 'Stopping event propagation...' . PHP_EOL;
     $event->stopPropagation();
 }, 5); //runs after build-in handler

@@ -13,22 +13,22 @@ class WarningEvent implements StoppableEventInterface
     use StoppableEventTrait;
 
     protected string $message;
-    protected ?Throwable $error = null;
+    protected ?Throwable $exception = null;
 
-    public function __construct(string $message, ?Throwable $error = null)
+    public function __construct(string $message, ?Throwable $exception = null)
     {
         $this->message = $message;
-        $this->error = $error;
+        $this->exception = $exception;
     }
 
-    public function getError(): ?Throwable
+    public function getException(): ?Throwable
     {
-        return $this->error;
+        return $this->exception;
     }
 
     public function hasError(): bool
     {
-        return $this->error !== null;
+        return $this->exception !== null;
     }
 
     public function getMessage(): string

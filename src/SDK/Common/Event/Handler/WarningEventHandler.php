@@ -13,6 +13,6 @@ class WarningEventHandler
 
     public function __invoke(WarningEvent $event): void
     {
-        self::logWarning($event->getMessage(), ['error' => $event->getError()]);
+        self::logWarning($event->getMessage(), ['exception' => $event->getException()]);
     }
 }
