@@ -155,14 +155,12 @@ class Context
      */
     public function get(ContextKey $key)
     {
-        if ($this->key === $key) {
-            return $this->value;
+        for ($context = $this; $context; $context = $context->parent) {
+            if ($context->key === $key) {
+                return $context->value;
+            }
         }
 
-        if (null === $this->parent) {
-            return null;
-        }
-
-        return $this->parent->get($key);
+        return null;
     }
 }
