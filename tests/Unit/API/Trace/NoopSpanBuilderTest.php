@@ -39,8 +39,7 @@ class NoopSpanBuilderTest extends TestCase
         $span = $this->createMock(SpanInterface::class);
         $span->method('getContext')->willReturn($spanContext);
 
-        $context = $this->createMock(Context::class);
-        $context->method('get')->with(SpanContextKey::instance())->willReturn($span);
+        $context = Context::getRoot()->with(SpanContextKey::instance(), $span);
 
         $contextStorage = $this->createMock(ContextStorageInterface::class);
 
@@ -59,8 +58,7 @@ class NoopSpanBuilderTest extends TestCase
         $span = $this->createMock(SpanInterface::class);
         $span->method('getContext')->willReturn($spanContext);
 
-        $context = $this->createMock(Context::class);
-        $context->method('get')->with(SpanContextKey::instance())->willReturn($span);
+        $context = Context::getRoot()->with(SpanContextKey::instance(), $span);
 
         $contextStorage = $this->createMock(ContextStorageInterface::class);
         $contextStorage->method('current')->willReturn($context);
@@ -79,8 +77,7 @@ class NoopSpanBuilderTest extends TestCase
         $span = $this->createMock(SpanInterface::class);
         $span->method('getContext')->willReturn($spanContext);
 
-        $context = $this->createMock(Context::class);
-        $context->method('get')->with(SpanContextKey::instance())->willReturn($span);
+        $context = Context::getRoot()->with(SpanContextKey::instance(), $span);
 
         $contextStorage = $this->createMock(ContextStorageInterface::class);
         $contextStorage->method('current')->willReturn($context);
@@ -99,8 +96,7 @@ class NoopSpanBuilderTest extends TestCase
         $span = $this->createMock(SpanInterface::class);
         $span->method('isRecording')->willReturn(true);
 
-        $context = $this->createMock(Context::class);
-        $context->method('get')->with(SpanContextKey::instance())->willReturn($span);
+        $context = Context::getRoot()->with(SpanContextKey::instance(), $span);
 
         $contextStorage = $this->createMock(ContextStorageInterface::class);
 
@@ -179,6 +175,7 @@ class NoopSpanBuilderTest extends TestCase
     public function test_start_span(): void
     {
         $contextStorage = $this->createMock(ContextStorageInterface::class);
+        $contextStorage->method('current')->willReturn(Context::getRoot());
 
         $this->assertInstanceOf(
             NonRecordingSpan::class,
