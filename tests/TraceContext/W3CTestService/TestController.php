@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use GuzzleHttp\Client;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
-use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
+use OpenTelemetry\Context\Propagation\SanitizeCombinedHeadersPropagationGetter;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,39 +18,53 @@ class TestController
 {
     /**
      * @Route("/test")
+     * @throws \Psr\Http\Client\ClientExceptionInterface
      */
     public function index(Request $request): Response
     {
         global $tracer;
+        if (!$tracer) {
+            return new Response('internal error', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
-        $array = $request->request->all();
+        $traceCtxPropagator = TraceContextPropagator::getInstance();
+        $propagationGetter = new SanitizeCombinedHeadersPropagationGetter(new ArrayAccessGetterSetter());
+
+        try {
+            $context = $traceCtxPropagator->extract($request->headers->all(), $propagationGetter);
+        } catch (\InvalidArgumentException $th) {
+            $context = new Context();
+        }
+
         $body = json_decode($request->getContent(), true);
+        if (!$body) {
+            return new Response('Invalid JSON', Response::HTTP_BAD_REQUEST);
+        }
 
         foreach ($body as $case) {
-            if ($tracer) {
-                $headers = ['content-type' => 'application/json'];
-                $url = $case['url'];
-                $arguments = $case['arguments'];
+            $headers = ['content-type' => 'application/json'];
+            $url = $case['url'];
+            $arguments = $case['arguments'];
 
-                try {
-                    $context = TraceContextPropagator::extract($request->headers->all());
-                } catch (\InvalidArgumentException $th) {
-                    $context = SpanContext::generate();
-                }
+            $span = $tracer->spanBuilder($url)->setParent($context)->startSpan();
+            $context = $span->storeInContext($context);
+            $scope = $context->activate();
 
-                $span = $tracer->startAndActivateSpanFromContext($url, $context, true);
-                TraceContextPropagator::inject($carrier, null, $context);
+            $traceCtxPropagator->inject($headers, null, $context);
 
-                $client = new Client([
+            $client = new Psr18Client(HttpClient::create(
+                [
                     'base_uri' => $url,
                     'timeout'  => 2.0,
-                ]);
+                ]
+            ));
 
-                $testServiceRequest = new \GuzzleHttp\Psr7\Request('POST', $url, $headers, json_encode($arguments));
-                $response = $client->sendRequest($testServiceRequest);
+            $testServiceRequest = new \Nyholm\Psr7\Request('POST', $url, $headers, json_encode($arguments));
 
-                $span->end();
-            }
+            $client->sendRequest($testServiceRequest);
+
+            $span->end();
+            $scope->detach();
         }
 
         return new Response(
