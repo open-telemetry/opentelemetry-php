@@ -15,7 +15,7 @@ class Context
      */
     private static ContextStorageInterface $storage;
 
-    private static ?\OpenTelemetry\Context\Context $root = null;
+    private static ?Context $root = null;
 
     /**
      * @internal
@@ -76,7 +76,7 @@ class Context
      *
      * @return mixed
      */
-    public static function getValue(ContextKey $key, $ctx=null)
+    public static function getValue(ContextKey $key, ?Context $ctx=null)
     {
         $ctx = $ctx ?? static::getCurrent();
 
@@ -86,11 +86,11 @@ class Context
     protected ?ContextKey $key;
 
     /**
-     * @var mixed|null
+     * @var mixed
      */
     protected $value;
 
-    protected ?\OpenTelemetry\Context\Context $parent;
+    protected ?Context $parent;
 
     /**
      * This is a general purpose read-only key-value store. Read-only in the sense that adding a new value does not
@@ -106,10 +106,10 @@ class Context
      * with Baggage instances.
      *
      * @param ContextKey|null $key The key object. Should only be null when creating an "empty" context
-     * @param mixed|null $value
-     * @param self|null $parent Reference to the parent object
+     * @param mixed $value
+     * @param Context|null $parent Reference to the parent object
      */
-    final public function __construct(?ContextKey $key=null, $value=null, $parent=null)
+    final public function __construct(?ContextKey $key=null, $value=null, ?Context $parent=null)
     {
         $this->key = $key;
         $this->value = $value;
@@ -125,7 +125,7 @@ class Context
      *
      * @return Context a new Context containing the k/v
      */
-    public function with(ContextKey $key, $value)
+    public function with(ContextKey $key, $value): Context
     {
         return new self($key, $value, $this);
     }
@@ -151,7 +151,7 @@ class Context
     /**
      * Fetch a value from the Context given a key value.
      *
-     * @return mixed|null
+     * @return mixed
      */
     public function get(ContextKey $key)
     {
