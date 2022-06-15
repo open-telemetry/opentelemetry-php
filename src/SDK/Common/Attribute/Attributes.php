@@ -41,8 +41,9 @@ class Attributes implements AttributesInterface
             return $this->unsetAttribute($name);
         }
 
-        $this->totalAddedAttributes++;
-
+        if (!$this->hasAttribute($name)) {
+            $this->totalAddedAttributes++;
+        }
         // drop attribute when limit is reached
         if (!$this->hasAttribute($name) && $this->isLimitReached()) {
             return $this;
