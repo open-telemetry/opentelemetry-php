@@ -102,36 +102,6 @@ class Context
         return $ctx->get($key);
     }
 
-    /**
-     * This is a static version of set().
-     * This is primarily useful when the caller doesn't already have a reference to a Context that they want to mutate.
-     *
-     * There are two ways to call this function.
-     * 1) With a $parent parameter:
-     *    Context::setValue($key, $value, $ctx) is functionally equivalent to $ctx->set($key, $value)
-     * 2) Without a $parent parameter:
-     *    In this scenario, setValue() will use the `$current_context` reference as supplied by `getCurrent()`
-     *    `getCurrent()` will always return a valid Context. If one does not exist at the global scope,
-     *    an "empty" context will be created.
-     *
-     * @param ContextKey $key
-     * @param mixed $value
-     * @param Context|null $parent
-     *
-     * @return Context a new Context containing the k/v
-     */
-    public static function withValue(ContextKey $key, $value, $parent=null)
-    {
-        if (null === $parent) {
-            // TODO This should not attach, leads to a context that cannot be detached
-            self::storage()->attach(new self($key, $value, self::getCurrent()));
-
-            return self::getCurrent();
-        }
-
-        return new self($key, $value, $parent);
-    }
-
     protected ?ContextKey $key;
 
     /**

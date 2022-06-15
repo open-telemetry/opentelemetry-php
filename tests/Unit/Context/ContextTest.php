@@ -98,40 +98,20 @@ class ContextTest extends TestCase
 
     public function test_storage_order_doesnt_matter(): void
     {
+        $context = new Context();
         $arr = [];
         foreach (range(0, 9) as $i) {
             $r = rand(0, 100);
             $key = new ContextKey((string) $r);
-            Context::withValue($key, $r);
+            $context = $context->with($key, $r);
             $arr[$r] = $key;
         }
 
         ksort($arr);
 
         foreach ($arr as $v => $k) {
-            $this->assertSame(Context::getValue($k), $v);
+            $this->assertSame($context->get($k), $v);
         }
-    }
-
-    public function test_static_use_of_current_doesnt_interfere_with_other_calls(): void
-    {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
-        $key3 = new ContextKey();
-
-        Context::withValue($key1, '111');
-        Context::withValue($key2, '222');
-
-        $ctx = Context::withValue($key3, '333', new Context());
-
-        $this->assertSame(Context::getValue($key1), '111');
-        $this->assertSame(Context::getValue($key2), '222');
-
-        $this->assertSame(Context::getValue($key3, $ctx), '333');
-
-        $this->assertNull(Context::getValue($key1, $ctx));
-        $this->assertNull(Context::getValue($key2, $ctx));
-        $this->assertNull(Context::getValue($key3));
     }
 
     public function test_reusing_key_overwrites_value(): void
@@ -172,42 +152,5 @@ class ContextTest extends TestCase
 
         $this->assertSame(Context::getValue($key, $ctx), $val);
         $this->assertSame(Context::getValue($key, null), $val);
-    }
-
-    public function test_static_set_and_instance_get_use_same_ctx(): void
-    {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
-        $val1 = '111';
-        $val2 = '222';
-
-        $ctx = Context::withValue($key1, $val1);
-        $ctx = Context::withValue($key2, $val2, $ctx);
-
-        $this->assertSame($ctx->get($key1), $val1);
-        $this->assertSame($ctx->get($key2), $val2);
-    }
-
-    public function test_static_without_passed_ctx_uses_current(): void
-    {
-        $ctx = Context::withValue(new ContextKey(), '111');
-        $first = Context::getCurrent();
-        $this->assertSame($first, $ctx);
-
-        $ctx = Context::withValue(new ContextKey(), '222');
-        $second = Context::getCurrent();
-        $this->assertSame($second, $ctx);
-
-        $this->assertNotSame($first, $second);
-    }
-
-    public function test_static_with_passed_ctx_does_not_use_current(): void
-    {
-        $key1 = new ContextKey();
-        $currentCtx = Context::withValue($key1, '111');
-
-        $key2 = new ContextKey();
-        $otherCtx = Context::withValue($key2, '222', new Context());
-        $this->assertSame($currentCtx, Context::getCurrent());
     }
 }
