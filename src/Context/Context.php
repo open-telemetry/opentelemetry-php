@@ -55,16 +55,6 @@ class Context
         return new ContextKey($key);
     }
 
-    /**
-     * Given a token, the current context will be set back to the one prior to the token being generated.
-     */
-    public static function detach(ScopeInterface $token): Context
-    {
-        $token->detach();
-
-        return self::getCurrent();
-    }
-
     public static function getCurrent(): Context
     {
         return self::storage()->current();

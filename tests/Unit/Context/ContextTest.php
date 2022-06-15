@@ -138,7 +138,7 @@ class ContextTest extends TestCase
         $token = Context::attach((new Context())->with($key, '222'));
         $this->assertSame(Context::getValue($key), '222');
 
-        Context::detach($token);
+        $token->detach();
         $this->assertSame(Context::getValue($key), '111');
     }
 
