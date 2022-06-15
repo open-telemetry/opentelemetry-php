@@ -37,15 +37,6 @@ class Context
     }
 
     /**
-     * This will set the given Context to be the "current" one. We return a token which can be passed to `detach()` to
-     * reset the Current Context back to the previous one.
-     */
-    public static function attach(Context $ctx): ScopeInterface
-    {
-        return self::storage()->attach($ctx);
-    }
-
-    /**
      * @param non-empty-string $key
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#create-a-key
@@ -154,7 +145,7 @@ class Context
      */
     public function activate(): ScopeInterface
     {
-        return self::attach($this);
+        return self::storage()->attach($this);
     }
 
     /**

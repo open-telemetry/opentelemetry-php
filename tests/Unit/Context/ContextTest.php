@@ -133,9 +133,9 @@ class ContextTest extends TestCase
     public function test_attach_and_detach_set_current_ctx(): void
     {
         $key = new ContextKey();
-        Context::attach((new Context())->with($key, '111'));
+        (new Context())->with($key, '111')->activate();
 
-        $token = Context::attach((new Context())->with($key, '222'));
+        $token = (new Context())->with($key, '222')->activate();
         $this->assertSame(Context::getValue($key), '222');
 
         $token->detach();
@@ -148,7 +148,7 @@ class ContextTest extends TestCase
         $val = 'foobar';
 
         $ctx = (new Context())->with($key, $val);
-        Context::attach($ctx);
+        $ctx->activate();
 
         $this->assertSame(Context::getValue($key, $ctx), $val);
         $this->assertSame(Context::getValue($key, null), $val);
