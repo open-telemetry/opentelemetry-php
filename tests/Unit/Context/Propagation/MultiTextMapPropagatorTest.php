@@ -76,7 +76,7 @@ class MultiTextMapPropagatorTest extends MockeryTestCase
     public function test_extract_no_propagators(): void
     {
         $this->assertSame(
-            Context::getRoot(),
+            Context::getCurrent(),
             (new MultiTextMapPropagator([]))->extract([])
         );
     }
