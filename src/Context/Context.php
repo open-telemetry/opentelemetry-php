@@ -109,7 +109,7 @@ class Context
      * @param mixed $value
      * @param Context|null $parent Reference to the parent object
      */
-    final public function __construct(?ContextKey $key=null, $value=null, ?Context $parent=null)
+    final protected function __construct(?ContextKey $key=null, $value=null, ?Context $parent=null)
     {
         $this->key = $key;
         $this->value = $value;

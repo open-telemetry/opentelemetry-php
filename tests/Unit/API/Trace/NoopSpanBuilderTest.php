@@ -27,7 +27,7 @@ class NoopSpanBuilderTest extends TestCase
             NoopSpanBuilder::class,
             (new NoopSpanBuilder($contextStorage))->setParent(
             // @todo: Create a interface for Context to allow it to be mocked
-                new Context()
+                Context::getRoot()
             )
         );
     }

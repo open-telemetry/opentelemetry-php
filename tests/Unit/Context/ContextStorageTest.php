@@ -52,8 +52,8 @@ class ContextStorageTest extends TestCase
     public function test_storage_switch_switches_context(): void
     {
         $storage = new ContextStorage();
-        $main = new Context();
-        $fork = new Context();
+        $main = Context::getRoot();
+        $fork = Context::getRoot();
 
         $scopeMain = $storage->attach($main);
 
@@ -85,7 +85,7 @@ class ContextStorageTest extends TestCase
     public function test_storage_fork_keeps_forked_root(): void
     {
         $storage = new ContextStorage();
-        $main = new Context();
+        $main = Context::getRoot();
 
         $scopeMain = $storage->attach($main);
         $storage->fork(1);

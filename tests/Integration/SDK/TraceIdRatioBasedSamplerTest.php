@@ -21,7 +21,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
     {
         $sampler = new TraceIdRatioBasedSampler(0.0);
         $decision = $sampler->shouldSample(
-            new Context(),
+            Context::getRoot(),
             '4bf92f3577b34da6a3ce929d0e0e4736',
             'test.opentelemetry.io',
             API\SpanKind::KIND_INTERNAL
@@ -33,7 +33,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
     {
         $sampler = new TraceIdRatioBasedSampler(1.0);
         $decision = $sampler->shouldSample(
-            new Context(),
+            Context::getRoot(),
             '4bf92f3577b34da6a3ce929d0e0e4736',
             'test.opentelemetry.io',
             API\SpanKind::KIND_INTERNAL
@@ -45,7 +45,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
     {
         $sampler = new TraceIdRatioBasedSampler(0.99);
         $decision = $sampler->shouldSample(
-            new Context(),
+            Context::getRoot(),
             '4bf92f3577b34da6afffffffffffffff',
             'test.opentelemetry.io',
             API\SpanKind::KIND_INTERNAL
@@ -57,7 +57,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
     {
         $sampler = new TraceIdRatioBasedSampler(0.01);
         $decision = $sampler->shouldSample(
-            new Context(),
+            Context::getRoot(),
             '4bf92f3577b34da6a000000000000000',
             'test.opentelemetry.io',
             API\SpanKind::KIND_INTERNAL
@@ -100,6 +100,6 @@ class TraceIdRatioBasedSamplerTest extends TestCase
             );
         }
 
-        return (new Context())->withContextValue(new NonRecordingSpan($spanContext));
+        return (Context::getRoot())->withContextValue(new NonRecordingSpan($spanContext));
     }
 }

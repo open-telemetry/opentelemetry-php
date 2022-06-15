@@ -15,9 +15,8 @@ class ContextTest extends TestCase
 {
     public function test_activate(): void
     {
-        $context = new Context();
+        $context = Context::getRoot();
 
-        $this->assertNotSame($context, Context::getCurrent());
         $context->activate();
         $this->assertSame($context, Context::getCurrent());
     }
@@ -27,7 +26,7 @@ class ContextTest extends TestCase
         $key1 = new ContextKey('key1');
         $key2 = new ContextKey('key2');
 
-        $ctx = (new Context())->with($key1, 'val1')->with($key2, 'val2');
+        $ctx = (Context::getRoot())->with($key1, 'val1')->with($key2, 'val2');
 
         $this->assertSame($ctx->get($key1), 'val1');
         $this->assertSame($ctx->get($key2), 'val2');
@@ -38,7 +37,7 @@ class ContextTest extends TestCase
         $key1 = new ContextKey();
         $key2 = new ContextKey();
 
-        $parent = (new Context())->with($key1, 'foo');
+        $parent = (Context::getRoot())->with($key1, 'foo');
         $child = $parent->with($key2, 'bar');
 
         $this->assertSame($child->get($key1), 'foo');
@@ -55,7 +54,7 @@ class ContextTest extends TestCase
         $key1 = new ContextKey($key_name);
         $key2 = new ContextKey($key_name);
 
-        $ctx = (new Context())->with($key1, 'val1')->with($key2, 'val2');
+        $ctx = (Context::getRoot())->with($key1, 'val1')->with($key2, 'val2');
 
         $this->assertSame($ctx->get($key1), 'val1');
         $this->assertSame($ctx->get($key2), 'val2');
@@ -66,7 +65,7 @@ class ContextTest extends TestCase
         $key1 = new ContextKey();
         $key2 = new ContextKey();
 
-        $ctx = (new Context())->with($key1, 'val1')->with($key2, 'val2');
+        $ctx = (Context::getRoot())->with($key1, 'val1')->with($key2, 'val2');
 
         $this->assertSame($ctx->get($key1), 'val1');
         $this->assertSame($ctx->get($key2), 'val2');
@@ -84,7 +83,7 @@ class ContextTest extends TestCase
         $null_key = new ContextKey();
         $obj_key = new ContextKey();
 
-        $ctx = (new Context())
+        $ctx = (Context::getRoot())
             ->with($scalar_key, $scalar_val)
             ->with($array_key, $array_val)
             ->with($null_key, $null_val)
@@ -98,7 +97,7 @@ class ContextTest extends TestCase
 
     public function test_storage_order_doesnt_matter(): void
     {
-        $context = new Context();
+        $context = Context::getRoot();
         $arr = [];
         foreach (range(0, 9) as $i) {
             $r = rand(0, 100);
@@ -117,7 +116,7 @@ class ContextTest extends TestCase
     public function test_reusing_key_overwrites_value(): void
     {
         $key = new ContextKey();
-        $ctx = (new Context())->with($key, 'val1');
+        $ctx = (Context::getRoot())->with($key, 'val1');
         $this->assertSame($ctx->get($key), 'val1');
 
         $ctx = $ctx->with($key, 'val2');
@@ -126,16 +125,16 @@ class ContextTest extends TestCase
 
     public function test_ctx_value_not_found_throws(): void
     {
-        $ctx = (new Context())->with(new ContextKey('foo'), 'bar');
+        $ctx = (Context::getRoot())->with(new ContextKey('foo'), 'bar');
         $this->assertNull($ctx->get(new ContextKey('baz')));
     }
 
     public function test_attach_and_detach_set_current_ctx(): void
     {
         $key = new ContextKey();
-        (new Context())->with($key, '111')->activate();
+        (Context::getRoot())->with($key, '111')->activate();
 
-        $token = (new Context())->with($key, '222')->activate();
+        $token = (Context::getRoot())->with($key, '222')->activate();
         $this->assertSame(Context::getValue($key), '222');
 
         $token->detach();
@@ -147,7 +146,7 @@ class ContextTest extends TestCase
         $key = new ContextKey('ofoba');
         $val = 'foobar';
 
-        $ctx = (new Context())->with($key, $val);
+        $ctx = (Context::getRoot())->with($key, $val);
         $ctx->activate();
 
         $this->assertSame(Context::getValue($key, $ctx), $val);

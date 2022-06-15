@@ -46,7 +46,7 @@ class ParentBasedTest extends TestCase
 
         $sampler = new ParentBased($rootSampler);
         $sampler->shouldSample(
-            new Context(),
+            Context::getRoot(),
             '4bf92f3577b34da6a3ce929d0e0e4736',
             'test.opentelemetry.io',
             API\SpanKind::KIND_INTERNAL
@@ -111,7 +111,7 @@ class ParentBasedTest extends TestCase
             );
         }
 
-        return (new Context())->withContextValue(new NonRecordingSpan($spanContext));
+        return (Context::getRoot())->withContextValue(new NonRecordingSpan($spanContext));
     }
 
     private function createMockSamplerNeverInvoked(): SamplerInterface
