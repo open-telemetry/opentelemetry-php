@@ -76,4 +76,4 @@ jobs:
     needs: php
     with:
       matrix_extension: '["ast, json"]'
-      install_directory: 'var'
+      install_directory: '~/.test/.packages'
