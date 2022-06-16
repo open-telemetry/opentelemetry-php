@@ -38,7 +38,7 @@ class AlwaysOnSampler implements SamplerInterface
 
         return new SamplingResult(
             SamplingResult::RECORD_AND_SAMPLE,
-            $attributes,
+            null,
             $traceState
         );
     }
