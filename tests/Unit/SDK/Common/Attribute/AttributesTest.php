@@ -159,7 +159,7 @@ class AttributesTest extends TestCase
         $this->assertEquals(3, $attributes->getTotalAddedValues());
     }
 
-    public function test_limit_get_total_added_values_same_key(): void
+    public function test_replace_attribute_does_not_increase_count(): void
     {
         $attributes = new Attributes([
             'foo' => 'foo',
