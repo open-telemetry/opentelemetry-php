@@ -1,5 +1,5 @@
 
-name: PHP Composer
+name: PHP QA
 
 on:
   push:
@@ -47,9 +47,6 @@ jobs:
       if: steps.composer-cache.outputs.cache-hit != 'true'
       run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: Validate packages composer.json
-      run: vendor/bin/otel packages:composer:validate
-
     - name: Check Style
       run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
 
@@ -75,3 +72,8 @@ jobs:
 
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash) -F ${{ matrix.php-version }}
+
+  packages:
+    uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@main
+    with:
+      matrix_extension: '["ast, json"]'
