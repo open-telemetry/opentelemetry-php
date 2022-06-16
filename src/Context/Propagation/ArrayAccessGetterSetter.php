@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context\Propagation;
 
-use function array_keys;
+use function array_key_first;
 use ArrayAccess;
 use function get_class;
 use function gettype;
@@ -13,7 +13,8 @@ use function is_array;
 use function is_object;
 use function is_string;
 use function sprintf;
-use function strtolower;
+use function strcasecmp;
+use Traversable;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/api-propagators.md#textmap-propagator Getter and Setter.
@@ -40,12 +41,13 @@ final class ArrayAccessGetterSetter implements PropagationGetterInterface, Propa
     /** {@inheritdoc} */
     public function keys($carrier): array
     {
-        if (is_array($carrier)) {
-            return array_keys($carrier);
-        }
+        if ($this->isSupportedCarrier($carrier)) {
+            $keys = [];
+            foreach ($carrier as $key => $_) {
+                $keys[] = (string) $key;
+            }
 
-        if ($carrier instanceof KeyedArrayAccessInterface) {
-            return $carrier->keys();
+            return $keys;
         }
 
         throw new InvalidArgumentException(
@@ -59,30 +61,15 @@ final class ArrayAccessGetterSetter implements PropagationGetterInterface, Propa
     /** {@inheritdoc} */
     public function get($carrier, string $key): ?string
     {
-        $lKey = strtolower($key);
-        if ($carrier instanceof ArrayAccess) {
-            return $carrier->offsetExists($lKey) ? $carrier->offsetGet($lKey) : null;
-        }
-
-        if (is_array($carrier)) {
-            if (empty($carrier)) {
-                return null;
+        if ($this->isSupportedCarrier($carrier)) {
+            $value = $carrier[$this->resolveKey($carrier, $key)] ?? null;
+            if (is_array($value) && $value) {
+                $value = $value[array_key_first($value)];
             }
 
-            foreach ($carrier as $k => $value) {
-                // Ensure traceparent and tracestate header keys are lowercase
-                if (is_string($k)) {
-                    if (strtolower($k) === $lKey) {
-                        if (is_array($value)) {
-                            return empty($value) ? null : $value[0];
-                        }
-
-                        return $value;
-                    }
-                }
-            }
-
-            return null;
+            return is_string($value)
+                ? $value
+                : null;
         }
 
         throw new InvalidArgumentException(
@@ -100,9 +87,12 @@ final class ArrayAccessGetterSetter implements PropagationGetterInterface, Propa
         if ($key === '') {
             throw new InvalidArgumentException('Unable to set value with an empty key');
         }
+        if ($this->isSupportedCarrier($carrier)) {
+            if (($r = $this->resolveKey($carrier, $key)) !== $key) {
+                unset($carrier[$r]);
+            }
 
-        if ($carrier instanceof ArrayAccess || is_array($carrier)) {
-            $carrier[strtolower($key)] = $value;
+            $carrier[$key] = $value;
 
             return;
         }
@@ -114,5 +104,26 @@ final class ArrayAccessGetterSetter implements PropagationGetterInterface, Propa
                 $key
             )
         );
+    }
+
+    private function isSupportedCarrier($carrier): bool
+    {
+        return is_array($carrier) || $carrier instanceof ArrayAccess && $carrier instanceof Traversable;
+    }
+
+    private function resolveKey($carrier, string $key): string
+    {
+        if (isset($carrier[$key])) {
+            return $key;
+        }
+
+        foreach ($carrier as $k => $_) {
+            $k = (string) $k;
+            if (!strcasecmp($k, $key)) {
+                return $k;
+            }
+        }
+
+        return $key;
     }
 }

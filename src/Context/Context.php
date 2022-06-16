@@ -7,7 +7,7 @@ namespace OpenTelemetry\Context;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#overview
  */
-class Context
+final class Context
 {
 
     /**
@@ -15,7 +15,7 @@ class Context
      */
     private static ContextStorageInterface $storage;
 
-    private static ?\OpenTelemetry\Context\Context $root = null;
+    private static ?Context $root = null;
 
     /**
      * @internal
@@ -37,15 +37,6 @@ class Context
     }
 
     /**
-     * This will set the given Context to be the "current" one. We return a token which can be passed to `detach()` to
-     * reset the Current Context back to the previous one.
-     */
-    public static function attach(Context $ctx): ScopeInterface
-    {
-        return self::storage()->attach($ctx);
-    }
-
-    /**
      * @param non-empty-string $key
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#create-a-key
@@ -53,16 +44,6 @@ class Context
     public static function createKey(string $key): ContextKey
     {
         return new ContextKey($key);
-    }
-
-    /**
-     * Given a token, the current context will be set back to the one prior to the token being generated.
-     */
-    public static function detach(ScopeInterface $token): Context
-    {
-        $token->detach();
-
-        return self::getCurrent();
     }
 
     public static function getCurrent(): Context
@@ -95,51 +76,21 @@ class Context
      *
      * @return mixed
      */
-    public static function getValue(ContextKey $key, $ctx=null)
+    public static function getValue(ContextKey $key, ?Context $ctx=null)
     {
-        $ctx = $ctx ?? static::getCurrent();
+        $ctx = $ctx ?? self::getCurrent();
 
         return $ctx->get($key);
     }
 
-    /**
-     * This is a static version of set().
-     * This is primarily useful when the caller doesn't already have a reference to a Context that they want to mutate.
-     *
-     * There are two ways to call this function.
-     * 1) With a $parent parameter:
-     *    Context::setValue($key, $value, $ctx) is functionally equivalent to $ctx->set($key, $value)
-     * 2) Without a $parent parameter:
-     *    In this scenario, setValue() will use the `$current_context` reference as supplied by `getCurrent()`
-     *    `getCurrent()` will always return a valid Context. If one does not exist at the global scope,
-     *    an "empty" context will be created.
-     *
-     * @param ContextKey $key
-     * @param mixed $value
-     * @param Context|null $parent
-     *
-     * @return Context a new Context containing the k/v
-     */
-    public static function withValue(ContextKey $key, $value, $parent=null)
-    {
-        if (null === $parent) {
-            // TODO This should not attach, leads to a context that cannot be detached
-            self::storage()->attach(new self($key, $value, self::getCurrent()));
-
-            return self::getCurrent();
-        }
-
-        return new self($key, $value, $parent);
-    }
-
-    protected ?ContextKey $key;
+    private ?ContextKey $key;
 
     /**
-     * @var mixed|null
+     * @var mixed
      */
-    protected $value;
+    private $value;
 
-    protected ?\OpenTelemetry\Context\Context $parent;
+    private ?Context $parent;
 
     /**
      * This is a general purpose read-only key-value store. Read-only in the sense that adding a new value does not
@@ -149,16 +100,11 @@ class Context
      * to the key object, the value that corresponds to the key, and an optional reference to the parent Context
      * (i.e. the next link in the linked list chain)
      *
-     * If you inherit from this class, you should "shadow" $parent into your subclass so that all operations give
-     * you back an instance of the same type that you are interacting with and different subclasses should NOT be
-     * treated as interoperable. i.e. you should NOT have a Context object chain with both Context instances interleaved
-     * with Baggage instances.
-     *
      * @param ContextKey|null $key The key object. Should only be null when creating an "empty" context
-     * @param mixed|null $value
-     * @param self|null $parent Reference to the parent object
+     * @param mixed $value
+     * @param Context|null $parent Reference to the parent object
      */
-    final public function __construct(?ContextKey $key=null, $value=null, $parent=null)
+    private function __construct(?ContextKey $key=null, $value=null, ?Context $parent=null)
     {
         $this->key = $key;
         $this->value = $value;
@@ -174,7 +120,7 @@ class Context
      *
      * @return Context a new Context containing the k/v
      */
-    public function with(ContextKey $key, $value)
+    public function with(ContextKey $key, $value): Context
     {
         return new self($key, $value, $this);
     }
@@ -194,24 +140,22 @@ class Context
      */
     public function activate(): ScopeInterface
     {
-        return self::attach($this);
+        return self::storage()->attach($this);
     }
 
     /**
      * Fetch a value from the Context given a key value.
      *
-     * @return mixed|null
+     * @return mixed
      */
     public function get(ContextKey $key)
     {
-        if ($this->key === $key) {
-            return $this->value;
+        for ($context = $this; $context; $context = $context->parent) {
+            if ($context->key === $key) {
+                return $context->value;
+            }
         }
 
-        if (null === $this->parent) {
-            return null;
-        }
-
-        return $this->parent->get($key);
+        return null;
     }
 }

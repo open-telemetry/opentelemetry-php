@@ -58,6 +58,6 @@ class AlwaysOffSamplerTest extends TestCase
             );
         }
 
-        return (new Context())->withContextValue(new NonRecordingSpan($spanContext));
+        return Context::getRoot()->withContextValue(new NonRecordingSpan($spanContext));
     }
 }

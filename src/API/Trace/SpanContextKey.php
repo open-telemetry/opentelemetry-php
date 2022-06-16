@@ -10,7 +10,7 @@ use OpenTelemetry\Context\ContextKey;
 /**
  * @psalm-internal \OpenTelemetry
  */
-final class SpanContextKey extends ContextKey
+final class SpanContextKey
 {
     private const KEY_NAME = 'opentelemetry-trace-span-key';
 
