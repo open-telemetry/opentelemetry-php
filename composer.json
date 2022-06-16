@@ -1,6 +1,7 @@
 {
     "name": "open-telemetry/opentelemetry",
     "description": "OpenTelemetry makes robust, portable telemetry a built-in feature of cloud-native software.",
+    "keywords": ["opentelemetry", "otel", "open-telemetry", "tracing", "logging", "metrics"],
     "type": "library",
     "homepage": "https://opentelemetry.io/docs/php",
     "readme": "./README.md",
