@@ -73,7 +73,7 @@ jobs:
 
   packages:
     uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@main
-    needs: php
+    #needs: php
     with:
       matrix_extension: '["ast, json"]'
       install_directory: '~/.test/.packages'
