@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Prometheus;
 
 use OpenTelemetry\API\Metrics as API;
-use OpenTelemetry\SDK\Metrics\Counter;
 use OpenTelemetry\SDK\Metrics\Exceptions\CantBeExported;
 use OpenTelemetry\SDK\Metrics\Exporters\AbstractExporter;
 use Prometheus\CollectorRegistry;
@@ -28,8 +27,8 @@ class PrometheusExporter extends AbstractExporter
     protected function doExport(iterable $metrics): void
     {
         foreach ($metrics as $metric) {
-            switch (get_class($metric)) {
-                case Counter::class:
+            switch (true) {
+                case $metric instanceof API\CounterInterface:
                     $this->exportCounter($metric);
 
                     break;

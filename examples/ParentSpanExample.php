@@ -7,16 +7,13 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
-use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 $serviceName = 'ParentSpanExample';
-$resource = ResourceInfoFactory::defaultResource();
 $sampler = new AlwaysOnSampler();
-$tracerProvider = new TracerProvider($resource, $sampler);
 
 // zipkin exporter
 $zipkinExporter = new ZipkinExporter(
@@ -26,7 +23,6 @@ $zipkinExporter = new ZipkinExporter(
     new HttpFactory(),
     new HttpFactory()
 );
-$tracerProvider->addSpanProcessor(new SimpleSpanProcessor($zipkinExporter));
 
 // jaeger exporter
 $jaegerExporter = new JaegerExporter(
@@ -36,40 +32,47 @@ $jaegerExporter = new JaegerExporter(
     new HttpFactory(),
     new HttpFactory()
 );
-$tracerProvider->addSpanProcessor(new SimpleSpanProcessor($jaegerExporter));
+
+$tracerProvider =  new TracerProvider(
+    [
+        new SimpleSpanProcessor($zipkinExporter),
+        new SimpleSpanProcessor($jaegerExporter),
+    ],
+    $sampler
+);
 
 $tracer = $tracerProvider->getTracer('example.php.opentelemetry.io', '0.0.1');
 
-$rootSpan = $tracer->startSpan('root-span');
+$rootSpan = $tracer->spanBuilder('root-span')->startSpan();
 sleep(1);
 
 $rootScope = $rootSpan->activate(); // set the root span active in the current context
 
 try {
-    $span1 = $tracer->startSpan('child-span-1');
+    $span1 = $tracer->spanBuilder('child-span-1')->startSpan();
     $internalScope = $span1->activate(); // set the child span active in the context
 
     try {
         for ($i = 0; $i < 3; $i++) {
-            $loopSpan = $tracer->startSpan('loop-' . $i);
+            $loopSpan = $tracer->spanBuilder('loop-' . $i)->startSpan();
             usleep((int) (0.5 * 1e6));
             $loopSpan->end();
         }
     } finally {
-        $internalScope->close(); // deactivate child span, the rootSpan is set back as active
+        $internalScope->detach(); // deactivate child span, the rootSpan is set back as active
+        $span1->end();
     }
-    $span1->end();
 
-    $span2 = $tracer->startSpan('child-span-2');
+    $span2 = $tracer->spanBuilder('child-span-2')->startSpan();
     sleep(1);
     $span2->end();
 } finally {
-    $rootScope->close(); // close the scope of the root span, no active span in the context now
+    $rootScope->detach(); // close the scope of the root span, no active span in the context now
+    $rootSpan->end();
 }
-$rootSpan->end();
 
 // start the second root span
-$secondRootSpan = $tracer->startSpan('root-span-2');
+$secondRootSpan = $tracer->spanBuilder('root-span-2')->startSpan();
 sleep(2);
 $secondRootSpan->end();
 

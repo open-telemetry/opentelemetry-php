@@ -1,7 +1,7 @@
 PHP_VERSION ?= 7.4
 DC_RUN_PHP = docker-compose run --rm php
 
-all: update style deptrac phan psalm phpstan test
+all: update style packages-composer deptrac phan psalm phpstan test
 install:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer install
 update:
@@ -25,6 +25,8 @@ psalm-info:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/psalm --show-info=true --threads=1
 phpstan:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpstan analyse --memory-limit=256M
+packages-composer:
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/otel packages:composer:validate
 benchmark:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpbench run --report=default
 phpmetrics:
@@ -64,4 +66,6 @@ w3c-test-service:
 	@docker-compose -f docker-compose.w3cTraceContext.yaml run --rm php ./tests/TraceContext/W3CTestService/symfony-setup
 semconv:
 	./script/semantic-conventions/semconv.sh
+split:
+	docker-compose -f docker/gitsplit/docker-compose.yaml --env-file ./.env up
 FORCE:

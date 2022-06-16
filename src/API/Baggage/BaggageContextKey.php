@@ -10,7 +10,7 @@ use OpenTelemetry\Context\ContextKey;
 /**
  * @psalm-internal OpenTelemetry
  */
-final class BaggageContextKey extends ContextKey
+final class BaggageContextKey
 {
     private const KEY_NAME = 'opentelemetry-trace-baggage-key';
 

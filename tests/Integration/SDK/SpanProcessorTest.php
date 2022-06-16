@@ -17,7 +17,7 @@ class SpanProcessorTest extends TestCase
 {
     public function test_parent_context_should_be_passed_to_span_processor(): void
     {
-        $parentContext = new Context();
+        $parentContext = Context::getRoot();
 
         $spanProcessor = $this->createMock(SpanProcessorInterface::class);
         $spanProcessor

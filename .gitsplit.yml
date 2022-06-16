@@ -1,0 +1,30 @@
+# Path to a cache directory Used to speed up the split over time by reusing git's objects
+cache_url: "/cache/gitsplit"
+
+# Path to the repository to split (default = current path)
+project_url: "https://github.com/open-telemetry/opentelemetry-php.git"
+
+# List of splits.
+splits:
+  - prefix: "proto/otel"
+    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/gen-otlp-protobuf.git"
+  - prefix: "thrift/jaeger"
+    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/gen-jaeger-thrift.git"
+  - prefix: "src/Context"
+    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/context.git"
+  - prefix: "src/SemConv"
+    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/sem-conv.git"
+  - prefix: "src/API"
+    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/api.git"
+  - prefix: "src/SDK"
+    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/sdk.git"
+  - prefix: "src/Contrib"
+    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/sdk-contrib.git"
+
+# List of references to split (defined as regexp)
+origins:
+  - ^main$
+  - ^test$
+  - ^split$
+  - ^v\d+\.\d+\.\d+$
+  - ^\d+\.\d+\.\d+$

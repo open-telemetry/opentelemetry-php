@@ -31,7 +31,7 @@ jobs:
         tools: php-cs-fixer
         extensions: ${{ matrix.extensions }}
 
-    - name: Validate composer.json and composer.lock
+    - name: Validate composer.json
       run: composer validate
 
     - name: Cache Composer packages
@@ -39,16 +39,16 @@ jobs:
       uses: actions/cache@v2
       with:
         path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.json') }}
+        key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
         restore-keys: |
-          ${{ runner.os }}-php-
+          ${{ runner.os }}-${{ matrix.php-version }}-php-
 
     - name: Install dependencies
       if: steps.composer-cache.outputs.cache-hit != 'true'
       run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: Update Composer
-      run: composer update
+    - name: Validate packages composer.json
+      run: vendor/bin/otel packages:composer:validate
 
     - name: Check Style
       run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv

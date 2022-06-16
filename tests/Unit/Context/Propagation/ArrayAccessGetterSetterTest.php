@@ -7,7 +7,6 @@ namespace OpenTelemetry\Tests\Context\Unit\Propagation;
 use ArrayObject;
 use InvalidArgumentException;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
-use OpenTelemetry\Context\Propagation\KeyedArrayAccessInterface;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -46,9 +45,9 @@ class ArrayAccessGetterSetterTest extends TestCase
             'b' => 'bravo',
         ];
         $map = new ArrayAccessGetterSetter();
-        $this->assertNull($map->get($carrier, '1'));
+        $this->assertSame('alpha', $map->get($carrier, '1'));
         $this->assertSame('bravo', $map->get($carrier, 'b'));
-        $this->assertSame([1, 'b'], $map->keys($carrier));
+        $this->assertSame(['1', 'b'], $map->keys($carrier));
     }
 
     public function test_get_from_unsupported_carrier(): void
@@ -61,10 +60,10 @@ class ArrayAccessGetterSetterTest extends TestCase
 
     public function test_keys_from_map_array_access(): void
     {
-        $carrier = new ArrayObject(['a' => 'alpha']);
+        $carrier = new ArrayObject(['a' => 'alpha', 'b' => 'bravo']);
+
         $map = new ArrayAccessGetterSetter();
-        $this->expectException(InvalidArgumentException::class);
-        $map->keys($carrier);
+        $this->assertSame(['a', 'b'], $map->keys($carrier));
     }
 
     public function test_keys_from_unsupported_carrier(): void
@@ -73,16 +72,6 @@ class ArrayAccessGetterSetterTest extends TestCase
         $map = new ArrayAccessGetterSetter();
         $this->expectException(InvalidArgumentException::class);
         $map->keys($carrier);
-    }
-
-    public function test_keys_keyed_array_access_object(): void
-    {
-        $carrier = $this->createMock(KeyedArrayAccessInterface::class);
-        $carrier->method('keys')->willReturn(['a', 'b']);
-
-        $map = new ArrayAccessGetterSetter();
-
-        $this->assertSame(['a', 'b'], $map->keys($carrier));
     }
 
     public function test_set_map_array(): void
@@ -103,6 +92,31 @@ class ArrayAccessGetterSetterTest extends TestCase
         $map->set($carrier, 'b', 'bravo');
         $value = $map->get($carrier, 'b');
         $this->assertSame('bravo', $value);
+    }
+
+    public function test_set_map_array_access_case(): void
+    {
+        $carrier = new ArrayObject(['A' => 'alpha']);
+        $map = new ArrayAccessGetterSetter();
+
+        $map->set($carrier, 'A', 'bravo');
+        $this->assertCount(1, $carrier);
+        $this->assertArrayHasKey('A', $carrier);
+        $this->assertSame('bravo', $carrier['A']);
+
+        $map->set($carrier, 'a', 'charlie');
+        $this->assertCount(1, $carrier);
+        $this->assertArrayHasKey('a', $carrier);
+        $this->assertSame('charlie', $carrier['a']);
+    }
+
+    public function test_get_map_array_access_case(): void
+    {
+        $carrier = new ArrayObject(['A' => 'alpha']);
+        $map = new ArrayAccessGetterSetter();
+
+        $value = $map->get($carrier, 'A');
+        $this->assertSame('alpha', $value);
     }
 
     public function test_set_unsupported_carrier(): void
