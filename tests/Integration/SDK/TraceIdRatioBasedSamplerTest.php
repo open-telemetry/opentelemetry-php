@@ -100,6 +100,6 @@ class TraceIdRatioBasedSamplerTest extends TestCase
             );
         }
 
-        return (Context::getRoot())->withContextValue(new NonRecordingSpan($spanContext));
+        return Context::getRoot()->withContextValue(new NonRecordingSpan($spanContext));
     }
 }

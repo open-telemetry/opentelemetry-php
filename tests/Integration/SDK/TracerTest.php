@@ -39,7 +39,7 @@ class TracerTest extends TestCase
     public function test_sampler_may_override_parents_trace_state(): void
     {
         $parentTraceState = new TraceState('orig-key=orig_value');
-        $parentContext = (Context::getRoot())
+        $parentContext = Context::getRoot()
             ->withContextValue(
                 new NonRecordingSpan(
                     SpanContext::create(
