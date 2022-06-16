@@ -15,8 +15,7 @@ final class TextMapPropagator
             case 0:
                 return NoopTextMapPropagator::getInstance();
             case 1:
-                assert($propagators !== []);
-
+                /** @psalm-suppress PossiblyNullArrayOffset */
                 return $propagators[array_key_first($propagators)];
             default:
                return new MultiTextMapPropagator($propagators);
