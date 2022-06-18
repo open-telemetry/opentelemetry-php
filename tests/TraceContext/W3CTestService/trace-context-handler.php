@@ -36,7 +36,6 @@ function handleTraceContext(RequestInterface $serviceRequest, TracerInterface $t
         $context = Context::getCurrent();
     }
 
-//    $body = json_decode($serviceRequest->getBody()->getContents(), true);
     $body = json_decode((string) $serviceRequest->getBody(), true);
     if (! is_array($body)) {
         return new Response(400, [], 'Invalid JSON');
