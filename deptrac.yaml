@@ -1,0 +1,122 @@
+
+imports:
+  - deptrac.baseline.yaml
+deptrac:
+    analyser:
+        types:
+            - class
+            - class_superglobal
+            - use
+            - file
+            - function
+            - function_superglobal
+    paths:
+        - ./src
+        - ./proto
+        - ./thrift
+        - ./tests
+    exclude_files:
+        - '#.*test.*#'
+    layers:
+      -   name: API
+          collectors:
+              -   type: className
+                  regex: ^OpenTelemetry\\API\\*
+      -   name: SDK
+          collectors:
+              -   type: className
+                  regex: ^OpenTelemetry\\SDK\\*
+      -   name: Context
+          collectors:
+              -   type: className
+                  regex: ^OpenTelemetry\\Context\\*
+      -   name: SemConv
+          collectors:
+              -   type: className
+                  regex: ^OpenTelemetry\\SemConv\\*
+      -   name: Contrib
+          collectors:
+              -   type: className
+                  regex: ^OpenTelemetry\\Contrib\\*
+      -   name: OtelProto
+          collectors:
+              -   type: className
+                  regex: ^OpenTelemetry\\Proto\\*
+              -   type: className
+                  regex: ^GPBMetadata\\Opentelemetry\\*
+      -   name: GoogleProtobuf
+          collectors:
+              -   type: className
+                  regex: ^Google\\Protobuf\\*
+      -   name: Grpc
+          collectors:
+              - type: className
+                regex: ^Grpc\\*
+      -   name: PsrLog
+          collectors:
+              - type: className
+                regex: ^Psr\\Log\\*
+      -   name: PsrHttp
+          collectors:
+              - type: className
+                regex: ^Psr\\Http\\*
+      -   name: HttpPlug
+          collectors:
+              - type: className
+                regex: ^Http\\*
+      -   name: NyholmDsn
+          collectors:
+              - type: className
+                regex: ^Nyholm\\Dsn\\*
+      -   name: Prometheus
+          collectors:
+              - type: className
+                regex: ^Prometheus\\*
+      -   name: FFI
+          collectors:
+              - type: className
+                regex: ^FFI\\*
+      -   name: Composer
+          collectors:
+              - type: className
+                regex: ^Composer\\*
+      -   name: Thrift
+          collectors:
+              - type: className
+                regex: ^Thrift\\*
+      -   name: JaegerThrift
+          collectors:
+              - type: className
+                regex: ^Jaeger\\Thrift\\*
+      -   name: Swoole
+          collectors:
+              - type: className
+                regex: ^Swoole\\*
+
+    ruleset:
+      Context:
+          - FFI
+      SemConv: ~
+      API:
+          - Context
+          - SemConv
+      SDK:
+          - +API
+          - PsrLog
+          - PsrHttp
+          - HttpPlug
+          - NyholmDsn
+          - Composer
+      Contrib:
+          - +SDK
+          - OtelProto
+          - Grpc
+          - Prometheus
+          - Thrift
+          - JaegerThrift
+          - Swoole
+      OtelProto:
+          - GoogleProtobuf
+          - Grpc
+      JaegerThrift:
+          - Thrift
