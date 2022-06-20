@@ -91,7 +91,7 @@
         "psalm/plugin-mockery": "^0.9",
         "psalm/plugin-phpunit": "^0.16",
         "psalm/psalm": "^4.0",
-        "qossmic/deptrac-shim": "^0.18",
+        "qossmic/deptrac-shim": "^0.22.1",
         "symfony/http-client": "^5.2"
     },
     "suggest": {
