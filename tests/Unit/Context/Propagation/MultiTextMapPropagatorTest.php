@@ -76,7 +76,7 @@ class MultiTextMapPropagatorTest extends MockeryTestCase
     public function test_extract_no_propagators(): void
     {
         $this->assertSame(
-            Context::getRoot(),
+            Context::getCurrent(),
             (new MultiTextMapPropagator([]))->extract([])
         );
     }
@@ -85,10 +85,10 @@ class MultiTextMapPropagatorTest extends MockeryTestCase
     {
         $carrier = [];
 
-        $context1 = new Context();
-        $context2 = new Context();
-        $context3 = new Context();
-        $expectedContext = new Context();
+        $context1 = Context::getRoot();
+        $context2 = Context::getRoot();
+        $context3 = Context::getRoot();
+        $expectedContext = Context::getRoot();
 
         $this->propagator1->expects('extract')->with($carrier, null, $context1)->andReturn($context2);
         $this->propagator2->expects('extract')->with($carrier, null, $context2)->andReturn($context3);
@@ -108,7 +108,7 @@ class MultiTextMapPropagatorTest extends MockeryTestCase
     {
         $carrier = [];
 
-        $context = new Context();
+        $context = Context::getRoot();
 
         $this->propagator1->expects('extract')->with($carrier, null, $context)->andReturn($context);
         $this->propagator2->expects('extract')->with($carrier, null, $context)->andReturn($context);

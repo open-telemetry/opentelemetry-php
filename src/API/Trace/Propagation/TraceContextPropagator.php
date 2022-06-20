@@ -98,20 +98,32 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
             return SpanContext::getInvalid();
         }
 
-        // Traceparent = {version}-{trace-id}-{parent-id}-{trace-flags}
+        // traceParent = {version}-{trace-id}-{parent-id}-{trace-flags}
         $pieces = explode('-', $traceparent);
 
-        // Unable to extract traceparent. Expected 4 values
-        if (count($pieces) !== 4) {
+        // If the header does not have at least 4 pieces, it is invalid -- restart the trace.
+        if (count($pieces) < 4) {
             return SpanContext::getInvalid();
         }
 
         [$version, $traceId, $spanId, $traceFlags] = $pieces;
 
-        // Validates the version, traceId, spanId and traceFlags
-        // Returns an invalid spanContext if any of the checks fail
-        if ($version !== self::VERSION || !SpanContext::isValidTraceId($traceId) ||
-            !SpanContext::isValidSpanId($spanId) || !SpanContext::isValidTraceFlag($traceFlags)) {
+        /**
+         * Return invalid if:
+         * - Version is invalid (not 2 char hex or 'ff')
+         * - Trace version, trace ID, span ID or trace flag are invalid
+         */
+        if (!SpanContext::isValidTraceVersion($version)
+            || !SpanContext::isValidTraceId($traceId)
+            || !SpanContext::isValidSpanId($spanId)
+            || !SpanContext::isValidTraceFlag($traceFlags)
+        ) {
+            return SpanContext::getInvalid();
+        }
+
+        // Return invalid if the trace version is not a future version but still has > 4 pieces.
+        $versionIsFuture = hexdec($version) > hexdec(self::VERSION);
+        if (count($pieces) > 4 && !$versionIsFuture) {
             return SpanContext::getInvalid();
         }
 

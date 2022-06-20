@@ -7,6 +7,7 @@ namespace OpenTelemetry\API\Trace;
 use function array_reverse;
 use function array_walk;
 use function implode;
+use function strlen;
 
 class TraceState implements TraceStateInterface
 {
@@ -134,16 +135,16 @@ class TraceState implements TraceStateInterface
     {
         $parsedTracestate = [];
 
-        if (\strlen($rawTracestate) <= self::MAX_TRACESTATE_LENGTH) {
+        if (strlen($rawTracestate) <= self::MAX_TRACESTATE_LENGTH) {
             $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
 
+            // Discard tracestate if entries exceed max length.
             if (count($listMembers) > self::MAX_TRACESTATE_LIST_MEMBERS) {
-
-                // Truncate the tracestate if it exceeds the maximum list-members allowed
-                // TODO: Log a message when truncation occurs
-                $listMembers = array_slice($listMembers, 0, self::MAX_TRACESTATE_LIST_MEMBERS);
+                // TODO: Log a message when we discard.
+                return [];
             }
 
+            $invalid = false;
             foreach ($listMembers as $listMember) {
                 $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, trim($listMember));
 
@@ -153,8 +154,17 @@ class TraceState implements TraceStateInterface
                     // TODO: Log if we can't validate the key and value
                     if ($this->validateKey($vendor[0]) && $this->validateValue($vendor[1])) {
                         $parsedTracestate[$vendor[0]] = $vendor[1];
+
+                        continue;
                     }
                 }
+                $invalid = true;
+
+                break;
+            }
+            // Discard tracestate if any member is invalid.
+            if ($invalid) {
+                return [];
             }
         }
 

@@ -258,6 +258,57 @@ class TraceContextPropagatorTest extends TestCase
         ]);
     }
 
+    public function test_extract_future_version(): void
+    {
+        $carrierFuture = [
+            TraceContextPropagator::TRACEPARENT => 'aa-' . self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-' . '00',
+            TraceContextPropagator::TRACESTATE => self::TRACESTATE_NOT_DEFAULT_ENCODING,
+        ];
+
+        // Tolerant of future versions with same parts.
+        $this->assertEquals(
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT, $this->traceState),
+            $this->getSpanContext($this->traceContextPropagator->extract($carrierFuture)),
+        );
+
+        $carrierFutureMoreParts = [
+            TraceContextPropagator::TRACEPARENT => 'af-' . self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-' . '00' . '-000-this-is-the-future',
+            TraceContextPropagator::TRACESTATE => self::TRACESTATE_NOT_DEFAULT_ENCODING,
+        ];
+
+        // Tolerant of future versions with more parts.
+        $this->assertEquals(
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT, $this->traceState),
+            $this->getSpanContext($this->traceContextPropagator->extract($carrierFutureMoreParts)),
+        );
+    }
+
+    public function test_invalid_traceparent_version_0xff(): void
+    {
+        $this->assertInvalid([
+            TraceContextPropagator::TRACEPARENT => 'ff-' . self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-' . '00',
+        ]);
+    }
+
+    public function test_invalid_traceparent_version(): void
+    {
+        $this->assertInvalid([
+            TraceContextPropagator::TRACEPARENT => 'aaa-' . self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-' . '00',
+        ]);
+
+        $this->assertInvalid([
+            TraceContextPropagator::TRACEPARENT => 'gx-' . self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-' . '00',
+        ]);
+    }
+
+    public function test_invalid_trace_format(): void
+    {
+        // More than 4 parts to the trace but not a future version.
+        $this->assertInvalid([
+            TraceContextPropagator::TRACEPARENT => '00-' . self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-' . '00' . '-000-this-is-not-the-future',
+        ]);
+    }
+
     public function test_empty_trace_id(): void
     {
         $this->assertInvalid([

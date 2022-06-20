@@ -11,6 +11,7 @@ use function strtolower;
 final class SpanContext implements API\SpanContextInterface
 {
     public const INVALID_TRACE = '00000000000000000000000000000000';
+    public const TRACE_VERSION_REGEX = '/^(?!ff)[\da-f]{2}$/';
     public const VALID_TRACE = '/^[0-9a-f]{32}$/';
     public const TRACE_LENGTH = 32;
     public const INVALID_SPAN = '0000000000000000';
@@ -54,6 +55,15 @@ final class SpanContext implements API\SpanContextInterface
         }
 
         return self::$invalidContext;
+    }
+
+    /**
+     * @param string $traceVersion
+     * @return bool Returns a value that indicates whether a trace version is valid.
+     */
+    public static function isValidTraceVersion(string $traceVersion): bool
+    {
+        return 1 === preg_match(self::TRACE_VERSION_REGEX, $traceVersion);
     }
 
     /**

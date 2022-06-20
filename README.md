@@ -1,6 +1,6 @@
 # OpenTelemetry php library
 
-![CI Build](https://github.com/open-telemetry/opentelemetry-php/workflows/PHP%20Composer/badge.svg)
+![CI Build](https://github.com/open-telemetry/opentelemetry-php/workflows/PHP%20QA/badge.svg)
 [![codecov](https://codecov.io/gh/open-telemetry/opentelemetry-php/branch/master/graph/badge.svg)](https://codecov.io/gh/open-telemetry/opentelemetry-php)
 
 ## Current Project Status

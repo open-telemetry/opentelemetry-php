@@ -77,7 +77,7 @@ class B3MultiPropagatorTest extends TestCase
                 )
             );
 
-        $this->compareKeyCaseInsensitive(
+        $this->assertSame(
             [
                 B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
                 B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
@@ -101,7 +101,7 @@ class B3MultiPropagatorTest extends TestCase
                 )
             );
 
-        $this->compareKeyCaseInsensitive(
+        $this->assertSame(
             [
                 B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
                 B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
@@ -124,11 +124,11 @@ class B3MultiPropagatorTest extends TestCase
      */
     public function test_extract_sampled_context($sampledValue): void
     {
-        $carrier = $this->getLowerCaseKeys([
+        $carrier = [
             B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
             B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
             B3MultiPropagator::SAMPLED => $sampledValue,
-        ]);
+        ];
 
         $this->assertEquals(
             SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
@@ -151,11 +151,11 @@ class B3MultiPropagatorTest extends TestCase
      */
     public function test_extract_non_sampled_context($sampledValue): void
     {
-        $carrier = $this->getLowerCaseKeys([
+        $carrier = [
             B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
             B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
             B3MultiPropagator::SAMPLED => $sampledValue,
-        ]);
+        ];
 
         $this->assertEquals(
             SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),
@@ -178,11 +178,11 @@ class B3MultiPropagatorTest extends TestCase
      */
     public function test_extract_invalid_sampled_context($sampledValue): void
     {
-        $carrier = $this->getLowerCaseKeys([
+        $carrier = [
             B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
             B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
             B3MultiPropagator::SAMPLED => $sampledValue,
-        ]);
+        ];
 
         $this->assertEquals(
             SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),
@@ -201,11 +201,11 @@ class B3MultiPropagatorTest extends TestCase
 
     public function test_extract_and_inject(): void
     {
-        $extractCarrier = $this->getLowerCaseKeys([
+        $extractCarrier = [
             B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
             B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
             B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
-        ]);
+        ];
         $context = $this->b3MultiPropagator->extract($extractCarrier);
         $injectCarrier = [];
         $this->b3MultiPropagator->inject($injectCarrier, null, $context);
@@ -215,66 +215,66 @@ class B3MultiPropagatorTest extends TestCase
     public function test_extract_empty_trace_id(): void
     {
         $this->assertInvalid(
-            $this->getLowerCaseKeys([
+            [
                 B3MultiPropagator::TRACE_ID => '',
                 B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
                 B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
-            ])
-        );
-    }
-
-    public function test_invalid_trace_id(): void
-    {
-        $this->assertInvalid(
-            $this->getLowerCaseKeys([
-                B3MultiPropagator::TRACE_ID => 'abcdefghijklmnopabcdefghijklmnop',
-                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
-            ])
-        );
-    }
-
-    public function test_invalid_trace_id_size(): void
-    {
-        $this->assertInvalid(
-            $this->getLowerCaseKeys([
-                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16 . '00',
-                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
-            ])
+            ]
         );
     }
 
     public function test_extract_empty_span_id(): void
     {
         $this->assertInvalid(
-            $this->getLowerCaseKeys([
+            [
                 B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
                 B3MultiPropagator::SPAN_ID => '',
                 B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
-            ])
+            ]
+        );
+    }
+
+    public function test_invalid_trace_id(): void
+    {
+        $this->assertInvalid(
+            [
+                B3MultiPropagator::TRACE_ID => 'abcdefghijklmnopabcdefghijklmnop',
+                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
+                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+            ]
+        );
+    }
+
+    public function test_invalid_trace_id_size(): void
+    {
+        $this->assertInvalid(
+            [
+                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16 . '00',
+                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
+                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+            ]
         );
     }
 
     public function test_invalid_span_id(): void
     {
         $this->assertInvalid(
-            $this->getLowerCaseKeys([
+            [
                 B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
                 B3MultiPropagator::SPAN_ID => 'abcdefghijklmnop',
                 B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
-            ])
+            ]
         );
     }
 
     public function test_invalid_span_id_size(): void
     {
         $this->assertInvalid(
-            $this->getLowerCaseKeys([
+            [
                 B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
                 B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16 . '00',
                 B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
-            ])
+            ]
         );
     }
 
@@ -294,19 +294,5 @@ class B3MultiPropagatorTest extends TestCase
     private function withSpanContext(SpanContextInterface $spanContext, Context $context): Context
     {
         return $context->withContextValue(Span::wrap($spanContext));
-    }
-
-    private function compareKeyCaseInsensitive(array $expected, array $actual): void
-    {
-        $expectedLower = $this->getLowerCaseKeys($expected);
-        $this->assertSame(
-            $expectedLower,
-            $actual
-        );
-    }
-
-    private function getLowerCaseKeys(array $carrier): array
-    {
-        return array_change_key_case($carrier, CASE_LOWER);
     }
 }
