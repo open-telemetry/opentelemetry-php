@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
 use OpenTelemetry\SDK\Metrics\Counter;
-use OpenTelemetry\SDK\Metrics\Meter;
+use OpenTelemetry\SDK\Metrics\Providers\MeterProvider;
 use OpenTelemetry\SDK\Metrics\UpDownCounter;
 use OpenTelemetry\SDK\Metrics\ValueRecorder;
 use PHPUnit\Framework\TestCase;
@@ -17,15 +17,15 @@ class MeterTest extends TestCase
 {
     public function test_meter(): void
     {
-        $meter = new Meter('Meter', '0.1');
+        $meter = (new MeterProvider())->getMeter('Meter', '0.1');
 
-        $this->assertSame('Meter', $meter->getName());
-        $this->assertSame('0.1', $meter->getVersion());
+        $this->assertSame('Meter', $meter->getInstrumentationScope()->getName());
+        $this->assertSame('0.1', $meter->getInstrumentationScope()->getVersion());
     }
 
     public function test_meter_counter(): void
     {
-        $meter = new Meter('Meter', '0.1');
+        $meter = (new MeterProvider())->getMeter('Meter', '0.1');
 
         $counterName = 'Counter';
         $counterDescription = 'A counter';
@@ -37,7 +37,7 @@ class MeterTest extends TestCase
 
     public function test_meter_up_down_counter(): void
     {
-        $meter = new Meter('Meter', '0.1');
+        $meter = (new MeterProvider())->getMeter('Meter', '0.1');
 
         $upDownCounterName = 'Updowncounter';
         $upDownCounterDescription = 'An up/down counter';
@@ -49,7 +49,7 @@ class MeterTest extends TestCase
 
     public function test_meter_value_recorder(): void
     {
-        $meter = new Meter('Meter', '0.1');
+        $meter = (new MeterProvider())->getMeter('Meter', '0.1');
 
         $valueRecorderName = 'ValueRecorder';
         $valueRecorderDescription = 'A value recorder';

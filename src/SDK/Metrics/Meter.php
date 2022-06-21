@@ -5,32 +5,48 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics as API;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 class Meter implements API\MeterInterface
 {
-    protected string $name;
-    protected string $version;
+    protected ResourceInfo $resource;
+    protected InstrumentationScopeInterface $instrumentationScope;
+    protected int $startEpochNanos = 0;
 
-    public function __construct(string $name, string $version = null)
+    public function __construct(
+        ResourceInfo $resource,
+        InstrumentationScopeInterface $instrumentationScope
+    ) {
+        $this->resource = $resource;
+        $this->instrumentationScope = $instrumentationScope;
+    }
+
+    public function setStartTimestamp(int $timestamp): API\MeterInterface
     {
-        $this->name = $name;
-        $this->version = (string) $version;
+        if (0 > $timestamp) {
+            return $this;
+        }
+
+        $this->startEpochNanos = $timestamp;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
+    public function getResource(): ResourceInfo
     {
-        return $this->name;
+        return $this->resource;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getVersion(): string
+    public function getInstrumentationScope(): InstrumentationScopeInterface
     {
-        return $this->version;
+        return $this->instrumentationScope;
     }
 
     /**
@@ -38,7 +54,13 @@ class Meter implements API\MeterInterface
      */
     public function newCounter(string $name, string $description = ''): API\CounterInterface
     {
-        return new Counter($name, $description);
+        return new Counter(
+            $name,
+            $description,
+            $this->resource,
+            $this->instrumentationScope,
+            $this->startEpochNanos
+        );
     }
 
     /**
@@ -46,7 +68,13 @@ class Meter implements API\MeterInterface
      */
     public function newUpDownCounter(string $name, string $description = ''): API\UpDownCounterInterface
     {
-        return new UpDownCounter($name, $description);
+        return new UpDownCounter(
+            $name,
+            $description,
+            $this->resource,
+            $this->instrumentationScope,
+            $this->startEpochNanos
+        );
     }
 
     /**
@@ -54,6 +82,12 @@ class Meter implements API\MeterInterface
      */
     public function newValueRecorder(string $name, string $description = ''): API\ValueRecorderInterface
     {
-        return new ValueRecorder($name, $description);
+        return new ValueRecorder(
+            $name,
+            $description,
+            $this->resource,
+            $this->instrumentationScope,
+            $this->startEpochNanos
+        );
     }
 }

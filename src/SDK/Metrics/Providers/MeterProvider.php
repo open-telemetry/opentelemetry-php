@@ -5,22 +5,39 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\Providers;
 
 use OpenTelemetry\API\Metrics as API;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
+use OpenTelemetry\SDK\Common\Instrumentation\KeyGenerator;
 use OpenTelemetry\SDK\Metrics\Meter;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
 class MeterProvider implements API\MeterProviderInterface
 {
     protected array $meters = [];
 
+    protected ResourceInfo $resource;
+
+    public function __construct(ResourceInfo $resource = null)
+    {
+        $this->resource = $resource ?? ResourceInfoFactory::defaultResource();
+    }
+
     /**
      * {@inheritDoc}
      */
-    public function getMeter(string $name, ?string $version = null): API\MeterInterface
+    public function getMeter(string $name, ?string $version = null, ?string $schemaUrl = null): API\MeterInterface
     {
-        if (empty($this->meters[$name . $version])) {
-            $this->meters[$name . $version] = $this->getCreatedMeter($name, $version);
+        $key = KeyGenerator::generateInstanceKey($name, $version, $schemaUrl);
+
+        if (isset($this->meters[$key]) && $this->meters[$key] instanceof API\MeterInterface) {
+            return $this->meters[$key];
         }
 
-        return $this->meters[$name . $version];
+        $instrumentationScope = new InstrumentationScope($name, $version, $schemaUrl);
+
+        $meter = new Meter($this->resource, $instrumentationScope);
+
+        return $this->meters[$key] = $meter;
     }
 
     /**
@@ -29,11 +46,14 @@ class MeterProvider implements API\MeterProviderInterface
      * @access	protected
      * @param	string	$name
      * @param	string|null	$version Default: null
+     * @param	string|null	$schemaUrl Default: null
      * @return	API\MeterInterface
      */
-    protected function getCreatedMeter(string $name, string $version = null): API\MeterInterface
+    protected function getCreatedMeter(string $name, ?string $version = null, ?string $schemaUrl = null): API\MeterInterface
     {
         // todo: once the Meter interface and an implementation are done, change this
-        return new Meter($name, $version);
+        $instrumentationScope = new InstrumentationScope($name, $version, $schemaUrl);
+
+        return new Meter($this->resource, $instrumentationScope);
     }
 }

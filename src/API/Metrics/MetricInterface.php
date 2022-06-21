@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Metrics;
 
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
+
 interface MetricInterface
 {
     /**
@@ -29,4 +32,36 @@ interface MetricInterface
      * @return	int
      */
     public function getType(): int;
+
+    /**
+     * Returns metric's resource
+     *
+     * @access	public
+     * @return	ResourceInfo
+     */
+    public function getResource(): ResourceInfo;
+
+    /**
+     * Returns metric's instrumentation scope
+     *
+     * @access	public
+     * @return	InstrumentationScopeInterface
+     */
+    public function getInstrumentationScope(): InstrumentationScopeInterface;
+
+    /**
+     * Returns metric's start epoch nanos
+     *
+     * @access	public
+     * @return	int
+     */
+    public function getStartEpochNanos(): int;
+
+    /**
+     * Returns metric's epoch nanos
+     *
+     * @access	public
+     * @return	int
+     */
+    public function getEpochNanos(): int;
 }

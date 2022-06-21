@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Metrics;
 
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
+
 interface MeterInterface
 {
     /**
-     * Returns the meter name.
+     * Returns the meter's resource info
      *
-     * @return string
+     * @return ResourceInfo
      */
-    public function getName(): string;
+    public function getResource(): ResourceInfo;
 
     /**
-     * Returns the meter version.
+     * Returns meter's instrumentation scope
      *
-     * @return string Metric version
+     * @return InstrumentationScopeInterface
      */
-    public function getVersion(): string;
+    public function getInstrumentationScope(): InstrumentationScopeInterface;
 
     /**
      * Creates a Counter metric instrument.

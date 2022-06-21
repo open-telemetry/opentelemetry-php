@@ -44,6 +44,8 @@ class Counter extends AbstractMetric implements API\CounterInterface, API\Labela
     {
         $this->value++;
 
+        $this->updateEpochNanos();
+
         return $this;
     }
 
@@ -60,6 +62,8 @@ class Counter extends AbstractMetric implements API\CounterInterface, API\Labela
         }
 
         $this->value += $value;
+
+        $this->updateEpochNanos();
 
         return $this;
     }
