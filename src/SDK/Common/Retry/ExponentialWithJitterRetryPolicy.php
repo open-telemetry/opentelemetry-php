@@ -60,7 +60,6 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
             $delay = $delay + random_int(-$randomness, +$randomness);
         }
 
-        // return $delay < $this->maxBackoff * 1000 ? (int) $delay : $this->maxBackoff;
         return min((int) $delay, $this->maxBackoff * 1000);
     }
 

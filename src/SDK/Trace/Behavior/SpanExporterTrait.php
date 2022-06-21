@@ -106,6 +106,13 @@ trait SpanExporterTrait
     }
 
     /**
+     * Returns the retry policy set by the user
+     */
+    public function getRetryPolicy()
+    {
+        return $this->retryPolicy;
+    }
+    /**
      * Set the retryable status code. All the status codes apart from
      * this list will not be retried
      * @param array $statusCode: array of retryable status code
