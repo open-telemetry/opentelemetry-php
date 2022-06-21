@@ -294,7 +294,9 @@ return [
     //
     // This is useful for excluding hopelessly unanalyzable
     // files that can't be removed for whatever reason.
-    'exclude_file_list' => [],
+    'exclude_file_list' => [
+        'vendor/composer/composer/src/Composer/InstalledVersions.php'
+    ],
 
     // A directory list that defines files that will be excluded
     // from static analysis, but whose class and method

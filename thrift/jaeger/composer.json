@@ -1,0 +1,22 @@
+{
+    "name": "open-telemetry/gen-jaeger-thrift",
+    "description": "PHP Thrift files for communication with Jaeger.",
+    "keywords": ["opentelemetry", "otel", "tracing", "jaeger", "thrift"],
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "opentelemetry-php contributors",
+            "homepage": "https://github.com/open-telemetry/opentelemetry-php/graphs/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "packaged/thrift": "^0.15.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jaeger\\Thrift\\": "."
+        }
+    }
+}

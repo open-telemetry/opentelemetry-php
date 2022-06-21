@@ -157,11 +157,11 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     {
         BcUtil::triggerMethodDeprecationNotice(
             __METHOD__,
-            'formatStackTrace',
-            TracingUtil::class
+            'format',
+            StackTraceFormatter::class
         );
 
-        return TracingUtil::formatStackTrace($e, $seen);
+        return StackTraceFormatter::format($e);
     }
 
     /** @inheritDoc */
@@ -235,7 +235,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         $eventAttributes = new Attributes([
                 'exception.type' => get_class($exception),
                 'exception.message' => $exception->getMessage(),
-                'exception.stacktrace' => TracingUtil::formatStackTrace($exception),
+                'exception.stacktrace' => StackTraceFormatter::format($exception),
             ]);
 
         foreach ($attributes as $key => $value) {

@@ -32,7 +32,5 @@ $tracerProvider =  new TracerProvider(
 
 $tracer = $tracerProvider->getTracer();
 
-$rootSpan = $tracer->spanBuilder('root')->startSpan();
-$rootSpan->activate();
-
-$rootSpan->end();
+$span = $tracer->spanBuilder('root')->startSpan();
+$span->end();

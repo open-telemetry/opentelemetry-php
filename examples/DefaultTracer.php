@@ -18,8 +18,9 @@ $tracer = $tracerProvider->getTracer();
 echo sprintf('Created tracer: %s', get_class($tracer)) . PHP_EOL;
 
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
-$rootSpan->activate();
+$scope = $rootSpan->activate();
 
 $default = TracerProvider::getDefaultTracer();
 echo sprintf('Default tracer: %s', get_class($default)) . PHP_EOL;
 $rootSpan->end();
+$scope->detach();

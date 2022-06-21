@@ -67,7 +67,7 @@ $tracer = $tracerProvider->getTracer();
  */
 echo 'Start Logging ...' . PHP_EOL;
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
-$rootSpan->activate();
+$scope = $rootSpan->activate();
 
 $spans = [];
 
@@ -92,4 +92,5 @@ foreach ($spans as $span) {
 }
 
 $rootSpan->end();
-echo 'Finished!' . PHP_EOL;
+$scope->detach();
+echo sprintf('Finished! Output written to %s', $logFile) . PHP_EOL;

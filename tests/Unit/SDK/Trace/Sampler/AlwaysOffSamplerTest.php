@@ -20,7 +20,7 @@ class AlwaysOffSamplerTest extends TestCase
      */
     public function test_should_sample(): void
     {
-        $parentContext = $this->createMock(Context::class);
+        $parentContext = Context::getRoot();
         $sampler = new AlwaysOffSampler();
         $decision = $sampler->shouldSample(
             $parentContext,

@@ -8,25 +8,28 @@ curl -sS https://get.symfony.com/cli/installer | bash
 mv /root/.symfony/bin/symfony /usr/local/bin/symfony
 
 # Set up Symfony test application
-cd tests/TraceContext/W3CTestService
+cd tests/TraceContext/W3CTestService || { printf "Something went wrong: could not cd into W3CTestService directory."; exit 1; }
 rm -rf test_app
 symfony new test_app --version=5.2
 
 # Move our files into the test application
 cp index.php test_app/public/index.php
 cp TestController.php test_app/src/Controller/TestController.php
-cd test_app
 
-composer require annotations
+cd test_app || { printf "Something went wrong: could not cd into test_app."; exit 1; }
 
 # Link the local opentelemetry changes to vendor/open-telemetry
-composer require open-telemetry/opentelemetry "*"
 composer config repositories.local \
     '{"type": "path", "url": "/usr/src/open-telemetry/", "options": {"symLink": true }}' \
     --file composer.json
 composer config minimum-stability dev --file composer.json
-composer require php-http/mock-client "*"
+
+composer require symfony/http-client
+composer require annotations
 composer require nyholm/psr7 "*"
+composer require open-telemetry/opentelemetry "*"
+composer require php-http/mock-client "*"
+
 rm composer.lock
 composer clearcache
 composer install
@@ -41,7 +44,7 @@ cd ..
 rm -rf trace-context
 git clone https://github.com/w3c/trace-context.git
 
-cd trace-context/test
+cd trace-context/test || { printf "Failed to cd to trace-context/test" ; exit; }
 
 # Run the test
 python3 test.py http://127.0.0.1:8001/test
