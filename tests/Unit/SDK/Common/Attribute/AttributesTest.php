@@ -15,7 +15,7 @@ class AttributesTest extends TestCase
 {
     public function test_has_attribute(): void
     {
-        $attributes = new Attributes([
+        $attributes = Attributes::create([
             'foo' => 'foo',
         ]);
 
@@ -29,7 +29,7 @@ class AttributesTest extends TestCase
     /** Test numeric attribute key is not cast to integer value */
     public function test_numeric_attribute_name(): void
     {
-        $attributes = new Attributes(['1' => '2']);
+        $attributes = Attributes::create(['1' => '2']);
         $this->assertCount(1, $attributes);
         foreach ($attributes as $key => $value) {
             $this->assertIsString($key);
@@ -49,7 +49,7 @@ class AttributesTest extends TestCase
         $longStringTrimmed = '0123456789abcdef';
 
         $attributeLimits = new AttributeLimits(6, 16);
-        $attributes = new Attributes([
+        $attributes = Attributes::withLimits([
             'bool' => true,
             'int' => $intValue,
             'float' => $floatValue,
@@ -78,7 +78,7 @@ class AttributesTest extends TestCase
      */
     public function test_apply_limits(): void
     {
-        $attributes = new Attributes([
+        $attributes = Attributes::create([
             'short' => '123',
             'long' => '1234567890',
             'dropped' => true,
@@ -93,7 +93,7 @@ class AttributesTest extends TestCase
 
     public function test_null_attribute_removes_existing(): void
     {
-        $attributes = new Attributes([
+        $attributes = Attributes::create([
             'foo' => 'foo',
             'bar' => 'bar',
             'baz' => 'baz',
@@ -105,7 +105,7 @@ class AttributesTest extends TestCase
 
     public function test_null_missing_attribute_does_nothing(): void
     {
-        $attributes = new Attributes([
+        $attributes = Attributes::create([
             'foo' => 'foo',
         ]);
         $this->assertCount(1, $attributes);
@@ -119,13 +119,13 @@ class AttributesTest extends TestCase
             'foo' => 'foo',
             'bar' => 'bar',
         ];
-        $attributes = new Attributes($values);
+        $attributes = Attributes::create($values);
         $this->assertSame($values, $attributes->toArray());
     }
 
     public function test_get_dropped_attributes_count(): void
     {
-        $attributes = new Attributes([
+        $attributes = Attributes::create([
             'foo' => 'foo',
             'bar' => 'bar',
         ]);
@@ -137,7 +137,7 @@ class AttributesTest extends TestCase
 
     public function test_unset_get_dropped_attributes_count(): void
     {
-        $attributes = new Attributes([
+        $attributes = Attributes::create([
             'foo' => 'foo',
             'bar' => 'bar',
         ]);
@@ -149,7 +149,7 @@ class AttributesTest extends TestCase
 
     public function test_limit_get_dropped_attributes_count(): void
     {
-        $attributes = new Attributes([
+        $attributes = Attributes::withLimits([
             'foo' => 'foo',
             'bar' => 'bar',
         ], new AttributeLimits(1));
@@ -161,7 +161,7 @@ class AttributesTest extends TestCase
 
     public function test_replace_attribute_does_not_increase_dropped_attributes_count(): void
     {
-        $attributes = new Attributes([
+        $attributes = Attributes::withLimits([
             'foo' => 'foo',
         ], new AttributeLimits(2));
 

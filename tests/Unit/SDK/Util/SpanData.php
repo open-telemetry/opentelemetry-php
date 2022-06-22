@@ -46,7 +46,7 @@ class SpanData implements SDK\SpanDataInterface
 
     public function __construct()
     {
-        $this->attributes = new Attributes();
+        $this->attributes = Attributes::create([]);
         $this->kind = API\SpanKind::KIND_INTERNAL;
         $this->status = StatusData::unset();
         $this->resource = ResourceInfoFactory::emptyResource();
@@ -82,7 +82,7 @@ class SpanData implements SDK\SpanDataInterface
         return $this;
     }
 
-    public function addLink(API\SpanContextInterface $context, AttributesInterface $attributes = null): self
+    public function addLink(API\SpanContextInterface $context, AttributesInterface $attributes): self
     {
         $this->links[] = new SDK\Link($context, $attributes);
 
@@ -103,7 +103,7 @@ class SpanData implements SDK\SpanDataInterface
         return $this;
     }
 
-    public function addEvent(string $name, ?AttributesInterface $attributes, int $timestamp = null): self
+    public function addEvent(string $name, AttributesInterface $attributes, int $timestamp = null): self
     {
         $this->events[] = new SDK\Event($name, $timestamp ?? ClockFactory::getDefault()->now(), $attributes);
 

@@ -60,7 +60,7 @@ class TraceIdRatioBasedSampler implements SamplerInterface
         $traceIdCondition = $lowerOrderBytes < round($this->probability * $traceIdLimit);
         $decision = $traceIdCondition ? SamplingResult::RECORD_AND_SAMPLE : SamplingResult::DROP;
 
-        return new SamplingResult($decision, null, $traceState);
+        return new SamplingResult($decision, [], $traceState);
     }
 
     public function getDescription(): string

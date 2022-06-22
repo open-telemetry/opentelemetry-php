@@ -6,15 +6,14 @@ require __DIR__ . '/../vendor/autoload.php';
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use OpenTelemetry\Contrib\Jaeger\AgentExporter;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\GlobalLoggerHolder;
+use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use Psr\Log\LogLevel;
 
 $logger = new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)]);
-GlobalLoggerHolder::set($logger);
+LoggerHolder::set($logger);
 
 $exporter = new AgentExporter('jaeger-thrift', 'jaeger:6831');
 $tracerProvider = new TracerProvider(
@@ -49,13 +48,13 @@ for ($i = 0; $i < 1; $i++) {
     $span->setAttribute('remote_ip', '1.2.3.4')
         ->setAttribute('country', 'USA');
 
-    $span->addEvent('found_login' . $i, new Attributes([
+    $span->addEvent('found_login' . $i, [
         'id' => $i,
         'username' => 'otuser' . $i,
-    ]));
-    $span->addEvent('generated_session', new Attributes([
+    ]);
+    $span->addEvent('generated_session', [
         'id' => md5((string) microtime(true)),
-    ]));
+    ]);
 
     try {
         throw new Exception('Record exception test event');

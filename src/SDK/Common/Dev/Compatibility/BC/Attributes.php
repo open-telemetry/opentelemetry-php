@@ -16,6 +16,7 @@ final class Attributes extends Moved implements AttributesInterface
 {
     public function __construct(iterable $attributes = [], AttributeLimitsInterface $attributeLimits = null)
     {
+        // @phan-suppress-next-line PhanAccessMethodInternal
         parent::__construct($attributes, $attributeLimits);
 
         Util::triggerClassDeprecationNotice(

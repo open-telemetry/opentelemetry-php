@@ -30,12 +30,5 @@ class LinkTest extends TestCase
 
         $this->assertSame($this->context, $link->getSpanContext());
         $this->assertSame($this->attributes, $link->getAttributes());
-        $this->assertSame(5, $link->getTotalAttributeCount());
-    }
-
-    public function test_null_attributes(): void
-    {
-        $link = new Link($this->context);
-        $this->assertSame(0, $link->getTotalAttributeCount());
     }
 }

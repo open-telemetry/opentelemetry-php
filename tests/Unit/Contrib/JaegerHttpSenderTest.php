@@ -92,10 +92,10 @@ class JaegerHttpSenderTest extends TestCase
 
         $spans = [
             (new SpanData())->setResource(ResourceInfo::create(
-                new Attributes(), //code should default service.name from how its set above
+                Attributes::create([]), //code should default service.name from how its set above
             )),
             (new SpanData())->setResource(ResourceInfo::create(
-                new Attributes([
+                Attributes::create([
                     'service.name' => 'nameOfThe2ndLogicalApp',
                 ]),
             )),
@@ -124,10 +124,10 @@ class JaegerHttpSenderTest extends TestCase
 
         $spans = [
             (new SpanData())->setResource(ResourceInfo::create(
-                new Attributes(), //code should default service.name from how its set above
+                Attributes::create([]), //code should default service.name from how its set above
             )),
             (new SpanData())->setResource(ResourceInfo::create(
-                new Attributes([
+                Attributes::create([
                     'service.name' => 'nameOfThe2ndLogicalApp',
                 ]),
             )),
@@ -155,10 +155,10 @@ class JaegerHttpSenderTest extends TestCase
 
         $spans = [
             (new SpanData())->setResource(ResourceInfo::create(
-                new Attributes(),
+                Attributes::create([]),
             )),
             (new SpanData())->setResource(ResourceInfo::create(
-                new Attributes([
+                Attributes::create([
                     'telemetry.sdk.name' => 'opentelemetry',
                 ]),
             )),

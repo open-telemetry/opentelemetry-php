@@ -4,7 +4,6 @@ declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
-use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -36,13 +35,13 @@ for ($i = 0; $i < 5; $i++) {
     $span->setAttribute('remote_ip', '1.2.3.4')
         ->setAttribute('country', 'USA');
 
-    $span->addEvent('found_login' . $i, new Attributes([
+    $span->addEvent('found_login' . $i, [
         'id' => $i,
         'username' => 'otuser' . $i,
-    ]));
-    $span->addEvent('generated_session', new Attributes([
+    ]);
+    $span->addEvent('generated_session', [
         'id' => md5((string) microtime(true)),
-    ]));
+    ]);
 
     try {
         throw new Exception('Record exception test event');

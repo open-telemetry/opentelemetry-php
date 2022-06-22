@@ -96,7 +96,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         $this->spanProcessor = $spanProcessor;
         $this->resource = $resource;
         $this->startEpochNanos = $startEpochNanos;
-        $this->attributes = Attributes::withLimits($attributes ?? new Attributes(), $spanLimits->getAttributeLimits());
+        $this->attributes = Attributes::withLimits($attributes ?? [], $spanLimits->getAttributeLimits());
         $this->status = StatusData::unset();
         $this->spanLimits = $spanLimits;
     }
@@ -184,7 +184,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         }
 
         if (null === $this->attributes) {
-            $this->attributes = Attributes::withLimits(new Attributes(), $this->spanLimits->getAttributeLimits());
+            $this->attributes = Attributes::withLimits([], $this->spanLimits->getAttributeLimits());
         }
 
         $this->attributes->setAttribute($key, $value);
@@ -232,11 +232,11 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     public function recordException(Throwable $exception, iterable $attributes = []): self
     {
         $timestamp = ClockFactory::getDefault()->now();
-        $eventAttributes = new Attributes([
-                'exception.type' => get_class($exception),
-                'exception.message' => $exception->getMessage(),
-                'exception.stacktrace' => StackTraceFormatter::format($exception),
-            ]);
+        $eventAttributes = Attributes::create([
+            'exception.type' => get_class($exception),
+            'exception.message' => $exception->getMessage(),
+            'exception.stacktrace' => StackTraceFormatter::format($exception),
+        ]);
 
         foreach ($attributes as $key => $value) {
             $eventAttributes->setAttribute($key, $value);
@@ -362,7 +362,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     private function getImmutableAttributes(): AttributesInterface
     {
         if (null === $this->attributes) {
-            return new Attributes();
+            return Attributes::create([]);
         }
 
         return clone $this->attributes;

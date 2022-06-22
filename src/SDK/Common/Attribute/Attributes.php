@@ -17,12 +17,20 @@ class Attributes implements AttributesInterface, IteratorAggregate
 
     private int $totalAddedAttributes = 0;
 
+    /**
+     * @internal
+     */
     public function __construct(iterable $attributes = [], AttributeLimitsInterface $attributeLimits = null)
     {
         $this->attributeLimits = $attributeLimits ?? new AttributeLimits();
         foreach ($attributes as $key => $value) {
             $this->setAttribute((string) $key, $value);
         }
+    }
+
+    public static function create(iterable $attributes): AttributesInterface
+    {
+        return self::withLimits($attributes, new AttributeLimits());
     }
 
     /** @return Attributes Returns a new instance of Attributes with the limits applied */

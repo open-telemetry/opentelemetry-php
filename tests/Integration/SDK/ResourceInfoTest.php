@@ -30,7 +30,7 @@ class ResourceInfoTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', $envAttributes);
         $resource = (new Detectors\Composite([
-            new Detectors\Constant(ResourceInfo::create(new Attributes($userAttributes))),
+            new Detectors\Constant(ResourceInfo::create(Attributes::create($userAttributes))),
             new Detectors\Environment(),
         ]))->getResource();
         foreach ($expected as $name => $value) {

@@ -107,7 +107,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     public function setAttribute(string $key, $value): API\SpanBuilderInterface
     {
         if (null === $this->attributes) {
-            $this->attributes = Attributes::withLimits(new Attributes(), $this->spanLimits->getAttributeLimits());
+            $this->attributes = Attributes::withLimits([], $this->spanLimits->getAttributeLimits());
         }
 
         $this->attributes->setAttribute($key, $value);
@@ -168,7 +168,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
         $links = $this->links ?? [];
         $this->links = null;
 
-        $attributes = $this->attributes ?? new Attributes();
+        $attributes = $this->attributes ?? Attributes::create([]);
         $this->attributes = null;
 
         $samplingResult = $this
@@ -197,10 +197,8 @@ final class SpanBuilder implements API\SpanBuilderInterface
         }
 
         $samplingAttributes = $samplingResult->getAttributes();
-        if ($samplingAttributes && $samplingAttributes->count() > 0) {
-            foreach ($samplingAttributes as $key => $value) {
-                $attributes->setAttribute($key, $value);
-            }
+        foreach ($samplingAttributes as $key => $value) {
+            $attributes->setAttribute($key, $value);
         }
 
         return Span::startSpan(

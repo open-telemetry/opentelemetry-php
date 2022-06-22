@@ -16,7 +16,7 @@ class ConstantTest extends TestCase
 {
     public function test_constant_get_resource_with_empty_resource(): void
     {
-        $resouceDetector = new Detectors\Constant(ResourceInfo::create(new Attributes()));
+        $resouceDetector = new Detectors\Constant(ResourceInfo::create(Attributes::create([])));
         $resource = $resouceDetector->getResource();
 
         $this->assertNull($resource->getSchemaUrl());
@@ -25,7 +25,7 @@ class ConstantTest extends TestCase
 
     public function test_constant_get_resource_with_custom_resource(): void
     {
-        $resouceDetector = new Detectors\Constant(ResourceInfo::create(new Attributes(['foo' => 'user-foo', 'bar' => 'user-bar'])));
+        $resouceDetector = new Detectors\Constant(ResourceInfo::create(Attributes::create(['foo' => 'user-foo', 'bar' => 'user-bar'])));
         $resource = $resouceDetector->getResource();
 
         $this->assertNull($resource->getSchemaUrl());

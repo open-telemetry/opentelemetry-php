@@ -27,7 +27,7 @@ class ResourceInfoTest extends TestCase
 
     public function test_get_attributes(): void
     {
-        $attributes = new Attributes();
+        $attributes = Attributes::create([]);
         $attributes->setAttribute('name', 'test');
 
         $resource = (new Detectors\Composite([
@@ -57,7 +57,7 @@ class ResourceInfoTest extends TestCase
 
     public function test_immutable_create(): void
     {
-        $attributes = new Attributes();
+        $attributes = Attributes::create([]);
         $attributes->setAttribute('name', 'test');
         $attributes->setAttribute('version', '1.0.0');
 
@@ -81,12 +81,12 @@ class ResourceInfoTest extends TestCase
     public function sameResourcesProvider(): iterable
     {
         yield 'Attribute keys sorted in ascending order vs Attribute keys sorted in descending order' => [
-            ResourceInfo::create(new Attributes([
+            ResourceInfo::create(Attributes::create([
                 'a' => 'someValue',
                 'b' => 'someValue',
                 'c' => 'someValue',
             ])),
-            ResourceInfo::create(new Attributes([
+            ResourceInfo::create(Attributes::create([
                 'c' => 'someValue',
                 'b' => 'someValue',
                 'a' => 'someValue',
@@ -105,8 +105,8 @@ class ResourceInfoTest extends TestCase
     public function differentResourcesProvider(): iterable
     {
         yield 'Null schema url vs Some schema url' => [
-            ResourceInfo::create(new Attributes(), null),
-            ResourceInfo::create(new Attributes(), 'someSchemaUrl'),
+            ResourceInfo::create(Attributes::create([]), null),
+            ResourceInfo::create(Attributes::create([]), 'someSchemaUrl'),
         ];
     }
 
