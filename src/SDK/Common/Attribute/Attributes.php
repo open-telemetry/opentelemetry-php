@@ -4,28 +4,22 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Attribute;
 
-use function count;
+use function array_key_exists;
 use IteratorAggregate;
-use function mb_substr;
 use Traversable;
 
 class Attributes implements AttributesInterface, IteratorAggregate
 {
-    private array $attributes = [];
-
-    private AttributeLimitsInterface $attributeLimits;
-
-    private int $totalAddedAttributes = 0;
+    private array $attributes;
+    private int $droppedAttributesCount;
 
     /**
      * @internal
      */
-    public function __construct(iterable $attributes = [], AttributeLimitsInterface $attributeLimits = null)
+    public function __construct(array $attributes, int $droppedAttributesCount)
     {
-        $this->attributeLimits = $attributeLimits ?? new AttributeLimits();
-        foreach ($attributes as $key => $value) {
-            $this->setAttribute((string) $key, $value);
-        }
+        $this->attributes = $attributes;
+        $this->droppedAttributesCount = $droppedAttributesCount;
     }
 
     public static function create(iterable $attributes): AttributesInterface
@@ -33,46 +27,23 @@ class Attributes implements AttributesInterface, IteratorAggregate
         return self::withLimits($attributes, new AttributeLimits());
     }
 
-    /** @return Attributes Returns a new instance of Attributes with the limits applied */
-    public static function withLimits(iterable $attributes, AttributeLimitsInterface $attributeLimits): Attributes
+    /** @return AttributesInterface Returns a new instance of Attributes with the limits applied */
+    public static function withLimits(iterable $attributes, AttributeLimitsInterface $attributeLimits): AttributesInterface
     {
-        return new self($attributes, $attributeLimits);
+        return self::factory(
+            $attributeLimits->getAttributeCountLimit(),
+            $attributeLimits->getAttributeValueLengthLimit(),
+        )->builder($attributes)->build();
+    }
+
+    public static function factory(?int $attributeCountLimit = null, ?int $attributeValueLengthLimit = null): AttributesFactoryInterface
+    {
+        return new AttributesFactory($attributeCountLimit, $attributeValueLengthLimit);
     }
 
     public function has(string $name): bool
     {
-        return isset($this->attributes[$name]);
-    }
-
-    public function setAttribute(string $name, $value): AttributesInterface
-    {
-        // unset the attribute when null value is passed
-        if ($value === null) {
-            return $this->unsetAttribute($name);
-        }
-
-        if (!$this->has($name)) {
-            $this->totalAddedAttributes++;
-        }
-        // drop attribute when limit is reached
-        if (!$this->has($name) && count($this) >= $this->attributeLimits->getAttributeCountLimit()) {
-            return $this;
-        }
-
-        $this->attributes[$name] = $this->normalizeValue($value);
-
-        return $this;
-    }
-
-    public function unsetAttribute(string $name): AttributesInterface
-    {
-        if ($this->has($name)) {
-            unset($this->attributes[$name]);
-
-            $this->totalAddedAttributes--;
-        }
-
-        return $this;
+        return array_key_exists($name, $this->attributes);
     }
 
     public function get(string $name)
@@ -100,26 +71,6 @@ class Attributes implements AttributesInterface, IteratorAggregate
 
     public function getDroppedAttributesCount(): int
     {
-        return $this->totalAddedAttributes - count($this);
-    }
-
-    private function truncateStringValue(string $value): string
-    {
-        return mb_substr($value, 0, $this->attributeLimits->getAttributeValueLengthLimit());
-    }
-
-    private function normalizeValue($value)
-    {
-        if (is_string($value)) {
-            return  $this->truncateStringValue($value);
-        }
-
-        if (is_array($value)) {
-            return array_map(function ($value) {
-                return $this->normalizeValue($value);
-            }, $value);
-        }
-
-        return $value;
+        return $this->droppedAttributesCount;
     }
 }

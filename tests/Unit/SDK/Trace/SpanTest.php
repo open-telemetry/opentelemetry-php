@@ -401,14 +401,6 @@ class SpanTest extends MockeryTestCase
         $span->end();
     }
 
-    public function test_set_attribute_empty_key(): void
-    {
-        $span = $this->createTestSpan();
-        $this->assertEmpty($span->toSpanData()->getAttributes());
-        $span->setAttribute('  ', 123);
-        $this->assertEmpty($span->toSpanData()->getAttributes());
-    }
-
     public function test_get_instrumentation_scope_info(): void
     {
         $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
@@ -666,17 +658,17 @@ class SpanTest extends MockeryTestCase
     {
         $maxNumberOfAttributes = 8;
 
-        $attributes = Attributes::create([]);
+        $attributesBuilder = Attributes::factory()->builder();
 
         foreach (range(1, $maxNumberOfAttributes * 2) as $idx) {
-            $attributes->setAttribute("str_attribute_${idx}", $idx);
+            $attributesBuilder["str_attribute_${idx}"] = $idx;
         }
 
         $span = $this->createTestSpan(
             API\SpanKind::KIND_INTERNAL,
             (new SpanLimitsBuilder())->setAttributeCountLimit($maxNumberOfAttributes)->build(),
             null,
-            $attributes
+            $attributesBuilder->build(),
         );
 
         $spanData = $span->toSpanData();
@@ -772,7 +764,7 @@ class SpanTest extends MockeryTestCase
         int $kind = API\SpanKind::KIND_INTERNAL,
         SpanLimits $spanLimits = null,
         string $parentSpanId = null,
-        ?AttributesInterface $attributes = null,
+        iterable $attributes = [],
         array $links = []
     ): Span {
         $parentSpanId = $parentSpanId ?? $this->parentSpanId;
@@ -789,7 +781,7 @@ class SpanTest extends MockeryTestCase
             $spanLimits,
             $this->spanProcessor,
             $this->resource,
-            $attributes,
+            $spanLimits->getAttributesFactory()->builder($attributes),
             $links,
             1,
             0

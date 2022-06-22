@@ -16,8 +16,9 @@ final class Attributes extends Moved implements AttributesInterface
 {
     public function __construct(iterable $attributes = [], AttributeLimitsInterface $attributeLimits = null)
     {
+        $attributes = Moved::withLimits($attributes, $attributeLimits ?? new AttributeLimits());
         // @phan-suppress-next-line PhanAccessMethodInternal
-        parent::__construct($attributes, $attributeLimits);
+        parent::__construct($attributes->toArray(), $attributes->getDroppedAttributesCount());
 
         Util::triggerClassDeprecationNotice(
             OpenTelemetry_SDK_Attributes,

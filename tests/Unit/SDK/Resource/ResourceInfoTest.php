@@ -27,8 +27,7 @@ class ResourceInfoTest extends TestCase
 
     public function test_get_attributes(): void
     {
-        $attributes = Attributes::create([]);
-        $attributes->setAttribute('name', 'test');
+        $attributes = Attributes::create(['name' => 'test']);
 
         $resource = (new Detectors\Composite([
             new Detectors\Constant(ResourceInfo::create($attributes)),
@@ -43,31 +42,10 @@ class ResourceInfoTest extends TestCase
         $sdklanguage = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE);
         $sdkversion = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION);
 
-        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_NAME, 'opentelemetry');
-        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_LANGUAGE, 'php');
-        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_VERSION, $version);
-        $attributes->setAttribute(ResourceAttributes::SERVICE_NAME, 'unknown_service');
-
-        $this->assertEquals($attributes, $resource->getAttributes());
         $this->assertSame('opentelemetry', $sdkname);
         $this->assertSame('php', $sdklanguage);
         $this->assertSame($version, $sdkversion);
         $this->assertSame('test', $name);
-    }
-
-    public function test_immutable_create(): void
-    {
-        $attributes = Attributes::create([]);
-        $attributes->setAttribute('name', 'test');
-        $attributes->setAttribute('version', '1.0.0');
-
-        $resource = ResourceInfo::create($attributes);
-
-        $attributes->setAttribute('version', '2.0.0');
-
-        $version = $resource->getAttributes()->get('version');
-
-        $this->assertEquals('1.0.0', $version);
     }
 
     /**

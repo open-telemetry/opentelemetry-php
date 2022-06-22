@@ -21,7 +21,10 @@ class AttributesTest extends TestCase
 
         $this->assertFalse($attributes->has('bar'));
 
-        $attributes->setAttribute('bar', 'bar');
+        $attributes = Attributes::create([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ]);
 
         $this->assertTrue($attributes->has('bar'));
     }
@@ -91,26 +94,27 @@ class AttributesTest extends TestCase
         $this->assertGreaterThan(0, $limitedAttributes->getDroppedAttributesCount());
     }
 
-    public function test_null_attribute_removes_existing(): void
+    public function test_null_attribute_ignore_existing(): void
     {
-        $attributes = Attributes::create([
+        $attributesBuilder = Attributes::factory()->builder([
             'foo' => 'foo',
             'bar' => 'bar',
             'baz' => 'baz',
         ]);
-        $this->assertCount(3, $attributes);
-        $attributes->setAttribute('foo', null);
-        $this->assertCount(2, $attributes);
+        $this->assertCount(3, $attributesBuilder->build());
+        $attributesBuilder['foo'] = null;
+        $this->assertCount(3, $attributesBuilder->build());
+        $this->assertSame('foo', $attributesBuilder['foo']);
     }
 
     public function test_null_missing_attribute_does_nothing(): void
     {
-        $attributes = Attributes::create([
+        $attributesBuilder = Attributes::factory()->builder([
             'foo' => 'foo',
         ]);
-        $this->assertCount(1, $attributes);
-        $attributes->setAttribute('bar', null);
-        $this->assertCount(1, $attributes);
+        $this->assertCount(1, $attributesBuilder->build());
+        $attributesBuilder['bar'] = null;
+        $this->assertCount(1, $attributesBuilder->build());
     }
 
     public function test_to_array(): void
@@ -125,47 +129,47 @@ class AttributesTest extends TestCase
 
     public function test_get_dropped_attributes_count(): void
     {
-        $attributes = Attributes::create([
+        $attributesBuilder = Attributes::factory()->builder([
             'foo' => 'foo',
             'bar' => 'bar',
         ]);
-        $this->assertEquals(0, $attributes->getDroppedAttributesCount());
+        $this->assertEquals(0, $attributesBuilder->build()->getDroppedAttributesCount());
 
-        $attributes->setAttribute('baz', 'baz');
-        $this->assertEquals(0, $attributes->getDroppedAttributesCount());
+        $attributesBuilder['baz'] = 'baz';
+        $this->assertEquals(0, $attributesBuilder->build()->getDroppedAttributesCount());
     }
 
     public function test_unset_get_dropped_attributes_count(): void
     {
-        $attributes = Attributes::create([
+        $attributesBuilder = Attributes::factory()->builder([
             'foo' => 'foo',
             'bar' => 'bar',
         ]);
-        $this->assertEquals(0, $attributes->getDroppedAttributesCount());
+        $this->assertEquals(0, $attributesBuilder->build()->getDroppedAttributesCount());
 
-        $attributes->unsetAttribute('foo');
-        $this->assertEquals(0, $attributes->getDroppedAttributesCount());
+        $attributesBuilder->offsetUnset('foo');
+        $this->assertEquals(0, $attributesBuilder->build()->getDroppedAttributesCount());
     }
 
     public function test_limit_get_dropped_attributes_count(): void
     {
-        $attributes = Attributes::withLimits([
+        $attributesBuilder = Attributes::factory(1)->builder([
             'foo' => 'foo',
             'bar' => 'bar',
-        ], new AttributeLimits(1));
-        $this->assertEquals(1, $attributes->getDroppedAttributesCount());
+        ]);
+        $this->assertEquals(1, $attributesBuilder->build()->getDroppedAttributesCount());
 
-        $attributes->setAttribute('baz', 'baz');
-        $this->assertEquals(2, $attributes->getDroppedAttributesCount());
+        $attributesBuilder['baz'] = 'baz';
+        $this->assertEquals(2, $attributesBuilder->build()->getDroppedAttributesCount());
     }
 
     public function test_replace_attribute_does_not_increase_dropped_attributes_count(): void
     {
-        $attributes = Attributes::withLimits([
+        $attributesBuilder = Attributes::factory(2)->builder([
             'foo' => 'foo',
-        ], new AttributeLimits(2));
+        ]);
 
-        $attributes->setAttribute('foo', 'bar');
-        $this->assertEquals(0, $attributes->getDroppedAttributesCount());
+        $attributesBuilder['foo'] = 'bar';
+        $this->assertEquals(0, $attributesBuilder->build()->getDroppedAttributesCount());
     }
 }
