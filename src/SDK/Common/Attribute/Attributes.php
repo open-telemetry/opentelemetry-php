@@ -8,7 +8,7 @@ use function array_key_exists;
 use IteratorAggregate;
 use Traversable;
 
-class Attributes implements AttributesInterface, IteratorAggregate
+final class Attributes implements AttributesInterface, IteratorAggregate
 {
     private array $attributes;
     private int $droppedAttributesCount;
@@ -24,16 +24,7 @@ class Attributes implements AttributesInterface, IteratorAggregate
 
     public static function create(iterable $attributes): AttributesInterface
     {
-        return self::withLimits($attributes, new AttributeLimits());
-    }
-
-    /** @return AttributesInterface Returns a new instance of Attributes with the limits applied */
-    public static function withLimits(iterable $attributes, AttributeLimitsInterface $attributeLimits): AttributesInterface
-    {
-        return self::factory(
-            $attributeLimits->getAttributeCountLimit(),
-            $attributeLimits->getAttributeValueLengthLimit(),
-        )->builder($attributes)->build();
+        return self::factory()->builder($attributes)->build();
     }
 
     public static function factory(?int $attributeCountLimit = null, ?int $attributeValueLengthLimit = null): AttributesFactoryInterface

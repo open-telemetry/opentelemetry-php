@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Attribute;
 
-use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use PHPUnit\Framework\TestCase;
 
@@ -51,8 +50,7 @@ class AttributesTest extends TestCase
         $longStringValue = '0123456789abcdefghijklmnopqrstuvwxyz';
         $longStringTrimmed = '0123456789abcdef';
 
-        $attributeLimits = new AttributeLimits(6, 16);
-        $attributes = Attributes::withLimits([
+        $attributes = Attributes::factory(6, 16)->builder([
             'bool' => true,
             'int' => $intValue,
             'float' => $floatValue,
@@ -64,7 +62,7 @@ class AttributesTest extends TestCase
                 true,
             ],
             'ignored_key' => 'ignored_value',
-        ], $attributeLimits);
+        ])->build();
 
         $this->assertTrue($attributes->get('bool'));
         $this->assertEquals($intValue, $attributes->get('int'));
@@ -86,7 +84,7 @@ class AttributesTest extends TestCase
             'long' => '1234567890',
             'dropped' => true,
         ]);
-        $limitedAttributes = Attributes::withLimits($attributes, new AttributeLimits(2, 5));
+        $limitedAttributes = Attributes::factory(2, 5)->builder($attributes)->build();
         $this->assertCount(2, $limitedAttributes);
         $this->assertEquals('123', $limitedAttributes->get('short'));
         $this->assertEquals('12345', $limitedAttributes->get('long'));
