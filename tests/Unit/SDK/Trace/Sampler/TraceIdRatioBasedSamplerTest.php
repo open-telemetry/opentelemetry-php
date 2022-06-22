@@ -24,7 +24,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
     {
         $sampler = new TraceIdRatioBasedSampler(1.0);
         $decision = $sampler->shouldSample(
-            new Context(),
+            Context::getRoot(),
             '4bf92f3577b34da6a3ce929d0e0e4736',
             'test.opentelemetry.io',
             API\SpanKind::KIND_INTERNAL

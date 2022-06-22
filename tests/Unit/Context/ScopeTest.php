@@ -18,8 +18,8 @@ class ScopeTest extends TestCase
     public function test_scope_close_restores_context(): void
     {
         $key = new ContextKey();
-        $ctx = (new Context())->with($key, 'test');
-        $scope = Context::attach($ctx);
+        $ctx = Context::getRoot()->with($key, 'test');
+        $scope = $ctx->activate();
 
         $this->assertSame('test', Context::getValue($key));
 
@@ -31,12 +31,12 @@ class ScopeTest extends TestCase
     public function test_nested_scope(): void
     {
         $key = new ContextKey();
-        $ctx1 = (new Context())->with($key, 'test1');
-        $scope1 = Context::attach($ctx1);
+        $ctx1 = Context::getRoot()->with($key, 'test1');
+        $scope1 = $ctx1->activate();
         $this->assertSame('test1', Context::getValue($key));
 
-        $ctx2 = (new Context())->with($key, 'test2');
-        $scope2 = Context::attach($ctx2);
+        $ctx2 = Context::getRoot()->with($key, 'test2');
+        $scope2 = $ctx2->activate();
         $this->assertSame('test2', Context::getValue($key));
 
         $scope2->detach();
@@ -48,7 +48,7 @@ class ScopeTest extends TestCase
 
     public function test_detached_scope_detach(): void
     {
-        $scope1 = Context::attach(Context::getCurrent());
+        $scope1 = Context::getCurrent()->activate();
 
         $this->assertSame(0, $scope1->detach());
         $this->assertSame(ScopeInterface::DETACHED, $scope1->detach() & ScopeInterface::DETACHED);
@@ -56,8 +56,8 @@ class ScopeTest extends TestCase
 
     public function test_order_mismatch_scope_detach(): void
     {
-        $scope1 = Context::attach(Context::getCurrent());
-        $scope2 = Context::attach(Context::getCurrent());
+        $scope1 = Context::getCurrent()->activate();
+        $scope2 = Context::getCurrent()->activate();
 
         $this->assertSame(ScopeInterface::MISMATCH, $scope1->detach() & ScopeInterface::MISMATCH);
         $this->assertSame(0, $scope2->detach());
@@ -80,7 +80,7 @@ class ScopeTest extends TestCase
     }
     public function test_inactive_scope_detach(): void
     {
-        $scope1 = Context::attach(Context::getCurrent());
+        $scope1 = Context::getCurrent()->activate();
 
         Context::storage()->fork(1);
         Context::storage()->switch(1);

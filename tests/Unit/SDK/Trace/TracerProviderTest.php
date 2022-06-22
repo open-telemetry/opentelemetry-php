@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
+use WeakReference;
 
 /**
  * @coversDefaultClass \OpenTelemetry\SDK\Trace\TracerProvider
@@ -173,5 +174,17 @@ class TracerProviderTest extends TestCase
             NoopTracer::class,
             $provider->getTracer('foo')
         );
+    }
+
+    /**
+     * @coversNothing
+     */
+    public function test_tracer_register_shutdown_function_does_not_leak_reference(): void
+    {
+        $provider = new TracerProvider();
+        $reference = WeakReference::create($provider);
+
+        $provider = null;
+        $this->assertTrue($reference->get() === null);
     }
 }

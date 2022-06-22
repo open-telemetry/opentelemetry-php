@@ -1,8 +1,36 @@
 # OpenTelemetry php library
 
-![CI Build](https://github.com/open-telemetry/opentelemetry-php/workflows/PHP%20Composer/badge.svg)
+![CI Build](https://github.com/open-telemetry/opentelemetry-php/workflows/PHP%20QA/badge.svg)
 [![codecov](https://codecov.io/gh/open-telemetry/opentelemetry-php/branch/master/graph/badge.svg)](https://codecov.io/gh/open-telemetry/opentelemetry-php)
 
+This is the **[monorepo](https://en.wikipedia.org/wiki/Monorepo)** for the **main** components of **[OpenTelemetry](https://opentelemetry.io/) PHP**. 
+The main library is distributed as a complete package: [open-telemetry/opentelemetry](https://packagist.org/packages/open-telemetry/opentelemetry) 
+as well as each component as a separate package. These packages are:
+
+- API: [open-telemetry/api](https://packagist.org/packages/open-telemetry/api)
+- SDK: [open-telemetry/sdk](https://packagist.org/packages/open-telemetry/sdk)
+- Semantic Conventions: [open-telemetry/sem-conv](https://packagist.org/packages/open-telemetry/sem-conv)
+- Context: [open-telemetry/context](https://packagist.org/packages/open-telemetry/context)
+- Contrib: [open-telemetry/sdk-contrib](https://packagist.org/packages/open-telemetry/sdk-contrib)
+
+---
+This repository also hosts and distributes generated client code used by individual components as separate packages.  These packages are:
+- Generated [OTLP](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md) ProtoBuf files:
+  [open-telemetry/gen-otlp-protobuf](https://packagist.org/packages/open-telemetry/gen-otlp-protobuf)
+- Generated [Jaeger](https://github.com/jaegertracing/jaeger-idl) Thrift files:
+  [open-telemetry/gen-jaeger-thrift](https://packagist.org/packages/open-telemetry/gen-jaeger-thrift)
+
+For now the generated code packages are meant to be only used by library components internally.
+
+---
+
+The [OpenTelemetry PHP Contrib repository](https://github.com/open-telemetry/opentelemetry-php-contrib/) hosts contributions that are not part of the core
+distribution or components of the library. Typically, these contributions are vendor specific receivers/exporters and/or
+components that are only useful to a relatively small number of users.  
+
+Additional packages, demos and tools are hosted or distributed in the [OpenTelemetry PHP organization](https://github.com/opentelemetry-php).
+
+---
 ## Current Project Status
 ![Current Version](https://img.shields.io/github/v/tag/open-telemetry/opentelemetry-php)
 
@@ -23,13 +51,6 @@ mentioned in the provided messages, since doing otherwise may break things compl
 
 ---
 
-There is a supplemental repository for OpenTelemetry PHP contributions that are not part of the core 
-distribution of the library. Typically, these contributions are vendor specific receivers/exporters and/or 
-components that are only useful to a relatively small number of users.  This repository can be found
-[here.](https://github.com/open-telemetry/opentelemetry-php-contrib/)
-
----
-
 We attempt to keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show which features are available and which have not yet been implemented.  
 
 If you find an inconsistency in the data in the matrix vs. the data in this repository, please let us know in our slack channel and we'll get it rectified.
@@ -46,7 +67,7 @@ A Google calendar invite with the included zoom link can be found [here](https:/
 Our open issues can all be found in the [GitHub issues tab](https://github.com/open-telemetry/opentelemetry-php/issues).  Feel free to reach out on Slack if you have any additional questions about these issues; we are always happy to talk through implementation details.
 
 ## Requirements
-The library requires a PHP version of 7.4.x, 8.0.x or 8.1.x
+The library and all separate packages requires a PHP version of 7.4.x, 8.0.x or 8.1.x
 
 ### Dependencies
 
@@ -55,7 +76,7 @@ The library requires a PHP version of 7.4.x, 8.0.x or 8.1.x
 #### REQUIRED DEPENDENCIES
 #### 1) Install PSR17/18 implementations
 
-The library has a dependency on both a [HTTP Factories (PSR17)](https://www.php-fig.org/psr/psr-17/)
+The **SDK** and **Contrib** packages have a dependency on both a [HTTP Factories (PSR17)](https://www.php-fig.org/psr/psr-17/)
 and a [php-http/async-client](https://docs.php-http.org/en/latest/clients.html) implementation.
 You can find appropriate composer packages implementing given standards on [packagist.org](https://packagist.org/).
 Follow [this link](https://packagist.org/providers/psr/http-factory-implementation) to find a `PSR17 (HTTP factories)` implementation,
@@ -67,7 +88,7 @@ and [this link](https://packagist.org/providers/php-http/async-client-implementa
 
 #### 1) Install PHP [ext-grpc](https://pecl.php.net/package/gRPC)
 
-**The PHP gRPC extension is only needed, if you want to use the OTLP GRPC Exporter.**
+**The PHP gRPC extension is only needed, if you want to use the OTLP GRPC Exporter from the Contrib package.**
 
 Three ways to install the gRPC extension are described below. Keep in mind, that whatever way
 to install the extension you choose, the compilation can take up to 10-15 minutes. (As an alternative you can search for
@@ -92,7 +113,7 @@ provides a package for the extension)
 
 #### 2) Install PHP [ext-mbstring](https://www.php.net/manual/en/book.mbstring.php)
 
-The library will load the `symfony/polyfill-mbstring` package, but for better performance you should install
+The library's components will load the `symfony/polyfill-mbstring` package, but for better performance you should install
 the  PHP mbstring extension. You can use the same install methods as described for the gRPC extension above,
 however most OS` package managers provide a package for the extension.
 
@@ -111,31 +132,63 @@ Using fibers with non-`CLI` SAPIs may require preloading of bindings. One way to
 
 #### 5) Install PHP [ext-protobuf](https://pecl.php.net/package/protobuf)
 
-**The PHP protobuf extension is optional when using either the `OTLPHttp` or `OTLPGrpc` exporters.**
+**The PHP protobuf extension is optional when using either the `OTLPHttp` or `OTLPGrpc` exporters from the Contrib package.**
 
 The protobuf extension makes both exporters more performant. _Note that protobuf 3.20.0+ is required for php 8.1 support_
 
 ---
 
 ## Installation
-The recommended way to install the library is through [Composer](http://getcomposer.org):
+The recommended way to install the library's packages is through [Composer](http://getcomposer.org):
 
-1)  Install the composer package using [Composer's installation instructions](https://getcomposer.org/doc/00-intromd#installation-linux-unix-macos).
-
-
-2)  Add
+Install Composer using the [installation instructions](https://getcomposer.org/doc/00-intromd#installation-linux-unix-macos) and add
 ```bash
  "minimum-stability": "dev"
 ```
 
-To your project's `composer.json` file, as this utility has not reached a stable release status yet.
+To your project's `composer.json` file, as this library has not reached a stable release status yet.
 
-3) Install the dependency with composer:
+### Getting Started with OpenTelemetry
+
+To install the complete library with all packages you can run:
 
 ```bash
 $ composer require open-telemetry/opentelemetry
 ```
+This is perfect for trying out our examples or demos.
 
+### Using OpenTelemetry in an Application
+
+Your application should only depend on Interfaces provided by the API package:
+
+```bash
+$ composer require open-telemetry/api
+```
+In the best case you will use [Dependency Inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle) and write an adapter to not depend on the API directly.
+
+Make sure your application works with a dependency on the API only, however to make really use of the library you want to install the **SDK** package and probably the **Contrib** package as well:
+
+```bash
+$ composer require open-telemetry/sdk
+```
+or
+```bash
+$ composer require open-telemetry/sdk open-telemetry/sdk-contrib
+```
+Make sure any **SDK** or **Contrib** code is set up by your configuration, bootstrap, dependency injection, etc.
+
+### Using OpenTelemetry to instrument a Library
+
+Your library should only depend on Interfaces provided by the API package:
+
+```bash
+$ composer require open-telemetry/api
+```
+
+For development and testing purposes you also want to install **SDK** and **Contrib** packages:
+```bash
+$ composer require --dev open-telemetry/sdk open-telemetry/sdk-contrib
+```
 ## Development
 For repeatability and consistency across different operating systems, we use the [3 Musketeers pattern](https://3musketeers.io/). If you're on Windows, it might be a good idea to use Git bash for following the steps below.
 

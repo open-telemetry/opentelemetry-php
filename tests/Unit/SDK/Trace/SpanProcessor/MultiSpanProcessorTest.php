@@ -12,7 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor
+ * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor
  */
 class MultiSpanProcessorTest extends TestCase
 {

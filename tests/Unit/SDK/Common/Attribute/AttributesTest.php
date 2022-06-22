@@ -159,6 +159,17 @@ class AttributesTest extends TestCase
         $this->assertEquals(3, $attributes->getTotalAddedValues());
     }
 
+    public function test_replace_attribute_does_not_increase_count(): void
+    {
+        $attributes = new Attributes([
+            'foo' => 'foo',
+        ], new AttributeLimits(2));
+
+        $attributes->setAttribute('foo', 'bar');
+        $this->assertEquals(1, $attributes->getTotalAddedValues());
+        $this->assertEquals(0, $attributes->getDroppedAttributesCount());
+    }
+
     public function test_count_dropped_attributes(): void
     {
         $attributes = new Attributes([

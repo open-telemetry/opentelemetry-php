@@ -1,5 +1,4 @@
-
-name: PHP Composer
+name: PHP QA
 
 on:
   push:
@@ -8,8 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
+  php:
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -47,14 +45,11 @@ jobs:
       if: steps.composer-cache.outputs.cache-hit != 'true'
       run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: Validate packages composer.json
-      run: vendor/bin/otel packages:composer:validate
-
     - name: Check Style
       run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
 
     - name: Check Dependencies
-      run: vendor/bin/deptrac --formatter=github-actions
+      run: vendor/bin/deptrac --formatter=github-actions --report-uncovered
 
     - name: Run Phan
       env:
@@ -62,7 +57,7 @@ jobs:
       run: vendor/bin/phan
 
     - name: Run Psalm
-      run: vendor/bin/psalm --output-format=github
+      run: vendor/bin/psalm --output-format=github --php-version=${{ matrix.php-version }}
 
     - name: Run Phpstan
       run: vendor/bin/phpstan analyse --error-format=github
@@ -75,3 +70,10 @@ jobs:
 
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash) -F ${{ matrix.php-version }}
+
+  packages:
+    uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@main
+    needs: php
+    with:
+      matrix_extension: '["ast, json, grpc"]'
+      install_directory: '~/.test/.packages'

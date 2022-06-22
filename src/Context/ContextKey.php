@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
-class ContextKey
+final class ContextKey
 {
     private ?string $name;
 
