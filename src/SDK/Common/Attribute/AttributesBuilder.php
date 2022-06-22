@@ -35,13 +35,6 @@ final class AttributesBuilder implements AttributesBuilderInterface
         $this->droppedAttributesCount = $droppedAttributesCount;
     }
 
-    public function incrementDroppedAttributesCount(int $count = 1): AttributesBuilderInterface
-    {
-        $this->droppedAttributesCount += $count;
-
-        return $this;
-    }
-
     public function build(): AttributesInterface
     {
         return new Attributes($this->attributes, $this->droppedAttributesCount);
