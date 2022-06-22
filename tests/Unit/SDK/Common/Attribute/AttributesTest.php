@@ -19,11 +19,11 @@ class AttributesTest extends TestCase
             'foo' => 'foo',
         ]);
 
-        $this->assertFalse($attributes->hasAttribute('bar'));
+        $this->assertFalse($attributes->has('bar'));
 
         $attributes->setAttribute('bar', 'bar');
 
-        $this->assertTrue($attributes->hasAttribute('bar'));
+        $this->assertTrue($attributes->has('bar'));
     }
 
     /** Test numeric attribute key is not cast to integer value */
@@ -123,78 +123,49 @@ class AttributesTest extends TestCase
         $this->assertSame($values, $attributes->toArray());
     }
 
-    public function test_get_total_added_values(): void
+    public function test_get_dropped_attributes_count(): void
     {
         $attributes = new Attributes([
             'foo' => 'foo',
             'bar' => 'bar',
         ]);
-        $this->assertEquals(2, $attributes->getTotalAddedValues());
+        $this->assertEquals(0, $attributes->getDroppedAttributesCount());
 
         $attributes->setAttribute('baz', 'baz');
-        $this->assertEquals(3, $attributes->getTotalAddedValues());
+        $this->assertEquals(0, $attributes->getDroppedAttributesCount());
     }
 
-    public function test_unset_get_total_added_values(): void
+    public function test_unset_get_dropped_attributes_count(): void
     {
         $attributes = new Attributes([
             'foo' => 'foo',
             'bar' => 'bar',
         ]);
-        $this->assertEquals(2, $attributes->getTotalAddedValues());
+        $this->assertEquals(0, $attributes->getDroppedAttributesCount());
 
         $attributes->unsetAttribute('foo');
-        $this->assertEquals(1, $attributes->getTotalAddedValues());
+        $this->assertEquals(0, $attributes->getDroppedAttributesCount());
     }
 
-    public function test_limit_get_total_added_values(): void
+    public function test_limit_get_dropped_attributes_count(): void
     {
         $attributes = new Attributes([
             'foo' => 'foo',
             'bar' => 'bar',
         ], new AttributeLimits(1));
-        $this->assertEquals(2, $attributes->getTotalAddedValues());
+        $this->assertEquals(1, $attributes->getDroppedAttributesCount());
 
         $attributes->setAttribute('baz', 'baz');
-        $this->assertEquals(3, $attributes->getTotalAddedValues());
+        $this->assertEquals(2, $attributes->getDroppedAttributesCount());
     }
 
-    public function test_replace_attribute_does_not_increase_count(): void
+    public function test_replace_attribute_does_not_increase_dropped_attributes_count(): void
     {
         $attributes = new Attributes([
             'foo' => 'foo',
         ], new AttributeLimits(2));
 
         $attributes->setAttribute('foo', 'bar');
-        $this->assertEquals(1, $attributes->getTotalAddedValues());
         $this->assertEquals(0, $attributes->getDroppedAttributesCount());
-    }
-
-    public function test_count_dropped_attributes(): void
-    {
-        $attributes = new Attributes([
-            'foo' => 'foo',
-            'bar' => 'bar',
-        ], new AttributeLimits(1));
-
-        $this->assertEquals(1, $attributes->getTotalAddedValues() - count($attributes));
-
-        $attributes->setAttribute('baz', 'baz');
-
-        $this->assertEquals(2, $attributes->getTotalAddedValues() - count($attributes));
-    }
-
-    public function test_is_limit_reached(): void
-    {
-        $attributes = new Attributes([
-            'foo' => 'foo',
-            'bar' => 'bar',
-        ], new AttributeLimits(3));
-
-        $this->assertFalse($attributes->isLimitReached());
-
-        $attributes->setAttribute('baz', 'baz');
-
-        $this->assertTrue($attributes->isLimitReached());
     }
 }

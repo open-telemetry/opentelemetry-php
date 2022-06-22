@@ -335,7 +335,7 @@ class SpanTest extends MockeryTestCase
 
         $spanData = $span->toSpanData();
         $this->assertSame(count(self::ATTRIBUTES) + 1, $spanData->getAttributes()->count());
-        $this->assertSame(0, $spanData->getTotalDroppedAttributes());
+        $this->assertSame(0, $spanData->getAttributes()->getDroppedAttributesCount());
     }
 
     /**
@@ -653,13 +653,13 @@ class SpanTest extends MockeryTestCase
         $spanData = $span->toSpanData();
 
         $this->assertCount($maxNumberOfAttributes, $spanData->getAttributes());
-        $this->assertSame(8, $spanData->getTotalDroppedAttributes());
+        $this->assertSame(8, $spanData->getAttributes()->getDroppedAttributesCount());
 
         $span->end();
         $spanData = $span->toSpanData();
 
         $this->assertCount($maxNumberOfAttributes, $spanData->getAttributes());
-        $this->assertSame(8, $spanData->getTotalDroppedAttributes());
+        $this->assertSame(8, $spanData->getAttributes()->getDroppedAttributesCount());
     }
 
     public function test_dropping_attributes_provided_via_span_builder(): void
@@ -682,13 +682,13 @@ class SpanTest extends MockeryTestCase
         $spanData = $span->toSpanData();
 
         $this->assertCount($maxNumberOfAttributes, $spanData->getAttributes());
-        $this->assertSame(8, $spanData->getTotalDroppedAttributes());
+        $this->assertSame(8, $spanData->getAttributes()->getDroppedAttributesCount());
 
         $span->end();
         $spanData = $span->toSpanData();
 
         $this->assertCount($maxNumberOfAttributes, $spanData->getAttributes());
-        $this->assertSame(8, $spanData->getTotalDroppedAttributes());
+        $this->assertSame(8, $spanData->getAttributes()->getDroppedAttributesCount());
     }
 
     public function test_dropping_events(): void

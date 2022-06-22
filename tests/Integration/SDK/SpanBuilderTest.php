@@ -235,7 +235,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->setAttribute('doo', 'baz');
 
         $this->assertSame(2, $attributes->count());
-        $this->assertFalse($attributes->hasAttribute('doo'));
+        $this->assertFalse($attributes->has('doo'));
     }
 
     /**
@@ -297,7 +297,7 @@ class SpanBuilderTest extends MockeryTestCase
 
         $attributes = $span->toSpanData()->getAttributes();
         $this->assertSame(2, $attributes->count());
-        $this->assertFalse($attributes->hasAttribute('bar1'));
+        $this->assertFalse($attributes->has('bar1'));
     }
 
     public function test_set_attribute_dropping(): void

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Attribute;
 
+use function count;
+use IteratorAggregate;
 use function mb_substr;
 use Traversable;
 
-class Attributes implements AttributesInterface
+class Attributes implements AttributesInterface, IteratorAggregate
 {
     private array $attributes = [];
 
@@ -29,7 +31,7 @@ class Attributes implements AttributesInterface
         return new self($attributes, $attributeLimits);
     }
 
-    public function hasAttribute(string $name): bool
+    public function has(string $name): bool
     {
         return isset($this->attributes[$name]);
     }
@@ -41,11 +43,11 @@ class Attributes implements AttributesInterface
             return $this->unsetAttribute($name);
         }
 
-        if (!$this->hasAttribute($name)) {
+        if (!$this->has($name)) {
             $this->totalAddedAttributes++;
         }
         // drop attribute when limit is reached
-        if (!$this->hasAttribute($name) && $this->isLimitReached()) {
+        if (!$this->has($name) && count($this) >= $this->attributeLimits->getAttributeCountLimit()) {
             return $this;
         }
 
@@ -56,7 +58,7 @@ class Attributes implements AttributesInterface
 
     public function unsetAttribute(string $name): AttributesInterface
     {
-        if ($this->hasAttribute($name)) {
+        if ($this->has($name)) {
             unset($this->attributes[$name]);
 
             $this->totalAddedAttributes--;
@@ -88,19 +90,9 @@ class Attributes implements AttributesInterface
         return $this->attributes;
     }
 
-    public function getTotalAddedValues(): int
-    {
-        return $this->totalAddedAttributes;
-    }
-
     public function getDroppedAttributesCount(): int
     {
         return $this->totalAddedAttributes - count($this);
-    }
-
-    public function isLimitReached(): bool
-    {
-        return count($this) >= $this->attributeLimits->getAttributeCountLimit();
     }
 
     private function truncateStringValue(string $value): string

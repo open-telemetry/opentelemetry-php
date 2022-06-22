@@ -310,7 +310,6 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             $this->links,
             $this->events,
             $this->getImmutableAttributes(),
-            (null === $this->attributes) ? 0 : $this->attributes->getTotalAddedValues(),
             $this->totalRecordedEvents,
             $this->status,
             $this->endEpochNanos,
