@@ -9,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \OpenTelemetry\SDK\Common\Attribute\Attributes
+ * @covers \OpenTelemetry\SDK\Common\Attribute\AttributesBuilder
+ * @covers \OpenTelemetry\SDK\Common\Attribute\AttributesFactory
  */
 class AttributesTest extends TestCase
 {
