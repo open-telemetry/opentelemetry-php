@@ -6,16 +6,9 @@ namespace OpenTelemetry\SDK\Common\Attribute;
 
 use function array_key_exists;
 use function count;
-use function get_resource_type;
 use function is_array;
-use function is_object;
-use function is_resource;
-use function is_scalar;
 use function is_string;
-use function method_exists;
-use function serialize;
-use function substr;
-use Throwable;
+use function mb_substr;
 
 /**
  * @internal
@@ -54,12 +47,18 @@ final class AttributesBuilder implements AttributesBuilderInterface
         return $this->attributes[$offset] ?? null;
     }
 
+    /**
+     * @phan-suppress PhanUndeclaredClassAttribute
+     */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
-        if ($value === null) {
+        if ($offset === null) {
             return;
         }
-        if ($offset === null) {
+        if ($value === null) {
+            unset($this->attributes[$offset]);
+
             return;
         }
         if (count($this->attributes) === $this->attributeCountLimit && !array_key_exists($offset, $this->attributes)) {
@@ -68,60 +67,35 @@ final class AttributesBuilder implements AttributesBuilderInterface
             return;
         }
 
-        $this->attributes[$offset] = self::convert($value, $this->attributeValueLengthLimit);
+        $this->attributes[$offset] = $this->normalizeValue($value);
     }
 
+    /**
+     * @phan-suppress PhanUndeclaredClassAttribute
+     */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         unset($this->attributes[$offset]);
     }
 
-    private static function convert($value, ?int $attributeValueLengthLimit)
+    private function normalizeValue($value)
     {
+        if (is_string($value) && $this->attributeValueLengthLimit !== null) {
+            return mb_substr($value, 0, $this->attributeValueLengthLimit);
+        }
+
         if (is_array($value)) {
             foreach ($value as $k => $v) {
-                $processed = self::convert($v, $attributeValueLengthLimit);
+                $processed = $this->normalizeValue($v);
                 if ($processed !== $v) {
                     $value[$k] = $processed;
                 }
             }
-        } else {
-            $value = self::convertValue($value);
 
-            if (is_string($value) && $attributeValueLengthLimit !== null) {
-                $value = substr($value, 0, $attributeValueLengthLimit);
-            }
+            return $value;
         }
 
         return $value;
-    }
-
-    private static function convertValue($value)
-    {
-        if (is_scalar($value) || $value === null) {
-            return $value;
-        }
-        if (is_resource($value)) {
-            return get_resource_type($value);
-        }
-        /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
-        /** @psalm-suppress UndefinedClass @phpstan-ignore-next-line @phan-suppress-next-line PhanUndeclaredClassInstanceof */
-        if ($value instanceof \UnitEnum) {
-            /** @phpstan-ignore-next-line @phan-suppress-next-line PhanUndeclaredClassProperty */
-            return $value->name;
-        }
-        if (is_object($value) && method_exists($value, '__toString')) {
-            try {
-                return $value->__toString();
-            } catch (Throwable $e) {
-            }
-        }
-
-        try {
-            return serialize($value);
-        } catch (Throwable $e) {
-        }
-
-        return null;
     }
 }

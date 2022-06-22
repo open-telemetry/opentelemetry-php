@@ -94,7 +94,7 @@ class AttributesTest extends TestCase
         $this->assertGreaterThan(0, $limitedAttributes->getDroppedAttributesCount());
     }
 
-    public function test_null_attribute_ignore_existing(): void
+    public function test_null_attribute_removes_existing(): void
     {
         $attributesBuilder = Attributes::factory()->builder([
             'foo' => 'foo',
@@ -103,8 +103,7 @@ class AttributesTest extends TestCase
         ]);
         $this->assertCount(3, $attributesBuilder->build());
         $attributesBuilder['foo'] = null;
-        $this->assertCount(3, $attributesBuilder->build());
-        $this->assertSame('foo', $attributesBuilder['foo']);
+        $this->assertCount(2, $attributesBuilder->build());
     }
 
     public function test_null_missing_attribute_does_nothing(): void
