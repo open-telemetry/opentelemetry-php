@@ -20,14 +20,15 @@ class EventBench
     {
         $this->listenerProvider = new SimpleListenerProvider();
         $this->dispatcher = new SimpleDispatcher($this->listenerProvider);
-        $this->listener = function(){};
+        $this->listener = function () {
+        };
         $this->event = new stdClass();
     }
 
     public function addEventsToListener(): void
     {
         for ($i=0; $i<10; $i++) {
-            $this->listenerProvider->listen('event_'.$i, $this->listener);
+            $this->listenerProvider->listen('event_' . $i, $this->listener);
         }
         $this->listenerProvider->listen(get_class($this->event), $this->listener);
     }
@@ -41,7 +42,7 @@ class EventBench
     public function benchAddListeners(array $params): void
     {
         for ($i=0; $i<$params[0]; $i++) {
-            $this->listenerProvider->listen('event_'.$i, $this->listener);
+            $this->listenerProvider->listen('event_' . $i, $this->listener);
         }
     }
 
