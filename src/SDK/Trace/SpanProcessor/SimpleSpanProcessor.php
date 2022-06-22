@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
+use OpenTelemetry\API\Behavior\EmitsEventsTrait;
+use OpenTelemetry\API\Common\Event\Event\DebugEvent;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Behavior\EmitsEventsTrait;
-use OpenTelemetry\SDK\Common\Event\Event\DebugEvent;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;

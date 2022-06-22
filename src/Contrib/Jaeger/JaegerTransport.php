@@ -8,8 +8,8 @@ use Jaeger\Thrift\Agent\AgentClient;
 use Jaeger\Thrift\Batch;
 use Jaeger\Thrift\Process;
 use Jaeger\Thrift\Span;
-use OpenTelemetry\SDK\Behavior\EmitsEventsTrait;
-use OpenTelemetry\SDK\Common\Event\Event\ErrorEvent;
+use OpenTelemetry\API\Behavior\EmitsEventsTrait;
+use OpenTelemetry\API\Common\Event\Event\ErrorEvent;
 use Thrift\Exception\TTransportException;
 use Thrift\Protocol\TCompactProtocol;
 

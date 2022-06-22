@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\API\Behavior\EmitsEventsTrait;
+use OpenTelemetry\API\Common\Event\Event\WarningEvent;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\Behavior\EmitsEventsTrait;
-use OpenTelemetry\SDK\Common\Event\Event\WarningEvent;
 
 final class TracerProviderFactory
 {

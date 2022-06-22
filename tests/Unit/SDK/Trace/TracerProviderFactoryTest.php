@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
-use OpenTelemetry\SDK\Common\Event\Dispatcher;
-use OpenTelemetry\SDK\Common\Event\Event\WarningEvent;
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
+use OpenTelemetry\API\Common\Event\Dispatcher;
+use OpenTelemetry\API\Common\Event\Event\WarningEvent;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Trace\Behavior;
 
 use GuzzleHttp\Exception\ClientException;
-use OpenTelemetry\SDK\Common\Event\Dispatcher;
+use OpenTelemetry\API\Common\Event\Dispatcher;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;

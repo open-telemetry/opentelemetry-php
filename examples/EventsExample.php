@@ -6,13 +6,13 @@ require __DIR__ . '/../vendor/autoload.php';
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use OpenTelemetry\API\Common\Event\Dispatcher;
+use OpenTelemetry\API\Common\Event\Event\ErrorEvent;
+use OpenTelemetry\API\Common\Event\EventType;
+use OpenTelemetry\API\Common\Event\SimpleDispatcher;
+use OpenTelemetry\API\Common\Event\SimpleListenerProvider;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
-use OpenTelemetry\SDK\Common\Event\Dispatcher;
-use OpenTelemetry\SDK\Common\Event\Event\ErrorEvent;
-use OpenTelemetry\SDK\Common\Event\EventType;
-use OpenTelemetry\SDK\Common\Event\SimpleDispatcher;
-use OpenTelemetry\SDK\Common\Event\SimpleListenerProvider;
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use Psr\Log\LogLevel;
@@ -42,12 +42,12 @@ $listenerProvider->listen(EventType::ERROR, function (ErrorEvent $event) {
 }, -10); //runs before built-in handler
 $listenerProvider->listen(EventType::ERROR, function (ErrorEvent $event) {
     echo 'Another custom handling of an error event: ' . $event->getMessage() . PHP_EOL;
-    echo json_encode($event->getException()->getTrace()) . PHP_EOL;
+    echo 'Trace: ' . json_encode($event->getException()->getTrace()) . PHP_EOL;
     echo 'Stopping event propagation...' . PHP_EOL;
     $event->stopPropagation();
-}, 5); //runs after build-in handler
+}, 5); //runs after built-in handler
 $listenerProvider->listen(EventType::ERROR, function (ErrorEvent $event) {
-    echo 'This will not be executed, because a high priority handler stopped event propagation.' . PHP_EOL;
+    echo 'This will not be executed, because a higher priority handler stopped event propagation.' . PHP_EOL;
 }, 10);
 
 Dispatcher::setInstance(new SimpleDispatcher($listenerProvider));

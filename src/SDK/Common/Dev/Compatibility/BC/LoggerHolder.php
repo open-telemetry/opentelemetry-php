@@ -11,9 +11,9 @@ use Psr\Log\LoggerInterface;
 /**
  * @codeCoverageIgnoreStart
  */
-const OpenTelemetry_SDK_GlobalLoggerHolder = 'OpenTelemetry\SDK\GlobalLoggerHolder';
+const OpenTelemetry_SDK_LoggerHolder = 'OpenTelemetry\SDK\LoggerHolder';
 
-class GlobalLoggerHolder
+class LoggerHolder
 {
     public static function get(): LoggerInterface
     {
@@ -53,13 +53,13 @@ class GlobalLoggerHolder
     private static function triggerClassDeprecationNotice(): void
     {
         Util::triggerClassDeprecationNotice(
-            OpenTelemetry_SDK_GlobalLoggerHolder,
+            OpenTelemetry_SDK_LoggerHolder,
             Moved::class
         );
     }
 }
 
-class_alias(GlobalLoggerHolder::class, OpenTelemetry_SDK_GlobalLoggerHolder);
+class_alias(LoggerHolder::class, OpenTelemetry_SDK_LoggerHolder);
 /**
  * @codeCoverageIgnoreEnd
  */
