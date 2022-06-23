@@ -6,12 +6,44 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SemConv;
 
-class ResourceAttributes
+interface ResourceAttributes
 {
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.9.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.12.0';
+
+    /**
+     * Array of brand name and version separated by a space.
+     *
+     * This value is intended to be taken from the UA client hints API (navigator.userAgentData.brands).
+     *
+     * @example  Not A;Brand 99
+     * @example Chromium 99
+     * @example Chrome 99
+     */
+    public const BROWSER_BRANDS = 'browser.brands';
+
+    /**
+     * The platform on which the browser is running.
+     *
+     * This value is intended to be taken from the UA client hints API (navigator.userAgentData.platform). If unavailable, the legacy `navigator.platform` API SHOULD NOT be used instead and this attribute SHOULD be left unset in order for the values to be consistent.
+     * The list of possible values is defined in the W3C User-Agent Client Hints specification. Note that some (but not all) of these values can overlap with values in the os.type and os.name attributes. However, for consistency, the values in the `browser.platform` attribute should capture the exact value that the user agent provides.
+     *
+     * @example Windows
+     * @example macOS
+     * @example Android
+     */
+    public const BROWSER_PLATFORM = 'browser.platform';
+
+    /**
+     * Full user-agent string provided by the browser.
+     *
+     * The user-agent value SHOULD be provided only from browsers that do not have a mechanism to retrieve brands and platform individually from the User-Agent Client Hints API. To retrieve the value, the legacy `navigator.userAgent` API can be used.
+     *
+     * @example Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36
+     */
+    public const BROWSER_USER_AGENT = 'browser.user_agent';
 
     /**
      * Name of the cloud provider.
@@ -222,29 +254,43 @@ class ResourceAttributes
     /**
      * The name of the single function that this runtime instance executes.
      *
-     * This is the name of the function as configured/deployed on the FaaS platform and is usually different from the name of the callback function (which may be stored in the `code.namespace`/`code.function` span attributes).
+     * This is the name of the function as configured/deployed on the FaaS
+     * platform and is usually different from the name of the callback
+     * function (which may be stored in the
+     * `code.namespace`/`code.function`
+     * span attributes).For some cloud providers, the above definition is ambiguous. The following
+     * definition of function name MUST be used for this attribute
+     * (and consequently the span name) for the listed cloud providers/products:<ul>
+     * <li><strong>Azure:</strong>  The full name `<FUNCAPP>/<FUNC>`, i.e., function app name
+     * followed by a forward slash followed by the function name (this form
+     * can also be seen in the resource JSON for the function).
+     * This means that a span attribute MUST be used, as an Azure function
+     * app can host multiple functions that would usually share
+     * a TracerProvider (see also the `faas.id` attribute).</li>
+     * </ul>
      *
      * @example my-function
+     * @example myazurefunctionapp/some-function-name
      */
     public const FAAS_NAME = 'faas.name';
 
     /**
      * The unique ID of the single function that this runtime instance executes.
      *
-     * Depending on the cloud provider, use:<ul>
-     * <li><strong>AWS Lambda:</strong> The function ARN.</li>
-     * </ul>
+     * On some cloud providers, it may not be possible to determine the full ID at startup,
+     * so consider setting `faas.id` as a span attribute instead.The exact value to use for `faas.id` depends on the cloud provider:<ul>
+     * <li><strong>AWS Lambda:</strong> The function ARN.
      * Take care not to use the &quot;invoked ARN&quot; directly but replace any
-     * alias suffix with the resolved function version, as the same runtime instance may be invokable with multiple
-     * different aliases.<ul>
+     * alias suffix
+     * with the resolved function version, as the same runtime instance may be invokable with
+     * multiple different aliases.</li>
      * <li><strong>GCP:</strong> The URI of the resource</li>
-     * <li><strong>Azure:</strong> The Fully Qualified Resource ID.</li>
+     * <li><strong>Azure:</strong> The Fully Qualified Resource ID of the invoked function,
+     * <em>not</em> the function app, having the form
+     * `/subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>`.
+     * This means that a span attribute MUST be used, as an Azure function app can host multiple functions that would usually share
+     * a TracerProvider.</li>
      * </ul>
-     * On some providers, it may not be possible to determine the full ID at startup,
-     * which is why this field cannot be made required. For example, on AWS the account ID
-     * part of the ARN is not available without calling another AWS API
-     * which may be deemed too slow for a short-running lambda function.
-     * As an alternative, consider setting `faas.id` as a span attribute instead.
      *
      * @example arn:aws:lambda:us-west-2:123456789012:function:my-function
      */
