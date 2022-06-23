@@ -24,10 +24,9 @@ class SpanUtils
     /**
      * Creates a new context to insert a span into, that then become the current context and the current active span
      * @param SpanInterface $span the span to set into the new context
-     * @return Context
      */
-    public static function setSpanIntoNewContext(SpanInterface $span): Context
+    public static function setSpanIntoNewContext(SpanInterface $span): void
     {
-        return Context::getCurrent()->withContextValue($span);
+        Context::getCurrent()->withContextValue($span)->activate();
     }
 }
