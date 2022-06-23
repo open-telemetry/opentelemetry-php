@@ -28,6 +28,12 @@ abstract class AbstractSpan implements SpanInterface
     }
 
     /** @inheritDoc */
+    final public static function setCurrent(SpanInterface $span): void
+    {
+        Context::getCurrent()->withContextValue($span)->activate();
+    }
+
+    /** @inheritDoc */
     final public static function getInvalid(): SpanInterface
     {
         if (null === self::$invalidSpan) {

@@ -26,6 +26,11 @@ interface SpanInterface extends ImplicitContextKeyedInterface
     public static function getCurrent(): SpanInterface;
 
     /**
+     * Creates a new {@see Context} to insert the {@see SpanInterface} into, then those become the new current context and span
+     */
+    public static function setCurrent(SpanInterface $span): void;
+
+    /**
      * Returns an invalid {@see SpanInterface} that is used when tracing is disabled, such s when there is no available SDK.
      */
     public static function getInvalid(): SpanInterface;

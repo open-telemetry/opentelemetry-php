@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\API\Unit\Trace;
 
+use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
-use OpenTelemetry\API\Trace\SpanUtils;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\API\Trace\SpanUtils
+ * @covers OpenTelemetry\API\Trace\AbstractSpan
  */
-class SpanUtilsTest extends TestCase
+class AbstractSpanTest extends TestCase
 {
     public function test_getter_retrieves_what_setter_set(): void
     {
         //Anything that will implement storeInContext like AbstractSpan's implementation of it should work for this
         $spanToSet = new NonRecordingSpan(SpanContext::getInvalid());
 
-        SpanUtils::setSpanIntoNewContext($spanToSet);
+        AbstractSpan::setCurrent($spanToSet);
 
-        $currentSpan = SpanUtils::getCurrentSpan();
+        $currentSpan = AbstractSpan::getCurrent();
 
         $this->assertSame($spanToSet, $currentSpan);
     }
