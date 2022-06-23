@@ -28,7 +28,7 @@ class ResourceInfo
 
     public static function create(AttributesInterface $attributes, ?string $schemaUrl = null): self
     {
-        return new ResourceInfo(clone $attributes, $schemaUrl);
+        return new ResourceInfo($attributes, $schemaUrl);
     }
 
     public function getAttributes(): AttributesInterface

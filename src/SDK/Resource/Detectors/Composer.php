@@ -25,6 +25,6 @@ final class Composer implements ResourceDetectorInterface
             ResourceAttributes::SERVICE_VERSION => InstalledVersions::getRootPackage()['pretty_version'],
         ];
 
-        return ResourceInfo::create(new Attributes($attributes), ResourceAttributes::SCHEMA_URL);
+        return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
     }
 }

@@ -47,7 +47,7 @@ class ZipkinSpanConverterTest extends TestCase
             ->addAttribute('peer.service', 'AuthService')
             ->setResource(
                 ResourceInfo::create(
-                    new Attributes([
+                    Attributes::create([
                         'telemetry.sdk.name' => 'opentelemetry',
                         'telemetry.sdk.language' => 'php',
                         'telemetry.sdk.version' => 'dev',
@@ -56,7 +56,7 @@ class ZipkinSpanConverterTest extends TestCase
                     ])
                 )
             )
-            ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
+            ->addEvent('validators.list', Attributes::create(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
 
         $converter = new SpanConverter('test.name');
@@ -162,7 +162,7 @@ class ZipkinSpanConverterTest extends TestCase
     public function test_should_convert_an_event_without_attributes_to_an_annotation_with_only_its_name(): void
     {
         $span = (new SpanData())
-            ->addEvent('event.name', new Attributes());
+            ->addEvent('event.name', Attributes::create([]));
 
         $converter = new SpanConverter('test.name');
         $row = $converter->convert([$span])[0];

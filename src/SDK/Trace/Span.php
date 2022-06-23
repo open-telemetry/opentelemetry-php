@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use function count;
-use function ctype_space;
 use function get_class;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
-use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesBuilderInterface;
 use OpenTelemetry\SDK\Common\Dev\Compatibility\Util as BcUtil;
 use OpenTelemetry\SDK\Common\Exception\StackTraceFormatter;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
@@ -62,7 +58,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /** @var list<EventInterface> */
     private array $events = [];
 
-    private ?AttributesInterface $attributes;
+    private AttributesBuilderInterface $attributesBuilder;
     private int $totalRecordedEvents = 0;
     private StatusDataInterface $status;
     private int $endEpochNanos = 0;
@@ -81,7 +77,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         SpanLimits $spanLimits,
         SpanProcessorInterface $spanProcessor,
         ResourceInfo $resource,
-        ?AttributesInterface $attributes,
+        AttributesBuilderInterface $attributesBuilder,
         array $links,
         int $totalRecordedLinks,
         int $startEpochNanos
@@ -96,7 +92,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         $this->spanProcessor = $spanProcessor;
         $this->resource = $resource;
         $this->startEpochNanos = $startEpochNanos;
-        $this->attributes = Attributes::withLimits($attributes ?? new Attributes(), $spanLimits->getAttributeLimits());
+        $this->attributesBuilder = $attributesBuilder;
         $this->status = StatusData::unset();
         $this->spanLimits = $spanLimits;
     }
@@ -122,7 +118,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
         SpanLimits $spanLimits,
         SpanProcessorInterface $spanProcessor,
         ResourceInfo $resource,
-        ?AttributesInterface $attributes,
+        AttributesBuilderInterface $attributesBuilder,
         array $links,
         int $totalRecordedLinks,
         int $startEpochNanos
@@ -136,7 +132,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             $spanLimits,
             $spanProcessor,
             $resource,
-            $attributes,
+            $attributesBuilder,
             $links,
             $totalRecordedLinks,
             $startEpochNanos !== 0 ? $startEpochNanos : ClockFactory::getDefault()->now()
@@ -179,15 +175,11 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /** @inheritDoc */
     public function setAttribute(string $key, $value): self
     {
-        if ($this->hasEnded || ctype_space($key)) {
+        if ($this->hasEnded) {
             return $this;
         }
 
-        if (null === $this->attributes) {
-            $this->attributes = Attributes::withLimits(new Attributes(), $this->spanLimits->getAttributeLimits());
-        }
-
-        $this->attributes->setAttribute($key, $value);
+        $this->attributesBuilder[$key] = $value;
 
         return $this;
     }
@@ -196,53 +188,54 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     public function setAttributes(iterable $attributes): self
     {
         foreach ($attributes as $key => $value) {
-            $this->setAttribute($key, $value);
+            $this->attributesBuilder[$key] = $value;
         }
 
         return $this;
     }
 
     /** @inheritDoc */
-    public function addEvent(string $name, iterable $attributes = [], int $timestamp = null): self
+    public function addEvent(string $name, iterable $attributes = [], ?int $timestamp = null): self
     {
         if ($this->hasEnded) {
             return $this;
         }
-
-        if (count($this->events) < $this->spanLimits->getEventCountLimit()) {
-            $this->events[] = new Event(
-                $name,
-                $timestamp ?? ClockFactory::getDefault()->now(),
-                Attributes::withLimits(
-                    $attributes,
-                    new AttributeLimits(
-                        $this->spanLimits->getAttributePerEventCountLimit(),
-                        $this->spanLimits->getAttributeLimits()->getAttributeValueLengthLimit()
-                    )
-                ),
-            );
+        if (++$this->totalRecordedEvents > $this->spanLimits->getEventCountLimit()) {
+            return $this;
         }
 
-        $this->totalRecordedEvents++;
+        $timestamp ??= ClockFactory::getDefault()->now();
+        $eventAttributesBuilder = $this->spanLimits->getEventAttributesFactory()->builder($attributes);
+
+        $this->events[] = new Event($name, $timestamp, $eventAttributesBuilder->build());
 
         return $this;
     }
 
     /** @inheritDoc */
-    public function recordException(Throwable $exception, iterable $attributes = []): self
+    public function recordException(Throwable $exception, iterable $attributes = [], ?int $timestamp = null): self
     {
-        $timestamp = ClockFactory::getDefault()->now();
-        $eventAttributes = new Attributes([
-                'exception.type' => get_class($exception),
-                'exception.message' => $exception->getMessage(),
-                'exception.stacktrace' => StackTraceFormatter::format($exception),
-            ]);
-
-        foreach ($attributes as $key => $value) {
-            $eventAttributes->setAttribute($key, $value);
+        if ($this->hasEnded) {
+            return $this;
+        }
+        if (++$this->totalRecordedEvents > $this->spanLimits->getEventCountLimit()) {
+            return $this;
         }
 
-        return $this->addEvent('exception', $eventAttributes, $timestamp);
+        $timestamp ??= ClockFactory::getDefault()->now();
+        $eventAttributesBuilder = $this->spanLimits->getEventAttributesFactory()->builder([
+            'exception.type' => get_class($exception),
+            'exception.message' => $exception->getMessage(),
+            'exception.stacktrace' => StackTraceFormatter::format($exception),
+        ]);
+
+        foreach ($attributes as $key => $value) {
+            $eventAttributesBuilder[$key] = $value;
+        }
+
+        $this->events[] = new Event('exception', $timestamp, $eventAttributesBuilder->build());
+
+        return $this;
     }
 
     /** @inheritDoc */
@@ -309,8 +302,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
             $this->name,
             $this->links,
             $this->events,
-            $this->getImmutableAttributes(),
-            (null === $this->attributes) ? 0 : $this->attributes->getTotalAddedValues(),
+            $this->attributesBuilder->build(),
             $this->totalRecordedEvents,
             $this->status,
             $this->endEpochNanos,
@@ -333,11 +325,7 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     /** @inheritDoc */
     public function getAttribute(string $key)
     {
-        if (null === $this->attributes) {
-            return null;
-        }
-
-        return $this->attributes->get($key);
+        return $this->attributesBuilder[$key];
     }
 
     public function getStartEpochNanos(): int
@@ -358,14 +346,5 @@ final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
     public function getResource(): ResourceInfo
     {
         return $this->resource;
-    }
-
-    private function getImmutableAttributes(): AttributesInterface
-    {
-        if (null === $this->attributes) {
-            return new Attributes();
-        }
-
-        return clone $this->attributes;
     }
 }

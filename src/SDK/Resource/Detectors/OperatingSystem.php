@@ -27,6 +27,6 @@ final class OperatingSystem implements ResourceDetectorInterface
             ResourceAttributes::OS_VERSION => php_uname('v'),
         ];
 
-        return ResourceInfo::create(new Attributes($attributes), ResourceAttributes::SCHEMA_URL);
+        return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
     }
 }

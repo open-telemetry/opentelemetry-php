@@ -63,7 +63,7 @@ class JaegerSpanConverterTest extends TestCase
             ->addAttribute('keyForFloat', 1.00)
             ->setResource(
                 ResourceInfo::create(
-                    new Attributes([
+                    Attributes::create([
                         'telemetry.sdk.name' => 'opentelemetry',
                         'telemetry.sdk.language' => 'php',
                         'telemetry.sdk.version' => 'dev',
@@ -173,7 +173,7 @@ class JaegerSpanConverterTest extends TestCase
                     new Event(
                         'eventName',
                         1505855794194009601,
-                        new Attributes([
+                        Attributes::create([
                             'eventAttributeKey' => 'eventAttributeValue',
                         ])
                     ),
@@ -198,7 +198,7 @@ class JaegerSpanConverterTest extends TestCase
                     new Event(
                         'eventName',
                         1505855794194009601,
-                        new Attributes([
+                        Attributes::create([
                             'event' => 'valueForTheEventAttributeOnTheEvent',
                         ])
                     ),
@@ -219,7 +219,8 @@ class JaegerSpanConverterTest extends TestCase
             ->setLinks(
                 [
                     new Link(
-                        SpanContext::getInvalid()
+                        SpanContext::getInvalid(),
+                        Attributes::create([]),
                     ),
                 ]
             );

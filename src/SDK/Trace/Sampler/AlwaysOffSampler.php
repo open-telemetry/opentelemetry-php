@@ -38,7 +38,7 @@ class AlwaysOffSampler implements SamplerInterface
 
         return new SamplingResult(
             SamplingResult::DROP,
-            null,
+            [],
             $traceState
         );
     }

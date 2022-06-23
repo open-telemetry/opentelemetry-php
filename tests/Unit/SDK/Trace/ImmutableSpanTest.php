@@ -32,7 +32,6 @@ class ImmutableSpanTest extends TestCase
     private string $parentSpanId = 'parent-span-id';
     private int $endEpochNanos = 2000;
     private int $startEpochNanes = 1000;
-    private int $totalAttributeCount = 1;
     private int $totalRecordedEvents = 1;
     private int $totalRecordedLinks = 1;
 
@@ -67,7 +66,6 @@ class ImmutableSpanTest extends TestCase
             [],
             [],
             $this->attributes,
-            $this->totalAttributeCount,
             $this->totalRecordedEvents,
             $this->status,
             $this->endEpochNanos,
@@ -88,7 +86,6 @@ class ImmutableSpanTest extends TestCase
         $this->assertSame([], $span->getLinks());
         $this->assertSame([], $span->getEvents());
         $this->assertSame($this->attributes, $span->getAttributes());
-        $this->assertSame(1, $span->getTotalDroppedAttributes());
         $this->assertSame(1, $span->getTotalDroppedEvents());
         $this->assertSame(1, $span->getTotalDroppedLinks());
         $this->assertSame($this->status, $span->getStatus());
