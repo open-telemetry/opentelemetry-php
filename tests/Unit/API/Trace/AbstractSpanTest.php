@@ -19,7 +19,7 @@ class AbstractSpanTest extends TestCase
         //Anything that will implement storeInContext like AbstractSpan's implementation of it should work for this
         $spanToSet = new NonRecordingSpan(SpanContext::getInvalid());
 
-        AbstractSpan::setCurrent($spanToSet);
+        AbstractSpan::setCurrent($spanToSet)->activate();
 
         $currentSpan = AbstractSpan::getCurrent();
 
