@@ -6,14 +6,14 @@ namespace OpenTelemetry\API\Trace;
 
 use OpenTelemetry\Context\Context;
 
-trait TraceTrait
+class SpanUtils
 {
-    protected static function getCurrentSpan(): SpanInterface
+    public static function getCurrentSpan(): SpanInterface
     {
         return AbstractSpan::fromContext(Context::getCurrent());
     }
 
-    protected static function setSpanIntoNewContext(SpanInterface $span): Context
+    public static function setSpanIntoNewContext(SpanInterface $span): Context
     {
         return Context::getCurrent()->withContextValue($span);
     }
