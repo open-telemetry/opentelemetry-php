@@ -54,12 +54,12 @@ class Instrumentation implements InstrumentationInterface
 
 An user of the instrumentation and API/SDK would the call:
 
-$instrumentation = Instrumentation::create();
+$instrumentation = new Instrumentation;
 $instrumentation->activate()
 
 to activate and use the instrumentation with the API/SDK.
-
  **/
+
 trait InstrumentationTrait
 {
     private TextMapPropagatorInterface $propagator;
@@ -70,11 +70,6 @@ trait InstrumentationTrait
     public function __construct()
     {
         $this->initDefaults();
-    }
-
-    public static function create(): InstrumentationInterface
-    {
-        return new static();
     }
 
     /**

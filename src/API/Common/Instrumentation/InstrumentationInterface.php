@@ -13,8 +13,6 @@ use Psr\Log\LoggerInterface;
 
 interface InstrumentationInterface
 {
-    public static function create(): InstrumentationInterface;
-
     public function getName(): string;
 
     public function getVersion(): ?string;
