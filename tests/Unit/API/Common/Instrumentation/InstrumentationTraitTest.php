@@ -116,7 +116,7 @@ class InstrumentationTraitTest extends TestCase
 
     private function createValidImplementation(): InstrumentationInterface
     {
-        return new ValidInstrumentation;
+        return new ValidInstrumentation();
     }
 
     private function createInvalidImplementation(): object
