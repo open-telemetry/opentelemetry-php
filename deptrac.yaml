@@ -100,9 +100,9 @@ deptrac:
       API:
           - Context
           - SemConv
+          - PsrLog
       SDK:
           - +API
-          - PsrLog
           - PsrHttp
           - HttpPlug
           - NyholmDsn
