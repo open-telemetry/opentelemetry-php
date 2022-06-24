@@ -9,4 +9,3 @@ services:
     environment:
       XDEBUG_MODE: ${XDEBUG_MODE:-off}
       XDEBUG_CONFIG: ${XDEBUG_CONFIG:-''}
-      

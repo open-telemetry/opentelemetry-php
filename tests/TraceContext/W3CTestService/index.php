@@ -1,40 +1,85 @@
 <?php
 
 declare(strict_types=1);
-require_once __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
+require __DIR__ . '/trace-context-handler.php';
 
-use App\Kernel;
+use Nyholm\Psr7\Request;
+use Nyholm\Psr7\Response;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
-use Symfony\Component\Dotenv\Dotenv;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpClient\Psr18Client;
-use Symfony\Component\HttpFoundation\Request;
 
-(new Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
+main();
 
-$httpClient = new Psr18Client();
+function main(): void
+{
+    $httpClient = new Psr18Client();
+    $request = parseRequestFromGlobals();
+    $tracer = (new TracerProvider(
+        [
+            new BatchSpanProcessor(
+                new JaegerExporter(
+                    'W3C Trace-Context Test Service',
+                    'http://localhost:9412/api/v2/spans',
+                    $httpClient,
+                    $httpClient,
+                    $httpClient,
+                ),
+            ),
+        ],
+    ))->getTracer('W3C Trace-Context Test Service');
 
-$tracer = (new TracerProvider([
-    new BatchSpanProcessor(
-        new JaegerExporter(
-            'W3C Trace-Context Test Service',
-            'http://localhost:9412/api/v2/spans',
-            $httpClient,
-            $httpClient,
-            $httpClient,
-        )
-    ),
-]))->getTracer('W3C Trace-Context Test Service');
+    try {
+        $response = handleTraceContext($request, $tracer, $httpClient);
+    } catch (ClientExceptionInterface $e) {
+        $response = new Response(500, [], $e->getMessage());
+    }
 
-$request = Request::createFromGlobals();
-$span = $tracer->spanBuilder($request->getUri())->startSpan();
-$spanScope = $span->activate();
+    sendResponse($response);
+}
 
-$kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
-$response = $kernel->handle($request);
-$response->send();
-$kernel->terminate($request, $response);
+function parseRequestFromGlobals(): RequestInterface
+{
+    // Method
+    $method = $_SERVER['REQUEST_METHOD'];
 
-$span->end();
-$spanScope->detach();
+    // URI
+    $uri = $_SERVER['REQUEST_URI'];
+
+    // Build headers
+    $headers = [];
+    foreach ($_SERVER as $key => $value) {
+        if (strpos($key, 'HTTP_') === 0) {
+            $headers[substr($key, 5)] = $value;
+        }
+    }
+
+    $body = file_get_contents('php://input');
+
+    return new Request($method, $uri, $headers, $body);
+}
+
+/**
+ * @param ResponseInterface $response
+ * @return void
+ */
+function sendResponse(ResponseInterface $response)
+{
+    // Status line
+    header(sprintf('HTTP/%s %d %s', $response->getProtocolVersion(), $response->getStatusCode(), $response->getReasonPhrase()));
+
+    // Headers
+    foreach ($response->getHeaders() as $name => $values) {
+        foreach ($values as $value) {
+            header(sprintf('%s: %s', $name, $value), false);
+        }
+    }
+
+    // Response body
+    echo $response->getBody();
+}
