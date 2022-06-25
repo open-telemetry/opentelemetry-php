@@ -26,7 +26,7 @@ class CompositeTest extends TestCase
 
     public function test_composite_get_resource(): void
     {
-        $resource = ResourceInfo::create(new Attributes(['foo' => 'user-foo', 'bar' => 'user-bar']));
+        $resource = ResourceInfo::create(Attributes::create(['foo' => 'user-foo', 'bar' => 'user-bar']));
 
         $resourceDetector = $this->createMock(ResourceDetectorInterface::class);
         $resourceDetector->method('getResource')->willReturn($resource);

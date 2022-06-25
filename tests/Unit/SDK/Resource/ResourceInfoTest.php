@@ -27,8 +27,7 @@ class ResourceInfoTest extends TestCase
 
     public function test_get_attributes(): void
     {
-        $attributes = new Attributes();
-        $attributes->setAttribute('name', 'test');
+        $attributes = Attributes::create(['name' => 'test']);
 
         $resource = (new Detectors\Composite([
             new Detectors\Constant(ResourceInfo::create($attributes)),
@@ -43,31 +42,10 @@ class ResourceInfoTest extends TestCase
         $sdklanguage = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE);
         $sdkversion = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION);
 
-        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_NAME, 'opentelemetry');
-        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_LANGUAGE, 'php');
-        $attributes->setAttribute(ResourceAttributes::TELEMETRY_SDK_VERSION, $version);
-        $attributes->setAttribute(ResourceAttributes::SERVICE_NAME, 'unknown_service');
-
-        $this->assertEquals($attributes, $resource->getAttributes());
         $this->assertSame('opentelemetry', $sdkname);
         $this->assertSame('php', $sdklanguage);
         $this->assertSame($version, $sdkversion);
         $this->assertSame('test', $name);
-    }
-
-    public function test_immutable_create(): void
-    {
-        $attributes = new Attributes();
-        $attributes->setAttribute('name', 'test');
-        $attributes->setAttribute('version', '1.0.0');
-
-        $resource = ResourceInfo::create($attributes);
-
-        $attributes->setAttribute('version', '2.0.0');
-
-        $version = $resource->getAttributes()->get('version');
-
-        $this->assertEquals('1.0.0', $version);
     }
 
     /**
@@ -81,12 +59,12 @@ class ResourceInfoTest extends TestCase
     public function sameResourcesProvider(): iterable
     {
         yield 'Attribute keys sorted in ascending order vs Attribute keys sorted in descending order' => [
-            ResourceInfo::create(new Attributes([
+            ResourceInfo::create(Attributes::create([
                 'a' => 'someValue',
                 'b' => 'someValue',
                 'c' => 'someValue',
             ])),
-            ResourceInfo::create(new Attributes([
+            ResourceInfo::create(Attributes::create([
                 'c' => 'someValue',
                 'b' => 'someValue',
                 'a' => 'someValue',
@@ -105,8 +83,8 @@ class ResourceInfoTest extends TestCase
     public function differentResourcesProvider(): iterable
     {
         yield 'Null schema url vs Some schema url' => [
-            ResourceInfo::create(new Attributes(), null),
-            ResourceInfo::create(new Attributes(), 'someSchemaUrl'),
+            ResourceInfo::create(Attributes::create([]), null),
+            ResourceInfo::create(Attributes::create([]), 'someSchemaUrl'),
         ];
     }
 

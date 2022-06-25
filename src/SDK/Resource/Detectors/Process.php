@@ -31,6 +31,6 @@ final class Process implements ResourceDetectorInterface
             $attributes[ResourceAttributes::PROCESS_OWNER] = \posix_getpwuid(\posix_geteuid())['name'];
         }
 
-        return ResourceInfo::create(new Attributes($attributes), ResourceAttributes::SCHEMA_URL);
+        return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
     }
 }

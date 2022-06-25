@@ -8,7 +8,6 @@ use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter as ZipkinToNewrelicExporter;
-use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
@@ -61,33 +60,30 @@ $zipkinToNewrelicExporter = new ZipkinToNewrelicExporter(
 
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
     echo 'Starting AlwaysOnZipkinToNewRelicExample';
-    $tracer = (new TracerProvider())
-        ->addSpanProcessor(new SimpleSpanProcessor($zipkinToNewrelicExporter))
+    $tracer = (new TracerProvider(new SimpleSpanProcessor($zipkinToNewrelicExporter)))
         ->getTracer('io.opentelemetry.contrib.php');
 
     for ($i = 0; $i < 5; $i++) {
         // start a span, register some events
         $timestamp = ClockFactory::getDefault()->now();
-        $span = $tracer->startAndActivateSpan('session.generate.span.' . microtime(true));
+        $span = $tracer->spanBuilder('session.generate.span.' . microtime(true))->startSpan();
 
-        $spanParent = $span->getParentContext();
         echo sprintf(
-            PHP_EOL . 'Exporting Trace: %s, Parent: %s, Span: %s',
+            PHP_EOL . 'Exporting Trace: %s, Span: %s',
             $span->getContext()->getTraceId(),
-            $spanParent ? $spanParent->getSpanId() : 'None',
             $span->getContext()->getSpanId()
         );
 
         $span->setAttribute('remote_ip', '1.2.3.4')
             ->setAttribute('country', 'USA');
 
-        $span->addEvent('found_login' . $i, new Attributes([
+        $span->addEvent('found_login' . $i, [
             'id' => $i,
             'username' => 'otuser' . $i,
-        ]), $timestamp);
-        $span->addEvent('generated_session', new Attributes([
+        ], $timestamp);
+        $span->addEvent('generated_session', [
             'id' => md5((string) microtime(true)),
-        ]), $timestamp);
+        ], $timestamp);
 
         $span->end();
     }
