@@ -50,7 +50,8 @@ interface SpanInterface extends ImplicitContextKeyedInterface
 
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-attributes
-     *
+     * Adding attributes at span creation is preferred to calling SetAttribute later, as samplers can only consider information
+     * already present during span creation
      * @param non-empty-string $key
      * @param bool|int|float|string|array|null $value Note: the array MUST be homogeneous, i.e. it MUST NOT contain values of different types.
      */
