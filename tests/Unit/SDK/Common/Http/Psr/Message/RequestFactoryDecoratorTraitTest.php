@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Common\Http\Psr\Message;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Http\Psr\Message;
 
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Message\RequestFactoryDecoratorTrait;
@@ -17,15 +17,13 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RequestFactoryDecoratorTraitTest extends TestCase
 {
+    use UsesTextMapPropagatorTrait;
+    use UsesRequestFactoryTrait;
+
     public function test_create_request(): void
     {
         $instance = $this->createImplementation();
-        $request = $this->createMock(RequestInterface::class);
-        $request->method('withHeader')
-            ->willReturn($request);
-        $factory = $this->createMock(RequestFactoryInterface::class);
-        $factory->method('createRequest')
-            ->willReturn($request);
+        $factory = $this->createRequestFactoryMock();
         $propagator = $this->createPropagatorMock();
 
         $this->assertInstanceOf(
@@ -38,6 +36,7 @@ class RequestFactoryDecoratorTraitTest extends TestCase
             )
         );
     }
+
     public function test_create_server_request(): void
     {
         $instance = $this->createImplementation();
@@ -86,16 +85,5 @@ class RequestFactoryDecoratorTraitTest extends TestCase
                 );
             }
         };
-    }
-
-    private function createPropagatorMock(): TextMapPropagatorInterface
-    {
-        $propagator = $this->createMock(TextMapPropagatorInterface::class);
-        $propagator->method('inject')
-            ->willReturnCallback(static function (array &$carrier) {
-                $carrier['foo'] = 'bar';
-            });
-
-        return $propagator;
     }
 }
