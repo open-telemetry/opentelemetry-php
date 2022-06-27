@@ -11,7 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class MessageFactory implements MessageFactoryInterface
+final class MessageFactory implements MessageFactoryInterface
 {
     private RequestFactoryInterface $requestFactory;
     private ResponseFactoryInterface $responseFactory;
