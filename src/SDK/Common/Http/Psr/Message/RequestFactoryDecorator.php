@@ -8,7 +8,7 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 
-class RequestFactoryDecorator implements RequestFactoryDecoratorInterface
+final class RequestFactoryDecorator implements RequestFactoryDecoratorInterface
 {
     use RequestFactoryDecoratorTrait;
 
