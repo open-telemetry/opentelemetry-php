@@ -85,6 +85,9 @@ class DependencyResolverTest extends TestCase
         }
     }
 
+    /**
+     *  @psalm-param class-string $interface
+     */
     private function resolveMethodName(string $interface, array $replacements = []): string
     {
         $interface = (new ReflectionClass($interface))->getShortName();
