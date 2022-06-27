@@ -13,7 +13,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 
-class MessageFactoryResolver implements FactoryResolverInterface
+final class MessageFactoryResolver implements FactoryResolverInterface
 {
     private ?RequestFactoryInterface $requestFactory;
     private ?ResponseFactoryInterface $responseFactory;

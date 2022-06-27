@@ -10,7 +10,7 @@ use Http\Discovery\HttpAsyncClientDiscovery;
 use Http\Discovery\HttpClientDiscovery;
 use OpenTelemetry\SDK\Common\Http\HttpPlug\Client\ResolverInterface;
 
-class HttpPlugClientResolver implements ResolverInterface
+final class HttpPlugClientResolver implements ResolverInterface
 {
     private ?HttpClient $httpClient;
     private ?HttpAsyncClient $httpAsyncClient;
