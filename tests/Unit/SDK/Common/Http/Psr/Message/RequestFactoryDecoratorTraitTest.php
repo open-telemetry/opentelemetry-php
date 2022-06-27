@@ -19,6 +19,7 @@ class RequestFactoryDecoratorTraitTest extends TestCase
 {
     use UsesTextMapPropagatorTrait;
     use UsesRequestFactoryTrait;
+    use UsesServerRequestFactoryTrait;
 
     public function test_create_request(): void
     {
@@ -40,12 +41,7 @@ class RequestFactoryDecoratorTraitTest extends TestCase
     public function test_create_server_request(): void
     {
         $instance = $this->createImplementation();
-        $request = $this->createMock(ServerRequestInterface::class);
-        $request->method('withHeader')
-            ->willReturn($request);
-        $factory = $this->createMock(ServerRequestFactoryInterface::class);
-        $factory->method('createServerRequest')
-            ->willReturn($request);
+        $factory = $this->createServerRequestFactoryMock();
         $propagator = $this->createPropagatorMock();
 
         $this->assertInstanceOf(
