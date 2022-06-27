@@ -11,6 +11,7 @@ use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
+/** @phan-file-suppress PhanUnreferencedUseNormal */
 trait RequestFactoryDecoratorTrait
 {
     use FactoryDecoratorTrait;
