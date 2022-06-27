@@ -189,7 +189,8 @@ For development and testing purposes you also want to install **SDK** and **Cont
 ```bash
 $ composer require --dev open-telemetry/sdk open-telemetry/sdk-contrib
 ```
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+## [Development](DEVELOPMENT.md)
 
 ## Pull Requests
 
