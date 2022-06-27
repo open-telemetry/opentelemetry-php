@@ -28,6 +28,7 @@ final class ResponseFactoryDecorator implements ResponseFactoryDecoratorInterfac
      */
     public function createResponse(int $code = 200, string $reasonPhrase = ''): ResponseInterface
     {
+        /** @psalm-suppress PossiblyUndefinedMethod */
         $response = $this->decorated->createResponse($code, $reasonPhrase);
 
         $headers = $response->getHeaders();

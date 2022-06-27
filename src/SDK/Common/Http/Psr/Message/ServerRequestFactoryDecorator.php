@@ -23,6 +23,10 @@ final class ServerRequestFactoryDecorator implements ServerRequestFactoryDecorat
         return new self($decorated, $propagator);
     }
 
+    /**
+     * @psalm-suppress MoreSpecificReturnType
+     * @psalm-suppress LessSpecificReturnStatement
+     */
     public function createServerRequest(string $method, $uri, array $serverParams = []): ServerRequestInterface
     {
         return self::doCreateRequest(
