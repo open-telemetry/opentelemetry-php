@@ -31,7 +31,7 @@ class RequestFactoryDecoratorTest extends TestCase
         );
         $this->assertSame(
             $uri,
-            $instance->createRequest($method, $uri)->getUri()
+            (string) $instance->createRequest($method, $uri)->getUri()
         );
     }
 }
