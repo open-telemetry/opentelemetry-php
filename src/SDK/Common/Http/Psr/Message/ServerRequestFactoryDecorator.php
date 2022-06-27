@@ -29,6 +29,7 @@ final class ServerRequestFactoryDecorator implements ServerRequestFactoryDecorat
      */
     public function createServerRequest(string $method, $uri, array $serverParams = []): ServerRequestInterface
     {
+        /** @phpstan-ignore-next-line */
         return self::doCreateRequest(
             $this->decorated,
             $this->propagator,
