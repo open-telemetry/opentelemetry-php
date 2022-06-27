@@ -8,7 +8,7 @@ use Http\Discovery\Psr18ClientDiscovery;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\ResolverInterface;
 use Psr\Http\Client\ClientInterface;
 
-class PsrClientResolver implements ResolverInterface
+final class PsrClientResolver implements ResolverInterface
 {
     private ?ClientInterface $client;
 

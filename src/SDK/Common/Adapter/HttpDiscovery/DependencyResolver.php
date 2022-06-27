@@ -18,7 +18,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 
-class DependencyResolver implements DependencyResolverInterface
+final class DependencyResolver implements DependencyResolverInterface
 {
     private MessageFactoryResolverInterface $messageFactoryResolver;
     private PsrClientResolverInterface $psrClientResolver;
