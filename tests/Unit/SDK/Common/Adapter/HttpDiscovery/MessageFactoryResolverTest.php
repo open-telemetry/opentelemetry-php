@@ -62,6 +62,9 @@ class MessageFactoryResolverTest extends TestCase
         }
     }
 
+    /**
+     *  @psalm-param class-string $interface
+     */
     private function resolveMethodName(string $interface): string
     {
         return sprintf(
