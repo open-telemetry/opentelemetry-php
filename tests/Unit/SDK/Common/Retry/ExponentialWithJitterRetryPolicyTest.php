@@ -33,29 +33,27 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
 
     public function test_retry_policy_set_properly()
     {
-        // $exporter = $this->createMock(OtlpExporter::class);
         $this->exporter->setRetryPolicy(ExponentialWithJitterRetryPolicy::getDefault());
-        // $this->exporter->setRetryPolicy(ExponentialWithJitterRetryPolicy::getDefault());
         $this->assertSame(
             $this->exporter->getRetryPolicy()->getMaxAttempts(),
             ExponentialWithJitterRetryPolicy::DEFAULT_MAX_ATTEMPTS
         );
-        // $this->assertSame(
-        //     $exporter->getRetryPolicy()->getInitialBackoff(),
-        //     ExponentialWithJitterRetryPolicy::DEFAULT_INITIAL_BACKOFF
-        // );
-        // $this->assertSame(
-        //     $exporter->getRetryPolicy()->getMaxBackoff(),
-        //     ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF
-        // );
-        // $this->assertSame(
-        //     $exporter->getRetryPolicy()->getMaxAttempts(),
-        //     ExponentialWithJitterRetryPolicy::DEFAULT_MAX_ATTEMPTS
-        // );
-        // $this->assertSame(
-        //     $exporter->getRetryPolicy()->getJitter(),
-        //     ExponentialWithJitterRetryPolicy::DEFAULT_JITTER
-        // );
+        $this->assertSame(
+            intval($this->exporter->getRetryPolicy()->getInitialBackoff()),
+            ExponentialWithJitterRetryPolicy::DEFAULT_INITIAL_BACKOFF
+        );
+        $this->assertSame(
+            $this->exporter->getRetryPolicy()->getMaxBackoff(),
+            ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF
+        );
+        $this->assertSame(
+            $this->exporter->getRetryPolicy()->getMaxAttempts(),
+            ExponentialWithJitterRetryPolicy::DEFAULT_MAX_ATTEMPTS
+        );
+        $this->assertSame(
+            $this->exporter->getRetryPolicy()->getJitter(),
+            ExponentialWithJitterRetryPolicy::DEFAULT_JITTER
+        );
     }
 
     public function test_delay_is_less_or_equal_to_max_backoff()

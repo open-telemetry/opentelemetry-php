@@ -11,24 +11,24 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
 {
     private $maxAttempts;
-    private $initial_backoff;
+    private $initialBackoff;
     private $maxBackoff;
-    private $backoff_multiplier;
+    private $backoffMultiplier;
     private $jitter;
     public $retryableStatusCodes;
 
     private function __construct(
-        int $max_attempts = self::DEFAULT_MAX_ATTEMPTS,
-        float $initial_backoff = self::DEFAULT_INITIAL_BACKOFF,
-        int $max_backoff = self::DEFAULT_MAX_BACKOFF,
-        float $backoff_multiplier = self::DEFAULT_BACKOFF_MULTIPLIER,
+        int $maxAttempts = self::DEFAULT_MAX_ATTEMPTS,
+        float $initialBackoff = self::DEFAULT_INITIAL_BACKOFF,
+        int $maxBackoff = self::DEFAULT_MAX_BACKOFF,
+        float $backoffMultiplier = self::DEFAULT_BACKOFF_MULTIPLIER,
         float $jitter = self::DEFAULT_JITTER,
         array $retryableStatusCodes = null
     ) {
-        $this->setMaxAttempts($max_attempts);
-        $this->setInitialBackoff($initial_backoff);
-        $this->setMaxBackoff($max_backoff);
-        $this->setBackoffMultipler($backoff_multiplier);
+        $this->setMaxAttempts($maxAttempts);
+        $this->setInitialBackoff($initialBackoff);
+        $this->setMaxBackoff($maxBackoff);
+        $this->setBackoffMultipler($backoffMultiplier);
         $this->setJitter($jitter);
         $this->retryableStatusCodes = $retryableStatusCodes;
     }
@@ -53,7 +53,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
             return 0;
         }
         // Initial exponential backoff in milli seconds
-        $delay = ($this->backoff_multiplier ** $attempt) * $this->initial_backoff * 1000;
+        $delay = ($this->backoffMultiplier ** $attempt) * $this->initialBackoff * 1000;
         // Adding jitter to exponential backoff
         if ($this->jitter > 0) {
             $randomness = (int) ($delay * $this->jitter);
@@ -87,7 +87,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
 
     public function getInitialBackoff(): float
     {
-        return $this->initial_backoff;
+        return $this->initialBackoff;
     }
 
     public function setInitialBackoff(
@@ -97,7 +97,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
             $initial_backoff > 0,
             sprintf('Initial backoff must be greater than 0: "%s" value provided', $initial_backoff)
         );
-        $this->initial_backoff = $initial_backoff;
+        $this->initialBackoff = $initial_backoff;
 
         return $this;
     }
@@ -120,7 +120,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
 
     public function getBackoffMultiplier(): float
     {
-        return $this->backoff_multiplier;
+        return $this->backoffMultiplier;
     }
 
     public function setBackoffMultipler(
@@ -130,7 +130,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
             $backoff_multiplier > 0,
             sprintf('Backoff multiplier must be greater than 0: "%s" value provided', $backoff_multiplier)
         );
-        $this->backoff_multiplier = $backoff_multiplier;
+        $this->backoffMultiplier = $backoff_multiplier;
 
         return $this;
     }
