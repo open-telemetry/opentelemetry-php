@@ -25,9 +25,9 @@ final class DependencyResolver implements DependencyResolverInterface
     private HttpPlugClientResolverInterface $httpPlugClientResolver;
 
     public function __construct(
-        ?MessageFactoryResolverInterface $messageFactoryResolver,
-        ?PsrClientResolverInterface $psrClientResolver,
-        ?HttpPlugClientResolverInterface $httpPlugClientResolver
+        ?MessageFactoryResolverInterface $messageFactoryResolver = null,
+        ?PsrClientResolverInterface $psrClientResolver = null,
+        ?HttpPlugClientResolverInterface $httpPlugClientResolver = null
     ) {
         $this->messageFactoryResolver = $messageFactoryResolver ?? MessageFactoryResolver::create();
         $this->psrClientResolver = $psrClientResolver ?? PsrClientResolver::create();
@@ -35,9 +35,9 @@ final class DependencyResolver implements DependencyResolverInterface
     }
 
     public static function create(
-        ?MessageFactoryResolverInterface $messageFactoryResolver,
-        ?PsrClientResolverInterface $psrClientResolver,
-        ?HttpPlugClientResolverInterface $httpPlugClientResolver
+        ?MessageFactoryResolverInterface $messageFactoryResolver = null,
+        ?PsrClientResolverInterface $psrClientResolver = null,
+        ?HttpPlugClientResolverInterface $httpPlugClientResolver = null
     ): self {
         return new self($messageFactoryResolver, $psrClientResolver, $httpPlugClientResolver);
     }
