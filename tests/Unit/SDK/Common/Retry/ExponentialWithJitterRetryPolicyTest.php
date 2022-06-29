@@ -39,7 +39,7 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
             ExponentialWithJitterRetryPolicy::DEFAULT_MAX_ATTEMPTS
         );
         $this->assertSame(
-            intval($this->exporter->getRetryPolicy()->getInitialBackoff()),
+            (int) ($this->exporter->getRetryPolicy()->getInitialBackoff()),
             ExponentialWithJitterRetryPolicy::DEFAULT_INITIAL_BACKOFF
         );
         $this->assertSame(
