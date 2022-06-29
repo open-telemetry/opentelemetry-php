@@ -81,30 +81,6 @@ class TracerProviderTest extends TestCase
     }
 
     /**
-     * @covers ::getDefaultTracer
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     * @group trace-compliance
-     */
-    public function test_tracer_provider_returns_noop_tracer_if_no_default_is_set(): void
-    {
-        $this->assertInstanceOf(NoopTracer::class, TracerProvider::getDefaultTracer());
-    }
-
-    /**
-     * @covers ::setDefaultTracer
-     * @covers ::getDefaultTracer
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function test_tracer_provider_accepts_default_tracer(): void
-    {
-        $tracer = $this->getMockBuilder(API\TracerInterface::class)->getMock();
-        TracerProvider::setDefaultTracer($tracer);
-        $this->assertSame($tracer, TracerProvider::getDefaultTracer());
-    }
-
-    /**
      * @covers ::getTracer
      * @group trace-compliance
      */

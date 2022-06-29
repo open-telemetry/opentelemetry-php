@@ -24,7 +24,6 @@ final class TracerProvider implements API\TracerProviderInterface
 
     /** @var array<int, WeakReference<self>>|null */
     private static ?array $tracerProviders = null;
-    private static ?API\TracerInterface $defaultTracer = null;
 
     /** @readonly */
     private TracerSharedState $tracerSharedState;
@@ -77,32 +76,10 @@ final class TracerProvider implements API\TracerProviderInterface
             return NoopTracer::getInstance();
         }
 
-        $instrumentationScope = $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes);
-
-        $tracer = new Tracer(
+        return new Tracer(
             $this->tracerSharedState,
-            $instrumentationScope,
+            $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes),
         );
-        if (null === self::$defaultTracer) {
-            self::$defaultTracer = $tracer;
-        }
-
-        return $tracer;
-    }
-
-    public static function getDefaultTracer(): API\TracerInterface
-    {
-        if (null === self::$defaultTracer) {
-            // TODO log a warning
-            return NoopTracer::getInstance();
-        }
-
-        return self::$defaultTracer;
-    }
-
-    public static function setDefaultTracer(API\TracerInterface $tracer): void
-    {
-        self::$defaultTracer = $tracer;
     }
 
     public function getSampler(): SamplerInterface

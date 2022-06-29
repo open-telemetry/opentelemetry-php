@@ -28,12 +28,12 @@ $tracer = (new TracerProviderFactory('example'))->create()->getTracer();
 $cb = new ContainerBuilder();
 $container = $cb->addDefinitions([
     Tracer::class => $tracer,
-    Client::class => function () {
+    Client::class => function () use ($tracer) {
         $stack = HandlerStack::create();
         //a guzzle middleware to wrap http calls in a span, and inject trace headers
-        $stack->push(function (callable $handler) {
-            return function (RequestInterface $request, array $options) use ($handler): PromiseInterface {
-                $span = TracerProvider::getDefaultTracer()
+        $stack->push(function (callable $handler) use ($tracer) {
+            return function (RequestInterface $request, array $options) use ($handler, $tracer): PromiseInterface {
+                $span = $tracer
                     ->spanBuilder(sprintf('%s %s', $request->getMethod(), $request->getUri()))
                     ->setSpanKind(SpanKind::KIND_CLIENT)
                     ->setAttribute('http.method', $request->getMethod())
@@ -70,11 +70,11 @@ $container = $cb->addDefinitions([
 $app = Bridge::create($container);
 
 //middleware starts root span based on route pattern, sets status from http code
-$app->add(function (Request $request, RequestHandler $handler) {
+$app->add(function (Request $request, RequestHandler $handler) use ($tracer) {
     $carrier = TraceContextPropagator::getInstance()->extract($request->getHeaders());
     $routeContext = RouteContext::fromRequest($request);
     $route = $routeContext->getRoute();
-    $root = TracerProvider::getDefaultTracer()->spanBuilder($route->getPattern())
+    $root = $tracer->spanBuilder($route->getPattern())
         ->setStartTimestamp((int) ($request->getServerParams()['REQUEST_TIME_FLOAT'] * 1e9))
         ->setParent($carrier)
         ->setSpanKind(SpanKind::KIND_SERVER)
@@ -105,8 +105,8 @@ $app->get('/users/{name}', function ($name, Client $client, Response $response) 
 });
 
 //route for service-two
-$app->get('/two/{name}', function (Response $response, $name) {
-    $span = TracerProvider::getDefaultTracer()
+$app->get('/two/{name}', function (Response $response, $name) use ($tracer) {
+    $span = $tracer
         ->spanBuilder('get-user')
         ->setAttribute('db.system', 'mysql')
         ->setAttribute('db.name', 'users')
