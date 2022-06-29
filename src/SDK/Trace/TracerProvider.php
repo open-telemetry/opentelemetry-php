@@ -7,8 +7,9 @@ namespace OpenTelemetry\SDK\Trace;
 use function is_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
-use OpenTelemetry\SDK\Common\Instrumentation\KeyGenerator;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -25,11 +26,9 @@ final class TracerProvider implements API\TracerProviderInterface
     private static ?array $tracerProviders = null;
     private static ?API\TracerInterface $defaultTracer = null;
 
-    /** @var array<string, API\TracerInterface> */
-    private ?array $tracers = null;
-
     /** @readonly */
     private TracerSharedState $tracerSharedState;
+    private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
 
     /** @param list<SpanProcessorInterface>|SpanProcessorInterface|null $spanProcessors */
     public function __construct(
@@ -37,7 +36,8 @@ final class TracerProvider implements API\TracerProviderInterface
         SamplerInterface $sampler = null,
         ResourceInfo $resource = null,
         SpanLimits $spanLimits = null,
-        IdGeneratorInterface $idGenerator = null
+        IdGeneratorInterface $idGenerator = null,
+        ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null
     ) {
         if (null === $spanProcessors) {
             $spanProcessors = [];
@@ -56,6 +56,7 @@ final class TracerProvider implements API\TracerProviderInterface
             $sampler,
             $spanProcessors
         );
+        $this->instrumentationScopeFactory = $instrumentationScopeFactory ?? new InstrumentationScopeFactory(Attributes::factory());
 
         self::registerShutdownFunction($this);
     }
@@ -66,19 +67,17 @@ final class TracerProvider implements API\TracerProviderInterface
     }
 
     /** @inheritDoc */
-    public function getTracer(string $name = self::DEFAULT_TRACER_NAME, ?string $version = null, ?string $schemaUrl = null): API\TracerInterface
-    {
+    public function getTracer(
+        string $name = self::DEFAULT_TRACER_NAME,
+        ?string $version = null,
+        ?string $schemaUrl = null,
+        iterable $attributes = []
+    ): API\TracerInterface {
         if ($this->tracerSharedState->hasShutdown()) {
             return NoopTracer::getInstance();
         }
 
-        $key = KeyGenerator::generateInstanceKey($name, $version, $schemaUrl);
-
-        if (isset($this->tracers[$key]) && $this->tracers[$key] instanceof API\TracerInterface) {
-            return $this->tracers[$key];
-        }
-
-        $instrumentationScope = new InstrumentationScope($name, $version, $schemaUrl);
+        $instrumentationScope = $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes);
 
         $tracer = new Tracer(
             $this->tracerSharedState,
@@ -88,7 +87,7 @@ final class TracerProvider implements API\TracerProviderInterface
             self::$defaultTracer = $tracer;
         }
 
-        return $this->tracers[$key] = $tracer;
+        return $tracer;
     }
 
     public static function getDefaultTracer(): API\TracerInterface

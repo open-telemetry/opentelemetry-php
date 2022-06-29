@@ -21,7 +21,7 @@ class TracerProviderTest extends TestCase
      * @covers ::getTracer
      * @covers ::__construct
      */
-    public function test_reuses_instance_for_same_name_without_version(): void
+    public function test_equal_for_same_name_without_version(): void
     {
         $provider = new TracerProvider(null);
 
@@ -29,9 +29,8 @@ class TracerProviderTest extends TestCase
         $t2 = $provider->getTracer('foo');
         $t3 = $provider->getTracer('bar');
 
-        $this->assertSame($t1, $t2);
-        $this->assertNotSame($t1, $t3);
-        $this->assertNotSame($t2, $t3);
+        $this->assertEquals($t1, $t2);
+        $this->assertNotEquals($t1, $t3);
     }
 
     /**
@@ -52,7 +51,7 @@ class TracerProviderTest extends TestCase
      * @covers ::getTracer
      * @covers ::__construct
      */
-    public function test_reuses_same_instance_with_version(): void
+    public function test_equal_for_same_name_with_version(): void
     {
         $provider = new TracerProvider(null);
 
@@ -60,9 +59,8 @@ class TracerProviderTest extends TestCase
         $t2 = $provider->getTracer('foo', '1.0.0');
         $t3 = $provider->getTracer('foo', '2.0.0');
 
-        $this->assertSame($t1, $t2);
-        $this->assertNotSame($t1, $t3);
-        $this->assertNotSame($t2, $t3);
+        $this->assertEquals($t1, $t2);
+        $this->assertNotEquals($t1, $t3);
     }
 
     /**
@@ -70,7 +68,7 @@ class TracerProviderTest extends TestCase
      * @covers ::__construct
      * @group trace-compliance
      */
-    public function test_reuses_same_instance_with_schema_and_version(): void
+    public function test_equal_for_same_name_with_schema_and_version(): void
     {
         $provider = new TracerProvider(null);
 
@@ -78,9 +76,8 @@ class TracerProviderTest extends TestCase
         $t2 = $provider->getTracer('foo', '2.0.0', 'http://url');
         $t3 = $provider->getTracer('foo', '2.0.0', 'http://schemaurl');
 
-        $this->assertSame($t1, $t2);
-        $this->assertNotSame($t1, $t3);
-        $this->assertNotSame($t2, $t3);
+        $this->assertEquals($t1, $t2);
+        $this->assertNotEquals($t1, $t3);
     }
 
     /**

@@ -74,28 +74,14 @@ class TracerTest extends TestCase
     public function test_span_should_receive_instrumentation_scope(): void
     {
         $tracerProvider = new TracerProvider();
-        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest', 'dev', 'http://url');
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest', 'dev', 'http://url', ['foo' => 'bar']);
         /** @var Span $span */
         $span = $tracer->spanBuilder('test.span')->startSpan();
         $spanInstrumentationScope = $span->getInstrumentationScope();
 
-        $this->assertEquals('OpenTelemetry.TracerTest', $spanInstrumentationScope->getName());
-        $this->assertEquals('dev', $spanInstrumentationScope->getVersion());
-        $this->assertEquals('http://url', $spanInstrumentationScope->getSchemaUrl());
-    }
-
-    /**
-     * @group trace-compliance
-     */
-    public function test_span_builder_propagates_instrumentation_scope_info_to_span(): void
-    {
-        /** @var Span $span */
-        $span = (new TracerProvider())
-            ->getTracer('name', 'version')
-            ->spanBuilder('span')
-            ->startSpan();
-
-        $this->assertSame('name', $span->getInstrumentationScope()->getName());
-        $this->assertSame('version', $span->getInstrumentationScope()->getVersion());
+        $this->assertSame('OpenTelemetry.TracerTest', $spanInstrumentationScope->getName());
+        $this->assertSame('dev', $spanInstrumentationScope->getVersion());
+        $this->assertSame('http://url', $spanInstrumentationScope->getSchemaUrl());
+        $this->assertSame(['foo' => 'bar'], $spanInstrumentationScope->getAttributes()->toArray());
     }
 }

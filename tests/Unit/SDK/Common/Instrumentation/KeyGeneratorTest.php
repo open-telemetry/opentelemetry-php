@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Instrumentation;
 
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Instrumentation\KeyGenerator;
 use PHPUnit\Framework\TestCase;
 
@@ -12,33 +14,43 @@ use PHPUnit\Framework\TestCase;
  */
 class KeyGeneratorTest extends TestCase
 {
-    public function test_non_null(): void
+    public function test_equal_instrumentation_scope_return_same_key(): void
     {
-        $name = 'foo';
-        $version = 'bar';
-        $schemaUrl = 'https://baz';
-
-        $key = KeyGenerator::generateInstanceKey($name, $version, $schemaUrl);
-
-        $this->assertSame(sprintf('%s@%s %s', $name, $version, $schemaUrl), $key);
+        $this->assertSame(
+            KeyGenerator::generateInstanceKey(new InstrumentationScope('foo', '0.0.1', null, Attributes::create([]))),
+            KeyGenerator::generateInstanceKey(new InstrumentationScope('foo', '0.0.1', null, Attributes::create([]))),
+        );
     }
 
-    public function test_null_version_and_null_schema(): void
+    public function test_non_equal_instrumentation_scope_return_different_keys_name(): void
     {
-        $name = 'foo';
-
-        $key = KeyGenerator::generateInstanceKey($name, null, null);
-
-        $this->assertSame(sprintf('%s@unknown ', $name), $key);
+        $this->assertNotSame(
+            KeyGenerator::generateInstanceKey(new InstrumentationScope('foo', '0.0.1', null, Attributes::create([]))),
+            KeyGenerator::generateInstanceKey(new InstrumentationScope('bar', '0.0.1', null, Attributes::create([]))),
+        );
     }
 
-    public function test_non_null_version_and_null_schema(): void
+    public function test_non_equal_instrumentation_scope_return_different_keys_version(): void
     {
-        $name = 'foo';
-        $version = 'bar';
+        $this->assertNotSame(
+            KeyGenerator::generateInstanceKey(new InstrumentationScope('foo', '0.0.1', null, Attributes::create([]))),
+            KeyGenerator::generateInstanceKey(new InstrumentationScope('foo', '0.0.2', null, Attributes::create([]))),
+        );
+    }
 
-        $key = KeyGenerator::generateInstanceKey($name, $version, null);
+    public function test_non_equal_instrumentation_scope_return_different_keys_schemaurl(): void
+    {
+        $this->assertNotSame(
+            KeyGenerator::generateInstanceKey(new InstrumentationScope('foo', '0.0.1', 'https://bar', Attributes::create([]))),
+            KeyGenerator::generateInstanceKey(new InstrumentationScope('foo', '0.0.1', 'https://baz', Attributes::create([]))),
+        );
+    }
 
-        $this->assertSame(sprintf('%s@%s ', $name, $version), $key);
+    public function test_non_equal_instrumentation_scope_return_different_keys_attributes(): void
+    {
+        $this->assertNotSame(
+            KeyGenerator::generateInstanceKey(new InstrumentationScope('foo', '0.0.1', null, Attributes::create(['foo' => 'bar']))),
+            KeyGenerator::generateInstanceKey(new InstrumentationScope('foo', '0.0.1', null, Attributes::create(['foo' => 'baz']))),
+        );
     }
 }

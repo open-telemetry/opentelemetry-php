@@ -73,7 +73,7 @@ class SpanTest extends MockeryTestCase
     {
         $this->idGenerator = new RandomIdGenerator();
         $this->resource = ResourceInfoFactory::emptyResource();
-        $this->instrumentationScope = new InstrumentationScope('test_scope', '0.1.2');
+        $this->instrumentationScope = new InstrumentationScope('test_scope', '0.1.2', null, Attributes::create([]));
 
         $this->spanProcessor = Mockery::spy(SpanProcessorInterface::class);
 

@@ -23,6 +23,7 @@ use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
 use OpenTelemetry\SDK\Common\Instrumentation\KeyGenerator;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use function spl_object_id;
 
 class SpanConverter implements SpanConverterInterface
 {
@@ -186,12 +187,13 @@ class SpanConverter implements SpanConverterInterface
     {
         $isSpansEmpty = true; //Waiting for the loop to prove otherwise
 
+        $scopeKeyCache = [];
         $instrumentationScopes = $convertedSpans = $schemas = [];
         foreach ($spans as /** @var SpanDataInterface $span */  $span) {
             $isSpansEmpty = false;
 
             $scope = $span->getInstrumentationScope();
-            $isKey = KeyGenerator::generateInstanceKey($scope->getName(), $scope->getVersion(), $scope->getSchemaUrl());
+            $isKey = $scopeKeyCache[spl_object_id($scope)] ??= KeyGenerator::generateInstanceKey($scope);
             if (!isset($instrumentationScopes[$isKey])) {
                 $convertedSpans[$isKey] = [];
                 $instrumentationScopes[$isKey] = new InstrumentationScope(['name' => $scope->getName(), 'version' => $scope->getVersion() ?? '']);
