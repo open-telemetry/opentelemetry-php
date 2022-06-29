@@ -12,7 +12,7 @@ $tracer = (new TracerProvider(
     new SimpleSpanProcessor(
         new ConsoleSpanExporter()
     )
-))->getTracer();
+))->getTracer('io.opentelemetry.contrib.php');
 
 // This creates a span and sets it as the current parent (and root) span
 $rootSpan = $tracer->spanBuilder('foo')->startSpan();

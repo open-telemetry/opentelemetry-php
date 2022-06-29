@@ -23,7 +23,7 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Routing\RouteContext;
 
 //create default tracer from environment variables, now available as TracerProvider::getDefaultTracer
-$tracer = (new TracerProviderFactory('example'))->create()->getTracer();
+$tracer = (new TracerProviderFactory('example'))->create()->getTracer('io.opentelemetry.contrib.php');
 
 $cb = new ContainerBuilder();
 $container = $cb->addDefinitions([

@@ -24,6 +24,6 @@ $tracerProvider =  new TracerProvider(
         new OtlpGrpcExporter(), //default endpoint unavailable, so exporting will fail
     )
 );
-$tracer = $tracerProvider->getTracer();
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 $span = $tracer->spanBuilder('root-span')->startSpan();
 $span->end();

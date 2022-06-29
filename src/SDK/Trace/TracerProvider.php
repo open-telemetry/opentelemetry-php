@@ -20,8 +20,6 @@ use WeakReference;
 
 final class TracerProvider implements API\TracerProviderInterface
 {
-    public const DEFAULT_TRACER_NAME = 'io.opentelemetry.contrib.php';
-
     /** @var array<int, WeakReference<self>>|null */
     private static ?array $tracerProviders = null;
 
@@ -67,7 +65,7 @@ final class TracerProvider implements API\TracerProviderInterface
 
     /** @inheritDoc */
     public function getTracer(
-        string $name = self::DEFAULT_TRACER_NAME,
+        string $name,
         ?string $version = null,
         ?string $schemaUrl = null,
         iterable $attributes = []

@@ -13,7 +13,7 @@ echo 'Handling Resource Detectors From Environment' . PHP_EOL;
 
 $tracerProvider = (new TracerProviderFactory('example'))->create();
 
-$tracer = $tracerProvider->getTracer();
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 echo 'Starting Tracer' . PHP_EOL;
 

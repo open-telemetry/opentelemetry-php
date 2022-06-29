@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
-use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 use WeakReference;
@@ -31,20 +29,6 @@ class TracerProviderTest extends TestCase
 
         $this->assertEquals($t1, $t2);
         $this->assertNotEquals($t1, $t3);
-    }
-
-    /**
-     * @covers ::getTracer
-     * @covers ::__construct
-     * @group trace-compliance
-     */
-    public function test_get_tracer_default(): void
-    {
-        $provider = new TracerProvider(null);
-
-        $t1 = $provider->getTracer();
-
-        $this->assertInstanceOf(Tracer::class, $t1);
     }
 
     /**
@@ -78,20 +62,6 @@ class TracerProviderTest extends TestCase
 
         $this->assertEquals($t1, $t2);
         $this->assertNotEquals($t1, $t3);
-    }
-
-    /**
-     * @covers ::getTracer
-     * @group trace-compliance
-     */
-    public function test_get_tracer_with_default_name(): void
-    {
-        $provider = new TracerProvider(null);
-
-        $t1 = $provider->getTracer();
-        $t2 = $provider->getTracer();
-
-        $this->assertSame($t1, $t2);
     }
 
     /**
