@@ -337,7 +337,9 @@ The easy way to test the example out with docker and docker-compose is:
 
 ## User Quickstarts
 * [Exploring OpenTelemetry in Laravel Applications](./docs/laravel-quickstart.md)
-* [Exploring OpenTelemetry in Symfony Applications](./docs/symfony-quickstart.md)
+
+## Framework integrations
+* [Symfony SDK Bundle](https://github.com/open-telemetry/opentelemetry-php-contrib/tree/main/src/Symfony/OtelSdkBundle) is the recommended way to use opentelemetry-php with symfony
 
 ## Versioning
 
