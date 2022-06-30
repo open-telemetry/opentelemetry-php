@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use function array_key_exists;
 use function hex2bin;
 use function iterator_to_array;
 use OpenTelemetry\API\Trace as API;
@@ -106,17 +105,11 @@ class SpanConverter implements SpanConverterInterface
     private function setAttributes($pElement, AttributesInterface $attributes): void
     {
         foreach ($attributes as $key => $value) {
-            $pElement->getAttributes()[] = $this->as_otlp_key_value($key, $value);
+            $pElement->getAttributes()[] = (new KeyValue())
+                ->setKey($key)
+                ->setValue($this->as_otlp_any_value($value));
         }
         $pElement->setDroppedAttributesCount($attributes->getDroppedAttributesCount());
-    }
-
-    private function as_otlp_key_value($key, $value): KeyValue
-    {
-        return new KeyValue([
-            'key' => $key,
-            'value' => $this->as_otlp_any_value($value),
-        ]);
     }
 
     private function as_otlp_any_value($value): AnyValue
@@ -125,11 +118,11 @@ class SpanConverter implements SpanConverterInterface
 
         switch (true) {
             case is_array($value):
-                $values = [];
+                $values = new ArrayValue();
                 foreach ($value as $element) {
-                    $values[] = $this->as_otlp_any_value($element);
+                    $values->getValues()[] = $this->as_otlp_any_value($element);
                 }
-                $result->setArrayValue(new ArrayValue(['values' => $values]));
+                $result->setArrayValue($values);
 
                 break;
             case is_int($value):
@@ -166,86 +159,54 @@ class SpanConverter implements SpanConverterInterface
         return SpanKind::SPAN_KIND_UNSPECIFIED;
     }
 
+    private function as_otlp_status_code(string $status): int
+    {
+        switch ($status) {
+            case API\StatusCode::STATUS_UNSET: return StatusCode::STATUS_CODE_UNSET;
+            case API\StatusCode::STATUS_OK: return StatusCode::STATUS_CODE_OK;
+            case API\StatusCode::STATUS_ERROR: return StatusCode::STATUS_CODE_ERROR;
+        }
+
+        return StatusCode::STATUS_CODE_UNSET;
+    }
+
     private function as_otlp_span(SpanDataInterface $span): Span
     {
-        $parent_span = $span->getParentContext();
-        $parent_span_id = $parent_span->isValid() ? $parent_span->getSpanId() : null;
-
-        $row = [
-            'trace_id' => hex2bin($span->getTraceId()),
-            'span_id' => hex2bin($span->getSpanId()),
-            'parent_span_id' => $parent_span_id ? hex2bin($parent_span_id) : null,
-            'name' => $span->getName(),
-            'start_time_unix_nano' => $span->getStartEpochNanos(),
-            'end_time_unix_nano' => $span->getEndEpochNanos(),
-            'kind' => $this->as_otlp_span_kind($span->getKind()),
-            'trace_state' => (string) $span->getContext()->getTraceState(),
-            'dropped_attributes_count' => $span->getAttributes()->getDroppedAttributesCount(),
-            'dropped_events_count' => $span->getTotalDroppedEvents(),
-            'dropped_links_count' => $span->getTotalDroppedLinks(),
-        ];
+        $pSpan = new Span();
+        $pSpan->setTraceId(hex2bin($span->getContext()->getTraceId()));
+        $pSpan->setSpanId(hex2bin($span->getContext()->getSpanId()));
+        $pSpan->setTraceState((string) $span->getContext()->getTraceState());
+        if ($span->getParentContext()->isValid()) {
+            $pSpan->setParentSpanId(hex2bin($span->getParentContext()->getSpanId()));
+        }
+        $pSpan->setName($span->getName());
+        $pSpan->setKind($this->as_otlp_span_kind($span->getKind()));
+        $pSpan->setStartTimeUnixNano($span->getStartEpochNanos());
+        $pSpan->setEndTimeUnixNano($span->getEndEpochNanos());
+        $this->setAttributes($pSpan, $span->getAttributes());
 
         foreach ($span->getEvents() as $event) {
-            if (!array_key_exists('events', $row)) {
-                $row['events'] = [];
-            }
-            $attrs = [];
-
-            foreach ($event->getAttributes() as $k => $v) {
-                $attrs[] = $this->as_otlp_key_value($k, $v);
-            }
-
-            $row['events'][] = new Event([
-                'time_unix_nano' => $event->getEpochNanos(),
-                'name' => $event->getName(),
-                'attributes' => $attrs,
-                'dropped_attributes_count' => $event->getAttributes()->getDroppedAttributesCount(),
-            ]);
+            $pSpan->getEvents()[] = $pEvent = new Event();
+            $pEvent->setTimeUnixNano($event->getEpochNanos());
+            $pEvent->setName($event->getName());
+            $this->setAttributes($pEvent, $event->getAttributes());
         }
+        $pSpan->setDroppedEventsCount($span->getTotalDroppedEvents());
 
         foreach ($span->getLinks() as $link) {
-            if (!array_key_exists('links', $row)) {
-                $row['links'] = [];
-            }
-            $attrs = [];
-
-            foreach ($link->getAttributes() as $k => $v) {
-                $attrs[] = $this->as_otlp_key_value($k, $v);
-            }
-
-            $row['links'][] = new Link([
-                'trace_id' => hex2bin($link->getSpanContext()->getTraceId()),
-                'span_id' => hex2bin($link->getSpanContext()->getSpanId()),
-                'trace_state' => (string) $link->getSpanContext()->getTraceState(),
-                'attributes' => $attrs,
-                'dropped_attributes_count' => $link->getAttributes()->getDroppedAttributesCount(),
-            ]);
+            $pSpan->getLinks()[] = $pLink = new Link();
+            $pLink->setTraceId(hex2bin($link->getSpanContext()->getTraceId()));
+            $pLink->setSpanId(hex2bin($link->getSpanContext()->getSpanId()));
+            $pLink->setTraceState((string) $link->getSpanContext()->getTraceState());
+            $this->setAttributes($pLink, $link->getAttributes());
         }
+        $pSpan->setDroppedLinksCount($span->getTotalDroppedLinks());
 
-        foreach ($span->getAttributes() as $k => $v) {
-            if (!array_key_exists('attributes', $row)) {
-                $row['attributes'] = [];
-            }
-            $row['attributes'][] = $this->as_otlp_key_value($k, $v);
-        }
+        $pStatus = new Status();
+        $pStatus->setMessage($span->getStatus()->getDescription());
+        $pStatus->setCode($this->as_otlp_status_code($span->getStatus()->getCode()));
+        $pSpan->setStatus($pStatus);
 
-        $status = new Status();
-
-        switch ($span->getStatus()->getCode()) {
-            case API\StatusCode::STATUS_OK:
-                $status->setCode(StatusCode::STATUS_CODE_OK);
-
-                break;
-            case API\StatusCode::STATUS_ERROR:
-                $status->setCode(StatusCode::STATUS_CODE_ERROR)->setMessage($span->getStatus()->getDescription());
-
-                break;
-            default:
-                $status->setCode(StatusCode::STATUS_CODE_UNSET);
-        }
-
-        $row['status'] = $status;
-
-        return new Span(array_filter($row));
+        return $pSpan;
     }
 }
