@@ -70,7 +70,7 @@ class SpanConverter implements SpanConverterInterface
                     = $this->convertScopeSpans($instrumentationScope);
             }
 
-            $pScopeSpans->getSpans()[] = $this->as_otlp_span($span);
+            $pScopeSpans->getSpans()[] = $this->convertSpan($span);
         }
 
         return iterator_to_array($pExportTraceServiceRequest->getResourceSpans());
@@ -107,12 +107,12 @@ class SpanConverter implements SpanConverterInterface
         foreach ($attributes as $key => $value) {
             $pElement->getAttributes()[] = (new KeyValue())
                 ->setKey($key)
-                ->setValue($this->as_otlp_any_value($value));
+                ->setValue($this->convertAnyValue($value));
         }
         $pElement->setDroppedAttributesCount($attributes->getDroppedAttributesCount());
     }
 
-    private function as_otlp_any_value($value): AnyValue
+    private function convertAnyValue($value): AnyValue
     {
         $result = new AnyValue();
 
@@ -120,7 +120,7 @@ class SpanConverter implements SpanConverterInterface
             case is_array($value):
                 $values = new ArrayValue();
                 foreach ($value as $element) {
-                    $values->getValues()[] = $this->as_otlp_any_value($element);
+                    $values->getValues()[] = $this->convertAnyValue($element);
                 }
                 $result->setArrayValue($values);
 
@@ -146,7 +146,7 @@ class SpanConverter implements SpanConverterInterface
         return $result;
     }
 
-    private function as_otlp_span_kind($kind): int
+    private function convertSpanKind(int $kind): int
     {
         switch ($kind) {
             case API\SpanKind::KIND_INTERNAL: return SpanKind::SPAN_KIND_INTERNAL;
@@ -159,7 +159,7 @@ class SpanConverter implements SpanConverterInterface
         return SpanKind::SPAN_KIND_UNSPECIFIED;
     }
 
-    private function as_otlp_status_code(string $status): int
+    private function convertStatusCode(string $status): int
     {
         switch ($status) {
             case API\StatusCode::STATUS_UNSET: return StatusCode::STATUS_CODE_UNSET;
@@ -170,7 +170,7 @@ class SpanConverter implements SpanConverterInterface
         return StatusCode::STATUS_CODE_UNSET;
     }
 
-    private function as_otlp_span(SpanDataInterface $span): Span
+    private function convertSpan(SpanDataInterface $span): Span
     {
         $pSpan = new Span();
         $pSpan->setTraceId(hex2bin($span->getContext()->getTraceId()));
@@ -180,7 +180,7 @@ class SpanConverter implements SpanConverterInterface
             $pSpan->setParentSpanId(hex2bin($span->getParentContext()->getSpanId()));
         }
         $pSpan->setName($span->getName());
-        $pSpan->setKind($this->as_otlp_span_kind($span->getKind()));
+        $pSpan->setKind($this->convertSpanKind($span->getKind()));
         $pSpan->setStartTimeUnixNano($span->getStartEpochNanos());
         $pSpan->setEndTimeUnixNano($span->getEndEpochNanos());
         $this->setAttributes($pSpan, $span->getAttributes());
@@ -204,7 +204,7 @@ class SpanConverter implements SpanConverterInterface
 
         $pStatus = new Status();
         $pStatus->setMessage($span->getStatus()->getDescription());
-        $pStatus->setCode($this->as_otlp_status_code($span->getStatus()->getCode()));
+        $pStatus->setCode($this->convertStatusCode($span->getStatus()->getCode()));
         $pSpan->setStatus($pStatus);
 
         return $pSpan;
