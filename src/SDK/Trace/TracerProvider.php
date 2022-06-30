@@ -41,10 +41,10 @@ final class TracerProvider implements API\TracerProviderInterface
         }
 
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
-        $resource = $resource ?? ResourceInfoFactory::defaultResource();
-        $sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
-        $idGenerator = $idGenerator ?? new RandomIdGenerator();
-        $spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
+        $resource ??= ResourceInfoFactory::defaultResource();
+        $sampler ??= new ParentBased(new AlwaysOnSampler());
+        $idGenerator ??= new RandomIdGenerator();
+        $spanLimits ??= (new SpanLimitsBuilder())->build();
 
         $this->tracerSharedState = new TracerSharedState(
             $idGenerator,

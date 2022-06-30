@@ -23,9 +23,9 @@ final class JaegerTransport implements TransportInterface
     private $transport;
     private $client;
 
-    private $buffer = [];
+    private array $buffer = [];
     private $process = null;
-    private $maxBufferSize = 0;
+    private int $maxBufferSize = 0;
 
     public function __construct(ParsedEndpointUrl $parsedEndpoint, $maxBufferSize = 0)
     {

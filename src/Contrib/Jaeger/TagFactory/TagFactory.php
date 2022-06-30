@@ -67,9 +67,7 @@ class TagFactory
     private static function recursivelySerializeArray($value): string
     {
         if (is_array($value)) {
-            return join(',', array_map(function ($val) {
-                return self::recursivelySerializeArray($val);
-            }, $value));
+            return join(',', array_map(fn($val) => self::recursivelySerializeArray($val), $value));
         }
 
         // Casting false to string makes an empty string
