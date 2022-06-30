@@ -192,7 +192,7 @@ class SpanConverter implements SpanConverterInterface
     private static function convertOtelEventsToJaegerLogs(SpanDataInterface $span): array
     {
         return array_map(
-            fn($event) => self::convertSingleOtelEventToJaegerLog($event),
+            fn ($event) => self::convertSingleOtelEventToJaegerLog($event),
             $span->getEvents()
         );
     }
@@ -215,7 +215,7 @@ class SpanConverter implements SpanConverterInterface
     private static function convertOtelLinksToJaegerSpanReferences(SpanDataInterface $span): array
     {
         return array_map(
-            fn($link) => self::convertSingleOtelLinkToJaegerSpanReference($link),
+            fn ($link) => self::convertSingleOtelLinkToJaegerSpanReference($link),
             $span->getLinks()
         );
     }

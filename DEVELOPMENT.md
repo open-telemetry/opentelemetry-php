@@ -43,7 +43,10 @@ make all
 This does the following things:
 
 * Installs/updates all the required dependencies for the project
+* Uses [Rector](https://github.com/rectorphp/rector) to refactor your code according to our standards.
 * Uses [php-cs-fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) to style your code using our style preferences.
+* Uses [Deptrac](https://github.com/qossmic/deptrac) to check for dependency violations inside our code base
+* Makes sure the composer files for the different components are valid
 * Runs all of our [phpunit](https://phpunit.de/) unit tests.
 * Performs static analysis with [Phan](https://github.com/phan/phan), [Psalm](https://psalm.dev/)
   and [PHPStan](https://phpstan.org/user-guide/getting-started)
@@ -88,11 +91,32 @@ SEMCONV_VERSION=1.8.0 make semconv
 
 Run this command in the root of this repository.
 
+## Automatic Refactoring and Upgrading
+
+We use [Rector](https://github.com/rectorphp/rector) to automatically refactor our code according to given standards
+and upgrade the code to supported PHP versions.
+The associated configuration can be found [here](./.rector.php)
+
+To refactor your code following our given standards, you can run:
+
+```bash
+make rector
+```
+
+This command applies the changes to the code base.
+Make sure to run `make style` (see below) after running the `rector`command as the changes might not follow our coding standard.
+
+If you want to simply check what changes would be applied by rector, you can run:
+
+```bash
+make rector-dry
+```
+This command will simply print out the changes `rector`would make without actually changing any code.
+
 ## Styling
 
 We use [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) for our code linting and standards fixer. The
-associated configuration for this standards fixer can be found in the root of the
-repository [here](https://github.com/open-telemetry/opentelemetry-php/blob/master/.php_cs)
+associated configuration can be found [here](./.php-cs-fixer.php)
 
 To ensure that your code follows our coding standards, you can run:
 
@@ -100,7 +124,7 @@ To ensure that your code follows our coding standards, you can run:
 make style
 ```
 
-This command executes a required test that also runs during CI. This process performs the required fixes and prints them
+This command executes a required check that also runs during CI. This process performs the required fixes and prints them
 out. Code that doesn't meet the style pattern will emit a failure with GitHub actions.
 
 ## Static Analysis
@@ -158,6 +182,21 @@ make test
 
 This will output the test output as well as a test coverage analysis (text + html - see `tests/coverage/html`). Code
 that doesn't pass our currently defined tests will emit a failure in CI
+
+## Dependency Validation
+
+To make sure the different components of the library are distributable as separate packages, we have to check
+    for dependency violations inside the code base. Dependencies must create a [DAC](https://en.wikipedia.org/wiki/Directed_acyclic_graph) in order to not create recursive dependencies.
+For this purpose we use [Deptrac](https://github.com/qossmic/deptrac) and the respective configuration can be found
+[here](./deptrac.yaml)
+
+To validatethe dependencies inside the code base, you can run:
+
+```bash
+make deptrac
+```
+This command will create an error for any violation of the defined dependencies. If you add new dependencies to the code base,
+please configure them in the rector configuration.
 
 ## PhpMetrics
 
