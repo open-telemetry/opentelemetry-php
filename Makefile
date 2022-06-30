@@ -1,7 +1,7 @@
 PHP_VERSION ?= 7.4
 DC_RUN_PHP = docker-compose run --rm php
 
-all: update rector style packages-composer deptrac phan psalm phpstan test
+all: update rector style deptrac packages-composer  phan psalm phpstan test
 install:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer install
 update:
