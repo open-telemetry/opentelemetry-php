@@ -164,7 +164,7 @@ class OTLPSpanConverterTest extends TestCase
             ->setStartEpochNanos($start_time)
             ->setEndEpochNanos($end_time)
             ->setName('http_get')
-            ->setInstrumentationScope(new InstrumentationScope('lib-test', 'v0.1.0', 'http://url'))
+            ->setInstrumentationScope(new InstrumentationScope('lib-test', 'v0.1.0', 'http://url', Attributes::create([])))
             ->addAttribute('user', 'alice')
             ->addAttribute('authenticated', true)
             ->addEvent('Event1', Attributes::create(['success' => 'yes']), 1617313804325769955)

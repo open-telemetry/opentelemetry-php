@@ -50,7 +50,7 @@ class SpanData implements SDK\SpanDataInterface
         $this->kind = API\SpanKind::KIND_INTERNAL;
         $this->status = StatusData::unset();
         $this->resource = ResourceInfoFactory::emptyResource();
-        $this->instrumentationScope = InstrumentationScope::getEmpty(); /** @phan-suppress-current-line PhanAccessMethodInternal */
+        $this->instrumentationScope = new InstrumentationScope('', null, null, Attributes::create([]));
         $this->context = API\SpanContext::getInvalid();
         $this->parentContext = API\SpanContext::getInvalid();
     }

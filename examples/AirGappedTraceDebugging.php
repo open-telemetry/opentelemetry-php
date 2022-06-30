@@ -44,7 +44,7 @@ $tracerProvider = new TracerProvider(
     new SimpleSpanProcessor($exporter),
     new AlwaysOnSampler()
 );
-$tracer = $tracerProvider->getTracer();
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 /**
  * Create some tracing data
  */

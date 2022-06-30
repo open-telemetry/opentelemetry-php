@@ -23,7 +23,7 @@ $tracerProvider = new TracerProvider(
 
 echo 'Starting JaegerThriftExample';
 
-$tracer = $tracerProvider->getTracer();
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
 $rootSpan->activate();

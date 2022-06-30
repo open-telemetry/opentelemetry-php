@@ -21,7 +21,7 @@ $tracerProvider =  new TracerProvider(
         $zipkinExporter
     )
 );
-$tracer = $tracerProvider->getTracer();
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 echo 'Starting AlwaysOnZipkinExample';
 

@@ -40,7 +40,9 @@ class ZipkinSpanConverterTest extends TestCase
             )
             ->setInstrumentationScope(new InstrumentationScope(
                 'instrumentation_scope_name',
-                'instrumentation_scope_version'
+                'instrumentation_scope_version',
+                null,
+                Attributes::create([]),
             ))
             ->addAttribute('service', 'guard')
             ->addAttribute('net.peer.name', 'authorizationservice.com')

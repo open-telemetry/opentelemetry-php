@@ -122,6 +122,9 @@ class SpanConverter implements SpanConverterInterface
         foreach ($span->getResource()->getAttributes() as $k => $v) {
             $row['tags'][$k] = $this->sanitiseTagValue($v);
         }
+        foreach ($span->getInstrumentationScope()->getAttributes() as $k => $v) {
+            $row['tags'][$k] = $this->sanitiseTagValue($v);
+        }
 
         foreach ($span->getEvents() as $event) {
             $row['annotations'][] = SpanConverter::toAnnotation($event);
