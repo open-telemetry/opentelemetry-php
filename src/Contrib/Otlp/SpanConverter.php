@@ -57,6 +57,7 @@ class SpanConverter implements SpanConverterInterface
             ]);
 
             if (!$pResourceSpans = $resourceSpans[$resourceId] ?? null) {
+                /** @psalm-suppress InvalidArgument */
                 $pExportTraceServiceRequest->getResourceSpans()[]
                     = $resourceSpans[$resourceId]
                     = $pResourceSpans
@@ -64,12 +65,14 @@ class SpanConverter implements SpanConverterInterface
             }
 
             if (!$pScopeSpans = $scopeSpans[$resourceId][$instrumentationScopeId] ?? null) {
+                /** @psalm-suppress InvalidArgument */
                 $pResourceSpans->getScopeSpans()[]
                     = $scopeSpans[$resourceId][$instrumentationScopeId]
                     = $pScopeSpans
                     = $this->convertScopeSpans($instrumentationScope);
             }
 
+            /** @psalm-suppress InvalidArgument */
             $pScopeSpans->getSpans()[] = $this->convertSpan($span);
         }
 
@@ -105,6 +108,7 @@ class SpanConverter implements SpanConverterInterface
     private function setAttributes($pElement, AttributesInterface $attributes): void
     {
         foreach ($attributes as $key => $value) {
+            /** @psalm-suppress InvalidArgument */
             $pElement->getAttributes()[] = (new KeyValue())
                 ->setKey($key)
                 ->setValue($this->convertAnyValue($value));
@@ -120,6 +124,7 @@ class SpanConverter implements SpanConverterInterface
             case is_array($value):
                 $values = new ArrayValue();
                 foreach ($value as $element) {
+                    /** @psalm-suppress InvalidArgument */
                     $values->getValues()[] = $this->convertAnyValue($element);
                 }
                 $result->setArrayValue($values);
@@ -186,6 +191,7 @@ class SpanConverter implements SpanConverterInterface
         $this->setAttributes($pSpan, $span->getAttributes());
 
         foreach ($span->getEvents() as $event) {
+            /** @psalm-suppress InvalidArgument */
             $pSpan->getEvents()[] = $pEvent = new Event();
             $pEvent->setTimeUnixNano($event->getEpochNanos());
             $pEvent->setName($event->getName());
@@ -194,6 +200,7 @@ class SpanConverter implements SpanConverterInterface
         $pSpan->setDroppedEventsCount($span->getTotalDroppedEvents());
 
         foreach ($span->getLinks() as $link) {
+            /** @psalm-suppress InvalidArgument */
             $pSpan->getLinks()[] = $pLink = new Link();
             $pLink->setTraceId(hex2bin($link->getSpanContext()->getTraceId()));
             $pLink->setSpanId(hex2bin($link->getSpanContext()->getSpanId()));
