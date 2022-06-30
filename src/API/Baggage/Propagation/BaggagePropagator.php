@@ -40,8 +40,8 @@ final class BaggagePropagator implements TextMapPropagatorInterface
 
     public function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void
     {
-        $setter = $setter ?? ArrayAccessGetterSetter::getInstance();
-        $context = $context ?? Context::getCurrent();
+        $setter ??= ArrayAccessGetterSetter::getInstance();
+        $context ??= Context::getCurrent();
 
         $baggage = Baggage::fromContext($context);
 
@@ -71,8 +71,8 @@ final class BaggagePropagator implements TextMapPropagatorInterface
 
     public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
     {
-        $getter = $getter ?? ArrayAccessGetterSetter::getInstance();
-        $context = $context ?? Context::getCurrent();
+        $getter ??= ArrayAccessGetterSetter::getInstance();
+        $context ??= Context::getCurrent();
 
         if (!$baggageHeader = $getter->get($carrier, self::BAGGAGE)) {
             return $context;

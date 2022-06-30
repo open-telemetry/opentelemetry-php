@@ -1,7 +1,7 @@
 PHP_VERSION ?= 7.4
 DC_RUN_PHP = docker-compose run --rm php
 
-all: update style packages-composer deptrac phan psalm phpstan test
+all: update rector style deptrac packages-composer  phan psalm phpstan test
 install:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer install
 update:
@@ -60,6 +60,10 @@ bash:
 	$(DC_RUN_PHP) bash
 style:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no -vvv
+rector:
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/rector process src
+rector-dry:
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/rector process src --dry-run
 deptrac:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/deptrac --formatter=table --report-uncovered --no-cache
 w3c-test-service:

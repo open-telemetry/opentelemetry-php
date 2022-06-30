@@ -78,7 +78,7 @@ final class Context
      */
     public static function getValue(ContextKey $key, ?Context $ctx=null)
     {
-        $ctx = $ctx ?? self::getCurrent();
+        $ctx ??= self::getCurrent();
 
         return $ctx->get($key);
     }
