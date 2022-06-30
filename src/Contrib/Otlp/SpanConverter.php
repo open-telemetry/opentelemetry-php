@@ -6,30 +6,109 @@ namespace OpenTelemetry\Contrib\Otlp;
 
 use function array_key_exists;
 use function hex2bin;
+use function iterator_to_array;
 use OpenTelemetry\API\Trace as API;
+use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Common\V1\AnyValue;
 use Opentelemetry\Proto\Common\V1\ArrayValue;
 use Opentelemetry\Proto\Common\V1\InstrumentationScope;
 use Opentelemetry\Proto\Common\V1\KeyValue;
-use Opentelemetry\Proto\Resource\V1\Resource;
+use Opentelemetry\Proto\Resource\V1\Resource as Resource_;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use Opentelemetry\Proto\Trace\V1\ScopeSpans;
-use Opentelemetry\Proto\Trace\V1\Span as CollectorSpan;
+use Opentelemetry\Proto\Trace\V1\Span;
 use Opentelemetry\Proto\Trace\V1\Span\Event;
 use Opentelemetry\Proto\Trace\V1\Span\Link;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
-use OpenTelemetry\SDK\Common\Instrumentation\KeyGenerator;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use function serialize;
 use function spl_object_id;
 
 class SpanConverter implements SpanConverterInterface
 {
     public function convert(iterable $spans): array
     {
-        return [$this->as_otlp_resource_span($spans)];
+        $pExportTraceServiceRequest = new ExportTraceServiceRequest();
+
+        $resourceSpans = [];
+        $resourceCache = [];
+        $scopeSpans = [];
+        $scopeCache = [];
+        foreach ($spans as $span) {
+            $resource = $span->getResource();
+            $instrumentationScope = $span->getInstrumentationScope();
+
+            $resourceId = $resourceCache[spl_object_id($resource)] ??= serialize([
+                $resource->getSchemaUrl(),
+                $resource->getAttributes()->toArray(),
+                $resource->getAttributes()->getDroppedAttributesCount(),
+            ]);
+            $instrumentationScopeId = $scopeCache[spl_object_id($instrumentationScope)] ??= serialize([
+                $instrumentationScope->getName(),
+                $instrumentationScope->getVersion(),
+                $instrumentationScope->getSchemaUrl(),
+                $instrumentationScope->getAttributes()->toArray(),
+                $instrumentationScope->getAttributes()->getDroppedAttributesCount(),
+            ]);
+
+            if (!$pResourceSpans = $resourceSpans[$resourceId] ?? null) {
+                $pExportTraceServiceRequest->getResourceSpans()[]
+                    = $resourceSpans[$resourceId]
+                    = $pResourceSpans
+                    = $this->convertResourceSpans($resource);
+            }
+
+            if (!$pScopeSpans = $scopeSpans[$resourceId][$instrumentationScopeId] ?? null) {
+                $pResourceSpans->getScopeSpans()[]
+                    = $scopeSpans[$resourceId][$instrumentationScopeId]
+                    = $pScopeSpans
+                    = $this->convertScopeSpans($instrumentationScope);
+            }
+
+            $pScopeSpans->getSpans()[] = $this->as_otlp_span($span);
+        }
+
+        return iterator_to_array($pExportTraceServiceRequest->getResourceSpans());
+    }
+
+    private function convertResourceSpans(ResourceInfo $resource): ResourceSpans
+    {
+        $pResourceSpans = new ResourceSpans();
+        $pResource = new Resource_();
+        $this->setAttributes($pResource, $resource->getAttributes());
+        $pResourceSpans->setResource($pResource);
+        $pResourceSpans->setSchemaUrl((string) $resource->getSchemaUrl());
+
+        return $pResourceSpans;
+    }
+
+    private function convertScopeSpans(InstrumentationScopeInterface $instrumentationScope): ScopeSpans
+    {
+        $pScopeSpans = new ScopeSpans();
+        $pInstrumentationScope = new InstrumentationScope();
+        $pInstrumentationScope->setName($instrumentationScope->getName());
+        $pInstrumentationScope->setVersion((string) $instrumentationScope->getVersion());
+        $pScopeSpans->setScope($pInstrumentationScope);
+        $pScopeSpans->setSchemaUrl((string) $instrumentationScope->getSchemaUrl());
+
+        return $pScopeSpans;
+    }
+
+    /**
+     * @param Resource_|Span|Event|Link $pElement
+     */
+    private function setAttributes($pElement, AttributesInterface $attributes): void
+    {
+        foreach ($attributes as $key => $value) {
+            $pElement->getAttributes()[] = $this->as_otlp_key_value($key, $value);
+        }
+        $pElement->setDroppedAttributesCount($attributes->getDroppedAttributesCount());
     }
 
     private function as_otlp_key_value($key, $value): KeyValue
@@ -77,17 +156,17 @@ class SpanConverter implements SpanConverterInterface
     private function as_otlp_span_kind($kind): int
     {
         switch ($kind) {
-            case 0: return SpanKind::SPAN_KIND_INTERNAL;
-            case 1: return SpanKind::SPAN_KIND_CLIENT;
-            case 2: return SpanKind::SPAN_KIND_SERVER;
-            case 3: return SpanKind::SPAN_KIND_PRODUCER;
-            case 4: return SpanKind::SPAN_KIND_CONSUMER;
+            case API\SpanKind::KIND_INTERNAL: return SpanKind::SPAN_KIND_INTERNAL;
+            case API\SpanKind::KIND_CLIENT: return SpanKind::SPAN_KIND_CLIENT;
+            case API\SpanKind::KIND_SERVER: return SpanKind::SPAN_KIND_SERVER;
+            case API\SpanKind::KIND_PRODUCER: return SpanKind::SPAN_KIND_PRODUCER;
+            case API\SpanKind::KIND_CONSUMER: return SpanKind::SPAN_KIND_CONSUMER;
         }
 
         return SpanKind::SPAN_KIND_UNSPECIFIED;
     }
 
-    private function as_otlp_span(SpanDataInterface $span): CollectorSpan
+    private function as_otlp_span(SpanDataInterface $span): Span
     {
         $parent_span = $span->getParentContext();
         $parent_span_id = $parent_span->isValid() ? $parent_span->getSpanId() : null;
@@ -167,59 +246,6 @@ class SpanConverter implements SpanConverterInterface
 
         $row['status'] = $status;
 
-        return new CollectorSpan(array_filter($row));
-    }
-
-    // @return KeyValue[]
-    private function as_otlp_resource_attributes(iterable $spans): array
-    {
-        $attrs = [];
-        foreach ($spans as $span) {
-            foreach ($span->getResource()->getAttributes() as $k => $v) {
-                $attrs[$k] = $this->as_otlp_key_value($k, $v);
-            }
-        }
-
-        return array_values($attrs);
-    }
-
-    private function as_otlp_resource_span(iterable $spans): ResourceSpans
-    {
-        $isSpansEmpty = true; //Waiting for the loop to prove otherwise
-
-        $scopeKeyCache = [];
-        $instrumentationScopes = $convertedSpans = $schemas = [];
-        foreach ($spans as /** @var SpanDataInterface $span */  $span) {
-            $isSpansEmpty = false;
-
-            $scope = $span->getInstrumentationScope();
-            $isKey = $scopeKeyCache[spl_object_id($scope)] ??= KeyGenerator::generateInstanceKey($scope);
-            if (!isset($instrumentationScopes[$isKey])) {
-                $convertedSpans[$isKey] = [];
-                $instrumentationScopes[$isKey] = new InstrumentationScope(['name' => $scope->getName(), 'version' => $scope->getVersion() ?? '']);
-                $schemas[$isKey] = $scope->getSchemaUrl();
-            }
-            $convertedSpans[$isKey][] = $this->as_otlp_span($span);
-        }
-
-        if ($isSpansEmpty == true) {
-            return new ResourceSpans();
-        }
-
-        $isSpans = [];
-        foreach ($instrumentationScopes as $isKey => $scope) {
-            $isSpans[] = new ScopeSpans([
-                'scope' => $scope,
-                'spans' => $convertedSpans[$isKey],
-                'schema_url' => $schemas[$isKey] ?? '',
-            ]);
-        }
-
-        return new ResourceSpans([
-            'resource' => new Resource([
-                'attributes' => $this->as_otlp_resource_attributes($spans),
-            ]),
-            'scope_spans' => $isSpans,
-        ]);
+        return new Span(array_filter($row));
     }
 }
