@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use Thrift\Exception\TTransportException;
 use Thrift\Protocol\TCompactProtocol;
 
+// @phan-file-suppress PhanUndeclaredClassMethod
 final class JaegerTransport implements TransportInterface
 {
     use LogsMessagesTrait;
