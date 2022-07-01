@@ -261,13 +261,21 @@ class OTLPSpanConverterTest extends TestCase
         $this->assertCount(2, $result[0]->getResource()->getAttributes());
     }
 
+    public function test_multiple_resources_result_in_multiple_resource_spans(): void
+    {
+        $resourceA = ResourceInfo::create(Attributes::create(['foo' => 'bar']));
+        $resourceB = ResourceInfo::create(Attributes::create(['foo' => 'baz']));
+        $converter = new SpanConverter();
+        $result = $converter->convert([
+            (new SpanData())->setResource($resourceA),
+            (new SpanData())->setResource($resourceB),
+        ]);
+        $this->assertCount(2, $result);
+    }
+
     public function test_otlp_no_spans(): void
     {
-        $spans = [];
-
-        $row = (new SpanConverter())->convert($spans)[0];
-
-        $this->assertEquals(new ResourceSpans(), $row);
+        $this->assertSame([], (new SpanConverter())->convert([]));
     }
 
     /**
