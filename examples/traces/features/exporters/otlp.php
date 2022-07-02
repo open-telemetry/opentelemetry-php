@@ -16,7 +16,7 @@ $exporter = new OTLPExporter(
     new HttpFactory()
 );
 
-echo 'Starting OTLPExample';
+echo 'Starting OTLP example';
 
 $tracerProvider =  new TracerProvider(
     new SimpleSpanProcessor(
@@ -46,6 +46,6 @@ for ($i = 0; $i < 3; $i++) {
     $span->end();
 }
 $root->end();
-echo PHP_EOL . 'OTLPExample complete!  ';
+echo PHP_EOL . 'OTLP example complete!  ';
 
 echo PHP_EOL;

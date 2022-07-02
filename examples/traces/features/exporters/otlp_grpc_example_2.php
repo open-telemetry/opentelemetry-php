@@ -12,7 +12,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 
 $Exporter = new OTLPExporter();
 
-echo 'Starting OTLPGrpcExample';
+echo 'Starting OTLPGrpc example 2';
 $tracer = (new TracerProvider(new SimpleSpanProcessor($Exporter)))
     ->getTracer('io.opentelemetry.contrib.php');
 $rootSpan = $tracer
@@ -94,6 +94,6 @@ try {
 }
 $rootSpan->end();
 
-echo PHP_EOL . 'OTLPGrpcExample complete!  ';
+echo PHP_EOL . 'OTLPGrpc example 2 complete!  ';
 
 echo PHP_EOL;

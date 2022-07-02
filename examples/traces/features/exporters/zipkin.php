@@ -23,7 +23,7 @@ $tracerProvider =  new TracerProvider(
 );
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
-echo 'Starting AlwaysOnZipkinExample';
+echo 'Starting Zipkin example';
 
 $root = $span = $tracer->spanBuilder('root')->startSpan();
 $span->activate();
@@ -46,6 +46,6 @@ for ($i = 0; $i < 3; $i++) {
     $span->end();
 }
 $root->end();
-echo PHP_EOL . 'AlwaysOnZipkinExample complete!  See the results at http://localhost:9411/';
+echo PHP_EOL . 'Zipkin example complete!  See the results at http://localhost:9411/';
 
 echo PHP_EOL;

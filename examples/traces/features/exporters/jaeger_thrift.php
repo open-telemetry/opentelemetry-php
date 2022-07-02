@@ -3,25 +3,38 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../../vendor/autoload.php';
 
-use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use OpenTelemetry\Contrib\Jaeger\AgentExporter;
+use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
+use Psr\Log\LogLevel;
 
-$exporter = JaegerExporter::fromConnectionString('http://jaeger:9412/api/v2/spans', 'AlwaysOnJaegerExample');
+$logger = new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)]);
+LoggerHolder::set($logger);
+
+$exporter = new AgentExporter('jaeger-thrift', 'jaeger:6831');
 $tracerProvider = new TracerProvider(
     new SimpleSpanProcessor($exporter),
     new AlwaysOnSampler(),
 );
 
-echo 'Starting AlwaysOnJaegerExample';
+echo 'Starting Jaeger Thrift example';
 
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
 $rootSpan->activate();
+echo PHP_EOL . sprintf(
+    'Root Span: %s, Parent: %s, Span: %s',
+    $rootSpan->getContext()->getTraceId(),
+    $rootSpan->getParentContext()->getSpanId(),
+    $rootSpan->getContext()->getSpanId()
+) . PHP_EOL;
 
-for ($i = 0; $i < 5; $i++) {
+for ($i = 0; $i < 1; $i++) {
     // start a span, register some events
     $span = $tracer->spanBuilder('session.generate.span-' . $i)->startSpan();
 
@@ -30,7 +43,7 @@ for ($i = 0; $i < 5; $i++) {
         $span->getContext()->getTraceId(),
         $span->getParentContext()->getSpanId() ?: 'None',
         $span->getContext()->getSpanId()
-    );
+    ) . PHP_EOL;
 
     $span->setAttribute('remote_ip', '1.2.3.4')
         ->setAttribute('country', 'USA');
@@ -52,6 +65,6 @@ for ($i = 0; $i < 5; $i++) {
     $span->end();
 }
 $rootSpan->end();
-echo PHP_EOL . 'AlwaysOnJaegerExample complete!  See the results at http://localhost:16686/';
+echo PHP_EOL . 'Jaeger Thrift example complete!  See the results at http://localhost:16686/';
 
 echo PHP_EOL;

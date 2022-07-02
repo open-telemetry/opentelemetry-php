@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 
 $exporter = new OTLPGrpcExporter('collector:4317');
 
-echo 'Starting OTLP GRPC Example';
+echo 'Starting OTLP GRPC example';
 
 $tracerProvider =  new TracerProvider(
     new SimpleSpanProcessor(
@@ -39,6 +39,6 @@ for ($i = 0; $i < 3; $i++) {
     $span->end();
 }
 $root->end();
-echo PHP_EOL . 'OTLP GRPC Example complete!  ';
+echo PHP_EOL . 'OTLP GRPC example complete!  ';
 
 echo PHP_EOL;
