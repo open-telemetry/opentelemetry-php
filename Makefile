@@ -33,23 +33,23 @@ phpmetrics:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpmetrics --config=./phpmetrics.json --junit=junit.xml
 trace examples: FORCE
 	docker-compose up -d --remove-orphans
-	$(DC_RUN_PHP) php ./examples/AlwaysOnZipkinExample.php
-	$(DC_RUN_PHP) php ./examples/AlwaysOffTraceExample.php
-	$(DC_RUN_PHP) php ./examples/AlwaysOnJaegerExample.php
+	$(DC_RUN_PHP) php ./examples/always_on_zipkin_example.php
+	$(DC_RUN_PHP) php ./examples/always_off_trace_example.php
+	$(DC_RUN_PHP) php ./examples/always_on_jaeger_example.php
         # The following examples do not use the DC_RUN_PHP global because they need environment variables.
-	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/AlwaysOnNewrelicExample.php
-	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/AlwaysOnZipkinToNewrelicExample.php
+	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/always_on_newrelic_example.php
+	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/always_on_zipkin_to_newrelic_example.php
 	docker-compose stop
 collector:
 	docker-compose -f docker-compose.collector.yaml up -d --remove-orphans
-	docker-compose -f docker-compose.collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=collector:4317 --rm php php ./examples/AlwaysOnOTLPGrpcExample.php
+	docker-compose -f docker-compose.collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=collector:4317 --rm php php ./examples/always_on_otlp_grpc_example.php
 	docker-compose -f docker-compose.collector.yaml stop
 
 fiber-ffi-example:
 	@docker-compose -f docker-compose.fiber-ffi.yaml -p opentelemetry-php_fiber-ffi-example up -d web
 metrics-prometheus-example:
 	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example up -d web
-	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example run --rm php php examples/prometheus/PrometheusMetricsExample.php
+	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example run --rm php php examples/prometheus/prometheus_metrics_example.php
 stop-prometheus:
 	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example stop
 protobuf:
