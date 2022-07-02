@@ -50,7 +50,7 @@ final class FiberBoundContextStorage implements ContextStorageInterface, Executi
     {
         $this->checkFiberMismatch();
 
-        if (!$scope = $this->storage->scope()) {
+        if (($scope = $this->storage->scope()) === null) {
             return null;
         }
 

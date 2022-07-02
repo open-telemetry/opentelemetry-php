@@ -67,7 +67,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
 
         // Build and inject the tracestate header
         // Spec says to avoid sending empty tracestate headers
-        if ($tracestate = (string) $spanContext->getTraceState()) {
+        if (($tracestate = (string) $spanContext->getTraceState()) !== '') {
             $setter->set($carrier, self::TRACESTATE, $tracestate);
         }
     }

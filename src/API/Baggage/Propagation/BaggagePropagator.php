@@ -56,14 +56,14 @@ final class BaggagePropagator implements TextMapPropagatorInterface
             $value = urlencode($entry->getValue());
             $headerString.= "{$key}={$value}";
 
-            if ($metadata = $entry->getMetadata()->getValue()) {
+            if (($metadata = $entry->getMetadata()->getValue()) !== '' && ($metadata = $entry->getMetadata()->getValue()) !== '0') {
                 $headerString .= ";{$metadata}";
             }
 
             $headerString .= ',';
         }
 
-        if ($headerString) {
+        if ($headerString !== '' && $headerString !== '0') {
             $headerString = rtrim($headerString, ',');
             $setter->set($carrier, self::BAGGAGE, $headerString);
         }
