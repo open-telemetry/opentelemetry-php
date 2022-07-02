@@ -130,7 +130,7 @@ class Exporter implements SpanExporterInterface
 
         if ($dsn->getScheme() === null) {
             $dsn = $dsn->withScheme('https');
-        } elseif (!($dsn->getScheme() === 'https' || $dsn->getScheme() === 'http')) {
+        } elseif ($dsn->getScheme() !== 'https' && $dsn->getScheme() !== 'http') {
             throw new InvalidArgumentException('Expected scheme of http or https, given: ' . $dsn->getScheme());
         }
 

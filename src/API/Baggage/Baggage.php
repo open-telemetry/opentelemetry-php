@@ -67,7 +67,7 @@ final class Baggage implements BaggageInterface
     /** @inheritDoc */
     public function getValue(string $key)
     {
-        if ($entry = $this->getEntry($key)) {
+        if (($entry = $this->getEntry($key)) !== null) {
             return $entry->getValue();
         }
 
