@@ -56,7 +56,7 @@ class SpanConverter implements SpanConverterInterface
                 $instrumentationScope->getAttributes()->getDroppedAttributesCount(),
             ]);
 
-            if (!$pResourceSpans = $resourceSpans[$resourceId] ?? null) {
+            if (($pResourceSpans = $resourceSpans[$resourceId] ?? null) === null) {
                 /** @psalm-suppress InvalidArgument */
                 $pExportTraceServiceRequest->getResourceSpans()[]
                     = $resourceSpans[$resourceId]
@@ -64,7 +64,7 @@ class SpanConverter implements SpanConverterInterface
                     = $this->convertResourceSpans($resource);
             }
 
-            if (!$pScopeSpans = $scopeSpans[$resourceId][$instrumentationScopeId] ?? null) {
+            if (($pScopeSpans = $scopeSpans[$resourceId][$instrumentationScopeId] ?? null) === null) {
                 /** @psalm-suppress InvalidArgument */
                 $pResourceSpans->getScopeSpans()[]
                     = $scopeSpans[$resourceId][$instrumentationScopeId]
@@ -138,7 +138,7 @@ class SpanConverter implements SpanConverterInterface
                 $result->setBoolValue($value);
 
                 break;
-            case is_double($value):
+            case is_float($value):
                 $result->setDoubleValue($value);
 
                 break;

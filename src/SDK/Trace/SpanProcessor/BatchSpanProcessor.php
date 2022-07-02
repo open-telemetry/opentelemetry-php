@@ -119,8 +119,8 @@ class BatchSpanProcessor implements SpanProcessorInterface
             return true;
         }
 
-        if (null !== $this->exporter) {
-            $this->forceFlush() && $this->exporter->shutdown();
+        if (null !== $this->exporter && $this->forceFlush()) {
+            $this->exporter->shutdown();
         }
         $this->running = false;
 

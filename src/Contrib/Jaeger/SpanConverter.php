@@ -174,9 +174,7 @@ class SpanConverter implements SpanConverterInterface
             $tags[$k] = $v;
         }
 
-        $tags = self::buildTags($tags);
-
-        return $tags;
+        return self::buildTags($tags);
     }
 
     private static function buildTags(array $tagPairs): array
