@@ -205,3 +205,7 @@ $ composer require --dev open-telemetry/sdk open-telemetry/sdk-contrib
 ## Versioning
 
 Versioning rationale can be found in the [Versioning Documentation](/docs/versioning.md)
+
+## Development
+
+See our [Development README](./DEVELOPMENT.md)
