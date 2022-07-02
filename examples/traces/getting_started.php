@@ -35,6 +35,8 @@ try {
         $span1->end();
     }
 } catch (Throwable $t) {
+    //The library's code shouldn't be throwing unhandled exceptions (it should emit any errors via diagnostic events)
+    //This is intended to illustrate a way you can capture unhandled exceptions coming from your app code
     $rootSpan->recordException($t);
 } finally {
     //ensure span ends and scope is detached
