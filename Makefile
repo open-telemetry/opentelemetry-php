@@ -33,16 +33,16 @@ phpmetrics:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpmetrics --config=./phpmetrics.json --junit=junit.xml
 trace examples: FORCE
 	docker-compose up -d --remove-orphans
-	$(DC_RUN_PHP) php ./examples/traces/always_on_zipkin_example.php
+	$(DC_RUN_PHP) php ./examples/traces/exporters/always_on_zipkin_example.php
 	$(DC_RUN_PHP) php ./examples/traces/always_off_trace_example.php
-	$(DC_RUN_PHP) php ./examples/traces/always_on_jaeger_example.php
+	$(DC_RUN_PHP) php ./examples/traces/exporters/always_on_jaeger_example.php
         # The following examples do not use the DC_RUN_PHP global because they need environment variables.
-	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/always_on_newrelic_example.php
-	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/always_on_zipkin_to_newrelic_example.php
+	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/exporters/always_on_newrelic_example.php
+	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/exporters/always_on_zipkin_to_newrelic_example.php
 	docker-compose stop
 collector:
 	docker-compose -f docker-compose.collector.yaml up -d --remove-orphans
-	docker-compose -f docker-compose.collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=collector:4317 --rm php php ./examples/traces/always_on_otlp_grpc_example.php
+	docker-compose -f docker-compose.collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=collector:4317 --rm php php ./examples/traces/exporters/always_on_otlp_grpc_example.php
 	docker-compose -f docker-compose.collector.yaml stop
 
 fiber-ffi-example:
