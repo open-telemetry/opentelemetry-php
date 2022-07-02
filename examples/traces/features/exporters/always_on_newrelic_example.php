@@ -1,13 +1,13 @@
 <?php
 
 declare(strict_types=1);
-require __DIR__ . '/../../../vendor/autoload.php';
+require __DIR__ . '/../../../../vendor/autoload.php';
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter as ZipkinToNewrelicExporter;
+use OpenTelemetry\Contrib\Newrelic\Exporter as NewrelicExporter;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
@@ -49,8 +49,8 @@ if ($endpointUrl == false) {
     $endpointUrl = 'https://trace-api.newrelic.com/trace/v1';
 }
 
-$zipkinToNewrelicExporter = new ZipkinToNewrelicExporter(
-    'alwaysOnZipkinToNewrelicExample',
+$newrelicExporter = new NewrelicExporter(
+    'alwaysOnNewrelicExample',
     $endpointUrl,
     $licenseKey,
     new Client(),
@@ -59,8 +59,8 @@ $zipkinToNewrelicExporter = new ZipkinToNewrelicExporter(
 );
 
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
-    echo 'Starting AlwaysOnZipkinToNewRelicExample';
-    $tracer = (new TracerProvider(new SimpleSpanProcessor($zipkinToNewrelicExporter)))
+    echo 'Starting AlwaysOnNewrelicExample';
+    $tracer = (new TracerProvider(new SimpleSpanProcessor($newrelicExporter)))
         ->getTracer('io.opentelemetry.contrib.php');
 
     for ($i = 0; $i < 5; $i++) {
@@ -87,9 +87,9 @@ if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {
 
         $span->end();
     }
-    echo PHP_EOL . 'AlwaysOnZipkinToNewrelicExample complete!  See the results at https://one.newrelic.com/launcher/distributed-tracing.launcher?pane=eyJuZXJkbGV0SWQiOiJkaXN0cmlidXRlZC10cmFjaW5nLmhvbWUiLCJzb3J0SW5kZXgiOjAsInNvcnREaXJlY3Rpb24iOiJERVNDIiwicXVlcnkiOnsib3BlcmF0b3IiOiJBTkQiLCJpbmRleFF1ZXJ5Ijp7ImNvbmRpdGlvblR5cGUiOiJJTkRFWCIsIm9wZXJhdG9yIjoiQU5EIiwiY29uZGl0aW9uU2V0cyI6W119LCJzcGFuUXVlcnkiOnsib3BlcmF0b3IiOiJBTkQiLCJjb25kaXRpb25TZXRzIjpbeyJjb25kaXRpb25UeXBlIjoiU1BBTiIsIm9wZXJhdG9yIjoiQU5EIiwiY29uZGl0aW9ucyI6W3siYXR0ciI6InNlcnZpY2UubmFtZSIsIm9wZXJhdG9yIjoiRVEiLCJ2YWx1ZSI6ImFsd2F5c09uWmlwa2luVG9OZXdyZWxpY0V4YW1wbGUifV19XX19fQ==&platform[timeRange][duration]=1800000&platform[$isFallbackTimeRange]=true';
+    echo PHP_EOL . 'NewrelicExample complete!  See the results at https://one.newrelic.com/launcher/distributed-tracing.launcher?pane=eyJuZXJkbGV0SWQiOiJkaXN0cmlidXRlZC10cmFjaW5nLmhvbWUiLCJzb3J0SW5kZXgiOjAsInNvcnREaXJlY3Rpb24iOiJERVNDIiwicXVlcnkiOnsib3BlcmF0b3IiOiJBTkQiLCJpbmRleFF1ZXJ5Ijp7ImNvbmRpdGlvblR5cGUiOiJJTkRFWCIsIm9wZXJhdG9yIjoiQU5EIiwiY29uZGl0aW9uU2V0cyI6W119LCJzcGFuUXVlcnkiOnsib3BlcmF0b3IiOiJBTkQiLCJjb25kaXRpb25TZXRzIjpbeyJjb25kaXRpb25UeXBlIjoiU1BBTiIsIm9wZXJhdG9yIjoiQU5EIiwiY29uZGl0aW9ucyI6W3siYXR0ciI6InNlcnZpY2UubmFtZSIsIm9wZXJhdG9yIjoiRVEiLCJ2YWx1ZSI6ImFsd2F5c09uTmV3cmVsaWNFeGFtcGxlIn1dfV19fX0=&platform[timeRange][duration]=1800000&platform[$isFallbackTimeRange]=true';
 } else {
-    echo PHP_EOL . 'AlwaysOnZipkinToNewrelicExample tracing is not enabled';
+    echo PHP_EOL . 'NewrelicExample tracing is not enabled';
 }
 
 echo PHP_EOL;
