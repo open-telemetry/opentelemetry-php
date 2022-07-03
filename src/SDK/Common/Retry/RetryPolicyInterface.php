@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Retry;
 
+use OpenTelemetry\SDK\Common\Time\SchedulerInterface;
 use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
 
 /**
@@ -61,6 +62,11 @@ use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
  *      \Grpc\STATUS_UNAUTHENTICATED,
  *      ]);
  *
+ *    User can also provide the delay scheduler with following api:
+ *    $this->setDelayScheduler(new NonBlockingScheduler());
+ *    This api will define whether delay function is blocking or non blocking
+ *    NonBlockingScheduler will be more useful when fiber is implemented.
+ *    By Default scheduler is of type BlockingScheduler.
  */
 interface RetryPolicyInterface
 {
@@ -118,4 +124,8 @@ interface RetryPolicyInterface
     public function setRetryableStatusCodes(array $statusCodes);
 
     public function getRetryableStatusCodes(): array;
+
+    public function setDelayScheduler(SchedulerInterface $scheduler);
+
+    public function getDelayScheduler(): SchedulerInterface;
 }

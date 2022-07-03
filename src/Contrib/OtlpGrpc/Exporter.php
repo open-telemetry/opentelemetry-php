@@ -13,6 +13,7 @@ use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Retry\ExponentialWithJitterRetryPolicy;
+use OpenTelemetry\SDK\Common\Time\NonBlockingScheduler;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -71,6 +72,8 @@ class Exporter implements SpanExporterInterface
 
         $this->setSpanConverter(new SpanConverter());
         $this->setRetryPolicy(ExponentialWithJitterRetryPolicy::getDefault());
+        // @phan-suppress-next-line PhanAccessMethodInternal
+        $this->setDelayScheduler(new NonBlockingScheduler());
         $this->setRetryableStatusCodes([
             \Grpc\STATUS_CANCELLED,
             \Grpc\STATUS_DEADLINE_EXCEEDED,

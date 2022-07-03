@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Retry;
 
 use InvalidArgumentException;
+use OpenTelemetry\SDK\Common\Time\BlockingScheduler;
+use OpenTelemetry\SDK\Common\Time\SchedulerInterface;
 use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -16,6 +18,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
     private $backoffMultiplier;
     private $jitter;
     public $retryableStatusCodes;
+    public $scheduler;
 
     private function __construct(
         int $maxAttempts = self::DEFAULT_MAX_ATTEMPTS,
@@ -31,6 +34,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         $this->setBackoffMultipler($backoffMultiplier);
         $this->setJitter($jitter);
         $this->retryableStatusCodes = $retryableStatusCodes;
+        $this->scheduler = new BlockingScheduler();
     }
 
     public function shouldRetry(
@@ -52,7 +56,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         if ($attempt == 0) {
             return 0;
         }
-        // Initial exponential backoff in milli seconds
+        // Initial exponential backoff in mili seconds
         $delay = ($this->backoffMultiplier ** $attempt) * $this->initialBackoff * 1000;
         // Adding jitter to exponential backoff
         if ($this->jitter > 0) {
@@ -173,6 +177,16 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
     public function getRetryableStatusCodes(): array
     {
         return $this->retryableStatusCodes;
+    }
+
+    public function setDelayScheduler(SchedulerInterface $scheduler)
+    {
+        $this->scheduler = $scheduler;
+    }
+
+    public function getDelayScheduler(): SchedulerInterface
+    {
+        return $this->scheduler;
     }
 
     public function checkArgument(bool $argument_condition, string $message)

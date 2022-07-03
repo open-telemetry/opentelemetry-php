@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace\Behavior;
 
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Retry\RetryPolicyInterface;
+use OpenTelemetry\SDK\Common\Time\SchedulerInterface;
 use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -57,6 +58,7 @@ trait SpanExporterTrait
 
         // If retryPolicy is not set then just doExport once and return the status
         if ($this->retryPolicy === null) {
+            self::logInfo('retry polict is null. Exporting the spans without retry' . PHP_EOL);
             return $this->doExport($spans); /** @phpstan-ignore-line */
         }
 
@@ -64,8 +66,8 @@ trait SpanExporterTrait
             // find the delay time before retry (it is 0 for the first attempt)
             $delay = $this->retryPolicy->getDelay($attempt);
             if ($attempt > 0) {
-                self::logDebug('Waiting for ' . $delay . ' seconds before retrying export');
-                usleep($delay * 1000);
+                self::logDebug('Waiting for ' . $delay . ' mili seconds before retrying export');
+                $this->retryPolicy->getDelayScheduler()->delay($delay);
                 self::logDebug('Retrying span export for ' . $attempt . ' time');
             }
             $attempt++;
@@ -112,6 +114,7 @@ trait SpanExporterTrait
     {
         return $this->retryPolicy;
     }
+
     /**
      * Set the retryable status code. All the status codes apart from
      * this list will not be retried
@@ -121,6 +124,17 @@ trait SpanExporterTrait
     {
         if ($this->retryPolicy) {
             $this->retryPolicy->setRetryableStatusCodes($statusCode);
+        }
+    }
+
+    /**
+     * Set the delay scheduler which will decide whether
+     * @param SchedulerInterface $scheduler: schedular object which implements delay method
+     */
+    public function setDelayScheduler(SchedulerInterface $scheduler)
+    {
+        if ($this->retryPolicy) {
+            $this->retryPolicy->setDelayScheduler($scheduler);
         }
     }
 
