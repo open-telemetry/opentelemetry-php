@@ -59,6 +59,7 @@ trait SpanExporterTrait
         // If retryPolicy is not set then just doExport once and return the status
         if ($this->retryPolicy === null) {
             self::logInfo('retry polict is null. Exporting the spans without retry' . PHP_EOL);
+
             return $this->doExport($spans); /** @phpstan-ignore-line */
         }
 
