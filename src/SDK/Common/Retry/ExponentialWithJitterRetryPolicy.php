@@ -26,7 +26,8 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         int $maxBackoff = self::DEFAULT_MAX_BACKOFF,
         float $backoffMultiplier = self::DEFAULT_BACKOFF_MULTIPLIER,
         float $jitter = self::DEFAULT_JITTER,
-        array $retryableStatusCodes = null
+        array $retryableStatusCodes = null,
+        $scheduler = null
     ) {
         $this->setMaxAttempts($maxAttempts);
         $this->setInitialBackoff($initialBackoff);
@@ -34,7 +35,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         $this->setBackoffMultipler($backoffMultiplier);
         $this->setJitter($jitter);
         $this->retryableStatusCodes = $retryableStatusCodes;
-        $this->scheduler = new BlockingScheduler();
+        $this->scheduler = $scheduler != null ? $scheduler : new BlockingScheduler();
     }
 
     public function shouldRetry(
