@@ -3,14 +3,14 @@
   "type": "application",
   "homepage": "https://opentelemetry.io/docs/php",
   "license": "Apache-2.0",
-    "repositories": [
+  "repositories": [
     {
       "type": "vcs",
       "url": "git@github.com:open-telemetry/opentelemetry-php.git"
     }
   ],
   "require": {
-    "php": ">=7.4",
+    "php": ">=8.1",
     "open-telemetry/opentelemetry": "dev-main",
     "guzzlehttp/guzzle": "*",
     "php-http/guzzle7-adapter": "*",

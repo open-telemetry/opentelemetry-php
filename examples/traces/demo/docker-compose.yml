@@ -1,16 +1,17 @@
-x-otel-common: &otel-common
-  OTEL_LOG_LEVEL: warning
+x-otel-common:
+  &otel-common
+  OTEL_LOG_LEVEL: warning # The library does not respect this environment variable as of this writing
   OTEL_TRACES_SAMPLER: parentbased_always_on
   OTEL_TRACES_EXPORTER: otlp
   OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: grpc
-  OTEL_EXPORTER_OTLP_ENDPOINT: collector:4317
+  OTEL_EXPORTER_OTLP_ENDPOINT: localhost:4317
   OTEL_PHP_TRACES_PROCESSOR: simple
 
 version: '3.7'
 services:
   service-one:
-    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:latest
-    command: ['php', '-S', '0.0.0.0:8000']
+    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:8.1
+    command: [ 'php', '-S', '0.0.0.0:8000' ]
     volumes:
       - './src:/usr/src/myapp'
     ports:
@@ -21,8 +22,8 @@ services:
       OTEL_RESOURCE_ATTRIBUTES: 'service.version=0.1'
 
   service-two:
-    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:latest
-    command: ['php', '-S', '0.0.0.0:8000']
+    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:8.1
+    command: [ 'php', '-S', '0.0.0.0:8000' ]
     volumes:
       - './src:/usr/src/myapp'
     environment:
@@ -31,8 +32,8 @@ services:
       OTEL_RESOURCE_ATTRIBUTES: 'service.version=0.2'
 
   service-three:
-    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:latest
-    command: ['php', '-S', '0.0.0.0:8000']
+    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:8.1
+    command: [ 'php', '-S', '0.0.0.0:8000' ]
     volumes:
       - './src:/usr/src/myapp'
     environment:
@@ -43,6 +44,8 @@ services:
     image: otel/opentelemetry-collector-contrib:0.39.0
     volumes:
       - './collector:/etc/otel'
+    ports:
+      - '4317:4317'
 
   zipkin:
     image: openzipkin/zipkin-slim
