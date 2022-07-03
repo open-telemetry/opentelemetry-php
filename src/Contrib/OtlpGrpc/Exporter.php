@@ -71,7 +71,6 @@ class Exporter implements SpanExporterInterface
 
         $this->setSpanConverter(new SpanConverter());
         $this->setRetryPolicy(ExponentialWithJitterRetryPolicy::getDefault());
-        
         $this->setRetryableStatusCodes([
             \Grpc\STATUS_CANCELLED,
             \Grpc\STATUS_DEADLINE_EXCEEDED,
