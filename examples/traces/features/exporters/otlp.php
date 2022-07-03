@@ -1,15 +1,22 @@
 <?php
 
 declare(strict_types=1);
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../../../vendor/autoload.php';
 
-use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPGrpcExporter;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
+use OpenTelemetry\Contrib\OtlpHttp\Exporter as OTLPExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
-$exporter = new OTLPGrpcExporter('collector:4317');
+putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318/v1/traces');
+$exporter = new OTLPExporter(
+    new Client(),
+    new HttpFactory(),
+    new HttpFactory()
+);
 
-echo 'Starting OTLP GRPC Example';
+echo 'Starting OTLP example';
 
 $tracerProvider =  new TracerProvider(
     new SimpleSpanProcessor(
@@ -39,6 +46,6 @@ for ($i = 0; $i < 3; $i++) {
     $span->end();
 }
 $root->end();
-echo PHP_EOL . 'OTLP GRPC Example complete!  ';
+echo PHP_EOL . 'OTLP example complete!  ';
 
 echo PHP_EOL;

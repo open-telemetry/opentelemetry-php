@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
 
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
@@ -27,7 +27,7 @@ $rootSpan = $tracer->spanBuilder('root')->startSpan();
 $scope = $rootSpan->activate();
 
 //3 spans should be sent at 3 seconds
-for ($i=1;$i<=4;$i++) {
+for ($i = 1; $i <= 4; $i++) {
     $span = $tracer->spanBuilder('span-' . $i)->startSpan();
     sleep(1);
     $span->end();

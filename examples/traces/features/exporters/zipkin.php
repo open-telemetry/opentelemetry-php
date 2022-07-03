@@ -1,29 +1,29 @@
 <?php
 
 declare(strict_types=1);
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../../../vendor/autoload.php';
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
-use OpenTelemetry\Contrib\OtlpHttp\Exporter as OTLPExporter;
+use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
-putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318/v1/traces');
-$exporter = new OTLPExporter(
+$zipkinExporter = new ZipkinExporter(
+    'alwaysOnZipkinExample',
+    'http://zipkin:9411/api/v2/spans',
     new Client(),
     new HttpFactory(),
     new HttpFactory()
 );
-
-echo 'Starting OTLPExample';
-
 $tracerProvider =  new TracerProvider(
     new SimpleSpanProcessor(
-        $exporter
+        $zipkinExporter
     )
 );
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
+
+echo 'Starting Zipkin example';
 
 $root = $span = $tracer->spanBuilder('root')->startSpan();
 $span->activate();
@@ -46,6 +46,6 @@ for ($i = 0; $i < 3; $i++) {
     $span->end();
 }
 $root->end();
-echo PHP_EOL . 'OTLPExample complete!  ';
+echo PHP_EOL . 'Zipkin example complete!  See the results at http://localhost:9411/';
 
 echo PHP_EOL;
