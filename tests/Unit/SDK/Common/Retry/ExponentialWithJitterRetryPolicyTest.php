@@ -6,8 +6,8 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Retry;
 
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OtlpExporter;
 use OpenTelemetry\SDK\Common\Retry\ExponentialWithJitterRetryPolicy;
+use OpenTelemetry\SDK\Common\Time\BlockingScheduler;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -54,17 +54,19 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
             $this->exporter->getRetryPolicy()->getJitter(),
             ExponentialWithJitterRetryPolicy::DEFAULT_JITTER
         );
+        $this->assertInstanceOf(
+            BlockingScheduler::class,
+            $this->exporter->getRetryPolicy()->getDelayScheduler()
+        );
     }
 
     public function test_delay_is_less_or_equal_to_max_backoff()
     {
-        // $exporter = $this->createMock(OtlpExporter::class);
         $this->exporter->setRetryPolicy(ExponentialWithJitterRetryPolicy::getDefault());
         $retryPolicy = $this->exporter->getRetryPolicy();
         $maxAttempts = $retryPolicy->getMaxAttempts();
         for ($i=0; $i < $maxAttempts; $i++) {
             $delay = floor($retryPolicy->getDelay($i)/1000);
-            echo 'delay: ' . (string) $delay . PHP_EOL;
             $this->assertLessThanOrEqual($retryPolicy->getMaxBackoff(), $delay);
         }
     }
