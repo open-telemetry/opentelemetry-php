@@ -8,5 +8,9 @@ use OpenTelemetry\Context\Context;
 
 interface MetricWriter
 {
-    public function record(float|int $value, iterable $attributes, Context|false|null $context, int $timestamp): void;
+    /**
+     * @param float|int $value
+     * @param Context|false|null $context
+     */
+    public function record($value, iterable $attributes, $context, int $timestamp): void;
 }

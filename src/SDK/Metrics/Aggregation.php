@@ -19,31 +19,33 @@ interface Aggregation
     /**
      * @return T
      */
-    public function initialize(): mixed;
+    public function initialize();
 
     /**
      * @param T $summary
+     * @param float|int $value
      */
-    public function record(mixed $summary, float|int $value, Attributes $attributes, Context $context, int $timestamp): void;
+    public function record($summary, $value, Attributes $attributes, Context $context, int $timestamp): void;
 
     /**
      * @param T $left
      * @param T $right
      * @return T
      */
-    public function merge(mixed $left, mixed $right): mixed;
+    public function merge($left, $right);
 
     /**
      * @param T $left
      * @param T $right
      * @return T
      */
-    public function diff(mixed $left, mixed $right): mixed;
+    public function diff($left, $right);
 
     /**
      * @param array<Attributes> $attributes
      * @param array<T> $summaries
      * @param array<list<Exemplar>> $exemplars
+     * @param string|Temporality $temporality
      */
     public function toData(
         array $attributes,
@@ -51,6 +53,6 @@ interface Aggregation
         array $exemplars,
         ?int $startTimestamp,
         int $timestamp,
-        Temporality $temporality,
+        $temporality
     ): Data;
 }

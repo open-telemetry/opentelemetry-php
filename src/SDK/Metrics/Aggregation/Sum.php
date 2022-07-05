@@ -8,7 +8,6 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Metrics\Aggregation;
 use OpenTelemetry\SDK\Metrics\Data;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
 
 /**
  * @implements Aggregation<SumSummary>
@@ -30,7 +29,7 @@ final class Sum implements Aggregation
     /**
      * @param SumSummary $summary
      */
-    public function record(mixed $summary, float|int $value, Attributes $attributes, Context $context, int $timestamp): void
+    public function record($summary, $value, Attributes $attributes, Context $context, int $timestamp): void
     {
         $summary->value += $value;
     }
@@ -39,7 +38,7 @@ final class Sum implements Aggregation
      * @param SumSummary $left
      * @param SumSummary $right
      */
-    public function merge(mixed $left, mixed $right): SumSummary
+    public function merge($left, $right): SumSummary
     {
         $sum = $left->value + $right->value;
 
@@ -52,7 +51,7 @@ final class Sum implements Aggregation
      * @param SumSummary $left
      * @param SumSummary $right
      */
-    public function diff(mixed $left, mixed $right): SumSummary
+    public function diff($left, $right): SumSummary
     {
         $sum = -$left->value + $right->value;
 
@@ -70,7 +69,7 @@ final class Sum implements Aggregation
         array $exemplars,
         ?int $startTimestamp,
         int $timestamp,
-        Temporality $temporality,
+        $temporality
     ): Data\Sum {
         $dataPoints = [];
         foreach ($attributes as $key => $dataPointAttributes) {

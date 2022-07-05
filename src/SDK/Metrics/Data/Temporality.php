@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Data;
 
-enum Temporality {
-
-    case Delta;
-    case Cumulative;
+final class Temporality
+{
+    public const DELTA = 'Delta';
+    public const CUMULATIVE = 'Cumulative';
 }

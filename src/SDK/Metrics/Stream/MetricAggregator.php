@@ -27,16 +27,21 @@ final class MetricAggregator implements WritableMetricStream
     public function __construct(
         ?AttributeProcessor $attributeProcessor,
         Aggregation $aggregation,
-        ?ExemplarReservoir $exemplarReservoir,
+        ?ExemplarReservoir $exemplarReservoir
     ) {
         $this->attributeProcessor = $attributeProcessor;
         $this->aggregation = $aggregation;
         $this->exemplarReservoir = $exemplarReservoir;
     }
 
-    public function record(float|int $value, Attributes $attributes, Context $context, int $timestamp): void
+    /**
+     * @param float|int $value
+     */
+    public function record($value, Attributes $attributes, Context $context, int $timestamp): void
     {
-        $filteredAttributes = $this->attributeProcessor?->process($attributes, $context) ?? $attributes;
+        $filteredAttributes = $this->attributeProcessor
+            ? $this->attributeProcessor->process($attributes, $context)
+            : $attributes;
         $raw = $filteredAttributes->toArray();
         $index = $raw ? serialize($raw) : 0;
         $this->attributes[$index] = $filteredAttributes;
@@ -48,7 +53,9 @@ final class MetricAggregator implements WritableMetricStream
             $timestamp,
         );
 
-        $this->exemplarReservoir?->offer($index, $value, $attributes, $context, $timestamp, $this->revision);
+        if ($this->exemplarReservoir) {
+            $this->exemplarReservoir->offer($index, $value, $attributes, $context, $timestamp, $this->revision);
+        }
     }
 
     public function collect(int $timestamp): Metric

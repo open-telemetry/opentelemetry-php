@@ -16,16 +16,38 @@ final class ViewTemplate
 {
 
     /**
-     * @param Closure(InstrumentType): Aggregation $aggregation
-     * @param Closure(Aggregation, InstrumentType): ?ExemplarReservoir $exemplarReservoir
+     * @readonly
      */
-    public function __construct(
-        public readonly ?string $name,
-        public readonly ?string $description,
-        public readonly ?AttributeProcessor $attributeProcessor,
-        public readonly Closure $aggregation,
-        public readonly Closure $exemplarReservoir,
-    ) {
+    public ?string $name;
+    /**
+     * @readonly
+     */
+    public ?string $description;
+    /**
+     * @readonly
+     */
+    public ?AttributeProcessor $attributeProcessor;
+    /**
+     * @var Closure(string|InstrumentType):Aggregation
+     * @readonly
+     */
+    public Closure $aggregation;
+    /**
+     * @var Closure(Aggregation, string|InstrumentType):?ExemplarReservoir
+     * @readonly
+     */
+    public Closure $exemplarReservoir;
+    /**
+     * @param Closure(string|InstrumentType): Aggregation $aggregation
+     * @param Closure(Aggregation, string|InstrumentType): ?ExemplarReservoir $exemplarReservoir
+     */
+    public function __construct(?string $name, ?string $description, ?AttributeProcessor $attributeProcessor, Closure $aggregation, Closure $exemplarReservoir)
+    {
+        $this->name = $name;
+        $this->description = $description;
+        $this->attributeProcessor = $attributeProcessor;
+        $this->aggregation = $aggregation;
+        $this->exemplarReservoir = $exemplarReservoir;
     }
 
     public function project(Instrument $instrument): ViewProjection

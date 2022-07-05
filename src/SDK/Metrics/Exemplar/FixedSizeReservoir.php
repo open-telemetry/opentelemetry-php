@@ -22,7 +22,7 @@ final class FixedSizeReservoir implements ExemplarReservoir
         $this->measurements = 0;
     }
 
-    public function offer(int|string $index, float|int $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void
+    public function offer($index, $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void
     {
         $bucket = random_int(0, $this->measurements);
         $this->measurements++;

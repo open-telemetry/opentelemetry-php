@@ -18,7 +18,7 @@ final class FilteredReservoir implements ExemplarReservoir
         $this->filter = $filter;
     }
 
-    public function offer(int|string $index, float|int $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void
+    public function offer($index, $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void
     {
         if ($this->filter->accepts($value, $attributes, $context, $timestamp)) {
             $this->reservoir->offer($index, $value, $attributes, $context, $timestamp, $revision);

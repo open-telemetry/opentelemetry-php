@@ -37,14 +37,17 @@ final class SdkMeterProvider implements MeterProvider
 
     private bool $closed = false;
 
+    /**
+     * @param MetricSourceRegistry&MetricReader $metricReader
+     */
     public function __construct(
         ?ContextStorage $contextStorage,
         Resource $resource,
         Clock $clock,
         InstrumentationScopeFactory $instrumentationScopeFactory,
-        MetricReader&MetricSourceRegistry $metricReader,
+        $metricReader,
         AttributesFactory $metricAttributes,
-        StalenessHandlerFactory $stalenessHandlerFactory,
+        StalenessHandlerFactory $stalenessHandlerFactory
     ) {
         $this->metricAttributes = $metricAttributes;
         $this->clock = $clock;
@@ -60,8 +63,8 @@ final class SdkMeterProvider implements MeterProvider
                     null,
                     null,
                     null,
-                    self::defaultAggregation(...),
-                    self::defaultExemplarReservoir(...),
+                    self::defaultAggregation(),
+                    self::defaultExemplarReservoir(),
                 ),
             ]),
             $metricReader,
@@ -74,7 +77,7 @@ final class SdkMeterProvider implements MeterProvider
         string $name,
         ?string $version = null,
         ?string $schemaUrl = null,
-        iterable $attributes = [],
+        iterable $attributes = []
     ): Meter {
         if ($this->closed) {
             return new NoopMeter();
@@ -93,7 +96,7 @@ final class SdkMeterProvider implements MeterProvider
         ?string $description = null,
         ?array $attributeKeys = null,
         ?Closure $aggregation = null,
-        ?Closure $exemplarReservoir = null,
+        ?Closure $exemplarReservoir = null
     ): void {
         $this->criteriaViewRegistry->register($criteria, new ViewTemplate(
             $name,
@@ -104,8 +107,8 @@ final class SdkMeterProvider implements MeterProvider
                     static fn (string $key): bool => in_array($key, $attributeKeys, true),
                 )
                 : null,
-            $aggregation ?? self::defaultAggregation(...),
-            $exemplarReservoir ?? self::defaultExemplarReservoir(...),
+            $aggregation ?? self::defaultAggregation(),
+            $exemplarReservoir ?? self::defaultExemplarReservoir(),
         ));
     }
 
@@ -129,28 +132,40 @@ final class SdkMeterProvider implements MeterProvider
         return $this->metricReader->forceFlush();
     }
 
-    private static function defaultAggregation(InstrumentType $type): Aggregation
+    /**
+     * @return Closure(string|InstrumentType): Aggregation
+     */
+    private static function defaultAggregation(): Closure
     {
-        return match ($type) {
-            InstrumentType::Counter,
-            InstrumentType::AsynchronousCounter,
-                => new Aggregation\Sum(true),
-            InstrumentType::UpDownCounter,
-            InstrumentType::AsynchronousUpDownCounter,
-                => new Aggregation\Sum(),
-            InstrumentType::Histogram,
-                => new Aggregation\ExplicitBucketHistogram([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]),
-            InstrumentType::AsynchronousGauge,
-                => new Aggregation\LastValue(),
+        return static function ($type): Aggregation {
+            switch ($type) {
+                case InstrumentType::COUNTER:
+                case InstrumentType::ASYNCHRONOUS_COUNTER:
+                    return new Aggregation\Sum(true);
+                case InstrumentType::UP_DOWN_COUNTER:
+                case InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER:
+                    return new Aggregation\Sum();
+                case InstrumentType::HISTOGRAM:
+                    return new Aggregation\ExplicitBucketHistogram([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
+                case InstrumentType::ASYNCHRONOUS_GAUGE:
+                    return new Aggregation\LastValue();
+            }
+
+            throw new \LogicException();
         };
     }
 
-    private static function defaultExemplarReservoir(Aggregation $aggregation): ExemplarReservoir
+    /**
+     * @return Closure(Aggregation, string|InstrumentType): ?ExemplarReservoir
+     */
+    private static function defaultExemplarReservoir(): Closure
     {
-        $reservoir = $aggregation instanceof Aggregation\ExplicitBucketHistogram && $aggregation->boundaries
-            ? new HistogramBucketReservoir(Attributes::factory(), $aggregation->boundaries)
-            : new FixedSizeReservoir(Attributes::factory(), 5);
+        return static function (Aggregation $aggregation): ExemplarReservoir {
+            $reservoir = $aggregation instanceof Aggregation\ExplicitBucketHistogram && $aggregation->boundaries
+                ? new HistogramBucketReservoir(Attributes::factory(), $aggregation->boundaries)
+                : new FixedSizeReservoir(Attributes::factory(), 5);
 
-        return new FilteredReservoir($reservoir, new ExemplarFilter\WithSampledTrace());
+            return new FilteredReservoir($reservoir, new ExemplarFilter\WithSampledTrace());
+        };
     }
 }

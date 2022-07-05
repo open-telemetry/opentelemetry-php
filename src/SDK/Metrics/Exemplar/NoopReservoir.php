@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Attributes;
 
 final class NoopReservoir implements ExemplarReservoir
 {
-    public function offer(int|string $index, float|int $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void
+    public function offer($index, $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void
     {
         // no-op
     }

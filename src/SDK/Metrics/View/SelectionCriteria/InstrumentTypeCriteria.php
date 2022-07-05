@@ -15,9 +15,9 @@ final class InstrumentTypeCriteria implements SelectionCriteria
     private array $instrumentTypes;
 
     /**
-     * @param InstrumentType|InstrumentType[] $instrumentType
+     * @param string|InstrumentType|string[]|InstrumentType[] $instrumentType
      */
-    public function __construct(InstrumentType|array $instrumentType)
+    public function __construct($instrumentType)
     {
         $this->instrumentTypes = (array) $instrumentType;
     }

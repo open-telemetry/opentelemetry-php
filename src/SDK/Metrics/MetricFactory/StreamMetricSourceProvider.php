@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricFactory;
 
 use OpenTelemetry\SDK\InstrumentationScope;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Instrument;
-use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MetricMetadata;
 use OpenTelemetry\SDK\Metrics\MetricSource;
 use OpenTelemetry\SDK\Metrics\MetricSourceProvider;
@@ -17,21 +15,41 @@ use OpenTelemetry\SDK\Resource;
 
 final class StreamMetricSourceProvider implements MetricSourceProvider, MetricMetadata
 {
-    public function __construct(
-        public readonly ViewProjection $view,
-        public readonly Instrument $instrument,
-        public readonly InstrumentationScope $instrumentationLibrary,
-        public readonly Resource $resource,
-        public readonly MetricStream $stream,
-    ) {
+    /**
+     * @readonly
+     */
+    public ViewProjection $view;
+    /**
+     * @readonly
+     */
+    public Instrument $instrument;
+    /**
+     * @readonly
+     */
+    public InstrumentationScope $instrumentationLibrary;
+    /**
+     * @readonly
+     */
+    public Resource $resource;
+    /**
+     * @readonly
+     */
+    public MetricStream $stream;
+    public function __construct(ViewProjection $view, Instrument $instrument, InstrumentationScope $instrumentationLibrary, Resource $resource, MetricStream $stream)
+    {
+        $this->view = $view;
+        $this->instrument = $instrument;
+        $this->instrumentationLibrary = $instrumentationLibrary;
+        $this->resource = $resource;
+        $this->stream = $stream;
     }
 
-    public function create(Temporality $temporality): MetricSource
+    public function create($temporality): MetricSource
     {
         return new StreamMetricSource($this, $this->stream->register($temporality));
     }
 
-    public function instrumentType(): InstrumentType
+    public function instrumentType()
     {
         return $this->instrument->type;
     }
@@ -51,7 +69,7 @@ final class StreamMetricSourceProvider implements MetricSourceProvider, MetricMe
         return $this->view->description;
     }
 
-    public function temporality(): Temporality
+    public function temporality()
     {
         return $this->stream->temporality();
     }

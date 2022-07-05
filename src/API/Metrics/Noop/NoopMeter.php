@@ -12,9 +12,6 @@ use OpenTelemetry\API\Metrics\ObservableGauge;
 use OpenTelemetry\API\Metrics\ObservableUpDownCounter;
 use OpenTelemetry\API\Metrics\UpDownCounter;
 
-/**
- * @internal
- */
 final class NoopMeter implements Meter
 {
     public function createCounter(string $name, ?string $unit = null, ?string $description = null): Counter

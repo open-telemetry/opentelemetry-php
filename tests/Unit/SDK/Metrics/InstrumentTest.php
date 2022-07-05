@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics\Observer;
@@ -21,15 +24,17 @@ use OpenTelemetry\SDK\Metrics\Stream\StreamWriter;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use PHPUnit\Framework\TestCase;
 
-final class InstrumentTest extends TestCase {
+final class InstrumentTest extends TestCase
+{
 
     /**
      * @covers \OpenTelemetry\SDK\Metrics\SdkCounter
      */
-    public function testCounter(): void {
+    public function test_counter(): void
+    {
         $s = new SynchronousMetricStream(null, new Aggregation\Sum(true), null, 0);
         $c = new SdkCounter(new StreamWriter(null, Attributes::factory(), $s->writable()), new NoopStalenessHandler(), ClockFactory::getDefault());
-        $r = $s->register(Temporality::Delta);
+        $r = $s->register(Temporality::DELTA);
 
         $c->add(5);
         $c->add(7);
@@ -44,7 +49,7 @@ final class InstrumentTest extends TestCase {
                     1,
                 ),
             ],
-            Temporality::Delta,
+            Temporality::DELTA,
             true,
         ), $s->collect($r, 1));
     }
@@ -52,13 +57,14 @@ final class InstrumentTest extends TestCase {
     /**
      * @covers \OpenTelemetry\SDK\Metrics\SdkObservableCounter
      */
-    public function testAsynchronousCounter(): void {
+    public function test_asynchronous_counter(): void
+    {
         $o = new MultiObserver(new NoopStalenessHandler());
         $s = new AsynchronousMetricStream(Attributes::factory(), null, new Aggregation\Sum(true), null, $o, 0);
         $c = new SdkObservableCounter($o, new NoopStalenessHandler());
-        $r = $s->register(Temporality::Cumulative);
+        $r = $s->register(Temporality::CUMULATIVE);
 
-        $c->observe(static function(Observer $observer): void {
+        $c->observe(static function (Observer $observer): void {
             $observer->observe(5);
         });
 
@@ -71,7 +77,7 @@ final class InstrumentTest extends TestCase {
                     1,
                 ),
             ],
-            Temporality::Cumulative,
+            Temporality::CUMULATIVE,
             true,
         ), $s->collect($r, 1));
     }
@@ -79,10 +85,11 @@ final class InstrumentTest extends TestCase {
     /**
      * @covers \OpenTelemetry\SDK\Metrics\SdkUpDownCounter
      */
-    public function testUpDownCounter(): void {
+    public function test_up_down_counter(): void
+    {
         $s = new SynchronousMetricStream(null, new Aggregation\Sum(false), null, 0);
         $c = new SdkUpDownCounter(new StreamWriter(null, Attributes::factory(), $s->writable()), new NoopStalenessHandler(), ClockFactory::getDefault());
-        $r = $s->register(Temporality::Delta);
+        $r = $s->register(Temporality::DELTA);
 
         $c->add(5);
         $c->add(7);
@@ -97,7 +104,7 @@ final class InstrumentTest extends TestCase {
                     1,
                 ),
             ],
-            Temporality::Delta,
+            Temporality::DELTA,
             false,
         ), $s->collect($r, 1));
     }
@@ -105,10 +112,11 @@ final class InstrumentTest extends TestCase {
     /**
      * @covers \OpenTelemetry\SDK\Metrics\SdkHistogram
      */
-    public function testHistogram(): void {
+    public function test_histogram(): void
+    {
         $s = new SynchronousMetricStream(null, new Aggregation\ExplicitBucketHistogram([3, 6, 9]), null, 0);
         $h = new SdkHistogram(new StreamWriter(null, Attributes::factory(), $s->writable()), new NoopStalenessHandler(), ClockFactory::getDefault());
-        $r = $s->register(Temporality::Delta);
+        $r = $s->register(Temporality::DELTA);
 
         $h->record(1);
         $h->record(7);
@@ -132,7 +140,7 @@ final class InstrumentTest extends TestCase {
                     1,
                 ),
             ],
-            Temporality::Delta,
+            Temporality::DELTA,
         ), $s->collect($r, 1));
     }
 }

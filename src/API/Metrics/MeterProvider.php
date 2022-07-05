@@ -23,6 +23,6 @@ interface MeterProvider
         string $name,
         ?string $version = null,
         ?string $schemaUrl = null,
-        iterable $attributes = [],
+        iterable $attributes = []
     ): Meter;
 }

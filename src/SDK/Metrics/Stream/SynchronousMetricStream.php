@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
+use function assert;
 use const E_USER_WARNING;
 use function extension_loaded;
 use GMP;
@@ -26,14 +27,22 @@ final class SynchronousMetricStream implements MetricStream
     private int $timestamp;
 
     private DeltaStorage $delta;
-    private int|GMP $readers = 0;
-    private int|GMP $cumulative = 0;
+    /**
+     * @psalm-suppress UndefinedDocblockClass
+     * @var int|GMP
+     */
+    private $readers = 0;
+    /**
+     * @psalm-suppress UndefinedDocblockClass
+     * @var int|GMP
+     */
+    private $cumulative = 0;
 
     public function __construct(
         ?AttributeProcessor $attributeProcessor,
         Aggregation $aggregation,
         ?ExemplarReservoir $exemplarReservoir,
-        int $startTimestamp,
+        int $startTimestamp
     ) {
         $this->metricAggregator = new MetricAggregator(
             $attributeProcessor,
@@ -50,9 +59,9 @@ final class SynchronousMetricStream implements MetricStream
         return $this->metricAggregator;
     }
 
-    public function temporality(): Temporality
+    public function temporality()
     {
-        return Temporality::Delta;
+        return Temporality::DELTA;
     }
 
     public function collectionTimestamp(): int
@@ -60,7 +69,7 @@ final class SynchronousMetricStream implements MetricStream
         return $this->timestamp;
     }
 
-    public function register(Temporality $temporality): int
+    public function register($temporality): int
     {
         $reader = 0;
         for ($r = $this->readers; ($r & 1) != 0; $r >>= 1, $reader++) {
@@ -71,6 +80,7 @@ final class SynchronousMetricStream implements MetricStream
                 trigger_error(sprintf('GMP extension required to register over %d readers', (PHP_INT_SIZE << 3) - 1), E_USER_WARNING);
                 $reader = PHP_INT_SIZE << 3;
             } else {
+                assert(is_int($this->cumulative));
                 $this->readers = gmp_init($this->readers);
                 $this->cumulative = gmp_init($this->cumulative);
             }
@@ -78,7 +88,7 @@ final class SynchronousMetricStream implements MetricStream
 
         $readerMask = ($this->readers & 1 | 1) << $reader;
         $this->readers ^= $readerMask;
-        if ($temporality === Temporality::Cumulative) {
+        if ($temporality === Temporality::CUMULATIVE) {
             $this->cumulative ^= $readerMask;
         }
 
@@ -114,8 +124,8 @@ final class SynchronousMetricStream implements MetricStream
         $metric = $this->delta->collect($reader, $cumulative) ?? new Metric([], [], $this->timestamp, -1);
 
         $temporality = $cumulative
-            ? Temporality::Cumulative
-            : Temporality::Delta;
+            ? Temporality::CUMULATIVE
+            : Temporality::DELTA;
 
         $data = $this->aggregation->toData(
             $metric->attributes,

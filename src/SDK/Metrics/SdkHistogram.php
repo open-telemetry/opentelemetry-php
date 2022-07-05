@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics\Histogram;
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Clock;
 
 final class SdkHistogram implements Histogram
@@ -28,7 +27,7 @@ final class SdkHistogram implements Histogram
         $this->referenceCounter->release();
     }
 
-    public function record(float|int $amount, iterable $attributes = [], Context|false|null $context = null): void
+    public function record($amount, iterable $attributes = [], $context = null): void
     {
         $this->writer->record($amount, $attributes, $context, $this->clock->nanotime());
     }

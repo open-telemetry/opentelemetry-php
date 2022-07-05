@@ -37,7 +37,7 @@ final class StreamFactory implements MetricFactory
         ViewRegistry $views,
         MetricSourceRegistry $metricSources,
         AttributesFactory $metricAttributes,
-        StalenessHandlerFactory $stalenessHandlerFactory,
+        StalenessHandlerFactory $stalenessHandlerFactory
     ) {
         $this->contextStorage = $contextStorage;
         $this->resource = $resource;
@@ -106,7 +106,7 @@ final class StreamFactory implements MetricFactory
         Instrument $instrument,
         InstrumentationScope $instrumentationScope,
         MetricStream $stream,
-        StalenessHandler $stalenessHandler,
+        StalenessHandler $stalenessHandler
     ): void {
         $provider = new StreamMetricSourceProvider(
             $view,
@@ -116,6 +116,6 @@ final class StreamFactory implements MetricFactory
             $stream,
         );
 
-        $this->metricSources->add($provider, $stalenessHandler);
+        $this->metricSources->add($provider, $provider, $stalenessHandler);
     }
 }

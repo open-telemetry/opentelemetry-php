@@ -8,7 +8,10 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 
 interface MetricMetadata
 {
-    public function instrumentType(): InstrumentType;
+    /**
+     * @return string|InstrumentType
+     */
+    public function instrumentType();
 
     public function name(): string;
 
@@ -16,5 +19,8 @@ interface MetricMetadata
 
     public function description(): ?string;
 
-    public function temporality(): Temporality;
+    /**
+     * @return string|Temporality
+     */
+    public function temporality();
 }

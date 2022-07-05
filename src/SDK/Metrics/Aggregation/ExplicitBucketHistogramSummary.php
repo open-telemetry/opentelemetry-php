@@ -6,12 +6,31 @@ namespace OpenTelemetry\SDK\Metrics\Aggregation;
 
 final class ExplicitBucketHistogramSummary
 {
-    public function __construct(
-        public int $count,
-        public float|int $sum,
-        public float|int $min,
-        public float|int $max,
-        public array $buckets,
-    ) {
+    public int $count;
+    /**
+     * @var float|int
+     */
+    public $sum;
+    /**
+     * @var float|int
+     */
+    public $min;
+    /**
+     * @var float|int
+     */
+    public $max;
+    public array $buckets;
+    /**
+     * @param float|int $sum
+     * @param float|int $min
+     * @param float|int $max
+     */
+    public function __construct(int $count, $sum, $min, $max, array $buckets)
+    {
+        $this->count = $count;
+        $this->sum = $sum;
+        $this->min = $min;
+        $this->max = $max;
+        $this->buckets = $buckets;
     }
 }

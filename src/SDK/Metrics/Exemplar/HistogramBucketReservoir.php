@@ -20,7 +20,7 @@ final class HistogramBucketReservoir implements ExemplarReservoir
         $this->boundaries = $boundaries;
     }
 
-    public function offer(int|string $index, float|int $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void
+    public function offer($index, $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void
     {
         for ($i = 0; $i < count($this->boundaries) && $this->boundaries[$i] < $value; $i++) {
         }

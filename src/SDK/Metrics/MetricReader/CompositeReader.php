@@ -24,14 +24,14 @@ final class CompositeReader implements MetricReader, MetricSourceRegistry
         $this->metricReaders = $metricReaders;
     }
 
-    public function add(MetricSourceProvider&MetricMetadata $provider, StalenessHandler $stalenessHandler): void
+    public function add(MetricSourceProvider $provider, MetricMetadata $metadata, StalenessHandler $stalenessHandler): void
     {
         if ($this->closed) {
             return;
         }
 
         foreach ($this->metricReaders as $metricReader) {
-            $metricReader->add($provider, $stalenessHandler);
+            $metricReader->add($provider, $metadata, $stalenessHandler);
         }
     }
 
@@ -43,7 +43,7 @@ final class CompositeReader implements MetricReader, MetricSourceRegistry
 
         $success = true;
         foreach ($this->metricReaders as $metricReader) {
-            $success &= $metricReader->collect();
+            $success &= +$metricReader->collect();
         }
 
         return (bool) $success;
@@ -59,7 +59,7 @@ final class CompositeReader implements MetricReader, MetricSourceRegistry
 
         $success = true;
         foreach ($this->metricReaders as $metricReader) {
-            $success &= $metricReader->shutdown();
+            $success &= +$metricReader->shutdown();
         }
 
         return (bool) $success;
@@ -73,7 +73,7 @@ final class CompositeReader implements MetricReader, MetricSourceRegistry
 
         $success = true;
         foreach ($this->metricReaders as $metricReader) {
-            $success &= $metricReader->forceFlush();
+            $success &= +$metricReader->forceFlush();
         }
 
         return (bool) $success;

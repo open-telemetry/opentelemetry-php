@@ -9,7 +9,10 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 
 interface MetricExporter
 {
-    public function temporality(MetricMetadata $metric): ?Temporality;
+    /**
+     * @return string|Temporality|null
+     */
+    public function temporality(MetricMetadata $metric);
 
     /**
      * @param iterable<Metric> $batch

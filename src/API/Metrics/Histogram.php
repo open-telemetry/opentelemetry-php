@@ -17,5 +17,5 @@ interface Histogram
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#record
      */
-    public function record(float|int $amount, iterable $attributes = [], Context|false|null $context = null): void;
+    public function record($amount, iterable $attributes = [], $context = null): void;
 }

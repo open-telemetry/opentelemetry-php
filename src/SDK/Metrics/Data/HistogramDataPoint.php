@@ -8,17 +8,65 @@ use OpenTelemetry\SDK\Attributes;
 
 final class HistogramDataPoint
 {
-    public function __construct(
-        public readonly int $count,
-        public readonly float|int $sum,
-        public readonly float|int $min,
-        public readonly float|int $max,
-        public readonly array $bucketCounts,
-        public readonly array $explicitBounds,
-        public readonly Attributes $attributes,
-        public readonly ?int $startTimestamp,
-        public readonly int $timestamp,
-        public readonly iterable $exemplars = [],
-    ) {
+    /**
+     * @readonly
+     */
+    public int $count;
+    /**
+     * @var float|int
+     * @readonly
+     */
+    public $sum;
+    /**
+     * @var float|int
+     * @readonly
+     */
+    public $min;
+    /**
+     * @var float|int
+     * @readonly
+     */
+    public $max;
+    /**
+     * @readonly
+     */
+    public array $bucketCounts;
+    /**
+     * @readonly
+     */
+    public array $explicitBounds;
+    /**
+     * @readonly
+     */
+    public Attributes $attributes;
+    /**
+     * @readonly
+     */
+    public ?int $startTimestamp;
+    /**
+     * @readonly
+     */
+    public int $timestamp;
+    /**
+     * @readonly
+     */
+    public iterable $exemplars = [];
+    /**
+     * @param float|int $sum
+     * @param float|int $min
+     * @param float|int $max
+     */
+    public function __construct(int $count, $sum, $min, $max, array $bucketCounts, array $explicitBounds, Attributes $attributes, ?int $startTimestamp, int $timestamp, iterable $exemplars = [])
+    {
+        $this->count = $count;
+        $this->sum = $sum;
+        $this->min = $min;
+        $this->max = $max;
+        $this->bucketCounts = $bucketCounts;
+        $this->explicitBounds = $explicitBounds;
+        $this->attributes = $attributes;
+        $this->startTimestamp = $startTimestamp;
+        $this->timestamp = $timestamp;
+        $this->exemplars = $exemplars;
     }
 }

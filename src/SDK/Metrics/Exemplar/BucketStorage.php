@@ -20,7 +20,7 @@ use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 final class BucketStorage
 {
     private AttributesFactory $attributes;
-    /** @var list<BucketEntry|null> */
+    /** @var array<int, BucketEntry|null> */
     private array $buckets;
 
     public function __construct(AttributesFactory $attributes, int $size = 0)
@@ -29,7 +29,11 @@ final class BucketStorage
         $this->buckets = array_fill(0, $size, null);
     }
 
-    public function store(int $bucket, int|string $index, float|int $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void
+    /**
+     * @param int|string $index
+     * @param float|int $value
+     */
+    public function store(int $bucket, $index, $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void
     {
         assert($bucket <= count($this->buckets));
 

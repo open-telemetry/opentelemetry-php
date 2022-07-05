@@ -8,12 +8,36 @@ use OpenTelemetry\SDK\Attributes;
 
 final class Exemplar
 {
-    public function __construct(
-        public readonly float|int $value,
-        public readonly int $timestamp,
-        public readonly Attributes $attributes,
-        public readonly ?string $traceId,
-        public readonly ?string $spanId,
-    ) {
+    /**
+     * @var float|int
+     * @readonly
+     */
+    public $value;
+    /**
+     * @readonly
+     */
+    public int $timestamp;
+    /**
+     * @readonly
+     */
+    public Attributes $attributes;
+    /**
+     * @readonly
+     */
+    public ?string $traceId;
+    /**
+     * @readonly
+     */
+    public ?string $spanId;
+    /**
+     * @param float|int $value
+     */
+    public function __construct($value, int $timestamp, Attributes $attributes, ?string $traceId, ?string $spanId)
+    {
+        $this->value = $value;
+        $this->timestamp = $timestamp;
+        $this->attributes = $attributes;
+        $this->traceId = $traceId;
+        $this->spanId = $spanId;
     }
 }

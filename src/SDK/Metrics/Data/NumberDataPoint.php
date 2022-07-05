@@ -8,12 +8,36 @@ use OpenTelemetry\SDK\Attributes;
 
 final class NumberDataPoint
 {
-    public function __construct(
-        public readonly float|int $value,
-        public readonly Attributes $attributes,
-        public readonly ?int $startTimestamp,
-        public readonly int $timestamp,
-        public readonly iterable $exemplars = [],
-    ) {
+    /**
+     * @var float|int
+     * @readonly
+     */
+    public $value;
+    /**
+     * @readonly
+     */
+    public Attributes $attributes;
+    /**
+     * @readonly
+     */
+    public ?int $startTimestamp;
+    /**
+     * @readonly
+     */
+    public int $timestamp;
+    /**
+     * @readonly
+     */
+    public iterable $exemplars = [];
+    /**
+     * @param float|int $value
+     */
+    public function __construct($value, Attributes $attributes, ?int $startTimestamp, int $timestamp, iterable $exemplars = [])
+    {
+        $this->value = $value;
+        $this->attributes = $attributes;
+        $this->startTimestamp = $startTimestamp;
+        $this->timestamp = $timestamp;
+        $this->exemplars = $exemplars;
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics\UpDownCounter;
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Clock;
 
 final class SdkUpDownCounter implements UpDownCounter
@@ -28,7 +27,7 @@ final class SdkUpDownCounter implements UpDownCounter
         $this->referenceCounter->release();
     }
 
-    public function add(float|int $amount, iterable $attributes = [], Context|false|null $context = null): void
+    public function add($amount, iterable $attributes = [], $context = null): void
     {
         $this->writer->record($amount, $attributes, $context, $this->clock->nanotime());
     }

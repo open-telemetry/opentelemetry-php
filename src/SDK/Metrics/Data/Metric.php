@@ -9,13 +9,37 @@ use OpenTelemetry\SDK\Resource;
 
 final class Metric
 {
-    public function __construct(
-        public readonly InstrumentationScope $instrumentationScope,
-        public readonly Resource $resource,
-        public readonly string $name,
-        public readonly ?string $description,
-        public readonly ?string $unit,
-        public readonly Data $data,
-    ) {
+    /**
+     * @readonly
+     */
+    public InstrumentationScope $instrumentationScope;
+    /**
+     * @readonly
+     */
+    public Resource $resource;
+    /**
+     * @readonly
+     */
+    public string $name;
+    /**
+     * @readonly
+     */
+    public ?string $description;
+    /**
+     * @readonly
+     */
+    public ?string $unit;
+    /**
+     * @readonly
+     */
+    public Data $data;
+    public function __construct(InstrumentationScope $instrumentationScope, Resource $resource, string $name, ?string $description, ?string $unit, Data $data)
+    {
+        $this->instrumentationScope = $instrumentationScope;
+        $this->resource = $resource;
+        $this->name = $name;
+        $this->description = $description;
+        $this->unit = $unit;
+        $this->data = $data;
     }
 }

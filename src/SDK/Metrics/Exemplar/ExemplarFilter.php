@@ -9,5 +9,8 @@ use OpenTelemetry\SDK\Attributes;
 
 interface ExemplarFilter
 {
-    public function accepts(float|int $value, Attributes $attributes, Context $context, int $timestamp): bool;
+    /**
+     * @param float|int $value
+     */
+    public function accepts($value, Attributes $attributes, Context $context, int $timestamp): bool;
 }

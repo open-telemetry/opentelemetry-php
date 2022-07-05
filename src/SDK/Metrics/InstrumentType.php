@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-enum InstrumentType {
+final class InstrumentType
+{
+    public const COUNTER = 'Counter';
+    public const UP_DOWN_COUNTER = 'UpDownCounter';
+    public const HISTOGRAM = 'Histogram';
 
-    case Counter;
-    case UpDownCounter;
-    case Histogram;
-
-    case AsynchronousCounter;
-    case AsynchronousUpDownCounter;
-    case AsynchronousGauge;
+    public const ASYNCHRONOUS_COUNTER = 'AsynchronousCounter';
+    public const ASYNCHRONOUS_UP_DOWN_COUNTER = 'AsynchronousUpDownCounter';
+    public const ASYNCHRONOUS_GAUGE = 'AsynchronousGauge';
 }

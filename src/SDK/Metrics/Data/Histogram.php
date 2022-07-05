@@ -8,11 +8,22 @@ final class Histogram implements Data
 {
 
     /**
-     * @param iterable<HistogramDataPoint> $dataPoints
+     * @var iterable<HistogramDataPoint>
+     * @readonly
      */
-    public function __construct(
-        public readonly iterable $dataPoints,
-        public readonly Temporality $temporality,
-    ) {
+    public iterable $dataPoints;
+    /**
+     * @var string|Temporality
+     * @readonly
+     */
+    public $temporality;
+    /**
+     * @param iterable<HistogramDataPoint> $dataPoints
+     * @param string|Temporality $temporality
+     */
+    public function __construct(iterable $dataPoints, $temporality)
+    {
+        $this->dataPoints = $dataPoints;
+        $this->temporality = $temporality;
     }
 }

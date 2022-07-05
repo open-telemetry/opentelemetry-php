@@ -6,5 +6,5 @@ namespace OpenTelemetry\SDK\Metrics;
 
 interface MetricSourceRegistry
 {
-    public function add(MetricSourceProvider&MetricMetadata $provider, StalenessHandler $stalenessHandler): void;
+    public function add(MetricSourceProvider $provider, MetricMetadata $metadata, StalenessHandler $stalenessHandler): void;
 }

@@ -9,10 +9,12 @@ use OpenTelemetry\SDK\Metrics\MetricSource;
 
 final class StreamMetricSource implements MetricSource
 {
-    public function __construct(
-        private StreamMetricSourceProvider $provider,
-        private int $reader,
-    ) {
+    private StreamMetricSourceProvider $provider;
+    private int $reader;
+    public function __construct(StreamMetricSourceProvider $provider, int $reader)
+    {
+        $this->provider = $provider;
+        $this->reader = $reader;
     }
 
     public function collectionTimestamp(): int

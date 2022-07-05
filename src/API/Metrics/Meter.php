@@ -20,7 +20,7 @@ interface Meter
     public function createCounter(
         string $name,
         ?string $unit = null,
-        ?string $description = null,
+        ?string $description = null
     ): Counter;
 
     /**
@@ -38,7 +38,7 @@ interface Meter
         string $name,
         ?string $unit = null,
         ?string $description = null,
-        callable ...$callbacks,
+        callable ...$callbacks
     ): ObservableCounter;
 
     /**
@@ -54,7 +54,7 @@ interface Meter
     public function createHistogram(
         string $name,
         ?string $unit = null,
-        ?string $description = null,
+        ?string $description = null
     ): Histogram;
 
     /**
@@ -72,7 +72,7 @@ interface Meter
         string $name,
         ?string $unit = null,
         ?string $description = null,
-        callable ...$callbacks,
+        callable ...$callbacks
     ): ObservableGauge;
 
     /**
@@ -88,7 +88,7 @@ interface Meter
     public function createUpDownCounter(
         string $name,
         ?string $unit = null,
-        ?string $description = null,
+        ?string $description = null
     ): UpDownCounter;
 
     /**
@@ -106,6 +106,6 @@ interface Meter
         string $name,
         ?string $unit = null,
         ?string $description = null,
-        callable ...$callbacks,
+        callable ...$callbacks
     ): ObservableUpDownCounter;
 }

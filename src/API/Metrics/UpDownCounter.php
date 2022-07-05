@@ -15,5 +15,5 @@ interface UpDownCounter
      *        attributes of the data point
      * @param Context|false|null $context execution context
      */
-    public function add(float|int $amount, iterable $attributes = [], Context|false|null $context = null): void;
+    public function add($amount, iterable $attributes = [], $context = null): void;
 }

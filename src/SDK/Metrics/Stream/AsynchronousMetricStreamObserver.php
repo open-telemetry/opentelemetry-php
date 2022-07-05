@@ -21,7 +21,7 @@ final class AsynchronousMetricStreamObserver implements Observer
         $this->timestamp = $timestamp;
     }
 
-    public function observe(float|int $amount, iterable $attributes = []): void
+    public function observe($amount, iterable $attributes = []): void
     {
         $this->stream->record($amount, $this->attributes->builder($attributes)->build(), Context::getRoot(), $this->timestamp);
     }

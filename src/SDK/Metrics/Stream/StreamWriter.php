@@ -23,7 +23,7 @@ final class StreamWriter implements MetricWriter
         $this->stream = $stream;
     }
 
-    public function record(float|int $value, iterable $attributes, Context|false|null $context, int $timestamp): void
+    public function record($value, iterable $attributes, $context, int $timestamp): void
     {
         $context = $context
             ?? ($this->contextStorage ?? Context::storage())->current()

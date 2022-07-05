@@ -24,7 +24,7 @@ final class SdkMeter implements Meter
     public function __construct(
         MetricFactory $metricFactory,
         Clock $clock,
-        InstrumentationScope $instrumentationScope,
+        InstrumentationScope $instrumentationScope
     ) {
         $this->metricFactory = $metricFactory;
         $this->clock = $clock;
@@ -35,7 +35,7 @@ final class SdkMeter implements Meter
     {
         [$writer, $referenceCounter] = $this->metricFactory->createSynchronousWriter(
             $this->instrumentationScope,
-            new Instrument(InstrumentType::Counter, $name, $unit, $description),
+            new Instrument(InstrumentType::COUNTER, $name, $unit, $description),
             $this->clock->nanotime(),
         );
 
@@ -46,7 +46,7 @@ final class SdkMeter implements Meter
     {
         [$observer, $referenceCounter] = $this->metricFactory->createAsynchronousObserver(
             $this->instrumentationScope,
-            new Instrument(InstrumentType::AsynchronousCounter, $name, $unit, $description),
+            new Instrument(InstrumentType::COUNTER, $name, $unit, $description),
             $this->clock->nanotime(),
         );
 
@@ -61,7 +61,7 @@ final class SdkMeter implements Meter
     {
         [$writer, $referenceCounter] = $this->metricFactory->createSynchronousWriter(
             $this->instrumentationScope,
-            new Instrument(InstrumentType::Histogram, $name, $unit, $description),
+            new Instrument(InstrumentType::HISTOGRAM, $name, $unit, $description),
             $this->clock->nanotime(),
         );
 
@@ -72,7 +72,7 @@ final class SdkMeter implements Meter
     {
         [$observer, $referenceCounter] = $this->metricFactory->createAsynchronousObserver(
             $this->instrumentationScope,
-            new Instrument(InstrumentType::AsynchronousGauge, $name, $unit, $description),
+            new Instrument(InstrumentType::ASYNCHRONOUS_GAUGE, $name, $unit, $description),
             $this->clock->nanotime(),
         );
 
@@ -87,7 +87,7 @@ final class SdkMeter implements Meter
     {
         [$writer, $referenceCounter] = $this->metricFactory->createSynchronousWriter(
             $this->instrumentationScope,
-            new Instrument(InstrumentType::UpDownCounter, $name, $unit, $description),
+            new Instrument(InstrumentType::UP_DOWN_COUNTER, $name, $unit, $description),
             $this->clock->nanotime(),
         );
 
@@ -98,7 +98,7 @@ final class SdkMeter implements Meter
     {
         [$observer, $referenceCounter] = $this->metricFactory->createAsynchronousObserver(
             $this->instrumentationScope,
-            new Instrument(InstrumentType::AsynchronousUpDownCounter, $name, $unit, $description),
+            new Instrument(InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER, $name, $unit, $description),
             $this->clock->nanotime(),
         );
 

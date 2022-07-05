@@ -8,12 +8,27 @@ final class Sum implements Data
 {
 
     /**
-     * @param iterable<NumberDataPoint> $dataPoints
+     * @var iterable<NumberDataPoint>
+     * @readonly
      */
-    public function __construct(
-        public readonly iterable $dataPoints,
-        public readonly Temporality $temporality,
-        public readonly bool $monotonic,
-    ) {
+    public iterable $dataPoints;
+    /**
+     * @var string|Temporality
+     * @readonly
+     */
+    public $temporality;
+    /**
+     * @readonly
+     */
+    public bool $monotonic;
+    /**
+     * @param iterable<NumberDataPoint> $dataPoints
+     * @param string|Temporality $temporality
+     */
+    public function __construct(iterable $dataPoints, $temporality, bool $monotonic)
+    {
+        $this->dataPoints = $dataPoints;
+        $this->temporality = $temporality;
+        $this->monotonic = $monotonic;
     }
 }

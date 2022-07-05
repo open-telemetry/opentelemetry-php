@@ -29,9 +29,9 @@ final class ExportingReader implements MetricReader, MetricSourceRegistry
         $this->clock = $clock;
     }
 
-    public function add(MetricSourceProvider&MetricMetadata $provider, StalenessHandler $stalenessHandler): void
+    public function add(MetricSourceProvider $provider, MetricMetadata $metadata, StalenessHandler $stalenessHandler): void
     {
-        if (!$temporality = $this->exporter->temporality($provider)) {
+        if (!$temporality = $this->exporter->temporality($metadata)) {
             return;
         }
 
@@ -73,7 +73,7 @@ final class ExportingReader implements MetricReader, MetricSourceRegistry
 
         $this->closed = true;
 
-        return (bool) ($this->doCollect() & $this->exporter->shutdown());
+        return (bool) (+$this->doCollect() & +$this->exporter->shutdown());
     }
 
     public function forceFlush(): bool
@@ -82,6 +82,6 @@ final class ExportingReader implements MetricReader, MetricSourceRegistry
             return false;
         }
 
-        return (bool) ($this->doCollect() & $this->exporter->forceFlush());
+        return (bool) (+$this->doCollect() & +$this->exporter->forceFlush());
     }
 }

@@ -38,7 +38,7 @@ final class AsynchronousMetricStream implements MetricStream
         Aggregation $aggregation,
         ?ExemplarReservoir $exemplarReservoir,
         callable $instrument,
-        int $startTimestamp,
+        int $startTimestamp
     ) {
         $this->metricAggregator = new MetricAggregator(
             $attributeProcessor,
@@ -52,9 +52,9 @@ final class AsynchronousMetricStream implements MetricStream
         $this->metric = new Metric([], [], $startTimestamp, -1);
     }
 
-    public function temporality(): Temporality
+    public function temporality()
     {
-        return Temporality::Cumulative;
+        return Temporality::CUMULATIVE;
     }
 
     public function collectionTimestamp(): int
@@ -62,9 +62,9 @@ final class AsynchronousMetricStream implements MetricStream
         return $this->metric->timestamp;
     }
 
-    public function register(Temporality $temporality): int
+    public function register($temporality): int
     {
-        if ($temporality === Temporality::Cumulative) {
+        if ($temporality === Temporality::CUMULATIVE) {
             return -1;
         }
 
@@ -103,10 +103,10 @@ final class AsynchronousMetricStream implements MetricStream
         $metric = $this->metric;
 
         if (!$lastRead = $this->lastReads[$reader] ?? null) {
-            $temporality = Temporality::Cumulative;
+            $temporality = Temporality::CUMULATIVE;
             $startTimestamp = $this->startTimestamp;
         } else {
-            $temporality = Temporality::Delta;
+            $temporality = Temporality::DELTA;
             $startTimestamp = $lastRead->timestamp;
 
             $this->lastReads[$reader] = $metric;

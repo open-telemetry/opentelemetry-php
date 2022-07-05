@@ -8,7 +8,6 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Metrics\Aggregation;
 use OpenTelemetry\SDK\Metrics\Data;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
 
 /**
  * @implements Aggregation<LastValueSummary>
@@ -23,7 +22,7 @@ final class LastValue implements Aggregation
     /**
      * @param LastValueSummary $summary
      */
-    public function record(mixed $summary, float|int $value, Attributes $attributes, Context $context, int $timestamp): void
+    public function record($summary, $value, Attributes $attributes, Context $context, int $timestamp): void
     {
         if ($summary->value === null || $timestamp >= $summary->timestamp) {
             $summary->value = $value;
@@ -35,7 +34,7 @@ final class LastValue implements Aggregation
      * @param LastValueSummary $left
      * @param LastValueSummary $right
      */
-    public function merge(mixed $left, mixed $right): LastValueSummary
+    public function merge($left, $right): LastValueSummary
     {
         return $right->timestamp >= $left->timestamp ? $right : $left;
     }
@@ -44,7 +43,7 @@ final class LastValue implements Aggregation
      * @param LastValueSummary $left
      * @param LastValueSummary $right
      */
-    public function diff(mixed $left, mixed $right): LastValueSummary
+    public function diff($left, $right): LastValueSummary
     {
         return $right->timestamp >= $left->timestamp ? $right : $left;
     }
@@ -58,7 +57,7 @@ final class LastValue implements Aggregation
         array $exemplars,
         ?int $startTimestamp,
         int $timestamp,
-        Temporality $temporality,
+        $temporality
     ): Data\Gauge {
         $dataPoints = [];
         foreach ($attributes as $key => $dataPointAttributes) {
