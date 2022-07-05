@@ -60,7 +60,8 @@
         "files": [
             "src/Context/fiber/initialize_fiber_handler.php",
             "src/SDK/Common/Dev/Compatibility/_load.php",
-            "src/SDK/Common/Util/functions.php"
+            "src/SDK/Common/Util/functions.php",
+            "src/SDK/Metrics/_bridge.php"
         ]
     },
     "autoload-dev": {

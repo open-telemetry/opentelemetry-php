@@ -1,0 +1,14 @@
+<?php declare(strict_types=1);
+namespace OpenTelemetry\API\Metrics;
+
+interface Observer {
+
+    /**
+     * Records the given absolute datapoint.
+     *
+     * @param float|int $amount observed amount
+     * @param iterable<non-empty-string, string|bool|float|int|array|null> $attributes
+     *        attributes of the data point
+     */
+    public function observe(float|int $amount, iterable $attributes = []): void;
+}

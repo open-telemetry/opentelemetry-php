@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Common\Instrumentation;
 
-use OpenTelemetry\API\Metrics\MeterInterface;
-use OpenTelemetry\API\Metrics\MeterProviderInterface;
-use OpenTelemetry\API\Metrics\NoopMeter;
+use OpenTelemetry\API\Metrics\Meter;
+use OpenTelemetry\API\Metrics\MeterProvider;
+use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
@@ -64,7 +64,7 @@ trait InstrumentationTrait
 {
     private TextMapPropagatorInterface $propagator;
     private TracerInterface $tracer;
-    private MeterInterface $meter;
+    private Meter $meter;
     private LoggerInterface $logger;
 
     public function __construct()
@@ -138,7 +138,7 @@ trait InstrumentationTrait
         return $this->tracer;
     }
 
-    public function setMeterProvider(MeterProviderInterface $meterProvider): void
+    public function setMeterProvider(MeterProvider $meterProvider): void
     {
         // @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.12.0/specification/metrics/api.md#get-a-meter
         $this->meter = $meterProvider->getMeter(
@@ -147,7 +147,7 @@ trait InstrumentationTrait
         );
     }
 
-    public function getMeter(): MeterInterface
+    public function getMeter(): Meter
     {
         return $this->meter;
     }
