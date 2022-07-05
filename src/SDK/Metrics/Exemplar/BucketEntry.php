@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Exemplar;
 
 use OpenTelemetry\SDK\Attributes;
@@ -6,8 +9,8 @@ use OpenTelemetry\SDK\Attributes;
 /**
  * @internal
  */
-final class BucketEntry {
-
+final class BucketEntry
+{
     public int|string $index;
     public float|int $value;
     public int $timestamp;

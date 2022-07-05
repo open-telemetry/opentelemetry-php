@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\SDK\Metrics\Data\Metric;
 
-interface MetricSource {
-
+interface MetricSource
+{
     public function collectionTimestamp(): int;
 
     public function collect(?int $timestamp): Metric;

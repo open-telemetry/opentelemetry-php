@@ -1,10 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics;
 
 use Closure;
+use function in_array;
+use OpenTelemetry\API\Metrics\Meter;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\ContextStorage;
-use OpenTelemetry\API\Metrics\Meter;
 use OpenTelemetry\SDK\AttributesFactory;
 use OpenTelemetry\SDK\Clock;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -21,10 +25,9 @@ use OpenTelemetry\SDK\Metrics\View\FallbackViewRegistry;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
 use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
 use OpenTelemetry\SDK\Resource;
-use function in_array;
 
-final class SdkMeterProvider implements MeterProvider {
-
+final class SdkMeterProvider implements MeterProvider
+{
     private MetricFactory $metricFactory;
     private AttributesFactory $metricAttributes;
     private Clock $clock;
@@ -98,7 +101,7 @@ final class SdkMeterProvider implements MeterProvider {
             $attributeKeys
                 ? new AttributeProcessor\Filtered(
                     $this->metricAttributes,
-                    static fn(string $key): bool => in_array($key, $attributeKeys, true),
+                    static fn (string $key): bool => in_array($key, $attributeKeys, true),
                 )
                 : null,
             $aggregation ?? self::defaultAggregation(...),
@@ -106,7 +109,8 @@ final class SdkMeterProvider implements MeterProvider {
         ));
     }
 
-    public function shutdown(): bool {
+    public function shutdown(): bool
+    {
         if ($this->closed) {
             return false;
         }
@@ -116,7 +120,8 @@ final class SdkMeterProvider implements MeterProvider {
         return $this->metricReader->shutdown();
     }
 
-    public function forceFlush(): bool {
+    public function forceFlush(): bool
+    {
         if ($this->closed) {
             return false;
         }
@@ -124,7 +129,8 @@ final class SdkMeterProvider implements MeterProvider {
         return $this->metricReader->forceFlush();
     }
 
-    private static function defaultAggregation(InstrumentType $type): Aggregation {
+    private static function defaultAggregation(InstrumentType $type): Aggregation
+    {
         return match ($type) {
             InstrumentType::Counter,
             InstrumentType::AsynchronousCounter,
@@ -139,7 +145,8 @@ final class SdkMeterProvider implements MeterProvider {
         };
     }
 
-    private static function defaultExemplarReservoir(Aggregation $aggregation): ExemplarReservoir {
+    private static function defaultExemplarReservoir(Aggregation $aggregation): ExemplarReservoir
+    {
         $reservoir = $aggregation instanceof Aggregation\ExplicitBucketHistogram && $aggregation->boundaries
             ? new HistogramBucketReservoir(Attributes::factory(), $aggregation->boundaries)
             : new FixedSizeReservoir(Attributes::factory(), 5);

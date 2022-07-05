@@ -1,28 +1,33 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Aggregation;
 
+use function array_fill;
+use function count;
+use const INF;
+use const NAN;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Metrics\Aggregation;
 use OpenTelemetry\SDK\Metrics\Data;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
-use function array_fill;
-use function count;
-use const INF;
-use const NAN;
 
 /**
  * @implements Aggregation<ExplicitBucketHistogramSummary>
  */
-final class ExplicitBucketHistogram implements Aggregation {
-
+final class ExplicitBucketHistogram implements Aggregation
+{
     public readonly array $boundaries;
 
-    public function __construct(array $boundaries) {
+    public function __construct(array $boundaries)
+    {
         $this->boundaries = $boundaries;
     }
 
-    public function initialize(): ExplicitBucketHistogramSummary {
+    public function initialize(): ExplicitBucketHistogramSummary
+    {
         return new ExplicitBucketHistogramSummary(
             0,
             0,
@@ -35,8 +40,10 @@ final class ExplicitBucketHistogram implements Aggregation {
     /**
      * @param ExplicitBucketHistogramSummary $summary
      */
-    public function record(mixed $summary, float|int $value, Attributes $attributes, Context $context, int $timestamp): void {
-        for ($i = 0; $i < count($this->boundaries) && $this->boundaries[$i] < $value; $i++) {}
+    public function record(mixed $summary, float|int $value, Attributes $attributes, Context $context, int $timestamp): void
+    {
+        for ($i = 0; $i < count($this->boundaries) && $this->boundaries[$i] < $value; $i++) {
+        }
         $summary->count++;
         $summary->sum += $value;
         $summary->min = self::min($value, $summary->min);
@@ -48,7 +55,8 @@ final class ExplicitBucketHistogram implements Aggregation {
      * @param ExplicitBucketHistogramSummary $left
      * @param ExplicitBucketHistogramSummary $right
      */
-    public function merge(mixed $left, mixed $right): ExplicitBucketHistogramSummary {
+    public function merge(mixed $left, mixed $right): ExplicitBucketHistogramSummary
+    {
         $count = $left->count + $right->count;
         $sum = $left->sum + $right->sum;
         $min = self::min($left->min, $right->min);
@@ -71,7 +79,8 @@ final class ExplicitBucketHistogram implements Aggregation {
      * @param ExplicitBucketHistogramSummary $left
      * @param ExplicitBucketHistogramSummary $right
      */
-    public function diff(mixed $left, mixed $right): ExplicitBucketHistogramSummary {
+    public function diff(mixed $left, mixed $right): ExplicitBucketHistogramSummary
+    {
         $count = -$left->count + $right->count;
         $sum = -$left->sum + $right->sum;
         $min = $left->min > $right->min ? $right->min : NAN;
@@ -127,12 +136,14 @@ final class ExplicitBucketHistogram implements Aggregation {
         );
     }
 
-    private static function min(float|int $left, float|int $right): float|int {
+    private static function min(float|int $left, float|int $right): float|int
+    {
         /** @noinspection PhpConditionAlreadyCheckedInspection */
         return $left <= $right ? $left : ($right <= $left ? $right : NAN);
     }
 
-    private static function max(float|int $left, float|int $right): float|int {
+    private static function max(float|int $left, float|int $right): float|int
+    {
         /** @noinspection PhpConditionAlreadyCheckedInspection */
         return $left >= $right ? $left : ($right >= $left ? $right : NAN);
     }

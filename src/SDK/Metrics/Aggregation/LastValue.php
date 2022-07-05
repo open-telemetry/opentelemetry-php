@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Aggregation;
 
 use OpenTelemetry\Context\Context;
@@ -10,16 +13,18 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 /**
  * @implements Aggregation<LastValueSummary>
  */
-final class LastValue implements Aggregation {
-
-    public function initialize(): LastValueSummary {
+final class LastValue implements Aggregation
+{
+    public function initialize(): LastValueSummary
+    {
         return new LastValueSummary(null, 0);
     }
 
     /**
      * @param LastValueSummary $summary
      */
-    public function record(mixed $summary, float|int $value, Attributes $attributes, Context $context, int $timestamp): void {
+    public function record(mixed $summary, float|int $value, Attributes $attributes, Context $context, int $timestamp): void
+    {
         if ($summary->value === null || $timestamp >= $summary->timestamp) {
             $summary->value = $value;
             $summary->timestamp = $timestamp;
@@ -30,7 +35,8 @@ final class LastValue implements Aggregation {
      * @param LastValueSummary $left
      * @param LastValueSummary $right
      */
-    public function merge(mixed $left, mixed $right): LastValueSummary {
+    public function merge(mixed $left, mixed $right): LastValueSummary
+    {
         return $right->timestamp >= $left->timestamp ? $right : $left;
     }
 
@@ -38,7 +44,8 @@ final class LastValue implements Aggregation {
      * @param LastValueSummary $left
      * @param LastValueSummary $right
      */
-    public function diff(mixed $left, mixed $right): LastValueSummary {
+    public function diff(mixed $left, mixed $right): LastValueSummary
+    {
         return $right->timestamp >= $left->timestamp ? $right : $left;
     }
 

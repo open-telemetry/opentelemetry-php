@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 class_alias(OpenTelemetry\Context\ContextStorageInterface::class, OpenTelemetry\ContextStorage::class);
 

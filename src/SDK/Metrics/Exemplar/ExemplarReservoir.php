@@ -1,12 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Exemplar;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Attributes;
 use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 
-interface ExemplarReservoir {
-
+interface ExemplarReservoir
+{
     public function offer(int|string $index, float|int $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void;
 
     /**

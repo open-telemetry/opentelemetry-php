@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\View;
 
 use Closure;
@@ -9,7 +12,8 @@ use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
 
-final class ViewTemplate {
+final class ViewTemplate
+{
 
     /**
      * @param Closure(InstrumentType): Aggregation $aggregation
@@ -21,9 +25,11 @@ final class ViewTemplate {
         public readonly ?AttributeProcessor $attributeProcessor,
         public readonly Closure $aggregation,
         public readonly Closure $exemplarReservoir,
-    ) {}
+    ) {
+    }
 
-    public function project(Instrument $instrument): ViewProjection {
+    public function project(Instrument $instrument): ViewProjection
+    {
         $aggregation = ($this->aggregation)($instrument->type);
         $exemplarReservoir = ($this->exemplarReservoir)($aggregation, $instrument->type);
 

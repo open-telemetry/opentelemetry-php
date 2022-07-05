@@ -1,10 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
 use OpenTelemetry\SDK\Metrics\Data\Data;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 
-interface MetricStream {
+interface MetricStream
+{
 
     /**
      * Returns the internal temporality of this stream.

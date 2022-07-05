@@ -1,21 +1,27 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\StalenessHandler;
 
 use Closure;
 use OpenTelemetry\SDK\Metrics\ReferenceCounter;
 use OpenTelemetry\SDK\Metrics\StalenessHandler;
 
-final class ImmediateStalenessHandler implements StalenessHandler, ReferenceCounter {
+final class ImmediateStalenessHandler implements StalenessHandler, ReferenceCounter
+{
 
     /** @var Closure[] */
     private array $onStale = [];
     private int $count = 0;
 
-    public function acquire(): void {
+    public function acquire(): void
+    {
         $this->count++;
     }
 
-    public function release(): void {
+    public function release(): void
+    {
         if (--$this->count) {
             return;
         }
@@ -27,7 +33,8 @@ final class ImmediateStalenessHandler implements StalenessHandler, ReferenceCoun
         }
     }
 
-    public function onStale(Closure $callback): void {
+    public function onStale(Closure $callback): void
+    {
         $this->onStale[] = $callback;
     }
 }

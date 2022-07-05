@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\MetricFactory;
 
 use OpenTelemetry\ContextStorage;
@@ -18,8 +21,8 @@ use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Metrics\ViewRegistry;
 use OpenTelemetry\SDK\Resource;
 
-final class StreamFactory implements MetricFactory {
-
+final class StreamFactory implements MetricFactory
+{
     private ?ContextStorage $contextStorage;
     private Resource $resource;
 
@@ -44,7 +47,8 @@ final class StreamFactory implements MetricFactory {
         $this->stalenessHandlerFactory = $stalenessHandlerFactory;
     }
 
-    public function createAsynchronousObserver(InstrumentationScope $instrumentationScope, Instrument $instrument, int $timestamp): array {
+    public function createAsynchronousObserver(InstrumentationScope $instrumentationScope, Instrument $instrument, int $timestamp): array
+    {
         $views = $this->views->find(
             $instrument,
             $instrumentationScope,
@@ -67,7 +71,8 @@ final class StreamFactory implements MetricFactory {
         return [$observer, $stalenessHandler];
     }
 
-    public function createSynchronousWriter(InstrumentationScope $instrumentationScope, Instrument $instrument, int $timestamp): array {
+    public function createSynchronousWriter(InstrumentationScope $instrumentationScope, Instrument $instrument, int $timestamp): array
+    {
         $views = $this->views->find(
             $instrument,
             $instrumentationScope,

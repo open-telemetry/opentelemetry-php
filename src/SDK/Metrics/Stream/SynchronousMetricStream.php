@@ -1,22 +1,25 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
+use const E_USER_WARNING;
+use function extension_loaded;
 use GMP;
+use function gmp_init;
+use function is_int;
 use OpenTelemetry\SDK\Metrics\Aggregation;
 use OpenTelemetry\SDK\Metrics\AttributeProcessor;
 use OpenTelemetry\SDK\Metrics\Data\Data;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoir;
-use function extension_loaded;
-use function gmp_init;
-use function is_int;
+use const PHP_INT_SIZE;
 use function sprintf;
 use function trigger_error;
-use const E_USER_WARNING;
-use const PHP_INT_SIZE;
 
-final class SynchronousMetricStream implements MetricStream {
-
+final class SynchronousMetricStream implements MetricStream
+{
     private MetricAggregator $metricAggregator;
     private Aggregation $aggregation;
 
@@ -42,21 +45,26 @@ final class SynchronousMetricStream implements MetricStream {
         $this->delta = new DeltaStorage($aggregation);
     }
 
-    public function writable(): WritableMetricStream {
+    public function writable(): WritableMetricStream
+    {
         return $this->metricAggregator;
     }
 
-    public function temporality(): Temporality {
+    public function temporality(): Temporality
+    {
         return Temporality::Delta;
     }
 
-    public function collectionTimestamp(): int {
+    public function collectionTimestamp(): int
+    {
         return $this->timestamp;
     }
 
-    public function register(Temporality $temporality): int {
+    public function register(Temporality $temporality): int
+    {
         $reader = 0;
-        for ($r = $this->readers; ($r & 1) != 0; $r >>= 1, $reader++) {}
+        for ($r = $this->readers; ($r & 1) != 0; $r >>= 1, $reader++) {
+        }
 
         if ($reader === (PHP_INT_SIZE << 3) - 1 && is_int($this->readers)) {
             if (!extension_loaded('gmp')) {
@@ -77,7 +85,8 @@ final class SynchronousMetricStream implements MetricStream {
         return $reader;
     }
 
-    public function unregister(int $reader): void {
+    public function unregister(int $reader): void
+    {
         $readerMask = ($this->readers & 1 | 1) << $reader;
         if (($this->readers & $readerMask) == 0) {
             return;
@@ -91,7 +100,8 @@ final class SynchronousMetricStream implements MetricStream {
         }
     }
 
-    public function collect(int $reader, ?int $timestamp): Data {
+    public function collect(int $reader, ?int $timestamp): Data
+    {
         if ($timestamp !== null) {
             $this->delta->add(
                 $this->metricAggregator->collect($this->timestamp),

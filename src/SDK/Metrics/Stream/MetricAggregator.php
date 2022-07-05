@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
 use OpenTelemetry\Context\Context;
@@ -9,8 +12,8 @@ use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoir;
 use function serialize;
 
-final class MetricAggregator implements WritableMetricStream {
-
+final class MetricAggregator implements WritableMetricStream
+{
     private ?AttributeProcessor $attributeProcessor;
     private Aggregation $aggregation;
     private ?ExemplarReservoir $exemplarReservoir;
@@ -31,7 +34,8 @@ final class MetricAggregator implements WritableMetricStream {
         $this->exemplarReservoir = $exemplarReservoir;
     }
 
-    public function record(float|int $value, Attributes $attributes, Context $context, int $timestamp): void {
+    public function record(float|int $value, Attributes $attributes, Context $context, int $timestamp): void
+    {
         $filteredAttributes = $this->attributeProcessor?->process($attributes, $context) ?? $attributes;
         $raw = $filteredAttributes->toArray();
         $index = $raw ? serialize($raw) : 0;
@@ -47,7 +51,8 @@ final class MetricAggregator implements WritableMetricStream {
         $this->exemplarReservoir?->offer($index, $value, $attributes, $context, $timestamp, $this->revision);
     }
 
-    public function collect(int $timestamp): Metric {
+    public function collect(int $timestamp): Metric
+    {
         $metric = new Metric($this->attributes, $this->summaries, $timestamp, $this->revision);
 
         $this->attributes = [];
@@ -60,7 +65,8 @@ final class MetricAggregator implements WritableMetricStream {
     /**
      * @return array<list<Exemplar>>
      */
-    public function exemplars(Metric $metric): array {
+    public function exemplars(Metric $metric): array
+    {
         return $this->exemplarReservoir && $metric->revision !== -1
             ? $this->exemplarReservoir->collect($metric->attributes, $metric->revision, $this->revision)
             : [];

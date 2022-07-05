@@ -1,7 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Data;
 
-final class Sum implements Data {
+final class Sum implements Data
+{
 
     /**
      * @param iterable<NumberDataPoint> $dataPoints
@@ -10,5 +14,6 @@ final class Sum implements Data {
         public readonly iterable $dataPoints,
         public readonly Temporality $temporality,
         public readonly bool $monotonic,
-    ) {}
+    ) {
+    }
 }

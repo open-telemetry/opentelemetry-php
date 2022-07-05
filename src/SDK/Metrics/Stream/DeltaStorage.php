@@ -1,23 +1,28 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
+use function assert;
 use GMP;
 use OpenTelemetry\SDK\Metrics\Aggregation;
-use function assert;
 
-final class DeltaStorage {
-
+final class DeltaStorage
+{
     private Aggregation $aggregation;
     private Delta $head;
 
-    public function __construct(Aggregation $aggregation) {
+    public function __construct(Aggregation $aggregation)
+    {
         $this->aggregation = $aggregation;
         $this->head = new Delta(new Metric([], [], 0, 0), 0);
 
         unset($this->head->metric);
     }
 
-    public function add(Metric $metric, int|GMP $readers): void {
+    public function add(Metric $metric, int|GMP $readers): void
+    {
         if ($readers == 0) {
             return;
         }
@@ -29,7 +34,8 @@ final class DeltaStorage {
         }
     }
 
-    public function collect(int $reader, bool $retain = false): ?Metric {
+    public function collect(int $reader, bool $retain = false): ?Metric
+    {
         $n = null;
         for ($d = $this->head; $d->prev; $d = $d->prev) {
             if (($d->prev->readers >> $reader & 1) != 0) {
@@ -57,15 +63,18 @@ final class DeltaStorage {
         return $metric;
     }
 
-    private function tryUnlink(Delta $n): void {
+    private function tryUnlink(Delta $n): void
+    {
         if ($n->prev->readers == 0) {
             $n->prev = $n->prev->prev;
+
             return;
         }
 
         for ($c = $n->prev->prev;
              $c && ($n->prev->readers & $c->readers) == 0;
-             $c = $c->prev) {}
+             $c = $c->prev) {
+        }
 
         if ($n->prev->readers == $c?->readers) {
             $this->mergeInto($c->metric, $n->prev->metric);
@@ -73,7 +82,8 @@ final class DeltaStorage {
         }
     }
 
-    private function mergeInto(Metric $into, Metric $metric): void {
+    private function mergeInto(Metric $into, Metric $metric): void
+    {
         assert($into->revision < $metric->revision);
 
         foreach ($metric->summaries as $k => $summary) {

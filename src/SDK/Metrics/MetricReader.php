@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics;
 
-interface MetricReader {
-
+interface MetricReader
+{
     public function collect(): bool;
 
     public function shutdown(): bool;

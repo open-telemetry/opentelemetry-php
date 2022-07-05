@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics;
 
 use Closure;
@@ -12,8 +15,8 @@ use OpenTelemetry\API\Metrics\UpDownCounter;
 use OpenTelemetry\SDK\Clock;
 use OpenTelemetry\SDK\InstrumentationScope;
 
-final class SdkMeter implements Meter {
-
+final class SdkMeter implements Meter
+{
     private MetricFactory $metricFactory;
     private Clock $clock;
     private InstrumentationScope $instrumentationScope;
@@ -28,7 +31,8 @@ final class SdkMeter implements Meter {
         $this->instrumentationScope = $instrumentationScope;
     }
 
-    public function createCounter(string $name, ?string $unit = null, ?string $description = null): Counter {
+    public function createCounter(string $name, ?string $unit = null, ?string $description = null): Counter
+    {
         [$writer, $referenceCounter] = $this->metricFactory->createSynchronousWriter(
             $this->instrumentationScope,
             new Instrument(InstrumentType::Counter, $name, $unit, $description),
@@ -38,7 +42,8 @@ final class SdkMeter implements Meter {
         return new SdkCounter($writer, $referenceCounter, $this->clock);
     }
 
-    public function createObservableCounter(string $name, ?string $unit = null, ?string $description = null, callable ...$callbacks): ObservableCounter {
+    public function createObservableCounter(string $name, ?string $unit = null, ?string $description = null, callable ...$callbacks): ObservableCounter
+    {
         [$observer, $referenceCounter] = $this->metricFactory->createAsynchronousObserver(
             $this->instrumentationScope,
             new Instrument(InstrumentType::AsynchronousCounter, $name, $unit, $description),
@@ -52,7 +57,8 @@ final class SdkMeter implements Meter {
         return new SdkObservableCounter($observer, $referenceCounter);
     }
 
-    public function createHistogram(string $name, ?string $unit = null, ?string $description = null): Histogram {
+    public function createHistogram(string $name, ?string $unit = null, ?string $description = null): Histogram
+    {
         [$writer, $referenceCounter] = $this->metricFactory->createSynchronousWriter(
             $this->instrumentationScope,
             new Instrument(InstrumentType::Histogram, $name, $unit, $description),
@@ -62,7 +68,8 @@ final class SdkMeter implements Meter {
         return new SdkHistogram($writer, $referenceCounter, $this->clock);
     }
 
-    public function createObservableGauge(string $name, ?string $unit = null, ?string $description = null, callable ...$callbacks): ObservableGauge {
+    public function createObservableGauge(string $name, ?string $unit = null, ?string $description = null, callable ...$callbacks): ObservableGauge
+    {
         [$observer, $referenceCounter] = $this->metricFactory->createAsynchronousObserver(
             $this->instrumentationScope,
             new Instrument(InstrumentType::AsynchronousGauge, $name, $unit, $description),
@@ -76,7 +83,8 @@ final class SdkMeter implements Meter {
         return new SdkObservableGauge($observer, $referenceCounter);
     }
 
-    public function createUpDownCounter(string $name, ?string $unit = null, ?string $description = null): UpDownCounter {
+    public function createUpDownCounter(string $name, ?string $unit = null, ?string $description = null): UpDownCounter
+    {
         [$writer, $referenceCounter] = $this->metricFactory->createSynchronousWriter(
             $this->instrumentationScope,
             new Instrument(InstrumentType::UpDownCounter, $name, $unit, $description),
@@ -86,7 +94,8 @@ final class SdkMeter implements Meter {
         return new SdkUpDownCounter($writer, $referenceCounter, $this->clock);
     }
 
-    public function createObservableUpDownCounter(string $name, ?string $unit = null, ?string $description = null, callable ...$callbacks): ObservableUpDownCounter {
+    public function createObservableUpDownCounter(string $name, ?string $unit = null, ?string $description = null, callable ...$callbacks): ObservableUpDownCounter
+    {
         [$observer, $referenceCounter] = $this->metricFactory->createAsynchronousObserver(
             $this->instrumentationScope,
             new Instrument(InstrumentType::AsynchronousUpDownCounter, $name, $unit, $description),

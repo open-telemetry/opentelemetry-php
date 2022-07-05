@@ -1,9 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\API\Metrics;
 
 use OpenTelemetry\Context\Context;
 
-interface Histogram {
+interface Histogram
+{
 
     /**
      * @param float|int $amount non-negative amount to record

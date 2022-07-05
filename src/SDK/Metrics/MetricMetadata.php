@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 
-interface MetricMetadata {
-
+interface MetricMetadata
+{
     public function instrumentType(): InstrumentType;
 
     public function name(): string;

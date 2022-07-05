@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Data;
 
 use OpenTelemetry\SDK\Attributes;
 
-final class HistogramDataPoint {
-
+final class HistogramDataPoint
+{
     public function __construct(
         public readonly int $count,
         public readonly float|int $sum,
@@ -16,5 +19,6 @@ final class HistogramDataPoint {
         public readonly ?int $startTimestamp,
         public readonly int $timestamp,
         public readonly iterable $exemplars = [],
-    ) {}
+    ) {
+    }
 }

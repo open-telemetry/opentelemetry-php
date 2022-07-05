@@ -1,9 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\API\Metrics;
 
 use OpenTelemetry\Context\Context;
 
-interface UpDownCounter {
+interface UpDownCounter
+{
 
     /**
      * @param float|int $amount amount to increment / decrement by

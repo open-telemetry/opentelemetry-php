@@ -1,7 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Data;
 
-final class Histogram implements Data {
+final class Histogram implements Data
+{
 
     /**
      * @param iterable<HistogramDataPoint> $dataPoints
@@ -9,5 +13,6 @@ final class Histogram implements Data {
     public function __construct(
         public readonly iterable $dataPoints,
         public readonly Temporality $temporality,
-    ) {}
+    ) {
+    }
 }

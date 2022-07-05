@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
 use OpenTelemetry\Context\Context;
@@ -6,20 +9,22 @@ use OpenTelemetry\ContextStorage;
 use OpenTelemetry\SDK\AttributesFactory;
 use OpenTelemetry\SDK\Metrics\MetricWriter;
 
-final class StreamWriter implements MetricWriter {
-
+final class StreamWriter implements MetricWriter
+{
     private ?ContextStorage $contextStorage;
     private AttributesFactory $attributes;
 
     private WritableMetricStream $stream;
 
-    public function __construct(?ContextStorage $contextStorage, AttributesFactory $attributes, WritableMetricStream $stream) {
+    public function __construct(?ContextStorage $contextStorage, AttributesFactory $attributes, WritableMetricStream $stream)
+    {
         $this->contextStorage = $contextStorage;
         $this->attributes = $attributes;
         $this->stream = $stream;
     }
 
-    public function record(float|int $value, iterable $attributes, Context|false|null $context, int $timestamp): void {
+    public function record(float|int $value, iterable $attributes, Context|false|null $context, int $timestamp): void
+    {
         $context = $context
             ?? ($this->contextStorage ?? Context::storage())->current()
             ?: Context::getRoot();

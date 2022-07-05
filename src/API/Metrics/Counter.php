@@ -1,9 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\API\Metrics;
 
 use OpenTelemetry\Context\Context;
 
-interface Counter {
+interface Counter
+{
 
     /**
      * @param float|int $amount non-negative amount to increment by

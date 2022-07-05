@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\Context\Context;
@@ -10,7 +13,8 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 /**
  * @template T
  */
-interface Aggregation {
+interface Aggregation
+{
 
     /**
      * @return T

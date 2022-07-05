@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
 use OpenTelemetry\SDK\Metrics\MetricMetadata;
@@ -7,8 +10,8 @@ use OpenTelemetry\SDK\Metrics\MetricSourceProvider;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistry;
 use OpenTelemetry\SDK\Metrics\StalenessHandler;
 
-final class CompositeReader implements MetricReader, MetricSourceRegistry {
-
+final class CompositeReader implements MetricReader, MetricSourceRegistry
+{
     private iterable $metricReaders;
 
     private bool $closed = false;
@@ -16,11 +19,13 @@ final class CompositeReader implements MetricReader, MetricSourceRegistry {
     /**
      * @param iterable<MetricReader&MetricSourceRegistry> $metricReaders
      */
-    public function __construct(iterable $metricReaders) {
+    public function __construct(iterable $metricReaders)
+    {
         $this->metricReaders = $metricReaders;
     }
 
-    public function add(MetricSourceProvider&MetricMetadata $provider, StalenessHandler $stalenessHandler): void {
+    public function add(MetricSourceProvider&MetricMetadata $provider, StalenessHandler $stalenessHandler): void
+    {
         if ($this->closed) {
             return;
         }
@@ -30,7 +35,8 @@ final class CompositeReader implements MetricReader, MetricSourceRegistry {
         }
     }
 
-    public function collect(): bool {
+    public function collect(): bool
+    {
         if ($this->closed) {
             return false;
         }
@@ -43,7 +49,8 @@ final class CompositeReader implements MetricReader, MetricSourceRegistry {
         return (bool) $success;
     }
 
-    public function shutdown(): bool {
+    public function shutdown(): bool
+    {
         if ($this->closed) {
             return false;
         }
@@ -58,7 +65,8 @@ final class CompositeReader implements MetricReader, MetricSourceRegistry {
         return (bool) $success;
     }
 
-    public function forceFlush(): bool {
+    public function forceFlush(): bool
+    {
         if ($this->closed) {
             return false;
         }

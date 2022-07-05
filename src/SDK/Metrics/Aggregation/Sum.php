@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Aggregation;
 
 use OpenTelemetry\Context\Context;
@@ -10,22 +13,25 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 /**
  * @implements Aggregation<SumSummary>
  */
-final class Sum implements Aggregation {
-
+final class Sum implements Aggregation
+{
     private bool $monotonic;
 
-    public function __construct(bool $monotonic = false) {
+    public function __construct(bool $monotonic = false)
+    {
         $this->monotonic = $monotonic;
     }
 
-    public function initialize(): SumSummary {
+    public function initialize(): SumSummary
+    {
         return new SumSummary(0);
     }
 
     /**
      * @param SumSummary $summary
      */
-    public function record(mixed $summary, float|int $value, Attributes $attributes, Context $context, int $timestamp): void {
+    public function record(mixed $summary, float|int $value, Attributes $attributes, Context $context, int $timestamp): void
+    {
         $summary->value += $value;
     }
 
@@ -33,7 +39,8 @@ final class Sum implements Aggregation {
      * @param SumSummary $left
      * @param SumSummary $right
      */
-    public function merge(mixed $left, mixed $right): SumSummary {
+    public function merge(mixed $left, mixed $right): SumSummary
+    {
         $sum = $left->value + $right->value;
 
         return new SumSummary(
@@ -45,7 +52,8 @@ final class Sum implements Aggregation {
      * @param SumSummary $left
      * @param SumSummary $right
      */
-    public function diff(mixed $left, mixed $right): SumSummary {
+    public function diff(mixed $left, mixed $right): SumSummary
+    {
         $sum = -$left->value + $right->value;
 
         return new SumSummary(

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
 use OpenTelemetry\SDK\Clock;
@@ -11,8 +14,8 @@ use OpenTelemetry\SDK\Metrics\MetricSourceRegistry;
 use OpenTelemetry\SDK\Metrics\StalenessHandler;
 use function spl_object_id;
 
-final class ExportingReader implements MetricReader, MetricSourceRegistry {
-
+final class ExportingReader implements MetricReader, MetricSourceRegistry
+{
     private MetricExporter $exporter;
     private Clock $clock;
     /** @var array<int, MetricSource> */
@@ -20,12 +23,14 @@ final class ExportingReader implements MetricReader, MetricSourceRegistry {
 
     private bool $closed = false;
 
-    public function __construct(MetricExporter $exporter, Clock $clock) {
+    public function __construct(MetricExporter $exporter, Clock $clock)
+    {
         $this->exporter = $exporter;
         $this->clock = $clock;
     }
 
-    public function add(MetricSourceProvider&MetricMetadata $provider, StalenessHandler $stalenessHandler): void {
+    public function add(MetricSourceProvider&MetricMetadata $provider, StalenessHandler $stalenessHandler): void
+    {
         if (!$temporality = $this->exporter->temporality($provider)) {
             return;
         }
@@ -35,12 +40,13 @@ final class ExportingReader implements MetricReader, MetricSourceRegistry {
 
         $this->sources[$sourceId] = $source;
 
-        $stalenessHandler->onStale(function() use ($sourceId): void {
+        $stalenessHandler->onStale(function () use ($sourceId): void {
             unset($this->sources[$sourceId]);
         });
     }
 
-    private function doCollect(): bool {
+    private function doCollect(): bool
+    {
         $timestamp = $this->clock->nanotime();
         $metrics = [];
         foreach ($this->sources as $source) {
@@ -50,7 +56,8 @@ final class ExportingReader implements MetricReader, MetricSourceRegistry {
         return $this->exporter->export($metrics);
     }
 
-    public function collect(): bool {
+    public function collect(): bool
+    {
         if ($this->closed) {
             return false;
         }
@@ -58,7 +65,8 @@ final class ExportingReader implements MetricReader, MetricSourceRegistry {
         return $this->doCollect();
     }
 
-    public function shutdown(): bool {
+    public function shutdown(): bool
+    {
         if ($this->closed) {
             return false;
         }
@@ -68,7 +76,8 @@ final class ExportingReader implements MetricReader, MetricSourceRegistry {
         return (bool) ($this->doCollect() & $this->exporter->shutdown());
     }
 
-    public function forceFlush(): bool {
+    public function forceFlush(): bool
+    {
         if ($this->closed) {
             return false;
         }

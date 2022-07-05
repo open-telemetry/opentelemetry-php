@@ -1,17 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics;
 
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\API\Metrics\Histogram;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Clock;
 
-final class SdkHistogram implements Histogram {
-
+final class SdkHistogram implements Histogram
+{
     private MetricWriter $writer;
     private ReferenceCounter $referenceCounter;
     private Clock $clock;
 
-    public function __construct(MetricWriter $writer, ReferenceCounter $referenceCounter, Clock $clock) {
+    public function __construct(MetricWriter $writer, ReferenceCounter $referenceCounter, Clock $clock)
+    {
         $this->writer = $writer;
         $this->referenceCounter = $referenceCounter;
         $this->clock = $clock;
@@ -19,11 +23,13 @@ final class SdkHistogram implements Histogram {
         $this->referenceCounter->acquire();
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->referenceCounter->release();
     }
 
-    public function record(float|int $amount, iterable $attributes = [], Context|false|null $context = null): void {
+    public function record(float|int $amount, iterable $attributes = [], Context|false|null $context = null): void
+    {
         $this->writer->record($amount, $attributes, $context, $this->clock->nanotime());
     }
 }

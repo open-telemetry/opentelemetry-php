@@ -1,6 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
+use function array_search;
+use function assert;
+use function count;
 use OpenTelemetry\API\Metrics\Observer;
 use OpenTelemetry\SDK\AttributesFactory;
 use OpenTelemetry\SDK\Metrics\Aggregation;
@@ -8,12 +14,9 @@ use OpenTelemetry\SDK\Metrics\AttributeProcessor;
 use OpenTelemetry\SDK\Metrics\Data\Data;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoir;
-use function array_search;
-use function assert;
-use function count;
 
-final class AsynchronousMetricStream implements MetricStream {
-
+final class AsynchronousMetricStream implements MetricStream
+{
     private MetricAggregator $metricAggregator;
     private AttributesFactory $attributes;
     private Aggregation $aggregation;
@@ -49,15 +52,18 @@ final class AsynchronousMetricStream implements MetricStream {
         $this->metric = new Metric([], [], $startTimestamp, -1);
     }
 
-    public function temporality(): Temporality {
+    public function temporality(): Temporality
+    {
         return Temporality::Cumulative;
     }
 
-    public function collectionTimestamp(): int {
+    public function collectionTimestamp(): int
+    {
         return $this->metric->timestamp;
     }
 
-    public function register(Temporality $temporality): int {
+    public function register(Temporality $temporality): int
+    {
         if ($temporality === Temporality::Cumulative) {
             return -1;
         }
@@ -71,7 +77,8 @@ final class AsynchronousMetricStream implements MetricStream {
         return $reader;
     }
 
-    public function unregister(int $reader): void {
+    public function unregister(int $reader): void
+    {
         if (!isset($this->lastReads[$reader])) {
             return;
         }
@@ -79,9 +86,11 @@ final class AsynchronousMetricStream implements MetricStream {
         $this->lastReads[$reader] = null;
     }
 
-    public function collect(int $reader, ?int $timestamp): Data {
+    public function collect(int $reader, ?int $timestamp): Data
+    {
         if ($timestamp !== null && !$this->locked) {
             $this->locked = true;
+
             try {
                 ($this->instrument)(new AsynchronousMetricStreamObserver($this->metricAggregator, $this->attributes, $timestamp));
 
@@ -116,7 +125,8 @@ final class AsynchronousMetricStream implements MetricStream {
         return $data;
     }
 
-    private function diff(Metric $lastRead, Metric $metric): Metric {
+    private function diff(Metric $lastRead, Metric $metric): Metric
+    {
         assert($lastRead->revision <= $metric->revision);
 
         $diff = clone $metric;

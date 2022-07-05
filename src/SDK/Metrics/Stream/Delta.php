@@ -1,13 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
 use GMP;
 
-final class Delta {
-
+final class Delta
+{
     public function __construct(
         public Metric $metric,
         public int|GMP $readers,
         public ?Delta $prev = null,
-    ) {}
+    ) {
+    }
 }

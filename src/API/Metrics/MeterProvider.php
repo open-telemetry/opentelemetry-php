@@ -1,7 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\API\Metrics;
 
-interface MeterProvider {
+interface MeterProvider
+{
 
     /**
      * Returns a `Meter` for the given instrumentation scope.
