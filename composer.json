@@ -23,7 +23,8 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "composer/package-versions-deprecated": true
+            "composer/package-versions-deprecated": true,
+            "symfony/runtime": true
         }
     },
     "authors": [
