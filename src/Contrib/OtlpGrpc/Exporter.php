@@ -13,9 +13,9 @@ use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Retry\ExponentialWithJitterRetryPolicy;
+use OpenTelemetry\SDK\Common\Time\BlockingScheduler;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use OpenTelemetry\SDK\Common\Time\BlockingScheduler;
 
 class Exporter implements SpanExporterInterface
 {
