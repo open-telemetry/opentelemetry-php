@@ -177,6 +177,7 @@ trait InstrumentationTrait
     {
         $this->propagator = new NullPropagator();
         $this->tracer = new NoopTracer();
+        /** @phan-suppress-next-line PhanAccessMethodInternal */
         $this->meter = new NoopMeter();
         $this->logger = new NullLogger();
     }
