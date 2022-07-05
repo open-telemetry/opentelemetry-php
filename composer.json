@@ -18,7 +18,6 @@
         "promphp/prometheus_client_php": "^2.2.1",
         "psr/http-factory-implementation": "^1.0",
         "psr/log": "^1.1|^2.0|^3.0",
-        "revolt/event-loop": "^0.2.4",
         "symfony/polyfill-mbstring": "^1.23"
     },
     "config": {

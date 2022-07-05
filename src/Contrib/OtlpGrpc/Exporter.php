@@ -15,6 +15,7 @@ use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Retry\ExponentialWithJitterRetryPolicy;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use OpenTelemetry\SDK\Common\Time\BlockingScheduler;
 
 class Exporter implements SpanExporterInterface
 {
@@ -82,6 +83,7 @@ class Exporter implements SpanExporterInterface
             \Grpc\STATUS_DATA_LOSS,
             \Grpc\STATUS_UNAUTHENTICATED,
         ]);
+        $this->setDelayScheduler(new BlockingScheduler());
 
         $this->metadata = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
