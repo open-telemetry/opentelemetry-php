@@ -247,7 +247,7 @@ class SpanTest extends MockeryTestCase
 
     /**
      * @group trace-compliance
-     * @covers ::isRecording
+     * @covers OpenTelemetry\SDK\Trace\Span::isRecording
      */
     public function test_to_span_data_active_span(): void
     {
@@ -446,7 +446,7 @@ class SpanTest extends MockeryTestCase
 
     /**
      * @group trace-compliance
-     * @covers ::setAttributes
+     * @covers OpenTelemetry\SDK\Trace\Span::setAttributes
      */
     public function test_set_attributes(): void
     {
@@ -486,7 +486,7 @@ class SpanTest extends MockeryTestCase
 
     /**
      * @group trace-compliance
-     * @covers ::addEvent
+     * @covers OpenTelemetry\SDK\Trace\Span::addEvent
      */
     public function test_add_event(): void
     {
