@@ -61,6 +61,9 @@ class SpanConverter implements SpanConverterInterface
         foreach ($span->getResource()->getAttributes() as $k => $v) {
             $row['attributes'][$k] = $v;
         }
+        foreach ($span->getInstrumentationScope()->getAttributes() as $k => $v) {
+            $row['attributes'][$k] = $v;
+        }
 
         /*
         foreach ($span->getEvents() as $event) {

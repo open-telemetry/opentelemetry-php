@@ -22,6 +22,6 @@ final class Host implements ResourceDetectorInterface
             ResourceAttributes::HOST_ARCH => php_uname('m'),
         ];
 
-        return ResourceInfo::create(new Attributes($attributes), ResourceAttributes::SCHEMA_URL);
+        return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
     }
 }

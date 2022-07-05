@@ -43,7 +43,4 @@ interface SpanDataInterface
 
     /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/sdk_exporters/non-otlp.md#dropped-links-count */
     public function getTotalDroppedLinks(): int;
-
-    /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/sdk_exporters/non-otlp.md#dropped-attributes-count */
-    public function getTotalDroppedAttributes(): int;
 }

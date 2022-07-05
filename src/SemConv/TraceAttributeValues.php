@@ -6,12 +6,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SemConv;
 
-class TraceAttributeValues
+interface TraceAttributeValues
 {
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.9.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.12.0';
     /**
      * @see TraceAttributes::OPENTRACING_REF_TYPE The parent Span depends on the child Span in some capacity
      */
@@ -390,19 +390,24 @@ class TraceAttributeValues
     public const FAAS_DOCUMENT_OPERATION_DELETE = 'delete';
 
     /**
-     * @see TraceAttributes::HTTP_FLAVOR HTTP 1.0
+     * @see TraceAttributes::HTTP_FLAVOR HTTP/1.0
      */
     public const HTTP_FLAVOR_HTTP_1_0 = '1.0';
 
     /**
-     * @see TraceAttributes::HTTP_FLAVOR HTTP 1.1
+     * @see TraceAttributes::HTTP_FLAVOR HTTP/1.1
      */
     public const HTTP_FLAVOR_HTTP_1_1 = '1.1';
 
     /**
-     * @see TraceAttributes::HTTP_FLAVOR HTTP 2
+     * @see TraceAttributes::HTTP_FLAVOR HTTP/2
      */
     public const HTTP_FLAVOR_HTTP_2_0 = '2.0';
+
+    /**
+     * @see TraceAttributes::HTTP_FLAVOR HTTP/3
+     */
+    public const HTTP_FLAVOR_HTTP_3_0 = '3.0';
 
     /**
      * @see TraceAttributes::HTTP_FLAVOR SPDY protocol
@@ -578,6 +583,26 @@ class TraceAttributeValues
      * @see TraceAttributes::FAAS_INVOKED_PROVIDER Tencent Cloud
      */
     public const FAAS_INVOKED_PROVIDER_TENCENT_CLOUD = 'tencent_cloud';
+
+    /**
+     * @see TraceAttributes::RPC_SYSTEM gRPC
+     */
+    public const RPC_SYSTEM_GRPC = 'grpc';
+
+    /**
+     * @see TraceAttributes::RPC_SYSTEM Java RMI
+     */
+    public const RPC_SYSTEM_JAVA_RMI = 'java_rmi';
+
+    /**
+     * @see TraceAttributes::RPC_SYSTEM .NET WCF
+     */
+    public const RPC_SYSTEM_DOTNET_WCF = 'dotnet_wcf';
+
+    /**
+     * @see TraceAttributes::RPC_SYSTEM Apache Dubbo
+     */
+    public const RPC_SYSTEM_APACHE_DUBBO = 'apache_dubbo';
 
     /**
      * @see TraceAttributes::MESSAGING_OPERATION receive

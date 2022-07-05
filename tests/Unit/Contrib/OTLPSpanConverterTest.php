@@ -36,8 +36,8 @@ class OTLPSpanConverterTest extends TestCase
             ->setName('batch.manager')
             ->addAttribute('attr1', 'apple')
             ->addAttribute('attr2', 'orange')
-            ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
-            ->addLink($context, new Attributes(['foo' => 'bar']))
+            ->addEvent('validators.list', Attributes::create(['job' => 'stage.updateTime']), 1505855799433901068)
+            ->addLink($context, Attributes::create(['foo' => 'bar']))
             ->setHasEnded(true);
 
         $converter = new SpanConverter();
@@ -152,7 +152,7 @@ class OTLPSpanConverterTest extends TestCase
             )
             ->setResource(
                 ResourceInfo::create(
-                    new Attributes([
+                    Attributes::create([
                         'telemetry.sdk.name' => 'opentelemetry',
                         'telemetry.sdk.language' => 'php',
                         'telemetry.sdk.version' => 'dev',
@@ -164,10 +164,10 @@ class OTLPSpanConverterTest extends TestCase
             ->setStartEpochNanos($start_time)
             ->setEndEpochNanos($end_time)
             ->setName('http_get')
-            ->setInstrumentationScope(new InstrumentationScope('lib-test', 'v0.1.0', 'http://url'))
+            ->setInstrumentationScope(new InstrumentationScope('lib-test', 'v0.1.0', 'http://url', Attributes::create([])))
             ->addAttribute('user', 'alice')
             ->addAttribute('authenticated', true)
-            ->addEvent('Event1', new Attributes(['success' => 'yes']), 1617313804325769955)
+            ->addEvent('Event1', Attributes::create(['success' => 'yes']), 1617313804325769955)
             ->setStatus(StatusData::ok())
             ->setHasEnded(true);
 
@@ -253,7 +253,7 @@ class OTLPSpanConverterTest extends TestCase
     {
         $span = $this->createMock(SpanData::class);
         $resource = $this->createMock(ResourceInfo::class);
-        $attributes = new Attributes(['foo' => 'foo', 'bar' => 'bar']);
+        $attributes = Attributes::create(['foo' => 'foo', 'bar' => 'bar']);
         $span->method('getResource')->willReturn($resource);
         $resource->method('getAttributes')->willReturn($attributes);
         $converter = new SpanConverter();
@@ -261,13 +261,21 @@ class OTLPSpanConverterTest extends TestCase
         $this->assertCount(2, $result[0]->getResource()->getAttributes());
     }
 
+    public function test_multiple_resources_result_in_multiple_resource_spans(): void
+    {
+        $resourceA = ResourceInfo::create(Attributes::create(['foo' => 'bar']));
+        $resourceB = ResourceInfo::create(Attributes::create(['foo' => 'baz']));
+        $converter = new SpanConverter();
+        $result = $converter->convert([
+            (new SpanData())->setResource($resourceA),
+            (new SpanData())->setResource($resourceB),
+        ]);
+        $this->assertCount(2, $result);
+    }
+
     public function test_otlp_no_spans(): void
     {
-        $spans = [];
-
-        $row = (new SpanConverter())->convert($spans)[0];
-
-        $this->assertEquals(new ResourceSpans(), $row);
+        $this->assertSame([], (new SpanConverter())->convert([]));
     }
 
     /**

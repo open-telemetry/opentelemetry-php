@@ -31,7 +31,7 @@ class ResourceInfoFactory
 
         $schemaUrl = self::mergeSchemaUrl(...$resources);
 
-        return ResourceInfo::create(new Attributes($attributes), $schemaUrl);
+        return ResourceInfo::create(Attributes::create($attributes), $schemaUrl);
     }
 
     public static function defaultResource(): ResourceInfo
@@ -91,7 +91,7 @@ class ResourceInfoFactory
 
     public static function emptyResource(): ResourceInfo
     {
-        return ResourceInfo::create(new Attributes());
+        return ResourceInfo::create(Attributes::create([]));
     }
 
     private static function mergeSchemaUrl(ResourceInfo ...$resources): ?string

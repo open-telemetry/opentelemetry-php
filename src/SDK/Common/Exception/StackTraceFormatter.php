@@ -132,7 +132,8 @@ final class StackTraceFormatter
     {
         $frames = [];
         $trace = $e->getTrace();
-        for ($i = 0; $i < count($trace) + 1; $i++) {
+        $traceCount = count($trace);
+        for ($i = 0; $i < $traceCount + 1; $i++) {
             $frames[] = [
                 'function' => $trace[$i]['function'] ?? '{main}',
                 'class' => $trace[$i]['class'] ?? null,

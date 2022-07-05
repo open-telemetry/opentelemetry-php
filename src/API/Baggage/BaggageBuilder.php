@@ -26,7 +26,7 @@ final class BaggageBuilder implements BaggageBuilderInterface
     /** @inheritDoc */
     public function set(string $key, $value, MetadataInterface $metadata = null): BaggageBuilderInterface
     {
-        $metadata = $metadata ?? Metadata::getEmpty();
+        $metadata ??= Metadata::getEmpty();
 
         $this->entries[$key] = new Entry($value, $metadata);
 

@@ -6,12 +6,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SemConv;
 
-class TraceAttributes
+interface TraceAttributes
 {
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.9.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.12.0';
 
     /**
      * The full invoked ARN as provided on the `Context` passed to the function (`Lambda-Runtime-Invoked-Function-Arn` header on the `/runtime/invocation/next` applicable).
@@ -21,6 +21,45 @@ class TraceAttributes
      * @example arn:aws:lambda:us-east-1:123456:function:myfunction:myalias
      */
     public const AWS_LAMBDA_INVOKED_ARN = 'aws.lambda.invoked_arn';
+
+    /**
+     * The event_id uniquely identifies the event.
+     *
+     * @example 123e4567-e89b-12d3-a456-426614174000
+     * @example 0001
+     */
+    public const CLOUDEVENTS_EVENT_ID = 'cloudevents.event_id';
+
+    /**
+     * The source identifies the context in which an event happened.
+     *
+     * @example https://github.com/cloudevents
+     * @example /cloudevents/spec/pull/123
+     * @example my-service
+     */
+    public const CLOUDEVENTS_EVENT_SOURCE = 'cloudevents.event_source';
+
+    /**
+     * The version of the CloudEvents specification which the event uses.
+     *
+     * @example 1.0
+     */
+    public const CLOUDEVENTS_EVENT_SPEC_VERSION = 'cloudevents.event_spec_version';
+
+    /**
+     * The event_type contains a value describing the type of event related to the originating occurrence.
+     *
+     * @example com.github.pull_request.opened
+     * @example com.example.object.deleted.v2
+     */
+    public const CLOUDEVENTS_EVENT_TYPE = 'cloudevents.event_type';
+
+    /**
+     * The subject of the event in the context of the event producer (identified by source).
+     *
+     * @example mynewfile.jpg
+     */
+    public const CLOUDEVENTS_EVENT_SUBJECT = 'cloudevents.event_subject';
 
     /**
      * Parent-child Reference type.
@@ -90,6 +129,8 @@ class TraceAttributes
 
     /**
      * Remote hostname or similar, see note below.
+     *
+     * `net.peer.name` SHOULD NOT be set if capturing it would require an extra DNS lookup.
      *
      * @example example.com
      */
@@ -377,6 +418,13 @@ class TraceAttributes
      * @example 5493
      */
     public const HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED = 'http.response_content_length_uncompressed';
+
+    /**
+     * The ordinal number of request re-sending attempt.
+     *
+     * @example 3
+     */
+    public const HTTP_RETRY_COUNT = 'http.retry_count';
 
     /**
      * The primary server name of the matched virtual host. This should be obtained via configuration. If no such configuration can be obtained, this attribute MUST NOT be set ( `net.host.name` should be used instead).

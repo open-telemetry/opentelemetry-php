@@ -58,7 +58,7 @@ class SpanBuilderTest extends MockeryTestCase
             ->tracer
             ->spanBuilder(self::SPAN_NAME)
             ->addLink($this->sampledSpanContext)
-            ->addLink($this->sampledSpanContext, new Attributes())
+            ->addLink($this->sampledSpanContext, [])
             ->startSpan();
 
         $this->assertCount(2, $span->toSpanData()->getLinks());
@@ -71,7 +71,7 @@ class SpanBuilderTest extends MockeryTestCase
             ->tracer
             ->spanBuilder(self::SPAN_NAME)
             ->addLink(Span::getInvalid()->getContext())
-            ->addLink(Span::getInvalid()->getContext(), new Attributes())
+            ->addLink(Span::getInvalid()->getContext(), [])
             ->startSpan();
 
         $this->assertEmpty($span->toSpanData()->getLinks());
@@ -99,7 +99,7 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame(8, $spanData->getTotalDroppedLinks());
 
         for ($idx = 0; $idx < $maxNumberOfLinks; $idx++) {
-            $this->assertEquals(new Link($this->sampledSpanContext), $links[$idx]);
+            $this->assertEquals(new Link($this->sampledSpanContext, Attributes::create([])), $links[$idx]);
         }
 
         $span->end();
@@ -113,11 +113,11 @@ class SpanBuilderTest extends MockeryTestCase
             ->spanBuilder(self::SPAN_NAME)
             ->addLink(
                 $this->sampledSpanContext,
-                new Attributes([
+                [
                     'key0' => 0,
                     'key1' => 1,
                     'key2' => 2,
-                ])
+                ]
             )
             ->startSpan();
 
@@ -138,12 +138,12 @@ class SpanBuilderTest extends MockeryTestCase
             ->spanBuilder(self::SPAN_NAME)
             ->addLink(
                 $this->sampledSpanContext,
-                new Attributes([
+                [
                     'string' => $tooLongStrVal,
                     'bool' => true,
                     'string_array' => [$strVal, $tooLongStrVal],
                     'int_array' => [1, 2],
-                ])
+                ]
             )
             ->startSpan();
 
@@ -235,7 +235,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span->setAttribute('doo', 'baz');
 
         $this->assertSame(2, $attributes->count());
-        $this->assertFalse($attributes->hasAttribute('doo'));
+        $this->assertFalse($attributes->has('doo'));
     }
 
     /**
@@ -297,7 +297,7 @@ class SpanBuilderTest extends MockeryTestCase
 
         $attributes = $span->toSpanData()->getAttributes();
         $this->assertSame(2, $attributes->count());
-        $this->assertFalse($attributes->hasAttribute('bar1'));
+        $this->assertFalse($attributes->has('bar1'));
     }
 
     public function test_set_attribute_dropping(): void
@@ -336,7 +336,7 @@ class SpanBuilderTest extends MockeryTestCase
                 ?AttributesInterface $attributes = null,
                 array $links = []
             ): SamplingResult {
-                return new SamplingResult(SamplingResult::RECORD_AND_SAMPLE, new Attributes(['cat' => 'meow']));
+                return new SamplingResult(SamplingResult::RECORD_AND_SAMPLE, ['cat' => 'meow']);
             }
 
             public function getDescription(): string
@@ -357,7 +357,7 @@ class SpanBuilderTest extends MockeryTestCase
 
     public function test_set_attributes(): void
     {
-        $attributes = new Attributes(['id' => 1, 'foo' => 'bar']);
+        $attributes = ['id' => 1, 'foo' => 'bar'];
 
         /** @var Span $span */
         $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setAttributes($attributes)->startSpan();
@@ -374,7 +374,7 @@ class SpanBuilderTest extends MockeryTestCase
      */
     public function test_set_attributes_merges_attributes_correctly(): void
     {
-        $attributes = new Attributes(['id' => 2, 'foo' => 'bar', 'key' => 'val']);
+        $attributes = ['id' => 2, 'foo' => 'bar', 'key' => 'val'];
 
         /** @var Span $span */
         $span = $this
@@ -397,7 +397,7 @@ class SpanBuilderTest extends MockeryTestCase
 
     public function test_set_attributes_overrides_values(): void
     {
-        $attributes = new Attributes(['id' => 1, 'foo' => 'bar']);
+        $attributes = ['id' => 1, 'foo' => 'bar'];
 
         /** @var Span $span */
         $span = $this
