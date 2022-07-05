@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
-use OpenTelemetry\Contrib\Prometheus\PrometheusExporter;
-use OpenTelemetry\SDK\Metrics\Counter;
-use Prometheus\CollectorRegistry;
 use Prometheus\Storage\Redis;
 
 Redis::setDefaultOptions(
@@ -20,10 +17,4 @@ Redis::setDefaultOptions(
     ]
 );
 
-$counter = new Counter('opentelemetry_prometheus_counter', 'Just a quick measurement');
-
-$counter->increment();
-
-$exporter = new PrometheusExporter(CollectorRegistry::getDefault());
-
-$exporter->export([$counter]);
+trigger_error('Prometheus exporter currently not supported', E_USER_WARNING);
