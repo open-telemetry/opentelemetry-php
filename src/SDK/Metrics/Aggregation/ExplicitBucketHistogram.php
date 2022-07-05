@@ -108,7 +108,7 @@ final class ExplicitBucketHistogram implements Aggregation
         array $attributes,
         array $summaries,
         array $exemplars,
-        ?int $startTimestamp,
+        int $startTimestamp,
         int $timestamp,
         $temporality
     ): Data\Histogram {

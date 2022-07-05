@@ -55,7 +55,7 @@ final class LastValue implements Aggregation
         array $attributes,
         array $summaries,
         array $exemplars,
-        ?int $startTimestamp,
+        int $startTimestamp,
         int $timestamp,
         $temporality
     ): Data\Gauge {

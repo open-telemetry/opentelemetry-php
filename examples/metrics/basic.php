@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+use OpenTelemetry\Contrib\Otlp\MetricConverter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
@@ -18,7 +19,7 @@ use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
-final class VarDumpingExporter implements MetricExporter
+final class EchoingExporter implements MetricExporter
 {
     /**
      * @var string|Temporality|null
@@ -40,7 +41,7 @@ final class VarDumpingExporter implements MetricExporter
 
     public function export(iterable $batch): bool
     {
-        var_dump($batch);
+        echo (new MetricConverter())->convert($batch)->serializeToJsonString(), PHP_EOL;
 
         return true;
     }
@@ -57,7 +58,7 @@ final class VarDumpingExporter implements MetricExporter
 }
 
 $clock = ClockFactory::getDefault();
-$reader = new ExportingReader(new VarDumpingExporter(/*Temporality::CUMULATIVE*/), $clock);
+$reader = new ExportingReader(new EchoingExporter(/*Temporality::CUMULATIVE*/), $clock);
 $meterProvider = new SdkMeterProvider(
     null,
     ResourceInfoFactory::emptyResource(),

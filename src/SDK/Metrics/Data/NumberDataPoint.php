@@ -20,7 +20,7 @@ final class NumberDataPoint
     /**
      * @readonly
      */
-    public ?int $startTimestamp;
+    public int $startTimestamp;
     /**
      * @readonly
      */
@@ -32,7 +32,7 @@ final class NumberDataPoint
     /**
      * @param float|int $value
      */
-    public function __construct($value, Attributes $attributes, ?int $startTimestamp, int $timestamp, iterable $exemplars = [])
+    public function __construct($value, Attributes $attributes, int $startTimestamp, int $timestamp, iterable $exemplars = [])
     {
         $this->value = $value;
         $this->attributes = $attributes;

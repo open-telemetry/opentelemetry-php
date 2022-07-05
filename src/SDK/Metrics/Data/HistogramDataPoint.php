@@ -42,7 +42,7 @@ final class HistogramDataPoint
     /**
      * @readonly
      */
-    public ?int $startTimestamp;
+    public int $startTimestamp;
     /**
      * @readonly
      */
@@ -56,7 +56,7 @@ final class HistogramDataPoint
      * @param float|int $min
      * @param float|int $max
      */
-    public function __construct(int $count, $sum, $min, $max, array $bucketCounts, array $explicitBounds, Attributes $attributes, ?int $startTimestamp, int $timestamp, iterable $exemplars = [])
+    public function __construct(int $count, $sum, $min, $max, array $bucketCounts, array $explicitBounds, Attributes $attributes, int $startTimestamp, int $timestamp, iterable $exemplars = [])
     {
         $this->count = $count;
         $this->sum = $sum;
