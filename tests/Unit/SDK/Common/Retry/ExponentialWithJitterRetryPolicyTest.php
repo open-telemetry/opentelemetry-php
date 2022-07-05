@@ -34,6 +34,7 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
     public function test_retry_policy_set_properly()
     {
         $this->exporter->setRetryPolicy(ExponentialWithJitterRetryPolicy::getDefault());
+
         $this->assertSame(
             $this->exporter->getRetryPolicy()->getMaxAttempts(),
             ExponentialWithJitterRetryPolicy::DEFAULT_MAX_ATTEMPTS
