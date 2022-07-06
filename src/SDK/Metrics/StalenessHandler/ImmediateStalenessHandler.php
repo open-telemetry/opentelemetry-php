@@ -22,7 +22,7 @@ final class ImmediateStalenessHandler implements StalenessHandler, ReferenceCoun
 
     public function release(): void
     {
-        if (--$this->count) {
+        if (--$this->count !== 0) {
             return;
         }
 

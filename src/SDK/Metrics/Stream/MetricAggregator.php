@@ -39,11 +39,11 @@ final class MetricAggregator implements WritableMetricStream
      */
     public function record($value, AttributesInterface $attributes, Context $context, int $timestamp): void
     {
-        $filteredAttributes = $this->attributeProcessor
+        $filteredAttributes = $this->attributeProcessor !== null
             ? $this->attributeProcessor->process($attributes, $context)
             : $attributes;
         $raw = $filteredAttributes->toArray();
-        $index = $raw ? serialize($raw) : 0;
+        $index = $raw !== [] ? serialize($raw) : 0;
         $this->attributes[$index] = $filteredAttributes;
         $this->aggregation->record(
             $this->summaries[$index] ??= $this->aggregation->initialize(),
@@ -53,7 +53,7 @@ final class MetricAggregator implements WritableMetricStream
             $timestamp,
         );
 
-        if ($this->exemplarReservoir) {
+        if ($this->exemplarReservoir !== null) {
             $this->exemplarReservoir->offer($index, $value, $attributes, $context, $timestamp, $this->revision);
         }
     }

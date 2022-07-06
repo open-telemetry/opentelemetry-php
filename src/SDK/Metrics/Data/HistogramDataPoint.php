@@ -28,10 +28,12 @@ final class HistogramDataPoint
      */
     public $max;
     /**
+     * @var int[]
      * @readonly
      */
     public array $bucketCounts;
     /**
+     * @var list<float|int>
      * @readonly
      */
     public array $explicitBounds;
@@ -55,6 +57,8 @@ final class HistogramDataPoint
      * @param float|int $sum
      * @param float|int $min
      * @param float|int $max
+     * @param int[] $bucketCounts
+     * @param list<float|int> $explicitBounds
      */
     public function __construct(int $count, $sum, $min, $max, array $bucketCounts, array $explicitBounds, AttributesInterface $attributes, int $startTimestamp, int $timestamp, iterable $exemplars = [])
     {

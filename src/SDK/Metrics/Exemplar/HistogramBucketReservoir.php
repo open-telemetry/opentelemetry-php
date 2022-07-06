@@ -12,8 +12,14 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 final class HistogramBucketReservoir implements ExemplarReservoir
 {
     private BucketStorage $storage;
+    /**
+     * @var list<float|int>
+     */
     private array $boundaries;
 
+    /**
+     * @param list<float|int> $boundaries
+     */
     public function __construct(AttributesFactoryInterface $attributesFactory, array $boundaries)
     {
         $this->storage = new BucketStorage($attributesFactory, count($boundaries) + 1);

@@ -13,6 +13,9 @@ use function spl_object_id;
 final class MultiObserver implements MetricObserver
 {
     private ReferenceCounter $referenceCounter;
+    /**
+     * @var array<int, Closure(Observer):void>
+     */
     private array $callbacks = [];
 
     public function __construct(ReferenceCounter $referenceCounter)

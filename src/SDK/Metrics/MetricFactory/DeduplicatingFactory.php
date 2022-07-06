@@ -7,12 +7,22 @@ namespace OpenTelemetry\SDK\Metrics\MetricFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\MetricFactory;
+use OpenTelemetry\SDK\Metrics\MetricObserver;
+use OpenTelemetry\SDK\Metrics\MetricWriter;
+use OpenTelemetry\SDK\Metrics\ReferenceCounter;
+use OpenTelemetry\SDK\Metrics\StalenessHandler;
 use function serialize;
 
 final class DeduplicatingFactory implements MetricFactory
 {
     private MetricFactory $metricFactory;
+    /**
+     * @var array<string, array<string, array{MetricObserver, StalenessHandler&ReferenceCounter}>>
+     */
     private array $observers = [];
+    /**
+     * @var array<string, array<string, array{MetricWriter, StalenessHandler&ReferenceCounter}>>
+     */
     private array $writers = [];
 
     public function __construct(MetricFactory $metricFactory)

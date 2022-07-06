@@ -14,12 +14,12 @@ final class Delta
      * @var int|GMP
      */
     public $readers;
-    public ?Delta $prev = null;
+    public ?self $prev;
     /**
      * @psalm-suppress UndefinedDocblockClass
      * @param int|GMP $readers
      */
-    public function __construct(Metric $metric, $readers, ?Delta $prev = null)
+    public function __construct(Metric $metric, $readers, ?self $prev = null)
     {
         $this->metric = $metric;
         $this->readers = $readers;

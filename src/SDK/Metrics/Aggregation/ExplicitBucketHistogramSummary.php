@@ -19,11 +19,15 @@ final class ExplicitBucketHistogramSummary
      * @var float|int
      */
     public $max;
+    /**
+     * @var int[]
+     */
     public array $buckets;
     /**
      * @param float|int $sum
      * @param float|int $min
      * @param float|int $max
+     * @param int[] $buckets
      */
     public function __construct(int $count, $sum, $min, $max, array $buckets)
     {

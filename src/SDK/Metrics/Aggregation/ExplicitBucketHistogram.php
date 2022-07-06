@@ -19,10 +19,14 @@ use OpenTelemetry\SDK\Metrics\Data;
 final class ExplicitBucketHistogram implements Aggregation
 {
     /**
+     * @var list<float|int>
      * @readonly
      */
     public array $boundaries;
 
+    /**
+     * @param list<float|int> $boundaries strictly ascending histogram bucket boundaries
+     */
     public function __construct(array $boundaries)
     {
         $this->boundaries = $boundaries;
