@@ -32,6 +32,7 @@
         ]
     },
     "suggest": {
+        "ext-gmp": "To support unlimited number of synchronous metric readers",
         "ext-mbstring": "To increase performance of string operations"
     }
 }

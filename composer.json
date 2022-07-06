@@ -98,6 +98,7 @@
         "symfony/http-client": "^5.2"
     },
     "suggest": {
+        "ext-gmp": "To support unlimited number of synchronous metric readers",
         "ext-grpc": "To use the OTLP GRPC Exporter",
         "ext-protobuf": "For more performant protobuf/grpc exporting",
         "ext-sockets": "To use the Thrift UDP Exporter for the Jaeger Agent"
