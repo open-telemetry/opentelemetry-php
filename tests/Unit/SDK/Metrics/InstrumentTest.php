@@ -4,45 +4,43 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
-use OpenTelemetry\API\Metrics\Observer;
+use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
-use OpenTelemetry\SDK\Metrics\Aggregation;
-use OpenTelemetry\SDK\Metrics\Data\Histogram;
-use OpenTelemetry\SDK\Metrics\Data\HistogramDataPoint;
-use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
-use OpenTelemetry\SDK\Metrics\Data\Sum;
+use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
+use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
+use OpenTelemetry\SDK\Metrics\Counter;
+use OpenTelemetry\SDK\Metrics\Data;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\Histogram;
 use OpenTelemetry\SDK\Metrics\MetricObserver\MultiObserver;
-use OpenTelemetry\SDK\Metrics\SdkCounter;
-use OpenTelemetry\SDK\Metrics\SdkHistogram;
-use OpenTelemetry\SDK\Metrics\SdkObservableCounter;
-use OpenTelemetry\SDK\Metrics\SdkUpDownCounter;
+use OpenTelemetry\SDK\Metrics\ObservableCounter;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandler;
 use OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\Stream\StreamWriter;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
+use OpenTelemetry\SDK\Metrics\UpDownCounter;
 use PHPUnit\Framework\TestCase;
 
 final class InstrumentTest extends TestCase
 {
 
     /**
-     * @covers \OpenTelemetry\SDK\Metrics\SdkCounter
+     * @covers \OpenTelemetry\SDK\Metrics\Counter
      */
     public function test_counter(): void
     {
-        $s = new SynchronousMetricStream(null, new Aggregation\Sum(true), null, 0);
-        $c = new SdkCounter(new StreamWriter(null, Attributes::factory(), $s->writable()), new NoopStalenessHandler(), ClockFactory::getDefault());
+        $s = new SynchronousMetricStream(null, new SumAggregation(true), null, 0);
+        $c = new Counter(new StreamWriter(null, Attributes::factory(), $s->writable()), new NoopStalenessHandler(), ClockFactory::getDefault());
         $r = $s->register(Temporality::DELTA);
 
         $c->add(5);
         $c->add(7);
         $c->add(3);
 
-        $this->assertEquals(new Sum(
+        $this->assertEquals(new Data\Sum(
             [
-                new NumberDataPoint(
+                new Data\NumberDataPoint(
                     15,
                     Attributes::create([]),
                     0,
@@ -55,22 +53,22 @@ final class InstrumentTest extends TestCase
     }
 
     /**
-     * @covers \OpenTelemetry\SDK\Metrics\SdkObservableCounter
+     * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter
      */
     public function test_asynchronous_counter(): void
     {
         $o = new MultiObserver(new NoopStalenessHandler());
-        $s = new AsynchronousMetricStream(Attributes::factory(), null, new Aggregation\Sum(true), null, $o, 0);
-        $c = new SdkObservableCounter($o, new NoopStalenessHandler());
+        $s = new AsynchronousMetricStream(Attributes::factory(), null, new SumAggregation(true), null, $o, 0);
+        $c = new ObservableCounter($o, new NoopStalenessHandler());
         $r = $s->register(Temporality::CUMULATIVE);
 
-        $c->observe(static function (Observer $observer): void {
+        $c->observe(static function (ObserverInterface $observer): void {
             $observer->observe(5);
         });
 
-        $this->assertEquals(new Sum(
+        $this->assertEquals(new Data\Sum(
             [
-                new NumberDataPoint(
+                new Data\NumberDataPoint(
                     5,
                     Attributes::create([]),
                     0,
@@ -83,21 +81,21 @@ final class InstrumentTest extends TestCase
     }
 
     /**
-     * @covers \OpenTelemetry\SDK\Metrics\SdkUpDownCounter
+     * @covers \OpenTelemetry\SDK\Metrics\UpDownCounter
      */
     public function test_up_down_counter(): void
     {
-        $s = new SynchronousMetricStream(null, new Aggregation\Sum(false), null, 0);
-        $c = new SdkUpDownCounter(new StreamWriter(null, Attributes::factory(), $s->writable()), new NoopStalenessHandler(), ClockFactory::getDefault());
+        $s = new SynchronousMetricStream(null, new SumAggregation(false), null, 0);
+        $c = new UpDownCounter(new StreamWriter(null, Attributes::factory(), $s->writable()), new NoopStalenessHandler(), ClockFactory::getDefault());
         $r = $s->register(Temporality::DELTA);
 
         $c->add(5);
         $c->add(7);
         $c->add(-8);
 
-        $this->assertEquals(new Sum(
+        $this->assertEquals(new Data\Sum(
             [
-                new NumberDataPoint(
+                new Data\NumberDataPoint(
                     4,
                     Attributes::create([]),
                     0,
@@ -110,12 +108,12 @@ final class InstrumentTest extends TestCase
     }
 
     /**
-     * @covers \OpenTelemetry\SDK\Metrics\SdkHistogram
+     * @covers \OpenTelemetry\SDK\Metrics\Histogram
      */
     public function test_histogram(): void
     {
-        $s = new SynchronousMetricStream(null, new Aggregation\ExplicitBucketHistogram([3, 6, 9]), null, 0);
-        $h = new SdkHistogram(new StreamWriter(null, Attributes::factory(), $s->writable()), new NoopStalenessHandler(), ClockFactory::getDefault());
+        $s = new SynchronousMetricStream(null, new ExplicitBucketHistogramAggregation([3, 6, 9]), null, 0);
+        $h = new Histogram(new StreamWriter(null, Attributes::factory(), $s->writable()), new NoopStalenessHandler(), ClockFactory::getDefault());
         $r = $s->register(Temporality::DELTA);
 
         $h->record(1);
@@ -126,9 +124,9 @@ final class InstrumentTest extends TestCase
         $h->record(8);
         $h->record(7);
 
-        $this->assertEquals(new Histogram(
+        $this->assertEquals(new Data\Histogram(
             [
-                new HistogramDataPoint(
+                new Data\HistogramDataPoint(
                     7,
                     59,
                     1,

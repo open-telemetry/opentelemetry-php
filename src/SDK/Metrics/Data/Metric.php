@@ -32,8 +32,8 @@ final class Metric
     /**
      * @readonly
      */
-    public Data $data;
-    public function __construct(InstrumentationScopeInterface $instrumentationScope, ResourceInfo $resource, string $name, ?string $description, ?string $unit, Data $data)
+    public DataInterface $data;
+    public function __construct(InstrumentationScopeInterface $instrumentationScope, ResourceInfo $resource, string $name, ?string $description, ?string $unit, DataInterface $data)
     {
         $this->instrumentationScope = $instrumentationScope;
         $this->resource = $resource;

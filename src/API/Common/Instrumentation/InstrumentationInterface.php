@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Common\Instrumentation;
 
-use OpenTelemetry\API\Metrics\Meter;
-use OpenTelemetry\API\Metrics\MeterProvider;
+use OpenTelemetry\API\Metrics\MeterInterface;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
@@ -31,9 +31,9 @@ interface InstrumentationInterface
 
     public function getTracer(): TracerInterface;
 
-    public function setMeterProvider(MeterProvider $meterProvider): void;
+    public function setMeterProvider(MeterProviderInterface $meterProvider): void;
 
-    public function getMeter(): Meter;
+    public function getMeter(): MeterInterface;
 
     public function setLogger(LoggerInterface $logger): void;
 

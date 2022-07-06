@@ -5,31 +5,31 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
-use OpenTelemetry\SDK\Metrics\MetricExporter;
-use OpenTelemetry\SDK\Metrics\MetricMetadata;
-use OpenTelemetry\SDK\Metrics\MetricReader;
-use OpenTelemetry\SDK\Metrics\MetricSource;
-use OpenTelemetry\SDK\Metrics\MetricSourceProvider;
-use OpenTelemetry\SDK\Metrics\MetricSourceRegistry;
-use OpenTelemetry\SDK\Metrics\StalenessHandler;
+use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
+use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
+use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
+use OpenTelemetry\SDK\Metrics\MetricSourceInterface;
+use OpenTelemetry\SDK\Metrics\MetricSourceProviderInterface;
+use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
+use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use function spl_object_id;
 
-final class ExportingReader implements MetricReader, MetricSourceRegistry
+final class ExportingReader implements MetricReaderInterface, MetricSourceRegistryInterface
 {
-    private MetricExporter $exporter;
+    private MetricExporterInterface $exporter;
     private ClockInterface $clock;
-    /** @var array<int, MetricSource> */
+    /** @var array<int, MetricSourceInterface> */
     private array $sources = [];
 
     private bool $closed = false;
 
-    public function __construct(MetricExporter $exporter, ClockInterface $clock)
+    public function __construct(MetricExporterInterface $exporter, ClockInterface $clock)
     {
         $this->exporter = $exporter;
         $this->clock = $clock;
     }
 
-    public function add(MetricSourceProvider $provider, MetricMetadata $metadata, StalenessHandler $stalenessHandler): void
+    public function add(MetricSourceProviderInterface $provider, MetricMetadataInterface $metadata, StalenessHandlerInterface $stalenessHandler): void
     {
         if (!$temporality = $this->exporter->temporality($metadata)) {
             return;

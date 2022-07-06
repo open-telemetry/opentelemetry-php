@@ -6,17 +6,17 @@ namespace OpenTelemetry\SDK\Metrics\View;
 
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
-use OpenTelemetry\SDK\Metrics\ViewRegistry;
+use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
 
-final class CriteriaViewRegistry implements ViewRegistry
+final class CriteriaViewRegistry implements ViewRegistryInterface
 {
 
-    /** @var list<SelectionCriteria> */
+    /** @var list<SelectionCriteriaInterface> */
     private array $criteria = [];
     /** @var list<ViewTemplate> */
     private array $views = [];
 
-    public function register(SelectionCriteria $criteria, ViewTemplate $view): void
+    public function register(SelectionCriteriaInterface $criteria, ViewTemplate $view): void
     {
         $this->criteria[] = $criteria;
         $this->views[] = $view;

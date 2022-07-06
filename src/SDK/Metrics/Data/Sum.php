@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Data;
 
-final class Sum implements Data
+final class Sum implements DataInterface
 {
 
     /**

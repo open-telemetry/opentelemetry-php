@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Metrics\Noop;
 
-use OpenTelemetry\API\Metrics\Counter;
+use OpenTelemetry\API\Metrics\CounterInterface;
 
 /**
  * @internal
  */
-final class NoopCounter implements Counter
+final class NoopCounter implements CounterInterface
 {
     public function add($amount, iterable $attributes = [], $context = null): void
     {

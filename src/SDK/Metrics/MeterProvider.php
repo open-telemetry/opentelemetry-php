@@ -5,31 +5,168 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use Closure;
-use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoir;
-use OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
+use function in_array;
+use LogicException;
+use OpenTelemetry\API\Metrics\MeterInterface;
+use OpenTelemetry\API\Metrics\Noop\NoopMeter;
+use OpenTelemetry\Context\ContextStorageInterface;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
+use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
+use OpenTelemetry\SDK\Metrics\Exemplar\FilteredReservoir;
+use OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir;
+use OpenTelemetry\SDK\Metrics\Exemplar\HistogramBucketReservoir;
+use OpenTelemetry\SDK\Metrics\MetricFactory\DeduplicatingFactory;
+use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
+use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
+use OpenTelemetry\SDK\Metrics\View\FallbackViewRegistry;
+use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
+use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 
-interface MeterProvider extends \OpenTelemetry\API\Metrics\MeterProvider
+final class MeterProvider implements MeterProviderInterface
 {
+    private MetricFactoryInterface $metricFactory;
+    private AttributesFactoryInterface $attributesFactory;
+    private ClockInterface $clock;
+    private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
+    private MetricReaderInterface $metricReader;
+    private CriteriaViewRegistry $criteriaViewRegistry;
+
+    private bool $closed = false;
 
     /**
-     * @param SelectionCriteria $criteria
-     * @param string|null $name
-     * @param string|null $description
-     * @param array|null $attributeKeys
-     * @param Closure(string|InstrumentType): Aggregation|null $aggregation
-     * @param Closure(Aggregation, string|InstrumentType): ?ExemplarReservoir|null $exemplarReservoir
-     * @return void
+     * @param MetricSourceRegistryInterface&MetricReaderInterface $metricReader
      */
+    public function __construct(
+        ?ContextStorageInterface $contextStorage,
+        ResourceInfo $resource,
+        ClockInterface $clock,
+        InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
+        $metricReader,
+        AttributesFactoryInterface $attributesFactory,
+        StalenessHandlerFactoryInterface $stalenessHandlerFactory
+    ) {
+        $this->attributesFactory = $attributesFactory;
+        $this->clock = $clock;
+        $this->instrumentationScopeFactory = $instrumentationScopeFactory;
+        $this->metricReader = $metricReader;
+        $this->criteriaViewRegistry = new CriteriaViewRegistry();
+
+        $this->metricFactory = new DeduplicatingFactory(new StreamFactory(
+            $contextStorage,
+            $resource,
+            new FallbackViewRegistry($this->criteriaViewRegistry, [
+                new ViewTemplate(
+                    null,
+                    null,
+                    null,
+                    self::defaultAggregation(),
+                    self::defaultExemplarReservoir(),
+                ),
+            ]),
+            $metricReader,
+            $this->attributesFactory,
+            $stalenessHandlerFactory,
+        ));
+    }
+
+    public function getMeter(
+        string $name,
+        ?string $version = null,
+        ?string $schemaUrl = null,
+        iterable $attributes = []
+    ): MeterInterface {
+        if ($this->closed) {
+            return new NoopMeter();
+        }
+
+        return new Meter(
+            $this->metricFactory,
+            $this->clock,
+            $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes),
+        );
+    }
+
     public function registerView(
-        SelectionCriteria $criteria,
+        SelectionCriteriaInterface $criteria,
         ?string $name = null,
         ?string $description = null,
         ?array $attributeKeys = null,
         ?Closure $aggregation = null,
         ?Closure $exemplarReservoir = null
-    ): void;
+    ): void {
+        $this->criteriaViewRegistry->register($criteria, new ViewTemplate(
+            $name,
+            $description,
+            $attributeKeys
+                ? new AttributeProcessor\Filtered(
+                    $this->attributesFactory,
+                    static fn (string $key): bool => in_array($key, $attributeKeys, true),
+                )
+                : null,
+            $aggregation ?? self::defaultAggregation(),
+            $exemplarReservoir ?? self::defaultExemplarReservoir(),
+        ));
+    }
 
-    public function shutdown(): bool;
+    public function shutdown(): bool
+    {
+        if ($this->closed) {
+            return false;
+        }
 
-    public function forceFlush(): bool;
+        $this->closed = true;
+
+        return $this->metricReader->shutdown();
+    }
+
+    public function forceFlush(): bool
+    {
+        if ($this->closed) {
+            return false;
+        }
+
+        return $this->metricReader->forceFlush();
+    }
+
+    /**
+     * @return Closure(string|InstrumentType): AggregationInterface
+     */
+    private static function defaultAggregation(): Closure
+    {
+        return static function ($type): AggregationInterface {
+            switch ($type) {
+                case InstrumentType::COUNTER:
+                case InstrumentType::ASYNCHRONOUS_COUNTER:
+                    return new Aggregation\SumAggregation(true);
+                case InstrumentType::UP_DOWN_COUNTER:
+                case InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER:
+                    return new Aggregation\SumAggregation();
+                case InstrumentType::HISTOGRAM:
+                    return new Aggregation\ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
+                case InstrumentType::ASYNCHRONOUS_GAUGE:
+                    return new Aggregation\LastValueAggregation();
+            }
+
+            throw new LogicException();
+        };
+    }
+
+    /**
+     * @return Closure(AggregationInterface, string|InstrumentType): ?ExemplarReservoirInterface
+     */
+    private static function defaultExemplarReservoir(): Closure
+    {
+        return static function (AggregationInterface $aggregation): ExemplarReservoirInterface {
+            $reservoir = $aggregation instanceof Aggregation\ExplicitBucketHistogramAggregation && $aggregation->boundaries
+                ? new HistogramBucketReservoir(Attributes::factory(), $aggregation->boundaries)
+                : new FixedSizeReservoir(Attributes::factory(), 5);
+
+            return new FilteredReservoir($reservoir, new WithSampledTraceExemplarFilter());
+        };
+    }
 }

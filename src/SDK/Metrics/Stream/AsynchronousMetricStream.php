@@ -7,19 +7,19 @@ namespace OpenTelemetry\SDK\Metrics\Stream;
 use function array_search;
 use function assert;
 use function count;
-use OpenTelemetry\API\Metrics\Observer;
+use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
-use OpenTelemetry\SDK\Metrics\Aggregation;
-use OpenTelemetry\SDK\Metrics\AttributeProcessor;
-use OpenTelemetry\SDK\Metrics\Data\Data;
+use OpenTelemetry\SDK\Metrics\AggregationInterface;
+use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
+use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
-use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoir;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 
-final class AsynchronousMetricStream implements MetricStream
+final class AsynchronousMetricStream implements MetricStreamInterface
 {
     private MetricAggregator $metricAggregator;
     private AttributesFactoryInterface $attributesFactory;
-    private Aggregation $aggregation;
+    private AggregationInterface $aggregation;
     private $instrument;
 
     private int $startTimestamp;
@@ -30,13 +30,13 @@ final class AsynchronousMetricStream implements MetricStream
     private array $lastReads = [];
 
     /**
-     * @param callable(Observer): void $instrument
+     * @param callable(ObserverInterface): void $instrument
      */
     public function __construct(
         AttributesFactoryInterface $attributesFactory,
-        ?AttributeProcessor $attributeProcessor,
-        Aggregation $aggregation,
-        ?ExemplarReservoir $exemplarReservoir,
+        ?AttributeProcessorInterface $attributeProcessor,
+        AggregationInterface $aggregation,
+        ?ExemplarReservoirInterface $exemplarReservoir,
         callable $instrument,
         int $startTimestamp
     ) {
@@ -86,7 +86,7 @@ final class AsynchronousMetricStream implements MetricStream
         $this->lastReads[$reader] = null;
     }
 
-    public function collect(int $reader, ?int $timestamp): Data
+    public function collect(int $reader, ?int $timestamp): DataInterface
     {
         if ($timestamp !== null && !$this->locked) {
             $this->locked = true;

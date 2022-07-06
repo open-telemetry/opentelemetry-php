@@ -10,19 +10,19 @@ use function extension_loaded;
 use GMP;
 use function gmp_init;
 use function is_int;
-use OpenTelemetry\SDK\Metrics\Aggregation;
-use OpenTelemetry\SDK\Metrics\AttributeProcessor;
-use OpenTelemetry\SDK\Metrics\Data\Data;
+use OpenTelemetry\SDK\Metrics\AggregationInterface;
+use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
+use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
-use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoir;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 use const PHP_INT_SIZE;
 use function sprintf;
 use function trigger_error;
 
-final class SynchronousMetricStream implements MetricStream
+final class SynchronousMetricStream implements MetricStreamInterface
 {
     private MetricAggregator $metricAggregator;
-    private Aggregation $aggregation;
+    private AggregationInterface $aggregation;
 
     private int $timestamp;
 
@@ -39,9 +39,9 @@ final class SynchronousMetricStream implements MetricStream
     private $cumulative = 0;
 
     public function __construct(
-        ?AttributeProcessor $attributeProcessor,
-        Aggregation $aggregation,
-        ?ExemplarReservoir $exemplarReservoir,
+        ?AttributeProcessorInterface $attributeProcessor,
+        AggregationInterface $aggregation,
+        ?ExemplarReservoirInterface $exemplarReservoir,
         int $startTimestamp
     ) {
         $this->metricAggregator = new MetricAggregator(
@@ -54,7 +54,7 @@ final class SynchronousMetricStream implements MetricStream
         $this->delta = new DeltaStorage($aggregation);
     }
 
-    public function writable(): WritableMetricStream
+    public function writable(): WritableMetricStreamInterface
     {
         return $this->metricAggregator;
     }
@@ -110,7 +110,7 @@ final class SynchronousMetricStream implements MetricStream
         }
     }
 
-    public function collect(int $reader, ?int $timestamp): Data
+    public function collect(int $reader, ?int $timestamp): DataInterface
     {
         if ($timestamp !== null) {
             $this->delta->add(

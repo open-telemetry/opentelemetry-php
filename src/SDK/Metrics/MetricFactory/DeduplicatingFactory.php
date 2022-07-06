@@ -6,26 +6,26 @@ namespace OpenTelemetry\SDK\Metrics\MetricFactory;
 
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
-use OpenTelemetry\SDK\Metrics\MetricFactory;
-use OpenTelemetry\SDK\Metrics\MetricObserver;
-use OpenTelemetry\SDK\Metrics\MetricWriter;
-use OpenTelemetry\SDK\Metrics\ReferenceCounter;
-use OpenTelemetry\SDK\Metrics\StalenessHandler;
+use OpenTelemetry\SDK\Metrics\MetricFactoryInterface;
+use OpenTelemetry\SDK\Metrics\MetricObserverInterface;
+use OpenTelemetry\SDK\Metrics\MetricWriterInterface;
+use OpenTelemetry\SDK\Metrics\ReferenceCounterInterface;
+use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use function serialize;
 
-final class DeduplicatingFactory implements MetricFactory
+final class DeduplicatingFactory implements MetricFactoryInterface
 {
-    private MetricFactory $metricFactory;
+    private MetricFactoryInterface $metricFactory;
     /**
-     * @var array<string, array<string, array{MetricObserver, StalenessHandler&ReferenceCounter}>>
+     * @var array<string, array<string, array{MetricObserverInterface, StalenessHandlerInterface&ReferenceCounterInterface}>>
      */
     private array $observers = [];
     /**
-     * @var array<string, array<string, array{MetricWriter, StalenessHandler&ReferenceCounter}>>
+     * @var array<string, array<string, array{MetricWriterInterface, StalenessHandlerInterface&ReferenceCounterInterface}>>
      */
     private array $writers = [];
 
-    public function __construct(MetricFactory $metricFactory)
+    public function __construct(MetricFactoryInterface $metricFactory)
     {
         $this->metricFactory = $metricFactory;
     }

@@ -4,27 +4,27 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
-use OpenTelemetry\SDK\Metrics\MetricMetadata;
-use OpenTelemetry\SDK\Metrics\MetricReader;
-use OpenTelemetry\SDK\Metrics\MetricSourceProvider;
-use OpenTelemetry\SDK\Metrics\MetricSourceRegistry;
-use OpenTelemetry\SDK\Metrics\StalenessHandler;
+use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
+use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
+use OpenTelemetry\SDK\Metrics\MetricSourceProviderInterface;
+use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
+use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 
-final class CompositeReader implements MetricReader, MetricSourceRegistry
+final class CompositeReader implements MetricReaderInterface, MetricSourceRegistryInterface
 {
     private iterable $metricReaders;
 
     private bool $closed = false;
 
     /**
-     * @param iterable<MetricReader&MetricSourceRegistry> $metricReaders
+     * @param iterable<MetricReaderInterface&MetricSourceRegistryInterface> $metricReaders
      */
     public function __construct(iterable $metricReaders)
     {
         $this->metricReaders = $metricReaders;
     }
 
-    public function add(MetricSourceProvider $provider, MetricMetadata $metadata, StalenessHandler $stalenessHandler): void
+    public function add(MetricSourceProviderInterface $provider, MetricMetadataInterface $metadata, StalenessHandlerInterface $stalenessHandler): void
     {
         if ($this->closed) {
             return;

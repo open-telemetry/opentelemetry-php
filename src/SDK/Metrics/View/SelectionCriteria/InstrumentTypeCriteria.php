@@ -8,9 +8,9 @@ use function in_array;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
-use OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
+use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
 
-final class InstrumentTypeCriteria implements SelectionCriteria
+final class InstrumentTypeCriteria implements SelectionCriteriaInterface
 {
     private array $instrumentTypes;
 

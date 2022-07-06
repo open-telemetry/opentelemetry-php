@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Data;
 
-final class Histogram implements Data
+final class Histogram implements DataInterface
 {
 
     /**

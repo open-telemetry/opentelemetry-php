@@ -5,25 +5,25 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricObserver;
 
 use Closure;
-use OpenTelemetry\API\Metrics\Observer;
-use OpenTelemetry\SDK\Metrics\MetricObserver;
-use OpenTelemetry\SDK\Metrics\ReferenceCounter;
+use OpenTelemetry\API\Metrics\ObserverInterface;
+use OpenTelemetry\SDK\Metrics\MetricObserverInterface;
+use OpenTelemetry\SDK\Metrics\ReferenceCounterInterface;
 use function spl_object_id;
 
-final class MultiObserver implements MetricObserver
+final class MultiObserver implements MetricObserverInterface
 {
-    private ReferenceCounter $referenceCounter;
+    private ReferenceCounterInterface $referenceCounter;
     /**
-     * @var array<int, Closure(Observer):void>
+     * @var array<int, Closure(ObserverInterface):void>
      */
     private array $callbacks = [];
 
-    public function __construct(ReferenceCounter $referenceCounter)
+    public function __construct(ReferenceCounterInterface $referenceCounter)
     {
         $this->referenceCounter = $referenceCounter;
     }
 
-    public function __invoke(Observer $observer): void
+    public function __invoke(ObserverInterface $observer): void
     {
         foreach ($this->callbacks as $token => $callback) {
             if (isset($this->callbacks[$token])) {

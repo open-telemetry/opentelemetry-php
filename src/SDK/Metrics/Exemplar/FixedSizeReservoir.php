@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use function random_int;
 
-final class FixedSizeReservoir implements ExemplarReservoir
+final class FixedSizeReservoir implements ExemplarReservoirInterface
 {
     private BucketStorage $storage;
     private int $size;

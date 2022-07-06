@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Metrics\Stream;
 
 use function memory_get_usage;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Metrics\Aggregation;
+use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumSummary;
 use OpenTelemetry\SDK\Metrics\Stream\DeltaStorage;
 use OpenTelemetry\SDK\Metrics\Stream\Metric;
@@ -17,14 +17,14 @@ use PHPUnit\Framework\TestCase;
  * @covers \OpenTelemetry\SDK\Metrics\Stream\Delta
  * @covers \OpenTelemetry\SDK\Metrics\Stream\Metric
  *
- * @uses \OpenTelemetry\SDK\Metrics\Aggregation\Sum
+ * @uses \OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation
  * @uses \OpenTelemetry\SDK\Metrics\Aggregation\SumSummary
  */
 final class DeltaStorageTest extends TestCase
 {
     public function test_empty_storage_returns_empty_metrics(): void
     {
-        $ds = new DeltaStorage(new Aggregation\Sum());
+        $ds = new DeltaStorage(new SumAggregation());
 
         $metric = $ds->collect(0b1);
         $this->assertNull($metric);
@@ -32,7 +32,7 @@ final class DeltaStorageTest extends TestCase
 
     public function test_storage_returns_inserted_metric(): void
     {
-        $ds = new DeltaStorage(new Aggregation\Sum());
+        $ds = new DeltaStorage(new SumAggregation());
 
         $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(3)], 0, 0), 0b1);
 
@@ -47,7 +47,7 @@ final class DeltaStorageTest extends TestCase
 
     public function test_storage_returns_inserted_metric_cumulative(): void
     {
-        $ds = new DeltaStorage(new Aggregation\Sum());
+        $ds = new DeltaStorage(new SumAggregation());
 
         $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(3)], 0, 0), 0b1);
         $ds->collect(0, true);
@@ -65,7 +65,7 @@ final class DeltaStorageTest extends TestCase
 
     public function test_storage_keeps_metrics_for_additional_readers(): void
     {
-        $ds = new DeltaStorage(new Aggregation\Sum());
+        $ds = new DeltaStorage(new SumAggregation());
 
         $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(3)], 0, 0), 0b111);
         $metric = $ds->collect(0);
@@ -113,7 +113,7 @@ final class DeltaStorageTest extends TestCase
 
     public function test_storage_keeps_constant_memory_on_one_active_reader(): void
     {
-        $ds = new DeltaStorage(new Aggregation\Sum());
+        $ds = new DeltaStorage(new SumAggregation());
         $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 0), 0b11);
         $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 1), 0b11);
 
@@ -130,7 +130,7 @@ final class DeltaStorageTest extends TestCase
 
     public function test_storage_keeps_constant_memory_on_one_active_retaining_reader(): void
     {
-        $ds = new DeltaStorage(new Aggregation\Sum());
+        $ds = new DeltaStorage(new SumAggregation());
         $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 0), 0b01);
         $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 1), 0b11);
 
@@ -149,7 +149,7 @@ final class DeltaStorageTest extends TestCase
 
     public function test_storage_keeps_constant_memory_on_alternating_active_retaining_readers(): void
     {
-        $ds = new DeltaStorage(new Aggregation\Sum());
+        $ds = new DeltaStorage(new SumAggregation());
         $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 0), 0b100);
         $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 1), 0b110);
         $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 2), 0b111);

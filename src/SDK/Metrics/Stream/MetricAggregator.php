@@ -6,17 +6,17 @@ namespace OpenTelemetry\SDK\Metrics\Stream;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\Metrics\Aggregation;
-use OpenTelemetry\SDK\Metrics\AttributeProcessor;
+use OpenTelemetry\SDK\Metrics\AggregationInterface;
+use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Exemplar;
-use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoir;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 use function serialize;
 
-final class MetricAggregator implements WritableMetricStream
+final class MetricAggregator implements WritableMetricStreamInterface
 {
-    private ?AttributeProcessor $attributeProcessor;
-    private Aggregation $aggregation;
-    private ?ExemplarReservoir $exemplarReservoir;
+    private ?AttributeProcessorInterface $attributeProcessor;
+    private AggregationInterface $aggregation;
+    private ?ExemplarReservoirInterface $exemplarReservoir;
 
     /** @var array<AttributesInterface> */
     private array $attributes = [];
@@ -25,9 +25,9 @@ final class MetricAggregator implements WritableMetricStream
     public int $revision = 0;
 
     public function __construct(
-        ?AttributeProcessor $attributeProcessor,
-        Aggregation $aggregation,
-        ?ExemplarReservoir $exemplarReservoir
+        ?AttributeProcessorInterface $attributeProcessor,
+        AggregationInterface $aggregation,
+        ?ExemplarReservoirInterface $exemplarReservoir
     ) {
         $this->attributeProcessor = $attributeProcessor;
         $this->aggregation = $aggregation;

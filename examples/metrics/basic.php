@@ -9,17 +9,17 @@ use OpenTelemetry\Contrib\Otlp\MetricConverter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
-use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogram;
+use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
-use OpenTelemetry\SDK\Metrics\MetricExporter;
-use OpenTelemetry\SDK\Metrics\MetricMetadata;
+use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
+use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
-use OpenTelemetry\SDK\Metrics\SdkMeterProvider;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
-final class EchoingExporter implements MetricExporter
+final class EchoingExporter implements MetricExporterInterface
 {
     /**
      * @var string|Temporality|null
@@ -34,7 +34,7 @@ final class EchoingExporter implements MetricExporter
         $this->temporality = $temporality;
     }
 
-    public function temporality(MetricMetadata $metric)
+    public function temporality(MetricMetadataInterface $metric)
     {
         return $this->temporality ?? $metric->temporality();
     }
@@ -59,7 +59,7 @@ final class EchoingExporter implements MetricExporter
 
 $clock = ClockFactory::getDefault();
 $reader = new ExportingReader(new EchoingExporter(/*Temporality::CUMULATIVE*/), $clock);
-$meterProvider = new SdkMeterProvider(
+$meterProvider = new MeterProvider(
     null,
     ResourceInfoFactory::emptyResource(),
     $clock,
@@ -75,7 +75,7 @@ $meterProvider->registerView(
     null,
     null,
     ['http.method', 'http.status_code'],
-    fn () => new ExplicitBucketHistogram([]),
+    fn () => new ExplicitBucketHistogramAggregation([]),
 );
 
 $serverDuration = $meterProvider->getMeter('io.opentelemetry.contrib.php')->createHistogram(

@@ -6,13 +6,13 @@ namespace OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
 
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
-use OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
+use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
 use function preg_match;
 use function preg_quote;
 use function sprintf;
 use function strtr;
 
-final class InstrumentNameCriteria implements SelectionCriteria
+final class InstrumentNameCriteria implements SelectionCriteriaInterface
 {
     private string $pattern;
 

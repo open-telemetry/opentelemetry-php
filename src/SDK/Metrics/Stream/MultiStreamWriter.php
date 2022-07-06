@@ -7,9 +7,9 @@ namespace OpenTelemetry\SDK\Metrics\Stream;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
-use OpenTelemetry\SDK\Metrics\MetricWriter;
+use OpenTelemetry\SDK\Metrics\MetricWriterInterface;
 
-final class MultiStreamWriter implements MetricWriter
+final class MultiStreamWriter implements MetricWriterInterface
 {
     private ?ContextStorageInterface $contextStorage;
     private AttributesFactoryInterface $attributesFactory;
@@ -17,7 +17,7 @@ final class MultiStreamWriter implements MetricWriter
     private iterable $streams;
 
     /**
-     * @param iterable<WritableMetricStream> $streams
+     * @param iterable<WritableMetricStreamInterface> $streams
      */
     public function __construct(?ContextStorageInterface $contextStorage, AttributesFactoryInterface $attributesFactory, iterable $streams)
     {

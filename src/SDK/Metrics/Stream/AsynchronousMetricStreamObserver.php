@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
-use OpenTelemetry\API\Metrics\Observer;
+use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 
-final class AsynchronousMetricStreamObserver implements Observer
+final class AsynchronousMetricStreamObserver implements ObserverInterface
 {
-    private WritableMetricStream $stream;
+    private WritableMetricStreamInterface $stream;
     private AttributesFactoryInterface $attributesFactory;
     private int $timestamp;
 
-    public function __construct(WritableMetricStream $stream, AttributesFactoryInterface $attributesFactory, int $timestamp)
+    public function __construct(WritableMetricStreamInterface $stream, AttributesFactoryInterface $attributesFactory, int $timestamp)
     {
         $this->stream = $stream;
         $this->attributesFactory = $attributesFactory;

@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Metrics\Exemplar;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
-final class NoopReservoir implements ExemplarReservoir
+final class NoopReservoir implements ExemplarReservoirInterface
 {
     public function offer($index, $value, AttributesInterface $attributes, Context $context, int $timestamp, int $revision): void
     {

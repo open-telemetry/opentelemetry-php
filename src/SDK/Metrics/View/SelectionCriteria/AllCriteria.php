@@ -6,14 +6,14 @@ namespace OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
 
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
-use OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
+use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
 
-final class AllCriteria implements SelectionCriteria
+final class AllCriteria implements SelectionCriteriaInterface
 {
     private iterable $criteria;
 
     /**
-     * @param iterable<SelectionCriteria> $criteria
+     * @param iterable<SelectionCriteriaInterface> $criteria
      */
     public function __construct(iterable $criteria)
     {

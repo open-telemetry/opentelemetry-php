@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\View;
 
 use Closure;
-use OpenTelemetry\SDK\Metrics\Aggregation;
-use OpenTelemetry\SDK\Metrics\AttributeProcessor;
-use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoir;
+use OpenTelemetry\SDK\Metrics\AggregationInterface;
+use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
@@ -26,22 +26,22 @@ final class ViewTemplate
     /**
      * @readonly
      */
-    public ?AttributeProcessor $attributeProcessor;
+    public ?AttributeProcessorInterface $attributeProcessor;
     /**
-     * @var Closure(string|InstrumentType):Aggregation
+     * @var Closure(string|InstrumentType):AggregationInterface
      * @readonly
      */
     public Closure $aggregation;
     /**
-     * @var Closure(Aggregation, string|InstrumentType):?ExemplarReservoir
+     * @var Closure(AggregationInterface, string|InstrumentType): (ExemplarReservoirInterface|null)
      * @readonly
      */
     public Closure $exemplarReservoir;
     /**
-     * @param Closure(string|InstrumentType): Aggregation $aggregation
-     * @param Closure(Aggregation, string|InstrumentType): ?ExemplarReservoir $exemplarReservoir
+     * @param Closure(string|InstrumentType): AggregationInterface $aggregation
+     * @param Closure(AggregationInterface, string|InstrumentType): (ExemplarReservoirInterface|null) $exemplarReservoir
      */
-    public function __construct(?string $name, ?string $description, ?AttributeProcessor $attributeProcessor, Closure $aggregation, Closure $exemplarReservoir)
+    public function __construct(?string $name, ?string $description, ?AttributeProcessorInterface $attributeProcessor, Closure $aggregation, Closure $exemplarReservoir)
     {
         $this->name = $name;
         $this->description = $description;

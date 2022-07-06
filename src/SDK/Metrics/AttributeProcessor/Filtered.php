@@ -8,9 +8,9 @@ use Closure;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\Metrics\AttributeProcessor;
+use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
 
-final class Filtered implements AttributeProcessor
+final class Filtered implements AttributeProcessorInterface
 {
     private AttributesFactoryInterface $attributesFactory;
     private Closure $filter;

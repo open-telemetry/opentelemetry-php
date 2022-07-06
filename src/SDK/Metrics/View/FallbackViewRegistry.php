@@ -6,17 +6,17 @@ namespace OpenTelemetry\SDK\Metrics\View;
 
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
-use OpenTelemetry\SDK\Metrics\ViewRegistry;
+use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
 
-final class FallbackViewRegistry implements ViewRegistry
+final class FallbackViewRegistry implements ViewRegistryInterface
 {
-    private ViewRegistry $views;
+    private ViewRegistryInterface $views;
     private iterable $fallback;
 
     /**
      * @param iterable<ViewTemplate> $fallback
      */
-    public function __construct(ViewRegistry $views, iterable $fallback)
+    public function __construct(ViewRegistryInterface $views, iterable $fallback)
     {
         $this->views = $views;
         $this->fallback = $fallback;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoir;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 
 final class ViewProjection
 {
@@ -23,16 +23,16 @@ final class ViewProjection
     /**
      * @readonly
      */
-    public ?AttributeProcessor $attributeProcessor;
+    public ?AttributeProcessorInterface $attributeProcessor;
     /**
      * @readonly
      */
-    public Aggregation $aggregation;
+    public AggregationInterface $aggregation;
     /**
      * @readonly
      */
-    public ?ExemplarReservoir $exemplarReservoir;
-    public function __construct(string $name, ?string $unit, ?string $description, ?AttributeProcessor $attributeProcessor, Aggregation $aggregation, ?ExemplarReservoir $exemplarReservoir)
+    public ?ExemplarReservoirInterface $exemplarReservoir;
+    public function __construct(string $name, ?string $unit, ?string $description, ?AttributeProcessorInterface $attributeProcessor, AggregationInterface $aggregation, ?ExemplarReservoirInterface $exemplarReservoir)
     {
         $this->name = $name;
         $this->unit = $unit;

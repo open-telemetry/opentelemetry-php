@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricFactory;
 
 use OpenTelemetry\SDK\Metrics\Data\Metric;
-use OpenTelemetry\SDK\Metrics\MetricSource;
+use OpenTelemetry\SDK\Metrics\MetricSourceInterface;
 
-final class StreamMetricSource implements MetricSource
+final class StreamMetricSource implements MetricSourceInterface
 {
     private StreamMetricSourceProvider $provider;
     private int $reader;

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Metrics\Noop;
 
-use OpenTelemetry\API\Metrics\Meter;
-use OpenTelemetry\API\Metrics\MeterProvider;
+use OpenTelemetry\API\Metrics\MeterInterface;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 
-final class NoopMeterProvider implements MeterProvider
+final class NoopMeterProvider implements MeterProviderInterface
 {
     public function getMeter(
         string $name,
         ?string $version = null,
         ?string $schemaUrl = null,
         iterable $attributes = []
-    ): Meter {
+    ): MeterInterface {
         return new NoopMeter();
     }
 }

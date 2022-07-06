@@ -7,12 +7,12 @@ namespace OpenTelemetry\SDK\Metrics\Exemplar;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
-final class FilteredReservoir implements ExemplarReservoir
+final class FilteredReservoir implements ExemplarReservoirInterface
 {
-    private ExemplarReservoir $reservoir;
-    private ExemplarFilter $filter;
+    private ExemplarReservoirInterface $reservoir;
+    private ExemplarFilterInterface $filter;
 
-    public function __construct(ExemplarReservoir $reservoir, ExemplarFilter $filter)
+    public function __construct(ExemplarReservoirInterface $reservoir, ExemplarFilterInterface $filter)
     {
         $this->reservoir = $reservoir;
         $this->filter = $filter;

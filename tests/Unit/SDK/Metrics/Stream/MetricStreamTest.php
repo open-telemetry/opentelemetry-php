@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\Stream;
 
-use OpenTelemetry\API\Metrics\Observer;
+use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Metrics\Aggregation;
+use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\Data;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream;
@@ -31,7 +31,7 @@ use PHPUnit\Framework\TestCase;
  * @uses \OpenTelemetry\SDK\Metrics\Data\Sum
  * @uses \OpenTelemetry\SDK\Metrics\Data\Temporality
  *
- * @uses \OpenTelemetry\SDK\Metrics\Aggregation\Sum
+ * @uses \OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation
  * @uses \OpenTelemetry\SDK\Metrics\Aggregation\SumSummary
  *
  * @uses \OpenTelemetry\SDK\Common\Attribute\Attributes
@@ -45,7 +45,7 @@ final class MetricStreamTest extends TestCase
         /** @var int|null $value */
         $value = null;
 
-        $s = new AsynchronousMetricStream(Attributes::factory(), null, new Aggregation\Sum(), null, function (Observer $observer) use (&$value): void {
+        $s = new AsynchronousMetricStream(Attributes::factory(), null, new SumAggregation(), null, function (ObserverInterface $observer) use (&$value): void {
             $observer->observe($value);
         }, 3);
 
@@ -82,7 +82,7 @@ final class MetricStreamTest extends TestCase
         /** @var int|null $m */
         $m = null;
 
-        $s = new AsynchronousMetricStream(Attributes::factory(), null, new Aggregation\Sum(), null, function (Observer $observer) use (&$m): void {
+        $s = new AsynchronousMetricStream(Attributes::factory(), null, new SumAggregation(), null, function (ObserverInterface $observer) use (&$m): void {
             if ($m === 0) {
                 $observer->observe(5, ['status' => 300]);
                 $observer->observe(2, ['status' => 400]);
@@ -122,7 +122,7 @@ final class MetricStreamTest extends TestCase
         /** @var int|null $value */
         $value = null;
 
-        $s = new AsynchronousMetricStream(Attributes::factory(), null, new Aggregation\Sum(), null, function (Observer $observer) use (&$value): void {
+        $s = new AsynchronousMetricStream(Attributes::factory(), null, new SumAggregation(), null, function (ObserverInterface $observer) use (&$value): void {
             if ($value !== null) {
                 $observer->observe($value);
             }
@@ -152,7 +152,7 @@ final class MetricStreamTest extends TestCase
 
     public function test_synchronous_single_data_point(): void
     {
-        $s = new SynchronousMetricStream(null, new Aggregation\Sum(), null, 3);
+        $s = new SynchronousMetricStream(null, new SumAggregation(), null, 3);
         $w = new StreamWriter(null, Attributes::factory(), $s->writable());
 
         $d = $s->register(Temporality::DELTA);
@@ -185,7 +185,7 @@ final class MetricStreamTest extends TestCase
 
     public function test_synchronous_multiple_data_points(): void
     {
-        $s = new SynchronousMetricStream(null, new Aggregation\Sum(), null, 3);
+        $s = new SynchronousMetricStream(null, new SumAggregation(), null, 3);
         $w = new StreamWriter(null, Attributes::factory(), $s->writable());
 
         $d = $s->register(Temporality::DELTA);

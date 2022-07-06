@@ -6,14 +6,14 @@ namespace OpenTelemetry\SDK\Metrics\Stream;
 
 use function assert;
 use GMP;
-use OpenTelemetry\SDK\Metrics\Aggregation;
+use OpenTelemetry\SDK\Metrics\AggregationInterface;
 
 final class DeltaStorage
 {
-    private Aggregation $aggregation;
+    private AggregationInterface $aggregation;
     private Delta $head;
 
-    public function __construct(Aggregation $aggregation)
+    public function __construct(AggregationInterface $aggregation)
     {
         $this->aggregation = $aggregation;
         $this->head = new Delta(new Metric([], [], 0, 0), 0);

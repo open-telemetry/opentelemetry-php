@@ -7,16 +7,16 @@ namespace OpenTelemetry\SDK\Metrics\Stream;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
-use OpenTelemetry\SDK\Metrics\MetricWriter;
+use OpenTelemetry\SDK\Metrics\MetricWriterInterface;
 
-final class StreamWriter implements MetricWriter
+final class StreamWriter implements MetricWriterInterface
 {
     private ?ContextStorageInterface $contextStorage;
     private AttributesFactoryInterface $attributesFactory;
 
-    private WritableMetricStream $stream;
+    private WritableMetricStreamInterface $stream;
 
-    public function __construct(?ContextStorageInterface $contextStorage, AttributesFactoryInterface $attributesFactory, WritableMetricStream $stream)
+    public function __construct(?ContextStorageInterface $contextStorage, AttributesFactoryInterface $attributesFactory, WritableMetricStreamInterface $stream)
     {
         $this->contextStorage = $contextStorage;
         $this->attributesFactory = $attributesFactory;

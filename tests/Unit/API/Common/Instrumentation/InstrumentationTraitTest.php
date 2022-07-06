@@ -6,8 +6,8 @@ namespace OpenTelemetry\Tests\Unit\API\Common\Instrumentation;
 
 use OpenTelemetry\API\Common\Instrumentation\InstrumentationInterface;
 use OpenTelemetry\API\Common\Instrumentation\InstrumentationTrait;
-use OpenTelemetry\API\Metrics\Meter;
-use OpenTelemetry\API\Metrics\MeterProvider;
+use OpenTelemetry\API\Metrics\MeterInterface;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\API\Trace\TracerInterface;
@@ -70,8 +70,8 @@ class InstrumentationTraitTest extends TestCase
 
         $this->assertInstanceOf(NoopMeter::class, $instrumentation->getMeter());
 
-        $meter = $this->createMock(Meter::class);
-        $meterProvider = $this->createMock(MeterProvider::class);
+        $meter = $this->createMock(MeterInterface::class);
+        $meterProvider = $this->createMock(MeterProviderInterface::class);
         $meterProvider->expects($this->once())
             ->method('getMeter')
             ->willReturn($meter);

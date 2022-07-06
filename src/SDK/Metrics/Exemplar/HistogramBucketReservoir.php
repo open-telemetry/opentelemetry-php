@@ -9,7 +9,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
-final class HistogramBucketReservoir implements ExemplarReservoir
+final class HistogramBucketReservoir implements ExemplarReservoirInterface
 {
     private BucketStorage $storage;
     /**
