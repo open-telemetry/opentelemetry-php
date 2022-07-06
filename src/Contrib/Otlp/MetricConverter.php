@@ -136,6 +136,7 @@ final class MetricConverter
     {
         $pGauge = new Gauge();
         foreach ($gauge->dataPoints as $dataPoint) {
+            /** @psalm-suppress InvalidArgument */
             $pGauge->getDataPoints()[] = $this->convertNumberDataPoint($dataPoint);
         }
 
@@ -146,6 +147,7 @@ final class MetricConverter
     {
         $pHistogram = new Histogram();
         foreach ($histogram->dataPoints as $dataPoint) {
+            /** @psalm-suppress InvalidArgument */
             $pHistogram->getDataPoints()[] = $this->convertHistogramDataPoint($dataPoint);
         }
         $pHistogram->setAggregationTemporality($this->convertTemporality($histogram->temporality));
@@ -157,6 +159,7 @@ final class MetricConverter
     {
         $pSum = new Sum();
         foreach ($sum->dataPoints as $dataPoint) {
+            /** @psalm-suppress InvalidArgument */
             $pSum->getDataPoints()[] = $this->convertNumberDataPoint($dataPoint);
         }
         $pSum->setAggregationTemporality($this->convertTemporality($sum->temporality));
@@ -178,6 +181,7 @@ final class MetricConverter
             $pNumberDataPoint->setAsDouble($dataPoint->value);
         }
         foreach ($dataPoint->exemplars as $exemplar) {
+            /** @psalm-suppress InvalidArgument */
             $pNumberDataPoint->getExemplars()[] = $this->convertExemplar($exemplar);
         }
 
@@ -197,6 +201,7 @@ final class MetricConverter
         /** @phpstan-ignore-next-line */
         $pHistogramDataPoint->setExplicitBounds($dataPoint->explicitBounds);
         foreach ($dataPoint->exemplars as $exemplar) {
+            /** @psalm-suppress InvalidArgument */
             $pHistogramDataPoint->getExemplars()[] = $this->convertExemplar($exemplar);
         }
 
