@@ -28,7 +28,7 @@ final class MetricConverter
 {
 
     /**
-     * @param iterable<Sdk\Metrics\Data\Metric> $batch
+     * @param iterable<SDK\Metrics\Data\Metric> $batch
      */
     public function convert(iterable $batch): ExportMetricsServiceRequest
     {
@@ -101,7 +101,7 @@ final class MetricConverter
         return $pScopeMetrics;
     }
 
-    private function convertMetric(Sdk\Metrics\Data\Metric $metric): Metric
+    private function convertMetric(SDK\Metrics\Data\Metric $metric): Metric
     {
         $pMetric = new Metric();
         $pMetric->setName($metric->name);
@@ -132,7 +132,7 @@ final class MetricConverter
         return AggregationTemporality::AGGREGATION_TEMPORALITY_UNSPECIFIED;
     }
 
-    private function convertGauge(Sdk\Metrics\Data\Gauge $gauge): Gauge
+    private function convertGauge(SDK\Metrics\Data\Gauge $gauge): Gauge
     {
         $pGauge = new Gauge();
         foreach ($gauge->dataPoints as $dataPoint) {
@@ -143,7 +143,7 @@ final class MetricConverter
         return $pGauge;
     }
 
-    private function convertHistogram(Sdk\Metrics\Data\Histogram $histogram): Histogram
+    private function convertHistogram(SDK\Metrics\Data\Histogram $histogram): Histogram
     {
         $pHistogram = new Histogram();
         foreach ($histogram->dataPoints as $dataPoint) {
@@ -155,7 +155,7 @@ final class MetricConverter
         return $pHistogram;
     }
 
-    private function convertSum(Sdk\Metrics\Data\Sum $sum): Sum
+    private function convertSum(SDK\Metrics\Data\Sum $sum): Sum
     {
         $pSum = new Sum();
         foreach ($sum->dataPoints as $dataPoint) {
@@ -168,7 +168,7 @@ final class MetricConverter
         return $pSum;
     }
 
-    private function convertNumberDataPoint(Sdk\Metrics\Data\NumberDataPoint $dataPoint): NumberDataPoint
+    private function convertNumberDataPoint(SDK\Metrics\Data\NumberDataPoint $dataPoint): NumberDataPoint
     {
         $pNumberDataPoint = new NumberDataPoint();
         $this->setAttributes($pNumberDataPoint, $dataPoint->attributes);
@@ -188,7 +188,7 @@ final class MetricConverter
         return $pNumberDataPoint;
     }
 
-    private function convertHistogramDataPoint(Sdk\Metrics\Data\HistogramDataPoint $dataPoint): HistogramDataPoint
+    private function convertHistogramDataPoint(SDK\Metrics\Data\HistogramDataPoint $dataPoint): HistogramDataPoint
     {
         $pHistogramDataPoint = new HistogramDataPoint();
         $this->setAttributes($pHistogramDataPoint, $dataPoint->attributes);
@@ -208,7 +208,7 @@ final class MetricConverter
         return $pHistogramDataPoint;
     }
 
-    private function convertExemplar(Sdk\Metrics\Data\Exemplar $exemplar): Exemplar
+    private function convertExemplar(SDK\Metrics\Data\Exemplar $exemplar): Exemplar
     {
         $pExemplar = new Exemplar();
         $this->setFilteredAttributes($pExemplar, $exemplar->attributes);
