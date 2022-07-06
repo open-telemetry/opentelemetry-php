@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
-use OpenTelemetry\SDK\Clock;
+use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricMetadata;
 use OpenTelemetry\SDK\Metrics\MetricReader;
@@ -17,13 +17,13 @@ use function spl_object_id;
 final class ExportingReader implements MetricReader, MetricSourceRegistry
 {
     private MetricExporter $exporter;
-    private Clock $clock;
+    private ClockInterface $clock;
     /** @var array<int, MetricSource> */
     private array $sources = [];
 
     private bool $closed = false;
 
-    public function __construct(MetricExporter $exporter, Clock $clock)
+    public function __construct(MetricExporter $exporter, ClockInterface $clock)
     {
         $this->exporter = $exporter;
         $this->clock = $clock;
@@ -47,7 +47,7 @@ final class ExportingReader implements MetricReader, MetricSourceRegistry
 
     private function doCollect(): bool
     {
-        $timestamp = $this->clock->nanotime();
+        $timestamp = $this->clock->now();
         $metrics = [];
         foreach ($this->sources as $source) {
             $metrics[] = $source->collect($timestamp);

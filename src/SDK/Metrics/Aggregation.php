@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\Data\Data;
 use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
@@ -25,7 +25,7 @@ interface Aggregation
      * @param T $summary
      * @param float|int $value
      */
-    public function record($summary, $value, Attributes $attributes, Context $context, int $timestamp): void;
+    public function record($summary, $value, AttributesInterface $attributes, Context $context, int $timestamp): void;
 
     /**
      * @param T $left
@@ -42,7 +42,7 @@ interface Aggregation
     public function diff($left, $right);
 
     /**
-     * @param array<Attributes> $attributes
+     * @param array<AttributesInterface> $attributes
      * @param array<T> $summaries
      * @param array<list<Exemplar>> $exemplars
      * @param string|Temporality $temporality

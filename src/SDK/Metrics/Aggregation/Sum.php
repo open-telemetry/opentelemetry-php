@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\Aggregation;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\Aggregation;
 use OpenTelemetry\SDK\Metrics\Data;
 
@@ -29,7 +29,7 @@ final class Sum implements Aggregation
     /**
      * @param SumSummary $summary
      */
-    public function record($summary, $value, Attributes $attributes, Context $context, int $timestamp): void
+    public function record($summary, $value, AttributesInterface $attributes, Context $context, int $timestamp): void
     {
         $summary->value += $value;
     }

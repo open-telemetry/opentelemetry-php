@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Exemplar;
 
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 /**
  * @internal
@@ -20,7 +20,7 @@ final class BucketEntry
      */
     public $value;
     public int $timestamp;
-    public Attributes $attributes;
+    public AttributesInterface $attributes;
     public ?string $traceId;
     public ?string $spanId;
 

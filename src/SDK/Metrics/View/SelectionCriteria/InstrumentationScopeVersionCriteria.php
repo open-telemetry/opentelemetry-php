@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
 
-use OpenTelemetry\SDK\InstrumentationScope;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
 
@@ -17,7 +17,7 @@ final class InstrumentationScopeVersionCriteria implements SelectionCriteria
         $this->version = $version;
     }
 
-    public function accepts(Instrument $instrument, InstrumentationScope $instrumentationScope): bool
+    public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool
     {
         return $this->version === $instrumentationScope->getVersion();
     }

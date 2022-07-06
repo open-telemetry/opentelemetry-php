@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Data;
 
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class HistogramDataPoint
 {
@@ -38,7 +38,7 @@ final class HistogramDataPoint
     /**
      * @readonly
      */
-    public Attributes $attributes;
+    public AttributesInterface $attributes;
     /**
      * @readonly
      */
@@ -56,7 +56,7 @@ final class HistogramDataPoint
      * @param float|int $min
      * @param float|int $max
      */
-    public function __construct(int $count, $sum, $min, $max, array $bucketCounts, array $explicitBounds, Attributes $attributes, int $startTimestamp, int $timestamp, iterable $exemplars = [])
+    public function __construct(int $count, $sum, $min, $max, array $bucketCounts, array $explicitBounds, AttributesInterface $attributes, int $startTimestamp, int $timestamp, iterable $exemplars = [])
     {
         $this->count = $count;
         $this->sum = $sum;

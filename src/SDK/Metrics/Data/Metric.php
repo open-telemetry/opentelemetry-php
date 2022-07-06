@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Data;
 
-use OpenTelemetry\SDK\InstrumentationScope;
-use OpenTelemetry\SDK\Resource;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 final class Metric
 {
     /**
      * @readonly
      */
-    public InstrumentationScope $instrumentationScope;
+    public InstrumentationScopeInterface $instrumentationScope;
     /**
      * @readonly
      */
-    public Resource $resource;
+    public ResourceInfo $resource;
     /**
      * @readonly
      */
@@ -33,7 +33,7 @@ final class Metric
      * @readonly
      */
     public Data $data;
-    public function __construct(InstrumentationScope $instrumentationScope, Resource $resource, string $name, ?string $description, ?string $unit, Data $data)
+    public function __construct(InstrumentationScopeInterface $instrumentationScope, ResourceInfo $resource, string $name, ?string $description, ?string $unit, Data $data)
     {
         $this->instrumentationScope = $instrumentationScope;
         $this->resource = $resource;

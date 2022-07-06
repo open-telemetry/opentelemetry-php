@@ -5,24 +5,24 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\ContextStorage;
-use OpenTelemetry\SDK\AttributesFactory;
+use OpenTelemetry\Context\ContextStorageInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricWriter;
 
 final class MultiStreamWriter implements MetricWriter
 {
-    private ?ContextStorage $contextStorage;
-    private AttributesFactory $attributes;
+    private ?ContextStorageInterface $contextStorage;
+    private AttributesFactoryInterface $attributesFactory;
 
     private iterable $streams;
 
     /**
      * @param iterable<WritableMetricStream> $streams
      */
-    public function __construct(?ContextStorage $contextStorage, AttributesFactory $attributes, iterable $streams)
+    public function __construct(?ContextStorageInterface $contextStorage, AttributesFactoryInterface $attributesFactory, iterable $streams)
     {
         $this->contextStorage = $contextStorage;
-        $this->attributes = $attributes;
+        $this->attributesFactory = $attributesFactory;
         $this->streams = $streams;
     }
 
@@ -32,7 +32,7 @@ final class MultiStreamWriter implements MetricWriter
             ?? ($this->contextStorage ?? Context::storage())->current()
             ?: Context::getRoot();
 
-        $attributes = $this->attributes->builder($attributes)->build();
+        $attributes = $this->attributesFactory->builder($attributes)->build();
         foreach ($this->streams as $stream) {
             $stream->record($value, $attributes, $context, $timestamp);
         }

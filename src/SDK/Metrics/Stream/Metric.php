@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 /**
  * @template T
@@ -13,7 +13,7 @@ final class Metric
 {
 
     /**
-     * @var array<Attributes>
+     * @var array<AttributesInterface>
      */
     public array $attributes;
     /**
@@ -23,7 +23,7 @@ final class Metric
     public int $timestamp;
     public int $revision;
     /**
-     * @param array<Attributes> $attributes
+     * @param array<AttributesInterface> $attributes
      * @param array<T> $summaries
      */
     public function __construct(array $attributes, array $summaries, int $timestamp, int $revision)

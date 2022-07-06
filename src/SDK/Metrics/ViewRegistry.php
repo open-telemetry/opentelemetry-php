@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-use OpenTelemetry\SDK\InstrumentationScope;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
 interface ViewRegistry
 {
@@ -12,5 +12,5 @@ interface ViewRegistry
     /**
      * @return iterable<ViewProjection>
      */
-    public function find(Instrument $instrument, InstrumentationScope $instrumentationScope): iterable;
+    public function find(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): iterable;
 }

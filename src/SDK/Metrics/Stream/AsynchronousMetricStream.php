@@ -8,7 +8,7 @@ use function array_search;
 use function assert;
 use function count;
 use OpenTelemetry\API\Metrics\Observer;
-use OpenTelemetry\SDK\AttributesFactory;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Metrics\Aggregation;
 use OpenTelemetry\SDK\Metrics\AttributeProcessor;
 use OpenTelemetry\SDK\Metrics\Data\Data;
@@ -18,7 +18,7 @@ use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoir;
 final class AsynchronousMetricStream implements MetricStream
 {
     private MetricAggregator $metricAggregator;
-    private AttributesFactory $attributes;
+    private AttributesFactoryInterface $attributesFactory;
     private Aggregation $aggregation;
     private $instrument;
 
@@ -33,7 +33,7 @@ final class AsynchronousMetricStream implements MetricStream
      * @param callable(Observer): void $instrument
      */
     public function __construct(
-        AttributesFactory $attributes,
+        AttributesFactoryInterface $attributesFactory,
         ?AttributeProcessor $attributeProcessor,
         Aggregation $aggregation,
         ?ExemplarReservoir $exemplarReservoir,
@@ -45,7 +45,7 @@ final class AsynchronousMetricStream implements MetricStream
             $aggregation,
             $exemplarReservoir,
         );
-        $this->attributes = $attributes;
+        $this->attributesFactory = $attributesFactory;
         $this->aggregation = $aggregation;
         $this->instrument = $instrument;
         $this->startTimestamp = $startTimestamp;
@@ -92,7 +92,7 @@ final class AsynchronousMetricStream implements MetricStream
             $this->locked = true;
 
             try {
-                ($this->instrument)(new AsynchronousMetricStreamObserver($this->metricAggregator, $this->attributes, $timestamp));
+                ($this->instrument)(new AsynchronousMetricStreamObserver($this->metricAggregator, $this->attributesFactory, $timestamp));
 
                 $this->metric = $this->metricAggregator->collect($timestamp);
             } finally {

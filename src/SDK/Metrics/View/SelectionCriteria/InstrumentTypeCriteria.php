@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
 
 use function in_array;
-use OpenTelemetry\SDK\InstrumentationScope;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
@@ -22,7 +22,7 @@ final class InstrumentTypeCriteria implements SelectionCriteria
         $this->instrumentTypes = (array) $instrumentType;
     }
 
-    public function accepts(Instrument $instrument, InstrumentationScope $instrumentationScope): bool
+    public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool
     {
         return in_array($instrument->type, $this->instrumentTypes, true);
     }

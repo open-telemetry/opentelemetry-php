@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Data;
 
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class NumberDataPoint
 {
@@ -16,7 +16,7 @@ final class NumberDataPoint
     /**
      * @readonly
      */
-    public Attributes $attributes;
+    public AttributesInterface $attributes;
     /**
      * @readonly
      */
@@ -32,7 +32,7 @@ final class NumberDataPoint
     /**
      * @param float|int $value
      */
-    public function __construct($value, Attributes $attributes, int $startTimestamp, int $timestamp, iterable $exemplars = [])
+    public function __construct($value, AttributesInterface $attributes, int $startTimestamp, int $timestamp, iterable $exemplars = [])
     {
         $this->value = $value;
         $this->attributes = $attributes;

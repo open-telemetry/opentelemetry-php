@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
 
-use OpenTelemetry\SDK\InstrumentationScope;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
 
@@ -20,7 +20,7 @@ final class AllCriteria implements SelectionCriteria
         $this->criteria = $criteria;
     }
 
-    public function accepts(Instrument $instrument, InstrumentationScope $instrumentationScope): bool
+    public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool
     {
         foreach ($this->criteria as $criterion) {
             if (!$criterion->accepts($instrument, $instrumentationScope)) {

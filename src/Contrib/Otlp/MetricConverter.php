@@ -78,7 +78,7 @@ final class MetricConverter
         return $pExportMetricsServiceRequest;
     }
 
-    private function convertResourceMetrics(SDK\Resource $resource): ResourceMetrics
+    private function convertResourceMetrics(SDK\Resource\ResourceInfo $resource): ResourceMetrics
     {
         $pResourceMetrics = new ResourceMetrics();
         $pResource = new Resource_();
@@ -89,7 +89,7 @@ final class MetricConverter
         return $pResourceMetrics;
     }
 
-    private function convertScopeMetrics(SDK\InstrumentationScope $instrumentationScope): ScopeMetrics
+    private function convertScopeMetrics(SDK\Common\Instrumentation\InstrumentationScopeInterface $instrumentationScope): ScopeMetrics
     {
         $pScopeMetrics = new ScopeMetrics();
         $pInstrumentationScope = new InstrumentationScope();
@@ -228,7 +228,7 @@ final class MetricConverter
     /**
      * @param Resource_|NumberDataPoint|HistogramDataPoint $pElement
      */
-    private function setAttributes($pElement, SDK\Attributes $attributes): void
+    private function setAttributes($pElement, SDK\Common\Attribute\AttributesInterface $attributes): void
     {
         foreach ($attributes as $key => $value) {
             /** @psalm-suppress InvalidArgument */
@@ -241,7 +241,7 @@ final class MetricConverter
         }
     }
 
-    private function setFilteredAttributes(Exemplar $pElement, SDK\Attributes $attributes): void
+    private function setFilteredAttributes(Exemplar $pElement, SDK\Common\Attribute\AttributesInterface $attributes): void
     {
         foreach ($attributes as $key => $value) {
             /** @psalm-suppress InvalidArgument */

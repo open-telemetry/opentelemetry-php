@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\Exemplar;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class FilteredReservoir implements ExemplarReservoir
 {
@@ -18,7 +18,7 @@ final class FilteredReservoir implements ExemplarReservoir
         $this->filter = $filter;
     }
 
-    public function offer($index, $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void
+    public function offer($index, $value, AttributesInterface $attributes, Context $context, int $timestamp, int $revision): void
     {
         if ($this->filter->accepts($value, $attributes, $context, $timestamp)) {
             $this->reservoir->offer($index, $value, $attributes, $context, $timestamp, $revision);

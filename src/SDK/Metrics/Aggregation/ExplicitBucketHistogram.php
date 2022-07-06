@@ -9,7 +9,7 @@ use function count;
 use const INF;
 use const NAN;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\Aggregation;
 use OpenTelemetry\SDK\Metrics\Data;
 
@@ -42,7 +42,7 @@ final class ExplicitBucketHistogram implements Aggregation
     /**
      * @param ExplicitBucketHistogramSummary $summary
      */
-    public function record($summary, $value, Attributes $attributes, Context $context, int $timestamp): void
+    public function record($summary, $value, AttributesInterface $attributes, Context $context, int $timestamp): void
     {
         for ($i = 0; $i < count($this->boundaries) && $this->boundaries[$i] < $value; $i++) {
         }

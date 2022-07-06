@@ -10,8 +10,8 @@ use function class_exists;
 use function count;
 use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\AttributesFactory;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 
 /**
@@ -19,13 +19,13 @@ use OpenTelemetry\SDK\Metrics\Data\Exemplar;
  */
 final class BucketStorage
 {
-    private AttributesFactory $attributes;
+    private AttributesFactoryInterface $attributesFactory;
     /** @var array<int, BucketEntry|null> */
     private array $buckets;
 
-    public function __construct(AttributesFactory $attributes, int $size = 0)
+    public function __construct(AttributesFactoryInterface $attributesFactory, int $size = 0)
     {
-        $this->attributes = $attributes;
+        $this->attributesFactory = $attributesFactory;
         $this->buckets = array_fill(0, $size, null);
     }
 
@@ -33,7 +33,7 @@ final class BucketStorage
      * @param int|string $index
      * @param float|int $value
      */
-    public function store(int $bucket, $index, $value, Attributes $attributes, Context $context, int $timestamp, int $revision): void
+    public function store(int $bucket, $index, $value, AttributesInterface $attributes, Context $context, int $timestamp, int $revision): void
     {
         assert($bucket <= count($this->buckets));
 
@@ -54,7 +54,7 @@ final class BucketStorage
     }
 
     /**
-     * @param array<Attributes> $dataPointAttributes
+     * @param array<AttributesInterface> $dataPointAttributes
      * @return array<list<Exemplar>>
      */
     public function collect(array $dataPointAttributes, int $revision, int $limit): array
@@ -80,9 +80,9 @@ final class BucketStorage
         return $exemplars;
     }
 
-    private function filterExemplarAttributes(Attributes $dataPointAttributes, Attributes $exemplarAttributes): Attributes
+    private function filterExemplarAttributes(AttributesInterface $dataPointAttributes, AttributesInterface $exemplarAttributes): AttributesInterface
     {
-        $attributes = $this->attributes->builder();
+        $attributes = $this->attributesFactory->builder();
         foreach ($exemplarAttributes as $key => $value) {
             if ($dataPointAttributes->get($key) === null) {
                 $attributes[$key] = $value;

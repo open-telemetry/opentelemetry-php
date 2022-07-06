@@ -6,13 +6,14 @@ namespace OpenTelemetry\SDK\Metrics;
 
 use Closure;
 use function in_array;
+use LogicException;
 use OpenTelemetry\API\Metrics\Meter;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
-use OpenTelemetry\ContextStorage;
-use OpenTelemetry\SDK\AttributesFactory;
-use OpenTelemetry\SDK\Clock;
+use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\InstrumentationScopeFactory;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
+use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoir;
 use OpenTelemetry\SDK\Metrics\Exemplar\FilteredReservoir;
@@ -24,14 +25,14 @@ use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Metrics\View\FallbackViewRegistry;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria;
 use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
-use OpenTelemetry\SDK\Resource;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 final class SdkMeterProvider implements MeterProvider
 {
     private MetricFactory $metricFactory;
-    private AttributesFactory $metricAttributes;
-    private Clock $clock;
-    private InstrumentationScopeFactory $instrumentationScopeFactory;
+    private AttributesFactoryInterface $attributesFactory;
+    private ClockInterface $clock;
+    private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
     private MetricReader $metricReader;
     private CriteriaViewRegistry $criteriaViewRegistry;
 
@@ -41,15 +42,15 @@ final class SdkMeterProvider implements MeterProvider
      * @param MetricSourceRegistry&MetricReader $metricReader
      */
     public function __construct(
-        ?ContextStorage $contextStorage,
-        Resource $resource,
-        Clock $clock,
-        InstrumentationScopeFactory $instrumentationScopeFactory,
+        ?ContextStorageInterface $contextStorage,
+        ResourceInfo $resource,
+        ClockInterface $clock,
+        InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
         $metricReader,
-        AttributesFactory $metricAttributes,
+        AttributesFactoryInterface $attributesFactory,
         StalenessHandlerFactory $stalenessHandlerFactory
     ) {
-        $this->metricAttributes = $metricAttributes;
+        $this->attributesFactory = $attributesFactory;
         $this->clock = $clock;
         $this->instrumentationScopeFactory = $instrumentationScopeFactory;
         $this->metricReader = $metricReader;
@@ -68,7 +69,7 @@ final class SdkMeterProvider implements MeterProvider
                 ),
             ]),
             $metricReader,
-            $this->metricAttributes,
+            $this->attributesFactory,
             $stalenessHandlerFactory,
         ));
     }
@@ -103,7 +104,7 @@ final class SdkMeterProvider implements MeterProvider
             $description,
             $attributeKeys
                 ? new AttributeProcessor\Filtered(
-                    $this->metricAttributes,
+                    $this->attributesFactory,
                     static fn (string $key): bool => in_array($key, $attributeKeys, true),
                 )
                 : null,
@@ -151,7 +152,7 @@ final class SdkMeterProvider implements MeterProvider
                     return new Aggregation\LastValue();
             }
 
-            throw new \LogicException();
+            throw new LogicException();
         };
     }
 

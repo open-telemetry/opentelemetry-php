@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\MetricFactory;
 
-use OpenTelemetry\SDK\InstrumentationScope;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\MetricMetadata;
 use OpenTelemetry\SDK\Metrics\MetricSource;
 use OpenTelemetry\SDK\Metrics\MetricSourceProvider;
 use OpenTelemetry\SDK\Metrics\Stream\MetricStream;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
-use OpenTelemetry\SDK\Resource;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 final class StreamMetricSourceProvider implements MetricSourceProvider, MetricMetadata
 {
@@ -26,16 +26,16 @@ final class StreamMetricSourceProvider implements MetricSourceProvider, MetricMe
     /**
      * @readonly
      */
-    public InstrumentationScope $instrumentationLibrary;
+    public InstrumentationScopeInterface $instrumentationLibrary;
     /**
      * @readonly
      */
-    public Resource $resource;
+    public ResourceInfo $resource;
     /**
      * @readonly
      */
     public MetricStream $stream;
-    public function __construct(ViewProjection $view, Instrument $instrument, InstrumentationScope $instrumentationLibrary, Resource $resource, MetricStream $stream)
+    public function __construct(ViewProjection $view, Instrument $instrument, InstrumentationScopeInterface $instrumentationLibrary, ResourceInfo $resource, MetricStream $stream)
     {
         $this->view = $view;
         $this->instrument = $instrument;

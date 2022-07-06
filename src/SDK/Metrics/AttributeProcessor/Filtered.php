@@ -6,24 +6,24 @@ namespace OpenTelemetry\SDK\Metrics\AttributeProcessor;
 
 use Closure;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Attributes;
-use OpenTelemetry\SDK\AttributesFactory;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\AttributeProcessor;
 
 final class Filtered implements AttributeProcessor
 {
-    private AttributesFactory $attributes;
+    private AttributesFactoryInterface $attributesFactory;
     private Closure $filter;
 
-    public function __construct(AttributesFactory $attributes, Closure $filter)
+    public function __construct(AttributesFactoryInterface $attributesFactory, Closure $filter)
     {
-        $this->attributes = $attributes;
+        $this->attributesFactory = $attributesFactory;
         $this->filter = $filter;
     }
 
-    public function process(Attributes $attributes, Context $context): Attributes
+    public function process(AttributesInterface $attributes, Context $context): AttributesInterface
     {
-        $filtered = $this->attributes->builder();
+        $filtered = $this->attributesFactory->builder();
         foreach ($attributes as $key => $value) {
             if (($this->filter)($key, $value)) {
                 $filtered[$key] = $value;

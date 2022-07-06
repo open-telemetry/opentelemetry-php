@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Data;
 
-use OpenTelemetry\SDK\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class Exemplar
 {
@@ -20,7 +20,7 @@ final class Exemplar
     /**
      * @readonly
      */
-    public Attributes $attributes;
+    public AttributesInterface $attributes;
     /**
      * @readonly
      */
@@ -32,7 +32,7 @@ final class Exemplar
     /**
      * @param float|int $value
      */
-    public function __construct($value, int $timestamp, Attributes $attributes, ?string $traceId, ?string $spanId)
+    public function __construct($value, int $timestamp, AttributesInterface $attributes, ?string $traceId, ?string $spanId)
     {
         $this->value = $value;
         $this->timestamp = $timestamp;

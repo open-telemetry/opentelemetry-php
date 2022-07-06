@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\MetricFactory;
 
-use OpenTelemetry\SDK\InstrumentationScope;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\MetricFactory;
 use function serialize;
@@ -20,7 +20,7 @@ final class DeduplicatingFactory implements MetricFactory
         $this->metricFactory = $metricFactory;
     }
 
-    public function createAsynchronousObserver(InstrumentationScope $instrumentationScope, Instrument $instrument, int $timestamp): array
+    public function createAsynchronousObserver(InstrumentationScopeInterface $instrumentationScope, Instrument $instrument, int $timestamp): array
     {
         $instrumentationScopeId = self::instrumentationScopeId($instrumentationScope);
         $instrumentId = self::instrumentId($instrument);
@@ -44,7 +44,7 @@ final class DeduplicatingFactory implements MetricFactory
         return $observer;
     }
 
-    public function createSynchronousWriter(InstrumentationScope $instrumentationScope, Instrument $instrument, int $timestamp): array
+    public function createSynchronousWriter(InstrumentationScopeInterface $instrumentationScope, Instrument $instrument, int $timestamp): array
     {
         $instrumentationScopeId = self::instrumentationScopeId($instrumentationScope);
         $instrumentId = self::instrumentId($instrument);
@@ -68,7 +68,7 @@ final class DeduplicatingFactory implements MetricFactory
         return $writer;
     }
 
-    private static function instrumentationScopeId(InstrumentationScope $instrumentationScope): string
+    private static function instrumentationScopeId(InstrumentationScopeInterface $instrumentationScope): string
     {
         return serialize($instrumentationScope);
     }
