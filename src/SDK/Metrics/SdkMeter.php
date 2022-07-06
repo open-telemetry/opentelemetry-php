@@ -46,7 +46,7 @@ final class SdkMeter implements Meter
     {
         [$observer, $referenceCounter] = $this->metricFactory->createAsynchronousObserver(
             $this->instrumentationScope,
-            new Instrument(InstrumentType::COUNTER, $name, $unit, $description),
+            new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, $name, $unit, $description),
             $this->clock->nanotime(),
         );
 
