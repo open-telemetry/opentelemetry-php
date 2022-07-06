@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Common\Time;
 
 final class StopWatchFactory implements StopWatchFactoryInterface
 {
-    private static ?StopWatchInterface $default;
+    private static ?StopWatchInterface $default = null;
 
     private ClockInterface $clock;
     private ?int $initialStartTime;

@@ -1,7 +1,7 @@
 PHP_VERSION ?= 7.4
 DC_RUN_PHP = docker-compose run --rm php
 
-all: update style packages-composer deptrac phan psalm phpstan test
+all: update rector style deptrac packages-composer  phan psalm phpstan test
 install:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer install
 update:
@@ -31,27 +31,45 @@ benchmark:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpbench run --report=default
 phpmetrics:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpmetrics --config=./phpmetrics.json --junit=junit.xml
-trace examples: FORCE
+smoke-test-examples: smoke-test-isolated-examples smoke-test-exporter-examples smoke-test-collector-integration smoke-test-prometheus-example
+smoke-test-isolated-examples:
+	$(DC_RUN_PHP) php ./examples/traces/getting_started.php
+	$(DC_RUN_PHP) php ./examples/traces/features/always_off_trace_example.php
+	$(DC_RUN_PHP) php ./examples/traces/features/batch_exporting.php
+	$(DC_RUN_PHP) php ./examples/traces/features/concurrent_spans.php
+	$(DC_RUN_PHP) php ./examples/traces/features/configuration_from_environment.php
+	$(DC_RUN_PHP) php ./examples/traces/features/creating_a_new_trace_in_the_same_process.php
+	$(DC_RUN_PHP) php ./examples/traces/features/parent_span_example.php
+	$(DC_RUN_PHP) php ./examples/traces/features/resource_detectors.php
+	$(DC_RUN_PHP) php ./examples/traces/features/span_resources.php
+	$(DC_RUN_PHP) php ./examples/traces/troubleshooting/air_gapped_trace_debugging.php
+	$(DC_RUN_PHP) php ./examples/traces/troubleshooting/logging_of_span_data.php
+	$(DC_RUN_PHP) php ./examples/traces/troubleshooting/setting_up_logging.php
+smoke-test-exporter-examples: FORCE
+# Note this does not include every exporter at the moment
 	docker-compose up -d --remove-orphans
-	$(DC_RUN_PHP) php ./examples/AlwaysOnZipkinExample.php
-	$(DC_RUN_PHP) php ./examples/AlwaysOffTraceExample.php
-	$(DC_RUN_PHP) php ./examples/AlwaysOnJaegerExample.php
-        # The following examples do not use the DC_RUN_PHP global because they need environment variables.
-	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/AlwaysOnNewrelicExample.php
-	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/AlwaysOnZipkinToNewrelicExample.php
+	$(DC_RUN_PHP) php ./examples/traces/features/exporters/zipkin.php
+	$(DC_RUN_PHP) php ./examples/traces/features/always_off_trace_example.php
+	$(DC_RUN_PHP) php ./examples/traces/features/exporters/jaeger.php
+# The following examples do not use the DC_RUN_PHP global because they need environment variables.
+	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/features/exporters/newrelic.php
+	docker-compose run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/features/exporters/zipkin_to_newrelic.php
 	docker-compose stop
-collector:
+smoke-test-collector-integration:
 	docker-compose -f docker-compose.collector.yaml up -d --remove-orphans
-	docker-compose -f docker-compose.collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=collector:4317 --rm php php ./examples/AlwaysOnOTLPGrpcExample.php
+# This is slow because it's building the image from scratch (and parts of that, like installing the gRPC extension, are slow)
+# This can be sped up by switching to the pre-built images hosted on ghcr.io (and referenced in other docker-compose**.yaml files) 
+	docker-compose -f docker-compose.collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=collector:4317 --rm php php ./examples/traces/features/exporters/otlp_grpc.php
 	docker-compose -f docker-compose.collector.yaml stop
-
-fiber-ffi-example:
-	@docker-compose -f docker-compose.fiber-ffi.yaml -p opentelemetry-php_fiber-ffi-example up -d web
+smoke-test-prometheus-example: metrics-prometheus-example stop-prometheus
 metrics-prometheus-example:
 	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example up -d web
-	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example run --rm php php examples/prometheus/PrometheusMetricsExample.php
+# This is slow because it's building the image from scratch (and parts of that, like installing the gRPC extension, are slow)
+	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example run --rm php php examples/metrics/prometheus/prometheus_metrics_example.php
 stop-prometheus:
 	@docker-compose -f docker-compose.prometheus.yaml -p opentelemetry-php_metrics-prometheus-example stop
+fiber-ffi-example:
+	@docker-compose -f docker-compose.fiber-ffi.yaml -p opentelemetry-php_fiber-ffi-example up -d web
 protobuf:
 	./script/proto_gen.sh
 thrift:
@@ -60,6 +78,10 @@ bash:
 	$(DC_RUN_PHP) bash
 style:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no -vvv
+rector:
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/rector process src
+rector-dry:
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/rector process src --dry-run
 deptrac:
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/deptrac --formatter=table --report-uncovered --no-cache
 w3c-test-service:

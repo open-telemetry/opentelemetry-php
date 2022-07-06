@@ -4,31 +4,24 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Instrumentation;
 
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+
 /**
  * Represents the instrumentation scope information associated with the Tracer or Meter
  */
 final class InstrumentationScope implements InstrumentationScopeInterface
 {
-    private static ?self $empty = null;
-
     private string $name;
     private ?string $version;
     private ?string $schemaUrl;
+    private AttributesInterface $attributes;
 
-    public function __construct(string $name, ?string $version = null, ?string $schemaUrl = null)
+    public function __construct(string $name, ?string $version, ?string $schemaUrl, AttributesInterface $attributes)
     {
         $this->name = $name;
         $this->version = $version;
         $this->schemaUrl = $schemaUrl;
-    }
-
-    /**
-     * @internal
-     * @psalm-internal OpenTelemetry
-     */
-    public static function getEmpty(): InstrumentationScope
-    {
-        return self::$empty ?? self::$empty = new self('', null, null);
+        $this->attributes = $attributes;
     }
 
     public function getName(): string
@@ -44,5 +37,10 @@ final class InstrumentationScope implements InstrumentationScopeInterface
     public function getSchemaUrl(): ?string
     {
         return $this->schemaUrl;
+    }
+
+    public function getAttributes(): AttributesInterface
+    {
+        return $this->attributes;
     }
 }

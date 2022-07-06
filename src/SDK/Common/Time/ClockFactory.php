@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Common\Time;
 
 final class ClockFactory implements ClockFactoryInterface
 {
-    private static ?ClockInterface $default;
+    private static ?ClockInterface $default = null;
 
     public static function create(): self
     {

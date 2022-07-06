@@ -164,7 +164,7 @@ class OTLPSpanConverterTest extends TestCase
             ->setStartEpochNanos($start_time)
             ->setEndEpochNanos($end_time)
             ->setName('http_get')
-            ->setInstrumentationScope(new InstrumentationScope('lib-test', 'v0.1.0', 'http://url'))
+            ->setInstrumentationScope(new InstrumentationScope('lib-test', 'v0.1.0', 'http://url', Attributes::create([])))
             ->addAttribute('user', 'alice')
             ->addAttribute('authenticated', true)
             ->addEvent('Event1', Attributes::create(['success' => 'yes']), 1617313804325769955)
@@ -261,13 +261,21 @@ class OTLPSpanConverterTest extends TestCase
         $this->assertCount(2, $result[0]->getResource()->getAttributes());
     }
 
+    public function test_multiple_resources_result_in_multiple_resource_spans(): void
+    {
+        $resourceA = ResourceInfo::create(Attributes::create(['foo' => 'bar']));
+        $resourceB = ResourceInfo::create(Attributes::create(['foo' => 'baz']));
+        $converter = new SpanConverter();
+        $result = $converter->convert([
+            (new SpanData())->setResource($resourceA),
+            (new SpanData())->setResource($resourceB),
+        ]);
+        $this->assertCount(2, $result);
+    }
+
     public function test_otlp_no_spans(): void
     {
-        $spans = [];
-
-        $row = (new SpanConverter())->convert($spans)[0];
-
-        $this->assertEquals(new ResourceSpans(), $row);
+        $this->assertSame([], (new SpanConverter())->convert([]));
     }
 
     /**

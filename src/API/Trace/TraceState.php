@@ -139,14 +139,11 @@ class TraceState implements TraceStateInterface
                 $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, trim($listMember));
 
                 // There should only be one list-member per vendor separated by '='
-                if (count($vendor) === 2) {
+                // TODO: Log if we can't validate the key and value
+                if (count($vendor) === 2 && ($this->validateKey($vendor[0]) && $this->validateValue($vendor[1]))) {
+                    $parsedTracestate[$vendor[0]] = $vendor[1];
 
-                    // TODO: Log if we can't validate the key and value
-                    if ($this->validateKey($vendor[0]) && $this->validateValue($vendor[1])) {
-                        $parsedTracestate[$vendor[0]] = $vendor[1];
-
-                        continue;
-                    }
+                    continue;
                 }
                 $invalid = true;
 
