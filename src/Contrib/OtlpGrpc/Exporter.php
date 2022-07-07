@@ -71,6 +71,7 @@ class Exporter implements SpanExporterInterface
             $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
         $this->setSpanConverter(new SpanConverter());
+
         $this->setRetryPolicy(ExponentialWithJitterRetryPolicy::getDefault());
         $this->setRetryableStatusCodes([
             \Grpc\STATUS_CANCELLED,
