@@ -183,6 +183,11 @@ make test
 This will output the test output as well as a test coverage analysis (text + html - see `tests/coverage/html`). Code
 that doesn't pass our currently defined tests will emit a failure in CI
 
+## Code Coverage
+We use [codecov.io](https://about.codecov.io/) to track code coverage for this repo.  This is configured in the [php.yaml github action](https://github.com/open-telemetry/opentelemetry-php/blob/main/.github/workflows/php.yml#L71-L72).  We don't require a specific level of code coverage for PRs to pass - we just use this tool in order to understand how a PR will potentially change the amount of code coverage we have across the code base.  This tool isn't perfect - sometimes we'll see small deltas in code coverage where there shouldn't be any - this is nothing to fret about.
+
+If code coverage does decrease on a pull request, you will see a red X in the CI for the repo, but that's ok - the reviewer will use their judgement to determine whether or not we have sufficient code coverage for the change.
+
 ## Dependency Validation
 
 To make sure the different components of the library are distributable as separate packages, we have to check
