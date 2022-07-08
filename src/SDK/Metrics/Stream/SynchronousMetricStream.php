@@ -127,7 +127,7 @@ final class SynchronousMetricStream implements MetricStreamInterface
             ? Temporality::CUMULATIVE
             : Temporality::DELTA;
 
-        $data = $this->aggregation->toData(
+        return $this->aggregation->toData(
             $metric->attributes,
             $metric->summaries,
             $this->metricAggregator->exemplars($metric),
@@ -135,7 +135,5 @@ final class SynchronousMetricStream implements MetricStreamInterface
             $this->timestamp,
             $temporality,
         );
-
-        return $data;
     }
 }

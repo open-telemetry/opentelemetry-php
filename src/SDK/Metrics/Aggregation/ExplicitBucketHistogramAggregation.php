@@ -48,7 +48,8 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
      */
     public function record($summary, $value, AttributesInterface $attributes, Context $context, int $timestamp): void
     {
-        for ($i = 0; $i < count($this->boundaries) && $this->boundaries[$i] < $value; $i++) {
+        $boundariesCount = count($this->boundaries);
+        for ($i = 0; $i < $boundariesCount && $this->boundaries[$i] < $value; $i++) {
         }
         $summary->count++;
         $summary->sum += $value;
@@ -67,9 +68,9 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
         $sum = $left->sum + $right->sum;
         $min = self::min($left->min, $right->min);
         $max = self::max($left->max, $right->max);
-        $buckets = [];
-        for ($i = 0; $i < count($this->boundaries) + 1; $i++) {
-            $buckets[$i] = $left->buckets[$i] + $right->buckets[$i];
+        $buckets = $right->buckets;
+        foreach ($left->buckets as $i => $bucketCount) {
+            $buckets[$i] += $bucketCount;
         }
 
         return new ExplicitBucketHistogramSummary(
@@ -91,9 +92,9 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
         $sum = -$left->sum + $right->sum;
         $min = $left->min > $right->min ? $right->min : NAN;
         $max = $left->max < $right->max ? $right->max : NAN;
-        $buckets = [];
-        for ($i = 0; $i < count($this->boundaries) + 1; $i++) {
-            $buckets[$i] = -$left->buckets[$i] + $right->buckets[$i];
+        $buckets = $right->buckets;
+        foreach ($left->buckets as $i => $bucketCount) {
+            $buckets[$i] -= $bucketCount;
         }
 
         return new ExplicitBucketHistogramSummary(
@@ -118,7 +119,7 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
     ): Data\Histogram {
         $dataPoints = [];
         foreach ($attributes as $key => $dataPointAttributes) {
-            if (!$summaries[$key]->count) {
+            if ($summaries[$key]->count === 0) {
                 continue;
             }
 
@@ -142,12 +143,22 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
         );
     }
 
+    /**
+     * @param float|int $left
+     * @param float|int $right
+     * @return float|int
+     */
     private static function min($left, $right)
     {
         /** @noinspection PhpConditionAlreadyCheckedInspection */
         return $left <= $right ? $left : ($right <= $left ? $right : NAN);
     }
 
+    /**
+     * @param float|int $left
+     * @param float|int $right
+     * @return float|int
+     */
     private static function max($left, $right)
     {
         /** @noinspection PhpConditionAlreadyCheckedInspection */

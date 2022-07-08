@@ -21,8 +21,8 @@ final class BucketEntry
     public $value;
     public int $timestamp;
     public AttributesInterface $attributes;
-    public ?string $traceId;
-    public ?string $spanId;
+    public ?string $traceId = null;
+    public ?string $spanId = null;
 
     public int $revision;
 }

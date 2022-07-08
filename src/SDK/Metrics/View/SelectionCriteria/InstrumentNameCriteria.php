@@ -23,6 +23,6 @@ final class InstrumentNameCriteria implements SelectionCriteriaInterface
 
     public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool
     {
-        return !!preg_match($this->pattern, $instrument->name);
+        return (bool) preg_match($this->pattern, $instrument->name);
     }
 }
