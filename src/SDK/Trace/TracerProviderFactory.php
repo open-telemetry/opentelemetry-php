@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 
 final class TracerProviderFactory
@@ -26,7 +25,7 @@ final class TracerProviderFactory
         $this->spanProcessorFactory = $spanProcessorFactory ?: new SpanProcessorFactory();
     }
 
-    public function create(): API\TracerProviderInterface
+    public function create(): TracerProviderInterface
     {
         try {
             $exporter = $this->exporterFactory->fromEnvironment();
