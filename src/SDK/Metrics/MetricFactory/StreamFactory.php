@@ -10,15 +10,15 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\MetricFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricObserver\MultiObserver;
+use OpenTelemetry\SDK\Metrics\MetricObserverInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
-use OpenTelemetry\SDK\Metrics\StalenessHandlerFactoryInterface;
+use OpenTelemetry\SDK\Metrics\MetricWriterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\Stream\MetricStreamInterface;
 use OpenTelemetry\SDK\Metrics\Stream\MultiStreamWriter;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
-use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 final class StreamFactory implements MetricFactoryInterface
@@ -26,36 +26,29 @@ final class StreamFactory implements MetricFactoryInterface
     private ?ContextStorageInterface $contextStorage;
     private ResourceInfo $resource;
 
-    private ViewRegistryInterface $views;
     private MetricSourceRegistryInterface $metricSources;
     private AttributesFactoryInterface $attributesFactory;
-    private StalenessHandlerFactoryInterface $stalenessHandlerFactory;
 
     public function __construct(
         ?ContextStorageInterface $contextStorage,
         ResourceInfo $resource,
-        ViewRegistryInterface $views,
         MetricSourceRegistryInterface $metricSources,
-        AttributesFactoryInterface $attributesFactory,
-        StalenessHandlerFactoryInterface $stalenessHandlerFactory
+        AttributesFactoryInterface $attributesFactory
     ) {
         $this->contextStorage = $contextStorage;
         $this->resource = $resource;
-        $this->views = $views;
         $this->metricSources = $metricSources;
         $this->attributesFactory = $attributesFactory;
-        $this->stalenessHandlerFactory = $stalenessHandlerFactory;
     }
 
-    public function createAsynchronousObserver(InstrumentationScopeInterface $instrumentationScope, Instrument $instrument, int $timestamp): array
-    {
-        $views = $this->views->find(
-            $instrument,
-            $instrumentationScope,
-        );
-
-        $stalenessHandler = $this->stalenessHandlerFactory->create();
-        $observer = new MultiObserver($stalenessHandler);
+    public function createAsynchronousObserver(
+        InstrumentationScopeInterface $instrumentationScope,
+        Instrument $instrument,
+        int $timestamp,
+        iterable $views,
+        StalenessHandlerInterface $stalenessHandler
+    ): MetricObserverInterface {
+        $observer = new MultiObserver();
         foreach ($views as $view) {
             $stream = new AsynchronousMetricStream(
                 $this->attributesFactory,
@@ -68,17 +61,16 @@ final class StreamFactory implements MetricFactoryInterface
             $this->registerSource($view, $instrument, $instrumentationScope, $stream, $stalenessHandler);
         }
 
-        return [$observer, $stalenessHandler];
+        return $observer;
     }
 
-    public function createSynchronousWriter(InstrumentationScopeInterface $instrumentationScope, Instrument $instrument, int $timestamp): array
-    {
-        $views = $this->views->find(
-            $instrument,
-            $instrumentationScope,
-        );
-
-        $stalenessHandler = $this->stalenessHandlerFactory->create();
+    public function createSynchronousWriter(
+        InstrumentationScopeInterface $instrumentationScope,
+        Instrument $instrument,
+        int $timestamp,
+        iterable $views,
+        StalenessHandlerInterface $stalenessHandler
+    ): MetricWriterInterface {
         $streams = [];
         foreach ($views as $view) {
             $stream = new SynchronousMetricStream(
@@ -92,13 +84,11 @@ final class StreamFactory implements MetricFactoryInterface
             $streams[] = $stream->writable();
         }
 
-        $writer = new MultiStreamWriter(
+        return new MultiStreamWriter(
             $this->contextStorage,
             $this->attributesFactory,
             $streams,
         );
-
-        return [$writer, $stalenessHandler];
     }
 
     private function registerSource(

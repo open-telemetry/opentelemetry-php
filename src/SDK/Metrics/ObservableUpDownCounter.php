@@ -30,6 +30,6 @@ final class ObservableUpDownCounter implements ObservableUpDownCounterInterface
     {
         $token = $this->metricObserver->observe(Closure::fromCallable($callback));
 
-        return new ObservableCallback($this->metricObserver, $token);
+        return new ObservableCallback($this->metricObserver, $this->referenceCounter, $token);
     }
 }

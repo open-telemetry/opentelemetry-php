@@ -30,6 +30,6 @@ final class ObservableGauge implements ObservableGaugeInterface
     {
         $token = $this->metricObserver->observe(Closure::fromCallable($callback));
 
-        return new ObservableCallback($this->metricObserver, $token);
+        return new ObservableCallback($this->metricObserver, $this->referenceCounter, $token);
     }
 }

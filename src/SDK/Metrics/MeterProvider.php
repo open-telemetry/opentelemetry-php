@@ -19,7 +19,6 @@ use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\FilteredReservoir;
 use OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir;
 use OpenTelemetry\SDK\Metrics\Exemplar\HistogramBucketReservoir;
-use OpenTelemetry\SDK\Metrics\MetricFactory\DeduplicatingFactory;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
 use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Metrics\View\FallbackViewRegistry;
@@ -34,7 +33,10 @@ final class MeterProvider implements MeterProviderInterface
     private ClockInterface $clock;
     private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
     private MetricReaderInterface $metricReader;
+    private StalenessHandlerFactoryInterface $stalenessHandlerFactory;
     private CriteriaViewRegistry $criteriaViewRegistry;
+    private ViewRegistryInterface $viewRegistry;
+    private MeterInstruments $instruments;
 
     private bool $closed = false;
 
@@ -50,28 +52,28 @@ final class MeterProvider implements MeterProviderInterface
         AttributesFactoryInterface $attributesFactory,
         StalenessHandlerFactoryInterface $stalenessHandlerFactory
     ) {
+        $this->metricFactory = new StreamFactory(
+            $contextStorage,
+            $resource,
+            $metricReader,
+            $attributesFactory,
+        );
         $this->attributesFactory = $attributesFactory;
         $this->clock = $clock;
         $this->instrumentationScopeFactory = $instrumentationScopeFactory;
         $this->metricReader = $metricReader;
+        $this->stalenessHandlerFactory = $stalenessHandlerFactory;
         $this->criteriaViewRegistry = new CriteriaViewRegistry();
-
-        $this->metricFactory = new DeduplicatingFactory(new StreamFactory(
-            $contextStorage,
-            $resource,
-            new FallbackViewRegistry($this->criteriaViewRegistry, [
-                new ViewTemplate(
-                    null,
-                    null,
-                    null,
-                    self::defaultAggregation(),
-                    self::defaultExemplarReservoir(),
-                ),
-            ]),
-            $metricReader,
-            $this->attributesFactory,
-            $stalenessHandlerFactory,
-        ));
+        $this->viewRegistry = new FallbackViewRegistry($this->criteriaViewRegistry, [
+            new ViewTemplate(
+                null,
+                null,
+                null,
+                self::defaultAggregation(),
+                self::defaultExemplarReservoir(),
+            ),
+        ]);
+        $this->instruments = new MeterInstruments();
     }
 
     public function getMeter(
@@ -87,6 +89,9 @@ final class MeterProvider implements MeterProviderInterface
         return new Meter(
             $this->metricFactory,
             $this->clock,
+            $this->stalenessHandlerFactory,
+            $this->viewRegistry,
+            $this->instruments,
             $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes),
         );
     }

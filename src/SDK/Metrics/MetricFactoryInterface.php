@@ -8,14 +8,25 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
 interface MetricFactoryInterface
 {
+    /**
+     * @param iterable<ViewProjection> $views
+     */
+    public function createAsynchronousObserver(
+        InstrumentationScopeInterface $instrumentationScope,
+        Instrument $instrument,
+        int $timestamp,
+        iterable $views,
+        StalenessHandlerInterface $stalenessHandler
+    ): MetricObserverInterface;
 
     /**
-     * @return array{MetricObserverInterface, StalenessHandlerInterface&ReferenceCounterInterface}
+     * @param iterable<ViewProjection> $views
      */
-    public function createAsynchronousObserver(InstrumentationScopeInterface $instrumentationScope, Instrument $instrument, int $timestamp): array;
-
-    /**
-     * @return array{MetricWriterInterface, StalenessHandlerInterface&ReferenceCounterInterface}
-     */
-    public function createSynchronousWriter(InstrumentationScopeInterface $instrumentationScope, Instrument $instrument, int $timestamp): array;
+    public function createSynchronousWriter(
+        InstrumentationScopeInterface $instrumentationScope,
+        Instrument $instrument,
+        int $timestamp,
+        iterable $views,
+        StalenessHandlerInterface $stalenessHandler
+    ): MetricWriterInterface;
 }

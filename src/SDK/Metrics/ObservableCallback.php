@@ -9,12 +9,16 @@ use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
 final class ObservableCallback implements ObservableCallbackInterface
 {
     private MetricObserverInterface $metricObserver;
+    private ReferenceCounterInterface $referenceCounter;
     private ?int $token;
 
-    public function __construct(MetricObserverInterface $metricObserver, int $token)
+    public function __construct(MetricObserverInterface $metricObserver, ReferenceCounterInterface $referenceCounter, int $token)
     {
         $this->metricObserver = $metricObserver;
+        $this->referenceCounter =  $referenceCounter;
         $this->token = $token;
+
+        $this->referenceCounter->acquire();
     }
 
     public function detach(): void
@@ -24,6 +28,7 @@ final class ObservableCallback implements ObservableCallbackInterface
         }
 
         $this->metricObserver->cancel($this->token);
+        $this->referenceCounter->release();
         $this->token = null;
     }
 }

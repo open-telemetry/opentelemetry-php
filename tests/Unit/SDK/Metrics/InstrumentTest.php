@@ -57,7 +57,7 @@ final class InstrumentTest extends TestCase
      */
     public function test_asynchronous_counter(): void
     {
-        $o = new MultiObserver(new NoopStalenessHandler());
+        $o = new MultiObserver();
         $s = new AsynchronousMetricStream(Attributes::factory(), null, new SumAggregation(true), null, $o, 0);
         $c = new ObservableCounter($o, new NoopStalenessHandler());
         $r = $s->register(Temporality::CUMULATIVE);

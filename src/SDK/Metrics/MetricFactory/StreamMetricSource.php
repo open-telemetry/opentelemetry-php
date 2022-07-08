@@ -28,8 +28,8 @@ final class StreamMetricSource implements MetricSourceInterface
             $this->provider->instrumentationLibrary,
             $this->provider->resource,
             $this->provider->view->name,
-            $this->provider->view->description,
             $this->provider->view->unit,
+            $this->provider->view->description,
             $this->provider->stream->collect($this->reader, $timestamp),
         );
     }
