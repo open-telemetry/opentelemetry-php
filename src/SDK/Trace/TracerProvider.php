@@ -18,7 +18,7 @@ use function register_shutdown_function;
 use function spl_object_id;
 use WeakReference;
 
-final class TracerProvider implements API\TracerProviderInterface
+final class TracerProvider implements TracerProviderInterface
 {
     /** @var array<int, WeakReference<self>>|null */
     private static ?array $tracerProviders = null;
@@ -58,7 +58,7 @@ final class TracerProvider implements API\TracerProviderInterface
         self::registerShutdownFunction($this);
     }
 
-    public function forceFlush(): ?bool
+    public function forceFlush(): bool
     {
         return $this->tracerSharedState->getSpanProcessor()->forceFlush();
     }
