@@ -14,7 +14,6 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Tracer;
-use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -22,8 +21,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Routing\RouteContext;
 
-//create default tracer from environment variables, now available as TracerProvider::getDefaultTracer
-$tracer = (new TracerProviderFactory('example'))->create()->getTracer('io.opentelemetry.contrib.php');
+$tracerProvider = (new TracerProviderFactory('example'))->create();
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 $cb = new ContainerBuilder();
 $container = $cb->addDefinitions([
