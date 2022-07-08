@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Metrics\AttributeProcessor;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Metrics\AttributeProcessor\Identity
+ * @covers \OpenTelemetry\SDK\Metrics\AttributeProcessor\IdentityAttributeProcessor
  */
 final class IdentityAttributeProcessorTest extends TestCase
 {
@@ -18,7 +18,7 @@ final class IdentityAttributeProcessorTest extends TestCase
     {
         $this->assertEquals(
             ['foo' => 3, 'bar' => 5],
-            (new AttributeProcessor\Identity())
+            (new AttributeProcessor\IdentityAttributeProcessor())
                 ->process(Attributes::create(['foo' => 3, 'bar' => 5]), Context::getRoot())
                 ->toArray(),
         );

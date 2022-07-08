@@ -8,7 +8,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
 
-final class Identity implements AttributeProcessorInterface
+final class IdentityAttributeProcessor implements AttributeProcessorInterface
 {
     public function process(AttributesInterface $attributes, Context $context): AttributesInterface
     {

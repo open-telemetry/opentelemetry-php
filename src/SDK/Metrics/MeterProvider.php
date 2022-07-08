@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use Closure;
-use function in_array;
 use LogicException;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
@@ -14,6 +13,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Metrics\AttributeProcessor\FilteredAttributeProcessor;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\FilteredReservoir;
@@ -103,10 +103,7 @@ final class MeterProvider implements MeterProviderInterface
             $name,
             $description,
             $attributeKeys
-                ? new AttributeProcessor\Filtered(
-                    $this->attributesFactory,
-                    static fn (string $key): bool => in_array($key, $attributeKeys, true),
-                )
+                ? new FilteredAttributeProcessor($this->attributesFactory, $attributeKeys)
                 : null,
             $aggregation ?? self::defaultAggregation(),
             $exemplarReservoir ?? self::defaultExemplarReservoir(),

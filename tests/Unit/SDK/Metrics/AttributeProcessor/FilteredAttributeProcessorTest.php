@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Metrics\AttributeProcessor;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Metrics\AttributeProcessor\Filtered
+ * @covers \OpenTelemetry\SDK\Metrics\AttributeProcessor\FilteredAttributeProcessor
  */
 final class FilteredAttributeProcessorTest extends TestCase
 {
@@ -18,7 +18,7 @@ final class FilteredAttributeProcessorTest extends TestCase
     {
         $this->assertEquals(
             ['foo' => 3],
-            (new AttributeProcessor\Filtered(Attributes::factory(), fn (string $key): bool => $key === 'foo'))
+            (new AttributeProcessor\FilteredAttributeProcessor(Attributes::factory(), ['foo']))
                 ->process(Attributes::create(['foo' => 3, 'bar' => 5]), Context::getRoot())
                 ->toArray(),
         );
