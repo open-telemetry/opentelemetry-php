@@ -12,31 +12,46 @@ use OpenTelemetry\API\Metrics\ObservableCounterInterface;
 use OpenTelemetry\API\Metrics\ObservableGaugeInterface;
 use OpenTelemetry\API\Metrics\ObservableUpDownCounterInterface;
 use OpenTelemetry\API\Metrics\UpDownCounterInterface;
+use OpenTelemetry\Context\ContextStorageInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use function serialize;
 
 final class Meter implements MeterInterface
 {
+    private ?ContextStorageInterface $contextStorage;
     private MetricFactoryInterface $metricFactory;
+    private ResourceInfo $resource;
     private ClockInterface $clock;
+    private AttributesFactoryInterface $attributesFactory;
     private StalenessHandlerFactoryInterface $stalenessHandlerFactory;
     private ViewRegistryInterface $viewRegistry;
+    private MetricSourceRegistryInterface $metricSourceRegistry;
     private MeterInstruments $instruments;
     private InstrumentationScopeInterface $instrumentationScope;
 
     public function __construct(
+        ?ContextStorageInterface $contextStorage,
         MetricFactoryInterface $metricFactory,
+        ResourceInfo $resource,
         ClockInterface $clock,
+        AttributesFactoryInterface $attributesFactory,
         StalenessHandlerFactoryInterface $stalenessHandlerFactory,
         ViewRegistryInterface $viewRegistry,
+        MetricSourceRegistryInterface $metricSourceRegistry,
         MeterInstruments $instruments,
         InstrumentationScopeInterface $instrumentationScope
     ) {
+        $this->contextStorage = $contextStorage;
         $this->metricFactory = $metricFactory;
+        $this->resource = $resource;
         $this->clock = $clock;
+        $this->attributesFactory = $attributesFactory;
         $this->stalenessHandlerFactory = $stalenessHandlerFactory;
         $this->viewRegistry = $viewRegistry;
+        $this->metricSourceRegistry = $metricSourceRegistry;
         $this->instruments = $instruments;
         $this->instrumentationScope = $instrumentationScope;
     }
@@ -158,11 +173,15 @@ final class Meter implements MeterInterface
 
         return $instruments->writers[$instrumentationScopeId][$instrumentId] = [
             $this->metricFactory->createSynchronousWriter(
+                $this->resource,
                 $this->instrumentationScope,
                 $instrument,
                 $instruments->startTimestamp,
                 $this->viewRegistry->find($instrument, $this->instrumentationScope),
+                $this->attributesFactory,
                 $this->stalenessHandlerFactory->create(),
+                $this->metricSourceRegistry,
+                $this->contextStorage,
             ),
             $stalenessHandler,
         ];
@@ -198,11 +217,14 @@ final class Meter implements MeterInterface
 
         return $instruments->observers[$instrumentationScopeId][$instrumentId] = [
             $this->metricFactory->createAsynchronousObserver(
+                $this->resource,
                 $this->instrumentationScope,
                 $instrument,
                 $instruments->startTimestamp,
                 $this->viewRegistry->find($instrument, $this->instrumentationScope),
+                $this->attributesFactory,
                 $stalenessHandler,
+                $this->metricSourceRegistry,
             ),
             $stalenessHandler,
         ];

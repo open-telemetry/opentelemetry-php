@@ -28,10 +28,13 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 final class MeterProvider implements MeterProviderInterface
 {
+    private ?ContextStorageInterface $contextStorage;
     private MetricFactoryInterface $metricFactory;
+    private ResourceInfo $resource;
     private AttributesFactoryInterface $attributesFactory;
     private ClockInterface $clock;
     private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
+    /** @var MetricSourceRegistryInterface&MetricReaderInterface */
     private MetricReaderInterface $metricReader;
     private StalenessHandlerFactoryInterface $stalenessHandlerFactory;
     private CriteriaViewRegistry $criteriaViewRegistry;
@@ -50,14 +53,12 @@ final class MeterProvider implements MeterProviderInterface
         InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
         $metricReader,
         AttributesFactoryInterface $attributesFactory,
-        StalenessHandlerFactoryInterface $stalenessHandlerFactory
+        StalenessHandlerFactoryInterface $stalenessHandlerFactory,
+        MetricFactoryInterface $metricFactory = null
     ) {
-        $this->metricFactory = new StreamFactory(
-            $contextStorage,
-            $resource,
-            $metricReader,
-            $attributesFactory,
-        );
+        $this->contextStorage = $contextStorage;
+        $this->metricFactory = $metricFactory ?? new StreamFactory();
+        $this->resource = $resource;
         $this->attributesFactory = $attributesFactory;
         $this->clock = $clock;
         $this->instrumentationScopeFactory = $instrumentationScopeFactory;
@@ -87,10 +88,14 @@ final class MeterProvider implements MeterProviderInterface
         }
 
         return new Meter(
+            $this->contextStorage,
             $this->metricFactory,
+            $this->resource,
             $this->clock,
+            $this->attributesFactory,
             $this->stalenessHandlerFactory,
             $this->viewRegistry,
+            $this->metricReader,
             $this->instruments,
             $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes),
         );

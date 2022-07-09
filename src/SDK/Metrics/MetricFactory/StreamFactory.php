@@ -23,53 +23,51 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 final class StreamFactory implements MetricFactoryInterface
 {
-    private ?ContextStorageInterface $contextStorage;
-    private ResourceInfo $resource;
-
-    private MetricSourceRegistryInterface $metricSources;
-    private AttributesFactoryInterface $attributesFactory;
-
-    public function __construct(
-        ?ContextStorageInterface $contextStorage,
-        ResourceInfo $resource,
-        MetricSourceRegistryInterface $metricSources,
-        AttributesFactoryInterface $attributesFactory
-    ) {
-        $this->contextStorage = $contextStorage;
-        $this->resource = $resource;
-        $this->metricSources = $metricSources;
-        $this->attributesFactory = $attributesFactory;
-    }
-
     public function createAsynchronousObserver(
+        ResourceInfo $resource,
         InstrumentationScopeInterface $instrumentationScope,
         Instrument $instrument,
         int $timestamp,
         iterable $views,
-        StalenessHandlerInterface $stalenessHandler
+        AttributesFactoryInterface $attributesFactory,
+        StalenessHandlerInterface $stalenessHandler,
+        MetricSourceRegistryInterface $metricSourceRegistry
     ): MetricObserverInterface {
         $observer = new MultiObserver();
         foreach ($views as $view) {
             $stream = new AsynchronousMetricStream(
-                $this->attributesFactory,
+                $attributesFactory,
                 $view->attributeProcessor,
                 $view->aggregation,
                 $view->exemplarReservoir,
                 $observer,
                 $timestamp,
             );
-            $this->registerSource($view, $instrument, $instrumentationScope, $stream, $stalenessHandler);
+
+            $this->registerSource(
+                $view,
+                $instrument,
+                $instrumentationScope,
+                $resource,
+                $stream,
+                $stalenessHandler,
+                $metricSourceRegistry,
+            );
         }
 
         return $observer;
     }
 
     public function createSynchronousWriter(
+        ResourceInfo $resource,
         InstrumentationScopeInterface $instrumentationScope,
         Instrument $instrument,
         int $timestamp,
         iterable $views,
-        StalenessHandlerInterface $stalenessHandler
+        AttributesFactoryInterface $attributesFactory,
+        StalenessHandlerInterface $stalenessHandler,
+        MetricSourceRegistryInterface $metricSourceRegistry,
+        ?ContextStorageInterface $contextStorage = null
     ): MetricWriterInterface {
         $streams = [];
         foreach ($views as $view) {
@@ -79,14 +77,22 @@ final class StreamFactory implements MetricFactoryInterface
                 $view->exemplarReservoir,
                 $timestamp,
             );
-            $this->registerSource($view, $instrument, $instrumentationScope, $stream, $stalenessHandler);
-
             $streams[] = $stream->writable();
+
+            $this->registerSource(
+                $view,
+                $instrument,
+                $instrumentationScope,
+                $resource,
+                $stream,
+                $stalenessHandler,
+                $metricSourceRegistry,
+            );
         }
 
         return new MultiStreamWriter(
-            $this->contextStorage,
-            $this->attributesFactory,
+            $contextStorage,
+            $attributesFactory,
             $streams,
         );
     }
@@ -95,17 +101,19 @@ final class StreamFactory implements MetricFactoryInterface
         ViewProjection $view,
         Instrument $instrument,
         InstrumentationScopeInterface $instrumentationScope,
+        ResourceInfo $resource,
         MetricStreamInterface $stream,
-        StalenessHandlerInterface $stalenessHandler
+        StalenessHandlerInterface $stalenessHandler,
+        MetricSourceRegistryInterface $metricSourceRegistry
     ): void {
         $provider = new StreamMetricSourceProvider(
             $view,
             $instrument,
             $instrumentationScope,
-            $this->resource,
+            $resource,
             $stream,
         );
 
-        $this->metricSources->add($provider, $provider, $stalenessHandler);
+        $metricSourceRegistry->add($provider, $provider, $stalenessHandler);
     }
 }

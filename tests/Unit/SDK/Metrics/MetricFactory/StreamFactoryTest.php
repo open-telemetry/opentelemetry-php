@@ -38,14 +38,8 @@ final class StreamFactoryTest extends TestCase
         $instrumentationScope = new InstrumentationScope('test', null, null, Attributes::create([]));
 
         $registry = new CollectingSourceRegistry();
-        $factory = new StreamFactory(
-            null,
+        $observer = (new StreamFactory())->createAsynchronousObserver(
             $resource,
-            $registry,
-            Attributes::factory(),
-        );
-
-        $observer = $factory->createAsynchronousObserver(
             $instrumentationScope,
             new Instrument(InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER, 'name', '{unit}', 'description'),
             1,
@@ -59,7 +53,9 @@ final class StreamFactoryTest extends TestCase
                     null,
                 ),
             ],
+            Attributes::factory(),
             new NoopStalenessHandler(),
+            $registry,
         );
 
         $this->assertCount(1, $registry->sources);
@@ -100,14 +96,8 @@ final class StreamFactoryTest extends TestCase
         $instrumentationScope = new InstrumentationScope('test', null, null, Attributes::create([]));
 
         $registry = new CollectingSourceRegistry();
-        $factory = new StreamFactory(
-            null,
+        $writer = (new StreamFactory())->createSynchronousWriter(
             $resource,
-            $registry,
-            Attributes::factory(),
-        );
-
-        $writer = $factory->createSynchronousWriter(
             $instrumentationScope,
             new Instrument(InstrumentType::UP_DOWN_COUNTER, 'name', '{unit}', 'description'),
             1,
@@ -121,7 +111,9 @@ final class StreamFactoryTest extends TestCase
                     null,
                 ),
             ],
+            Attributes::factory(),
             new NoopStalenessHandler(),
+            $registry,
         );
 
         $this->assertCount(1, $registry->sources);
