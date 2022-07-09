@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\MetricObserver;
 
+use function array_key_last;
 use Closure;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Metrics\MetricObserverInterface;
-use function spl_object_id;
 
 final class MultiObserver implements MetricObserverInterface
 {
@@ -27,14 +27,9 @@ final class MultiObserver implements MetricObserverInterface
 
     public function observe(Closure $callback): int
     {
-        $token = spl_object_id($callback);
-        if (isset($this->callbacks[$token])) {
-            return -1;
-        }
+        $this->callbacks[] = $callback;
 
-        $this->callbacks[$token] = $callback;
-
-        return $token;
+        return array_key_last($this->callbacks);
     }
 
     public function cancel(int $token): void

@@ -26,19 +26,6 @@ final class MultiObserverTest extends TestCase
         $this->assertSame([1, 2, 3], $observer->values);
     }
 
-    public function test_register_duplicate_callback_is_added_only_once(): void
-    {
-        $multiObserver = new MultiObserver();
-
-        $callback = static fn (ObserverInterface $observer) => $observer->observe(1);
-        $multiObserver->observe($callback);
-        $multiObserver->observe($callback);
-
-        $observer = new ValueCollectingObserver();
-        $multiObserver($observer);
-        $this->assertSame([1], $observer->values);
-    }
-
     public function test_unregistered_callbacks_are_not_invoked(): void
     {
         $multiObserver = new MultiObserver();
@@ -78,6 +65,23 @@ final class MultiObserverTest extends TestCase
             $observer->observe(1);
             /** @phpstan-ignore-next-line */
             $multiObserver->cancel($token);
+        });
+        $token = $multiObserver->observe(static fn (ObserverInterface $observer) => $observer->observe(2));
+        $multiObserver->observe(static fn (ObserverInterface $observer) => $observer->observe(3));
+
+        $observer = new ValueCollectingObserver();
+        $multiObserver($observer);
+        $this->assertSame([1, 3], $observer->values);
+    }
+
+    public function test_unregister_register_during_collection_does_not_trigger_old_callback(): void
+    {
+        $multiObserver = new MultiObserver();
+
+        $multiObserver->observe(static function (ObserverInterface $observer) use ($multiObserver, &$token): void {
+            $observer->observe(1);
+            $multiObserver->cancel($token);
+            $token = $multiObserver->observe(static fn (ObserverInterface $observer) => $observer->observe(2));
         });
         $token = $multiObserver->observe(static fn (ObserverInterface $observer) => $observer->observe(2));
         $multiObserver->observe(static fn (ObserverInterface $observer) => $observer->observe(3));
