@@ -20,7 +20,9 @@ interface MetricMetadataInterface
     public function description(): ?string;
 
     /**
-     * @return string|Temporality
+     * Returns the underlying temporality of this metric.
+     *
+     * @return string|Temporality internal temporality
      */
     public function temporality();
 }
