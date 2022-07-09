@@ -18,11 +18,13 @@ final class DeltaStorage
         $this->aggregation = $aggregation;
         $this->head = new Delta(new Metric([], [], 0, 0), 0);
 
+        /** @phan-suppress-next-line PhanTypeObjectUnsetDeclaredProperty */
         unset($this->head->metric);
     }
 
     /**
      * @psalm-suppress UndefinedDocblockClass
+     * @phan-suppress PhanUndeclaredTypeParameter
      * @param int|GMP $readers
      */
     public function add(Metric $metric, $readers): void

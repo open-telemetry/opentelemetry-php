@@ -296,7 +296,6 @@ return [
     // files that can't be removed for whatever reason.
     'exclude_file_list' => [
         'vendor/composer/composer/src/Composer/InstalledVersions.php',
-        'src/Contrib/Otlp/MetricConverter.php',
     ],
 
     // A directory list that defines files that will be excluded
@@ -314,7 +313,6 @@ return [
         'vendor/',
         'proto/',
         'thrift/',
-        'src/SDK/Metrics',
     ],
 
     // Enable this to enable checks of require/include statements referring to valid paths.

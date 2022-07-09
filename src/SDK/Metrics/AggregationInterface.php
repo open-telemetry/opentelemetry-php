@@ -11,39 +11,39 @@ use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 
 /**
- * @template T
+ * @psalm-template T
  */
 interface AggregationInterface
 {
 
     /**
-     * @return T
+     * @psalm-return T
      */
     public function initialize();
 
     /**
-     * @param T $summary
-     * @param float|int $value
+     * @psalm-param T $summary
+     * @psalm-param float|int $value
      */
     public function record($summary, $value, AttributesInterface $attributes, Context $context, int $timestamp): void;
 
     /**
-     * @param T $left
-     * @param T $right
-     * @return T
+     * @psalm-param T $left
+     * @psalm-param T $right
+     * @psalm-return T
      */
     public function merge($left, $right);
 
     /**
-     * @param T $left
-     * @param T $right
-     * @return T
+     * @psalm-param T $left
+     * @psalm-param T $right
+     * @psalm-return T
      */
     public function diff($left, $right);
 
     /**
      * @param array<AttributesInterface> $attributes
-     * @param array<T> $summaries
+     * @psalm-param array<T> $summaries
      * @param array<list<Exemplar>> $exemplars
      * @param string|Temporality $temporality
      */

@@ -43,10 +43,12 @@ final class CompositeReader implements MetricReaderInterface, MetricSourceRegist
 
         $success = true;
         foreach ($this->metricReaders as $metricReader) {
-            $success &= +$metricReader->collect();
+            if (!$metricReader->collect()) {
+                $success = false;
+            }
         }
 
-        return (bool) $success;
+        return $success;
     }
 
     public function shutdown(): bool
@@ -59,10 +61,12 @@ final class CompositeReader implements MetricReaderInterface, MetricSourceRegist
 
         $success = true;
         foreach ($this->metricReaders as $metricReader) {
-            $success &= +$metricReader->shutdown();
+            if (!$metricReader->shutdown()) {
+                $success = false;
+            }
         }
 
-        return (bool) $success;
+        return $success;
     }
 
     public function forceFlush(): bool
@@ -73,9 +77,11 @@ final class CompositeReader implements MetricReaderInterface, MetricSourceRegist
 
         $success = true;
         foreach ($this->metricReaders as $metricReader) {
-            $success &= +$metricReader->forceFlush();
+            if (!$metricReader->forceFlush()) {
+                $success = false;
+            }
         }
 
-        return (bool) $success;
+        return $success;
     }
 }

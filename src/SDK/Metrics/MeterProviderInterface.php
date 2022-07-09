@@ -17,7 +17,7 @@ interface MeterProviderInterface extends \OpenTelemetry\API\Metrics\MeterProvide
      * @param string|null $description
      * @param array|null $attributeKeys
      * @param Closure(string|InstrumentType): AggregationInterface|null $aggregation
-     * @param Closure(AggregationInterface, string|InstrumentType): ?ExemplarReservoirInterface|null $exemplarReservoir
+     * @param Closure(AggregationInterface, string|InstrumentType): (ExemplarReservoirInterface|null)|null $exemplarReservoir
      * @return void
      */
     public function registerView(

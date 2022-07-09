@@ -107,14 +107,16 @@ final class MetricConverter
         $pMetric->setName($metric->name);
         $pMetric->setDescription((string) $metric->description);
         $pMetric->setUnit((string) $metric->unit);
-        if ($metric->data instanceof SDK\Metrics\Data\Gauge) {
-            $pMetric->setGauge($this->convertGauge($metric->data));
+
+        $data = $metric->data;
+        if ($data instanceof SDK\Metrics\Data\Gauge) {
+            $pMetric->setGauge($this->convertGauge($data));
         }
-        if ($metric->data instanceof SDK\Metrics\Data\Histogram) {
-            $pMetric->setHistogram($this->convertHistogram($metric->data));
+        if ($data instanceof SDK\Metrics\Data\Histogram) {
+            $pMetric->setHistogram($this->convertHistogram($data));
         }
-        if ($metric->data instanceof SDK\Metrics\Data\Sum) {
-            $pMetric->setSum($this->convertSum($metric->data));
+        if ($data instanceof SDK\Metrics\Data\Sum) {
+            $pMetric->setSum($this->convertSum($data));
         }
 
         return $pMetric;
@@ -248,9 +250,6 @@ final class MetricConverter
             $pElement->getFilteredAttributes()[] = $pAttribute = new KeyValue();
             $pAttribute->setKey($key);
             $pAttribute->setValue(AttributesConverter::convertAnyValue($value));
-        }
-        if (method_exists($pElement, 'setDroppedAttributesCount')) {
-            $pElement->setDroppedAttributesCount($attributes->getDroppedAttributesCount());
         }
     }
 }

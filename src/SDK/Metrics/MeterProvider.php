@@ -164,11 +164,13 @@ final class MeterProvider implements MeterProviderInterface
     }
 
     /**
-     * @return Closure(AggregationInterface, string|InstrumentType): ?ExemplarReservoirInterface
+     * @return Closure(AggregationInterface, string|InstrumentType): (ExemplarReservoirInterface|null)
+     *
+     * @noinspection PhpUnusedParameterInspection
      */
     private static function defaultExemplarReservoir(): Closure
     {
-        return static function (AggregationInterface $aggregation): ExemplarReservoirInterface {
+        return static function (AggregationInterface $aggregation, $instrumentType): ExemplarReservoirInterface {
             $reservoir = $aggregation instanceof Aggregation\ExplicitBucketHistogramAggregation && $aggregation->boundaries
                 ? new HistogramBucketReservoir(Attributes::factory(), $aggregation->boundaries)
                 : new FixedSizeReservoir(Attributes::factory(), 5);

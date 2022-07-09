@@ -29,11 +29,13 @@ final class SynchronousMetricStream implements MetricStreamInterface
     private DeltaStorage $delta;
     /**
      * @psalm-suppress UndefinedDocblockClass
+     * @phan-suppress PhanUndeclaredTypeProperty
      * @var int|GMP
      */
     private $readers = 0;
     /**
      * @psalm-suppress UndefinedDocblockClass
+     * @phan-suppress PhanUndeclaredTypeProperty
      * @var int|GMP
      */
     private $cumulative = 0;
