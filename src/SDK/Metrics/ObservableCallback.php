@@ -31,4 +31,14 @@ final class ObservableCallback implements ObservableCallbackInterface
         $this->referenceCounter->release();
         $this->token = null;
     }
+
+    public function __destruct()
+    {
+        if ($this->token === null) {
+            return;
+        }
+
+        $this->referenceCounter->acquire(true);
+        $this->referenceCounter->release();
+    }
 }

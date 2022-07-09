@@ -79,7 +79,7 @@ final class Meter implements MeterInterface
 
         foreach ($callbacks as $callback) {
             $observer->observe(Closure::fromCallable($callback));
-            $referenceCounter->acquire();
+            $referenceCounter->acquire(true);
         }
 
         return new ObservableCounter($observer, $referenceCounter);
@@ -108,7 +108,7 @@ final class Meter implements MeterInterface
 
         foreach ($callbacks as $callback) {
             $observer->observe(Closure::fromCallable($callback));
-            $referenceCounter->acquire();
+            $referenceCounter->acquire(true);
         }
 
         return new ObservableGauge($observer, $referenceCounter);
@@ -137,7 +137,7 @@ final class Meter implements MeterInterface
 
         foreach ($callbacks as $callback) {
             $observer->observe(Closure::fromCallable($callback));
-            $referenceCounter->acquire();
+            $referenceCounter->acquire(true);
         }
 
         return new ObservableUpDownCounter($observer, $referenceCounter);

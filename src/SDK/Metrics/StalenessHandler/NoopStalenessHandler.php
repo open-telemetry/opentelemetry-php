@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 
 final class NoopStalenessHandler implements StalenessHandlerInterface, ReferenceCounterInterface
 {
-    public function acquire(): void
+    public function acquire(bool $persistent = false): void
     {
         // no-op
     }

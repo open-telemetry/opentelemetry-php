@@ -6,6 +6,8 @@ namespace OpenTelemetry\Tests\Unit\SDK\Metrics\StalenessHandler;
 
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
 use PHPUnit\Framework\TestCase;
+use stdClass;
+use WeakReference;
 
 /**
  * @covers \OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandler
@@ -31,5 +33,27 @@ final class ImmediateStalenessHandlerTest extends TestCase
         $handler->release();
         /** @phpstan-ignore-next-line */
         $this->assertTrue($called);
+    }
+
+    public function test_releases_callbacks_on_persistent_acquire(): void
+    {
+        $handler = (new ImmediateStalenessHandlerFactory())->create();
+
+        $object = new stdClass();
+        $reference = WeakReference::create($object);
+        /** @phpstan-ignore-next-line */
+        $handler->onStale(static function () use ($object): void {
+        });
+        $handler->acquire(true);
+        $object = null;
+        $this->assertNull($reference->get());
+
+        $object = new stdClass();
+        $reference = WeakReference::create($object);
+        /** @phpstan-ignore-next-line */
+        $handler->onStale(static function () use ($object): void {
+        });
+        $object = null;
+        $this->assertNull($reference->get());
     }
 }

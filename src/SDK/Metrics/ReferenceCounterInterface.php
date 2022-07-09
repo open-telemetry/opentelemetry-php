@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Metrics;
 
 interface ReferenceCounterInterface
 {
-    public function acquire(): void;
+    public function acquire(bool $persistent = false): void;
 
     public function release(): void;
 }

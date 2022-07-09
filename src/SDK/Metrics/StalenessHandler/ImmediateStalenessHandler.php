@@ -10,19 +10,22 @@ use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 
 final class ImmediateStalenessHandler implements StalenessHandlerInterface, ReferenceCounterInterface
 {
-
-    /** @var Closure[] */
-    private array $onStale = [];
+    /** @var Closure[]|null */
+    private ?array $onStale = [];
     private int $count = 0;
 
-    public function acquire(): void
+    public function acquire(bool $persistent = false): void
     {
         $this->count++;
+
+        if ($persistent) {
+            $this->onStale = null;
+        }
     }
 
     public function release(): void
     {
-        if (--$this->count !== 0) {
+        if (--$this->count !== 0 || !$this->onStale) {
             return;
         }
 
@@ -35,6 +38,10 @@ final class ImmediateStalenessHandler implements StalenessHandlerInterface, Refe
 
     public function onStale(Closure $callback): void
     {
+        if ($this->onStale === null) {
+            return;
+        }
+
         $this->onStale[] = $callback;
     }
 }
