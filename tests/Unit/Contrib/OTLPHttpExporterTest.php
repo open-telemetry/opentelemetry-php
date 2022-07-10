@@ -18,6 +18,7 @@ use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
+use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 
 /**
  * @covers OpenTelemetry\Contrib\OtlpHttp\Exporter
@@ -121,9 +122,9 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         $stack = HandlerStack::create($mock);
         $stack->push($history);
 
-        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_ENDPOINT', $endpoint);
-        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_HEADERS', 'x-auth-header=tomato');
-        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_COMPRESSION', 'gzip');
+        $this->setEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT, $endpoint);
+        $this->setEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_HEADERS, 'x-auth-header=tomato');
+        $this->setEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_COMPRESSION, 'gzip');
 
         $client = new Client(['handler' => $stack]);
         $exporter = new Exporter($client, new HttpFactory(), new HttpFactory());
@@ -143,11 +144,12 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     public function exporterEndpointDataProvider(): array
     {
         return [
-            'Default Endpoint' => ['', 'https://localhost:4318/v1/traces'],
+            'Default Endpoint' => [null, 'https://localhost:4318/v1/traces'],
             'Custom Endpoint' => ['https://otel-collector:4318/custom/path', 'https://otel-collector:4318/custom/path'],
             'Insecure Endpoint' => ['http://api.example.com:80/v1/traces', 'http://api.example.com/v1/traces'],
-            'Without Path' => ['https://api.example.com', 'https://api.example.com/v1/traces'],
-            'Without Scheme' => ['localhost:4318', 'https://localhost:4318/v1/traces'],
+            //'Without Path' => ['https://api.example.com', 'https://api.example.com/v1/traces'],
+            // The HTTP exporter is not defined in the spec to accept endpoints without scheme
+            //'Without Scheme' => ['localhost:4318', 'https://localhost:4318/v1/traces'],
         ];
     }
 
