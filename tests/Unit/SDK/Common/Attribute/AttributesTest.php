@@ -4,32 +4,36 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Attribute;
 
-use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \OpenTelemetry\SDK\Common\Attribute\Attributes
+ * @covers \OpenTelemetry\SDK\Common\Attribute\AttributesBuilder
+ * @covers \OpenTelemetry\SDK\Common\Attribute\AttributesFactory
  */
 class AttributesTest extends TestCase
 {
     public function test_has_attribute(): void
     {
-        $attributes = new Attributes([
+        $attributes = Attributes::create([
             'foo' => 'foo',
         ]);
 
-        $this->assertFalse($attributes->hasAttribute('bar'));
+        $this->assertFalse($attributes->has('bar'));
 
-        $attributes->setAttribute('bar', 'bar');
+        $attributes = Attributes::create([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ]);
 
-        $this->assertTrue($attributes->hasAttribute('bar'));
+        $this->assertTrue($attributes->has('bar'));
     }
 
     /** Test numeric attribute key is not cast to integer value */
     public function test_numeric_attribute_name(): void
     {
-        $attributes = new Attributes(['1' => '2']);
+        $attributes = Attributes::create(['1' => '2']);
         $this->assertCount(1, $attributes);
         foreach ($attributes as $key => $value) {
             $this->assertIsString($key);
@@ -48,8 +52,7 @@ class AttributesTest extends TestCase
         $longStringValue = '0123456789abcdefghijklmnopqrstuvwxyz';
         $longStringTrimmed = '0123456789abcdef';
 
-        $attributeLimits = new AttributeLimits(6, 16);
-        $attributes = new Attributes([
+        $attributes = Attributes::factory(6, 16)->builder([
             'bool' => true,
             'int' => $intValue,
             'float' => $floatValue,
@@ -61,7 +64,7 @@ class AttributesTest extends TestCase
                 true,
             ],
             'ignored_key' => 'ignored_value',
-        ], $attributeLimits);
+        ])->build();
 
         $this->assertTrue($attributes->get('bool'));
         $this->assertEquals($intValue, $attributes->get('int'));
@@ -78,12 +81,12 @@ class AttributesTest extends TestCase
      */
     public function test_apply_limits(): void
     {
-        $attributes = new Attributes([
+        $attributes = Attributes::create([
             'short' => '123',
             'long' => '1234567890',
             'dropped' => true,
         ]);
-        $limitedAttributes = Attributes::withLimits($attributes, new AttributeLimits(2, 5));
+        $limitedAttributes = Attributes::factory(2, 5)->builder($attributes)->build();
         $this->assertCount(2, $limitedAttributes);
         $this->assertEquals('123', $limitedAttributes->get('short'));
         $this->assertEquals('12345', $limitedAttributes->get('long'));
@@ -93,24 +96,24 @@ class AttributesTest extends TestCase
 
     public function test_null_attribute_removes_existing(): void
     {
-        $attributes = new Attributes([
+        $attributesBuilder = Attributes::factory()->builder([
             'foo' => 'foo',
             'bar' => 'bar',
             'baz' => 'baz',
         ]);
-        $this->assertCount(3, $attributes);
-        $attributes->setAttribute('foo', null);
-        $this->assertCount(2, $attributes);
+        $this->assertCount(3, $attributesBuilder->build());
+        $attributesBuilder['foo'] = null;
+        $this->assertCount(2, $attributesBuilder->build());
     }
 
     public function test_null_missing_attribute_does_nothing(): void
     {
-        $attributes = new Attributes([
+        $attributesBuilder = Attributes::factory()->builder([
             'foo' => 'foo',
         ]);
-        $this->assertCount(1, $attributes);
-        $attributes->setAttribute('bar', null);
-        $this->assertCount(1, $attributes);
+        $this->assertCount(1, $attributesBuilder->build());
+        $attributesBuilder['bar'] = null;
+        $this->assertCount(1, $attributesBuilder->build());
     }
 
     public function test_to_array(): void
@@ -119,82 +122,53 @@ class AttributesTest extends TestCase
             'foo' => 'foo',
             'bar' => 'bar',
         ];
-        $attributes = new Attributes($values);
+        $attributes = Attributes::create($values);
         $this->assertSame($values, $attributes->toArray());
     }
 
-    public function test_get_total_added_values(): void
+    public function test_get_dropped_attributes_count(): void
     {
-        $attributes = new Attributes([
+        $attributesBuilder = Attributes::factory()->builder([
             'foo' => 'foo',
             'bar' => 'bar',
         ]);
-        $this->assertEquals(2, $attributes->getTotalAddedValues());
+        $this->assertEquals(0, $attributesBuilder->build()->getDroppedAttributesCount());
 
-        $attributes->setAttribute('baz', 'baz');
-        $this->assertEquals(3, $attributes->getTotalAddedValues());
+        $attributesBuilder['baz'] = 'baz';
+        $this->assertEquals(0, $attributesBuilder->build()->getDroppedAttributesCount());
     }
 
-    public function test_unset_get_total_added_values(): void
+    public function test_unset_get_dropped_attributes_count(): void
     {
-        $attributes = new Attributes([
+        $attributesBuilder = Attributes::factory()->builder([
             'foo' => 'foo',
             'bar' => 'bar',
         ]);
-        $this->assertEquals(2, $attributes->getTotalAddedValues());
+        $this->assertEquals(0, $attributesBuilder->build()->getDroppedAttributesCount());
 
-        $attributes->unsetAttribute('foo');
-        $this->assertEquals(1, $attributes->getTotalAddedValues());
+        $attributesBuilder->offsetUnset('foo');
+        $this->assertEquals(0, $attributesBuilder->build()->getDroppedAttributesCount());
     }
 
-    public function test_limit_get_total_added_values(): void
+    public function test_limit_get_dropped_attributes_count(): void
     {
-        $attributes = new Attributes([
+        $attributesBuilder = Attributes::factory(1)->builder([
             'foo' => 'foo',
             'bar' => 'bar',
-        ], new AttributeLimits(1));
-        $this->assertEquals(2, $attributes->getTotalAddedValues());
+        ]);
+        $this->assertEquals(1, $attributesBuilder->build()->getDroppedAttributesCount());
 
-        $attributes->setAttribute('baz', 'baz');
-        $this->assertEquals(3, $attributes->getTotalAddedValues());
+        $attributesBuilder['baz'] = 'baz';
+        $this->assertEquals(2, $attributesBuilder->build()->getDroppedAttributesCount());
     }
 
-    public function test_replace_attribute_does_not_increase_count(): void
+    public function test_replace_attribute_does_not_increase_dropped_attributes_count(): void
     {
-        $attributes = new Attributes([
+        $attributesBuilder = Attributes::factory(2)->builder([
             'foo' => 'foo',
-        ], new AttributeLimits(2));
+        ]);
 
-        $attributes->setAttribute('foo', 'bar');
-        $this->assertEquals(1, $attributes->getTotalAddedValues());
-        $this->assertEquals(0, $attributes->getDroppedAttributesCount());
-    }
-
-    public function test_count_dropped_attributes(): void
-    {
-        $attributes = new Attributes([
-            'foo' => 'foo',
-            'bar' => 'bar',
-        ], new AttributeLimits(1));
-
-        $this->assertEquals(1, $attributes->getTotalAddedValues() - count($attributes));
-
-        $attributes->setAttribute('baz', 'baz');
-
-        $this->assertEquals(2, $attributes->getTotalAddedValues() - count($attributes));
-    }
-
-    public function test_is_limit_reached(): void
-    {
-        $attributes = new Attributes([
-            'foo' => 'foo',
-            'bar' => 'bar',
-        ], new AttributeLimits(3));
-
-        $this->assertFalse($attributes->isLimitReached());
-
-        $attributes->setAttribute('baz', 'baz');
-
-        $this->assertTrue($attributes->isLimitReached());
+        $attributesBuilder['foo'] = 'bar';
+        $this->assertEquals(0, $attributesBuilder->build()->getDroppedAttributesCount());
     }
 }

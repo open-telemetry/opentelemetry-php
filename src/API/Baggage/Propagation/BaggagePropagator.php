@@ -40,8 +40,8 @@ final class BaggagePropagator implements TextMapPropagatorInterface
 
     public function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void
     {
-        $setter = $setter ?? ArrayAccessGetterSetter::getInstance();
-        $context = $context ?? Context::getCurrent();
+        $setter ??= ArrayAccessGetterSetter::getInstance();
+        $context ??= Context::getCurrent();
 
         $baggage = Baggage::fromContext($context);
 
@@ -56,14 +56,14 @@ final class BaggagePropagator implements TextMapPropagatorInterface
             $value = urlencode($entry->getValue());
             $headerString.= "{$key}={$value}";
 
-            if ($metadata = $entry->getMetadata()->getValue()) {
+            if (($metadata = $entry->getMetadata()->getValue()) !== '' && ($metadata = $entry->getMetadata()->getValue()) !== '0') {
                 $headerString .= ";{$metadata}";
             }
 
             $headerString .= ',';
         }
 
-        if ($headerString) {
+        if ($headerString !== '' && $headerString !== '0') {
             $headerString = rtrim($headerString, ',');
             $setter->set($carrier, self::BAGGAGE, $headerString);
         }
@@ -71,8 +71,8 @@ final class BaggagePropagator implements TextMapPropagatorInterface
 
     public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
     {
-        $getter = $getter ?? ArrayAccessGetterSetter::getInstance();
-        $context = $context ?? Context::getCurrent();
+        $getter ??= ArrayAccessGetterSetter::getInstance();
+        $context ??= Context::getCurrent();
 
         if (!$baggageHeader = $getter->get($carrier, self::BAGGAGE)) {
             return $context;

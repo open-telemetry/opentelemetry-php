@@ -43,6 +43,6 @@ final class Sdk implements ResourceDetectorInterface
             }
         }
 
-        return ResourceInfo::create(new Attributes($attributes), ResourceAttributes::SCHEMA_URL);
+        return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
     }
 }

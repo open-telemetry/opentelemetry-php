@@ -6,12 +6,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SemConv;
 
-class ResourceAttributeValues
+interface ResourceAttributeValues
 {
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.9.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.12.0';
     /**
      * @see ResourceAttributes::CLOUD_PROVIDER Alibaba Cloud
      */
@@ -238,7 +238,7 @@ class ResourceAttributeValues
     public const OS_TYPE_AIX = 'aix';
 
     /**
-     * @see ResourceAttributes::OS_TYPE Oracle Solaris
+     * @see ResourceAttributes::OS_TYPE SunOS, Oracle Solaris
      */
     public const OS_TYPE_SOLARIS = 'solaris';
 

@@ -53,8 +53,8 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
     /** {@inheritdoc} */
     public function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void
     {
-        $setter = $setter ?? ArrayAccessGetterSetter::getInstance();
-        $context = $context ?? Context::getCurrent();
+        $setter ??= ArrayAccessGetterSetter::getInstance();
+        $context ??= Context::getCurrent();
         $spanContext = AbstractSpan::fromContext($context)->getContext();
 
         if (!$spanContext->isValid()) {
@@ -67,7 +67,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
 
         // Build and inject the tracestate header
         // Spec says to avoid sending empty tracestate headers
-        if ($tracestate = (string) $spanContext->getTraceState()) {
+        if (($tracestate = (string) $spanContext->getTraceState()) !== '') {
             $setter->set($carrier, self::TRACESTATE, $tracestate);
         }
     }
@@ -75,8 +75,8 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
     /** {@inheritdoc} */
     public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
     {
-        $getter = $getter ?? ArrayAccessGetterSetter::getInstance();
-        $context = $context ?? Context::getCurrent();
+        $getter ??= ArrayAccessGetterSetter::getInstance();
+        $context ??= Context::getCurrent();
 
         $spanContext = self::extractImpl($carrier, $getter);
         if (!$spanContext->isValid()) {

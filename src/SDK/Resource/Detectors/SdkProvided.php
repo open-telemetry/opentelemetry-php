@@ -20,6 +20,6 @@ final class SdkProvided implements ResourceDetectorInterface
             ResourceAttributes::SERVICE_NAME => 'unknown_service',
         ];
 
-        return ResourceInfo::create(new Attributes($attributes), ResourceAttributes::SCHEMA_URL);
+        return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
     }
 }

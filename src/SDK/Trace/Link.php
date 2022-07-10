@@ -4,22 +4,18 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use function count;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class Link implements LinkInterface
 {
     private AttributesInterface $attributes;
     private API\SpanContextInterface $context;
-    private int $totalAttributeCount;
 
-    public function __construct(API\SpanContextInterface $context, AttributesInterface $attributes = null)
+    public function __construct(API\SpanContextInterface $context, AttributesInterface $attributes)
     {
         $this->context = $context;
-        $this->attributes = $attributes ?? new Attributes();
-        $this->totalAttributeCount = count($this->attributes);
+        $this->attributes = $attributes;
     }
 
     public function getSpanContext(): API\SpanContextInterface
@@ -30,10 +26,5 @@ final class Link implements LinkInterface
     public function getAttributes(): AttributesInterface
     {
         return $this->attributes;
-    }
-
-    public function getTotalAttributeCount(): int
-    {
-        return $this->totalAttributeCount;
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Integration\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -28,7 +29,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT', 9);
         $builder = new SpanLimitsBuilder();
         $spanLimits = $builder->build();
-        $this->assertEquals(9, $spanLimits->getAttributeLimits()->getAttributeValueLengthLimit());
+        $this->assertEquals(Attributes::factory(128, 9), $spanLimits->getAttributesFactory());
     }
 
     /**
@@ -40,7 +41,7 @@ class SpanLimitsBuilderTest extends TestCase
         $builder = new SpanLimitsBuilder();
         $builder->setAttributeValueLengthLimit(201);
         $spanLimits = $builder->build();
-        $this->assertEquals(201, $spanLimits->getAttributeLimits()->getAttributeValueLengthLimit());
+        $this->assertEquals(Attributes::factory(128, 201), $spanLimits->getAttributesFactory());
     }
 
     /**
@@ -97,7 +98,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->setEnvironmentVariable('OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT', 400);
         $builder = new SpanLimitsBuilder();
         $spanLimits = $builder->build();
-        $this->assertEquals(400, $spanLimits->getAttributePerEventCountLimit());
+        $this->assertEquals(Attributes::factory(400), $spanLimits->getEventAttributesFactory());
     }
 
     /**
@@ -109,7 +110,7 @@ class SpanLimitsBuilderTest extends TestCase
         $builder = new SpanLimitsBuilder();
         $builder->setAttributePerEventCountLimit(155);
         $spanLimits = $builder->build();
-        $this->assertEquals(155, $spanLimits->getAttributePerEventCountLimit());
+        $this->assertEquals(Attributes::factory(155), $spanLimits->getEventAttributesFactory());
     }
 
     /**
@@ -120,7 +121,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->setEnvironmentVariable('OTEL_LINK_ATTRIBUTE_COUNT_LIMIT', 500);
         $builder = new SpanLimitsBuilder();
         $spanLimits = $builder->build();
-        $this->assertEquals(500, $spanLimits->getAttributePerLinkCountLimit());
+        $this->assertEquals(Attributes::factory(500), $spanLimits->getLinkAttributesFactory());
     }
 
     /**
@@ -132,6 +133,6 @@ class SpanLimitsBuilderTest extends TestCase
         $builder = new SpanLimitsBuilder();
         $builder->setAttributePerLinkCountLimit(450);
         $spanLimits = $builder->build();
-        $this->assertEquals(450, $spanLimits->getAttributePerLinkCountLimit());
+        $this->assertEquals(Attributes::factory(450), $spanLimits->getLinkAttributesFactory());
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use OpenTelemetry\API\Trace\TraceStateInterface;
-use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
 
@@ -32,11 +31,11 @@ class SamplingResultTest extends TestCase
     {
         return [
             [
-                new Attributes(['foo' => 'bar']),
+                ['foo' => 'bar'],
                 $this->createMock(TraceStateInterface::class),
             ],
             [
-                null,
+                [],
                 null,
             ],
         ];

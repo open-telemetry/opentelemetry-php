@@ -31,8 +31,8 @@ class ResourceInfoFactoryTest extends TestCase
 
     public function test_merge(): void
     {
-        $primary = ResourceInfo::create(new Attributes(['name' => 'primary', 'empty' => '']));
-        $secondary = ResourceInfo::create(new Attributes(['version' => '1.0.0', 'empty' => 'value']));
+        $primary = ResourceInfo::create(Attributes::create(['name' => 'primary', 'empty' => '']));
+        $secondary = ResourceInfo::create(Attributes::create(['version' => '1.0.0', 'empty' => 'value']));
         $result = ResourceInfoFactory::merge($primary, $secondary);
 
         $name = $result->getAttributes()->get('name');
@@ -52,7 +52,7 @@ class ResourceInfoFactoryTest extends TestCase
     {
         $resourcesToMerge = [];
         foreach ($schemaUrlsToMerge as $schemaUrl) {
-            $resourcesToMerge[] = ResourceInfo::create(new Attributes([]), $schemaUrl);
+            $resourcesToMerge[] = ResourceInfo::create(Attributes::create([]), $schemaUrl);
         }
         $result = ResourceInfoFactory::merge(...$resourcesToMerge);
 

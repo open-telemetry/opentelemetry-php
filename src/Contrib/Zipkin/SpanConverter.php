@@ -49,7 +49,7 @@ class SpanConverter implements SpanConverterInterface
         // Zipkin tags must be strings, but opentelemetry
         // accepts strings, booleans, numbers, and lists of each.
         if (is_array($value)) {
-            return implode(',', array_map([$this, 'sanitiseTagValue'], $value));
+            return implode(',', array_map(fn ($value) => $this->sanitiseTagValue($value), $value));
         }
 
         // Floats will lose precision if their string representation
@@ -122,6 +122,9 @@ class SpanConverter implements SpanConverterInterface
         foreach ($span->getResource()->getAttributes() as $k => $v) {
             $row['tags'][$k] = $this->sanitiseTagValue($v);
         }
+        foreach ($span->getInstrumentationScope()->getAttributes() as $k => $v) {
+            $row['tags'][$k] = $this->sanitiseTagValue($v);
+        }
 
         foreach ($span->getEvents() as $event) {
             $row['annotations'][] = SpanConverter::toAnnotation($event);
@@ -166,12 +169,10 @@ class SpanConverter implements SpanConverterInterface
 
         $value = ($attributesAsJson !== null) ? sprintf('"%s": %s', $eventName, $attributesAsJson) : sprintf('"%s"', $eventName);
 
-        $annotation = [
+        return [
             'timestamp' => TimeUtil::nanosToMicros($event->getEpochNanos()),
             'value' => $value,
         ];
-
-        return $annotation;
     }
 
     private static function convertEventAttributesToJson(EventInterface $event): ?string
@@ -181,7 +182,7 @@ class SpanConverter implements SpanConverterInterface
         }
 
         $attributesAsJson = json_encode($event->getAttributes()->toArray());
-        if (($attributesAsJson === false) || (strlen($attributesAsJson) === 0)) {
+        if (($attributesAsJson === false) || ($attributesAsJson === '')) {
             return null;
         }
 

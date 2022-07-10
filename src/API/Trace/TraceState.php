@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Trace;
 
 use function array_reverse;
-use function array_walk;
-use function implode;
 use function strlen;
 
 class TraceState implements TraceStateInterface
@@ -97,23 +95,15 @@ class TraceState implements TraceStateInterface
      */
     public function __toString(): string
     {
-        if (!empty($this->traceState)) {
-            $clonedTracestate = clone $this;
-
-            // Reverse the order back to the original to ensure new entries are at the beginning.
-            $clonedTracestate->traceState = array_reverse($clonedTracestate->traceState);
-
-            array_walk(
-                $clonedTracestate->traceState,
-                static function (&$v, $k) {
-                    $v = $k . self::LIST_MEMBER_KEY_VALUE_SPLITTER . $v;
-                }
-            );
-
-            return implode(self::LIST_MEMBERS_SEPARATOR, $clonedTracestate->traceState);
+        if (empty($this->traceState)) {
+            return '';
+        }
+        $traceStateString='';
+        foreach (array_reverse($this->traceState) as $k => $v) {
+            $traceStateString .=$k . self::LIST_MEMBER_KEY_VALUE_SPLITTER . $v . self::LIST_MEMBERS_SEPARATOR;
         }
 
-        return '';
+        return rtrim($traceStateString, ',');
     }
 
     /**
@@ -149,14 +139,11 @@ class TraceState implements TraceStateInterface
                 $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, trim($listMember));
 
                 // There should only be one list-member per vendor separated by '='
-                if (count($vendor) === 2) {
+                // TODO: Log if we can't validate the key and value
+                if (count($vendor) === 2 && ($this->validateKey($vendor[0]) && $this->validateValue($vendor[1]))) {
+                    $parsedTracestate[$vendor[0]] = $vendor[1];
 
-                    // TODO: Log if we can't validate the key and value
-                    if ($this->validateKey($vendor[0]) && $this->validateValue($vendor[1])) {
-                        $parsedTracestate[$vendor[0]] = $vendor[1];
-
-                        continue;
-                    }
+                    continue;
                 }
                 $invalid = true;
 

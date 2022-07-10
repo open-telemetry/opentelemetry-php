@@ -27,7 +27,6 @@ final class ImmutableSpan implements SpanDataInterface
     private array $links;
 
     private AttributesInterface $attributes;
-    private int $totalAttributeCount;
     private int $totalRecordedEvents;
     private StatusDataInterface $status;
     private int $endEpochNanos;
@@ -44,7 +43,6 @@ final class ImmutableSpan implements SpanDataInterface
         array $links,
         array $events,
         AttributesInterface $attributes,
-        int $totalAttributeCount,
         int $totalRecordedEvents,
         StatusDataInterface $status,
         int $endEpochNanos,
@@ -55,7 +53,6 @@ final class ImmutableSpan implements SpanDataInterface
         $this->links = $links;
         $this->events = $events;
         $this->attributes = $attributes;
-        $this->totalAttributeCount = $totalAttributeCount;
         $this->totalRecordedEvents = $totalRecordedEvents;
         $this->status = $status;
         $this->endEpochNanos = $endEpochNanos;
@@ -132,11 +129,6 @@ final class ImmutableSpan implements SpanDataInterface
     public function getAttributes(): AttributesInterface
     {
         return $this->attributes;
-    }
-
-    public function getTotalDroppedAttributes(): int
-    {
-        return max(0, $this->totalAttributeCount - count($this->attributes));
     }
 
     public function getTotalDroppedEvents(): int
