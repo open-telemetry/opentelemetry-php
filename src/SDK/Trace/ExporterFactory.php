@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
-use Nyholm\Dsn\Configuration\Dsn;
-use Nyholm\Dsn\Configuration\Url;
-use Nyholm\Dsn\DsnParser;
+use OpenTelemetry\SDK\Common\Dsn\DsnInterface;
+use OpenTelemetry\SDK\Common\Dsn\Parser;
+use OpenTelemetry\SDK\Common\Dsn\ParserInterface;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
@@ -33,43 +33,45 @@ class ExporterFactory
     private const DEFAULT_SERVICE_NAME = 'unknown_service';
 
     private string $serviceName;
+    private ParserInterface $parser;
 
-    public function __construct(string $serviceName = self::DEFAULT_SERVICE_NAME)
+    public function __construct(string $serviceName = self::DEFAULT_SERVICE_NAME, ParserInterface $parser = null)
     {
         $this->serviceName = $serviceName;
+        $this->parser = $parser ?? Parser::create();
     }
 
     /**
       * Returns the corresponding Exporter via the configuration string
       *
-      * @param string $connectionString String containing information for Exporter creation
+      * @param string $exporterDsn String containing information for Exporter creation
       * Should follow the format: type+baseUri?option1=a
       * Query string is optional and based on the Exporter
       */
-    public function fromConnectionString(string $connectionString): SpanExporterInterface
+    public function fromConnectionString(string $exporterDsn): SpanExporterInterface
     {
-        if (in_array($connectionString, ['console', 'memory', 'otlp+http'])) {
-            return self::buildExporter($connectionString);
+        if (in_array($exporterDsn, ['console', 'memory', 'otlp+http'])) {
+            return self::buildExporter($exporterDsn);
         }
 
-        $dsn = DsnParser::parseUrl($connectionString);
+        $dsn = $this->parser->parse($exporterDsn);
 
-        self::validateScheme((string) $dsn->getScheme());
+        self::validateScheme($dsn->getScheme());
 
-        $endpoint = self::getEndpointFromDsn($dsn);
+        $endpoint = $dsn->getEndpoint();
         $serviceName = $this->resolveServiceName($dsn);
 
-        if (in_array(self::normalizeScheme((string) $dsn->getScheme()), ['newrelic+http', 'zipkintonewrelic+http'])) {
+        if (in_array(self::normalizeProtocol($dsn->getScheme()), ['newrelic+http', 'zipkintonewrelic+http'])) {
             return self::buildExporter(
-                (string) $dsn->getScheme(),
+                $dsn->getScheme(),
                 $endpoint,
                 $serviceName,
-                self::getParameterFromDsn($dsn, 'licenseKey')
+                self::getOptionFromDsn($dsn, 'licenseKey')
             );
         }
 
         return self::buildExporter(
-            (string) $dsn->getScheme(),
+            $dsn->getScheme(),
             $endpoint,
             $serviceName
         );
@@ -115,52 +117,38 @@ class ExporterFactory
         }
     }
 
-    private function resolveServiceName(Dsn $dsn): string
+    private function resolveServiceName(DsnInterface $dsn): string
     {
-        return self::getParameterFromDsn($dsn, 'serviceName') ?? $this->serviceName;
+        return self::getOptionFromDsn($dsn, 'serviceName') ?? $this->serviceName;
     }
 
-    private static function getParameterFromDsn(Dsn $dsn, string $parameter): ?string
+    private static function getOptionFromDsn(DsnInterface $dsn, string $parameter): ?string
     {
-        $parameters = $dsn->getParameters();
-
         foreach ([$parameter, strtolower($parameter)] as $name) {
-            if (array_key_exists($name, $parameters)) {
-                return $parameters[$name];
+            if (($option = $dsn->getOption($name)) !== null) {
+                return $option;
             }
         }
 
         return null;
     }
 
-    private static function getEndpointFromDsn(Url $dsn): string
-    {
-        return (string) new Url(
-            self::getProtocolFromScheme((string) $dsn->getScheme()),
-            $dsn->getHost(),
-            $dsn->getPort(),
-            $dsn->getPath(),
-            [],
-            $dsn->getAuthentication()
-        );
-    }
-
     private static function buildExporter(string $scheme, string $endpoint = null, string $name = null, $args = null): SpanExporterInterface
     {
-        $exporterClass = self::KNOWN_EXPORTERS[self::normalizeScheme($scheme)];
+        $exporterClass = self::KNOWN_EXPORTERS[self::normalizeProtocol($scheme)];
         self::validateExporterClass($exporterClass);
 
         return call_user_func([$exporterClass, 'fromConnectionString'], $endpoint, $name, $args);
     }
 
-    private static function validateScheme(string $scheme)
+    private static function validateScheme(string $scheme): void
     {
-        if (!array_key_exists(self::normalizeScheme($scheme), self::KNOWN_EXPORTERS)) {
+        if (!array_key_exists(self::normalizeProtocol($scheme), self::KNOWN_EXPORTERS)) {
             throw new InvalidArgumentException('Invalid exporter scheme: ' . $scheme);
         }
     }
 
-    private static function validateExporterClass(string $class)
+    private static function validateExporterClass(string $class): void
     {
         if (!class_exists($class)) {
             throw new InvalidArgumentException('Could not find exporter class: ' . $class);
@@ -174,7 +162,7 @@ class ExporterFactory
         return count($components) === 1 ? $components[0] : $components[1];
     }
 
-    private static function normalizeScheme(string $scheme): string
+    private static function normalizeProtocol(string $scheme): string
     {
         return str_replace('https', 'http', $scheme);
     }
