@@ -58,7 +58,6 @@ class DsnTest extends TestCase
         );
     }
 
-
     public function test_as_config_array(): void
     {
         $this->assertSame(
