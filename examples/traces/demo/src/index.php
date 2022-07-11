@@ -70,12 +70,12 @@ $app = Bridge::create($container);
 
 //middleware starts root span based on route pattern, sets status from http code
 $app->add(function (Request $request, RequestHandler $handler) use ($tracer) {
-    $carrier = TraceContextPropagator::getInstance()->extract($request->getHeaders());
+    $parent = TraceContextPropagator::getInstance()->extract($request->getHeaders());
     $routeContext = RouteContext::fromRequest($request);
     $route = $routeContext->getRoute();
     $root = $tracer->spanBuilder($route->getPattern())
         ->setStartTimestamp((int) ($request->getServerParams()['REQUEST_TIME_FLOAT'] * 1e9))
-        ->setParent($carrier)
+        ->setParent($parent)
         ->setSpanKind(SpanKind::KIND_SERVER)
         ->startSpan();
     $root->activate();
