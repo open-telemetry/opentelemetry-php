@@ -24,10 +24,11 @@ class DispatcherTest extends TestCase
         Dispatcher::unset();
     }
 
-    public function test_configures_self(): void
+    public function test_get_instance(): void
     {
         $dispatcher = Dispatcher::getInstance();
         $this->assertInstanceOf(Dispatcher::class, $dispatcher);
+        $this->assertSame($dispatcher, Dispatcher::getInstance());
     }
 
     public function test_dispatch_event(): void
@@ -46,7 +47,7 @@ class DispatcherTest extends TestCase
         $event = $this->createMock(StoppableEventInterface::class);
         $event->method('isPropagationStopped')->willReturnOnConsecutiveCalls(false, true);
         $handlerOne = function (StoppableEventInterface $event) {
-            $this->assertTrue(true, 'handler called');
+            $this->assertTrue(true, 'handler was called');
         };
         $handlerTwo = function (StoppableEventInterface $event) {
             $this->fail('method should not have been called');
