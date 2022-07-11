@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\API\Common\Event;
 
 use OpenTelemetry\API\Common\Event\Dispatcher;
-use OpenTelemetry\API\Common\Event\ListenerProvider;
 use PHPUnit\Framework\TestCase;
-use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\EventDispatcher\StoppableEventInterface;
 use stdClass;
 
@@ -16,12 +14,9 @@ use stdClass;
  */
 class DispatcherTest extends TestCase
 {
-    private ListenerProviderInterface $listenerProvider;
-
     public function setUp(): void
     {
         Dispatcher::unset();
-        $this->listenerProvider = $this->createMock(ListenerProviderInterface::class);
     }
 
     public function tearDown(): void
@@ -33,51 +28,19 @@ class DispatcherTest extends TestCase
     {
         $dispatcher = Dispatcher::getInstance();
         $this->assertInstanceOf(Dispatcher::class, $dispatcher);
-        $this->assertInstanceOf(ListenerProvider::class, $dispatcher->getListenerProvider());
     }
 
-    public function test_get_listener_provider(): void
-    {
-        $dispatcher = new Dispatcher($this->listenerProvider);
-        $this->assertSame($this->listenerProvider, $dispatcher->getListenerProvider());
-    }
-
-    public function test_proxies_listen_to_listener_provider(): void
-    {
-        $provider = $this->createMock(ListenerProvider::class);
-        $callable = function () {
-        };
-        $eventName = 'my.event';
-        $priority = 99;
-        $dispatcher = new Dispatcher($provider);
-        $provider
-            ->expects($this->once())
-            ->method('listen')
-            ->with(
-                $this->equalTo($eventName),
-                $this->equalTo($callable),
-                $this->equalTo($priority)
-            );
-        $dispatcher->listen($eventName, $callable, $priority);
-    }
-
-    /**
-     * @psalm-suppress UndefinedInterfaceMethod
-     */
     public function test_dispatch_event(): void
     {
         $event = new stdClass();
         $handler = function ($receivedEvent) use ($event) {
             $this->assertSame($event, $receivedEvent);
         };
-        $this->listenerProvider->expects($this->once())->method('getListenersForEvent')->willReturn([$handler]); //@phpstan-ignore-line
-        $dispatcher = new Dispatcher($this->listenerProvider);
+        $dispatcher = Dispatcher::getInstance();
+        $dispatcher->listen(get_class($event), $handler);
         $dispatcher->dispatch($event);
     }
 
-    /**
-     * @psalm-suppress UndefinedInterfaceMethod
-     */
     public function test_dispatch_stoppable_event(): void
     {
         $event = $this->createMock(StoppableEventInterface::class);
@@ -88,8 +51,74 @@ class DispatcherTest extends TestCase
         $handlerTwo = function (StoppableEventInterface $event) {
             $this->fail('method should not have been called');
         };
-        $this->listenerProvider->method('getListenersForEvent')->willReturn([$handlerOne, $handlerTwo]); //@phpstan-ignore-line
-        $dispatcher = new Dispatcher($this->listenerProvider);
+        $dispatcher = Dispatcher::getInstance();
+        $dispatcher->listen(get_class($event), $handlerOne);
+        $dispatcher->listen(get_class($event), $handlerTwo, 1);
         $dispatcher->dispatch($event);
+    }
+
+    public function test_add_listeners(): void
+    {
+        $event = new stdClass();
+        $listenerFunction = function () {
+        };
+        $dispatcher = Dispatcher::getInstance();
+        $dispatcher->listen(get_class($event), $listenerFunction);
+        $listeners = [...$dispatcher->getListenersForEvent($event)];
+        $this->assertCount(1, $listeners);
+        $this->assertSame($listenerFunction, $listeners[0]);
+    }
+
+    public function test_can_add_multiple_listeners_with_same_priority(): void
+    {
+        $event = new stdClass();
+        $listenerOne = function ($event) {
+        };
+        $listenerTwo = function ($event) {
+        };
+        $dispatcher = Dispatcher::getInstance();
+        $dispatcher->listen(get_class($event), $listenerOne);
+        $dispatcher->listen(get_class($event), $listenerTwo);
+        $listeners = [...$dispatcher->getListenersForEvent($event)];
+        $this->assertCount(2, $listeners);
+        $this->assertSame($listenerOne, $listeners[0]);
+        $this->assertSame($listenerTwo, $listeners[1]);
+    }
+
+    public function test_listener_priority(): void
+    {
+        $event = new stdClass();
+        $listenerOne = function () {
+        };
+        $listenerTwo = function () {
+        };
+        $listenerThree = function () {
+        };
+        $listenerFour = function () {
+        };
+        $dispatcher = Dispatcher::getInstance();
+        $dispatcher->listen(get_class($event), $listenerOne, 1);
+        $dispatcher->listen(get_class($event), $listenerTwo, -1);
+        $dispatcher->listen(get_class($event), $listenerThree, 0);
+        $dispatcher->listen(get_class($event), $listenerFour, 1);
+        $listeners = [...$dispatcher->getListenersForEvent($event)];
+        $this->assertCount(4, $listeners);
+        $this->assertSame($listenerTwo, $listeners[0]);
+        $this->assertSame($listenerThree, $listeners[1]);
+        $this->assertSame($listenerOne, $listeners[2]);
+        $this->assertSame($listenerFour, $listeners[3]);
+    }
+
+    public function test_get_listener_for_subclass(): void
+    {
+        $event = new stdClass();
+        $subclass = $this->createMock(stdClass::class);
+        $listener = function () {
+        };
+        $dispatcher = Dispatcher::getInstance();
+        $dispatcher->listen(stdClass::class, $listener);
+        $listeners = [...$dispatcher->getListenersForEvent($subclass)];
+        $this->assertCount(1, $listeners);
+        $this->assertSame($listener, $listeners[0]);
     }
 }

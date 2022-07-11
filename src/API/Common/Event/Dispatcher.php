@@ -8,20 +8,20 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\EventDispatcher\StoppableEventInterface;
 
-class Dispatcher implements EventDispatcherInterface
+class Dispatcher implements EventDispatcherInterface, ListenerProviderInterface
 {
     private static ?self $instance = null;
-    private ListenerProviderInterface $listenerProvider;
+    /** @var array<string, array<int, array<callable>>> */
+    private array $listeners = [];
 
-    public function __construct(ListenerProviderInterface $listenerProvider)
+    private function __construct()
     {
-        $this->listenerProvider = $listenerProvider;
     }
 
-    public static function getInstance(): EventDispatcherInterface
+    public static function getInstance(): self
     {
         if (self::$instance === null) {
-            self::$instance = new self(new ListenerProvider());
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -32,21 +32,31 @@ class Dispatcher implements EventDispatcherInterface
         self::$instance = null;
     }
 
-    public function getListenerProvider(): ListenerProviderInterface
+    /**
+     * @psalm-suppress ArgumentTypeCoercion
+     */
+    public function getListenersForEvent(object $event): iterable
     {
-        return $this->listenerProvider;
+        foreach ($this->listeners as $key => $priority) {
+            if (is_a($event, $key)) {
+                foreach ($priority as $listeners) {
+                    foreach ($listeners as $listener) {
+                        yield $listener;
+                    }
+                }
+            }
+        }
     }
 
     public function listen(string $event, callable $listener, int $priority = 0): void
     {
-        if ($this->listenerProvider instanceof \OpenTelemetry\API\Common\Event\ListenerProvider) {
-            $this->listenerProvider->listen($event, $listener, $priority);
-        }
+        $this->listeners[$event][$priority][] = $listener;
+        ksort($this->listeners[$event]);
     }
 
     public function dispatch(object $event): object
     {
-        $listeners = $this->listenerProvider->getListenersForEvent($event);
+        $listeners = $this->getListenersForEvent($event);
 
         $event instanceof StoppableEventInterface
             ? $this->dispatchStoppableEvent($listeners, $event)
