@@ -12,8 +12,8 @@ use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricFactoryInterface;
-use OpenTelemetry\SDK\Metrics\MetricReader\CompositeReader;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
+use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -244,14 +244,15 @@ final class MeterTest extends TestCase
 
     private function createMeterProviderForMetricFactory(MetricFactoryInterface $metricFactory): MeterProvider
     {
-        /** @noinspection PhpParamsInspection */
         return new MeterProvider(
             null,
             ResourceInfoFactory::emptyResource(),
             ClockFactory::getDefault(),
-            new InstrumentationScopeFactory(Attributes::factory()),
-            new CompositeReader([]),
             Attributes::factory(),
+            new InstrumentationScopeFactory(Attributes::factory()),
+            [],
+            new CriteriaViewRegistry(),
+            null,
             new ImmediateStalenessHandlerFactory(),
             $metricFactory,
         );

@@ -4,64 +4,79 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\View;
 
-use Closure;
+use function assert;
+use function is_string;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
-use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
-use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
-use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
 
 final class ViewTemplate
 {
+    private ?string $name = null;
+    private ?string $description = null;
+    /**
+     * @var list<string>
+     */
+    private ?array $attributeKeys = null;
+    private ?AggregationInterface $aggregation = null;
+
+    private function __construct()
+    {
+    }
+
+    public static function create(): self
+    {
+        static $instance;
+
+        return $instance ??= new self();
+    }
+
+    public function withName(string $name): self
+    {
+        $self = clone $this;
+        $self->name = $name;
+
+        return $self;
+    }
+
+    public function withDescription(string $description): self
+    {
+        $self = clone $this;
+        $self->description = $description;
+
+        return $self;
+    }
 
     /**
-     * @readonly
+     * @param list<string> $attributeKeys
      */
-    public ?string $name;
-    /**
-     * @readonly
-     */
-    public ?string $description;
-    /**
-     * @readonly
-     */
-    public ?AttributeProcessorInterface $attributeProcessor;
-    /**
-     * @var Closure(string|InstrumentType):AggregationInterface
-     * @readonly
-     */
-    public Closure $aggregation;
-    /**
-     * @var Closure(AggregationInterface, string|InstrumentType): (ExemplarReservoirInterface|null)
-     * @readonly
-     */
-    public Closure $exemplarReservoir;
-    /**
-     * @param Closure(string|InstrumentType): AggregationInterface $aggregation
-     * @param Closure(AggregationInterface, string|InstrumentType): (ExemplarReservoirInterface|null) $exemplarReservoir
-     */
-    public function __construct(?string $name, ?string $description, ?AttributeProcessorInterface $attributeProcessor, Closure $aggregation, Closure $exemplarReservoir)
+    public function withAttributeKeys(array $attributeKeys): self
     {
-        $this->name = $name;
-        $this->description = $description;
-        $this->attributeProcessor = $attributeProcessor;
-        $this->aggregation = $aggregation;
-        $this->exemplarReservoir = $exemplarReservoir;
+        $self = clone $this;
+        $self->attributeKeys = $attributeKeys;
+
+        return $self;
+    }
+
+    public function withAggregation(?AggregationInterface $aggregation): self
+    {
+        $self = clone $this;
+        $self->aggregation = $aggregation;
+
+        return $self;
     }
 
     public function project(Instrument $instrument): ViewProjection
     {
-        $aggregation = ($this->aggregation)($instrument->type);
-        $exemplarReservoir = ($this->exemplarReservoir)($aggregation, $instrument->type);
+        $instrumentType = $instrument->type;
+        assert(is_string($instrumentType));
 
         return new ViewProjection(
             $this->name ?? $instrument->name,
             $instrument->unit,
             $this->description ?? $instrument->description,
-            $this->attributeProcessor,
-            $aggregation,
-            $exemplarReservoir,
+            $this->attributeKeys,
+            $this->aggregation,
         );
     }
 }

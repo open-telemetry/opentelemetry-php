@@ -13,10 +13,12 @@ use OpenTelemetry\SDK\Metrics\Data\Metric;
 use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
+use OpenTelemetry\SDK\Metrics\MetricRegistration\RegistryRegistration;
 use OpenTelemetry\SDK\Metrics\MetricSourceProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandler;
@@ -44,18 +46,16 @@ final class StreamFactoryTest extends TestCase
             new Instrument(InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER, 'name', '{unit}', 'description'),
             1,
             [
-                new ViewProjection(
+                [new ViewProjection(
                     'view-name',
                     'view-unit',
                     'view-description',
                     null,
                     new SumAggregation(),
-                    null,
-                ),
+                ), new RegistryRegistration($registry, new NoopStalenessHandler())],
             ],
             Attributes::factory(),
-            new NoopStalenessHandler(),
-            $registry,
+            new NoneExemplarFilter(),
         );
 
         $this->assertCount(1, $registry->sources);
@@ -102,18 +102,16 @@ final class StreamFactoryTest extends TestCase
             new Instrument(InstrumentType::UP_DOWN_COUNTER, 'name', '{unit}', 'description'),
             1,
             [
-                new ViewProjection(
+                [new ViewProjection(
                     'view-name',
                     'view-unit',
                     'view-description',
                     null,
                     new SumAggregation(),
-                    null,
-                ),
+                ), new RegistryRegistration($registry, new NoopStalenessHandler())],
             ],
             Attributes::factory(),
-            new NoopStalenessHandler(),
-            $registry,
+            new NoneExemplarFilter(),
         );
 
         $this->assertCount(1, $registry->sources);

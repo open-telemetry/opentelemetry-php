@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Metrics\Aggregation\SumSummary;
 use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -82,6 +83,14 @@ final class SumAggregationTest extends TestCase
                 1,
                 Temporality::DELTA,
             ),
+        );
+    }
+
+    public function test_exemplar_reservoir(): void
+    {
+        $this->assertEquals(
+            new FixedSizeReservoir(Attributes::factory()),
+            (new SumAggregation())->exemplarReservoir(Attributes::factory()),
         );
     }
 }

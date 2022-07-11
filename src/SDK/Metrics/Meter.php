@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use function assert;
 use Closure;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\HistogramInterface;
@@ -16,6 +17,9 @@ use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
+use OpenTelemetry\SDK\Metrics\MetricRegistration\MultiRegistryRegistration;
+use OpenTelemetry\SDK\Metrics\MetricRegistration\RegistryRegistration;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use function serialize;
 
@@ -27,11 +31,16 @@ final class Meter implements MeterInterface
     private ClockInterface $clock;
     private AttributesFactoryInterface $attributesFactory;
     private StalenessHandlerFactoryInterface $stalenessHandlerFactory;
+    /** @var iterable<MetricSourceRegistryInterface&DefaultAggregationProvider> */
+    private iterable $metricRegistries;
     private ViewRegistryInterface $viewRegistry;
-    private MetricSourceRegistryInterface $metricSourceRegistry;
+    private ?ExemplarFilterInterface $exemplarFilter;
     private MeterInstruments $instruments;
     private InstrumentationScopeInterface $instrumentationScope;
 
+    /**x
+     * @param iterable<MetricSourceRegistryInterface&DefaultAggregationProvider> $metricRegistries
+     */
     public function __construct(
         ?ContextStorageInterface $contextStorage,
         MetricFactoryInterface $metricFactory,
@@ -39,8 +48,9 @@ final class Meter implements MeterInterface
         ClockInterface $clock,
         AttributesFactoryInterface $attributesFactory,
         StalenessHandlerFactoryInterface $stalenessHandlerFactory,
+        iterable $metricRegistries,
         ViewRegistryInterface $viewRegistry,
-        MetricSourceRegistryInterface $metricSourceRegistry,
+        ?ExemplarFilterInterface $exemplarFilter,
         MeterInstruments $instruments,
         InstrumentationScopeInterface $instrumentationScope
     ) {
@@ -50,8 +60,9 @@ final class Meter implements MeterInterface
         $this->clock = $clock;
         $this->attributesFactory = $attributesFactory;
         $this->stalenessHandlerFactory = $stalenessHandlerFactory;
+        $this->metricRegistries = $metricRegistries;
         $this->viewRegistry = $viewRegistry;
-        $this->metricSourceRegistry = $metricSourceRegistry;
+        $this->exemplarFilter = $exemplarFilter;
         $this->instruments = $instruments;
         $this->instrumentationScope = $instrumentationScope;
     }
@@ -177,10 +188,9 @@ final class Meter implements MeterInterface
                 $this->instrumentationScope,
                 $instrument,
                 $instruments->startTimestamp,
-                $this->viewRegistry->find($instrument, $this->instrumentationScope),
+                $this->viewRegistrationRequests($instrument, $stalenessHandler),
                 $this->attributesFactory,
-                $this->stalenessHandlerFactory->create(),
-                $this->metricSourceRegistry,
+                $this->exemplarFilter,
                 $this->contextStorage,
             ),
             $stalenessHandler,
@@ -221,13 +231,57 @@ final class Meter implements MeterInterface
                 $this->instrumentationScope,
                 $instrument,
                 $instruments->startTimestamp,
-                $this->viewRegistry->find($instrument, $this->instrumentationScope),
+                $this->viewRegistrationRequests($instrument, $stalenessHandler),
                 $this->attributesFactory,
-                $stalenessHandler,
-                $this->metricSourceRegistry,
+                $this->exemplarFilter,
             ),
             $stalenessHandler,
         ];
+    }
+
+    /**
+     * @return iterable<array{ViewProjection, MetricRegistrationInterface}>
+     */
+    private function viewRegistrationRequests(Instrument $instrument, StalenessHandlerInterface $stalenessHandler): iterable
+    {
+        if (($views = $this->viewRegistry->find($instrument, $this->instrumentationScope)) !== null) {
+            $compositeRegistry = new MultiRegistryRegistration($this->metricRegistries, $stalenessHandler);
+            foreach ($views as $view) {
+                if ($view->aggregation !== null) {
+                    yield [$view, $compositeRegistry];
+                } else {
+                    yield from $this->viewRegistrationDefaultRequests($instrument, $stalenessHandler, $view);
+                }
+            }
+        } else {
+            yield from $this->viewRegistrationDefaultRequests($instrument, $stalenessHandler, new ViewProjection(
+                $instrument->name,
+                $instrument->unit,
+                $instrument->description,
+                null,
+                null,
+            ));
+        }
+    }
+
+    private function viewRegistrationDefaultRequests(
+        Instrument $instrument,
+        StalenessHandlerInterface $stalenessHandler,
+        ViewProjection $view
+    ): iterable {
+        assert($view->aggregation === null);
+        foreach ($this->metricRegistries as $metricRegistry) {
+            yield [
+                new ViewProjection(
+                    $view->name,
+                    $view->unit,
+                    $view->description,
+                    $view->attributeKeys,
+                    $metricRegistry->defaultAggregation($instrument->type),
+                ),
+                new RegistryRegistration($metricRegistry, $stalenessHandler),
+            ];
+        }
     }
 
     private static function instrumentationScopeId(InstrumentationScopeInterface $instrumentationScope): string

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\Aggregation;
 
+use const INF;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
@@ -11,6 +12,8 @@ use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramSummary;
 use OpenTelemetry\SDK\Metrics\Data\Histogram;
 use OpenTelemetry\SDK\Metrics\Data\HistogramDataPoint;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir;
+use OpenTelemetry\SDK\Metrics\Exemplar\HistogramBucketReservoir;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -125,6 +128,22 @@ final class ExplicitBucketHistogramAggregationTest extends TestCase
                 1,
                 Temporality::DELTA,
             ),
+        );
+    }
+
+    public function test_exemplar_reservoir(): void
+    {
+        $this->assertEquals(
+            new HistogramBucketReservoir(Attributes::factory(), [0, 5]),
+            (new ExplicitBucketHistogramAggregation([0, 5]))->exemplarReservoir(Attributes::factory()),
+        );
+    }
+
+    public function test_exemplar_reservoir_single_bucket_returns_fixed_size_reservoir(): void
+    {
+        $this->assertEquals(
+            new FixedSizeReservoir(Attributes::factory()),
+            (new ExplicitBucketHistogramAggregation([]))->exemplarReservoir(Attributes::factory()),
         );
     }
 }

@@ -11,10 +11,10 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
-use OpenTelemetry\SDK\Metrics\MetricReader\CompositeReader;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
+use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -47,9 +47,11 @@ final class MeterProviderTest extends TestCase
             null,
             ResourceInfoFactory::emptyResource(),
             ClockFactory::getDefault(),
-            $instrumentationScopeFactory->reveal(),
-            new CompositeReader([]),
             Attributes::factory(),
+            $instrumentationScopeFactory->reveal(),
+            [],
+            new CriteriaViewRegistry(),
+            null,
             new ImmediateStalenessHandlerFactory(),
         );
         $meterProvider->getMeter('name', '0.0.1', 'https://schema-url.test');
@@ -61,9 +63,11 @@ final class MeterProviderTest extends TestCase
             null,
             ResourceInfoFactory::emptyResource(),
             ClockFactory::getDefault(),
-            new InstrumentationScopeFactory(Attributes::factory()),
-            new CompositeReader([]),
             Attributes::factory(),
+            new InstrumentationScopeFactory(Attributes::factory()),
+            [],
+            new CriteriaViewRegistry(),
+            null,
             new ImmediateStalenessHandlerFactory(),
         );
         $meterProvider->shutdown();
@@ -84,15 +88,16 @@ final class MeterProviderTest extends TestCase
             ->shouldBeCalledOnce()
             ->willReturn(true);
 
-        /** @noinspection PhpParamsInspection */
         $meterProvider = new MeterProvider(
             null,
             ResourceInfoFactory::emptyResource(),
             ClockFactory::getDefault(),
+            Attributes::factory(),
             new InstrumentationScopeFactory(Attributes::factory()),
             /** @phpstan-ignore-next-line */
-            $metricReader->reveal(),
-            Attributes::factory(),
+            [$metricReader->reveal()],
+            new CriteriaViewRegistry(),
+            null,
             new ImmediateStalenessHandlerFactory(),
         );
         $this->assertTrue($meterProvider->shutdown());
@@ -116,10 +121,12 @@ final class MeterProviderTest extends TestCase
             null,
             ResourceInfoFactory::emptyResource(),
             ClockFactory::getDefault(),
+            Attributes::factory(),
             new InstrumentationScopeFactory(Attributes::factory()),
             /** @phpstan-ignore-next-line */
-            $metricReader->reveal(),
-            Attributes::factory(),
+            [$metricReader->reveal()],
+            new CriteriaViewRegistry(),
+            null,
             new ImmediateStalenessHandlerFactory(),
         );
         $this->assertTrue($meterProvider->forceFlush());

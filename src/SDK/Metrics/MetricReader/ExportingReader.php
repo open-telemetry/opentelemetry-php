@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Metrics\AggregationInterface;
+use OpenTelemetry\SDK\Metrics\DefaultAggregationProvider;
+use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
@@ -14,8 +17,10 @@ use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use function spl_object_id;
 
-final class ExportingReader implements MetricReaderInterface, MetricSourceRegistryInterface
+final class ExportingReader implements MetricReaderInterface, MetricSourceRegistryInterface, DefaultAggregationProvider
 {
+    use DefaultAggregationProviderTrait { defaultAggregation as private _defaultAggregation; }
+
     private MetricExporterInterface $exporter;
     private ClockInterface $clock;
     /** @var array<int, MetricSourceInterface> */
@@ -27,6 +32,15 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
     {
         $this->exporter = $exporter;
         $this->clock = $clock;
+    }
+
+    public function defaultAggregation($instrumentType): ?AggregationInterface
+    {
+        if ($this->exporter instanceof DefaultAggregationProvider) {
+            return $this->exporter->defaultAggregation($instrumentType);
+        }
+
+        return $this->_defaultAggregation($instrumentType);
     }
 
     public function add(MetricSourceProviderInterface $provider, MetricMetadataInterface $metadata, StalenessHandlerInterface $stalenessHandler): void

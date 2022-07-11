@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\Aggregation;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\Data;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
+use OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir;
 
 /**
  * @implements AggregationInterface<SumSummary>
@@ -87,5 +90,10 @@ final class SumAggregation implements AggregationInterface
             $temporality,
             $this->monotonic,
         );
+    }
+
+    public function exemplarReservoir(AttributesFactoryInterface $attributesFactory): ExemplarReservoirInterface
+    {
+        return new FixedSizeReservoir($attributesFactory);
     }
 }

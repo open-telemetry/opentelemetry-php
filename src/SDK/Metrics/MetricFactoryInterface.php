@@ -7,12 +7,13 @@ namespace OpenTelemetry\SDK\Metrics;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 interface MetricFactoryInterface
 {
     /**
-     * @param iterable<ViewProjection> $views
+     * @param iterable<array{ViewProjection, MetricRegistrationInterface}> $views
      */
     public function createAsynchronousObserver(
         ResourceInfo $resource,
@@ -21,12 +22,11 @@ interface MetricFactoryInterface
         int $timestamp,
         iterable $views,
         AttributesFactoryInterface $attributesFactory,
-        StalenessHandlerInterface $stalenessHandler,
-        MetricSourceRegistryInterface $metricSourceRegistry
+        ?ExemplarFilterInterface $exemplarFilter = null
     ): MetricObserverInterface;
 
     /**
-     * @param iterable<ViewProjection> $views
+     * @param iterable<array{ViewProjection, MetricRegistrationInterface}> $views
      */
     public function createSynchronousWriter(
         ResourceInfo $resource,
@@ -35,8 +35,7 @@ interface MetricFactoryInterface
         int $timestamp,
         iterable $views,
         AttributesFactoryInterface $attributesFactory,
-        StalenessHandlerInterface $stalenessHandler,
-        MetricSourceRegistryInterface $metricSourceRegistry,
+        ?ExemplarFilterInterface $exemplarFilter = null,
         ?ContextStorageInterface $contextStorage = null
     ): MetricWriterInterface;
 }

@@ -11,12 +11,15 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
+use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
+use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
 final class EchoingExporter implements MetricExporterInterface
@@ -59,23 +62,26 @@ final class EchoingExporter implements MetricExporterInterface
 
 $clock = ClockFactory::getDefault();
 $reader = new ExportingReader(new EchoingExporter(/*Temporality::CUMULATIVE*/), $clock);
+
+// Let's imagine we export the metrics as Histogram, and to simplify the story we will only have one histogram bucket (-Inf, +Inf):
+$views = new CriteriaViewRegistry();
+$views->register(
+    new InstrumentNameCriteria('http.server.duration'),
+    ViewTemplate::create()
+        ->withAttributeKeys(['http.method', 'http.status_code'])
+        ->withAggregation(new ExplicitBucketHistogramAggregation([])),
+);
+
 $meterProvider = new MeterProvider(
     null,
     ResourceInfoFactory::emptyResource(),
     $clock,
-    new InstrumentationScopeFactory(Attributes::factory()),
-    $reader,
     Attributes::factory(),
+    new InstrumentationScopeFactory(Attributes::factory()),
+    [$reader],
+    $views,
+    new WithSampledTraceExemplarFilter(),
     new ImmediateStalenessHandlerFactory(),
-);
-
-// Let's imagine we export the metrics as Histogram, and to simplify the story we will only have one histogram bucket (-Inf, +Inf):
-$meterProvider->registerView(
-    new InstrumentNameCriteria('http.server.duration'),
-    null,
-    null,
-    ['http.method', 'http.status_code'],
-    fn () => new ExplicitBucketHistogramAggregation([]),
 );
 
 $serverDuration = $meterProvider->getMeter('io.opentelemetry.contrib.php')->createHistogram(
