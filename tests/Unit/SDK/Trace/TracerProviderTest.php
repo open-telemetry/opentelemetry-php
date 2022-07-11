@@ -6,8 +6,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophet;
 use WeakReference;
 
 /**
@@ -129,5 +131,40 @@ class TracerProviderTest extends TestCase
 
         $provider = null;
         $this->assertTrue($reference->get() === null);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function test_tracer_shuts_down_immediately_when_out_of_scope(): void
+    {
+        $prophet = new Prophet();
+        $spanProcessor = $prophet->prophesize(SpanProcessorInterface::class);
+        // @phpstan-ignore-next-line
+        $spanProcessor->shutdown()
+            ->shouldBeCalledTimes(1);
+
+        /* because no reference is kept to the TracerProvider, it will immediately __destruct and shutdown,
+        which will also shut down span processors. This is a trade-off */
+        $tracer = (new TracerProvider($spanProcessor->reveal()))->getTracer('test');
+
+        $spanProcessor->checkProphecyMethodsPredictions();
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function test_tracer_remains_in_scope(): void
+    {
+        $prophet = new Prophet();
+        $spanProcessor = $prophet->prophesize(SpanProcessorInterface::class);
+        // @phpstan-ignore-next-line
+        $spanProcessor->shutdown()
+            ->shouldBeCalledTimes(0);
+
+        $tracerProvider = new TracerProvider($spanProcessor->reveal());
+        $tracer = $tracerProvider->getTracer('test');
+
+        $spanProcessor->checkProphecyMethodsPredictions();
     }
 }

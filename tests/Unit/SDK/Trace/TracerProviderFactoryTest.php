@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
+ * @covers \OpenTelemetry\SDK\Trace\TracerProviderFactory
  * @coversDefaultClass \OpenTelemetry\SDK\Trace\TracerProviderFactory
  */
 class TracerProviderFactoryTest extends TestCase
