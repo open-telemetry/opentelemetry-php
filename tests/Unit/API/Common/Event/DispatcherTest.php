@@ -33,17 +33,7 @@ class DispatcherTest extends TestCase
         $this->assertSame($dispatcher, Dispatcher::getInstance());
     }
 
-    public function test_dispatch_event(): void
-    {
-        $handler = function ($receivedEvent) {
-            $this->assertSame($this->event, $receivedEvent);
-        };
-        $dispatcher = Dispatcher::getInstance();
-        $dispatcher->listen($this->event->getType(), $handler);
-        $dispatcher->dispatch($this->event);
-    }
-
-    public function test_add_listeners(): void
+    public function test_add_listener(): void
     {
         $listenerFunction = function () {
         };
@@ -54,7 +44,17 @@ class DispatcherTest extends TestCase
         $this->assertSame($listenerFunction, $listeners[0]);
     }
 
-    public function test_can_add_multiple_listeners_with_same_priority(): void
+    public function test_dispatch_event(): void
+    {
+        $handler = function ($receivedEvent) {
+            $this->assertSame($this->event, $receivedEvent);
+        };
+        $dispatcher = Dispatcher::getInstance();
+        $dispatcher->listen($this->event->getType(), $handler);
+        $dispatcher->dispatch($this->event);
+    }
+
+    public function test_add_multiple_listeners_with_same_priority(): void
     {
         $listenerOne = function (CloudEventInterface $event) {
         };
@@ -92,7 +92,7 @@ class DispatcherTest extends TestCase
         $this->assertSame($listenerFour, $listeners[3]);
     }
 
-    public function test_adding_listener_to_multiple_events(): void
+    public function test_add_listener_to_multiple_events(): void
     {
         $event = $this->createMock(CloudEventInterface::class);
         $event->method('getType')->willReturn('bar');

@@ -30,9 +30,6 @@ class Dispatcher
         self::$instance = null;
     }
 
-    /**
-     * @psalm-suppress ArgumentTypeCoercion
-     */
     public function getListenersForEvent(CloudEventInterface $event): iterable
     {
         foreach ($this->listeners[$event->getType()] as $listeners) {

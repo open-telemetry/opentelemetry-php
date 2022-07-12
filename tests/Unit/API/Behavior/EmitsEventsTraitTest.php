@@ -19,15 +19,18 @@ class EmitsEventsTraitTest extends TestCase
         Dispatcher::unset();
     }
 
-    public function test_does_stuff(): void
+    public function test_emits_event(): void
     {
         $event = $this->createMock(CloudEventInterface::class);
         $event->method('getType')->willReturn('bar');
+        $called = false;
         $class = $this->createInstance();
-        Dispatcher::getInstance()->listen($event->getType(), function () {
+        Dispatcher::getInstance()->listen($event->getType(), function () use (&$called) {
             $this->assertTrue(true, 'listener was called');
+            $called = true;
         });
         $class->run('emit', $event);
+        $this->assertTrue($called);
     }
 
     private function createInstance(): object
