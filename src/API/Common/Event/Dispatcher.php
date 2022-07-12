@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Common\Event;
 
-use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\EventDispatcher\ListenerProviderInterface;
-use Psr\EventDispatcher\StoppableEventInterface;
+use CloudEvents\V1\CloudEventInterface;
 
-class Dispatcher implements EventDispatcherInterface, ListenerProviderInterface
+class Dispatcher
 {
     private static ?self $instance = null;
     /** @var array<string, array<int, array<callable>>> */
@@ -35,48 +33,30 @@ class Dispatcher implements EventDispatcherInterface, ListenerProviderInterface
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
-    public function getListenersForEvent(object $event): iterable
+    public function getListenersForEvent(CloudEventInterface $event): iterable
     {
-        foreach ($this->listeners as $key => $priority) {
-            if (is_a($event, $key)) {
-                foreach ($priority as $listeners) {
-                    foreach ($listeners as $listener) {
-                        yield $listener;
-                    }
-                }
+        foreach ($this->listeners[$event->getType()] as $listeners) {
+            foreach ($listeners as $listener) {
+                yield $listener;
             }
         }
     }
 
-    public function listen(string $event, callable $listener, int $priority = 0): void
+    public function listen(string $type, callable $listener, int $priority = 0): void
     {
-        $this->listeners[$event][$priority][] = $listener;
-        ksort($this->listeners[$event]);
+        $this->listeners[$type][$priority][] = $listener;
+        ksort($this->listeners[$type]);
     }
 
-    public function dispatch(object $event): object
+    public function dispatch(CloudEventInterface $event): object
     {
         $listeners = $this->getListenersForEvent($event);
-
-        $event instanceof StoppableEventInterface
-            ? $this->dispatchStoppableEvent($listeners, $event)
-            : $this->dispatchEvent($listeners, $event);
+        $this->dispatchEvent($listeners, $event);
 
         return $event;
     }
 
-    private function dispatchStoppableEvent(iterable $listeners, StoppableEventInterface $event): void
-    {
-        foreach ($listeners as $listener) {
-            if ($event->isPropagationStopped()) {
-                break;
-            }
-
-            $listener($event);
-        }
-    }
-
-    private function dispatchEvent(iterable $listeners, object $event): void
+    private function dispatchEvent(iterable $listeners, CloudEventInterface $event): void
     {
         foreach ($listeners as $listener) {
             $listener($event);

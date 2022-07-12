@@ -4,30 +4,31 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Benchmark;
 
+use CloudEvents\V1\CloudEvent;
+use CloudEvents\V1\CloudEventInterface;
 use Generator;
 use OpenTelemetry\API\Common\Event\Dispatcher;
-use stdClass;
 
 class EventBench
 {
     private Dispatcher $dispatcher;
     private $listener;
-    private object $event;
+    private CloudEventInterface $event;
 
     public function __construct()
     {
         $this->dispatcher = Dispatcher::getInstance();
         $this->listener = function () {
         };
-        $this->event = new stdClass();
+        $this->event = new CloudEvent(uniqid(), self::class, 'foo');
     }
 
-    public function addEventsToListener(): void
+    public function addEvents(): void
     {
         for ($i=0; $i<10; $i++) {
             $this->dispatcher->listen('event_' . $i, $this->listener);
         }
-        $this->dispatcher->listen(get_class($this->event), $this->listener);
+        $this->dispatcher->listen($this->event->getType(), $this->listener);
     }
 
     /**
