@@ -92,6 +92,10 @@ deptrac:
           collectors:
               - type: className
                 regex: ^Swoole\\*
+      -   name: CloudEvents
+          collectors:
+              - type: className
+                regex: ^CloudEvents\\*
 
     ruleset:
       Context:
@@ -101,6 +105,7 @@ deptrac:
           - Context
           - SemConv
           - PsrLog
+          - CloudEvents
       SDK:
           - +API
           - PsrHttp
