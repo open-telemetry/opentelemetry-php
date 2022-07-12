@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use ArrayAccess;
 use function assert;
 use Closure;
 use OpenTelemetry\API\Metrics\CounterInterface;
@@ -17,6 +18,7 @@ use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Common\Util\WeakMap;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\MultiRegistryRegistration;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\RegistryRegistration;
@@ -81,7 +83,7 @@ final class Meter implements MeterInterface
 
     public function createObservableCounter(string $name, ?string $unit = null, ?string $description = null, callable ...$callbacks): ObservableCounterInterface
     {
-        [$observer, $referenceCounter] = $this->createAsynchronousObserver(
+        [$observer, $referenceCounter, $callbackDestructors] = $this->createAsynchronousObserver(
             InstrumentType::ASYNCHRONOUS_COUNTER,
             $name,
             $unit,
@@ -93,7 +95,7 @@ final class Meter implements MeterInterface
             $referenceCounter->acquire(true);
         }
 
-        return new ObservableCounter($observer, $referenceCounter);
+        return new ObservableCounter($observer, $referenceCounter, $callbackDestructors);
     }
 
     public function createHistogram(string $name, ?string $unit = null, ?string $description = null): HistogramInterface
@@ -110,7 +112,7 @@ final class Meter implements MeterInterface
 
     public function createObservableGauge(string $name, ?string $unit = null, ?string $description = null, callable ...$callbacks): ObservableGaugeInterface
     {
-        [$observer, $referenceCounter] = $this->createAsynchronousObserver(
+        [$observer, $referenceCounter, $callbackDestructors] = $this->createAsynchronousObserver(
             InstrumentType::ASYNCHRONOUS_GAUGE,
             $name,
             $unit,
@@ -122,7 +124,7 @@ final class Meter implements MeterInterface
             $referenceCounter->acquire(true);
         }
 
-        return new ObservableGauge($observer, $referenceCounter);
+        return new ObservableGauge($observer, $referenceCounter, $callbackDestructors);
     }
 
     public function createUpDownCounter(string $name, ?string $unit = null, ?string $description = null): UpDownCounterInterface
@@ -139,7 +141,7 @@ final class Meter implements MeterInterface
 
     public function createObservableUpDownCounter(string $name, ?string $unit = null, ?string $description = null, callable ...$callbacks): ObservableUpDownCounterInterface
     {
-        [$observer, $referenceCounter] = $this->createAsynchronousObserver(
+        [$observer, $referenceCounter, $callbackDestructors] = $this->createAsynchronousObserver(
             InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER,
             $name,
             $unit,
@@ -151,7 +153,7 @@ final class Meter implements MeterInterface
             $referenceCounter->acquire(true);
         }
 
-        return new ObservableUpDownCounter($observer, $referenceCounter);
+        return new ObservableUpDownCounter($observer, $referenceCounter, $callbackDestructors);
     }
 
     /**
@@ -199,7 +201,7 @@ final class Meter implements MeterInterface
 
     /**
      * @param string|InstrumentType $instrumentType
-     * @return array{MetricObserverInterface, ReferenceCounterInterface}
+     * @return array{MetricObserverInterface, ReferenceCounterInterface, ArrayAccess}
      */
     private function createAsynchronousObserver($instrumentType, string $name, ?string $unit, ?string $description): array
     {
@@ -236,6 +238,7 @@ final class Meter implements MeterInterface
                 $this->exemplarFilter,
             ),
             $stalenessHandler,
+            WeakMap::create(),
         ];
     }
 

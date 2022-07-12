@@ -5,36 +5,44 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
+use OpenTelemetry\SDK\Metrics\MetricObserver\CallbackDestructor;
 
 final class ObservableCallback implements ObservableCallbackInterface
 {
     private MetricObserverInterface $metricObserver;
     private ReferenceCounterInterface $referenceCounter;
-    private ?int $token;
+    private int $token;
+    private ?CallbackDestructor $callbackDestructor;
 
-    public function __construct(MetricObserverInterface $metricObserver, ReferenceCounterInterface $referenceCounter, int $token)
+    public function __construct(MetricObserverInterface $metricObserver, ReferenceCounterInterface $referenceCounter, int $token, ?CallbackDestructor $callbackDestructor)
     {
         $this->metricObserver = $metricObserver;
         $this->referenceCounter =  $referenceCounter;
         $this->token = $token;
+        $this->callbackDestructor = $callbackDestructor;
 
         $this->referenceCounter->acquire();
     }
 
     public function detach(): void
     {
-        if ($this->token === null) {
+        if (!$this->metricObserver->has($this->token)) {
             return;
         }
 
         $this->metricObserver->cancel($this->token);
         $this->referenceCounter->release();
-        $this->token = null;
+        if ($this->callbackDestructor !== null) {
+            unset($this->callbackDestructor->tokens[$this->token]);
+        }
     }
 
     public function __destruct()
     {
-        if ($this->token === null) {
+        if ($this->callbackDestructor !== null) {
+            return;
+        }
+        if (!$this->metricObserver->has($this->token)) {
             return;
         }
 

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use ArrayAccess;
+
 final class MeterInstruments
 {
     public ?int $startTimestamp = null;
     /**
-     * @var array<string, array<string, array{MetricObserverInterface, ReferenceCounterInterface}>>
+     * @var array<string, array<string, array{MetricObserverInterface, ReferenceCounterInterface, ArrayAccess}>>
      */
     public array $observers = [];
     /**

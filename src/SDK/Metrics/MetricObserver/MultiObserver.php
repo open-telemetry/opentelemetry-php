@@ -32,12 +32,13 @@ final class MultiObserver implements MetricObserverInterface
         return array_key_last($this->callbacks);
     }
 
+    public function has(int $token): bool
+    {
+        return isset($this->callbacks[$token]);
+    }
+
     public function cancel(int $token): void
     {
-        if (!isset($this->callbacks[$token])) {
-            return;
-        }
-
         unset($this->callbacks[$token]);
     }
 }

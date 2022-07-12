@@ -12,7 +12,7 @@ use OpenTelemetry\API\Metrics\ObservableGaugeInterface;
  */
 final class NoopObservableGauge implements ObservableGaugeInterface
 {
-    public function observe(callable $callback): ObservableCallbackInterface
+    public function observe(callable $callback, bool $weaken = false): ObservableCallbackInterface
     {
         return new NoopObservableCallback();
     }

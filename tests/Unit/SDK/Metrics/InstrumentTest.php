@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Common\Util\WeakMap;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\Counter;
@@ -59,7 +60,7 @@ final class InstrumentTest extends TestCase
     {
         $o = new MultiObserver();
         $s = new AsynchronousMetricStream(Attributes::factory(), null, new SumAggregation(true), null, $o, 0);
-        $c = new ObservableCounter($o, new NoopStalenessHandler());
+        $c = new ObservableCounter($o, new NoopStalenessHandler(), WeakMap::create());
         $r = $s->register(Temporality::CUMULATIVE);
 
         $c->observe(static function (ObserverInterface $observer): void {

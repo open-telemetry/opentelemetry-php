@@ -12,7 +12,7 @@ use OpenTelemetry\API\Metrics\ObservableUpDownCounterInterface;
  */
 final class NoopObservableUpDownCounter implements ObservableUpDownCounterInterface
 {
-    public function observe(callable $callback): ObservableCallbackInterface
+    public function observe(callable $callback, bool $weaken = false): ObservableCallbackInterface
     {
         return new NoopObservableCallback();
     }

@@ -12,5 +12,5 @@ interface ObservableCounterInterface
      *        reporting the measurements (as absolute values)
      * @return ObservableCallbackInterface token to detach callback
      */
-    public function observe(callable $callback): ObservableCallbackInterface;
+    public function observe(callable $callback, bool $weaken = false): ObservableCallbackInterface;
 }

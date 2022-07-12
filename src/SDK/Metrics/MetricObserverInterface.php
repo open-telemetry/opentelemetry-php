@@ -14,5 +14,7 @@ interface MetricObserverInterface
      */
     public function observe(Closure $callback): int;
 
+    public function has(int $token): bool;
+
     public function cancel(int $token): void;
 }
