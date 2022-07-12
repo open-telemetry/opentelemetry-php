@@ -63,7 +63,11 @@ final class TracerProvider implements TracerProviderInterface
         return $this->tracerSharedState->getSpanProcessor()->forceFlush();
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     * @note Getting a tracer without keeping a strong reference to the TracerProvider will cause the TracerProvider to
+     *       immediately shut itself down including its shared state, ie don't do this: $tracer = (new TracerProvider())->getTracer('foo')
+     */
     public function getTracer(
         string $name,
         ?string $version = null,

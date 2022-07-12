@@ -9,6 +9,8 @@ We use `docker` and `docker-compose` to perform a lot of our static analysis and
 
 The installation instructions for these tools are [here](https://docs.docker.com/install/), under the `Docker Engine` and `Docker Compose` submenus respectively.
 
+Development tasks are generally run through a `Makefile`. Running `make` or `make help` will list available targets.
+
 To ensure you have all the correct packages installed locally in your dev environment, you can run
 
 ```bash
