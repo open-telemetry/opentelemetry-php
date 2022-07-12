@@ -6,6 +6,8 @@ namespace OpenTelemetry\Tests\Unit\API\Common\Event;
 
 use CloudEvents\V1\CloudEventInterface;
 use OpenTelemetry\API\Common\Event\Dispatcher;
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextKey;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,22 +16,31 @@ use PHPUnit\Framework\TestCase;
 class DispatcherTest extends TestCase
 {
     private CloudEventInterface $event;
+
     public function setUp(): void
     {
-        Dispatcher::unset();
         $this->event = $this->createMock(CloudEventInterface::class);
         $this->event->method('getType')->willReturn('foo');
     }
 
     public function tearDown(): void
     {
-        Dispatcher::unset();
+        Dispatcher::getInstance()->reset();
     }
 
     public function test_get_instance(): void
     {
         $dispatcher = Dispatcher::getInstance();
         $this->assertInstanceOf(Dispatcher::class, $dispatcher);
+        $this->assertSame($dispatcher, Dispatcher::getInstance());
+    }
+
+    public function test_get_instance_from_parent_context(): void
+    {
+        $dispatcher = Dispatcher::getInstance();
+        $this->assertInstanceOf(Dispatcher::class, $dispatcher);
+        $parent = Context::getCurrent()->with(new ContextKey('foo'), 'bar');
+        $parent->activate();
         $this->assertSame($dispatcher, Dispatcher::getInstance());
     }
 

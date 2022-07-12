@@ -14,11 +14,6 @@ use PHPUnit\Framework\TestCase;
  */
 class EmitsEventsTraitTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        Dispatcher::unset();
-    }
-
     public function test_emits_event(): void
     {
         $event = $this->createMock(CloudEventInterface::class);
