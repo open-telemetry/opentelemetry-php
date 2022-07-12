@@ -128,3 +128,4 @@ $app->get('/three', function (Response $response) {
 });
 
 $app->run();
+$tracerProvider->shutdown();
