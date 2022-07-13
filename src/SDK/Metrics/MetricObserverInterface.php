@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use ArrayAccess;
 use Closure;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 
@@ -17,4 +18,6 @@ interface MetricObserverInterface
     public function has(int $token): bool;
 
     public function cancel(int $token): void;
+
+    public function weakMap(): ArrayAccess;
 }

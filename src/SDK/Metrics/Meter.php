@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-use ArrayAccess;
-use function assert;
-use Closure;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;
@@ -18,7 +15,7 @@ use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
-use OpenTelemetry\SDK\Common\Util\WeakMap;
+use function OpenTelemetry\SDK\Common\Util\closure;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\MultiRegistryRegistration;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\RegistryRegistration;
@@ -33,15 +30,15 @@ final class Meter implements MeterInterface
     private ClockInterface $clock;
     private AttributesFactoryInterface $attributesFactory;
     private StalenessHandlerFactoryInterface $stalenessHandlerFactory;
-    /** @var iterable<MetricSourceRegistryInterface&DefaultAggregationProvider> */
+    /** @var iterable<MetricSourceRegistryInterface&DefaultAggregationProviderInterface> */
     private iterable $metricRegistries;
     private ViewRegistryInterface $viewRegistry;
     private ?ExemplarFilterInterface $exemplarFilter;
     private MeterInstruments $instruments;
     private InstrumentationScopeInterface $instrumentationScope;
 
-    /**x
-     * @param iterable<MetricSourceRegistryInterface&DefaultAggregationProvider> $metricRegistries
+    /**
+     * @param iterable<MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricRegistries
      */
     public function __construct(
         ?ContextStorageInterface $contextStorage,
@@ -83,7 +80,7 @@ final class Meter implements MeterInterface
 
     public function createObservableCounter(string $name, ?string $unit = null, ?string $description = null, callable ...$callbacks): ObservableCounterInterface
     {
-        [$observer, $referenceCounter, $callbackDestructors] = $this->createAsynchronousObserver(
+        [$observer, $referenceCounter] = $this->createAsynchronousObserver(
             InstrumentType::ASYNCHRONOUS_COUNTER,
             $name,
             $unit,
@@ -91,11 +88,12 @@ final class Meter implements MeterInterface
         );
 
         foreach ($callbacks as $callback) {
-            $observer->observe(Closure::fromCallable($callback));
+            /** @psalm-suppress InvalidArgument */
+            $observer->observe(closure($callback));
             $referenceCounter->acquire(true);
         }
 
-        return new ObservableCounter($observer, $referenceCounter, $callbackDestructors);
+        return new ObservableCounter($observer, $referenceCounter);
     }
 
     public function createHistogram(string $name, ?string $unit = null, ?string $description = null): HistogramInterface
@@ -112,7 +110,7 @@ final class Meter implements MeterInterface
 
     public function createObservableGauge(string $name, ?string $unit = null, ?string $description = null, callable ...$callbacks): ObservableGaugeInterface
     {
-        [$observer, $referenceCounter, $callbackDestructors] = $this->createAsynchronousObserver(
+        [$observer, $referenceCounter] = $this->createAsynchronousObserver(
             InstrumentType::ASYNCHRONOUS_GAUGE,
             $name,
             $unit,
@@ -120,11 +118,12 @@ final class Meter implements MeterInterface
         );
 
         foreach ($callbacks as $callback) {
-            $observer->observe(Closure::fromCallable($callback));
+            /** @psalm-suppress InvalidArgument */
+            $observer->observe(closure($callback));
             $referenceCounter->acquire(true);
         }
 
-        return new ObservableGauge($observer, $referenceCounter, $callbackDestructors);
+        return new ObservableGauge($observer, $referenceCounter);
     }
 
     public function createUpDownCounter(string $name, ?string $unit = null, ?string $description = null): UpDownCounterInterface
@@ -141,7 +140,7 @@ final class Meter implements MeterInterface
 
     public function createObservableUpDownCounter(string $name, ?string $unit = null, ?string $description = null, callable ...$callbacks): ObservableUpDownCounterInterface
     {
-        [$observer, $referenceCounter, $callbackDestructors] = $this->createAsynchronousObserver(
+        [$observer, $referenceCounter] = $this->createAsynchronousObserver(
             InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER,
             $name,
             $unit,
@@ -149,11 +148,12 @@ final class Meter implements MeterInterface
         );
 
         foreach ($callbacks as $callback) {
-            $observer->observe(Closure::fromCallable($callback));
+            /** @psalm-suppress InvalidArgument */
+            $observer->observe(closure($callback));
             $referenceCounter->acquire(true);
         }
 
-        return new ObservableUpDownCounter($observer, $referenceCounter, $callbackDestructors);
+        return new ObservableUpDownCounter($observer, $referenceCounter);
     }
 
     /**
@@ -201,7 +201,7 @@ final class Meter implements MeterInterface
 
     /**
      * @param string|InstrumentType $instrumentType
-     * @return array{MetricObserverInterface, ReferenceCounterInterface, ArrayAccess}
+     * @return array{MetricObserverInterface, ReferenceCounterInterface}
      */
     private function createAsynchronousObserver($instrumentType, string $name, ?string $unit, ?string $description): array
     {
@@ -238,7 +238,6 @@ final class Meter implements MeterInterface
                 $this->exemplarFilter,
             ),
             $stalenessHandler,
-            WeakMap::create(),
         ];
     }
 
@@ -247,43 +246,34 @@ final class Meter implements MeterInterface
      */
     private function viewRegistrationRequests(Instrument $instrument, StalenessHandlerInterface $stalenessHandler): iterable
     {
-        if (($views = $this->viewRegistry->find($instrument, $this->instrumentationScope)) !== null) {
-            $compositeRegistry = new MultiRegistryRegistration($this->metricRegistries, $stalenessHandler);
-            foreach ($views as $view) {
-                if ($view->aggregation !== null) {
-                    yield [$view, $compositeRegistry];
-                } else {
-                    yield from $this->viewRegistrationDefaultRequests($instrument, $stalenessHandler, $view);
-                }
-            }
-        } else {
-            yield from $this->viewRegistrationDefaultRequests($instrument, $stalenessHandler, new ViewProjection(
+        $views = $this->viewRegistry->find($instrument, $this->instrumentationScope) ?? [
+            new ViewProjection(
                 $instrument->name,
                 $instrument->unit,
                 $instrument->description,
                 null,
                 null,
-            ));
-        }
-    }
+            ),
+        ];
 
-    private function viewRegistrationDefaultRequests(
-        Instrument $instrument,
-        StalenessHandlerInterface $stalenessHandler,
-        ViewProjection $view
-    ): iterable {
-        assert($view->aggregation === null);
-        foreach ($this->metricRegistries as $metricRegistry) {
-            yield [
-                new ViewProjection(
-                    $view->name,
-                    $view->unit,
-                    $view->description,
-                    $view->attributeKeys,
-                    $metricRegistry->defaultAggregation($instrument->type),
-                ),
-                new RegistryRegistration($metricRegistry, $stalenessHandler),
-            ];
+        $compositeRegistration = new MultiRegistryRegistration($this->metricRegistries, $stalenessHandler);
+        foreach ($views as $view) {
+            if ($view->aggregation !== null) {
+                yield [$view, $compositeRegistration];
+            } else {
+                foreach ($this->metricRegistries as $metricRegistry) {
+                    yield [
+                        new ViewProjection(
+                            $view->name,
+                            $view->unit,
+                            $view->description,
+                            $view->attributeKeys,
+                            $metricRegistry->defaultAggregation($instrument->type),
+                        ),
+                        new RegistryRegistration($metricRegistry, $stalenessHandler),
+                    ];
+                }
+            }
         }
     }
 

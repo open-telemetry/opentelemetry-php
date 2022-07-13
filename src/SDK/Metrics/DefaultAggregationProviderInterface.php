@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-interface DefaultAggregationProvider
+interface DefaultAggregationProviderInterface
 {
     /**
      * @param string|InstrumentType $instrumentType

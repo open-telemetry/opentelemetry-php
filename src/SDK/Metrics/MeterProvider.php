@@ -31,7 +31,7 @@ final class MeterProvider implements MeterProviderInterface
     private bool $closed = false;
 
     /**
-     * @param iterable<MetricReaderInterface&MetricSourceRegistryInterface&DefaultAggregationProvider> $metricReaders
+     * @param iterable<MetricReaderInterface&MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricReaders
      */
     public function __construct(
         ?ContextStorageInterface $contextStorage,

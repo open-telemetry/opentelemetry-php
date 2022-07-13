@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricObserver;
 
 use function array_key_last;
+use ArrayAccess;
 use Closure;
 use OpenTelemetry\API\Metrics\ObserverInterface;
+use OpenTelemetry\SDK\Common\Util\WeakMap;
 use OpenTelemetry\SDK\Metrics\MetricObserverInterface;
 
 final class MultiObserver implements MetricObserverInterface
@@ -15,6 +17,7 @@ final class MultiObserver implements MetricObserverInterface
      * @var array<int, Closure(ObserverInterface):void>
      */
     private array $callbacks = [];
+    private ?ArrayAccess $weakMap = null;
 
     public function __invoke(ObserverInterface $observer): void
     {
@@ -40,5 +43,10 @@ final class MultiObserver implements MetricObserverInterface
     public function cancel(int $token): void
     {
         unset($this->callbacks[$token]);
+    }
+
+    public function weakMap(): ArrayAccess
+    {
+        return $this->weakMap ??= WeakMap::create();
     }
 }

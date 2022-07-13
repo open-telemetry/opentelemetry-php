@@ -19,12 +19,10 @@ trait ObservableInstrumentTrait
 
     public function __construct(
         MetricObserverInterface $metricObserver,
-        ReferenceCounterInterface $referenceCounter,
-        ArrayAccess $callbackDestructors
+        ReferenceCounterInterface $referenceCounter
     ) {
         $this->metricObserver = $metricObserver;
         $this->referenceCounter = $referenceCounter;
-        $this->callbackDestructors = $callbackDestructors;
 
         $this->referenceCounter->acquire();
     }
@@ -50,7 +48,7 @@ trait ObservableInstrumentTrait
 
         $destructor = null;
         if ($object = $target) {
-            $destructor = $this->callbackDestructors[$object] ??= new CallbackDestructor($this->metricObserver, $this->referenceCounter);
+            $destructor = $this->metricObserver->weakMap()[$object] ??= new CallbackDestructor($this->metricObserver, $this->referenceCounter);
             $destructor->tokens[$token] = $token;
         }
 
