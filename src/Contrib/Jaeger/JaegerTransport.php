@@ -94,7 +94,7 @@ final class JaegerTransport implements TransportInterface
             // reset the process tag
             $this->process = null;
         } catch (TTransportException $e) {
-            self::logError('jaeger: transport failure: ' . $e->getMessage());
+            self::logError('jaeger: transport failure', ['exception' => $e]);
 
             return 0;
         }
