@@ -6,6 +6,7 @@ namespace OpenTelemetry\Contrib\OtlpHttp;
 
 use function array_filter;
 use OpenTelemetry\Contrib\Otlp\MetricConverter;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
@@ -17,6 +18,8 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class MetricExporter implements MetricExporterInterface
 {
+    use LogsMessagesTrait;
+
     private ClientInterface $client;
     private RequestFactoryInterface $requestFactory;
     private StreamFactoryInterface $streamFactory;
@@ -115,19 +118,23 @@ final class MetricExporter implements MetricExporterInterface
         }
 
         for ($retries = 0;;) {
+            $statusCode = null;
+            $e = null;
+
             $request = $request->withBody($this->streamFactory->createStream($payload));
 
             try {
                 $response = $this->client->sendRequest($request);
 
-                if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+                $statusCode = $response->getStatusCode();
+                if ($statusCode >= 200 && $statusCode < 300) {
                     return true;
                 }
-                if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500 && $response->getStatusCode() !== 408) {
-                    return false;
+                if ($statusCode >= 400 && $statusCode < 500 && $statusCode !== 408) {
+                    break;
                 }
             } catch (RequestExceptionInterface $e) {
-                return false;
+                break;
             } catch (ClientExceptionInterface $e) {
             }
 
@@ -139,6 +146,12 @@ final class MetricExporter implements MetricExporterInterface
             /** @psalm-suppress InvalidArgument */
             usleep(rand($wait >> 1, $wait));
         }
+
+        /** @psalm-suppress PossiblyUndefinedVariable */
+        self::logError('Metric export failed', [
+            'exception' => $e,
+            'status_code' => $statusCode,
+        ]);
 
         return false;
     }
