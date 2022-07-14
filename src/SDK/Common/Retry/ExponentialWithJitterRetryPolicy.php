@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Common\Time\SchedulerInterface;
 use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
-class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
+final class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
 {
     private $maxAttempts;
     private $initialBackoff;
@@ -20,22 +20,16 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
     public $retryableStatusCodes;
     public $scheduler;
 
-    private function __construct(
-        int $maxAttempts = self::DEFAULT_MAX_ATTEMPTS,
-        float $initialBackoff = self::DEFAULT_INITIAL_BACKOFF,
-        int $maxBackoff = self::DEFAULT_MAX_BACKOFF,
-        float $backoffMultiplier = self::DEFAULT_BACKOFF_MULTIPLIER,
-        float $jitter = self::DEFAULT_JITTER,
-        array $retryableStatusCodes = null,
-        $scheduler = null
-    ) {
-        $this->setMaxAttempts($maxAttempts);
-        $this->setInitialBackoff($initialBackoff);
-        $this->setMaxBackoff($maxBackoff);
-        $this->setBackoffMultipler($backoffMultiplier);
-        $this->setJitter($jitter);
-        $this->retryableStatusCodes = $retryableStatusCodes;
-        $this->scheduler = $scheduler != null ? $scheduler : new BlockingScheduler();
+    public function __construct($arguments=[])
+    {
+        extract($arguments, EXTR_IF_EXISTS);
+        $this->setMaxAttempts($arguments['maxAttempts'] ?? self::DEFAULT_MAX_ATTEMPTS);
+        $this->setInitialBackoff($arguments['initialBackoff'] ?? self::DEFAULT_INITIAL_BACKOFF);
+        $this->setMaxBackoff($arguments['maxBackoff'] ?? self::DEFAULT_MAX_BACKOFF);
+        $this->setBackoffMultipler($arguments['backoffMultiplier'] ?? self::DEFAULT_BACKOFF_MULTIPLIER);
+        $this->setJitter($arguments['jitter'] ?? self::DEFAULT_JITTER);
+        $this->setRetryableStatusCodes($arguments['retryableStatusCodes'] ?? []);
+        $this->setDelayScheduler($arguments['scheduler'] ?? new BlockingScheduler());
     }
 
     public function shouldRetry(
@@ -59,18 +53,19 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         }
         // Initial exponential backoff in mili seconds
         $delay = ($this->backoffMultiplier ** $attempt) * $this->initialBackoff * 1000;
+
         // Adding jitter to exponential backoff
         if ($this->jitter > 0) {
             $randomness = (int) ($delay * $this->jitter);
-            $delay = $delay + random_int(-$randomness, +$randomness);
+            $delay += rand(-$randomness, +$randomness);
         }
 
         return min((int) $delay, $this->maxBackoff * 1000);
     }
 
-    public static function getDefault(): ExponentialWithJitterRetryPolicy
+    public function delay(int $timeout): void
     {
-        return new ExponentialWithJitterRetryPolicy();
+        $this->scheduler->delay($timeout);
     }
 
     public function getMaxAttempts(): int
@@ -132,7 +127,7 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         float $backoff_multiplier = self::DEFAULT_BACKOFF_MULTIPLIER
     ) {
         $this->checkArgument(
-            $backoff_multiplier > 0,
+            $backoff_multiplier > 1,
             sprintf('Backoff multiplier must be greater than 0: "%s" value provided', $backoff_multiplier)
         );
         $this->backoffMultiplier = $backoff_multiplier;
@@ -159,16 +154,14 @@ class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
     public function setRetryableStatusCodes(array $statusCodes)
     {
         $this->checkArgument(
-            count($statusCodes) > 0 &&
+            $statusCodes !== [] &&
             array_reduce(
                 $statusCodes,
-                function ($result, $item) {
-                    return $result && is_int($item);
-                },
+                fn ($result, $item) => $result && is_int($item),
                 true
             ),
-            sprintf('Retryable Status Code array should not be empty 
-                    and each value should be valid status code')
+            'Retryable Status Code array should not be empty 
+                    and each value should be valid status code'
         );
         $this->retryableStatusCodes = $statusCodes;
 

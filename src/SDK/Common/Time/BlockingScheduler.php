@@ -13,15 +13,10 @@ final class BlockingScheduler implements SchedulerInterface
     {
         self::logInfo('setting Blocking Delay scheduler');
     }
-    /**
-     * delays the current thread by $timeout seconds
-     *
-     * @param int $timeout - no of mili seconds to delay the current execution
-     * @return void
-     */
+
     public function delay(int $timeout): void
     {
-        self::logInfo("Delaying the execution by $timeout mili seconds");
+        self::logInfo("Delaying the execution by $timeout milliseconds");
         usleep(abs($timeout) * 1000);
     }
 }

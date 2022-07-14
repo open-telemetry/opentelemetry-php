@@ -13,7 +13,6 @@ use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Retry\ExponentialWithJitterRetryPolicy;
-use OpenTelemetry\SDK\Common\Time\BlockingScheduler;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -37,6 +36,17 @@ class Exporter implements SpanExporterInterface
 
     private TraceServiceClient $client;
 
+    private array $retryableStatusCodes = [
+            \Grpc\STATUS_CANCELLED,
+            \Grpc\STATUS_DEADLINE_EXCEEDED,
+            \Grpc\STATUS_PERMISSION_DENIED,
+            \Grpc\STATUS_RESOURCE_EXHAUSTED,
+            \Grpc\STATUS_ABORTED,
+            \Grpc\STATUS_OUT_OF_RANGE,
+            \Grpc\STATUS_UNAVAILABLE,
+            \Grpc\STATUS_DATA_LOSS,
+            \Grpc\STATUS_UNAUTHENTICATED,
+    ];
     /**
      * OTLP GRPC Exporter Constructor
      */
@@ -71,21 +81,10 @@ class Exporter implements SpanExporterInterface
             $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
         $this->setSpanConverter(new SpanConverter());
-
-        $this->setRetryPolicy(ExponentialWithJitterRetryPolicy::getDefault());
-        $this->setRetryableStatusCodes([
-            \Grpc\STATUS_CANCELLED,
-            \Grpc\STATUS_DEADLINE_EXCEEDED,
-            \Grpc\STATUS_PERMISSION_DENIED,
-            \Grpc\STATUS_RESOURCE_EXHAUSTED,
-            \Grpc\STATUS_ABORTED,
-            \Grpc\STATUS_OUT_OF_RANGE,
-            \Grpc\STATUS_UNAVAILABLE,
-            \Grpc\STATUS_DATA_LOSS,
-            \Grpc\STATUS_UNAUTHENTICATED,
+        $retryPolicy = new ExponentialWithJitterRetryPolicy([
+            'retryableStatusCodes' => $this->retryableStatusCodes,
         ]);
-        $this->setDelayScheduler(new BlockingScheduler());
-
+        $this->setRetryPolicy($retryPolicy);
         $this->metadata = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers);
@@ -143,7 +142,7 @@ class Exporter implements SpanExporterInterface
                 'error' => $status->details ?? 'unknown grpc error',
                 'code' => $status->code,
             ];
-        if ($this->retryPolicy && in_array($status->code, $this->retryPolicy->getRetryableStatusCodes(), false)) {
+        if ($this->retryPolicy && in_array($status->code, $this->retryableStatusCodes, false)) {
             self::logWarning('Retryable error exporting grpc span', ['error' => $error]);
 
             return self::STATUS_FAILED_RETRYABLE;

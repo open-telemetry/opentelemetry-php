@@ -4,71 +4,80 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Retry;
 
-use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OtlpExporter;
 use OpenTelemetry\SDK\Common\Retry\ExponentialWithJitterRetryPolicy;
 use OpenTelemetry\SDK\Common\Time\BlockingScheduler;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\RequestInterface;
 
 /**
  * @covers \OpenTelemetry\SDK\Common\Retry\ExponentialWithJitterRetryPolicy
  */
 class ExponentialWithJitterRetryPolicyTest extends TestCase
 {
-    private OtlpExporter $exporter;
-    // private ClientInterface $client;
-
-    public function setUp(): void
-    {
-        $request = $this->createMock(RequestInterface::class);
-        // $this->client = $this->createMock(ClientInterface::class);
-        $this->exporter = $this->createExporter();
-    }
-
-    private function createExporter(): OtlpExporter
-    {
-        return new class() extends OtlpExporter {
-        };
-    }
-
     public function test_retry_policy_set_properly()
     {
-        $this->exporter->setRetryPolicy(ExponentialWithJitterRetryPolicy::getDefault());
-
+        $retryPolicy = new ExponentialWithJitterRetryPolicy([
+            'retryableStatusCodes' => [
+                \Grpc\STATUS_CANCELLED,
+                \Grpc\STATUS_DEADLINE_EXCEEDED,
+                \Grpc\STATUS_PERMISSION_DENIED,
+                \Grpc\STATUS_RESOURCE_EXHAUSTED,
+                \Grpc\STATUS_ABORTED,
+                \Grpc\STATUS_OUT_OF_RANGE,
+                \Grpc\STATUS_UNAVAILABLE,
+                \Grpc\STATUS_DATA_LOSS,
+                \Grpc\STATUS_UNAUTHENTICATED,
+            ],
+        ]);
         $this->assertSame(
-            $this->exporter->getRetryPolicy()->getMaxAttempts(),
+            $retryPolicy->getMaxAttempts(),
             ExponentialWithJitterRetryPolicy::DEFAULT_MAX_ATTEMPTS
         );
         $this->assertSame(
-            (int) ($this->exporter->getRetryPolicy()->getInitialBackoff()),
+            (int) ($retryPolicy->getInitialBackoff()),
             ExponentialWithJitterRetryPolicy::DEFAULT_INITIAL_BACKOFF
         );
         $this->assertSame(
-            $this->exporter->getRetryPolicy()->getMaxBackoff(),
+            $retryPolicy->getMaxBackoff(),
             ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF
         );
         $this->assertSame(
-            $this->exporter->getRetryPolicy()->getMaxAttempts(),
+            $retryPolicy->getMaxAttempts(),
             ExponentialWithJitterRetryPolicy::DEFAULT_MAX_ATTEMPTS
         );
         $this->assertSame(
-            $this->exporter->getRetryPolicy()->getJitter(),
+            $retryPolicy->getJitter(),
             ExponentialWithJitterRetryPolicy::DEFAULT_JITTER
         );
         $this->assertInstanceOf(
             BlockingScheduler::class,
-            $this->exporter->getRetryPolicy()->getDelayScheduler()
+            $retryPolicy->getDelayScheduler()
         );
+        $this->assertEquals(count($retryPolicy->getRetryableStatusCodes()), 9);
     }
 
-    public function test_delay_is_less_or_equal_to_max_backoff()
+    /**
+     * @dataProvider provider
+     */
+    public function test_delay_is_less_or_equal_to_max_backoff($attempt, $delay, $maxBackoff)
     {
-        $this->exporter->setRetryPolicy(ExponentialWithJitterRetryPolicy::getDefault());
-        $retryPolicy = $this->exporter->getRetryPolicy();
-        $maxAttempts = $retryPolicy->getMaxAttempts();
-        for ($i=0; $i < $maxAttempts; $i++) {
-            $delay = floor($retryPolicy->getDelay($i)/1000);
-            $this->assertLessThanOrEqual($retryPolicy->getMaxBackoff(), $delay);
-        }
+        $this->assertLessThanOrEqual($maxBackoff, $delay);
+    }
+
+    public function provider()
+    {
+        $retryPolicy = new ExponentialWithJitterRetryPolicy([
+            'retryableStatusCodes' => [
+                \Grpc\STATUS_CANCELLED,
+            ],
+        ]);
+        $maxBackoff = $retryPolicy->getMaxBackoff();
+
+        return [
+            [0, $retryPolicy->getDelay(0)/1000, $maxBackoff],
+            [1, $retryPolicy->getDelay(1)/1000, $maxBackoff],
+            [2, $retryPolicy->getDelay(2)/1000, $maxBackoff],
+            [3, $retryPolicy->getDelay(3)/1000, $maxBackoff],
+            [4, $retryPolicy->getDelay(4)/1000, $maxBackoff],
+        ];
     }
 }
