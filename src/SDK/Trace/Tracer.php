@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use function ctype_space;
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
 class Tracer implements API\TracerInterface
@@ -34,7 +35,7 @@ class Tracer implements API\TracerInterface
         }
 
         if ($this->tracerSharedState->hasShutdown()) {
-            // TODO: Return a noop tracer
+            return new API\NoopSpanBuilder(Context::storage());
         }
 
         return new SpanBuilder(

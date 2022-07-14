@@ -31,6 +31,7 @@ class SpanBuilderTest extends MockeryTestCase
     private const SPAN_NAME = 'span_name';
 
     private API\TracerInterface $tracer;
+    private API\TracerProviderInterface $tracerProvider;
     private API\SpanContextInterface $sampledSpanContext;
 
     /** @var MockInterface&SpanProcessorInterface  */
@@ -39,7 +40,8 @@ class SpanBuilderTest extends MockeryTestCase
     protected function setUp(): void
     {
         $this->spanProcessor = Mockery::spy(SpanProcessorInterface::class);
-        $this->tracer = (new TracerProvider($this->spanProcessor))->getTracer('SpanBuilderTest');
+        $this->tracerProvider = new TracerProvider($this->spanProcessor);
+        $this->tracer = $this->tracerProvider->getTracer('SpanBuilderTest');
 
         $this->sampledSpanContext = SpanContext::create(
             '12345678876543211234567887654321',
@@ -81,7 +83,8 @@ class SpanBuilderTest extends MockeryTestCase
     public function test_add_link_dropping_links(): void
     {
         $maxNumberOfLinks = 8;
-        $spanBuilder = (new TracerProvider([], null, null, (new SpanLimitsBuilder())->setLinkCountLimit($maxNumberOfLinks)->build()))
+        $tracerProvider = new TracerProvider([], null, null, (new SpanLimitsBuilder())->setLinkCountLimit($maxNumberOfLinks)->build());
+        $spanBuilder = $tracerProvider
             ->getTracer('test')
             ->spanBuilder(self::SPAN_NAME);
 
@@ -107,8 +110,9 @@ class SpanBuilderTest extends MockeryTestCase
 
     public function test_add_link_truncate_link_attributes(): void
     {
+        $tracerProvider = new TracerProvider([], null, null, (new SpanLimitsBuilder())->setAttributePerLinkCountLimit(1)->build());
         /** @var Span $span */
-        $span = (new TracerProvider([], null, null, (new SpanLimitsBuilder())->setAttributePerLinkCountLimit(1)->build()))
+        $span = $tracerProvider
             ->getTracer('test')
             ->spanBuilder(self::SPAN_NAME)
             ->addLink(
@@ -132,8 +136,9 @@ class SpanBuilderTest extends MockeryTestCase
         $strVal = str_repeat('a', $maxLength);
         $tooLongStrVal = "${strVal}${strVal}";
 
+        $tracerProvider = new TracerProvider([], null, null, (new SpanLimitsBuilder())->setAttributeValueLengthLimit($maxLength)->build());
         /** @var Span $span */
-        $span = (new TracerProvider([], null, null, (new SpanLimitsBuilder())->setAttributeValueLengthLimit($maxLength)->build()))
+        $span = $tracerProvider
             ->getTracer('test')
             ->spanBuilder(self::SPAN_NAME)
             ->addLink(
@@ -303,12 +308,14 @@ class SpanBuilderTest extends MockeryTestCase
     public function test_set_attribute_dropping(): void
     {
         $maxNumberOfAttributes = 8;
-        $spanBuilder = (new TracerProvider(
+        $tracerProvider = new TracerProvider(
             null,
             null,
             null,
             (new SpanLimitsBuilder())->setAttributeCountLimit($maxNumberOfAttributes)->build()
-        ))->getTracer('test')->spanBuilder(self::SPAN_NAME);
+        );
+        $spanBuilder = $tracerProvider
+            ->getTracer('test')->spanBuilder(self::SPAN_NAME);
 
         foreach (range(1, $maxNumberOfAttributes * 2) as $idx) {
             $spanBuilder->setAttribute("str_attribute_${idx}", $idx);
@@ -345,8 +352,9 @@ class SpanBuilderTest extends MockeryTestCase
             }
         };
 
+        $tracerProvider = new TracerProvider([], $sampler);
         /** @var Span $span */
-        $span = (new TracerProvider([], $sampler))->getTracer('test')->spanBuilder(self::SPAN_NAME)->startSpan();
+        $span = $tracerProvider->getTracer('test')->spanBuilder(self::SPAN_NAME)->startSpan();
         $span->end();
 
         $attributes = $span->toSpanData()->getAttributes();

@@ -48,8 +48,6 @@ class TracerTest extends TestCase
         ];
     }
 
-    /**
-     */
     public function test_get_instrumentation_scope(): void
     {
         $this->assertSame($this->instrumentationScope, $this->tracer->getInstrumentationScope());
