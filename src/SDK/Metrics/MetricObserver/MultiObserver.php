@@ -45,7 +45,7 @@ final class MultiObserver implements MetricObserverInterface
         unset($this->callbacks[$token]);
     }
 
-    public function weakMap(): ArrayAccess
+    public function destructors(): ArrayAccess
     {
         return $this->weakMap ??= WeakMap::create();
     }

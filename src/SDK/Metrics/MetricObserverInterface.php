@@ -7,6 +7,7 @@ namespace OpenTelemetry\SDK\Metrics;
 use ArrayAccess;
 use Closure;
 use OpenTelemetry\API\Metrics\ObserverInterface;
+use OpenTelemetry\SDK\Metrics\MetricObserver\CallbackDestructor;
 
 interface MetricObserverInterface
 {
@@ -19,5 +20,8 @@ interface MetricObserverInterface
 
     public function cancel(int $token): void;
 
-    public function weakMap(): ArrayAccess;
+    /**
+     * @return ArrayAccess<object, CallbackDestructor>
+     */
+    public function destructors(): ArrayAccess;
 }

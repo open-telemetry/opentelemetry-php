@@ -45,10 +45,11 @@ trait ObservableInstrumentTrait
 
         /** @psalm-var \Closure(ObserverInterface): void $callback */
         $token = $this->metricObserver->observe($callback);
+        $this->referenceCounter->acquire();
 
         $destructor = null;
         if ($object = $target) {
-            $destructor = $this->metricObserver->weakMap()[$object] ??= new CallbackDestructor($this->metricObserver, $this->referenceCounter);
+            $destructor = $this->metricObserver->destructors()[$object] ??= new CallbackDestructor($this->metricObserver, $this->referenceCounter);
             $destructor->tokens[$token] = $token;
         }
 

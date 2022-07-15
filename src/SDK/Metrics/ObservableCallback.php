@@ -20,8 +20,6 @@ final class ObservableCallback implements ObservableCallbackInterface
         $this->referenceCounter =  $referenceCounter;
         $this->token = $token;
         $this->callbackDestructor = $callbackDestructor;
-
-        $this->referenceCounter->acquire();
     }
 
     public function detach(): void

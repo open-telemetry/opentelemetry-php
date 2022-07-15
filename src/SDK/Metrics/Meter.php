@@ -37,6 +37,8 @@ final class Meter implements MeterInterface
     private MeterInstruments $instruments;
     private InstrumentationScopeInterface $instrumentationScope;
 
+    private ?string $instrumentationScopeId = null;
+
     /**
      * @param iterable<MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricRegistries
      */
@@ -164,8 +166,8 @@ final class Meter implements MeterInterface
     {
         $instrument = new Instrument($instrumentType, $name, $unit, $description);
 
-        $instrumentationScopeId = self::instrumentationScopeId($this->instrumentationScope);
-        $instrumentId = self::instrumentId($instrument);
+        $instrumentationScopeId = $this->instrumentationScopeId($this->instrumentationScope);
+        $instrumentId = $this->instrumentId($instrument);
 
         $instruments = $this->instruments;
         if ($writer = $instruments->writers[$instrumentationScopeId][$instrumentId] ?? null) {
@@ -207,8 +209,8 @@ final class Meter implements MeterInterface
     {
         $instrument = new Instrument($instrumentType, $name, $unit, $description);
 
-        $instrumentationScopeId = self::instrumentationScopeId($this->instrumentationScope);
-        $instrumentId = self::instrumentId($instrument);
+        $instrumentationScopeId = $this->instrumentationScopeId($this->instrumentationScope);
+        $instrumentId = $this->instrumentId($instrument);
 
         $instruments = $this->instruments;
         if ($observer = $instruments->observers[$instrumentationScopeId][$instrumentId] ?? null) {
@@ -277,12 +279,12 @@ final class Meter implements MeterInterface
         }
     }
 
-    private static function instrumentationScopeId(InstrumentationScopeInterface $instrumentationScope): string
+    private function instrumentationScopeId(InstrumentationScopeInterface $instrumentationScope): string
     {
-        return serialize($instrumentationScope);
+        return $this->instrumentationScopeId ??= serialize($instrumentationScope);
     }
 
-    private static function instrumentId(Instrument $instrument): string
+    private function instrumentId(Instrument $instrument): string
     {
         return serialize($instrument);
     }

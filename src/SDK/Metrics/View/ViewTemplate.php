@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\View;
 
-use function assert;
-use function is_string;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
@@ -68,9 +66,6 @@ final class ViewTemplate
 
     public function project(Instrument $instrument): ViewProjection
     {
-        $instrumentType = $instrument->type;
-        assert(is_string($instrumentType));
-
         return new ViewProjection(
             $this->name ?? $instrument->name,
             $instrument->unit,
