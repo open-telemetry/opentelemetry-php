@@ -33,7 +33,7 @@ final class Sdk implements ResourceDetectorInterface
                 if (!InstalledVersions::isInstalled($package)) {
                     continue;
                 }
-                if (($version = InstalledVersions::getVersion($package)) === null) {
+                if (($version = InstalledVersions::getPrettyVersion($package)) === null) {
                     continue;
                 }
 
