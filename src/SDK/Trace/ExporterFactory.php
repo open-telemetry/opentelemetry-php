@@ -56,14 +56,14 @@ class ExporterFactory
 
         $dsn = $this->parser->parse($exporterDsn);
 
-        self::validateScheme($dsn->getScheme());
+        self::validateProtocol($dsn->getProtocol());
 
         $endpoint = $dsn->getEndpoint();
         $serviceName = $this->resolveServiceName($dsn);
 
-        if (in_array(self::normalizeProtocol($dsn->getScheme()), ['newrelic+http', 'zipkintonewrelic+http'])) {
+        if (in_array(self::normalizeProtocol($dsn->getProtocol()), ['newrelic+http', 'zipkintonewrelic+http'])) {
             return self::buildExporter(
-                $dsn->getScheme(),
+                $dsn->getProtocol(),
                 $endpoint,
                 $serviceName,
                 self::getOptionFromDsn($dsn, 'licenseKey')
@@ -71,7 +71,7 @@ class ExporterFactory
         }
 
         return self::buildExporter(
-            $dsn->getScheme(),
+            $dsn->getProtocol(),
             $endpoint,
             $serviceName
         );
@@ -133,18 +133,18 @@ class ExporterFactory
         return null;
     }
 
-    private static function buildExporter(string $scheme, string $endpoint = null, string $name = null, $args = null): SpanExporterInterface
+    private static function buildExporter(string $protocol, string $endpoint = null, string $name = null, $args = null): SpanExporterInterface
     {
-        $exporterClass = self::KNOWN_EXPORTERS[self::normalizeProtocol($scheme)];
+        $exporterClass = self::KNOWN_EXPORTERS[self::normalizeProtocol($protocol)];
         self::validateExporterClass($exporterClass);
 
         return call_user_func([$exporterClass, 'fromConnectionString'], $endpoint, $name, $args);
     }
 
-    private static function validateScheme(string $scheme): void
+    private static function validateProtocol(string $protocol): void
     {
-        if (!array_key_exists(self::normalizeProtocol($scheme), self::KNOWN_EXPORTERS)) {
-            throw new InvalidArgumentException('Invalid exporter scheme: ' . $scheme);
+        if (!array_key_exists(self::normalizeProtocol($protocol), self::KNOWN_EXPORTERS)) {
+            throw new InvalidArgumentException('Invalid exporter protocol: ' . $protocol);
         }
     }
 
@@ -153,13 +153,6 @@ class ExporterFactory
         if (!class_exists($class)) {
             throw new InvalidArgumentException('Could not find exporter class: ' . $class);
         }
-    }
-
-    private static function getProtocolFromScheme(string $scheme): string
-    {
-        $components = explode('+', $scheme);
-
-        return count($components) === 1 ? $components[0] : $components[1];
     }
 
     private static function normalizeProtocol(string $scheme): string

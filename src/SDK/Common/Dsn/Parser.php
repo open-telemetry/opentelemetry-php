@@ -48,11 +48,8 @@ class Parser implements ParserInterface
 
         self::validateComponents($components);
 
-        $components[DsnInterface::PROTOCOL_ATTRIBUTE] = $components[self::SCHEME_ATTRIBUTE];
-        unset($components[self::SCHEME_ATTRIBUTE]);
-
-        [$components[DsnInterface::TYPE_ATTRIBUTE], $components[DsnInterface::PROTOCOL_ATTRIBUTE]]
-            = explode('+', $components[DsnInterface::PROTOCOL_ATTRIBUTE]);
+        [$components[DsnInterface::TYPE_ATTRIBUTE], $components[DsnInterface::SCHEME_ATTRIBUTE]]
+            = explode('+', $components[DsnInterface::SCHEME_ATTRIBUTE] ?? '+');
 
         $components[DsnInterface::PATH_ATTRIBUTE] ??= null;
         $components[DsnInterface::PORT_ATTRIBUTE] ??= null;
@@ -66,7 +63,7 @@ class Parser implements ParserInterface
         if (!isset($components[self::SCHEME_ATTRIBUTE])
             || (int) strpos($components[self::SCHEME_ATTRIBUTE], '+') === 0) {
             throw new InvalidArgumentException(
-                'An exporter DSN must have a exporter type and a protocol: type+protocol://host:port'
+                'An exporter DSN must have a exporter type and a scheme: type+scheme://host:port'
             );
         }
     }

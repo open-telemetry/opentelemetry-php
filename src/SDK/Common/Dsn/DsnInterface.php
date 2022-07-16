@@ -11,6 +11,8 @@ interface DsnInterface
     /** @var string  */
     public const PROTOCOL_ATTRIBUTE = 'protocol';
     /** @var string  */
+    public const SCHEME_ATTRIBUTE = 'scheme';
+    /** @var string  */
     public const HOST_ATTRIBUTE = 'host';
     /** @var string  */
     public const PATH_ATTRIBUTE = 'path';
@@ -22,6 +24,15 @@ interface DsnInterface
     public const USER_ATTRIBUTE = 'user';
     /** @var string  */
     public const PASSWORD_ATTRIBUTE = 'password';
+    /** @var string  */
+    public const URL_ATTRIBUTE = 'url';
+
+    /** @var string[]  */
+    public const CONFIG_ATTRIBUTES = [
+        DsnInterface::TYPE_ATTRIBUTE,
+        DsnInterface::URL_ATTRIBUTE,
+        DsnInterface::OPTIONS_ATTRIBUTE,
+    ];
 
     /**
      * Returns the endpoint (DSN without type and options)

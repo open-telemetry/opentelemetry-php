@@ -11,7 +11,7 @@ final class Factory implements FactoryInterface
     /** @var array  */
     public const REQUIRED_ATTRIBUTES = [
         DsnInterface::TYPE_ATTRIBUTE,
-        DsnInterface::PROTOCOL_ATTRIBUTE,
+        DsnInterface::SCHEME_ATTRIBUTE,
         DsnInterface::HOST_ATTRIBUTE,
     ];
 
@@ -32,7 +32,7 @@ final class Factory implements FactoryInterface
     {
         return new Dsn(
             $this->getValue(DsnInterface::TYPE_ATTRIBUTE, $dsn),
-            $this->getValue(DsnInterface::PROTOCOL_ATTRIBUTE, $dsn),
+            $this->getValue(DsnInterface::SCHEME_ATTRIBUTE, $dsn),
             $this->getValue(DsnInterface::HOST_ATTRIBUTE, $dsn),
             $this->getValue(DsnInterface::PATH_ATTRIBUTE, $dsn),
             $this->getValue(DsnInterface::PORT_ATTRIBUTE, $dsn),

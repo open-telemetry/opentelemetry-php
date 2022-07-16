@@ -17,7 +17,7 @@ class FactoryTest extends TestCase
 {
     private const ARGUMENTS = [
         DsnInterface::TYPE_ATTRIBUTE => 'foo',
-        DsnInterface::PROTOCOL_ATTRIBUTE => 'bar',
+        DsnInterface::SCHEME_ATTRIBUTE => 'bar',
         DsnInterface::HOST_ATTRIBUTE => 'example.com',
         DsnInterface::PATH_ATTRIBUTE => '/path',
         DsnInterface::PORT_ATTRIBUTE => 42,
@@ -65,14 +65,14 @@ class FactoryTest extends TestCase
         Factory::create()->fromArray($arguments);
     }
 
-    private function provideArguments(): Generator
+    public function provideArguments(): Generator
     {
         foreach (self::ARGUMENTS as $name => $value) {
             yield ['get' . ucfirst($name), $value];
         }
     }
 
-    private function provideMissingAttributeValues(): Generator
+    public function provideMissingAttributeValues(): Generator
     {
         foreach (Factory::REQUIRED_ATTRIBUTES as $name) {
             $arguments = self::ARGUMENTS;

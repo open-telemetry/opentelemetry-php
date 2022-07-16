@@ -19,7 +19,7 @@ class Dsn implements DsnInterface
 
     public function __construct(
         string $type,
-        string $protocol,
+        string $scheme,
         string $host,
         ?string $path = null,
         ?int $port = null,
@@ -28,7 +28,7 @@ class Dsn implements DsnInterface
         ?string $password = null
     ) {
         $this->type = $type;
-        $this->protocol = $protocol;
+        $this->scheme = $scheme;
         $this->host = $host;
         $this->path = $path;
         $this->port = $port;
@@ -39,7 +39,7 @@ class Dsn implements DsnInterface
 
     public static function create(
         string $type,
-        string $protocol,
+        string $scheme,
         string $host,
         ?string $path = null,
         ?int $port = null,
@@ -47,7 +47,7 @@ class Dsn implements DsnInterface
         ?string $user = null,
         ?string $password = null
     ): self {
-        return new self($type, $protocol, $host, $path, $port, $options, $user, $password);
+        return new self($type, $scheme, $host, $path, $port, $options, $user, $password);
     }
 
     public function __toString(): string
@@ -62,19 +62,20 @@ class Dsn implements DsnInterface
     }
 
     /**
-     * Returns the endpoint (DSN without type and options)
+     * @inheritDoc
      */
     public function getEndpoint(): string
     {
-        return $this->endpoint ??= $this->assembleEndpoint();
+        /** @psalm-suppress RedundantPropertyInitializationCheck */
+        return $this->endpoint ??= $this->renderEndpoint();
     }
 
     public function asConfigArray(): array
     {
         return [
-            'type' => $this->getType(),
-            'url' => $this->getEndpoint(),
-            'options' => $this->getOptions(),
+            DsnInterface::TYPE_ATTRIBUTE => $this->getType(),
+            DsnInterface::URL_ATTRIBUTE => $this->getEndpoint(),
+            DsnInterface::OPTIONS_ATTRIBUTE => $this->getOptions(),
         ];
     }
 
@@ -83,14 +84,15 @@ class Dsn implements DsnInterface
         return $this->type;
     }
 
-    public function getProtocol(): string
-    {
-        return $this->protocol;
-    }
-
     public function getScheme(): string
     {
-        return $this->scheme ??= $this->assembleScheme();
+        return $this->scheme;
+    }
+
+    public function getProtocol(): string
+    {
+        /** @psalm-suppress RedundantPropertyInitializationCheck */
+        return $this->protocol ??= $this->renderProtocol();
     }
 
     public function getHost(): string
@@ -128,37 +130,61 @@ class Dsn implements DsnInterface
         return $this->password;
     }
 
-    private function assembleScheme(): string
+    private function renderProtocol(): string
     {
-        return sprintf('%s+%s', $this->getType(), $this->getProtocol());
+        return sprintf('%s+%s', $this->getType(), $this->getScheme());
     }
 
-    private function assembleEndpoint(): string
+    private function renderEndpoint(): string
     {
-        $dsn = sprintf(
-            '%s://',
-            $this->getProtocol()
-        );
+        $dsn = $this->renderScheme();
 
-        if ($this->getUser() !== null) {
-            $dsn .= $this->getPassword() !== null
-                ? sprintf(
-                    '%s:%s@',
-                    $this->getUser(),
-                    $this->getPassword()
-                )
-                : sprintf(
-                    '%s@',
-                    $this->getUser()
-                );
-        }
-
+        $dsn .= $this->renderUserInfo();
         $dsn .= $this->getHost();
-        $dsn .= $this->getPort() !== null ? sprintf(
-            ':%s',
-            (string) $this->getPort(),
-        ) : '';
+        $dsn .= $this->renderPort();
 
         return $dsn . ($this->getPath() ?? '');
+    }
+
+    private function renderScheme(): string
+    {
+        return sprintf(
+            '%s://',
+            $this->getScheme()
+        );
+    }
+
+    /**
+     * @phan-suppress PhanTypeMismatchArgumentNullableInternal
+     * @psalm-suppress PossiblyNullArgument
+     */
+    private function renderUserInfo(): string
+    {
+        if ($this->getUser() === null) {
+            return '';
+        }
+
+        return $this->getPassword() !== null
+            ? sprintf(
+                '%s:%s@',
+                $this->getUser(),
+                $this->getPassword()
+            )
+            : sprintf(
+                '%s@',
+                $this->getUser()
+            );
+    }
+
+    /**
+     * @phan-suppress PhanTypeMismatchArgumentNullableInternal
+     * @psalm-suppress PossiblyNullArgument
+     */
+    private function renderPort(): string
+    {
+        return $this->getPort() !== null ? sprintf(
+            ':%s',
+            $this->getPort(),
+        ) : '';
     }
 }

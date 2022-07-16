@@ -20,7 +20,7 @@ class ParserTest extends TestCase
 
     private const PARTS = [
         DsnInterface::TYPE_ATTRIBUTE => 'foo',
-        DsnInterface::PROTOCOL_ATTRIBUTE => 'bar',
+        DsnInterface::SCHEME_ATTRIBUTE => 'bar',
         DsnInterface::HOST_ATTRIBUTE => 'example.com',
         DsnInterface::PATH_ATTRIBUTE => '/path',
         DsnInterface::PORT_ATTRIBUTE => 42,
@@ -79,7 +79,7 @@ class ParserTest extends TestCase
         $this->instance->parseToArray($dsn);
     }
 
-    private function provideParts(): Generator
+    public function provideParts(): Generator
     {
         // all
         yield ['foo+bar://root:secret@example.com:42/path?key=value', []];
@@ -161,7 +161,7 @@ class ParserTest extends TestCase
         ]];
     }
 
-    private function provideInvalidDsn(): Generator
+    public function provideInvalidDsn(): Generator
     {
         // invalid
         yield ['http://user@:80"'];

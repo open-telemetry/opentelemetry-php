@@ -16,7 +16,7 @@ class DsnTest extends TestCase
 {
     private const ARGUMENTS = [
         DsnInterface::TYPE_ATTRIBUTE => 'foo',
-        DsnInterface::PROTOCOL_ATTRIBUTE => 'bar',
+        DsnInterface::SCHEME_ATTRIBUTE => 'bar',
         DsnInterface::HOST_ATTRIBUTE => 'example.com',
         DsnInterface::PATH_ATTRIBUTE => '/path',
         DsnInterface::PORT_ATTRIBUTE => 42,
@@ -80,7 +80,7 @@ class DsnTest extends TestCase
 
         return Dsn::create(
             $arguments[DsnInterface::TYPE_ATTRIBUTE],
-            $arguments[DsnInterface::PROTOCOL_ATTRIBUTE],
+            $arguments[DsnInterface::SCHEME_ATTRIBUTE],
             $arguments[DsnInterface::HOST_ATTRIBUTE],
             $arguments[DsnInterface::PATH_ATTRIBUTE],
             $arguments[DsnInterface::PORT_ATTRIBUTE],
@@ -90,14 +90,14 @@ class DsnTest extends TestCase
         );
     }
 
-    private function provideArguments(): Generator
+    public function provideArguments(): Generator
     {
         foreach (self::ARGUMENTS as $name => $value) {
             yield ['get' . ucfirst($name), $value];
         }
     }
 
-    private function provideToStringValues(): Generator
+    public function provideToStringValues(): Generator
     {
         // all
         yield ['foo+bar://root:secret@example.com:42/path?key=value', []];
@@ -183,7 +183,7 @@ class DsnTest extends TestCase
         ]];
     }
 
-    private function provideEndpointValues(): Generator
+    public function provideEndpointValues(): Generator
     {
         // all
         yield ['bar://root:secret@example.com:42/path', []];

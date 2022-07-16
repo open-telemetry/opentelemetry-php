@@ -34,14 +34,6 @@ class Exporter implements SpanExporterInterface
     private const DEFAULT_ENDPOINT = 'https://localhost:4318/v1/traces';
     private const DEFAULT_COMPRESSION = 'none';
     private const OTLP_PROTOCOL = 'http/protobuf';
-    private const DEFAULT_PROTOCOL = 'https';
-    private const DEFAULT_PATH = '/v1/traces';
-    private const SCHEME_ATTRIBUTE = 'scheme';
-    private const PATH_ATTRIBUTE = 'path';
-    private const VALID_PROTOCOLS = [
-        'http',
-        'https',
-    ];
 
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
     // private string $insecure;
@@ -52,8 +44,6 @@ class Exporter implements SpanExporterInterface
     private array $headers;
 
     private string $compression;
-
-    private HttpEndpointResolverInterface $httpEndpointResolver;
 
     // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
     // private int $timeout;
@@ -140,11 +130,6 @@ class Exporter implements SpanExporterInterface
     private function shouldCompress(): bool
     {
         return $this->compression === 'gzip' && function_exists('gzencode');
-    }
-
-    private function setHttpEndpointResolver(HttpEndpointResolverInterface $httpEndpointResolver): void
-    {
-        $this->httpEndpointResolver = $httpEndpointResolver;
     }
 
     private function resolveEndpoint(HttpEndpointResolverInterface $httpEndpointResolver): string
