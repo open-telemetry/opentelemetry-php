@@ -74,7 +74,6 @@ class Exporter implements SpanExporterInterface
         $this->setRequestFactory($requestFactory);
         $this->setStreamFactory($streamFactory);
         $this->setSpanConverter($spanConverter ?? new SpanConverter());
-        $this->setHttpEndpointResolver($httpEndpointResolver ?? HttpEndpointResolver::create());
 
         $protocol = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
             $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, self::OTLP_PROTOCOL) :
