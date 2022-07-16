@@ -18,6 +18,7 @@ class ExporterFactory
 
     private const KNOWN_EXPORTERS = [
         'console' => '\OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter',
+        'memory' => '\OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter',
         'logger+file' => '\OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter',
         'jaeger+http' => '\OpenTelemetry\Contrib\Jaeger\Exporter',
         'zipkin+http' => '\OpenTelemetry\Contrib\Zipkin\Exporter',
@@ -47,7 +48,7 @@ class ExporterFactory
       */
     public function fromConnectionString(string $connectionString): SpanExporterInterface
     {
-        if (in_array($connectionString, ['console', 'otlp+http'])) {
+        if (in_array($connectionString, ['console', 'memory', 'otlp+http'])) {
             return self::buildExporter($connectionString);
         }
 
