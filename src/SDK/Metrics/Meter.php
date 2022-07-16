@@ -23,6 +23,9 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use const PHP_VERSION_ID;
 use function serialize;
 
+/**
+ * @internal
+ */
 final class Meter implements MeterInterface
 {
     private ?ContextStorageInterface $contextStorage;

@@ -7,6 +7,9 @@ namespace OpenTelemetry\SDK\Metrics;
 use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 
+/**
+ * @internal
+ */
 final class UpDownCounter implements UpDownCounterInterface
 {
     private MetricWriterInterface $writer;

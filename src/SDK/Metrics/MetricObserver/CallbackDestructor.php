@@ -7,6 +7,9 @@ namespace OpenTelemetry\SDK\Metrics\MetricObserver;
 use OpenTelemetry\SDK\Metrics\MetricObserverInterface;
 use OpenTelemetry\SDK\Metrics\ReferenceCounterInterface;
 
+/**
+ * @internal
+ */
 final class CallbackDestructor
 {
     /**

@@ -9,6 +9,9 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
 
+/**
+ * @internal
+ */
 final class FilteredAttributeProcessor implements AttributeProcessorInterface
 {
     private AttributesFactoryInterface $attributesFactory;

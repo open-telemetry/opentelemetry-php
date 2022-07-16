@@ -7,6 +7,9 @@ namespace OpenTelemetry\SDK\Metrics;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 
+/**
+ * @internal
+ */
 final class Counter implements CounterInterface
 {
     private MetricWriterInterface $writer;

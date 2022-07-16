@@ -29,6 +29,9 @@ use function serialize;
 use function spl_object_id;
 use Throwable;
 
+/**
+ * @internal
+ */
 final class StreamFactory implements MetricFactoryInterface
 {
     public function createAsynchronousObserver(

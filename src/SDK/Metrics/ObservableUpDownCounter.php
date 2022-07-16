@@ -6,6 +6,9 @@ namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics\ObservableUpDownCounterInterface;
 
+/**
+ * @internal
+ */
 final class ObservableUpDownCounter implements ObservableUpDownCounterInterface
 {
     use ObservableInstrumentTrait;

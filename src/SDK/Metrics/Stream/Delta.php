@@ -6,6 +6,9 @@ namespace OpenTelemetry\SDK\Metrics\Stream;
 
 use GMP;
 
+/**
+ * @internal
+ */
 final class Delta
 {
     public Metric $metric;

@@ -7,6 +7,9 @@ namespace OpenTelemetry\SDK\Metrics\Stream;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
+/**
+ * @internal
+ */
 interface WritableMetricStreamInterface
 {
     /**

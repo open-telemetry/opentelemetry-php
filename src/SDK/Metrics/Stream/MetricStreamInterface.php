@@ -7,9 +7,11 @@ namespace OpenTelemetry\SDK\Metrics\Stream;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 
+/**
+ * @internal
+ */
 interface MetricStreamInterface
 {
-
     /**
      * Returns the internal temporality of this stream.
      *

@@ -9,6 +9,9 @@ use Closure;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Metrics\MetricObserver\CallbackDestructor;
 
+/**
+ * @internal
+ */
 interface MetricObserverInterface
 {
     /**

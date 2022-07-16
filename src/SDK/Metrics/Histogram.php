@@ -7,6 +7,9 @@ namespace OpenTelemetry\SDK\Metrics;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 
+/**
+ * @internal
+ */
 final class Histogram implements HistogramInterface
 {
     private MetricWriterInterface $writer;

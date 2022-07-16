@@ -7,6 +7,8 @@ namespace OpenTelemetry\SDK\Metrics\Stream;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 /**
+ * @internal
+ *
  * @template T
  */
 final class Metric

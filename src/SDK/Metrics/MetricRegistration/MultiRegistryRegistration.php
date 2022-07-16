@@ -10,6 +10,9 @@ use OpenTelemetry\SDK\Metrics\MetricSourceProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 
+/**
+ * @internal
+ */
 final class MultiRegistryRegistration implements MetricRegistrationInterface
 {
     private iterable $registries;

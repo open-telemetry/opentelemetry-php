@@ -19,6 +19,9 @@ use const PHP_INT_SIZE;
 use function sprintf;
 use function trigger_error;
 
+/**
+ * @internal
+ */
 final class SynchronousMetricStream implements MetricStreamInterface
 {
     private MetricAggregator $metricAggregator;

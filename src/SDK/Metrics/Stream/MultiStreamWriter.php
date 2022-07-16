@@ -9,6 +9,9 @@ use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricWriterInterface;
 
+/**
+ * @internal
+ */
 final class MultiStreamWriter implements MetricWriterInterface
 {
     private ?ContextStorageInterface $contextStorage;

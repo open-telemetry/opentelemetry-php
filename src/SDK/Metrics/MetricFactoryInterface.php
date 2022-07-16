@@ -10,6 +10,9 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
+/**
+ * @internal
+ */
 interface MetricFactoryInterface
 {
     /**

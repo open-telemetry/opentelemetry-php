@@ -6,6 +6,9 @@ namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\Context\Context;
 
+/**
+ * @internal
+ */
 interface MetricWriterInterface
 {
     /**

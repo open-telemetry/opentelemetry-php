@@ -12,6 +12,9 @@ use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 use function serialize;
 
+/**
+ * @internal
+ */
 final class MetricAggregator implements WritableMetricStreamInterface
 {
     private ?AttributeProcessorInterface $attributeProcessor;

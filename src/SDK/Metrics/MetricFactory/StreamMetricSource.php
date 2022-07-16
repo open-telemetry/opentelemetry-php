@@ -7,6 +7,9 @@ namespace OpenTelemetry\SDK\Metrics\MetricFactory;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
 use OpenTelemetry\SDK\Metrics\MetricSourceInterface;
 
+/**
+ * @internal
+ */
 final class StreamMetricSource implements MetricSourceInterface
 {
     private StreamMetricSourceProvider $provider;

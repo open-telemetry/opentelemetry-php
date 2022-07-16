@@ -7,6 +7,9 @@ namespace OpenTelemetry\SDK\Metrics;
 use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
 use OpenTelemetry\SDK\Metrics\MetricObserver\CallbackDestructor;
 
+/**
+ * @internal
+ */
 final class ObservableCallback implements ObservableCallbackInterface
 {
     private MetricObserverInterface $metricObserver;

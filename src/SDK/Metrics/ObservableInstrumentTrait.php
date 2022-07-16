@@ -11,6 +11,9 @@ use function OpenTelemetry\SDK\Common\Util\closure;
 use function OpenTelemetry\SDK\Common\Util\weaken;
 use OpenTelemetry\SDK\Metrics\MetricObserver\CallbackDestructor;
 
+/**
+ * @internal
+ */
 trait ObservableInstrumentTrait
 {
     private MetricObserverInterface $metricObserver;

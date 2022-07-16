@@ -8,6 +8,9 @@ use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 
+/**
+ * @internal
+ */
 final class AsynchronousMetricStreamObserver implements ObserverInterface
 {
     private WritableMetricStreamInterface $stream;

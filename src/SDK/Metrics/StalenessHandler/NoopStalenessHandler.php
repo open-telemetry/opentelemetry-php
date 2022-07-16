@@ -8,6 +8,9 @@ use Closure;
 use OpenTelemetry\SDK\Metrics\ReferenceCounterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 
+/**
+ * @internal
+ */
 final class NoopStalenessHandler implements StalenessHandlerInterface, ReferenceCounterInterface
 {
     public function acquire(bool $persistent = false): void

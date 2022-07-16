@@ -13,6 +13,9 @@ use OpenTelemetry\SDK\Metrics\Stream\MetricStreamInterface;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
+/**
+ * @internal
+ */
 final class StreamMetricSourceProvider implements MetricSourceProviderInterface, MetricMetadataInterface
 {
     /**

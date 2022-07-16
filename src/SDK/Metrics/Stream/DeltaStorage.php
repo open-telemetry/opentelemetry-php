@@ -8,6 +8,9 @@ use function assert;
 use GMP;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 
+/**
+ * @internal
+ */
 final class DeltaStorage
 {
     private AggregationInterface $aggregation;

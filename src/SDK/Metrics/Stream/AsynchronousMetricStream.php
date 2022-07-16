@@ -15,6 +15,9 @@ use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 
+/**
+ * @internal
+ */
 final class AsynchronousMetricStream implements MetricStreamInterface
 {
     private MetricAggregator $metricAggregator;

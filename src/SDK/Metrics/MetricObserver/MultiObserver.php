@@ -11,6 +11,9 @@ use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Util\WeakMap;
 use OpenTelemetry\SDK\Metrics\MetricObserverInterface;
 
+/**
+ * @internal
+ */
 final class MultiObserver implements MetricObserverInterface
 {
     /**

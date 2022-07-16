@@ -9,5 +9,5 @@ interface StalenessHandlerFactoryInterface
     /**
      * @return StalenessHandlerInterface&ReferenceCounterInterface
      */
-    public function create();
+    public function create(): StalenessHandlerInterface;
 }
