@@ -14,7 +14,7 @@ $storage = new ArrayObject();
 // Boilerplate setup to create a new tracer with an in-memory exporter
 $tracer = (new TracerProvider(
     new SimpleSpanProcessor(
-        new InMemoryExporter()
+        new InMemoryExporter($storage)
     )
 ))->getTracer('io.opentelemetry.contrib.php');
 
