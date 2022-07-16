@@ -15,4 +15,10 @@ final class MeterInstruments
      * @var array<string, array<string, array{MetricWriterInterface, ReferenceCounterInterface}>>
      */
     public array $writers = [];
+
+    /**
+     * @var list<MetricObserverInterface>
+     * @deprecated
+     */
+    public array $staleObservers = [];
 }

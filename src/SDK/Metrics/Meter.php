@@ -20,6 +20,7 @@ use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\MultiRegistryRegistration;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\RegistryRegistration;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use const PHP_VERSION_ID;
 use function serialize;
 
 final class Meter implements MeterInterface
@@ -213,12 +214,19 @@ final class Meter implements MeterInterface
         $instrumentId = $this->instrumentId($instrument);
 
         $instruments = $this->instruments;
+        /** @phan-suppress-next-line PhanDeprecatedProperty */
+        $instruments->staleObservers = [];
         if ($observer = $instruments->observers[$instrumentationScopeId][$instrumentId] ?? null) {
             return $observer;
         }
 
         $stalenessHandler = $this->stalenessHandlerFactory->create();
         $stalenessHandler->onStale(static function () use ($instruments, $instrumentationScopeId, $instrumentId): void {
+            if (PHP_VERSION_ID < 80000) {
+                /** @phan-suppress-next-line PhanDeprecatedProperty */
+                $instruments->staleObservers[] = $instruments->observers[$instrumentationScopeId][$instrumentId][0];
+            }
+
             unset($instruments->observers[$instrumentationScopeId][$instrumentId]);
             if (!$instruments->observers[$instrumentationScopeId]) {
                 unset($instruments->observers[$instrumentationScopeId]);
