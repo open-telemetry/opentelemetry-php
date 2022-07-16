@@ -26,7 +26,10 @@
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\SDK\\": "."
-        }
+        },
+        "files": [
+            "src/SDK/Common/Util/functions.php"
+        ]
     },
     "suggest": {
         "ext-mbstring": "To increase performance of string operations"
