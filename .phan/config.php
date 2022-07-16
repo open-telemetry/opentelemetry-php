@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Phan\Issue;
 
 /**
@@ -295,7 +297,7 @@ return [
     // This is useful for excluding hopelessly unanalyzable
     // files that can't be removed for whatever reason.
     'exclude_file_list' => [
-        'vendor/composer/composer/src/Composer/InstalledVersions.php'
+        'vendor/composer/composer/src/Composer/InstalledVersions.php',
     ],
 
     // A directory list that defines files that will be excluded
@@ -312,7 +314,7 @@ return [
     'exclude_analysis_directory_list' => [
         'vendor/',
         'proto/',
-        'thrift/'
+        'thrift/',
     ],
 
     // Enable this to enable checks of require/include statements referring to valid paths.
@@ -374,7 +376,6 @@ return [
         'vendor/phpunit/phpunit/src',
         'vendor/promphp/prometheus_client_php/src',
         'vendor/google/protobuf/src',
-        'vendor/nyholm/dsn/src',
     ],
 
     // A list of individual files to include in analysis
