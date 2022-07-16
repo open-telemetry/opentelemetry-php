@@ -70,6 +70,9 @@ class DsnTest extends TestCase
         );
     }
 
+    /**
+     * @psalm-suppress PossiblyInvalidArgument
+     */
     private function createInstance(array $droppedArguments = []): Dsn
     {
         $arguments = self::ARGUMENTS;
