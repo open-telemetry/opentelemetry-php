@@ -14,7 +14,10 @@
         "php": "^7.4 || ^8.0",
         "open-telemetry/context": "self.version",
         "open-telemetry/sem-conv": "self.version",
-        "psr/log": "^1.1|^2.0|^3.0"
+        "psr/log": "^1.1|^2.0|^3.0",
+        "symfony/polyfill-php80": "^1.26",
+        "symfony/polyfill-php81": "^1.26",
+        "symfony/polyfill-php82": "^1.26"
     },
     "autoload": {
         "psr-4": {
