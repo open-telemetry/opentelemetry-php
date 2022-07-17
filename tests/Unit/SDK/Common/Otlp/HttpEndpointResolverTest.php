@@ -16,6 +16,21 @@ use PHPUnit\Framework\TestCase;
  */
 class HttpEndpointResolverTest extends TestCase
 {
+    private const SIGNALS = [
+        'trace',
+        'metrics',
+        'logs',
+    ];
+    private const DEFAULT_PATHS = [
+        'trace' => 'v1/traces',
+        'metrics' => 'v1/metrics',
+        'logs' => 'v1/logs',
+    ];
+    private const VALID_SCHEMES = [
+        'http',
+        'https',
+    ];
+
     /**
      * @dataProvider provideEndpoints
      */
@@ -63,7 +78,7 @@ class HttpEndpointResolverTest extends TestCase
 
     public function provideEndpoints(): Generator
     {
-        foreach (HttpEndpointResolverInterface::DEFAULT_PATHS as $signal => $path) {
+        foreach (self::DEFAULT_PATHS as $signal => $path) {
             $baseEndpoint = 'http://collector';
             yield [$baseEndpoint, $signal, sprintf('%s/%s', $baseEndpoint, $path)];
 
@@ -87,17 +102,35 @@ class HttpEndpointResolverTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider provideReferences
+     */
+    public function test_references_are_correct(array $values, array $reference): void
+    {
+        $this->assertSame(
+            $values,
+            $reference
+        );
+    }
+
     public function provideSignals(): Generator
     {
-        foreach (Signals::SIGNALS as $signal) {
+        foreach (self::SIGNALS as $signal) {
             yield [$signal];
         }
     }
 
     public function provideSchemes(): Generator
     {
-        foreach (HttpEndpointResolverInterface::VALID_SCHEMES as $scheme) {
+        foreach (self::VALID_SCHEMES as $scheme) {
             yield [$scheme];
         }
+    }
+
+    public function provideReferences(): Generator
+    {
+        yield 'signals'       => [self::SIGNALS, Signals::SIGNALS];
+        yield 'default paths' => [self::DEFAULT_PATHS, HttpEndpointResolverInterface::DEFAULT_PATHS];
+        yield 'valid schemes' => [self::VALID_SCHEMES, HttpEndpointResolverInterface::VALID_SCHEMES];
     }
 }
