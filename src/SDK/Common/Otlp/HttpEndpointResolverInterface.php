@@ -10,12 +10,12 @@ use Psr\Http\Message\UriInterface;
 interface HttpEndpointResolverInterface
 {
     public const TRACE_DEFAULT_PATH = 'v1/traces';
-    public const METRICS_DEFAULT_PATH = 'v1/traces';
-    public const LOGS_DEFAULT_PATH = 'v1/traces';
+    public const METRICS_DEFAULT_PATH = 'v1/metrics';
+    public const LOGS_DEFAULT_PATH = 'v1/logs';
     public const DEFAULT_PATHS = [
-        SIGNALS::TRACE => self::TRACE_DEFAULT_PATH,
-        SIGNALS::METRICS => self::METRICS_DEFAULT_PATH,
-        SIGNALS::LOGS => self::LOGS_DEFAULT_PATH,
+        Signals::TRACE => self::TRACE_DEFAULT_PATH,
+        Signals::METRICS => self::METRICS_DEFAULT_PATH,
+        Signals::LOGS => self::LOGS_DEFAULT_PATH,
     ];
     public const VALID_SCHEMES = [
         'http',
