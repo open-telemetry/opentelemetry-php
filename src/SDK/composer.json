@@ -21,7 +21,10 @@
         "php-http/discovery": "^1.14",
         "psr/http-factory-implementation": "^1.0",
         "psr/log": "^1.1|^2.0|^3.0",
-        "symfony/polyfill-mbstring": "^1.23"
+        "symfony/polyfill-mbstring": "^1.23",
+        "symfony/polyfill-php80": "^1.26",
+        "symfony/polyfill-php81": "^1.26",
+        "symfony/polyfill-php82": "^1.26"
     },
     "autoload": {
         "psr-4": {
