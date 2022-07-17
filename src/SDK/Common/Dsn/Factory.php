@@ -27,6 +27,9 @@ final class Factory implements FactoryInterface
         return new self($defaults);
     }
 
+    /**
+     * @phan-suppress PhanUndeclaredClassAttribute
+     */
     #[\ReturnTypeWillChange]
     public function fromArray(array $dsn): Dsn
     {
