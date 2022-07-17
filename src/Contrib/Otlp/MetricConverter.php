@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
+use function hex2bin;
 use function is_float;
 use function is_int;
 use function method_exists;
@@ -26,7 +27,6 @@ use function serialize;
 
 final class MetricConverter
 {
-
     /**
      * @param iterable<SDK\Metrics\Data\Metric> $batch
      */
@@ -131,7 +131,9 @@ final class MetricConverter
                 return AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE;
         }
 
+        // @codeCoverageIgnoreStart
         return AggregationTemporality::AGGREGATION_TEMPORALITY_UNSPECIFIED;
+        // @codeCoverageIgnoreEnd
     }
 
     private function convertGauge(SDK\Metrics\Data\Gauge $gauge): Gauge
@@ -215,8 +217,8 @@ final class MetricConverter
         $pExemplar = new Exemplar();
         $this->setFilteredAttributes($pExemplar, $exemplar->attributes);
         $pExemplar->setTimeUnixNano($exemplar->timestamp);
-        $pExemplar->setSpanId((string) $exemplar->spanId);
-        $pExemplar->setTraceId((string) $exemplar->traceId);
+        $pExemplar->setSpanId(hex2bin((string) $exemplar->spanId));
+        $pExemplar->setTraceId(hex2bin((string) $exemplar->traceId));
         if (is_int($exemplar->value)) {
             $pExemplar->setAsInt($exemplar->value);
         }
