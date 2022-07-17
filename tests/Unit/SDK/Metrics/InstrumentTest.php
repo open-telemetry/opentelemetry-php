@@ -13,8 +13,12 @@ use OpenTelemetry\SDK\Metrics\Counter;
 use OpenTelemetry\SDK\Metrics\Data;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Histogram;
+use OpenTelemetry\SDK\Metrics\MetricObserver\CallbackDestructor;
 use OpenTelemetry\SDK\Metrics\MetricObserver\MultiObserver;
+use OpenTelemetry\SDK\Metrics\MetricObserverInterface;
+use OpenTelemetry\SDK\Metrics\ObservableCallback;
 use OpenTelemetry\SDK\Metrics\ObservableCounter;
+use OpenTelemetry\SDK\Metrics\ReferenceCounterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandler;
 use OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\Stream\StreamWriter;
@@ -81,6 +85,33 @@ final class InstrumentTest extends TestCase
     }
 
     /**
+     * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter
+     */
+    public function test_asynchronous_counter_weaken(): void
+    {
+        $o = new MultiObserver();
+        $s = new AsynchronousMetricStream(Attributes::factory(), null, new SumAggregation(true), null, $o, 0);
+        $c = new ObservableCounter($o, new NoopStalenessHandler());
+        $r = $s->register(Temporality::CUMULATIVE);
+
+        $instance = new class() {
+            public function __invoke(ObserverInterface $observer)
+            {
+                $observer->observe(5);
+            }
+        };
+
+        $c->observe($instance, true);
+        $instance = null;
+
+        $this->assertEquals(new Data\Sum(
+            [],
+            Temporality::CUMULATIVE,
+            true,
+        ), $s->collect($r, 1));
+    }
+
+    /**
      * @covers \OpenTelemetry\SDK\Metrics\UpDownCounter
      */
     public function test_up_down_counter(): void
@@ -140,5 +171,85 @@ final class InstrumentTest extends TestCase
             ],
             Temporality::DELTA,
         ), $s->collect($r, 1));
+    }
+
+    /**
+     * @covers \OpenTelemetry\SDK\Metrics\ObservableCallback
+     */
+    public function test_observable_callback_releases_on_detach(): void
+    {
+        $metricObserver = $this->createMock(MetricObserverInterface::class);
+        $metricObserver->method('has')->with(1)->willReturnOnConsecutiveCalls(true, false);
+        $metricObserver->expects($this->once())->method('cancel')->with(1);
+        $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
+        $referenceCounter->expects($this->once())->method('release');
+
+        $callback = new ObservableCallback($metricObserver, $referenceCounter, 1, null);
+        $callback->detach();
+    }
+
+    /**
+     * @covers \OpenTelemetry\SDK\Metrics\ObservableCallback
+     */
+    public function test_observable_callback_removes_callback_destructor_token_on_detach(): void
+    {
+        $metricObserver = $this->createMock(MetricObserverInterface::class);
+        $metricObserver->method('has')->with(1)->willReturnOnConsecutiveCalls(true, false);
+        $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
+
+        $callbackDestructor = new CallbackDestructor($metricObserver, $referenceCounter);
+        $callbackDestructor->tokens[1] = 1;
+
+        $callback = new ObservableCallback($metricObserver, $referenceCounter, 1, $callbackDestructor);
+        $callback->detach();
+
+        $this->assertArrayNotHasKey(1, $callbackDestructor->tokens);
+    }
+
+    /**
+     * @covers \OpenTelemetry\SDK\Metrics\ObservableCallback
+     */
+    public function test_observable_callback_does_not_release_on_detach_if_invalid_token(): void
+    {
+        $metricObserver = $this->createMock(MetricObserverInterface::class);
+        $metricObserver->method('has')->with(1)->willReturn(false);
+        $metricObserver->expects($this->never())->method('cancel')->with(1);
+        $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
+        $referenceCounter->expects($this->never())->method('release');
+
+        $callback = new ObservableCallback($metricObserver, $referenceCounter, 1, null);
+        $callback->detach();
+    }
+
+    /**
+     * @covers \OpenTelemetry\SDK\Metrics\ObservableCallback
+     */
+    public function test_observable_callback_acquires_persistent_on_destruct(): void
+    {
+        $metricObserver = $this->createMock(MetricObserverInterface::class);
+        $metricObserver->method('has')->with(1)->willReturn(true);
+        $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
+        $referenceCounter->expects($this->once())->method('acquire')->with(true);
+        $referenceCounter->expects($this->once())->method('release');
+
+        /** @noinspection PhpExpressionResultUnusedInspection */
+        new ObservableCallback($metricObserver, $referenceCounter, 1, null);
+    }
+
+    /**
+     * @covers \OpenTelemetry\SDK\Metrics\ObservableCallback
+     */
+    public function test_observable_callback_does_not_acquire_persistent_on_destruct_if_callback_destructor_set(): void
+    {
+        $metricObserver = $this->createMock(MetricObserverInterface::class);
+        $metricObserver->method('has')->with(1)->willReturn(true);
+        $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
+        $referenceCounter->expects($this->never())->method('acquire')->with(true);
+
+        $callbackDestructor = new CallbackDestructor($metricObserver, $referenceCounter);
+        $callbackDestructor->tokens[1] = 1;
+
+        /** @noinspection PhpExpressionResultUnusedInspection */
+        new ObservableCallback($metricObserver, $referenceCounter, 1, $callbackDestructor);
     }
 }
