@@ -18,8 +18,7 @@ use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
-use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
-use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
+use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
@@ -37,7 +36,7 @@ final class MeterProviderTest extends TestCase
     public function test_weak_asynchronous_observer_is_released_when_instance_out_of_scope(): void
     {
         $clock = new TestClock();
-        $exporter = new CollectingMetricExporter();
+        $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter, $clock);
         $meterProvider = $this->meterProvider($reader, $clock);
 
@@ -70,7 +69,7 @@ final class MeterProviderTest extends TestCase
                     ], Temporality::CUMULATIVE, false),
                 ),
             ],
-            $exporter->collectMetrics(),
+            $exporter->collect(true),
         );
 
         $instance = null;
@@ -78,7 +77,7 @@ final class MeterProviderTest extends TestCase
         $this->assertEquals(
             [
             ],
-            $exporter->collectMetrics(),
+            $exporter->collect(true),
         );
     }
 
@@ -98,55 +97,5 @@ final class MeterProviderTest extends TestCase
             new WithSampledTraceExemplarFilter(),
             new ImmediateStalenessHandlerFactory(),
         );
-    }
-}
-
-final class CollectingMetricExporter implements MetricExporterInterface
-{
-    private array $metrics = [];
-
-    /**
-     * @var string|Temporality|null
-     */
-    private $temporality;
-
-    /**
-     * @param string|Temporality|null $temporality
-     */
-    public function __construct($temporality = null)
-    {
-        $this->temporality = $temporality;
-    }
-
-    public function temporality(MetricMetadataInterface $metric)
-    {
-        return $this->temporality ?? $metric->temporality();
-    }
-
-    public function collectMetrics(): array
-    {
-        $metrics = $this->metrics;
-        $this->metrics = [];
-
-        return $metrics;
-    }
-
-    public function export(iterable $batch): bool
-    {
-        foreach ($batch as $metric) {
-            $this->metrics[] = $metric;
-        }
-
-        return true;
-    }
-
-    public function shutdown(): bool
-    {
-        return true;
-    }
-
-    public function forceFlush(): bool
-    {
-        return true;
     }
 }

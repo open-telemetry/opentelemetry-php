@@ -21,7 +21,7 @@ interface MetricExporterInterface
     public function temporality(MetricMetadataInterface $metric);
 
     /**
-     * @param iterable<Metric> $batch
+     * @param iterable<int, Metric> $batch
      */
     public function export(iterable $batch): bool;
 
