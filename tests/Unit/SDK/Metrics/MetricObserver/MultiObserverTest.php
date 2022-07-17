@@ -90,6 +90,32 @@ final class MultiObserverTest extends TestCase
         $multiObserver($observer);
         $this->assertSame([1, 3], $observer->values);
     }
+
+    public function test_has_returns_true_for_registered_callback(): void
+    {
+        $multiObserver = new MultiObserver();
+
+        $token = $multiObserver->observe(static fn (ObserverInterface $observer) => $observer->observe(1));
+        $this->assertTrue($multiObserver->has($token));
+    }
+
+    public function test_has_returns_false_for_canceled_callback(): void
+    {
+        $multiObserver = new MultiObserver();
+
+        $token = $multiObserver->observe(static fn (ObserverInterface $observer) => $observer->observe(1));
+        $multiObserver->cancel($token);
+        $this->assertFalse($multiObserver->has($token));
+    }
+
+    public function test_multiple_calls_to_destructors_return_same_instance(): void
+    {
+        $multiObserver = new MultiObserver();
+
+        $a = $multiObserver->destructors();
+        $b = $multiObserver->destructors();
+        $this->assertSame($a, $b);
+    }
 }
 
 final class ValueCollectingObserver implements ObserverInterface
