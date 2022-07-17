@@ -63,6 +63,15 @@ final class DeltaStorageTest extends TestCase
         }
     }
 
+    public function test_storage_does_not_return_zero_reader_metric(): void
+    {
+        $ds = new DeltaStorage(new SumAggregation());
+
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(3)], 0, 0), 0b0);
+
+        $this->assertNull($ds->collect(0));
+    }
+
     public function test_storage_keeps_metrics_for_additional_readers(): void
     {
         $ds = new DeltaStorage(new SumAggregation());
