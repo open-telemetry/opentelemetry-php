@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
+use OpenTelemetry\API\Trace\NoopSpanBuilder;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerSharedState;
@@ -48,10 +49,17 @@ class TracerTest extends TestCase
         ];
     }
 
-    /**
-     */
     public function test_get_instrumentation_scope(): void
     {
         $this->assertSame($this->instrumentationScope, $this->tracer->getInstrumentationScope());
+    }
+
+    /**
+     * @psalm-suppress UndefinedMethod
+     */
+    public function test_returns_noop_span_builder_if_shared_state_is_shutdown(): void
+    {
+        $this->tracerSharedState->method('hasShutdown')->willReturn(true); //@phpstan-ignore-line
+        $this->assertInstanceOf(NoopSpanBuilder::class, $this->tracer->spanBuilder('foo'));
     }
 }

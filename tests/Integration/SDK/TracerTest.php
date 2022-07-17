@@ -13,6 +13,7 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
+use OpenTelemetry\SDK\Trace\SpanBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
@@ -83,5 +84,14 @@ class TracerTest extends TestCase
         $this->assertSame('dev', $spanInstrumentationScope->getVersion());
         $this->assertSame('http://url', $spanInstrumentationScope->getSchemaUrl());
         $this->assertSame(['foo' => 'bar'], $spanInstrumentationScope->getAttributes()->toArray());
+    }
+
+    public function test_returns_noop_span_builder_after_shutdown(): void
+    {
+        $tracerProvider = new TracerProvider();
+        $tracer = $tracerProvider->getTracer('foo');
+        $this->assertInstanceOf(SpanBuilder::class, $tracer->spanBuilder('bar'));
+        $tracerProvider->shutdown();
+        $this->assertInstanceOf(API\NoopSpanBuilder::class, $tracer->spanBuilder('baz'));
     }
 }
