@@ -21,6 +21,8 @@ trait DefaultAggregationProviderTrait
                 return new Aggregation\LastValueAggregation();
         }
 
+        // @codeCoverageIgnoreStart
         return null;
+        // @codeCoverageIgnoreEnd
     }
 }
