@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\API\Behavior;
+namespace OpenTelemetry\Tests\Unit\API\Common\Event;
 
 use CloudEvents\V1\CloudEventInterface;
-use OpenTelemetry\API\Behavior\EmitsEventsTrait;
 use OpenTelemetry\API\Common\Event\Dispatcher;
+use OpenTelemetry\API\Common\Event\EmitsEventsTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\API\Behavior\EmitsEventsTrait
+ * @covers \OpenTelemetry\API\Common\Event\EmitsEventsTrait
  */
 class EmitsEventsTraitTest extends TestCase
 {

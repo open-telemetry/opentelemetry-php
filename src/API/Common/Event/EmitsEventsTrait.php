@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Behavior;
+namespace OpenTelemetry\API\Common\Event;
 
 use CloudEvents\V1\CloudEventInterface;
-use OpenTelemetry\API\Common\Event\Dispatcher;
 
 trait EmitsEventsTrait
 {

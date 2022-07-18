@@ -15,17 +15,20 @@ use PHPUnit\Framework\TestCase;
  */
 class DispatcherTest extends TestCase
 {
+    private Dispatcher $dispatcher;
     private CloudEventInterface $event;
+    private \ReflectionMethod $method;
 
     public function setUp(): void
     {
+        $this->dispatcher = new Dispatcher();
+
+        $reflection = new \ReflectionClass($this->dispatcher);
+        $this->method = $reflection->getMethod('getListenersForEvent');
+        $this->method->setAccessible(true);
+
         $this->event = $this->createMock(CloudEventInterface::class);
         $this->event->method('getType')->willReturn('foo');
-    }
-
-    public function tearDown(): void
-    {
-        Dispatcher::getInstance()->reset();
     }
 
     public function test_get_instance(): void
@@ -48,9 +51,8 @@ class DispatcherTest extends TestCase
     {
         $listenerFunction = function () {
         };
-        $dispatcher = Dispatcher::getInstance();
-        $dispatcher->listen($this->event->getType(), $listenerFunction);
-        $listeners = [...$dispatcher->getListenersForEvent($this->event)];
+        $this->dispatcher->listen($this->event->getType(), $listenerFunction);
+        $listeners = [...$this->method->invokeArgs($this->dispatcher, [$this->event])];
         $this->assertCount(1, $listeners);
         $this->assertSame($listenerFunction, $listeners[0]);
     }
@@ -60,9 +62,8 @@ class DispatcherTest extends TestCase
         $handler = function ($receivedEvent) {
             $this->assertSame($this->event, $receivedEvent);
         };
-        $dispatcher = Dispatcher::getInstance();
-        $dispatcher->listen($this->event->getType(), $handler);
-        $dispatcher->dispatch($this->event);
+        $this->dispatcher->listen($this->event->getType(), $handler);
+        $this->dispatcher->dispatch($this->event);
     }
 
     public function test_add_multiple_listeners_with_same_priority(): void
@@ -71,10 +72,9 @@ class DispatcherTest extends TestCase
         };
         $listenerTwo = function (CloudEventInterface $event) {
         };
-        $dispatcher = Dispatcher::getInstance();
-        $dispatcher->listen($this->event->getType(), $listenerOne);
-        $dispatcher->listen($this->event->getType(), $listenerTwo);
-        $listeners = [...$dispatcher->getListenersForEvent($this->event)];
+        $this->dispatcher->listen($this->event->getType(), $listenerOne);
+        $this->dispatcher->listen($this->event->getType(), $listenerTwo);
+        $listeners = [...$this->method->invokeArgs($this->dispatcher, [$this->event])];
         $this->assertCount(2, $listeners);
         $this->assertSame($listenerOne, $listeners[0]);
         $this->assertSame($listenerTwo, $listeners[1]);
@@ -90,12 +90,11 @@ class DispatcherTest extends TestCase
         };
         $listenerFour = function () {
         };
-        $dispatcher = Dispatcher::getInstance();
-        $dispatcher->listen($this->event->getType(), $listenerOne, 1);
-        $dispatcher->listen($this->event->getType(), $listenerTwo, -1);
-        $dispatcher->listen($this->event->getType(), $listenerThree, 0);
-        $dispatcher->listen($this->event->getType(), $listenerFour, 1);
-        $listeners = [...$dispatcher->getListenersForEvent($this->event)];
+        $this->dispatcher->listen($this->event->getType(), $listenerOne, 1);
+        $this->dispatcher->listen($this->event->getType(), $listenerTwo, -1);
+        $this->dispatcher->listen($this->event->getType(), $listenerThree, 0);
+        $this->dispatcher->listen($this->event->getType(), $listenerFour, 1);
+        $listeners = [...$this->method->invokeArgs($this->dispatcher, [$this->event])];
         $this->assertCount(4, $listeners);
         $this->assertSame($listenerTwo, $listeners[0]);
         $this->assertSame($listenerThree, $listeners[1]);
@@ -109,10 +108,8 @@ class DispatcherTest extends TestCase
         $event->method('getType')->willReturn('bar');
         $listener = function () {
         };
-        $dispatcher = Dispatcher::getInstance();
-        $dispatcher->listen($this->event->getType(), $listener);
-        $dispatcher->listen($event->getType(), $listener);
-        $this->assertSame([$listener], [...$dispatcher->getListenersForEvent($event)]);
-        $this->assertSame([$listener], [...$dispatcher->getListenersForEvent($this->event)]);
+        $this->dispatcher->listen($this->event->getType(), $listener);
+        $this->dispatcher->listen($event->getType(), $listener);
+        $this->assertSame([$listener], [...$this->method->invokeArgs($this->dispatcher, [$this->event])]);
     }
 }
