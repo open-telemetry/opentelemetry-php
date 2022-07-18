@@ -52,7 +52,7 @@ class DispatcherTest extends TestCase
         $listenerFunction = function () {
         };
         $this->dispatcher->listen($this->event->getType(), $listenerFunction);
-        $listeners = [...$this->method->invokeArgs($this->dispatcher, [$this->event])];
+        $listeners = [...$this->method->invokeArgs($this->dispatcher, [$this->event->getType()])];
         $this->assertCount(1, $listeners);
         $this->assertSame($listenerFunction, $listeners[0]);
     }
@@ -74,7 +74,7 @@ class DispatcherTest extends TestCase
         };
         $this->dispatcher->listen($this->event->getType(), $listenerOne);
         $this->dispatcher->listen($this->event->getType(), $listenerTwo);
-        $listeners = [...$this->method->invokeArgs($this->dispatcher, [$this->event])];
+        $listeners = [...$this->method->invokeArgs($this->dispatcher, [$this->event->getType()])];
         $this->assertCount(2, $listeners);
         $this->assertSame($listenerOne, $listeners[0]);
         $this->assertSame($listenerTwo, $listeners[1]);
@@ -94,7 +94,7 @@ class DispatcherTest extends TestCase
         $this->dispatcher->listen($this->event->getType(), $listenerTwo, -1);
         $this->dispatcher->listen($this->event->getType(), $listenerThree, 0);
         $this->dispatcher->listen($this->event->getType(), $listenerFour, 1);
-        $listeners = [...$this->method->invokeArgs($this->dispatcher, [$this->event])];
+        $listeners = [...$this->method->invokeArgs($this->dispatcher, [$this->event->getType()])];
         $this->assertCount(4, $listeners);
         $this->assertSame($listenerTwo, $listeners[0]);
         $this->assertSame($listenerThree, $listeners[1]);
@@ -110,6 +110,6 @@ class DispatcherTest extends TestCase
         };
         $this->dispatcher->listen($this->event->getType(), $listener);
         $this->dispatcher->listen($event->getType(), $listener);
-        $this->assertSame([$listener], [...$this->method->invokeArgs($this->dispatcher, [$this->event])]);
+        $this->assertSame([$listener], [...$this->method->invokeArgs($this->dispatcher, [$this->event->getType()])]);
     }
 }

@@ -8,6 +8,6 @@ use CloudEvents\V1\CloudEventInterface;
 
 interface DispatcherInterface
 {
-    public function dispatch(CloudEventInterface $event): object;
+    public function dispatch(CloudEventInterface $event): void;
     public function listen(string $type, callable $listener, int $priority = 0): void;
 }

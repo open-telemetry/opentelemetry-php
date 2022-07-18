@@ -21,12 +21,9 @@ class Dispatcher implements DispatcherInterface
         return Context::getCurrent()->get($key) ?? self::createInstance();
     }
 
-    public function dispatch(CloudEventInterface $event): object
+    public function dispatch(CloudEventInterface $event): void
     {
-        $listeners = $this->getListenersForEvent($event);
-        $this->dispatchEvent($listeners, $event);
-
-        return $event;
+        $this->dispatchEvent($this->getListenersForEvent($event->getType()), $event);
     }
 
     public function listen(string $type, callable $listener, int $priority = 0): void
@@ -35,9 +32,8 @@ class Dispatcher implements DispatcherInterface
         ksort($this->listeners[$type]);
     }
 
-    private function getListenersForEvent(CloudEventInterface $event): iterable
+    private function getListenersForEvent(string $key): iterable
     {
-        $key = $event->getType();
         foreach ($this->listeners[$key] as $listeners) {
             foreach ($listeners as $listener) {
                 yield $listener;
