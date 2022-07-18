@@ -64,10 +64,6 @@ deptrac:
           collectors:
               - type: className
                 regex: ^Http\\*
-      -   name: NyholmDsn
-          collectors:
-              - type: className
-                regex: ^Nyholm\\Dsn\\*
       -   name: Prometheus
           collectors:
               - type: className
@@ -110,7 +106,6 @@ deptrac:
           - +API
           - PsrHttp
           - HttpPlug
-          - NyholmDsn
           - Composer
       Contrib:
           - +SDK
