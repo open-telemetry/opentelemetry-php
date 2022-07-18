@@ -119,7 +119,7 @@ final class ArrayAccessGetterSetter implements PropagationGetterInterface, Propa
 
         foreach ($carrier as $k => $_) {
             $k = (string) $k;
-            if (!strcasecmp($k, $key)) {
+            if (strcasecmp($k, $key) === 0) {
                 return $k;
             }
         }

@@ -102,8 +102,8 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
     /** {@inheritdoc} */
     public function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void
     {
-        $setter = $setter ?? ArrayAccessGetterSetter::getInstance();
-        $context = $context ?? Context::getCurrent();
+        $setter ??= ArrayAccessGetterSetter::getInstance();
+        $context ??= Context::getCurrent();
         $spanContext = AbstractSpan::fromContext($context)->getContext();
 
         if (!$spanContext->isValid()) {
@@ -118,8 +118,8 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
 
     public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
     {
-        $getter = $getter ?? ArrayAccessGetterSetter::getInstance();
-        $context = $context ?? Context::getCurrent();
+        $getter ??= ArrayAccessGetterSetter::getInstance();
+        $context ??= Context::getCurrent();
 
         $spanContext = self::extractImpl($carrier, $getter);
         if (!$spanContext->isValid()) {

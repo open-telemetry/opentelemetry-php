@@ -23,6 +23,6 @@ final class ProcessRuntime implements ResourceDetectorInterface
             ResourceAttributes::PROCESS_RUNTIME_VERSION => PHP_VERSION,
         ];
 
-        return ResourceInfo::create(new Attributes($attributes), ResourceAttributes::SCHEMA_URL);
+        return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
     }
 }

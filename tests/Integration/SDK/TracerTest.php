@@ -13,6 +13,7 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
+use OpenTelemetry\SDK\Trace\SpanBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
@@ -56,7 +57,7 @@ class TracerTest extends TestCase
         $sampler->method('shouldSample')
             ->willReturn(new SamplingResult(
                 SamplingResult::RECORD_AND_SAMPLE,
-                null,
+                [],
                 $newTraceState
             ));
 
@@ -74,28 +75,23 @@ class TracerTest extends TestCase
     public function test_span_should_receive_instrumentation_scope(): void
     {
         $tracerProvider = new TracerProvider();
-        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest', 'dev', 'http://url');
+        $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest', 'dev', 'http://url', ['foo' => 'bar']);
         /** @var Span $span */
         $span = $tracer->spanBuilder('test.span')->startSpan();
         $spanInstrumentationScope = $span->getInstrumentationScope();
 
-        $this->assertEquals('OpenTelemetry.TracerTest', $spanInstrumentationScope->getName());
-        $this->assertEquals('dev', $spanInstrumentationScope->getVersion());
-        $this->assertEquals('http://url', $spanInstrumentationScope->getSchemaUrl());
+        $this->assertSame('OpenTelemetry.TracerTest', $spanInstrumentationScope->getName());
+        $this->assertSame('dev', $spanInstrumentationScope->getVersion());
+        $this->assertSame('http://url', $spanInstrumentationScope->getSchemaUrl());
+        $this->assertSame(['foo' => 'bar'], $spanInstrumentationScope->getAttributes()->toArray());
     }
 
-    /**
-     * @group trace-compliance
-     */
-    public function test_span_builder_propagates_instrumentation_scope_info_to_span(): void
+    public function test_returns_noop_span_builder_after_shutdown(): void
     {
-        /** @var Span $span */
-        $span = (new TracerProvider())
-            ->getTracer('name', 'version')
-            ->spanBuilder('span')
-            ->startSpan();
-
-        $this->assertSame('name', $span->getInstrumentationScope()->getName());
-        $this->assertSame('version', $span->getInstrumentationScope()->getVersion());
+        $tracerProvider = new TracerProvider();
+        $tracer = $tracerProvider->getTracer('foo');
+        $this->assertInstanceOf(SpanBuilder::class, $tracer->spanBuilder('bar'));
+        $tracerProvider->shutdown();
+        $this->assertInstanceOf(API\NoopSpanBuilder::class, $tracer->spanBuilder('baz'));
     }
 }

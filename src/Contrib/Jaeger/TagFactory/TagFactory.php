@@ -36,7 +36,7 @@ class TagFactory
             ]);
         }
 
-        if (is_integer($value)) {
+        if (is_int($value)) {
             return new Tag([
                 'key' => $key,
                 'vType' => TagType::LONG,
@@ -67,9 +67,7 @@ class TagFactory
     private static function recursivelySerializeArray($value): string
     {
         if (is_array($value)) {
-            return join(',', array_map(function ($val) {
-                return self::recursivelySerializeArray($val);
-            }, $value));
+            return implode(',', array_map(fn ($val) => self::recursivelySerializeArray($val), $value));
         }
 
         // Casting false to string makes an empty string

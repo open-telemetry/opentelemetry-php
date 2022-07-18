@@ -51,7 +51,7 @@ final class MultiTextMapPropagator implements TextMapPropagatorInterface
 
     public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
     {
-        $context = $context ?? Context::getCurrent();
+        $context ??= Context::getCurrent();
 
         foreach ($this->propagators as $propagator) {
             $context = $propagator->extract($carrier, $getter, $context);

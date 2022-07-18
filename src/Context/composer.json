@@ -11,7 +11,10 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0"
+        "php": "^7.4 || ^8.0",
+        "symfony/polyfill-php80": "^1.26",
+        "symfony/polyfill-php81": "^1.26",
+        "symfony/polyfill-php82": "^1.26"
     },
     "autoload": {
         "psr-4": {

@@ -7,11 +7,13 @@ namespace OpenTelemetry\Contrib\OtlpHttp;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use InvalidArgumentException;
-use Nyholm\Dsn\DsnParser;
+use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolver;
+use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolverInterface;
 use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Psr\Http\Client\ClientInterface;
@@ -53,16 +55,11 @@ class Exporter implements SpanExporterInterface
         ClientInterface $client,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
-        SpanConverter $spanConverter = null
+        ?SpanConverter $spanConverter = null,
+        ?HttpEndpointResolverInterface $httpEndpointResolver = null
     ) {
-        $tracesEndpoint = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) ?
-            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) :
-            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, self::DEFAULT_ENDPOINT);
-
         $this->setEndpointUrl(
-            $this->validateEndpoint(
-                $tracesEndpoint
-            )
+            $this->resolveEndpoint($httpEndpointResolver ?? HttpEndpointResolver::create())
         );
 
         $this->headers = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
@@ -120,27 +117,6 @@ class Exporter implements SpanExporterInterface
         return $request;
     }
 
-    /**
-     * validateEndpoint does two functions, firstly checks that the endpoint is valid
-     *  secondly it appends https:// and /v1/traces should they have been omitted
-     */
-    private function validateEndpoint(string $endpoint): string
-    {
-        $dsn = DsnParser::parseUrl($endpoint);
-
-        if ($dsn->getScheme() === null) {
-            $dsn = $dsn->withScheme('https');
-        } elseif (!($dsn->getScheme() === 'https' || $dsn->getScheme() === 'http')) {
-            throw new InvalidArgumentException('Expected scheme of http or https, given: ' . $dsn->getScheme());
-        }
-
-        if ($dsn->getPath() === null) {
-            return (string) $dsn->withPath('/v1/traces');
-        }
-
-        return (string) $dsn;
-    }
-
     public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null): Exporter
     {
         return new Exporter(
@@ -153,5 +129,21 @@ class Exporter implements SpanExporterInterface
     private function shouldCompress(): bool
     {
         return $this->compression === 'gzip' && function_exists('gzencode');
+    }
+
+    private function resolveEndpoint(HttpEndpointResolverInterface $httpEndpointResolver): string
+    {
+        if ($this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)) {
+            return $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT);
+        }
+
+        if ($this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_ENDPOINT)) {
+            return $httpEndpointResolver->resolveToString(
+                $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT),
+                Signals::TRACE
+            );
+        }
+
+        return self::DEFAULT_ENDPOINT;
     }
 }

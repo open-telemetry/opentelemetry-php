@@ -11,5 +11,4 @@ interface LinkInterface
 {
     public function getSpanContext(): SpanContextInterface;
     public function getAttributes(): AttributesInterface;
-    public function getTotalAttributeCount(): int;
 }

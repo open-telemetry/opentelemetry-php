@@ -35,7 +35,7 @@ class OtlpBench
     public function __construct()
     {
         $this->sampler = new AlwaysOnSampler();
-        $this->resource = ResourceInfo::create(new Attributes([
+        $this->resource = ResourceInfo::create(Attributes::create([
             'service.name' => 'A123456789',
             'service.version' => '1.34567890',
             'service.instance.id' => '123ab456-a123-12ab-12ab-12340a1abc12',
@@ -46,7 +46,7 @@ class OtlpBench
     {
         $processor = new SimpleSpanProcessor();
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
-        $this->tracer = $provider->getTracer();
+        $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
     }
 
     public function setUpGrpc(): void
@@ -55,7 +55,7 @@ class OtlpBench
         $exporter = new GrpcExporter('foo:4317', true, '', '', false, 10, $client);
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
-        $this->tracer = $provider->getTracer();
+        $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
     }
 
     /**
@@ -81,7 +81,7 @@ class OtlpBench
         $exporter = new HttpExporter($client, $requestFactory, $streamFactory);
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
-        $this->tracer = $provider->getTracer();
+        $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
     }
 
     /**

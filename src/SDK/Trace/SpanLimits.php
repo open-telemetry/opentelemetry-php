@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use OpenTelemetry\SDK\Common\Attribute\AttributeLimits;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 
 final class SpanLimits
 {
@@ -15,19 +15,25 @@ final class SpanLimits
     public const DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT = 128;
     public const DEFAULT_LINK_ATTRIBUTE_COUNT_LIMIT = 128;
 
-    private AttributeLimits $attributeLimits;
-
+    private AttributesFactoryInterface $attributesFactory;
+    private AttributesFactoryInterface $eventAttributesFactory;
+    private AttributesFactoryInterface $linkAttributesFactory;
     private int $eventCountLimit;
-
     private int $linkCountLimit;
 
-    private int $attributePerEventCountLimit;
-
-    private int $attributePerLinkCountLimit;
-
-    public function getAttributeLimits(): AttributeLimits
+    public function getAttributesFactory(): AttributesFactoryInterface
     {
-        return $this->attributeLimits;
+        return $this->attributesFactory;
+    }
+
+    public function getEventAttributesFactory(): AttributesFactoryInterface
+    {
+        return $this->eventAttributesFactory;
+    }
+
+    public function getLinkAttributesFactory(): AttributesFactoryInterface
+    {
+        return $this->linkAttributesFactory;
     }
 
     /** @return int Maximum allowed span event count */
@@ -42,33 +48,20 @@ final class SpanLimits
         return $this->linkCountLimit;
     }
 
-    /** @return int Maximum allowed attribute per span event count */
-    public function getAttributePerEventCountLimit(): int
-    {
-        return $this->attributePerEventCountLimit;
-    }
-
-    /** @return int Maximum allowed attribute per span link count */
-    public function getAttributePerLinkCountLimit(): int
-    {
-        return $this->attributePerLinkCountLimit;
-    }
-
     /**
      * @internal Use {@see SpanLimitsBuilder} to create {@see SpanLimits} instance.
      */
     public function __construct(
-        int $attributeCountLimit,
-        int $attributeValueLengthLimit,
+        AttributesFactoryInterface $attributesFactory,
+        AttributesFactoryInterface $eventAttributesFactory,
+        AttributesFactoryInterface $linkAttributesFactory,
         int $eventCountLimit,
-        int $linkCountLimit,
-        int $attributePerEventCountLimit,
-        int $attributePerLinkCountLimit
+        int $linkCountLimit
     ) {
-        $this->attributeLimits = new AttributeLimits($attributeCountLimit, $attributeValueLengthLimit);
+        $this->attributesFactory = $attributesFactory;
+        $this->eventAttributesFactory = $eventAttributesFactory;
+        $this->linkAttributesFactory = $linkAttributesFactory;
         $this->eventCountLimit = $eventCountLimit;
         $this->linkCountLimit = $linkCountLimit;
-        $this->attributePerEventCountLimit = $attributePerEventCountLimit;
-        $this->attributePerLinkCountLimit = $attributePerLinkCountLimit;
     }
 }

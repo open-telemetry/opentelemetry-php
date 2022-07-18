@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Dev\Compatibility\BC;
 
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Dev\Compatibility\Util;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope as Moved;
 
@@ -18,7 +20,7 @@ final class InstrumentationLibrary implements InstrumentationLibraryInterface
 
     public function __construct(string $name, ?string $version = null, ?string $schemaUrl = null)
     {
-        $this->adapted = new Moved($name, $version, $schemaUrl);
+        $this->adapted = new Moved($name, $version, $schemaUrl, Attributes::create([]));
 
         Util::triggerClassDeprecationNotice(
             OpenTelemetry_SDK_InstrumentationLibrary,
@@ -39,6 +41,11 @@ final class InstrumentationLibrary implements InstrumentationLibraryInterface
     public function getSchemaUrl(): ?string
     {
         return $this->adapted->getSchemaUrl();
+    }
+
+    public function getAttributes(): AttributesInterface
+    {
+        return $this->adapted->getAttributes();
     }
 }
 

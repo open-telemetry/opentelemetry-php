@@ -51,7 +51,7 @@ final class SwooleContextStorage implements ContextStorageInterface, ExecutionCo
     {
         $this->handler->switchToActiveCoroutine();
 
-        if (!$scope = $this->storage->scope()) {
+        if (($scope = $this->storage->scope()) === null) {
             return null;
         }
 

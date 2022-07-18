@@ -22,14 +22,14 @@ class NewrelicSpanConverterTest extends TestCase
             ->addAttribute('service', 'guard')
             ->setResource(
                 ResourceInfo::create(
-                    new Attributes([
+                    Attributes::create([
                         'telemetry.sdk.name' => 'opentelemetry',
                         'telemetry.sdk.language' => 'php',
                         'telemetry.sdk.version' => 'dev',
                     ])
                 )
             )
-            ->addEvent('validators.list', new Attributes(['job' => 'stage.updateTime']), 1505855799433901068)
+            ->addEvent('validators.list', Attributes::create(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
 
         $converter = new SpanConverter('test.name');

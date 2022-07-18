@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use Thrift\Exception\TTransportException;
 use Thrift\Protocol\TCompactProtocol;
 
+// @phan-file-suppress PhanUndeclaredClassMethod
 final class JaegerTransport implements TransportInterface
 {
     use LogsMessagesTrait;
@@ -23,9 +24,9 @@ final class JaegerTransport implements TransportInterface
     private $transport;
     private $client;
 
-    private $buffer = [];
+    private array $buffer = [];
     private $process = null;
-    private $maxBufferSize = 0;
+    private int $maxBufferSize = 0;
 
     public function __construct(ParsedEndpointUrl $parsedEndpoint, $maxBufferSize = 0)
     {
@@ -93,7 +94,7 @@ final class JaegerTransport implements TransportInterface
             // reset the process tag
             $this->process = null;
         } catch (TTransportException $e) {
-            self::logError('jaeger: transport failure: ' . $e->getMessage());
+            self::logError('jaeger: transport failure', ['exception' => $e]);
 
             return 0;
         }

@@ -30,6 +30,6 @@ final class Environment implements ResourceDetectorInterface
             $attributes[ResourceAttributes::SERVICE_NAME] = $serviceName;
         }
 
-        return ResourceInfo::create(new Attributes($attributes), ResourceAttributes::SCHEMA_URL);
+        return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
     }
 }

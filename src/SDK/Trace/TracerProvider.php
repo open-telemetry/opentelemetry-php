@@ -7,25 +7,19 @@ namespace OpenTelemetry\SDK\Trace;
 use function is_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
-use OpenTelemetry\SDK\Common\Instrumentation\KeyGenerator;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
-use function register_shutdown_function;
 
-final class TracerProvider implements API\TracerProviderInterface
+final class TracerProvider implements TracerProviderInterface
 {
-    public const DEFAULT_TRACER_NAME = 'io.opentelemetry.contrib.php';
-
-    private static ?API\TracerInterface $defaultTracer = null;
-
-    /** @var array<string, API\TracerInterface> */
-    private ?array $tracers = null;
-
     /** @readonly */
     private TracerSharedState $tracerSharedState;
+    private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
 
     /** @param list<SpanProcessorInterface>|SpanProcessorInterface|null $spanProcessors */
     public function __construct(
@@ -33,17 +27,18 @@ final class TracerProvider implements API\TracerProviderInterface
         SamplerInterface $sampler = null,
         ResourceInfo $resource = null,
         SpanLimits $spanLimits = null,
-        IdGeneratorInterface $idGenerator = null
+        IdGeneratorInterface $idGenerator = null,
+        ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null
     ) {
         if (null === $spanProcessors) {
             $spanProcessors = [];
         }
 
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
-        $resource = $resource ?? ResourceInfoFactory::defaultResource();
-        $sampler = $sampler ?? new ParentBased(new AlwaysOnSampler());
-        $idGenerator = $idGenerator ?? new RandomIdGenerator();
-        $spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
+        $resource ??= ResourceInfoFactory::defaultResource();
+        $sampler ??= new ParentBased(new AlwaysOnSampler());
+        $idGenerator ??= new RandomIdGenerator();
+        $spanLimits ??= (new SpanLimitsBuilder())->build();
 
         $this->tracerSharedState = new TracerSharedState(
             $idGenerator,
@@ -52,54 +47,31 @@ final class TracerProvider implements API\TracerProviderInterface
             $sampler,
             $spanProcessors
         );
-
-        register_shutdown_function([$this, 'shutdown']);
+        $this->instrumentationScopeFactory = $instrumentationScopeFactory ?? new InstrumentationScopeFactory(Attributes::factory());
     }
 
-    public function forceFlush(): ?bool
+    public function forceFlush(): bool
     {
         return $this->tracerSharedState->getSpanProcessor()->forceFlush();
     }
 
-    /** @inheritDoc */
-    public function getTracer(string $name = self::DEFAULT_TRACER_NAME, ?string $version = null, ?string $schemaUrl = null): API\TracerInterface
-    {
+    /**
+     * @inheritDoc
+     */
+    public function getTracer(
+        string $name,
+        ?string $version = null,
+        ?string $schemaUrl = null,
+        iterable $attributes = []
+    ): API\TracerInterface {
         if ($this->tracerSharedState->hasShutdown()) {
             return NoopTracer::getInstance();
         }
 
-        $key = KeyGenerator::generateInstanceKey($name, $version, $schemaUrl);
-
-        if (isset($this->tracers[$key]) && $this->tracers[$key] instanceof API\TracerInterface) {
-            return $this->tracers[$key];
-        }
-
-        $instrumentationScope = new InstrumentationScope($name, $version, $schemaUrl);
-
-        $tracer = new Tracer(
+        return new Tracer(
             $this->tracerSharedState,
-            $instrumentationScope,
+            $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes),
         );
-        if (null === self::$defaultTracer) {
-            self::$defaultTracer = $tracer;
-        }
-
-        return $this->tracers[$key] = $tracer;
-    }
-
-    public static function getDefaultTracer(): API\TracerInterface
-    {
-        if (null === self::$defaultTracer) {
-            // TODO log a warning
-            return NoopTracer::getInstance();
-        }
-
-        return self::$defaultTracer;
-    }
-
-    public static function setDefaultTracer(API\TracerInterface $tracer): void
-    {
-        self::$defaultTracer = $tracer;
     }
 
     public function getSampler(): SamplerInterface

@@ -8,35 +8,38 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
+SPEC_DIR="${ROOT_DIR}/var/opentelemetry-specification"
+CODE_DIR="${ROOT_DIR}/src/SemConv"
 
 # freeze the spec & generator tools versions to make SemanticAttributes generation reproducible
-SEMCONV_VERSION=${SEMCONV_VERSION:=1.9.0}
+SEMCONV_VERSION=${SEMCONV_VERSION:=1.12.0}
 SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
-GENERATOR_VERSION=0.8.0
+GENERATOR_VERSION=0.11.0
 
-cd ${SCRIPT_DIR}
+cd "${SCRIPT_DIR}" || exit
 
-rm -rf opentelemetry-specification || true
-mkdir opentelemetry-specification
-cd opentelemetry-specification
+rm -rf "${SPEC_DIR}" || true
+mkdir "${SPEC_DIR}"
+cd "${SPEC_DIR}" || exit
 
 git init
 git remote add origin https://github.com/open-telemetry/opentelemetry-specification.git
 git fetch origin "$SPEC_VERSION"
 git reset --hard FETCH_HEAD
 
-cd ${SCRIPT_DIR}
+cd "${SCRIPT_DIR}" || exit
 
-rm -rf ${ROOT_DIR}/src/SemConv || true
-mkdir -p ${ROOT_DIR}/src/SemConv
+rm -rf "${CODE_DIR}"  || true
+mkdir -p "${CODE_DIR}"
+git checkout HEAD "${CODE_DIR}/composer.json"
 
 # Trace
 docker run --rm \
-  -v ${SCRIPT_DIR}/opentelemetry-specification/semantic_conventions/trace:/source \
-  -v ${SCRIPT_DIR}/templates:/templates \
-  -v ${ROOT_DIR}/src/SemConv:/output \
-  -u ${UID} \
+  -v "${SPEC_DIR}/semantic_conventions/trace:/source" \
+  -v "${SCRIPT_DIR}/templates:/templates" \
+  -v "${CODE_DIR}:/output" \
+  -u "${UID}" \
   otel/semconvgen:$GENERATOR_VERSION \
   -f /source code \
   --template /templates/Attributes.php.j2 \
@@ -46,10 +49,10 @@ docker run --rm \
   -DschemaUrl=$SCHEMA_URL
 
 docker run --rm \
-  -v ${SCRIPT_DIR}/opentelemetry-specification/semantic_conventions/trace:/source \
-  -v ${SCRIPT_DIR}/templates:/templates \
-  -v ${ROOT_DIR}/src/SemConv:/output \
-  -u ${UID} \
+  -v "${SPEC_DIR}/semantic_conventions/trace:/source" \
+  -v "${SCRIPT_DIR}/templates:/templates" \
+  -v "${CODE_DIR}:/"output \
+  -u "${UID}" \
   otel/semconvgen:$GENERATOR_VERSION \
   -f /source code \
   --template /templates/AttributeValues.php.j2 \
@@ -61,10 +64,10 @@ docker run --rm \
 
 # Resource
 docker run --rm \
-  -v ${SCRIPT_DIR}/opentelemetry-specification/semantic_conventions/resource:/source \
-  -v ${SCRIPT_DIR}/templates:/templates \
-  -v ${ROOT_DIR}/src/SemConv:/output \
-  -u ${UID} \
+  -v "${SPEC_DIR}/semantic_conventions/resource:/source" \
+  -v "${SCRIPT_DIR}/templates:/templates" \
+  -v "${CODE_DIR}:/output" \
+  -u "${UID}" \
   otel/semconvgen:$GENERATOR_VERSION \
   -f /source code \
   --template /templates/Attributes.php.j2 \
@@ -74,10 +77,10 @@ docker run --rm \
   -DschemaUrl=$SCHEMA_URL
 
 docker run --rm \
-  -v ${SCRIPT_DIR}/opentelemetry-specification/semantic_conventions/resource:/source \
-  -v ${SCRIPT_DIR}/templates:/templates \
-  -v ${ROOT_DIR}/src/SemConv:/output \
-  -u ${UID} \
+  -v "${SPEC_DIR}/semantic_conventions/resource:/source" \
+  -v "${SCRIPT_DIR}/templates:/templates" \
+  -v "${CODE_DIR}:/output" \
+  -u "${UID}" \
   otel/semconvgen:$GENERATOR_VERSION \
   -f /source code \
   --template /templates/AttributeValues.php.j2 \
@@ -85,3 +88,5 @@ docker run --rm \
   -Dnamespace="OpenTelemetry\\SemConv" \
   -Dclass="Resource" \
   -DschemaUrl=$SCHEMA_URL
+
+rm -rf "${SPEC_DIR}" || true

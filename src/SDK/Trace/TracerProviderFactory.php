@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 
 final class TracerProviderFactory
@@ -26,26 +25,26 @@ final class TracerProviderFactory
         $this->spanProcessorFactory = $spanProcessorFactory ?: new SpanProcessorFactory();
     }
 
-    public function create(): API\TracerProviderInterface
+    public function create(): TracerProviderInterface
     {
         try {
             $exporter = $this->exporterFactory->fromEnvironment();
         } catch (\Throwable $t) {
-            self::logWarning('Unable to create exporter', ['error' => $t]);
+            self::logWarning('Unable to create exporter', ['exception' => $t]);
             $exporter = null;
         }
 
         try {
             $sampler = $this->samplerFactory->fromEnvironment();
         } catch (\Throwable $t) {
-            self::logWarning('Unable to create sampler', ['error' => $t]);
+            self::logWarning('Unable to create sampler', ['exception' => $t]);
             $sampler = null;
         }
 
         try {
             $spanProcessor = $this->spanProcessorFactory->fromEnvironment($exporter);
         } catch (\Throwable $t) {
-            self::logWarning('Unable to create span processor', ['error' => $t]);
+            self::logWarning('Unable to create span processor', ['exception' => $t]);
             $spanProcessor = null;
         }
 
