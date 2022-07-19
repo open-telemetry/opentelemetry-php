@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
@@ -92,8 +93,8 @@ final class TracerSharedState
     /**
      * Returns `false` is the provider is already shutdown, otherwise `true`.
      */
-    public function shutdown(): bool
+    public function shutdown(?CancellationInterface $cancellation = null): bool
     {
-        return $this->shutdownResult ?? ($this->shutdownResult = $this->spanProcessor->shutdown());
+        return $this->shutdownResult ?? ($this->shutdownResult = $this->spanProcessor->shutdown($cancellation));
     }
 }

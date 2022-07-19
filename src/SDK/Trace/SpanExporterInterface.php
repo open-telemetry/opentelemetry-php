@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#span-exporter
  */
@@ -25,11 +27,11 @@ interface SpanExporterInterface
      *
      * @psalm-return SpanExporterInterface::STATUS_*
      */
-    public function export(iterable $spans): int;
+    public function export(iterable $spans, ?CancellationInterface $cancellation = null): int;
 
     /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#shutdown-2 */
-    public function shutdown(): bool;
+    public function shutdown(?CancellationInterface $cancellation = null): bool;
 
     /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#forceflush-2 */
-    public function forceFlush(): bool;
+    public function forceFlush(?CancellationInterface $cancellation = null): bool;
 }
