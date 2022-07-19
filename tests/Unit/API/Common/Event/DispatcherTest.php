@@ -31,19 +31,10 @@ class DispatcherTest extends TestCase
         $this->event->method('getType')->willReturn('foo');
     }
 
-    public function test_get_instance(): void
+    public function test_get_root_dispatcher(): void
     {
         $dispatcher = Dispatcher::getRoot();
         $this->assertInstanceOf(Dispatcher::class, $dispatcher);
-        $this->assertSame($dispatcher, Dispatcher::getRoot());
-    }
-
-    public function test_get_instance_from_parent_context(): void
-    {
-        $dispatcher = Dispatcher::getRoot();
-        $this->assertInstanceOf(Dispatcher::class, $dispatcher);
-        $parent = Context::getCurrent()->with(new ContextKey('foo'), 'bar');
-        $parent->activate();
         $this->assertSame($dispatcher, Dispatcher::getRoot());
     }
 
