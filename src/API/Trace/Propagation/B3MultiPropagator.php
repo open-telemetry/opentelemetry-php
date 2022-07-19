@@ -8,6 +8,7 @@ use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
@@ -69,6 +70,8 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
      */
     public const DEBUG_FLAG = 'X-B3-Flags';
 
+    public static ContextKey $B3_DEBUG_FLAG_KEY;
+
     private const IS_SAMPLED = '1';
     private const VALID_SAMPLED = [self::IS_SAMPLED, 'true'];
     private const IS_NOT_SAMPLED = '0';
@@ -88,6 +91,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
     {
         if (null === self::$instance) {
             self::$instance = new self();
+            self::$B3_DEBUG_FLAG_KEY = new ContextKey('OpenTelemetry Context Key B3 Debug Flag');
         }
 
         return self::$instance;
@@ -113,7 +117,13 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
         // Inject multiple b3 headers
         $setter->set($carrier, self::TRACE_ID, $spanContext->getTraceId());
         $setter->set($carrier, self::SPAN_ID, $spanContext->getSpanId());
-        $setter->set($carrier, self::SAMPLED, $spanContext->isSampled() ? self::IS_SAMPLED : self::IS_NOT_SAMPLED);
+
+        $debugValue = $context->get(self::$B3_DEBUG_FLAG_KEY);
+        if ($debugValue && $debugValue === self::IS_SAMPLED) {
+            $setter->set($carrier, self::DEBUG_FLAG, self::IS_SAMPLED);
+        } else {
+            $setter->set($carrier, self::SAMPLED, $spanContext->isSampled() ? self::IS_SAMPLED : self::IS_NOT_SAMPLED);
+        }
     }
 
     public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
@@ -121,7 +131,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
         $getter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
 
-        $spanContext = self::extractImpl($carrier, $getter);
+        $spanContext = self::extractImpl($carrier, $getter, $context);
         if (!$spanContext->isValid()) {
             return $context;
         }
@@ -147,11 +157,12 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
         return null;
     }
 
-    private static function extractImpl($carrier, PropagationGetterInterface $getter): SpanContextInterface
+    private static function extractImpl($carrier, PropagationGetterInterface $getter, Context &$context): SpanContextInterface
     {
         $traceId = $getter->get($carrier, self::TRACE_ID);
         $spanId = $getter->get($carrier, self::SPAN_ID);
         $sampled = self::getSampledValue($carrier, $getter);
+        $debug = $getter->get($carrier, self::DEBUG_FLAG);
 
         if ($traceId === null || $spanId === null) {
             return SpanContext::getInvalid();
@@ -163,7 +174,12 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
             return SpanContext::getInvalid();
         }
 
-        $isSampled = ($sampled === SpanContext::SAMPLED_FLAG);
+        if ($debug && $debug === self::IS_SAMPLED) {
+            $context = $context->with(self::$B3_DEBUG_FLAG_KEY, self::IS_SAMPLED);
+            $isSampled = SpanContext::SAMPLED_FLAG;
+        } else {
+            $isSampled = ($sampled === SpanContext::SAMPLED_FLAG);
+        }
 
         return SpanContext::createFromRemoteParent(
             $traceId,
