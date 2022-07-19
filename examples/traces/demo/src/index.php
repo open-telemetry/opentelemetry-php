@@ -14,7 +14,6 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Tracer;
-use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -22,8 +21,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Routing\RouteContext;
 
-//create default tracer from environment variables, now available as TracerProvider::getDefaultTracer
-$tracer = (new TracerProviderFactory('example'))->create()->getTracer('io.opentelemetry.contrib.php');
+$tracerProvider = (new TracerProviderFactory('example'))->create();
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 $cb = new ContainerBuilder();
 $container = $cb->addDefinitions([
@@ -71,12 +70,12 @@ $app = Bridge::create($container);
 
 //middleware starts root span based on route pattern, sets status from http code
 $app->add(function (Request $request, RequestHandler $handler) use ($tracer) {
-    $carrier = TraceContextPropagator::getInstance()->extract($request->getHeaders());
+    $parent = TraceContextPropagator::getInstance()->extract($request->getHeaders());
     $routeContext = RouteContext::fromRequest($request);
     $route = $routeContext->getRoute();
     $root = $tracer->spanBuilder($route->getPattern())
         ->setStartTimestamp((int) ($request->getServerParams()['REQUEST_TIME_FLOAT'] * 1e9))
-        ->setParent($carrier)
+        ->setParent($parent)
         ->setSpanKind(SpanKind::KIND_SERVER)
         ->startSpan();
     $root->activate();
@@ -129,3 +128,4 @@ $app->get('/three', function (Response $response) {
 });
 
 $app->run();
+$tracerProvider->shutdown();

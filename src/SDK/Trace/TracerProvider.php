@@ -14,15 +14,9 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
-use function register_shutdown_function;
-use function spl_object_id;
-use WeakReference;
 
-final class TracerProvider implements API\TracerProviderInterface
+final class TracerProvider implements TracerProviderInterface
 {
-    /** @var array<int, WeakReference<self>>|null */
-    private static ?array $tracerProviders = null;
-
     /** @readonly */
     private TracerSharedState $tracerSharedState;
     private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
@@ -54,16 +48,16 @@ final class TracerProvider implements API\TracerProviderInterface
             $spanProcessors
         );
         $this->instrumentationScopeFactory = $instrumentationScopeFactory ?? new InstrumentationScopeFactory(Attributes::factory());
-
-        self::registerShutdownFunction($this);
     }
 
-    public function forceFlush(): ?bool
+    public function forceFlush(): bool
     {
         return $this->tracerSharedState->getSpanProcessor()->forceFlush();
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     */
     public function getTracer(
         string $name,
         ?string $version = null,
@@ -94,41 +88,6 @@ final class TracerProvider implements API\TracerProviderInterface
             return true;
         }
 
-        self::unregisterShutdownFunction($this);
-
         return $this->tracerSharedState->shutdown();
-    }
-
-    public function __destruct()
-    {
-        $this->shutdown();
-    }
-
-    private static function registerShutdownFunction(TracerProvider $tracerProvider): void
-    {
-        if (self::$tracerProviders === null) {
-            register_shutdown_function(static function (): void {
-                $tracerProviders = self::$tracerProviders;
-                self::$tracerProviders = null;
-
-                // Push tracer provider shutdown to end of queue
-                // @phan-suppress-next-line PhanTypeMismatchArgumentInternal
-                register_shutdown_function(static function (array $tracerProviders): void {
-                    foreach ($tracerProviders as $reference) {
-                        if ($tracerProvider = $reference->get()) {
-                            $tracerProvider->shutdown();
-                        }
-                    }
-                }, $tracerProviders);
-            });
-        }
-
-        self::$tracerProviders[spl_object_id($tracerProvider)] = WeakReference::create($tracerProvider);
-    }
-
-    private static function unregisterShutdownFunction(TracerProvider $tracerProvider): void
-    {
-        /** @psalm-suppress PossiblyNullArrayAccess */
-        unset(self::$tracerProviders[spl_object_id($tracerProvider)]);
     }
 }
