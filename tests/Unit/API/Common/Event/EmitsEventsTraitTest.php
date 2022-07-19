@@ -20,7 +20,7 @@ class EmitsEventsTraitTest extends TestCase
         $event->method('getType')->willReturn('bar');
         $called = false;
         $class = $this->createInstance();
-        Dispatcher::getInstance()->listen($event->getType(), function () use (&$called) {
+        Dispatcher::getRoot()->listen($event->getType(), function () use (&$called) {
             $this->assertTrue(true, 'listener was called');
             $called = true;
         });

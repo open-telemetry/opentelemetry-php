@@ -33,18 +33,18 @@ class DispatcherTest extends TestCase
 
     public function test_get_instance(): void
     {
-        $dispatcher = Dispatcher::getInstance();
+        $dispatcher = Dispatcher::getRoot();
         $this->assertInstanceOf(Dispatcher::class, $dispatcher);
-        $this->assertSame($dispatcher, Dispatcher::getInstance());
+        $this->assertSame($dispatcher, Dispatcher::getRoot());
     }
 
     public function test_get_instance_from_parent_context(): void
     {
-        $dispatcher = Dispatcher::getInstance();
+        $dispatcher = Dispatcher::getRoot();
         $this->assertInstanceOf(Dispatcher::class, $dispatcher);
         $parent = Context::getCurrent()->with(new ContextKey('foo'), 'bar');
         $parent->activate();
-        $this->assertSame($dispatcher, Dispatcher::getInstance());
+        $this->assertSame($dispatcher, Dispatcher::getRoot());
     }
 
     public function test_add_listener(): void
