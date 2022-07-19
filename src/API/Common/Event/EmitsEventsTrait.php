@@ -10,6 +10,6 @@ trait EmitsEventsTrait
 {
     protected static function emit(CloudEventInterface $event): void
     {
-        Dispatcher::getInstance()->dispatch($event);
+        Dispatcher::getRoot()->dispatch($event);
     }
 }
