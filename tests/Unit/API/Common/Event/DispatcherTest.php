@@ -6,8 +6,6 @@ namespace OpenTelemetry\Tests\Unit\API\Common\Event;
 
 use CloudEvents\V1\CloudEventInterface;
 use OpenTelemetry\API\Common\Event\Dispatcher;
-use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKey;
 use PHPUnit\Framework\TestCase;
 
 /**
