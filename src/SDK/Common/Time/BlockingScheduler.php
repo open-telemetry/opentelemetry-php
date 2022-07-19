@@ -16,7 +16,7 @@ final class BlockingScheduler implements SchedulerInterface
 
     public function delay(int $timeout): void
     {
-        self::logInfo("Delaying the execution by $timeout milliseconds");
+        self::logDebug("Delaying the execution by $timeout milliseconds");
         usleep(abs($timeout) * 1000);
     }
 }

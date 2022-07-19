@@ -101,10 +101,7 @@ trait SpanExporterTrait
         $this->retryPolicy = $retryPolicy;
     }
 
-    /**
-     * @return RetryPolicyInterface|null
-     */
-    public function getRetryPolicy()
+    public function getRetryPolicy(): ?RetryPolicyInterface
     {
         return $this->retryPolicy;
     }

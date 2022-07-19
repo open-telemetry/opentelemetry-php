@@ -54,7 +54,7 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
     public function doExport(iterable $spans): int
     {
         try {
-            $this->doLog($spans);
+            $this->writeLog($spans);
         } catch (Throwable $t) {
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
@@ -97,7 +97,7 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
     /**
      * @param iterable $spans
      */
-    private function doLog(iterable $spans): void
+    private function writeLog(iterable $spans): void
     {
         if ($this->granularity === self::GRANULARITY_AGGREGATE) {
             $this->log($this->serviceName, $this->getSpanConverter()->convert($spans));

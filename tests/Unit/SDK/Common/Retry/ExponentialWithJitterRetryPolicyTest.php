@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ExponentialWithJitterRetryPolicyTest extends TestCase
 {
-    public function test_retry_policy_set_properly()
+    public function test_retry_policy_set_properly(): void
     {
         $retryPolicy = new ExponentialWithJitterRetryPolicy([
             'retryableStatusCodes' => [
@@ -58,12 +58,12 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function test_delay_is_less_or_equal_to_max_backoff($attempt, $delay, $maxBackoff)
+    public function test_delay_is_less_or_equal_to_max_backoff($attempt, $delay, $maxBackoff): void
     {
         $this->assertLessThanOrEqual($maxBackoff, $delay);
     }
 
-    public function provider()
+    public function provider(): array
     {
         $retryPolicy = new ExponentialWithJitterRetryPolicy([
             'retryableStatusCodes' => [
