@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Util;
 
 use Closure;
+use Exception;
 use function get_class;
 use ReflectionFunction;
 use stdClass;
@@ -49,4 +50,22 @@ function weaken(Closure $closure, ?object &$target = null): Closure
     return $scope && get_class($target) === $scope->name && !$scope->isInternal()
         ? static fn (...$args) => ($obj = $ref->get()) ? $closure->call($obj, ...$args) : null
         : static fn (...$args) => ($obj = $ref->get()) ? $closure->bindTo($obj)(...$args) : null;
+}
+
+/**
+ *  Returns whether an iterable is empty or not
+ */
+function isEmpty(iterable $list)
+{
+    try {
+        foreach ($list as $value) {
+            break;
+        }
+    }
+    //catch exception
+    catch (Exception $e) {
+        return true;
+    }
+
+    return false;
 }
