@@ -67,5 +67,5 @@ function isEmpty(iterable $list)
         return true;
     }
 
-    return false;
+    return empty($list);
 }
