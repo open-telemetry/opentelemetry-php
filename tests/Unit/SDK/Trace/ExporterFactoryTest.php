@@ -11,6 +11,7 @@ use Http\Discovery\Strategy\MockClientStrategy;
 use OpenTelemetry\Contrib;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
+use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -50,6 +51,7 @@ class ExporterFactoryTest extends TestCase
             'otlp+grpc' => ['test.otlpgrpc', 'otlp+grpc://otlp:4317', Contrib\OtlpGrpc\Exporter::class],
             'zipkintonewrelic' => ['test.zipkintonewrelic', 'zipkintonewrelic+https://trace-api.newrelic.com/trace/v1?licenseKey=abc23423423', Contrib\ZipkinToNewrelic\Exporter::class],
             'console' => ['test.console', 'console', ConsoleSpanExporter::class],
+            'memory' => ['test.memory', 'memory', InMemoryExporter::class],
         ];
     }
 

@@ -8,17 +8,20 @@
     "license": "Apache-2.0",
     "require": {
         "php": "^7.4 || ^8.0",
+        "cloudevents/sdk-php": "^v1.0.1",
         "ext-json": "*",
         "google/protobuf": "^3.3.0",
         "grpc/grpc": "^1.30",
-        "nyholm/dsn": "^2.0.0",
         "packaged/thrift": "^0.15.0",
         "php-http/async-client-implementation": "^1.0",
         "php-http/discovery": "^1.14",
         "promphp/prometheus_client_php": "^2.2.1",
         "psr/http-factory-implementation": "^1.0",
         "psr/log": "^1.1|^2.0|^3.0",
-        "symfony/polyfill-mbstring": "^1.23"
+        "symfony/polyfill-mbstring": "^1.23",
+        "symfony/polyfill-php80": "^1.26",
+        "symfony/polyfill-php81": "^1.26",
+        "symfony/polyfill-php82": "^1.26"
     },
     "config": {
         "sort-packages": true,
@@ -59,7 +62,8 @@
         },
         "files": [
             "src/Context/fiber/initialize_fiber_handler.php",
-            "src/SDK/Common/Dev/Compatibility/_load.php"
+            "src/SDK/Common/Dev/Compatibility/_load.php",
+            "src/SDK/Common/Util/functions.php"
         ]
     },
     "autoload-dev": {

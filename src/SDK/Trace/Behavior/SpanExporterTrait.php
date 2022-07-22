@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace\Behavior;
 
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Retry\RetryPolicyInterface;
+use function OpenTelemetry\SDK\Common\Util\isEmpty;
 use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -51,7 +52,7 @@ trait SpanExporterTrait
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
 
-        if (empty($spans)) {
+        if (isEmpty($spans)) {
             return SpanExporterInterface::STATUS_SUCCESS;
         }
 

@@ -13,7 +13,6 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
-        "nyholm/dsn": "^2.0.0",
         "open-telemetry/api": "self.version",
         "open-telemetry/context": "self.version",
         "open-telemetry/gen-jaeger-thrift": "self.version",
@@ -25,7 +24,10 @@
         "promphp/prometheus_client_php": "^2.2.1",
         "psr/http-factory-implementation": "^1.0",
         "psr/log": "^1.1|^2.0|^3.0",
-        "symfony/polyfill-mbstring": "^1.23"
+        "symfony/polyfill-mbstring": "^1.23",
+        "symfony/polyfill-php80": "^1.26",
+        "symfony/polyfill-php81": "^1.26",
+        "symfony/polyfill-php82": "^1.26"
     },
     "autoload": {
         "psr-4": {

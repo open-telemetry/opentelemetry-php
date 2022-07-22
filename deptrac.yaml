@@ -64,10 +64,6 @@ deptrac:
           collectors:
               - type: className
                 regex: ^Http\\*
-      -   name: NyholmDsn
-          collectors:
-              - type: className
-                regex: ^Nyholm\\Dsn\\*
       -   name: Prometheus
           collectors:
               - type: className
@@ -92,6 +88,10 @@ deptrac:
           collectors:
               - type: className
                 regex: ^Swoole\\*
+      -   name: CloudEvents
+          collectors:
+              - type: className
+                regex: ^CloudEvents\\*
 
     ruleset:
       Context:
@@ -101,11 +101,11 @@ deptrac:
           - Context
           - SemConv
           - PsrLog
+          - CloudEvents
       SDK:
           - +API
           - PsrHttp
           - HttpPlug
-          - NyholmDsn
           - Composer
       Contrib:
           - +SDK
