@@ -55,10 +55,14 @@ function weaken(Closure $closure, ?object &$target = null): Closure
 /**
  *  Returns whether an iterable is empty or not
  */
-function isEmpty(iterable $list)
+function isEmpty(iterable $list): bool
 {
+    $empty=true;
+
     try {
         foreach ($list as $value) {
+            $empty=false;
+
             break;
         }
     }
@@ -67,5 +71,5 @@ function isEmpty(iterable $list)
         return true;
     }
 
-    return empty($list);
+    return $empty;
 }

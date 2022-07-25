@@ -17,9 +17,14 @@ function gen(): iterable
  */
 final class FunctionsTest extends TestCase
 {
-    public function test_for_empty_iterable(): void
+    public function test_for_empty_array(): void
     {
         $this->assertTrue(isEmpty([]));
+    }
+
+    public function test_for_non_empty_array(): void
+    {
+        $this->assertFalse(isEmpty([1,2]));
     }
 
     public function test_for_exhausted_generator(): void
@@ -27,12 +32,17 @@ final class FunctionsTest extends TestCase
         $generator = gen();
         foreach ($generator as $value) {
         }
-        $value=isEmpty($generator) ? true : false;
-        $this->assertTrue($value);
+        $this->assertTrue(isEmpty($generator));
     }
 
-    public function test_for_non_empty():void
+    public function test_for_non_exhausted_generator(): void
     {
-        $this->assertFalse(isEmpty([1,2]));
+        $generator = gen();
+        $this->assertFalse(isEmpty($generator));
+    }
+
+    public function test_for_empty_generator(): void
+    {
+        $this->assertTrue(isEmpty((fn () => yield from [])()));
     }
 }
