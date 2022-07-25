@@ -15,9 +15,13 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
 {
     public function test_retry_policy_set_properly(): void
     {
-        $retryPolicy = new ExponentialWithJitterRetryPolicy([
-            'retryableStatusCodes' => [
-                \Grpc\STATUS_CANCELLED,
+        $retryPolicy = new ExponentialWithJitterRetryPolicy(
+            $maxAttempts = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_ATTEMPTS,
+            $initialBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_INITIAL_BACKOFF,
+            $maxBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF,
+            $backoffMultiplier = ExponentialWithJitterRetryPolicy::DEFAULT_BACKOFF_MULTIPLIER,
+            $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER,
+            $retryableStatusCodes = [\Grpc\STATUS_CANCELLED,
                 \Grpc\STATUS_DEADLINE_EXCEEDED,
                 \Grpc\STATUS_PERMISSION_DENIED,
                 \Grpc\STATUS_RESOURCE_EXHAUSTED,
@@ -27,7 +31,8 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
                 \Grpc\STATUS_DATA_LOSS,
                 \Grpc\STATUS_UNAUTHENTICATED,
             ],
-        ]);
+            $scheduler = null
+        );
         $this->assertSame(
             $retryPolicy->getMaxAttempts(),
             ExponentialWithJitterRetryPolicy::DEFAULT_MAX_ATTEMPTS
@@ -65,11 +70,15 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
 
     public function provider(): array
     {
-        $retryPolicy = new ExponentialWithJitterRetryPolicy([
-            'retryableStatusCodes' => [
-                \Grpc\STATUS_CANCELLED,
-            ],
-        ]);
+        $retryPolicy = new ExponentialWithJitterRetryPolicy(
+            $maxAttempts = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_ATTEMPTS,
+            $initialBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_INITIAL_BACKOFF,
+            $maxBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF,
+            $backoffMultiplier = ExponentialWithJitterRetryPolicy::DEFAULT_BACKOFF_MULTIPLIER,
+            $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER,
+            $retryableStatusCodes = [\Grpc\STATUS_CANCELLED],
+            $scheduler = null
+        );
         $maxBackoff = $retryPolicy->getMaxBackoff();
 
         return [

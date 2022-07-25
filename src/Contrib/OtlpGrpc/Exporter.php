@@ -81,9 +81,15 @@ class Exporter implements SpanExporterInterface
             $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
         $this->setSpanConverter(new SpanConverter());
-        $retryPolicy = new ExponentialWithJitterRetryPolicy([
-            'retryableStatusCodes' => $this->retryableStatusCodes,
-        ]);
+        $retryPolicy = new ExponentialWithJitterRetryPolicy(
+            $maxAttempts = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_ATTEMPTS,
+            $initialBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_INITIAL_BACKOFF,
+            $maxBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF,
+            $backoffMultiplier = ExponentialWithJitterRetryPolicy::DEFAULT_BACKOFF_MULTIPLIER,
+            $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER,
+            $retryableStatusCodes = $this->retryableStatusCodes,
+            $scheduler = null
+        );
         $this->setRetryPolicy($retryPolicy);
         $this->metadata = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :

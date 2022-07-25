@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Retry;
 
-use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
-
 /**
  * This interface is to implement retry policy for exporters where in case of failure send the spans,
  * based on few parameters, exporter will wait for specific period and retry sending them for upto maxAttempts.
@@ -22,19 +20,14 @@ use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
  *
  *    The following line will enable the exponential retry policy with jitter with
  *    default values.
- *    Only mandatory argument is "retryableStatusCodes" as they are different for different types of exporters
  *
- *    $this->setRetryPolicy(new ExponentialWithJitterRetryPolicy(["retryableStatusCodes" => \GRPC\STATUS_CANCELLED]));
- *
- *    User can provide different values for retry params as well as follows:
- *    $retryPolicy = new ExponentialWithJitterRetryPolicy([
- *          "maxAttempt" => 5,
- *          "initialBackoff" => 1,
- *          "maxBackoff" => 10,
- *          "backoffMultiplier" => 1.5,
- *          "jitter" => 0.1,
- *          "scheduler" => new BlockingScheduler(),
- *          "retryableStatusCodes" => [
+ *    $retryPolicy = new ExponentialWithJitterRetryPolicy(
+ *          $maxAttempts = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_ATTEMPTS,
+ *          $initialBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_INITIAL_BACKOFF,
+ *          $maxBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF,
+ *          $backoffMultiplier = ExponentialWithJitterRetryPolicy::DEFAULT_BACKOFF_MULTIPLIER,
+ *          $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER,
+ *          $retryableStatusCodes = [
  *              \GRPC\STATUS_CANCELLED,
  *              \Grpc\STATUS_DEADLINE_EXCEEDED,
  *              \Grpc\STATUS_PERMISSION_DENIED,
@@ -45,7 +38,8 @@ use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
  *              \Grpc\STATUS_DATA_LOSS,
  *              \Grpc\STATUS_UNAUTHENTICATED,
  *          ],
- *      ]);
+ *          $scheduler = null
+ *      );
  *    $this->setRetryPolicy($retryPolicy);
  *
  *    The arguments in ExponentialWithJitterRetryPolicy() are as follows:
@@ -63,16 +57,9 @@ use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
  */
 interface RetryPolicyInterface
 {
-    public const DEFAULT_MAX_ATTEMPTS = 5;
-    public const DEFAULT_INITIAL_BACKOFF = 1;
-    public const DEFAULT_MAX_BACKOFF = 10;
-    public const DEFAULT_BACKOFF_MULTIPLIER = 1.5;
-    public const DEFAULT_JITTER = 0.1;
-
     public function shouldRetry(
         int $attempt,
-        int $status,
-        ?RetryableExportException $exception
+        int $status
     ): ?bool;
 
     public function getDelay(int $attempt): int;

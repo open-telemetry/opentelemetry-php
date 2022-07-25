@@ -7,11 +7,16 @@ namespace OpenTelemetry\SDK\Common\Retry;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Time\BlockingScheduler;
 use OpenTelemetry\SDK\Common\Time\SchedulerInterface;
-use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 final class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
 {
+    public const DEFAULT_MAX_ATTEMPTS = 5;
+    public const DEFAULT_INITIAL_BACKOFF = 1;
+    public const DEFAULT_MAX_BACKOFF = 10;
+    public const DEFAULT_BACKOFF_MULTIPLIER = 1.5;
+    public const DEFAULT_JITTER = 0.1;
+
     private $maxAttempts;
     private $initialBackoff;
     private $maxBackoff;
@@ -20,27 +25,29 @@ final class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
     public $retryableStatusCodes;
     public $scheduler;
 
-    public function __construct($arguments=[])
-    {
-        extract($arguments, EXTR_IF_EXISTS);
-        $this->setMaxAttempts($arguments['maxAttempts'] ?? self::DEFAULT_MAX_ATTEMPTS);
-        $this->setInitialBackoff($arguments['initialBackoff'] ?? self::DEFAULT_INITIAL_BACKOFF);
-        $this->setMaxBackoff($arguments['maxBackoff'] ?? self::DEFAULT_MAX_BACKOFF);
-        $this->setBackoffMultipler($arguments['backoffMultiplier'] ?? self::DEFAULT_BACKOFF_MULTIPLIER);
-        $this->setJitter($arguments['jitter'] ?? self::DEFAULT_JITTER);
-        $this->setRetryableStatusCodes($arguments['retryableStatusCodes'] ?? []);
-        $this->setDelayScheduler($arguments['scheduler'] ?? new BlockingScheduler());
+    public function __construct(
+        int $maxAttempts = self::DEFAULT_MAX_ATTEMPTS,
+        float $initialBackoff = self::DEFAULT_INITIAL_BACKOFF,
+        int $maxBackoff = self::DEFAULT_MAX_BACKOFF,
+        float $backoffMultiplier = self::DEFAULT_BACKOFF_MULTIPLIER,
+        float $jitter = self::DEFAULT_JITTER,
+        array $retryableStatusCodes = [],
+        SchedulerInterface $scheduler = null
+    ) {
+        $this->setMaxAttempts($maxAttempts);
+        $this->setInitialBackoff($initialBackoff);
+        $this->setMaxBackoff($maxBackoff);
+        $this->setBackoffMultipler($backoffMultiplier);
+        $this->setJitter($jitter);
+        $this->setRetryableStatusCodes($retryableStatusCodes);
+        $scheduler = $scheduler != null ? $scheduler : new BlockingScheduler();
+        $this->setDelayScheduler($scheduler);
     }
 
     public function shouldRetry(
         int $attempt,
-        int $status,
-        ?RetryableExportException $exception = null
+        int $status
     ): bool {
-        if ($attempt >= $this->maxAttempts && null !== $exception) {
-            throw $exception;
-        }
-
         return $attempt < $this->maxAttempts &&
             $status == SpanExporterInterface::STATUS_FAILED_RETRYABLE;
     }

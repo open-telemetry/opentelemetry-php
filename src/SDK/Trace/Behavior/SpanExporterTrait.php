@@ -7,10 +7,8 @@ namespace OpenTelemetry\SDK\Trace\Behavior;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Retry\RetryPolicyInterface;
 use function OpenTelemetry\SDK\Common\Util\isEmpty;
-use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use Throwable;
 
 trait SpanExporterTrait
 {
@@ -72,26 +70,8 @@ trait SpanExporterTrait
                 self::logDebug('Retrying span export for ' . $attempt . ' time');
             }
             $attempt++;
-
-            try {
-                $status = $this->doExport($spans);
-            } catch (Throwable $e) {
-                if ($e instanceof \Error) {
-                    self::logError($e->getMessage());
-                    $e = new RetryableExportException(
-                        $e->getMessage(),
-                        $e->getCode(),
-                        $e
-                    );
-                    $exception = $e;
-                }
-            }
-            // Find whether the request should be retried or not
-            $shouldRetry = $this->retryPolicy->shouldRetry(
-                $attempt,
-                $status,
-                $exception
-            );
+            $status = $this->doExport($spans);
+            $shouldRetry = $this->retryPolicy->shouldRetry($attempt, $status);
         }
 
         return $status; /** @phpstan-ignore-line */
