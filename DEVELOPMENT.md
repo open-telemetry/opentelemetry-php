@@ -26,6 +26,15 @@ To update these dependencies, you can run
 make update
 ```
 
+## Coding Guidelines
+Even though it may not be reflected everywhere in the codebase yet, we aim to provide software which is easy to read and change.
+The methods described in Clean Code book(s) by Robert C. Martin (Uncle Bob) are a de facto industry standards nowadays.
+Reading those books is highly recommended, however you can take a look at the examples given at [Clean Code PHP](https://github.com/jupeter/clean-code-php). 
+While we have no rule to strictly follow said methods and patterns, they are highly recommended as an orientation for 
+your pull requests and to be referenced in reviews.
+
+We might add additional guidelines regarding for example testing in the future.
+
 ## Pull Requests
 
 To propose changes to the codebase, you need
@@ -215,42 +224,3 @@ make phpmetrics
 
 This will generate a HTML PhpMetrics report in the `var/metrics` directory. Make sure to run `make test` before to
 create the test log-file, used by the metrics report.
-
-## Examples
-
-### Trace
-
-You can use the [examples/AlwaysOnZipkinExample.php](/examples/AlwaysOnZipkinExample.php) file to test out the reference
-implementation we have for zipkin. This example performs a sample trace with a grouping of 5 spans and POSTs the result
-to a local zipkin instance.
-
-You can also use the [examples/AlwaysOnJaegerExample.php](/examples/AlwaysOnJaegerExample.php) file to test out the
-reference implementation we have for Jaeger. This example performs a sample trace with a grouping of 5 spans and POSTs
-the result to a local Jaeger instance.
-
-If you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
-
-1) Install the necessary dependencies by running `make install`.
-2) Execute the example trace using `make trace examples`.
-
-Exported spans can be seen in zipkin at [http://127.0.0.1:9411](http://127.0.0.1:9411)
-
-Exported spans can also be seen in jaeger at [http://127.0.0.1:16686](http://127.0.0.1:16686)
-
-### Metrics
-
-You can use the [examples/prometheus/PrometheusMetricsExample.php](/examples/prometheus/PrometheusMetricsExample.php)
-file to test out the reference implementation we have. This example will create a counter that will be scraped by local
-Prometheus instance.
-
-The easy way to test the example out with docker and docker-compose is:
-
-1) Run `make metrics-prometheus-example`. Make sure that local ports 8080, 6379 and 9090 are available.
-
-2) Open local Prometheus instance: http://localhost:9090
-
-3) Go to Graph section, type "opentelemetry_prometheus_counter" in the search field or select it in the dropdown menu.
-   You will see the counter value. Every other time you run `make metrics-prometheus-example` will increment the counter
-   but remember that Prometheus scrapes values once in 10 seconds.
-
-4) In order to stop docker containers for this example just run `make stop-prometheus`

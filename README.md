@@ -202,6 +202,47 @@ $ composer require --dev open-telemetry/sdk open-telemetry/sdk-contrib
 
 * [Symfony SDK Bundle](https://github.com/open-telemetry/opentelemetry-php-contrib/tree/main/src/Symfony/OtelSdkBundle) is the recommended way to use opentelemetry-php with symfony
 
+
+## Examples
+
+### Trace
+
+You can use the [examples/AlwaysOnZipkinExample.php](/examples/AlwaysOnZipkinExample.php) file to test out the reference
+implementation we have for zipkin. This example performs a sample trace with a grouping of 5 spans and POSTs the result
+to a local zipkin instance.
+
+You can also use the [examples/AlwaysOnJaegerExample.php](/examples/AlwaysOnJaegerExample.php) file to test out the
+reference implementation we have for Jaeger. This example performs a sample trace with a grouping of 5 spans and POSTs
+the result to a local Jaeger instance.
+
+If you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
+
+1) Install the necessary dependencies by running `make install`.
+2) Execute the example trace using `make trace examples`.
+
+Exported spans can be seen in zipkin at [http://127.0.0.1:9411](http://127.0.0.1:9411)
+
+Exported spans can also be seen in jaeger at [http://127.0.0.1:16686](http://127.0.0.1:16686)
+
+### Metrics
+
+You can use the [examples/prometheus/PrometheusMetricsExample.php](/examples/prometheus/PrometheusMetricsExample.php)
+file to test out the reference implementation we have. This example will create a counter that will be scraped by local
+Prometheus instance.
+
+The easy way to test the example out with docker and docker-compose is:
+
+1) Run `make metrics-prometheus-example`. Make sure that local ports 8080, 6379 and 9090 are available.
+
+2) Open local Prometheus instance: http://localhost:9090
+
+3) Go to Graph section, type "opentelemetry_prometheus_counter" in the search field or select it in the dropdown menu.
+   You will see the counter value. Every other time you run `make metrics-prometheus-example` will increment the counter
+   but remember that Prometheus scrapes values once in 10 seconds.
+
+4) In order to stop docker containers for this example just run `make stop-prometheus`
+
+
 ## Versioning
 
 Versioning rationale can be found in the [Versioning Documentation](/docs/versioning.md)
