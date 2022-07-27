@@ -7,7 +7,6 @@ namespace OpenTelemetry\SDK\Metrics\Exporters;
 use Exception;
 use InvalidArgumentException;
 use OpenTelemetry\API\Metrics as API;
-use function OpenTelemetry\SDK\Common\Util\isEmpty;
 use OpenTelemetry\SDK\Metrics\Exceptions\RetryableExportException;
 
 abstract class AbstractExporter implements API\ExporterInterface
@@ -17,7 +16,7 @@ abstract class AbstractExporter implements API\ExporterInterface
      */
     public function export(iterable $metrics): int
     {
-        if (isEmpty($metrics)) {
+        if (empty($metrics)) {
             return API\ExporterInterface::SUCCESS;
         }
 

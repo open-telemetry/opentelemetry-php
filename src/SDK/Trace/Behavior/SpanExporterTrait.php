@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\Behavior;
 
-use function OpenTelemetry\SDK\Common\Util\isEmpty;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -41,7 +40,7 @@ trait SpanExporterTrait
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
 
-        if (isEmpty($spans)) {
+        if (empty($spans)) {
             return SpanExporterInterface::STATUS_SUCCESS;
         }
 
