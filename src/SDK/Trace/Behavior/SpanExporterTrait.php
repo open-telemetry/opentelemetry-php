@@ -40,10 +40,6 @@ trait SpanExporterTrait
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
 
-        if (empty($spans)) {
-            return SpanExporterInterface::STATUS_SUCCESS;
-        }
-
         return $this->doExport($spans); /** @phpstan-ignore-line */
     }
 
