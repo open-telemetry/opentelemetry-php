@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Retry;
 
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Common\Time\BlockingScheduler;
-use OpenTelemetry\SDK\Common\Time\SchedulerInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 final class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
@@ -23,7 +21,6 @@ final class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
     private $backoffMultiplier;
     private $jitter;
     public $retryableStatusCodes;
-    public $scheduler;
 
     public function __construct(
         int $maxAttempts = self::DEFAULT_MAX_ATTEMPTS,
@@ -31,8 +28,7 @@ final class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         int $maxBackoff = self::DEFAULT_MAX_BACKOFF,
         float $backoffMultiplier = self::DEFAULT_BACKOFF_MULTIPLIER,
         float $jitter = self::DEFAULT_JITTER,
-        array $retryableStatusCodes = [],
-        SchedulerInterface $scheduler = null
+        array $retryableStatusCodes = []
     ) {
         $this->setMaxAttempts($maxAttempts);
         $this->setInitialBackoff($initialBackoff);
@@ -40,8 +36,6 @@ final class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         $this->setBackoffMultipler($backoffMultiplier);
         $this->setJitter($jitter);
         $this->setRetryableStatusCodes($retryableStatusCodes);
-        $scheduler = $scheduler != null ? $scheduler : new BlockingScheduler();
-        $this->setDelayScheduler($scheduler);
     }
 
     public function shouldRetry(
@@ -68,11 +62,6 @@ final class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         }
 
         return min((int) $delay, $this->maxBackoff * 1000);
-    }
-
-    public function delay(int $timeout): void
-    {
-        $this->scheduler->delay($timeout);
     }
 
     public function getMaxAttempts(): int
@@ -178,16 +167,6 @@ final class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
     public function getRetryableStatusCodes(): array
     {
         return $this->retryableStatusCodes;
-    }
-
-    public function setDelayScheduler(SchedulerInterface $scheduler)
-    {
-        $this->scheduler = $scheduler;
-    }
-
-    public function getDelayScheduler(): SchedulerInterface
-    {
-        return $this->scheduler;
     }
 
     public function checkArgument(bool $argument_condition, string $message)

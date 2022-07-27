@@ -38,9 +38,9 @@ namespace OpenTelemetry\SDK\Common\Retry;
  *              \Grpc\STATUS_DATA_LOSS,
  *              \Grpc\STATUS_UNAUTHENTICATED,
  *          ],
- *          $scheduler = null
  *      );
  *    $this->setRetryPolicy($retryPolicy);
+ *    $this->setDelayScheduler(new BlockingScheduler());
  *
  *    The arguments in ExponentialWithJitterRetryPolicy() are as follows:
  *          maxAttempts,        - maximum no of retry attempts allowed
@@ -48,10 +48,11 @@ namespace OpenTelemetry\SDK\Common\Retry;
  *          maxBackoff,         - maximum no of sec to wait before retry timeout
  *          backoffMultiplier,  - multiplier value used to calculate the delay before next attempt
  *          jitter,             - jitter value to add randomness to delay value
- *          scheduler           - Blocking or Non Blocking delay scheduler (default: BlockingSchuduler)
  *          retryableStatusCodes- array of retryable status code. All the status codes apart from this will not be retried
  *      )
  *
+ *    DelayScheduler is used to define the delay method for the exporter whether should it block the current execution
+ *    or not.
  *    NonBlockingScheduler will be more useful when fiber is implemented.
  *    By Default scheduler is of type BlockingScheduler.
  */
@@ -64,9 +65,4 @@ interface RetryPolicyInterface
 
     public function getDelay(int $attempt): int;
 
-    /**
-     * delay the execution of the thread by $timeout milliseconds
-     * @param  int $timeout: milliseconds to delay the execution
-     */
-    public function delay(int $timeout): void;
 }

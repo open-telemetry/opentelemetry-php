@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Retry;
 
 use OpenTelemetry\SDK\Common\Retry\ExponentialWithJitterRetryPolicy;
-use OpenTelemetry\SDK\Common\Time\BlockingScheduler;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,17 +20,15 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
             $maxBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF,
             $backoffMultiplier = ExponentialWithJitterRetryPolicy::DEFAULT_BACKOFF_MULTIPLIER,
             $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER,
-            $retryableStatusCodes = [\Grpc\STATUS_CANCELLED,
+            $retryableStatusCodes = [
+                \Grpc\STATUS_CANCELLED,
                 \Grpc\STATUS_DEADLINE_EXCEEDED,
-                \Grpc\STATUS_PERMISSION_DENIED,
                 \Grpc\STATUS_RESOURCE_EXHAUSTED,
                 \Grpc\STATUS_ABORTED,
                 \Grpc\STATUS_OUT_OF_RANGE,
                 \Grpc\STATUS_UNAVAILABLE,
                 \Grpc\STATUS_DATA_LOSS,
-                \Grpc\STATUS_UNAUTHENTICATED,
             ],
-            $scheduler = null
         );
         $this->assertSame(
             $retryPolicy->getMaxAttempts(),
@@ -53,10 +50,6 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
             $retryPolicy->getJitter(),
             ExponentialWithJitterRetryPolicy::DEFAULT_JITTER
         );
-        $this->assertInstanceOf(
-            BlockingScheduler::class,
-            $retryPolicy->getDelayScheduler()
-        );
         $this->assertEquals(count($retryPolicy->getRetryableStatusCodes()), 9);
     }
 
@@ -77,7 +70,6 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
             $backoffMultiplier = ExponentialWithJitterRetryPolicy::DEFAULT_BACKOFF_MULTIPLIER,
             $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER,
             $retryableStatusCodes = [\Grpc\STATUS_CANCELLED],
-            $scheduler = null
         );
         $maxBackoff = $retryPolicy->getMaxBackoff();
 

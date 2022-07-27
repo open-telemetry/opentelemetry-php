@@ -13,6 +13,7 @@ use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Retry\ExponentialWithJitterRetryPolicy;
+use OpenTelemetry\SDK\Common\Time\BlockingScheduler;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -39,13 +40,11 @@ class Exporter implements SpanExporterInterface
     private array $retryableStatusCodes = [
             \Grpc\STATUS_CANCELLED,
             \Grpc\STATUS_DEADLINE_EXCEEDED,
-            \Grpc\STATUS_PERMISSION_DENIED,
             \Grpc\STATUS_RESOURCE_EXHAUSTED,
             \Grpc\STATUS_ABORTED,
             \Grpc\STATUS_OUT_OF_RANGE,
             \Grpc\STATUS_UNAVAILABLE,
             \Grpc\STATUS_DATA_LOSS,
-            \Grpc\STATUS_UNAUTHENTICATED,
     ];
     /**
      * OTLP GRPC Exporter Constructor
@@ -87,10 +86,10 @@ class Exporter implements SpanExporterInterface
             $maxBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF,
             $backoffMultiplier = ExponentialWithJitterRetryPolicy::DEFAULT_BACKOFF_MULTIPLIER,
             $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER,
-            $retryableStatusCodes = $this->retryableStatusCodes,
-            $scheduler = null
+            $retryableStatusCodes = $this->retryableStatusCodes
         );
         $this->setRetryPolicy($retryPolicy);
+        $this->setDelayScheduler(new BlockingScheduler());
         $this->metadata = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers);

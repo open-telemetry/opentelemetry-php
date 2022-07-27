@@ -6,6 +6,8 @@ namespace OpenTelemetry\SDK\Trace\Behavior;
 
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Retry\RetryPolicyInterface;
+use OpenTelemetry\SDK\Common\Time\SchedulerInterface;
+
 use function OpenTelemetry\SDK\Common\Util\isEmpty;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -15,6 +17,7 @@ trait SpanExporterTrait
     use LogsMessagesTrait;
     private bool $running = true;
     private ?RetryPolicyInterface $retryPolicy = null;
+    private SchedulerInterface $delayScheduler;
 
     /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#shutdown-2 */
     public function shutdown(): bool
@@ -45,7 +48,6 @@ trait SpanExporterTrait
         $shouldRetry = true;
         $status = SpanExporterInterface::STATUS_SUCCESS;
         $attempt = 0;
-        $exception = null;
         if (!$this->running) {
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
@@ -66,7 +68,7 @@ trait SpanExporterTrait
             $delay = $this->retryPolicy->getDelay($attempt);
             if ($attempt > 0) {
                 self::logDebug('Waiting for ' . $delay . ' mili seconds before retrying export');
-                $this->retryPolicy->delay($delay);
+                $this->delayScheduler->delay($delay);
                 self::logDebug('Retrying span export for ' . $attempt . ' time');
             }
             $attempt++;
@@ -85,6 +87,16 @@ trait SpanExporterTrait
     public function getRetryPolicy(): ?RetryPolicyInterface
     {
         return $this->retryPolicy;
+    }
+
+    public function setDelayScheduler(SchedulerInterface $delayScheduler)
+    {
+        $this->delayScheduler = $delayScheduler;
+    }
+
+    public function getDelayScheduler(): ?SchedulerInterface
+    {
+        return $this->delayScheduler;
     }
 
     /**
