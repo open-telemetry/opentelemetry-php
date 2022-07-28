@@ -26,18 +26,7 @@ namespace OpenTelemetry\SDK\Common\Retry;
  *          $initialBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_INITIAL_BACKOFF,
  *          $maxBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF,
  *          $backoffMultiplier = ExponentialWithJitterRetryPolicy::DEFAULT_BACKOFF_MULTIPLIER,
- *          $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER,
- *          $retryableStatusCodes = [
- *              \GRPC\STATUS_CANCELLED,
- *              \Grpc\STATUS_DEADLINE_EXCEEDED,
- *              \Grpc\STATUS_PERMISSION_DENIED,
- *              \Grpc\STATUS_RESOURCE_EXHAUSTED,
- *              \Grpc\STATUS_ABORTED,
- *              \Grpc\STATUS_OUT_OF_RANGE,
- *              \Grpc\STATUS_UNAVAILABLE,
- *              \Grpc\STATUS_DATA_LOSS,
- *              \Grpc\STATUS_UNAUTHENTICATED,
- *          ],
+ *          $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER
  *      );
  *    $this->setRetryPolicy($retryPolicy);
  *    $this->setDelayScheduler(new BlockingScheduler());
@@ -48,8 +37,6 @@ namespace OpenTelemetry\SDK\Common\Retry;
  *          maxBackoff,         - maximum no of sec to wait before retry timeout
  *          backoffMultiplier,  - multiplier value used to calculate the delay before next attempt
  *          jitter,             - jitter value to add randomness to delay value
- *          retryableStatusCodes- array of retryable status code. All the status codes apart from this will not be retried
- *      )
  *
  *    DelayScheduler is used to define the delay method for the exporter whether should it block the current execution
  *    or not.

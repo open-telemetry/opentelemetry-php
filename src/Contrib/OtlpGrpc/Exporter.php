@@ -85,8 +85,7 @@ class Exporter implements SpanExporterInterface
             $initialBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_INITIAL_BACKOFF,
             $maxBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF,
             $backoffMultiplier = ExponentialWithJitterRetryPolicy::DEFAULT_BACKOFF_MULTIPLIER,
-            $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER,
-            $retryableStatusCodes = $this->retryableStatusCodes
+            $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER
         );
         $this->setRetryPolicy($retryPolicy);
         $this->setDelayScheduler(new BlockingScheduler());

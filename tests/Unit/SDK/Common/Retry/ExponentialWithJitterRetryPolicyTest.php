@@ -19,16 +19,7 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
             $initialBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_INITIAL_BACKOFF,
             $maxBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF,
             $backoffMultiplier = ExponentialWithJitterRetryPolicy::DEFAULT_BACKOFF_MULTIPLIER,
-            $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER,
-            $retryableStatusCodes = [
-                \Grpc\STATUS_CANCELLED,
-                \Grpc\STATUS_DEADLINE_EXCEEDED,
-                \Grpc\STATUS_RESOURCE_EXHAUSTED,
-                \Grpc\STATUS_ABORTED,
-                \Grpc\STATUS_OUT_OF_RANGE,
-                \Grpc\STATUS_UNAVAILABLE,
-                \Grpc\STATUS_DATA_LOSS,
-            ],
+            $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER
         );
         $this->assertSame(
             $retryPolicy->getMaxAttempts(),
@@ -50,7 +41,6 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
             $retryPolicy->getJitter(),
             ExponentialWithJitterRetryPolicy::DEFAULT_JITTER
         );
-        $this->assertEquals(count($retryPolicy->getRetryableStatusCodes()), 9);
     }
 
     /**
@@ -68,8 +58,7 @@ class ExponentialWithJitterRetryPolicyTest extends TestCase
             $initialBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_INITIAL_BACKOFF,
             $maxBackoff = ExponentialWithJitterRetryPolicy::DEFAULT_MAX_BACKOFF,
             $backoffMultiplier = ExponentialWithJitterRetryPolicy::DEFAULT_BACKOFF_MULTIPLIER,
-            $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER,
-            $retryableStatusCodes = [\Grpc\STATUS_CANCELLED],
+            $jitter = ExponentialWithJitterRetryPolicy::DEFAULT_JITTER
         );
         $maxBackoff = $retryPolicy->getMaxBackoff();
 

@@ -27,15 +27,13 @@ final class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         float $initialBackoff = self::DEFAULT_INITIAL_BACKOFF,
         int $maxBackoff = self::DEFAULT_MAX_BACKOFF,
         float $backoffMultiplier = self::DEFAULT_BACKOFF_MULTIPLIER,
-        float $jitter = self::DEFAULT_JITTER,
-        array $retryableStatusCodes = []
+        float $jitter = self::DEFAULT_JITTER
     ) {
         $this->setMaxAttempts($maxAttempts);
         $this->setInitialBackoff($initialBackoff);
         $this->setMaxBackoff($maxBackoff);
         $this->setBackoffMultipler($backoffMultiplier);
         $this->setJitter($jitter);
-        $this->setRetryableStatusCodes($retryableStatusCodes);
     }
 
     public function shouldRetry(
@@ -145,28 +143,6 @@ final class ExponentialWithJitterRetryPolicy implements RetryPolicyInterface
         $this->jitter = $jitter;
 
         return $this;
-    }
-
-    public function setRetryableStatusCodes(array $statusCodes)
-    {
-        $this->checkArgument(
-            $statusCodes !== [] &&
-            array_reduce(
-                $statusCodes,
-                fn ($result, $item) => $result && is_int($item),
-                true
-            ),
-            'Retryable Status Code array should not be empty 
-                    and each value should be valid status code'
-        );
-        $this->retryableStatusCodes = $statusCodes;
-
-        return $this;
-    }
-
-    public function getRetryableStatusCodes(): array
-    {
-        return $this->retryableStatusCodes;
     }
 
     public function checkArgument(bool $argument_condition, string $message)
