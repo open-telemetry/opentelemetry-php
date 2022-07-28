@@ -13,13 +13,12 @@ final class FixedSizeReservoir implements ExemplarReservoirInterface
 {
     private BucketStorage $storage;
     private int $size;
-    private int $measurements;
+    private int $measurements = 0;
 
     public function __construct(AttributesFactoryInterface $attributesFactory, int $size = 4)
     {
         $this->storage = new BucketStorage($attributesFactory, $size);
         $this->size = $size;
-        $this->measurements = 0;
     }
 
     public function offer($index, $value, AttributesInterface $attributes, Context $context, int $timestamp, int $revision): void
