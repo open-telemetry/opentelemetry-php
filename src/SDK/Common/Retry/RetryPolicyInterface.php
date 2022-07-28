@@ -64,5 +64,4 @@ interface RetryPolicyInterface
     ): ?bool;
 
     public function getDelay(int $attempt): int;
-
 }
