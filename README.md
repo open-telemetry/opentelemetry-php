@@ -35,6 +35,12 @@ Additional packages, demos and tools are hosted or distributed in the [OpenTelem
 
 ![Current Version](https://img.shields.io/github/v/tag/open-telemetry/opentelemetry-php)
 
+| Signal  | Status | Project |
+| ------- | ------ | ------- |
+| Traces  | Alpha  | N/A     |
+| Metrics | Alpha  | N/A     |
+| Logs    | N/A    | N/A     |
+
 This project currently lives in a **alpha status**.  Our current release is not production ready; it has been created in order to receive feedback from the community. \
 As long as this project is in alpha status, things may and probably will break once in a while.  \
 We aim to provide backward compatibility (without any guarantee) even for alpha releases, however the library will raise notices indicating breaking changes and what to do about them. \
