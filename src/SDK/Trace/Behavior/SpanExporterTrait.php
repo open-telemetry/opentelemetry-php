@@ -8,8 +8,6 @@ use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Retry\RetryPolicyInterface;
 use OpenTelemetry\SDK\Common\Time\SchedulerInterface;
 
-use function OpenTelemetry\SDK\Common\Util\isEmpty;
-
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
