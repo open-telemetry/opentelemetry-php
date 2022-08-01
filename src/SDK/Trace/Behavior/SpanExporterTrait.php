@@ -52,9 +52,6 @@ trait SpanExporterTrait
         if (!$this->running) {
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
-        if (isEmpty($spans)) {
-            return SpanExporterInterface::STATUS_SUCCESS;
-        }
 
         // If retryPolicy is not set then just doExport once and return the status
         if ($this->retryPolicy === null) {
