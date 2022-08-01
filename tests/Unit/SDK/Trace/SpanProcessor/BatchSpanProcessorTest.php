@@ -227,6 +227,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $batchSize = 3;
 
         $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->expects($this->once())->method('export');
         $exporter->expects($this->once())->method('forceFlush');
         $exporter->expects($this->once())->method('shutdown');
 
@@ -266,11 +267,11 @@ class BatchSpanProcessorTest extends MockeryTestCase
                     ->with(
                         Mockery::on(
                             function (array $spans) use ($sampledSpan) {
-                                    $this->assertCount(1, $spans);
-                                    $this->assertEquals($sampledSpan->toSpanData(), $spans[0]);
+                                $this->assertCount(1, $spans);
+                                $this->assertEquals($sampledSpan->toSpanData(), $spans[0]);
 
-                                    return true;
-                                }
+                                return true;
+                            }
                         )
                     );
         $batchProcessor = new BatchSpanProcessor($exporter, $this->testClock);
