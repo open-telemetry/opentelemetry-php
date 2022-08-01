@@ -105,7 +105,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
     /**
      * @dataProvider scheduledDelayProvider
      */
-    public function test_export_scheduled_delay(int $exportDelay, int $advanceByNano, bool $expectedFlush): void
+    public function test_export_scheduled_delay(int $exportDelay, int $advanceByNano, bool $expectedExport): void
     {
         $batchSize = 2;
         $queueSize = 5;
@@ -117,7 +117,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
 
         $exporter = $this->createMock(SpanExporterInterface::class);
-        $exporter->expects($this->exactly($expectedFlush ? 1 : 0))->method('forceFlush');
+        $exporter->expects($this->exactly($expectedExport ? 1 : 0))->method('export');
 
         /** @var SpanExporterInterface $exporter */
         $processor = new BatchSpanProcessor(
@@ -160,7 +160,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
 
         $exporter = Mockery::mock(SpanExporterInterface::class);
-        $exporter->expects('forceFlush');
         $exporter
             ->expects('export')
             ->with(
@@ -223,12 +222,12 @@ class BatchSpanProcessorTest extends MockeryTestCase
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#shutdown-1
      */
-    public function test_export_includes_force_flush_on_shutdown(): void
+    public function test_includes_force_flush_on_shutdown(): void
     {
         $batchSize = 3;
 
         $exporter = $this->createMock(SpanExporterInterface::class);
-        $exporter->expects($this->once())->method('export');
+        $exporter->expects($this->once())->method('forceFlush');
         $exporter->expects($this->once())->method('shutdown');
 
         $proc = new BatchSpanProcessor($exporter, $this->createMock(ClockInterface::class));
@@ -263,24 +262,21 @@ class BatchSpanProcessorTest extends MockeryTestCase
 
         $exporter = Mockery::mock(SpanExporterInterface::class);
         $exporter->expects('forceFlush');
-        $exporter
-            ->expects('export')
-            ->with(
-                Mockery::on(
-                    function (array $spans) use ($sampledSpan) {
-                        $this->assertCount(1, $spans);
-                        $this->assertEquals($sampledSpan->toSpanData(), $spans[0]);
+        $exporter->expects('export')
+                    ->with(
+                        Mockery::on(
+                            function (array $spans) use ($sampledSpan) {
+                                    $this->assertCount(1, $spans);
+                                    $this->assertEquals($sampledSpan->toSpanData(), $spans[0]);
 
-                        return true;
-                    }
-                )
-            );
-
+                                    return true;
+                                }
+                        )
+                    );
         $batchProcessor = new BatchSpanProcessor($exporter, $this->testClock);
         foreach ([$sampledSpan, $nonSampledSpan] as $span) {
             $batchProcessor->onEnd($span);
         }
-
         $batchProcessor->forceFlush();
     }
 

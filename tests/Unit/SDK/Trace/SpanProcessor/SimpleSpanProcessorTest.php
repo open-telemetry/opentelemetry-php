@@ -79,6 +79,7 @@ class SimpleSpanProcessorTest extends MockeryTestCase
 
     public function test_force_flush(): void
     {
+        $this->spanExporter->expects('forceFlush')->andReturnTrue();
         $this->assertTrue($this->simpleSpanProcessor->forceFlush());
     }
 

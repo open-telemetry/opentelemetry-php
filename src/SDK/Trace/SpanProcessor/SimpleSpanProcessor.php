@@ -43,6 +43,12 @@ class SimpleSpanProcessor implements SpanProcessorInterface
     /** @inheritDoc */
     public function forceFlush(): bool
     {
+        if (!$this->running || $this->exporter === null) {
+            return true;
+        }
+
+        $this->exporter->forceFlush();
+
         return true;
     }
 

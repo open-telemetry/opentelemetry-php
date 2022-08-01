@@ -93,7 +93,9 @@ class BatchSpanProcessor implements SpanProcessorInterface
         }
 
         if ($this->bufferReachedExportLimit() || $this->enoughTimeHasPassed()) {
-            $this->forceFlush();
+            $this->exporter->export($this->queue);
+            $this->queue = [];
+            $this->stopwatch->reset();
         }
     }
 
@@ -103,7 +105,6 @@ class BatchSpanProcessor implements SpanProcessorInterface
         if (!$this->running || $this->exporter === null) {
             return true;
         }
-
         $this->exporter->export($this->queue);
         $this->queue = [];
         $this->stopwatch->reset();
