@@ -71,8 +71,8 @@ class ParentBased implements SamplerInterface
         string $traceId,
         string $spanName,
         int $spanKind,
-        ?AttributesInterface $attributes = null,
-        array $links = []
+        AttributesInterface $attributes,
+        array $links
     ): SamplingResult {
         $parentSpan = Span::fromContext($parentContext);
         $parentSpanContext = $parentSpan->getContext();

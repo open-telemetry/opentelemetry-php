@@ -9,6 +9,7 @@ use OpenTelemetry\SDK\Common\Retry\RetryPolicyInterface;
 use OpenTelemetry\SDK\Common\Time\SchedulerInterface;
 
 use function OpenTelemetry\SDK\Common\Util\isEmpty;
+
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -51,7 +52,6 @@ trait SpanExporterTrait
         if (!$this->running) {
             return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
         }
-
         if (isEmpty($spans)) {
             return SpanExporterInterface::STATUS_SUCCESS;
         }
@@ -72,7 +72,7 @@ trait SpanExporterTrait
                 self::logDebug('Retrying span export for ' . $attempt . ' time');
             }
             $attempt++;
-            $status = $this->doExport($spans);
+            $status = $this->doExport($spans); /** @phpstan-ignore-line */
             $shouldRetry = $this->retryPolicy->shouldRetry($attempt, $status);
         }
 
