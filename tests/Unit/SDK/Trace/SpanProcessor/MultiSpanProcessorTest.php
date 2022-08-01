@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
 
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
@@ -52,7 +53,8 @@ class MultiSpanProcessorTest extends TestCase
 
         $this->createMultiSpanProcessor()
             ->onStart(
-                $this->createMock(ReadWriteSpanInterface::class)
+                $this->createMock(ReadWriteSpanInterface::class),
+                Context::getCurrent(),
             );
     }
 
