@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
+use Exception;
 use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
@@ -93,8 +94,14 @@ class BatchSpanProcessor implements SpanProcessorInterface
         }
 
         if ($this->bufferReachedExportLimit() || $this->enoughTimeHasPassed()) {
-            $this->exporter->export($this->queue);
-            $this->queue = [];
+            try {
+                $this->exporter->export($this->queue);
+            } catch (Exception $e) {
+                //Add Log Statement
+                $err=true;
+            } finally {
+                $this->queue = [];
+            }
             $this->stopwatch->reset();
         }
     }
@@ -105,8 +112,15 @@ class BatchSpanProcessor implements SpanProcessorInterface
         if (!$this->running || $this->exporter === null) {
             return true;
         }
-        $this->exporter->export($this->queue);
-        $this->queue = [];
+
+        try {
+            $this->exporter->export($this->queue);
+        } catch (Exception $e) {
+            //Add Log Statement
+            $err=true;
+        } finally {
+            $this->queue = [];
+        }
         $this->stopwatch->reset();
         $this->exporter->forceFlush();
 
