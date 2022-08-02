@@ -9,6 +9,7 @@ use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
@@ -44,7 +45,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
     {
         $proc = new BatchSpanProcessor(null, $this->testClock);
         $span = $this->createSampledSpanMock();
-        $proc->onStart($span);
+        $proc->onStart($span, Context::getCurrent());
         $proc->onEnd($span);
         $proc->forceFlush();
         $proc->shutdown();
@@ -250,7 +251,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $proc->shutdown();
 
         $span = $this->createSampledSpanMock();
-        $proc->onStart($span);
+        $proc->onStart($span, Context::getCurrent());
         $proc->onEnd($span);
         $proc->forceFlush();
         $proc->shutdown();

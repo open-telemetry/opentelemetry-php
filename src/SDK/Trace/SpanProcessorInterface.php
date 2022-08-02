@@ -12,7 +12,7 @@ interface SpanProcessorInterface
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#onstart
      */
-    public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void;
+    public function onStart(ReadWriteSpanInterface $span, Context $parentContext): void;
 
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#onendspan

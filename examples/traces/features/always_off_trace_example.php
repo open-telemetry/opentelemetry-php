@@ -5,6 +5,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
@@ -15,7 +16,9 @@ $samplingResult = $sampler->shouldSample(
     Context::getCurrent(),
     md5((string) microtime(true)),
     'io.opentelemetry.example',
-    API\SpanKind::KIND_INTERNAL
+    API\SpanKind::KIND_INTERNAL,
+    Attributes::create([]),
+    [],
 );
 
 if (SamplingResult::RECORD_AND_SAMPLE === $samplingResult->getDecision()) {

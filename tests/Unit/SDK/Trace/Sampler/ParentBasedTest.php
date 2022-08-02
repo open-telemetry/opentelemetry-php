@@ -8,6 +8,7 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
@@ -49,7 +50,9 @@ class ParentBasedTest extends TestCase
             Context::getRoot(),
             '4bf92f3577b34da6a3ce929d0e0e4736',
             'test.opentelemetry.io',
-            API\SpanKind::KIND_INTERNAL
+            API\SpanKind::KIND_INTERNAL,
+            Attributes::create([]),
+            [],
         );
     }
 
@@ -72,7 +75,9 @@ class ParentBasedTest extends TestCase
             $parentContext,
             '4bf92f3577b34da6a3ce929d0e0e4736',
             'test.opentelemetry.io',
-            API\SpanKind::KIND_INTERNAL
+            API\SpanKind::KIND_INTERNAL,
+            Attributes::create([]),
+            [],
         );
         $this->assertEquals($expectedDecision, $decision->getDecision());
     }
