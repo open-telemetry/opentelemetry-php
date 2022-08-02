@@ -8,6 +8,7 @@ use function is_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -50,9 +51,9 @@ final class TracerProvider implements TracerProviderInterface
         $this->instrumentationScopeFactory = $instrumentationScopeFactory ?? new InstrumentationScopeFactory(Attributes::factory());
     }
 
-    public function forceFlush(): bool
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
-        return $this->tracerSharedState->getSpanProcessor()->forceFlush();
+        return $this->tracerSharedState->getSpanProcessor()->forceFlush($cancellation);
     }
 
     /**
@@ -82,12 +83,12 @@ final class TracerProvider implements TracerProviderInterface
     /**
      * Returns `false` is the provider is already shutdown, otherwise `true`.
      */
-    public function shutdown(): bool
+    public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if ($this->tracerSharedState->hasShutdown()) {
             return true;
         }
 
-        return $this->tracerSharedState->shutdown();
+        return $this->tracerSharedState->shutdown($cancellation);
     }
 }
