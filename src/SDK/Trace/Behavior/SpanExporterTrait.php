@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Trace\Behavior;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Retry\RetryPolicyInterface;
 use OpenTelemetry\SDK\Common\Time\SchedulerInterface;
-
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -19,7 +19,7 @@ trait SpanExporterTrait
     private SchedulerInterface $delayScheduler;
 
     /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#shutdown-2 */
-    public function shutdown(): bool
+    public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         $this->running = false;
 
@@ -27,7 +27,7 @@ trait SpanExporterTrait
     }
 
     /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#forceflush-2 */
-    public function forceFlush(): bool
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return true;
     }
@@ -42,7 +42,7 @@ trait SpanExporterTrait
      * @psalm-suppress ArgumentTypeCoercion
      * @psalm-return SpanExporterInterface::STATUS_*
      */
-    public function export(iterable $spans): int
+    public function export(iterable $spans, ?CancellationInterface $cancellation = null): int
     {
         $shouldRetry = true;
         $status = SpanExporterInterface::STATUS_SUCCESS;
