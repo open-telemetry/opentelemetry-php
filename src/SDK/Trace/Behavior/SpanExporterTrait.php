@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\Behavior;
 
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Retry\RetryPolicyInterface;
 use OpenTelemetry\SDK\Common\Time\SchedulerInterface;
-use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
