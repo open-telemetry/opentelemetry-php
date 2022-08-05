@@ -170,6 +170,38 @@ To your project's `composer.json` file, as this library has not reached a stable
 
 ## Getting Started
 
+You can find a getting started guide on [opentelemetry.io](https://opentelemetry.io/docs/php/getting-started/)
+
+OpenTelemetry's goal is to provide a single set of APIs to capture distributed traces and metrics from your application and send them to an observability platform. This project allows you to do just that for applications written in PHP. There are two steps to this process: instrument your application, and configure an exporter.
+
+To start capturing distributed traces and metric events from your application it first  needs to be instrumented.
+
+### Auto-instrumentation
+
+_We do not currently support auto-instrumentation_
+
+### Framework instrumentation
+todo list existing framework instrumentations (symfony)
+
+### Manual instrumentation
+
+If you wish to build your own instrumentation for your application, you will need to use the *API*
+
+### Distributed tracing
+OpenTelemetry supports distributed tracing, where multiple related traces can be related. This is achieved by sending trace headers as part of outgoing HTTP requests, which can be understood by the receiving service.
+
+```php
+$request = new Request('GET', 'https://www.example.com');
+$carrier = [];
+TraceContextPropagator::getInstance()->inject($carrier);
+foreach ($carrier as $name => $value) {
+    $request = $request->withAddedHeader($name, $value);
+}
+$response = $client->send($request);
+```
+
+See [examples/traces/demo](examples/traces/demo) for a working example.
+
 To install the complete library with all packages you can run:
 
 ```bash
