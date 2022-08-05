@@ -3,6 +3,37 @@
 ![CI Build](https://github.com/open-telemetry/opentelemetry-php/workflows/PHP%20QA/badge.svg)
 [![codecov](https://codecov.io/gh/open-telemetry/opentelemetry-php/branch/master/graph/badge.svg)](https://codecov.io/gh/open-telemetry/opentelemetry-php)
 
+<details>
+<summary>Table of Contents</summary>
+
+<!-- toc -->
+
+- [Introduction](#intro)
+- [Project status](#project-status)
+  * [Backwards compatibility](#backwards-compatibility)
+  * [Specification conformance](#specification-conformance)
+- [Getting started](#getting-started)
+- [Requirements](#requirements)
+  * [Required dependencies](#required-dependencies)
+  * [Optional dependencies](#optional-dependencies)
+- [Installation](#installation)
+- [Getting started](#getting-started)
+  * [Instrumenting an application](#using-opentelemetry-in-an-application)
+  * [Instrumenting a library](#using-opentelemetry-to-instrument-a-library)
+- [User Quickstarts](#user-quickstarts)
+- [Framework integrations](#framework-integrations)
+- [Examples](#examples)
+  * [Trace](#trace)
+  * [Metrics](#metrics)
+- [Versioning](#versioning)
+- [Development](#development)
+
+<!-- tocstop -->
+
+</details>
+
+## Introduction
+
 This is the **[monorepo](https://en.wikipedia.org/wiki/Monorepo)** for the **main** components of **[OpenTelemetry](https://opentelemetry.io/) PHP**. 
 The main library is distributed as a complete package: [open-telemetry/opentelemetry](https://packagist.org/packages/open-telemetry/opentelemetry) 
 as well as each component as a separate package. These packages are:
@@ -30,13 +61,13 @@ components that are only useful to a relatively small number of users.
 
 Additional packages, demos and tools are hosted or distributed in the [OpenTelemetry PHP organization](https://github.com/opentelemetry-php).
 
----
-## Current Project Status
+## Project Status
 
 ![Current Version](https://img.shields.io/github/v/tag/open-telemetry/opentelemetry-php)
 
 This project currently lives in a **alpha status**.  Our current release is not production ready; it has been created in order to receive feedback from the community. \
-As long as this project is in alpha status, things may and probably will break once in a while.  \
+As long as this project is in alpha status, things may and probably will break once in a while.
+### Backwards Compatibility
 We aim to provide backward compatibility (without any guarantee) even for alpha releases, however the library will raise notices indicating breaking changes and what to do about them. \
 If you don't want these notices to appear or change the error message level, you can do so by calling:
 ```php
@@ -50,33 +81,18 @@ to trigger only deprecation notices. Valid error levels are `0` (none), `E_USER_
 However (as long as in alpha) it is safer to pin a dependency on the library to a specific version and/or make the adjustments 
 mentioned in the provided messages, since doing otherwise may break things completely for you in the future!
 
----
-
+### Specification conformance
 We attempt to keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show which features are available and which have not yet been implemented.  
 
 If you find an inconsistency in the data in the matrix vs. the data in this repository, please let us know in our slack channel and we'll get it rectified.
 
 ---
 
-## Communication
-
-Most of our communication is done on CNCF Slack in the channel [otel-php](https://cloud-native.slack.com/archives/C01NFPCV44V).
-To sign up, create a CNCF Slack account [here](http://slack.cncf.io/)
-
-Our meetings are held weekly on zoom on Wednesdays at 10:30am PST / 1:30pm EST.  
-A Google calendar invite with the included zoom link can be found [here](https://calendar.google.com/event?action=TEMPLATE&tmeid=N2VtZXZmYnVmbzZkYjZkbTYxdjZvYTdxN21fMjAyMDA5MTZUMTczMDAwWiBrYXJlbnlyeHVAbQ&tmsrc=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com&scp=ALL)
-
-Our open issues can all be found in the [GitHub issues tab](https://github.com/open-telemetry/opentelemetry-php/issues).  Feel free to reach out on Slack if you have any additional questions about these issues; we are always happy to talk through implementation details.
-
 ## Requirements
 
 The library and all separate packages requires a PHP version of 7.4.x, 8.0.x or 8.1.x
 
-### Dependencies
-
----
-
-#### REQUIRED DEPENDENCIES
+### Required dependencies
 #### 1) Install PSR17/18 implementations
 
 The **SDK** and **Contrib** packages have a dependency on both a [HTTP Factories (PSR17)](https://www.php-fig.org/psr/psr-17/)
@@ -87,7 +103,7 @@ and [this link](https://packagist.org/providers/php-http/async-client-implementa
 
 ---
 
-#### OPTIONAL DEPENDENCIES
+### Optional dependencies
 
 #### 1) Install PHP [ext-grpc](https://pecl.php.net/package/gRPC)
 
@@ -152,7 +168,7 @@ Install Composer using the [installation instructions](https://getcomposer.org/d
 
 To your project's `composer.json` file, as this library has not reached a stable release status yet.
 
-### Getting Started with OpenTelemetry
+## Getting Started
 
 To install the complete library with all packages you can run:
 
@@ -202,29 +218,26 @@ $ composer require --dev open-telemetry/sdk open-telemetry/sdk-contrib
 
 * [Symfony SDK Bundle](https://github.com/open-telemetry/opentelemetry-php-contrib/tree/main/src/Symfony/OtelSdkBundle) is the recommended way to use opentelemetry-php with symfony
 
-
 ## Examples
 
 ### Trace
 
-You can use the [examples/AlwaysOnZipkinExample.php](/examples/AlwaysOnZipkinExample.php) file to test out the reference
-implementation we have for zipkin. This example performs a sample trace with a grouping of 5 spans and POSTs the result
-to a local zipkin instance.
-
-You can also use the [examples/AlwaysOnJaegerExample.php](/examples/AlwaysOnJaegerExample.php) file to test out the
-reference implementation we have for Jaeger. This example performs a sample trace with a grouping of 5 spans and POSTs
-the result to a local Jaeger instance.
+You can use the [zipkin](/examples/traces/exporters/zipkin.php) or [jaeger](/examples/traces/exporters/jaeger.php) example to test out the reference
+implementations. This example performs a sample trace with a grouping of 5 spans and exports the result
+to a local zipkin or jaeger instance.
 
 If you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
 
 1) Install the necessary dependencies by running `make install`.
-2) Execute the example trace using `make trace examples`.
+2) Execute the example trace using `make smoke-test-exporter-examples:`.
 
 Exported spans can be seen in zipkin at [http://127.0.0.1:9411](http://127.0.0.1:9411)
 
 Exported spans can also be seen in jaeger at [http://127.0.0.1:16686](http://127.0.0.1:16686)
 
 ### Metrics
+<details>
+<summary>This section is deprecated, we have a new metrics implementation in development</summary>
 
 You can use the [examples/prometheus/PrometheusMetricsExample.php](/examples/prometheus/PrometheusMetricsExample.php)
 file to test out the reference implementation we have. This example will create a counter that will be scraped by local
@@ -241,12 +254,12 @@ The easy way to test the example out with docker and docker-compose is:
    but remember that Prometheus scrapes values once in 10 seconds.
 
 4) In order to stop docker containers for this example just run `make stop-prometheus`
-
+</details>
 
 ## Versioning
 
 Versioning rationale can be found in the [Versioning Documentation](/docs/versioning.md)
 
-## Development
+## Development and contributing
 
-See our [Development README](./DEVELOPMENT.md)
+We would love to have you on board, please see our [Development README](./DEVELOPMENT.md) and [Contributing README](./CONTRIBUTING.md).
