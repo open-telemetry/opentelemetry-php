@@ -8,7 +8,7 @@
 
 <!-- toc -->
 
-- [Introduction](#intro)
+- [Introduction](#introduction)
 - [Project status](#project-status)
   * [Backwards compatibility](#backwards-compatibility)
   * [Specification conformance](#specification-conformance)
@@ -26,7 +26,7 @@
   * [Trace](#trace)
   * [Metrics](#metrics)
 - [Versioning](#versioning)
-- [Development](#development)
+- [Contributing](#contributing)
 
 <!-- tocstop -->
 
@@ -260,6 +260,6 @@ The easy way to test the example out with docker and docker-compose is:
 
 Versioning rationale can be found in the [Versioning Documentation](/docs/versioning.md)
 
-## Development and contributing
+## Contributing
 
 We would love to have you on board, please see our [Development README](./DEVELOPMENT.md) and [Contributing README](./CONTRIBUTING.md).
