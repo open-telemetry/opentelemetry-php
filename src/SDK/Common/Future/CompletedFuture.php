@@ -21,7 +21,7 @@ final class CompletedFuture implements FutureInterface
         $this->value = $value;
     }
 
-    public function await(?CancellationInterface $cancellation = null)
+    public function await()
     {
         return $this->value;
     }

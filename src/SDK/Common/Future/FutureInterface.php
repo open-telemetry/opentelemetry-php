@@ -12,5 +12,5 @@ interface FutureInterface
     /**
      * @psalm-return T
      */
-    public function await(?CancellationInterface $cancellation = null);
+    public function await();
 }
