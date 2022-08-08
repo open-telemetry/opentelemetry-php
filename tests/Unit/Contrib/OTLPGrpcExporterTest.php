@@ -119,14 +119,6 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'bar', 'key' => 'value'], $exporter->getHeaders());
     }
 
-    public function test_should_be_ok_to_exporter_empty_spans_collection(): void
-    {
-        $this->assertEquals(
-            SpanExporterInterface::STATUS_SUCCESS,
-            (new Exporter('test.otlp'))->export([])
-        );
-    }
-
     private function isInsecure(Exporter $exporter) : bool
     {
         $reflection = new \ReflectionClass($exporter);

@@ -40,12 +40,4 @@ abstract class AbstractExporterTest extends TestCase
 
         $this->assertSame(SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE, $exporter->export([$span]));
     }
-
-    public function test_export_empty_span_collection(): void
-    {
-        $this->assertEquals(
-            SpanExporterInterface::STATUS_SUCCESS,
-            $this->createExporter()->export([])
-        );
-    }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 
 /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/sdk.md#span-processor */
 interface SpanProcessorInterface
@@ -12,7 +13,7 @@ interface SpanProcessorInterface
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#onstart
      */
-    public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void;
+    public function onStart(ReadWriteSpanInterface $span, Context $parentContext): void;
 
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#onendspan
@@ -25,7 +26,7 @@ interface SpanProcessorInterface
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#forceflush-1
      */
-    public function forceFlush(): bool;
+    public function forceFlush(?CancellationInterface $cancellation = null): bool;
 
     /**
      * Cleanup; after shutdown, calling onStart, onEnd, or forceFlush is invalid
@@ -33,5 +34,5 @@ interface SpanProcessorInterface
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#shutdown-1
      */
-    public function shutdown(): bool;
+    public function shutdown(?CancellationInterface $cancellation = null): bool;
 }

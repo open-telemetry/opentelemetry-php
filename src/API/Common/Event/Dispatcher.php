@@ -5,20 +5,16 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Common\Event;
 
 use CloudEvents\V1\CloudEventInterface;
-use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKey;
 
 class Dispatcher implements DispatcherInterface
 {
-    private static ?ContextKey $key = null;
+    private static ?self $root = null;
     /** @var array<string, array<int, array<callable>>> */
     private array $listeners = [];
 
-    public static function getInstance(): self
+    public static function getRoot(): self
     {
-        $key = self::getConstantKeyInstance();
-
-        return Context::getCurrent()->get($key) ?? self::createInstance();
+        return self::$root ??= new self();
     }
 
     public function dispatch(CloudEventInterface $event): void
@@ -46,18 +42,5 @@ class Dispatcher implements DispatcherInterface
         foreach ($listeners as $listener) {
             $listener($event);
         }
-    }
-
-    private static function getConstantKeyInstance(): ContextKey
-    {
-        return self::$key ??= new ContextKey(self::class);
-    }
-
-    private static function createInstance(): self
-    {
-        $dispatcher = new self();
-        Context::getCurrent()->with(self::getConstantKeyInstance(), $dispatcher)->activate();
-
-        return $dispatcher;
     }
 }

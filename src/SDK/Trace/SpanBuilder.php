@@ -31,8 +31,8 @@ final class SpanBuilder implements API\SpanBuilderInterface
      */
     private int $spanKind = API\SpanKind::KIND_INTERNAL;
 
-    /** @var list<LinkInterface>|null */
-    private ?array $links = null;
+    /** @var list<LinkInterface> */
+    private array $links = [];
 
     private AttributesBuilderInterface $attributesBuilder;
     private int $totalNumberOfLinksAdded = 0;
@@ -74,10 +74,6 @@ final class SpanBuilder implements API\SpanBuilderInterface
         }
 
         $this->totalNumberOfLinksAdded++;
-
-        if (null === $this->links) {
-            $this->links = [];
-        }
 
         if (count($this->links) === $this->tracerSharedState->getSpanLimits()->getLinkCountLimit()) {
             return $this;
@@ -152,10 +148,6 @@ final class SpanBuilder implements API\SpanBuilderInterface
             $traceId = $parentSpanContext->getTraceId();
         }
 
-        // Reset links and attributes back to null to prevent mutation of the started span.
-        $links = $this->links ?? [];
-        $this->links = null;
-
         $samplingResult = $this
             ->tracerSharedState
             ->getSampler()
@@ -165,7 +157,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
                 $this->spanName,
                 $this->spanKind,
                 $this->attributesBuilder->build(),
-                $links
+                $this->links,
             );
         $samplingDecision = $samplingResult->getDecision();
         $samplingResultTraceState = $samplingResult->getTraceState();
@@ -197,7 +189,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
             $this->tracerSharedState->getSpanProcessor(),
             $this->tracerSharedState->getResource(),
             $attributesBuilder,
-            $links,
+            $this->links,
             $this->totalNumberOfLinksAdded,
             $this->startEpochNanos
         );

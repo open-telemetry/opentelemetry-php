@@ -17,7 +17,7 @@ class EventBench
 
     public function __construct()
     {
-        $this->dispatcher = Dispatcher::getInstance();
+        $this->dispatcher = Dispatcher::getRoot();
         $this->listener = function () {
         };
         $this->event = new CloudEvent(uniqid(), self::class, 'foo');

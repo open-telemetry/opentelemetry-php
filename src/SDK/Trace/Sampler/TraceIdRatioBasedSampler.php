@@ -44,8 +44,8 @@ class TraceIdRatioBasedSampler implements SamplerInterface
         string $traceId,
         string $spanName,
         int $spanKind,
-        ?AttributesInterface $attributes = null,
-        array $links = []
+        AttributesInterface $attributes,
+        array $links
     ): SamplingResult {
         // TODO: Add config to adjust which spans get sampled (only default from specification is implemented)
         $parentSpan = Span::fromContext($parentContext);

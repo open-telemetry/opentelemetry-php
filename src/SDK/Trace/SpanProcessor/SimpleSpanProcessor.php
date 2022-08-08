@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -24,7 +25,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
-    public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
+    public function onStart(ReadWriteSpanInterface $span, Context $parentContext): void
     {
     }
 
@@ -41,13 +42,13 @@ class SimpleSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
-    public function forceFlush(): bool
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return true;
     }
 
     /** @inheritDoc */
-    public function shutdown(): bool
+    public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if (!$this->running) {
             return true;
