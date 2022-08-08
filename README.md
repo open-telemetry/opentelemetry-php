@@ -42,14 +42,16 @@
 # Introduction
 
 This is the **[monorepo](https://en.wikipedia.org/wiki/Monorepo)** for the **main** components of **[OpenTelemetry](https://opentelemetry.io/) PHP**. 
-The main library is distributed as a complete package: [open-telemetry/opentelemetry](https://packagist.org/packages/open-telemetry/opentelemetry) 
-as well as each component as a separate package. These packages are:
+
+All OpenTelemetry libraries are distributed via packagist, notably:
 
 - API: [open-telemetry/api](https://packagist.org/packages/open-telemetry/api)
 - SDK: [open-telemetry/sdk](https://packagist.org/packages/open-telemetry/sdk)
 - Semantic Conventions: [open-telemetry/sem-conv](https://packagist.org/packages/open-telemetry/sem-conv)
 - Context: [open-telemetry/context](https://packagist.org/packages/open-telemetry/context)
 - Contrib: [open-telemetry/sdk-contrib](https://packagist.org/packages/open-telemetry/sdk-contrib)
+
+The [open-telemetry/opentelemetry](https://packagist.org/packages/open-telemetry/opentelemetry) package contains all of the above and is the easiest way to try out OpenTelemetry.
 
 ---
 This repository also hosts and distributes generated client code used by individual components as separate packages.  These packages are:
@@ -176,8 +178,6 @@ Install Composer using the [installation instructions](https://getcomposer.org/d
 
 To your project's `composer.json` file, as this library has not reached a stable release status yet.
 
-All OpenTelemetry packages are separately published to [packagist](https://packagist.org/packages/open-telemetry/).
-
 To install the complete library with all packages you can run:
 
 ```bash
@@ -203,7 +203,7 @@ $ composer require open-telemetry/api
 ```
 In the best case you will use [Dependency Inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle) and write an adapter to not depend on the API directly.
 
-Make sure your application works with a dependency on the API only, however to make really use of the library you want to install the **SDK** package and probably the **Contrib** package as well:
+Make sure your application works with a dependency on the API only, however to make full use of the library you want to install the **SDK** package and probably the **Contrib** package as well:
 
 ```bash
 $ composer require open-telemetry/sdk
@@ -242,7 +242,7 @@ _We do not currently support auto-instrumentation, but are internally discussing
 If you wish to build your own instrumentation for your application, you will need to use the API, the SDK, and probably the contrib module (which contains most of the exporters).
 
 #### Set up a tracer
-Tracers are obtained from a `TracerProvider`.
+Tracers must be obtained from a `TracerProvider`:
 
 ```php
 $tracerProvider = new \OpenTelemetry\SDK\Trace\TracerProvider(
@@ -254,7 +254,8 @@ $tracerProvider = new \OpenTelemetry\SDK\Trace\TracerProvider(
 $tracer = $tracerProvider->getTracer('example');
 ```
 
-It's important to run the tracer provider's `shutdown()` method when the PHP process ends. The shutdown process is blocking, so consider running it in an async process. Otherwise, you can use the `ShutdownHandler` to register the shutdown function as part of PHP's shutdown process, to ensure enqueued telemetry can be flushed.
+It's important to run the tracer provider's `shutdown()` method when the PHP process ends, to enable flushing of any enqueued telemetry.
+The shutdown process is blocking, so consider running it in an async process. Otherwise, you can use the `ShutdownHandler` to register the shutdown function as part of PHP's shutdown process, as demonstrated above.
 
 #### Creating spans
 
@@ -266,11 +267,9 @@ $span->end();
 
 #### Nesting spans
 
-You can _activate_ a span, and future spans will be a child of the most recently activated span.
+You can _activate_ a span, so that it will be the parent of future spans.
 
-When you activate a span, it's critical that you also _detach_ it when done. We recommend doing this in a `finally` block.
-
-When an active span is deactivated (scope detached), the previously active span will become the active span again.
+When you activate a span, it's critical that you also _detach_ it when done. We recommend doing this in a `finally` block:
 ```php
 $root = $tracer->spanBuilder('root')->startSpan();
 $scope = $root->activate();
@@ -282,6 +281,7 @@ try {
     $scope->detach();
 }
 ```
+When an active span is deactivated (scope detached), the previously active span will become the active span again.
 
 #### Distributed tracing
 OpenTelemetry supports distributed tracing via [Context Propagation](https://opentelemetry.io/docs/concepts/signals/traces/#context-propagation), where traces can be correlated across multiple services. To enable this, outgoing HTTP requests must be injected with standardized headers which are understood by other OTEL-enabled services.
