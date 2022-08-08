@@ -7,6 +7,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use OpenTelemetry\Contrib\Jaeger\AgentExporter;
 use OpenTelemetry\SDK\Common\Log\LoggerHolder;
+use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -20,7 +21,7 @@ $tracerProvider = new TracerProvider(
     new SimpleSpanProcessor($exporter),
     new AlwaysOnSampler(),
 );
-\OpenTelemetry\SDK\Common\Util\ShutdownHandler::register([$tracerProvider, 'shutdown']);
+ShutdownHandler::register([$tracerProvider, 'shutdown']);
 
 echo 'Starting Jaeger Thrift example';
 

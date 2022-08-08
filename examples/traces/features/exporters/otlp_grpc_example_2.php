@@ -7,6 +7,7 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPExporter;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
@@ -15,7 +16,7 @@ $Exporter = new OTLPExporter();
 echo 'Starting OTLPGrpc example 2';
 $tracerProvider = new TracerProvider(new SimpleSpanProcessor($Exporter));
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
-\OpenTelemetry\SDK\Common\Util\ShutdownHandler::register([$tracerProvider, 'shutdown']);
+ShutdownHandler::register([$tracerProvider, 'shutdown']);
 $rootSpan = $tracer
     ->spanBuilder('root-span')
     ->setSpanKind(API\SpanKind::KIND_SERVER)

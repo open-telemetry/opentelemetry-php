@@ -83,6 +83,7 @@ $app->add(function (Request $request, RequestHandler $handler) use ($tracer) {
         ->setSpanKind(SpanKind::KIND_SERVER)
         ->startSpan();
     $scope = $root->activate();
+
     try {
         $response = $handler->handle($request);
         $root->setStatus($response->getStatusCode() < 500 ? StatusCode::STATUS_OK : StatusCode::STATUS_ERROR);

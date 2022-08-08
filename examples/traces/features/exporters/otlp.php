@@ -6,6 +6,7 @@ require __DIR__ . '/../../../../vendor/autoload.php';
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter as OTLPExporter;
+use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
@@ -23,7 +24,7 @@ $tracerProvider =  new TracerProvider(
         $exporter
     )
 );
-\OpenTelemetry\SDK\Common\Util\ShutdownHandler::register([$tracerProvider, 'shutdown']);
+ShutdownHandler::register([$tracerProvider, 'shutdown']);
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 $root = $span = $tracer->spanBuilder('root')->startSpan();

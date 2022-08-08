@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\Newrelic\Exporter as NewrelicExporter;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
@@ -48,7 +49,7 @@ $newrelicExporter = new NewrelicExporter(
 
 echo 'Starting Newrelic example';
 $tracerProvider = new TracerProvider(new SimpleSpanProcessor($newrelicExporter));
-\OpenTelemetry\SDK\Common\Util\ShutdownHandler::register([$tracerProvider, 'shutdown']);
+ShutdownHandler::register([$tracerProvider, 'shutdown']);
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 for ($i = 0; $i < 5; $i++) {
