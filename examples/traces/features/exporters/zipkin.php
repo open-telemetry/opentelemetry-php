@@ -21,6 +21,7 @@ $tracerProvider =  new TracerProvider(
         $zipkinExporter
     )
 );
+\OpenTelemetry\SDK\Common\Util\ShutdownHandler::register([$tracerProvider, 'shutdown']);
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 echo 'Starting Zipkin example';

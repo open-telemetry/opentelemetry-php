@@ -12,9 +12,9 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 $Exporter = new OTLPExporter();
 
 echo 'Starting OTLPGrpc example 1';
-$tracer = (new TracerProvider(new SimpleSpanProcessor($Exporter)))
-    ->getTracer('io.opentelemetry.contrib.php');
-
+$tracerProvider = new TracerProvider(new SimpleSpanProcessor($Exporter));
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
+\OpenTelemetry\SDK\Common\Util\ShutdownHandler::register([$tracerProvider, 'shutdown']);
 for ($i = 0; $i < 5; $i++) {
     // start a span, register some events
     $timestamp = ClockFactory::getDefault()->now();

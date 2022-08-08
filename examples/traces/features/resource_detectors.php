@@ -3,6 +3,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../vendor/autoload.php';
 
+use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 
 putenv('OTEL_PHP_DETECTORS=env,sdk,sdk_provided');
@@ -12,6 +13,7 @@ putenv('OTEL_RESOURCE_ATTRIBUTES=foo=bar'); //env detector will add this to trac
 echo 'Handling Resource Detectors From Environment' . PHP_EOL;
 
 $tracerProvider = (new TracerProviderFactory('example'))->create();
+ShutdownHandler::register([$tracerProvider, 'shutdown']);
 
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 

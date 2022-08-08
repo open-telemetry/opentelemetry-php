@@ -47,8 +47,9 @@ $newrelicExporter = new NewrelicExporter(
 );
 
 echo 'Starting Newrelic example';
-$tracer = (new TracerProvider(new SimpleSpanProcessor($newrelicExporter)))
-    ->getTracer('io.opentelemetry.contrib.php');
+$tracerProvider = new TracerProvider(new SimpleSpanProcessor($newrelicExporter));
+\OpenTelemetry\SDK\Common\Util\ShutdownHandler::register([$tracerProvider, 'shutdown']);
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 for ($i = 0; $i < 5; $i++) {
     // start a span, register some events

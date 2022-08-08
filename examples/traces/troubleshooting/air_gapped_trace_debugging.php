@@ -12,6 +12,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
  * Note that the spans are logged in the order they are closed, so in this example the root span will be the last log entry
  */
 
+use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Logs\SimplePsrFileLogger;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter;
@@ -44,6 +45,7 @@ $tracerProvider = new TracerProvider(
     new SimpleSpanProcessor($exporter),
     new AlwaysOnSampler()
 );
+ShutdownHandler::register([$tracerProvider, 'shutdown']);
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 /**
  * Create some tracing data

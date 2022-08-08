@@ -3,16 +3,19 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../vendor/autoload.php';
 
+use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 // Boilerplate setup to create a new tracer with console output
-$tracer = (new TracerProvider(
+$tracerProvider = new TracerProvider(
     new SimpleSpanProcessor(
         new ConsoleSpanExporter()
     )
-))->getTracer('io.opentelemetry.contrib.php');
+);
+ShutdownHandler::register([$tracerProvider, 'shutdown']);
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 // This creates a span and sets it as the current parent (and root) span
 $rootSpan = $tracer->spanBuilder('foo')->startSpan();
