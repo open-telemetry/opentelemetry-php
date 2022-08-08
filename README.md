@@ -283,7 +283,7 @@ try {
 }
 ```
 
-### Distributed tracing
+#### Distributed tracing
 OpenTelemetry supports distributed tracing via [Context Propagation](https://opentelemetry.io/docs/concepts/signals/traces/#context-propagation), where traces can be correlated across multiple services. To enable this, outgoing HTTP requests must be injected with standardized headers which are understood by other OTEL-enabled services.
 
 ```php
