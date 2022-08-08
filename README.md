@@ -2,6 +2,7 @@
 
 ![CI Build](https://github.com/open-telemetry/opentelemetry-php/workflows/PHP%20QA/badge.svg)
 [![codecov](https://codecov.io/gh/open-telemetry/opentelemetry-php/branch/master/graph/badge.svg)](https://codecov.io/gh/open-telemetry/opentelemetry-php)
+[![Slack](https://img.shields.io/badge/slack-@cncf/otel--php-brightgreen.svg?logo=slack)](https://cloud-native.slack.com/archives/D03FAB6GN0K)
 
 <details>
 <summary>Table of Contents</summary>
@@ -168,6 +169,13 @@ Install Composer using the [installation instructions](https://getcomposer.org/d
 
 To your project's `composer.json` file, as this library has not reached a stable release status yet.
 
+To install the complete library with all packages you can run:
+
+```bash
+$ composer require open-telemetry/opentelemetry
+```
+This is perfect for trying out our examples or demos.
+
 ## Getting Started
 
 You can find a getting started guide on [opentelemetry.io](https://opentelemetry.io/docs/php/getting-started/)
@@ -178,17 +186,60 @@ To start capturing distributed traces and metric events from your application it
 
 ### Auto-instrumentation
 
-_We do not currently support auto-instrumentation_
+_We do not currently support auto-instrumentation, but are internally discussing how to implement it_
 
 ### Framework instrumentation
-todo list existing framework instrumentations (symfony)
+
+* [Symfony SDK Bundle](https://github.com/open-telemetry/opentelemetry-php-contrib/tree/main/src/Symfony/OtelSdkBundle) is the recommended way to use opentelemetry-php with symfony
 
 ### Manual instrumentation
 
-If you wish to build your own instrumentation for your application, you will need to use the *API*
+If you wish to build your own instrumentation for your application, you will need to use the API, the SDK, and probably the contrib module (which contains most of the exporters).
+
+#### Set up a tracer
+Tracers are obtained from a `TracerProvider`.
+
+```php
+$tracerProvider = new \OpenTelemetry\SDK\Trace\TracerProvider(
+    new \OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor(
+        new \OpenTelemetry\Contrib\OtlpGrpc\Exporter('otel-collector:4317')
+    )
+);
+\OpenTelemetry\SDK\Common\Util\ShutdownHandler::register([$tracerProvider, 'shutdown']);
+$tracer = $tracerProvider->getTracer('example');
+```
+
+It's important to run the tracer provider's `shutdown()` method when the PHP process ends. The shutdown process is blocking, so consider running it in an async process. Otherwise, you can use the `ShutdownHandler` to register the shutdown function as part of PHP's shutdown process.
+
+#### Create spans
+
+```php
+$span = $tracer->spanBuilder('root')->startSpan();
+//do some work
+$span->end();
+```
+
+#### Nesting spans
+
+You can _activate_ a span, and future spans will be a child of the most recently activated span.
+
+When you activate a span, it's critical that you also _detach_ it when done. We recommend doing this in a `finally` block.
+
+When an active span is deactivated (scope detached), the previously active span will become the active span again.
+```php
+$root = $tracer->spanBuilder('root')->startSpan();
+$scope = $root->activate();
+try {
+    $child = $tracer->spanBuilder('child')->startSpan();
+    $child->end();
+} finally {
+    $root->end();
+    $scope->detach();
+}
+```
 
 ### Distributed tracing
-OpenTelemetry supports distributed tracing, where multiple related traces can be related. This is achieved by sending trace headers as part of outgoing HTTP requests, which can be understood by the receiving service.
+OpenTelemetry supports distributed tracing via [Context Propagation](https://opentelemetry.io/docs/concepts/signals/traces/#context-propagation), where traces can be correlated across multiple services. To enable this, outgoing HTTP requests must be injected with standardized headers which are understood by other OTEL-enabled services.
 
 ```php
 $request = new Request('GET', 'https://www.example.com');
@@ -201,13 +252,6 @@ $response = $client->send($request);
 ```
 
 See [examples/traces/demo](examples/traces/demo) for a working example.
-
-To install the complete library with all packages you can run:
-
-```bash
-$ composer require open-telemetry/opentelemetry
-```
-This is perfect for trying out our examples or demos.
 
 ### Using OpenTelemetry in an Application
 
@@ -245,10 +289,6 @@ $ composer require --dev open-telemetry/sdk open-telemetry/sdk-contrib
 ## User Quickstarts
 
 * [Exploring OpenTelemetry in Laravel Applications](./docs/laravel-quickstart.md)
-
-## Framework integrations
-
-* [Symfony SDK Bundle](https://github.com/open-telemetry/opentelemetry-php-contrib/tree/main/src/Symfony/OtelSdkBundle) is the recommended way to use opentelemetry-php with symfony
 
 ## Examples
 
