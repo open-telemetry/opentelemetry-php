@@ -3,7 +3,6 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../vendor/autoload.php';
 
-use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -21,7 +20,6 @@ $tracerProvider = new TracerProvider(
         $delayMillis, //batch delay milliseconds
     )
 );
-ShutdownHandler::register([$tracerProvider, 'shutdown']);
 
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
@@ -38,3 +36,4 @@ for ($i = 1; $i <= 4; $i++) {
 $rootSpan->end();
 $scope->detach();
 sleep(1);
+$tracerProvider->shutdown();

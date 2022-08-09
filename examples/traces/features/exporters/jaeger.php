@@ -4,7 +4,6 @@ declare(strict_types=1);
 require __DIR__ . '/../../../../vendor/autoload.php';
 
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
-use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -14,7 +13,6 @@ $tracerProvider = new TracerProvider(
     new SimpleSpanProcessor($exporter),
     new AlwaysOnSampler(),
 );
-ShutdownHandler::register([$tracerProvider, 'shutdown']);
 
 echo 'Starting Jaeger example';
 
@@ -57,3 +55,5 @@ $rootSpan->end();
 echo PHP_EOL . 'Jaeger example complete!  See the results at http://localhost:16686/';
 
 echo PHP_EOL;
+
+$tracerProvider->shutdown();

@@ -3,7 +3,6 @@
 declare(strict_types=1);
 require __DIR__ . '/../../vendor/autoload.php';
 
-use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -15,7 +14,6 @@ $tracerProvider =  new TracerProvider(
         new ConsoleSpanExporter()
     )
 );
-ShutdownHandler::register([$tracerProvider, 'shutdown']);
 
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
@@ -45,3 +43,4 @@ try {
     $rootScope->detach();
     $rootSpan->end();
 }
+$tracerProvider->shutdown();

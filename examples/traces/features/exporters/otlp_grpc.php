@@ -4,7 +4,6 @@ declare(strict_types=1);
 require __DIR__ . '/../../../../vendor/autoload.php';
 
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPGrpcExporter;
-use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
@@ -17,7 +16,6 @@ $tracerProvider =  new TracerProvider(
         $exporter
     )
 );
-ShutdownHandler::register([$tracerProvider, 'shutdown']);
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 $root = $span = $tracer->spanBuilder('root')->startSpan();
@@ -44,3 +42,4 @@ $root->end();
 echo PHP_EOL . 'OTLP GRPC example complete!  ';
 
 echo PHP_EOL;
+$tracerProvider->shutdown();

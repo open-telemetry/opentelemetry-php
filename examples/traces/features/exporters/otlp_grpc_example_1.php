@@ -6,7 +6,6 @@ require __DIR__ . '/../../../../vendor/autoload.php';
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPExporter;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
-use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
@@ -15,7 +14,6 @@ $Exporter = new OTLPExporter();
 echo 'Starting OTLPGrpc example 1';
 $tracerProvider = new TracerProvider(new SimpleSpanProcessor($Exporter));
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
-ShutdownHandler::register([$tracerProvider, 'shutdown']);
 for ($i = 0; $i < 5; $i++) {
     // start a span, register some events
     $timestamp = ClockFactory::getDefault()->now();
@@ -58,3 +56,4 @@ for ($i = 0; $i < 5; $i++) {
 echo PHP_EOL . 'OTLPGrpc example 1 complete!  ';
 
 echo PHP_EOL;
+$tracerProvider->shutdown();

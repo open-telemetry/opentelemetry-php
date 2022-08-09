@@ -7,7 +7,6 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OtlpGrpcExporter;
 use OpenTelemetry\SDK\Common\Log\LoggerHolder;
-use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use Psr\Log\LogLevel;
@@ -26,6 +25,6 @@ $tracerProvider =  new TracerProvider(
     )
 );
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
-ShutdownHandler::register([$tracerProvider, 'shutdown']);
 $span = $tracer->spanBuilder('root-span')->startSpan();
 $span->end();
+$tracerProvider->shutdown();

@@ -4,7 +4,6 @@ declare(strict_types=1);
 require __DIR__ . '/../../../vendor/autoload.php';
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
@@ -30,9 +29,10 @@ $tracerProvider =  new TracerProvider(
     null,
     $resource
 );
-ShutdownHandler::register([$tracerProvider, 'shutdown']);
 
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 $span = $tracer->spanBuilder('root')->startSpan();
 $span->end();
+
+$tracerProvider->shutdown();

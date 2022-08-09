@@ -3,7 +3,6 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../vendor/autoload.php';
 
-use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 
 //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md
@@ -19,7 +18,6 @@ putenv('OTEL_BSP_SCHEDULE_DELAY=10000');
 echo 'Creating Exporter From Environment' . PHP_EOL;
 
 $tracerProvider = (new TracerProviderFactory('example'))->create();
-ShutdownHandler::register([$tracerProvider, 'shutdown']);
 
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
@@ -27,6 +25,12 @@ echo 'Starting Tracer' . PHP_EOL;
 
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
 $scope = $rootSpan->activate();
-$rootSpan->addEvent('my_event')->setAttribute('fruit', 'apple');
-$rootSpan->end();
-$scope->detach();
+
+try {
+    $rootSpan->addEvent('my_event')->setAttribute('fruit', 'apple');
+} finally {
+    $rootSpan->end();
+    $scope->detach();
+}
+
+$tracerProvider->shutdown();

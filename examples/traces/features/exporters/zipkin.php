@@ -6,7 +6,6 @@ require __DIR__ . '/../../../../vendor/autoload.php';
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
-use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
@@ -22,7 +21,6 @@ $tracerProvider =  new TracerProvider(
         $zipkinExporter
     )
 );
-ShutdownHandler::register([$tracerProvider, 'shutdown']);
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 echo 'Starting Zipkin example';
@@ -51,3 +49,4 @@ $root->end();
 echo PHP_EOL . 'Zipkin example complete!  See the results at http://localhost:9411/';
 
 echo PHP_EOL;
+$tracerProvider->shutdown();
