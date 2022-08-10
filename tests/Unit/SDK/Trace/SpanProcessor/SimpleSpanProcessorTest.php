@@ -59,6 +59,14 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $this->spanExporter->shouldNotReceive('export');
     }
 
+    public function test_on_end_after_shutdown(): void
+    {
+        $this->spanExporter->shouldReceive('shutdown');
+        $this->spanExporter->shouldNotReceive('export');
+        $this->simpleSpanProcessor->shutdown();
+        $this->simpleSpanProcessor->onEnd($this->readableSpan);
+    }
+
     public function test_on_end_sampled_span(): void
     {
         $spanData = new SpanData();
@@ -76,11 +84,41 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $this->simpleSpanProcessor->onEnd($this->readableSpan);
     }
 
+    public function test_does_not_trigger_concurrent_export(): void
+    {
+        $spanData = new SpanData();
+        $count = 3;
+        $this->readableSpan->expects('getContext')->times($count)->andReturn($this->sampledSpanContext);
+        $this->readableSpan->expects('toSpanData')->times($count)->andReturn($spanData);
+
+        $this->spanExporter->expects('export')->times($count)->andReturnUsing(function () use (&$running, &$count) {
+            $this->assertNotTrue($running);
+            $running = true;
+            if (--$count) {
+                $this->simpleSpanProcessor->onEnd($this->readableSpan);
+            }
+            $running = false;
+
+            return 0;
+        });
+
+        $this->simpleSpanProcessor->onEnd($this->readableSpan);
+    }
+
     // TODO: Add test to ensure exporter is retried on failure.
 
     public function test_force_flush(): void
     {
+        $this->spanExporter->expects('forceFlush')->andReturn(true);
         $this->assertTrue($this->simpleSpanProcessor->forceFlush());
+    }
+
+    public function test_force_flush_after_shutdown(): void
+    {
+        $this->spanExporter->expects('shutdown')->andReturn(true);
+        $this->spanExporter->shouldNotReceive('forceFlush');
+        $this->simpleSpanProcessor->shutdown();
+        $this->simpleSpanProcessor->forceFlush();
     }
 
     public function test_shutdown(): void
@@ -89,11 +127,5 @@ class SimpleSpanProcessorTest extends MockeryTestCase
 
         $this->assertTrue($this->simpleSpanProcessor->shutdown());
         $this->assertTrue($this->simpleSpanProcessor->shutdown());
-    }
-
-    public function test_shutdown_with_no_exporter(): void
-    {
-        $processor = new SimpleSpanProcessor(null);
-        $this->assertTrue($processor->shutdown());
     }
 }
