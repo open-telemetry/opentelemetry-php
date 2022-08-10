@@ -6,47 +6,106 @@ namespace OpenTelemetry\API\Metrics;
 
 interface MeterInterface
 {
-    /**
-     * Returns the meter name.
-     *
-     * @return string
-     */
-    public function getName(): string;
 
     /**
-     * Returns the meter version.
+     * Creates a `Counter`.
      *
-     * @return string Metric version
+     * @param string $name name of the instrument
+     * @param string|null $unit unit of measure
+     * @param string|null $description description of the instrument
+     * @return CounterInterface created instrument
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#counter-creation
      */
-    public function getVersion(): string;
+    public function createCounter(
+        string $name,
+        ?string $unit = null,
+        ?string $description = null
+    ): CounterInterface;
 
     /**
-     * Creates a Counter metric instrument.
+     * Creates an `ObservableCounter`.
      *
-     * @param string $name        (required) - Counter name
-     * @param string $description (optional) - Counter description
+     * @param string $name name of the instrument
+     * @param string|null $unit unit of measure
+     * @param string|null $description description of the instrument
+     * @param callable ...$callbacks responsible for reporting measurements
+     * @return ObservableCounterInterface created instrument
      *
-     * @return CounterInterface
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#asynchronous-counter-creation
      */
-    public function newCounter(string $name, string $description): CounterInterface;
+    public function createObservableCounter(
+        string $name,
+        ?string $unit = null,
+        ?string $description = null,
+        callable ...$callbacks
+    ): ObservableCounterInterface;
 
     /**
-     * Creates an UpDownCounter metric instrument.
+     * Creates a `Histogram`.
      *
-     * @param string $name        (required) - UpDownCounter name
-     * @param string $description (optional) - UpDownCounter description
+     * @param string $name name of the instrument
+     * @param string|null $unit unit of measure
+     * @param string|null $description description of the instrument
+     * @return HistogramInterface created instrument
      *
-     * @return UpDownCounterInterface
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#histogram-creation
      */
-    public function newUpDownCounter(string $name, string $description): UpDownCounterInterface;
+    public function createHistogram(
+        string $name,
+        ?string $unit = null,
+        ?string $description = null
+    ): HistogramInterface;
 
     /**
-     * Creates a ValueRecorder metric instrument.
+     * Creates an `ObservableGauge`.
      *
-     * @param string $name        (required) - ValueRecorder name
-     * @param string $description (optional) - ValueRecorder description
+     * @param string $name name of the instrument
+     * @param string|null $unit unit of measure
+     * @param string|null $description description of the instrument
+     * @param callable ...$callbacks responsible for reporting measurements
+     * @return ObservableGaugeInterface created instrument
      *
-     * @return ValueRecorderInterface
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#asynchronous-gauge-creation
      */
-    public function newValueRecorder(string $name, string $description): ValueRecorderInterface;
+    public function createObservableGauge(
+        string $name,
+        ?string $unit = null,
+        ?string $description = null,
+        callable ...$callbacks
+    ): ObservableGaugeInterface;
+
+    /**
+     * Creates an `UpDownCounter`.
+     *
+     * @param string $name name of the instrument
+     * @param string|null $unit unit of measure
+     * @param string|null $description description of the instrument
+     * @return UpDownCounterInterface created instrument
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#updowncounter-creation
+     */
+    public function createUpDownCounter(
+        string $name,
+        ?string $unit = null,
+        ?string $description = null
+    ): UpDownCounterInterface;
+
+    /**
+     * Creates an `ObservableUpDownCounter`.
+     *
+     * @param string $name name of the instrument
+     * @param string|null $unit unit of measure
+     * @param string|null $description description of the instrument
+     * @param callable ...$callbacks responsible for reporting measurements
+     * @return ObservableUpDownCounterInterface created instrument
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#asynchronous-updowncounter-creation
+     */
+    public function createObservableUpDownCounter(
+        string $name,
+        ?string $unit = null,
+        ?string $description = null,
+        callable ...$callbacks
+    ): ObservableUpDownCounterInterface;
 }

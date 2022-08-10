@@ -4,30 +4,18 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Metrics;
 
-interface CounterInterface extends MetricInterface
+use OpenTelemetry\Context\Context;
+
+interface CounterInterface
 {
-    /**
-     * Adds value to the counter
-     *
-     * @access	public
-     * @param	int	$value
-     * @return	self
-     */
-    public function add(int $value): CounterInterface;
 
     /**
-     * Increments value
+     * @param float|int $amount non-negative amount to increment by
+     * @param iterable<non-empty-string, string|bool|float|int|array|null> $attributes
+     *        attributes of the data point
+     * @param Context|false|null $context execution context
      *
-     * @access	public
-     * @return	self
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#add
      */
-    public function increment(): CounterInterface;
-
-    /**
-     * Gets the value
-     *
-     * @access	public
-     * @return	int
-     */
-    public function getValue(): int;
+    public function add($amount, iterable $attributes = [], $context = null): void;
 }

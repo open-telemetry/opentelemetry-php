@@ -4,63 +4,34 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-use InvalidArgumentException;
-use OpenTelemetry\API\Metrics as API;
+use OpenTelemetry\API\Metrics\CounterInterface;
+use OpenTelemetry\SDK\Common\Time\ClockInterface;
 
-class Counter extends AbstractMetric implements API\CounterInterface, API\LabelableMetricInterfaceInterface
+/**
+ * @internal
+ */
+final class Counter implements CounterInterface
 {
-    use HasLabelsTrait;
+    private MetricWriterInterface $writer;
+    private ReferenceCounterInterface $referenceCounter;
+    private ClockInterface $clock;
 
-    protected int $value = 0;
-
-    /**
-     * Get $type
-     *
-     * @return  int
-     */
-    public function getType(): int
+    public function __construct(MetricWriterInterface $writer, ReferenceCounterInterface $referenceCounter, ClockInterface $clock)
     {
-        return API\MetricKind::COUNTER;
+        $this->writer = $writer;
+        $this->referenceCounter = $referenceCounter;
+        $this->clock = $clock;
+
+        $this->referenceCounter->acquire();
     }
 
-    /**
-     * Returns the current value
-     *
-     * @access	public
-     * @return	int
-     */
-    public function getValue(): int
+    public function __destruct()
     {
-        return $this->value;
+        $this->referenceCounter->release();
     }
 
-    /**
-     * Increments the current value
-     *
-     * @access	public
-     * @return	self
-     */
-    public function increment(): API\CounterInterface
+    public function add($amount, iterable $attributes = [], $context = null): void
     {
-        $this->value++;
-
-        return $this;
-    }
-
-    /**
-     * Adds the specified value to the current counter's value
-     *
-     * @access	public
-     * @return	self
-     */
-    public function add(int $value): API\CounterInterface
-    {
-        if ($value <= 0) {
-            throw new InvalidArgumentException('Only positive numbers can be added to the Counter');
-        }
-
-        $this->value += $value;
-
-        return $this;
+        $this->writer->record($amount, $attributes, $context, $this->clock->now());
     }
 }

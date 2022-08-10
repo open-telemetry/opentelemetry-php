@@ -6,7 +6,7 @@ namespace OpenTelemetry\API\Common\Instrumentation;
 
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
-use OpenTelemetry\API\Metrics\NoopMeter;
+use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
@@ -177,6 +177,7 @@ trait InstrumentationTrait
     {
         $this->propagator = new NullPropagator();
         $this->tracer = new NoopTracer();
+        /** @phan-suppress-next-line PhanAccessMethodInternal */
         $this->meter = new NoopMeter();
         $this->logger = new NullLogger();
     }
