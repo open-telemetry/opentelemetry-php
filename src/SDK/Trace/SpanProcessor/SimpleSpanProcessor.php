@@ -11,14 +11,20 @@ use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use SplQueue;
+use function sprintf;
+use Throwable;
 
-class SimpleSpanProcessor implements SpanProcessorInterface
+class SimpleSpanProcessor implements SpanProcessorInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     private SpanExporterInterface $exporter;
 
     private bool $running = false;
-    /** @var SplQueue<Closure> */
+    /** @var SplQueue<array{Closure, string, bool}> */
     private SplQueue $queue;
 
     private bool $closed = false;
@@ -44,47 +50,69 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         }
 
         $spanData = $span->toSpanData();
-        $this->flush(fn () => $this->exporter->export([$spanData])->await());
+        $this->flush(fn () => $this->exporter->export([$spanData])->await(), 'export');
     }
 
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         if ($this->closed) {
-            return $this->queue->isEmpty();
+            return false;
         }
 
-        return $this->flush(fn (): bool => $this->exporter->forceFlush($cancellation));
+        return $this->flush(fn (): bool => $this->exporter->forceFlush($cancellation), __FUNCTION__, true);
     }
 
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if ($this->closed) {
-            return $this->queue->isEmpty();
+            return false;
         }
 
         $this->closed = true;
 
-        return $this->flush(fn (): bool => $this->exporter->shutdown($cancellation));
+        return $this->flush(fn (): bool => $this->exporter->shutdown($cancellation), __FUNCTION__, true);
     }
 
-    private function flush(Closure $task): bool
+    private function flush(Closure $task, string $taskName, bool $propagateResult = false): bool
     {
-        $this->queue->enqueue($task);
+        $this->queue->enqueue([$task, $taskName, $propagateResult && !$this->running]);
 
         if ($this->running) {
             return false;
         }
 
+        $success = true;
+        $exception = null;
         $this->running = true;
 
         try {
             while (!$this->queue->isEmpty()) {
-                $this->queue->dequeue()();
+                [$task, $taskName, $propagateResult] = $this->queue->dequeue();
+
+                try {
+                    $result = $task();
+                    if ($propagateResult) {
+                        $success = $result;
+                    }
+                } catch (Throwable $e) {
+                    if ($propagateResult) {
+                        $exception = $e;
+
+                        continue;
+                    }
+                    if ($this->logger !== null) {
+                        $this->logger->error(sprintf('Unhandled %s error', $taskName), ['exception' => $e]);
+                    }
+                }
             }
         } finally {
             $this->running = false;
         }
 
-        return true;
+        if ($exception !== null) {
+            throw $exception;
+        }
+
+        return $success;
     }
 }

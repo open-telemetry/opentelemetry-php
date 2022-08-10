@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
 
+use LogicException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
@@ -16,6 +17,7 @@ use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
+use Psr\Log\LoggerInterface;
 
 /**
  * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor
@@ -126,6 +128,37 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $this->spanExporter->expects('shutdown')->andReturnTrue();
 
         $this->assertTrue($this->simpleSpanProcessor->shutdown());
-        $this->assertTrue($this->simpleSpanProcessor->shutdown());
+        $this->assertFalse($this->simpleSpanProcessor->shutdown());
+    }
+
+    public function test_throwing_exporter_export(): void
+    {
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->method('forceFlush')->willReturn(true);
+        $exporter->method('export')->willThrowException(new LogicException());
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('error');
+
+        $processor = new SimpleSpanProcessor($exporter);
+        $processor->setLogger($logger);
+
+        $this->readableSpan->expects('getContext')->andReturn($this->sampledSpanContext);
+        $this->readableSpan->expects('toSpanData')->andReturn(new SpanData());
+
+        $processor->onStart($this->readWriteSpan, Context::getCurrent());
+        $processor->onEnd($this->readableSpan);
+    }
+
+    public function test_throwing_exporter_flush(): void
+    {
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->method('forceFlush')->willThrowException(new LogicException());
+
+        $this->expectException(LogicException::class);
+
+        $processor = new SimpleSpanProcessor($exporter);
+
+        $processor->forceFlush();
     }
 }

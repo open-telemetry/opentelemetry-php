@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use function assert;
-use Closure;
 use function count;
 use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
@@ -16,10 +15,16 @@ use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use SplQueue;
+use function sprintf;
+use Throwable;
 
-class BatchSpanProcessor implements SpanProcessorInterface
+class BatchSpanProcessor implements SpanProcessorInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     public const DEFAULT_SCHEDULE_DELAY = 5000;
     public const DEFAULT_EXPORT_TIMEOUT = 30000;
     public const DEFAULT_MAX_QUEUE_SIZE = 2048;
@@ -40,7 +45,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private array $batch = [];
     /** @var SplQueue<list<SpanDataInterface>> */
     private SplQueue $queue;
-    /** @var SplQueue<array{int, Closure}> */
+    /** @var SplQueue<array{int, string, ?CancellationInterface, bool}> */
     private SplQueue $flush;
 
     private bool $closed = false;
@@ -105,7 +110,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         if (count($this->batch) === $this->maxExportBatchSize) {
             $this->enqueueBatch();
         }
-        if ($this->autoFlush && !$this->running && $this->shouldFlush()) {
+        if ($this->autoFlush) {
             $this->flush();
         }
     }
@@ -113,64 +118,96 @@ class BatchSpanProcessor implements SpanProcessorInterface
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         if ($this->closed) {
-            return $this->flush->isEmpty();
+            return false;
         }
 
-        return $this->flush(fn (): bool => $this->exporter->forceFlush($cancellation));
+        return $this->flush(__FUNCTION__, $cancellation);
     }
 
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if ($this->closed) {
-            return $this->flush->isEmpty();
+            return false;
         }
 
         $this->closed = true;
 
-        return $this->flush(fn (): bool => $this->exporter->shutdown($cancellation));
+        return $this->flush(__FUNCTION__, $cancellation);
     }
 
-    private function flush(?Closure $forceFlush = null): bool
+    private function flush(?string $flushMethod = null, ?CancellationInterface $cancellation = null): bool
     {
-        $flushId = $this->batchId + $this->queue->count() + (int) (bool) $this->batch;
-
-        if ($forceFlush !== null) {
-            $this->flush->enqueue([$flushId, $forceFlush]);
+        if ($flushMethod !== null) {
+            $flushId = $this->batchId + $this->queue->count() + (int) (bool) $this->batch;
+            $this->flush->enqueue([$flushId, $flushMethod, $cancellation, !$this->running]);
         }
 
-        $this->processFlushTasks();
+        if ($this->running) {
+            return false;
+        }
 
-        if (!$this->running) {
-            $this->running = true;
+        $success = true;
+        $exception = null;
+        $this->running = true;
 
-            try {
-                while ($this->shouldFlush()) {
-                    if ($this->queue->isEmpty()) {
-                        $this->enqueueBatch();
-                    }
-                    $batchSize = count($this->queue->bottom());
-                    $this->batchId++;
+        try {
+            for (;;) {
+                while (!$this->flush->isEmpty() && $this->flush->bottom()[0] <= $this->batchId) {
+                    [, $flushMethod, $cancellation, $propagateResult] = $this->flush->dequeue();
 
                     try {
-                        $this->exporter->export($this->queue->dequeue())->await();
-                    } finally {
-                        $this->queueSize -= $batchSize;
+                        $result = $this->exporter->$flushMethod($cancellation);
+                        if ($propagateResult) {
+                            $success = $result;
+                        }
+                    } catch (Throwable $e) {
+                        if ($propagateResult) {
+                            $exception = $e;
+
+                            continue;
+                        }
+                        if ($this->logger !== null) {
+                            $this->logger->error(sprintf('Unhandled %s error', $flushMethod), ['exception' => $e]);
+                        }
                     }
-                    $this->processFlushTasks();
                 }
-            } finally {
-                $this->running = false;
+
+                if (!$this->shouldFlush()) {
+                    break;
+                }
+
+                if ($this->queue->isEmpty()) {
+                    $this->enqueueBatch();
+                }
+                $batchSize = count($this->queue->bottom());
+                $this->batchId++;
+
+                try {
+                    $this->exporter->export($this->queue->dequeue())->await();
+                } catch (Throwable $e) {
+                    if ($this->logger !== null) {
+                        $this->logger->error('Unhandled export error', ['exception' => $e]);
+                    }
+                } finally {
+                    $this->queueSize -= $batchSize;
+                }
             }
+        } finally {
+            $this->running = false;
         }
 
-        return $this->batchId >= $flushId;
+        if ($exception !== null) {
+            throw $exception;
+        }
+
+        return $success;
     }
 
     private function shouldFlush(): bool
     {
-        return !$this->queue->isEmpty()
-            || !$this->flush->isEmpty()
-            || $this->nextScheduledRun !== null && $this->clock->now() > $this->nextScheduledRun;
+        return !$this->flush->isEmpty()
+            || $this->autoFlush && !$this->queue->isEmpty()
+            || $this->autoFlush && $this->nextScheduledRun !== null && $this->clock->now() > $this->nextScheduledRun;
     }
 
     private function enqueueBatch(): void
@@ -180,12 +217,5 @@ class BatchSpanProcessor implements SpanProcessorInterface
         $this->queue->enqueue($this->batch);
         $this->batch = [];
         $this->nextScheduledRun = null;
-    }
-
-    private function processFlushTasks(): void
-    {
-        while (!$this->flush->isEmpty() && $this->flush->bottom()[0] <= $this->batchId) {
-            $this->flush->dequeue()[1]();
-        }
     }
 }
