@@ -7,7 +7,6 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 use function assert;
 use Closure;
 use function count;
-use function intdiv;
 use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -29,7 +28,6 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private SpanExporterInterface $exporter;
     private ClockInterface $clock;
     private int $maxQueueSize;
-    private int $maxBatchSize;
     private int $scheduledDelayNanos;
     private int $maxExportBatchSize;
     private bool $autoFlush;
@@ -37,6 +35,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private ?int $nextScheduledRun = null;
     private bool $running = false;
     private int $batchId = 0;
+    private int $queueSize = 0;
     /** @var list<SpanDataInterface> */
     private array $batch = [];
     /** @var SplQueue<list<SpanDataInterface>> */
@@ -73,8 +72,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
 
         $this->exporter = $exporter;
         $this->clock = $clock;
-        $this->maxQueueSize = intdiv($maxQueueSize, $maxExportBatchSize);
-        $this->maxBatchSize = $maxQueueSize % $maxExportBatchSize;
+        $this->maxQueueSize = $maxQueueSize;
         $this->scheduledDelayNanos = $scheduledDelayMillis * 1_000_000;
         $this->maxExportBatchSize = $maxExportBatchSize;
         $this->autoFlush = $autoFlush;
@@ -96,10 +94,11 @@ class BatchSpanProcessor implements SpanProcessorInterface
             return;
         }
 
-        if (count($this->queue) === $this->maxQueueSize && count($this->batch) === $this->maxBatchSize) {
+        if ($this->queueSize === $this->maxQueueSize) {
             return;
         }
 
+        $this->queueSize++;
         $this->batch[] = $span->toSpanData();
         $this->nextScheduledRun ??= $this->clock->now() + $this->scheduledDelayNanos;
 
@@ -149,8 +148,14 @@ class BatchSpanProcessor implements SpanProcessorInterface
                     if ($this->queue->isEmpty()) {
                         $this->enqueueBatch();
                     }
+                    $batchSize = count($this->queue->bottom());
                     $this->batchId++;
-                    $this->exporter->export($this->queue->dequeue())->await();
+
+                    try {
+                        $this->exporter->export($this->queue->dequeue())->await();
+                    } finally {
+                        $this->queueSize -= $batchSize;
+                    }
                     $this->processFlushTasks();
                 }
             } finally {

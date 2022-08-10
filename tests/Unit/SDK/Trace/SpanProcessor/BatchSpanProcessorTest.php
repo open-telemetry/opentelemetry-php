@@ -297,9 +297,9 @@ class BatchSpanProcessorTest extends MockeryTestCase
 
         $exporter->expects($this->exactly(2))->method('export')->willReturnCallback(function (iterable $batch) use ($processor, &$i) {
             if ($i) {
-                $this->assertCount(5, $batch);
+                $this->assertCount(3, $batch);
             } else {
-                for ($i = 0; $i < 6; $i++) {
+                for ($i = 0; $i < 5; $i++) {
                     $span = $this->createSampledSpanMock();
                     $processor->onStart($span, Context::getCurrent());
                     $processor->onEnd($span);
@@ -312,7 +312,10 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $span = $this->createSampledSpanMock();
         $processor->onStart($span, Context::getCurrent());
         $processor->onEnd($span);
+        $processor->onStart($span, Context::getCurrent());
+        $processor->onEnd($span);
 
+        $processor->forceFlush();
         $processor->forceFlush();
     }
 
