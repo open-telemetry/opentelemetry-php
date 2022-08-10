@@ -12,11 +12,12 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 $storage = new ArrayObject();
 
 // Boilerplate setup to create a new tracer with an in-memory exporter
-$tracer = (new TracerProvider(
+$tracerProvider = new TracerProvider(
     new SimpleSpanProcessor(
         new InMemoryExporter($storage)
     )
-))->getTracer('io.opentelemetry.contrib.php');
+);
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 // This creates a span and sets it as the current parent (and root) span
 $rootSpan = $tracer->spanBuilder('foo')->startSpan();
@@ -41,3 +42,5 @@ foreach ($storage as $span) {
     );
 }
 echo PHP_EOL;
+
+$tracerProvider->shutdown();

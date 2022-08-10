@@ -49,3 +49,4 @@ $root->end();
 echo PHP_EOL . 'OTLP example complete!  ';
 
 echo PHP_EOL;
+$tracerProvider->shutdown();

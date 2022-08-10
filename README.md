@@ -2,16 +2,56 @@
 
 ![CI Build](https://github.com/open-telemetry/opentelemetry-php/workflows/PHP%20QA/badge.svg)
 [![codecov](https://codecov.io/gh/open-telemetry/opentelemetry-php/branch/master/graph/badge.svg)](https://codecov.io/gh/open-telemetry/opentelemetry-php)
+[![Slack](https://img.shields.io/badge/slack-@cncf/otel--php-brightgreen.svg?logo=slack)](https://cloud-native.slack.com/archives/D03FAB6GN0K)
+
+<details>
+<summary>Table of Contents</summary>
+
+<!-- toc -->
+
+- [Introduction](#introduction)
+- [Project status](#project-status)
+  - [Specification conformance](#specification-conformance)
+  - [Backwards compatibility](#backwards-compatibility)
+- [Requirements](#requirements)
+  - [Required dependencies](#required-dependencies)
+  - [Optional dependencies](#optional-dependencies)
+- [Installation](#installation)
+- [Getting started](#getting-started)
+  - [Instrumenting an application](#using-opentelemetry-in-an-application)
+  - [Instrumenting a library](#using-opentelemetry-to-instrument-a-library)
+  - [Trace signals](#trace-signals)
+    - [Auto-instrumentation](#auto-instrumentation)
+    - [Framework instrumentation](#framework-instrumentation)
+    - [Manual instrumentation](#manual-instrumentation)
+      - [Set up a tracer](#set-up-a-tracer)
+      - [Creating spans](#creating-spans)
+      - [Nesting spans](#nesting-spans)
+      - [Distributed tracing](#distributed-tracing)
+    - [Examples](#metrics-examples)
+  - [Metrics signals](#metrics-signals)
+    - [Examples](#trace-examples)
+  - [Log signals](#log-signals)
+- [User Quickstarts](#user-quickstarts)
+- [Versioning](#versioning)
+- [Contributing](#contributing)
+<!-- tocstop -->
+
+</details>
+
+# Introduction
 
 This is the **[monorepo](https://en.wikipedia.org/wiki/Monorepo)** for the **main** components of **[OpenTelemetry](https://opentelemetry.io/) PHP**. 
-The main library is distributed as a complete package: [open-telemetry/opentelemetry](https://packagist.org/packages/open-telemetry/opentelemetry) 
-as well as each component as a separate package. These packages are:
+
+All OpenTelemetry libraries are distributed via packagist, notably:
 
 - API: [open-telemetry/api](https://packagist.org/packages/open-telemetry/api)
 - SDK: [open-telemetry/sdk](https://packagist.org/packages/open-telemetry/sdk)
 - Semantic Conventions: [open-telemetry/sem-conv](https://packagist.org/packages/open-telemetry/sem-conv)
 - Context: [open-telemetry/context](https://packagist.org/packages/open-telemetry/context)
 - Contrib: [open-telemetry/sdk-contrib](https://packagist.org/packages/open-telemetry/sdk-contrib)
+
+The [open-telemetry/opentelemetry](https://packagist.org/packages/open-telemetry/opentelemetry) package contains all of the above and is the easiest way to try out OpenTelemetry.
 
 ---
 This repository also hosts and distributes generated client code used by individual components as separate packages.  These packages are:
@@ -30,13 +70,21 @@ components that are only useful to a relatively small number of users.
 
 Additional packages, demos and tools are hosted or distributed in the [OpenTelemetry PHP organization](https://github.com/opentelemetry-php).
 
----
-## Current Project Status
+# Project Status
 
 ![Current Version](https://img.shields.io/github/v/tag/open-telemetry/opentelemetry-php)
 
 This project currently lives in a **alpha status**.  Our current release is not production ready; it has been created in order to receive feedback from the community. \
-As long as this project is in alpha status, things may and probably will break once in a while.  \
+As long as this project is in alpha status, things may and probably will break once in a while.
+
+## Specification conformance
+We attempt to keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show which features are available and which have not yet been implemented.
+
+If you find an inconsistency in the data in the matrix vs. the data in this repository, please let us know in our slack channel and we'll get it rectified.
+
+---
+
+## Backwards Compatibility
 We aim to provide backward compatibility (without any guarantee) even for alpha releases, however the library will raise notices indicating breaking changes and what to do about them. \
 If you don't want these notices to appear or change the error message level, you can do so by calling:
 ```php
@@ -50,34 +98,12 @@ to trigger only deprecation notices. Valid error levels are `0` (none), `E_USER_
 However (as long as in alpha) it is safer to pin a dependency on the library to a specific version and/or make the adjustments 
 mentioned in the provided messages, since doing otherwise may break things completely for you in the future!
 
----
-
-We attempt to keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show which features are available and which have not yet been implemented.  
-
-If you find an inconsistency in the data in the matrix vs. the data in this repository, please let us know in our slack channel and we'll get it rectified.
-
----
-
-## Communication
-
-Most of our communication is done on CNCF Slack in the channel [otel-php](https://cloud-native.slack.com/archives/C01NFPCV44V).
-To sign up, create a CNCF Slack account [here](http://slack.cncf.io/)
-
-Our meetings are held weekly on zoom on Wednesdays at 10:30am PST / 1:30pm EST.  
-A Google calendar invite with the included zoom link can be found [here](https://calendar.google.com/event?action=TEMPLATE&tmeid=N2VtZXZmYnVmbzZkYjZkbTYxdjZvYTdxN21fMjAyMDA5MTZUMTczMDAwWiBrYXJlbnlyeHVAbQ&tmsrc=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com&scp=ALL)
-
-Our open issues can all be found in the [GitHub issues tab](https://github.com/open-telemetry/opentelemetry-php/issues).  Feel free to reach out on Slack if you have any additional questions about these issues; we are always happy to talk through implementation details.
-
-## Requirements
+# Requirements
 
 The library and all separate packages requires a PHP version of 7.4.x, 8.0.x or 8.1.x
 
-### Dependencies
-
----
-
-#### REQUIRED DEPENDENCIES
-#### 1) Install PSR17/18 implementations
+## Required dependencies
+### 1) Install PSR17/18 implementations
 
 The **SDK** and **Contrib** packages have a dependency on both a [HTTP Factories (PSR17)](https://www.php-fig.org/psr/psr-17/)
 and a [php-http/async-client](https://docs.php-http.org/en/latest/clients.html) implementation.
@@ -87,9 +113,9 @@ and [this link](https://packagist.org/providers/php-http/async-client-implementa
 
 ---
 
-#### OPTIONAL DEPENDENCIES
+## Optional dependencies
 
-#### 1) Install PHP [ext-grpc](https://pecl.php.net/package/gRPC)
+### 1) Install PHP [ext-grpc](https://pecl.php.net/package/gRPC)
 
 **The PHP gRPC extension is only needed, if you want to use the OTLP GRPC Exporter from the Contrib package.**
 
@@ -114,26 +140,26 @@ provides a package for the extension)
 > Notice: The artifact of the gRPC extension can be as large as 100mb (!!!), Some 'hacks' to reduce that size,
 >are mentioned [in this thread](https://github.com/grpc/grpc/issues/23626). **Use at your own risk.**
 
-#### 2) Install PHP [ext-mbstring](https://www.php.net/manual/en/book.mbstring.php)
+### 2) Install PHP [ext-mbstring](https://www.php.net/manual/en/book.mbstring.php)
 
 The library's components will load the `symfony/polyfill-mbstring` package, but for better performance you should install
 the  PHP mbstring extension. You can use the same install methods as described for the gRPC extension above,
 however most OS` package managers provide a package for the extension.
 
-#### 3) Install PHP [ext-zlib](https://www.php.net/manual/en/book.zlib.php)
+### 3) Install PHP [ext-zlib](https://www.php.net/manual/en/book.zlib.php)
 
 In order to use compression in HTTP requests you should install
 the  PHP zlib extension. You can use the same install methods as described for the gRPC extension above,
 however most OS` package managers provide a package for the extension.
 
-#### 4) Install PHP [ext-ffi](https://www.php.net/manual/en/book.ffi.php)
+### 4) Install PHP [ext-ffi](https://www.php.net/manual/en/book.ffi.php)
 
 _Experimental_ support for using fibers in PHP 8.1 for Context storage requires the `ffi` extension, and can
 be enabled by setting the `OTEL_PHP_FIBERS_ENABLED` environment variable to a truthy value (`1`, `true`, `on`).
 
 Using fibers with non-`CLI` SAPIs may require preloading of bindings. One way to achieve this is setting [`ffi.preload`](https://www.php.net/manual/en/ffi.configuration.php#ini.ffi.preload) to `src/Context/fiber/zend_observer_fiber.h` and setting [`opcache.preload`](https://www.php.net/manual/en/opcache.preloading.php) to `vendor/autoload.php`.
 
-#### 5) Install PHP [ext-protobuf](https://pecl.php.net/package/protobuf)
+### 5) Install PHP [ext-protobuf](https://pecl.php.net/package/protobuf)
 
 **The PHP protobuf extension is optional when using either the `OTLPHttp` or `OTLPGrpc` exporters from the Contrib package.**
 
@@ -141,7 +167,7 @@ The protobuf extension makes both exporters more performant. _Note that protobuf
 
 ---
 
-## Installation
+# Installation
 
 The recommended way to install the library's packages is through [Composer](http://getcomposer.org):
 
@@ -152,8 +178,6 @@ Install Composer using the [installation instructions](https://getcomposer.org/d
 
 To your project's `composer.json` file, as this library has not reached a stable release status yet.
 
-### Getting Started with OpenTelemetry
-
 To install the complete library with all packages you can run:
 
 ```bash
@@ -161,7 +185,16 @@ $ composer require open-telemetry/opentelemetry
 ```
 This is perfect for trying out our examples or demos.
 
-### Using OpenTelemetry in an Application
+
+# Getting Started
+
+You can find a getting started guide on [opentelemetry.io](https://opentelemetry.io/docs/php/getting-started/)
+
+OpenTelemetry's goal is to provide a single set of APIs to capture _signals_, such as distributed traces and metrics, from your application and send them to an observability platform. This project allows you to do just that for applications written in PHP. There are two steps to this process: instrument your application, and configure an exporter.
+
+To start capturing signals from your application it first  needs to be instrumented.
+
+## Using OpenTelemetry in an Application
 
 Your application should only depend on Interfaces provided by the API package:
 
@@ -170,7 +203,7 @@ $ composer require open-telemetry/api
 ```
 In the best case you will use [Dependency Inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle) and write an adapter to not depend on the API directly.
 
-Make sure your application works with a dependency on the API only, however to make really use of the library you want to install the **SDK** package and probably the **Contrib** package as well:
+Make sure your application works with a dependency on the API only, however to make full use of the library you want to install the **SDK** package and probably the **Contrib** package as well:
 
 ```bash
 $ composer require open-telemetry/sdk
@@ -181,7 +214,7 @@ $ composer require open-telemetry/sdk open-telemetry/sdk-contrib
 ```
 Make sure any **SDK** or **Contrib** code is set up by your configuration, bootstrap, dependency injection, etc.
 
-### Using OpenTelemetry to instrument a Library
+## Using OpenTelemetry to instrument a Library
 
 Your library should only depend on Interfaces provided by the API package:
 
@@ -194,37 +227,99 @@ For development and testing purposes you also want to install **SDK** and **Cont
 $ composer require --dev open-telemetry/sdk open-telemetry/sdk-contrib
 ```
 
-## User Quickstarts
+## Trace signals
 
-* [Exploring OpenTelemetry in Laravel Applications](./docs/laravel-quickstart.md)
+### Auto-instrumentation
 
-## Framework integrations
+_We do not currently support auto-instrumentation, but are internally discussing how to implement it_
+
+### Framework instrumentation
 
 * [Symfony SDK Bundle](https://github.com/open-telemetry/opentelemetry-php-contrib/tree/main/src/Symfony/OtelSdkBundle) is the recommended way to use opentelemetry-php with symfony
 
+### Manual instrumentation
 
-## Examples
+If you wish to build your own instrumentation for your application, you will need to use the API, the SDK, and probably the contrib module (which contains most of the exporters).
 
-### Trace
+#### Set up a tracer
+Tracers must be obtained from a `TracerProvider`:
 
-You can use the [examples/AlwaysOnZipkinExample.php](/examples/AlwaysOnZipkinExample.php) file to test out the reference
-implementation we have for zipkin. This example performs a sample trace with a grouping of 5 spans and POSTs the result
-to a local zipkin instance.
+```php
+$tracerProvider = new \OpenTelemetry\SDK\Trace\TracerProvider(
+    new \OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor(
+        new \OpenTelemetry\Contrib\OtlpGrpc\Exporter('otel-collector:4317')
+    )
+);
+\OpenTelemetry\SDK\Common\Util\ShutdownHandler::register([$tracerProvider, 'shutdown']);
+$tracer = $tracerProvider->getTracer('example');
+```
 
-You can also use the [examples/AlwaysOnJaegerExample.php](/examples/AlwaysOnJaegerExample.php) file to test out the
-reference implementation we have for Jaeger. This example performs a sample trace with a grouping of 5 spans and POSTs
-the result to a local Jaeger instance.
+It's important to run the tracer provider's `shutdown()` method when the PHP process ends, to enable flushing of any enqueued telemetry.
+The shutdown process is blocking, so consider running it in an async process. Otherwise, you can use the `ShutdownHandler` to register the shutdown function as part of PHP's shutdown process, as demonstrated above.
+
+#### Creating spans
+
+```php
+$span = $tracer->spanBuilder('root')->startSpan();
+//do some work
+$span->end();
+```
+
+#### Nesting spans
+
+You can _activate_ a span, so that it will be the parent of future spans.
+
+When you activate a span, it's critical that you also _detach_ it when done. We recommend doing this in a `finally` block:
+```php
+$root = $tracer->spanBuilder('root')->startSpan();
+$scope = $root->activate();
+try {
+    $child = $tracer->spanBuilder('child')->startSpan();
+    $child->end();
+} finally {
+    $root->end();
+    $scope->detach();
+}
+```
+When an active span is deactivated (scope detached), the previously active span will become the active span again.
+
+#### Distributed tracing
+OpenTelemetry supports distributed tracing via [Context Propagation](https://opentelemetry.io/docs/concepts/signals/traces/#context-propagation), where traces can be correlated across multiple services. To enable this, outgoing HTTP requests must be injected with standardized headers which are understood by other OTEL-enabled services.
+
+```php
+$request = new Request('GET', 'https://www.example.com');
+$carrier = [];
+TraceContextPropagator::getInstance()->inject($carrier);
+foreach ($carrier as $name => $value) {
+    $request = $request->withAddedHeader($name, $value);
+}
+$response = $client->send($request);
+```
+
+See [examples/traces/demo](examples/traces/demo) for a working example.
+
+### Trace examples
+
+You can use the [zipkin](/examples/traces/exporters/zipkin.php) or [jaeger](/examples/traces/exporters/jaeger.php) example to test out the reference
+implementations. This example performs a sample trace with a grouping of 5 spans and exports the result
+to a local zipkin or jaeger instance.
 
 If you'd like a no-fuss way to test this out with docker and docker-compose, you can perform the following simple steps:
 
 1) Install the necessary dependencies by running `make install`.
-2) Execute the example trace using `make trace examples`.
+2) Execute the example trace using `make smoke-test-exporter-examples:`.
 
 Exported spans can be seen in zipkin at [http://127.0.0.1:9411](http://127.0.0.1:9411)
 
 Exported spans can also be seen in jaeger at [http://127.0.0.1:16686](http://127.0.0.1:16686)
 
-### Metrics
+## Metrics signals
+_coming soon_
+
+### Metrics examples
+
+<details>
+<summary>This section is deprecated, we have a new metrics implementation in development</summary>
 
 You can use the [examples/prometheus/PrometheusMetricsExample.php](/examples/prometheus/PrometheusMetricsExample.php)
 file to test out the reference implementation we have. This example will create a counter that will be scraped by local
@@ -241,12 +336,19 @@ The easy way to test the example out with docker and docker-compose is:
    but remember that Prometheus scrapes values once in 10 seconds.
 
 4) In order to stop docker containers for this example just run `make stop-prometheus`
+</details>
 
+## Log signals
+_frozen pending delivery of tracing and metrics_
 
-## Versioning
+# User Quickstarts
+
+* [Exploring OpenTelemetry in Laravel Applications](./docs/laravel-quickstart.md)
+
+# Versioning
 
 Versioning rationale can be found in the [Versioning Documentation](/docs/versioning.md)
 
-## Development
+# Contributing
 
-See our [Development README](./DEVELOPMENT.md)
+We would love to have you on board, please see our [Development README](./DEVELOPMENT.md) and [Contributing README](./CONTRIBUTING.md).

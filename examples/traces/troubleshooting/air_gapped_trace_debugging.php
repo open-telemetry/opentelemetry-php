@@ -77,3 +77,4 @@ foreach ($spans as $span) {
 $rootSpan->end();
 $scope->detach();
 echo 'Finished!' . PHP_EOL;
+$tracerProvider->shutdown();

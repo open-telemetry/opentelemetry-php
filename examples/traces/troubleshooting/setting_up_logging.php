@@ -27,3 +27,4 @@ $tracerProvider =  new TracerProvider(
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 $span = $tracer->spanBuilder('root-span')->startSpan();
 $span->end();
+$tracerProvider->shutdown();

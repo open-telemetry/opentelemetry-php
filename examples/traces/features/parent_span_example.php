@@ -83,3 +83,5 @@ echo PHP_EOL;
 echo 'See the results at' . PHP_EOL;
 echo 'Jaeger: http://localhost:16686/' . PHP_EOL;
 echo 'Zipkin: http://localhost:9411/' . PHP_EOL;
+
+$tracerProvider->shutdown();

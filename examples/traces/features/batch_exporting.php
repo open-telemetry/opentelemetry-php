@@ -12,7 +12,7 @@ $delayMillis = 3000;
 echo 'Starting ConsoleSpanExporter with BatchSpanProcessor' . PHP_EOL;
 echo sprintf('Sending batches every %dms and on shutdown', $delayMillis) . PHP_EOL;
 
-$tracerProvider =  new TracerProvider(
+$tracerProvider = new TracerProvider(
     new BatchSpanProcessor(
         new ConsoleSpanExporter(),
         null,
@@ -36,3 +36,4 @@ for ($i = 1; $i <= 4; $i++) {
 $rootSpan->end();
 $scope->detach();
 sleep(1);
+$tracerProvider->shutdown();

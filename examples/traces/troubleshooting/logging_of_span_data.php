@@ -94,3 +94,4 @@ foreach ($spans as $span) {
 $rootSpan->end();
 $scope->detach();
 echo sprintf('Finished! Output written to %s', $logFile) . PHP_EOL;
+$tracerProvider->shutdown();

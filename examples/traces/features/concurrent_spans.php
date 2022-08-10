@@ -44,3 +44,4 @@ try {
     $scope->detach();
     $rootSpan->end();
 }
+$tracerProvider->shutdown();
