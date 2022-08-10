@@ -10,12 +10,12 @@ use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\Contrib\Jaeger\HttpCollectorExporter
- * @covers OpenTelemetry\Contrib\Jaeger\HttpSender
- * @covers OpenTelemetry\Contrib\Jaeger\ThriftHttpTransport
- * @covers OpenTelemetry\Contrib\Jaeger\ParsedEndpointUrl
- * @covers OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapter
- * @covers OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactory
+ * @covers \OpenTelemetry\Contrib\Jaeger\HttpCollectorExporter
+ * @covers \OpenTelemetry\Contrib\Jaeger\HttpSender
+ * @covers \OpenTelemetry\Contrib\Jaeger\ThriftHttpTransport
+ * @covers \OpenTelemetry\Contrib\Jaeger\ParsedEndpointUrl
+ * @covers \OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapter
+ * @covers \OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactory
  *
  */
 class JaegerHttpCollectorExporterTest extends TestCase
@@ -35,7 +35,7 @@ class JaegerHttpCollectorExporterTest extends TestCase
             $this->getStreamFactoryInterfaceMock()
         );
 
-        $status = $exporter->export([new SpanData()]);
+        $status = $exporter->export([new SpanData()])->await();
 
         $this->assertSame(SpanExporterInterface::STATUS_SUCCESS, $status);
     }

@@ -105,7 +105,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
             return true;
         }
 
-        $this->exporter->export($this->queue);
+        $this->exporter->export($this->queue)->await();
         $this->queue = [];
         $this->stopwatch->reset();
         $this->exporter->forceFlush();

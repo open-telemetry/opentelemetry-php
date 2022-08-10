@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Contrib\Unit;
+namespace OpenTelemetry\Tests\Unit\Contrib;
 
 use OpenTelemetry\Contrib\Jaeger\AgentExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -10,10 +10,10 @@ use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\Contrib\Jaeger\AgentExporter
- * @covers OpenTelemetry\Contrib\Jaeger\JaegerTransport
- * @covers OpenTelemetry\Contrib\Jaeger\ThriftUdpTransport
- * @covers OpenTelemetry\Contrib\Jaeger\ParsedEndpointUrl
+ * @covers \OpenTelemetry\Contrib\Jaeger\AgentExporter
+ * @covers \OpenTelemetry\Contrib\Jaeger\JaegerTransport
+ * @covers \OpenTelemetry\Contrib\Jaeger\ThriftUdpTransport
+ * @covers \OpenTelemetry\Contrib\Jaeger\ParsedEndpointUrl
  */
 class AgentExporterTest extends TestCase
 {
@@ -24,7 +24,7 @@ class AgentExporterTest extends TestCase
             'someServiceName',
         );
 
-        $status = $exporter->export([new SpanData()]);
+        $status = $exporter->export([new SpanData()])->await();
 
         $this->assertSame(SpanExporterInterface::STATUS_SUCCESS, $status);
 

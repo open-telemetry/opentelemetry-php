@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter
+ * @covers \OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter
  */
 class LoggerExporterTest extends AbstractExporterTest
 {
@@ -53,6 +53,7 @@ class LoggerExporterTest extends AbstractExporterTest
                 ->export(
                     $this->createSpanMocks()
                 )
+                ->await(),
         );
     }
 
@@ -72,6 +73,7 @@ class LoggerExporterTest extends AbstractExporterTest
             SpanExporterInterface::STATUS_SUCCESS,
             $this->createLoggerExporter(LoggerExporter::GRANULARITY_SPAN)
                 ->export($spans)
+                ->await(),
         );
     }
 
@@ -91,6 +93,7 @@ class LoggerExporterTest extends AbstractExporterTest
                 ->export(
                     $this->createSpanMocks()
                 )
+                ->await(),
         );
     }
 

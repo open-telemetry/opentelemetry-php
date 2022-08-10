@@ -10,6 +10,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
@@ -173,7 +174,8 @@ class BatchSpanProcessorTest extends MockeryTestCase
                         return true;
                     }
                 )
-            );
+            )
+            ->andReturn(new CompletedFuture(0));
 
         /** @var SpanExporterInterface $exporter */
         $processor = new BatchSpanProcessor(
@@ -275,7 +277,8 @@ class BatchSpanProcessorTest extends MockeryTestCase
                         return true;
                     }
                 )
-            );
+            )
+            ->andReturn(new CompletedFuture(0));
 
         $batchProcessor = new BatchSpanProcessor($exporter, $this->testClock);
         foreach ([$sampledSpan, $nonSampledSpan] as $span) {
@@ -305,7 +308,8 @@ class BatchSpanProcessorTest extends MockeryTestCase
                         return true;
                     }
                 )
-            );
+            )
+            ->andReturn(new CompletedFuture(0));
 
         $processor = new BatchSpanProcessor(
             $exporter,

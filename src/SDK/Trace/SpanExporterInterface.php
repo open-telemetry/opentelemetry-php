@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Future\FutureInterface;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#span-exporter
@@ -25,9 +26,9 @@ interface SpanExporterInterface
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#exportbatch
      *
-     * @psalm-return SpanExporterInterface::STATUS_*
+     * @psalm-return FutureInterface<int>
      */
-    public function export(iterable $spans, ?CancellationInterface $cancellation = null): int;
+    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface;
 
     /** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#shutdown-2 */
     public function shutdown(?CancellationInterface $cancellation = null): bool;

@@ -10,6 +10,7 @@ use Mockery\MockInterface;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -17,7 +18,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor
+ * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor
  */
 class SimpleSpanProcessorTest extends MockeryTestCase
 {
@@ -63,7 +64,7 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $spanData = new SpanData();
         $this->readableSpan->expects('getContext')->andReturn($this->sampledSpanContext);
         $this->readableSpan->expects('toSpanData')->andReturn($spanData);
-        $this->spanExporter->expects('export')->with([$spanData]);
+        $this->spanExporter->expects('export')->with([$spanData])->andReturn(new CompletedFuture(0));
         $this->simpleSpanProcessor->onEnd($this->readableSpan);
     }
 
