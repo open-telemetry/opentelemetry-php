@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib;
+namespace OpenTelemetry\Tests\Unit\Contrib\ZipkinToNewrelic;
 
-use OpenTelemetry\Contrib\Newrelic\Exporter;
+use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter;
 
 /**
- * @covers OpenTelemetry\Contrib\Newrelic\Exporter
+ * @covers OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter
  */
-class NewrelicExporterTest extends AbstractHttpExporterTest
+class ZipkinToNewrelicExporterTest extends AbstractHttpExporterTest
 {
-    protected const EXPORTER_NAME = 'test.newrelic';
+    protected const EXPORTER_NAME = 'test.zipkinToNR';
     protected const LICENSE_KEY = 'abc123';
 
     /**

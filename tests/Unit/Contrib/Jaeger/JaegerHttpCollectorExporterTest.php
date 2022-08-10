@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib;
+namespace OpenTelemetry\Tests\Unit\Contrib\Jaeger;
 
 use OpenTelemetry\Contrib\Jaeger\HttpCollectorExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;

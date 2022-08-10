@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib;
+namespace OpenTelemetry\Tests\Unit\Contrib\Jaeger;
 
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactoryInterface;
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterInterface;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib;
+namespace OpenTelemetry\Tests\Unit\Contrib\Prometheus;
 
 use OpenTelemetry\API\Metrics as API;
 use OpenTelemetry\Contrib\Prometheus\PrometheusExporter;

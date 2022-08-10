@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib;
+namespace OpenTelemetry\Tests\Unit\Contrib\OtlpHttp;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use GuzzleHttp\Client;
