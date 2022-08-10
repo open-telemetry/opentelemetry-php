@@ -16,7 +16,7 @@ use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use org\bovigo\vfs\vfsStream;
 
 /**
- * @covers OpenTelemetry\Contrib\OtlpGrpc\Exporter
+ * @covers \OpenTelemetry\Contrib\OtlpGrpc\Exporter
  */
 class OTLPGrpcExporterTest extends AbstractExporterTest
 {
@@ -55,7 +55,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
             ])
         );
 
-        $exporterStatusCode = $exporter->export([new SpanData()]);
+        $exporterStatusCode = $exporter->export([new SpanData()])->await();
 
         $this->assertSame(SpanExporterInterface::STATUS_SUCCESS, $exporterStatusCode);
     }
@@ -80,14 +80,14 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
             ])
         );
 
-        $exporterStatusCode = $exporter->export([new SpanData()]);
+        $exporterStatusCode = $exporter->export([new SpanData()])->await();
 
         $this->assertSame(SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE, $exporterStatusCode);
     }
 
     public function test_exporter_grpc_responds_as_unavailable(): void
     {
-        $this->assertEquals(SpanExporterInterface::STATUS_FAILED_RETRYABLE, (new Exporter())->export([new SpanData()]));
+        $this->assertEquals(SpanExporterInterface::STATUS_FAILED_RETRYABLE, (new Exporter())->export([new SpanData()])->await());
     }
 
     public function test_set_headers_with_environment_variables(): void
