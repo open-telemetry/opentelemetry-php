@@ -43,3 +43,4 @@ try {
     $rootScope->detach();
     $rootSpan->end();
 }
+$tracerProvider->shutdown();

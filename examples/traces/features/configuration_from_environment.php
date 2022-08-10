@@ -25,6 +25,12 @@ echo 'Starting Tracer' . PHP_EOL;
 
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
 $scope = $rootSpan->activate();
-$rootSpan->addEvent('my_event')->setAttribute('fruit', 'apple');
-$rootSpan->end();
-$scope->detach();
+
+try {
+    $rootSpan->addEvent('my_event')->setAttribute('fruit', 'apple');
+} finally {
+    $rootSpan->end();
+    $scope->detach();
+}
+
+$tracerProvider->shutdown();

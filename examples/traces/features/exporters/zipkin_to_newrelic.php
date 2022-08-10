@@ -47,8 +47,8 @@ $zipkinToNewrelicExporter = new ZipkinToNewrelicExporter(
 );
 
 echo 'Starting ZipkinToNewRelic example';
-$tracer = (new TracerProvider(new SimpleSpanProcessor($zipkinToNewrelicExporter)))
-    ->getTracer('io.opentelemetry.contrib.php');
+$tracerProvider = new TracerProvider(new SimpleSpanProcessor($zipkinToNewrelicExporter));
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 for ($i = 0; $i < 5; $i++) {
     // start a span, register some events
@@ -77,3 +77,4 @@ for ($i = 0; $i < 5; $i++) {
 echo PHP_EOL . 'ZipkinToNewrelic example complete!  See the results at https://one.newrelic.com/launcher/distributed-tracing.launcher?pane=eyJuZXJkbGV0SWQiOiJkaXN0cmlidXRlZC10cmFjaW5nLmhvbWUiLCJzb3J0SW5kZXgiOjAsInNvcnREaXJlY3Rpb24iOiJERVNDIiwicXVlcnkiOnsib3BlcmF0b3IiOiJBTkQiLCJpbmRleFF1ZXJ5Ijp7ImNvbmRpdGlvblR5cGUiOiJJTkRFWCIsIm9wZXJhdG9yIjoiQU5EIiwiY29uZGl0aW9uU2V0cyI6W119LCJzcGFuUXVlcnkiOnsib3BlcmF0b3IiOiJBTkQiLCJjb25kaXRpb25TZXRzIjpbeyJjb25kaXRpb25UeXBlIjoiU1BBTiIsIm9wZXJhdG9yIjoiQU5EIiwiY29uZGl0aW9ucyI6W3siYXR0ciI6InNlcnZpY2UubmFtZSIsIm9wZXJhdG9yIjoiRVEiLCJ2YWx1ZSI6ImFsd2F5c09uWmlwa2luVG9OZXdyZWxpY0V4YW1wbGUifV19XX19fQ==&platform[timeRange][duration]=1800000&platform[$isFallbackTimeRange]=true';
 
 echo PHP_EOL;
+$tracerProvider->shutdown();

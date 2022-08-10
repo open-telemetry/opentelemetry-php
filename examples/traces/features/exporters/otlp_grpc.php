@@ -42,3 +42,4 @@ $root->end();
 echo PHP_EOL . 'OTLP GRPC example complete!  ';
 
 echo PHP_EOL;
+$tracerProvider->shutdown();
