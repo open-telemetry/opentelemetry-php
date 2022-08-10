@@ -10,7 +10,6 @@ use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
@@ -24,8 +23,6 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 final class B3SinglePropagator implements TextMapPropagatorInterface
 {
     public const B3 = 'b3';
-
-    public static ContextKey $B3_DEBUG_FLAG_KEY;
 
     private const IS_DEBUG = 'd';
     private const IS_SAMPLED = '1';
@@ -43,7 +40,6 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
     {
         if (null === self::$instance) {
             self::$instance = new self();
-            self::$B3_DEBUG_FLAG_KEY = new ContextKey('OpenTelemetry Context Key B3 Debug Flag');
         }
 
         return self::$instance;
@@ -67,7 +63,7 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
         }
 
         // Build and inject the b3 header
-        $debugValue = $context->get(self::$B3_DEBUG_FLAG_KEY);
+        $debugValue = $context->get(B3DebugFlagContextKey::instance());
         if ($debugValue) {
             $b3 = $spanContext->getTraceId() . '-' . $spanContext->getSpanId() . '-' . $debugValue;
         } elseif ($spanContext->isSampled()) {
@@ -164,7 +160,7 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
         }
 
         if ($samplingState && strtolower($samplingState) === self::IS_DEBUG) {
-            $context = $context->with(self::$B3_DEBUG_FLAG_KEY, strtolower($samplingState));
+            $context = $context->with(B3DebugFlagContextKey::instance(), strtolower($samplingState));
         }
 
         $sampled = self::processSampledValue($samplingState);

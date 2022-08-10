@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\API\Unit\Trace\Propagation;
 
+use OpenTelemetry\API\Trace\Propagation\B3DebugFlagContextKey;
 use OpenTelemetry\API\Trace\Propagation\B3SinglePropagator;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
@@ -37,14 +37,6 @@ class B3SinglePropagatorTest extends TestCase
         $this->assertSame(
             ['b3'],
             $this->b3SinglePropagator->fields()
-        );
-    }
-
-    public function test_b3_debug_flag_key(): void
-    {
-        $this->assertEquals(
-            new ContextKey('OpenTelemetry Context Key B3 Debug Flag'),
-            B3SinglePropagator::$B3_DEBUG_FLAG_KEY
         );
     }
 
@@ -126,7 +118,7 @@ class B3SinglePropagatorTest extends TestCase
                 $this->withSpanContext(
                     SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
                     Context::getCurrent()
-                )->with(B3SinglePropagator::$B3_DEBUG_FLAG_KEY, self::DEBUG_FLAG)
+                )->with(B3DebugFlagContextKey::instance(), self::DEBUG_FLAG)
             );
 
         $this->assertSame(
@@ -156,7 +148,7 @@ class B3SinglePropagatorTest extends TestCase
 
         $this->assertEquals(
             self::DEBUG_FLAG,
-            $context->get(B3SinglePropagator::$B3_DEBUG_FLAG_KEY)
+            $context->get(B3DebugFlagContextKey::instance())
         );
 
         $this->assertEquals(
@@ -181,7 +173,7 @@ class B3SinglePropagatorTest extends TestCase
 
         $context = $this->b3SinglePropagator->extract($carrier);
 
-        $this->assertNull($context->get(B3SinglePropagator::$B3_DEBUG_FLAG_KEY));
+        $this->assertNull($context->get(B3DebugFlagContextKey::instance()));
 
         $this->assertEquals(
             SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
@@ -197,7 +189,7 @@ class B3SinglePropagatorTest extends TestCase
 
         $context = $this->b3SinglePropagator->extract($carrier);
 
-        $this->assertNull($context->get(B3SinglePropagator::$B3_DEBUG_FLAG_KEY));
+        $this->assertNull($context->get(B3DebugFlagContextKey::instance()));
 
         $this->assertEquals(
             SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),
@@ -213,7 +205,7 @@ class B3SinglePropagatorTest extends TestCase
 
         $context = $this->b3SinglePropagator->extract($carrier);
 
-        $this->assertNull($context->get(B3SinglePropagator::$B3_DEBUG_FLAG_KEY));
+        $this->assertNull($context->get(B3DebugFlagContextKey::instance()));
 
         $this->assertEquals(
             SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
@@ -229,7 +221,7 @@ class B3SinglePropagatorTest extends TestCase
 
         $context = $this->b3SinglePropagator->extract($carrier);
 
-        $this->assertNull($context->get(B3SinglePropagator::$B3_DEBUG_FLAG_KEY));
+        $this->assertNull($context->get(B3DebugFlagContextKey::instance()));
 
         $this->assertEquals(
             SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),

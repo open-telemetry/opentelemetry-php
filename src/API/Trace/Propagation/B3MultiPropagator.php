@@ -8,7 +8,6 @@ use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
@@ -70,8 +69,6 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
      */
     public const DEBUG_FLAG = 'X-B3-Flags';
 
-    public static ContextKey $B3_DEBUG_FLAG_KEY;
-
     private const IS_SAMPLED = '1';
     private const VALID_SAMPLED = [self::IS_SAMPLED, 'true'];
     private const IS_NOT_SAMPLED = '0';
@@ -91,7 +88,6 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
     {
         if (null === self::$instance) {
             self::$instance = new self();
-            self::$B3_DEBUG_FLAG_KEY = new ContextKey('OpenTelemetry Context Key B3 Debug Flag');
         }
 
         return self::$instance;
@@ -118,7 +114,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
         $setter->set($carrier, self::TRACE_ID, $spanContext->getTraceId());
         $setter->set($carrier, self::SPAN_ID, $spanContext->getSpanId());
 
-        $debugValue = $context->get(self::$B3_DEBUG_FLAG_KEY);
+        $debugValue = $context->get(B3DebugFlagContextKey::instance());
         if ($debugValue && $debugValue === self::IS_SAMPLED) {
             $setter->set($carrier, self::DEBUG_FLAG, self::IS_SAMPLED);
         } else {
@@ -175,7 +171,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
         }
 
         if ($debug && $debug === self::IS_SAMPLED) {
-            $context = $context->with(self::$B3_DEBUG_FLAG_KEY, self::IS_SAMPLED);
+            $context = $context->with(B3DebugFlagContextKey::instance(), self::IS_SAMPLED);
             $isSampled = SpanContext::SAMPLED_FLAG;
         } else {
             $isSampled = ($sampled === SpanContext::SAMPLED_FLAG);
