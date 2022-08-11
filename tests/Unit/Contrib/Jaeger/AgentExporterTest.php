@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-
 namespace OpenTelemetry\Tests\Unit\Contrib\Jaeger;
-
 
 use OpenTelemetry\Contrib\Jaeger\AgentExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
