@@ -30,3 +30,6 @@ service:
       receivers: [otlp, zipkin]
       exporters: [zipkin, logging, newrelic]
       processors: [batch]
+    metrics:
+      receivers: [otlp]
+      exporters: [logging]

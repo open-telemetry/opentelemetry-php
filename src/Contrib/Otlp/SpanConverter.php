@@ -8,8 +8,6 @@ use function hex2bin;
 use function iterator_to_array;
 use OpenTelemetry\API\Trace as API;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
-use Opentelemetry\Proto\Common\V1\AnyValue;
-use Opentelemetry\Proto\Common\V1\ArrayValue;
 use Opentelemetry\Proto\Common\V1\InstrumentationScope;
 use Opentelemetry\Proto\Common\V1\KeyValue;
 use Opentelemetry\Proto\Resource\V1\Resource as Resource_;
@@ -111,44 +109,9 @@ class SpanConverter implements SpanConverterInterface
             /** @psalm-suppress InvalidArgument */
             $pElement->getAttributes()[] = (new KeyValue())
                 ->setKey($key)
-                ->setValue($this->convertAnyValue($value));
+                ->setValue(AttributesConverter::convertAnyValue($value));
         }
         $pElement->setDroppedAttributesCount($attributes->getDroppedAttributesCount());
-    }
-
-    private function convertAnyValue($value): AnyValue
-    {
-        $result = new AnyValue();
-
-        switch (true) {
-            case is_array($value):
-                $values = new ArrayValue();
-                foreach ($value as $element) {
-                    /** @psalm-suppress InvalidArgument */
-                    $values->getValues()[] = $this->convertAnyValue($element);
-                }
-                $result->setArrayValue($values);
-
-                break;
-            case is_int($value):
-                $result->setIntValue($value);
-
-                break;
-            case is_bool($value):
-                $result->setBoolValue($value);
-
-                break;
-            case is_float($value):
-                $result->setDoubleValue($value);
-
-                break;
-            case is_string($value):
-                $result->setStringValue($value);
-
-                break;
-        }
-
-        return $result;
     }
 
     private function convertSpanKind(int $kind): int

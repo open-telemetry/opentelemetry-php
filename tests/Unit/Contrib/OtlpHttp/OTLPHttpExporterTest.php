@@ -21,7 +21,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 
 /**
- * @covers OpenTelemetry\Contrib\OtlpHttp\Exporter
+ * @covers \OpenTelemetry\Contrib\OtlpHttp\Exporter
  */
 class OTLPHttpExporterTest extends AbstractExporterTest
 {
@@ -59,7 +59,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
 
         $this->assertEquals(
             $expected,
-            $exporter->export([new SpanData()])
+            $exporter->export([new SpanData()])->await(),
         );
     }
 
@@ -90,7 +90,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
 
         $this->assertEquals(
             $expected,
-            $exporter->export([new SpanData()])
+            $exporter->export([new SpanData()])->await(),
         );
     }
 
@@ -129,7 +129,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         $client = new Client(['handler' => $stack]);
         $exporter = new Exporter($client, new HttpFactory(), new HttpFactory());
 
-        $exporter->export([new SpanData()]);
+        $exporter->export([new SpanData()])->await();
 
         $request = $container[0]['request'];
 
@@ -164,7 +164,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
                 $this->getClientInterfaceMock(),
                 $this->getRequestFactoryInterfaceMock(),
                 $this->getStreamFactoryInterfaceMock()
-            ))->export([])
+            ))->export([])->await(),
         );
     }
 

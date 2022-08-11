@@ -4,28 +4,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Metrics;
 
-/*
- * Name: UpDownCounter
- * Instrument kind : Synchronous additive
- * Function(argument) : Add(increment) where increment is a numeric value
- * Default aggregation : Sum
- * Notes : Per-request, part of a non-monotonic sum
- *
- * UpDownCounter supports negative increments. This makes UpDownCounter
- * not useful for computing a rate aggregation. It aggregates a Sum,
- * only the sum is non-monotonic. It is generally useful for capturing changes
- * in an amount of resources used, or any quantity that rises and falls during
- * a request.
- *
- */
+use OpenTelemetry\Context\Context;
+
 interface UpDownCounterInterface
 {
+
     /**
-     * Updates counter value with the positive or negative int that is passed in.
-     *
-     * @access	public
-     * @param	int|float $increment
-     * @return	int returns the non-monotonic sum
+     * @param float|int $amount amount to increment / decrement by
+     * @param iterable<non-empty-string, string|bool|float|int|array|null> $attributes
+     *        attributes of the data point
+     * @param Context|false|null $context execution context
      */
-    public function add($increment) : int;
+    public function add($amount, iterable $attributes = [], $context = null): void;
 }
