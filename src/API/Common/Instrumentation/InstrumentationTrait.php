@@ -8,6 +8,7 @@ use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\API\Trace\NoopTracer;
+use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\NullPropagator;
@@ -63,6 +64,7 @@ to activate and use the instrumentation with the API/SDK.
 trait InstrumentationTrait
 {
     private TextMapPropagatorInterface $propagator;
+    private TracerProviderInterface $tracerProvider;
     private TracerInterface $tracer;
     private MeterInterface $meter;
     private LoggerInterface $logger;
@@ -125,12 +127,18 @@ trait InstrumentationTrait
 
     public function setTracerProvider(TracerProviderInterface $tracerProvider): void
     {
+        $this->tracerProvider = $tracerProvider;
         // @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.12.0/specification/trace/api.md#get-a-tracer
         $this->tracer = $tracerProvider->getTracer(
             $this->getName(),
             $this->getVersion(),
             $this->getSchemaUrl(),
         );
+    }
+
+    public function getTracerProvider(): TracerProviderInterface
+    {
+        return $this->tracerProvider;
     }
 
     public function getTracer(): TracerInterface
@@ -177,6 +185,7 @@ trait InstrumentationTrait
     {
         $this->propagator = new NullPropagator();
         $this->tracer = new NoopTracer();
+        $this->tracerProvider = new NoopTracerProvider();
         /** @phan-suppress-next-line PhanAccessMethodInternal */
         $this->meter = new NoopMeter();
         $this->logger = new NullLogger();
