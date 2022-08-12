@@ -6,6 +6,8 @@ namespace OpenTelemetry\Tests\Unit\Contrib\ZipkinToNewrelic;
 
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter;
 
+use OpenTelemetry\Tests\Unit\Contrib\AbstractHttpExporterTest;
+
 /**
  * @covers OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter
  */

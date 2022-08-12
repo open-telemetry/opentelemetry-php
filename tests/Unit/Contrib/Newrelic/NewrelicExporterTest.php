@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Contrib\Newrelic;
 
 use OpenTelemetry\Contrib\Newrelic\Exporter;
+use OpenTelemetry\Tests\Unit\Contrib\AbstractHttpExporterTest;
 
 /**
  * @covers OpenTelemetry\Contrib\Newrelic\Exporter

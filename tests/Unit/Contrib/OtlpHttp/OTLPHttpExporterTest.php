@@ -14,6 +14,7 @@ use GuzzleHttp\Psr7\Response;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use OpenTelemetry\Tests\Unit\Contrib\UsesHttpClientTrait;
 use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use Psr\Http\Client\ClientExceptionInterface;

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Contrib\Jaeger;
 
 use OpenTelemetry\Contrib\Jaeger\Exporter;
+use OpenTelemetry\Tests\Unit\Contrib\AbstractHttpExporterTest;
+use OpenTelemetry\Tests\Unit\Contrib\UsesHttpClientTrait;
 
 /**
  * @covers OpenTelemetry\Contrib\Jaeger\Exporter

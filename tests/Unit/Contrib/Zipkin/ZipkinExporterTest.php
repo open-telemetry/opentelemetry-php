@@ -6,6 +6,8 @@ namespace OpenTelemetry\Tests\Unit\Contrib\Zipkin;
 
 use OpenTelemetry\Contrib\Zipkin\Exporter;
 
+use OpenTelemetry\Tests\Unit\Contrib\AbstractHttpExporterTest;
+
 /**
  * @covers OpenTelemetry\Contrib\Zipkin\Exporter
  */
