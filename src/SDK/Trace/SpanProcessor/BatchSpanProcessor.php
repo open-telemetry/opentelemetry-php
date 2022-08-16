@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Common\Time\StopWatch;
@@ -71,7 +72,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     /**
      * @inheritDoc
      */
-    public function onStart(ReadWriteSpanInterface $span, ?Context $parentContext = null): void
+    public function onStart(ReadWriteSpanInterface $span, Context $parentContext): void
     {
     }
 
@@ -98,13 +99,13 @@ class BatchSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
-    public function forceFlush(): bool
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         if (!$this->running || $this->exporter === null) {
             return true;
         }
 
-        $this->exporter->export($this->queue);
+        $this->exporter->export($this->queue)->await();
         $this->queue = [];
         $this->stopwatch->reset();
         $this->exporter->forceFlush();
@@ -113,7 +114,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
-    public function shutdown(): bool
+    public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if (!$this->running) {
             return true;
