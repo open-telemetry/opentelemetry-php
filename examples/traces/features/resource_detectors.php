@@ -20,3 +20,5 @@ echo 'Starting Tracer' . PHP_EOL;
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
 $rootSpan->activate();
 $rootSpan->end();
+
+$tracerProvider->shutdown();

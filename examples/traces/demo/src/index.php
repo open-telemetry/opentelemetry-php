@@ -13,6 +13,7 @@ use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use Psr\Http\Message\RequestInterface;
@@ -22,6 +23,7 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Routing\RouteContext;
 
 $tracerProvider = (new TracerProviderFactory('example'))->create();
+ShutdownHandler::register([$tracerProvider, 'shutdown']);
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 $cb = new ContainerBuilder();
@@ -38,6 +40,7 @@ $container = $cb->addDefinitions([
                     ->setAttribute('http.method', $request->getMethod())
                     ->setAttribute('http.url', $request->getUri())
                     ->startSpan();
+
                 $ctx = $span->storeInContext(Context::getCurrent());
                 $carrier = [];
                 TraceContextPropagator::getInstance()->inject($carrier, null, $ctx);
@@ -45,6 +48,7 @@ $container = $cb->addDefinitions([
                 foreach ($carrier as $name => $value) {
                     $request = $request->withAddedHeader($name, $value);
                 }
+
                 $promise = $handler($request, $options);
                 $promise->then(function (Response $response) use ($span) {
                     $span->setAttribute('http.status_code', $response->getStatusCode())
@@ -78,10 +82,15 @@ $app->add(function (Request $request, RequestHandler $handler) use ($tracer) {
         ->setParent($parent)
         ->setSpanKind(SpanKind::KIND_SERVER)
         ->startSpan();
-    $root->activate();
-    $response = $handler->handle($request);
-    $root->setStatus($response->getStatusCode() < 500 ? StatusCode::STATUS_OK : StatusCode::STATUS_ERROR);
-    $root->end();
+    $scope = $root->activate();
+
+    try {
+        $response = $handler->handle($request);
+        $root->setStatus($response->getStatusCode() < 500 ? StatusCode::STATUS_OK : StatusCode::STATUS_ERROR);
+    } finally {
+        $root->end();
+        $scope->detach();
+    }
 
     return $response;
 });

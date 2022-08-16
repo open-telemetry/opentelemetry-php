@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -36,12 +37,12 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         }
 
         if (null !== $this->exporter) {
-            $this->exporter->export([$span->toSpanData()]);
+            $this->exporter->export([$span->toSpanData()])->await();
         }
     }
 
     /** @inheritDoc */
-    public function forceFlush(): bool
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         if (!$this->running || $this->exporter === null) {
             return true;
@@ -53,7 +54,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
-    public function shutdown(): bool
+    public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if (!$this->running) {
             return true;

@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter
+ * @covers \OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter
  */
 class ConsoleSpanExporterTest extends AbstractExporterTest
 {
@@ -64,7 +64,7 @@ class ConsoleSpanExporterTest extends AbstractExporterTest
             SpanExporterInterface::STATUS_SUCCESS,
             (new ConsoleSpanExporter($converter))->export([
                 $this->createMock(SpanDataInterface::class),
-            ])
+            ])->await(),
         );
 
         ob_end_clean();
@@ -84,7 +84,7 @@ class ConsoleSpanExporterTest extends AbstractExporterTest
             SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE,
             (new ConsoleSpanExporter($converter))->export([
                 $this->createMock(SpanDataInterface::class),
-            ])
+            ])->await(),
         );
 
         ob_end_clean();
@@ -108,7 +108,7 @@ class ConsoleSpanExporterTest extends AbstractExporterTest
 
         (new ConsoleSpanExporter($converter))->export([
             $this->createMock(SpanDataInterface::class),
-        ]);
+        ])->await();
     }
 
     public function test_from_connection_string(): void

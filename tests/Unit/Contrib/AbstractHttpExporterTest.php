@@ -53,7 +53,7 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
             $expected,
             $this->createExporter()->export([
                 $this->createMock(SpanData::class),
-            ])
+            ])->await(),
         );
     }
 
@@ -107,7 +107,7 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
             $expected,
             $this->createExporter()->export([
                 $this->createMock(SpanData::class),
-            ])
+            ])->await(),
         );
     }
 

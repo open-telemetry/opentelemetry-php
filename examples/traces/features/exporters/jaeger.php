@@ -55,3 +55,5 @@ $rootSpan->end();
 echo PHP_EOL . 'Jaeger example complete!  See the results at http://localhost:16686/';
 
 echo PHP_EOL;
+
+$tracerProvider->shutdown();

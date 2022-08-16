@@ -49,3 +49,4 @@ $root->end();
 echo PHP_EOL . 'Zipkin example complete!  See the results at http://localhost:9411/';
 
 echo PHP_EOL;
+$tracerProvider->shutdown();

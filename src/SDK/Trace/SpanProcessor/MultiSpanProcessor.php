@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
@@ -53,7 +54,7 @@ final class MultiSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
-    public function shutdown(): bool
+    public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         $result = true;
 
@@ -65,7 +66,7 @@ final class MultiSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
-    public function forceFlush(): bool
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         $result = true;
 

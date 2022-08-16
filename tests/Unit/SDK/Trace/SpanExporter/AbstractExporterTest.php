@@ -38,6 +38,6 @@ abstract class AbstractExporterTest extends TestCase
         $span = $this->createMock(SpanData::class);
         $exporter->shutdown();
 
-        $this->assertSame(SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE, $exporter->export([$span]));
+        $this->assertSame(SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE, $exporter->export([$span])->await());
     }
 }

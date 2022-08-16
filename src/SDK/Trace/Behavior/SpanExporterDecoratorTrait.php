@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\Behavior;
 
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -13,15 +15,15 @@ trait SpanExporterDecoratorTrait
 
     /**
      * @param iterable<SpanDataInterface> $spans
-     * @return int
-     * @psalm-return SpanExporterInterface::STATUS_*
+     * @return FutureInterface<int>
      */
-    public function export(iterable $spans): int
+    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
     {
         $response = $this->decorated->export(
-            $this->beforeExport($spans)
+            $this->beforeExport($spans),
+            $cancellation,
         );
-        $this->afterExport($spans, $response);
+        $this->afterExport($spans, $response->await());
 
         return $response;
     }
@@ -30,14 +32,14 @@ trait SpanExporterDecoratorTrait
 
     abstract protected function afterExport(iterable $spans, int $exporterResponse): void;
 
-    public function shutdown(): bool
+    public function shutdown(?CancellationInterface $cancellation = null): bool
     {
-        return $this->decorated->shutdown();
+        return $this->decorated->shutdown($cancellation);
     }
 
-    public function forceFlush(): bool
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
-        return $this->decorated->forceFlush();
+        return $this->decorated->forceFlush($cancellation);
     }
 
     public function setDecorated(SpanExporterInterface $decorated): void

@@ -280,7 +280,11 @@ return [
 
     // Add any issue types (such as `'PhanUndeclaredMethod'`)
     // to this deny-list to inhibit them from being reported.
-    'suppress_issue_types' => [],
+    'suppress_issue_types' => [
+        'PhanAccessClassInternal',
+        'PhanAccessMethodInternal',
+        'PhanAccessPropertyInternal',
+    ],
 
     // A regular expression to match files to be excluded
     // from parsing and analysis and will not be read at all.

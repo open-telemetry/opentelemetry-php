@@ -4,75 +4,34 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-use InvalidArgumentException;
-use OpenTelemetry\API\Metrics as API;
+use OpenTelemetry\API\Metrics\UpDownCounterInterface;
+use OpenTelemetry\SDK\Common\Time\ClockInterface;
 
-/*
- * Name: UpDownCounter
- * Instrument kind : Synchronous additive
- * Function(argument) : add(increment)
- * Default aggregation : Sum
- * Notes : Per-request, part of a non-monotonic sum
- *
- * UpDownCounter supports negative increments. This makes UpDownCounter
- * not useful for computing a rate aggregation. It aggregates a Sum,
- * only the sum is non-monotonic. It is generally useful for capturing changes
- * in an amount of resources used, or any quantity that rises and falls during
- * a request.
+/**
+ * @internal
  */
-class UpDownCounter extends AbstractMetric implements API\UpDownCounterInterface, API\LabelableMetricInterfaceInterface
+final class UpDownCounter implements UpDownCounterInterface
 {
-    use HasLabelsTrait;
+    private MetricWriterInterface $writer;
+    private ReferenceCounterInterface $referenceCounter;
+    private ClockInterface $clock;
 
-    protected int $value = 0;
-
-    /**
-     * getType
-     *
-     * @access	public
-     * @return	int
-     */
-    public function getType(): int
+    public function __construct(MetricWriterInterface $writer, ReferenceCounterInterface $referenceCounter, ClockInterface $clock)
     {
-        return API\MetricKind::UP_DOWN_COUNTER;
+        $this->writer = $writer;
+        $this->referenceCounter = $referenceCounter;
+        $this->clock = $clock;
+
+        $this->referenceCounter->acquire();
     }
 
-    /**
-     * Returns the current value
-     *
-     * @access	public
-     * @return	int
-     */
-    public function getValue(): int
+    public function __destruct()
     {
-        return $this->value;
+        $this->referenceCounter->release();
     }
 
-    /**
-     * Updates the UpDownCounter's value with the specified increment then returns the current value.
-     *
-     * @access	public
-     *
-     * @param int|float $increment, accepts INTs or FLOATs. If increment is a float, it is truncated.
-     *
-     * @return int $value
-     */
-
-    public function add($increment): int
+    public function add($amount, iterable $attributes = [], $context = null): void
     {
-        if (is_float($increment)) {
-            /*
-             *
-             * todo: send the following message to the log when logger is implemented:
-             *       Floating point detected, ignoring the fractional decimal places.
-             */
-            $increment = (int) $increment;
-        }
-        if (!is_int($increment)) {
-            throw new InvalidArgumentException('Only numerical values can be used to update the UpDownCounter.');
-        }
-        $this->value += $increment;
-
-        return $this->value;
+        $this->writer->record($amount, $attributes, $context, $this->clock->now());
     }
 }
