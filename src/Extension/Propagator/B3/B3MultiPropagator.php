@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Contrib\Propagator;
+namespace OpenTelemetry\Extension\Propagator\B3;
 
 use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
