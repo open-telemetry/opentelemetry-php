@@ -6,20 +6,19 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use Closure;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use SplQueue;
 use function sprintf;
 use Throwable;
 
-class SimpleSpanProcessor implements SpanProcessorInterface, LoggerAwareInterface
+class SimpleSpanProcessor implements SpanProcessorInterface
 {
-    use LoggerAwareTrait;
+    use LogsMessagesTrait;
 
     private SpanExporterInterface $exporter;
 
@@ -100,9 +99,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface, LoggerAwareInterfac
 
                         continue;
                     }
-                    if ($this->logger !== null) {
-                        $this->logger->error(sprintf('Unhandled %s error', $taskName), ['exception' => $e]);
-                    }
+                    self::logError(sprintf('Unhandled %s error', $taskName), ['exception' => $e]);
                 }
             }
         } finally {

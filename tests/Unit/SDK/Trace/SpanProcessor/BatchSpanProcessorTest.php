@@ -11,6 +11,7 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
+use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
@@ -20,6 +21,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor
@@ -360,16 +362,22 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $exporter->method('export')->willThrowException(new LogicException());
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('error');
+        $logger->expects($this->once())->method('log')->with(LogLevel::ERROR);
 
         $processor = new BatchSpanProcessor($exporter, $this->testClock);
-        $processor->setLogger($logger);
 
         $span = $this->createSampledSpanMock();
         $processor->onStart($span, Context::getCurrent());
         $processor->onEnd($span);
 
-        $processor->forceFlush();
+        $previousLogger = LoggerHolder::get();
+        LoggerHolder::set($logger);
+
+        try {
+            $processor->forceFlush();
+        } finally {
+            LoggerHolder::set($previousLogger);
+        }
     }
 
     public function test_throwing_exporter_flush(): void
@@ -401,16 +409,22 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $exporter->method('shutdown')->willThrowException(new LogicException());
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('error');
+        $logger->expects($this->once())->method('log')->with(LogLevel::ERROR);
 
         $processor = new BatchSpanProcessor($exporter, $this->testClock);
-        $processor->setLogger($logger);
 
         $span = $this->createSampledSpanMock();
         $processor->onStart($span, Context::getCurrent());
         $processor->onEnd($span);
 
-        $processor->forceFlush();
+        $previousLogger = LoggerHolder::get();
+        LoggerHolder::set($logger);
+
+        try {
+            $processor->forceFlush();
+        } finally {
+            LoggerHolder::set($previousLogger);
+        }
     }
 
     public function test_throwing_exporter_flush_rethrows_in_original_caller(): void

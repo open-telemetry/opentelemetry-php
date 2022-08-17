@@ -12,12 +12,14 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
+use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor
@@ -138,16 +140,22 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $exporter->method('export')->willThrowException(new LogicException());
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('error');
+        $logger->expects($this->once())->method('log')->with(LogLevel::ERROR);
 
         $processor = new SimpleSpanProcessor($exporter);
-        $processor->setLogger($logger);
 
         $this->readableSpan->expects('getContext')->andReturn($this->sampledSpanContext);
         $this->readableSpan->expects('toSpanData')->andReturn(new SpanData());
 
-        $processor->onStart($this->readWriteSpan, Context::getCurrent());
-        $processor->onEnd($this->readableSpan);
+        $previousLogger = LoggerHolder::get();
+        LoggerHolder::set($logger);
+
+        try {
+            $processor->onStart($this->readWriteSpan, Context::getCurrent());
+            $processor->onEnd($this->readableSpan);
+        } finally {
+            LoggerHolder::set($previousLogger);
+        }
     }
 
     public function test_throwing_exporter_flush(): void

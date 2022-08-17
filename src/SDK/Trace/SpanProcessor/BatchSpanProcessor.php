@@ -8,6 +8,7 @@ use function assert;
 use function count;
 use InvalidArgumentException;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
@@ -15,15 +16,13 @@ use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use SplQueue;
 use function sprintf;
 use Throwable;
 
-class BatchSpanProcessor implements SpanProcessorInterface, LoggerAwareInterface
+class BatchSpanProcessor implements SpanProcessorInterface
 {
-    use LoggerAwareTrait;
+    use LogsMessagesTrait;
 
     public const DEFAULT_SCHEDULE_DELAY = 5000;
     public const DEFAULT_EXPORT_TIMEOUT = 30000;
@@ -166,9 +165,7 @@ class BatchSpanProcessor implements SpanProcessorInterface, LoggerAwareInterface
 
                             continue;
                         }
-                        if ($this->logger !== null) {
-                            $this->logger->error(sprintf('Unhandled %s error', $flushMethod), ['exception' => $e]);
-                        }
+                        self::logError(sprintf('Unhandled %s error', $flushMethod), ['exception' => $e]);
                     }
                 }
 
@@ -185,9 +182,7 @@ class BatchSpanProcessor implements SpanProcessorInterface, LoggerAwareInterface
                 try {
                     $this->exporter->export($this->queue->dequeue())->await();
                 } catch (Throwable $e) {
-                    if ($this->logger !== null) {
-                        $this->logger->error('Unhandled export error', ['exception' => $e]);
-                    }
+                    self::logError('Unhandled export error', ['exception' => $e]);
                 } finally {
                     $this->queueSize -= $batchSize;
                 }
