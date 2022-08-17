@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\API\Unit\Trace\Propagation;
+namespace OpenTelemetry\Tests\Unit\Contrib\Propagator;
 
-use OpenTelemetry\API\Trace\Propagation\B3DebugFlagContextKey;
 use OpenTelemetry\Context\ContextKey;
+use OpenTelemetry\Contrib\Propagator\B3DebugFlagContextKey;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\API\Trace\Propagation\B3DebugFlagContextKey
+ * @covers OpenTelemetry\Contrib\Propagator\B3DebugFlagContextKey
  */
 class B3DebugFlagContextKeyTest extends TestCase
 {

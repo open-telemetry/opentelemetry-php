@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\API\Unit\Trace\Propagation;
+namespace OpenTelemetry\Tests\Unit\Contrib\Propagator;
 
-use OpenTelemetry\API\Trace\Propagation\B3DebugFlagContextKey;
-use OpenTelemetry\API\Trace\Propagation\B3MultiPropagator;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Contrib\Propagator\B3DebugFlagContextKey;
+use OpenTelemetry\Contrib\Propagator\B3MultiPropagator;
 use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\API\Trace\Propagation\B3MultiPropagator
+ * @covers OpenTelemetry\Contrib\Propagator\B3MultiPropagator
  */
 class B3MultiPropagatorTest extends TestCase
 {
