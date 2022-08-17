@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib;
+namespace OpenTelemetry\Tests\Unit\Contrib\Zipkin;
 
-use OpenTelemetry\Contrib\Newrelic\Exporter;
+use OpenTelemetry\Contrib\Zipkin\Exporter;
+
+use OpenTelemetry\Tests\Unit\Contrib\AbstractHttpExporterTest;
 
 /**
- * @covers OpenTelemetry\Contrib\Newrelic\Exporter
+ * @covers OpenTelemetry\Contrib\Zipkin\Exporter
  */
-class NewrelicExporterTest extends AbstractHttpExporterTest
+class ZipkinExporterTest extends AbstractHttpExporterTest
 {
-    protected const EXPORTER_NAME = 'test.newrelic';
-    protected const LICENSE_KEY = 'abc123';
+    protected const EXPORTER_NAME = 'test.zipkin';
 
     /**
      * @psalm-suppress PossiblyInvalidArgument
@@ -22,7 +23,6 @@ class NewrelicExporterTest extends AbstractHttpExporterTest
         return new Exporter(
             self::EXPORTER_NAME,
             $dsn,
-            self::LICENSE_KEY,
             $this->getClientInterfaceMock(),
             $this->getRequestFactoryInterfaceMock(),
             $this->getStreamFactoryInterfaceMock()

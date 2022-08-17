@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib;
+namespace OpenTelemetry\Tests\Unit\Contrib\Jaeger;
 
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterFactoryInterface;
 use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterInterface;
@@ -10,6 +10,7 @@ use OpenTelemetry\Contrib\Jaeger\HttpSender;
 use OpenTelemetry\Contrib\Jaeger\ParsedEndpointUrl;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\Tests\Unit\Contrib\UsesHttpClientTrait;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 use Thrift\Protocol\TProtocol;
