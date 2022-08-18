@@ -6,7 +6,9 @@ namespace OpenTelemetry\API\Trace\Propagation;
 
 use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\API\Trace\SpanContextFactory;
 use OpenTelemetry\API\Trace\SpanContextInterface;
+use OpenTelemetry\API\Trace\ValidationSpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
@@ -159,14 +161,14 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
 
         // Validates the traceId, spanId and sampled
         // Returns an invalid spanContext if any of the checks fail
-        if (!SpanContext::isValidTraceId($traceId) || !SpanContext::isValidSpanId($spanId)) {
+        if (!ValidationSpanContext::isValidTraceId($traceId) || !ValidationSpanContext::isValidSpanId($spanId)) {
             return SpanContext::getInvalid();
         }
 
         $isSampled = ($sampled === SpanContext::SAMPLED_FLAG);
 
         // Only traceparent header is extracted. No tracestate.
-        return SpanContext::createFromRemoteParent(
+        return SpanContextFactory::createFromRemoteParent(
             $traceId,
             $spanId,
             $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT
