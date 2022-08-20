@@ -6,11 +6,12 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 RUN chmod +x /usr/local/bin/install-php-extensions; \
     apk add --update binutils; \
     install-php-extensions \
-        ast-1.0.14 \
+        ast \
         xdebug \
         zip \
         pcntl \
         grpc \
+        runkit7-alpha \
         sockets \
         intl \
         @composer \
