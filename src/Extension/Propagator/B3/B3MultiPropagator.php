@@ -28,7 +28,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
      *
      * @see https://github.com/openzipkin/b3-propagation#traceid-1
      */
-    public const TRACE_ID = 'X-B3-TraceId';
+    private const TRACE_ID = 'X-B3-TraceId';
 
     /**
      * The X-B3-SpanId header is required and is encoded as 16 lower-hex characters.
@@ -37,7 +37,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
      *
      * @see https://github.com/openzipkin/b3-propagation#spanid-1
      */
-    public const SPAN_ID = 'X-B3-SpanId';
+    private const SPAN_ID = 'X-B3-SpanId';
 
     /**
      * The X-B3-ParentSpanId header must be present on a child span and absent on the root span.
@@ -46,7 +46,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
      *
      * @see https://github.com/openzipkin/b3-propagation#parentspanid-1
      */
-    public const PARENT_SPAN_ID = 'X-B3-ParentSpanId';
+    private const PARENT_SPAN_ID = 'X-B3-ParentSpanId';
 
     /**
      * An accept sampling decision is encoded as X-B3-Sampled: 1 and a deny as X-B3-Sampled: 0.
@@ -58,7 +58,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
      *
      * @see https://github.com/openzipkin/b3-propagation#sampling-state-1
      */
-    public const SAMPLED = 'X-B3-Sampled';
+    private const SAMPLED = 'X-B3-Sampled';
 
     /**
      * Debug is encoded as X-B3-Flags: 1.
@@ -67,14 +67,14 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
      *
      * @see https://github.com/openzipkin/b3-propagation#debug-flag
      */
-    public const DEBUG_FLAG = 'X-B3-Flags';
+    private const DEBUG_FLAG = 'X-B3-Flags';
 
     private const IS_SAMPLED = '1';
     private const VALID_SAMPLED = [self::IS_SAMPLED, 'true'];
     private const IS_NOT_SAMPLED = '0';
     private const VALID_NON_SAMPLED = [self::IS_NOT_SAMPLED, 'false'];
 
-    public const FIELDS = [
+    private const FIELDS = [
         self::TRACE_ID,
         self::SPAN_ID,
         self::PARENT_SPAN_ID,

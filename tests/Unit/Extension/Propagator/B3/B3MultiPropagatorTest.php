@@ -22,11 +22,21 @@ class B3MultiPropagatorTest extends TestCase
     private const IS_SAMPLED = '1';
     private const IS_NOT_SAMPLED = '0';
 
+    private $TRACE_ID;
+    private $SPAN_ID;
+    private $SAMPLED;
+    private $DEBUG_FLAG;
+
     private B3MultiPropagator $b3MultiPropagator;
 
     protected function setUp(): void
     {
         $this->b3MultiPropagator = B3MultiPropagator::getInstance();
+        $b3MultiFields = $this->b3MultiPropagator->fields();
+        $this->TRACE_ID = $b3MultiFields[0];
+        $this->SPAN_ID = $b3MultiFields[1];
+        $this->SAMPLED = $b3MultiFields[3];
+        $this->DEBUG_FLAG = $b3MultiFields[4];
     }
 
     public function test_fields(): void
@@ -80,9 +90,9 @@ class B3MultiPropagatorTest extends TestCase
 
         $this->assertSame(
             [
-                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+                $this->TRACE_ID => self::TRACE_ID_BASE16,
+                $this->SPAN_ID => self::SPAN_ID_BASE16,
+                $this->SAMPLED => self::IS_SAMPLED,
             ],
             $carrier
         );
@@ -104,9 +114,9 @@ class B3MultiPropagatorTest extends TestCase
 
         $this->assertSame(
             [
-                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-                B3MultiPropagator::SAMPLED => self::IS_NOT_SAMPLED,
+                $this->TRACE_ID => self::TRACE_ID_BASE16,
+                $this->SPAN_ID => self::SPAN_ID_BASE16,
+                $this->SAMPLED => self::IS_NOT_SAMPLED,
             ],
             $carrier
         );
@@ -128,9 +138,9 @@ class B3MultiPropagatorTest extends TestCase
 
         $this->assertSame(
             [
-                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-                B3MultiPropagator::DEBUG_FLAG => self::IS_SAMPLED,
+                $this->TRACE_ID => self::TRACE_ID_BASE16,
+                $this->SPAN_ID => self::SPAN_ID_BASE16,
+                $this->DEBUG_FLAG => self::IS_SAMPLED,
             ],
             $carrier
         );
@@ -152,9 +162,9 @@ class B3MultiPropagatorTest extends TestCase
 
         $this->assertSame(
             [
-                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-                B3MultiPropagator::DEBUG_FLAG => self::IS_SAMPLED,
+                $this->TRACE_ID => self::TRACE_ID_BASE16,
+                $this->SPAN_ID => self::SPAN_ID_BASE16,
+                $this->DEBUG_FLAG => self::IS_SAMPLED,
             ],
             $carrier
         );
@@ -171,9 +181,9 @@ class B3MultiPropagatorTest extends TestCase
     public function test_extract_debug_context(): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::DEBUG_FLAG => self::IS_SAMPLED,
+            $this->TRACE_ID => self::TRACE_ID_BASE16,
+            $this->SPAN_ID => self::SPAN_ID_BASE16,
+            $this->DEBUG_FLAG => self::IS_SAMPLED,
         ];
 
         $context = $this->b3MultiPropagator->extract($carrier);
@@ -192,10 +202,10 @@ class B3MultiPropagatorTest extends TestCase
     public function test_extract_debug_with_sampled_context(): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
-            B3MultiPropagator::DEBUG_FLAG => self::IS_SAMPLED,
+            $this->TRACE_ID => self::TRACE_ID_BASE16,
+            $this->SPAN_ID => self::SPAN_ID_BASE16,
+            $this->SAMPLED => self::IS_SAMPLED,
+            $this->DEBUG_FLAG => self::IS_SAMPLED,
         ];
 
         $context = $this->b3MultiPropagator->extract($carrier);
@@ -214,10 +224,10 @@ class B3MultiPropagatorTest extends TestCase
     public function test_extract_debug_with_non_sampled_context(): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_NOT_SAMPLED,
-            B3MultiPropagator::DEBUG_FLAG => self::IS_SAMPLED,
+            $this->TRACE_ID => self::TRACE_ID_BASE16,
+            $this->SPAN_ID => self::SPAN_ID_BASE16,
+            $this->SAMPLED => self::IS_NOT_SAMPLED,
+            $this->DEBUG_FLAG => self::IS_SAMPLED,
         ];
 
         $context = $this->b3MultiPropagator->extract($carrier);
@@ -239,9 +249,9 @@ class B3MultiPropagatorTest extends TestCase
     public function test_extract_sampled_context($sampledValue): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => $sampledValue,
+            $this->TRACE_ID => self::TRACE_ID_BASE16,
+            $this->SPAN_ID => self::SPAN_ID_BASE16,
+            $this->SAMPLED => $sampledValue,
         ];
 
         $this->assertEquals(
@@ -266,9 +276,9 @@ class B3MultiPropagatorTest extends TestCase
     public function test_extract_non_sampled_context($sampledValue): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => $sampledValue,
+            $this->TRACE_ID => self::TRACE_ID_BASE16,
+            $this->SPAN_ID => self::SPAN_ID_BASE16,
+            $this->SAMPLED => $sampledValue,
         ];
 
         $this->assertEquals(
@@ -293,10 +303,10 @@ class B3MultiPropagatorTest extends TestCase
     public function test_extract_invalid_debug_with_sampled_context($debugValue): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
-            B3MultiPropagator::DEBUG_FLAG => $debugValue,
+            $this->TRACE_ID => self::TRACE_ID_BASE16,
+            $this->SPAN_ID => self::SPAN_ID_BASE16,
+            $this->SAMPLED => self::IS_SAMPLED,
+            $this->DEBUG_FLAG => $debugValue,
         ];
 
         $context = $this->b3MultiPropagator->extract($carrier);
@@ -315,10 +325,10 @@ class B3MultiPropagatorTest extends TestCase
     public function test_extract_invalid_debug_with_non_sampled_context($debugValue): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_NOT_SAMPLED,
-            B3MultiPropagator::DEBUG_FLAG => $debugValue,
+            $this->TRACE_ID => self::TRACE_ID_BASE16,
+            $this->SPAN_ID => self::SPAN_ID_BASE16,
+            $this->SAMPLED => self::IS_NOT_SAMPLED,
+            $this->DEBUG_FLAG => $debugValue,
         ];
 
         $context = $this->b3MultiPropagator->extract($carrier);
@@ -347,9 +357,9 @@ class B3MultiPropagatorTest extends TestCase
     public function test_extract_invalid_sampled_context($sampledValue): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => $sampledValue,
+            $this->TRACE_ID => self::TRACE_ID_BASE16,
+            $this->SPAN_ID => self::SPAN_ID_BASE16,
+            $this->SAMPLED => $sampledValue,
         ];
 
         $this->assertEquals(
@@ -370,9 +380,9 @@ class B3MultiPropagatorTest extends TestCase
     public function test_extract_and_inject(): void
     {
         $extractCarrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+            $this->TRACE_ID => self::TRACE_ID_BASE16,
+            $this->SPAN_ID => self::SPAN_ID_BASE16,
+            $this->SAMPLED => self::IS_SAMPLED,
         ];
         $context = $this->b3MultiPropagator->extract($extractCarrier);
         $injectCarrier = [];
@@ -384,9 +394,9 @@ class B3MultiPropagatorTest extends TestCase
     {
         $this->assertInvalid(
             [
-                B3MultiPropagator::TRACE_ID => '',
-                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+                $this->TRACE_ID => '',
+                $this->SPAN_ID => self::SPAN_ID_BASE16,
+                $this->SAMPLED => self::IS_SAMPLED,
             ]
         );
     }
@@ -395,9 +405,9 @@ class B3MultiPropagatorTest extends TestCase
     {
         $this->assertInvalid(
             [
-                B3MultiPropagator::TRACE_ID => 'abcdefghijklmnopabcdefghijklmnop',
-                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+                $this->TRACE_ID => 'abcdefghijklmnopabcdefghijklmnop',
+                $this->SPAN_ID => self::SPAN_ID_BASE16,
+                $this->SAMPLED => self::IS_SAMPLED,
             ]
         );
     }
@@ -406,9 +416,9 @@ class B3MultiPropagatorTest extends TestCase
     {
         $this->assertInvalid(
             [
-                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16 . '00',
-                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+                $this->TRACE_ID => self::TRACE_ID_BASE16 . '00',
+                $this->SPAN_ID => self::SPAN_ID_BASE16,
+                $this->SAMPLED => self::IS_SAMPLED,
             ]
         );
     }
@@ -417,9 +427,9 @@ class B3MultiPropagatorTest extends TestCase
     {
         $this->assertInvalid(
             [
-                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-                B3MultiPropagator::SPAN_ID => '',
-                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+                $this->TRACE_ID => self::TRACE_ID_BASE16,
+                $this->SPAN_ID => '',
+                $this->SAMPLED => self::IS_SAMPLED,
             ]
         );
     }
@@ -428,9 +438,9 @@ class B3MultiPropagatorTest extends TestCase
     {
         $this->assertInvalid(
             [
-                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-                B3MultiPropagator::SPAN_ID => 'abcdefghijklmnop',
-                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+                $this->TRACE_ID => self::TRACE_ID_BASE16,
+                $this->SPAN_ID => 'abcdefghijklmnop',
+                $this->SAMPLED => self::IS_SAMPLED,
             ]
         );
     }
@@ -439,9 +449,9 @@ class B3MultiPropagatorTest extends TestCase
     {
         $this->assertInvalid(
             [
-                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16 . '00',
-                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+                $this->TRACE_ID => self::TRACE_ID_BASE16,
+                $this->SPAN_ID => self::SPAN_ID_BASE16 . '00',
+                $this->SAMPLED => self::IS_SAMPLED,
             ]
         );
     }

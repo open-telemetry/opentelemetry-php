@@ -25,11 +25,14 @@ class B3SinglePropagatorTest extends TestCase
     private const B3_HEADER_DEBUG = self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-' . self::DEBUG_FLAG;
     private const B3_DENY_SAMPLING = '0';
 
+    private $B3;
+
     private B3SinglePropagator $b3SinglePropagator;
 
     protected function setUp(): void
     {
         $this->b3SinglePropagator = B3SinglePropagator::getInstance();
+        [$this->B3] = $this->b3SinglePropagator->fields();
     }
 
     public function test_fields(): void
@@ -82,7 +85,7 @@ class B3SinglePropagatorTest extends TestCase
             );
 
         $this->assertSame(
-            [B3SinglePropagator::B3 => self::B3_HEADER_SAMPLED],
+            [$this->B3 => self::B3_HEADER_SAMPLED],
             $carrier
         );
     }
@@ -102,7 +105,7 @@ class B3SinglePropagatorTest extends TestCase
             );
 
         $this->assertSame(
-            [B3SinglePropagator::B3 => self::B3_DENY_SAMPLING],
+            [$this->B3 => self::B3_HEADER_NOT_SAMPLED],
             $carrier
         );
     }
@@ -122,7 +125,7 @@ class B3SinglePropagatorTest extends TestCase
             );
 
         $this->assertSame(
-            [B3SinglePropagator::B3 => self::B3_HEADER_DEBUG],
+            [$this->B3 => self::B3_HEADER_DEBUG],
             $carrier
         );
     }
@@ -141,7 +144,7 @@ class B3SinglePropagatorTest extends TestCase
     public function test_extract_debug_context($headerValue): void
     {
         $carrier = [
-            B3SinglePropagator::B3 => $headerValue,
+            $this->B3 => $headerValue,
         ];
 
         $context = $this->b3SinglePropagator->extract($carrier);
@@ -168,7 +171,7 @@ class B3SinglePropagatorTest extends TestCase
     public function test_extract_sampled_context(): void
     {
         $carrier = [
-            B3SinglePropagator::B3 => self::B3_HEADER_SAMPLED,
+            $this->B3 => self::B3_HEADER_SAMPLED,
         ];
 
         $context = $this->b3SinglePropagator->extract($carrier);
@@ -184,7 +187,7 @@ class B3SinglePropagatorTest extends TestCase
     public function test_extract_non_sampled_context(): void
     {
         $carrier = [
-            B3SinglePropagator::B3 => self::B3_HEADER_NOT_SAMPLED,
+            $this->B3 => self::B3_HEADER_NOT_SAMPLED,
         ];
 
         $context = $this->b3SinglePropagator->extract($carrier);
@@ -200,7 +203,7 @@ class B3SinglePropagatorTest extends TestCase
     public function test_extract_sampled_context_with_parent_span_id(): void
     {
         $carrier = [
-            B3SinglePropagator::B3 => self::B3_HEADER_SAMPLED . '-' . self::TRACE_ID_BASE16,
+            $this->B3 => self::B3_HEADER_SAMPLED . '-' . self::TRACE_ID_BASE16,
         ];
 
         $context = $this->b3SinglePropagator->extract($carrier);
@@ -216,7 +219,7 @@ class B3SinglePropagatorTest extends TestCase
     public function test_extract_non_sampled_context_with_parent_span_id(): void
     {
         $carrier = [
-            B3SinglePropagator::B3 => self::B3_HEADER_NOT_SAMPLED . '-' . self::TRACE_ID_BASE16,
+            $this->B3 => self::B3_HEADER_NOT_SAMPLED . '-' . self::TRACE_ID_BASE16,
         ];
 
         $context = $this->b3SinglePropagator->extract($carrier);
@@ -232,7 +235,7 @@ class B3SinglePropagatorTest extends TestCase
     public function test_extract_defer_sampling(): void
     {
         $carrier = [
-            B3SinglePropagator::B3 => self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16,
+            $this->B3 => self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16,
         ];
         $this->assertEquals(
             SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),
@@ -246,7 +249,7 @@ class B3SinglePropagatorTest extends TestCase
     public function test_extract_invalid_sampled_context($headerValue): void
     {
         $carrier = [
-            B3SinglePropagator::B3 => $headerValue,
+            $this->B3 => $headerValue,
         ];
 
         $this->assertEquals(
@@ -266,7 +269,7 @@ class B3SinglePropagatorTest extends TestCase
     public function test_extract_and_inject(): void
     {
         $extractCarrier = [
-            B3SinglePropagator::B3 => self::B3_HEADER_SAMPLED,
+            $this->B3 => self::B3_HEADER_SAMPLED,
         ];
         $context = $this->b3SinglePropagator->extract($extractCarrier);
         $injectCarrier = [];
@@ -277,62 +280,62 @@ class B3SinglePropagatorTest extends TestCase
     public function test_extract_empty_header(): void
     {
         $this->assertInvalid([
-            B3SinglePropagator::B3 => '',
+            $this->B3 => '',
         ]);
     }
 
     public function test_extract_header_with_extra_flags(): void
     {
         $this->assertInvalid([
-            B3SinglePropagator::B3 => self::B3_HEADER_SAMPLED . '-extra-flags',
+            $this->B3 => self::B3_HEADER_SAMPLED . '-extra-flags',
         ]);
     }
 
     public function test_extract_deny_sampling(): void
     {
         $this->assertInvalid([
-            B3SinglePropagator::B3 => self::B3_DENY_SAMPLING,
+            $this->B3 => self::B3_DENY_SAMPLING,
         ]);
     }
 
     public function test_empty_trace_id(): void
     {
         $this->assertInvalid([
-            B3SinglePropagator::B3 => '-' . self::SPAN_ID_BASE16 . '-1',
+            $this->B3 => '-' . self::SPAN_ID_BASE16 . '-1',
         ]);
     }
     public function test_invalid_trace_id(): void
     {
         $this->assertInvalid([
-            B3SinglePropagator::B3 => 'abcdefghijklmnopabcdefghijklmnop-' . self::SPAN_ID_BASE16 . '-1',
+            $this->B3 => 'abcdefghijklmnopabcdefghijklmnop-' . self::SPAN_ID_BASE16 . '-1',
         ]);
     }
 
     public function test_invalid_trace_id_size(): void
     {
         $this->assertInvalid([
-            B3SinglePropagator::B3 => self::TRACE_ID_BASE16 . '00-' . self::SPAN_ID_BASE16 . '-1',
+            $this->B3 => self::TRACE_ID_BASE16 . '00-' . self::SPAN_ID_BASE16 . '-1',
         ]);
     }
 
     public function test_empty_span_id(): void
     {
         $this->assertInvalid([
-            B3SinglePropagator::B3 => self::TRACE_ID_BASE16 . '--1',
+            $this->B3 => self::TRACE_ID_BASE16 . '--1',
         ]);
     }
 
     public function test_invalid_span_id(): void
     {
         $this->assertInvalid([
-            B3SinglePropagator::B3 => self::TRACE_ID_BASE16 . '-abcdefghijklmnop-1',
+            $this->B3 => self::TRACE_ID_BASE16 . '-abcdefghijklmnop-1',
         ]);
     }
 
     public function test_invalid_span_id_size(): void
     {
         $this->assertInvalid([
-            B3SinglePropagator::B3 => self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '00-1',
+            $this->B3 => self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '00-1',
         ]);
     }
 

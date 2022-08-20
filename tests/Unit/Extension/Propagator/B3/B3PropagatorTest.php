@@ -27,6 +27,20 @@ class B3PropagatorTest extends TestCase
     private const IS_SAMPLED = '1';
     private const IS_NOT_SAMPLED = '0';
 
+    private $B3;
+    private $TRACE_ID;
+    private $SPAN_ID;
+    private $SAMPLED;
+
+    public function setUp(): void
+    {
+        [$this->B3] = B3SinglePropagator::getInstance()->fields();
+        $b3MultiFields = B3MultiPropagator::getInstance()->fields();
+        $this->TRACE_ID = $b3MultiFields[0];
+        $this->SPAN_ID = $b3MultiFields[1];
+        $this->SAMPLED = $b3MultiFields[3];
+    }
+
     public function test_b3multi_fields(): void
     {
         $propagator = B3Propagator::getB3MultiHeaderInstance();
@@ -60,9 +74,9 @@ class B3PropagatorTest extends TestCase
 
         $this->assertSame(
             [
-                B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
-                B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
-                B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+                $this->TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+                $this->SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
+                $this->SAMPLED => self::IS_SAMPLED,
             ],
             $carrier
         );
@@ -82,7 +96,7 @@ class B3PropagatorTest extends TestCase
         );
 
         $this->assertSame(
-            [B3SinglePropagator::B3 => self::B3_SINGLE_HEADER_SAMPLED],
+            [$this->B3 => self::B3_SINGLE_HEADER_SAMPLED],
             $carrier
         );
     }
@@ -90,7 +104,7 @@ class B3PropagatorTest extends TestCase
     public function test_extract_only_b3single_sampled_context_with_b3single_instance(): void
     {
         $carrier = [
-            B3SinglePropagator::B3 => self::B3_SINGLE_HEADER_SAMPLED,
+            $this->B3 => self::B3_SINGLE_HEADER_SAMPLED,
         ];
 
         $propagator = B3Propagator::getB3SingleHeaderInstance();
@@ -108,7 +122,7 @@ class B3PropagatorTest extends TestCase
     public function test_extract_only_b3single_sampled_context_with_b3multi_instance(): void
     {
         $carrier = [
-            B3SinglePropagator::B3 => self::B3_SINGLE_HEADER_SAMPLED,
+            $this->B3 => self::B3_SINGLE_HEADER_SAMPLED,
         ];
 
         $propagator = B3Propagator::getB3MultiHeaderInstance();
@@ -126,9 +140,9 @@ class B3PropagatorTest extends TestCase
     public function test_extract_only_b3multi_sampled_context_with_b3single_instance(): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+            $this->TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+            $this->SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
+            $this->SAMPLED => self::IS_SAMPLED,
         ];
 
         $propagator = B3Propagator::getB3SingleHeaderInstance();
@@ -144,9 +158,9 @@ class B3PropagatorTest extends TestCase
     public function test_extract_only_b3multi_sampled_context_with_b3multi_instance(): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
+            $this->TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+            $this->SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
+            $this->SAMPLED => self::IS_SAMPLED,
         ];
 
         $propagator = B3Propagator::getB3MultiHeaderInstance();
@@ -162,10 +176,10 @@ class B3PropagatorTest extends TestCase
     public function test_extract_both_sampled_context_with_b3single_instance(): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_NOT_SAMPLED,
-            B3SinglePropagator::B3 => self::B3_SINGLE_HEADER_SAMPLED,
+            $this->TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+            $this->SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
+            $this->SAMPLED => self::IS_NOT_SAMPLED,
+            $this->B3 => self::B3_SINGLE_HEADER_SAMPLED,
         ];
 
         $propagator = B3Propagator::getB3SingleHeaderInstance();
@@ -181,10 +195,10 @@ class B3PropagatorTest extends TestCase
     public function test_extract_both_sampled_context_with_b3multi_instance(): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_NOT_SAMPLED,
-            B3SinglePropagator::B3 => self::B3_SINGLE_HEADER_SAMPLED,
+            $this->TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+            $this->SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
+            $this->SAMPLED => self::IS_NOT_SAMPLED,
+            $this->B3 => self::B3_SINGLE_HEADER_SAMPLED,
         ];
 
         $propagator = B3Propagator::getB3MultiHeaderInstance();
@@ -203,10 +217,10 @@ class B3PropagatorTest extends TestCase
     public function test_extract_b3_single_invalid_and_b3_multi_valid_context_with_b3single_instance($headerValue): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_NOT_SAMPLED,
-            B3SinglePropagator::B3 => $headerValue,
+            $this->TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+            $this->SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
+            $this->SAMPLED => self::IS_NOT_SAMPLED,
+            $this->B3 => $headerValue,
         ];
 
         $propagator = B3Propagator::getB3SingleHeaderInstance();
@@ -225,10 +239,10 @@ class B3PropagatorTest extends TestCase
     public function test_extract_b3_single_invalid_and_b3_multi_valid_context_with_b3multi_instance($headerValue): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_NOT_SAMPLED,
-            B3SinglePropagator::B3 => $headerValue,
+            $this->TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+            $this->SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
+            $this->SAMPLED => self::IS_NOT_SAMPLED,
+            $this->B3 => $headerValue,
         ];
 
         $propagator = B3Propagator::getB3MultiHeaderInstance();

@@ -55,13 +55,9 @@ final class B3Propagator implements TextMapPropagatorInterface
         $getter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
 
-        $b3Context = $getter->get($carrier, B3SinglePropagator::B3);
-
-        if ($b3Context) {
-            $b3ExtractedContext = B3SinglePropagator::getInstance()->extract($carrier, $getter, $context);
-            if ($b3ExtractedContext !== $context) {
-                return $b3ExtractedContext;
-            }
+        $b3SingleHeaderContext = B3SinglePropagator::getInstance()->extract($carrier, $getter, $context);
+        if ($b3SingleHeaderContext !== $context) {
+            return $b3SingleHeaderContext;
         }
 
         return B3MultiPropagator::getInstance()->extract($carrier, $getter, $context);

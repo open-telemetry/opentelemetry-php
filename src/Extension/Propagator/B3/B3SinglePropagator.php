@@ -22,7 +22,7 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
  */
 final class B3SinglePropagator implements TextMapPropagatorInterface
 {
-    public const B3 = 'b3';
+    private const B3 = 'b3';
 
     private const IS_DEBUG = 'd';
     private const IS_SAMPLED = '1';
@@ -30,7 +30,7 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
     private const IS_NOT_SAMPLED = '0';
     private const VALID_NON_SAMPLED = [self::IS_NOT_SAMPLED, 'false'];
 
-    public const FIELDS = [
+    private const FIELDS = [
         self::B3,
     ];
 
@@ -69,7 +69,7 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
         } elseif ($spanContext->isSampled()) {
             $b3 = $spanContext->getTraceId() . '-' . $spanContext->getSpanId() . '-' . self::IS_SAMPLED;
         } else {
-            $b3 = self::IS_NOT_SAMPLED;
+            $b3 = $spanContext->getTraceId() . '-' . $spanContext->getSpanId() . '-' . self::IS_NOT_SAMPLED;
         }
         $setter->set($carrier, self::B3, $b3);
     }
