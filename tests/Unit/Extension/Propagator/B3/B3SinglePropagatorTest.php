@@ -157,7 +157,7 @@ class B3SinglePropagatorTest extends TestCase
         );
     }
 
-    public function debugValueProvider()
+    public function debugValueProvider(): array
     {
         return [
             'String(lower string) debug value' => [self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-' . self::DEBUG_FLAG],
@@ -255,7 +255,7 @@ class B3SinglePropagatorTest extends TestCase
         );
     }
 
-    public function invalidSampledValueProvider()
+    public function invalidSampledValueProvider(): array
     {
         return [
             'wrong sampled value' => [self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-wrong'],

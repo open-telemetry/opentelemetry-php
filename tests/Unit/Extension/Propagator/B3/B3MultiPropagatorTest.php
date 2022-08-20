@@ -250,7 +250,7 @@ class B3MultiPropagatorTest extends TestCase
         );
     }
 
-    public function sampledValueProvider()
+    public function sampledValueProvider(): array
     {
         return [
             'String sampled value' => ['1'],
@@ -277,7 +277,7 @@ class B3MultiPropagatorTest extends TestCase
         );
     }
 
-    public function notSampledValueProvider()
+    public function notSampledValueProvider(): array
     {
         return [
             'String sampled value' => ['0'],
@@ -331,7 +331,7 @@ class B3MultiPropagatorTest extends TestCase
         );
     }
 
-    public function invalidDebugValueProvider()
+    public function invalidDebugValueProvider(): array
     {
         return [
             'Invalid debug value - wrong type' => [1],
@@ -358,7 +358,7 @@ class B3MultiPropagatorTest extends TestCase
         );
     }
 
-    public function invalidSampledValueProvider()
+    public function invalidSampledValueProvider(): array
     {
         return [
             'wrong sampled value' => ['wrong'],

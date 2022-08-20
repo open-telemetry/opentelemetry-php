@@ -19,10 +19,13 @@ use PHPUnit\Framework\TestCase;
  */
 class B3PropagatorTest extends TestCase
 {
-    private const TRACE_ID_BASE16 = 'ff000000000000000000000000000041';
-    private const SPAN_ID_BASE16 = 'ff00000000000041';
-    private const B3_HEADER_SAMPLED = self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-1';
+    private const B3_SINGLE_TRACE_ID_BASE16 = 'ff0000000000051791e0000000000041';
+    private const B3_SINGLE_SPAN_ID_BASE16 = 'ff00051791e00041';
+    private const B3_SINGLE_HEADER_SAMPLED = self::B3_SINGLE_TRACE_ID_BASE16 . '-' . self::B3_SINGLE_SPAN_ID_BASE16 . '-1';
+    private const B3_MULTI_TRACE_ID_BASE16 = 'ff000000000000301710000000000041';
+    private const B3_MULTI_SPAN_ID_BASE16 = 'ff00003017100041';
     private const IS_SAMPLED = '1';
+    private const IS_NOT_SAMPLED = '0';
 
     public function test_b3multi_fields(): void
     {
@@ -50,15 +53,15 @@ class B3PropagatorTest extends TestCase
             $carrier,
             null,
             $this->withSpanContext(
-                SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+                SpanContext::create(self::B3_MULTI_TRACE_ID_BASE16, self::B3_MULTI_SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
                 Context::getCurrent()
             )
         );
 
         $this->assertSame(
             [
-                B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-                B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
+                B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+                B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
                 B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
             ],
             $carrier
@@ -73,13 +76,13 @@ class B3PropagatorTest extends TestCase
             $carrier,
             null,
             $this->withSpanContext(
-                SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+                SpanContext::create(self::B3_SINGLE_TRACE_ID_BASE16, self::B3_SINGLE_SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
                 Context::getCurrent()
             )
         );
 
         $this->assertSame(
-            [B3SinglePropagator::B3 => self::B3_HEADER_SAMPLED],
+            [B3SinglePropagator::B3 => self::B3_SINGLE_HEADER_SAMPLED],
             $carrier
         );
     }
@@ -87,7 +90,7 @@ class B3PropagatorTest extends TestCase
     public function test_extract_only_b3single_sampled_context_with_b3single_instance(): void
     {
         $carrier = [
-            B3SinglePropagator::B3 => self::B3_HEADER_SAMPLED,
+            B3SinglePropagator::B3 => self::B3_SINGLE_HEADER_SAMPLED,
         ];
 
         $propagator = B3Propagator::getB3SingleHeaderInstance();
@@ -97,7 +100,7 @@ class B3PropagatorTest extends TestCase
         $this->assertNull($context->get(B3DebugFlagContextKey::instance()));
 
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+            SpanContext::createFromRemoteParent(self::B3_SINGLE_TRACE_ID_BASE16, self::B3_SINGLE_SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
             $this->getSpanContext($context)
         );
     }
@@ -105,7 +108,7 @@ class B3PropagatorTest extends TestCase
     public function test_extract_only_b3single_sampled_context_with_b3multi_instance(): void
     {
         $carrier = [
-            B3SinglePropagator::B3 => self::B3_HEADER_SAMPLED,
+            B3SinglePropagator::B3 => self::B3_SINGLE_HEADER_SAMPLED,
         ];
 
         $propagator = B3Propagator::getB3MultiHeaderInstance();
@@ -115,7 +118,7 @@ class B3PropagatorTest extends TestCase
         $this->assertNull($context->get(B3DebugFlagContextKey::instance()));
 
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+            SpanContext::createFromRemoteParent(self::B3_SINGLE_TRACE_ID_BASE16, self::B3_SINGLE_SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
             $this->getSpanContext($context)
         );
     }
@@ -123,8 +126,8 @@ class B3PropagatorTest extends TestCase
     public function test_extract_only_b3multi_sampled_context_with_b3single_instance(): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
+            B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+            B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
             B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
         ];
 
@@ -133,7 +136,7 @@ class B3PropagatorTest extends TestCase
         $context = $propagator->extract($carrier);
 
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+            SpanContext::createFromRemoteParent(self::B3_MULTI_TRACE_ID_BASE16, self::B3_MULTI_SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
             $this->getSpanContext($context)
         );
     }
@@ -141,8 +144,8 @@ class B3PropagatorTest extends TestCase
     public function test_extract_only_b3multi_sampled_context_with_b3multi_instance(): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
+            B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+            B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
             B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
         ];
 
@@ -151,7 +154,7 @@ class B3PropagatorTest extends TestCase
         $context = $propagator->extract($carrier);
 
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+            SpanContext::createFromRemoteParent(self::B3_MULTI_TRACE_ID_BASE16, self::B3_MULTI_SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
             $this->getSpanContext($context)
         );
     }
@@ -159,10 +162,10 @@ class B3PropagatorTest extends TestCase
     public function test_extract_both_sampled_context_with_b3single_instance(): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
-            B3SinglePropagator::B3 => self::B3_HEADER_SAMPLED,
+            B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+            B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
+            B3MultiPropagator::SAMPLED => self::IS_NOT_SAMPLED,
+            B3SinglePropagator::B3 => self::B3_SINGLE_HEADER_SAMPLED,
         ];
 
         $propagator = B3Propagator::getB3SingleHeaderInstance();
@@ -170,7 +173,7 @@ class B3PropagatorTest extends TestCase
         $context = $propagator->extract($carrier);
 
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+            SpanContext::createFromRemoteParent(self::B3_SINGLE_TRACE_ID_BASE16, self::B3_SINGLE_SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
             $this->getSpanContext($context)
         );
     }
@@ -178,10 +181,10 @@ class B3PropagatorTest extends TestCase
     public function test_extract_both_sampled_context_with_b3multi_instance(): void
     {
         $carrier = [
-            B3MultiPropagator::TRACE_ID => self::TRACE_ID_BASE16,
-            B3MultiPropagator::SPAN_ID => self::SPAN_ID_BASE16,
-            B3MultiPropagator::SAMPLED => self::IS_SAMPLED,
-            B3SinglePropagator::B3 => self::B3_HEADER_SAMPLED,
+            B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+            B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
+            B3MultiPropagator::SAMPLED => self::IS_NOT_SAMPLED,
+            B3SinglePropagator::B3 => self::B3_SINGLE_HEADER_SAMPLED,
         ];
 
         $propagator = B3Propagator::getB3MultiHeaderInstance();
@@ -189,9 +192,61 @@ class B3PropagatorTest extends TestCase
         $context = $propagator->extract($carrier);
 
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+            SpanContext::createFromRemoteParent(self::B3_SINGLE_TRACE_ID_BASE16, self::B3_SINGLE_SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
             $this->getSpanContext($context)
         );
+    }
+
+    /**
+     * @dataProvider invalidB3SingleHeaderValueProvider
+     */
+    public function test_extract_b3_single_invalid_and_b3_multi_valid_context_with_b3single_instance($headerValue): void
+    {
+        $carrier = [
+            B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+            B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
+            B3MultiPropagator::SAMPLED => self::IS_NOT_SAMPLED,
+            B3SinglePropagator::B3 => $headerValue,
+        ];
+
+        $propagator = B3Propagator::getB3SingleHeaderInstance();
+
+        $context = $propagator->extract($carrier);
+
+        $this->assertEquals(
+            SpanContext::createFromRemoteParent(self::B3_MULTI_TRACE_ID_BASE16, self::B3_MULTI_SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT),
+            $this->getSpanContext($context)
+        );
+    }
+
+    /**
+     * @dataProvider invalidB3SingleHeaderValueProvider
+     */
+    public function test_extract_b3_single_invalid_and_b3_multi_valid_context_with_b3multi_instance($headerValue): void
+    {
+        $carrier = [
+            B3MultiPropagator::TRACE_ID => self::B3_MULTI_TRACE_ID_BASE16,
+            B3MultiPropagator::SPAN_ID => self::B3_MULTI_SPAN_ID_BASE16,
+            B3MultiPropagator::SAMPLED => self::IS_NOT_SAMPLED,
+            B3SinglePropagator::B3 => $headerValue,
+        ];
+
+        $propagator = B3Propagator::getB3MultiHeaderInstance();
+
+        $context = $propagator->extract($carrier);
+
+        $this->assertEquals(
+            SpanContext::createFromRemoteParent(self::B3_MULTI_TRACE_ID_BASE16, self::B3_MULTI_SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT),
+            $this->getSpanContext($context)
+        );
+    }
+
+    public function invalidB3SingleHeaderValueProvider(): array
+    {
+        return [
+            'invalid traceid' => ['abcdefghijklmnopabcdefghijklmnop-' . self::B3_SINGLE_SPAN_ID_BASE16 . '-1'],
+            'invalid spanid' => [self::B3_SINGLE_TRACE_ID_BASE16 . '-abcdefghijklmnop-1'],
+        ];
     }
 
     private function getSpanContext(Context $context): SpanContextInterface
