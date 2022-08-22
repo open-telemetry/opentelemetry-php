@@ -1,0 +1,29 @@
+{
+  "name": "open-telemetry/exporter-otlp-grpc",
+  "description": "GRPC exporter for OpenTelemetry PHP.",
+  "keywords": ["opentelemetry", "otel", "tracing", "apm", "otlp", "grpc", "protobuf"],
+  "type": "library",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "opentelemetry-php contributors",
+      "homepage": "https://github.com/open-telemetry/opentelemetry-php/graphs/contributors"
+    }
+  ],
+  "require": {
+    "php": "^7.4 || ^8.0",
+    "ext-grpc": "*",
+    "google/protobuf": "^3.3.0",
+    "open-telemetry/exporter-otlp-common": "self.version",
+    "open-telemetry/gen-otlp-protobuf": "self.version",
+    "open-telemetry/sdk": "self.version"
+  },
+  "autoload": {
+    "psr-4": {
+      "OpenTelemetry\\Contrib\\OtlpGrpc\\": "."
+    }
+  },
+  "suggest": {
+    "ext-protobuf": "For more performant grpc exporting"
+  }
+}
