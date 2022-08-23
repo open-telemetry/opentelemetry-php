@@ -34,6 +34,8 @@ splits:
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/exporter-zipkin.git"
   - prefix: "src/Contrib/ZipkinToNewrelic"
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/exporter-zipkintonewrelic.git"
+  - prefix: "src/Contrib/Context/Swoole"
+    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/context-swoole.git"
 
 # List of references to split (defined as regexp)
 origins:
