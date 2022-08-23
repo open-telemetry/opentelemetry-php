@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib;
+namespace OpenTelemetry\Tests\Unit\Contrib\Newrelic;
 
-use OpenTelemetry\Contrib\Jaeger\Exporter;
+use OpenTelemetry\Contrib\Newrelic\Exporter;
+use OpenTelemetry\Tests\Unit\Contrib\AbstractHttpExporterTest;
 
 /**
- * @covers OpenTelemetry\Contrib\Jaeger\Exporter
+ * @covers OpenTelemetry\Contrib\Newrelic\Exporter
  */
-class JaegerExporterTest extends AbstractHttpExporterTest
+class NewrelicExporterTest extends AbstractHttpExporterTest
 {
-    use UsesHttpClientTrait;
-
-    private const EXPORTER_NAME = 'test.jaeger';
+    protected const EXPORTER_NAME = 'test.newrelic';
+    protected const LICENSE_KEY = 'abc123';
 
     /**
      * @psalm-suppress PossiblyInvalidArgument
@@ -23,6 +23,7 @@ class JaegerExporterTest extends AbstractHttpExporterTest
         return new Exporter(
             self::EXPORTER_NAME,
             $dsn,
+            self::LICENSE_KEY,
             $this->getClientInterfaceMock(),
             $this->getRequestFactoryInterfaceMock(),
             $this->getStreamFactoryInterfaceMock()

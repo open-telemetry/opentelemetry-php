@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib;
+namespace OpenTelemetry\Tests\Unit\Contrib\Newrelic;
 
 use OpenTelemetry\Contrib\Newrelic\SpanConverter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;

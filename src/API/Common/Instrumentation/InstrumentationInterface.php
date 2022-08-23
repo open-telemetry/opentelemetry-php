@@ -29,6 +29,8 @@ interface InstrumentationInterface
 
     public function setTracerProvider(TracerProviderInterface $tracerProvider): void;
 
+    public function getTracerProvider(): TracerProviderInterface;
+
     public function getTracer(): TracerInterface;
 
     public function setMeterProvider(MeterProviderInterface $meterProvider): void;

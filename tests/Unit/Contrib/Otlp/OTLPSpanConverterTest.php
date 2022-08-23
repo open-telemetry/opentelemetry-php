@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib;
+namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use function bin2hex;
 use OpenTelemetry\API\Trace\SpanContext;

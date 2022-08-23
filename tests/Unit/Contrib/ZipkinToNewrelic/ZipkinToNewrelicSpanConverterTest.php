@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib;
+namespace OpenTelemetry\Tests\Unit\Contrib\ZipkinToNewrelic;
 
 use function implode;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\SpanConverter;
