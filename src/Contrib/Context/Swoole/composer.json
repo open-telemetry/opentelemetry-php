@@ -17,7 +17,7 @@
   },
   "autoload": {
     "psr-4": {
-      "OpenTelemetry\\Contrib\\Context\\Swoolo\\": "."
+      "OpenTelemetry\\Contrib\\Context\\Swoole\\": "."
     }
   }
 }
