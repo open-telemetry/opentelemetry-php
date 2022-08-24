@@ -309,6 +309,13 @@ class TraceContextPropagatorTest extends TestCase
         ]);
     }
 
+    public function test_empty_trace_id(): void
+    {
+        $this->assertInvalid([
+            TraceContextPropagator::TRACEPARENT => '00--' . self::SPAN_ID_BASE16 . '-01',
+        ]);
+    }
+
     public function test_invalid_trace_id(): void
     {
         $this->assertInvalid([
@@ -323,17 +330,24 @@ class TraceContextPropagatorTest extends TestCase
         ]);
     }
 
+    public function test_empty_span_id(): void
+    {
+        $this->assertInvalid([
+            TraceContextPropagator::TRACEPARENT => '00-' . self::TRACE_ID_BASE16 . '--01',
+        ]);
+    }
+
     public function test_invalid_span_id(): void
     {
         $this->assertInvalid([
-            TraceContextPropagator::TRACEPARENT => '00-' . self::TRACE_ID_BASE16 . 'abcdefghijklmnop-01',
+            TraceContextPropagator::TRACEPARENT => '00-' . self::TRACE_ID_BASE16 . '-abcdefghijklmnop-01',
         ]);
     }
 
     public function test_invalid_span_id_size(): void
     {
         $this->assertInvalid([
-            TraceContextPropagator::TRACEPARENT => '00-' . self::TRACE_ID_BASE16 . 'abcdefghijklmnop-00-01',
+            TraceContextPropagator::TRACEPARENT => '00-' . self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '00-01',
         ]);
     }
 
