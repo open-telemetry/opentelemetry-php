@@ -179,12 +179,8 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
             $isSampled = ($sampled === SpanContext::SAMPLED_FLAG);
         }
 
-<<<<<<< HEAD:src/API/Trace/Propagation/B3MultiPropagator.php
         // Only traceparent header is extracted. No tracestate.
         return SpanContextFactory::createFromRemoteParent(
-=======
-        return SpanContext::createFromRemoteParent(
->>>>>>> main:src/Extension/Propagator/B3/B3MultiPropagator.php
             $traceId,
             $spanId,
             $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT
