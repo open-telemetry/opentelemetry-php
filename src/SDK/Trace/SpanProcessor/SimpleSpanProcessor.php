@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
+use Closure;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -11,56 +12,104 @@ use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use SplQueue;
+use function sprintf;
+use Throwable;
 
 class SimpleSpanProcessor implements SpanProcessorInterface
 {
     use LogsMessagesTrait;
 
-    private ?SpanExporterInterface $exporter;
-    private bool $running = true;
+    private SpanExporterInterface $exporter;
 
-    public function __construct(SpanExporterInterface $exporter = null)
+    private bool $running = false;
+    /** @var SplQueue<array{Closure, string, bool}> */
+    private SplQueue $queue;
+
+    private bool $closed = false;
+
+    public function __construct(SpanExporterInterface $exporter)
     {
         $this->exporter = $exporter;
+
+        $this->queue = new SplQueue();
     }
 
-    /** @inheritDoc */
     public function onStart(ReadWriteSpanInterface $span, Context $parentContext): void
     {
     }
 
-    /** @inheritDoc */
     public function onEnd(ReadableSpanInterface $span): void
     {
-        if (!$this->running || !$span->getContext()->isSampled()) {
+        if ($this->closed) {
+            return;
+        }
+        if (!$span->getContext()->isSampled()) {
             return;
         }
 
-        if (null !== $this->exporter) {
-            $this->exporter->export([$span->toSpanData()])->await();
-        }
+        $spanData = $span->toSpanData();
+        $this->flush(fn () => $this->exporter->export([$spanData])->await(), 'export');
     }
 
-    /** @inheritDoc */
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
-        return true;
+        if ($this->closed) {
+            return false;
+        }
+
+        return $this->flush(fn (): bool => $this->exporter->forceFlush($cancellation), __FUNCTION__, true);
     }
 
-    /** @inheritDoc */
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
-        if (!$this->running) {
-            return true;
+        if ($this->closed) {
+            return false;
         }
 
-        $this->running = false;
-        self::logDebug('Shutting down span processor');
+        $this->closed = true;
 
-        if (null !== $this->exporter) {
-            return $this->forceFlush() && $this->exporter->shutdown();
+        return $this->flush(fn (): bool => $this->exporter->shutdown($cancellation), __FUNCTION__, true);
+    }
+
+    private function flush(Closure $task, string $taskName, bool $propagateResult = false): bool
+    {
+        $this->queue->enqueue([$task, $taskName, $propagateResult && !$this->running]);
+
+        if ($this->running) {
+            return false;
         }
 
-        return true;
+        $success = true;
+        $exception = null;
+        $this->running = true;
+
+        try {
+            while (!$this->queue->isEmpty()) {
+                [$task, $taskName, $propagateResult] = $this->queue->dequeue();
+
+                try {
+                    $result = $task();
+                    if ($propagateResult) {
+                        $success = $result;
+                    }
+                } catch (Throwable $e) {
+                    if ($propagateResult) {
+                        $exception = $e;
+
+                        continue;
+                    }
+                    self::logError(sprintf('Unhandled %s error', $taskName), ['exception' => $e]);
+                }
+            }
+        } finally {
+            $this->running = false;
+        }
+
+        if ($exception !== null) {
+            throw $exception;
+        }
+
+        return $success;
     }
 }

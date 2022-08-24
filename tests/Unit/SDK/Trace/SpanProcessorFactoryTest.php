@@ -33,7 +33,7 @@ class SpanProcessorFactoryTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_PHP_TRACES_PROCESSOR', $processorName);
         $factory = new SpanProcessorFactory();
-        $this->assertInstanceOf($expected, $factory->fromEnvironment());
+        $this->assertInstanceOf($expected, $factory->fromEnvironment($this->createMock(SpanExporterInterface::class)));
     }
 
     public function processorProvider()
