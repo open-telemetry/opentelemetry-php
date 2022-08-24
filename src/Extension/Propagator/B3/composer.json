@@ -1,0 +1,23 @@
+{
+    "name": "open-telemetry/extension-propagator-b3",
+    "description": "B3 propagator extension for OpenTelemetry PHP.",
+    "keywords": ["opentelemetry", "otel", "tracing", "apm", "extension", "propagator", "b3"],
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "opentelemetry-php contributors",
+            "homepage": "https://github.com/open-telemetry/opentelemetry-php/graphs/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "open-telemetry/api": "self.version",
+        "open-telemetry/context": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "OpenTelemetry\\Extension\\Propagator\\B3\\": "."
+        }
+    }
+}
