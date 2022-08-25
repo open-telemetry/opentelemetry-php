@@ -9,6 +9,7 @@ use Grpc\UnaryCall;
 use Mockery;
 use Mockery\MockInterface;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
+use Opentelemetry\Proto\Collector\Trace\V1\ExportTracePartialSuccess;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -53,6 +54,11 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
                 'return_values' => [
                     'status_code' => \Grpc\STATUS_OK,
                 ],
+                'partial_success' => [
+                    'has_partial_success' => false,
+                    'rejected' => 0,
+                    'error' => '',
+                ],
             ])
         );
 
@@ -77,6 +83,11 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
                 ],
                 'return_values' => [
                     'status_code' => 'An unexpected status',
+                ],
+                'partial_success' => [
+                    'has_partial_success' => false,
+                    'rejected' => 0,
+                    'error' => '',
                 ],
             ])
         );
@@ -155,6 +166,47 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
     }
 
     /**
+     * @dataProvider partialSuccessProvider
+     */
+    public function test_partial_success(int $rejected, string $error, int $expectedStatusCode): void
+    {
+        $exporter = new Exporter(
+            'localhost:4317',
+            true,
+            '',
+            '',
+            false,
+            10,
+            $this->createMockTraceServiceClient([
+                'expectations' => [
+                    'num_spans' => 1,
+                ],
+                'return_values' => [
+                    'status_code' => null,
+                ],
+                'partial_success' => [
+                    'has_partial_success' => true,
+                    'rejected' => $rejected,
+                    'error' => $error,
+                ],
+            ])
+        );
+
+        $exporterStatusCode = $exporter->export([new SpanData()])->await();
+
+        $this->assertSame($expectedStatusCode, $exporterStatusCode);
+    }
+
+    public function partialSuccessProvider(): array
+    {
+        return [
+            'partial success with dropped' => [1, 'some.error.message', SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE],
+            'partial success with no dropped and warning' => [0, 'some.warning.message', SpanExporterInterface::STATUS_SUCCESS],
+            'partial success with full success' => [0, '', SpanExporterInterface::STATUS_SUCCESS],
+        ];
+    }
+
+    /**
      * @psalm-suppress PossiblyUndefinedMethod
      * @psalm-suppress UndefinedMagicMethod
      */
@@ -166,8 +218,19 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
             ],
             'return_values' => [
                 'status_code' => $statusCode,
-            ]
+            ],
+            'partial_success' => [
+                'has_partial_success' => $hasPartialSuccess,
+                'rejected' => $rejectedNumSpans,
+                'error' => $partialErrorMessage,
+            ],
         ] = $options;
+        $partial = $hasPartialSuccess
+            ? Mockery::mock(ExportTracePartialSuccess::class)->allows([
+                'getRejectedSpans' => $rejectedNumSpans,
+                'getErrorMessage' => $partialErrorMessage,
+            ])
+            : null;
 
         /** @var MockInterface&TraceServiceClient */
         $mockClient = Mockery::mock(TraceServiceClient::class)
@@ -181,10 +244,19 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
                                 ->andReturns(
                                     [
                                         // @note mocking ExportTraceServiceResponse with protobuf extension = segfault
-                                        new class() {
+                                        new class($partial) {
+                                            private $partial;
+                                            public function __construct($partial)
+                                            {
+                                                $this->partial = $partial;
+                                            }
                                             public function hasPartialSuccess(): bool
                                             {
-                                                return false;
+                                                return $this->partial !== null;
+                                            }
+                                            public function getPartialSuccess()
+                                            {
+                                                return $this->partial;
                                             }
                                         },
                                         new class($statusCode) {
