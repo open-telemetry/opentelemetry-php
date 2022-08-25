@@ -1,7 +1,7 @@
 {
   "name": "open-telemetry/context-swoole",
-  "description": "Async Swoole context implementation for OpenTelemetry PHP.",
-  "keywords": ["opentelemetry", "otel", "context", "swoole", "coroutine"],
+  "description": "Async Swoole/OpenSwoole context implementation for OpenTelemetry PHP.",
+  "keywords": ["opentelemetry", "otel", "context", "swoole", "openswoole", "coroutine"],
   "type": "library",
   "license": "Apache-2.0",
   "authors": [
@@ -12,8 +12,7 @@
   ],
   "require": {
     "php": "^7.4 || ^8.0",
-    "open-telemetry/context": "self.version",
-    "ext-openswoole": "^4"
+    "open-telemetry/context": "self.version"
   },
   "autoload": {
     "psr-4": {
