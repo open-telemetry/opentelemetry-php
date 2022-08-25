@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Trace\Propagation;
+namespace OpenTelemetry\Extension\Propagator\B3;
 
 use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
@@ -14,9 +14,10 @@ use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 
 /**
- * B3Multi is a propagator that supports the specification for the header
- * "b3" used for trace context propagation across service boundaries.
- * (https://github.com/openzipkin/b3-propagation)
+ * B3Multi is a propagator that supports the specification for multiple
+ * "b3" http headers used for trace context propagation across service
+ * boundaries.
+ * (https://github.com/openzipkin/b3-propagation#multiple-headers)
  */
 final class B3MultiPropagator implements TextMapPropagatorInterface
 {
@@ -27,7 +28,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
      *
      * @see https://github.com/openzipkin/b3-propagation#traceid-1
      */
-    public const TRACE_ID = 'X-B3-TraceId';
+    private const TRACE_ID = 'X-B3-TraceId';
 
     /**
      * The X-B3-SpanId header is required and is encoded as 16 lower-hex characters.
@@ -36,7 +37,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
      *
      * @see https://github.com/openzipkin/b3-propagation#spanid-1
      */
-    public const SPAN_ID = 'X-B3-SpanId';
+    private const SPAN_ID = 'X-B3-SpanId';
 
     /**
      * The X-B3-ParentSpanId header must be present on a child span and absent on the root span.
@@ -45,7 +46,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
      *
      * @see https://github.com/openzipkin/b3-propagation#parentspanid-1
      */
-    public const PARENT_SPAN_ID = 'X-B3-ParentSpanId';
+    private const PARENT_SPAN_ID = 'X-B3-ParentSpanId';
 
     /**
      * An accept sampling decision is encoded as X-B3-Sampled: 1 and a deny as X-B3-Sampled: 0.
@@ -57,7 +58,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
      *
      * @see https://github.com/openzipkin/b3-propagation#sampling-state-1
      */
-    public const SAMPLED = 'X-B3-Sampled';
+    private const SAMPLED = 'X-B3-Sampled';
 
     /**
      * Debug is encoded as X-B3-Flags: 1.
@@ -66,12 +67,14 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
      *
      * @see https://github.com/openzipkin/b3-propagation#debug-flag
      */
-    public const DEBUG_FLAG = 'X-B3-Flags';
+    private const DEBUG_FLAG = 'X-B3-Flags';
 
     private const IS_SAMPLED = '1';
+    private const VALID_SAMPLED = [self::IS_SAMPLED, 'true'];
     private const IS_NOT_SAMPLED = '0';
+    private const VALID_NON_SAMPLED = [self::IS_NOT_SAMPLED, 'false'];
 
-    public const FIELDS = [
+    private const FIELDS = [
         self::TRACE_ID,
         self::SPAN_ID,
         self::PARENT_SPAN_ID,
@@ -107,9 +110,16 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
             return;
         }
 
+        // Inject multiple b3 headers
         $setter->set($carrier, self::TRACE_ID, $spanContext->getTraceId());
         $setter->set($carrier, self::SPAN_ID, $spanContext->getSpanId());
-        $setter->set($carrier, self::SAMPLED, $spanContext->isSampled() ? self::IS_SAMPLED : self::IS_NOT_SAMPLED);
+
+        $debugValue = $context->get(B3DebugFlagContextKey::instance());
+        if ($debugValue && $debugValue === self::IS_SAMPLED) {
+            $setter->set($carrier, self::DEBUG_FLAG, self::IS_SAMPLED);
+        } else {
+            $setter->set($carrier, self::SAMPLED, $spanContext->isSampled() ? self::IS_SAMPLED : self::IS_NOT_SAMPLED);
+        }
     }
 
     public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
@@ -117,7 +127,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
         $getter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
 
-        $spanContext = self::extractImpl($carrier, $getter);
+        $spanContext = self::extractImpl($carrier, $getter, $context);
         if (!$spanContext->isValid()) {
             return $context;
         }
@@ -133,39 +143,40 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
             return null;
         }
 
-        if ($value === '0' || $value === '1') {
-            return (int) $value;
+        if (in_array(strtolower($value), self::VALID_SAMPLED)) {
+            return (int) self::IS_SAMPLED;
         }
-
-        if (strtolower($value) === 'true') {
-            return 1;
-        }
-        if (strtolower($value) === 'false') {
-            return 0;
+        if (in_array(strtolower($value), self::VALID_NON_SAMPLED)) {
+            return (int) self::IS_NOT_SAMPLED;
         }
 
         return null;
     }
 
-    private static function extractImpl($carrier, PropagationGetterInterface $getter): SpanContextInterface
+    private static function extractImpl($carrier, PropagationGetterInterface $getter, Context &$context): SpanContextInterface
     {
         $traceId = $getter->get($carrier, self::TRACE_ID);
         $spanId = $getter->get($carrier, self::SPAN_ID);
         $sampled = self::getSampledValue($carrier, $getter);
+        $debug = $getter->get($carrier, self::DEBUG_FLAG);
 
         if ($traceId === null || $spanId === null) {
             return SpanContext::getInvalid();
         }
 
-        // Validates the traceId, spanId and sampled
+        // Validates the traceId and spanId
         // Returns an invalid spanContext if any of the checks fail
         if (!SpanContext::isValidTraceId($traceId) || !SpanContext::isValidSpanId($spanId)) {
             return SpanContext::getInvalid();
         }
 
-        $isSampled = ($sampled === SpanContext::SAMPLED_FLAG);
+        if ($debug && $debug === self::IS_SAMPLED) {
+            $context = $context->with(B3DebugFlagContextKey::instance(), self::IS_SAMPLED);
+            $isSampled = SpanContext::SAMPLED_FLAG;
+        } else {
+            $isSampled = ($sampled === SpanContext::SAMPLED_FLAG);
+        }
 
-        // Only traceparent header is extracted. No tracestate.
         return SpanContext::createFromRemoteParent(
             $traceId,
             $spanId,

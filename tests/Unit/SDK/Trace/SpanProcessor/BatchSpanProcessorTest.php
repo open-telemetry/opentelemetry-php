@@ -4,29 +4,30 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use Exception;
+use InvalidArgumentException;
+use LogicException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
+use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
-use ReflectionObject;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor
+ * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor
  */
 class BatchSpanProcessorTest extends MockeryTestCase
 {
-    use EnvironmentVariables;
-
     private TestClock $testClock;
 
     protected function setUp(): void
@@ -39,18 +40,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
     protected function tearDown(): void
     {
         ClockFactory::setDefault(null);
-        $this->restoreEnvironmentVariables();
-    }
-
-    public function test_allows_null_exporter(): void
-    {
-        $proc = new BatchSpanProcessor(null, $this->testClock);
-        $span = $this->createSampledSpanMock();
-        $proc->onStart($span, Context::getCurrent());
-        $proc->onEnd($span);
-        $proc->forceFlush();
-        $proc->shutdown();
-        $this->assertTrue(true); // phpunit requires an assertion
     }
 
     public function test_export_batch_size_met(): void
@@ -83,27 +72,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
-    public function test_export_batch_size_greater_than_queue_size_is_rejected(): void
-    {
-        $batchSize = 3;
-        $queueSize = 2; // queue is smaller than batch
-        $exportDelay = 3;
-        $timeout = 3000;
-
-        $exporter = $this->createMock(SpanExporterInterface::class);
-
-        $this->expectException(\InvalidArgumentException::class);
-        /** @var SpanExporterInterface $exporter */
-        $processor = new BatchSpanProcessor(
-            $exporter,
-            $this->testClock,
-            $queueSize,
-            $exportDelay,
-            $timeout,
-            $batchSize
-        );
-    }
-
     /**
      * @dataProvider scheduledDelayProvider
      */
@@ -119,7 +87,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
 
         $exporter = $this->createMock(SpanExporterInterface::class);
-        $exporter->expects($this->exactly($expectedFlush ? 1 : 0))->method('forceFlush');
+        $exporter->expects($this->exactly($expectedFlush ? 1 : 0))->method('export');
 
         /** @var SpanExporterInterface $exporter */
         $processor = new BatchSpanProcessor(
@@ -162,7 +130,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
 
         $exporter = Mockery::mock(SpanExporterInterface::class);
-        $exporter->expects('forceFlush');
         $exporter
             ->expects('export')
             ->with(
@@ -328,6 +295,57 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $processor->forceFlush();
     }
 
+    public function test_queue_size_exceeded_drops_spans(): void
+    {
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $processor = new BatchSpanProcessor($exporter, $this->testClock, 5, 5000, 30000, 5);
+
+        $exporter->expects($this->exactly(2))->method('export')->willReturnCallback(function (iterable $batch) use ($processor, &$i) {
+            if ($i) {
+                $this->assertCount(3, $batch);
+            } else {
+                for ($i = 0; $i < 5; $i++) {
+                    $span = $this->createSampledSpanMock();
+                    $processor->onStart($span, Context::getCurrent());
+                    $processor->onEnd($span);
+                }
+            }
+
+            return 0;
+        });
+
+        $span = $this->createSampledSpanMock();
+        $processor->onStart($span, Context::getCurrent());
+        $processor->onEnd($span);
+        $processor->onStart($span, Context::getCurrent());
+        $processor->onEnd($span);
+
+        $processor->forceFlush();
+        $processor->forceFlush();
+    }
+
+    public function test_force_flush_applies_only_to_current_spans(): void
+    {
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $processor = new BatchSpanProcessor($exporter, $this->testClock);
+
+        $exporter->expects($this->exactly(1))->method('export')->willReturnCallback(function (iterable $batch) use ($processor) {
+            $this->assertCount(1, $batch);
+
+            $span = $this->createSampledSpanMock();
+            $processor->onStart($span, Context::getCurrent());
+            $processor->onEnd($span);
+
+            return 0;
+        });
+
+        $span = $this->createSampledSpanMock();
+        $processor->onStart($span, Context::getCurrent());
+        $processor->onEnd($span);
+
+        $processor->forceFlush();
+    }
+
     public function test_shutdown_shutdowns_exporter(): void
     {
         $exporter = $this->createMock(SpanExporterInterface::class);
@@ -337,34 +355,136 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $processor->shutdown();
     }
 
-    public function test_create_from_environment_variables(): void
+    public function test_throwing_exporter_export(): void
     {
         $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->method('forceFlush')->willReturn(true);
+        $exporter->method('export')->willThrowException(new LogicException());
 
-        $input = [
-            ['OTEL_BSP_MAX_EXPORT_BATCH_SIZE', 'maxExportBatchSize', 1],
-            ['OTEL_BSP_MAX_QUEUE_SIZE', 'maxQueueSize', 2],
-            ['OTEL_BSP_SCHEDULE_DELAY', 'scheduledDelayMillis', 3],
-            ['OTEL_BSP_EXPORT_TIMEOUT', 'exporterTimeoutMillis', 4],
-        ];
-        foreach ($input as $i) {
-            $this->setEnvironmentVariable($i[0], $i[2]);
-        }
-        $processor = new BatchSpanProcessor($exporter);
-        $reflection = new ReflectionObject($processor);
-        foreach ($input as $i) {
-            $attr = $reflection->getProperty($i[1]);
-            $attr->setAccessible(true);
-            $this->assertEquals($i[2], $attr->getValue($processor));
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('log')->with(LogLevel::ERROR);
+
+        $processor = new BatchSpanProcessor($exporter, $this->testClock);
+
+        $span = $this->createSampledSpanMock();
+        $processor->onStart($span, Context::getCurrent());
+        $processor->onEnd($span);
+
+        $previousLogger = LoggerHolder::get();
+        LoggerHolder::set($logger);
+
+        try {
+            $processor->forceFlush();
+        } finally {
+            LoggerHolder::set($previousLogger);
         }
     }
 
-    public function test_create_non_numeric_environment_value_throws_exception(): void
+    public function test_throwing_exporter_flush(): void
     {
-        $this->setEnvironmentVariable('OTEL_BSP_MAX_QUEUE_SIZE', 'fruit');
         $exporter = $this->createMock(SpanExporterInterface::class);
-        $this->expectException(Exception::class);
-        new BatchSpanProcessor($exporter);
+        $exporter->method('forceFlush')->willThrowException(new LogicException());
+
+        $this->expectException(LogicException::class);
+
+        $processor = new BatchSpanProcessor($exporter, $this->testClock);
+        $span = $this->createSampledSpanMock();
+        $processor->onStart($span, Context::getCurrent());
+        $processor->onEnd($span);
+
+        $processor->forceFlush();
+    }
+
+    public function test_throwing_exporter_flush_cannot_rethrow_in_original_caller_logs_error(): void
+    {
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->method('forceFlush')->willReturnCallback(function () use (&$processor) {
+            /** @var SpanProcessorInterface $processor */
+            $span = $this->createSampledSpanMock();
+            $processor->onStart($span, Context::getCurrent());
+            $processor->onEnd($span);
+
+            return $processor->shutdown();
+        });
+        $exporter->method('shutdown')->willThrowException(new LogicException());
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('log')->with(LogLevel::ERROR);
+
+        $processor = new BatchSpanProcessor($exporter, $this->testClock);
+
+        $span = $this->createSampledSpanMock();
+        $processor->onStart($span, Context::getCurrent());
+        $processor->onEnd($span);
+
+        $previousLogger = LoggerHolder::get();
+        LoggerHolder::set($logger);
+
+        try {
+            $processor->forceFlush();
+        } finally {
+            LoggerHolder::set($previousLogger);
+        }
+    }
+
+    public function test_throwing_exporter_flush_rethrows_in_original_caller(): void
+    {
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->method('forceFlush')->willReturnCallback(function () use (&$processor) {
+            /** @var SpanProcessorInterface $processor */
+            $span = $this->createSampledSpanMock();
+            $processor->onStart($span, Context::getCurrent());
+            $processor->onEnd($span);
+            $processor->shutdown();
+
+            throw new LogicException();
+        });
+        $exporter->expects($this->once())->method('shutdown');
+
+        $this->expectException(LogicException::class);
+
+        $processor = new BatchSpanProcessor($exporter, $this->testClock);
+
+        $span = $this->createSampledSpanMock();
+        $processor->onStart($span, Context::getCurrent());
+        $processor->onEnd($span);
+
+        $processor->forceFlush();
+    }
+
+    public function test_span_processor_throws_on_invalid_max_queue_size(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        new BatchSpanProcessor($exporter, $this->testClock, -1);
+    }
+
+    public function test_span_processor_throws_on_invalid_scheduled_delay(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        new BatchSpanProcessor($exporter, $this->testClock, 2048, -1);
+    }
+
+    public function test_span_processor_throws_on_invalid_export_timeout(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        new BatchSpanProcessor($exporter, $this->testClock, 2048, 5000, -1);
+    }
+
+    public function test_span_processor_throws_on_invalid_max_export_batch_size(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        new BatchSpanProcessor($exporter, $this->testClock, 2048, 5000, 30000, -1);
+    }
+
+    public function test_span_processor_throws_on_invalid_max_export_batch_size_exceeding_max_queue_size(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        new BatchSpanProcessor($exporter, $this->testClock, 2, 5000, 30000, 3);
     }
 
     private function createSampledSpanMock()
