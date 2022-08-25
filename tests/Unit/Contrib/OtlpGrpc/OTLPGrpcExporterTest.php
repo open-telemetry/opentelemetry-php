@@ -180,7 +180,13 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
                                 ->allows('wait')
                                 ->andReturns(
                                     [
-                                        Mockery::mock(ExportTraceServiceResponse::class)->allows('hasPartialSuccess')->andReturns(false)->getMock(),
+                                        // @note mocking ExportTraceServiceResponse with protobuf extension = segfault
+                                        new class() {
+                                            public function hasPartialSuccess(): bool
+                                            {
+                                                return false;
+                                            }
+                                        },
                                         new class($statusCode) {
                                             public $code;
 
