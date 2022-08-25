@@ -26,6 +26,14 @@ class InstrumentationScope extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string version = 2;</code>
      */
     protected $version = '';
+    /**
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
+     */
+    private $attributes;
+    /**
+     * Generated from protobuf field <code>uint32 dropped_attributes_count = 4;</code>
+     */
+    protected $dropped_attributes_count = 0;
 
     /**
      * Constructor.
@@ -36,6 +44,8 @@ class InstrumentationScope extends \Google\Protobuf\Internal\Message
      *     @type string $name
      *           An empty instrumentation scope name means the name is unknown.
      *     @type string $version
+     *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $attributes
+     *     @type int $dropped_attributes_count
      * }
      */
     public function __construct($data = NULL) {
@@ -87,6 +97,50 @@ class InstrumentationScope extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->version = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
+     * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setAttributes($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Common\V1\KeyValue::class);
+        $this->attributes = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>uint32 dropped_attributes_count = 4;</code>
+     * @return int
+     */
+    public function getDroppedAttributesCount()
+    {
+        return $this->dropped_attributes_count;
+    }
+
+    /**
+     * Generated from protobuf field <code>uint32 dropped_attributes_count = 4;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setDroppedAttributesCount($var)
+    {
+        GPBUtil::checkUint32($var);
+        $this->dropped_attributes_count = $var;
 
         return $this;
     }

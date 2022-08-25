@@ -9,6 +9,7 @@ use Grpc\UnaryCall;
 use Mockery;
 use Mockery\MockInterface;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
+use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
@@ -179,7 +180,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
                                 ->allows('wait')
                                 ->andReturns(
                                     [
-                                        'unused response data',
+                                        Mockery::mock(ExportTraceServiceResponse::class)->allows('hasPartialSuccess')->andReturns(false)->getMock(),
                                         new class($statusCode) {
                                             public $code;
 
