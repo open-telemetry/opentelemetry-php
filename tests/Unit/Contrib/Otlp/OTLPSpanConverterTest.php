@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use function bin2hex;
 use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\API\Trace\SpanContextFactory;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Common\V1\AnyValue;
@@ -144,7 +145,7 @@ class OTLPSpanConverterTest extends TestCase
 
         $sdk = (new SpanData())
             ->setContext(
-                SpanContext::create(
+                SpanContextFactory::create(
                     bin2hex('0000000000000001'), // traceId
                     bin2hex('00000001'), // spanId
                     0, // traceFlags
