@@ -8,9 +8,8 @@ use function count;
 use function explode;
 use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
-use OpenTelemetry\API\Trace\SpanContextFactory;
 use OpenTelemetry\API\Trace\SpanContextInterface;
-use OpenTelemetry\API\Trace\ValidationSpanContext;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
@@ -157,7 +156,7 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
 
         // Validates the traceId and spanId
         // Returns an invalid spanContext if any of the checks fail
-        if (!ValidationSpanContext::isValidTraceId($traceId) || !ValidationSpanContext::isValidSpanId($spanId)) {
+        if (!SpanContextValidator::isValidTraceId($traceId) || !SpanContextValidator::isValidSpanId($spanId)) {
             return SpanContext::getInvalid();
         }
 
@@ -168,10 +167,12 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
         $sampled = self::processSampledValue($samplingState);
         $isSampled = ($sampled === SpanContext::SAMPLED_FLAG);
 
-        return SpanContextFactory::createFromRemoteParent(
+        return SpanContext::create(
             $traceId,
             $spanId,
-            $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT
+            $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT,
+            null,
+            true
         );
     }
 }

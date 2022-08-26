@@ -7,7 +7,7 @@ namespace OpenTelemetry\API\Trace;
 use function strlen;
 use function strtolower;
 
-class ValidationSpanContext
+class SpanContextValidator
 {
     public const INVALID_TRACE = '00000000000000000000000000000000';
     public const INVALID_SPAN = '0000000000000000';

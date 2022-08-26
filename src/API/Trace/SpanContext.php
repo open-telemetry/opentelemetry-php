@@ -38,7 +38,7 @@ final class SpanContext implements SpanContextInterface
     ) {
         // TraceId must be exactly 16 bytes (32 chars) and at least one non-zero byte
         // SpanId must be exactly 8 bytes (16 chars) and at least one non-zero byte
-        if (!ValidationSpanContext::isValidTraceId($traceId) || !ValidationSpanContext::isValidSpanId($spanId)) {
+        if (!SpanContextValidator::isValidTraceId($traceId) || !SpanContextValidator::isValidSpanId($spanId)) {
             $traceId = self::INVALID_TRACE;
             $spanId = self::INVALID_SPAN;
         }
@@ -49,7 +49,7 @@ final class SpanContext implements SpanContextInterface
         $this->isRemote = $isRemote;
         $this->isSampled = ($traceFlags & self::SAMPLED_FLAG) === self::SAMPLED_FLAG;
         $this->traceFlags = $traceFlags;
-        $this->isValid = ValidationSpanContext::isValidTraceId($this->traceId) && ValidationSpanContext::isValidSpanId($this->spanId);
+        $this->isValid = SpanContextValidator::isValidTraceId($this->traceId) && SpanContextValidator::isValidSpanId($this->spanId);
     }
 
     public function getTraceId(): string
@@ -88,7 +88,7 @@ final class SpanContext implements SpanContextInterface
     }
 
     /** @inheritDoc */
-    public static function builder(string $traceId, string $spanId, bool $isRemote, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface
+    public static function create(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?TraceStateInterface $traceState = null, bool $isRemote=false): SpanContextInterface
     {
         return new SpanContext(
             $traceId,
@@ -103,7 +103,7 @@ final class SpanContext implements SpanContextInterface
     public static function getInvalid(): SpanContextInterface
     {
         if (null === self::$invalidContext) {
-            self::$invalidContext = SpanContextFactory::create(self::INVALID_TRACE, self::INVALID_SPAN, 0);
+            self::$invalidContext = self::create(self::INVALID_TRACE, self::INVALID_SPAN, 0);
         }
 
         return self::$invalidContext;

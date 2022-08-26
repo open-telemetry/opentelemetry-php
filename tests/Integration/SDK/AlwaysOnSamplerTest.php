@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Integration\SDK;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
-use OpenTelemetry\API\Trace\SpanContextFactory;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -46,14 +46,15 @@ class AlwaysOnSamplerTest extends TestCase
         $traceFlag = $sampled ? API\SpanContextInterface::TRACE_FLAG_SAMPLED : API\SpanContextInterface::TRACE_FLAG_DEFAULT;
 
         if ($isRemote) {
-            $spanContext = SpanContextFactory::createFromRemoteParent(
+            $spanContext = SpanContext::create(
                 '4bf92f3577b34da6a3ce929d0e0e4736',
                 '00f067aa0ba902b7',
                 $traceFlag,
-                $traceState
+                $traceState,
+                true
             );
         } else {
-            $spanContext = SpanContextFactory::create(
+            $spanContext = SpanContext::create(
                 '4bf92f3577b34da6a3ce929d0e0e4736',
                 '00f067aa0ba902b7',
                 $traceFlag,

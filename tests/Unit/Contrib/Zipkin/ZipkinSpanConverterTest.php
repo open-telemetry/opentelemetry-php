@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Zipkin;
 
-use OpenTelemetry\API\Trace\SpanContextFactory;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
@@ -27,7 +27,7 @@ class ZipkinSpanConverterTest extends TestCase
             ->setName('guard.validate')
             ->setKind(SpanKind::KIND_CLIENT)
             ->setParentContext(
-                SpanContextFactory::create(
+                SpanContext::create(
                     '10000000000000000000000000000000',
                     '1000000000000000'
                 )

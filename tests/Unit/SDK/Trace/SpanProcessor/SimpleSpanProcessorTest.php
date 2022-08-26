@@ -9,7 +9,6 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
 use OpenTelemetry\API\Trace\SpanContext;
-use OpenTelemetry\API\Trace\SpanContextFactory;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -23,7 +22,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor
+ * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor
  */
 class SimpleSpanProcessorTest extends MockeryTestCase
 {
@@ -46,7 +45,7 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $this->readWriteSpan = Mockery::mock(ReadWriteSpanInterface::class);
         $this->readableSpan = Mockery::mock(ReadableSpanInterface::class);
 
-        $this->sampledSpanContext = SpanContextFactory::create(
+        $this->sampledSpanContext = SpanContext::create(
             SpanContext::INVALID_TRACE,
             SpanContext::INVALID_SPAN,
             SpanContextInterface::TRACE_FLAG_SAMPLED
