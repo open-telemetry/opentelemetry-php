@@ -7,6 +7,8 @@ use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPGrpcExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
+\OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
+
 $exporter = new OTLPGrpcExporter('collector:4317');
 
 echo 'Starting OTLP GRPC example';
