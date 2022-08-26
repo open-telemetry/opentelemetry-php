@@ -68,6 +68,7 @@ trait HttpSpanExporterTrait
         }
 
         self::logDebug('Exported span(s)', ['spans' => $spans]);
+
         return SpanExporterInterface::STATUS_SUCCESS;
     }
 
