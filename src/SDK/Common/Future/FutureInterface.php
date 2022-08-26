@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Future;
 
 /**
- * @template T
+ * @template-covariant T
  */
 interface FutureInterface
 {
