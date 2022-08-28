@@ -9,7 +9,6 @@ use Grpc\UnaryCall;
 use Mockery;
 use Mockery\MockInterface;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter;
-use Opentelemetry\Proto\Collector\Trace\V1\ExportTracePartialSuccess;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -207,6 +206,31 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
     }
 
     /**
+     * Mocking protobuf classes with C extension explicitly not supported
+     * @see https://github.com/protocolbuffers/protobuf/issues/4107#issuecomment-509358356
+     */
+    private function createMockExportTracePartialSuccess(int $rejectedNumSpans = 0, string $error = '')
+    {
+        return new class($rejectedNumSpans, $error) {
+            private int $rejectedNumSpans;
+            private string $error;
+            public function __construct(int $rejectedNumSpans, string $error)
+            {
+                $this->rejectedNumSpans = $rejectedNumSpans;
+                $this->error = $error;
+            }
+            public function getRejectedSpans(): int
+            {
+                return $this->rejectedNumSpans;
+            }
+            public function getErrorMessage(): string
+            {
+                return $this->error;
+            }
+        };
+    }
+
+    /**
      * @psalm-suppress PossiblyUndefinedMethod
      * @psalm-suppress UndefinedMagicMethod
      */
@@ -226,10 +250,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
             ],
         ] = $options;
         $partial = $hasPartialSuccess
-            ? Mockery::mock(ExportTracePartialSuccess::class)->allows([
-                'getRejectedSpans' => $rejectedNumSpans,
-                'getErrorMessage' => $partialErrorMessage,
-            ])
+            ? $this->createMockExportTracePartialSuccess($rejectedNumSpans, $partialErrorMessage)
             : null;
 
         /** @var MockInterface&TraceServiceClient */
