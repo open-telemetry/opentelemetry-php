@@ -1,7 +1,7 @@
 {
   "name": "open-telemetry/exporter-otlp-common",
   "description": "OTLP common code for OpenTelemetry exporters.",
-  "keywords": ["opentelemetry", "otel", "tracing", "exporter", "otlp", "grpc"],
+  "keywords": ["opentelemetry", "otel", "tracing", "metrics", "exporter", "otlp", "grpc"],
   "type": "library",
   "license": "Apache-2.0",
   "authors": [
