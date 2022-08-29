@@ -19,11 +19,9 @@ trait SpanExporterDecoratorTrait
      */
     public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
     {
-        $response = $this->decorated->export(
-            $this->beforeExport($spans),
-            $cancellation,
-        );
-        $this->afterExport($spans, $response->await());
+        $spans = $this->beforeExport($spans);
+        $response = $this->decorated->export($spans, $cancellation);
+        $response->map(fn (int $result) => $this->afterExport($spans, $result));
 
         return $response;
     }
