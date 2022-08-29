@@ -1,7 +1,7 @@
 {
   "name": "open-telemetry/context-swoole",
   "description": "Async Swoole/OpenSwoole context implementation for OpenTelemetry PHP.",
-  "keywords": ["opentelemetry", "otel", "context", "swoole", "openswoole", "coroutine"],
+  "keywords": ["opentelemetry", "otel", "contrib", "context", "swoole", "openswoole", "coroutine"],
   "type": "library",
   "license": "Apache-2.0",
   "authors": [
