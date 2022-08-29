@@ -6,9 +6,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Grpc;
 
-use BadMethodCallException;
-use UnexpectedValueException;
 use function array_change_key_case;
+use BadMethodCallException;
 use Grpc\Call;
 use Grpc\Channel;
 use const Grpc\OP_RECV_INITIAL_METADATA;
@@ -28,6 +27,7 @@ use OpenTelemetry\SDK\Common\Future\NullCancellation;
 use RuntimeException;
 use function sprintf;
 use Throwable;
+use UnexpectedValueException;
 
 /**
  * @internal

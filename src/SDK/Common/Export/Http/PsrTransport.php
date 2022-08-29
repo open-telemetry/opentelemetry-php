@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Common\Export\Http;
 
 use function assert;
 use BadMethodCallException;
+use function in_array;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -17,7 +18,6 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use RuntimeException;
 use Throwable;
-use function in_array;
 use function time_nanosleep;
 
 final class PsrTransport implements TransportInterface
