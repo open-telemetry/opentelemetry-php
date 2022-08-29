@@ -13,6 +13,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Tests\Unit\Contrib\UsesHttpClientTrait;
 use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
@@ -34,11 +35,11 @@ class OTLPHttpExporterTest extends AbstractExporterTest
      */
     public function createExporter(): SpanExporterInterface
     {
-        return new Exporter(
+        return new Exporter(Exporter::createTransport(new PsrTransportFactory(
             $this->getClientInterfaceMock(),
             $this->getRequestFactoryInterfaceMock(),
-            $this->getStreamFactoryInterfaceMock()
-        );
+            $this->getStreamFactoryInterfaceMock(),
+        )));
     }
 
     public function tearDown(): void
@@ -53,13 +54,13 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     {
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn(
-            new Response($responseStatus)
+            new Response($responseStatus, [])
         );
         /** @var ClientInterface $client */
-        $exporter = new Exporter($client, new HttpFactory(), new HttpFactory());
+        $exporter = new Exporter(Exporter::createTransport(new PsrTransportFactory($client, new HttpFactory(), new HttpFactory())));
 
         $this->assertEquals(
-            $expected,
+            min($expected, 1),
             $exporter->export([new SpanData()])->await(),
         );
     }
@@ -87,10 +88,10 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         $client->method('sendRequest')->willThrowException($exception);
 
         /** @var ClientInterface $client */
-        $exporter = new Exporter($client, new HttpFactory(), new HttpFactory());
+        $exporter = new Exporter(Exporter::createTransport(new PsrTransportFactory($client, new HttpFactory(), new HttpFactory())));
 
         $this->assertEquals(
-            $expected,
+            min($expected, 1),
             $exporter->export([new SpanData()])->await(),
         );
     }
@@ -128,7 +129,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         $this->setEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_COMPRESSION, 'gzip');
 
         $client = new Client(['handler' => $stack]);
-        $exporter = new Exporter($client, new HttpFactory(), new HttpFactory());
+        $exporter = new Exporter(Exporter::createTransport(new PsrTransportFactory($client, new HttpFactory(), new HttpFactory())));
 
         $exporter->export([new SpanData()])->await();
 
@@ -159,13 +160,16 @@ class OTLPHttpExporterTest extends AbstractExporterTest
      */
     public function test_should_be_ok_to_exporter_empty_spans_collection(): void
     {
+        $client = $this->createMock(ClientInterface::class);
+        $client->method('sendRequest')->willReturn(new Response(200));
+
         $this->assertEquals(
             SpanExporterInterface::STATUS_SUCCESS,
-            (new Exporter(
-                $this->getClientInterfaceMock(),
-                $this->getRequestFactoryInterfaceMock(),
-                $this->getStreamFactoryInterfaceMock()
-            ))->export([])->await(),
+            (new Exporter(Exporter::createTransport(new PsrTransportFactory(
+                $client,
+                new HttpFactory(),
+                new HttpFactory(),
+            ))))->export([])->await(),
         );
     }
 
@@ -180,11 +184,11 @@ class OTLPHttpExporterTest extends AbstractExporterTest
 
         $this->expectException(\InvalidArgumentException::class);
 
-        new Exporter(
+        new Exporter(Exporter::createTransport(new PsrTransportFactory(
             $this->getClientInterfaceMock(),
             $this->getRequestFactoryInterfaceMock(),
-            $this->getStreamFactoryInterfaceMock()
-        );
+            $this->getStreamFactoryInterfaceMock(),
+        )));
     }
 
     /**
@@ -198,11 +202,11 @@ class OTLPHttpExporterTest extends AbstractExporterTest
 
         $this->expectException(\InvalidArgumentException::class);
 
-        new Exporter(
+        new Exporter(Exporter::createTransport(new PsrTransportFactory(
             $this->getClientInterfaceMock(),
             $this->getRequestFactoryInterfaceMock(),
-            $this->getStreamFactoryInterfaceMock()
-        );
+            $this->getStreamFactoryInterfaceMock(),
+        )));
     }
 
     public function exporterInvalidEndpointDataProvider(): array

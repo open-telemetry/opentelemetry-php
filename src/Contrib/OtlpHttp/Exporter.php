@@ -4,146 +4,114 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpHttp;
 
-use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
+use Http\Discovery\Psr18ClientDiscovery;
 use InvalidArgumentException;
 use OpenTelemetry\API\Common\Signal\Signals;
-use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
-use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
+use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolver;
-use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolverInterface;
-use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\StreamFactoryInterface;
+use function sprintf;
+use Throwable;
 
 class Exporter implements SpanExporterInterface
 {
-    use ExporterTrait;
-    use HttpSpanExporterTrait;
+    use LogsMessagesTrait;
 
-    private const REQUEST_METHOD = 'POST';
-    private const HEADER_CONTENT_TYPE = 'content-type';
-    private const HEADER_CONTENT_ENCODING = 'Content-Encoding';
-    private const VALUE_CONTENT_TYPE = 'application/x-protobuf';
-    private const VALUE_CONTENT_ENCODING = 'gzip';
-    private const DEFAULT_ENDPOINT = 'https://localhost:4318/v1/traces';
+    private const DEFAULT_ENDPOINT = 'https://localhost:4318';
     private const DEFAULT_COMPRESSION = 'none';
     private const OTLP_PROTOCOL = 'http/protobuf';
 
-    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
-    // private string $insecure;
-
-    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
-    // private string $certificateFile;
-
-    private array $headers;
-
-    private string $compression;
-
-    // @todo: Please, check if this code is needed. It creates an error in phpstan, since it's not used
-    // private int $timeout;
+    private TransportInterface $transport;
 
     /**
      * Exporter constructor.
      */
-    public function __construct(
-        ClientInterface $client,
-        RequestFactoryInterface $requestFactory,
-        StreamFactoryInterface $streamFactory,
-        ?SpanConverter $spanConverter = null,
-        ?HttpEndpointResolverInterface $httpEndpointResolver = null
-    ) {
-        $this->setEndpointUrl(
-            $this->resolveEndpoint($httpEndpointResolver ?? HttpEndpointResolver::create())
-        );
+    public function __construct(TransportInterface $transport)
+    {
+        $this->transport = $transport;
+    }
 
-        $this->headers = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
-            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) :
-            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS);
+    /** @internal */
+    public static function createTransport(
+        TransportFactoryInterface $transportFactory
+    ): TransportInterface {
+        $env = new class() {
+            use EnvironmentVariablesTrait;
+        };
 
-        $this->compression = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
-            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION, self::DEFAULT_COMPRESSION) :
-            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
+        $endpoint = $env->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
+            ? $env->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
+            : HttpEndpointResolver::create()->resolveToString(
+                $env->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, self::DEFAULT_ENDPOINT),
+                Signals::TRACE,
+            );
 
-        $this->setClient($client);
-        $this->setRequestFactory($requestFactory);
-        $this->setStreamFactory($streamFactory);
-        $this->setSpanConverter($spanConverter ?? new SpanConverter());
+        $headers = $env->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
+            $env->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) :
+            $env->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS);
 
-        $protocol = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
-            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, self::OTLP_PROTOCOL) :
-            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_PROTOCOL, self::OTLP_PROTOCOL);
+        $compression = $env->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
+            $env->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION, self::DEFAULT_COMPRESSION) :
+            $env->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
+
+        $protocol = $env->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
+            $env->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, self::OTLP_PROTOCOL) :
+            $env->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_PROTOCOL, self::OTLP_PROTOCOL);
 
         if ($protocol !== self::OTLP_PROTOCOL) {
             throw new InvalidArgumentException(sprintf('Invalid OTLP Protocol "%s" specified', $protocol));
         }
-    }
 
-    protected function serializeTrace(iterable $spans): string
-    {
-        $bytes = (new ExportTraceServiceRequest([
-            'resource_spans' => $this->getSpanConverter()->convert($spans),
-        ]))->serializeToString();
-
-        // TODO: Add Tests
-        return $this->shouldCompress()
-            ? gzencode($bytes)
-            : $bytes;
-    }
-
-    protected function marshallRequest(iterable $spans): RequestInterface
-    {
-        $request =  $this->createRequest(self::REQUEST_METHOD)
-            ->withBody(
-                $this->createStream(
-                    $this->serializeTrace($spans)
-                )
-            )
-            ->withHeader(self::HEADER_CONTENT_TYPE, self::VALUE_CONTENT_TYPE);
-
-        foreach ($this->headers as $header => $value) {
-            $request = $request->withHeader($header, $value);
-        }
-
-        if ($this->shouldCompress()) {
-            return $request->withHeader(self::HEADER_CONTENT_ENCODING, self::VALUE_CONTENT_ENCODING);
-        }
-
-        return $request;
+        return $transportFactory->create(
+            $endpoint,
+            $headers,
+            $compression,
+        );
     }
 
     public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null): Exporter
     {
-        return new Exporter(
-            HttpClientDiscovery::find(),
+        return new Exporter(self::createTransport(new PsrTransportFactory(
+            Psr18ClientDiscovery::find(),
             Psr17FactoryDiscovery::findRequestFactory(),
-            Psr17FactoryDiscovery::findStreamFactory()
-        );
+            Psr17FactoryDiscovery::findStreamFactory(),
+        )));
     }
 
-    private function shouldCompress(): bool
+    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
     {
-        return $this->compression === 'gzip' && function_exists('gzencode');
+        return $this->transport
+            ->send((new SpanConverter())->convert($spans)->serializeToString(), 'application/x-protobuf', $cancellation)
+            ->map(static function (string $payload): int {
+                $serviceResponse = new ExportTraceServiceResponse();
+                $serviceResponse->mergeFromString($payload);
+
+                return 0;
+            })
+            ->catch(static function (Throwable $throwable): int {
+                self::logError('Export failure', ['exception' => $throwable]);
+
+                return 1;
+            });
     }
 
-    private function resolveEndpoint(HttpEndpointResolverInterface $httpEndpointResolver): string
+    public function shutdown(?CancellationInterface $cancellation = null): bool
     {
-        if ($this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)) {
-            return $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT);
-        }
+        return $this->transport->shutdown($cancellation);
+    }
 
-        if ($this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_ENDPOINT)) {
-            return $httpEndpointResolver->resolveToString(
-                $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT),
-                Signals::TRACE
-            );
-        }
-
-        return self::DEFAULT_ENDPOINT;
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
+    {
+        return $this->transport->forceFlush($cancellation);
     }
 }

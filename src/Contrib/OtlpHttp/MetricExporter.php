@@ -4,58 +4,32 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpHttp;
 
-use function array_filter;
 use OpenTelemetry\Contrib\Otlp\MetricConverter;
+use Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsServiceResponse;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
-use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Client\RequestExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Throwable;
 
 final class MetricExporter implements MetricExporterInterface
 {
     use LogsMessagesTrait;
 
-    private ClientInterface $client;
-    private RequestFactoryInterface $requestFactory;
-    private StreamFactoryInterface $streamFactory;
-
-    private string $endpoint;
-    private array $headers;
-    private ?string $compression;
-    private int $retryDelay;
-    private int $maxRetries;
+    private TransportInterface $transport;
     private $temporality;
 
-    private bool $closed = false;
-
     /**
-     * @param array<string|string[]> $headers
      * @param string|Temporality|null $temporality
      */
-    private function __construct(
-        ClientInterface $client,
-        RequestFactoryInterface $requestFactory,
-        StreamFactoryInterface $streamFactory,
-        string $endpoint,
-        array $headers,
-        ?string $compression,
-        int $retryDelay,
-        int $maxRetries,
-        $temporality
-    ) {
-        $this->client = $client;
-        $this->requestFactory = $requestFactory;
-        $this->streamFactory = $streamFactory;
-        $this->endpoint = $endpoint;
-        $this->headers = $headers;
-        $this->compression = $compression;
-        $this->retryDelay = $retryDelay;
-        $this->maxRetries = $maxRetries;
+    public function __construct(TransportInterface $transport, $temporality)
+    {
+        $this->transport = $transport;
         $this->temporality = $temporality;
     }
 
@@ -79,14 +53,13 @@ final class MetricExporter implements MetricExporterInterface
         $temporality = null
     ): MetricExporterInterface {
         return new self(
-            $client,
-            $requestFactory,
-            $streamFactory,
-            $endpoint,
-            $headers,
-            $compression,
-            $retryDelay * 1000,
-            $maxRetries,
+            (new PsrTransportFactory($client, $requestFactory, $streamFactory))->create(
+                $endpoint,
+                $headers,
+                $compression,
+                $retryDelay,
+                $maxRetries,
+            ),
             $temporality,
         );
     }
@@ -98,87 +71,29 @@ final class MetricExporter implements MetricExporterInterface
 
     public function export(iterable $batch): bool
     {
-        if ($this->closed) {
-            return false;
-        }
+        return $this->transport
+            ->send((new MetricConverter())->convert($batch)->serializeToString(), 'application/x-protobuf')
+            ->map(static function (string $payload): bool {
+                $serviceResponse = new ExportMetricsServiceResponse();
+                $serviceResponse->mergeFromString($payload);
 
-        $payload = (new MetricConverter())->convert($batch)->serializeToString();
-        $request = $this->requestFactory
-            ->createRequest('POST', $this->endpoint)
-            ->withHeader('Content-Type', 'application/x-protobuf')
-        ;
+                return true;
+            })
+            ->catch(static function (Throwable $throwable): bool {
+                self::logError('Export failure', ['exception' => $throwable]);
 
-        if ($this->compression && $encoder = self::encoder($this->compression)) {
-            $payload = $encoder($payload);
-            $request = $request->withHeader('Content-Encoding', $this->compression);
-        }
-
-        foreach ($this->headers as $header => $value) {
-            $request = $request->withAddedHeader((string) $header, $value);
-        }
-
-        for ($retries = 0;;) {
-            $statusCode = null;
-            $e = null;
-
-            $request = $request->withBody($this->streamFactory->createStream($payload));
-
-            try {
-                $response = $this->client->sendRequest($request);
-
-                $statusCode = $response->getStatusCode();
-                if ($statusCode >= 200 && $statusCode < 300) {
-                    return true;
-                }
-                if ($statusCode >= 400 && $statusCode < 500 && $statusCode !== 408) {
-                    break;
-                }
-            } catch (RequestExceptionInterface $e) {
-                break;
-            } catch (ClientExceptionInterface $e) {
-            }
-
-            if (++$retries >= $this->maxRetries) {
-                break;
-            }
-
-            $wait = $this->retryDelay << $retries - 1;
-            /** @psalm-suppress InvalidArgument */
-            usleep(rand($wait >> 1, $wait));
-        }
-
-        /** @psalm-suppress PossiblyUndefinedVariable */
-        self::logError('Metric export failed', [
-            'exception' => $e,
-            'status_code' => $statusCode,
-        ]);
-
-        return false;
+                return false;
+            })
+            ->await();
     }
 
     public function shutdown(): bool
     {
-        if ($this->closed) {
-            return false;
-        }
-
-        $this->closed = true;
-
-        return true;
+        return $this->transport->shutdown();
     }
 
     public function forceFlush(): bool
     {
-        return !$this->closed;
-    }
-
-    private static function encoder(string $encoding): ?callable
-    {
-        static $encoders;
-        $encoders ??= array_filter([
-            'gzip' => 'gzencode',
-        ], 'function_exists');
-
-        return $encoders[$encoding] ?? null;
+        return $this->transport->forceFlush();
     }
 }
