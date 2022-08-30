@@ -7,14 +7,18 @@ namespace OpenTelemetry\Contrib\Zipkin;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use JsonException;
-use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Throwable;
 
 /**
  * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
@@ -22,12 +26,10 @@ use Psr\Http\Message\StreamFactoryInterface;
  */
 class Exporter implements SpanExporterInterface
 {
+    use LogsMessagesTrait;
     use UsesSpanConverterTrait;
-    use HttpSpanExporterTrait;
 
-    private const REQUEST_METHOD = 'POST';
-    private const HEADER_CONTENT_TYPE = 'content-type';
-    private const VALUE_CONTENT_TYPE = 'application/json';
+    private TransportInterface $transport;
 
     public function __construct(
         $name,
@@ -37,10 +39,7 @@ class Exporter implements SpanExporterInterface
         StreamFactoryInterface $streamFactory,
         SpanConverterInterface $spanConverter = null
     ) {
-        $this->setEndpointUrl($endpointUrl);
-        $this->setClient($client);
-        $this->setRequestFactory($requestFactory);
-        $this->setStreamFactory($streamFactory);
+        $this->transport = (new PsrTransportFactory($client, $requestFactory, $streamFactory))->create($endpointUrl);
         $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
     }
 
@@ -55,20 +54,6 @@ class Exporter implements SpanExporterInterface
         );
     }
 
-    /**
-     * @throws JsonException
-     */
-    protected function marshallRequest(iterable $spans): RequestInterface
-    {
-        return $this->createRequest(self::REQUEST_METHOD)
-            ->withBody(
-                $this->createStream(
-                    $this->serializeTrace($spans)
-                )
-            )
-            ->withHeader(self::HEADER_CONTENT_TYPE, self::VALUE_CONTENT_TYPE);
-    }
-
     /** @inheritDoc */
     public static function fromConnectionString(string $endpointUrl, string $name, $args = null)
     {
@@ -79,5 +64,27 @@ class Exporter implements SpanExporterInterface
             Psr17FactoryDiscovery::findRequestFactory(),
             Psr17FactoryDiscovery::findStreamFactory()
         );
+    }
+
+    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
+    {
+        return $this->transport
+            ->send($this->serializeTrace($spans), 'application/json', $cancellation)
+            ->map(static fn (): int => 0)
+            ->catch(static function (Throwable $throwable): int {
+                self::logError('Export failure', ['exception' => $throwable]);
+
+                return 1;
+            });
+    }
+
+    public function shutdown(?CancellationInterface $cancellation = null): bool
+    {
+        return $this->transport->shutdown($cancellation);
+    }
+
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
+    {
+        return $this->transport->forceFlush($cancellation);
     }
 }

@@ -8,13 +8,17 @@ use Exception;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use JsonException;
-use OpenTelemetry\SDK\Trace\Behavior\HttpSpanExporterTrait;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Throwable;
 
 /**
  * Class NewrelicExporter - implements the export interface for data transfer via Newrelic protocol
@@ -26,23 +30,14 @@ use Psr\Http\Message\StreamFactoryInterface;
  */
 class Exporter implements SpanExporterInterface
 {
+    use LogsMessagesTrait;
     use UsesSpanConverterTrait;
-    use HttpSpanExporterTrait;
 
     private const DATA_FORMAT_VERSION_DEFAULT = '1';
-    private const REQUEST_METHOD = 'POST';
-    private const HEADER_CONTENT_TYPE = 'content-type';
-    private const HEADER_API_KEY = 'Api-Key';
-    private const HEADER_DATA_FORMAT = 'Data-Format';
-    private const HEADER_DATA_FORMAT_VERSION = 'Data-Format-Version';
-    private const VALUE_CONTENT_TYPE = 'application/json';
-    private const VALUE_DATA_FORMAT = 'newrelic';
 
-    private string $licenseKey;
-
+    private TransportInterface $transport;
     private string $name;
-
-    private string $dataFormatVersion;
+    private string $endpointUrl;
 
     public function __construct(
         $name,
@@ -54,13 +49,13 @@ class Exporter implements SpanExporterInterface
         SpanConverter $spanConverter = null,
         string $dataFormatVersion = Exporter::DATA_FORMAT_VERSION_DEFAULT
     ) {
+        $this->transport = (new PsrTransportFactory($client, $requestFactory, $streamFactory))->create($endpointUrl, [
+            'Api-Key' => $licenseKey,
+            'Data-Format' => 'newrelic',
+            'Data-Format-Version' => $dataFormatVersion,
+        ]);
         $this->name = $name;
-        $this->licenseKey = $licenseKey;
-        $this->dataFormatVersion = $dataFormatVersion;
-        $this->setEndpointUrl($endpointUrl);
-        $this->setClient($client);
-        $this->setRequestFactory($requestFactory);
-        $this->setStreamFactory($streamFactory);
+        $this->endpointUrl = $endpointUrl;
         $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
     }
 
@@ -81,23 +76,6 @@ class Exporter implements SpanExporterInterface
             'spans' => $this->getSpanConverter()->convert($spans), ]];
     }
 
-    /**
-     * @throws JsonException
-     */
-    protected function marshallRequest(iterable $spans): RequestInterface
-    {
-        return $this->createRequest(self::REQUEST_METHOD)
-            ->withBody(
-                $this->createStream(
-                    $this->serializeTrace($spans)
-                )
-            )
-            ->withHeader(self::HEADER_CONTENT_TYPE, self::VALUE_CONTENT_TYPE)
-            ->withAddedHeader(self::HEADER_API_KEY, $this->licenseKey)
-            ->withAddedHeader(self::HEADER_DATA_FORMAT, self::VALUE_DATA_FORMAT)
-            ->withAddedHeader(self::HEADER_DATA_FORMAT_VERSION, $this->dataFormatVersion);
-    }
-
     /** @inheritDoc */
     public static function fromConnectionString(string $endpointUrl, string $name, $args)
     {
@@ -113,5 +91,27 @@ class Exporter implements SpanExporterInterface
             Psr17FactoryDiscovery::findRequestFactory(),
             Psr17FactoryDiscovery::findStreamFactory()
         );
+    }
+
+    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
+    {
+        return $this->transport
+            ->send($this->serializeTrace($spans), 'application/json', $cancellation)
+            ->map(static fn (): int => 0)
+            ->catch(static function (Throwable $throwable): int {
+                self::logError('Export failure', ['exception' => $throwable]);
+
+                return 1;
+            });
+    }
+
+    public function shutdown(?CancellationInterface $cancellation = null): bool
+    {
+        return $this->transport->shutdown($cancellation);
+    }
+
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
+    {
+        return $this->transport->forceFlush($cancellation);
     }
 }
