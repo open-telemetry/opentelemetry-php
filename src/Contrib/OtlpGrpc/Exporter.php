@@ -121,24 +121,19 @@ class Exporter implements SpanExporterInterface
         $fullSuccessWithPartial = false;
         if ($response && $response->hasPartialSuccess()) {
             //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#partial-success
-            if ($response->getPartialSuccess()->getRejectedSpans() === 0 && $response->getPartialSuccess()->getErrorMessage()) {
-                //full success with warnings
-                self::logWarning('Export warning', ['server_message' => $response->getPartialSuccess()->getErrorMessage()]);
-                $fullSuccessWithPartial = true;
-            } elseif ($response->getPartialSuccess()->getRejectedSpans() === 0 && !$response->getPartialSuccess()->getErrorMessage()) {
-                //equivalent to full success
-                $fullSuccessWithPartial = true;
-            } else {
+            if ($response->getPartialSuccess()->getRejectedSpans()) {
                 self::logError('Partial success exporting span(s)', [
                     'dropped' => $response->getPartialSuccess()->getRejectedSpans(),
                     'error' => $response->getPartialSuccess()->getErrorMessage(),
                 ]);
 
                 return self::STATUS_FAILED_NOT_RETRYABLE;
+            } elseif ($response->getPartialSuccess()->getErrorMessage()) {
+                self::logWarning('Export warning', ['server_message' => $response->getPartialSuccess()->getErrorMessage()]);
             }
         }
 
-        if ($status->code === \Grpc\STATUS_OK || $fullSuccessWithPartial) {
+        if ($status->code === \Grpc\STATUS_OK) {
             self::logDebug('Exported span(s)', ['spans' => $resourceSpans]);
 
             return self::STATUS_SUCCESS;

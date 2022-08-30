@@ -181,7 +181,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
                     'num_spans' => 1,
                 ],
                 'return_values' => [
-                    'status_code' => null,
+                    'status_code' => \Grpc\STATUS_OK,
                 ],
                 'partial_success' => [
                     'has_partial_success' => true,
