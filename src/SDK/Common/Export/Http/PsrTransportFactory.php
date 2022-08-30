@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Export\Http;
 
+use const FILTER_VALIDATE_URL;
+use function filter_var;
+use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use Psr\Http\Client\ClientInterface;
@@ -37,6 +40,10 @@ final class PsrTransportFactory implements TransportFactoryInterface
         ?string $cert = null,
         ?string $key = null
     ): TransportInterface {
+        if (!filter_var($endpoint, FILTER_VALIDATE_URL)) {
+            throw new InvalidArgumentException(sprintf('Invalid endpoint url "%s"', $endpoint));
+        }
+
         return new PsrTransport(
             $this->client,
             $this->requestFactory,
