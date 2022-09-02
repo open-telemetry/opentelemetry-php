@@ -11,7 +11,7 @@ class SpanContextFactory
     /** @inheritDoc */
     public static function createFromRemoteParent(string $traceId, string $spanId, int $traceFlags= self::TRACE_FLAG_DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface
     {
-        return SpanContext::builder(
+        return SpanContext::createSpanContext(
             $traceId,
             $spanId,
             true,
@@ -23,7 +23,7 @@ class SpanContextFactory
     /** @inheritDoc */
     public static function create(string $traceId, string $spanId, int $traceFlags= self::TRACE_FLAG_DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface
     {
-        return SpanContext::builder(
+        return SpanContext::createSpanContext(
             $traceId,
             $spanId,
             false,

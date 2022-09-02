@@ -11,8 +11,9 @@ use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextFactory;
 use OpenTelemetry\API\Trace\SpanContextInterface;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\API\Trace\TraceState;
-use OpenTelemetry\API\Trace\ValidationSpanContext;
+use OpenTelemetry\API\Trace\Propagation\TraceContextValidator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
@@ -115,10 +116,10 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
          * - Version is invalid (not 2 char hex or 'ff')
          * - Trace version, trace ID, span ID or trace flag are invalid
          */
-        if (!ValidationSpanContext::isValidTraceVersion($version)
-            || !ValidationSpanContext::isValidTraceId($traceId)
-            || !ValidationSpanContext::isValidSpanId($spanId)
-            || !ValidationSpanContext::isValidTraceFlag($traceFlags)
+        if (!TraceContextValidator::isValidTraceVersion($version)
+            || !SpanContextValidator::isValidTraceId($traceId)
+            || !SpanContextValidator::isValidSpanId($spanId)
+            || !TraceContextValidator::isValidTraceFlag($traceFlags)
         ) {
             return SpanContext::getInvalid();
         }

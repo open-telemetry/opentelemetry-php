@@ -8,7 +8,7 @@ use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextFactory;
 use OpenTelemetry\API\Trace\SpanContextInterface;
-use OpenTelemetry\API\Trace\ValidationSpanContext;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
@@ -168,7 +168,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
 
         // Validates the traceId and spanId
         // Returns an invalid spanContext if any of the checks fail
-        if (!ValidationSpanContext::isValidTraceId($traceId) || !ValidationSpanContext::isValidSpanId($spanId)) {
+        if (!SpanContextValidator::isValidTraceId($traceId) || !SpanContextValidator::isValidSpanId($spanId)) {
             return SpanContext::getInvalid();
         }
 
