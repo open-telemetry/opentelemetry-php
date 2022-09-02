@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Integration\SDK;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
-use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\API\Trace\SpanContextFactory;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
@@ -43,7 +43,7 @@ class TracerTest extends TestCase
         $parentContext = Context::getRoot()
             ->withContextValue(
                 new NonRecordingSpan(
-                    SpanContext::create(
+                    SpanContextFactory::create(
                         '4bf92f3577b34da6a3ce929d0e0e4736',
                         '00f067aa0ba902b7',
                         API\SpanContextInterface::TRACE_FLAG_SAMPLED

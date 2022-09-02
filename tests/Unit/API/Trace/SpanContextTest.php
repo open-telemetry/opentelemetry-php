@@ -25,9 +25,9 @@ class SpanContextTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->first = SpanContext::create(self::FIRST_TRACE_ID, self::FIRST_SPAN_ID, API\SpanContextInterface::TRACE_FLAG_DEFAULT, new TraceState('foo=bar'));
-        $this->second = SpanContext::create(self::SECOND_TRACE_ID, self::SECOND_SPAN_ID, API\SpanContextInterface::TRACE_FLAG_SAMPLED, new TraceState('foo=baz'));
-        $this->remote = SpanContext::create(self::SECOND_TRACE_ID, self::SECOND_SPAN_ID, API\SpanContextInterface::TRACE_FLAG_SAMPLED, new TraceState(), true);
+        $this->first = SpanContext::builder(self::FIRST_TRACE_ID, self::FIRST_SPAN_ID, false, API\SpanContextInterface::TRACE_FLAG_DEFAULT, new TraceState('foo=bar'));
+        $this->second = SpanContext::builder(self::SECOND_TRACE_ID, self::SECOND_SPAN_ID, false, API\SpanContextInterface::TRACE_FLAG_SAMPLED, new TraceState('foo=baz'));
+        $this->remote = SpanContext::builder(self::SECOND_TRACE_ID, self::SECOND_SPAN_ID, true, API\SpanContextInterface::TRACE_FLAG_SAMPLED, new TraceState());
     }
 
     // region API
@@ -37,18 +37,18 @@ class SpanContextTest extends TestCase
         $this->assertFalse(SpanContext::getInvalid()->isValid());
 
         $this->assertFalse(
-            SpanContext::create(
+            SpanContext::builder(
                 self::FIRST_TRACE_ID,
                 SpanContext::INVALID_SPAN,
-                API\SpanContextInterface::TRACE_FLAG_DEFAULT
+                true
             )->isValid()
         );
 
         $this->assertFalse(
-            SpanContext::create(
+            SpanContext::builder(
                 SpanContext::INVALID_TRACE,
                 self::SECOND_SPAN_ID,
-                API\SpanContextInterface::TRACE_FLAG_DEFAULT
+                true
             )->isValid()
         );
 
