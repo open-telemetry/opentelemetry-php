@@ -64,9 +64,11 @@ smoke-test-exporter-examples: FORCE ## Run (some) exporter smoke test examples
 	docker-compose stop
 smoke-test-collector-integration: ## Run smoke test collector integration
 	docker-compose -f docker-compose.collector.yaml up -d --remove-orphans
+	sleep 5
 # This is slow because it's building the image from scratch (and parts of that, like installing the gRPC extension, are slow)
 # This can be sped up by switching to the pre-built images hosted on ghcr.io (and referenced in other docker-compose**.yaml files)
-	docker-compose -f docker-compose.collector.yaml run -e OTEL_EXPORTER_OTLP_ENDPOINT=collector:4317 --rm php php ./examples/traces/features/exporters/otlp_grpc.php
+	docker-compose -f docker-compose.collector.yaml run --rm php php ./examples/traces/features/exporters/otlp_grpc.php
+	docker-compose -f docker-compose.collector.yaml run --rm php php ./examples/traces/features/exporters/otlp.php
 	docker-compose -f docker-compose.collector.yaml stop
 smoke-test-collector-metrics-integration:
 	docker-compose -f docker-compose.collector.yaml up -d --force-recreate collector

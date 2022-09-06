@@ -107,6 +107,18 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>uint32 flags = 10;</code>
      */
     protected $flags = 0;
+    /**
+     * min is the minimum value over (start_time, end_time].
+     *
+     * Generated from protobuf field <code>optional double min = 11;</code>
+     */
+    protected $min = null;
+    /**
+     * max is the maximum value over (start_time, end_time].
+     *
+     * Generated from protobuf field <code>optional double max = 12;</code>
+     */
+    protected $max = null;
 
     /**
      * Constructor.
@@ -162,6 +174,10 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
      *     @type int $flags
      *           Flags that apply to this specific data point.  See DataPointFlags
      *           for the available flags and their meaning.
+     *     @type float $min
+     *           min is the minimum value over (start_time, end_time].
+     *     @type float $max
+     *           max is the maximum value over (start_time, end_time].
      * }
      */
     public function __construct($data = NULL) {
@@ -469,6 +485,78 @@ class HistogramDataPoint extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkUint32($var);
         $this->flags = $var;
+
+        return $this;
+    }
+
+    /**
+     * min is the minimum value over (start_time, end_time].
+     *
+     * Generated from protobuf field <code>optional double min = 11;</code>
+     * @return float
+     */
+    public function getMin()
+    {
+        return isset($this->min) ? $this->min : 0.0;
+    }
+
+    public function hasMin()
+    {
+        return isset($this->min);
+    }
+
+    public function clearMin()
+    {
+        unset($this->min);
+    }
+
+    /**
+     * min is the minimum value over (start_time, end_time].
+     *
+     * Generated from protobuf field <code>optional double min = 11;</code>
+     * @param float $var
+     * @return $this
+     */
+    public function setMin($var)
+    {
+        GPBUtil::checkDouble($var);
+        $this->min = $var;
+
+        return $this;
+    }
+
+    /**
+     * max is the maximum value over (start_time, end_time].
+     *
+     * Generated from protobuf field <code>optional double max = 12;</code>
+     * @return float
+     */
+    public function getMax()
+    {
+        return isset($this->max) ? $this->max : 0.0;
+    }
+
+    public function hasMax()
+    {
+        return isset($this->max);
+    }
+
+    public function clearMax()
+    {
+        unset($this->max);
+    }
+
+    /**
+     * max is the maximum value over (start_time, end_time].
+     *
+     * Generated from protobuf field <code>optional double max = 12;</code>
+     * @param float $var
+     * @return $this
+     */
+    public function setMax($var)
+    {
+        GPBUtil::checkDouble($var);
+        $this->max = $var;
 
         return $this;
     }

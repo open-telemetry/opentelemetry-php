@@ -67,6 +67,8 @@ trait HttpSpanExporterTrait
                 : SpanExporterInterface::STATUS_FAILED_RETRYABLE;
         }
 
+        self::logDebug('Exported span(s)', ['spans' => $spans]);
+
         return SpanExporterInterface::STATUS_SUCCESS;
     }
 

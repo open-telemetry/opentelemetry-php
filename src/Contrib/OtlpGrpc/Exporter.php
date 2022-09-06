@@ -116,7 +116,22 @@ class Exporter implements SpanExporterInterface
             'resource_spans' => $resourceSpans,
         ]);
 
+        // @var \Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse|null $response
         [$response, $status] = $this->client->Export($request)->wait();
+        $fullSuccessWithPartial = false;
+        if ($response && $response->hasPartialSuccess()) {
+            //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#partial-success
+            if ($response->getPartialSuccess()->getRejectedSpans()) {
+                self::logError('Partial success exporting span(s)', [
+                    'dropped' => $response->getPartialSuccess()->getRejectedSpans(),
+                    'error' => $response->getPartialSuccess()->getErrorMessage(),
+                ]);
+
+                return self::STATUS_FAILED_NOT_RETRYABLE;
+            } elseif ($response->getPartialSuccess()->getErrorMessage()) {
+                self::logWarning('Export warning', ['server_message' => $response->getPartialSuccess()->getErrorMessage()]);
+            }
+        }
 
         if ($status->code === \Grpc\STATUS_OK) {
             self::logDebug('Exported span(s)', ['spans' => $resourceSpans]);

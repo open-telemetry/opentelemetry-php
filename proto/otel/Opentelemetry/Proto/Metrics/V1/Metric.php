@@ -11,7 +11,7 @@ use Google\Protobuf\Internal\GPBUtil;
 /**
  * Defines a Metric which has one or more timeseries.  The following is a
  * brief summary of the Metric data model.  For more details, see:
- *   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/datamodel.md
+ *   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/data-model.md
  * The data model and relation between entities is shown in the
  * diagram below. Here, "DataPoint" is the term used to refer to any
  * one of the specific data point value types, and "points" is the term used

@@ -9,13 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Span represents a single operation within a trace. Spans can be
- * nested to form a trace tree. Spans may also be linked to other spans
- * from the same or different trace and form graphs. Often, a trace
- * contains a root span that describes the end-to-end latency, and one
- * or more subspans for its sub-operations. A trace can also contain
- * multiple root spans, or none at all. Spans do not need to be
- * contiguous - there may be gaps or overlaps between spans in a trace.
+ * A Span represents a single operation performed by a single component of the system.
  * The next available field id is 17.
  *
  * Generated from protobuf message <code>opentelemetry.proto.trace.v1.Span</code>
@@ -108,7 +102,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *     "abc.com/myattribute": true
      *     "abc.com/score": 10.239
      * The OpenTelemetry API specification further restricts the allowed value types:
-     * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
+     * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
      * Attribute keys MUST be unique (it is not allowed to have more than one
      * attribute with the same key).
      *
@@ -218,7 +212,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *               "abc.com/myattribute": true
      *               "abc.com/score": 10.239
      *           The OpenTelemetry API specification further restricts the allowed value types:
-     *           https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
+     *           https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
      *           Attribute keys MUST be unique (it is not allowed to have more than one
      *           attribute with the same key).
      *     @type int $dropped_attributes_count
@@ -522,7 +516,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *     "abc.com/myattribute": true
      *     "abc.com/score": 10.239
      * The OpenTelemetry API specification further restricts the allowed value types:
-     * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
+     * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
      * Attribute keys MUST be unique (it is not allowed to have more than one
      * attribute with the same key).
      *
@@ -542,7 +536,7 @@ class Span extends \Google\Protobuf\Internal\Message
      *     "abc.com/myattribute": true
      *     "abc.com/score": 10.239
      * The OpenTelemetry API specification further restricts the allowed value types:
-     * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
+     * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
      * Attribute keys MUST be unique (it is not allowed to have more than one
      * attribute with the same key).
      *
