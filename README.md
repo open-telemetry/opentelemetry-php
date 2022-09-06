@@ -50,6 +50,7 @@ All OpenTelemetry libraries are distributed via packagist, notably:
 - Semantic Conventions: [open-telemetry/sem-conv](https://packagist.org/packages/open-telemetry/sem-conv)
 - Context: [open-telemetry/context](https://packagist.org/packages/open-telemetry/context)
 - Contrib: [open-telemetry/sdk-contrib](https://packagist.org/packages/open-telemetry/sdk-contrib)
+- Extensions: [open-telemetry/extension-*](https://packagist.org/search/?query=open-telemetry%2Fextension)
 
 The [open-telemetry/opentelemetry](https://packagist.org/packages/open-telemetry/opentelemetry) package contains all of the above and is the easiest way to try out OpenTelemetry.
 
