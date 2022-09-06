@@ -25,7 +25,7 @@ final class MultiObserver implements MetricObserverInterface
     public function __invoke(ObserverInterface $observer): void
     {
         foreach ($this->callbacks as $token => $callback) {
-            if (isset($this->callbacks[$token])) {
+            if (isset($this->callbacks[$token])) { //@phpstan-ignore-line callbacks can be unregistered during collection
                 $callback($observer);
             }
         }
