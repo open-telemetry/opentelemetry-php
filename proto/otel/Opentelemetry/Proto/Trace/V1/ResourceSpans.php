@@ -29,34 +29,6 @@ class ResourceSpans extends \Google\Protobuf\Internal\Message
      */
     private $scope_spans;
     /**
-     * A list of InstrumentationLibrarySpans that originate from a resource.
-     * This field is deprecated and will be removed after grace period expires on June 15, 2022.
-     * During the grace period the following rules SHOULD be followed:
-     * For Binary Protobufs
-     * ====================
-     * Binary Protobuf senders SHOULD NOT set instrumentation_library_spans. Instead
-     * scope_spans SHOULD be set.
-     * Binary Protobuf receivers SHOULD check if instrumentation_library_spans is set
-     * and scope_spans is not set then the value in instrumentation_library_spans
-     * SHOULD be used instead by converting InstrumentationLibrarySpans into ScopeSpans.
-     * If scope_spans is set then instrumentation_library_spans SHOULD be ignored.
-     * For JSON
-     * ========
-     * JSON senders that set instrumentation_library_spans field MAY also set
-     * scope_spans to carry the same spans, essentially double-publishing the same data.
-     * Such double-publishing MAY be controlled by a user-settable option.
-     * If double-publishing is not used then the senders SHOULD set scope_spans and
-     * SHOULD NOT set instrumentation_library_spans.
-     * JSON receivers SHOULD check if instrumentation_library_spans is set and
-     * scope_spans is not set then the value in instrumentation_library_spans
-     * SHOULD be used instead by converting InstrumentationLibrarySpans into ScopeSpans.
-     * If scope_spans is set then instrumentation_library_spans field SHOULD be ignored.
-     *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.trace.v1.InstrumentationLibrarySpans instrumentation_library_spans = 1000 [deprecated = true];</code>
-     * @deprecated
-     */
-    private $instrumentation_library_spans;
-    /**
      * This schema_url applies to the data in the "resource" field. It does not apply
      * to the data in the "scope_spans" field which have their own schema_url field.
      *
@@ -75,29 +47,6 @@ class ResourceSpans extends \Google\Protobuf\Internal\Message
      *           If this field is not set then no resource info is known.
      *     @type \Opentelemetry\Proto\Trace\V1\ScopeSpans[]|\Google\Protobuf\Internal\RepeatedField $scope_spans
      *           A list of ScopeSpans that originate from a resource.
-     *     @type \Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans[]|\Google\Protobuf\Internal\RepeatedField $instrumentation_library_spans
-     *           A list of InstrumentationLibrarySpans that originate from a resource.
-     *           This field is deprecated and will be removed after grace period expires on June 15, 2022.
-     *           During the grace period the following rules SHOULD be followed:
-     *           For Binary Protobufs
-     *           ====================
-     *           Binary Protobuf senders SHOULD NOT set instrumentation_library_spans. Instead
-     *           scope_spans SHOULD be set.
-     *           Binary Protobuf receivers SHOULD check if instrumentation_library_spans is set
-     *           and scope_spans is not set then the value in instrumentation_library_spans
-     *           SHOULD be used instead by converting InstrumentationLibrarySpans into ScopeSpans.
-     *           If scope_spans is set then instrumentation_library_spans SHOULD be ignored.
-     *           For JSON
-     *           ========
-     *           JSON senders that set instrumentation_library_spans field MAY also set
-     *           scope_spans to carry the same spans, essentially double-publishing the same data.
-     *           Such double-publishing MAY be controlled by a user-settable option.
-     *           If double-publishing is not used then the senders SHOULD set scope_spans and
-     *           SHOULD NOT set instrumentation_library_spans.
-     *           JSON receivers SHOULD check if instrumentation_library_spans is set and
-     *           scope_spans is not set then the value in instrumentation_library_spans
-     *           SHOULD be used instead by converting InstrumentationLibrarySpans into ScopeSpans.
-     *           If scope_spans is set then instrumentation_library_spans field SHOULD be ignored.
      *     @type string $schema_url
      *           This schema_url applies to the data in the "resource" field. It does not apply
      *           to the data in the "scope_spans" field which have their own schema_url field.
@@ -168,78 +117,6 @@ class ResourceSpans extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Trace\V1\ScopeSpans::class);
         $this->scope_spans = $arr;
-
-        return $this;
-    }
-
-    /**
-     * A list of InstrumentationLibrarySpans that originate from a resource.
-     * This field is deprecated and will be removed after grace period expires on June 15, 2022.
-     * During the grace period the following rules SHOULD be followed:
-     * For Binary Protobufs
-     * ====================
-     * Binary Protobuf senders SHOULD NOT set instrumentation_library_spans. Instead
-     * scope_spans SHOULD be set.
-     * Binary Protobuf receivers SHOULD check if instrumentation_library_spans is set
-     * and scope_spans is not set then the value in instrumentation_library_spans
-     * SHOULD be used instead by converting InstrumentationLibrarySpans into ScopeSpans.
-     * If scope_spans is set then instrumentation_library_spans SHOULD be ignored.
-     * For JSON
-     * ========
-     * JSON senders that set instrumentation_library_spans field MAY also set
-     * scope_spans to carry the same spans, essentially double-publishing the same data.
-     * Such double-publishing MAY be controlled by a user-settable option.
-     * If double-publishing is not used then the senders SHOULD set scope_spans and
-     * SHOULD NOT set instrumentation_library_spans.
-     * JSON receivers SHOULD check if instrumentation_library_spans is set and
-     * scope_spans is not set then the value in instrumentation_library_spans
-     * SHOULD be used instead by converting InstrumentationLibrarySpans into ScopeSpans.
-     * If scope_spans is set then instrumentation_library_spans field SHOULD be ignored.
-     *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.trace.v1.InstrumentationLibrarySpans instrumentation_library_spans = 1000 [deprecated = true];</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
-     * @deprecated
-     */
-    public function getInstrumentationLibrarySpans()
-    {
-        @trigger_error('instrumentation_library_spans is deprecated.', E_USER_DEPRECATED);
-        return $this->instrumentation_library_spans;
-    }
-
-    /**
-     * A list of InstrumentationLibrarySpans that originate from a resource.
-     * This field is deprecated and will be removed after grace period expires on June 15, 2022.
-     * During the grace period the following rules SHOULD be followed:
-     * For Binary Protobufs
-     * ====================
-     * Binary Protobuf senders SHOULD NOT set instrumentation_library_spans. Instead
-     * scope_spans SHOULD be set.
-     * Binary Protobuf receivers SHOULD check if instrumentation_library_spans is set
-     * and scope_spans is not set then the value in instrumentation_library_spans
-     * SHOULD be used instead by converting InstrumentationLibrarySpans into ScopeSpans.
-     * If scope_spans is set then instrumentation_library_spans SHOULD be ignored.
-     * For JSON
-     * ========
-     * JSON senders that set instrumentation_library_spans field MAY also set
-     * scope_spans to carry the same spans, essentially double-publishing the same data.
-     * Such double-publishing MAY be controlled by a user-settable option.
-     * If double-publishing is not used then the senders SHOULD set scope_spans and
-     * SHOULD NOT set instrumentation_library_spans.
-     * JSON receivers SHOULD check if instrumentation_library_spans is set and
-     * scope_spans is not set then the value in instrumentation_library_spans
-     * SHOULD be used instead by converting InstrumentationLibrarySpans into ScopeSpans.
-     * If scope_spans is set then instrumentation_library_spans field SHOULD be ignored.
-     *
-     * Generated from protobuf field <code>repeated .opentelemetry.proto.trace.v1.InstrumentationLibrarySpans instrumentation_library_spans = 1000 [deprecated = true];</code>
-     * @param \Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
-     * @deprecated
-     */
-    public function setInstrumentationLibrarySpans($var)
-    {
-        @trigger_error('instrumentation_library_spans is deprecated.', E_USER_DEPRECATED);
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Trace\V1\InstrumentationLibrarySpans::class);
-        $this->instrumentation_library_spans = $arr;
 
         return $this;
     }

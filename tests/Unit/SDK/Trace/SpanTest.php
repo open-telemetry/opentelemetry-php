@@ -40,7 +40,7 @@ use function range;
 use function str_repeat;
 
 /**
- * @coversDefaultClass OpenTelemetry\SDK\Trace\Span
+ * @covers \OpenTelemetry\SDK\Trace\Span
  */
 class SpanTest extends MockeryTestCase
 {

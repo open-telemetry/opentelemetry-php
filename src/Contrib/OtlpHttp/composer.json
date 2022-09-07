@@ -1,0 +1,32 @@
+{
+  "name": "open-telemetry/exporter-otlp-http",
+  "description": "HTTP/protobuf exporter for OpenTelemetry PHP.",
+  "keywords": ["opentelemetry", "otel", "tracing", "metrics", "otlp", "protobuf", "http"],
+  "type": "library",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "opentelemetry-php contributors",
+      "homepage": "https://github.com/open-telemetry/opentelemetry-php/graphs/contributors"
+    }
+  ],
+  "require": {
+    "php": "^7.4 || ^8.0",
+    "google/protobuf": "^3.3.0",
+    "open-telemetry/api": "self.version",
+    "open-telemetry/exporter-otlp-common": "self.version",
+    "open-telemetry/gen-otlp-protobuf": "self.version",
+    "open-telemetry/sdk": "self.version",
+    "php-http/async-client-implementation": "^1.0",
+    "php-http/discovery": "^1.14",
+    "psr/http-factory-implementation": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "OpenTelemetry\\Contrib\\OtlpHttp\\": "."
+    }
+  },
+  "suggest": {
+    "ext-protobuf": "For more performant protobuf exporting"
+  }
+}

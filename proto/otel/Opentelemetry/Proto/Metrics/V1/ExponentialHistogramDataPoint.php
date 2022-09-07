@@ -61,9 +61,9 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
      * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *
-     * Generated from protobuf field <code>double sum = 5;</code>
+     * Generated from protobuf field <code>optional double sum = 5;</code>
      */
-    protected $sum = 0.0;
+    protected $sum = null;
     /**
      * scale describes the resolution of the histogram.  Boundaries are
      * located at powers of the base, where:
@@ -118,6 +118,18 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .opentelemetry.proto.metrics.v1.Exemplar exemplars = 11;</code>
      */
     private $exemplars;
+    /**
+     * min is the minimum value over (start_time, end_time].
+     *
+     * Generated from protobuf field <code>optional double min = 12;</code>
+     */
+    protected $min = null;
+    /**
+     * max is the maximum value over (start_time, end_time].
+     *
+     * Generated from protobuf field <code>optional double max = 13;</code>
+     */
+    protected $max = null;
 
     /**
      * Constructor.
@@ -181,6 +193,10 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *     @type \Opentelemetry\Proto\Metrics\V1\Exemplar[]|\Google\Protobuf\Internal\RepeatedField $exemplars
      *           (Optional) List of exemplars collected from
      *           measurements that were used to form the data point
+     *     @type float $min
+     *           min is the minimum value over (start_time, end_time].
+     *     @type float $max
+     *           max is the maximum value over (start_time, end_time].
      * }
      */
     public function __construct($data = NULL) {
@@ -321,12 +337,22 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
      * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *
-     * Generated from protobuf field <code>double sum = 5;</code>
+     * Generated from protobuf field <code>optional double sum = 5;</code>
      * @return float
      */
     public function getSum()
     {
-        return $this->sum;
+        return isset($this->sum) ? $this->sum : 0.0;
+    }
+
+    public function hasSum()
+    {
+        return isset($this->sum);
+    }
+
+    public function clearSum()
+    {
+        unset($this->sum);
     }
 
     /**
@@ -338,7 +364,7 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
      * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
      *
-     * Generated from protobuf field <code>double sum = 5;</code>
+     * Generated from protobuf field <code>optional double sum = 5;</code>
      * @param float $var
      * @return $this
      */
@@ -558,6 +584,78 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Metrics\V1\Exemplar::class);
         $this->exemplars = $arr;
+
+        return $this;
+    }
+
+    /**
+     * min is the minimum value over (start_time, end_time].
+     *
+     * Generated from protobuf field <code>optional double min = 12;</code>
+     * @return float
+     */
+    public function getMin()
+    {
+        return isset($this->min) ? $this->min : 0.0;
+    }
+
+    public function hasMin()
+    {
+        return isset($this->min);
+    }
+
+    public function clearMin()
+    {
+        unset($this->min);
+    }
+
+    /**
+     * min is the minimum value over (start_time, end_time].
+     *
+     * Generated from protobuf field <code>optional double min = 12;</code>
+     * @param float $var
+     * @return $this
+     */
+    public function setMin($var)
+    {
+        GPBUtil::checkDouble($var);
+        $this->min = $var;
+
+        return $this;
+    }
+
+    /**
+     * max is the maximum value over (start_time, end_time].
+     *
+     * Generated from protobuf field <code>optional double max = 13;</code>
+     * @return float
+     */
+    public function getMax()
+    {
+        return isset($this->max) ? $this->max : 0.0;
+    }
+
+    public function hasMax()
+    {
+        return isset($this->max);
+    }
+
+    public function clearMax()
+    {
+        unset($this->max);
+    }
+
+    /**
+     * max is the maximum value over (start_time, end_time].
+     *
+     * Generated from protobuf field <code>optional double max = 13;</code>
+     * @param float $var
+     * @return $this
+     */
+    public function setMax($var)
+    {
+        GPBUtil::checkDouble($var);
+        $this->max = $var;
 
         return $this;
     }
