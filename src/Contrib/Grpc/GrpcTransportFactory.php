@@ -6,12 +6,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Grpc;
 
-use function array_diff_key;
-use function array_flip;
-use function array_keys;
 use function file_get_contents;
 use Grpc\ChannelCredentials;
-use function implode;
 use function in_array;
 use InvalidArgumentException;
 use function json_encode;
@@ -20,16 +16,14 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use function parse_url;
 use RuntimeException;
 use function sprintf;
-use function strcasecmp;
 use function substr_count;
-use UnexpectedValueException;
 
 final class GrpcTransportFactory implements TransportFactoryInterface
 {
     public function create(
         string $endpoint,
         array $headers = [],
-        ?string $compression = null,
+        $compression = null,
         float $timeout = 10.,
         int $retryDelay = 100,
         int $maxRetries = 3,
@@ -38,20 +32,18 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         ?string $key = null
     ): TransportInterface {
         $parts = parse_url($endpoint);
-        if ($unsupported = array_diff_key($parts, array_flip(['scheme', 'host', 'port', 'path']))) {
-            throw new InvalidArgumentException(sprintf('Endpoint contains not supported parts %s', implode(', ', array_keys($unsupported))));
-        }
-        if (!isset($parts['path']) || substr_count($parts['path'], '/') !== 2) {
-            throw new InvalidArgumentException(sprintf('Endpoint path is missing or invalid "%s"', $parts['path'] ?? ''));
+        if (!isset($parts['scheme'], $parts['host'], $parts['path'])) {
+            throw new InvalidArgumentException('Endpoint has to contain scheme, host and path');
         }
 
-        $scheme = $parts['scheme'] ?? 'https';
-        $host = $parts['host'] ?? 'localhost';
-        $port = $parts['port'] ?? null;
+        $scheme = $parts['scheme'];
         $method = $parts['path'];
 
         if (!in_array($scheme, ['http', 'https'], true)) {
             throw new InvalidArgumentException(sprintf('Endpoint contains not supported scheme "%s"', $scheme));
+        }
+        if (substr_count($parts['path'], '/') !== 2) {
+            throw new InvalidArgumentException(sprintf('Endpoint path is not a valid GRPC method "%s"', $method));
         }
 
         $opts = self::createOpts($compression, $timeout, $maxRetries, $retryDelay);
@@ -64,9 +56,9 @@ final class GrpcTransportFactory implements TransportFactoryInterface
                 self::fileGetContents($cert),
             );
 
-        $grpcEndpoint = $port !== null
-            ? $host . ':' . $port
-            : $host;
+        $grpcEndpoint = isset($parts['port'])
+            ? $parts['host'] . ':' . $parts['port']
+            : $parts['host'];
 
         return new GrpcTransport(
             $grpcEndpoint,
@@ -77,7 +69,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
     }
 
     private static function createOpts(
-        ?string $compression,
+        $compression,
         float $timeout,
         int $maxRetries,
         int $retryDelay
@@ -85,18 +77,17 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         $opts = [];
 
         // https://github.com/grpc/grpc/tree/master/src/php#compression
-        if ($compression === null) {
-            $opts['grpc.default_compression_algorithm'] = 0;
-        } elseif (strcasecmp($compression, 'identity') === 0) {
-            $opts['grpc.default_compression_algorithm'] = 0;
-        } elseif (strcasecmp($compression, 'none') === 0) {
-            $opts['grpc.default_compression_algorithm'] = 0;
-        } elseif (strcasecmp($compression, 'deflate') === 0) {
-            $opts['grpc.default_compression_algorithm'] = 1;
-        } elseif (strcasecmp($compression, 'gzip') === 0) {
-            $opts['grpc.default_compression_algorithm'] = 2;
-        } else {
-            throw new UnexpectedValueException(sprintf('Unsupported compression algorithm "%s"', $compression));
+        static $algorithms = [
+            TransportFactoryInterface::COMPRESSION_DEFLATE => 1,
+            TransportFactoryInterface::COMPRESSION_GZIP => 2,
+        ];
+        $opts['grpc.default_compression_algorithm'] = 0;
+        foreach ((array) $compression as $algorithm) {
+            if (($flag = $algorithms[$algorithm] ?? null) !== null) {
+                $opts['grpc.default_compression_algorithm'] = $flag;
+
+                break;
+            }
         }
 
         // https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto

@@ -32,7 +32,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
     public function create(
         string $endpoint,
         array $headers = [],
-        ?string $compression = null,
+        $compression = null,
         float $timeout = 10.,
         int $retryDelay = 100,
         int $maxRetries = 3,
@@ -50,7 +50,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
             $this->streamFactory,
             $endpoint,
             $headers,
-            $compression,
+            (array) $compression,
             $retryDelay,
             $maxRetries,
         );

@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Common\Export\Http;
 
 use function assert;
 use BadMethodCallException;
+use function explode;
 use function in_array;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -15,10 +16,13 @@ use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use RuntimeException;
+use function strtolower;
 use Throwable;
 use function time_nanosleep;
+use function trim;
 
 final class PsrTransport implements TransportInterface
 {
@@ -28,7 +32,7 @@ final class PsrTransport implements TransportInterface
 
     private string $endpoint;
     private array $headers;
-    private ?string $compression;
+    private array $compression;
     private int $retryDelay;
     private int $maxRetries;
 
@@ -40,7 +44,7 @@ final class PsrTransport implements TransportInterface
         StreamFactoryInterface $streamFactory,
         string $endpoint,
         array $headers,
-        ?string $compression,
+        array $compression,
         int $retryDelay,
         int $maxRetries
     ) {
@@ -60,14 +64,14 @@ final class PsrTransport implements TransportInterface
             return new ErrorFuture(new BadMethodCallException('Transport closed'));
         }
 
+        $body = PsrUtils::encode($payload, $this->compression, $appliedEncodings);
         $request = $this->requestFactory
             ->createRequest('POST', $this->endpoint)
-            ->withBody($this->streamFactory->createStream($payload));
-
-        $request = $request->withHeader('Content-Type', $contentType);
-        if ($this->compression !== null) {
-            $request = $request->withBody(PsrUtils::encodeStream($request->getBody(), $this->compression, $this->streamFactory));
-            $request = $request->withHeader('Content-Encoding', $this->compression);
+            ->withBody($this->streamFactory->createStream($body))
+            ->withHeader('Content-Type', $contentType)
+        ;
+        if ($appliedEncodings) {
+            $request = $request->withHeader('Content-Encoding', $appliedEncodings);
         }
         foreach ($this->headers as $header => $value) {
             $request = $request->withAddedHeader($header, $value);
@@ -84,7 +88,7 @@ final class PsrTransport implements TransportInterface
                 }
 
                 if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500 && !in_array($response->getStatusCode(), [408, 429], true)) {
-                    return new ErrorFuture(new RuntimeException($response->getReasonPhrase(), $response->getStatusCode()));
+                    throw new RuntimeException($response->getReasonPhrase(), $response->getStatusCode());
                 }
             } catch (NetworkExceptionInterface $e) {
             } catch (Throwable $e) {
@@ -108,15 +112,27 @@ final class PsrTransport implements TransportInterface
         assert(isset($response));
 
         try {
-            $body = $response->getBody();
-            if (($encoding = $response->getHeaderLine('Content-Encoding')) !== '') {
-                $body = PsrUtils::decodeStream($body, $encoding, $this->streamFactory);
-            }
-
-            return new CompletedFuture($body->__toString());
+            $body = PsrUtils::decode(
+                $response->getBody()->__toString(),
+                self::parseContentEncoding($response),
+            );
         } catch (Throwable $e) {
             return new ErrorFuture($e);
         }
+
+        return new CompletedFuture($body);
+    }
+
+    private static function parseContentEncoding(ResponseInterface $response): array
+    {
+        $encodings = [];
+        foreach (explode(',', $response->getHeaderLine('Content-Encoding')) as $encoding) {
+            if (($encoding = trim($encoding, " \t")) !== '') {
+                $encodings[] = strtolower($encoding);
+            }
+        }
+
+        return $encodings;
     }
 
     public function shutdown(?CancellationInterface $cancellation = null): bool

@@ -8,8 +8,6 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Export\Http;
 
 use function date;
 use const DATE_RFC7231;
-use GuzzleHttp\Psr7\HttpFactory;
-use GuzzleHttp\Psr7\Utils;
 use function gzdecode;
 use function gzencode;
 use Nyholm\Psr7\Response;
@@ -71,30 +69,26 @@ final class PsrUtilsTest extends TestCase
 
     public function test_encode_stream(): void
     {
-        /** @psalm-suppress UndefinedFunction */
-        $stream = Utils::streamFor('abc');
-        $stream = PsrUtils::encodeStream($stream, 'gzip', new HttpFactory());
-        $this->assertSame('abc', gzdecode((string) $stream));
+        $value = PsrUtils::encode('abc', ['gzip']);
+        $this->assertSame('abc', gzdecode($value));
     }
 
     public function test_decode_stream(): void
     {
-        $stream = Utils::streamFor(gzencode('abc'));
-        $stream = PsrUtils::decodeStream($stream, 'gzip', new HttpFactory());
-        $this->assertSame('abc', (string) $stream);
+        $value = PsrUtils::decode(gzencode('abc'), ['gzip']);
+        $this->assertSame('abc', $value);
     }
 
     public function test_encode_stream_unknown_encoding(): void
     {
-        $this->expectException(UnexpectedValueException::class);
-
-        PsrUtils::encodeStream(Utils::streamFor(), 'invalid', new HttpFactory());
+        PsrUtils::encode('', ['invalid'], $appliedEncodings);
+        $this->assertSame([], $appliedEncodings);
     }
 
     public function test_decode_stream_unknown_encoding(): void
     {
         $this->expectException(UnexpectedValueException::class);
 
-        PsrUtils::decodeStream(Utils::streamFor(), 'invalid', new HttpFactory());
+        PsrUtils::decode('', ['invalid']);
     }
 }

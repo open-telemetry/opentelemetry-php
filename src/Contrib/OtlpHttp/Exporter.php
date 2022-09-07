@@ -71,11 +71,17 @@ class Exporter implements SpanExporterInterface
         if ($protocol !== self::OTLP_PROTOCOL) {
             throw new InvalidArgumentException(sprintf('Invalid OTLP Protocol "%s" specified', $protocol));
         }
+        if ($compression === self::DEFAULT_COMPRESSION) {
+            $compression = null;
+        }
 
         return $transportFactory->create(
             $endpoint,
             $headers,
-            $compression,
+            (array) $compression,
+            10,
+            100,
+            1,
         );
     }
 

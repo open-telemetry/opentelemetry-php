@@ -5,20 +5,27 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Export\Http;
 
 use function array_filter;
-use function array_reverse;
-use function explode;
+use function array_map;
+use function count;
+use ErrorException;
+use LogicException;
 use function max;
+use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-use Psr\Http\Message\StreamInterface;
 use function rand;
+use function restore_error_handler;
+use function set_error_handler;
 use function sprintf;
-use function strtolower;
+use function strcasecmp;
 use function strtotime;
+use Throwable;
 use function time;
 use function trim;
 use UnexpectedValueException;
 
+/**
+ * @internal
+ */
 final class PsrUtils
 {
     /**
@@ -53,65 +60,98 @@ final class PsrUtils
         return 0;
     }
 
-    public static function encodeStream(StreamInterface $stream, string $encodings, StreamFactoryInterface $streamFactory): StreamInterface
+    /**
+     * @param list<string> $encodings
+     * @param array<int, string>|null $appliedEncodings
+     */
+    public static function encode(string $value, array $encodings, ?array &$appliedEncodings = null): string
     {
-        $value = $stream->__toString();
-        foreach (explode(',', $encodings) as $encoding) {
-            $encoding = strtolower(trim($encoding, " \t"));
-            $value = self::encoder($encoding)($value);
+        for ($i = 0, $n = count($encodings); $i < $n; $i++) {
+            if (!$encoder = self::encoder($encodings[$i])) {
+                unset($encodings[$i]);
+
+                continue;
+            }
+
+            try {
+                $value = $encoder($value);
+            } catch (Throwable $e) {
+                unset($encodings[$i]);
+            }
         }
 
-        return $streamFactory->createStream($value);
+        $appliedEncodings = $encodings;
+
+        return $value;
     }
 
-    public static function decodeStream(StreamInterface $stream, string $encodings, StreamFactoryInterface $streamFactory): StreamInterface
+    /**
+     * @param list<string> $encodings
+     */
+    public static function decode(string $value, array $encodings): string
     {
-        $value = $stream->__toString();
-        foreach (array_reverse(explode(',', $encodings)) as $encoding) {
-            $encoding = strtolower(trim($encoding, " \t"));
-            $value = self::decoder($encoding)($value);
+        for ($i = count($encodings); --$i >= 0;) {
+            if (strcasecmp($encodings[$i], 'identity') === 0) {
+                continue;
+            }
+            if (!$decoder = self::decoder($encodings[$i])) {
+                throw new UnexpectedValueException(sprintf('Not supported decompression encoding "%s"', $encodings[$i]));
+            }
+
+            $value = $decoder($value);
         }
 
-        return $streamFactory->createStream($value);
+        return $value;
     }
 
-    private static function encoder(string $encoding): callable
+    private static function encoder(string $encoding): ?callable
     {
         static $encoders;
 
         /** @noinspection SpellCheckingInspection */
-        $encoders ??= array_filter([
-            'gzip' => 'gzencode',
-            'deflate' => 'gzcompress',
-            'identity' => 'strval',
-            'none' => 'strval',
-            'br' => 'brotli_compress',
-        ], 'function_exists');
+        $encoders ??= array_map(fn (callable $callable): callable => self::throwOnErrorOrFalse($callable), array_filter([
+            TransportFactoryInterface::COMPRESSION_GZIP => 'gzencode',
+            TransportFactoryInterface::COMPRESSION_DEFLATE => 'gzcompress',
+            TransportFactoryInterface::COMPRESSION_BROTLI => 'brotli_compress',
+        ], 'function_exists'));
 
-        if (!$encoder = $encoders[$encoding] ?? null) {
-            throw new UnexpectedValueException(sprintf('Not supported compression encoding "%s"', $encoding));
-        }
-
-        return $encoder;
+        return $encoders[$encoding] ?? null;
     }
 
-    private static function decoder(string $encoding): callable
+    private static function decoder(string $encoding): ?callable
     {
         static $decoders;
 
         /** @noinspection SpellCheckingInspection */
-        $decoders ??= array_filter([
-            'gzip' => 'gzdecode',
-            'deflate' => 'gzuncompress',
-            'identity' => 'strval',
-            'none' => 'strval',
-            'br' => 'brotli_uncompress',
-        ], 'function_exists');
+        $decoders ??= array_map(fn (callable $callable): callable => self::throwOnErrorOrFalse($callable), array_filter([
+            TransportFactoryInterface::COMPRESSION_GZIP => 'gzdecode',
+            TransportFactoryInterface::COMPRESSION_DEFLATE => 'gzuncompress',
+            TransportFactoryInterface::COMPRESSION_BROTLI => 'brotli_uncompress',
+        ], 'function_exists'));
 
-        if (!$decoder = $decoders[$encoding] ?? null) {
-            throw new UnexpectedValueException(sprintf('Not supported decompression encoding "%s"', $encoding));
-        }
+        return $decoders[$encoding] ?? null;
+    }
 
-        return $decoder;
+    private static function throwOnErrorOrFalse(callable $callable): callable
+    {
+        return static function (...$args) use ($callable) {
+            set_error_handler(static function (int $errno, string $errstr, string $errfile, int $errline): bool {
+                throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+            });
+
+            try {
+                $result = $callable(...$args);
+            } finally {
+                restore_error_handler();
+            }
+
+            /** @phan-suppress-next-line PhanPossiblyUndeclaredVariable */
+            if ($result === false) {
+                throw new LogicException();
+            }
+
+            /** @phan-suppress-next-line PhanPossiblyUndeclaredVariable */
+            return $result;
+        };
     }
 }

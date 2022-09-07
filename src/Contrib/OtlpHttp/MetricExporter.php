@@ -27,7 +27,7 @@ final class MetricExporter implements MetricExporterInterface
     /**
      * @param string|Temporality|null $temporality
      */
-    public function __construct(TransportInterface $transport, $temporality)
+    public function __construct(TransportInterface $transport, $temporality = null)
     {
         $this->transport = $transport;
         $this->temporality = $temporality;
@@ -56,7 +56,7 @@ final class MetricExporter implements MetricExporterInterface
             (new PsrTransportFactory($client, $requestFactory, $streamFactory))->create(
                 $endpoint,
                 $headers,
-                $compression,
+                (array) $compression,
                 $retryDelay,
                 $maxRetries,
             ),

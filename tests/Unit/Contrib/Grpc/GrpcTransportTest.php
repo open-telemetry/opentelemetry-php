@@ -26,14 +26,6 @@ final class GrpcTransportTest extends TestCase
         $response->await();
     }
 
-    public function test_invalid_compression(): void
-    {
-        $this->expectException(UnexpectedValueException::class);
-
-        $factory = new GrpcTransportFactory();
-        $factory->create('http://localhost/service/method', [], 'invalid');
-    }
-
     public function test_shutdown_returns_true(): void
     {
         $factory = new GrpcTransportFactory();
@@ -56,7 +48,7 @@ final class GrpcTransportTest extends TestCase
         $transport = $factory->create('http://localhost/service/method');
         $transport->shutdown();
 
-        $response = $transport->send('', 'text/plain');
+        $response = $transport->send('', 'application/x-protobuf');
 
         $this->expectException(Exception::class);
         $response->await();
