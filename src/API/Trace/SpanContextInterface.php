@@ -12,10 +12,8 @@ interface SpanContextInterface
     public const TRACE_FLAG_SAMPLED = 0x01;
     public const TRACE_FLAG_DEFAULT = 0x00;
 
-    /** @todo Implement this in the API layer */
     public static function getInvalid(): SpanContextInterface;
 
-    /** @todo Implement this in the API layer */
     public static function createSpanContext(string $traceId, string $spanId, bool $isRemote, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface;
 
     /** @psalm-mutation-free */

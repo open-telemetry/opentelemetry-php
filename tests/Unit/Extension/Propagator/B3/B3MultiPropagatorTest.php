@@ -67,7 +67,7 @@ class B3MultiPropagatorTest extends TestCase
                     SpanContextFactory::create(
                         SpanContext::INVALID_TRACE,
                         SpanContext::INVALID_SPAN,
-                        SpanContext::SAMPLED_FLAG
+                        SpanContextInterface::TRACE_FLAG_SAMPLED
                     ),
                     Context::getCurrent()
                 )

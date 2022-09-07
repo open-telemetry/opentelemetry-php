@@ -174,9 +174,9 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
 
         if ($debug && $debug === self::IS_SAMPLED) {
             $context = $context->with(B3DebugFlagContextKey::instance(), self::IS_SAMPLED);
-            $isSampled = SpanContext::SAMPLED_FLAG;
+            $isSampled = SpanContextInterface::TRACE_FLAG_SAMPLED;
         } else {
-            $isSampled = ($sampled === SpanContext::SAMPLED_FLAG);
+            $isSampled = ($sampled === SpanContextInterface::TRACE_FLAG_SAMPLED);
         }
 
         // Only traceparent header is extracted. No tracestate.

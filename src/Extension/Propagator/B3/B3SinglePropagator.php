@@ -166,7 +166,7 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
         }
 
         $sampled = self::processSampledValue($samplingState);
-        $isSampled = ($sampled === SpanContext::SAMPLED_FLAG);
+        $isSampled = ($sampled === SpanContextInterface::TRACE_FLAG_SAMPLED);
 
         return SpanContextFactory::createFromRemoteParent(
             $traceId,

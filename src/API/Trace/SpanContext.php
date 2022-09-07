@@ -12,7 +12,6 @@ final class SpanContext implements SpanContextInterface
     public const INVALID_SPAN = '0000000000000000';
     public const VALID_SPAN = '/^[0-9a-f]{16}$/';
     public const SPAN_LENGTH_BYTES = 8;
-    public const SAMPLED_FLAG = 1;
 
     private static ?SpanContextInterface $invalidContext = null;
 
@@ -47,7 +46,7 @@ final class SpanContext implements SpanContextInterface
         $this->spanId = $spanId;
         $this->traceState = $traceState;
         $this->isRemote = $isRemote;
-        $this->isSampled = ($traceFlags & self::SAMPLED_FLAG) === self::SAMPLED_FLAG;
+        $this->isSampled = ($traceFlags & self::TRACE_FLAG_SAMPLED) === self::TRACE_FLAG_SAMPLED;
         $this->traceFlags = $traceFlags;
         $this->isValid = SpanContextValidator::isValidTraceId($this->traceId) && SpanContextValidator::isValidSpanId($this->spanId);
     }

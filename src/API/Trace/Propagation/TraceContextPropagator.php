@@ -131,7 +131,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
 
         // Only the sampled flag is extracted from the traceFlags (00000001)
         $convertedTraceFlags = hexdec($traceFlags);
-        $isSampled = ($convertedTraceFlags & SpanContext::SAMPLED_FLAG) === SpanContext::SAMPLED_FLAG;
+        $isSampled = ($convertedTraceFlags & SpanContextInterface::TRACE_FLAG_SAMPLED) === SpanContextInterface::TRACE_FLAG_SAMPLED;
 
         // Tracestate = 'Vendor1=Value1,...,VendorN=ValueN'
         $rawTracestate = $getter->get($carrier, self::TRACESTATE);
