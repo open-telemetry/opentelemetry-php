@@ -511,7 +511,7 @@ class SpanTest extends MockeryTestCase
         $maxLength = 25;
 
         $strVal = str_repeat('a', $maxLength);
-        $tooLongStrVal = "${strVal}${strVal}";
+        $tooLongStrVal = "{$strVal}{$strVal}";
 
         $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL, (new SpanLimitsBuilder())->setAttributeValueLengthLimit($maxLength)->build());
 
@@ -601,7 +601,7 @@ class SpanTest extends MockeryTestCase
         $maxLength = 25;
 
         $strVal = str_repeat('a', $maxLength);
-        $tooLongStrVal = "${strVal}${strVal}";
+        $tooLongStrVal = "{$strVal}{$strVal}";
 
         $span = $this->createTestSpan(
             API\SpanKind::KIND_INTERNAL,
@@ -639,7 +639,7 @@ class SpanTest extends MockeryTestCase
         $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL, (new SpanLimitsBuilder())->setAttributeCountLimit($maxNumberOfAttributes)->build());
 
         foreach (range(1, $maxNumberOfAttributes * 2) as $idx) {
-            $span->setAttribute("str_attribute_${idx}", $idx);
+            $span->setAttribute("str_attribute_{$idx}", $idx);
         }
 
         $spanData = $span->toSpanData();
@@ -661,7 +661,7 @@ class SpanTest extends MockeryTestCase
         $attributesBuilder = Attributes::factory()->builder();
 
         foreach (range(1, $maxNumberOfAttributes * 2) as $idx) {
-            $attributesBuilder["str_attribute_${idx}"] = $idx;
+            $attributesBuilder["str_attribute_{$idx}"] = $idx;
         }
 
         $span = $this->createTestSpan(

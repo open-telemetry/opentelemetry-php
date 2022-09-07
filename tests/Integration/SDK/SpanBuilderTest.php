@@ -134,7 +134,7 @@ class SpanBuilderTest extends MockeryTestCase
         $maxLength = 25;
 
         $strVal = str_repeat('a', $maxLength);
-        $tooLongStrVal = "${strVal}${strVal}";
+        $tooLongStrVal = "{$strVal}{$strVal}";
 
         $tracerProvider = new TracerProvider([], null, null, (new SpanLimitsBuilder())->setAttributeValueLengthLimit($maxLength)->build());
         /** @var Span $span */
@@ -318,7 +318,7 @@ class SpanBuilderTest extends MockeryTestCase
             ->getTracer('test')->spanBuilder(self::SPAN_NAME);
 
         foreach (range(1, $maxNumberOfAttributes * 2) as $idx) {
-            $spanBuilder->setAttribute("str_attribute_${idx}", $idx);
+            $spanBuilder->setAttribute("str_attribute_{$idx}", $idx);
         }
 
         /** @var Span $span */
@@ -328,7 +328,7 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertCount($maxNumberOfAttributes, $attributes);
 
         foreach (range(1, $maxNumberOfAttributes) as $idx) {
-            $this->assertSame($idx, $attributes->get("str_attribute_${idx}"));
+            $this->assertSame($idx, $attributes->get("str_attribute_{$idx}"));
         }
     }
 
