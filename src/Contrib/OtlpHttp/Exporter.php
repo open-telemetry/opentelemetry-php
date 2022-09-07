@@ -78,7 +78,7 @@ class Exporter implements SpanExporterInterface
         return $transportFactory->create(
             $endpoint,
             $headers,
-            (array) $compression,
+            $compression,
             10,
             100,
             1,
@@ -101,6 +101,19 @@ class Exporter implements SpanExporterInterface
             ->map(static function (string $payload): int {
                 $serviceResponse = new ExportTraceServiceResponse();
                 $serviceResponse->mergeFromString($payload);
+
+                $partialSuccess = $serviceResponse->getPartialSuccess();
+                if ($partialSuccess !== null && $partialSuccess->getRejectedSpans()) {
+                    self::logError('Export partial success', [
+                        'rejected_spans' => $partialSuccess->getRejectedSpans(),
+                        'error_message' => $partialSuccess->getErrorMessage(),
+                    ]);
+
+                    return 1;
+                }
+                if ($partialSuccess !== null && $partialSuccess->getErrorMessage()) {
+                    self::logWarning('Export success with warnings/suggestions', ['error_message' => $partialSuccess->getErrorMessage()]);
+                }
 
                 return 0;
             })

@@ -56,7 +56,7 @@ final class MetricExporter implements MetricExporterInterface
             (new PsrTransportFactory($client, $requestFactory, $streamFactory))->create(
                 $endpoint,
                 $headers,
-                (array) $compression,
+                $compression,
                 $retryDelay,
                 $maxRetries,
             ),
@@ -76,6 +76,19 @@ final class MetricExporter implements MetricExporterInterface
             ->map(static function (string $payload): bool {
                 $serviceResponse = new ExportMetricsServiceResponse();
                 $serviceResponse->mergeFromString($payload);
+
+                $partialSuccess = $serviceResponse->getPartialSuccess();
+                if ($partialSuccess !== null && $partialSuccess->getRejectedDataPoints()) {
+                    self::logError('Export partial success', [
+                        'rejected_data_points' => $partialSuccess->getRejectedDataPoints(),
+                        'error_message' => $partialSuccess->getErrorMessage(),
+                    ]);
+
+                    return false;
+                }
+                if ($partialSuccess !== null && $partialSuccess->getErrorMessage()) {
+                    self::logWarning('Export success with warnings/suggestions', ['error_message' => $partialSuccess->getErrorMessage()]);
+                }
 
                 return true;
             })
