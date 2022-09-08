@@ -12,22 +12,22 @@ use PHPUnit\Framework\TestCase;
  */
 class TraceContextValidatorTest extends TestCase
 {
-    private const INVALID_TRACE_Flag = 'f';
-    private const TRACE_Flag = '11';
-    private const Trace_Version = '00';
+    private const INVALID_TRACE_FLAG = 'f';
+    private const TRACE_FLAG = '11';
+    private const TRACE_VERSION = '00';
 
-    public function test_is__invalid__trace__flag(): void
+    public function test_is_invalid_trace_flag(): void
     {
-        $this->assertFalse(TraceContextValidator::isValidTraceFlag(self::INVALID_TRACE_Flag));
+        $this->assertFalse(TraceContextValidator::isValidTraceFlag(self::INVALID_TRACE_FLAG));
     }
 
-    public function test_is__valid__trace__flag(): void
+    public function test_is_valid_trace_flag(): void
     {
-        $this->assertTrue(TraceContextValidator::isValidTraceFlag(self::TRACE_Flag));
+        $this->assertTrue(TraceContextValidator::isValidTraceFlag(self::TRACE_FLAG));
     }
 
-    public function test_is__invalid__trace__version(): void
+    public function test_is_invalid_trace_version(): void
     {
-        $this->assertTrue(TraceContextValidator::isValidTraceVersion(self::Trace_Version));
+        $this->assertTrue(TraceContextValidator::isValidTraceVersion(self::TRACE_VERSION));
     }
 }
