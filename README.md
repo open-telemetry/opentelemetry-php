@@ -49,7 +49,7 @@ All OpenTelemetry libraries are distributed via packagist, notably:
 - SDK: [open-telemetry/sdk](https://packagist.org/packages/open-telemetry/sdk)
 - Semantic Conventions: [open-telemetry/sem-conv](https://packagist.org/packages/open-telemetry/sem-conv)
 - Context: [open-telemetry/context](https://packagist.org/packages/open-telemetry/context)
-- Exporters: [open-telemetry/exporter-*](https://packagist.org/search/?query=open--telemetry&tags=exporter)
+- Exporters: [open-telemetry/exporter-*](https://packagist.org/search/?query=open-telemetry&tags=exporter)
 - Contrib: [open-telemetry/sdk-contrib](https://packagist.org/packages/open-telemetry/sdk-contrib)
 - Extensions: [open-telemetry/extension-*](https://packagist.org/search/?query=open-telemetry&tags=extension)
 
