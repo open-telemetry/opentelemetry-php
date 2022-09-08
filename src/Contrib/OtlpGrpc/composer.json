@@ -1,7 +1,7 @@
 {
   "name": "open-telemetry/exporter-otlp-grpc",
   "description": "GRPC exporter for OpenTelemetry PHP.",
-  "keywords": ["opentelemetry", "otel", "tracing", "apm", "otlp", "grpc", "protobuf"],
+  "keywords": ["opentelemetry", "otel", "tracing", "contrib", "exporter", "otlp", "grpc", "protobuf"],
   "type": "library",
   "license": "Apache-2.0",
   "authors": [
