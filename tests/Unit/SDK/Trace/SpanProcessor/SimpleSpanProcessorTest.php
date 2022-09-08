@@ -11,6 +11,7 @@ use Mockery\MockInterface;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextFactory;
 use OpenTelemetry\API\Trace\SpanContextInterface;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Log\LoggerHolder;
@@ -47,8 +48,8 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $this->readableSpan = Mockery::mock(ReadableSpanInterface::class);
 
         $this->sampledSpanContext = SpanContextFactory::create(
-            SpanContext::INVALID_TRACE,
-            SpanContext::INVALID_SPAN,
+            SpanContextValidator::INVALID_TRACE,
+            SpanContextValidator::INVALID_SPAN,
             SpanContextInterface::TRACE_FLAG_SAMPLED
         );
 

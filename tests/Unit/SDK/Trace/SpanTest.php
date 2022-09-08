@@ -754,7 +754,7 @@ class SpanTest extends MockeryTestCase
             ->createTestSpan(
                 API\SpanKind::KIND_INTERNAL,
                 null,
-                SpanContext::INVALID_SPAN
+                SpanContextValidator::INVALID_SPAN
             );
     }
 

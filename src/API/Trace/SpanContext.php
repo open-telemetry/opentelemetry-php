@@ -6,13 +6,6 @@ namespace OpenTelemetry\API\Trace;
 
 final class SpanContext implements SpanContextInterface
 {
-    public const INVALID_TRACE = '00000000000000000000000000000000';
-    public const VALID_TRACE = '/^[0-9a-f]{32}$/';
-    public const TRACE_LENGTH = 32;
-    public const INVALID_SPAN = '0000000000000000';
-    public const VALID_SPAN = '/^[0-9a-f]{16}$/';
-    public const SPAN_LENGTH_BYTES = 8;
-
     private static ?SpanContextInterface $invalidContext = null;
 
     /**
@@ -38,8 +31,8 @@ final class SpanContext implements SpanContextInterface
         // TraceId must be exactly 16 bytes (32 chars) and at least one non-zero byte
         // SpanId must be exactly 8 bytes (16 chars) and at least one non-zero byte
         if (!SpanContextValidator::isValidTraceId($traceId) || !SpanContextValidator::isValidSpanId($spanId)) {
-            $traceId = self::INVALID_TRACE;
-            $spanId = self::INVALID_SPAN;
+            $traceId = SpanContextValidator::INVALID_TRACE;
+            $spanId = SpanContextValidator::INVALID_SPAN;
         }
 
         $this->traceId = $traceId;
@@ -102,7 +95,7 @@ final class SpanContext implements SpanContextInterface
     public static function getInvalid(): SpanContextInterface
     {
         if (null === self::$invalidContext) {
-            self::$invalidContext = self::createSpanContext(self::INVALID_TRACE, self::INVALID_SPAN, false, 0);
+            self::$invalidContext = self::createSpanContext(SpanContextValidator::INVALID_TRACE, SpanContextValidator::INVALID_SPAN, false, 0);
         }
 
         return self::$invalidContext;

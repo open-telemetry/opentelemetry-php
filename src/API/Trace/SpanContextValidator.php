@@ -9,10 +9,13 @@ use function strtolower;
 
 class SpanContextValidator
 {
-    public const INVALID_TRACE = '00000000000000000000000000000000';
+    public const VALID_SPAN = '/^[0-9a-f]{16}$/';
+    public const VALID_TRACE = '/^[0-9a-f]{32}$/';
     public const INVALID_SPAN = '0000000000000000';
+    public const INVALID_TRACE = '00000000000000000000000000000000';
     public const SPAN_LENGTH = 16;
     public const TRACE_LENGTH = 32;
+    public const SPAN_LENGTH_BYTES = 8;
 
     /**
      * @return bool Returns a value that indicates whether a trace id is valid
