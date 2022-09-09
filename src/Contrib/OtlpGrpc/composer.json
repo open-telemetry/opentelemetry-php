@@ -14,6 +14,7 @@
     "php": "^7.4 || ^8.0",
     "ext-grpc": "*",
     "ext-protobuf": "*",
+    "grpc/grpc": "*",
     "open-telemetry/exporter-otlp-common": "self.version",
     "open-telemetry/gen-otlp-protobuf": "self.version",
     "open-telemetry/sdk": "self.version"
