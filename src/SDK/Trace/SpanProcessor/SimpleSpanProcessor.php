@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use Closure;
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
@@ -35,7 +35,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         $this->queue = new SplQueue();
     }
 
-    public function onStart(ReadWriteSpanInterface $span, Context $parentContext): void
+    public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void
     {
     }
 

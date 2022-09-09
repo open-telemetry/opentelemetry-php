@@ -10,6 +10,7 @@ use Mockery\MockInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Link;
@@ -336,7 +337,7 @@ class SpanBuilderTest extends MockeryTestCase
     {
         $sampler = new class() implements SamplerInterface {
             public function shouldSample(
-                Context $parentContext,
+                ContextInterface $parentContext,
                 string $traceId,
                 string $spanName,
                 int $spanKind,

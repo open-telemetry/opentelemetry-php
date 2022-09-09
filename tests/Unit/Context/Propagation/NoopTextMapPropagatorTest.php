@@ -9,7 +9,7 @@ use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\Context\Propagation\NoopTextMapPropagator
+ * @covers \OpenTelemetry\Context\Propagation\NoopTextMapPropagator
  */
 class NoopTextMapPropagatorTest extends TestCase
 {
@@ -21,7 +21,7 @@ class NoopTextMapPropagatorTest extends TestCase
     public function test_extract_context_is_unchanged(): void
     {
         $this->assertSame(
-            Context::getRoot(),
+            Context::getCurrent(),
             NoopTextMapPropagator::getInstance()->extract([])
         );
     }

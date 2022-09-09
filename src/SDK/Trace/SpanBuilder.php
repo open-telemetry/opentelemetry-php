@@ -7,6 +7,7 @@ namespace OpenTelemetry\SDK\Trace;
 use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesBuilderInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
@@ -24,7 +25,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     /** @readonly */
     private TracerSharedState $tracerSharedState;
 
-    private ?Context $parentContext = null; // Null means use current context.
+    private ?ContextInterface $parentContext = null; // Null means use current context.
 
     /**
      * @psalm-var API\SpanKind::KIND_*
@@ -51,7 +52,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
-    public function setParent(Context $parentContext): API\SpanBuilderInterface
+    public function setParent(ContextInterface $parentContext): API\SpanBuilderInterface
     {
         $this->parentContext = $parentContext;
 

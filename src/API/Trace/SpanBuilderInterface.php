@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 
 /**
  * Obtained from a {@see TracerInterface} and used to construct a {@see SpanInterface}.
@@ -15,14 +15,14 @@ use OpenTelemetry\Context\Context;
 interface SpanBuilderInterface
 {
     /**
-     * Sets the parent {@see Context} to use.
+     * Sets the parent {@see ContextInterface} to use.
      *
      * If no {@see SpanInterface} is available in the provided context, the resulting span will become a root span,
      * as if {@see SpanBuilderInterface::setNoParent} was called.
      *
      * Defaults to {@see Context::getCurrent} when {@see SpanBuilderInterface::startSpan} was called if not explicitly set.
      */
-    public function setParent(Context $parentContext): SpanBuilderInterface;
+    public function setParent(ContextInterface $parentContext): SpanBuilderInterface;
 
     /**
      * Makes the to be created {@see SpanInterface} a root span of a new trace.

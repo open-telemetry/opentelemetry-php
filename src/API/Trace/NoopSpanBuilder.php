@@ -5,20 +5,21 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Trace;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ContextStorageInterface;
 
 final class NoopSpanBuilder implements SpanBuilderInterface
 {
     private ContextStorageInterface $contextStorage;
 
-    private ?Context $parent = null;
+    private ?ContextInterface $parent = null;
 
     public function __construct(ContextStorageInterface $contextStorage)
     {
         $this->contextStorage = $contextStorage;
     }
 
-    public function setParent(Context $parentContext): SpanBuilderInterface
+    public function setParent(ContextInterface $parentContext): SpanBuilderInterface
     {
         $this->parent = $parentContext;
 

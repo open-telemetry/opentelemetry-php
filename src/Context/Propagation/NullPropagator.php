@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Context\Propagation;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 
 class NullPropagator implements TextMapPropagatorInterface
 {
@@ -13,11 +14,11 @@ class NullPropagator implements TextMapPropagatorInterface
         return [];
     }
 
-    public function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void
+    public function inject(&$carrier, PropagationSetterInterface $setter = null, ContextInterface $context = null): void
     {
     }
 
-    public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
+    public function extract($carrier, PropagationGetterInterface $getter = null, ContextInterface $context = null): ContextInterface
     {
         return $context ?? Context::getCurrent();
     }

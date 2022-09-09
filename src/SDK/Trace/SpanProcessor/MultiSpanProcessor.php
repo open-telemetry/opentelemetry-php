@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
@@ -38,7 +38,7 @@ final class MultiSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
-    public function onStart(ReadWriteSpanInterface $span, Context $parentContext): void
+    public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void
     {
         foreach ($this->processors as $processor) {
             $processor->onStart($span, $parentContext);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Exemplar;
 
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use function random_int;
@@ -21,7 +21,7 @@ final class FixedSizeReservoir implements ExemplarReservoirInterface
         $this->size = $size;
     }
 
-    public function offer($index, $value, AttributesInterface $attributes, Context $context, int $timestamp, int $revision): void
+    public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp, int $revision): void
     {
         $bucket = random_int(0, $this->measurements);
         $this->measurements++;

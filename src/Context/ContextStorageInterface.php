@@ -8,7 +8,7 @@ interface ContextStorageInterface
 {
     public function scope(): ?ContextStorageScopeInterface;
 
-    public function current(): Context;
+    public function current(): ContextInterface;
 
-    public function attach(Context $context): ContextStorageScopeInterface;
+    public function attach(ContextInterface $context): ContextStorageScopeInterface;
 }

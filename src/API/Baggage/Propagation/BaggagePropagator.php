@@ -8,6 +8,7 @@ use OpenTelemetry\API\Baggage\Baggage;
 use OpenTelemetry\API\Baggage\BaggageBuilderInterface;
 use OpenTelemetry\API\Baggage\Entry; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
@@ -38,7 +39,7 @@ final class BaggagePropagator implements TextMapPropagatorInterface
         return [self::BAGGAGE];
     }
 
-    public function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void
+    public function inject(&$carrier, PropagationSetterInterface $setter = null, ContextInterface $context = null): void
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
@@ -69,7 +70,7 @@ final class BaggagePropagator implements TextMapPropagatorInterface
         }
     }
 
-    public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
+    public function extract($carrier, PropagationGetterInterface $getter = null, ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();

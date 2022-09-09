@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Extension\Propagator\B3;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
@@ -44,13 +45,13 @@ final class B3Propagator implements TextMapPropagatorInterface
     }
 
     /** {@inheritdoc} */
-    public function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void
+    public function inject(&$carrier, PropagationSetterInterface $setter = null, ContextInterface $context = null): void
     {
         $this->propagator->inject($carrier, $setter, $context);
     }
 
     /** {@inheritdoc} */
-    public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
+    public function extract($carrier, PropagationGetterInterface $getter = null, ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
