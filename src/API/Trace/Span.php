@@ -15,11 +15,7 @@ abstract class Span implements SpanInterface
     /** @inheritDoc */
     final public static function fromContext(Context $context): SpanInterface
     {
-        if ($span = $context->get(ContextKeys::span())) {
-            return $span;
-        }
-
-        return NonRecordingSpan::getInvalid();
+        return $context->get(ContextKeys::span()) ?? self::getInvalid();
     }
 
     /** @inheritDoc */

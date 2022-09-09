@@ -15,11 +15,7 @@ final class Baggage implements BaggageInterface
     /** @inheritDoc */
     public static function fromContext(Context $context): BaggageInterface
     {
-        if ($baggage = $context->get(ContextKeys::baggage())) {
-            return $baggage;
-        }
-
-        return self::getEmpty();
+        return $context->get(ContextKeys::baggage()) ?? self::getEmpty();
     }
 
     /** @inheritDoc */

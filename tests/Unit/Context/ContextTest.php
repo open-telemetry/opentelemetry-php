@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Context;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Context\ImplicitContextKeyedInterface;
 use PHPUnit\Framework\TestCase;
@@ -31,8 +30,8 @@ class ContextTest extends TestCase
 
     public function test_ctx_can_store_values_by_key(): void
     {
-        $key1 = new ContextKey('key1');
-        $key2 = new ContextKey('key2');
+        $key1 = Context::createKey('key1');
+        $key2 = Context::createKey('key2');
 
         $ctx = Context::getRoot()->with($key1, 'val1')->with($key2, 'val2');
 
@@ -42,8 +41,8 @@ class ContextTest extends TestCase
 
     public function test_set_does_not_mutate_the_original(): void
     {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
+        $key1 = Context::createKey('-');
+        $key2 = Context::createKey('-');
 
         $parent = Context::getRoot()->with($key1, 'foo');
         $child = $parent->with($key2, 'bar');
@@ -59,8 +58,8 @@ class ContextTest extends TestCase
     {
         $key_name = 'foo';
 
-        $key1 = new ContextKey($key_name);
-        $key2 = new ContextKey($key_name);
+        $key1 = Context::createKey($key_name);
+        $key2 = Context::createKey($key_name);
 
         $ctx = Context::getRoot()->with($key1, 'val1')->with($key2, 'val2');
 
@@ -70,8 +69,8 @@ class ContextTest extends TestCase
 
     public function test_empty_ctx_keys_are_valid(): void
     {
-        $key1 = new ContextKey();
-        $key2 = new ContextKey();
+        $key1 = Context::createKey('-');
+        $key2 = Context::createKey('-');
 
         $ctx = Context::getRoot()->with($key1, 'val1')->with($key2, 'val2');
 
@@ -86,10 +85,10 @@ class ContextTest extends TestCase
         $null_val = null;
         $obj_val = new \stdClass();
 
-        $scalar_key = new ContextKey();
-        $array_key = new ContextKey();
-        $null_key = new ContextKey();
-        $obj_key = new ContextKey();
+        $scalar_key = Context::createKey('-');
+        $array_key = Context::createKey('-');
+        $null_key = Context::createKey('-');
+        $obj_key = Context::createKey('-');
 
         $ctx = Context::getRoot()
             ->with($scalar_key, $scalar_val)
@@ -109,7 +108,7 @@ class ContextTest extends TestCase
         $arr = [];
         foreach (range(0, 9) as $i) {
             $r = rand(0, 100);
-            $key = new ContextKey((string) $r);
+            $key = Context::createKey((string) $r);
             $context = $context->with($key, $r);
             $arr[$r] = $key;
         }
@@ -123,7 +122,7 @@ class ContextTest extends TestCase
 
     public function test_reusing_key_overwrites_value(): void
     {
-        $key = new ContextKey();
+        $key = Context::createKey('-');
         $ctx = Context::getRoot()->with($key, 'val1');
         $this->assertSame($ctx->get($key), 'val1');
 
@@ -133,8 +132,8 @@ class ContextTest extends TestCase
 
     public function test_ctx_value_not_found_returns_null(): void
     {
-        $ctx = Context::getRoot()->with(new ContextKey('foo'), 'bar');
-        $this->assertNull($ctx->get(new ContextKey('baz')));
+        $ctx = Context::getRoot()->with(Context::createKey('foo'), 'bar');
+        $this->assertNull($ctx->get(Context::createKey('baz')));
     }
 
     public function test_ctx_value_overwrite_null_returns_null(): void
@@ -165,7 +164,7 @@ class ContextTest extends TestCase
 
     public function test_attach_and_detach_set_current_ctx(): void
     {
-        $key = new ContextKey();
+        $key = Context::createKey('-');
         $scope = Context::getRoot()->with($key, '111')->activate();
 
         try {

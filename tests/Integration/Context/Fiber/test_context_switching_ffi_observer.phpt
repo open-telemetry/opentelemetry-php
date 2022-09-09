@@ -5,11 +5,10 @@ Context switches on execution context switch.
 --FILE--
 <?php
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKey;
 
 require_once 'vendor/autoload.php';
 
-$key = new ContextKey();
+$key = Context::createKey('-');
 $scope = Context::getCurrent()
     ->with($key, 'main')
     ->activate();

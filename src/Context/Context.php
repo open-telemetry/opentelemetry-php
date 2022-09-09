@@ -15,11 +15,11 @@ final class Context
     private static ContextStorageInterface $storage;
 
     // Optimization for spans to avoid copying the context array.
-    private static ContextKey $spanContextKey;
+    private static ContextKeyInterface $spanContextKey;
     private ?object $span = null;
     /** @var array<int, mixed> */
     private array $context = [];
-    /** @var array<int, ContextKey> */
+    /** @var array<int, ContextKeyInterface> */
     private array $contextKeys = [];
 
     private function __construct()
@@ -27,7 +27,7 @@ final class Context
         self::$spanContextKey = ContextKeys::span();
     }
 
-    public static function createKey(string $key): ContextKey
+    public static function createKey(string $key): ContextKeyInterface
     {
         return new ContextKey($key);
     }
@@ -80,7 +80,7 @@ final class Context
         return $value->storeInContext($this);
     }
 
-    public function with(ContextKey $key, $value): self
+    public function with(ContextKeyInterface $key, $value): self
     {
         if ($this->get($key) === $value) {
             return $this;
@@ -108,7 +108,7 @@ final class Context
         return $self;
     }
 
-    public function get(ContextKey $key)
+    public function get(ContextKeyInterface $key)
     {
         if ($key === self::$spanContextKey) {
             return $this->span;

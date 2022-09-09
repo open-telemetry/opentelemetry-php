@@ -6,7 +6,7 @@ namespace OpenTelemetry\Context;
 
 /**
  * Represents a value that can be sored within {@see Context}.
- * Allows storing themselves without exposing a {@see ContextKey}.
+ * Allows storing themselves without exposing a {@see ContextKeyInterface}.
  *
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#context-interaction
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/baggage/api.md#context-interaction
