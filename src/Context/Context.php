@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
+use function assert;
 use function spl_object_id;
 
 /**
@@ -49,6 +50,18 @@ final class Context implements ContextInterface
     {
         /** @psalm-suppress RedundantPropertyInitializationCheck */
         return self::$storage ??= new ContextStorage();
+    }
+
+    /**
+     * @param ContextInterface|false|null $context
+     *
+     * @internal
+     */
+    public static function resolve($context, ?ContextStorageInterface $contextStorage = null): ContextInterface
+    {
+        return $context
+            ?? ($contextStorage ?? self::storage())->current()
+            ?: self::getRoot();
     }
 
     /**

@@ -12,23 +12,17 @@ final class NoopSpanBuilder implements SpanBuilderInterface
 {
     private ContextStorageInterface $contextStorage;
 
-    private ?ContextInterface $parent = null;
+    /** @var ContextInterface|false|null */
+    private $parentContext = null;
 
     public function __construct(ContextStorageInterface $contextStorage)
     {
         $this->contextStorage = $contextStorage;
     }
 
-    public function setParent(ContextInterface $parentContext): SpanBuilderInterface
+    public function setParent($context): SpanBuilderInterface
     {
-        $this->parent = $parentContext;
-
-        return $this;
-    }
-
-    public function setNoParent(): SpanBuilderInterface
-    {
-        $this->parent = Context::getRoot();
+        $this->parentContext = $context;
 
         return $this;
     }
@@ -60,7 +54,8 @@ final class NoopSpanBuilder implements SpanBuilderInterface
 
     public function startSpan(): SpanInterface
     {
-        $span = Span::fromContext($this->parent ?? $this->contextStorage->current());
+        $parentContext = Context::resolve($this->parentContext, $this->contextStorage);
+        $span = Span::fromContext($parentContext);
         if ($span->isRecording()) {
             $span = Span::wrap($span->getContext());
         }

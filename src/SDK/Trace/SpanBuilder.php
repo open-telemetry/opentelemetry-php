@@ -25,7 +25,8 @@ final class SpanBuilder implements API\SpanBuilderInterface
     /** @readonly */
     private TracerSharedState $tracerSharedState;
 
-    private ?ContextInterface $parentContext = null; // Null means use current context.
+    /** @var ContextInterface|false|null */
+    private $parentContext = null;
 
     /**
      * @psalm-var API\SpanKind::KIND_*
@@ -52,17 +53,9 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
-    public function setParent(ContextInterface $parentContext): API\SpanBuilderInterface
+    public function setParent($context): API\SpanBuilderInterface
     {
-        $this->parentContext = $parentContext;
-
-        return $this;
-    }
-
-    /** @inheritDoc */
-    public function setNoParent(): API\SpanBuilderInterface
-    {
-        $this->parentContext = Context::getRoot();
+        $this->parentContext = $context;
 
         return $this;
     }
@@ -137,7 +130,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     /** @inheritDoc */
     public function startSpan(): API\SpanInterface
     {
-        $parentContext = $this->parentContext ?? Context::getCurrent();
+        $parentContext = Context::resolve($this->parentContext);
         $parentSpan = Span::fromContext($parentContext);
         $parentSpanContext = $parentSpan->getContext();
 
