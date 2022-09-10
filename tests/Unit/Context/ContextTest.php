@@ -141,26 +141,10 @@ class ContextTest extends TestCase
 
         try {
             $token = Context::getRoot()->with($key, '222')->activate();
-            $this->assertSame(Context::getValue($key), '222');
+            $this->assertSame(Context::getCurrent()->get($key), '222');
 
             $token->detach();
-            $this->assertSame(Context::getValue($key), '111');
-        } finally {
-            $scope->detach();
-        }
-    }
-
-    public function test_instance_set_and_static_get_use_same_ctx(): void
-    {
-        $key = new ContextKey('ofoba');
-        $val = 'foobar';
-
-        $ctx = Context::getRoot()->with($key, $val);
-        $scope = $ctx->activate();
-
-        try {
-            $this->assertSame(Context::getValue($key, $ctx), $val);
-            $this->assertSame(Context::getValue($key, null), $val);
+            $this->assertSame(Context::getCurrent()->get($key), '111');
         } finally {
             $scope->detach();
         }

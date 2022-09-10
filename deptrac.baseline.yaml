@@ -1,4 +1,7 @@
 deptrac:
   skip_violations:
+    OpenTelemetry\Context\Context:
+      - OpenTelemetry\API\Trace\SpanContextKey
+      - OpenTelemetry\API\Trace\SpanInterface
     OpenTelemetry\SDK\Trace\Span:
       - OpenTelemetry\API\Trace\NonRecordingSpan
