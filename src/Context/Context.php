@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
-use function assert;
-use OpenTelemetry\API\Trace\SpanContextKey;
-use OpenTelemetry\API\Trace\SpanInterface;
 use function spl_object_id;
 
 /**
@@ -19,7 +16,7 @@ final class Context
 
     // Optimization for spans to avoid copying the context array.
     private static ContextKey $spanContextKey;
-    private ?SpanInterface $span = null;
+    private ?object $span = null;
     /** @var array<int, mixed> */
     private array $context = [];
     /** @var array<int, ContextKey> */
@@ -27,7 +24,7 @@ final class Context
 
     private function __construct()
     {
-        self::$spanContextKey = SpanContextKey::instance();
+        self::$spanContextKey = ContextKeys::span();
     }
 
     public static function createKey(string $key): ContextKey
@@ -92,8 +89,7 @@ final class Context
         $self = clone $this;
 
         if ($key === self::$spanContextKey) {
-            assert($value instanceof SpanInterface || $value === null);
-            $self->span = $value;
+            $self->span = $value; // @phan-suppress-current-line PhanTypeMismatchPropertyReal
 
             return $self;
         }

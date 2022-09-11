@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Trace;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Context\ScopeInterface;
 
 abstract class AbstractSpan implements SpanInterface
@@ -14,7 +15,7 @@ abstract class AbstractSpan implements SpanInterface
     /** @inheritDoc */
     final public static function fromContext(Context $context): SpanInterface
     {
-        if ($span = $context->get(SpanContextKey::instance())) {
+        if ($span = $context->get(ContextKeys::span())) {
             return $span;
         }
 
@@ -56,6 +57,6 @@ abstract class AbstractSpan implements SpanInterface
     /** @inheritDoc */
     final public function storeInContext(Context $context): Context
     {
-        return $context->with(SpanContextKey::instance(), $this);
+        return $context->with(ContextKeys::span(), $this);
     }
 }

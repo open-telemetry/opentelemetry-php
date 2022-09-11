@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\API\Unit\Trace;
+namespace OpenTelemetry\Tests\Unit\API\Trace;
 
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\NoopSpanBuilder;
 use OpenTelemetry\API\Trace\SpanContextInterface;
-use OpenTelemetry\API\Trace\SpanContextKey;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
@@ -39,7 +39,7 @@ class NoopSpanBuilderTest extends TestCase
         $span = $this->createMock(SpanInterface::class);
         $span->method('getContext')->willReturn($spanContext);
 
-        $context = Context::getRoot()->with(SpanContextKey::instance(), $span);
+        $context = Context::getRoot()->with(ContextKeys::span(), $span);
 
         $contextStorage = $this->createMock(ContextStorageInterface::class);
 
@@ -58,7 +58,7 @@ class NoopSpanBuilderTest extends TestCase
         $span = $this->createMock(SpanInterface::class);
         $span->method('getContext')->willReturn($spanContext);
 
-        $context = Context::getRoot()->with(SpanContextKey::instance(), $span);
+        $context = Context::getRoot()->with(ContextKeys::span(), $span);
 
         $contextStorage = $this->createMock(ContextStorageInterface::class);
         $contextStorage->method('current')->willReturn($context);
@@ -77,7 +77,7 @@ class NoopSpanBuilderTest extends TestCase
         $span = $this->createMock(SpanInterface::class);
         $span->method('getContext')->willReturn($spanContext);
 
-        $context = Context::getRoot()->with(SpanContextKey::instance(), $span);
+        $context = Context::getRoot()->with(ContextKeys::span(), $span);
 
         $contextStorage = $this->createMock(ContextStorageInterface::class);
         $contextStorage->method('current')->willReturn($context);
@@ -96,7 +96,7 @@ class NoopSpanBuilderTest extends TestCase
         $span = $this->createMock(SpanInterface::class);
         $span->method('isRecording')->willReturn(true);
 
-        $context = Context::getRoot()->with(SpanContextKey::instance(), $span);
+        $context = Context::getRoot()->with(ContextKeys::span(), $span);
 
         $contextStorage = $this->createMock(ContextStorageInterface::class);
 
