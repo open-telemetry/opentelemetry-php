@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
+use function assert;
+
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/context.md#overview
  */
@@ -92,7 +94,11 @@ final class Context
      */
     public function activate(): ScopeInterface
     {
-        return self::storage()->attach($this);
+        $scope = self::storage()->attach($this);
+        /** @psalm-suppress RedundantCondition */
+        assert((bool) $scope = new DebugScope($scope));
+
+        return $scope;
     }
 
     /**

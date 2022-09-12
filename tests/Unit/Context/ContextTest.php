@@ -17,8 +17,13 @@ class ContextTest extends TestCase
     {
         $context = Context::getRoot();
 
-        $context->activate();
-        $this->assertSame($context, Context::getCurrent());
+        $scope = $context->activate();
+
+        try {
+            $this->assertSame($context, Context::getCurrent());
+        } finally {
+            $scope->detach();
+        }
     }
 
     public function test_ctx_can_store_values_by_key(): void
@@ -132,13 +137,17 @@ class ContextTest extends TestCase
     public function test_attach_and_detach_set_current_ctx(): void
     {
         $key = new ContextKey();
-        Context::getRoot()->with($key, '111')->activate();
+        $scope = Context::getRoot()->with($key, '111')->activate();
 
-        $token = Context::getRoot()->with($key, '222')->activate();
-        $this->assertSame(Context::getValue($key), '222');
+        try {
+            $token = Context::getRoot()->with($key, '222')->activate();
+            $this->assertSame(Context::getValue($key), '222');
 
-        $token->detach();
-        $this->assertSame(Context::getValue($key), '111');
+            $token->detach();
+            $this->assertSame(Context::getValue($key), '111');
+        } finally {
+            $scope->detach();
+        }
     }
 
     public function test_instance_set_and_static_get_use_same_ctx(): void
@@ -147,9 +156,13 @@ class ContextTest extends TestCase
         $val = 'foobar';
 
         $ctx = Context::getRoot()->with($key, $val);
-        $ctx->activate();
+        $scope = $ctx->activate();
 
-        $this->assertSame(Context::getValue($key, $ctx), $val);
-        $this->assertSame(Context::getValue($key, null), $val);
+        try {
+            $this->assertSame(Context::getValue($key, $ctx), $val);
+            $this->assertSame(Context::getValue($key, null), $val);
+        } finally {
+            $scope->detach();
+        }
     }
 }

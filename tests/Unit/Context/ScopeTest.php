@@ -51,7 +51,8 @@ class ScopeTest extends TestCase
         $scope1 = Context::getCurrent()->activate();
 
         $this->assertSame(0, $scope1->detach());
-        $this->assertSame(ScopeInterface::DETACHED, $scope1->detach() & ScopeInterface::DETACHED);
+        /** @phpstan-ignore-next-line */
+        $this->assertSame(ScopeInterface::DETACHED, @$scope1->detach() & ScopeInterface::DETACHED);
     }
 
     public function test_order_mismatch_scope_detach(): void
@@ -59,7 +60,7 @@ class ScopeTest extends TestCase
         $scope1 = Context::getCurrent()->activate();
         $scope2 = Context::getCurrent()->activate();
 
-        $this->assertSame(ScopeInterface::MISMATCH, $scope1->detach() & ScopeInterface::MISMATCH);
+        $this->assertSame(ScopeInterface::MISMATCH, @$scope1->detach() & ScopeInterface::MISMATCH);
         $this->assertSame(0, $scope2->detach());
     }
 
@@ -78,13 +79,14 @@ class ScopeTest extends TestCase
         $this->assertSame(0, $scope4->detach());
         $this->assertSame(0, $scope1->detach());
     }
+
     public function test_inactive_scope_detach(): void
     {
         $scope1 = Context::getCurrent()->activate();
 
         Context::storage()->fork(1);
         Context::storage()->switch(1);
-        $this->assertSame(ScopeInterface::INACTIVE, $scope1->detach() & ScopeInterface::INACTIVE);
+        $this->assertSame(ScopeInterface::INACTIVE, @$scope1->detach() & ScopeInterface::INACTIVE);
 
         Context::storage()->switch(0);
         Context::storage()->destroy(1);
