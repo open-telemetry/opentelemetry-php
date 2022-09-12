@@ -171,7 +171,7 @@ Using fibers with non-`CLI` SAPIs may require preloading of bindings. One way to
 
 **The PHP protobuf extension is optional when using either the `OTLPHttp` or `OTLPGrpc` exporters from the Contrib package.**
 
-The protobuf extension makes both exporters more performant. _Note that protobuf 3.20.0+ is required for php 8.1 support_
+The protobuf extension makes both exporters _significantly_ more performant, and we recommend that you do not use the PHP package in production. _Note that protobuf 3.20.0+ is required for php 8.1 support_
 
 ---
 

@@ -12,7 +12,7 @@
   ],
   "require": {
     "php": "^7.4 || ^8.0",
-    "google/protobuf": "^3.3.0",
+    "ext-protobuf": "*",
     "open-telemetry/api": "self.version",
     "open-telemetry/exporter-otlp-common": "self.version",
     "open-telemetry/gen-otlp-protobuf": "self.version",
@@ -25,8 +25,5 @@
     "psr-4": {
       "OpenTelemetry\\Contrib\\OtlpHttp\\": "."
     }
-  },
-  "suggest": {
-    "ext-protobuf": "For more performant protobuf exporting"
   }
 }
