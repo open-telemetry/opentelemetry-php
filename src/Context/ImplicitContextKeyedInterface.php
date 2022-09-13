@@ -27,7 +27,6 @@ interface ImplicitContextKeyedInterface
 
     /**
      * Returns a new {@see ContextInterface} created by setting `$this` into the provided [@see ContextInterface}.
-     * It is suggested to use {@see ContextInterface::withContextValue()} instead of using this method directly.
      */
     public function storeInContext(ContextInterface $context): ContextInterface;
 }
