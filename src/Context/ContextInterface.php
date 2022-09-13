@@ -25,7 +25,7 @@ interface ContextInterface
      *
      * @psalm-template T
      * @psalm-param ContextKeyInterface<T> $key
-     * @psalm-param T $value
+     * @psalm-param T|null $value
      */
     public function with(ContextKeyInterface $key, $value): ContextInterface;
 
