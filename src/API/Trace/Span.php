@@ -8,7 +8,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Context\ScopeInterface;
 
-abstract class AbstractSpan implements SpanInterface
+abstract class Span implements SpanInterface
 {
     private static ?self $invalidSpan = null;
 

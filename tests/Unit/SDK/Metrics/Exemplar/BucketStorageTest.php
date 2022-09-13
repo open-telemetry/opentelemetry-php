@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\Exemplar;
 
-use OpenTelemetry\API\Trace\AbstractSpan;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -47,7 +47,7 @@ final class BucketStorageTest extends TestCase
     {
         $storage = new BucketStorage(Attributes::factory());
 
-        $context = AbstractSpan::wrap(SpanContext::create('12345678901234567890123456789012', '1234567890123456'))
+        $context = Span::wrap(SpanContext::create('12345678901234567890123456789012', '1234567890123456'))
             ->storeInContext(Context::getRoot());
 
         $storage->store(0, 0, 5, Attributes::create([]), $context, 7, 0);

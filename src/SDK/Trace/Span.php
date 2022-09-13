@@ -15,7 +15,7 @@ use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use Throwable;
 
-final class Span extends API\AbstractSpan implements ReadWriteSpanInterface
+final class Span extends API\Span implements ReadWriteSpanInterface
 {
 
     /** @readonly */
