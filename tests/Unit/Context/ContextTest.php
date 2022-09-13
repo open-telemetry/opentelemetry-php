@@ -6,7 +6,10 @@ namespace OpenTelemetry\Tests\Unit\Context;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKey;
+use OpenTelemetry\Context\ContextKeys;
+use OpenTelemetry\Context\ImplicitContextKeyedInterface;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * @covers \OpenTelemetry\Context\Context
@@ -132,6 +135,32 @@ class ContextTest extends TestCase
     {
         $ctx = Context::getRoot()->with(new ContextKey('foo'), 'bar');
         $this->assertNull($ctx->get(new ContextKey('baz')));
+    }
+
+    public function test_ctx_value_overwrite_null_returns_null(): void
+    {
+        $key = Context::createKey('-');
+        $ctx = Context::getRoot()->with($key, 'val')->with($key, null);
+
+        $this->assertNull($ctx->get($key));
+    }
+
+    public function test_set_get_span_key(): void
+    {
+        $key = ContextKeys::span();
+        $span = new stdClass();
+
+        $ctx = Context::getRoot()->with($key, $span);
+        $this->assertSame($span, $ctx->get($key));
+    }
+
+    public function test_with_context_value_calls_store_in_context(): void
+    {
+        $ctx = Context::getRoot();
+        $value = $this->createMock(ImplicitContextKeyedInterface::class);
+        $value->expects($this->once())->method('storeInContext')->with($ctx)->willReturn($ctx);
+
+        $ctx->withContextValue($value);
     }
 
     public function test_attach_and_detach_set_current_ctx(): void
