@@ -129,7 +129,7 @@ the `use` keyword. This is what our list of open-telemetry imported classes shou
  ```php
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
-use OpenTelemetry\API\Trace\AbstractSpan;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
@@ -255,7 +255,7 @@ child span of the rootSpan. We can do the same as follows:
 - Import the required functions on top of the file:
 
 ```php
-use OpenTelemetry\API\Trace\AbstractSpan;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 ```
@@ -267,7 +267,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 $tracer = TracerProvider::getDefaultTracer();
 if ($tracer) {
     /** @var Span $span */
-    $span = AbstractSpan::getCurrent();
+    $span = Span::getCurrent();
 
     $span->setAttribute('foo', 'bar');
     $span->setAttribute('Application', 'Laravel');

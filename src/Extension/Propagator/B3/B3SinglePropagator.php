@@ -6,7 +6,7 @@ namespace OpenTelemetry\Extension\Propagator\B3;
 
 use function count;
 use function explode;
-use OpenTelemetry\API\Trace\AbstractSpan;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\Context;
@@ -56,7 +56,7 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
-        $spanContext = AbstractSpan::fromContext($context)->getContext();
+        $spanContext = Span::fromContext($context)->getContext();
 
         if (!$spanContext->isValid()) {
             return;
@@ -85,7 +85,7 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
             return $context;
         }
 
-        return $context->withContextValue(AbstractSpan::wrap($spanContext));
+        return $context->withContextValue(Span::wrap($spanContext));
     }
 
     private static function processSampledValue($value): ?int

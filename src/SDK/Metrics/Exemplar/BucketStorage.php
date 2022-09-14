@@ -8,7 +8,7 @@ use function array_fill;
 use function assert;
 use function class_exists;
 use function count;
-use OpenTelemetry\API\Trace\AbstractSpan;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
@@ -44,7 +44,7 @@ final class BucketStorage
         $exemplar->attributes = $attributes;
         $exemplar->revision = $revision;
 
-        if (class_exists(AbstractSpan::class) && ($spanContext = AbstractSpan::fromContext($context)->getContext())->isValid()) {
+        if (class_exists(Span::class) && ($spanContext = Span::fromContext($context)->getContext())->isValid()) {
             $exemplar->traceId = $spanContext->getTraceId();
             $exemplar->spanId = $spanContext->getSpanId();
         } else {

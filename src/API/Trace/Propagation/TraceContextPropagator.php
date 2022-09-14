@@ -7,7 +7,7 @@ namespace OpenTelemetry\API\Trace\Propagation;
 use function count;
 use function explode;
 use function hexdec;
-use OpenTelemetry\API\Trace\AbstractSpan;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\TraceState;
@@ -60,7 +60,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
-        $spanContext = AbstractSpan::fromContext($context)->getContext();
+        $spanContext = Span::fromContext($context)->getContext();
 
         if (!$spanContext->isValid()) {
             return;
@@ -88,7 +88,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
             return $context;
         }
 
-        return $context->withContextValue(AbstractSpan::wrap($spanContext));
+        return $context->withContextValue(Span::wrap($spanContext));
     }
 
     private static function extractImpl($carrier, PropagationGetterInterface $getter): SpanContextInterface

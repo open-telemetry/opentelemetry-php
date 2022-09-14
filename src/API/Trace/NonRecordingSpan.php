@@ -12,7 +12,7 @@ use Throwable;
  * @internal
  * @psalm-internal OpenTelemetry
  */
-final class NonRecordingSpan extends AbstractSpan
+final class NonRecordingSpan extends Span
 {
     private SpanContextInterface $context;
 

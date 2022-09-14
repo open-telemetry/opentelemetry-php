@@ -59,9 +59,9 @@ final class NoopSpanBuilder implements SpanBuilderInterface
 
     public function startSpan(): SpanInterface
     {
-        $span = AbstractSpan::fromContext($this->parent ?? $this->contextStorage->current());
+        $span = Span::fromContext($this->parent ?? $this->contextStorage->current());
         if ($span->isRecording()) {
-            $span = AbstractSpan::wrap($span->getContext());
+            $span = Span::wrap($span->getContext());
         }
 
         return $span;
