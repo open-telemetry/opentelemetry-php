@@ -95,7 +95,6 @@ class SpanConverter implements SpanConverterInterface
         $pInstrumentationScope->setName($instrumentationScope->getName());
         $pInstrumentationScope->setVersion((string) $instrumentationScope->getVersion());
         $this->setAttributes($pInstrumentationScope, $instrumentationScope->getAttributes());
-        $pInstrumentationScope->setDroppedAttributesCount($instrumentationScope->getAttributes()->getDroppedAttributesCount());
         $pScopeSpans->setScope($pInstrumentationScope);
         $pScopeSpans->setSchemaUrl((string) $instrumentationScope->getSchemaUrl());
 

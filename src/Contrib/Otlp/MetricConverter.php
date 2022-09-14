@@ -96,7 +96,6 @@ final class MetricConverter
         $pInstrumentationScope->setName($instrumentationScope->getName());
         $pInstrumentationScope->setVersion((string) $instrumentationScope->getVersion());
         $this->setAttributes($pInstrumentationScope, $instrumentationScope->getAttributes());
-        $pInstrumentationScope->setDroppedAttributesCount($instrumentationScope->getAttributes()->getDroppedAttributesCount());
         $pScopeMetrics->setScope($pInstrumentationScope);
         $pScopeMetrics->setSchemaUrl((string) $instrumentationScope->getSchemaUrl());
 
