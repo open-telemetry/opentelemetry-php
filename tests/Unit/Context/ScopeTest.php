@@ -21,11 +21,11 @@ class ScopeTest extends TestCase
         $ctx = Context::getRoot()->with($key, 'test');
         $scope = $ctx->activate();
 
-        $this->assertSame('test', Context::getValue($key));
+        $this->assertSame('test', Context::getCurrent()->get($key));
 
         $scope->detach();
 
-        $this->assertNull(Context::getValue($key));
+        $this->assertNull(Context::getCurrent()->get($key));
     }
 
     public function test_nested_scope(): void
@@ -33,17 +33,17 @@ class ScopeTest extends TestCase
         $key = new ContextKey();
         $ctx1 = Context::getRoot()->with($key, 'test1');
         $scope1 = $ctx1->activate();
-        $this->assertSame('test1', Context::getValue($key));
+        $this->assertSame('test1', Context::getCurrent()->get($key));
 
         $ctx2 = Context::getRoot()->with($key, 'test2');
         $scope2 = $ctx2->activate();
-        $this->assertSame('test2', Context::getValue($key));
+        $this->assertSame('test2', Context::getCurrent()->get($key));
 
         $scope2->detach();
-        $this->assertSame('test1', Context::getValue($key));
+        $this->assertSame('test1', Context::getCurrent()->get($key));
 
         $scope1->detach();
-        $this->assertNull(Context::getValue($key));
+        $this->assertNull(Context::getCurrent()->get($key));
     }
 
     public function test_detached_scope_detach(): void
