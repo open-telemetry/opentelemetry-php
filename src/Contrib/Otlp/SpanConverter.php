@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Otlp;
 
 use function hex2bin;
-use function iterator_to_array;
 use OpenTelemetry\API\Trace as API;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Common\V1\InstrumentationScope;
@@ -22,14 +21,13 @@ use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use function serialize;
 use function spl_object_id;
 
-class SpanConverter implements SpanConverterInterface
+final class SpanConverter
 {
-    public function convert(iterable $spans): array
+    public function convert(iterable $spans): ExportTraceServiceRequest
     {
         $pExportTraceServiceRequest = new ExportTraceServiceRequest();
 
@@ -74,7 +72,7 @@ class SpanConverter implements SpanConverterInterface
             $pScopeSpans->getSpans()[] = $this->convertSpan($span);
         }
 
-        return iterator_to_array($pExportTraceServiceRequest->getResourceSpans());
+        return $pExportTraceServiceRequest;
     }
 
     private function convertResourceSpans(ResourceInfo $resource): ResourceSpans

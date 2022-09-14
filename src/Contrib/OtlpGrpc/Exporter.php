@@ -8,7 +8,6 @@ use grpc;
 use Grpc\ChannelCredentials;
 use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
-use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
@@ -68,8 +67,6 @@ class Exporter implements SpanExporterInterface
             $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, $timeout) :
             $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
-        $this->setSpanConverter(new SpanConverter());
-
         $this->metadata = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers);
@@ -110,11 +107,7 @@ class Exporter implements SpanExporterInterface
      */
     protected function doExport(iterable $spans): int
     {
-        $resourceSpans = $this->getSpanConverter()->convert($spans);
-
-        $request = new ExportTraceServiceRequest([
-            'resource_spans' => $resourceSpans,
-        ]);
+        $request = (new SpanConverter())->convert($spans);
 
         // @var \Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse|null $response
         [$response, $status] = $this->client->Export($request)->wait();
@@ -134,7 +127,7 @@ class Exporter implements SpanExporterInterface
         }
 
         if ($status->code === \Grpc\STATUS_OK) {
-            self::logDebug('Exported span(s)', ['spans' => $resourceSpans]);
+            self::logDebug('Exported span(s)', ['spans' => $request->getResourceSpans()]);
 
             return self::STATUS_SUCCESS;
         }

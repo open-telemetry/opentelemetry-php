@@ -24,7 +24,7 @@ use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\Contrib\Otlp\SpanConverter
+ * @covers \OpenTelemetry\Contrib\Otlp\SpanConverter
  */
 class OTLPSpanConverterTest extends TestCase
 {
@@ -41,7 +41,8 @@ class OTLPSpanConverterTest extends TestCase
             ->setHasEnded(true);
 
         $converter = new SpanConverter();
-        $row = $converter->convert([$span])[0]->getScopeSpans()[0]->getSpans()[0];
+        /** @psalm-suppress InvalidArgument */
+        $row = $converter->convert([$span])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
 
         $this->assertSame($span->getContext()->getSpanId(), bin2hex($row->getSpanId()));
         $this->assertSame($span->getContext()->getTraceId(), bin2hex($row->getTraceId()));
@@ -68,7 +69,8 @@ class OTLPSpanConverterTest extends TestCase
             ->addAttribute('test.attribute', $actual);
 
         $converter = new SpanConverter();
-        $converted = $converter->convert([$span])[0];
+        /** @psalm-suppress InvalidArgument */
+        $converted = $converter->convert([$span])->getResourceSpans()[0];
         $attributes = $converted->getScopeSpans()[0]->getSpans()[0]->getAttributes();
 
         // Check that we can convert all attributes to tags
@@ -244,8 +246,9 @@ class OTLPSpanConverterTest extends TestCase
             ],
         ]);
 
-        $row = (new SpanConverter())->convert([$sdk]);
+        $row = (new SpanConverter())->convert([$sdk])->getResourceSpans();
 
+        /** @psalm-suppress InvalidArgument */
         $this->assertEquals($expected, $row[0]);
     }
 
@@ -257,7 +260,8 @@ class OTLPSpanConverterTest extends TestCase
         $span->method('getResource')->willReturn($resource);
         $resource->method('getAttributes')->willReturn($attributes);
         $converter = new SpanConverter();
-        $result = $converter->convert([$span, $span, $span]);
+        $result = $converter->convert([$span, $span, $span])->getResourceSpans();
+        /** @psalm-suppress InvalidArgument */
         $this->assertCount(2, $result[0]->getResource()->getAttributes());
     }
 
@@ -269,13 +273,13 @@ class OTLPSpanConverterTest extends TestCase
         $result = $converter->convert([
             (new SpanData())->setResource($resourceA),
             (new SpanData())->setResource($resourceB),
-        ]);
+        ])->getResourceSpans();
         $this->assertCount(2, $result);
     }
 
     public function test_otlp_no_spans(): void
     {
-        $this->assertSame([], (new SpanConverter())->convert([]));
+        $this->assertCount(0, (new SpanConverter())->convert([])->getResourceSpans());
     }
 
     /**
@@ -284,7 +288,8 @@ class OTLPSpanConverterTest extends TestCase
     public function test_span_kind($kind, $expected): void
     {
         $span = (new SpanData())->setKind($kind);
-        $row = (new SpanConverter())->convert([$span])[0]->getScopeSpans()[0]->getSpans()[0];
+        /** @psalm-suppress InvalidArgument */
+        $row = (new SpanConverter())->convert([$span])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
         $this->assertSame($expected, $row->getKind());
     }
 
@@ -303,7 +308,8 @@ class OTLPSpanConverterTest extends TestCase
     public function test_span_with_error_status(): void
     {
         $span = (new SpanData())->setStatus(StatusData::error());
-        $row = (new SpanConverter())->convert([$span])[0]->getScopeSpans()[0]->getSpans()[0];
+        /** @psalm-suppress InvalidArgument */
+        $row = (new SpanConverter())->convert([$span])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
         $this->assertSame(V1\Status\StatusCode::STATUS_CODE_ERROR, $row->getStatus()->getCode());
     }
 }

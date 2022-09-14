@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Contrib;
 
 use InvalidArgumentException;
+use Nyholm\Psr7\Response;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
@@ -45,15 +46,13 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
     public function test_exporter_response_status($responseStatus, $expected): void
     {
         $this->getClientInterfaceMock()->method('sendRequest')
-            ->willReturn(
-                $this->createResponseInterfaceMock($responseStatus)
-            );
+            ->willReturn(new Response($responseStatus));
 
         $this->assertEquals(
-            $expected,
-            $this->createExporter()->export([
+            min(1, $expected),
+            min(1, $this->createExporter()->export([
                 $this->createMock(SpanData::class),
-            ])->await(),
+            ])->await()),
         );
     }
 
@@ -104,10 +103,10 @@ abstract class AbstractHttpExporterTest extends AbstractExporterTest
             ->willThrowException($exception);
 
         $this->assertEquals(
-            $expected,
-            $this->createExporter()->export([
+            min(1, $expected),
+            min(1, $this->createExporter()->export([
                 $this->createMock(SpanData::class),
-            ])->await(),
+            ])->await()),
         );
     }
 

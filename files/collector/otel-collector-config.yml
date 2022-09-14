@@ -8,10 +8,6 @@ receivers:
 exporters:
   zipkin:
     endpoint: "http://zipkin:9411/api/v2/spans"
-  newrelic:
-    apikey: 'ADD_A_LICENSE_KEY_HERE'
-    timeout: 30s
-    host_override: "trace-api.newrelic.com"
   logging:
     loglevel: debug
 
@@ -28,7 +24,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp, zipkin]
-      exporters: [zipkin, logging, newrelic]
+      exporters: [zipkin, logging]
       processors: [batch]
     metrics:
       receivers: [otlp]

@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use function fflush;
-use function fopen;
-use function fwrite;
 use function is_string;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Common\Export\Stream\StreamTransport;
+use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use const STDOUT;
-use function strlen;
+use Throwable;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/stdout.md#opentelemetry-metrics-exporter---standard-output
@@ -20,10 +21,9 @@ use function strlen;
  */
 final class StreamMetricExporter implements MetricExporterInterface
 {
-    /**
-     * @var resource|null
-     */
-    private $stream;
+    use LogsMessagesTrait;
+
+    private TransportInterface $transport;
     /**
      * @var string|Temporality|null
      */
@@ -35,9 +35,9 @@ final class StreamMetricExporter implements MetricExporterInterface
      */
     public function __construct($stream = STDOUT, $temporality = null)
     {
-        $this->stream = is_string($stream)
-            ? @fopen($stream, 'ab')
-            : $stream;
+        $this->transport = is_string($stream)
+            ? (new StreamTransportFactory())->create($stream)
+            : new StreamTransport($stream);
         $this->temporality = $temporality;
     }
 
@@ -48,34 +48,27 @@ final class StreamMetricExporter implements MetricExporterInterface
 
     public function export(iterable $batch): bool
     {
-        if (!$this->stream) {
-            return false;
-        }
-
         $payload = (new MetricConverter())->convert($batch)->serializeToJsonString();
         $payload .= "\n";
 
-        return @fwrite($this->stream, $payload) === strlen($payload);
+        return $this->transport
+            ->send($payload, 'application/x-ndjson')
+            ->map(static fn (): bool => true)
+            ->catch(static function (Throwable $throwable): bool {
+                self::logError('Export failure', ['exception' => $throwable]);
+
+                return false;
+            })
+            ->await();
     }
 
     public function shutdown(): bool
     {
-        if (!$this->stream) {
-            return false;
-        }
-
-        $flush = @fflush($this->stream);
-        $this->stream = null;
-
-        return $flush;
+        return $this->transport->shutdown();
     }
 
     public function forceFlush(): bool
     {
-        if (!$this->stream) {
-            return false;
-        }
-
-        return @fflush($this->stream);
+        return $this->transport->forceFlush();
     }
 }
