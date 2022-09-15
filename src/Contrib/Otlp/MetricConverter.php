@@ -95,6 +95,7 @@ final class MetricConverter
         $pInstrumentationScope = new InstrumentationScope();
         $pInstrumentationScope->setName($instrumentationScope->getName());
         $pInstrumentationScope->setVersion((string) $instrumentationScope->getVersion());
+        $this->setAttributes($pInstrumentationScope, $instrumentationScope->getAttributes());
         $pScopeMetrics->setScope($pInstrumentationScope);
         $pScopeMetrics->setSchemaUrl((string) $instrumentationScope->getSchemaUrl());
 
@@ -230,7 +231,7 @@ final class MetricConverter
     }
 
     /**
-     * @param Resource_|NumberDataPoint|HistogramDataPoint $pElement
+     * @param Resource_|NumberDataPoint|HistogramDataPoint|InstrumentationScope $pElement
      */
     private function setAttributes($pElement, SDK\Common\Attribute\AttributesInterface $attributes): void
     {

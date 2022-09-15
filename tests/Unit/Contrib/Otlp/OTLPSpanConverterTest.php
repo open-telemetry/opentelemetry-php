@@ -166,7 +166,7 @@ class OTLPSpanConverterTest extends TestCase
             ->setStartEpochNanos($start_time)
             ->setEndEpochNanos($end_time)
             ->setName('http_get')
-            ->setInstrumentationScope(new InstrumentationScope('lib-test', 'v0.1.0', 'http://url', Attributes::create([])))
+            ->setInstrumentationScope(new InstrumentationScope('lib-test', 'v0.1.0', 'http://url', Attributes::create(['foo' => 'bar'])))
             ->addAttribute('user', 'alice')
             ->addAttribute('authenticated', true)
             ->addEvent('Event1', Attributes::create(['success' => 'yes']), 1617313804325769955)
@@ -204,6 +204,12 @@ class OTLPSpanConverterTest extends TestCase
                     'scope' => new \Opentelemetry\Proto\Common\V1\InstrumentationScope([
                         'name' => 'lib-test',
                         'version' => 'v0.1.0',
+                        'attributes' => [
+                            new KeyValue([
+                                'key' => 'foo',
+                                'value' => new AnyValue(['string_value' => 'bar']),
+                            ]),
+                        ],
                     ]),
                     'spans' => [
                         new V1\Span([

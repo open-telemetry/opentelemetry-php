@@ -92,6 +92,7 @@ final class SpanConverter
         $pInstrumentationScope = new InstrumentationScope();
         $pInstrumentationScope->setName($instrumentationScope->getName());
         $pInstrumentationScope->setVersion((string) $instrumentationScope->getVersion());
+        $this->setAttributes($pInstrumentationScope, $instrumentationScope->getAttributes());
         $pScopeSpans->setScope($pInstrumentationScope);
         $pScopeSpans->setSchemaUrl((string) $instrumentationScope->getSchemaUrl());
 
@@ -99,7 +100,7 @@ final class SpanConverter
     }
 
     /**
-     * @param Resource_|Span|Event|Link $pElement
+     * @param Resource_|Span|Event|Link|InstrumentationScope $pElement
      */
     private function setAttributes($pElement, AttributesInterface $attributes): void
     {

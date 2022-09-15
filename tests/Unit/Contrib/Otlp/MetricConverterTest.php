@@ -205,4 +205,28 @@ final class MetricConverterTest extends TestCase
             ])->getResourceMetrics(),
         );
     }
+
+    public function test_instrumentation_scope_is_converted(): void
+    {
+        $this->assertJsonStringEqualsJsonString(
+            <<<JSON
+                {"resourceMetrics": [{"resource": {},"scopeMetrics": [{
+                    "metrics": [{"description": "description-1","name": "name-1","unit": "unit-1"}],
+                    "schemaUrl": "http://schema.url",
+                    "scope": {"attributes": [{"key": "foo","value": {"stringValue": "bar"}}],"name": "scope-name","version": "scope-version"}
+                }
+            ]}]}
+            JSON,
+            (new MetricConverter())->convert([
+                new Metric(
+                    new InstrumentationScope('scope-name', 'scope-version', 'http://schema.url', Attributes::create(['foo' => 'bar'])),
+                    ResourceInfoFactory::emptyResource(),
+                    'name-1',
+                    'unit-1',
+                    'description-1',
+                    $this->createMock(DataInterface::class),
+                ),
+            ])->serializeToJsonString(),
+        );
+    }
 }
