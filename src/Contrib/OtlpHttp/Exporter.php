@@ -98,7 +98,7 @@ class Exporter implements SpanExporterInterface
     {
         return $this->transport
             ->send((new SpanConverter())->convert($spans)->serializeToString(), 'application/x-protobuf', $cancellation)
-            ->map(static function (string $payload): int {
+            ->map(static function (string $payload): bool {
                 $serviceResponse = new ExportTraceServiceResponse();
                 $serviceResponse->mergeFromString($payload);
 
@@ -109,18 +109,18 @@ class Exporter implements SpanExporterInterface
                         'error_message' => $partialSuccess->getErrorMessage(),
                     ]);
 
-                    return 1;
+                    return false;
                 }
                 if ($partialSuccess !== null && $partialSuccess->getErrorMessage()) {
                     self::logWarning('Export success with warnings/suggestions', ['error_message' => $partialSuccess->getErrorMessage()]);
                 }
 
-                return 0;
+                return true;
             })
-            ->catch(static function (Throwable $throwable): int {
+            ->catch(static function (Throwable $throwable): bool {
                 self::logError('Export failure', ['exception' => $throwable]);
 
-                return 1;
+                return false;
             });
     }
 

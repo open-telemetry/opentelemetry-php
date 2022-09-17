@@ -105,7 +105,7 @@ class Exporter implements SpanExporterInterface
      * @inheritDoc
      * @psalm-suppress UndefinedConstant
      */
-    protected function doExport(iterable $spans): int
+    protected function doExport(iterable $spans): bool
     {
         $request = (new SpanConverter())->convert($spans);
 
@@ -120,7 +120,7 @@ class Exporter implements SpanExporterInterface
                     'error' => $response->getPartialSuccess()->getErrorMessage(),
                 ]);
 
-                return self::STATUS_FAILED_NOT_RETRYABLE;
+                return false;
             } elseif ($response->getPartialSuccess()->getErrorMessage()) {
                 self::logWarning('Export warning', ['server_message' => $response->getPartialSuccess()->getErrorMessage()]);
             }
@@ -129,7 +129,7 @@ class Exporter implements SpanExporterInterface
         if ($status->code === \Grpc\STATUS_OK) {
             self::logDebug('Exported span(s)', ['spans' => $request->getResourceSpans()]);
 
-            return self::STATUS_SUCCESS;
+            return true;
         }
 
         $error = [
@@ -150,12 +150,12 @@ class Exporter implements SpanExporterInterface
         ], true)) {
             self::logWarning('Retryable error exporting grpc span', ['error' => $error]);
 
-            return self::STATUS_FAILED_RETRYABLE;
+            return false;
         }
 
         self::logError('Error exporting grpc span', ['error' => $error]);
 
-        return self::STATUS_FAILED_NOT_RETRYABLE;
+        return false;
     }
 
     public function setHeader($key, $value): void

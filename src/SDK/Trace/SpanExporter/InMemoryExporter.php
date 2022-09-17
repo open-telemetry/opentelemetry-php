@@ -24,13 +24,13 @@ class InMemoryExporter implements SpanExporterInterface
         return new self();
     }
 
-    protected function doExport(iterable $spans): int
+    protected function doExport(iterable $spans): bool
     {
         foreach ($spans as $span) {
             $this->storage[] = $span;
         }
 
-        return SpanExporterInterface::STATUS_SUCCESS;
+        return true;
     }
 
     public function getSpans(): array

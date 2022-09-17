@@ -39,14 +39,11 @@ class HttpCollectorExporter implements SpanExporterInterface
         );
     }
 
-    /**
-     * @psalm-return SpanExporterInterface::STATUS_*
-     */
-    public function doExport(iterable $spans): int
+    public function doExport(iterable $spans): bool
     {
         $this->sender->send($spans);
 
-        return SpanExporterInterface::STATUS_SUCCESS;
+        return true;
     }
 
     /** @inheritDoc */
