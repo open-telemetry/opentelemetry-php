@@ -8,7 +8,7 @@ use ArrayAccess;
 
 interface ContextStorageScopeInterface extends ScopeInterface, ArrayAccess
 {
-    public function context(): Context;
+    public function context(): ContextInterface;
 
     /**
      * @param string $offset

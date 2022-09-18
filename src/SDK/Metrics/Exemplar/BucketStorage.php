@@ -6,10 +6,9 @@ namespace OpenTelemetry\SDK\Metrics\Exemplar;
 
 use function array_fill;
 use function assert;
-use function class_exists;
 use function count;
 use OpenTelemetry\API\Trace\Span;
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\Data\Exemplar;
@@ -33,7 +32,7 @@ final class BucketStorage
      * @param int|string $index
      * @param float|int $value
      */
-    public function store(int $bucket, $index, $value, AttributesInterface $attributes, Context $context, int $timestamp, int $revision): void
+    public function store(int $bucket, $index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp, int $revision): void
     {
         assert($bucket <= count($this->buckets));
 
@@ -44,7 +43,7 @@ final class BucketStorage
         $exemplar->attributes = $attributes;
         $exemplar->revision = $revision;
 
-        if (class_exists(Span::class) && ($spanContext = Span::fromContext($context)->getContext())->isValid()) {
+        if (($spanContext = Span::fromContext($context)->getContext())->isValid()) {
             $exemplar->traceId = $spanContext->getTraceId();
             $exemplar->spanId = $spanContext->getSpanId();
         } else {

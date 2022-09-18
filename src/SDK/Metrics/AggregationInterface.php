@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
@@ -26,7 +26,7 @@ interface AggregationInterface
      * @psalm-param T $summary
      * @psalm-param float|int $value
      */
-    public function record($summary, $value, AttributesInterface $attributes, Context $context, int $timestamp): void;
+    public function record($summary, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void;
 
     /**
      * @psalm-param T $left

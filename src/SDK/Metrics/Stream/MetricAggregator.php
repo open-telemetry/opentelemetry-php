@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
@@ -40,7 +40,7 @@ final class MetricAggregator implements WritableMetricStreamInterface
     /**
      * @param float|int $value
      */
-    public function record($value, AttributesInterface $attributes, Context $context, int $timestamp): void
+    public function record($value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $filteredAttributes = $this->attributeProcessor !== null
             ? $this->attributeProcessor->process($attributes, $context)

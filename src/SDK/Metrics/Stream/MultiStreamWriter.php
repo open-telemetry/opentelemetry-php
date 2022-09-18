@@ -31,10 +31,7 @@ final class MultiStreamWriter implements MetricWriterInterface
 
     public function record($value, iterable $attributes, $context, int $timestamp): void
     {
-        $context = $context
-            ?? ($this->contextStorage ?? Context::storage())->current()
-            ?: Context::getRoot();
-
+        $context = Context::resolve($context, $this->contextStorage);
         $attributes = $this->attributesFactory->builder($attributes)->build();
         foreach ($this->streams as $stream) {
             $stream->record($value, $attributes, $context, $timestamp);

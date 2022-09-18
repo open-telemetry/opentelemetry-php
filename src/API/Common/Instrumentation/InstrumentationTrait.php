@@ -11,7 +11,7 @@ use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
-use OpenTelemetry\Context\Propagation\NullPropagator;
+use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -183,7 +183,7 @@ trait InstrumentationTrait
 
     private function initDefaults(): void
     {
-        $this->propagator = new NullPropagator();
+        $this->propagator = new NoopTextMapPropagator();
         $this->tracer = new NoopTracer();
         $this->tracerProvider = new NoopTracerProvider();
         /** @phan-suppress-next-line PhanAccessMethodInternal */

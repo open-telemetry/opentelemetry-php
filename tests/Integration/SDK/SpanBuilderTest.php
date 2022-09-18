@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Integration\SDK\Trace;
+namespace OpenTelemetry\Tests\Integration\SDK;
 
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
@@ -10,6 +10,7 @@ use Mockery\MockInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Link;
@@ -336,7 +337,7 @@ class SpanBuilderTest extends MockeryTestCase
     {
         $sampler = new class() implements SamplerInterface {
             public function shouldSample(
-                Context $parentContext,
+                ContextInterface $parentContext,
                 string $traceId,
                 string $spanName,
                 int $spanKind,
@@ -473,7 +474,7 @@ class SpanBuilderTest extends MockeryTestCase
         $parentScope = $parentSpan->activate();
 
         /** @var Span $span */
-        $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setNoParent()->startSpan();
+        $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setParent(false)->startSpan();
 
         $this->assertNotSame(
             $span->getContext()->getTraceId(),
@@ -490,9 +491,9 @@ class SpanBuilderTest extends MockeryTestCase
         $spanNoParent = $this
             ->tracer
             ->spanBuilder(self::SPAN_NAME)
-            ->setNoParent()
+            ->setParent(false)
             ->setParent(Context::getCurrent())
-            ->setNoParent()
+            ->setParent(false)
             ->startSpan();
 
         $this->assertNotSame($span->getContext()->getTraceId(), $spanNoParent->getContext()->getTraceId());
@@ -515,7 +516,7 @@ class SpanBuilderTest extends MockeryTestCase
         $parentContext = Context::getCurrent()->withContextValue($parentSpan);
 
         /** @var Span $span */
-        $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setNoParent()->setParent($parentContext)->startSpan();
+        $span = $this->tracer->spanBuilder(self::SPAN_NAME)->setParent(false)->setParent($parentContext)->startSpan();
 
         $this
             ->spanProcessor
@@ -538,7 +539,7 @@ class SpanBuilderTest extends MockeryTestCase
         $span2 = $this
             ->tracer
             ->spanBuilder(self::SPAN_NAME)
-            ->setNoParent()
+            ->setParent(false)
             ->setParent($parentContext2)
             ->startSpan();
 

@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
+use function assert;
 use function spl_object_id;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/README.md#context
  */
-final class Context
+final class Context implements ContextInterface
 {
     /** @var ContextStorageInterface&ExecutionContextAwareInterface */
     private static ContextStorageInterface $storage;
 
     // Optimization for spans to avoid copying the context array.
-    private static ContextKey $spanContextKey;
+    private static ContextKeyInterface $spanContextKey;
     private ?object $span = null;
     /** @var array<int, mixed> */
     private array $context = [];
-    /** @var array<int, ContextKey> */
+    /** @var array<int, ContextKeyInterface> */
     private array $contextKeys = [];
 
     private function __construct()
@@ -27,7 +28,7 @@ final class Context
         self::$spanContextKey = ContextKeys::span();
     }
 
-    public static function createKey(string $key): ContextKey
+    public static function createKey(string $key): ContextKeyInterface
     {
         return new ContextKey($key);
     }
@@ -52,16 +53,28 @@ final class Context
     }
 
     /**
+     * @param ContextInterface|false|null $context
+     *
      * @internal
      */
-    public static function getRoot(): Context
+    public static function resolve($context, ?ContextStorageInterface $contextStorage = null): ContextInterface
+    {
+        return $context
+            ?? ($contextStorage ?? self::storage())->current()
+            ?: self::getRoot();
+    }
+
+    /**
+     * @internal
+     */
+    public static function getRoot(): ContextInterface
     {
         static $empty;
 
         return $empty ??= new self();
     }
 
-    public static function getCurrent(): Context
+    public static function getCurrent(): ContextInterface
     {
         return self::storage()->current();
     }
@@ -75,12 +88,12 @@ final class Context
         return $scope;
     }
 
-    public function withContextValue(ImplicitContextKeyedInterface $value): Context
+    public function withContextValue(ImplicitContextKeyedInterface $value): ContextInterface
     {
         return $value->storeInContext($this);
     }
 
-    public function with(ContextKey $key, $value): self
+    public function with(ContextKeyInterface $key, $value): self
     {
         if ($this->get($key) === $value) {
             return $this;
@@ -108,9 +121,10 @@ final class Context
         return $self;
     }
 
-    public function get(ContextKey $key)
+    public function get(ContextKeyInterface $key)
     {
         if ($key === self::$spanContextKey) {
+            /** @psalm-suppress InvalidReturnStatement */
             return $this->span;
         }
 

@@ -49,7 +49,7 @@ final class FiberBoundContextStorageScope implements ScopeInterface, ContextStor
         $this->scope->offsetUnset($offset);
     }
 
-    public function context(): Context
+    public function context(): ContextInterface
     {
         return $this->scope->context();
     }

@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 use function assert;
 use function count;
 use InvalidArgumentException;
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
@@ -85,7 +85,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         $this->flush = new SplQueue();
     }
 
-    public function onStart(ReadWriteSpanInterface $span, Context $parentContext): void
+    public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void
     {
     }
 

@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use function get_class;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesBuilderInterface;
 use OpenTelemetry\SDK\Common\Dev\Compatibility\Util as BcUtil;
 use OpenTelemetry\SDK\Common\Exception\StackTraceFormatter;
@@ -114,7 +114,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         InstrumentationScopeInterface $instrumentationScope,
         int $kind,
         API\SpanInterface $parentSpan,
-        Context $parentContext,
+        ContextInterface $parentContext,
         SpanLimits $spanLimits,
         SpanProcessorInterface $spanProcessor,
         ResourceInfo $resource,

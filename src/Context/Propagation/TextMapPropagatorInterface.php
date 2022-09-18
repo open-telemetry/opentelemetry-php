@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context\Propagation;
 
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/api-propagators.md#textmap-propagator
@@ -21,20 +21,20 @@ interface TextMapPropagatorInterface
     public function fields() : array;
 
     /**
-     * Injects specific values from the provided {@see Context} into the provided carrier
+     * Injects specific values from the provided {@see ContextInterface} into the provided carrier
      * via an {@see PropagationSetterInterface}.
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/api-propagators.md#textmap-inject
      *
      * @param mixed $carrier
      */
-    public function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void;
+    public function inject(&$carrier, PropagationSetterInterface $setter = null, ContextInterface $context = null): void;
 
     /**
-     * Extracts specific values from the provided carrier into the provided {@see Context}
+     * Extracts specific values from the provided carrier into the provided {@see ContextInterface}
      * via an {@see PropagationGetterInterface}.
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/api-propagators.md#textmap-extract
      */
-    public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context;
+    public function extract($carrier, PropagationGetterInterface $getter = null, ContextInterface $context = null): ContextInterface;
 }

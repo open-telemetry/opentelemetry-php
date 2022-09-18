@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\Sampler;
 
 use InvalidArgumentException;
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
@@ -40,7 +40,7 @@ class TraceIdRatioBasedSampler implements SamplerInterface
      * {@inheritdoc}
      */
     public function shouldSample(
-        Context $parentContext,
+        ContextInterface $parentContext,
         string $traceId,
         string $spanName,
         int $spanKind,

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
-final class ContextKey
+/**
+ * @internal
+ */
+final class ContextKey implements ContextKeyInterface
 {
     private ?string $name;
 

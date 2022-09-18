@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Baggage;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Context\ScopeInterface;
 
@@ -13,13 +14,9 @@ final class Baggage implements BaggageInterface
     private static ?self $emptyBaggage = null;
 
     /** @inheritDoc */
-    public static function fromContext(Context $context): BaggageInterface
+    public static function fromContext(ContextInterface $context): BaggageInterface
     {
-        if ($baggage = $context->get(ContextKeys::baggage())) {
-            return $baggage;
-        }
-
-        return self::getEmpty();
+        return $context->get(ContextKeys::baggage()) ?? self::getEmpty();
     }
 
     /** @inheritDoc */
@@ -96,7 +93,7 @@ final class Baggage implements BaggageInterface
     }
 
     /** @inheritDoc */
-    public function storeInContext(Context $context): Context
+    public function storeInContext(ContextInterface $context): ContextInterface
     {
         return $context->with(ContextKeys::baggage(), $this);
     }

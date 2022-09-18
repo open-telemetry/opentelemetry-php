@@ -10,6 +10,7 @@ use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
@@ -359,12 +360,12 @@ class TraceContextPropagatorTest extends TestCase
         );
     }
 
-    private function getSpanContext(Context $context): SpanContextInterface
+    private function getSpanContext(ContextInterface $context): SpanContextInterface
     {
         return Span::fromContext($context)->getContext();
     }
 
-    private function withSpanContext(SpanContextInterface $spanContext, Context $context): Context
+    private function withSpanContext(SpanContextInterface $spanContext, ContextInterface $context): ContextInterface
     {
         return $context->withContextValue(Span::wrap($spanContext));
     }

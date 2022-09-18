@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Context;
 
 /**
- * Represents a value that can be sored within {@see Context}.
- * Allows storing themselves without exposing a {@see ContextKey}.
+ * Represents a value that can be stored within {@see ContextInterface}.
+ * Allows storing themselves without exposing a {@see ContextKeyInterface}.
  *
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#context-interaction
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/baggage/api.md#context-interaction
@@ -26,8 +26,7 @@ interface ImplicitContextKeyedInterface
     public function activate(): ScopeInterface;
 
     /**
-     * Returns a new {@see Context} created by setting `$this` into the provided [@see Context}.
-     * It is suggested to use {@see Context::withContextValue()} instead of using this method directly.
+     * Returns a new {@see ContextInterface} created by setting `$this` into the provided [@see ContextInterface}.
      */
-    public function storeInContext(Context $context): Context;
+    public function storeInContext(ContextInterface $context): ContextInterface;
 }

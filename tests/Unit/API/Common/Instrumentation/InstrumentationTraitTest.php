@@ -12,7 +12,7 @@ use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
-use OpenTelemetry\Context\Propagation\NullPropagator;
+use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -32,7 +32,7 @@ class InstrumentationTraitTest extends TestCase
     {
         $instrumentation = $this->createValidImplementation();
 
-        $this->assertInstanceOf(NullPropagator::class, $instrumentation->getPropagator());
+        $this->assertInstanceOf(NoopTextMapPropagator::class, $instrumentation->getPropagator());
 
         $propagator = $this->createMock(TextMapPropagatorInterface::class);
 

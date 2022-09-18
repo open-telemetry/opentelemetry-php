@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Context\Swoole;
 
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ContextStorageScopeInterface;
 use OpenTelemetry\Context\ScopeInterface;
 
@@ -46,7 +46,7 @@ final class SwooleContextScope implements ScopeInterface, ContextStorageScopeInt
         $this->scope->offsetUnset($offset);
     }
 
-    public function context(): Context
+    public function context(): ContextInterface
     {
         return $this->scope->context();
     }

@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Context\Swoole;
 
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\Context\ContextStorageScopeInterface;
 use OpenTelemetry\Context\ExecutionContextAwareInterface;
@@ -58,14 +58,14 @@ final class SwooleContextStorage implements ContextStorageInterface, ExecutionCo
         return new SwooleContextScope($scope, $this->handler);
     }
 
-    public function current(): Context
+    public function current(): ContextInterface
     {
         $this->handler->switchToActiveCoroutine();
 
         return $this->storage->current();
     }
 
-    public function attach(Context $context): ContextStorageScopeInterface
+    public function attach(ContextInterface $context): ContextStorageScopeInterface
     {
         $this->handler->switchToActiveCoroutine();
         $this->handler->splitOffChildCoroutines();

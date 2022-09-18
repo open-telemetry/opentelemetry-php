@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 /**
@@ -15,5 +15,5 @@ interface WritableMetricStreamInterface
     /**
      * @param float|int $value
      */
-    public function record($value, AttributesInterface $attributes, Context $context, int $timestamp): void;
+    public function record($value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void;
 }
