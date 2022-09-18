@@ -39,10 +39,7 @@ class AgentExporter implements SpanExporterInterface
         $this->jaegerTransport->close();
     }
 
-    /**
-     * @psalm-return SpanExporterInterface::STATUS_*
-     */
-    public function doExport(iterable $spans): int
+    public function doExport(iterable $spans): bool
     {
         // UDP Transport begins here after converting to thrift format span
         foreach ($spans as $span) {
@@ -52,7 +49,7 @@ class AgentExporter implements SpanExporterInterface
             );
         }
 
-        return SpanExporterInterface::STATUS_SUCCESS;
+        return true;
     }
 
     /** @inheritDoc */

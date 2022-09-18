@@ -21,7 +21,7 @@ class ConsoleSpanExporter implements SpanExporterInterface
     }
 
     /** @inheritDoc */
-    public function doExport(iterable $spans): int
+    public function doExport(iterable $spans): bool
     {
         try {
             foreach ($spans as $span) {
@@ -32,10 +32,10 @@ class ConsoleSpanExporter implements SpanExporterInterface
                 );
             }
         } catch (Throwable $t) {
-            return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
+            return false;
         }
 
-        return SpanExporterInterface::STATUS_SUCCESS;
+        return true;
     }
 
     public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)

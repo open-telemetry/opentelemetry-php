@@ -15,20 +15,20 @@ trait SpanExporterDecoratorTrait
 
     /**
      * @param iterable<SpanDataInterface> $spans
-     * @return FutureInterface<int>
+     * @return FutureInterface<bool>
      */
     public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
     {
         $spans = $this->beforeExport($spans);
         $response = $this->decorated->export($spans, $cancellation);
-        $response->map(fn (int $result) => $this->afterExport($spans, $result));
+        $response->map(fn (bool $result) => $this->afterExport($spans, $result));
 
         return $response;
     }
 
     abstract protected function beforeExport(iterable $spans): iterable;
 
-    abstract protected function afterExport(iterable $spans, int $exporterResponse): void;
+    abstract protected function afterExport(iterable $spans, bool $exportSuccess): void;
 
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {

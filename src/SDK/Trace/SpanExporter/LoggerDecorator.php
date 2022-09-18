@@ -21,18 +21,6 @@ class LoggerDecorator implements SpanExporterInterface, LoggerAwareInterface
     use UsesSpanConverterTrait;
     use LoggerAwareTrait;
 
-    private const RESPONSE_MAPPING = [
-        SpanExporterInterface::STATUS_SUCCESS =>  LogLevel::INFO,
-        SpanExporterInterface::STATUS_FAILED_RETRYABLE =>  LogLevel::ERROR,
-        SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE =>  LogLevel::ALERT,
-    ];
-
-    private const MESSAGE_MAPPING = [
-        SpanExporterInterface::STATUS_SUCCESS =>  'Status Success',
-        SpanExporterInterface::STATUS_FAILED_RETRYABLE =>  'Status Failed Retryable',
-        SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE =>  'Status Failed Not Retryable',
-    ];
-
     public function __construct(
         SpanExporterInterface $decorated,
         ?LoggerInterface $logger = null,
@@ -57,14 +45,22 @@ class LoggerDecorator implements SpanExporterInterface, LoggerAwareInterface
 
     /**
      * @param iterable $spans
-     * @param int $exporterResponse
+     * @param bool $exportSuccess
      */
-    protected function afterExport(iterable $spans, int $exporterResponse): void
+    protected function afterExport(iterable $spans, bool $exportSuccess): void
     {
-        $this->log(
-            self::MESSAGE_MAPPING[$exporterResponse],
-            $this->getSpanConverter()->convert($spans),
-            self::RESPONSE_MAPPING[$exporterResponse]
-        );
+        if ($exportSuccess) {
+            $this->log(
+                'Status Success',
+                $this->getSpanConverter()->convert($spans),
+                LogLevel::INFO,
+            );
+        } else {
+            $this->log(
+                'Status Failed Retryable',
+                $this->getSpanConverter()->convert($spans),
+                LogLevel::ERROR,
+            );
+        }
     }
 }

@@ -84,11 +84,11 @@ class Exporter implements SpanExporterInterface
     {
         return $this->transport
             ->send($this->serializeTrace($spans), 'application/json', $cancellation)
-            ->map(static fn (): int => 0)
-            ->catch(static function (Throwable $throwable): int {
+            ->map(static fn (): bool => true)
+            ->catch(static function (Throwable $throwable): bool {
                 self::logError('Export failure', ['exception' => $throwable]);
 
-                return 1;
+                return false;
             });
     }
 

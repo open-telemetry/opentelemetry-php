@@ -6,7 +6,6 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
 
 use Exception;
 use OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter;
-use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 /**
  * @covers \OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter
@@ -47,8 +46,7 @@ class LoggerExporterTest extends AbstractExporterTest
             ->expects($this->once())
             ->method('log');
 
-        $this->assertSame(
-            SpanExporterInterface::STATUS_SUCCESS,
+        $this->assertTrue(
             $this->createLoggerExporter(LoggerExporter::GRANULARITY_AGGREGATE)
                 ->export(
                     $this->createSpanMocks()
@@ -69,8 +67,7 @@ class LoggerExporterTest extends AbstractExporterTest
             ->expects($this->exactly(count($spans)))
             ->method('log');
 
-        $this->assertSame(
-            SpanExporterInterface::STATUS_SUCCESS,
+        $this->assertTrue(
             $this->createLoggerExporter(LoggerExporter::GRANULARITY_SPAN)
                 ->export($spans)
                 ->await(),
@@ -87,8 +84,7 @@ class LoggerExporterTest extends AbstractExporterTest
             ->method('log')
             ->willThrowException(new Exception());
 
-        $this->assertSame(
-            SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE,
+        $this->assertFalse(
             $this->createLoggerExporter()
                 ->export(
                     $this->createSpanMocks()
