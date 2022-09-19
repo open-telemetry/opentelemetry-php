@@ -3,6 +3,7 @@
 /** @noinspection PhpUndefinedMethodInspection */
 /** @phan-file-suppress PhanUndeclaredClassCatch */
 /** @phan-file-suppress PhanUndeclaredClassMethod */
+/** @phan-file-suppress PhanUndeclaredMethod */
 
 declare(strict_types=1);
 
@@ -17,6 +18,9 @@ use const PHP_VERSION_ID;
 use function sprintf;
 use function trigger_error;
 
+/**
+ * @internal
+ */
 final class ZendObserverFiber
 {
     public static function isEnabled(): bool
