@@ -19,7 +19,10 @@
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\Context\\": "."
-        }
+        },
+        "files": [
+            "fiber/initialize_fiber_handler.php"
+        ]
     },
     "suggest": {
         "ext-ffi": "To allow context switching in Fibers"
