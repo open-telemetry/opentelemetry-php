@@ -28,15 +28,18 @@ final class SpanContext implements SpanContextInterface
         bool $isRemote,
         TraceStateInterface $traceState = null
     ) {
-        $this->traceId = $traceId;
-        $this->spanId = $spanId;
+        $this->isValid=true;
+        
         // TraceId must be exactly 16 bytes (32 chars) and at least one non-zero byte
         // SpanId must be exactly 8 bytes (16 chars) and at least one non-zero byte
-        $this->isValid = SpanContextValidator::isValidTraceId($this->traceId) && SpanContextValidator::isValidSpanId($this->spanId);
-        if (!$this->isValid) {
-            $this->traceId = SpanContextValidator::INVALID_TRACE;
-            $this->spanId = SpanContextValidator::INVALID_SPAN;
+        if (!SpanContextValidator::isValidTraceId($traceId) || !SpanContextValidator::isValidSpanId($spanId)) {
+            $traceId = SpanContextValidator::INVALID_TRACE;
+            $spanId = SpanContextValidator::INVALID_SPAN;
+            $this->isValid=false;
         }
+
+        $this->traceId = $traceId;
+        $this->spanId = $spanId;
         $this->traceState = $traceState;
         $this->isRemote = $isRemote;
         $this->isSampled = ($traceFlags & self::TRACE_FLAG_SAMPLED) === self::TRACE_FLAG_SAMPLED;
