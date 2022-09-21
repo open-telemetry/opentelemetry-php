@@ -1,7 +1,7 @@
 {
     "name": "open-telemetry/context",
     "description": "Context implementation for OpenTelemetry PHP.",
-    "keywords": ["opentelemetry", "otel", "metrics", "tracing", "logging", "apm", "context"],
+    "keywords": ["opentelemetry", "otel", "context"],
     "type": "library",
     "license": "Apache-2.0",
     "authors": [
