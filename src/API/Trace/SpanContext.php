@@ -80,13 +80,25 @@ final class SpanContext implements SpanContextInterface
     }
 
     /** @inheritDoc */
-    public static function createSpanContext(string $traceId, string $spanId, bool $isRemote, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface
+    public static function createFromRemoteParent(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface
     {
-        return new SpanContext(
+        return new self(
             $traceId,
             $spanId,
             $traceFlags,
-            $isRemote,
+            true,
+            $traceState,
+        );
+    }
+
+    /** @inheritDoc */
+    public static function create(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface
+    {
+        return new self(
+            $traceId,
+            $spanId,
+            $traceFlags,
+            false,
             $traceState,
         );
     }
@@ -95,7 +107,7 @@ final class SpanContext implements SpanContextInterface
     public static function getInvalid(): SpanContextInterface
     {
         if (null === self::$invalidContext) {
-            self::$invalidContext = self::createSpanContext(SpanContextValidator::INVALID_TRACE, SpanContextValidator::INVALID_SPAN, false, 0);
+            self::$invalidContext = self::create(SpanContextValidator::INVALID_TRACE, SpanContextValidator::INVALID_SPAN, 0);
         }
 
         return self::$invalidContext;

@@ -9,7 +9,6 @@ use function explode;
 use function hexdec;
 use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
-use OpenTelemetry\API\Trace\SpanContextFactory;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\API\Trace\TraceState;
@@ -138,7 +137,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
         if ($rawTracestate !== null) {
             $tracestate = new TraceState($rawTracestate);
 
-            return SpanContextFactory::createFromRemoteParent(
+            return SpanContext::createFromRemoteParent(
                 $traceId,
                 $spanId,
                 $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT,
@@ -147,7 +146,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
         }
 
         // Only traceparent header is extracted. No tracestate.
-        return SpanContextFactory::createFromRemoteParent(
+        return SpanContext::createFromRemoteParent(
             $traceId,
             $spanId,
             $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT

@@ -8,7 +8,6 @@ use function count;
 use function explode;
 use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
-use OpenTelemetry\API\Trace\SpanContextFactory;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
@@ -168,7 +167,7 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
         $sampled = self::processSampledValue($samplingState);
         $isSampled = ($sampled === SpanContextInterface::TRACE_FLAG_SAMPLED);
 
-        return SpanContextFactory::createFromRemoteParent(
+        return SpanContext::createFromRemoteParent(
             $traceId,
             $spanId,
             $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT

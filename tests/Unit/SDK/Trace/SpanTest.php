@@ -12,7 +12,6 @@ use Mockery\MockInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
-use OpenTelemetry\API\Trace\SpanContextFactory;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -83,7 +82,7 @@ class SpanTest extends MockeryTestCase
         $this->spanId = $this->idGenerator->generateSpanId();
         $this->parentSpanId = $this->idGenerator->generateSpanId();
 
-        $this->spanContext = SpanContextFactory::create($this->traceId, $this->spanId);
+        $this->spanContext = SpanContext::create($this->traceId, $this->spanId);
         $this->testClock = new TestClock(self::START_EPOCH);
 
         $this->link = new Link($this->spanContext, Attributes::create([]));
@@ -778,7 +777,7 @@ class SpanTest extends MockeryTestCase
             $this->spanContext,
             $this->instrumentationScope,
             $kind,
-            $parentSpanId ? Span::wrap(SpanContextFactory::create($this->traceId, $parentSpanId)) : Span::getInvalid(),
+            $parentSpanId ? Span::wrap(SpanContext::create($this->traceId, $parentSpanId)) : Span::getInvalid(),
             Context::getRoot(),
             $spanLimits,
             $this->spanProcessor,

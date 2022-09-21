@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Extension\Propagator\B3;
 
-use OpenTelemetry\API\Trace\SpanContextFactory;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
@@ -64,7 +64,7 @@ class B3MultiPropagatorTest extends TestCase
                 $carrier,
                 null,
                 $this->withSpanContext(
-                    SpanContextFactory::create(
+                    SpanContext::create(
                         SpanContextValidator::INVALID_TRACE,
                         SpanContextValidator::INVALID_SPAN,
                         SpanContextInterface::TRACE_FLAG_SAMPLED
@@ -84,7 +84,7 @@ class B3MultiPropagatorTest extends TestCase
                 $carrier,
                 null,
                 $this->withSpanContext(
-                    SpanContextFactory::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+                    SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
                     Context::getCurrent()
                 )
             );
@@ -108,7 +108,7 @@ class B3MultiPropagatorTest extends TestCase
                 $carrier,
                 null,
                 $this->withSpanContext(
-                    SpanContextFactory::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),
+                    SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),
                     Context::getCurrent()
                 )
             );
@@ -132,7 +132,7 @@ class B3MultiPropagatorTest extends TestCase
                 $carrier,
                 null,
                 $this->withSpanContext(
-                    SpanContextFactory::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+                    SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
                     Context::getCurrent()
                 )->with(B3DebugFlagContextKey::instance(), self::IS_SAMPLED)
             );
@@ -156,7 +156,7 @@ class B3MultiPropagatorTest extends TestCase
                 $carrier,
                 null,
                 $this->withSpanContext(
-                    SpanContextFactory::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT),
+                    SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT),
                     Context::getCurrent()
                 )->with(B3DebugFlagContextKey::instance(), self::IS_SAMPLED)
             );
@@ -195,7 +195,7 @@ class B3MultiPropagatorTest extends TestCase
         );
 
         $this->assertEquals(
-            SpanContextFactory::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
             $this->getSpanContext($context)
         );
     }
@@ -217,7 +217,7 @@ class B3MultiPropagatorTest extends TestCase
         );
 
         $this->assertEquals(
-            SpanContextFactory::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
             $this->getSpanContext($context)
         );
     }
@@ -239,7 +239,7 @@ class B3MultiPropagatorTest extends TestCase
         );
 
         $this->assertEquals(
-            SpanContextFactory::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
             $this->getSpanContext($context)
         );
     }
@@ -256,7 +256,7 @@ class B3MultiPropagatorTest extends TestCase
         ];
 
         $this->assertEquals(
-            SpanContextFactory::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
             $this->getSpanContext($this->b3MultiPropagator->extract($carrier))
         );
     }
@@ -283,7 +283,7 @@ class B3MultiPropagatorTest extends TestCase
         ];
 
         $this->assertEquals(
-            SpanContextFactory::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),
             $this->getSpanContext($this->b3MultiPropagator->extract($carrier))
         );
     }
@@ -315,7 +315,7 @@ class B3MultiPropagatorTest extends TestCase
         $this->assertNull($context->get(B3DebugFlagContextKey::instance()));
 
         $this->assertEquals(
-            SpanContextFactory::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
             $this->getSpanContext($context)
         );
     }
@@ -337,7 +337,7 @@ class B3MultiPropagatorTest extends TestCase
         $this->assertNull($context->get(B3DebugFlagContextKey::instance()));
 
         $this->assertEquals(
-            SpanContextFactory::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT),
             $this->getSpanContext($context)
         );
     }
@@ -364,7 +364,7 @@ class B3MultiPropagatorTest extends TestCase
         ];
 
         $this->assertEquals(
-            SpanContextFactory::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16),
             $this->getSpanContext($this->b3MultiPropagator->extract($carrier))
         );
     }

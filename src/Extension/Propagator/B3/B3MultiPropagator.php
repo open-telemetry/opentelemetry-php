@@ -6,7 +6,6 @@ namespace OpenTelemetry\Extension\Propagator\B3;
 
 use OpenTelemetry\API\Trace\AbstractSpan;
 use OpenTelemetry\API\Trace\SpanContext;
-use OpenTelemetry\API\Trace\SpanContextFactory;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
@@ -180,7 +179,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
         }
 
         // Only traceparent header is extracted. No tracestate.
-        return SpanContextFactory::createFromRemoteParent(
+        return SpanContext::createFromRemoteParent(
             $traceId,
             $spanId,
             $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT
