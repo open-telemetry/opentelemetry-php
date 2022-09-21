@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Integration\SDK\Context;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;
 use PHPUnit\Framework\TestCase;
@@ -21,8 +22,8 @@ class SpanContextTest extends TestCase
     public function test_invalid_span(string $traceId, string $spanId): void
     {
         $spanContext = SpanContext::create($traceId, $spanId);
-        $this->assertSame(SpanContext::INVALID_TRACE, $spanContext->getTraceId());
-        $this->assertSame(SpanContext::INVALID_SPAN, $spanContext->getSpanId());
+        $this->assertSame(SpanContextValidator::INVALID_TRACE, $spanContext->getTraceId());
+        $this->assertSame(SpanContextValidator::INVALID_SPAN, $spanContext->getSpanId());
     }
 
     public function invalidSpanData(): array

@@ -9,6 +9,7 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -637,7 +638,7 @@ class SpanBuilderTest extends MockeryTestCase
             $parentSpan->getContext()->getTraceId()
         );
 
-        $this->assertFalse(SpanContext::isValidSpanId($span->toSpanData()->getParentSpanId()));
+        $this->assertFalse(SpanContextValidator::isValidSpanId($span->toSpanData()->getParentSpanId()));
 
         $span->end();
         $parentSpan->end();

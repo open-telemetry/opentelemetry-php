@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\Extension\Propagator\B3;
 
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3DebugFlagContextKey;
@@ -65,9 +66,9 @@ class B3MultiPropagatorTest extends TestCase
                 null,
                 $this->withSpanContext(
                     SpanContext::create(
-                        SpanContext::INVALID_TRACE,
-                        SpanContext::INVALID_SPAN,
-                        SpanContext::SAMPLED_FLAG
+                        SpanContextValidator::INVALID_TRACE,
+                        SpanContextValidator::INVALID_SPAN,
+                        SpanContextInterface::TRACE_FLAG_SAMPLED
                     ),
                     Context::getCurrent()
                 )

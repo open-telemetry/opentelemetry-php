@@ -10,6 +10,7 @@ use function hexdec;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
@@ -114,10 +115,10 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
          * - Version is invalid (not 2 char hex or 'ff')
          * - Trace version, trace ID, span ID or trace flag are invalid
          */
-        if (!SpanContext::isValidTraceVersion($version)
-            || !SpanContext::isValidTraceId($traceId)
-            || !SpanContext::isValidSpanId($spanId)
-            || !SpanContext::isValidTraceFlag($traceFlags)
+        if (!TraceContextValidator::isValidTraceVersion($version)
+            || !SpanContextValidator::isValidTraceId($traceId)
+            || !SpanContextValidator::isValidSpanId($spanId)
+            || !TraceContextValidator::isValidTraceFlag($traceFlags)
         ) {
             return SpanContext::getInvalid();
         }
@@ -130,7 +131,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
 
         // Only the sampled flag is extracted from the traceFlags (00000001)
         $convertedTraceFlags = hexdec($traceFlags);
-        $isSampled = ($convertedTraceFlags & SpanContext::SAMPLED_FLAG) === SpanContext::SAMPLED_FLAG;
+        $isSampled = ($convertedTraceFlags & SpanContextInterface::TRACE_FLAG_SAMPLED) === SpanContextInterface::TRACE_FLAG_SAMPLED;
 
         // Tracestate = 'Vendor1=Value1,...,VendorN=ValueN'
         $rawTracestate = $getter->get($carrier, self::TRACESTATE);

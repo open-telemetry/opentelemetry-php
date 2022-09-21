@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\API\Unit\Trace\Propagation;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
@@ -60,9 +61,9 @@ class TraceContextPropagatorTest extends TestCase
                 null,
                 $this->withSpanContext(
                     SpanContext::create(
-                        SpanContext::INVALID_TRACE,
-                        SpanContext::INVALID_SPAN,
-                        SpanContext::SAMPLED_FLAG
+                        SpanContextValidator::INVALID_TRACE,
+                        SpanContextValidator::INVALID_SPAN,
+                        SpanContextInterface::TRACE_FLAG_SAMPLED
                     ),
                     Context::getCurrent()
                 )
