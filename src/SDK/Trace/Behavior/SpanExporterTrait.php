@@ -30,16 +30,16 @@ trait SpanExporterTrait
     abstract public static function fromConnectionString(string $endpointUrl, string $name, string $args);
 
     /**
-     * @param iterable<SpanDataInterface> $spans
+     * @param iterable<SpanDataInterface> $batch
      * @return FutureInterface<bool>
      */
-    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
+    public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         if (!$this->running) {
             return new CompletedFuture(false);
         }
 
-        return new CompletedFuture($this->doExport($spans)); /** @phpstan-ignore-line */
+        return new CompletedFuture($this->doExport($batch)); /** @phpstan-ignore-line */
     }
 
     /**

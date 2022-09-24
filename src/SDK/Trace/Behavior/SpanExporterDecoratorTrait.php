@@ -14,14 +14,14 @@ trait SpanExporterDecoratorTrait
     protected SpanExporterInterface $decorated;
 
     /**
-     * @param iterable<SpanDataInterface> $spans
+     * @param iterable<SpanDataInterface> $batch
      * @return FutureInterface<bool>
      */
-    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
+    public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
-        $spans = $this->beforeExport($spans);
-        $response = $this->decorated->export($spans, $cancellation);
-        $response->map(fn (bool $result) => $this->afterExport($spans, $result));
+        $batch = $this->beforeExport($batch);
+        $response = $this->decorated->export($batch, $cancellation);
+        $response->map(fn (bool $result) => $this->afterExport($batch, $result));
 
         return $response;
     }

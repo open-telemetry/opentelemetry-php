@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Benchmark;
 use Grpc\UnaryCall;
 use Mockery;
 use OpenTelemetry\API\Trace\TracerInterface;
+use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\Contrib\OtlpGrpc\Exporter as GrpcExporter;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter as HttpExporter;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
@@ -80,7 +81,7 @@ class OtlpBench
         $streamFactory = Mockery::mock(StreamFactoryInterface::class)
             ->allows(['createStream' => $stream]);
         // @phpstan-ignore-next-line
-        $exporter = new HttpExporter(HttpExporter::createTransport(new PsrTransportFactory($client, $requestFactory, $streamFactory)));
+        $exporter = new SpanExporter(HttpExporter::createTransport(new PsrTransportFactory($client, $requestFactory, $streamFactory)));
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');

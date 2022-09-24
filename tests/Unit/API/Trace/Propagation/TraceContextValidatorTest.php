@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\API\Unit\Trace;
+namespace OpenTelemetry\Tests\Unit\API\Trace\Propagation;
 
 use OpenTelemetry\API\Trace\Propagation\TraceContextValidator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\API\Trace\TraceContextValidator
+ * @covers \OpenTelemetry\API\Trace\Propagation\TraceContextValidator
  */
 class TraceContextValidatorTest extends TestCase
 {

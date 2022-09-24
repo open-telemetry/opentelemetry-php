@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Contrib\Grpc;
 
 use Exception;
+use InvalidArgumentException;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use PHPUnit\Framework\TestCase;
-use UnexpectedValueException;
 
 /**
  * @covers \OpenTelemetry\Contrib\Grpc\GrpcTransportFactory
@@ -18,12 +18,10 @@ final class GrpcTransportTest extends TestCase
     public function test_grpc_transport_supports_only_protobuf(): void
     {
         $factory = new GrpcTransportFactory();
-        $transport = $factory->create('http://localhost/service/method');
 
-        $response = $transport->send('', 'text/plain');
-
-        $this->expectException(UnexpectedValueException::class);
-        $response->await();
+        $this->expectException(InvalidArgumentException::class);
+        /** @psalm-suppress InvalidArgument @phpstan-ignore-next-line */
+        $factory->create('http://localhost/service/method', 'text/plain');
     }
 
     public function test_shutdown_returns_true(): void
@@ -48,7 +46,7 @@ final class GrpcTransportTest extends TestCase
         $transport = $factory->create('http://localhost/service/method');
         $transport->shutdown();
 
-        $response = $transport->send('', 'application/x-protobuf');
+        $response = $transport->send('');
 
         $this->expectException(Exception::class);
         $response->await();
