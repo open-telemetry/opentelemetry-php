@@ -20,6 +20,7 @@ interface Variables
     public const OTEL_PROPAGATORS = 'OTEL_PROPAGATORS';
     public const OTEL_TRACES_SAMPLER = 'OTEL_TRACES_SAMPLER';
     public const OTEL_TRACES_SAMPLER_ARG = 'OTEL_TRACES_SAMPLER_ARG';
+    public const OTEL_SDK_DISABLED = 'OTEL_SDK_DISABLED';
     /**
      * Batch Span Processor
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#batch-span-processor

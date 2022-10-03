@@ -17,6 +17,7 @@ interface Defaults
     public const OTEL_LOG_LEVEL = 'info';
     public const OTEL_PROPAGATORS = 'tracecontext,baggage';
     public const OTEL_TRACES_SAMPLER = 'parentbased_always_on';
+    public const OTEL_SDK_DISABLED = 'false';
     /**
      * Batch Span Processor
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#batch-span-processor
