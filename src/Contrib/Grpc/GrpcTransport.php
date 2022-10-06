@@ -8,16 +8,16 @@ namespace OpenTelemetry\Contrib\Grpc;
 
 use function array_change_key_case;
 use BadMethodCallException;
-use Grpc\Call;
-use Grpc\Channel;
+/*use Grpc\Channel;
 use const Grpc\OP_RECV_INITIAL_METADATA;
 use const Grpc\OP_RECV_MESSAGE;
 use const Grpc\OP_RECV_STATUS_ON_CLIENT;
 use const Grpc\OP_SEND_CLOSE_FROM_CLIENT;
 use const Grpc\OP_SEND_INITIAL_METADATA;
-use const Grpc\OP_SEND_MESSAGE;
+use const Grpc\OP_SEND_MESSAGE;*/
 use const Grpc\STATUS_OK;
-use Grpc\Timeval;
+use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
+use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -34,23 +34,25 @@ use UnexpectedValueException;
  */
 final class GrpcTransport implements TransportInterface
 {
-    private Channel $channel;
-    private string $method;
     private array $headers;
+    private TraceServiceClient $client;
+    private ExportTraceServiceRequest $requestPrototype;
 
     private bool $closed = false;
 
     public function __construct(
-        string $endpoint,
-        array $opts,
-        string $method,
-        array $headers = []
+        TraceServiceClient $client,
+        array $headers = [],
+        ExportTraceServiceRequest $requestPrototype = null
     ) {
-        $this->channel = new Channel($endpoint, $opts);
-        $this->method = $method;
+        $this->client = $client;
         $this->headers = array_change_key_case($headers);
+        $this->requestPrototype = $requestPrototype ?: new ExportTraceServiceRequest();
     }
 
+    /**
+     * @todo Possibly inefficient to convert payload to/from string, can we refactor to keep in it ExportTraceServiceRequest
+     */
     public function send(string $payload, string $contentType, ?CancellationInterface $cancellation = null): FutureInterface
     {
         if ($this->closed) {
@@ -60,31 +62,41 @@ final class GrpcTransport implements TransportInterface
             return new ErrorFuture(new UnexpectedValueException(sprintf('Unsupported content type "%s", grpc transport supports only application/x-protobuf', $contentType)));
         }
 
-        $call = new Call($this->channel, $this->method, Timeval::infFuture());
+        $request = clone $this->requestPrototype;
+
+        try {
+            $request->mergeFromString($payload);
+        } catch (\Exception $e) {
+            return new ErrorFuture($e);
+        }
+
+        $call = $this->client->Export($request, $this->formatMetadata($this->headers));
 
         $cancellation ??= new NullCancellation();
         $cancellationId = $cancellation->subscribe(static fn (Throwable $e) => $call->cancel());
 
         try {
-            $event = $call->startBatch([
-                OP_SEND_INITIAL_METADATA => $this->headers,
+            /*$event = $call->startBatch([
+                OP_SEND_INITIAL_METADATA => $this->formatMetadata($this->headers),
                 OP_SEND_MESSAGE => ['message' => $payload],
                 OP_SEND_CLOSE_FROM_CLIENT => true,
                 OP_RECV_INITIAL_METADATA => true,
                 OP_RECV_STATUS_ON_CLIENT => true,
                 OP_RECV_MESSAGE => true,
-            ]);
+            ]);*/
+            // @var \Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse $response
+            [$response, $status] = $call->wait();
         } catch (Throwable $e) {
             return new ErrorFuture($e);
         } finally {
             $cancellation->unsubscribe($cancellationId);
         }
 
-        if ($event->status->code === STATUS_OK) {
-            return new CompletedFuture($event->message);
+        if ($status->code === STATUS_OK) {
+            return new CompletedFuture($response->serializeToString());
         }
 
-        return new ErrorFuture(new RuntimeException($event->status->details, $event->status->code));
+        return new ErrorFuture(new RuntimeException($status->details, $status->code));
     }
 
     public function shutdown(?CancellationInterface $cancellation = null): bool
@@ -94,7 +106,7 @@ final class GrpcTransport implements TransportInterface
         }
 
         $this->closed = true;
-        $this->channel->close();
+        $this->client->close();
 
         return true;
     }
@@ -102,5 +114,13 @@ final class GrpcTransport implements TransportInterface
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return !$this->closed;
+    }
+
+    /**
+     * @link https://github.com/grpc/grpc/blob/7e7a48f863218f39a1767e1c2b957ca8e4789272/src/php/tests/interop/interop_client.php#L525
+     */
+    private function formatMetadata(array $metadata): array
+    {
+        return array_map(fn ($value) => [$value], $metadata);
     }
 }

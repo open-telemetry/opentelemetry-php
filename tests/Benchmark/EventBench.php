@@ -58,7 +58,7 @@ class EventBench
     }
 
     /**
-     * @BeforeMethods("addEventsToListener")
+     * @BeforeMethods("addEvents")
      * @Revs(1000)
      * @Iterations(10)
      * @OutputTimeUnit("microseconds")

@@ -45,6 +45,17 @@ class Accessor
         );
     }
 
+    public static function getFloat(string $variableName, string $default = null): float
+    {
+        return (int) self::validateVariableValue(
+            Resolver::resolveValue(
+                self::validateVariableType($variableName, VariableTypes::FLOAT),
+                $default
+            ),
+            FILTER_VALIDATE_FLOAT
+        );
+    }
+
     public static function getRatio(string $variableName, string $default = null): float
     {
         return RatioParser::parse(

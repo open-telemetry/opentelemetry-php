@@ -15,7 +15,7 @@ interface TransportFactoryInterface
      * @param string|string[]|null $compression
      */
     public function create(
-        string $endpoint,
+        string $endpoint = null,
         array $headers = [],
         $compression = null,
         float $timeout = 10.,

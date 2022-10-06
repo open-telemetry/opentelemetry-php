@@ -21,7 +21,7 @@ use function stream_context_create;
 final class StreamTransportFactory implements TransportFactoryInterface
 {
     public function create(
-        string $endpoint,
+        string $endpoint = null,
         array $headers = [],
         $compression = null,
         float $timeout = 10.,
@@ -31,6 +31,7 @@ final class StreamTransportFactory implements TransportFactoryInterface
         ?string $cert = null,
         ?string $key = null
     ): TransportInterface {
+        assert(!empty($endpoint));
         $context = stream_context_create([
             'http' => [
                 'method' => 'POST',
@@ -48,6 +49,9 @@ final class StreamTransportFactory implements TransportFactoryInterface
             throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
         });
 
+        /**
+         * @psalm-suppress PossiblyNullArgument
+         */
         try {
             $stream = fopen($endpoint, 'ab', false, $context);
         } finally {

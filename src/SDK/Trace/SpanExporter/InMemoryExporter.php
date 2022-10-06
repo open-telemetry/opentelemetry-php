@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanExporter;
 
 use ArrayObject;
+use OpenTelemetry\SDK\Common\Export\FromConnectionStringInterface;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
-class InMemoryExporter implements SpanExporterInterface
+class InMemoryExporter implements SpanExporterInterface, FromConnectionStringInterface
 {
     use SpanExporterTrait;
 

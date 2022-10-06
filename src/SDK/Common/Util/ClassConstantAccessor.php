@@ -21,11 +21,11 @@ class ClassConstantAccessor
         return constant($constant);
     }
 
-    public static function getValue(string $className, string $constantName)
+    public static function getValue(string $className, string $constantName, $default = null)
     {
         $constant = self::getFullName($className, $constantName);
 
-        return defined($constant) ?  constant($constant) : null;
+        return defined($constant) ?  constant($constant) : $default;
     }
 
     private static function getFullName(string $className, string $constantName): string

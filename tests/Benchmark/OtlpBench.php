@@ -7,11 +7,11 @@ namespace OpenTelemetry\Tests\Benchmark;
 use Grpc\UnaryCall;
 use Mockery;
 use OpenTelemetry\API\Trace\TracerInterface;
-use OpenTelemetry\Contrib\OtlpGrpc\Exporter as GrpcExporter;
-use OpenTelemetry\Contrib\OtlpHttp\Exporter as HttpExporter;
+use OpenTelemetry\Contrib\Grpc\GrpcTransport;
+use OpenTelemetry\Contrib\Otlp\Exporter;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
@@ -54,7 +54,8 @@ class OtlpBench
     public function setUpGrpc(): void
     {
         $client = $this->createMockTraceServiceClient();
-        $exporter = new GrpcExporter('foo:4317', true, '', '', false, 10, $client);
+        $transport = new GrpcTransport($client);
+        $exporter = new Exporter($transport);
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
@@ -65,7 +66,7 @@ class OtlpBench
      * @psalm-suppress InvalidArgument
      * @psalm-suppress PossiblyUndefinedMethod
      */
-    public function setUpGrpcHttp(): void
+    public function setUpOtlpHttp(): void
     {
         $response = Mockery::mock(ResponseInterface::class)
             ->allows(['getStatusCode' => 200]);
@@ -79,8 +80,9 @@ class OtlpBench
             ->allows(['createRequest' => $request]);
         $streamFactory = Mockery::mock(StreamFactoryInterface::class)
             ->allows(['createStream' => $stream]);
-        // @phpstan-ignore-next-line
-        $exporter = new HttpExporter(HttpExporter::createTransport(new PsrTransportFactory($client, $requestFactory, $streamFactory)));
+        $transport = new PsrTransport($client, $requestFactory, $streamFactory, 'http://foo', [], [], 0, 0); // @phpstan-ignore-line
+        $exporter = new Exporter($transport);
+
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
@@ -158,7 +160,7 @@ class OtlpBench
     }
 
     /**
-     * @BeforeMethods("setUpGrpcHttp")
+     * @BeforeMethods("setUpOtlpHttp")
      * @Revs(1000)
      * @Iterations(10)
      * @OutputTimeUnit("microseconds")

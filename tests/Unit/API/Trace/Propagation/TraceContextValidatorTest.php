@@ -8,7 +8,7 @@ use OpenTelemetry\API\Trace\Propagation\TraceContextValidator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\API\Trace\TraceContextValidator
+ * @covers \OpenTelemetry\API\Trace\Propagation\TraceContextValidator
  */
 class TraceContextValidatorTest extends TestCase
 {

@@ -11,17 +11,25 @@ use Grpc\ChannelCredentials;
 use function in_array;
 use InvalidArgumentException;
 use function json_encode;
+use OpenTelemetry\Contrib\Otlp\OtlpUtil;
+use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
+use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
+use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use function parse_url;
 use RuntimeException;
 use function sprintf;
-use function substr_count;
 
 final class GrpcTransportFactory implements TransportFactoryInterface
 {
+    use EnvironmentVariablesTrait;
+
+    public const DEFAULT_ENDPOINT = 'http://localhost:4317';
+
     public function create(
-        string $endpoint,
+        string $endpoint = null,
         array $headers = [],
         $compression = null,
         float $timeout = 10.,
@@ -31,19 +39,39 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         ?string $cert = null,
         ?string $key = null
     ): TransportInterface {
+        $endpoint ??= $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) ?
+            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) :
+            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, self::DEFAULT_ENDPOINT);
+
+        if (!$cacert && ($this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) || $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_CERTIFICATE))) {
+            $cacert = $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE, Env::OTEL_EXPORTER_OTLP_CERTIFICATE);
+        }
+
+        $compression = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
+            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
+            $this->getEnumFromEnvironment(
+                Env::OTEL_EXPORTER_OTLP_COMPRESSION,
+                $compression ? Values::VALUE_GZIP : Values::VALUE_NONE
+            );
+
+        $timeout = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT) ?
+            $this->getFloatFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, $timeout) :
+            $this->getFloatFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
+
+        $headers += $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
+            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, null) :
+            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, null);
+        $headers += OtlpUtil::getUserAgentHeader();
+
         $parts = parse_url($endpoint);
-        if (!isset($parts['scheme'], $parts['host'], $parts['path'])) {
-            throw new InvalidArgumentException('Endpoint has to contain scheme, host and path');
+        if (!isset($parts['scheme'], $parts['host'])) {
+            throw new InvalidArgumentException('Endpoint has to contain scheme and host');
         }
 
         $scheme = $parts['scheme'];
-        $method = $parts['path'];
 
         if (!in_array($scheme, ['http', 'https'], true)) {
             throw new InvalidArgumentException(sprintf('Endpoint contains not supported scheme "%s"', $scheme));
-        }
-        if (substr_count($parts['path'], '/') !== 2) {
-            throw new InvalidArgumentException(sprintf('Endpoint path is not a valid GRPC method "%s"', $method));
         }
 
         $opts = self::createOpts($compression, $timeout, $maxRetries, $retryDelay);
@@ -60,10 +88,10 @@ final class GrpcTransportFactory implements TransportFactoryInterface
             ? $parts['host'] . ':' . $parts['port']
             : $parts['host'];
 
+        $client = new TraceServiceClient($grpcEndpoint, $opts);
+
         return new GrpcTransport(
-            $grpcEndpoint,
-            $opts,
-            $method,
+            $client,
             $headers,
         );
     }

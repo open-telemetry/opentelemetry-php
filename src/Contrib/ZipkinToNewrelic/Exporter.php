@@ -9,6 +9,7 @@ use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use JsonException;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Common\Export\FromConnectionStringInterface;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -28,7 +29,7 @@ use Throwable;
  * It will send PHP Otel trace data end to end across the internet to a functional backend.
  * Needs a license key to connect.  For a free account/key, go to: https://newrelic.com/signup/
  */
-class Exporter implements SpanExporterInterface
+class Exporter implements SpanExporterInterface, FromConnectionStringInterface
 {
     use LogsMessagesTrait;
     use UsesSpanConverterTrait;

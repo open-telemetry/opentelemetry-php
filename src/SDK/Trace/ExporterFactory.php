@@ -11,6 +11,8 @@ use OpenTelemetry\SDK\Common\Dsn\ParserInterface;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
 
 class ExporterFactory
 {
@@ -22,12 +24,16 @@ class ExporterFactory
         'logger+file' => '\OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter',
         'jaeger+http' => '\OpenTelemetry\Contrib\Jaeger\Exporter',
         'zipkin+http' => '\OpenTelemetry\Contrib\Zipkin\Exporter',
-        'otlp+grpc' => '\OpenTelemetry\Contrib\OtlpGrpc\Exporter',
-        'otlp+http' => '\OpenTelemetry\Contrib\OtlpHttp\Exporter',
+        'otlp+grpc' => '\OpenTelemetry\Contrib\Otlp\Exporter',
+        'otlp+http' => '\OpenTelemetry\Contrib\Otlp\Exporter',
         'newrelic+http' => '\OpenTelemetry\Contrib\Newrelic\Exporter',
         'zipkintonewrelic+http' => '\OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter',
         // this entry exists only for testing purposes
         'test+http' => '\OpenTelemetry\Contrib\Test\Exporter',
+    ];
+    private const KNOWN_TRANSPORT_FACTORIES = [
+        'otlp+grpc' => '\OpenTelemetry\Contrib\Grpc\GrpcTransportFactory',
+        'otlp+http' => '\OpenTelemetry\Contrib\OtlpHttp\OtlpHttpTransportFactory',
     ];
 
     private const DEFAULT_SERVICE_NAME = 'unknown_service';
@@ -50,7 +56,7 @@ class ExporterFactory
       */
     public function fromConnectionString(string $exporterDsn): SpanExporterInterface
     {
-        if (in_array($exporterDsn, ['console', 'memory', 'otlp+http'])) {
+        if (in_array($exporterDsn, ['console', 'memory'])) {
             return self::buildExporter($exporterDsn);
         }
 
@@ -101,9 +107,9 @@ class ExporterFactory
                 );
                 switch ($protocol) {
                     case Values::VALUE_GRPC:
-                        return self::buildExporter('otlp+grpc');
+                        return self::buildExporterWithTransport('otlp+grpc');
                     case Values::VALUE_HTTP_PROTOBUF:
-                        return self::buildExporter('otlp+http');
+                        return self::buildExporterWithTransport('otlp+http');
                     case Values::VALUE_HTTP_JSON:
                         throw new InvalidArgumentException('otlp+http/json not implemented');
                     default:
@@ -133,12 +139,37 @@ class ExporterFactory
         return null;
     }
 
-    private static function buildExporter(string $protocol, string $endpoint = null, string $name = null, $args = null): SpanExporterInterface
+    private static function buildExporter($protocol, string $endpoint = null, string $name = null, $args = null): SpanExporterInterface
     {
         $exporterClass = self::KNOWN_EXPORTERS[self::normalizeProtocol($protocol)];
-        self::validateExporterClass($exporterClass);
+        self::validateClass($exporterClass);
 
-        return call_user_func([$exporterClass, 'fromConnectionString'], $endpoint, $name, $args);
+        return call_user_func([$exporterClass, 'fromConnectionString'], $endpoint, $name, $args, $protocol);
+    }
+
+    /**
+     * @phan-suppress PhanTypeMismatchArgument
+     * @phan-suppress PhanUndeclaredClass
+     */
+    private static function buildExporterWithTransport(string $protocol): SpanExporterInterface
+    {
+        $exporterClass = self::KNOWN_EXPORTERS[self::normalizeProtocol($protocol)];
+        self::validateClass($exporterClass);
+
+        $exporter = new $exporterClass(self::buildTransport($protocol)); // @phpstan-ignore-line
+        assert($exporter instanceof SpanExporterInterface);
+
+        return $exporter;
+    }
+
+    private static function buildTransport(string $protocol): TransportInterface
+    {
+        $factoryClass = self::KNOWN_TRANSPORT_FACTORIES[self::normalizeProtocol($protocol)];
+        self::validateClass($factoryClass);
+        $factory = new $factoryClass();
+        assert($factory instanceof TransportFactoryInterface);
+
+        return $factory->create();
     }
 
     private static function validateProtocol(string $protocol): void
@@ -148,10 +179,10 @@ class ExporterFactory
         }
     }
 
-    private static function validateExporterClass(string $class): void
+    private static function validateClass(string $class): void
     {
         if (!class_exists($class)) {
-            throw new InvalidArgumentException('Could not find exporter class: ' . $class);
+            throw new InvalidArgumentException('Could not find class: ' . $class);
         }
     }
 

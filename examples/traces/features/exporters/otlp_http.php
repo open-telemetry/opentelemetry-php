@@ -3,14 +3,16 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../../vendor/autoload.php';
 
-use OpenTelemetry\Contrib\OtlpHttp\Exporter as OTLPExporter;
+use OpenTelemetry\Contrib\Otlp\Exporter as OTLPExporter;
+use OpenTelemetry\Contrib\OtlpHttp\OtlpHttpTransportFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
-putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318');
 \OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('otlp-example', [new \Monolog\Handler\StreamHandler('php://stderr')]));
 
-$exporter = OTLPExporter::fromConnectionString();
+$transport = (new OtlpHttpTransportFactory())->create('http://collector:4318');
+$exporter = new OTLPExporter($transport);
+//$exporter = OTLPExporter::withHttpProtobuf('http://collector:4318');
 
 echo 'Starting OTLP example';
 
@@ -22,7 +24,7 @@ $tracerProvider =  new TracerProvider(
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 $root = $span = $tracer->spanBuilder('root')->startSpan();
-$span->activate();
+$scope = $span->activate();
 
 for ($i = 0; $i < 3; $i++) {
     // start a span, register some events
@@ -42,6 +44,7 @@ for ($i = 0; $i < 3; $i++) {
     $span->end();
 }
 $root->end();
+$scope->detach();
 echo PHP_EOL . 'OTLP example complete!  ';
 
 echo PHP_EOL;
