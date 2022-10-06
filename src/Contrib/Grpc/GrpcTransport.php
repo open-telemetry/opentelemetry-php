@@ -36,22 +36,19 @@ final class GrpcTransport implements TransportInterface
 {
     private array $headers;
     private TraceServiceClient $client;
-    private ExportTraceServiceRequest $requestPrototype;
 
     private bool $closed = false;
 
     public function __construct(
         TraceServiceClient $client,
-        array $headers = [],
-        ExportTraceServiceRequest $requestPrototype = null
+        array $headers = []
     ) {
         $this->client = $client;
         $this->headers = array_change_key_case($headers);
-        $this->requestPrototype = $requestPrototype ?: new ExportTraceServiceRequest();
     }
 
     /**
-     * @todo Possibly inefficient to convert payload to/from string, can we refactor to keep in it ExportTraceServiceRequest
+     * @todo Possibly inefficient to convert payload to/from string, can we refactor to use ExportTraceServiceRequest?
      */
     public function send(string $payload, string $contentType, ?CancellationInterface $cancellation = null): FutureInterface
     {
@@ -62,7 +59,7 @@ final class GrpcTransport implements TransportInterface
             return new ErrorFuture(new UnexpectedValueException(sprintf('Unsupported content type "%s", grpc transport supports only application/x-protobuf', $contentType)));
         }
 
-        $request = clone $this->requestPrototype;
+        $request = new ExportTraceServiceRequest();
 
         try {
             $request->mergeFromString($payload);

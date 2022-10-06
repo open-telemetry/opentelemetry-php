@@ -8,6 +8,8 @@ use Exception;
 use const Grpc\STATUS_OK;
 use const Grpc\STATUS_UNAVAILABLE;
 use Grpc\UnaryCall;
+use Mockery;
+use Mockery\MockInterface;
 use OpenTelemetry\Contrib\Grpc\GrpcTransport;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse;
@@ -15,17 +17,19 @@ use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Future\ErrorFuture;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use UnexpectedValueException;
 
 /**
- * @covers \OpenTelemetry\Contrib\Grpc\GrpcTransportFactory
  * @covers \OpenTelemetry\Contrib\Grpc\GrpcTransport
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 final class GrpcTransportTest extends TestCase
 {
     private GrpcTransport $transport;
     private MockObject $client;
-    private MockObject $request;
+    private MockInterface $request;
     private MockObject $response;
     private MockObject $call;
     private object $status;
@@ -34,11 +38,11 @@ final class GrpcTransportTest extends TestCase
     {
         $this->status = (object) ['code' => STATUS_OK];
         $this->call = $this->createMock(UnaryCall::class);
-        $this->request = $this->createMock(ExportTraceServiceRequest::class);
+        $this->request = Mockery::mock('overload:' . ExportTraceServiceRequest::class);
         $this->response = $this->createMock(ExportTraceServiceResponse::class);
         $this->client = $this->createMock(TraceServiceClient::class);
         $this->client->method('Export')->willReturn($this->call);
-        $this->transport = new GrpcTransport($this->client, [], $this->request);
+        $this->transport = new GrpcTransport($this->client, []);
     }
 
     public function test_grpc_transport_supports_only_protobuf(): void
@@ -85,16 +89,18 @@ final class GrpcTransportTest extends TestCase
 
     public function test_send_failure_with_grpc_exception(): void
     {
-        $this->call->method('wait')->willThrowException(new \Exception('dummy exception'));
+        $this->request->allows(['mergeFromString' => null]);
+        $this->call->method('wait')->willThrowException(new RuntimeException('dummy exception'));
         $future = $this->transport->send('some.payload', 'application/x-protobuf');
         $this->assertInstanceOf(ErrorFuture::class, $future);
-        $this->expectException(\Exception::class);
+        $this->expectException(RuntimeException::class);
         $future->await();
     }
 
     public function test_send_success(): void
     {
         $this->call->method('wait')->willReturn([$this->response, $this->status]);
+        $this->request->allows(['mergeFromString' => null]);
         $this->response->method('serializeToString')->willReturn('serialized.to.string');
         $future = $this->transport->send('', 'application/x-protobuf');
         $this->assertSame('serialized.to.string', $future->await());
@@ -102,7 +108,7 @@ final class GrpcTransportTest extends TestCase
 
     public function test_send_failure_with_invalid_payload(): void
     {
-        $this->request->method('mergeFromString')->willThrowException(new \Exception('serialization error'));
+        $this->request->shouldReceive('mergeFromString')->andThrow(new RuntimeException('serialization error'));
         $future = $this->transport->send('', 'application/x-protobuf');
         $this->assertInstanceOf(ErrorFuture::class, $future);
     }
@@ -112,10 +118,18 @@ final class GrpcTransportTest extends TestCase
         $this->status->code = STATUS_UNAVAILABLE;
         $this->status->details = 'error.detail';
         $this->call->method('wait')->willReturn([$this->response, $this->status]);
+        $this->request->allows(['mergeFromString' => null]);
         $this->response->method('serializeToString')->willReturn('serialized.to.string');
         $future = $this->transport->send('', 'application/x-protobuf');
         $this->assertInstanceOf(ErrorFuture::class, $future);
-        $this->expectException(\RuntimeException::class);
-        $future->await();
+    }
+
+    public function test_send_failure_with_exception_in_grpc_call(): void
+    {
+        $this->call->method('wait')->willThrowException(new RuntimeException('grpc exception'));
+        $this->request->allows(['mergeFromString' => null]);
+        $this->response->method('serializeToString')->willReturn('serialized.to.string');
+        $future = $this->transport->send('', 'application/x-protobuf');
+        $this->assertInstanceOf(ErrorFuture::class, $future);
     }
 }
