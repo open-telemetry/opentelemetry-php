@@ -1,9 +1,7 @@
 version: '3.7'
 services:
   php:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
+    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${PHP_VERSION:-7.4}
     volumes:
     - ./:/usr/src/myapp
     depends_on:

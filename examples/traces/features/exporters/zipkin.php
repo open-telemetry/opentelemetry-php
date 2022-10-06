@@ -26,7 +26,7 @@ $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 echo 'Starting Zipkin example';
 
 $root = $span = $tracer->spanBuilder('root')->startSpan();
-$span->activate();
+$scope = $span->activate();
 
 for ($i = 0; $i < 3; $i++) {
     // start a span, register some events
@@ -45,6 +45,7 @@ for ($i = 0; $i < 3; $i++) {
 
     $span->end();
 }
+$scope->detach();
 $root->end();
 echo PHP_EOL . 'Zipkin example complete!  See the results at http://localhost:9411/';
 

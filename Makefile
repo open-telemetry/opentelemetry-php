@@ -46,12 +46,10 @@ phpmetrics: ## Run php metrics
 smoke-test-examples: smoke-test-isolated-examples smoke-test-exporter-examples smoke-test-collector-integration smoke-test-prometheus-example ## Run smoke test examples
 smoke-test-isolated-examples: ## Run smoke test isolated examples
 	$(DC_RUN_PHP) php ./examples/traces/getting_started.php
-	$(DC_RUN_PHP) php ./examples/traces/features/always_off_trace_example.php
 	$(DC_RUN_PHP) php ./examples/traces/features/batch_exporting.php
 	$(DC_RUN_PHP) php ./examples/traces/features/concurrent_spans.php
 	$(DC_RUN_PHP) php ./examples/traces/features/configuration_from_environment.php
 	$(DC_RUN_PHP) php ./examples/traces/features/creating_a_new_trace_in_the_same_process.php
-	$(DC_RUN_PHP) php ./examples/traces/features/parent_span_example.php
 	$(DC_RUN_PHP) php ./examples/traces/features/resource_detectors.php
 	$(DC_RUN_PHP) php ./examples/traces/features/span_resources.php
 	$(DC_RUN_PHP) php ./examples/traces/troubleshooting/air_gapped_trace_debugging.php
@@ -61,8 +59,8 @@ smoke-test-exporter-examples: FORCE ## Run (some) exporter smoke test examples
 # Note this does not include every exporter at the moment
 	$(DOCKER_COMPOSE) up -d --remove-orphans
 	$(DC_RUN_PHP) php ./examples/traces/features/exporters/zipkin.php
-	$(DC_RUN_PHP) php ./examples/traces/features/always_off_trace_example.php
 	$(DC_RUN_PHP) php ./examples/traces/features/exporters/jaeger.php
+	$(DC_RUN_PHP) php ./examples/traces/features/parent_span_example.php
 # The following examples do not use the DC_RUN_PHP global because they need environment variables.
 	$(DOCKER_COMPOSE) run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/features/exporters/newrelic.php
 	$(DOCKER_COMPOSE) run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/features/exporters/zipkin_to_newrelic.php
@@ -70,14 +68,12 @@ smoke-test-exporter-examples: FORCE ## Run (some) exporter smoke test examples
 smoke-test-collector-integration: ## Run smoke test collector integration
 	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml up -d --remove-orphans
 	sleep 5
-# This is slow because it's building the image from scratch (and parts of that, like installing the gRPC extension, are slow)
-# This can be sped up by switching to the pre-built images hosted on ghcr.io (and referenced in other docker-compose**.yaml files)
 	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml run --rm php php ./examples/traces/features/exporters/otlp_grpc.php
-	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml run --rm php php ./examples/traces/features/exporters/otlp.php
+	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml run --rm php php ./examples/traces/features/exporters/otlp_http.php
 	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml stop
 smoke-test-collector-metrics-integration:
 	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml up -d --force-recreate collector
-	COMPOSE_IGNORE_ORPHANS=TRUE $(DOCKER_COMPOSE) -f docker-compose.yaml run --rm php php ./examples/metrics/features/exporters/otlp.php
+	COMPOSE_IGNORE_ORPHANS=TRUE $(DOCKER_COMPOSE) -f docker-compose.yaml run --rm php php ./examples/metrics/features/exporters/otlp_http.php
 	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml logs collector
 	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml stop collector
 smoke-test-prometheus-example: metrics-prometheus-example stop-prometheus
