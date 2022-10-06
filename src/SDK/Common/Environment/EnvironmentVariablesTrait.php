@@ -16,6 +16,7 @@ trait EnvironmentVariablesTrait
     {
         return Accessor::getInt($key, (string) $default);
     }
+
     public function getFloatFromEnvironment(string $key, float $default): float
     {
         return Accessor::getInt($key, (string) $default);

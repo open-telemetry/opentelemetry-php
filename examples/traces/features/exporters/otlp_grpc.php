@@ -5,7 +5,7 @@ require __DIR__ . '/../../../../vendor/autoload.php';
 
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\Contrib\Otlp\Exporter;
-use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 \OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
@@ -15,9 +15,8 @@ $exporter = new Exporter($transport);
 echo 'Starting OTLP GRPC example';
 
 $tracerProvider =  new TracerProvider(
-    new BatchSpanProcessor(
-        $exporter,
-        \OpenTelemetry\SDK\Common\Time\ClockFactory::getDefault()
+    new SimpleSpanProcessor(
+        $exporter
     )
 );
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');

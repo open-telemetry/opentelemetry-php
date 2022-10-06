@@ -25,7 +25,7 @@ class LoggerDecoratorTest extends AbstractLoggerAwareTest
     {
         $this->expectException(RuntimeException::class);
 
-        LoggerDecorator::fromConnectionString('foo', 'bar', 'baz', 'bat');
+        LoggerDecorator::fromConnectionString('foo', 'bar', 'baz');
     }
 
     /**

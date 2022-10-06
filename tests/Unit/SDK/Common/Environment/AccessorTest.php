@@ -29,6 +29,7 @@ class AccessorTest extends TestCase
         VariableTypes::STRING => ['getString'],
         VariableTypes::BOOL => ['getBool'],
         VariableTypes::INTEGER => ['getInt'],
+        VariableTypes::FLOAT => ['getFloat'],
         VariableTypes::RATIO => ['getRatio'],
         VariableTypes::ENUM => ['getEnum'],
         VariableTypes::LIST => ['getList'],

@@ -14,33 +14,33 @@ class OtlpExporter implements SpanExporterInterface
 {
     private static string $message = 'Class has been replaced by Contrib\Otlp\Exporter + Transports';
 
-    private static function deprecated(): void
+    private static function error(): void
     {
-        trigger_error(self::$message, E_USER_DEPRECATED);
+        trigger_error(self::$message, E_USER_ERROR);
     }
 
     public static function fromConnectionString(string $endpointUrl, string $name, string $args)
     {
-        self::deprecated();
+        self::error();
     }
 
     public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
     {
-        self::deprecated();
+        self::error();
 
         return new ErrorFuture(new RuntimeException('class is deprecated'));
     }
 
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
-        self::deprecated();
+        self::error();
 
         return false;
     }
 
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
-        self::deprecated();
+        self::error();
 
         return false;
     }

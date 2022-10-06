@@ -49,14 +49,6 @@ class ExporterTest extends TestCase
         $this->assertTrue($result->await());
     }
 
-    /*public function test_from_connection_string(): void
-    {
-        $this->assertNotSame(
-            Exporter::fromConnectionString(),
-            Exporter::fromConnectionString()
-        );
-    }*/
-
     public function test_shutdown(): void
     {
         $this->transport->expects($this->once())->method('shutdown');

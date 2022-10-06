@@ -47,7 +47,7 @@ class Accessor
 
     public static function getFloat(string $variableName, string $default = null): float
     {
-        return (int) self::validateVariableValue(
+        return (float) self::validateVariableValue(
             Resolver::resolveValue(
                 self::validateVariableType($variableName, VariableTypes::FLOAT),
                 $default

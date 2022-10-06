@@ -32,7 +32,7 @@ class LoggerDecorator implements SpanExporterInterface, LoggerAwareInterface, Fr
         $this->setSpanConverter($converter ?? new FriendlySpanConverter());
     }
 
-    public static function fromConnectionString(string $endpointUrl, string $name, string $args, string $protocol): void
+    public static function fromConnectionString(string $endpointUrl, string $name, string $args): void
     {
         throw new RuntimeException(
             sprintf('%s cannot be instantiated via %s', __CLASS__, __METHOD__)

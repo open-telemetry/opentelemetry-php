@@ -12,7 +12,6 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 
 $transport = (new OtlpHttpTransportFactory())->create('http://collector:4318');
 $exporter = new OTLPExporter($transport);
-//$exporter = OTLPExporter::withHttpProtobuf('http://collector:4318');
 
 echo 'Starting OTLP example';
 
