@@ -72,7 +72,7 @@ final class MetricExporter implements MetricExporterInterface
     public function export(iterable $batch): bool
     {
         return $this->transport
-            ->send((new MetricConverter())->convert($batch)->serializeToString(), 'application/x-protobuf')
+            ->send((new MetricConverter())->convert($batch)->serializeToString(), TransportInterface::CONTENT_TYPE_PROTOBUF)
             ->map(static function (string $payload): bool {
                 $serviceResponse = new ExportMetricsServiceResponse();
                 $serviceResponse->mergeFromString($payload);

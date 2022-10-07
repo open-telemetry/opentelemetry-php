@@ -6,7 +6,6 @@ require __DIR__ . '/../../../vendor/autoload.php';
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use OpenTelemetry\Contrib\Otlp\Exporter;
-use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OtlpGrpcExporter;
 use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;

@@ -29,7 +29,7 @@ class Exporter implements SpanExporterInterface
     public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
     {
         return $this->transport
-            ->send((new SpanConverter())->convert($spans)->serializeToString(), 'application/x-protobuf', $cancellation)
+            ->send((new SpanConverter())->convert($spans)->serializeToString(), TransportInterface::CONTENT_TYPE_PROTOBUF, $cancellation)
             ->map(static function (string $payload): bool {
                 $serviceResponse = new ExportTraceServiceResponse();
                 $serviceResponse->mergeFromString($payload);

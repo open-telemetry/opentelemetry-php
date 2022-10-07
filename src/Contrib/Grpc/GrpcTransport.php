@@ -27,8 +27,6 @@ use UnexpectedValueException;
  */
 final class GrpcTransport implements TransportInterface
 {
-    public const PROTOCOL_PROTOBUF = 'application/x-protobuf';
-
     private array $metadata;
     private TraceServiceClient $client;
     private bool $closed = false;
@@ -49,8 +47,12 @@ final class GrpcTransport implements TransportInterface
         if ($this->closed) {
             return new ErrorFuture(new BadMethodCallException('Transport closed'));
         }
-        if ($contentType !== self::PROTOCOL_PROTOBUF) {
-            return new ErrorFuture(new UnexpectedValueException(sprintf('Unsupported content type "%s", grpc transport supports only %s', $contentType, self::PROTOCOL_PROTOBUF)));
+        if ($contentType !== TransportInterface::CONTENT_TYPE_PROTOBUF) {
+            return new ErrorFuture(
+                new UnexpectedValueException(
+                    sprintf('Unsupported content type "%s", grpc transport supports only %s', $contentType, TransportInterface::CONTENT_TYPE_PROTOBUF)
+                )
+            );
         }
 
         $request = new ExportTraceServiceRequest();
