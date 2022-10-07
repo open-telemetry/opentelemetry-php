@@ -18,9 +18,6 @@ class Exporter implements SpanExporterInterface
 
     private TransportInterface $transport;
 
-    /**
-     * Exporter constructor.
-     */
     public function __construct(TransportInterface $transport)
     {
         $this->transport = $transport;

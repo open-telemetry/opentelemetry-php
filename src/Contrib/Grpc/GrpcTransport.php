@@ -27,9 +27,10 @@ use UnexpectedValueException;
  */
 final class GrpcTransport implements TransportInterface
 {
-    private array $headers;
-    private TraceServiceClient $client;
+    public const PROTOCOL_PROTOBUF = 'application/x-protobuf';
 
+    private array $metadata;
+    private TraceServiceClient $client;
     private bool $closed = false;
 
     public function __construct(
@@ -37,7 +38,7 @@ final class GrpcTransport implements TransportInterface
         array $headers = []
     ) {
         $this->client = $client;
-        $this->headers = array_change_key_case($headers);
+        $this->metadata = $this->formatMetadata(array_change_key_case($headers));
     }
 
     /**
@@ -48,8 +49,8 @@ final class GrpcTransport implements TransportInterface
         if ($this->closed) {
             return new ErrorFuture(new BadMethodCallException('Transport closed'));
         }
-        if ($contentType !== 'application/x-protobuf') {
-            return new ErrorFuture(new UnexpectedValueException(sprintf('Unsupported content type "%s", grpc transport supports only application/x-protobuf', $contentType)));
+        if ($contentType !== self::PROTOCOL_PROTOBUF) {
+            return new ErrorFuture(new UnexpectedValueException(sprintf('Unsupported content type "%s", grpc transport supports only %s', $contentType, self::PROTOCOL_PROTOBUF)));
         }
 
         $request = new ExportTraceServiceRequest();
@@ -60,7 +61,7 @@ final class GrpcTransport implements TransportInterface
             return new ErrorFuture($e);
         }
 
-        $call = $this->client->Export($request, $this->formatMetadata($this->headers));
+        $call = $this->client->Export($request, $this->metadata);
 
         $cancellation ??= new NullCancellation();
         $cancellationId = $cancellation->subscribe(static fn (Throwable $e) => $call->cancel());
