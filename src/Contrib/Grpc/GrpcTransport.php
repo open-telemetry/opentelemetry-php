@@ -8,13 +8,6 @@ namespace OpenTelemetry\Contrib\Grpc;
 
 use function array_change_key_case;
 use BadMethodCallException;
-/*use Grpc\Channel;
-use const Grpc\OP_RECV_INITIAL_METADATA;
-use const Grpc\OP_RECV_MESSAGE;
-use const Grpc\OP_RECV_STATUS_ON_CLIENT;
-use const Grpc\OP_SEND_CLOSE_FROM_CLIENT;
-use const Grpc\OP_SEND_INITIAL_METADATA;
-use const Grpc\OP_SEND_MESSAGE;*/
 use const Grpc\STATUS_OK;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
@@ -73,14 +66,6 @@ final class GrpcTransport implements TransportInterface
         $cancellationId = $cancellation->subscribe(static fn (Throwable $e) => $call->cancel());
 
         try {
-            /*$event = $call->startBatch([
-                OP_SEND_INITIAL_METADATA => $this->formatMetadata($this->headers),
-                OP_SEND_MESSAGE => ['message' => $payload],
-                OP_SEND_CLOSE_FROM_CLIENT => true,
-                OP_RECV_INITIAL_METADATA => true,
-                OP_RECV_STATUS_ON_CLIENT => true,
-                OP_RECV_MESSAGE => true,
-            ]);*/
             // @var \Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse $response
             [$response, $status] = $call->wait();
         } catch (Throwable $e) {
