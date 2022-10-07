@@ -40,7 +40,7 @@ final class GrpcTransport implements TransportInterface
     }
 
     /**
-     * @todo Possibly inefficient to convert payload to/from string, can we refactor to keep in it ExportTraceServiceRequest
+     * @todo Possibly inefficient to convert payload to/from string, can we refactor to accept ExportTraceServiceRequest?
      */
     public function send(string $payload, string $contentType, ?CancellationInterface $cancellation = null): FutureInterface
     {
