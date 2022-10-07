@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\SpanExporter;
 
-use OpenTelemetry\SDK\Common\Export\FromConnectionStringInterface;
 use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterDecoratorTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
@@ -16,7 +15,7 @@ use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use RuntimeException;
 
-class LoggerDecorator implements SpanExporterInterface, LoggerAwareInterface, FromConnectionStringInterface
+class LoggerDecorator implements SpanExporterInterface, LoggerAwareInterface
 {
     use SpanExporterDecoratorTrait;
     use UsesSpanConverterTrait;

@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Jaeger;
 
-use OpenTelemetry\SDK\Common\Export\FromConnectionStringInterface;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 /**
  * @package OpenTelemetry\Exporter
  */
-class AgentExporter implements SpanExporterInterface, FromConnectionStringInterface
+class AgentExporter implements SpanExporterInterface
 {
     use SpanExporterTrait;
 

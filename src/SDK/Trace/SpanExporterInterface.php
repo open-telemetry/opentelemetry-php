@@ -12,6 +12,8 @@ use OpenTelemetry\SDK\Common\Future\FutureInterface;
  */
 interface SpanExporterInterface
 {
+    public static function fromConnectionString(string $endpointUrl, string $name, string $args);
+
     /**
      * @param iterable<SpanDataInterface> $spans Batch of spans to export
      *

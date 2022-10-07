@@ -8,7 +8,6 @@ use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use JsonException;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Export\FromConnectionStringInterface;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -25,7 +24,7 @@ use Throwable;
  * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
  * @package OpenTelemetry\Exporter
  */
-class Exporter implements SpanExporterInterface, FromConnectionStringInterface
+class Exporter implements SpanExporterInterface
 {
     use LogsMessagesTrait;
     use UsesSpanConverterTrait;

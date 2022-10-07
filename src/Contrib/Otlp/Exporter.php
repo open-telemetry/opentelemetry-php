@@ -65,4 +65,9 @@ class Exporter implements SpanExporterInterface
     {
         return $this->transport->forceFlush($cancellation);
     }
+
+    public static function fromConnectionString(string $endpointUrl, string $name, string $args)
+    {
+        trigger_error('Not implemented');
+    }
 }

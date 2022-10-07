@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\SpanExporter;
 
-use OpenTelemetry\SDK\Common\Export\FromConnectionStringInterface;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Throwable;
 
-class ConsoleSpanExporter implements SpanExporterInterface, FromConnectionStringInterface
+class ConsoleSpanExporter implements SpanExporterInterface
 {
     use SpanExporterTrait;
     use UsesSpanConverterTrait;

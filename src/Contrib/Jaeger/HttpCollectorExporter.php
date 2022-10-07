@@ -6,7 +6,6 @@ namespace OpenTelemetry\Contrib\Jaeger;
 
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
-use OpenTelemetry\SDK\Common\Export\FromConnectionStringInterface;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -14,7 +13,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
-class HttpCollectorExporter implements SpanExporterInterface, FromConnectionStringInterface
+class HttpCollectorExporter implements SpanExporterInterface
 {
     use UsesSpanConverterTrait;
     use SpanExporterTrait;
