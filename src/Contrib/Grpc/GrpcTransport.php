@@ -29,17 +29,14 @@ final class GrpcTransport implements TransportInterface
 {
     private array $metadata;
     private TraceServiceClient $client;
-    private ExportTraceServiceRequest $requestPrototype;
     private bool $closed = false;
 
     public function __construct(
         TraceServiceClient $client,
-        array $headers = [],
-        ExportTraceServiceRequest $requestPrototype = null
+        array $headers = []
     ) {
         $this->client = $client;
         $this->metadata = $this->formatMetadata(array_change_key_case($headers));
-        $this->requestPrototype = $requestPrototype ?: new ExportTraceServiceRequest();
     }
 
     /**
@@ -58,7 +55,7 @@ final class GrpcTransport implements TransportInterface
             );
         }
 
-        $request = clone $this->requestPrototype;
+        $request = new ExportTraceServiceRequest();
 
         try {
             $request->mergeFromString($payload);
