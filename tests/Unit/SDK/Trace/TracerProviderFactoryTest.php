@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
+use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
@@ -13,10 +15,12 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
- * @coversDefaultClass \OpenTelemetry\SDK\Trace\TracerProviderFactory
+ * @covers \OpenTelemetry\SDK\Trace\TracerProviderFactory
  */
 class TracerProviderFactoryTest extends TestCase
 {
+    use EnvironmentVariables;
+
     private $logger;
 
     public function setUp(): void
@@ -28,12 +32,9 @@ class TracerProviderFactoryTest extends TestCase
     public function tearDown(): void
     {
         LoggerHolder::unset();
+        $this->restoreEnvironmentVariables();
     }
 
-    /**
-     * @covers ::create
-     * @covers ::__construct
-     */
     public function test_factory_creates_tracer(): void
     {
         $exporterFactory = $this->createMock(ExporterFactory::class);
@@ -48,9 +49,6 @@ class TracerProviderFactoryTest extends TestCase
         $factory->create();
     }
 
-    /**
-     * @covers ::create
-     */
     public function test_factory_logs_warnings_and_continues(): void
     {
         $exporterFactory = $this->createMock(ExporterFactory::class);
@@ -70,5 +68,12 @@ class TracerProviderFactoryTest extends TestCase
 
         $factory = new TracerProviderFactory('test', $exporterFactory, $samplerFactory, $spanProcessorFactory);
         $factory->create();
+    }
+
+    public function test_can_be_disabled(): void
+    {
+        $this->setEnvironmentVariable('OTEL_SDK_DISABLED', 'true');
+        $factory = new TracerProviderFactory('test');
+        $this->assertInstanceOf(NoopTracerProvider::class, $factory->create());
     }
 }
