@@ -119,4 +119,35 @@ final class GrpcTransportTest extends TestCase
         $future = $this->transport->send('', TransportInterface::CONTENT_TYPE_PROTOBUF);
         $this->assertInstanceOf(ErrorFuture::class, $future);
     }
+
+    /**
+     * @dataProvider headersProvider
+     */
+    public function test_grpc_headers(array $headers, array $expected): void
+    {
+        $this->call->method('wait')->willReturn([$this->response, $this->status]);
+        $client = $this->createMock(TraceServiceClient::class);
+        $client
+            ->expects($this->once())
+            ->method('Export')
+            ->with($this->anything(), $this->equalTo($expected))
+            ->willReturn($this->call)
+        ;
+        $transport = new GrpcTransport($client, $headers);
+        $transport->send('', TransportInterface::CONTENT_TYPE_PROTOBUF);
+    }
+
+    public function headersProvider(): array
+    {
+        return [
+            [
+                ['foo' => 'bar'],
+                ['foo' => ['bar']],
+            ],
+            [
+                ['foo' => ['bar']],
+                ['foo' => ['bar']],
+            ],
+        ];
+    }
 }

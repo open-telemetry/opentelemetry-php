@@ -106,6 +106,6 @@ final class GrpcTransport implements TransportInterface
      */
     private function formatMetadata(array $metadata): array
     {
-        return array_map(fn ($value) => [$value], $metadata);
+        return array_map(fn ($value) => is_array($value) ? $value : [$value], $metadata);
     }
 }
