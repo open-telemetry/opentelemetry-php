@@ -67,9 +67,9 @@ class Exporter implements SpanExporterInterface
             $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, $timeout) :
             $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
-        $this->metadata = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
+        $this->metadata = self::transformToGrpcMetadata($this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
-            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers);
+            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers));
 
         $opts = $this->getClientOptions();
 
@@ -160,8 +160,12 @@ class Exporter implements SpanExporterInterface
 
     public function setHeader($key, $value): void
     {
-        // metadata is supposed to be key-value pairs
+        // metadata is supposed to be key-value pairs and the value must be an array
         // @see https://grpc.io/docs/what-is-grpc/core-concepts/#metadata
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+
         $this->metadata[$key] = $value;
     }
 
@@ -189,5 +193,16 @@ class Exporter implements SpanExporterInterface
     public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null): Exporter
     {
         return is_string($endpointUrl) ? new Exporter($endpointUrl) :  new Exporter();
+    }
+
+    private static function transformToGrpcMetadata(array $metadata): array
+    {
+        foreach ($metadata as $key => $value) {
+            if (!is_array($value)) {
+                $metadata[$key] = [$value];
+            }
+        }
+
+        return $metadata;
     }
 }

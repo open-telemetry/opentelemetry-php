@@ -107,7 +107,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
 
         $exporter = new Exporter();
 
-        $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'barf'], $exporter->getHeaders());
+        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['barf']], $exporter->getHeaders());
     }
 
     public function test_set_header(): void
@@ -116,18 +116,18 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $exporter->setHeader('foo', 'bar');
         $headers = $exporter->getHeaders();
         $this->assertArrayHasKey('foo', $headers);
-        $this->assertEquals('bar', $headers['foo']);
+        $this->assertEquals(['bar'], $headers['foo']);
     }
 
     public function test_set_headers_in_constructor(): void
     {
         $exporter = new Exporter('localhost:4317', true, '', 'x-aaa=foo,x-bbb=bar');
 
-        $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'bar'], $exporter->getHeaders());
+        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar']], $exporter->getHeaders());
 
         $exporter->setHeader('key', 'value');
 
-        $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'bar', 'key' => 'value'], $exporter->getHeaders());
+        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar'], 'key' => ['value']], $exporter->getHeaders());
     }
 
     private function isInsecure(Exporter $exporter) : bool
