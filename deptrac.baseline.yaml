@@ -1,4 +1,2 @@
 deptrac:
   skip_violations:
-    OpenTelemetry\API\Common\Instrumentation\Instrumentation:
-      - OpenTelemetry\SDK\Common\Util\WeakMap
