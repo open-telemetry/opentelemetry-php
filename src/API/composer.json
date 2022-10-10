@@ -23,6 +23,9 @@
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\API\\": "."
-        }
+        },
+        "files": [
+            "Trace/functions.php"
+        ]
     }
 }
