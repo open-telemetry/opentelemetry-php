@@ -16,12 +16,12 @@ use Throwable;
  * @template R
  * @param SpanInterface $span span to enclose the closure with
  * @param Closure(...): R $closure closure to invoke
- * @param array $args arguments to provide to the closure
+ * @param iterable<int|string, mixed> $args arguments to provide to the closure
  * @return R result of the closure invocation
  *
  * @phpstan-ignore-next-line
  */
-function trace(SpanInterface $span, Closure $closure, array $args = [])
+function trace(SpanInterface $span, Closure $closure, iterable $args = [])
 {
     $s = $span;
     $c = $closure;
@@ -31,6 +31,7 @@ function trace(SpanInterface $span, Closure $closure, array $args = [])
     $scope = $s->activate();
 
     try {
+        /** @psalm-suppress InvalidArgument */
         return $c(...$a, ...($a = []));
     } catch (Throwable $e) {
         $s->setStatus(StatusCode::STATUS_ERROR, $e->getMessage());
