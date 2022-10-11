@@ -49,7 +49,7 @@ class Exporter implements SpanExporterInterface
         SpanConverter $spanConverter = null,
         string $dataFormatVersion = Exporter::DATA_FORMAT_VERSION_DEFAULT
     ) {
-        $this->transport = (new PsrTransportFactory($client, $requestFactory, $streamFactory))->create($endpointUrl, [
+        $this->transport = (new PsrTransportFactory($client, $requestFactory, $streamFactory))->create($endpointUrl, 'application/json', [
             'Api-Key' => $licenseKey,
             'Data-Format' => 'newrelic',
             'Data-Format-Version' => $dataFormatVersion,
@@ -93,10 +93,10 @@ class Exporter implements SpanExporterInterface
         );
     }
 
-    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
+    public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         return $this->transport
-            ->send($this->serializeTrace($spans), 'application/json', $cancellation)
+            ->send($this->serializeTrace($batch), $cancellation)
             ->map(static fn (): bool => true)
             ->catch(static function (Throwable $throwable): bool {
                 self::logError('Export failure', ['exception' => $throwable]);

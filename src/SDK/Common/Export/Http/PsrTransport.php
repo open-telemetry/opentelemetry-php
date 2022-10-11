@@ -24,6 +24,10 @@ use Throwable;
 use function time_nanosleep;
 use function trim;
 
+/**
+ * @psalm-template CONTENT_TYPE of string
+ * @template-implements TransportInterface<CONTENT_TYPE>
+ */
 final class PsrTransport implements TransportInterface
 {
     private ClientInterface $client;
@@ -31,6 +35,7 @@ final class PsrTransport implements TransportInterface
     private StreamFactoryInterface $streamFactory;
 
     private string $endpoint;
+    private string $contentType;
     private array $headers;
     private array $compression;
     private int $retryDelay;
@@ -38,11 +43,15 @@ final class PsrTransport implements TransportInterface
 
     private bool $closed = false;
 
+    /**
+     * @psalm-param CONTENT_TYPE $contentType
+     */
     public function __construct(
         ClientInterface $client,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
         string $endpoint,
+        string $contentType,
         array $headers,
         array $compression,
         int $retryDelay,
@@ -52,13 +61,19 @@ final class PsrTransport implements TransportInterface
         $this->requestFactory = $requestFactory;
         $this->streamFactory = $streamFactory;
         $this->endpoint = $endpoint;
+        $this->contentType = $contentType;
         $this->headers = $headers;
         $this->compression = $compression;
         $this->retryDelay = $retryDelay;
         $this->maxRetries = $maxRetries;
     }
 
-    public function send(string $payload, string $contentType, ?CancellationInterface $cancellation = null): FutureInterface
+    public function contentType(): string
+    {
+        return $this->contentType;
+    }
+
+    public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface
     {
         if ($this->closed) {
             return new ErrorFuture(new BadMethodCallException('Transport closed'));
@@ -68,7 +83,7 @@ final class PsrTransport implements TransportInterface
         $request = $this->requestFactory
             ->createRequest('POST', $this->endpoint)
             ->withBody($this->streamFactory->createStream($body))
-            ->withHeader('Content-Type', $contentType)
+            ->withHeader('Content-Type', $this->contentType)
         ;
         if ($appliedEncodings) {
             $request = $request->withHeader('Content-Encoding', $appliedEncodings);

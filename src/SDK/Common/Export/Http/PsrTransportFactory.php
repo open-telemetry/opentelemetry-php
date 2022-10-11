@@ -31,6 +31,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
 
     public function create(
         string $endpoint,
+        string $contentType,
         array $headers = [],
         $compression = null,
         float $timeout = 10.,
@@ -49,6 +50,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
             $this->requestFactory,
             $this->streamFactory,
             $endpoint,
+            $contentType,
             $headers,
             (array) $compression,
             $retryDelay,

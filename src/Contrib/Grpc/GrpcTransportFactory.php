@@ -20,8 +20,16 @@ use function substr_count;
 
 final class GrpcTransportFactory implements TransportFactoryInterface
 {
+    /**
+     * @psalm-param "application/x-protobuf" $contentType
+     * @psalm-return TransportInterface<"application/x-protobuf">
+     *
+     * @psalm-suppress MoreSpecificImplementedParamType
+     * @psalm-suppress ImplementedReturnTypeMismatch
+     */
     public function create(
         string $endpoint,
+        string $contentType = 'application/x-protobuf',
         array $headers = [],
         $compression = null,
         float $timeout = 10.,
@@ -34,6 +42,10 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         $parts = parse_url($endpoint);
         if (!isset($parts['scheme'], $parts['host'], $parts['path'])) {
             throw new InvalidArgumentException('Endpoint has to contain scheme, host and path');
+        }
+        /** @phpstan-ignore-next-line */
+        if ($contentType !== 'application/x-protobuf') {
+            throw new InvalidArgumentException(sprintf('Unsupported content type "%s", grpc transport supports only application/x-protobuf', $contentType));
         }
 
         $scheme = $parts['scheme'];

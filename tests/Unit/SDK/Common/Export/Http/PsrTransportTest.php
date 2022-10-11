@@ -30,7 +30,7 @@ final class PsrTransportTest extends TestCase
 
         $client = $this->createMock(ClientInterface::class);
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $factory->create('localhost');
+        $factory->create('localhost', 'text/plain');
     }
 
     public function test_send_propagates_body_and_content_type(): void
@@ -43,9 +43,9 @@ final class PsrTransportTest extends TestCase
             return new Response();
         });
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost');
+        $transport = $factory->create('http://localhost', 'text/plain');
 
-        $transport->send('abc', 'text/plain');
+        $transport->send('abc');
     }
 
     public function test_send_applies_compression(): void
@@ -58,9 +58,9 @@ final class PsrTransportTest extends TestCase
             return new Response();
         });
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost', [], 'gzip');
+        $transport = $factory->create('http://localhost', 'text/plain', [], 'gzip');
 
-        $transport->send('abc', 'text/plain');
+        $transport->send('abc');
     }
 
     public function test_send_sets_headers(): void
@@ -72,9 +72,9 @@ final class PsrTransportTest extends TestCase
             return new Response();
         });
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost', ['x-foo' => 'bar']);
+        $transport = $factory->create('http://localhost', 'text/plain', ['x-foo' => 'bar']);
 
-        $transport->send('abc', 'text/plain');
+        $transport->send('abc');
     }
 
     public function test_send_returns_response_body(): void
@@ -82,9 +82,9 @@ final class PsrTransportTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, [], 'abc'));
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost');
+        $transport = $factory->create('http://localhost', 'text/plain');
 
-        $this->assertSame('abc', $transport->send('', 'text/plain')->await());
+        $this->assertSame('abc', $transport->send('')->await());
     }
 
     public function test_send_decodes_response_body(): void
@@ -92,9 +92,9 @@ final class PsrTransportTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, ['Content-Encoding' => 'gzip'], gzencode('abc')));
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost');
+        $transport = $factory->create('http://localhost', 'text/plain');
 
-        $this->assertSame('abc', $transport->send('', 'text/plain')->await());
+        $this->assertSame('abc', $transport->send('')->await());
     }
 
     public function test_send_decode_unknown_encoding_returns_error(): void
@@ -102,9 +102,9 @@ final class PsrTransportTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, ['Content-Encoding' => 'invalid'], ''));
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost');
+        $transport = $factory->create('http://localhost', 'text/plain');
 
-        $response = $transport->send('', 'text/plain');
+        $response = $transport->send('');
 
         $this->expectException(Exception::class);
         $response->await();
@@ -115,9 +115,9 @@ final class PsrTransportTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->expects($this->once())->method('sendRequest')->willReturn(new Response(403));
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost');
+        $transport = $factory->create('http://localhost', 'text/plain');
 
-        $response = $transport->send('', 'text/plain');
+        $response = $transport->send('');
 
         $this->expectException(Exception::class);
         $response->await();
@@ -131,9 +131,9 @@ final class PsrTransportTest extends TestCase
             new Response(200, [], 'abc')
         );
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost', [], null, 10., 1);
+        $transport = $factory->create('http://localhost', 'text/plain', [], null, 10., 1);
 
-        $this->assertSame('abc', $transport->send('', 'text/plain')->await());
+        $this->assertSame('abc', $transport->send('')->await());
     }
 
     public function test_send_returns_error_if_retry_limit_exceeded(): void
@@ -141,9 +141,9 @@ final class PsrTransportTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->expects($this->once())->method('sendRequest')->willReturn(new Response(500));
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost', [], null, 10., 100, 1);
+        $transport = $factory->create('http://localhost', 'text/plain', [], null, 10., 100, 1);
 
-        $response = $transport->send('', 'text/plain');
+        $response = $transport->send('');
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('retry limit');
@@ -155,9 +155,9 @@ final class PsrTransportTest extends TestCase
         $client = $this->createMock(ClientInterface::class);
         $client->expects($this->once())->method('sendRequest')->willThrowException(new Exception());
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost');
+        $transport = $factory->create('http://localhost', 'text/plain');
 
-        $response = $transport->send('', 'text/plain');
+        $response = $transport->send('');
 
         $this->expectException(Exception::class);
         $response->await();
@@ -167,7 +167,7 @@ final class PsrTransportTest extends TestCase
     {
         $client = $this->createMock(ClientInterface::class);
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost');
+        $transport = $factory->create('http://localhost', 'text/plain');
 
         $this->assertTrue($transport->shutdown());
     }
@@ -176,7 +176,7 @@ final class PsrTransportTest extends TestCase
     {
         $client = $this->createMock(ClientInterface::class);
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost');
+        $transport = $factory->create('http://localhost', 'text/plain');
 
         $this->assertTrue($transport->forceFlush());
     }
@@ -185,10 +185,10 @@ final class PsrTransportTest extends TestCase
     {
         $client = $this->createMock(ClientInterface::class);
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost');
+        $transport = $factory->create('http://localhost', 'text/plain');
         $transport->shutdown();
 
-        $response = $transport->send('', 'text/plain');
+        $response = $transport->send('');
 
         $this->expectException(Exception::class);
         $response->await();
@@ -198,7 +198,7 @@ final class PsrTransportTest extends TestCase
     {
         $client = $this->createMock(ClientInterface::class);
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost');
+        $transport = $factory->create('http://localhost', 'text/plain');
         $transport->shutdown();
 
         $this->assertFalse($transport->shutdown());
@@ -208,7 +208,7 @@ final class PsrTransportTest extends TestCase
     {
         $client = $this->createMock(ClientInterface::class);
         $factory = new PsrTransportFactory($client, new HttpFactory(), new HttpFactory());
-        $transport = $factory->create('http://localhost');
+        $transport = $factory->create('http://localhost', 'text/plain');
         $transport->shutdown();
 
         $this->assertFalse($transport->forceFlush());
