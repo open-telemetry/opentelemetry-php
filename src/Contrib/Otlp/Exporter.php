@@ -12,27 +12,32 @@ use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Throwable;
 
+/**
+ * @todo rename to TraceExporter ?
+ */
 class Exporter implements SpanExporterInterface
 {
     use LogsMessagesTrait;
 
     private TransportInterface $transport;
+    private string $protocol; //@see Protocols::*
 
-    public function __construct(TransportInterface $transport)
+    public function __construct(TransportInterface $transport, string $protocol)
     {
         $this->transport = $transport;
+        $this->protocol = $protocol;
     }
 
-    /**
-     * @todo inefficient string conversion to/from ExportTraceService{Request,Response}?
-     */
     public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
     {
+        $protocol = $this->protocol;
+        $payload = Converter::encode((new SpanConverter())->convert($spans), $protocol);
+
         return $this->transport
-            ->send((new SpanConverter())->convert($spans)->serializeToString(), TransportInterface::CONTENT_TYPE_PROTOBUF, $cancellation)
-            ->map(static function (string $payload): bool {
+            ->send($payload, Converter::contentType($this->protocol), $cancellation)
+            ->map(static function (string $payload) use ($protocol): bool {
                 $serviceResponse = new ExportTraceServiceResponse();
-                $serviceResponse->mergeFromString($payload);
+                Converter::decode($serviceResponse, $payload, $protocol);
 
                 $partialSuccess = $serviceResponse->getPartialSuccess();
                 if ($partialSuccess !== null && $partialSuccess->getRejectedSpans()) {

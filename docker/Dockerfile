@@ -11,7 +11,7 @@ RUN chmod +x /usr/local/bin/install-php-extensions; \
         zip \
         pcntl \
         grpc \
-        runkit7-alpha \
+	protobuf \
         sockets \
         intl \
         @composer \

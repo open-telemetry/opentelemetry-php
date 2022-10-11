@@ -11,8 +11,10 @@ use Grpc\ChannelCredentials;
 use function in_array;
 use InvalidArgumentException;
 use function json_encode;
+use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
-use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
+use OpenTelemetry\Contrib\Otlp\Protocols;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
@@ -25,8 +27,11 @@ use function sprintf;
 final class GrpcTransportFactory implements TransportFactoryInterface
 {
     use EnvironmentVariablesTrait;
+    use LogsMessagesTrait;
 
-    public const DEFAULT_ENDPOINT = 'http://localhost:4317';
+    private const DEFAULT_ENDPOINT = 'http://localhost:4317';
+    private const DEFAULT_SIGNAL = Signals::TRACE;
+    private string $signal = self::DEFAULT_SIGNAL;
 
     public function create(
         string $endpoint = null,
@@ -88,10 +93,10 @@ final class GrpcTransportFactory implements TransportFactoryInterface
             ? $parts['host'] . ':' . $parts['port']
             : $parts['host'];
 
-        $client = new TraceServiceClient($grpcEndpoint, $opts);
-
         return new GrpcTransport(
-            $client,
+            $grpcEndpoint,
+            $opts,
+            GrpcTransport::method($this->signal),
             $headers,
         );
     }
@@ -168,5 +173,20 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         }
 
         return $content;
+    }
+
+    public function withSignal(string $signal): TransportFactoryInterface
+    {
+        Signals::validate($signal);
+        $this->signal = $signal;
+
+        return $this;
+    }
+
+    public function withProtocol(string $protocol): TransportFactoryInterface
+    {
+        Protocols::validate($protocol);
+
+        return $this;
     }
 }

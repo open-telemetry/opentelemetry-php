@@ -69,4 +69,14 @@ final class PsrTransportFactory implements TransportFactoryInterface
             Psr17FactoryDiscovery::findStreamFactory(),
         );
     }
+
+    public function withSignal(string $signal): TransportFactoryInterface
+    {
+        return $this;
+    }
+
+    public function withProtocol(string $protocol): TransportFactoryInterface
+    {
+        return $this;
+    }
 }

@@ -38,7 +38,7 @@ final class StreamTransport implements TransportInterface
         $this->stream = $stream;
     }
 
-    public function send(string $payload, string $contentType, ?CancellationInterface $cancellation = null): FutureInterface
+    public function send($payload, string $contentType, ?CancellationInterface $cancellation = null): FutureInterface
     {
         if (!$this->stream) {
             return new ErrorFuture(new BadMethodCallException('Transport closed'));

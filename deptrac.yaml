@@ -109,7 +109,7 @@ deptrac:
           - Composer
       Contrib:
           - +SDK
-          - OtelProto
+          - +OtelProto
           - Grpc
           - Prometheus
           - Thrift

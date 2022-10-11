@@ -7,8 +7,8 @@ namespace OpenTelemetry\Contrib\OtlpHttp;
 use InvalidArgumentException;
 use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
+use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
-use OpenTelemetry\SDK\Common\Environment\KnownValues;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
@@ -21,10 +21,14 @@ class OtlpHttpTransportFactory implements TransportFactoryInterface
 
     private const DEFAULT_ENDPOINT = 'http://localhost:4318';
     private const DEFAULT_COMPRESSION = 'none';
-    private const DEFAULT_OTLP_PROTOCOL = KnownValues::VALUE_HTTP_PROTOBUF;
+    private const DEFAULT_OTLP_PROTOCOL = Protocols::HTTP_PROTOBUF;
+    private const DEFAULT_SIGNAL = Signals::TRACE;
     private static array $protocols = [
-        KnownValues::VALUE_HTTP_PROTOBUF,
+        Protocols::HTTP_PROTOBUF,
+        Protocols::HTTP_JSON,
     ];
+    private string $signal = self::DEFAULT_SIGNAL;
+    private string $protocol = self::DEFAULT_OTLP_PROTOCOL;
 
     public function create(
         string $endpoint = null,
@@ -40,7 +44,7 @@ class OtlpHttpTransportFactory implements TransportFactoryInterface
         $endpoint ??= $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
             ? $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
             : $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, self::DEFAULT_ENDPOINT);
-        $endpoint = HttpEndpointResolver::create()->resolveToString($endpoint, Signals::TRACE);
+        $endpoint = HttpEndpointResolver::create()->resolveToString($endpoint, $this->signal);
 
         $headers += $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) :
@@ -52,8 +56,8 @@ class OtlpHttpTransportFactory implements TransportFactoryInterface
             $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
 
         $protocol = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
-            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, self::DEFAULT_OTLP_PROTOCOL) :
-            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_PROTOCOL, self::DEFAULT_OTLP_PROTOCOL);
+            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, $this->protocol) :
+            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_PROTOCOL, $this->protocol);
 
         if (!in_array($protocol, self::$protocols)) {
             throw new InvalidArgumentException(sprintf('Invalid OTLP Protocol "%s" specified', $protocol));
@@ -63,5 +67,21 @@ class OtlpHttpTransportFactory implements TransportFactoryInterface
         }
 
         return PsrTransportFactory::discover()->create($endpoint, $headers, $compression);
+    }
+
+    public function withSignal(string $signal): TransportFactoryInterface
+    {
+        Signals::validate($signal);
+        $this->signal = $signal;
+
+        return $this;
+    }
+
+    public function withProtocol(string $protocol): TransportFactoryInterface
+    {
+        Protocols::validate($protocol);
+        $this->protocol = $protocol;
+
+        return $this;
     }
 }

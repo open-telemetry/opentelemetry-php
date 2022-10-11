@@ -6,8 +6,10 @@ namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use function fopen;
 use function fseek;
-use OpenTelemetry\Contrib\Otlp\StreamMetricExporter;
+use OpenTelemetry\Contrib\Otlp\MetricExporter;
+use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Export\Stream\StreamTransport;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
 use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
@@ -18,16 +20,23 @@ use PHPUnit\Framework\TestCase;
 use function stream_get_contents;
 
 /**
- * @covers \OpenTelemetry\Contrib\Otlp\StreamMetricExporter
+ * @covers \OpenTelemetry\Contrib\Otlp\MetricExporter
  */
-final class StreamMetricExporterTest extends TestCase
+final class MetricExporterTest extends TestCase
 {
+    private $stream;
+    private MetricExporter $exporter;
+
+    public function setUp(): void
+    {
+        $this->stream = fopen('php://memory', 'a+b');
+        $transport = new StreamTransport($this->stream);
+        $this->exporter = new MetricExporter($transport, Protocols::HTTP_ND_JSON);
+    }
+
     public function test_exporter_writes_metrics_in_otlp_json_format_with_trailing_newline(): void
     {
-        $stream = fopen('php://memory', 'a+b');
-        $exporter = new StreamMetricExporter($stream);
-
-        $exporter->export([
+        $this->exporter->export([
             new Metric(
                 new InstrumentationScope('test', null, null, Attributes::create([])),
                 ResourceInfoFactory::emptyResource(),
@@ -40,19 +49,16 @@ final class StreamMetricExporterTest extends TestCase
             ),
         ]);
 
-        fseek($stream, 0);
+        fseek($this->stream, 0);
         $this->assertSame(<<<METRICS
             {"resourceMetrics":[{"resource":{},"scopeMetrics":[{"scope":{"name":"test"},"metrics":[{"name":"test","sum":{"dataPoints":[{"startTimeUnixNano":"17","timeUnixNano":"42","asInt":"5"}],"aggregationTemporality":"AGGREGATION_TEMPORALITY_DELTA"}}]}]}]}
 
-            METRICS, stream_get_contents($stream));
+            METRICS, stream_get_contents($this->stream));
     }
 
     public function test_exporter_appends_metrics(): void
     {
-        $stream = fopen('php://memory', 'a+b');
-        $exporter = new StreamMetricExporter($stream);
-
-        $exporter->export([
+        $this->exporter->export([
             new Metric(
                 new InstrumentationScope('test', null, null, Attributes::create([])),
                 ResourceInfoFactory::emptyResource(),
@@ -64,7 +70,7 @@ final class StreamMetricExporterTest extends TestCase
                 ], Temporality::DELTA, false)
             ),
         ]);
-        $exporter->export([
+        $this->exporter->export([
             new Metric(
                 new InstrumentationScope('test', null, null, Attributes::create([])),
                 ResourceInfoFactory::emptyResource(),
@@ -77,11 +83,11 @@ final class StreamMetricExporterTest extends TestCase
             ),
         ]);
 
-        fseek($stream, 0);
+        fseek($this->stream, 0);
         $this->assertSame(<<<METRICS
             {"resourceMetrics":[{"resource":{},"scopeMetrics":[{"scope":{"name":"test"},"metrics":[{"name":"test","sum":{"dataPoints":[{"startTimeUnixNano":"17","timeUnixNano":"42","asInt":"5"}],"aggregationTemporality":"AGGREGATION_TEMPORALITY_DELTA"}}]}]}]}
             {"resourceMetrics":[{"resource":{},"scopeMetrics":[{"scope":{"name":"test"},"metrics":[{"name":"test","sum":{"dataPoints":[{"startTimeUnixNano":"42","timeUnixNano":"57","asInt":"7"}],"aggregationTemporality":"AGGREGATION_TEMPORALITY_DELTA"}}]}]}]}
 
-            METRICS, stream_get_contents($stream));
+            METRICS, stream_get_contents($this->stream));
     }
 }

@@ -8,9 +8,17 @@ namespace OpenTelemetry\Contrib\Grpc;
 
 use function array_change_key_case;
 use BadMethodCallException;
+use Grpc\Call;
+use Grpc\Channel;
+use const Grpc\OP_RECV_INITIAL_METADATA;
+use const Grpc\OP_RECV_MESSAGE;
+use const Grpc\OP_RECV_STATUS_ON_CLIENT;
+use const Grpc\OP_SEND_CLOSE_FROM_CLIENT;
+use const Grpc\OP_SEND_INITIAL_METADATA;
+use const Grpc\OP_SEND_MESSAGE;
 use const Grpc\STATUS_OK;
-use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
-use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
+use Grpc\Timeval;
+use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -18,7 +26,6 @@ use OpenTelemetry\SDK\Common\Future\ErrorFuture;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Common\Future\NullCancellation;
 use RuntimeException;
-use function sprintf;
 use Throwable;
 use UnexpectedValueException;
 
@@ -27,61 +34,62 @@ use UnexpectedValueException;
  */
 final class GrpcTransport implements TransportInterface
 {
+    //@see protobuf *ServiceClient
+    private const METHODS = [
+        Signals::TRACE => '/opentelemetry.proto.collector.trace.v1.TraceService/Export',
+        Signals::METRICS => '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
+        Signals::LOGS => '/opentelemetry.proto.collector.logs.v1.LogsService/Export',
+    ];
     private array $metadata;
-    private TraceServiceClient $client;
+    private Channel $channel;
+    private string $method;
     private bool $closed = false;
 
     public function __construct(
-        TraceServiceClient $client,
+        string $endpoint,
+        array $opts,
+        string $method,
         array $headers = []
     ) {
-        $this->client = $client;
+        $this->channel = new Channel($endpoint, $opts);
+        $this->method = $method;
         $this->metadata = $this->formatMetadata(array_change_key_case($headers));
     }
 
-    /**
-     * @todo Possibly inefficient to convert payload to/from string, can we refactor to accept ExportTraceServiceRequest?
-     */
     public function send(string $payload, string $contentType, ?CancellationInterface $cancellation = null): FutureInterface
     {
         if ($this->closed) {
             return new ErrorFuture(new BadMethodCallException('Transport closed'));
         }
-        if ($contentType !== TransportInterface::CONTENT_TYPE_PROTOBUF) {
-            return new ErrorFuture(
-                new UnexpectedValueException(
-                    sprintf('Unsupported content type "%s", grpc transport supports only %s', $contentType, TransportInterface::CONTENT_TYPE_PROTOBUF)
-                )
-            );
+        if ($contentType !== 'application/x-protobuf') {
+            return new ErrorFuture(new UnexpectedValueException(sprintf('Unsupported content type "%s", grpc transport supports only application/x-protobuf', $contentType)));
         }
 
-        $request = new ExportTraceServiceRequest();
-
-        try {
-            $request->mergeFromString($payload);
-        } catch (\Exception $e) {
-            return new ErrorFuture($e);
-        }
-
-        $call = $this->client->Export($request, $this->metadata);
+        $call = new Call($this->channel, $this->method, Timeval::infFuture());
 
         $cancellation ??= new NullCancellation();
         $cancellationId = $cancellation->subscribe(static fn (Throwable $e) => $call->cancel());
 
         try {
-            // @var \Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse $response
-            [$response, $status] = $call->wait();
+            $event = $call->startBatch([
+                OP_SEND_INITIAL_METADATA => $this->metadata,
+                OP_SEND_MESSAGE => ['message' => $payload],
+                OP_SEND_CLOSE_FROM_CLIENT => true,
+                OP_RECV_INITIAL_METADATA => true,
+                OP_RECV_STATUS_ON_CLIENT => true,
+                OP_RECV_MESSAGE => true,
+            ]);
         } catch (Throwable $e) {
             return new ErrorFuture($e);
         } finally {
             $cancellation->unsubscribe($cancellationId);
         }
 
-        if ($status->code === STATUS_OK) {
-            return new CompletedFuture($response->serializeToString());
+        if ($event->status->code === STATUS_OK) {
+            return new CompletedFuture($event->message);
         }
 
-        return new ErrorFuture(new RuntimeException($status->details, $status->code));
+        return new ErrorFuture(new RuntimeException($event->status->details, $event->status->code));
     }
 
     public function shutdown(?CancellationInterface $cancellation = null): bool
@@ -91,7 +99,7 @@ final class GrpcTransport implements TransportInterface
         }
 
         $this->closed = true;
-        $this->client->close();
+        $this->channel->close();
 
         return true;
     }
@@ -107,5 +115,14 @@ final class GrpcTransport implements TransportInterface
     private function formatMetadata(array $metadata): array
     {
         return array_map(fn ($value) => is_array($value) ? $value : [$value], $metadata);
+    }
+
+    public static function method(string $signal): string
+    {
+        if (!array_key_exists($signal, self::METHODS)) {
+            throw new UnexpectedValueException('Method not defined for signal: ' . $signal);
+        }
+
+        return self::METHODS[$signal];
     }
 }

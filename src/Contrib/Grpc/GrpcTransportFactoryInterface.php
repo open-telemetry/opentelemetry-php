@@ -2,19 +2,18 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Export;
+namespace OpenTelemetry\Contrib\Grpc;
 
-interface TransportFactoryInterface
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
+
+interface GrpcTransportFactoryInterface
 {
-    public const COMPRESSION_GZIP = 'gzip';
-    public const COMPRESSION_DEFLATE = 'deflate';
-    public const COMPRESSION_BROTLI = 'br';
-
     /**
      * @param array<string, string|string[]> $headers
      * @param string|string[]|null $compression
      */
     public function create(
+        string $signal = null,
         string $endpoint = null,
         array $headers = [],
         $compression = null,
@@ -25,8 +24,4 @@ interface TransportFactoryInterface
         ?string $cert = null,
         ?string $key = null
     ): TransportInterface;
-
-    public function withSignal(string $signal): self;
-
-    public function withProtocol(string $protocol): self;
 }

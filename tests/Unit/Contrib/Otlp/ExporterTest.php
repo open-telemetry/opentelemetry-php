@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use OpenTelemetry\Contrib\Otlp\Exporter;
+use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\ErrorFuture;
@@ -22,7 +23,7 @@ class ExporterTest extends TestCase
     public function setUp(): void
     {
         $this->transport = $this->createMock(TransportInterface::class);
-        $this->exporter = new Exporter($this->transport);
+        $this->exporter = new Exporter($this->transport, Protocols::HTTP_PROTOBUF);
     }
 
     public function test_export_with_transport_failure(): void

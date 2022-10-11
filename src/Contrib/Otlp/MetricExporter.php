@@ -4,40 +4,35 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use function is_string;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Export\Stream\StreamTransport;
-use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
-use const STDOUT;
 use Throwable;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/stdout.md#opentelemetry-metrics-exporter---standard-output
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/experimental/serialization/json.md#json-file-serialization
  */
-final class StreamMetricExporter implements MetricExporterInterface
+final class MetricExporter implements MetricExporterInterface
 {
     use LogsMessagesTrait;
 
     private TransportInterface $transport;
+    private string $protocol;
     /**
      * @var string|Temporality|null
      */
     private $temporality;
 
     /**
-     * @param string|resource $stream filename or stream to write to
      * @param string|Temporality|null $temporality
      */
-    public function __construct($stream = STDOUT, $temporality = null)
+    public function __construct(TransportInterface $transport, string $protocol, $temporality = null)
     {
-        $this->transport = is_string($stream)
-            ? (new StreamTransportFactory())->create($stream)
-            : new StreamTransport($stream);
+        $this->transport = $transport;
+        $this->protocol = $protocol;
         $this->temporality = $temporality;
     }
 
@@ -48,11 +43,11 @@ final class StreamMetricExporter implements MetricExporterInterface
 
     public function export(iterable $batch): bool
     {
-        $payload = (new MetricConverter())->convert($batch)->serializeToJsonString();
-        $payload .= "\n";
+        $request = (new MetricConverter())->convert($batch);
+        $payload = Converter::encode($request, $this->protocol);
 
         return $this->transport
-            ->send($payload, 'application/x-ndjson')
+            ->send($payload, Converter::contentType($this->protocol))
             ->map(static fn (): bool => true)
             ->catch(static function (Throwable $throwable): bool {
                 self::logError('Export failure', ['exception' => $throwable]);

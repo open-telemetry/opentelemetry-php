@@ -35,18 +35,6 @@ class OtlpHttpTransportFactoryTest extends TestCase
     }
 
     /**
-     * @link https://github.com/open-telemetry/opentelemetry-specification/issues/786
-     * @psalm-suppress PossiblyInvalidArgument
-     */
-    public function test_fails_exporter_refuses_otlp_json(): void
-    {
-        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_PROTOCOL', 'http/json');
-        $this->expectException(\InvalidArgumentException::class);
-
-        $this->factory->create();
-    }
-
-    /**
      * @dataProvider exporterInvalidEndpointDataProvider
      * @psalm-suppress PossiblyInvalidArgument
      */

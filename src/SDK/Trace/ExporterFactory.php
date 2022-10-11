@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
+use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\SDK\Common\Dsn\DsnInterface;
 use OpenTelemetry\SDK\Common\Dsn\Parser;
 use OpenTelemetry\SDK\Common\Dsn\ParserInterface;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\KnownValues;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
@@ -34,6 +36,10 @@ class ExporterFactory
     private const KNOWN_TRANSPORT_FACTORIES = [
         'otlp+grpc' => '\OpenTelemetry\Contrib\Grpc\GrpcTransportFactory',
         'otlp+http' => '\OpenTelemetry\Contrib\OtlpHttp\OtlpHttpTransportFactory',
+    ];
+    private const KNOWN_TRANSPORT_PROTOCOLS = [
+        'otlp+grpc' => KnownValues::VALUE_GRPC,
+        'otlp+http' => KnownValues::VALUE_HTTP_PROTOBUF,
     ];
 
     private const DEFAULT_SERVICE_NAME = 'unknown_service';
@@ -150,13 +156,14 @@ class ExporterFactory
     /**
      * @phan-suppress PhanTypeMismatchArgument
      * @phan-suppress PhanUndeclaredClass
+     * @phan-suppress PhanParamTooMany
      */
     private static function buildExporterWithTransport(string $protocol): SpanExporterInterface
     {
         $exporterClass = self::KNOWN_EXPORTERS[self::normalizeProtocol($protocol)];
         self::validateClass($exporterClass);
 
-        $exporter = new $exporterClass(self::buildTransport($protocol)); // @phpstan-ignore-line
+        $exporter = new $exporterClass(self::buildTransport($protocol), self::KNOWN_TRANSPORT_PROTOCOLS[$protocol]); // @phpstan-ignore-line
         assert($exporter instanceof SpanExporterInterface);
 
         return $exporter;
@@ -169,7 +176,7 @@ class ExporterFactory
         $factory = new $factoryClass();
         assert($factory instanceof TransportFactoryInterface);
 
-        return $factory->create();
+        return $factory->withSignal(Signals::TRACE)->create();
     }
 
     private static function validateProtocol(string $protocol): void
