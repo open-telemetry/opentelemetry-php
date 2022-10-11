@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK;
 
+use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Metrics as API;
+use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
@@ -33,6 +35,13 @@ use PHPUnit\Framework\TestCase;
  */
 final class MeterProviderTest extends TestCase
 {
+    use EnvironmentVariables;
+
+    public function tearDown(): void
+    {
+        self::restoreEnvironmentVariables();
+    }
+
     public function test_weak_asynchronous_observer_is_released_when_instance_out_of_scope(): void
     {
         $clock = new TestClock();
@@ -79,6 +88,17 @@ final class MeterProviderTest extends TestCase
             ],
             $exporter->collect(true),
         );
+    }
+
+    public function test_returns_noop_meter_when_sdk_disabled(): void
+    {
+        self::setEnvironmentVariable('OTEL_SDK_DISABLED', 'true');
+        $clock = new TestClock();
+        $exporter = new InMemoryExporter();
+        $reader = new ExportingReader($exporter, $clock);
+        $meterProvider = $this->meterProvider($reader, $clock);
+
+        $this->assertInstanceOf(NoopMeter::class, $meterProvider->getMeter('test'));
     }
 
     /**

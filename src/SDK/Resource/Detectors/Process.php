@@ -30,8 +30,9 @@ final class Process implements ResourceDetectorInterface
             $attributes[ResourceAttributes::PROCESS_COMMAND_ARGS] = $_SERVER['argv'];
         }
 
-        if (extension_loaded('posix')) {
-            $attributes[ResourceAttributes::PROCESS_OWNER] = \posix_getpwuid(\posix_geteuid())['name'];
+        /** @phan-suppress-next-line PhanTypeComparisonFromArray */
+        if (extension_loaded('posix') && ($user = \posix_getpwuid(\posix_geteuid())) !== false) {
+            $attributes[ResourceAttributes::PROCESS_OWNER] = $user['name'];
         }
 
         return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
