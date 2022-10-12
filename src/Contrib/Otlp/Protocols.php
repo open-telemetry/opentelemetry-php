@@ -12,12 +12,12 @@ class Protocols
     public const GRPC = KnownValues::VALUE_GRPC;
     public const HTTP_PROTOBUF = KnownValues::VALUE_HTTP_PROTOBUF;
     public const HTTP_JSON = KnownValues::VALUE_HTTP_JSON;
-    public const HTTP_ND_JSON = KnownValues::VALUE_HTTP_NDJSON;
+    public const HTTP_NDJSON = KnownValues::VALUE_HTTP_NDJSON;
     private const PROTOCOLS = [
         self::GRPC => 'application/x-protobuf',
         self::HTTP_PROTOBUF => 'application/x-protobuf',
         self::HTTP_JSON => 'application/json',
-        self::HTTP_ND_JSON => 'application/x-ndjson',
+        self::HTTP_NDJSON => 'application/x-ndjson',
     ];
 
     public static function validate(string $protocol): void

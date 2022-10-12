@@ -12,8 +12,6 @@ use OpenTelemetry\SDK\Common\Future\FutureInterface;
  */
 interface TransportInterface
 {
-    public const CONTENT_TYPE_PROTOBUF = 'application/x-protobuf';
-
     public function contentType(): string;
 
     public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface;

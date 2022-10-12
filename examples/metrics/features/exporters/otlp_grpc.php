@@ -7,7 +7,6 @@ require __DIR__ . '/../../../../vendor/autoload.php';
 use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
-use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\Example\ExampleMetricsGenerator;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
@@ -18,8 +17,7 @@ $clock = ClockFactory::getDefault();
 
 $reader = new ExportingReader(
     new MetricExporter(
-        (new GrpcTransportFactory())->withSignal(Signals::METRICS)->create('http://collector:4317'),
-        Protocols::GRPC,
+        (new GrpcTransportFactory())->withSignal(Signals::METRICS)->create('http://collector:4317')
     ),
     $clock
 );

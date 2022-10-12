@@ -28,6 +28,7 @@ class ExporterFactory
         'zipkin+http' => '\OpenTelemetry\Contrib\Zipkin\Exporter',
         'otlp+grpc' => '\OpenTelemetry\Contrib\Otlp\SpanExporter',
         'otlp+http' => '\OpenTelemetry\Contrib\Otlp\SpanExporter',
+        'otlp+json' => '\OpenTelemetry\Contrib\Otlp\SpanExporter',
         'newrelic+http' => '\OpenTelemetry\Contrib\Newrelic\Exporter',
         'zipkintonewrelic+http' => '\OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter',
         // this entry exists only for testing purposes
@@ -36,10 +37,12 @@ class ExporterFactory
     private const KNOWN_TRANSPORT_FACTORIES = [
         'otlp+grpc' => '\OpenTelemetry\Contrib\Grpc\GrpcTransportFactory',
         'otlp+http' => '\OpenTelemetry\Contrib\OtlpHttp\OtlpHttpTransportFactory',
+        'otlp+json' => '\OpenTelemetry\Contrib\OtlpHttp\OtlpHttpTransportFactory',
     ];
     private const KNOWN_TRANSPORT_PROTOCOLS = [
         'otlp+grpc' => KnownValues::VALUE_GRPC,
         'otlp+http' => KnownValues::VALUE_HTTP_PROTOBUF,
+        'otlp+json' => KnownValues::VALUE_HTTP_JSON,
     ];
 
     private const DEFAULT_SERVICE_NAME = 'unknown_service';
@@ -117,7 +120,7 @@ class ExporterFactory
                     case Values::VALUE_HTTP_PROTOBUF:
                         return self::buildExporterWithTransport('otlp+http');
                     case Values::VALUE_HTTP_JSON:
-                        throw new InvalidArgumentException('otlp+http/json not implemented');
+                        return self::buildExporterWithTransport('otlp+json');
                     default:
                         throw new InvalidArgumentException('Unknown protocol: ' . $protocol);
                 }
