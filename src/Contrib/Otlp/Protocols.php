@@ -14,16 +14,23 @@ class Protocols
     public const HTTP_JSON = KnownValues::VALUE_HTTP_JSON;
     public const HTTP_ND_JSON = KnownValues::VALUE_HTTP_NDJSON;
     private const PROTOCOLS = [
-        self::GRPC,
-        self::HTTP_PROTOBUF,
-        self::HTTP_JSON,
-        self::HTTP_ND_JSON,
+        self::GRPC => 'application/x-protobuf',
+        self::HTTP_PROTOBUF => 'application/x-protobuf',
+        self::HTTP_JSON => 'application/json',
+        self::HTTP_ND_JSON => 'application/x-ndjson',
     ];
 
     public static function validate(string $protocol): void
     {
-        if (!in_array($protocol, self::PROTOCOLS)) {
+        if (!array_key_exists($protocol, self::PROTOCOLS)) {
             throw new UnexpectedValueException('Unknown protocol: ' . $protocol);
         }
+    }
+
+    public static function contentType(string $protocol): string
+    {
+        self::validate($protocol);
+
+        return self::PROTOCOLS[$protocol];
     }
 }

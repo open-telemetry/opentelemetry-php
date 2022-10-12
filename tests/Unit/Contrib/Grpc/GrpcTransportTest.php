@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Contrib\Grpc;
 
 use Exception;
+use InvalidArgumentException;
 use OpenTelemetry\Contrib\Grpc\GrpcTransport;
-use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use PHPUnit\Framework\TestCase;
-use UnexpectedValueException;
 
 /**
  * @covers \OpenTelemetry\Contrib\Grpc\GrpcTransport
- * Note that real ExportTraceService* objects are used, since mocking them segfaults with ext-protobuf
  */
 final class GrpcTransportTest extends TestCase
 {
@@ -25,10 +24,11 @@ final class GrpcTransportTest extends TestCase
 
     public function test_grpc_transport_supports_only_protobuf(): void
     {
-        $response = $this->transport->send('', 'text/plain');
+        $factory = new GrpcTransportFactory();
 
-        $this->expectException(UnexpectedValueException::class);
-        $response->await();
+        $this->expectException(InvalidArgumentException::class);
+        /** @psalm-suppress InvalidArgument @phpstan-ignore-next-line */
+        $factory->create('http://localhost/service/method', 'text/plain');
     }
 
     public function test_shutdown_returns_true(): void
@@ -45,7 +45,7 @@ final class GrpcTransportTest extends TestCase
     {
         $this->transport->shutdown();
 
-        $response = $this->transport->send('', TransportInterface::CONTENT_TYPE_PROTOBUF);
+        $response = $this->transport->send('');
 
         $this->expectException(Exception::class);
         $response->await();

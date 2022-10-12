@@ -20,25 +20,36 @@ use function strlen;
 use Throwable;
 
 /**
- * @psalm-internal \OpenTelemetry
+ * @internal
+ *
+ * @psalm-template CONTENT_TYPE of string
+ * @template-implements TransportInterface<CONTENT_TYPE>
  */
 final class StreamTransport implements TransportInterface
 {
-
     /**
      * @var resource|null
      */
     private $stream;
+    private string $contentType;
 
     /**
      * @param resource $stream
+     *
+     * @psalm-param CONTENT_TYPE $contentType
      */
-    public function __construct($stream)
+    public function __construct($stream, string $contentType)
     {
         $this->stream = $stream;
+        $this->contentType = $contentType;
     }
 
-    public function send($payload, string $contentType, ?CancellationInterface $cancellation = null): FutureInterface
+    public function contentType(): string
+    {
+        return $this->contentType;
+    }
+
+    public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface
     {
         if (!$this->stream) {
             return new ErrorFuture(new BadMethodCallException('Transport closed'));

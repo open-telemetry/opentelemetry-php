@@ -3,16 +3,16 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../../vendor/autoload.php';
 
+use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
-use OpenTelemetry\Contrib\Otlp\Exporter;
-use OpenTelemetry\Contrib\Otlp\Protocols;
+use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 \OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
 
-$transport = (new GrpcTransportFactory())->create('http://collector:4317');
-$exporter = new Exporter($transport, Protocols::GRPC);
+$transport = (new GrpcTransportFactory())->withSignal(Signals::TRACE)->create('http://collector:4317');
+$exporter = new SpanExporter($transport);
 echo 'Starting OTLP GRPC example';
 
 $tracerProvider =  new TracerProvider(

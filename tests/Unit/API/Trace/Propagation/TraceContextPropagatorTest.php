@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\API\Unit\Trace\Propagation;
+namespace OpenTelemetry\Tests\Unit\API\Trace\Propagation;
 
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\SpanContext;
@@ -16,7 +16,7 @@ use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\API\Trace\Propagation\TraceContextPropagator
+ * @covers \OpenTelemetry\API\Trace\Propagation\TraceContextPropagator
  */
 class TraceContextPropagatorTest extends TestCase
 {

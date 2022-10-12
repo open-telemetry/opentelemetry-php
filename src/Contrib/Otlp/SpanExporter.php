@@ -13,31 +13,35 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Throwable;
 
 /**
- * @todo rename to TraceExporter ?
+ * @psalm-import-type SUPPORTED_CONTENT_TYPES from ProtobufSerializer
  */
-class Exporter implements SpanExporterInterface
+final class SpanExporter implements SpanExporterInterface
 {
     use LogsMessagesTrait;
 
     private TransportInterface $transport;
-    private string $protocol; //@see Protocols::*
+    private ProtobufSerializer $serializer;
 
-    public function __construct(TransportInterface $transport, string $protocol)
+    /**
+     * @psalm-param TransportInterface<SUPPORTED_CONTENT_TYPES> $transport
+     */
+    public function __construct(TransportInterface $transport)
     {
         $this->transport = $transport;
-        $this->protocol = $protocol;
+        $this->serializer = ProtobufSerializer::forTransport($transport);
     }
 
-    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
+    public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
-        $protocol = $this->protocol;
-        $payload = Converter::encode((new SpanConverter())->convert($spans), $protocol);
-
         return $this->transport
-            ->send($payload, Converter::contentType($this->protocol), $cancellation)
-            ->map(static function (string $payload) use ($protocol): bool {
+            ->send($this->serializer->serialize((new SpanConverter())->convert($batch)), $cancellation)
+            ->map(function (?string $payload): bool {
+                if ($payload === null) {
+                    return true;
+                }
+
                 $serviceResponse = new ExportTraceServiceResponse();
-                Converter::decode($serviceResponse, $payload, $protocol);
+                $this->serializer->hydrate($serviceResponse, $payload);
 
                 $partialSuccess = $serviceResponse->getPartialSuccess();
                 if ($partialSuccess !== null && $partialSuccess->getRejectedSpans()) {
@@ -69,10 +73,5 @@ class Exporter implements SpanExporterInterface
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return $this->transport->forceFlush($cancellation);
-    }
-
-    public static function fromConnectionString(string $endpointUrl, string $name, string $args)
-    {
-        trigger_error('Not implemented');
     }
 }

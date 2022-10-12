@@ -14,7 +14,7 @@ use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 $clock = ClockFactory::getDefault();
 $reader = new ExportingReader(
     new MetricExporter(
-        new StreamTransport(STDOUT),
+        new StreamTransport(STDOUT, 'application/x-ndjson'),
         Protocols::HTTP_ND_JSON
     ),
     $clock

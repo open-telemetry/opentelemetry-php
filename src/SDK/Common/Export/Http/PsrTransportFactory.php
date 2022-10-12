@@ -34,7 +34,8 @@ final class PsrTransportFactory implements TransportFactoryInterface
      * @phan-suppress PhanTypeMismatchArgumentNullable
      */
     public function create(
-        string $endpoint = null,
+        string $endpoint,
+        string $contentType,
         array $headers = [],
         $compression = null,
         float $timeout = 10.,
@@ -45,7 +46,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
         ?string $key = null
     ): PsrTransport {
         if (!filter_var($endpoint, FILTER_VALIDATE_URL)) {
-            throw new InvalidArgumentException(sprintf('Invalid endpoint url "%s"', $endpoint ?? ''));
+            throw new InvalidArgumentException(sprintf('Invalid endpoint url "%s"', $endpoint));
         }
         assert(!empty($endpoint));
 
@@ -54,6 +55,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
             $this->requestFactory,
             $this->streamFactory,
             $endpoint,
+            $contentType,
             $headers,
             (array) $compression,
             $retryDelay,

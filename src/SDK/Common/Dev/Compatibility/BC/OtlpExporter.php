@@ -12,7 +12,7 @@ use RuntimeException;
 
 class OtlpExporter implements SpanExporterInterface
 {
-    private static string $message = 'Class has been replaced by Contrib\Otlp\Exporter + Transports';
+    private static string $message = 'Class has been replaced by Contrib\Otlp\SpanExporter + Transports';
 
     private static function error(): void
     {
@@ -24,7 +24,7 @@ class OtlpExporter implements SpanExporterInterface
         self::error();
     }
 
-    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
+    public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         self::error();
 
@@ -48,3 +48,4 @@ class OtlpExporter implements SpanExporterInterface
 
 class_alias(OtlpExporter::class, 'OpenTelemetry\Contrib\OtlpGrpc\Exporter');
 class_alias(OtlpExporter::class, 'OpenTelemetry\Contrib\OtlpHttp\Exporter');
+class_alias(OtlpExporter::class, 'OpenTelemetry\Contrib\Otlp\Exporter');

@@ -26,8 +26,8 @@ class ExporterFactory
         'logger+file' => '\OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter',
         'jaeger+http' => '\OpenTelemetry\Contrib\Jaeger\Exporter',
         'zipkin+http' => '\OpenTelemetry\Contrib\Zipkin\Exporter',
-        'otlp+grpc' => '\OpenTelemetry\Contrib\Otlp\Exporter',
-        'otlp+http' => '\OpenTelemetry\Contrib\Otlp\Exporter',
+        'otlp+grpc' => '\OpenTelemetry\Contrib\Otlp\SpanExporter',
+        'otlp+http' => '\OpenTelemetry\Contrib\Otlp\SpanExporter',
         'newrelic+http' => '\OpenTelemetry\Contrib\Newrelic\Exporter',
         'zipkintonewrelic+http' => '\OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter',
         // this entry exists only for testing purposes
@@ -169,6 +169,10 @@ class ExporterFactory
         return $exporter;
     }
 
+    /**
+     * @phan-suppress PhanParamTooFew
+     * @psalm-suppress TooFewArguments
+     */
     private static function buildTransport(string $protocol): TransportInterface
     {
         $factoryClass = self::KNOWN_TRANSPORT_FACTORIES[self::normalizeProtocol($protocol)];
@@ -176,7 +180,7 @@ class ExporterFactory
         $factory = new $factoryClass();
         assert($factory instanceof TransportFactoryInterface);
 
-        return $factory->withSignal(Signals::TRACE)->create();
+        return $factory->withSignal(Signals::TRACE)->create(); //@phpstan-ignore-line
     }
 
     private static function validateProtocol(string $protocol): void

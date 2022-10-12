@@ -7,7 +7,6 @@ namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 use function fopen;
 use function fseek;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
-use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\Stream\StreamTransport;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
@@ -30,8 +29,8 @@ final class MetricExporterTest extends TestCase
     public function setUp(): void
     {
         $this->stream = fopen('php://memory', 'a+b');
-        $transport = new StreamTransport($this->stream);
-        $this->exporter = new MetricExporter($transport, Protocols::HTTP_ND_JSON);
+        $transport = new StreamTransport($this->stream, 'application/x-ndjson');
+        $this->exporter = new MetricExporter($transport);
     }
 
     public function test_exporter_writes_metrics_in_otlp_json_format_with_trailing_newline(): void

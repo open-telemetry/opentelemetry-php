@@ -34,7 +34,7 @@ class ExporterFactoryTest extends TestCase
     /**
      * @dataProvider endpointProvider
      */
-    public function test_exporter_has_correct_endpoint($name, $input, $expectedClass): void
+    public function test_exporter_from_connection_string($name, $input, $expectedClass): void
     {
         $factory = new ExporterFactory($name);
         $exporter = $factory->fromConnectionString($input);
@@ -104,22 +104,22 @@ class ExporterFactoryTest extends TestCase
             'otlp+http/protobuf from traces protocol' => [
                 'otlp',
                 ['OTEL_EXPORTER_OTLP_TRACES_PROTOCOL' => 'http/protobuf'],
-                Contrib\Otlp\Exporter::class,
+                Contrib\Otlp\SpanExporter::class,
             ],
             'otlp+http/protobuf from protocol' => [
                 'otlp',
                 ['OTEL_EXPORTER_OTLP_PROTOCOL' => 'http/protobuf'],
-                Contrib\Otlp\Exporter::class,
+                Contrib\Otlp\SpanExporter::class,
             ],
             'otlp+grpc from traces protocol' => [
                 'otlp',
                 ['OTEL_EXPORTER_OTLP_TRACES_PROTOCOL' => 'grpc'],
-                Contrib\Otlp\Exporter::class,
+                Contrib\Otlp\SpanExporter::class,
             ],
             'otlp+grpc from protocol' => [
                 'otlp',
                 ['OTEL_EXPORTER_OTLP_PROTOCOL' => 'grpc'],
-                Contrib\Otlp\Exporter::class,
+                Contrib\Otlp\SpanExporter::class,
             ],
             'console' => [
                 'console', [], ConsoleSpanExporter::class,

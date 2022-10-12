@@ -6,8 +6,7 @@ namespace OpenTelemetry\Tests\Benchmark;
 
 use Mockery;
 use OpenTelemetry\API\Trace\TracerInterface;
-use OpenTelemetry\Contrib\Otlp\Exporter;
-use OpenTelemetry\Contrib\Otlp\Protocols;
+use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
@@ -61,7 +60,7 @@ class OtlpBench
             'shutdown' => true,
             'forceFlush' => true,
         ]);
-        $exporter = new Exporter($transport, Protocols::GRPC); //@phpstan-ignore-line
+        $exporter = new SpanExporter($transport);
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
@@ -86,8 +85,8 @@ class OtlpBench
             ->allows(['createRequest' => $request]);
         $streamFactory = Mockery::mock(StreamFactoryInterface::class)
             ->allows(['createStream' => $stream]);
-        $transport = new PsrTransport($client, $requestFactory, $streamFactory, 'http://foo', [], [], 0, 0); // @phpstan-ignore-line
-        $exporter = new Exporter($transport, Protocols::HTTP_PROTOBUF);
+        $transport = new PsrTransport($client, $requestFactory, $streamFactory, 'http://foo', 'application/x-protobuf', [], [], 0, 0); // @phpstan-ignore-line
+        $exporter = new SpanExporter($transport);
 
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);

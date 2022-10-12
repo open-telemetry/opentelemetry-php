@@ -12,8 +12,8 @@ use function in_array;
 use InvalidArgumentException;
 use function json_encode;
 use OpenTelemetry\API\Common\Signal\Signals;
+use OpenTelemetry\Contrib\Otlp\OtlpTransportFactoryInterface;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
-use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
@@ -24,7 +24,7 @@ use function parse_url;
 use RuntimeException;
 use function sprintf;
 
-final class GrpcTransportFactory implements TransportFactoryInterface
+final class GrpcTransportFactory implements TransportFactoryInterface, OtlpTransportFactoryInterface
 {
     use EnvironmentVariablesTrait;
     use LogsMessagesTrait;
@@ -33,8 +33,15 @@ final class GrpcTransportFactory implements TransportFactoryInterface
     private const DEFAULT_SIGNAL = Signals::TRACE;
     private string $signal = self::DEFAULT_SIGNAL;
 
+    /**
+     * @psalm-param "application/x-protobuf" $contentType
+     * @psalm-return TransportInterface<"application/x-protobuf">
+     * @psalm-suppress MoreSpecificImplementedParamType
+     * @psalm-suppress ImplementedReturnTypeMismatch
+     */
     public function create(
         string $endpoint = null,
+        string $contentType = 'application/x-protobuf',
         array $headers = [],
         $compression = null,
         float $timeout = 10.,
@@ -72,6 +79,10 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         if (!isset($parts['scheme'], $parts['host'])) {
             throw new InvalidArgumentException('Endpoint has to contain scheme and host');
         }
+        /** @phpstan-ignore-next-line */
+        if ($contentType !== 'application/x-protobuf') {
+            throw new InvalidArgumentException(sprintf('Unsupported content type "%s", grpc transport supports only application/x-protobuf', $contentType));
+        }
 
         $scheme = $parts['scheme'];
 
@@ -99,6 +110,20 @@ final class GrpcTransportFactory implements TransportFactoryInterface
             GrpcTransport::method($this->signal),
             $headers,
         );
+    }
+
+    public function withSignal(string $signal): TransportFactoryInterface
+    {
+        Signals::validate($signal);
+        $this->signal = $signal;
+
+        return $this;
+    }
+
+    public function withProtocol(string $protocol): TransportFactoryInterface
+    {
+        //only protobuf is supported
+        return $this;
     }
 
     private static function createOpts(
@@ -173,20 +198,5 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         }
 
         return $content;
-    }
-
-    public function withSignal(string $signal): TransportFactoryInterface
-    {
-        Signals::validate($signal);
-        $this->signal = $signal;
-
-        return $this;
-    }
-
-    public function withProtocol(string $protocol): TransportFactoryInterface
-    {
-        Protocols::validate($protocol);
-
-        return $this;
     }
 }

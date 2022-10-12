@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
-use OpenTelemetry\Contrib\Otlp\Exporter;
-use OpenTelemetry\Contrib\Otlp\Protocols;
+use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\ErrorFuture;
@@ -13,17 +12,18 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\Contrib\Otlp\Exporter
+ * @covers \OpenTelemetry\Contrib\Otlp\SpanExporter
  */
-class ExporterTest extends TestCase
+class SpanExporterTest extends TestCase
 {
     private MockObject $transport;
-    private Exporter $exporter;
+    private SpanExporter $exporter;
 
     public function setUp(): void
     {
         $this->transport = $this->createMock(TransportInterface::class);
-        $this->exporter = new Exporter($this->transport, Protocols::HTTP_PROTOBUF);
+        $this->transport->method('contentType')->willReturn('application/x-protobuf');
+        $this->exporter = new SpanExporter($this->transport);
     }
 
     public function test_export_with_transport_failure(): void

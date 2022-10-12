@@ -5,8 +5,7 @@ require __DIR__ . '/../../../../vendor/autoload.php';
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use OpenTelemetry\Contrib\Otlp\Exporter as OTLPExporter;
-use OpenTelemetry\Contrib\Otlp\Protocols;
+use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\Contrib\OtlpHttp\OtlpHttpTransportFactory;
 use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
@@ -15,7 +14,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 LoggerHolder::set(new Logger('otlp-example', [new StreamHandler('php://stderr')]));
 
 $transport = (new OtlpHttpTransportFactory())->create('http://collector:4318');
-$exporter = new OTLPExporter($transport, Protocols::HTTP_PROTOBUF);
+$exporter = new SpanExporter($transport);
 
 echo 'Starting OTLP example';
 

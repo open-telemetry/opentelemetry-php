@@ -7,6 +7,7 @@ namespace OpenTelemetry\SDK\Common\Export\Stream;
 use ErrorException;
 use function fopen;
 use function implode;
+use function is_resource;
 use LogicException;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
@@ -20,8 +21,18 @@ use function stream_context_create;
  */
 final class StreamTransportFactory implements TransportFactoryInterface
 {
+    /**
+     * @param string|resource $endpoint
+     * @param array<string, string|string[]> $headers
+     * @param string|string[]|null $compression
+     *
+     * @psalm-template CONTENT_TYPE of string
+     * @psalm-param CONTENT_TYPE $contentType
+     * @psalm-return TransportInterface<CONTENT_TYPE>
+     */
     public function create(
-        string $endpoint = null,
+        $endpoint,
+        string $contentType,
         array $headers = [],
         $compression = null,
         float $timeout = 10.,
@@ -32,10 +43,34 @@ final class StreamTransportFactory implements TransportFactoryInterface
         ?string $key = null
     ): TransportInterface {
         assert(!empty($endpoint));
+        $stream = is_resource($endpoint)
+            ? $endpoint
+            : self::createStream(
+                $endpoint,
+                $contentType,
+                $headers,
+                $timeout,
+                $cacert,
+                $cert,
+                $key,
+            );
+
+        return new StreamTransport($stream, $contentType);
+    }
+
+    private static function createStream(
+        $endpoint,
+        string $contentType,
+        array $headers = [],
+        float $timeout = 10.,
+        ?string $cacert = null,
+        ?string $cert = null,
+        ?string $key = null
+    ) {
         $context = stream_context_create([
             'http' => [
                 'method' => 'POST',
-                'header' => self::createHeaderArray($headers),
+                'header' => self::createHeaderArray($contentType, $headers),
                 'timeout' => $timeout,
             ],
             'ssl' => [
@@ -62,14 +97,12 @@ final class StreamTransportFactory implements TransportFactoryInterface
         if (!$stream) {
             throw new LogicException(sprintf('Failed opening stream "%s"', $endpoint));
         }
-
-        /** @phan-suppress-next-line PhanPossiblyUndeclaredVariable */
-        return new StreamTransport($stream);
     }
 
-    private static function createHeaderArray(array $headers): array
+    private static function createHeaderArray(string $contentType, array $headers): array
     {
         $header = [];
+        $header[] = sprintf('Content-Type: %s', $contentType);
         foreach ($headers as $name => $value) {
             $header[] = sprintf('%s: %s', $name, implode(', ', (array) $value));
         }

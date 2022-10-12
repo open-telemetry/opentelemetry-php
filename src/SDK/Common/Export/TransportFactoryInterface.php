@@ -11,11 +11,15 @@ interface TransportFactoryInterface
     public const COMPRESSION_BROTLI = 'br';
 
     /**
-     * @param array<string, string|string[]> $headers
-     * @param string|string[]|null $compression
+     * @psalm-template CONTENT_TYPE of string
+     * @psalm-param CONTENT_TYPE $contentType
+     * @psalm-param array<string, string|string[]> $headers
+     * @psalm-param string|string[]|null $compression
+     * @psalm-return TransportInterface<CONTENT_TYPE>
      */
     public function create(
-        string $endpoint = null,
+        string $endpoint,
+        string $contentType,
         array $headers = [],
         $compression = null,
         float $timeout = 10.,
