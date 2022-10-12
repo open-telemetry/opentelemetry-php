@@ -116,13 +116,13 @@ class ExporterFactory
                 );
                 switch ($protocol) {
                     case Values::VALUE_GRPC:
-                        return self::buildExporterWithTransport('otlp+grpc');
+                        return self::buildOtlpExporter('otlp+grpc');
                     case Values::VALUE_HTTP_PROTOBUF:
-                        return self::buildExporterWithTransport('otlp+http');
+                        return self::buildOtlpExporter('otlp+http');
                     case Values::VALUE_HTTP_JSON:
-                        return self::buildExporterWithTransport('otlp+json');
+                        return self::buildOtlpExporter('otlp+json');
                     default:
-                        throw new InvalidArgumentException('Unknown protocol: ' . $protocol);
+                        throw new InvalidArgumentException('Unknown/unsupported otlp protocol: ' . $protocol);
                 }
                 // no break
             case 'console':
@@ -161,7 +161,7 @@ class ExporterFactory
      * @phan-suppress PhanUndeclaredClass
      * @phan-suppress PhanParamTooMany
      */
-    private static function buildExporterWithTransport(string $protocol): SpanExporterInterface
+    private static function buildOtlpExporter(string $protocol): SpanExporterInterface
     {
         $exporterClass = self::KNOWN_EXPORTERS[self::normalizeProtocol($protocol)];
         self::validateClass($exporterClass);
@@ -182,8 +182,11 @@ class ExporterFactory
         self::validateClass($factoryClass);
         $factory = new $factoryClass();
         assert($factory instanceof TransportFactoryInterface);
+        if (method_exists($factory, 'withSignal')) {
+            $factory = $factory->withSignal(Signals::TRACE);
+        }
 
-        return $factory->withSignal(Signals::TRACE)->create(); //@phpstan-ignore-line
+        return $factory->create(); //@phpstan-ignore-line
     }
 
     private static function validateProtocol(string $protocol): void

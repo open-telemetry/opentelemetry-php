@@ -109,14 +109,4 @@ final class StreamTransportFactory implements TransportFactoryInterface
 
         return $header;
     }
-
-    public function withSignal(string $signal): TransportFactoryInterface
-    {
-        return $this;
-    }
-
-    public function withProtocol(string $protocol): TransportFactoryInterface
-    {
-        return $this;
-    }
 }

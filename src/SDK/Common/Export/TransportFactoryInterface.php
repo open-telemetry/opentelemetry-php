@@ -29,8 +29,4 @@ interface TransportFactoryInterface
         ?string $cert = null,
         ?string $key = null
     ): TransportInterface;
-
-    public function withSignal(string $signal): self;
-
-    public function withProtocol(string $protocol): self;
 }
