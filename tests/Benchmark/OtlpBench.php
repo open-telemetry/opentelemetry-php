@@ -59,6 +59,7 @@ class OtlpBench
             'send' => new CompletedFuture('ok'),
             'shutdown' => true,
             'forceFlush' => true,
+            'contentType' => 'application/x-protobuf',
         ]);
         $exporter = new SpanExporter($transport);
         $processor = new SimpleSpanProcessor($exporter);

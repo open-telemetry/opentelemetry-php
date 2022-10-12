@@ -5,7 +5,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use OpenTelemetry\Contrib\Otlp\Exporter;
+use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -22,7 +22,7 @@ $transport = (new \OpenTelemetry\Contrib\Grpc\GrpcTransportFactory())->create();
 
 $tracerProvider =  new TracerProvider(
     new SimpleSpanProcessor(
-        new Exporter($transport) //default endpoint unavailable, so exporting will fail
+        new SpanExporter($transport) //default endpoint unavailable, so exporting will fail
     )
 );
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
