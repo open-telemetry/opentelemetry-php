@@ -6,7 +6,6 @@ namespace OpenTelemetry\Contrib\OtlpHttp;
 
 use InvalidArgumentException;
 use OpenTelemetry\API\Common\Signal\Signals;
-use OpenTelemetry\Contrib\Otlp\OtlpTransportFactoryInterface;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
@@ -16,7 +15,7 @@ use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolver;
 
-class OtlpHttpTransportFactory implements TransportFactoryInterface, OtlpTransportFactoryInterface
+class OtlpHttpTransportFactory implements TransportFactoryInterface
 {
     use EnvironmentVariablesTrait;
 
