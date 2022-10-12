@@ -22,6 +22,9 @@ final class Process implements ResourceDetectorInterface
         $attributes = [];
         $attributes[ResourceAttributes::PROCESS_PID] = getmypid();
         $attributes[ResourceAttributes::PROCESS_EXECUTABLE_PATH] = PHP_BINARY;
+        /**
+         * @psalm-suppress PossiblyUndefinedArrayOffset
+         */
         if ($_SERVER['argv'] ?? null) {
             $attributes[ResourceAttributes::PROCESS_COMMAND] = $_SERVER['argv'][0];
             $attributes[ResourceAttributes::PROCESS_COMMAND_ARGS] = $_SERVER['argv'];

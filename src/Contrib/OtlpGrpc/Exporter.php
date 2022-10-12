@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpGrpc;
 
-use grpc;
+use Grpc;
 use Grpc\ChannelCredentials;
 use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
