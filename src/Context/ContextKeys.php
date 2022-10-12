@@ -9,14 +9,14 @@ namespace OpenTelemetry\Context;
  */
 final class ContextKeys
 {
-    public static function span(): ContextKey
+    public static function span(): ContextKeyInterface
     {
         static $instance;
 
         return $instance ??= Context::createKey('opentelemetry-trace-span-key');
     }
 
-    public static function baggage(): ContextKey
+    public static function baggage(): ContextKeyInterface
     {
         static $instance;
 

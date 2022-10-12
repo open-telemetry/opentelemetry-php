@@ -25,12 +25,12 @@ use OpenTelemetry\SDK\Common\Future\ErrorFuture;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Common\Future\NullCancellation;
 use RuntimeException;
-use function sprintf;
 use Throwable;
-use UnexpectedValueException;
 
 /**
  * @internal
+ *
+ * @template-implements TransportInterface<"application/x-protobuf">
  */
 final class GrpcTransport implements TransportInterface
 {
@@ -51,13 +51,15 @@ final class GrpcTransport implements TransportInterface
         $this->headers = array_change_key_case($headers);
     }
 
-    public function send(string $payload, string $contentType, ?CancellationInterface $cancellation = null): FutureInterface
+    public function contentType(): string
+    {
+        return 'application/x-protobuf';
+    }
+
+    public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface
     {
         if ($this->closed) {
             return new ErrorFuture(new BadMethodCallException('Transport closed'));
-        }
-        if ($contentType !== 'application/x-protobuf') {
-            return new ErrorFuture(new UnexpectedValueException(sprintf('Unsupported content type "%s", grpc transport supports only application/x-protobuf', $contentType)));
         }
 
         $call = new Call($this->channel, $this->method, Timeval::infFuture());

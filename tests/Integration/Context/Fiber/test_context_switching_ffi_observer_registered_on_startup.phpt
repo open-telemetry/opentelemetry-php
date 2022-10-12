@@ -2,14 +2,15 @@
 Fiber handler has to be loaded before fibers are used.
 --SKIPIF--
 <?php if (PHP_VERSION_ID < 80100 || !extension_loaded('ffi')) die('skip requires PHP8.1 and FFI'); ?>
+--ENV--
+OTEL_PHP_FIBERS_ENABLED=1
 --FILE--
 <?php
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKey;
 
 require_once 'vendor/autoload.php';
 
-$key = new ContextKey();
+$key = Context::createKey('-');
 
 $fiber = new Fiber(function() use ($key) {
     $scope = Context::getCurrent()

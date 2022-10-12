@@ -6,14 +6,16 @@ namespace OpenTelemetry\Tests\Unit\Extension\Propagator\B3;
 
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3DebugFlagContextKey;
 use OpenTelemetry\Extension\Propagator\B3\B3SinglePropagator;
 use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\Extension\Propagator\B3\B3SinglePropagator
+ * @covers \OpenTelemetry\Extension\Propagator\B3\B3SinglePropagator
  */
 class B3SinglePropagatorTest extends TestCase
 {
@@ -25,7 +27,7 @@ class B3SinglePropagatorTest extends TestCase
     private const B3_HEADER_DEBUG = self::TRACE_ID_BASE16 . '-' . self::SPAN_ID_BASE16 . '-' . self::DEBUG_FLAG;
     private const B3_DENY_SAMPLING = '0';
 
-    private $B3;
+    private string $B3;
 
     private B3SinglePropagator $b3SinglePropagator;
 
@@ -60,9 +62,9 @@ class B3SinglePropagatorTest extends TestCase
                 null,
                 $this->withSpanContext(
                     SpanContext::create(
-                        SpanContext::INVALID_TRACE,
-                        SpanContext::INVALID_SPAN,
-                        SpanContext::SAMPLED_FLAG
+                        SpanContextValidator::INVALID_TRACE,
+                        SpanContextValidator::INVALID_SPAN,
+                        SpanContextInterface::TRACE_FLAG_SAMPLED
                     ),
                     Context::getCurrent()
                 )
@@ -347,12 +349,12 @@ class B3SinglePropagatorTest extends TestCase
         );
     }
 
-    private function getSpanContext(Context $context): SpanContextInterface
+    private function getSpanContext(ContextInterface $context): SpanContextInterface
     {
         return Span::fromContext($context)->getContext();
     }
 
-    private function withSpanContext(SpanContextInterface $spanContext, Context $context): Context
+    private function withSpanContext(SpanContextInterface $spanContext, ContextInterface $context): ContextInterface
     {
         return $context->withContextValue(Span::wrap($spanContext));
     }

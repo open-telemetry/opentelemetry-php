@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Baggage;
 
 use OpenTelemetry\API\Baggage as API;
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ImplicitContextKeyedInterface;
 
 /**
@@ -19,7 +19,7 @@ interface BaggageInterface extends ImplicitContextKeyedInterface
      *
      * @todo Implement this in the API layer
      */
-    public static function fromContext(Context $context): API\BaggageInterface;
+    public static function fromContext(ContextInterface $context): API\BaggageInterface;
 
     /**
      * Returns a new empty {@see API\BaggageBuilderInterface}.
@@ -27,7 +27,7 @@ interface BaggageInterface extends ImplicitContextKeyedInterface
     public static function getBuilder(): API\BaggageBuilderInterface;
 
     /**
-     * Returns the current {@see Baggage} from the current {@see Context},
+     * Returns the current {@see Baggage} from the current {@see ContextInterface},
      * falling back on {@see API\BaggageInterface::getEmpty()} if there is no baggage in the current context.
      *
      * @todo Implement this in the API layer

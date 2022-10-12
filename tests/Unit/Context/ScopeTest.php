@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Context;
 
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKey;
 use OpenTelemetry\Context\ContextStorage;
 use OpenTelemetry\Context\ScopeInterface;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +16,7 @@ class ScopeTest extends TestCase
 {
     public function test_scope_close_restores_context(): void
     {
-        $key = new ContextKey();
+        $key = Context::createKey('-');
         $ctx = Context::getRoot()->with($key, 'test');
         $scope = $ctx->activate();
 
@@ -30,7 +29,7 @@ class ScopeTest extends TestCase
 
     public function test_nested_scope(): void
     {
-        $key = new ContextKey();
+        $key = Context::createKey('-');
         $ctx1 = Context::getRoot()->with($key, 'test1');
         $scope1 = $ctx1->activate();
         $this->assertSame('test1', Context::getCurrent()->get($key));
@@ -96,8 +95,8 @@ class ScopeTest extends TestCase
     {
         $storage = new ContextStorage();
 
-        $ctx1 = $storage->current()->with(new ContextKey(), 1);
-        $ctx2 = $storage->current()->with(new ContextKey(), 2);
+        $ctx1 = $storage->current()->with(Context::createKey('-'), 1);
+        $ctx2 = $storage->current()->with(Context::createKey('-'), 2);
 
         $scope1 = $storage->attach($ctx1);
         $this->assertSame($ctx1, $scope1->context());

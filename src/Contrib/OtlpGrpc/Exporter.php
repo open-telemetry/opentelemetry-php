@@ -67,9 +67,9 @@ class Exporter implements SpanExporterInterface
             $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, $timeout) :
             $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
-        $this->metadata = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
+        $this->metadata = self::transformToGrpcMetadata($this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
-            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers);
+            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers));
 
         $opts = $this->getClientOptions();
 
@@ -105,7 +105,7 @@ class Exporter implements SpanExporterInterface
      * @inheritDoc
      * @psalm-suppress UndefinedConstant
      */
-    protected function doExport(iterable $spans): int
+    protected function doExport(iterable $spans): bool
     {
         $request = (new SpanConverter())->convert($spans);
 
@@ -120,7 +120,7 @@ class Exporter implements SpanExporterInterface
                     'error' => $response->getPartialSuccess()->getErrorMessage(),
                 ]);
 
-                return self::STATUS_FAILED_NOT_RETRYABLE;
+                return false;
             } elseif ($response->getPartialSuccess()->getErrorMessage()) {
                 self::logWarning('Export warning', ['server_message' => $response->getPartialSuccess()->getErrorMessage()]);
             }
@@ -129,7 +129,7 @@ class Exporter implements SpanExporterInterface
         if ($status->code === \Grpc\STATUS_OK) {
             self::logDebug('Exported span(s)', ['spans' => $request->getResourceSpans()]);
 
-            return self::STATUS_SUCCESS;
+            return true;
         }
 
         $error = [
@@ -150,18 +150,22 @@ class Exporter implements SpanExporterInterface
         ], true)) {
             self::logWarning('Retryable error exporting grpc span', ['error' => $error]);
 
-            return self::STATUS_FAILED_RETRYABLE;
+            return false;
         }
 
         self::logError('Error exporting grpc span', ['error' => $error]);
 
-        return self::STATUS_FAILED_NOT_RETRYABLE;
+        return false;
     }
 
     public function setHeader($key, $value): void
     {
-        // metadata is supposed to be key-value pairs
+        // metadata is supposed to be key-value pairs and the value must be an array
         // @see https://grpc.io/docs/what-is-grpc/core-concepts/#metadata
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+
         $this->metadata[$key] = $value;
     }
 
@@ -189,5 +193,16 @@ class Exporter implements SpanExporterInterface
     public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null): Exporter
     {
         return is_string($endpointUrl) ? new Exporter($endpointUrl) :  new Exporter();
+    }
+
+    private static function transformToGrpcMetadata(array $metadata): array
+    {
+        foreach ($metadata as $key => $value) {
+            if (!is_array($value)) {
+                $metadata[$key] = [$value];
+            }
+        }
+
+        return $metadata;
     }
 }

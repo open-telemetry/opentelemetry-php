@@ -8,7 +8,7 @@ use function array_fill;
 use function count;
 use const INF;
 use const NAN;
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
@@ -50,7 +50,7 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
     /**
      * @param ExplicitBucketHistogramSummary $summary
      */
-    public function record($summary, $value, AttributesInterface $attributes, Context $context, int $timestamp): void
+    public function record($summary, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $boundariesCount = count($this->boundaries);
         for ($i = 0; $i < $boundariesCount && $this->boundaries[$i] < $value; $i++) {

@@ -6,14 +6,16 @@ namespace OpenTelemetry\Tests\Unit\Extension\Propagator\B3;
 
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3DebugFlagContextKey;
 use OpenTelemetry\Extension\Propagator\B3\B3MultiPropagator;
 use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\Extension\Propagator\B3\B3MultiPropagator
+ * @covers \OpenTelemetry\Extension\Propagator\B3\B3MultiPropagator
  */
 class B3MultiPropagatorTest extends TestCase
 {
@@ -64,9 +66,9 @@ class B3MultiPropagatorTest extends TestCase
                 null,
                 $this->withSpanContext(
                     SpanContext::create(
-                        SpanContext::INVALID_TRACE,
-                        SpanContext::INVALID_SPAN,
-                        SpanContext::SAMPLED_FLAG
+                        SpanContextValidator::INVALID_TRACE,
+                        SpanContextValidator::INVALID_SPAN,
+                        SpanContextInterface::TRACE_FLAG_SAMPLED
                     ),
                     Context::getCurrent()
                 )
@@ -464,12 +466,12 @@ class B3MultiPropagatorTest extends TestCase
         );
     }
 
-    private function getSpanContext(Context $context): SpanContextInterface
+    private function getSpanContext(ContextInterface $context): SpanContextInterface
     {
         return Span::fromContext($context)->getContext();
     }
 
-    private function withSpanContext(SpanContextInterface $spanContext, Context $context): Context
+    private function withSpanContext(SpanContextInterface $spanContext, ContextInterface $context): ContextInterface
     {
         return $context->withContextValue(Span::wrap($spanContext));
     }

@@ -8,7 +8,6 @@ use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
-use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 trait SpanExporterTrait
 {
@@ -31,22 +30,20 @@ trait SpanExporterTrait
     abstract public static function fromConnectionString(string $endpointUrl, string $name, string $args);
 
     /**
-     * @param iterable<SpanDataInterface> $spans
-     * @return FutureInterface<int>
+     * @param iterable<SpanDataInterface> $batch
+     * @return FutureInterface<bool>
      */
-    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
+    public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         if (!$this->running) {
-            return new CompletedFuture(SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE);
+            return new CompletedFuture(false);
         }
 
-        return new CompletedFuture($this->doExport($spans)); /** @phpstan-ignore-line */
+        return new CompletedFuture($this->doExport($batch)); /** @phpstan-ignore-line */
     }
 
     /**
      * @param iterable<SpanDataInterface> $spans Batch of spans to export
-     *
-     * @psalm-return SpanExporterInterface::STATUS_*
      */
-    abstract protected function doExport(iterable $spans): int; /** @phpstan-ignore-line */
+    abstract protected function doExport(iterable $spans): bool; /** @phpstan-ignore-line */
 }

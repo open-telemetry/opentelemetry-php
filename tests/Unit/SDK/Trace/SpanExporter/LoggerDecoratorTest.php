@@ -67,7 +67,7 @@ class LoggerDecoratorTest extends AbstractLoggerAwareTest
         $this->getSpanExporterInterfaceMock()
             ->expects($this->once())
             ->method('export')
-            ->willReturn(new CompletedFuture(SpanExporterInterface::STATUS_SUCCESS));
+            ->willReturn(new CompletedFuture(true));
 
         $this->getLoggerInterfaceMock()
             ->expects($this->once())
@@ -85,40 +85,17 @@ class LoggerDecoratorTest extends AbstractLoggerAwareTest
      * @psalm-suppress PossiblyUndefinedMethod
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function test_export_failed_retryable(): void
+    public function test_export_failed(): void
     {
         $this->getSpanExporterInterfaceMock()
             ->expects($this->once())
             ->method('export')
-            ->willReturn(new CompletedFuture(SpanExporterInterface::STATUS_FAILED_RETRYABLE));
+            ->willReturn(new CompletedFuture(false));
 
         $this->getLoggerInterfaceMock()
             ->expects($this->once())
             ->method('log')
             ->with(LogLevel::ERROR);
-
-        $this->createLoggerDecorator()
-            ->export(
-                $this->createSpanMocks()
-            )
-            ->await();
-    }
-
-    /**
-     * @psalm-suppress PossiblyUndefinedMethod
-     * @psalm-suppress PossiblyInvalidArgument
-     */
-    public function test_export_failed_not_retryable(): void
-    {
-        $this->getSpanExporterInterfaceMock()
-            ->expects($this->once())
-            ->method('export')
-            ->willReturn(new CompletedFuture(SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE));
-
-        $this->getLoggerInterfaceMock()
-            ->expects($this->once())
-            ->method('log')
-            ->with(LogLevel::ALERT);
 
         $this->createLoggerDecorator()
             ->export(

@@ -7,7 +7,9 @@ namespace OpenTelemetry\Extension\Propagator\B3;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
@@ -100,7 +102,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
     }
 
     /** {@inheritdoc} */
-    public function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void
+    public function inject(&$carrier, PropagationSetterInterface $setter = null, ContextInterface $context = null): void
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
@@ -122,7 +124,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
         }
     }
 
-    public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
+    public function extract($carrier, PropagationGetterInterface $getter = null, ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
@@ -153,7 +155,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
         return null;
     }
 
-    private static function extractImpl($carrier, PropagationGetterInterface $getter, Context &$context): SpanContextInterface
+    private static function extractImpl($carrier, PropagationGetterInterface $getter, ContextInterface &$context): SpanContextInterface
     {
         $traceId = $getter->get($carrier, self::TRACE_ID);
         $spanId = $getter->get($carrier, self::SPAN_ID);
@@ -166,17 +168,18 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
 
         // Validates the traceId and spanId
         // Returns an invalid spanContext if any of the checks fail
-        if (!SpanContext::isValidTraceId($traceId) || !SpanContext::isValidSpanId($spanId)) {
+        if (!SpanContextValidator::isValidTraceId($traceId) || !SpanContextValidator::isValidSpanId($spanId)) {
             return SpanContext::getInvalid();
         }
 
         if ($debug && $debug === self::IS_SAMPLED) {
             $context = $context->with(B3DebugFlagContextKey::instance(), self::IS_SAMPLED);
-            $isSampled = SpanContext::SAMPLED_FLAG;
+            $isSampled = SpanContextInterface::TRACE_FLAG_SAMPLED;
         } else {
-            $isSampled = ($sampled === SpanContext::SAMPLED_FLAG);
+            $isSampled = ($sampled === SpanContextInterface::TRACE_FLAG_SAMPLED);
         }
 
+        // Only traceparent header is extracted. No tracestate.
         return SpanContext::createFromRemoteParent(
             $traceId,
             $spanId,

@@ -47,7 +47,7 @@ class ExporterFactoryTest extends TestCase
             'zipkin' => ['test.zipkin', 'zipkin+http://zipkin:9411/api/v2/spans', Contrib\Zipkin\Exporter::class],
             'jaeger' => ['test.jaeger', 'jaeger+http://jaeger:9412/api/v2/spans', Contrib\Jaeger\Exporter::class],
             'newrelic' => ['rest.newrelic', 'newrelic+https://trace-api.newrelic.com/trace/v1?licenseKey=abc23423423', Contrib\Newrelic\Exporter::class],
-            'otlp+http' => ['test.otlp', 'otlp+http', Contrib\OtlpHttp\Exporter::class],
+            'otlp+http' => ['test.otlp', 'otlp+http', Contrib\Otlp\SpanExporter::class],
             'otlp+grpc' => ['test.otlpgrpc', 'otlp+grpc://otlp:4317', Contrib\OtlpGrpc\Exporter::class],
             'zipkintonewrelic' => ['test.zipkintonewrelic', 'zipkintonewrelic+https://trace-api.newrelic.com/trace/v1?licenseKey=abc23423423', Contrib\ZipkinToNewrelic\Exporter::class],
             'console' => ['test.console', 'console', ConsoleSpanExporter::class],
@@ -106,12 +106,12 @@ class ExporterFactoryTest extends TestCase
             'otlp+http/protobuf from traces protocol' => [
                 'otlp',
                 ['OTEL_EXPORTER_OTLP_TRACES_PROTOCOL' => 'http/protobuf'],
-                Contrib\OtlpHttp\Exporter::class,
+                Contrib\Otlp\SpanExporter::class,
             ],
             'otlp+http/protobuf from protocol' => [
                 'otlp',
                 ['OTEL_EXPORTER_OTLP_PROTOCOL' => 'http/protobuf'],
-                Contrib\OtlpHttp\Exporter::class,
+                Contrib\Otlp\SpanExporter::class,
             ],
             'otlp+grpc from traces protocol' => [
                 'otlp',

@@ -8,7 +8,12 @@ use ArrayAccess;
 
 interface ContextStorageScopeInterface extends ScopeInterface, ArrayAccess
 {
-    public function context(): Context;
+    /**
+     * Returns the context associated with this scope.
+     *
+     * @return ContextInterface associated context
+     */
+    public function context(): ContextInterface;
 
     /**
      * @param string $offset

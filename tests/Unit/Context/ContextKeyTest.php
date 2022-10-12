@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Context\Unit;
+namespace OpenTelemetry\Tests\Unit\Context;
 
 use OpenTelemetry\Context\ContextKey;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\Context\ContextKey
+ * @covers \OpenTelemetry\Context\ContextKey
  */
 class ContextKeyTest extends TestCase
 {

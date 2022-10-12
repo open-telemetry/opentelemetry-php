@@ -8,40 +8,27 @@ use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use InvalidArgumentException;
 use OpenTelemetry\API\Common\Signal\Signals;
-use OpenTelemetry\Contrib\Otlp\SpanConverter;
-use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse;
-use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
-use OpenTelemetry\SDK\Common\Future\CancellationInterface;
-use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolver;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use function sprintf;
-use Throwable;
 
-class Exporter implements SpanExporterInterface
+class Exporter
 {
-    use LogsMessagesTrait;
-
     private const DEFAULT_ENDPOINT = 'https://localhost:4318';
     private const DEFAULT_COMPRESSION = 'none';
     private const OTLP_PROTOCOL = 'http/protobuf';
 
-    private TransportInterface $transport;
-
     /**
-     * Exporter constructor.
+     * @internal
+     *
+     * @psalm-return TransportInterface<"application/x-protobuf">
      */
-    public function __construct(TransportInterface $transport)
-    {
-        $this->transport = $transport;
-    }
-
-    /** @internal */
     public static function createTransport(
         TransportFactoryInterface $transportFactory
     ): TransportInterface {
@@ -77,6 +64,7 @@ class Exporter implements SpanExporterInterface
 
         return $transportFactory->create(
             $endpoint,
+            'application/x-protobuf',
             $headers,
             $compression,
             10,
@@ -85,52 +73,12 @@ class Exporter implements SpanExporterInterface
         );
     }
 
-    public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null): Exporter
+    public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null): SpanExporterInterface
     {
-        return new Exporter(self::createTransport(new PsrTransportFactory(
+        return new SpanExporter(self::createTransport(new PsrTransportFactory(
             Psr18ClientDiscovery::find(),
             Psr17FactoryDiscovery::findRequestFactory(),
             Psr17FactoryDiscovery::findStreamFactory(),
         )));
-    }
-
-    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
-    {
-        return $this->transport
-            ->send((new SpanConverter())->convert($spans)->serializeToString(), 'application/x-protobuf', $cancellation)
-            ->map(static function (string $payload): int {
-                $serviceResponse = new ExportTraceServiceResponse();
-                $serviceResponse->mergeFromString($payload);
-
-                $partialSuccess = $serviceResponse->getPartialSuccess();
-                if ($partialSuccess !== null && $partialSuccess->getRejectedSpans()) {
-                    self::logError('Export partial success', [
-                        'rejected_spans' => $partialSuccess->getRejectedSpans(),
-                        'error_message' => $partialSuccess->getErrorMessage(),
-                    ]);
-
-                    return 1;
-                }
-                if ($partialSuccess !== null && $partialSuccess->getErrorMessage()) {
-                    self::logWarning('Export success with warnings/suggestions', ['error_message' => $partialSuccess->getErrorMessage()]);
-                }
-
-                return 0;
-            })
-            ->catch(static function (Throwable $throwable): int {
-                self::logError('Export failure', ['exception' => $throwable]);
-
-                return 1;
-            });
-    }
-
-    public function shutdown(?CancellationInterface $cancellation = null): bool
-    {
-        return $this->transport->shutdown($cancellation);
-    }
-
-    public function forceFlush(?CancellationInterface $cancellation = null): bool
-    {
-        return $this->transport->forceFlush($cancellation);
     }
 }

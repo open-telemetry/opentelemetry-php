@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Contrib\Jaeger;
 
 use OpenTelemetry\Contrib\Jaeger\HttpCollectorExporter;
-use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Tests\Unit\Contrib\UsesHttpClientTrait;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
@@ -38,6 +37,6 @@ class JaegerHttpCollectorExporterTest extends TestCase
 
         $status = $exporter->export([new SpanData()])->await();
 
-        $this->assertSame(SpanExporterInterface::STATUS_SUCCESS, $status);
+        $this->assertTrue($status);
     }
 }

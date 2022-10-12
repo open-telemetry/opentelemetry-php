@@ -12,6 +12,7 @@ use Mockery\MockInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
@@ -312,7 +313,7 @@ class SpanTest extends MockeryTestCase
         $span->end();
 
         $this->assertFalse($span->getParentContext()->isValid());
-        $this->assertFalse(SpanContext::isValidSpanId($span->toSpanData()->getParentSpanId()));
+        $this->assertFalse(SpanContextValidator::isValidSpanId($span->toSpanData()->getParentSpanId()));
     }
 
     public function test_to_span_data_child_span(): void
@@ -752,7 +753,7 @@ class SpanTest extends MockeryTestCase
             ->createTestSpan(
                 API\SpanKind::KIND_INTERNAL,
                 null,
-                SpanContext::INVALID_SPAN
+                SpanContextValidator::INVALID_SPAN
             );
     }
 

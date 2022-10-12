@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\API\Unit\Trace;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\API\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
@@ -37,15 +38,15 @@ class SpanContextTest extends TestCase
         $this->assertFalse(SpanContext::getInvalid()->isValid());
 
         $this->assertFalse(
-            SpanContext::create(
+            SpanContext::createFromRemoteParent(
                 self::FIRST_TRACE_ID,
-                SpanContext::INVALID_SPAN,
+                SpanContextValidator::INVALID_SPAN
             )->isValid()
         );
 
         $this->assertFalse(
-            SpanContext::create(
-                SpanContext::INVALID_TRACE,
+            SpanContext::createFromRemoteParent(
+                SpanContextValidator::INVALID_TRACE,
                 self::SECOND_SPAN_ID
             )->isValid()
         );

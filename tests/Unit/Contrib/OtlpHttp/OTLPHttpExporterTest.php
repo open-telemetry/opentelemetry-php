@@ -11,6 +11,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
+use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\Contrib\OtlpHttp\Exporter;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
@@ -35,7 +36,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
      */
     public function createExporter(): SpanExporterInterface
     {
-        return new Exporter(Exporter::createTransport(new PsrTransportFactory(
+        return new SpanExporter(Exporter::createTransport(new PsrTransportFactory(
             $this->getClientInterfaceMock(),
             $this->getRequestFactoryInterfaceMock(),
             $this->getStreamFactoryInterfaceMock(),
@@ -57,10 +58,10 @@ class OTLPHttpExporterTest extends AbstractExporterTest
             new Response($responseStatus, [])
         );
         /** @var ClientInterface $client */
-        $exporter = new Exporter(Exporter::createTransport(new PsrTransportFactory($client, new HttpFactory(), new HttpFactory())));
+        $exporter = new SpanExporter(Exporter::createTransport(new PsrTransportFactory($client, new HttpFactory(), new HttpFactory())));
 
         $this->assertEquals(
-            min($expected, 1),
+            $expected,
             $exporter->export([new SpanData()])->await(),
         );
     }
@@ -68,14 +69,14 @@ class OTLPHttpExporterTest extends AbstractExporterTest
     public function exporterResponseStatusDataProvider(): array
     {
         return [
-            'ok'                => [200, SpanExporterInterface::STATUS_SUCCESS],
-            'not found'         => [404, SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE],
-            'not authorized'    => [401, SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE],
-            'bad request'       => [402, SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE],
-            'too many requests' => [429, SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE],
-            'server error'      => [500, SpanExporterInterface::STATUS_FAILED_RETRYABLE],
-            'timeout'           => [503, SpanExporterInterface::STATUS_FAILED_RETRYABLE],
-            'bad gateway'       => [502, SpanExporterInterface::STATUS_FAILED_RETRYABLE],
+            'ok'                => [200, true],
+            'not found'         => [404, false],
+            'not authorized'    => [401, false],
+            'bad request'       => [402, false],
+            'too many requests' => [429, false],
+            'server error'      => [500, false],
+            'timeout'           => [503, false],
+            'bad gateway'       => [502, false],
         ];
     }
 
@@ -88,7 +89,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         $client->method('sendRequest')->willThrowException($exception);
 
         /** @var ClientInterface $client */
-        $exporter = new Exporter(Exporter::createTransport(new PsrTransportFactory($client, new HttpFactory(), new HttpFactory())));
+        $exporter = new SpanExporter(Exporter::createTransport(new PsrTransportFactory($client, new HttpFactory(), new HttpFactory())));
 
         $this->assertEquals(
             min($expected, 1),
@@ -101,11 +102,11 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         return [
             'client'    => [
                 $this->createMock(ClientExceptionInterface::class),
-                SpanExporterInterface::STATUS_FAILED_RETRYABLE,
+                false,
             ],
             'network'   => [
                 $this->createMock(NetworkExceptionInterface::class),
-                SpanExporterInterface::STATUS_FAILED_RETRYABLE,
+                false,
             ],
         ];
     }
@@ -129,7 +130,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         $this->setEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_COMPRESSION, 'gzip');
 
         $client = new Client(['handler' => $stack]);
-        $exporter = new Exporter(Exporter::createTransport(new PsrTransportFactory($client, new HttpFactory(), new HttpFactory())));
+        $exporter = new SpanExporter(Exporter::createTransport(new PsrTransportFactory($client, new HttpFactory(), new HttpFactory())));
 
         $exporter->export([new SpanData()])->await();
 
@@ -163,9 +164,8 @@ class OTLPHttpExporterTest extends AbstractExporterTest
         $client = $this->createMock(ClientInterface::class);
         $client->method('sendRequest')->willReturn(new Response(200));
 
-        $this->assertEquals(
-            SpanExporterInterface::STATUS_SUCCESS,
-            (new Exporter(Exporter::createTransport(new PsrTransportFactory(
+        $this->assertTrue(
+            (new SpanExporter(Exporter::createTransport(new PsrTransportFactory(
                 $client,
                 new HttpFactory(),
                 new HttpFactory(),
@@ -184,7 +184,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
 
         $this->expectException(\InvalidArgumentException::class);
 
-        new Exporter(Exporter::createTransport(new PsrTransportFactory(
+        new SpanExporter(Exporter::createTransport(new PsrTransportFactory(
             $this->getClientInterfaceMock(),
             $this->getRequestFactoryInterfaceMock(),
             $this->getStreamFactoryInterfaceMock(),
@@ -202,7 +202,7 @@ class OTLPHttpExporterTest extends AbstractExporterTest
 
         $this->expectException(\InvalidArgumentException::class);
 
-        new Exporter(Exporter::createTransport(new PsrTransportFactory(
+        new SpanExporter(Exporter::createTransport(new PsrTransportFactory(
             $this->getClientInterfaceMock(),
             $this->getRequestFactoryInterfaceMock(),
             $this->getStreamFactoryInterfaceMock(),

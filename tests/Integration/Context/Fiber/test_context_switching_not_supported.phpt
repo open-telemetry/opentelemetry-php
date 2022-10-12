@@ -2,16 +2,15 @@
 Context usage in fiber without fiber support triggers warning.
 --SKIPIF--
 <?php if (!class_exists(Fiber::class)) die('skip requires fibers'); ?>
---INI--
-ffi.enable=0
+--ENV--
+OTEL_PHP_FIBERS_ENABLED=0
 --FILE--
 <?php
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKey;
 
 require_once 'vendor/autoload.php';
 
-$key = new ContextKey();
+$key = Context::createKey('-');
 $scope = Context::getCurrent()
     ->with($key, 'main')
     ->activate();

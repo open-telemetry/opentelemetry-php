@@ -51,15 +51,15 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
     }
 
     /** @inheritDoc */
-    public function doExport(iterable $spans): int
+    public function doExport(iterable $spans): bool
     {
         try {
             $this->doLog($spans);
         } catch (Throwable $t) {
-            return SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE;
+            return false;
         }
 
-        return SpanExporterInterface::STATUS_SUCCESS;
+        return true;
     }
 
     /**

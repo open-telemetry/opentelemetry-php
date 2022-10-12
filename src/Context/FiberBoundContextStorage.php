@@ -57,14 +57,14 @@ final class FiberBoundContextStorage implements ContextStorageInterface, Executi
         return new FiberBoundContextStorageScope($scope);
     }
 
-    public function current(): Context
+    public function current(): ContextInterface
     {
         $this->checkFiberMismatch();
 
         return $this->storage->current();
     }
 
-    public function attach(Context $context): ContextStorageScopeInterface
+    public function attach(ContextInterface $context): ContextStorageScopeInterface
     {
         $scope = $this->storage->attach($context);
         assert(class_exists(Fiber::class, false));

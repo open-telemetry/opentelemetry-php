@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\SDK;
 
 final class TracerProviderFactory
 {
@@ -27,6 +28,10 @@ final class TracerProviderFactory
 
     public function create(): TracerProviderInterface
     {
+        if (SDK::isDisabled()) {
+            return new NoopTracerProvider();
+        }
+
         try {
             $exporter = $this->exporterFactory->fromEnvironment();
         } catch (\Throwable $t) {

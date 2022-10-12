@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\FilteredAttributesFactory;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SemConv\TraceAttributes;
 use const PHP_INT_MAX;
 
 class SpanLimitsBuilder
@@ -30,6 +32,8 @@ class SpanLimitsBuilder
 
     /** @var ?int Maximum allowed attribute per span link count */
     private ?int $attributePerLinkCountLimit = null;
+
+    private bool $retainGeneralIdentityAttributes = false;
 
     /**
      * @param int $attributeCountLimit Maximum allowed attribute count per record
@@ -92,6 +96,18 @@ class SpanLimitsBuilder
     }
 
     /**
+     * @param bool $retain whether general identity attributes should be retained
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/span-general.md#general-identity-attributes
+     */
+    public function retainGeneralIdentityAttributes(bool $retain = true): SpanLimitsBuilder
+    {
+        $this->retainGeneralIdentityAttributes = $retain;
+
+        return $this;
+    }
+
+    /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#span-limits-
      */
     public function build(): SpanLimits
@@ -113,8 +129,18 @@ class SpanLimitsBuilder
             $attributeValueLengthLimit = null;
         }
 
+        $spanAttributesFactory = Attributes::factory($attributeCountLimit, $attributeValueLengthLimit);
+
+        if (!$this->retainGeneralIdentityAttributes) {
+            $spanAttributesFactory = new FilteredAttributesFactory($spanAttributesFactory, [
+                TraceAttributes::ENDUSER_ID,
+                TraceAttributes::ENDUSER_ROLE,
+                TraceAttributes::ENDUSER_SCOPE,
+            ]);
+        }
+
         return new SpanLimits(
-            Attributes::factory($attributeCountLimit, $attributeValueLengthLimit),
+            $spanAttributesFactory,
             Attributes::factory($attributePerEventCountLimit, $attributeValueLengthLimit),
             Attributes::factory($attributePerLinkCountLimit, $attributeValueLengthLimit),
             $eventCountLimit,

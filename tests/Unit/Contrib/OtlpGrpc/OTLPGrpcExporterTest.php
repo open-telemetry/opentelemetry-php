@@ -63,7 +63,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
 
         $exporterStatusCode = $exporter->export([new SpanData()])->await();
 
-        $this->assertSame(SpanExporterInterface::STATUS_SUCCESS, $exporterStatusCode);
+        $this->assertTrue($exporterStatusCode);
     }
 
     public function test_exporter_unexpected_grpc_response_status(): void
@@ -93,12 +93,12 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
 
         $exporterStatusCode = $exporter->export([new SpanData()])->await();
 
-        $this->assertSame(SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE, $exporterStatusCode);
+        $this->assertFalse($exporterStatusCode);
     }
 
     public function test_exporter_grpc_responds_as_unavailable(): void
     {
-        $this->assertEquals(SpanExporterInterface::STATUS_FAILED_RETRYABLE, (new Exporter())->export([new SpanData()])->await());
+        $this->assertFalse((new Exporter())->export([new SpanData()])->await());
     }
 
     public function test_set_headers_with_environment_variables(): void
@@ -107,7 +107,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
 
         $exporter = new Exporter();
 
-        $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'barf'], $exporter->getHeaders());
+        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['barf']], $exporter->getHeaders());
     }
 
     public function test_set_header(): void
@@ -116,18 +116,18 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
         $exporter->setHeader('foo', 'bar');
         $headers = $exporter->getHeaders();
         $this->assertArrayHasKey('foo', $headers);
-        $this->assertEquals('bar', $headers['foo']);
+        $this->assertEquals(['bar'], $headers['foo']);
     }
 
     public function test_set_headers_in_constructor(): void
     {
         $exporter = new Exporter('localhost:4317', true, '', 'x-aaa=foo,x-bbb=bar');
 
-        $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'bar'], $exporter->getHeaders());
+        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar']], $exporter->getHeaders());
 
         $exporter->setHeader('key', 'value');
 
-        $this->assertEquals(['x-aaa' => 'foo', 'x-bbb' => 'bar', 'key' => 'value'], $exporter->getHeaders());
+        $this->assertEquals(['x-aaa' => ['foo'], 'x-bbb' => ['bar'], 'key' => ['value']], $exporter->getHeaders());
     }
 
     private function isInsecure(Exporter $exporter) : bool
@@ -167,7 +167,7 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
     /**
      * @dataProvider partialSuccessProvider
      */
-    public function test_partial_success(int $rejected, string $error, int $expectedStatusCode): void
+    public function test_partial_success(int $rejected, string $error, bool $expectedStatusCode): void
     {
         $exporter = new Exporter(
             'localhost:4317',
@@ -199,9 +199,9 @@ class OTLPGrpcExporterTest extends AbstractExporterTest
     public function partialSuccessProvider(): array
     {
         return [
-            'partial success with dropped' => [1, 'some.error.message', SpanExporterInterface::STATUS_FAILED_NOT_RETRYABLE],
-            'partial success with no dropped and warning' => [0, 'some.warning.message', SpanExporterInterface::STATUS_SUCCESS],
-            'partial success with full success' => [0, '', SpanExporterInterface::STATUS_SUCCESS],
+            'partial success with dropped' => [1, 'some.error.message', false],
+            'partial success with no dropped and warning' => [0, 'some.warning.message', true],
+            'partial success with full success' => [0, '', true],
         ];
     }
 

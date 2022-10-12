@@ -41,12 +41,12 @@ final class ContextStorage implements ContextStorageInterface, ExecutionContextA
             : null;
     }
 
-    public function current(): Context
+    public function current(): ContextInterface
     {
         return $this->current->node->context ?? Context::getRoot();
     }
 
-    public function attach(Context $context): ContextStorageScopeInterface
+    public function attach(ContextInterface $context): ContextStorageScopeInterface
     {
         return $this->current->node = new ContextStorageNode($context, $this->current, $this->current->node);
     }

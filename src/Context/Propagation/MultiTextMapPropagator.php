@@ -9,6 +9,7 @@ use function array_merge;
 use function array_unique;
 use function array_values;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 
 final class MultiTextMapPropagator implements TextMapPropagatorInterface
 {
@@ -42,14 +43,14 @@ final class MultiTextMapPropagator implements TextMapPropagatorInterface
         return $this->fields;
     }
 
-    public function inject(&$carrier, PropagationSetterInterface $setter = null, Context $context = null): void
+    public function inject(&$carrier, PropagationSetterInterface $setter = null, ContextInterface $context = null): void
     {
         foreach ($this->propagators as $propagator) {
             $propagator->inject($carrier, $setter, $context);
         }
     }
 
-    public function extract($carrier, PropagationGetterInterface $getter = null, Context $context = null): Context
+    public function extract($carrier, PropagationGetterInterface $getter = null, ContextInterface $context = null): ContextInterface
     {
         $context ??= Context::getCurrent();
 

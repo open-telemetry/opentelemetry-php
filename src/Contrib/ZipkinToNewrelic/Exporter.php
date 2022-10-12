@@ -44,7 +44,7 @@ class Exporter implements SpanExporterInterface
         StreamFactoryInterface $streamFactory,
         SpanConverter $spanConverter = null
     ) {
-        $this->transport = (new PsrTransportFactory($client, $requestFactory, $streamFactory))->create($endpointUrl, [
+        $this->transport = (new PsrTransportFactory($client, $requestFactory, $streamFactory))->create($endpointUrl, 'application/json', [
             'Api-Key' => $licenseKey,
             'Data-Format' => 'zipkin',
             'Data-Format-Version' => '2',
@@ -80,15 +80,15 @@ class Exporter implements SpanExporterInterface
         );
     }
 
-    public function export(iterable $spans, ?CancellationInterface $cancellation = null): FutureInterface
+    public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         return $this->transport
-            ->send($this->serializeTrace($spans), 'application/json', $cancellation)
-            ->map(static fn (): int => 0)
-            ->catch(static function (Throwable $throwable): int {
+            ->send($this->serializeTrace($batch), $cancellation)
+            ->map(static fn (): bool => true)
+            ->catch(static function (Throwable $throwable): bool {
                 self::logError('Export failure', ['exception' => $throwable]);
 
-                return 1;
+                return false;
             });
     }
 

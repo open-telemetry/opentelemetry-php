@@ -11,13 +11,13 @@ use function assert;
  */
 final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInterface
 {
-    public Context $context;
+    public ContextInterface $context;
     public ContextStorageHead $head;
     private ?ContextStorageNode $previous;
     private array $localStorage = [];
 
     public function __construct(
-        Context $context,
+        ContextInterface $context,
         ContextStorageHead $head,
         ?ContextStorageNode $previous = null
     ) {
@@ -50,7 +50,7 @@ final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInt
         unset($this->localStorage[$offset]);
     }
 
-    public function context(): Context
+    public function context(): ContextInterface
     {
         return $this->context;
     }

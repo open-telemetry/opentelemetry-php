@@ -83,7 +83,7 @@ class NoopSpanBuilderTest extends TestCase
         $contextStorage->method('current')->willReturn($context);
 
         $span = (new NoopSpanBuilder($contextStorage))
-            ->setNoParent()
+            ->setParent(false)
             ->startSpan()
         ;
 
@@ -114,7 +114,7 @@ class NoopSpanBuilderTest extends TestCase
 
         $this->assertInstanceOf(
             NoopSpanBuilder::class,
-            (new NoopSpanBuilder($contextStorage))->setNoParent()
+            (new NoopSpanBuilder($contextStorage))->setParent(false)
         );
     }
 

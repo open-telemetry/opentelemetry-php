@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ImplicitContextKeyedInterface;
 use Throwable;
 
@@ -17,10 +17,10 @@ interface SpanInterface extends ImplicitContextKeyedInterface
      * Returns the {@see SpanInterface} from the provided *$context*,
      * falling back on {@see SpanInterface::getInvalid()} if there is no span in the provided context.
      */
-    public static function fromContext(Context $context): SpanInterface;
+    public static function fromContext(ContextInterface $context): SpanInterface;
 
     /**
-     * Returns the current {@see SpanInterface} from the current {@see Context},
+     * Returns the current {@see SpanInterface} from the current {@see ContextInterface},
      * falling back on {@see SpanInterface::getEmpty()} if there is no span in the current context.
      */
     public static function getCurrent(): SpanInterface;
