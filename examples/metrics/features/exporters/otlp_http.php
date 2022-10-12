@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 require __DIR__ . '/../../../../vendor/autoload.php';
 
-use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Example\ExampleMetricsGenerator;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
