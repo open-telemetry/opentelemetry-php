@@ -4,16 +4,25 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
 
+use function array_column;
 use InvalidArgumentException;
 use LogicException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
+use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
+use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
+use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -450,6 +459,50 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $processor->onEnd($span);
 
         $processor->forceFlush();
+    }
+
+    /**
+     * @requires PHP >= 8.0
+     */
+    public function test_self_diagnostics(): void
+    {
+        $clock = new TestClock();
+        $metrics = new InMemoryExporter();
+        $reader = new ExportingReader($metrics, $clock);
+        $meterProvider = new MeterProvider(
+            null,
+            ResourceInfoFactory::emptyResource(),
+            $clock,
+            Attributes::factory(),
+            new InstrumentationScopeFactory(Attributes::factory()),
+            [$reader],
+            new CriteriaViewRegistry(),
+            null,
+            new ImmediateStalenessHandlerFactory(),
+        );
+
+        $exporter = $this->createMock(SpanExporterInterface::class);
+
+        $processor = new BatchSpanProcessor(
+            $exporter,
+            ClockFactory::getDefault(),
+            2048,
+            5000,
+            30000,
+            512,
+            false,
+            $meterProvider,
+        );
+
+        $reader->collect();
+        $this->assertEquals(
+            [
+                'otel.trace.span_processor.spans',
+                'otel.trace.span_processor.queue.limit',
+                'otel.trace.span_processor.queue.usage',
+            ],
+            array_column($metrics->collect(), 'name'),
+        );
     }
 
     public function test_span_processor_throws_on_invalid_max_queue_size(): void
