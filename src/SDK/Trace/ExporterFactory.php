@@ -104,29 +104,17 @@ class ExporterFactory
         switch ($exporter) {
             case Values::VALUE_NONE:
                 return null;
+            case Values::VALUE_OTLP:
+                $factory = 'OpenTelemetry\Contrib\Otlp\SpanExporterFactory';
+
+                return (new $factory())->fromEnvironment();
+            case 'console':
+                return self::buildExporter('console');
             case Values::VALUE_JAEGER:
             case Values::VALUE_ZIPKIN:
             case Values::VALUE_NEWRELIC:
             case 'zipkintonewrelic':
                 throw new InvalidArgumentException(sprintf('Exporter %s cannot be created from environment', $exporter));
-            case Values::VALUE_OTLP:
-                $protocol = $this->getEnumFromEnvironment(
-                    Env::OTEL_EXPORTER_OTLP_PROTOCOL,
-                    $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, '')
-                );
-                switch ($protocol) {
-                    case Values::VALUE_GRPC:
-                        return self::buildOtlpExporter('otlp+grpc');
-                    case Values::VALUE_HTTP_PROTOBUF:
-                        return self::buildOtlpExporter('otlp+http');
-                    case Values::VALUE_HTTP_JSON:
-                        return self::buildOtlpExporter('otlp+json');
-                    default:
-                        throw new InvalidArgumentException('Unknown/unsupported otlp protocol: ' . $protocol);
-                }
-                // no break
-            case 'console':
-                return self::buildExporter('console');
             default:
                 throw new InvalidArgumentException(sprintf('Invalid exporter name "%s"', $exporter));
         }

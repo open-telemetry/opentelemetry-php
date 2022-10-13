@@ -16,20 +16,17 @@ use OpenTelemetry\Contrib\Otlp\OtlpTransportFactoryInterface;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
-use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
-use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use function parse_url;
 use RuntimeException;
 use function sprintf;
 
-final class GrpcTransportFactory implements TransportFactoryInterface, OtlpTransportFactoryInterface
+final class GrpcTransportFactory implements OtlpTransportFactoryInterface
 {
     use EnvironmentVariablesTrait;
     use LogsMessagesTrait;
 
-    private const DEFAULT_ENDPOINT = 'http://localhost:4317';
     private const DEFAULT_SIGNAL = Signals::TRACE;
     private string $signal = self::DEFAULT_SIGNAL;
 
@@ -40,7 +37,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface, OtlpTrans
      * @psalm-suppress ImplementedReturnTypeMismatch
      */
     public function create(
-        string $endpoint = null,
+        string $endpoint,
         string $contentType = 'application/x-protobuf',
         array $headers = [],
         $compression = null,
@@ -51,28 +48,6 @@ final class GrpcTransportFactory implements TransportFactoryInterface, OtlpTrans
         ?string $cert = null,
         ?string $key = null
     ): TransportInterface {
-        $endpoint ??= $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) ?
-            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) :
-            $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, self::DEFAULT_ENDPOINT);
-
-        if (!$cacert && ($this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) || $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_CERTIFICATE))) {
-            $cacert = $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE, Env::OTEL_EXPORTER_OTLP_CERTIFICATE);
-        }
-
-        $compression = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
-            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
-            $this->getEnumFromEnvironment(
-                Env::OTEL_EXPORTER_OTLP_COMPRESSION,
-                $compression ? Values::VALUE_GZIP : Values::VALUE_NONE
-            );
-
-        $timeout = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT) ?
-            $this->getFloatFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, $timeout) :
-            $this->getFloatFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
-
-        $headers += $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
-            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, null) :
-            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, null);
         $headers += OtlpUtil::getUserAgentHeader();
 
         $parts = parse_url($endpoint);
@@ -112,7 +87,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface, OtlpTrans
         );
     }
 
-    public function withSignal(string $signal): TransportFactoryInterface
+    public function withSignal(string $signal): self
     {
         Signals::validate($signal);
         $this->signal = $signal;
@@ -120,7 +95,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface, OtlpTrans
         return $this;
     }
 
-    public function withProtocol(string $protocol): TransportFactoryInterface
+    public function withProtocol(string $protocol): self
     {
         //only protobuf is supported
         return $this;
@@ -198,5 +173,10 @@ final class GrpcTransportFactory implements TransportFactoryInterface, OtlpTrans
         }
 
         return $content;
+    }
+
+    public static function discover(): self
+    {
+        return new self();
     }
 }
