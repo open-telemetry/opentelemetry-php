@@ -174,9 +174,4 @@ final class GrpcTransportFactory implements OtlpTransportFactoryInterface
 
         return $content;
     }
-
-    public static function discover(): self
-    {
-        return new self();
-    }
 }

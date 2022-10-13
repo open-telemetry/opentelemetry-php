@@ -5,16 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
-use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\SDK\Common\Dsn\DsnInterface;
 use OpenTelemetry\SDK\Common\Dsn\Parser;
 use OpenTelemetry\SDK\Common\Dsn\ParserInterface;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
-use OpenTelemetry\SDK\Common\Environment\KnownValues;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
-use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
-use OpenTelemetry\SDK\Common\Export\TransportInterface;
 
 class ExporterFactory
 {
@@ -33,16 +29,6 @@ class ExporterFactory
         'zipkintonewrelic+http' => '\OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter',
         // this entry exists only for testing purposes
         'test+http' => '\OpenTelemetry\Contrib\Test\Exporter',
-    ];
-    private const KNOWN_TRANSPORT_FACTORIES = [
-        'otlp+grpc' => '\OpenTelemetry\Contrib\Grpc\GrpcTransportFactory',
-        'otlp+http' => '\OpenTelemetry\Contrib\OtlpHttp\OtlpHttpTransportFactory',
-        'otlp+json' => '\OpenTelemetry\Contrib\OtlpHttp\OtlpHttpTransportFactory',
-    ];
-    private const KNOWN_TRANSPORT_PROTOCOLS = [
-        'otlp+grpc' => KnownValues::VALUE_GRPC,
-        'otlp+http' => KnownValues::VALUE_HTTP_PROTOBUF,
-        'otlp+json' => KnownValues::VALUE_HTTP_JSON,
     ];
 
     private const DEFAULT_SERVICE_NAME = 'unknown_service';
@@ -142,39 +128,6 @@ class ExporterFactory
         self::validateClass($exporterClass);
 
         return call_user_func([$exporterClass, 'fromConnectionString'], $endpoint, $name, $args, $protocol);
-    }
-
-    /**
-     * @phan-suppress PhanTypeMismatchArgument
-     * @phan-suppress PhanUndeclaredClass
-     * @phan-suppress PhanParamTooMany
-     */
-    private static function buildOtlpExporter(string $protocol): SpanExporterInterface
-    {
-        $exporterClass = self::KNOWN_EXPORTERS[self::normalizeProtocol($protocol)];
-        self::validateClass($exporterClass);
-
-        $exporter = new $exporterClass(self::buildTransport($protocol), self::KNOWN_TRANSPORT_PROTOCOLS[$protocol]); // @phpstan-ignore-line
-        assert($exporter instanceof SpanExporterInterface);
-
-        return $exporter;
-    }
-
-    /**
-     * @phan-suppress PhanParamTooFew
-     * @psalm-suppress TooFewArguments
-     */
-    private static function buildTransport(string $protocol): TransportInterface
-    {
-        $factoryClass = self::KNOWN_TRANSPORT_FACTORIES[self::normalizeProtocol($protocol)];
-        self::validateClass($factoryClass);
-        $factory = new $factoryClass();
-        assert($factory instanceof TransportFactoryInterface);
-        if (method_exists($factory, 'withSignal')) {
-            $factory = $factory->withSignal(Signals::TRACE);
-        }
-
-        return $factory->create(); //@phpstan-ignore-line
     }
 
     private static function validateProtocol(string $protocol): void
