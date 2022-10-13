@@ -22,11 +22,11 @@ final class MetricExporter implements MetricExporterInterface
     use LogsMessagesTrait;
 
     private TransportInterface $transport;
+    private ProtobufSerializer $serializer;
     /**
      * @var string|Temporality|null
      */
     private $temporality;
-    private ProtobufSerializer $serializer;
 
     /**
      * @param string|Temporality|null $temporality

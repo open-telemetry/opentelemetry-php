@@ -8,5 +8,5 @@ See https://github.com/open-telemetry/opentelemetry-php/blob/main/examples/trace
 
 ```php
 $transport = (new \OpenTelemetry\Contrib\OtlpHttp\OtlpHttpTransportFactory())->create('http://collector:4318');
-$exporter = new \OpenTelemetry\Contrib\Otlp\Exporter($transport);
+$exporter = new \OpenTelemetry\Contrib\Otlp\SpanExporter($transport);
 ```

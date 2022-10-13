@@ -125,9 +125,9 @@ class ExporterFactory
     private static function buildExporter($protocol, string $endpoint = null, string $name = null, $args = null): SpanExporterInterface
     {
         $exporterClass = self::KNOWN_EXPORTERS[self::normalizeProtocol($protocol)];
-        self::validateClass($exporterClass);
+        self::validateExporterClass($exporterClass);
 
-        return call_user_func([$exporterClass, 'fromConnectionString'], $endpoint, $name, $args, $protocol);
+        return call_user_func([$exporterClass, 'fromConnectionString'], $endpoint, $name, $args);
     }
 
     private static function validateProtocol(string $protocol): void
@@ -137,7 +137,7 @@ class ExporterFactory
         }
     }
 
-    private static function validateClass(string $class): void
+    private static function validateExporterClass(string $class): void
     {
         if (!class_exists($class)) {
             throw new InvalidArgumentException('Could not find class: ' . $class);
