@@ -9,7 +9,6 @@ use Throwable;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#wrapping-a-spancontext-in-a-span
  *
- * @internal
  * @psalm-internal OpenTelemetry
  */
 final class NonRecordingSpan extends Span
