@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\OtlpHttp;
 
-use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\Contrib\Otlp\OtlpTransportFactoryInterface;
-use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
