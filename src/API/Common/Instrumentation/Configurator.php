@@ -7,34 +7,39 @@ namespace OpenTelemetry\API\Common\Instrumentation;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextStorageInterface;
+use OpenTelemetry\Context\ContextInterface;
+use OpenTelemetry\Context\ImplicitContextKeyedInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
-use Psr\Log\LoggerInterface;
 
-final class InstrumentationConfigurator
+/**
+ * Configures the global (context scoped) instrumentation instances.
+ *
+ * @see Configurator::activate()
+ */
+final class Configurator implements ImplicitContextKeyedInterface
 {
-    private ?ContextStorageInterface $contextStorage;
-
     private ?TracerProviderInterface $tracerProvider = null;
     private ?MeterProviderInterface $meterProvider = null;
-    private ?LoggerInterface $logger = null;
     private ?TextMapPropagatorInterface $propagator = null;
 
-    private function __construct(?ContextStorageInterface $contextStorage)
+    private function __construct()
     {
-        $this->contextStorage = $contextStorage;
     }
 
-    public static function create(?ContextStorageInterface $contextStorage = null): InstrumentationConfigurator
+    public static function create(): Configurator
     {
-        return new self($contextStorage);
+        return new self();
     }
 
     public function activate(): ScopeInterface
     {
-        $contextStorage = $this->contextStorage ?? Context::storage();
-        $context = $contextStorage->current();
+        return $this->storeInContext()->activate();
+    }
+
+    public function storeInContext(?ContextInterface $context = null): ContextInterface
+    {
+        $context ??= Context::getCurrent();
 
         if ($this->tracerProvider !== null) {
             $context = $context->with(ContextKeys::tracerProvider(), $this->tracerProvider);
@@ -42,17 +47,14 @@ final class InstrumentationConfigurator
         if ($this->meterProvider !== null) {
             $context = $context->with(ContextKeys::meterProvider(), $this->meterProvider);
         }
-        if ($this->logger !== null) {
-            $context = $context->with(ContextKeys::logger(), $this->logger);
-        }
         if ($this->propagator !== null) {
             $context = $context->with(ContextKeys::propagator(), $this->propagator);
         }
 
-        return $contextStorage->attach($context);
+        return $context;
     }
 
-    public function withTracerProvider(?TracerProviderInterface $tracerProvider): InstrumentationConfigurator
+    public function withTracerProvider(?TracerProviderInterface $tracerProvider): Configurator
     {
         $self = clone $this;
         $self->tracerProvider = $tracerProvider;
@@ -60,7 +62,7 @@ final class InstrumentationConfigurator
         return $self;
     }
 
-    public function withMeterProvider(?MeterProviderInterface $meterProvider): InstrumentationConfigurator
+    public function withMeterProvider(?MeterProviderInterface $meterProvider): Configurator
     {
         $self = clone $this;
         $self->meterProvider = $meterProvider;
@@ -68,15 +70,7 @@ final class InstrumentationConfigurator
         return $self;
     }
 
-    public function withLogger(?LoggerInterface $logger): InstrumentationConfigurator
-    {
-        $self = clone $this;
-        $self->logger = $logger;
-
-        return $self;
-    }
-
-    public function withPropagator(?TextMapPropagatorInterface $propagator): InstrumentationConfigurator
+    public function withPropagator(?TextMapPropagatorInterface $propagator): Configurator
     {
         $self = clone $this;
         $self->propagator = $propagator;

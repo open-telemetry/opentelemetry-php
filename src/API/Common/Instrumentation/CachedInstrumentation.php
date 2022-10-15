@@ -9,23 +9,20 @@ use function assert;
 use function class_exists;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
-use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
-use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
-use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKeyInterface;
-use OpenTelemetry\Context\ContextStorageInterface;
-use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
-use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use const PHP_VERSION_ID;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
-final class Instrumentation
+/**
+ * Provides access to cached {@link TracerInterface} and {@link MeterInterface}
+ * instances.
+ *
+ * Autoinstrumentation should prefer using a {@link CachedInstrumentation}
+ * instance over repeatedly obtaining instrumentation instances from
+ * {@link Globals}.
+ */
+final class CachedInstrumentation
 {
-    private ?ContextStorageInterface $contextStorage;
-
     private string $name;
     private ?string $version;
     private ?string $schemaUrl;
@@ -35,9 +32,8 @@ final class Instrumentation
     /** @var ArrayAccess<MeterProviderInterface, MeterInterface>|null */
     private ?ArrayAccess $meters;
 
-    public function __construct(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = [], ?ContextStorageInterface $contextStorage = null)
+    public function __construct(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = [])
     {
-        $this->contextStorage = $contextStorage;
         $this->name = $name;
         $this->version = $version;
         $this->schemaUrl = $schemaUrl;
@@ -61,15 +57,9 @@ final class Instrumentation
         return $map;
     }
 
-    private function get(ContextKeyInterface $contextKey)
-    {
-        return ($this->contextStorage ?? Context::storage())->current()->get($contextKey);
-    }
-
     public function tracer(): TracerInterface
     {
-        static $noop;
-        $tracerProvider = $this->get(ContextKeys::tracerProvider()) ?? $noop ??= new NoopTracerProvider();
+        $tracerProvider = Globals::tracerProvider();
 
         if ($this->tracers === null) {
             return $tracerProvider->getTracer($this->name, $this->version, $this->schemaUrl, $this->attributes);
@@ -80,27 +70,12 @@ final class Instrumentation
 
     public function meter(): MeterInterface
     {
-        static $noop;
-        $meterProvider = $this->get(ContextKeys::meterProvider()) ?? $noop ??= new NoopMeterProvider();
+        $meterProvider = Globals::meterProvider();
 
         if ($this->meters === null) {
             return $meterProvider->getMeter($this->name, $this->version, $this->schemaUrl, $this->attributes);
         }
 
         return $this->meters[$meterProvider] ??= $meterProvider->getMeter($this->name, $this->version, $this->schemaUrl, $this->attributes);
-    }
-
-    public function logger(): LoggerInterface
-    {
-        static $noop;
-
-        return $this->get(ContextKeys::logger()) ?? $noop ??= new NullLogger();
-    }
-
-    public function propagator(): TextMapPropagatorInterface
-    {
-        static $noop;
-
-        return $this->get(ContextKeys::propagator()) ?? $noop ??= new NoopTextMapPropagator();
     }
 }
