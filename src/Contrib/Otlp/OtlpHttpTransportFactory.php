@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Contrib\OtlpHttp;
+namespace OpenTelemetry\Contrib\Otlp;
 
-use OpenTelemetry\Contrib\Otlp\OtlpTransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
 
 class OtlpHttpTransportFactory implements OtlpTransportFactoryInterface
 {

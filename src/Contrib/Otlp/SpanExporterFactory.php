@@ -6,7 +6,6 @@ namespace OpenTelemetry\Contrib\Otlp;
 
 use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
-use OpenTelemetry\Contrib\OtlpHttp\OtlpHttpTransportFactory;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\KnownValues;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;

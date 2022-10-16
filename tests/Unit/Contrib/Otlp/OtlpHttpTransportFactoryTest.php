@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib\OtlpHttp;
+namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
-use OpenTelemetry\Contrib\OtlpHttp\OtlpHttpTransportFactory;
+use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\Contrib\OtlpHttp\OtlpHttpTransportFactory
+ * @covers \OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory
  */
 class OtlpHttpTransportFactoryTest extends TestCase
 {
