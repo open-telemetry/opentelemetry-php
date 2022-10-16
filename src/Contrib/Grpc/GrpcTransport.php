@@ -36,12 +36,6 @@ use UnexpectedValueException;
  */
 final class GrpcTransport implements TransportInterface
 {
-    //@see protobuf *ServiceClient
-    private const METHODS = [
-        Signals::TRACE => '/opentelemetry.proto.collector.trace.v1.TraceService/Export',
-        Signals::METRICS => '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
-        Signals::LOGS => '/opentelemetry.proto.collector.logs.v1.LogsService/Export',
-    ];
     private array $metadata;
     private Channel $channel;
     private string $method;
@@ -119,14 +113,5 @@ final class GrpcTransport implements TransportInterface
     private function formatMetadata(array $metadata): array
     {
         return array_map(fn ($value) => is_array($value) ? $value : [$value], $metadata);
-    }
-
-    public static function method(string $signal): string
-    {
-        if (!array_key_exists($signal, self::METHODS)) {
-            throw new UnexpectedValueException('Method not defined for signal: ' . $signal);
-        }
-
-        return self::METHODS[$signal];
     }
 }

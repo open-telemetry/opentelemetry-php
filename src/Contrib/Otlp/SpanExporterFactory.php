@@ -35,10 +35,19 @@ class SpanExporterFactory
 
     private function buildTransport(): TransportInterface
     {
+        $protocol = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
+            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) :
+            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_PROTOCOL);
+        $contentType = Protocols::contentType($protocol);
+
         $endpoint = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
             ? $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
             : $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT);
-        $endpoint = HttpEndpointResolver::create()->resolveToString($endpoint, Signals::TRACE);
+        if ($protocol === Protocols::GRPC) {
+            $endpoint .= GrpcTransportFactory::method(Signals::TRACE);
+        } else {
+            $endpoint = HttpEndpointResolver::create()->resolveToString($endpoint, Signals::TRACE);
+        }
 
         $headers = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) :
@@ -48,18 +57,8 @@ class SpanExporterFactory
             $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
             $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
 
-        $protocol = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
-            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) :
-            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_PROTOCOL);
-        $contentType = Protocols::contentType($protocol);
-
         $factoryClass = self::FACTORIES[$protocol];
-        /**
-         * @var OtlpTransportFactoryInterface $factory
-         */
-        $factory = (new $factoryClass());
-        $factory = $factory->withProtocol($protocol)->withSignal(Signals::TRACE);
 
-        return $factory->create($endpoint, $contentType, $headers, $compression);
+        return (new $factoryClass())->create($endpoint, $contentType, $headers, $compression);
     }
 }

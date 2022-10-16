@@ -6,13 +6,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Grpc;
 
+use OpenTelemetry\API\Common\Signal\Signals;
+use UnexpectedValueException;
 use function file_get_contents;
 use Grpc\ChannelCredentials;
 use function in_array;
 use InvalidArgumentException;
 use function json_encode;
-use OpenTelemetry\API\Common\Signal\Signals;
-use OpenTelemetry\Contrib\Otlp\OtlpTransportFactoryInterface;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
@@ -22,13 +22,17 @@ use function parse_url;
 use RuntimeException;
 use function sprintf;
 
-final class GrpcTransportFactory implements OtlpTransportFactoryInterface
+final class GrpcTransportFactory implements TransportFactoryInterface
 {
     use EnvironmentVariablesTrait;
     use LogsMessagesTrait;
 
-    private const DEFAULT_SIGNAL = Signals::TRACE;
-    private string $signal = self::DEFAULT_SIGNAL;
+    //@see protobuf *ServiceClient
+    private const METHODS = [
+        Signals::TRACE => '/opentelemetry.proto.collector.trace.v1.TraceService/Export',
+        Signals::METRICS => '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
+        Signals::LOGS => '/opentelemetry.proto.collector.logs.v1.LogsService/Export',
+    ];
 
     /**
      * @psalm-param "application/x-protobuf" $contentType
@@ -51,8 +55,8 @@ final class GrpcTransportFactory implements OtlpTransportFactoryInterface
         $headers += OtlpUtil::getUserAgentHeader();
 
         $parts = parse_url($endpoint);
-        if (!isset($parts['scheme'], $parts['host'])) {
-            throw new InvalidArgumentException('Endpoint has to contain scheme and host');
+        if (!isset($parts['scheme'], $parts['host'], $parts['path'])) {
+            throw new InvalidArgumentException('Endpoint has to contain scheme, host and path');
         }
         /** @phpstan-ignore-next-line */
         if ($contentType !== 'application/x-protobuf') {
@@ -60,6 +64,7 @@ final class GrpcTransportFactory implements OtlpTransportFactoryInterface
         }
 
         $scheme = $parts['scheme'];
+        $method = $parts['path'];
 
         if (!in_array($scheme, ['http', 'https'], true)) {
             throw new InvalidArgumentException(sprintf('Endpoint contains not supported scheme "%s"', $scheme));
@@ -82,23 +87,18 @@ final class GrpcTransportFactory implements OtlpTransportFactoryInterface
         return new GrpcTransport(
             $grpcEndpoint,
             $opts,
-            GrpcTransport::method($this->signal),
+            $method,
             $headers,
         );
     }
 
-    public function withSignal(string $signal): self
+    public static function method(string $signal): string
     {
-        Signals::validate($signal);
-        $this->signal = $signal;
+        if (!array_key_exists($signal, self::METHODS)) {
+            throw new UnexpectedValueException('Method not defined for signal: ' . $signal);
+        }
 
-        return $this;
-    }
-
-    public function withProtocol(string $protocol): self
-    {
-        //only protobuf is supported
-        return $this;
+        return self::METHODS[$signal];
     }
 
     private static function createOpts(

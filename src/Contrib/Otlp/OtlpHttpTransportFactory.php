@@ -7,9 +7,9 @@ namespace OpenTelemetry\Contrib\Otlp;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
-use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 
-class OtlpHttpTransportFactory implements OtlpTransportFactoryInterface
+class OtlpHttpTransportFactory implements TransportFactoryInterface
 {
     use EnvironmentVariablesTrait;
 
@@ -31,15 +31,5 @@ class OtlpHttpTransportFactory implements OtlpTransportFactoryInterface
         }
 
         return PsrTransportFactory::discover()->create($endpoint, $contentType, $headers, $compression);
-    }
-
-    public function withSignal(string $signal): OtlpTransportFactoryInterface
-    {
-        return $this;
-    }
-
-    public function withProtocol(string $protocol): OtlpTransportFactoryInterface
-    {
-        return $this;
     }
 }

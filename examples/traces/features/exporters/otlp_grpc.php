@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 
 \OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
 
-$transport = (new GrpcTransportFactory())->withSignal(Signals::TRACE)->create('http://collector:4317');
+$transport = (new GrpcTransportFactory())->create('http://collector:4317' . GrpcTransportFactory::method(Signals::TRACE));
 $exporter = new SpanExporter($transport);
 echo 'Starting OTLP GRPC example';
 
