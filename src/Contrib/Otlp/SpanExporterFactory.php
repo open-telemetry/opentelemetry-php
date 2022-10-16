@@ -33,6 +33,9 @@ class SpanExporterFactory
         return new SpanExporter($transport);
     }
 
+    /**
+     * @psalm-suppress ArgumentTypeCoercion
+     */
     private function buildTransport(): TransportInterface
     {
         $protocol = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
