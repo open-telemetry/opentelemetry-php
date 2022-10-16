@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\SDK;
+use OpenTelemetry\SDK\Sdk;
 
 final class TracerProviderFactory
 {
@@ -28,7 +28,7 @@ final class TracerProviderFactory
 
     public function create(): TracerProviderInterface
     {
-        if (SDK::isDisabled()) {
+        if (Sdk::isDisabled()) {
             return new NoopTracerProvider();
         }
 
