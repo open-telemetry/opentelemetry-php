@@ -6,13 +6,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Grpc;
 
-use OpenTelemetry\API\Common\Signal\Signals;
-use UnexpectedValueException;
 use function file_get_contents;
 use Grpc\ChannelCredentials;
 use function in_array;
 use InvalidArgumentException;
 use function json_encode;
+use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
@@ -21,6 +20,7 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use function parse_url;
 use RuntimeException;
 use function sprintf;
+use UnexpectedValueException;
 
 final class GrpcTransportFactory implements TransportFactoryInterface
 {

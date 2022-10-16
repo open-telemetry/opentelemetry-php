@@ -18,7 +18,6 @@ use const Grpc\OP_SEND_INITIAL_METADATA;
 use const Grpc\OP_SEND_MESSAGE;
 use const Grpc\STATUS_OK;
 use Grpc\Timeval;
-use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -27,7 +26,6 @@ use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Common\Future\NullCancellation;
 use RuntimeException;
 use Throwable;
-use UnexpectedValueException;
 
 /**
  * @internal
