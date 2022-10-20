@@ -47,7 +47,7 @@ class SpanExporterFactory
             ? $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
             : $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT);
         if ($protocol === Protocols::GRPC) {
-            $endpoint .= GrpcTransportFactory::method(Signals::TRACE);
+            $endpoint .= OtlpUtil::method(Signals::TRACE);
         } else {
             $endpoint = HttpEndpointResolver::create()->resolveToString($endpoint, Signals::TRACE);
         }
@@ -55,6 +55,7 @@ class SpanExporterFactory
         $headers = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) :
             $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS);
+        $headers += OtlpUtil::getUserAgentHeader();
 
         $compression = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
             $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :

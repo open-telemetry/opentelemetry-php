@@ -11,8 +11,6 @@ use Grpc\ChannelCredentials;
 use function in_array;
 use InvalidArgumentException;
 use function json_encode;
-use OpenTelemetry\API\Common\Signal\Signals;
-use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
@@ -20,19 +18,11 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use function parse_url;
 use RuntimeException;
 use function sprintf;
-use UnexpectedValueException;
 
 final class GrpcTransportFactory implements TransportFactoryInterface
 {
     use EnvironmentVariablesTrait;
     use LogsMessagesTrait;
-
-    //@see protobuf *ServiceClient
-    private const METHODS = [
-        Signals::TRACE => '/opentelemetry.proto.collector.trace.v1.TraceService/Export',
-        Signals::METRICS => '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
-        Signals::LOGS => '/opentelemetry.proto.collector.logs.v1.LogsService/Export',
-    ];
 
     /**
      * @psalm-param "application/x-protobuf" $contentType
@@ -52,8 +42,6 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         ?string $cert = null,
         ?string $key = null
     ): TransportInterface {
-        $headers += OtlpUtil::getUserAgentHeader();
-
         $parts = parse_url($endpoint);
         if (!isset($parts['scheme'], $parts['host'], $parts['path'])) {
             throw new InvalidArgumentException('Endpoint has to contain scheme, host and path');
@@ -90,15 +78,6 @@ final class GrpcTransportFactory implements TransportFactoryInterface
             $method,
             $headers,
         );
-    }
-
-    public static function method(string $signal): string
-    {
-        if (!array_key_exists($signal, self::METHODS)) {
-            throw new UnexpectedValueException('Method not defined for signal: ' . $signal);
-        }
-
-        return self::METHODS[$signal];
     }
 
     private static function createOpts(
