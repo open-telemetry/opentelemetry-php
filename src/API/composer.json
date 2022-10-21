@@ -12,7 +12,6 @@
     ],
     "require": {
         "php": "^7.4 || ^8.0",
-        "cloudevents/sdk-php": "^v1.0.1",
         "open-telemetry/context": "self.version",
         "open-telemetry/sem-conv": "self.version",
         "psr/log": "^1.1|^2.0|^3.0",
