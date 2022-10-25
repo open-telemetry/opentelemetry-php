@@ -118,7 +118,7 @@ final class MeterProvider implements MeterProviderInterface
         return $success;
     }
 
-    public function builder(): MeterProviderBuilder
+    public static function builder(): MeterProviderBuilder
     {
         return new MeterProviderBuilder();
     }
