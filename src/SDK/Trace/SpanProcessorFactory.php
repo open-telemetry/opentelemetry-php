@@ -23,16 +23,16 @@ class SpanProcessorFactory
             return new NoopSpanProcessor();
         }
 
-        $name = $this->getEnumFromEnvironment(Env::OTEL_PHP_TRACES_PROCESSOR);
+        $name = self::getEnumFromEnvironment(Env::OTEL_PHP_TRACES_PROCESSOR);
         switch ($name) {
             case Values::VALUE_BATCH:
                 return new BatchSpanProcessor(
                     $exporter,
                     ClockFactory::getDefault(),
-                    $this->getIntFromEnvironment(Env::OTEL_BSP_MAX_QUEUE_SIZE, BatchSpanProcessor::DEFAULT_MAX_QUEUE_SIZE),
-                    $this->getIntFromEnvironment(Env::OTEL_BSP_SCHEDULE_DELAY, BatchSpanProcessor::DEFAULT_SCHEDULE_DELAY),
-                    $this->getIntFromEnvironment(Env::OTEL_BSP_EXPORT_TIMEOUT, BatchSpanProcessor::DEFAULT_EXPORT_TIMEOUT),
-                    $this->getIntFromEnvironment(Env::OTEL_BSP_MAX_EXPORT_BATCH_SIZE, BatchSpanProcessor::DEFAULT_MAX_EXPORT_BATCH_SIZE),
+                    self::getIntFromEnvironment(Env::OTEL_BSP_MAX_QUEUE_SIZE, BatchSpanProcessor::DEFAULT_MAX_QUEUE_SIZE),
+                    self::getIntFromEnvironment(Env::OTEL_BSP_SCHEDULE_DELAY, BatchSpanProcessor::DEFAULT_SCHEDULE_DELAY),
+                    self::getIntFromEnvironment(Env::OTEL_BSP_EXPORT_TIMEOUT, BatchSpanProcessor::DEFAULT_EXPORT_TIMEOUT),
+                    self::getIntFromEnvironment(Env::OTEL_BSP_MAX_EXPORT_BATCH_SIZE, BatchSpanProcessor::DEFAULT_MAX_EXPORT_BATCH_SIZE),
                 );
             case Values::VALUE_SIMPLE:
                 return new SimpleSpanProcessor($exporter);

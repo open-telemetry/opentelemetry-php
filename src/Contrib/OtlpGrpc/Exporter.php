@@ -47,36 +47,36 @@ class Exporter implements SpanExporterInterface
         TraceServiceClient $client = null
     ) {
         $this->insecure = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_INSECURE) ?
-            $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_INSECURE, $insecure) :
-            $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
+            self::getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_INSECURE, $insecure) :
+            self::getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
 
         if (!empty($certificateFile) || $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_CERTIFICATE)) {
             $this->certificateFile = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) ?
-                    $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) :
-                    $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
+                    self::getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) :
+                    self::getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
         }
 
         $this->compression = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
-            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
-            $this->getEnumFromEnvironment(
+            self::getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
+            self::getEnumFromEnvironment(
                 Env::OTEL_EXPORTER_OTLP_COMPRESSION,
                 $compression ? Values::VALUE_GZIP : Values::VALUE_NONE
             );
 
         $this->timeout = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT) ?
-            $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, $timeout) :
-            $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
+            self::getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, $timeout) :
+            self::getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
         $this->metadata = self::transformToGrpcMetadata($this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
-            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
-            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers));
+            self::getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
+            self::getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers));
 
         $opts = $this->getClientOptions();
 
         $this->client = $client ?? new TraceServiceClient(
             $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) ?
-                $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) :
-                $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, $endpointURL),
+                self::getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) :
+                self::getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, $endpointURL),
             $opts
         );
     }

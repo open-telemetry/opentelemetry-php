@@ -79,7 +79,7 @@ class ExporterFactory
 
     public function fromEnvironment(): ?SpanExporterInterface
     {
-        $envValue = $this->getStringFromEnvironment(Env::OTEL_TRACES_EXPORTER, '');
+        $envValue = self::getStringFromEnvironment(Env::OTEL_TRACES_EXPORTER, '');
         $exporters = explode(',', $envValue);
         //TODO "The SDK MAY accept a comma-separated list to enable setting multiple exporters"
         if (1 !== count($exporters)) {
@@ -95,9 +95,9 @@ class ExporterFactory
             case 'zipkintonewrelic':
                 throw new InvalidArgumentException(sprintf('Exporter %s cannot be created from environment', $exporter));
             case Values::VALUE_OTLP:
-                $protocol = $this->getEnumFromEnvironment(
+                $protocol = self::getEnumFromEnvironment(
                     Env::OTEL_EXPORTER_OTLP_PROTOCOL,
-                    $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, '')
+                    self::getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, '')
                 );
                 switch ($protocol) {
                     case Values::VALUE_GRPC:

@@ -21,10 +21,10 @@ class SamplerFactory
 
     public function fromEnvironment(): SamplerInterface
     {
-        $name = $this->getStringFromEnvironment(Env::OTEL_TRACES_SAMPLER);
+        $name = self::getStringFromEnvironment(Env::OTEL_TRACES_SAMPLER);
 
         if (strpos($name, self::TRACEIDRATIO_PREFIX) !== false) {
-            $arg = $this->getRatioFromEnvironment(Env::OTEL_TRACES_SAMPLER_ARG);
+            $arg = self::getRatioFromEnvironment(Env::OTEL_TRACES_SAMPLER_ARG);
 
             switch ($name) {
                 case Values::VALUE_TRACE_ID_RATIO:
