@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Common\Instrumentation;
 
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
+use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
+use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ImplicitContextKeyedInterface;
+use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
 
@@ -27,9 +30,24 @@ final class Configurator implements ImplicitContextKeyedInterface
     {
     }
 
+    /**
+     * Creates a configurator that uses parent instances for not configured values.
+     */
     public static function create(): Configurator
     {
         return new self();
+    }
+
+    /**
+     * Creates a configurator that uses noop instances for not configured values.
+     */
+    public static function createNoop(): Configurator
+    {
+        return self::create()
+            ->withTracerProvider(new NoopTracerProvider())
+            ->withMeterProvider(new NoopMeterProvider())
+            ->withPropagator(new NoopTextMapPropagator())
+        ;
     }
 
     public function activate(): ScopeInterface

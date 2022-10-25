@@ -8,11 +8,8 @@ use function assert;
 use Closure;
 use const E_USER_WARNING;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
-use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
-use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use function sprintf;
 use Throwable;
@@ -73,12 +70,7 @@ final class Globals
             return $globals;
         }
 
-        $configurator = Configurator::create()
-            ->withTracerProvider(new NoopTracerProvider())
-            ->withMeterProvider(new NoopMeterProvider())
-            ->withPropagator(new NoopTextMapPropagator())
-        ;
-
+        $configurator = Configurator::createNoop();
         $scope = $configurator->activate();
 
         try {
