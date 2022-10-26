@@ -65,7 +65,7 @@ final class MeterProvider implements MeterProviderInterface
         ?string $schemaUrl = null,
         iterable $attributes = []
     ): MeterInterface {
-        if ($this->closed || Sdk::isDisabled()) {
+        if ($this->closed || Sdk::isDisabled()) { //@todo create meter provider from factory, and move Sdk::isDisabled() there
             return new NoopMeter();
         }
 

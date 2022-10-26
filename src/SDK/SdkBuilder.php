@@ -5,20 +5,32 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK;
 
 use OpenTelemetry\API\Common\Instrumentation\Configurator;
-use OpenTelemetry\API\Metrics\MeterProviderInterface;
-use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
-use OpenTelemetry\API\Trace\NoopTracerProvider;
-use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
+use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
+use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
+use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
+use OpenTelemetry\SDK\Trace\NoopTracerProvider;
+use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 
 class SdkBuilder
 {
     private ?TracerProviderInterface $tracerProvider = null;
     private ?MeterProviderInterface  $meterProvider = null;
     private ?TextMapPropagatorInterface $propagator = null;
+    private bool $autoShutdown = false;
+
+    /**
+     * Automatically shut down providers on process completion. If not set, the user is responsible for calling `shutdown`.
+     */
+    public function setAutoShutdown(bool $shutdown): self
+    {
+        $this->autoShutdown = $shutdown;
+
+        return $this;
+    }
 
     public function setTracerProvider(TracerProviderInterface $provider): self
     {
@@ -43,6 +55,11 @@ class SdkBuilder
 
     public function build(): Sdk
     {
+        if ($this->autoShutdown) {
+            $this->tracerProvider && ShutdownHandler::register([$this->tracerProvider, 'shutdown']);
+            $this->meterProvider && ShutdownHandler::register([$this->meterProvider, 'shutdown']);
+        }
+
         return new Sdk(
             $this->tracerProvider ?? new NoopTracerProvider(),
             $this->meterProvider ?? new NoopMeterProvider(),

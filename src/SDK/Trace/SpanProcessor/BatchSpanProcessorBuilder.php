@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
-use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -13,7 +12,6 @@ class BatchSpanProcessorBuilder
 {
     private SpanExporterInterface $exporter;
     private ?MeterProviderInterface $meterProvider = null;
-    private ?ClockInterface $clock = null;
 
     public function __construct(SpanExporterInterface $exporter)
     {
@@ -27,18 +25,11 @@ class BatchSpanProcessorBuilder
         return $this;
     }
 
-    public function setClock(ClockInterface $clock): self
-    {
-        $this->clock = $clock;
-
-        return $this;
-    }
-
     public function build(): BatchSpanProcessor
     {
         return new BatchSpanProcessor(
             $this->exporter,
-            $this->clock ?? ClockFactory::getDefault(),
+            ClockFactory::getDefault(),
             BatchSpanProcessor::DEFAULT_MAX_QUEUE_SIZE,
             BatchSpanProcessor::DEFAULT_SCHEDULE_DELAY,
             BatchSpanProcessor::DEFAULT_EXPORT_TIMEOUT,

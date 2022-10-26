@@ -13,7 +13,6 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
-use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 
@@ -66,7 +65,7 @@ final class TracerProvider implements TracerProviderInterface
         ?string $schemaUrl = null,
         iterable $attributes = []
     ): API\TracerInterface {
-        if ($this->tracerSharedState->hasShutdown() || Sdk::isDisabled()) {
+        if ($this->tracerSharedState->hasShutdown()) {
             return NoopTracer::getInstance();
         }
 

@@ -39,7 +39,6 @@ $reader = new ExportingReader(
 $meterProvider = MeterProvider::builder()
     ->setResource($resource)
     ->addReader($reader)
-    ->setAutoShutdown(true)
     ->build();
 
 $tracerProvider = TracerProvider::builder()
@@ -50,13 +49,13 @@ $tracerProvider = TracerProvider::builder()
     )
     ->setResource($resource)
     ->setSampler(new ParentBased(new AlwaysOnSampler()))
-    ->setAutoShutdown(true)
     ->build();
 
 Sdk::builder()
     ->setTracerProvider($tracerProvider)
     ->setMeterProvider($meterProvider)
     ->setPropagator(TraceContextPropagator::getInstance())
+    ->setAutoShutdown(true)
     ->buildAndRegisterGlobal();
 
 $instrumentation = new CachedInstrumentation('example');
