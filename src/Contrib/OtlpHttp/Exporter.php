@@ -32,7 +32,6 @@ class Exporter
     public static function createTransport(
         TransportFactoryInterface $transportFactory
     ): TransportInterface {
-
         $endpoint = EnvironmentVariables::has(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
             ? EnvironmentVariables::getString(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
             : HttpEndpointResolver::create()->resolveToString(

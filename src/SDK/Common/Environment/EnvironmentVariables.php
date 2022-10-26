@@ -24,7 +24,7 @@ class EnvironmentVariables
 
     public static function getBoolean(string $key, bool $default = null): bool
     {
-        return Accessor::getBool($key, is_null($default) ? null : ($default ? 'true' : 'false'));
+        return Accessor::getBool($key, null === $default ? null : ($default ? 'true' : 'false'));
     }
 
     public static function getMap(string $key, string $default = null): array
