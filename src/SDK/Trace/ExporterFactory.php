@@ -8,14 +8,12 @@ use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Dsn\DsnInterface;
 use OpenTelemetry\SDK\Common\Dsn\Parser;
 use OpenTelemetry\SDK\Common\Dsn\ParserInterface;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 
 class ExporterFactory
 {
-    use EnvironmentVariablesTrait;
-
     private const KNOWN_EXPORTERS = [
         'console' => '\OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter',
         'memory' => '\OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter',
@@ -79,7 +77,7 @@ class ExporterFactory
 
     public function fromEnvironment(): ?SpanExporterInterface
     {
-        $envValue = $this->getStringFromEnvironment(Env::OTEL_TRACES_EXPORTER, '');
+        $envValue = EnvironmentVariables::getString(Env::OTEL_TRACES_EXPORTER, '');
         $exporters = explode(',', $envValue);
         //TODO "The SDK MAY accept a comma-separated list to enable setting multiple exporters"
         if (1 !== count($exporters)) {
@@ -95,9 +93,9 @@ class ExporterFactory
             case 'zipkintonewrelic':
                 throw new InvalidArgumentException(sprintf('Exporter %s cannot be created from environment', $exporter));
             case Values::VALUE_OTLP:
-                $protocol = $this->getEnumFromEnvironment(
+                $protocol = EnvironmentVariables::getEnum(
                     Env::OTEL_EXPORTER_OTLP_PROTOCOL,
-                    $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, '')
+                    EnvironmentVariables::getEnum(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, '')
                 );
                 switch ($protocol) {
                     case Values::VALUE_GRPC:

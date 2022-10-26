@@ -9,7 +9,7 @@ use Http\Discovery\Psr18ClientDiscovery;
 use InvalidArgumentException;
 use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
@@ -32,28 +32,24 @@ class Exporter
     public static function createTransport(
         TransportFactoryInterface $transportFactory
     ): TransportInterface {
-        $env = new class() {
-            use EnvironmentVariablesTrait;
-        };
-
-        $endpoint = $env->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
-            ? $env->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
+        $endpoint = EnvironmentVariables::has(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
+            ? EnvironmentVariables::getString(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
             : HttpEndpointResolver::create()->resolveToString(
-                $env->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, self::DEFAULT_ENDPOINT),
+                EnvironmentVariables::getString(Env::OTEL_EXPORTER_OTLP_ENDPOINT, self::DEFAULT_ENDPOINT),
                 Signals::TRACE,
             );
 
-        $headers = $env->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
-            $env->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) :
-            $env->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS);
+        $headers = EnvironmentVariables::has(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
+            EnvironmentVariables::getMap(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) :
+            EnvironmentVariables::getMap(Env::OTEL_EXPORTER_OTLP_HEADERS);
 
-        $compression = $env->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
-            $env->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION, self::DEFAULT_COMPRESSION) :
-            $env->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
+        $compression = EnvironmentVariables::has(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
+            EnvironmentVariables::getEnum(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION, self::DEFAULT_COMPRESSION) :
+            EnvironmentVariables::getEnum(Env::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
 
-        $protocol = $env->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
-            $env->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, self::OTLP_PROTOCOL) :
-            $env->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_PROTOCOL, self::OTLP_PROTOCOL);
+        $protocol = EnvironmentVariables::has(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
+            EnvironmentVariables::getEnum(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, self::OTLP_PROTOCOL) :
+            EnvironmentVariables::getEnum(Env::OTEL_EXPORTER_OTLP_PROTOCOL, self::OTLP_PROTOCOL);
 
         if ($protocol !== self::OTLP_PROTOCOL) {
             throw new InvalidArgumentException(sprintf('Invalid OTLP Protocol "%s" specified', $protocol));

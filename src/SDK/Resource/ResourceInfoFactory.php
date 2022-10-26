@@ -7,14 +7,11 @@ namespace OpenTelemetry\SDK\Resource;
 use function in_array;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Environment\Accessor;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 
 class ResourceInfoFactory
 {
-    use EnvironmentVariablesTrait;
-
     /**
      * Merges resources into a new one.
      *

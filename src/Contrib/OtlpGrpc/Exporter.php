@@ -9,6 +9,7 @@ use Grpc\ChannelCredentials;
 use OpenTelemetry\Contrib\Otlp\ExporterTrait;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
+use OpenTelemetry\SDK\Common\Environment\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
@@ -46,37 +47,37 @@ class Exporter implements SpanExporterInterface
         int $timeout = 10,
         TraceServiceClient $client = null
     ) {
-        $this->insecure = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_INSECURE) ?
-            $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_INSECURE, $insecure) :
-            $this->getBooleanFromEnvironment(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
+        $this->insecure = EnvironmentVariables::has(Env::OTEL_EXPORTER_OTLP_TRACES_INSECURE) ?
+            EnvironmentVariables::getBoolean(Env::OTEL_EXPORTER_OTLP_TRACES_INSECURE, $insecure) :
+            EnvironmentVariables::getBoolean(Env::OTEL_EXPORTER_OTLP_INSECURE, $insecure);
 
-        if (!empty($certificateFile) || $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_CERTIFICATE)) {
-            $this->certificateFile = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) ?
-                    $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) :
-                    $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
+        if (!empty($certificateFile) || EnvironmentVariables::has(Env::OTEL_EXPORTER_OTLP_CERTIFICATE)) {
+            $this->certificateFile = EnvironmentVariables::has(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) ?
+                    EnvironmentVariables::getString(Env::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE) :
+                    EnvironmentVariables::getString(Env::OTEL_EXPORTER_OTLP_CERTIFICATE, $certificateFile);
         }
 
-        $this->compression = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
-            $this->getEnumFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
-            $this->getEnumFromEnvironment(
+        $this->compression = EnvironmentVariables::has(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
+            EnvironmentVariables::getEnum(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
+            EnvironmentVariables::getEnum(
                 Env::OTEL_EXPORTER_OTLP_COMPRESSION,
                 $compression ? Values::VALUE_GZIP : Values::VALUE_NONE
             );
 
-        $this->timeout = $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT) ?
-            $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, $timeout) :
-            $this->getIntFromEnvironment(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
+        $this->timeout = EnvironmentVariables::has(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT) ?
+            EnvironmentVariables::getInt(Env::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, $timeout) :
+            EnvironmentVariables::getInt(Env::OTEL_EXPORTER_OTLP_TIMEOUT, $timeout);
 
-        $this->metadata = self::transformToGrpcMetadata($this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
-            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
-            $this->getMapFromEnvironment(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers));
+        $this->metadata = self::transformToGrpcMetadata(EnvironmentVariables::has(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
+            EnvironmentVariables::getMap(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS, $headers) :
+            EnvironmentVariables::getMap(Env::OTEL_EXPORTER_OTLP_HEADERS, $headers));
 
         $opts = $this->getClientOptions();
 
         $this->client = $client ?? new TraceServiceClient(
-            $this->hasEnvironmentVariable(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) ?
-                $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) :
-                $this->getStringFromEnvironment(Env::OTEL_EXPORTER_OTLP_ENDPOINT, $endpointURL),
+            EnvironmentVariables::has(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) ?
+                EnvironmentVariables::getString(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) :
+                EnvironmentVariables::getString(Env::OTEL_EXPORTER_OTLP_ENDPOINT, $endpointURL),
             $opts
         );
     }
