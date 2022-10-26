@@ -8,7 +8,6 @@
     "license": "Apache-2.0",
     "require": {
         "php": "^7.4 || ^8.0",
-        "cloudevents/sdk-php": "^v1.0.1",
         "ext-json": "*",
         "google/protobuf": "^3.3.0",
         "grpc/grpc": "^1.30",
