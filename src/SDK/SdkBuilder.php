@@ -9,6 +9,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
@@ -55,14 +56,16 @@ class SdkBuilder
 
     public function build(): Sdk
     {
+        $tracerProvider = $this->tracerProvider ?? new NoopTracerProvider();
+        $meterProvider = $this->meterProvider ?? new NoopMeterProvider();
         if ($this->autoShutdown) {
-            $this->tracerProvider && ShutdownHandler::register([$this->tracerProvider, 'shutdown']);
-            $this->meterProvider && ShutdownHandler::register([$this->meterProvider, 'shutdown']);
+            ShutdownHandler::register(fn (?CancellationInterface $cancellation = null): bool => $tracerProvider->shutdown($cancellation));
+            ShutdownHandler::register(fn (): bool => $meterProvider->shutdown());
         }
 
         return new Sdk(
-            $this->tracerProvider ?? new NoopTracerProvider(),
-            $this->meterProvider ?? new NoopMeterProvider(),
+            $tracerProvider,
+            $meterProvider,
             $this->propagator ?? NoopTextMapPropagator::getInstance(),
         );
     }
