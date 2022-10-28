@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
+use OpenTelemetry\SDK\Common\Environment\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
@@ -15,16 +15,14 @@ use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 
 class SamplerFactory
 {
-    use EnvironmentVariablesTrait;
-
     private const TRACEIDRATIO_PREFIX = 'traceidratio';
 
     public function fromEnvironment(): SamplerInterface
     {
-        $name = $this->getStringFromEnvironment(Env::OTEL_TRACES_SAMPLER);
+        $name = EnvironmentVariables::getString(Env::OTEL_TRACES_SAMPLER);
 
         if (strpos($name, self::TRACEIDRATIO_PREFIX) !== false) {
-            $arg = $this->getRatioFromEnvironment(Env::OTEL_TRACES_SAMPLER_ARG);
+            $arg = EnvironmentVariables::getRatio(Env::OTEL_TRACES_SAMPLER_ARG);
 
             switch ($name) {
                 case Values::VALUE_TRACE_ID_RATIO:

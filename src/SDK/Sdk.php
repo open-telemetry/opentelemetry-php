@@ -8,13 +8,12 @@ use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Environment\Accessor;
+use OpenTelemetry\SDK\Common\Environment\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Environment\Variables;
 
 class Sdk
 {
-    use EnvironmentVariablesTrait;
-
     private TracerProviderInterface $tracerProvider;
     private MeterProviderInterface $meterProvider;
     private TextMapPropagatorInterface $propagator;
@@ -31,7 +30,7 @@ class Sdk
 
     public static function isDisabled(): bool
     {
-        return Accessor::getBool(Variables::OTEL_SDK_DISABLED);
+        return EnvironmentVariables::getBoolean(Variables::OTEL_SDK_DISABLED);
     }
 
     public static function builder(): SdkBuilder
