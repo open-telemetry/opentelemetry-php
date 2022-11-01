@@ -35,7 +35,7 @@ class ResourceInfoTest extends TestCase
             new Detectors\SdkProvided(),
         ]))->getResource();
 
-        $version = InstalledVersions::getVersion('open-telemetry/opentelemetry');
+        $version = InstalledVersions::getPrettyVersion('open-telemetry/opentelemetry');
 
         $name = $resource->getAttributes()->get('name');
         $sdkname = $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME);

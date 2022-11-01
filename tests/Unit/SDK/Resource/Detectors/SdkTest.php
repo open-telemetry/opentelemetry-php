@@ -18,7 +18,7 @@ class SdkTest extends TestCase
     {
         $resouceDetector = new Detectors\Sdk();
         $resource = $resouceDetector->getResource();
-        $version = InstalledVersions::getVersion('open-telemetry/opentelemetry');
+        $version = InstalledVersions::getPrettyVersion('open-telemetry/opentelemetry');
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertSame('opentelemetry', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));

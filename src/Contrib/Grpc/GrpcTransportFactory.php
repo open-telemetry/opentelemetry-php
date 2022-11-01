@@ -12,7 +12,6 @@ use function in_array;
 use InvalidArgumentException;
 use function json_encode;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use function parse_url;
@@ -21,7 +20,6 @@ use function sprintf;
 
 final class GrpcTransportFactory implements TransportFactoryInterface
 {
-    use EnvironmentVariablesTrait;
     use LogsMessagesTrait;
 
     /**

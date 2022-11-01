@@ -20,6 +20,7 @@ use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
+use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use OpenTelemetry\SemConv\TraceAttributes;
 use PHPUnit\Framework\TestCase;
 
@@ -107,10 +108,10 @@ class TracerTest extends TestCase
         $this->assertInstanceOf(API\NoopSpanBuilder::class, $tracer->spanBuilder('baz'));
     }
 
-    public function test_returns_noop_tracer_when_sdk_disabled(): void
+    public function test_factory_returns_noop_tracer_when_sdk_disabled(): void
     {
         self::setEnvironmentVariable('OTEL_SDK_DISABLED', 'true');
-        $tracerProvider = new TracerProvider();
+        $tracerProvider = (new TracerProviderFactory('test'))->create();
         $tracer = $tracerProvider->getTracer('foo');
         $this->assertInstanceOf(API\NoopTracer::class, $tracer);
     }

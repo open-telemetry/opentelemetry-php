@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariablesTrait;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 
 class OtlpHttpTransportFactory implements TransportFactoryInterface
 {
-    use EnvironmentVariablesTrait;
-
     private const DEFAULT_COMPRESSION = 'none';
     public function create(
         string $endpoint,
