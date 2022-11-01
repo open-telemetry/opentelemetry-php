@@ -17,6 +17,7 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use function parse_url;
 use RuntimeException;
 use function sprintf;
+use function substr_count;
 
 final class GrpcTransportFactory implements TransportFactoryInterface
 {
@@ -54,6 +55,9 @@ final class GrpcTransportFactory implements TransportFactoryInterface
 
         if (!in_array($scheme, ['http', 'https'], true)) {
             throw new InvalidArgumentException(sprintf('Endpoint contains not supported scheme "%s"', $scheme));
+        }
+        if (substr_count($parts['path'], '/') !== 2) {
+            throw new InvalidArgumentException(sprintf('Endpoint path is not a valid GRPC method "%s"', $method));
         }
 
         $opts = self::createOpts($compression, $timeout, $maxRetries, $retryDelay);
