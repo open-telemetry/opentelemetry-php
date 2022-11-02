@@ -38,6 +38,10 @@ deptrac:
           collectors:
               -   type: className
                   regex: ^OpenTelemetry\\Contrib\\*
+      -   name: Extension
+          collectors:
+            -   type: className
+                regex: ^OpenTelemetry\\Extension\\*
       -   name: OtelProto
           collectors:
               -   type: className
@@ -110,6 +114,8 @@ deptrac:
           - Thrift
           - JaegerThrift
           - Swoole
+      Extension:
+          - +API
       OtelProto:
           - GoogleProtobuf
           - Grpc
