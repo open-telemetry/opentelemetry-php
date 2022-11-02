@@ -21,6 +21,7 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->skip([
         CallableThisArrayToAnonymousFunctionRector::class => [
             __DIR__ . '/src/SDK/SdkBuilder.php',
+            __DIR__ . '/src/SDK/SdkAutoloader.php',
         ],
     ]);
 };

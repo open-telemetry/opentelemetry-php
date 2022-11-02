@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
-use OpenTelemetry\Context\ScopeInterface;
+use OpenTelemetry\API\Common\Instrumentation\Configurator;
+use OpenTelemetry\API\Common\Instrumentation\Globals;
 use OpenTelemetry\SDK\Common\Environment\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Environment\Variables;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
@@ -17,36 +18,31 @@ use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
 
 class SdkAutoloader
 {
-    private static ?ScopeInterface $scope = null;
     private static ?bool $enabled = null;
 
-    public static function autoload(?SdkBuilder $builder = null): bool
+    public static function autoload(): bool
     {
-        if (self::$enabled === null) {
-            self::$enabled = EnvironmentVariables::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
-        }
-        if (!self::$enabled || self::$scope) {
+        self::$enabled ??= EnvironmentVariables::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+        if (!self::$enabled) {
             return false;
         }
-        $exporter = (new ExporterFactory())->fromEnvironment();
-        $propagator = (new PropagatorFactory())->create();
-        $meterProvider = (new MeterProviderFactory())->create();
-        $spanProcessor = (new SpanProcessorFactory())->fromEnvironment($exporter, $meterProvider);
-        $tracerProvider = (new TracerProviderBuilder())
-            ->addSpanProcessor($spanProcessor)
-            ->setSampler((new SamplerFactory())->fromEnvironment())
-            ->build();
-        $builder ??= Sdk::builder();
-        self::$scope = $builder
-            ->setTracerProvider($tracerProvider)
-            ->setPropagator($propagator)
-            ->setMeterProvider($meterProvider)
-            ->setAutoShutdown(true)
-            ->buildAndRegisterGlobal();
-        ShutdownHandler::register(function () {
-            if (self::$scope !== null) {
-                self::$scope->detach();
-            }
+        Globals::registerInitializer(function (Configurator $configurator) {
+            $exporter = (new ExporterFactory())->fromEnvironment();
+            $propagator = (new PropagatorFactory())->create();
+            $meterProvider = (new MeterProviderFactory())->create();
+            $spanProcessor = (new SpanProcessorFactory())->fromEnvironment($exporter, $meterProvider);
+            $tracerProvider = (new TracerProviderBuilder())
+                ->addSpanProcessor($spanProcessor)
+                ->setSampler((new SamplerFactory())->fromEnvironment())
+                ->build();
+
+            ShutdownHandler::register([$tracerProvider, 'shutdown']);
+            ShutdownHandler::register([$meterProvider, 'shutdown']);
+
+            return $configurator
+                ->withTracerProvider($tracerProvider)
+                ->withMeterProvider($meterProvider)
+                ->withPropagator($propagator);
         });
 
         return true;
@@ -57,10 +53,6 @@ class SdkAutoloader
      */
     public static function shutdown(): void
     {
-        if (self::$scope !== null) {
-            self::$scope->detach();
-            self::$scope = null;
-        }
         self::$enabled = null;
     }
 }
