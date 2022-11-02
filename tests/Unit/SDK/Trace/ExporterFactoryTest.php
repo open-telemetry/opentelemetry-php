@@ -34,7 +34,7 @@ class ExporterFactoryTest extends TestCase
     /**
      * @dataProvider endpointProvider
      */
-    public function test_exporter_has_correct_endpoint($name, $input, $expectedClass): void
+    public function test_exporter_from_connection_string($name, $input, $expectedClass): void
     {
         $factory = new ExporterFactory($name);
         $exporter = $factory->fromConnectionString($input);
@@ -47,8 +47,6 @@ class ExporterFactoryTest extends TestCase
             'zipkin' => ['test.zipkin', 'zipkin+http://zipkin:9411/api/v2/spans', Contrib\Zipkin\Exporter::class],
             'jaeger' => ['test.jaeger', 'jaeger+http://jaeger:9412/api/v2/spans', Contrib\Jaeger\Exporter::class],
             'newrelic' => ['rest.newrelic', 'newrelic+https://trace-api.newrelic.com/trace/v1?licenseKey=abc23423423', Contrib\Newrelic\Exporter::class],
-            'otlp+http' => ['test.otlp', 'otlp+http', Contrib\Otlp\SpanExporter::class],
-            'otlp+grpc' => ['test.otlpgrpc', 'otlp+grpc://otlp:4317', Contrib\OtlpGrpc\Exporter::class],
             'zipkintonewrelic' => ['test.zipkintonewrelic', 'zipkintonewrelic+https://trace-api.newrelic.com/trace/v1?licenseKey=abc23423423', Contrib\ZipkinToNewrelic\Exporter::class],
             'console' => ['test.console', 'console', ConsoleSpanExporter::class],
             'memory' => ['test.memory', 'memory', InMemoryExporter::class],
@@ -116,12 +114,17 @@ class ExporterFactoryTest extends TestCase
             'otlp+grpc from traces protocol' => [
                 'otlp',
                 ['OTEL_EXPORTER_OTLP_TRACES_PROTOCOL' => 'grpc'],
-                Contrib\OtlpGrpc\Exporter::class,
+                Contrib\Otlp\SpanExporter::class,
             ],
             'otlp+grpc from protocol' => [
                 'otlp',
                 ['OTEL_EXPORTER_OTLP_PROTOCOL' => 'grpc'],
-                Contrib\OtlpGrpc\Exporter::class,
+                Contrib\Otlp\SpanExporter::class,
+            ],
+            'otlp+json from protocol' => [
+                'otlp',
+                ['OTEL_EXPORTER_OTLP_PROTOCOL' => 'http/json'],
+                Contrib\Otlp\SpanExporter::class,
             ],
             'console' => [
                 'console', [], ConsoleSpanExporter::class,
@@ -151,10 +154,6 @@ class ExporterFactoryTest extends TestCase
             'zipkin' => ['zipkin'],
             'newrelic' => ['newrelic'],
             'zipkintonewrelic' => ['zipkintonewrelic'],
-            'otlp+http/json' => [
-                'otlp',
-                ['OTEL_EXPORTER_OTLP_PROTOCOL' => 'http/json'],
-            ],
             'otlp+invalid protocol' => [
                 'otlp',
                 ['OTEL_EXPORTER_OTLP_PROTOCOL' => 'foo'],

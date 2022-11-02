@@ -17,6 +17,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\SimplePsrFileLogger;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanExporter\LoggerDecorator;
@@ -58,7 +59,7 @@ $decorator = new LoggerDecorator(
  * Create the Tracer
  */
 $tracerProvider = new TracerProvider(
-    new BatchSpanProcessor($decorator),
+    new BatchSpanProcessor($decorator, ClockFactory::getDefault()),
     new AlwaysOnSampler()
 );
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');

@@ -13,6 +13,8 @@ use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use Throwable;
 
 /**
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/stdout.md#opentelemetry-metrics-exporter---standard-output
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/experimental/serialization/json.md#json-file-serialization
  * @psalm-import-type SUPPORTED_CONTENT_TYPES from ProtobufSerializer
  */
 final class MetricExporter implements MetricExporterInterface
@@ -21,6 +23,9 @@ final class MetricExporter implements MetricExporterInterface
 
     private TransportInterface $transport;
     private ProtobufSerializer $serializer;
+    /**
+     * @var string|Temporality|null
+     */
     private $temporality;
 
     /**

@@ -6,9 +6,10 @@ namespace OpenTelemetry\SDK\Common\Export\Http;
 
 use const FILTER_VALIDATE_URL;
 use function filter_var;
+use Http\Discovery\Psr17FactoryDiscovery;
+use Http\Discovery\Psr18ClientDiscovery;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
-use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -29,6 +30,9 @@ final class PsrTransportFactory implements TransportFactoryInterface
         $this->streamFactory = $streamFactory;
     }
 
+    /**
+     * @phan-suppress PhanTypeMismatchArgumentNullable
+     */
     public function create(
         string $endpoint,
         string $contentType,
@@ -40,10 +44,11 @@ final class PsrTransportFactory implements TransportFactoryInterface
         ?string $cacert = null,
         ?string $cert = null,
         ?string $key = null
-    ): TransportInterface {
+    ): PsrTransport {
         if (!filter_var($endpoint, FILTER_VALIDATE_URL)) {
             throw new InvalidArgumentException(sprintf('Invalid endpoint url "%s"', $endpoint));
         }
+        assert(!empty($endpoint));
 
         return new PsrTransport(
             $this->client,
@@ -55,6 +60,15 @@ final class PsrTransportFactory implements TransportFactoryInterface
             (array) $compression,
             $retryDelay,
             $maxRetries,
+        );
+    }
+
+    public static function discover(): self
+    {
+        return new self(
+            Psr18ClientDiscovery::find(),
+            Psr17FactoryDiscovery::findRequestFactory(),
+            Psr17FactoryDiscovery::findStreamFactory(),
         );
     }
 }

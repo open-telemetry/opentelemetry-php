@@ -3,6 +3,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../vendor/autoload.php';
 
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -15,7 +16,7 @@ echo sprintf('Sending batches every %dms and on shutdown', $delayMillis) . PHP_E
 $tracerProvider = new TracerProvider(
     new BatchSpanProcessor(
         new ConsoleSpanExporter(),
-        null,
+        ClockFactory::getDefault(),
         2048, //max spans to queue before sending to exporter
         $delayMillis, //batch delay milliseconds
     )

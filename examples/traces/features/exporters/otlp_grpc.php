@@ -3,14 +3,17 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../../vendor/autoload.php';
 
-use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OTLPGrpcExporter;
+use OpenTelemetry\API\Common\Signal\Signals;
+use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
+use OpenTelemetry\Contrib\Otlp\OtlpUtil;
+use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 \OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
 
-$exporter = new OTLPGrpcExporter('collector:4317');
-
+$transport = (new GrpcTransportFactory())->create('http://collector:4317' . OtlpUtil::method(Signals::TRACE));
+$exporter = new SpanExporter($transport);
 echo 'Starting OTLP GRPC example';
 
 $tracerProvider =  new TracerProvider(
@@ -21,7 +24,7 @@ $tracerProvider =  new TracerProvider(
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 $root = $span = $tracer->spanBuilder('root')->startSpan();
-$span->activate();
+$scope = $span->activate();
 
 for ($i = 0; $i < 3; $i++) {
     // start a span, register some events
@@ -41,6 +44,7 @@ for ($i = 0; $i < 3; $i++) {
     $span->end();
 }
 $root->end();
+$scope->detach();
 echo PHP_EOL . 'OTLP GRPC example complete!  ';
 
 echo PHP_EOL;

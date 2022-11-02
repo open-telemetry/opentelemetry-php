@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Benchmark;
 
-use Grpc\UnaryCall;
 use Mockery;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
-use OpenTelemetry\Contrib\OtlpGrpc\Exporter as GrpcExporter;
-use OpenTelemetry\Contrib\OtlpHttp\Exporter as HttpExporter;
-use Opentelemetry\Proto\Collector\Trace\V1\TraceServiceClient;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
@@ -52,10 +50,18 @@ class OtlpBench
         $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
     }
 
+    /**
+     * @psalm-suppress InvalidArgument
+     */
     public function setUpGrpc(): void
     {
-        $client = $this->createMockTraceServiceClient();
-        $exporter = new GrpcExporter('foo:4317', true, '', '', false, 10, $client);
+        $transport = Mockery::mock(TransportInterface::class)->allows([
+            'send' => new CompletedFuture('ok'),
+            'shutdown' => true,
+            'forceFlush' => true,
+            'contentType' => 'application/x-protobuf',
+        ]);
+        $exporter = new SpanExporter($transport);
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
@@ -66,7 +72,7 @@ class OtlpBench
      * @psalm-suppress InvalidArgument
      * @psalm-suppress PossiblyUndefinedMethod
      */
-    public function setUpGrpcHttp(): void
+    public function setUpOtlpHttp(): void
     {
         $response = Mockery::mock(ResponseInterface::class)
             ->allows(['getStatusCode' => 200]);
@@ -80,8 +86,9 @@ class OtlpBench
             ->allows(['createRequest' => $request]);
         $streamFactory = Mockery::mock(StreamFactoryInterface::class)
             ->allows(['createStream' => $stream]);
-        // @phpstan-ignore-next-line
-        $exporter = new SpanExporter(HttpExporter::createTransport(new PsrTransportFactory($client, $requestFactory, $streamFactory)));
+        $transport = new PsrTransport($client, $requestFactory, $streamFactory, 'http://foo', 'application/x-protobuf', [], [], 0, 0); // @phpstan-ignore-line
+        $exporter = new SpanExporter($transport);
+
         $processor = new SimpleSpanProcessor($exporter);
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
@@ -159,7 +166,7 @@ class OtlpBench
     }
 
     /**
-     * @BeforeMethods("setUpGrpcHttp")
+     * @BeforeMethods("setUpOtlpHttp")
      * @Revs(1000)
      * @Iterations(10)
      * @OutputTimeUnit("microseconds")
@@ -171,19 +178,5 @@ class OtlpBench
             ->startSpan();
         $span->addEvent('my_event');
         $span->end();
-    }
-
-    private function createMockTraceServiceClient()
-    {
-        // @var MockInterface&TraceServiceClient
-        $unaryCall = Mockery::mock(UnaryCall::class)
-            ->allows(['wait' => [
-                'unused response data',
-                (object) ['code' => \Grpc\STATUS_OK],
-            ]]);
-        $mockClient = Mockery::mock(TraceServiceClient::class)
-            ->allows(['Export'=> $unaryCall]);
-
-        return $mockClient;
     }
 }

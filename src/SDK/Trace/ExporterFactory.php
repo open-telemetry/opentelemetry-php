@@ -20,8 +20,9 @@ class ExporterFactory
         'logger+file' => '\OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter',
         'jaeger+http' => '\OpenTelemetry\Contrib\Jaeger\Exporter',
         'zipkin+http' => '\OpenTelemetry\Contrib\Zipkin\Exporter',
-        'otlp+grpc' => '\OpenTelemetry\Contrib\OtlpGrpc\Exporter',
-        'otlp+http' => '\OpenTelemetry\Contrib\OtlpHttp\Exporter',
+        'otlp+grpc' => '\OpenTelemetry\Contrib\Otlp\SpanExporter',
+        'otlp+http' => '\OpenTelemetry\Contrib\Otlp\SpanExporter',
+        'otlp+json' => '\OpenTelemetry\Contrib\Otlp\SpanExporter',
         'newrelic+http' => '\OpenTelemetry\Contrib\Newrelic\Exporter',
         'zipkintonewrelic+http' => '\OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter',
         // this entry exists only for testing purposes
@@ -48,7 +49,7 @@ class ExporterFactory
       */
     public function fromConnectionString(string $exporterDsn): SpanExporterInterface
     {
-        if (in_array($exporterDsn, ['console', 'memory', 'otlp+http'])) {
+        if (in_array($exporterDsn, ['console', 'memory'])) {
             return self::buildExporter($exporterDsn);
         }
 
@@ -87,29 +88,17 @@ class ExporterFactory
         switch ($exporter) {
             case Values::VALUE_NONE:
                 return null;
+            case Values::VALUE_OTLP:
+                $factory = '\OpenTelemetry\Contrib\Otlp\SpanExporterFactory';
+
+                return (new $factory())->fromEnvironment();
+            case 'console':
+                return self::buildExporter('console');
             case Values::VALUE_JAEGER:
             case Values::VALUE_ZIPKIN:
             case Values::VALUE_NEWRELIC:
             case 'zipkintonewrelic':
                 throw new InvalidArgumentException(sprintf('Exporter %s cannot be created from environment', $exporter));
-            case Values::VALUE_OTLP:
-                $protocol = EnvironmentVariables::getEnum(
-                    Env::OTEL_EXPORTER_OTLP_PROTOCOL,
-                    EnvironmentVariables::getEnum(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL, '')
-                );
-                switch ($protocol) {
-                    case Values::VALUE_GRPC:
-                        return self::buildExporter('otlp+grpc');
-                    case Values::VALUE_HTTP_PROTOBUF:
-                        return self::buildExporter('otlp+http');
-                    case Values::VALUE_HTTP_JSON:
-                        throw new InvalidArgumentException('otlp+http/json not implemented');
-                    default:
-                        throw new InvalidArgumentException('Unknown protocol: ' . $protocol);
-                }
-                // no break
-            case 'console':
-                return self::buildExporter('console');
             default:
                 throw new InvalidArgumentException(sprintf('Invalid exporter name "%s"', $exporter));
         }
@@ -131,7 +120,7 @@ class ExporterFactory
         return null;
     }
 
-    private static function buildExporter(string $protocol, string $endpoint = null, string $name = null, $args = null): SpanExporterInterface
+    private static function buildExporter($protocol, string $endpoint = null, string $name = null, $args = null): SpanExporterInterface
     {
         $exporterClass = self::KNOWN_EXPORTERS[self::normalizeProtocol($protocol)];
         self::validateExporterClass($exporterClass);
@@ -149,7 +138,7 @@ class ExporterFactory
     private static function validateExporterClass(string $class): void
     {
         if (!class_exists($class)) {
-            throw new InvalidArgumentException('Could not find exporter class: ' . $class);
+            throw new InvalidArgumentException('Could not find class: ' . $class);
         }
     }
 

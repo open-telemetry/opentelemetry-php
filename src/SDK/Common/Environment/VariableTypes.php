@@ -25,6 +25,12 @@ interface VariableTypes
     public const INTEGER = 'integer';
 
     /**
+     * A single float value
+     * example: 10.5
+     */
+    public const FLOAT = 'float';
+
+    /**
      * A single float value between 0.0 and 1.0
      * example: 0.5
      */

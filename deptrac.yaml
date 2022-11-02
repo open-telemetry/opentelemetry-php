@@ -105,6 +105,7 @@ deptrac:
       Contrib:
           - +SDK
           - +OtelProto
+          - Grpc
           - Prometheus
           - Thrift
           - JaegerThrift

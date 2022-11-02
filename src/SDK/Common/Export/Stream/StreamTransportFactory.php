@@ -42,6 +42,7 @@ final class StreamTransportFactory implements TransportFactoryInterface
         ?string $cert = null,
         ?string $key = null
     ): TransportInterface {
+        assert(!empty($endpoint));
         $stream = is_resource($endpoint)
             ? $endpoint
             : self::createStream(
@@ -83,6 +84,9 @@ final class StreamTransportFactory implements TransportFactoryInterface
             throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
         });
 
+        /**
+         * @psalm-suppress PossiblyNullArgument
+         */
         try {
             $stream = fopen($endpoint, 'ab', false, $context);
         } finally {

@@ -11,6 +11,7 @@ use Grpc\ChannelCredentials;
 use function in_array;
 use InvalidArgumentException;
 use function json_encode;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use function parse_url;
@@ -20,10 +21,11 @@ use function substr_count;
 
 final class GrpcTransportFactory implements TransportFactoryInterface
 {
+    use LogsMessagesTrait;
+
     /**
      * @psalm-param "application/x-protobuf" $contentType
      * @psalm-return TransportInterface<"application/x-protobuf">
-     *
      * @psalm-suppress MoreSpecificImplementedParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
      */

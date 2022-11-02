@@ -38,6 +38,7 @@ interface KnownValues
     public const VALUE_GRPC = 'grpc';
     public const VALUE_HTTP_PROTOBUF = 'http/protobuf';
     public const VALUE_HTTP_JSON = 'http/json';
+    public const VALUE_HTTP_NDJSON = 'http/ndjson';
     public const VALUE_OTLP = 'otlp';
     public const VALUE_JAEGER = 'jaeger';
     public const VALUE_ZIPKIN = 'zipkin';

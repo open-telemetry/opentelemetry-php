@@ -34,10 +34,9 @@ use Throwable;
  */
 final class GrpcTransport implements TransportInterface
 {
+    private array $metadata;
     private Channel $channel;
     private string $method;
-    private array $headers;
-
     private bool $closed = false;
 
     public function __construct(
@@ -48,7 +47,7 @@ final class GrpcTransport implements TransportInterface
     ) {
         $this->channel = new Channel($endpoint, $opts);
         $this->method = $method;
-        $this->headers = array_change_key_case($headers);
+        $this->metadata = $this->formatMetadata(array_change_key_case($headers));
     }
 
     public function contentType(): string
@@ -69,7 +68,7 @@ final class GrpcTransport implements TransportInterface
 
         try {
             $event = $call->startBatch([
-                OP_SEND_INITIAL_METADATA => $this->headers,
+                OP_SEND_INITIAL_METADATA => $this->metadata,
                 OP_SEND_MESSAGE => ['message' => $payload],
                 OP_SEND_CLOSE_FROM_CLIENT => true,
                 OP_RECV_INITIAL_METADATA => true,
@@ -104,5 +103,13 @@ final class GrpcTransport implements TransportInterface
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return !$this->closed;
+    }
+
+    /**
+     * @link https://github.com/grpc/grpc/blob/7e7a48f863218f39a1767e1c2b957ca8e4789272/src/php/tests/interop/interop_client.php#L525
+     */
+    private function formatMetadata(array $metadata): array
+    {
+        return array_map(fn ($value) => is_array($value) ? $value : [$value], $metadata);
     }
 }

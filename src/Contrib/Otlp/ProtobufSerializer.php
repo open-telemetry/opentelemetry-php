@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Otlp;
 
 use AssertionError;
+use Exception;
 use Google\Protobuf\Internal\Message;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
@@ -29,7 +30,7 @@ final class ProtobufSerializer
     }
 
     /**
-     * @param TransportInterface<SUPPORTED_CONTENT_TYPES> $transport
+     * @psalm-param TransportInterface<SUPPORTED_CONTENT_TYPES> $transport
      */
     public static function forTransport(TransportInterface $transport): ProtobufSerializer
     {
@@ -49,6 +50,7 @@ final class ProtobufSerializer
             case self::PROTOBUF:
                 return $message->serializeToString();
             case self::JSON:
+                //@todo https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#json-protobuf-encoding
                 return $message->serializeToJsonString();
             case self::NDJSON:
                 return $message->serializeToJsonString() . "\n";
@@ -57,6 +59,9 @@ final class ProtobufSerializer
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function hydrate(Message $message, string $payload): void
     {
         switch ($this->contentType) {

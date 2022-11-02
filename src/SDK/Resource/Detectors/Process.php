@@ -17,6 +17,9 @@ use const PHP_BINARY;
  */
 final class Process implements ResourceDetectorInterface
 {
+    /**
+     * @psalm-suppress PossiblyUndefinedArrayOffset
+     */
     public function getResource(): ResourceInfo
     {
         $attributes = [];

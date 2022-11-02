@@ -19,7 +19,7 @@ echo 'Starting Jaeger example';
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 $rootSpan = $tracer->spanBuilder('root')->startSpan();
-$rootSpan->activate();
+$scope = $rootSpan->activate();
 
 for ($i = 0; $i < 5; $i++) {
     // start a span, register some events
@@ -51,6 +51,7 @@ for ($i = 0; $i < 5; $i++) {
 
     $span->end();
 }
+$scope->detach();
 $rootSpan->end();
 echo PHP_EOL . 'Jaeger example complete!  See the results at http://localhost:16686/';
 

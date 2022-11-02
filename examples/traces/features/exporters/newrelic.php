@@ -21,7 +21,7 @@ $licenseKey = getenv('NEW_RELIC_INSERT_KEY');
 // Needs a license key in the environment to connect to the backend server.
 
 if ($licenseKey == false) {
-    echo PHP_EOL . 'NEW_RELIC_INSERT_KEY not found in environment. Newrelic Example tracing is not enabled.';
+    echo PHP_EOL . 'NEW_RELIC_INSERT_KEY not found in environment. Newrelic Example tracing is not enabled.' . PHP_EOL;
 
     return;
 }

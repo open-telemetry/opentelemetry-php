@@ -5,7 +5,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use OpenTelemetry\Contrib\OtlpGrpc\Exporter as OtlpGrpcExporter;
+use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -13,15 +13,16 @@ use Psr\Log\LogLevel;
 
 echo 'Starting SettingUpLogging example' . PHP_EOL;
 
-//create a Logger, and register it with the global logger holder. The library will use this logger
+//create a Logger, and register it with library's logger holder. The library will use this logger
 //for all of its internal logging (errors, warnings, etc)
 LoggerHolder::set(
     new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)])
 );
+$transport = (new \OpenTelemetry\Contrib\Grpc\GrpcTransportFactory())->create();
 
 $tracerProvider =  new TracerProvider(
     new SimpleSpanProcessor(
-        new OtlpGrpcExporter(), //default endpoint unavailable, so exporting will fail
+        new SpanExporter($transport) //default endpoint unavailable, so exporting will fail
     )
 );
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
