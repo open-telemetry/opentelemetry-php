@@ -120,4 +120,5 @@ interface Variables
      */
     public const OTEL_PHP_TRACES_PROCESSOR = 'OTEL_PHP_TRACES_PROCESSOR';
     public const OTEL_PHP_DETECTORS = 'OTEL_PHP_DETECTORS';
+    public const OTEL_PHP_AUTOLOAD_ENABLED = 'OTEL_PHP_AUTOLOAD_ENABLED';
 }

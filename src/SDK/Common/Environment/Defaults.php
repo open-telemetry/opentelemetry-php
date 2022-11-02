@@ -102,4 +102,5 @@ interface Defaults
      */
     public const OTEL_PHP_TRACES_PROCESSOR = 'batch';
     public const OTEL_PHP_DETECTORS = 'all';
+    public const OTEL_PHP_AUTOLOAD_ENABLED = 'false';
 }
