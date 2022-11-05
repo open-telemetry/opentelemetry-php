@@ -176,6 +176,25 @@ final class ExportingReaderTest extends TestCase
         $this->assertTrue($reader->forceFlush());
     }
 
+    public function test_force_flush_clears_sources(): void
+    {
+        $exporter = new InMemoryExporter(Temporality::CUMULATIVE);
+        $clock = new TestClock();
+        $reader = new ExportingReader($exporter, $clock);
+
+        $provider = $this->createMock(MetricSourceProviderInterface::class);
+        $metricMetadata = $this->createMock(MetricMetadataInterface::class);
+        $stalenessHandler = new ImmediateStalenessHandler();
+        $stalenessHandler->acquire();
+        $reader->add($provider, $metricMetadata, $stalenessHandler);
+
+        $reader->forceFlush();
+        $this->assertCount(1, $exporter->collect());
+
+        $reader->forceFlush();
+        $this->assertCount(1, $exporter->collect());
+    }
+
     public function test_closed_reader_does_not_call_exporter_methods(): void
     {
         $exporter = $this->createMock(MetricExporterInterface::class);

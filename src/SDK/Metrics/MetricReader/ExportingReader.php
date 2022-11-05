@@ -107,6 +107,8 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         $collect = $this->doCollect();
         $forceFlush = $this->exporter->forceFlush();
 
+        $this->sources = [];
+
         return $collect && $forceFlush;
     }
 }
