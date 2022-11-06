@@ -6,9 +6,9 @@ namespace OpenTelemetry\SDK\Resource;
 
 use function in_array;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Environment\Accessor;
-use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
-use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
+use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 
 class ResourceInfoFactory
 {
@@ -33,7 +33,7 @@ class ResourceInfoFactory
 
     public static function defaultResource(): ResourceInfo
     {
-        $detectors = Accessor::getList(Env::OTEL_PHP_DETECTORS);
+        $detectors = Configuration::getList(Env::OTEL_PHP_DETECTORS);
 
         if (in_array(Values::VALUE_ALL, $detectors)) {
             return (new Detectors\Composite([

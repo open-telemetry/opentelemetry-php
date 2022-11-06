@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
+use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
+use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 use OpenTelemetry\SDK\Common\Dsn\DsnInterface;
 use OpenTelemetry\SDK\Common\Dsn\Parser;
 use OpenTelemetry\SDK\Common\Dsn\ParserInterface;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariables;
-use OpenTelemetry\SDK\Common\Environment\KnownValues as Values;
-use OpenTelemetry\SDK\Common\Environment\Variables as Env;
 
 class ExporterFactory
 {
@@ -78,7 +78,7 @@ class ExporterFactory
 
     public function fromEnvironment(): ?SpanExporterInterface
     {
-        $envValue = EnvironmentVariables::getString(Env::OTEL_TRACES_EXPORTER, '');
+        $envValue = Configuration::getString(Env::OTEL_TRACES_EXPORTER, '');
         $exporters = explode(',', $envValue);
         //TODO "The SDK MAY accept a comma-separated list to enable setting multiple exporters"
         if (1 !== count($exporters)) {

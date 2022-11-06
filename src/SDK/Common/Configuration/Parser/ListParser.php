@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Environment\Parser;
+namespace OpenTelemetry\SDK\Common\Configuration\Parser;
 
 class ListParser
 {

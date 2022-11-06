@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Environment\Parser;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Parser;
 
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Common\Environment\Parser\BooleanParser;
+use OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Environment\Parser\BooleanParser
+ * @covers \OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser
  */
 class BooleanParserTest extends TestCase
 {
@@ -62,7 +62,7 @@ class BooleanParserTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        BooleanParser::parse($value);
+        \OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser::parse($value);
     }
 
     public function truthyValueProvider(): array

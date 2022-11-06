@@ -2,19 +2,18 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Environment;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\SDK\Common\Environment\Defaults;
-use OpenTelemetry\SDK\Common\Environment\KnownValues;
-use OpenTelemetry\SDK\Common\Environment\Resolver;
-use OpenTelemetry\SDK\Common\Environment\VariableTypes;
+use OpenTelemetry\SDK\Common\Configuration\Defaults;
+use OpenTelemetry\SDK\Common\Configuration\EnvironmentResolver;
+use OpenTelemetry\SDK\Common\Configuration\VariableTypes;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Environment\Resolver
+ * @covers \OpenTelemetry\SDK\Common\Configuration\EnvironmentResolver
  */
-class ResolverTest extends TestCase
+class EnvironmentResolverTest extends TestCase
 {
     use EnvironmentVariables;
 
@@ -35,23 +34,30 @@ class ResolverTest extends TestCase
     private const TYPES = [
         'bool' => ['OTEL_EXPORTER_OTLP_INSECURE', VariableTypes::BOOL],
         'string' => ['OTEL_SERVICE_NAME', VariableTypes::STRING],
-        'integer' => ['OTEL_EXPORTER_JAEGER_AGENT_PORT', VariableTypes::INTEGER],
-        'enum' => ['OTEL_LOG_LEVEL', VariableTypes::ENUM],
-        'list' => ['OTEL_PROPAGATORS', VariableTypes::LIST],
+        'integer' => ['OTEL_EXPORTER_JAEGER_AGENT_PORT', \OpenTelemetry\SDK\Common\Configuration\VariableTypes::INTEGER],
+        'enum' => ['OTEL_LOG_LEVEL', \OpenTelemetry\SDK\Common\Configuration\VariableTypes::ENUM],
+        'list' => ['OTEL_PROPAGATORS', \OpenTelemetry\SDK\Common\Configuration\VariableTypes::LIST],
         'map' => ['OTEL_RESOURCE_ATTRIBUTES', VariableTypes::MAP],
         'mixed' => ['OTEL_TRACES_SAMPLER_ARG', VariableTypes::MIXED],
     ];
 
     private const KNOWN_VALUES = [
-        'log level' => ['OTEL_LOG_LEVEL', KnownValues::OTEL_LOG_LEVEL],
-        'trace sampler' => ['OTEL_TRACES_SAMPLER', KnownValues::OTEL_TRACES_SAMPLER],
-        'trace processor' => ['OTEL_PHP_TRACES_PROCESSOR', KnownValues::OTEL_PHP_TRACES_PROCESSOR],
+        'log level' => ['OTEL_LOG_LEVEL', \OpenTelemetry\SDK\Common\Configuration\KnownValues::OTEL_LOG_LEVEL],
+        'trace sampler' => ['OTEL_TRACES_SAMPLER', \OpenTelemetry\SDK\Common\Configuration\KnownValues::OTEL_TRACES_SAMPLER],
+        'trace processor' => ['OTEL_PHP_TRACES_PROCESSOR', \OpenTelemetry\SDK\Common\Configuration\KnownValues::OTEL_PHP_TRACES_PROCESSOR],
     ];
 
     /**
      * All injected environment variables.
      */
     private array $injectedEnvironmentVariables = [];
+
+    private EnvironmentResolver $resolver;
+
+    public function setUp(): void
+    {
+        $this->resolver = new EnvironmentResolver();
+    }
 
     public function tearDown(): void
     {
@@ -61,26 +67,26 @@ class ResolverTest extends TestCase
     public function test_has_variable(): void
     {
         $this->assertFalse(
-            Resolver::hasVariable('FOO_VAR')
+            $this->resolver->hasVariable('FOO_VAR')
         );
 
         $this->setEnvironmentVariable('FOO_VAR', 'FOO');
 
         $this->assertTrue(
-            Resolver::hasVariable('FOO_VAR')
+            $this->resolver->hasVariable('FOO_VAR')
         );
     }
 
     public function test_has_variable_with_injected_value(): void
     {
         $this->assertFalse(
-            Resolver::hasVariable('FOO_VAR')
+            $this->resolver->hasVariable('FOO_VAR')
         );
 
         $this->injectEnvironmentVariable('FOO_VAR', 'FOO');
 
         $this->assertTrue(
-            Resolver::hasVariable('FOO_VAR')
+            $this->resolver->hasVariable('FOO_VAR')
         );
     }
 
@@ -93,7 +99,7 @@ class ResolverTest extends TestCase
 
         $this->assertSame(
             $varValue,
-            Resolver::getRawValue($varName)
+            $this->resolver->getRawValue($varName)
         );
     }
 
@@ -106,18 +112,18 @@ class ResolverTest extends TestCase
 
         $this->assertSame(
             $varValue,
-            Resolver::getRawValue($varName)
+            $this->resolver->getRawValue($varName)
         );
     }
 
     public function test_get_raw_value_no_var(): void
     {
         $this->assertFalse(
-            Resolver::hasVariable('FOO_VAR')
+            $this->resolver->hasVariable('FOO_VAR')
         );
 
         $this->assertNull(
-            Resolver::getRawValue('FOO_VAR')
+            $this->resolver->getRawValue('FOO_VAR')
         );
     }
 
@@ -128,7 +134,7 @@ class ResolverTest extends TestCase
     {
         $this->assertSame(
             $varValue,
-            Resolver::getDefault($varName)
+            $this->resolver->getDefault($varName)
         );
     }
 
@@ -141,7 +147,7 @@ class ResolverTest extends TestCase
 
         $this->assertSame(
             $varValue,
-            Resolver::getDefault($varName)
+            $this->resolver->getDefault($varName)
         );
     }
 
@@ -152,7 +158,7 @@ class ResolverTest extends TestCase
     {
         $this->assertSame(
             $type,
-            Resolver::getType($varName)
+            $this->resolver->getType($varName)
         );
     }
 
@@ -163,7 +169,7 @@ class ResolverTest extends TestCase
     {
         $this->assertSame(
             $varValue,
-            Resolver::getKnownValues($varName)
+            $this->resolver->getKnownValues($varName)
         );
     }
 
@@ -173,14 +179,14 @@ class ResolverTest extends TestCase
         $variable = 'OTEL_PHP_TRACES_PROCESSOR';
 
         $this->assertFalse(
-            Resolver::hasVariable($variable)
+            $this->resolver->hasVariable($variable)
         );
 
         $this->setEnvironmentVariable($variable, $value);
 
         $this->assertSame(
             $value,
-            Resolver::resolveValue($variable)
+            $this->resolver->resolveValue($variable)
         );
     }
 
@@ -190,14 +196,14 @@ class ResolverTest extends TestCase
         $variable = 'OTEL_PHP_TRACES_PROCESSOR';
 
         $this->assertFalse(
-            Resolver::hasVariable($variable)
+            $this->resolver->hasVariable($variable)
         );
 
         $this->injectEnvironmentVariable($variable, $value);
 
         $this->assertSame(
             $value,
-            Resolver::resolveValue($variable)
+            $this->resolver->resolveValue($variable)
         );
     }
 
@@ -207,12 +213,12 @@ class ResolverTest extends TestCase
         $variable = 'OTEL_PHP_TRACES_PROCESSOR';
 
         $this->assertFalse(
-            Resolver::hasVariable($variable)
+            $this->resolver->hasVariable($variable)
         );
 
         $this->assertSame(
             $value,
-            Resolver::resolveValue($variable, $value)
+            $this->resolver->resolveValue($variable, $value)
         );
     }
 
@@ -222,12 +228,12 @@ class ResolverTest extends TestCase
         $variable = 'OTEL_PHP_TRACES_PROCESSOR';
 
         $this->assertFalse(
-            Resolver::hasVariable($variable)
+            $this->resolver->hasVariable($variable)
         );
 
         $this->assertSame(
             $value,
-            Resolver::resolveValue($variable)
+            $this->resolver->resolveValue($variable)
         );
     }
 

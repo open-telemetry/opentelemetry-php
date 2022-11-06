@@ -2,15 +2,19 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Environment;
+namespace OpenTelemetry\SDK\Common\Configuration;
 
 use OpenTelemetry\SDK\Common\Util\ClassConstantAccessor;
 
-class Resolver
+abstract class Resolver
 {
-    public static function resolveValue(string $variableName, $default = null): string
+    abstract public function retrieveValue(string $variableName, ?string $default = ''): ?string;
+
+    abstract public function hasVariable(string $variableName): bool;
+
+    public function resolveValue(string $variableName, $default = null): string
     {
-        $value = self::getValue($variableName);
+        $value = $this->getValue($variableName);
 
         if (self::isEmpty($value)) {
             return self::isEmpty($default) ? (string) self::getDefault($variableName) : (string) $default;
@@ -19,22 +23,17 @@ class Resolver
         return (string) $value;
     }
 
-    public static function getValue(string $variableName): ?string
+    public function getValue(string $variableName): ?string
     {
-        $value = self::getRawValue($variableName);
+        $value = $this->getRawValue($variableName);
 
         return $value ? trim($value) : $value;
     }
 
-    public static function getRawValue(string $variableName): ?string
+    public function getRawValue(string $variableName): ?string
     {
         /** @psalm-suppress FalsableReturnStatement **/
-        return self::hasVariable($variableName) ? self::retrieveValue($variableName) : null;
-    }
-
-    public static function hasVariable(string $variableName): bool
-    {
-        return getenv($variableName) !== false || isset($_ENV[$variableName]);
+        return $this->hasVariable($variableName) ? $this->retrieveValue($variableName) : null;
     }
 
     public static function getDefault(string $variableName)
@@ -52,19 +51,9 @@ class Resolver
         return ClassConstantAccessor::getValue(KnownValues::class, $variableName);
     }
 
-    private static function isEmpty($value): bool
+    protected static function isEmpty($value): bool
     {
         // don't use 'empty()', since '0' is not considered to be empty
         return $value === null || $value === '';
-    }
-
-    private static function retrieveValue(string $variableName)
-    {
-        $value = getenv($variableName);
-        if ($value === false) {
-            $value = $_ENV[$variableName] ?? false;
-        }
-
-        return $value;
     }
 }
