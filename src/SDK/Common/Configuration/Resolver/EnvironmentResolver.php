@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Configuration;
+namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
+
+use OpenTelemetry\SDK\Common\Configuration\Resolver;
 
 /**
  * @internal
@@ -11,7 +13,7 @@ class EnvironmentResolver extends Resolver
 {
     public function hasVariable(string $variableName): bool
     {
-        return getenv($variableName) !== false || isset($_ENV[$variableName]);
+        return getenv($variableName) !== false || isset($_SERVER[$variableName]);
     }
 
     /**
@@ -22,9 +24,12 @@ class EnvironmentResolver extends Resolver
     {
         $value = getenv($variableName);
         if ($value === false) {
-            $value = $_ENV[$variableName] ?? $default;
+            $value = $_SERVER[$variableName] ?? $default;
+        }
+        if (is_array($value)) {
+            return implode(',', $value);
         }
 
-        return self::isEmpty($value) ? $default : $value;
+        return self::isEmpty($value) ? $default : (string) $value;
     }
 }

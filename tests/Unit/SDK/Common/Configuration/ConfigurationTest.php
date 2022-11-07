@@ -105,9 +105,9 @@ class ConfigurationTest extends TestCase
     public function booleanProvider()
     {
         return [
-            //'false' => ['false', true, false],
-            //'true' => ['true', false, true],
-            //'truthy' => ['1', false, true],
+            'false' => ['false', true, false],
+            'true' => ['true', false, true],
+            'truthy' => ['1', false, true],
             'falsey' => ['0', true, false],
             'TRUE' => ['TRUE', false, true],
             'FALSE' => ['FALSE', true, false],

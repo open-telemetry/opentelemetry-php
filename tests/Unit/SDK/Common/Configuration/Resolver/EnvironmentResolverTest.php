@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Configuration\Defaults;
-use OpenTelemetry\SDK\Common\Configuration\EnvironmentResolver;
+use OpenTelemetry\SDK\Common\Configuration\KnownValues;
+use OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver;
 use OpenTelemetry\SDK\Common\Configuration\VariableTypes;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Configuration\EnvironmentResolver
+ * @covers \OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver
  */
 class EnvironmentResolverTest extends TestCase
 {
@@ -34,17 +35,17 @@ class EnvironmentResolverTest extends TestCase
     private const TYPES = [
         'bool' => ['OTEL_EXPORTER_OTLP_INSECURE', VariableTypes::BOOL],
         'string' => ['OTEL_SERVICE_NAME', VariableTypes::STRING],
-        'integer' => ['OTEL_EXPORTER_JAEGER_AGENT_PORT', \OpenTelemetry\SDK\Common\Configuration\VariableTypes::INTEGER],
-        'enum' => ['OTEL_LOG_LEVEL', \OpenTelemetry\SDK\Common\Configuration\VariableTypes::ENUM],
-        'list' => ['OTEL_PROPAGATORS', \OpenTelemetry\SDK\Common\Configuration\VariableTypes::LIST],
+        'integer' => ['OTEL_EXPORTER_JAEGER_AGENT_PORT', VariableTypes::INTEGER],
+        'enum' => ['OTEL_LOG_LEVEL', VariableTypes::ENUM],
+        'list' => ['OTEL_PROPAGATORS', VariableTypes::LIST],
         'map' => ['OTEL_RESOURCE_ATTRIBUTES', VariableTypes::MAP],
         'mixed' => ['OTEL_TRACES_SAMPLER_ARG', VariableTypes::MIXED],
     ];
 
     private const KNOWN_VALUES = [
-        'log level' => ['OTEL_LOG_LEVEL', \OpenTelemetry\SDK\Common\Configuration\KnownValues::OTEL_LOG_LEVEL],
-        'trace sampler' => ['OTEL_TRACES_SAMPLER', \OpenTelemetry\SDK\Common\Configuration\KnownValues::OTEL_TRACES_SAMPLER],
-        'trace processor' => ['OTEL_PHP_TRACES_PROCESSOR', \OpenTelemetry\SDK\Common\Configuration\KnownValues::OTEL_PHP_TRACES_PROCESSOR],
+        'log level' => ['OTEL_LOG_LEVEL', KnownValues::OTEL_LOG_LEVEL],
+        'trace sampler' => ['OTEL_TRACES_SAMPLER', KnownValues::OTEL_TRACES_SAMPLER],
+        'trace processor' => ['OTEL_PHP_TRACES_PROCESSOR', KnownValues::OTEL_PHP_TRACES_PROCESSOR],
     ];
 
     /**
@@ -263,7 +264,7 @@ class EnvironmentResolverTest extends TestCase
             $this->injectedEnvironmentVariables[] = $name;
         }
 
-        $_ENV[$name] = $value;
+        $_SERVER[$name] = $value;
     }
 
     private function resetEnvironmentVariables(): void
@@ -271,7 +272,7 @@ class EnvironmentResolverTest extends TestCase
         $this->restoreEnvironmentVariables();
 
         foreach ($this->injectedEnvironmentVariables as $variable) {
-            unset($_ENV[$variable]);
+            unset($_SERVER[$variable]);
         }
     }
 }

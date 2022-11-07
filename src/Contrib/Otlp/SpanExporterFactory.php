@@ -8,7 +8,7 @@ use OpenTelemetry\API\Common\Signal\Signals;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
-use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolver;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -37,28 +37,28 @@ class SpanExporterFactory
      */
     private function buildTransport(): TransportInterface
     {
-        $protocol = Configuration::has(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
-            Configuration::getEnum(Env::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) :
-            Configuration::getEnum(Env::OTEL_EXPORTER_OTLP_PROTOCOL);
+        $protocol = Configuration::has(Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) ?
+            Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) :
+            Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_PROTOCOL);
         $contentType = Protocols::contentType($protocol);
 
-        $endpoint = Configuration::has(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
-            ? Configuration::getString(Env::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
-            : Configuration::getString(Env::OTEL_EXPORTER_OTLP_ENDPOINT);
+        $endpoint = Configuration::has(Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
+            ? Configuration::getString(Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
+            : Configuration::getString(Variables::OTEL_EXPORTER_OTLP_ENDPOINT);
         if ($protocol === Protocols::GRPC) {
             $endpoint .= OtlpUtil::method(Signals::TRACE);
         } else {
             $endpoint = HttpEndpointResolver::create()->resolveToString($endpoint, Signals::TRACE);
         }
 
-        $headers = Configuration::has(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
-            Configuration::getMap(Env::OTEL_EXPORTER_OTLP_TRACES_HEADERS) :
-            Configuration::getMap(Env::OTEL_EXPORTER_OTLP_HEADERS);
+        $headers = Configuration::has(Variables::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
+            Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_TRACES_HEADERS) :
+            Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_HEADERS);
         $headers += OtlpUtil::getUserAgentHeader();
 
-        $compression = Configuration::has(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
-            Configuration::getEnum(Env::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
-            Configuration::getEnum(Env::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
+        $compression = Configuration::has(Variables::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
+            Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
+            Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
 
         $factoryClass = self::FACTORIES[$protocol];
 

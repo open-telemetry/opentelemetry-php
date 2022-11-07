@@ -8,30 +8,31 @@ use OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\ListParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser;
+use OpenTelemetry\SDK\Common\Configuration\Resolver\CompositeResolver;
 use UnexpectedValueException;
 
 class Accessor
 {
-    public static function has(Resolver $resolver, string $variableName): bool
+    public static function has(string $variableName): bool
     {
-        return $resolver->hasVariable($variableName);
+        return CompositeResolver::instance()->hasVariable($variableName);
     }
 
-    public static function getString(Resolver $resolver, string $variableName, string $default = null): string
+    public static function getString(string $variableName, string $default = null): string
     {
         return (string) self::validateVariableValue(
-            $resolver->resolveValue(
+            CompositeResolver::instance()->resolveValue(
                 self::validateVariableType($variableName, VariableTypes::STRING),
                 $default
             )
         );
     }
 
-    public static function getBool(Resolver $resolver, string $variableName, string $default = null): bool
+    public static function getBool(string $variableName, string $default = null): bool
     {
         return BooleanParser::parse(
             self::validateVariableValue(
-                $resolver->resolveValue(
+                CompositeResolver::instance()->resolveValue(
                     self::validateVariableType($variableName, VariableTypes::BOOL),
                     $default
                 )
@@ -39,10 +40,10 @@ class Accessor
         );
     }
 
-    public static function getInt(Resolver $resolver, string $variableName, string $default = null): int
+    public static function getInt(string $variableName, string $default = null): int
     {
         return (int) self::validateVariableValue(
-            $resolver->resolveValue(
+            CompositeResolver::instance()->resolveValue(
                 self::validateVariableType($variableName, VariableTypes::INTEGER),
                 $default
             ),
@@ -50,10 +51,10 @@ class Accessor
         );
     }
 
-    public static function getFloat(Resolver $resolver, string $variableName, string $default = null): float
+    public static function getFloat(string $variableName, string $default = null): float
     {
         return (float) self::validateVariableValue(
-            $resolver->resolveValue(
+            CompositeResolver::instance()->resolveValue(
                 self::validateVariableType($variableName, VariableTypes::FLOAT),
                 $default
             ),
@@ -61,11 +62,11 @@ class Accessor
         );
     }
 
-    public static function getRatio(Resolver $resolver, string $variableName, string $default = null): float
+    public static function getRatio(string $variableName, string $default = null): float
     {
         return RatioParser::parse(
             self::validateVariableValue(
-                $resolver->resolveValue(
+                CompositeResolver::instance()->resolveValue(
                     self::validateVariableType($variableName, VariableTypes::RATIO),
                     $default
                 )
@@ -73,40 +74,40 @@ class Accessor
         );
     }
 
-    public static function getEnum(Resolver $resolver, string $variableName, string $default = null): string
+    public static function getEnum(string $variableName, string $default = null): string
     {
         return (string) self::validateVariableValue(
-            $resolver->resolveValue(
+            CompositeResolver::instance()->resolveValue(
                 self::validateVariableType($variableName, VariableTypes::ENUM),
                 $default
             )
         );
     }
 
-    public static function getList(Resolver $resolver, string $variableName, string $default = null): array
+    public static function getList(string $variableName, string $default = null): array
     {
         return ListParser::parse(
-            $resolver->resolveValue(
+            CompositeResolver::instance()->resolveValue(
                 self::validateVariableType($variableName, VariableTypes::LIST),
                 $default
             )
         );
     }
 
-    public static function getMap(Resolver $resolver, string $variableName, string $default = null): array
+    public static function getMap(string $variableName, string $default = null): array
     {
         return MapParser::parse(
-            $resolver->resolveValue(
+            CompositeResolver::instance()->resolveValue(
                 self::validateVariableType($variableName, VariableTypes::MAP),
                 $default
             )
         );
     }
 
-    public static function getMixed(Resolver $resolver, string $variableName, string $default = null)
+    public static function getMixed(string $variableName, string $default = null)
     {
         return self::validateVariableValue(
-            $resolver->resolveValue(
+            CompositeResolver::instance()->resolveValue(
                 $variableName,
                 $default
             )

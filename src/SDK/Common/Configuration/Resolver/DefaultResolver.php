@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Configuration;
+namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
+
+use OpenTelemetry\SDK\Common\Configuration\Resolver;
 
 class DefaultResolver extends Resolver
 {

@@ -7,8 +7,6 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration;
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Generator;
 use OpenTelemetry\SDK\Common\Configuration\Accessor;
-use OpenTelemetry\SDK\Common\Configuration\EnvironmentResolver;
-use OpenTelemetry\SDK\Common\Configuration\Resolver;
 use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 use OpenTelemetry\SDK\Common\Configuration\VariableTypes;
 use PHPUnit\Framework\TestCase;
@@ -20,8 +18,6 @@ use UnexpectedValueException;
 class AccessorTest extends TestCase
 {
     use EnvironmentVariables;
-
-    private Resolver $resolver;
 
     private const ALLOW_EMPTY = [
         VariableTypes::LIST,
@@ -76,11 +72,6 @@ class AccessorTest extends TestCase
         VariableTypes::MIXED => [Env::OTEL_TRACES_SAMPLER_ARG],
     ];
 
-    public function setUp(): void
-    {
-        $this->resolver = new EnvironmentResolver();
-    }
-
     public function tearDown(): void
     {
         $this->restoreEnvironmentVariables();
@@ -95,7 +86,7 @@ class AccessorTest extends TestCase
 
         $this->assertSame(
             $result,
-            call_user_func([\OpenTelemetry\SDK\Common\Configuration\Accessor::class, $methodName], $this->resolver, $variable)
+            call_user_func([\OpenTelemetry\SDK\Common\Configuration\Accessor::class, $methodName], $variable)
         );
     }
 
@@ -106,7 +97,7 @@ class AccessorTest extends TestCase
     {
         $this->assertSame(
             $result,
-            call_user_func([\OpenTelemetry\SDK\Common\Configuration\Accessor::class, $methodName], $this->resolver, $variable, $defaultValue)
+            call_user_func([\OpenTelemetry\SDK\Common\Configuration\Accessor::class, $methodName], $variable, $defaultValue)
         );
     }
 
@@ -117,7 +108,7 @@ class AccessorTest extends TestCase
     {
         $this->assertSame(
             $result,
-            call_user_func([Accessor::class, $methodName], $this->resolver, $variable)
+            call_user_func([Accessor::class, $methodName], $variable)
         );
     }
 
@@ -128,7 +119,7 @@ class AccessorTest extends TestCase
     {
         $this->expectException(UnexpectedValueException::class);
 
-        call_user_func([\OpenTelemetry\SDK\Common\Configuration\Accessor::class, $methodName], $this->resolver, 'FOO_BAR_' . $methodName);
+        call_user_func([\OpenTelemetry\SDK\Common\Configuration\Accessor::class, $methodName], 'FOO_BAR_' . $methodName);
     }
 
     /**
@@ -138,7 +129,7 @@ class AccessorTest extends TestCase
     {
         $this->expectException(UnexpectedValueException::class);
 
-        call_user_func([\OpenTelemetry\SDK\Common\Configuration\Accessor::class, $methodName], $this->resolver, $variable);
+        call_user_func([\OpenTelemetry\SDK\Common\Configuration\Accessor::class, $methodName], $variable);
     }
 
     /**
@@ -148,7 +139,7 @@ class AccessorTest extends TestCase
     {
         $this->expectException(UnexpectedValueException::class);
 
-        call_user_func([\OpenTelemetry\SDK\Common\Configuration\Accessor::class, $methodName], $this->resolver, $variable);
+        call_user_func([\OpenTelemetry\SDK\Common\Configuration\Accessor::class, $methodName], $variable);
     }
 
     public function userValueProvider(): Generator

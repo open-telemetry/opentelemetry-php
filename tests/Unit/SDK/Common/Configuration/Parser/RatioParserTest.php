@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Parser;
 
 use InvalidArgumentException;
+use OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser;
 use PHPUnit\Framework\TestCase;
 use RangeException;
 
@@ -35,7 +36,7 @@ class RatioParserTest extends TestCase
     public function test_ratio_values_return_float(string $value): void
     {
         $this->assertIsFloat(
-            \OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser::parse($value)
+            RatioParser::parse($value)
         );
     }
 
@@ -46,7 +47,7 @@ class RatioParserTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        \OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser::parse($value);
+        RatioParser::parse($value);
     }
 
     /**
@@ -56,7 +57,7 @@ class RatioParserTest extends TestCase
     {
         $this->expectException(RangeException::class);
 
-        \OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser::parse($value);
+        RatioParser::parse($value);
     }
 
     public function ratioValueProvider(): array
