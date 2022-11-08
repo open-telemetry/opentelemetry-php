@@ -326,4 +326,10 @@ class ConfigurationTest extends TestCase
             yield $varType => [self::METHOD_NAMES[$varType][0], $values[0]];
         }
     }
+
+    public function test_default_ratio_for_non_existent_variable(): void
+    {
+        $value = Configuration::getRatio('not-set', 0);
+        $this->assertSame(0.0, $value);
+    }
 }
