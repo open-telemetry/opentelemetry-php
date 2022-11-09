@@ -6,8 +6,8 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\FilteredAttributesFactory;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariables;
-use OpenTelemetry\SDK\Common\Environment\Variables as Env;
+use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 use OpenTelemetry\SemConv\TraceAttributes;
 use const PHP_INT_MAX;
 
@@ -111,17 +111,17 @@ class SpanLimitsBuilder
     public function build(): SpanLimits
     {
         $attributeCountLimit = $this->attributeCountLimit
-            ?: EnvironmentVariables::getInt(Env::OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, SpanLimits::DEFAULT_SPAN_ATTRIBUTE_COUNT_LIMIT);
+            ?: Configuration::getInt(Env::OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, SpanLimits::DEFAULT_SPAN_ATTRIBUTE_COUNT_LIMIT);
         $attributeValueLengthLimit = $this->attributeValueLengthLimit
-            ?: EnvironmentVariables::getInt(Env::OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT, SpanLimits::DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT);
+            ?: Configuration::getInt(Env::OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT, SpanLimits::DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT);
         $eventCountLimit = $this->eventCountLimit
-            ?: EnvironmentVariables::getInt(Env::OTEL_SPAN_EVENT_COUNT_LIMIT, SpanLimits::DEFAULT_SPAN_EVENT_COUNT_LIMIT);
+            ?: Configuration::getInt(Env::OTEL_SPAN_EVENT_COUNT_LIMIT, SpanLimits::DEFAULT_SPAN_EVENT_COUNT_LIMIT);
         $linkCountLimit = $this->linkCountLimit
-            ?: EnvironmentVariables::getInt(Env::OTEL_SPAN_LINK_COUNT_LIMIT, SpanLimits::DEFAULT_SPAN_LINK_COUNT_LIMIT);
+            ?: Configuration::getInt(Env::OTEL_SPAN_LINK_COUNT_LIMIT, SpanLimits::DEFAULT_SPAN_LINK_COUNT_LIMIT);
         $attributePerEventCountLimit = $this->attributePerEventCountLimit
-            ?: EnvironmentVariables::getInt(Env::OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT, SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT);
+            ?: Configuration::getInt(Env::OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT, SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT);
         $attributePerLinkCountLimit = $this->attributePerLinkCountLimit
-            ?: EnvironmentVariables::getInt(Env::OTEL_LINK_ATTRIBUTE_COUNT_LIMIT, SpanLimits::DEFAULT_LINK_ATTRIBUTE_COUNT_LIMIT);
+            ?: Configuration::getInt(Env::OTEL_LINK_ATTRIBUTE_COUNT_LIMIT, SpanLimits::DEFAULT_LINK_ATTRIBUTE_COUNT_LIMIT);
 
         if ($attributeValueLengthLimit === PHP_INT_MAX) {
             $attributeValueLengthLimit = null;

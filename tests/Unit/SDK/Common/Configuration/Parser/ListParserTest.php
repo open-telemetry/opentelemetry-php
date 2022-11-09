@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Environment\Parser;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Parser;
 
-use OpenTelemetry\SDK\Common\Environment\Parser\ListParser;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Environment\Parser\ListParser
+ * @covers \OpenTelemetry\SDK\Common\Configuration\Parser\ListParser
  */
 class ListParserTest extends TestCase
 {
@@ -41,7 +40,7 @@ class ListParserTest extends TestCase
     public function test_comma_separated_list_returns_array(string $value, array $expected): void
     {
         $this->assertSame(
-            ListParser::parse($value),
+            \OpenTelemetry\SDK\Common\Configuration\Parser\ListParser::parse($value),
             $expected
         );
     }

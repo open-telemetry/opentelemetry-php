@@ -11,3 +11,9 @@ parameters:
         # - ./examples TODO: Uncomment this once examples are updated
     excludePaths:
         - tests/TraceContext/W3CTestService
+    ignoreErrors:
+        -
+            message: "#Call to an undefined method .*#"
+            paths:
+                - tests/Unit/SDK/Common/Configuration/Resolver/PhpIniResolverTest.php
+                - tests/Unit/SDK/Common/Configuration/Resolver/CompositeResolverTest.php

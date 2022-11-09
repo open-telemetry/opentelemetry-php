@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Environment;
+namespace OpenTelemetry\SDK\Common\Configuration;
 
 use Psr\Log\LogLevel;
 
 /**
- * "Known values" for OpenTelemetry environment variables.
+ * "Known values" for OpenTelemetry configurataion variables.
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md
  * Notice: Values specific to the PHP SDK have been added
  */
