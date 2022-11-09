@@ -28,14 +28,11 @@ class EnvironmentResolver implements ResolverInterface
      * @psalm-suppress InvalidReturnStatement
      * @psalm-suppress InvalidReturnType
      */
-    public function retrieveValue(string $variableName): ?string
+    public function retrieveValue(string $variableName)
     {
         $value = getenv($variableName);
         if ($value === false) {
             $value = $_SERVER[$variableName] ?? null;
-        }
-        if (is_array($value)) {
-            return implode(',', $value);
         }
 
         return $value;

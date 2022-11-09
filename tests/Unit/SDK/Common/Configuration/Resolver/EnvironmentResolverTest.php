@@ -107,15 +107,15 @@ class EnvironmentResolverTest extends TestCase
         return self::RAW_VALUES;
     }
 
-    private function injectEnvironmentVariable(string $name, string $value): void
+    private function injectEnvironmentVariable(string $name, $value): void
     {
         $_SERVER[$name] = $value;
     }
 
-    public function test_get_array_from_env_returns_string(): void
+    public function test_get_array_from_env(): void
     {
-        $_SERVER['OTEL_FOO'] = ['foo', 'bar'];
+        $this->injectEnvironmentVariable('OTEL_FOO', ['foo', 'bar']);
         $value = $this->resolver->retrieveValue('OTEL_FOO');
-        $this->assertSame('foo,bar', $value);
+        $this->assertEqualsCanonicalizing(['foo', 'bar'], $value);
     }
 }

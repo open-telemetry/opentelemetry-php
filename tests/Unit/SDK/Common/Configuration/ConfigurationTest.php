@@ -430,4 +430,27 @@ class ConfigurationTest extends TestCase
     {
         return self::DEFAULT_VALUES;
     }
+
+    /**
+     * @dataProvider nonStringProvider
+     */
+    public function test_get_non_string_value(string $method, $value): void
+    {
+        $_SERVER['OTEL_FOO'] = $value;
+        $this->assertTrue(Configuration::has('OTEL_FOO'));
+        $this->assertSame($value, call_user_func([Configuration::class, $method], 'OTEL_FOO'));
+    }
+
+    public function nonStringProvider(): array
+    {
+        return [
+            ['getFloat', 3.14159],
+            ['getInt', 22],
+            ['getBoolean', true],
+            ['getRatio', 0.44],
+            ['getMixed', [25, 'green']],
+            ['getList', ['foo', 'bar']],
+            ['getMap', ['key1' => 'val1', 'key2' => 'val2']],
+        ];
+    }
 }

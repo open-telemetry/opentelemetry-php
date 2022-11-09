@@ -19,7 +19,7 @@ class PhpIniResolver implements ResolverInterface
         $this->accessor = $accessor ?? new PhpIniAccessor();
     }
 
-    public function retrieveValue(string $variableName): ?string
+    public function retrieveValue(string $variableName)
     {
         $value = $this->accessor->get($variableName) ?: '';
         if (is_array($value)) {

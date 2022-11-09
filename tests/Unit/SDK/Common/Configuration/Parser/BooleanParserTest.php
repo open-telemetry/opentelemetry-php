@@ -62,7 +62,7 @@ class BooleanParserTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        \OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser::parse($value);
+        BooleanParser::parse($value);
     }
 
     public function truthyValueProvider(): array

@@ -6,7 +6,10 @@ namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
 
 interface ResolverInterface
 {
-    public function retrieveValue(string $variableName): ?string;
+    /**
+     * @return mixed
+     */
+    public function retrieveValue(string $variableName);
 
     public function hasVariable(string $variableName): bool;
 }
