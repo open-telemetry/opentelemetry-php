@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\SDK\Common\Configuration\Defaults;
-use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver;
-use OpenTelemetry\SDK\Common\Configuration\VariableTypes;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -26,33 +23,6 @@ class EnvironmentResolverTest extends TestCase
         'map' => ['MAP_VAR', 'foo=bar,bar=baz'],
     ];
 
-    private const DEFAULT_VALUES = [
-        'log level' => ['OTEL_LOG_LEVEL', Defaults::OTEL_LOG_LEVEL],
-        'attribute count limit' => ['OTEL_ATTRIBUTE_COUNT_LIMIT', Defaults::OTEL_ATTRIBUTE_COUNT_LIMIT],
-        'trace exporter' => ['OTEL_PHP_TRACES_PROCESSOR', Defaults::OTEL_PHP_TRACES_PROCESSOR],
-    ];
-
-    private const TYPES = [
-        'bool' => ['OTEL_EXPORTER_OTLP_INSECURE', VariableTypes::BOOL],
-        'string' => ['OTEL_SERVICE_NAME', VariableTypes::STRING],
-        'integer' => ['OTEL_EXPORTER_JAEGER_AGENT_PORT', VariableTypes::INTEGER],
-        'enum' => ['OTEL_LOG_LEVEL', VariableTypes::ENUM],
-        'list' => ['OTEL_PROPAGATORS', VariableTypes::LIST],
-        'map' => ['OTEL_RESOURCE_ATTRIBUTES', VariableTypes::MAP],
-        'mixed' => ['OTEL_TRACES_SAMPLER_ARG', VariableTypes::MIXED],
-    ];
-
-    private const KNOWN_VALUES = [
-        'log level' => ['OTEL_LOG_LEVEL', KnownValues::OTEL_LOG_LEVEL],
-        'trace sampler' => ['OTEL_TRACES_SAMPLER', KnownValues::OTEL_TRACES_SAMPLER],
-        'trace processor' => ['OTEL_PHP_TRACES_PROCESSOR', KnownValues::OTEL_PHP_TRACES_PROCESSOR],
-    ];
-
-    /**
-     * All injected environment variables.
-     */
-    private array $injectedEnvironmentVariables = [];
-
     private EnvironmentResolver $resolver;
 
     public function setUp(): void
@@ -62,7 +32,7 @@ class EnvironmentResolverTest extends TestCase
 
     public function tearDown(): void
     {
-        $this->resetEnvironmentVariables();
+        $this->restoreEnvironmentVariables();
     }
 
     public function test_has_variable(): void
@@ -94,104 +64,28 @@ class EnvironmentResolverTest extends TestCase
     /**
      * @dataProvider rawValueProvider
      */
-    public function test_get_raw_value(string $varName, string $varValue): void
+    public function test_retrieve_value(string $varName, string $varValue): void
     {
         $this->setEnvironmentVariable($varName, $varValue);
 
         $this->assertSame(
             $varValue,
-            $this->resolver->getRawValue($varName)
+            $this->resolver->retrieveValue($varName)
         );
     }
 
-    /**
-     * @dataProvider rawValueProvider
-     */
-    public function test_get_raw_value_with_injected_value(string $varName, string $varValue): void
-    {
-        $this->injectEnvironmentVariable($varName, $varValue);
-
-        $this->assertSame(
-            $varValue,
-            $this->resolver->getRawValue($varName)
-        );
-    }
-
-    public function test_get_raw_value_no_var(): void
+    public function test_retrieve_value_no_var(): void
     {
         $this->assertFalse(
             $this->resolver->hasVariable('FOO_VAR')
         );
 
         $this->assertNull(
-            $this->resolver->getRawValue('FOO_VAR')
+            $this->resolver->retrieveValue('FOO_VAR')
         );
     }
 
-    /**
-     * @dataProvider defaultValueProvider
-     */
-    public function test_get_default_value(string $varName, $varValue): void
-    {
-        $this->assertSame(
-            $varValue,
-            $this->resolver->getDefault($varName)
-        );
-    }
-
-    /**
-     * @dataProvider defaultValueProvider
-     */
-    public function test_get_default_value_with_empty_var(string $varName, $varValue): void
-    {
-        $this->setEnvironmentVariable($varName, '');
-
-        $this->assertSame(
-            $varValue,
-            $this->resolver->getDefault($varName)
-        );
-    }
-
-    /**
-     * @dataProvider typeProvider
-     */
-    public function test_get_type(string $varName, string $type): void
-    {
-        $this->assertSame(
-            $type,
-            $this->resolver->getType($varName)
-        );
-    }
-
-    /**
-     * @dataProvider knownValuesProvider
-     */
-    public function test_get_known_values(string $varName, array $varValue): void
-    {
-        $this->assertSame(
-            $varValue,
-            $this->resolver->getKnownValues($varName)
-        );
-    }
-
-    public function test_resolve_value(): void
-    {
-        $value = 'simple';
-        $variable = 'OTEL_PHP_TRACES_PROCESSOR';
-
-        $this->assertFalse(
-            $this->resolver->hasVariable($variable)
-        );
-
-        $this->setEnvironmentVariable($variable, $value);
-
-        $this->assertSame(
-            $value,
-            $this->resolver->resolveValue($variable)
-        );
-    }
-
-    public function test_resolve_value_with_injected_value(): void
+    public function test_retrieve_value_with_injected_value(): void
     {
         $value = 'simple';
         $variable = 'OTEL_PHP_TRACES_PROCESSOR';
@@ -204,37 +98,7 @@ class EnvironmentResolverTest extends TestCase
 
         $this->assertSame(
             $value,
-            $this->resolver->resolveValue($variable)
-        );
-    }
-
-    public function test_resolve_value_library_default(): void
-    {
-        $value = 'simple';
-        $variable = 'OTEL_PHP_TRACES_PROCESSOR';
-
-        $this->assertFalse(
-            $this->resolver->hasVariable($variable)
-        );
-
-        $this->assertSame(
-            $value,
-            $this->resolver->resolveValue($variable, $value)
-        );
-    }
-
-    public function test_resolve_value_user_default(): void
-    {
-        $value = Defaults::OTEL_PHP_TRACES_PROCESSOR;
-        $variable = 'OTEL_PHP_TRACES_PROCESSOR';
-
-        $this->assertFalse(
-            $this->resolver->hasVariable($variable)
-        );
-
-        $this->assertSame(
-            $value,
-            $this->resolver->resolveValue($variable)
+            $this->resolver->retrieveValue($variable)
         );
     }
 
@@ -243,36 +107,15 @@ class EnvironmentResolverTest extends TestCase
         return self::RAW_VALUES;
     }
 
-    public function defaultValueProvider(): array
-    {
-        return self::DEFAULT_VALUES;
-    }
-
-    public function typeProvider(): array
-    {
-        return self::TYPES;
-    }
-
-    public function knownValuesProvider(): array
-    {
-        return self::KNOWN_VALUES;
-    }
-
     private function injectEnvironmentVariable(string $name, string $value): void
     {
-        if (!in_array($name, $this->injectedEnvironmentVariables, true)) {
-            $this->injectedEnvironmentVariables[] = $name;
-        }
-
         $_SERVER[$name] = $value;
     }
 
-    private function resetEnvironmentVariables(): void
+    public function test_get_array_from_env_returns_string(): void
     {
-        $this->restoreEnvironmentVariables();
-
-        foreach ($this->injectedEnvironmentVariables as $variable) {
-            unset($_SERVER[$variable]);
-        }
+        $_SERVER['OTEL_FOO'] = ['foo', 'bar'];
+        $value = $this->resolver->retrieveValue('OTEL_FOO');
+        $this->assertSame('foo,bar', $value);
     }
 }

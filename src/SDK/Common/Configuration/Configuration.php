@@ -9,12 +9,13 @@ use OpenTelemetry\SDK\Common\Configuration\Parser\ListParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser;
 use OpenTelemetry\SDK\Common\Configuration\Resolver\CompositeResolver;
+use OpenTelemetry\SDK\Common\Util\ClassConstantAccessor;
 use UnexpectedValueException;
 
 /**
  * Configuration can come from one or more of the following sources (from highest to lowest priority):
  * - values defined in php.ini
- * - environment variable
+ * - environment variable ($_SERVER)
  * - configuration file (todo)
  */
 class Configuration
@@ -27,43 +28,40 @@ class Configuration
     public static function getInt(string $key, int $default = null): int
     {
         return (int) self::validateVariableValue(
-            CompositeResolver::instance()->resolveValue(
+            CompositeResolver::instance()->resolve(
                 self::validateVariableType($key, VariableTypes::INTEGER),
                 $default
             ),
             FILTER_VALIDATE_INT
         );
-        //return Accessor::getInt($key, (string) $default);
     }
 
     public static function getString(string $key, string $default = ''): string
     {
         return (string) self::validateVariableValue(
-            CompositeResolver::instance()->resolveValue(
+            CompositeResolver::instance()->resolve(
                 self::validateVariableType($key, VariableTypes::STRING),
                 $default
             )
         );
-        //return Accessor::getString($key, $default);
     }
 
     public static function getBoolean(string $key, bool $default = null): bool
     {
         return BooleanParser::parse(
             self::validateVariableValue(
-                CompositeResolver::instance()->resolveValue(
+                CompositeResolver::instance()->resolve(
                     self::validateVariableType($key, VariableTypes::BOOL),
-                    $default
+                    null === $default ? $default : ($default ? 'true' : 'false')
                 )
             )
         );
-        //return Accessor::getBool($key, null === $default ? null : ($default ? 'true' : 'false'));
     }
 
     public static function getMixed(string $key, string $default = null)
     {
         return self::validateVariableValue(
-            CompositeResolver::instance()->resolveValue(
+            CompositeResolver::instance()->resolve(
                 $key,
                 $default
             )
@@ -73,53 +71,37 @@ class Configuration
     public static function getMap(string $key, string $default = null): array
     {
         return MapParser::parse(
-            CompositeResolver::instance()->resolveValue(
+            CompositeResolver::instance()->resolve(
                 self::validateVariableType($key, VariableTypes::MAP),
                 $default
             )
         );
-        //return Accessor::getMap($key, $default);
     }
 
     public static function getList(string $key, string $default = null): array
     {
         return ListParser::parse(
-            CompositeResolver::instance()->resolveValue(
+            CompositeResolver::instance()->resolve(
                 self::validateVariableType($key, VariableTypes::LIST),
                 $default
             )
         );
-        //return Accessor::getList($key, $default);
     }
 
     public static function getEnum(string $key, string $default = null): string
     {
         return (string) self::validateVariableValue(
-            CompositeResolver::instance()->resolveValue(
+            CompositeResolver::instance()->resolve(
                 self::validateVariableType($key, VariableTypes::ENUM),
                 $default
             )
         );
-        //return Accessor::getEnum($key, $default);
-    }
-
-    public static function getRatio(string $key, float $default = null): float
-    {
-        return RatioParser::parse(
-            self::validateVariableValue(
-                CompositeResolver::instance()->resolveValue(
-                    self::validateVariableType($key, VariableTypes::RATIO),
-                    $default
-                )
-            )
-        );
-        //return Accessor::getRatio($key, $default ? (string) $default : null);
     }
 
     public static function getFloat(string $key, string $default = null): float
     {
         return (float) self::validateVariableValue(
-            CompositeResolver::instance()->resolveValue(
+            CompositeResolver::instance()->resolve(
                 self::validateVariableType($key, VariableTypes::FLOAT),
                 $default
             ),
@@ -127,9 +109,42 @@ class Configuration
         );
     }
 
+    public static function getRatio(string $key, float $default = null): float
+    {
+        return RatioParser::parse(
+            self::validateVariableValue(
+                CompositeResolver::instance()->resolve(
+                    self::validateVariableType($key, VariableTypes::RATIO),
+                    $default
+                )
+            )
+        );
+    }
+
+    public static function getKnownValues(string $variableName): ?array
+    {
+        return ClassConstantAccessor::getValue(KnownValues::class, $variableName);
+    }
+
+    public static function getDefault(string $variableName)
+    {
+        return ClassConstantAccessor::getValue(Defaults::class, $variableName);
+    }
+
+    public static function getType(string $variableName): ?string
+    {
+        return ClassConstantAccessor::getValue(ValueTypes::class, $variableName);
+    }
+
+    public static function isEmpty($value): bool
+    {
+        // don't use 'empty()', since '0' is not considered to be empty
+        return $value === null || $value === '';
+    }
+
     private static function validateVariableType(string $variableName, string $type): string
     {
-        $variableType = Resolver::getType($variableName);
+        $variableType = self::getType($variableName);
 
         if ($variableType !== null && $variableType !== $type && $variableType !== VariableTypes::MIXED) {
             throw new UnexpectedValueException(

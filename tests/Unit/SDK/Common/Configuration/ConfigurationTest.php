@@ -8,6 +8,8 @@ use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
 use Generator;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration\Defaults;
+use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Configuration\VariableTypes;
 use PHPUnit\Framework\TestCase;
@@ -66,11 +68,23 @@ class ConfigurationTest extends TestCase
         VariableTypes::LIST => [Variables::OTEL_PROPAGATORS, ['tracecontext', 'baggage']],
     ];
 
+    private const DEFAULT_VALUES = [
+        'log level' => [Variables::OTEL_LOG_LEVEL, Defaults::OTEL_LOG_LEVEL],
+        'attribute count limit' => [Variables::OTEL_ATTRIBUTE_COUNT_LIMIT, Defaults::OTEL_ATTRIBUTE_COUNT_LIMIT],
+        'trace exporter' => [Variables::OTEL_PHP_TRACES_PROCESSOR, Defaults::OTEL_PHP_TRACES_PROCESSOR],
+    ];
+
     private const NO_DEFAULTS = [
         VariableTypes::STRING => [Variables::OTEL_SERVICE_NAME],
         VariableTypes::ENUM => [Variables::OTEL_EXPORTER_OTLP_COMPRESSION],
         VariableTypes::MAP => [Variables::OTEL_EXPORTER_OTLP_HEADERS],
         VariableTypes::MIXED => [Variables::OTEL_TRACES_SAMPLER_ARG],
+    ];
+
+    private const KNOWN_VALUES = [
+        'log level' => [Variables::OTEL_LOG_LEVEL, KnownValues::OTEL_LOG_LEVEL],
+        'trace sampler' => [Variables::OTEL_TRACES_SAMPLER, KnownValues::OTEL_TRACES_SAMPLER],
+        'trace processor' => [Variables::OTEL_PHP_TRACES_PROCESSOR, KnownValues::OTEL_PHP_TRACES_PROCESSOR],
     ];
 
     public function tearDown(): void
@@ -331,5 +345,89 @@ class ConfigurationTest extends TestCase
     {
         $value = Configuration::getRatio('not-set', 0);
         $this->assertSame(0.0, $value);
+    }
+
+    /**
+     * @dataProvider knownValuesProvider
+     */
+    public function test_get_known_values(string $varName, array $varValue): void
+    {
+        $this->assertSame(
+            $varValue,
+            Configuration::getKnownValues($varName)
+        );
+    }
+
+    public function knownValuesProvider(): array
+    {
+        return self::KNOWN_VALUES;
+    }
+
+    public function test_retrieve_value_library_default(): void
+    {
+        $value = 'simple';
+        $variable = Variables::OTEL_PHP_TRACES_PROCESSOR;
+
+        $this->assertFalse(
+            Configuration::has($variable)
+        );
+
+        $this->assertSame(
+            $value,
+            Configuration::getEnum($variable, $value)
+        );
+    }
+
+    /**
+     * @dataProvider typeProvider
+     */
+    public function test_get_type(string $varName, string $type): void
+    {
+        $this->assertSame(
+            $type,
+            Configuration::getType($varName)
+        );
+    }
+
+    public function typeProvider(): array
+    {
+        return [
+            'bool' => ['OTEL_EXPORTER_OTLP_INSECURE', VariableTypes::BOOL],
+            'string' => ['OTEL_SERVICE_NAME', VariableTypes::STRING],
+            'integer' => ['OTEL_EXPORTER_JAEGER_AGENT_PORT', VariableTypes::INTEGER],
+            'enum' => ['OTEL_LOG_LEVEL', VariableTypes::ENUM],
+            'list' => ['OTEL_PROPAGATORS', VariableTypes::LIST],
+            'map' => ['OTEL_RESOURCE_ATTRIBUTES', VariableTypes::MAP],
+            'mixed' => ['OTEL_TRACES_SAMPLER_ARG', VariableTypes::MIXED],
+        ];
+    }
+
+    /**
+     * @dataProvider defaultValueProvider
+     */
+    public function test_get_default_value_with_empty_var(string $varName, $varValue): void
+    {
+        $this->setEnvironmentVariable($varName, '');
+
+        $this->assertSame(
+            $varValue,
+            Configuration::getDefault($varName)
+        );
+    }
+
+    /**
+     * @dataProvider defaultValueProvider
+     */
+    public function test_get_default_value(string $varName, $varValue): void
+    {
+        $this->assertSame(
+            $varValue,
+            Configuration::getDefault($varName)
+        );
+    }
+
+    public function defaultValueProvider(): array
+    {
+        return self::DEFAULT_VALUES;
     }
 }

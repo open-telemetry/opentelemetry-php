@@ -4,32 +4,40 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
 
-use OpenTelemetry\SDK\Common\Configuration\Resolver;
+use OpenTelemetry\SDK\Common\Configuration\Configuration;
 
 /**
  * @internal
  */
-class EnvironmentResolver extends Resolver
+class EnvironmentResolver implements ResolverInterface
 {
     public function hasVariable(string $variableName): bool
     {
-        return getenv($variableName) !== false || isset($_SERVER[$variableName]);
+        if (!Configuration::isEmpty($_SERVER[$variableName] ?? null)) {
+            return true;
+        }
+        $env = getenv($variableName);
+        if ($env === false) {
+            return false;
+        }
+
+        return !Configuration::isEmpty($env);
     }
 
     /**
      * @psalm-suppress InvalidReturnStatement
      * @psalm-suppress InvalidReturnType
      */
-    public function retrieveValue(string $variableName, ?string $default = ''): ?string
+    public function retrieveValue(string $variableName): ?string
     {
         $value = getenv($variableName);
         if ($value === false) {
-            $value = $_SERVER[$variableName] ?? $default;
+            $value = $_SERVER[$variableName] ?? null;
         }
         if (is_array($value)) {
             return implode(',', $value);
         }
 
-        return self::isEmpty($value) ? $default : (string) $value;
+        return $value;
     }
 }

@@ -11,11 +11,11 @@ class MapParser
     private const VARIABLE_SEPARATOR = ',';
     private const KEY_VALUE_SEPARATOR = '=';
 
-    public static function parse(string $value): array
+    public static function parse(?string $value): array
     {
         $result = [];
 
-        if (trim($value) === '') {
+        if (null === $value || trim($value) === '') {
             return $result;
         }
 

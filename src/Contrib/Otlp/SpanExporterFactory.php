@@ -15,6 +15,7 @@ use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolver;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use UnexpectedValueException;
 
 class SpanExporterFactory
 {
@@ -57,7 +58,7 @@ class SpanExporterFactory
         $compression = $this->getCompression();
 
         if (!$this->transportFactory && !array_key_exists($protocol, self::FACTORIES)) {
-            throw new \UnexpectedValueException('Unknown OTLP protocol: ' . $protocol);
+            throw new UnexpectedValueException('Unknown OTLP protocol: ' . $protocol);
         }
         $factoryClass = self::FACTORIES[$protocol];
         $factory = $this->transportFactory ?: new $factoryClass();

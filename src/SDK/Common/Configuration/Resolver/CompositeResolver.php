@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
 
-use OpenTelemetry\SDK\Common\Configuration\Resolver;
+use OpenTelemetry\SDK\Common\Configuration\Configuration;
 
 /**
  * @interal
  */
-class CompositeResolver extends Resolver
+class CompositeResolver
 {
+    // @var array<ResolverInterface>
     private array $resolvers = [];
 
     public static function instance(): self
     {
         static $instance;
         $instance ??= new self([
-            new IniResolver(),
+            new PhpIniResolver(),
             new EnvironmentResolver(),
         ]);
 
@@ -31,12 +32,17 @@ class CompositeResolver extends Resolver
         }
     }
 
-    private function addResolver(Resolver $resolver): void
+    public function addResolver(ResolverInterface $resolver): void
     {
         $this->resolvers[] = $resolver;
     }
 
-    public function retrieveValue(string $variableName, ?string $default = ''): ?string
+    public function getResolvers(): array
+    {
+        return $this->resolvers;
+    }
+
+    public function resolve(string $variableName, $default = '')
     {
         foreach ($this->resolvers as $resolver) {
             if ($resolver->hasVariable($variableName)) {
@@ -44,7 +50,9 @@ class CompositeResolver extends Resolver
             }
         }
 
-        return $default;
+        return Configuration::isEmpty($default)
+            ? Configuration::getDefault($variableName)
+            : $default;
     }
 
     public function hasVariable(string $variableName): bool
