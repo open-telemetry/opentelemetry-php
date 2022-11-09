@@ -7,8 +7,8 @@ namespace OpenTelemetry\SDK;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariables;
-use OpenTelemetry\SDK\Common\Environment\Variables;
+use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 
 class Sdk
 {
@@ -28,7 +28,7 @@ class Sdk
 
     public static function isDisabled(): bool
     {
-        return EnvironmentVariables::getBoolean(Variables::OTEL_SDK_DISABLED);
+        return Configuration::getBoolean(Variables::OTEL_SDK_DISABLED);
     }
 
     public static function builder(): SdkBuilder

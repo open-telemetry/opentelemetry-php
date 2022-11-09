@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Environment\Parser;
+namespace OpenTelemetry\SDK\Common\Configuration\Parser;
 
 use InvalidArgumentException;
 
@@ -20,8 +20,14 @@ class BooleanParser
         '0',
     ];
 
-    public static function parse(string $value): bool
+    /**
+     * @param string|bool $value
+     */
+    public static function parse($value): bool
     {
+        if (is_bool($value)) {
+            return $value;
+        }
         if (in_array(strtolower($value), self::TRUTHY_VALUES)) {
             return true;
         }

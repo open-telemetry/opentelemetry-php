@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Environment\Parser;
+namespace OpenTelemetry\SDK\Common\Configuration\Parser;
 
 use InvalidArgumentException;
 
@@ -11,11 +11,14 @@ class MapParser
     private const VARIABLE_SEPARATOR = ',';
     private const KEY_VALUE_SEPARATOR = '=';
 
-    public static function parse(string $value): array
+    public static function parse($value): array
     {
+        if (is_array($value)) {
+            return $value;
+        }
         $result = [];
 
-        if (trim($value) === '') {
+        if (null === $value || trim($value) === '') {
             return $result;
         }
 

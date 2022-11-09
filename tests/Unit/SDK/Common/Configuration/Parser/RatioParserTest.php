@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Environment\Parser;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Parser;
 
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Common\Environment\Parser\RatioParser;
+use OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser;
 use PHPUnit\Framework\TestCase;
 use RangeException;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Environment\Parser\RatioParser
+ * @covers \OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser
  */
 class RatioParserTest extends TestCase
 {

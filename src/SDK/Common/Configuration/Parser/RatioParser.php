@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Environment\Parser;
+namespace OpenTelemetry\SDK\Common\Configuration\Parser;
 
 use InvalidArgumentException;
 use RangeException;
@@ -12,7 +12,7 @@ class RatioParser
     private const MAX_VALUE = 1;
     private const MIN_VALUE = 0;
 
-    public static function parse(string $value): float
+    public static function parse($value): float
     {
         if (filter_var($value, FILTER_VALIDATE_FLOAT) === false) {
             throw new InvalidArgumentException(
