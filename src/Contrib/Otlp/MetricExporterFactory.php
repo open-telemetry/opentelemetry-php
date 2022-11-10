@@ -30,6 +30,11 @@ class MetricExporterFactory
 
     private function buildTransport(string $protocol): TransportInterface
     {
+        /**
+         * @todo (https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#periodic-exporting-metricreader)
+         * - OTEL_METRIC_EXPORT_INTERVAL
+         * - OTEL_METRIC_EXPORT_TIMEOUT
+         */
         $endpoint = Configuration::has(Variables::OTEL_EXPORTER_OTLP_METRICS_ENDPOINT)
             ? Configuration::getString(Variables::OTEL_EXPORTER_OTLP_METRICS_ENDPOINT)
             : Configuration::getString(Variables::OTEL_EXPORTER_OTLP_ENDPOINT);

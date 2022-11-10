@@ -9,6 +9,10 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
@@ -27,14 +31,6 @@ class MeterProviderFactory
         if (Sdk::isDisabled()) {
             return new NoopMeterProvider();
         }
-        /**
-         * @todo:
-         * - OTEL_METRICS_EXEMPLAR_FILTER
-         * - OTEL_METRIC_EXPORT_INTERVAL
-         * - OTEL_METRIC_EXPORT_TIMEOUT
-         * - OTEL_EXPORTER_OTLP_METRICS_HEADERS
-         */
-
         $exporterName = Configuration::getString(Variables::OTEL_METRICS_EXPORTER, KnownValues::VALUE_NONE);
         if ($exporterName === KnownValues::VALUE_NONE) {
             $exporter = new NoopMetricExporter();
@@ -48,10 +44,28 @@ class MeterProviderFactory
         }
         $reader = new ExportingReader($exporter, ClockFactory::getDefault());
         $resource = ResourceInfoFactory::defaultResource();
+        $exemplarFilter = $this->createExemplarFilter(Configuration::getEnum(Variables::OTEL_METRICS_EXEMPLAR_FILTER));
 
         return MeterProvider::builder()
             ->setResource($resource)
             ->addReader($reader)
+            ->setExemplarFilter($exemplarFilter)
             ->build();
+    }
+
+    private function createExemplarFilter(string $name): ExemplarFilterInterface
+    {
+        switch ($name) {
+            case KnownValues::VALUE_WITH_SAMPLED_TRACE:
+                return new WithSampledTraceExemplarFilter();
+            case KnownValues::VALUE_ALL:
+                return new AllExemplarFilter();
+            case KnownValues::VALUE_NONE:
+                return new NoneExemplarFilter();
+            default:
+                self::logWarning('Unknown exemplar filter: ' . $name);
+
+                return new NoneExemplarFilter();
+        }
     }
 }
