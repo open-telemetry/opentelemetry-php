@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\SDK\Common\Environment\Variables;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\SdkAutoloader;
 use PHPUnit\Framework\TestCase;
 

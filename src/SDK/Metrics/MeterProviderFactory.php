@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariables;
-use OpenTelemetry\SDK\Common\Environment\KnownValues;
-use OpenTelemetry\SDK\Common\Environment\Variables;
+use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration\KnownValues;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
@@ -35,7 +35,7 @@ class MeterProviderFactory
          * - OTEL_EXPORTER_OTLP_METRICS_HEADERS
          */
 
-        $exporterName = EnvironmentVariables::getString(Variables::OTEL_METRICS_EXPORTER, KnownValues::VALUE_NONE);
+        $exporterName = Configuration::getString(Variables::OTEL_METRICS_EXPORTER, KnownValues::VALUE_NONE);
         if ($exporterName === KnownValues::VALUE_NONE) {
             $exporter = new NoopMetricExporter();
         } elseif (!array_key_exists($exporterName, self::KNOWN_EXPORTER_FACTORIES)) {
@@ -47,7 +47,7 @@ class MeterProviderFactory
             $exporter = $factory->create();
         }
         $reader = new ExportingReader($exporter, ClockFactory::getDefault());
-        $resource = ResourceInfoFactory::defaultResource(); //@todo ??
+        $resource = ResourceInfoFactory::defaultResource();
 
         return MeterProvider::builder()
             ->setResource($resource)

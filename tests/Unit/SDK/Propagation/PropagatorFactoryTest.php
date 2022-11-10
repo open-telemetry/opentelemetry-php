@@ -10,8 +10,8 @@ use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
-use OpenTelemetry\SDK\Common\Environment\KnownValues;
-use OpenTelemetry\SDK\Common\Environment\Variables;
+use OpenTelemetry\SDK\Common\Configuration\KnownValues;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -31,7 +31,7 @@ class PropagatorFactoryTest extends TestCase
      * @dataProvider propagatorsProvider
      * @psalm-suppress ArgumentTypeCoercion
      */
-    public function test_foo(string $propagators, string $expected): void
+    public function test_create(string $propagators, string $expected): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PROPAGATORS, $propagators);
         $propagator = (new PropagatorFactory())->create();

@@ -8,9 +8,9 @@ use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariables;
-use OpenTelemetry\SDK\Common\Environment\KnownValues;
-use OpenTelemetry\SDK\Common\Environment\Variables;
+use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration\KnownValues;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 
 class PropagatorFactory
 {
@@ -25,7 +25,7 @@ class PropagatorFactory
 
     public function create(): TextMapPropagatorInterface
     {
-        $propagators = EnvironmentVariables::getList(Variables::OTEL_PROPAGATORS);
+        $propagators = Configuration::getList(Variables::OTEL_PROPAGATORS);
         switch (count($propagators)) {
             case 0:
                 return new NoopTextMapPropagator();

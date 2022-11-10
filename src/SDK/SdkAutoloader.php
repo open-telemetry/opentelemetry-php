@@ -6,8 +6,8 @@ namespace OpenTelemetry\SDK;
 
 use OpenTelemetry\API\Common\Instrumentation\Configurator;
 use OpenTelemetry\API\Common\Instrumentation\Globals;
-use OpenTelemetry\SDK\Common\Environment\EnvironmentVariables;
-use OpenTelemetry\SDK\Common\Environment\Variables;
+use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
@@ -22,7 +22,7 @@ class SdkAutoloader
 
     public static function autoload(): bool
     {
-        self::$enabled ??= EnvironmentVariables::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+        self::$enabled ??= Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
         if (!self::$enabled) {
             return false;
         }
