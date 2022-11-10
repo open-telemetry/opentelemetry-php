@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
+use InvalidArgumentException;
 use OpenTelemetry\API\Common\Instrumentation\Configurator;
 use OpenTelemetry\API\Common\Instrumentation\Globals;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
@@ -22,7 +23,12 @@ class SdkAutoloader
 
     public static function autoload(): bool
     {
-        self::$enabled ??= Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+        try {
+            self::$enabled ??= Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+        } catch (InvalidArgumentException $e) {
+            //invalid setting, assume false
+            self::$enabled = false;
+        }
         if (!self::$enabled) {
             return false;
         }

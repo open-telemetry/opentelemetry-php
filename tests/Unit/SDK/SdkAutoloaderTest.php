@@ -32,4 +32,10 @@ class SdkAutoloaderTest extends TestCase
         $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
         $this->assertTrue(SdkAutoloader::autoload());
     }
+
+    public function test_disabled_with_invalid_flag(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'invalid-value');
+        $this->assertFalse(SdkAutoloader::autoload());
+    }
 }
