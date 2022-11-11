@@ -31,7 +31,7 @@ class MeterProviderFactory
         if (Sdk::isDisabled()) {
             return new NoopMeterProvider();
         }
-        $exporterName = Configuration::getString(Variables::OTEL_METRICS_EXPORTER, KnownValues::VALUE_NONE);
+        $exporterName = Configuration::getString(Variables::OTEL_METRICS_EXPORTER);
         if ($exporterName === KnownValues::VALUE_NONE) {
             $exporter = new NoopMetricExporter();
         } elseif (!array_key_exists($exporterName, self::KNOWN_EXPORTER_FACTORIES)) {

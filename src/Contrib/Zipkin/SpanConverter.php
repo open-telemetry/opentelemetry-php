@@ -182,7 +182,7 @@ class SpanConverter implements SpanConverterInterface
         }
 
         $attributesAsJson = json_encode($event->getAttributes()->toArray());
-        if (($attributesAsJson === false) || ($attributesAsJson === '')) {
+        if (($attributesAsJson === false)) {
             return null;
         }
 
