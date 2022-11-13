@@ -55,6 +55,16 @@ class ConfigurationTest extends TestCase
         VariableTypes::BOOL => ['true', true],
         VariableTypes::INTEGER => ['42', 42],
         VariableTypes::ENUM => ['val1', 'val1'],
+        VariableTypes::LIST => [['val1', 'val2'], ['val1','val2']],
+        VariableTypes::MAP => [['var1' => 'val1', 'var2' => 'val2'], ['var1'=>'val1','var2'=>'val2']],
+        VariableTypes::MIXED => ['foo', 'foo'],
+    ];
+
+    private const USER_ENV_VALUES = [
+        VariableTypes::STRING => ['foo', 'foo'],
+        VariableTypes::BOOL => ['true', true],
+        VariableTypes::INTEGER => ['42', 42],
+        VariableTypes::ENUM => ['val1', 'val1'],
         VariableTypes::LIST => ['val1,val2', ['val1','val2']],
         VariableTypes::MAP => ['var1=val1,var2=val2', ['var1'=>'val1','var2'=>'val2']],
         VariableTypes::MIXED => ['foo', 'foo'],
@@ -210,7 +220,7 @@ class ConfigurationTest extends TestCase
     }
 
     /**
-     * @dataProvider userValueProvider
+     * @dataProvider userEnvValueProvider
      */
     public function test_return_user_env_vars(string $methodName, string $variable, string $value, $result)
     {
@@ -225,7 +235,7 @@ class ConfigurationTest extends TestCase
     /**
      * @dataProvider userValueProvider
      */
-    public function test_return_user_default_value(string $methodName, string $variable, string $defaultValue, $result)
+    public function test_return_user_default_value(string $methodName, string $variable, $defaultValue, $result)
     {
         $this->assertSame(
             $result,
@@ -277,6 +287,20 @@ class ConfigurationTest extends TestCase
     public function userValueProvider(): Generator
     {
         foreach (self::USER_VALUES as $varType => $values) {
+            [$default, $result] = $values;
+
+            yield $varType => [
+                self::METHOD_NAMES[$varType][0],
+                self::TYPES[$varType][0],
+                $default,
+                $result,
+            ];
+        }
+    }
+
+    public function userEnvValueProvider(): Generator
+    {
+        foreach (self::USER_ENV_VALUES as $varType => $values) {
             [$default, $result] = $values;
 
             yield $varType => [

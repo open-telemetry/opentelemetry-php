@@ -36,7 +36,7 @@ class Configuration
         );
     }
 
-    public static function getString(string $key, string $default = ''): string
+    public static function getString(string $key, string $default = null): string
     {
         return (string) self::validateVariableValue(
             CompositeResolver::instance()->resolve(
@@ -68,7 +68,7 @@ class Configuration
         );
     }
 
-    public static function getMap(string $key, $default = null): array
+    public static function getMap(string $key, array $default = null): array
     {
         return MapParser::parse(
             CompositeResolver::instance()->resolve(
@@ -78,7 +78,7 @@ class Configuration
         );
     }
 
-    public static function getList(string $key, $default = null): array
+    public static function getList(string $key, array $default = null): array
     {
         return ListParser::parse(
             CompositeResolver::instance()->resolve(
@@ -98,7 +98,7 @@ class Configuration
         );
     }
 
-    public static function getFloat(string $key, $default = null): float
+    public static function getFloat(string $key, float $default = null): float
     {
         return (float) self::validateVariableValue(
             CompositeResolver::instance()->resolve(
