@@ -64,7 +64,8 @@
             "src/Context/fiber/initialize_fiber_handler.php",
             "src/API/Trace/functions.php",
             "src/SDK/Common/Dev/Compatibility/_load.php",
-            "src/SDK/Common/Util/functions.php"
+            "src/SDK/Common/Util/functions.php",
+            "src/SDK/_autoload.php"
         ]
     },
     "autoload-dev": {
@@ -96,7 +97,7 @@
         "phpstan/phpstan-phpunit": "^1.0",
         "phpunit/phpunit": "^9.3",
         "psalm/plugin-mockery": "^0.9",
-        "psalm/plugin-phpunit": "^0.16",
+        "psalm/plugin-phpunit": "^0.18",
         "psalm/psalm": "^4.0",
         "qossmic/deptrac-shim": "^0.24",
         "rector/rector": "^0.13.7",

@@ -8,6 +8,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
 use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -18,6 +19,7 @@ class MeterProviderBuilder
     // @var array<MetricReaderInterface>
     private array $metricReaders = [];
     private ?ResourceInfo $resource = null;
+    private ?ExemplarFilterInterface $exemplarFilter = null;
 
     public function registerMetricReader(MetricReaderInterface $reader): self
     {
@@ -29,6 +31,13 @@ class MeterProviderBuilder
     public function setResource(ResourceInfo $resource): self
     {
         $this->resource = $resource;
+
+        return $this;
+    }
+
+    public function setExemplarFilter(ExemplarFilterInterface $exemplarFilter): self
+    {
+        $this->exemplarFilter = $exemplarFilter;
 
         return $this;
     }
@@ -53,7 +62,7 @@ class MeterProviderBuilder
             new InstrumentationScopeFactory(Attributes::factory()),
             $this->metricReaders,
             new CriteriaViewRegistry(),
-            new WithSampledTraceExemplarFilter(),
+            $this->exemplarFilter ?? new WithSampledTraceExemplarFilter(),
             new ImmediateStalenessHandlerFactory(),
         );
     }

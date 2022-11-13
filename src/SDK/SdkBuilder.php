@@ -9,7 +9,6 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
-use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
@@ -59,8 +58,9 @@ class SdkBuilder
         $tracerProvider = $this->tracerProvider ?? new NoopTracerProvider();
         $meterProvider = $this->meterProvider ?? new NoopMeterProvider();
         if ($this->autoShutdown) {
-            ShutdownHandler::register(fn (?CancellationInterface $cancellation = null): bool => $tracerProvider->shutdown($cancellation));
-            ShutdownHandler::register(fn (): bool => $meterProvider->shutdown());
+            // rector rule disabled in config, because ShutdownHandler::register() does not keep a strong reference to $this
+            ShutdownHandler::register([$tracerProvider, 'shutdown']);
+            ShutdownHandler::register([$meterProvider, 'shutdown']);
         }
 
         return new Sdk(
@@ -79,6 +79,7 @@ class SdkBuilder
             ->withMeterProvider($sdk->getMeterProvider())
             ->storeInContext();
 
+        // @todo could auto-shutdown self?
         return Context::storage()->attach($context);
     }
 }

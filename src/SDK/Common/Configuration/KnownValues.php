@@ -165,6 +165,7 @@ interface KnownValues
         self::VALUE_NOOP,
         self::VALUE_NONE,
     ];
+    public const OTEL_PHP_AUTOLOAD_ENABLED = self::VALUES_BOOLEAN;
     public const VALUE_DETECTORS_ENVIRONMENT = 'env';
     public const VALUE_DETECTORS_HOST = 'host';
     public const VALUE_DETECTORS_OS = 'os';

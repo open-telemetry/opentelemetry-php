@@ -30,7 +30,8 @@
             "OpenTelemetry\\SDK\\": "."
         },
         "files": [
-            "Common/Util/functions.php"
+            "Common/Util/functions.php",
+            "_autoload.php"
         ]
     },
     "suggest": {
