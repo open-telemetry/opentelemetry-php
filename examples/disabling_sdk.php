@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-use OpenTelemetry\Contrib\Otlp\StreamMetricExporter;
+use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
@@ -27,7 +28,7 @@ var_dump(get_class($tracer));
 
 //metrics
 $clock = ClockFactory::getDefault();
-$reader = new ExportingReader(new StreamMetricExporter(STDOUT), $clock);
+$reader = new ExportingReader(new MetricExporter((new StreamTransportFactory())->create(STDOUT, 'application/x-ndjson')), $clock);
 $views = new CriteriaViewRegistry();
 $meterProvider = new MeterProvider(
     null,

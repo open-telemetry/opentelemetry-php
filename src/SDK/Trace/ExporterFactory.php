@@ -8,9 +8,13 @@ use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Registry;
+use RuntimeException;
 
 class ExporterFactory
 {
+    /**
+     * @throws RuntimeException
+     */
     public function fromEnvironment(): ?SpanExporterInterface
     {
         $exporters = Configuration::getList(Variables::OTEL_TRACES_EXPORTER);

@@ -3,9 +3,8 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../../vendor/autoload.php';
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\Newrelic\Exporter as NewrelicExporter;
+use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -31,20 +30,9 @@ if ($licenseKey == false) {
  * EU data centers: https://trace-api.eu.newrelic.com/trace/v1
  */
 
-$endpointUrl =  getenv('NEW_RELIC_ENDPOINT');
+$endpointUrl = Configuration::getString('NEW_RELIC_ENDPOINT', 'https://trace-api.newrelic.com/trace/v1');
 
-if ($endpointUrl == false) {
-    $endpointUrl = 'https://trace-api.newrelic.com/trace/v1';
-}
-
-$newrelicExporter = new NewrelicExporter(
-    'alwaysOnNewrelicExample',
-    $endpointUrl,
-    $licenseKey,
-    new Client(),
-    new HttpFactory(),
-    new HttpFactory()
-);
+$newrelicExporter = NewrelicExporter::create('alwaysOnNewrelicExample', $endpointUrl, $licenseKey);
 
 echo 'Starting Newrelic example';
 $tracerProvider = new TracerProvider(new SimpleSpanProcessor($newrelicExporter));

@@ -19,7 +19,7 @@ putenv('OTEL_BSP_SCHEDULE_DELAY=10000');
 
 echo 'Creating Exporter From Environment' . PHP_EOL;
 
-$tracerProvider = (new TracerProviderFactory('example'))->create();
+$tracerProvider = (new TracerProviderFactory())->create();
 
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 

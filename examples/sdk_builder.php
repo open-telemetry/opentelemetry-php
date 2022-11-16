@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
@@ -30,8 +28,7 @@ $spanExporter = new InMemoryExporter();
 
 $reader = new ExportingReader(
     new MetricExporter(
-        (new PsrTransportFactory(new Client(), new HttpFactory(), new HttpFactory()))
-            ->create('http://collector:4318/v1/metrics', 'application/x-protobuf')
+        PsrTransportFactory::discover()->create('http://collector:4318/v1/metrics', 'application/x-protobuf')
     ),
     ClockFactory::getDefault()
 );

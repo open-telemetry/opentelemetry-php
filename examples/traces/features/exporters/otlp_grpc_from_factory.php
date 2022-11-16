@@ -13,7 +13,7 @@ require __DIR__ . '/../../../../vendor/autoload.php';
  */
 putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4317');
 putenv('OTEL_EXPORTER_OTLP_PROTOCOL=grpc');
-$factory = new TracerProviderFactory('otlp-grpc-demo');
+$factory = new TracerProviderFactory();
 $tracerProvider = $factory->create();
 
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');

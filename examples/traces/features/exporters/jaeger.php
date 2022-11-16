@@ -4,11 +4,15 @@ declare(strict_types=1);
 require __DIR__ . '/../../../../vendor/autoload.php';
 
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
-$exporter = JaegerExporter::fromConnectionString('http://jaeger:9412/api/v2/spans', 'AlwaysOnJaegerExample');
+$exporter = new JaegerExporter(
+    'AlwaysOnJaegerExample',
+    PsrTransportFactory::discover()->create('http://jaeger:9412/api/v2/spans')
+);
 $tracerProvider = new TracerProvider(
     new SimpleSpanProcessor($exporter),
     new AlwaysOnSampler(),

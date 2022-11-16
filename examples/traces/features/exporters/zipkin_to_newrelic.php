@@ -3,9 +3,9 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../../vendor/autoload.php';
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\Exporter as ZipkinToNewrelicExporter;
+use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -31,19 +31,11 @@ if ($licenseKey == false) {
  * EU data centers: https://trace-api.eu.newrelic.com/trace/v1
  */
 
-$endpointUrl =  getenv('NEW_RELIC_ENDPOINT');
-
-if ($endpointUrl == false) {
-    $endpointUrl = 'https://trace-api.newrelic.com/trace/v1';
-}
-
+$endpointUrl = Configuration::getString('NEW_RELIC_ENDPOINT', 'https://trace-api.newrelic.com/trace/v1');
+$transport = PsrTransportFactory::discover()->create($endpointUrl, $licenseKey);
 $zipkinToNewrelicExporter = new ZipkinToNewrelicExporter(
-    'alwaysOnZipkinToNewrelicExample',
-    $endpointUrl,
-    $licenseKey,
-    new Client(),
-    new HttpFactory(),
-    new HttpFactory()
+    'AlwaysOnZipkinToNewrelicExample',
+    $transport
 );
 
 echo 'Starting ZipkinToNewRelic example';
