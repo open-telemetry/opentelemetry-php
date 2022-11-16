@@ -13,7 +13,6 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
-use RuntimeException;
 
 class LoggerDecorator implements SpanExporterInterface, LoggerAwareInterface
 {
@@ -29,13 +28,6 @@ class LoggerDecorator implements SpanExporterInterface, LoggerAwareInterface
         $this->setDecorated($decorated);
         $this->setLogger($logger ?? new NullLogger());
         $this->setSpanConverter($converter ?? new FriendlySpanConverter());
-    }
-
-    public static function fromConnectionString(string $endpointUrl, string $name, string $args): void
-    {
-        throw new RuntimeException(
-            sprintf('%s cannot be instantiated via %s', __CLASS__, __METHOD__)
-        );
     }
 
     protected function beforeExport(iterable $spans): iterable

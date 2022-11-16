@@ -63,6 +63,10 @@
         "files": [
             "src/Context/fiber/initialize_fiber_handler.php",
             "src/API/Trace/functions.php",
+            "src/Contrib/Otlp/_register.php",
+            "src/Contrib/Grpc/_register.php",
+            "src/Contrib/Zipkin/_register.php",
+            "src/SDK/Trace/SpanExporter/_register.php",
             "src/SDK/Common/Dev/Compatibility/_load.php",
             "src/SDK/Common/Util/functions.php",
             "src/SDK/_autoload.php"

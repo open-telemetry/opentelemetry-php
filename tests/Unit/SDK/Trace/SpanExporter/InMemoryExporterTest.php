@@ -30,14 +30,6 @@ class InMemoryExporterTest extends TestCase
         );
     }
 
-    public function test_from_connection_string(): void
-    {
-        $this->assertInstanceOf(
-            InMemoryExporter::class,
-            InMemoryExporter::fromConnectionString()
-        );
-    }
-
     public function test_get_storage(): void
     {
         $storage = new ArrayObject();

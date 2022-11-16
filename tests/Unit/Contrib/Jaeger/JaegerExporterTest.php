@@ -5,29 +5,21 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Contrib\Jaeger;
 
 use OpenTelemetry\Contrib\Jaeger\Exporter;
-use OpenTelemetry\Tests\Unit\Contrib\AbstractHttpExporterTest;
-use OpenTelemetry\Tests\Unit\Contrib\UsesHttpClientTrait;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
 
 /**
  * @covers OpenTelemetry\Contrib\Jaeger\Exporter
  */
-class JaegerExporterTest extends AbstractHttpExporterTest
+class JaegerExporterTest extends AbstractExporterTest
 {
-    use UsesHttpClientTrait;
-
     private const EXPORTER_NAME = 'test.jaeger';
 
-    /**
-     * @psalm-suppress PossiblyInvalidArgument
-     */
-    public function createExporterWithDsn(string $dsn): Exporter
+    public function createExporterWithTransport(TransportInterface $transport): Exporter
     {
         return new Exporter(
             self::EXPORTER_NAME,
-            $dsn,
-            $this->getClientInterfaceMock(),
-            $this->getRequestFactoryInterfaceMock(),
-            $this->getStreamFactoryInterfaceMock()
+            $transport
         );
     }
 

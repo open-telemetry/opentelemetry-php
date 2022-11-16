@@ -17,3 +17,15 @@ parameters:
             paths:
                 - tests/Unit/SDK/Common/Configuration/Resolver/PhpIniResolverTest.php
                 - tests/Unit/SDK/Common/Configuration/Resolver/CompositeResolverTest.php
+        -
+            message: "#Call to an undefined method .*:allows.*#"
+            paths:
+                - tests
+        -
+            message: "#Call to an undefined method .*:shouldReceive.*#"
+            paths:
+                - tests
+        -
+            message: "#Call to an undefined method .*:shouldHaveReceived.*#"
+            paths:
+                - tests

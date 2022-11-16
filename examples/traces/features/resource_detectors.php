@@ -11,7 +11,7 @@ putenv('OTEL_RESOURCE_ATTRIBUTES=foo=bar'); //env detector will add this to trac
 
 echo 'Handling Resource Detectors From Environment' . PHP_EOL;
 
-$tracerProvider = (new TracerProviderFactory('example'))->create();
+$tracerProvider = (new TracerProviderFactory())->create();
 
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 

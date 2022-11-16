@@ -14,9 +14,8 @@ require __DIR__ . '/../../../vendor/autoload.php';
  * will be the last log entry
  */
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\SimplePsrFileLogger;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -43,10 +42,7 @@ $exporterEndpoint = 'http://jaeger:9412/api/v2/spans';
 //$exporterEndpoint = 'http://example.com:9412/api/v2/spans';
 $exporter = new JaegerExporter(
     'alwaysOnJaegerExample',
-    'http://jaeger:9412/api/v2/spans',
-    new Client(),
-    new HttpFactory(),
-    new HttpFactory()
+    PsrTransportFactory::discover()->create('http://jaeger:9412/api/v2/spans', 'application/json'),
 );
 /**
  * Decorate the Exporter

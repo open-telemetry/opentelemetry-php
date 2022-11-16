@@ -45,7 +45,7 @@ class TracerProviderFactoryTest extends TestCase
         $samplerFactory->expects($this->once())->method('fromEnvironment');
         $spanProcessorFactory->expects($this->once())->method('fromEnvironment');
 
-        $factory = new TracerProviderFactory('test', $exporterFactory, $samplerFactory, $spanProcessorFactory);
+        $factory = new TracerProviderFactory($exporterFactory, $samplerFactory, $spanProcessorFactory);
         $factory->create();
     }
 
@@ -66,14 +66,14 @@ class TracerProviderFactoryTest extends TestCase
             ->willThrowException(new \InvalidArgumentException('foo'));
         $this->logger->expects($this->atLeast(3))->method('log');
 
-        $factory = new TracerProviderFactory('test', $exporterFactory, $samplerFactory, $spanProcessorFactory);
+        $factory = new TracerProviderFactory($exporterFactory, $samplerFactory, $spanProcessorFactory);
         $factory->create();
     }
 
     public function test_can_be_disabled(): void
     {
         $this->setEnvironmentVariable('OTEL_SDK_DISABLED', 'true');
-        $factory = new TracerProviderFactory('test');
+        $factory = new TracerProviderFactory();
         $this->assertInstanceOf(NoopTracerProvider::class, $factory->create());
     }
 }

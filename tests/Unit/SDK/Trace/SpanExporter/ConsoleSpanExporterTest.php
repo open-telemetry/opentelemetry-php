@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
 
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 /**
  * @covers \OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter
+ * @psalm-suppress UndefinedInterfaceMethod
  */
 class ConsoleSpanExporterTest extends AbstractExporterTest
 {
     public function createExporter(): ConsoleSpanExporter
     {
-        return new ConsoleSpanExporter();
+        return new ConsoleSpanExporter($this->transport);
     }
 
     private const TEST_DATA = [
@@ -50,44 +53,6 @@ class ConsoleSpanExporterTest extends AbstractExporterTest
         ],],
     ];
 
-    public function test_export_success(): void
-    {
-        $converter = $this->createMock(SpanConverterInterface::class);
-        $converter->expects($this->once())
-            ->method('convert')
-            ->willReturn(self::TEST_DATA);
-
-        ob_start();
-
-        $this->assertTrue(
-            (new ConsoleSpanExporter($converter))->export([
-                $this->createMock(SpanDataInterface::class),
-            ])->await(),
-        );
-
-        ob_end_clean();
-    }
-
-    public function test_export_failed(): void
-    {
-        $resource = fopen('php://stdin', 'rb');
-        $converter = $this->createMock(SpanConverterInterface::class);
-        $converter->expects($this->once())
-            ->method('convert')
-            ->willReturn([$resource]);
-
-        ob_start();
-
-        $this->assertFalse(
-            (new ConsoleSpanExporter($converter))->export([
-                $this->createMock(SpanDataInterface::class),
-            ])->await(),
-        );
-
-        ob_end_clean();
-        fclose($resource);
-    }
-
     public function test_export_output(): void
     {
         try {
@@ -95,24 +60,29 @@ class ConsoleSpanExporterTest extends AbstractExporterTest
         } catch (\Throwable $t) {
             $this->fail($t->getMessage());
         }
+        $this->future->allows([
+            'await' => true,
+        ]);
 
         $converter = $this->createMock(SpanConverterInterface::class);
         $converter->expects($this->once())
             ->method('convert')
             ->willReturn(self::TEST_DATA);
 
-        $this->expectOutputString($expected);
-
-        (new ConsoleSpanExporter($converter))->export([
+        (new ConsoleSpanExporter($this->transport, $converter))->export([
             $this->createMock(SpanDataInterface::class),
         ])->await();
+
+        $this->transport->shouldHaveReceived('send')->with($expected);
     }
 
-    public function test_from_connection_string(): void
+    public function createExporterWithTransport(TransportInterface $transport): SpanExporterInterface
     {
-        $this->assertInstanceOf(
-            ConsoleSpanExporter::class,
-            ConsoleSpanExporter::fromConnectionString()
-        );
+        return new ConsoleSpanExporter($transport);
+    }
+
+    public function getExporterClass(): string
+    {
+        return ConsoleSpanExporter::class;
     }
 }

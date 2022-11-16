@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Newrelic;
 
-use Exception;
-use Http\Discovery\HttpClientDiscovery;
-use Http\Discovery\Psr17FactoryDiscovery;
 use JsonException;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
@@ -15,9 +12,6 @@ use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
 use Throwable;
 
 /**
@@ -41,22 +35,30 @@ class Exporter implements SpanExporterInterface
 
     public function __construct(
         $name,
+        TransportInterface $transport,
+        string $endpointUrl,
+        SpanConverter $spanConverter = null
+    ) {
+        $this->name = $name;
+        $this->endpointUrl = $endpointUrl;
+        $this->transport = $transport;
+        $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
+    }
+
+    //@todo move to a factory?
+    public static function create(
+        $name,
         string $endpointUrl,
         string $licenseKey,
-        ClientInterface $client,
-        RequestFactoryInterface $requestFactory,
-        StreamFactoryInterface $streamFactory,
-        SpanConverter $spanConverter = null,
         string $dataFormatVersion = Exporter::DATA_FORMAT_VERSION_DEFAULT
-    ) {
-        $this->transport = (new PsrTransportFactory($client, $requestFactory, $streamFactory))->create($endpointUrl, 'application/json', [
+    ): self {
+        $transport = PsrTransportFactory::discover()->create($endpointUrl, 'application/json', [
             'Api-Key' => $licenseKey,
             'Data-Format' => 'newrelic',
             'Data-Format-Version' => $dataFormatVersion,
         ]);
-        $this->name = $name;
-        $this->endpointUrl = $endpointUrl;
-        $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
+
+        return new self($name, $transport, $endpointUrl);
     }
 
     /**
@@ -74,23 +76,6 @@ class Exporter implements SpanExporterInterface
 
         return [[ 'common' => $commonAttributes,
             'spans' => $this->getSpanConverter()->convert($spans), ]];
-    }
-
-    /** @inheritDoc */
-    public static function fromConnectionString(string $endpointUrl, string $name, $args)
-    {
-        if (!is_string($args)) {
-            throw new Exception('Invalid license key.');
-        }
-
-        return new Exporter(
-            $name,
-            $endpointUrl,
-            $args,
-            HttpClientDiscovery::find(),
-            Psr17FactoryDiscovery::findRequestFactory(),
-            Psr17FactoryDiscovery::findStreamFactory()
-        );
     }
 
     public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface

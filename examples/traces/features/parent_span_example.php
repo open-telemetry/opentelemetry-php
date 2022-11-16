@@ -3,10 +3,9 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../vendor/autoload.php';
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
@@ -18,19 +17,13 @@ $sampler = new AlwaysOnSampler();
 // zipkin exporter
 $zipkinExporter = new ZipkinExporter(
     $serviceName,
-    'http://zipkin:9411/api/v2/spans',
-    new Client(),
-    new HttpFactory(),
-    new HttpFactory()
+    PsrTransportFactory::discover()->create('http://zipkin:9411/api/v2/spans')
 );
 
 // jaeger exporter
 $jaegerExporter = new JaegerExporter(
     $serviceName,
-    'http://jaeger:9412/api/v2/spans',
-    new Client(),
-    new HttpFactory(),
-    new HttpFactory()
+    PsrTransportFactory::discover()->create('http://jaeger:9411/api/v2/spans')
 );
 
 $tracerProvider =  new TracerProvider(

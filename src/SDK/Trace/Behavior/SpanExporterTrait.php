@@ -27,8 +27,6 @@ trait SpanExporterTrait
         return true;
     }
 
-    abstract public static function fromConnectionString(string $endpointUrl, string $name, string $args);
-
     /**
      * @param iterable<SpanDataInterface> $batch
      * @return FutureInterface<bool>

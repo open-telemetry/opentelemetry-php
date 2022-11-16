@@ -18,10 +18,7 @@ class AgentExporterTest extends TestCase
 {
     public function test_happy_path()
     {
-        $exporter = AgentExporter::fromConnectionString(
-            'http://127.0.0.1:80',
-            'someServiceName',
-        );
+        $exporter = new AgentExporter('someServiceName', 'http://127.0.0.1:80');
 
         $status = $exporter->export([new SpanData()])->await();
 

@@ -16,12 +16,11 @@ final class TracerProviderFactory
     private SpanProcessorFactory $spanProcessorFactory;
 
     public function __construct(
-        string $name,
         ?ExporterFactory $exporterFactory = null,
         ?SamplerFactory $samplerFactory = null,
         ?SpanProcessorFactory $spanProcessorFactory = null
     ) {
-        $this->exporterFactory = $exporterFactory ?: new ExporterFactory($name);
+        $this->exporterFactory = $exporterFactory ?: new ExporterFactory();
         $this->samplerFactory = $samplerFactory ?: new SamplerFactory();
         $this->spanProcessorFactory = $spanProcessorFactory ?: new SpanProcessorFactory();
     }

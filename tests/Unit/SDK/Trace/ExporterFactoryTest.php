@@ -11,7 +11,6 @@ use Http\Discovery\Strategy\MockClientStrategy;
 use OpenTelemetry\Contrib;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
-use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,54 +31,12 @@ class ExporterFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider endpointProvider
-     */
-    public function test_exporter_from_connection_string($name, $input, $expectedClass): void
-    {
-        $factory = new ExporterFactory($name);
-        $exporter = $factory->fromConnectionString($input);
-        $this->assertInstanceOf($expectedClass, $exporter);
-    }
-
-    public function endpointProvider(): array
-    {
-        return [
-            'zipkin' => ['test.zipkin', 'zipkin+http://zipkin:9411/api/v2/spans', Contrib\Zipkin\Exporter::class],
-            'jaeger' => ['test.jaeger', 'jaeger+http://jaeger:9412/api/v2/spans', Contrib\Jaeger\Exporter::class],
-            'newrelic' => ['rest.newrelic', 'newrelic+https://trace-api.newrelic.com/trace/v1?licenseKey=abc23423423', Contrib\Newrelic\Exporter::class],
-            'zipkintonewrelic' => ['test.zipkintonewrelic', 'zipkintonewrelic+https://trace-api.newrelic.com/trace/v1?licenseKey=abc23423423', Contrib\ZipkinToNewrelic\Exporter::class],
-            'console' => ['test.console', 'console', ConsoleSpanExporter::class],
-            'memory' => ['test.memory', 'memory', InMemoryExporter::class],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidConnectionStringProvider
-     */
-    public function test_invalid_connection_string(string $name, string $input): void
-    {
-        $this->expectException(Exception::class);
-        $factory = new ExporterFactory($name);
-        $factory->fromConnectionString($input);
-    }
-
-    public function invalidConnectionStringProvider(): array
-    {
-        return [
-            'zipkin without +' => ['test.zipkin', 'zipkinhttp://zipkin:9411/api/v2/spans'],
-            'zapkin' => ['zipkin.test', 'zapkin+http://zipkin:9411/api/v2/spans'],
-            'otlp' => ['test.otlp', 'otlp'],
-            'test' => ['test', 'test+http://test:1345'],
-        ];
-    }
-
-    /**
      * @group trace-compliance
      */
     public function test_accepts_none_exporter_env_var(): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', 'none');
-        $factory = new ExporterFactory('test.fromEnv');
+        $factory = new ExporterFactory();
         $this->assertNull($factory->fromEnvironment());
     }
 
@@ -94,7 +51,7 @@ class ExporterFactoryTest extends TestCase
         foreach ($env as $k => $v) {
             $this->setEnvironmentVariable($k, $v);
         }
-        $factory = new ExporterFactory('test.fromEnv');
+        $factory = new ExporterFactory();
         $this->assertInstanceOf($expected, $factory->fromEnvironment());
     }
 
@@ -142,7 +99,7 @@ class ExporterFactoryTest extends TestCase
         foreach ($env as $k => $v) {
             $this->setEnvironmentVariable($k, $v);
         }
-        $factory = new ExporterFactory('test');
+        $factory = new ExporterFactory();
         $this->expectException(Exception::class);
         $factory->fromEnvironment();
     }
@@ -151,7 +108,6 @@ class ExporterFactoryTest extends TestCase
     {
         return [
             'jaeger' => ['jaeger'],
-            'zipkin' => ['zipkin'],
             'newrelic' => ['newrelic'],
             'zipkintonewrelic' => ['zipkintonewrelic'],
             'otlp+invalid protocol' => [

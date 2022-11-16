@@ -11,7 +11,9 @@ putenv('OTEL_SERVICE_NAME=example-app');
 putenv('OTEL_LOG_LEVEL=warning');
 putenv('OTEL_TRACES_SAMPLER=traceidratio');
 putenv('OTEL_TRACES_SAMPLER_ARG=0.95');
-putenv('OTEL_TRACES_EXPORTER=console');
+putenv('OTEL_TRACES_EXPORTER=otlp');
+putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318');
+putenv('OTEL_EXPORTER_OTLP_PROTOCOL=http/json');
 putenv('OTEL_PHP_TRACES_PROCESSOR=batch');
 putenv('OTEL_BSP_SCHEDULE_DELAY=10000');
 

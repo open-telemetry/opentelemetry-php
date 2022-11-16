@@ -11,15 +11,16 @@ use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use UnexpectedValueException;
 
-class MetricExporterFactory
+class MetricExporterFactory implements MetricExporterFactoryInterface
 {
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
-    public function create(): MetricExporterInterface
+    public function fromEnvironment(): MetricExporterInterface
     {
         $protocol = Configuration::has(Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL)
             ? Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL)

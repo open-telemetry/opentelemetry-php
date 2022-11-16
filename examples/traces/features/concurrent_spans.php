@@ -3,7 +3,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../vendor/autoload.php';
 
-use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
+use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
@@ -15,7 +15,7 @@ echo 'Starting ConsoleSpanExporter' . PHP_EOL;
 
 $tracerProvider =  new TracerProvider(
     new SimpleSpanProcessor(
-        new ConsoleSpanExporter()
+        (new ConsoleSpanExporterFactory())->create()
     )
 );
 

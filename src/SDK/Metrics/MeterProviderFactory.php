@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use InvalidArgumentException;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
@@ -15,6 +16,7 @@ use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFi
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
+use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Sdk;
 
@@ -22,26 +24,29 @@ class MeterProviderFactory
 {
     use LogsMessagesTrait;
 
-    private const KNOWN_EXPORTER_FACTORIES = [
-        KnownValues::VALUE_OTLP => '\OpenTelemetry\Contrib\Otlp\MetricExporterFactory',
-    ];
-
     public function create(): MeterProviderInterface
     {
         if (Sdk::isDisabled()) {
             return new NoopMeterProvider();
         }
-        $exporterName = Configuration::getString(Variables::OTEL_METRICS_EXPORTER);
+        $exporters = Configuration::getList(Variables::OTEL_METRICS_EXPORTER);
+        //TODO "The SDK MAY accept a comma-separated list to enable setting multiple exporters"
+        if (count($exporters) !== 1) {
+            throw new InvalidArgumentException(sprintf('Configuration %s requires exactly 1 exporter', Variables::OTEL_METRICS_EXPORTER));
+        }
+        $exporterName = $exporters[0];
         if ($exporterName === KnownValues::VALUE_NONE) {
             $exporter = new NoopMetricExporter();
-        } elseif (!array_key_exists($exporterName, self::KNOWN_EXPORTER_FACTORIES)) {
-            self::logError('Factory cannot create exporter: ' . $exporterName);
-            $exporter = new NoopMetricExporter();
         } else {
-            $factoryClass = self::KNOWN_EXPORTER_FACTORIES[$exporterName];
-            $factory = new $factoryClass();
-            $exporter = $factory->create();
+            try {
+                $factory = Registry::metricExporterFactory($exporterName);
+                $exporter = $factory->fromEnvironment();
+            } catch (\Throwable $t) {
+                self::logWarning(sprintf('Unable to create %s meter provider: %s', $exporterName, $t->getMessage()));
+                $exporter = new NoopMetricExporter();
+            }
         }
+
         $reader = new ExportingReader($exporter, ClockFactory::getDefault());
         $resource = ResourceInfoFactory::defaultResource();
         $exemplarFilter = $this->createExemplarFilter(Configuration::getEnum(Variables::OTEL_METRICS_EXEMPLAR_FILTER));

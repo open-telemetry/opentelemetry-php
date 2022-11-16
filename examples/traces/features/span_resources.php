@@ -6,7 +6,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
-use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
+use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SemConv\ResourceAttributes;
@@ -24,7 +24,7 @@ $resource = ResourceInfoFactory::merge(ResourceInfo::create(Attributes::create([
 
 $tracerProvider =  new TracerProvider(
     new SimpleSpanProcessor(
-        new ConsoleSpanExporter()
+        (new ConsoleSpanExporterFactory())->create()
     ),
     null,
     $resource

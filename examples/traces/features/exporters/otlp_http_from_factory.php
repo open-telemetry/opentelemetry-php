@@ -15,8 +15,7 @@ $tracerProvider = $factory->create();
 
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
-$root = $span = $tracer->spanBuilder('root')->startSpan();
-$root->end();
+$tracer->spanBuilder('root')->startSpan()->end();
 echo PHP_EOL . 'OTLP http/protobuf example complete!  ';
 
 echo PHP_EOL;

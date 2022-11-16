@@ -51,13 +51,4 @@ class AgentExporter implements SpanExporterInterface
 
         return true;
     }
-
-    /** @inheritDoc */
-    public static function fromConnectionString(string $endpointUrl, string $name, $args = null): AgentExporter
-    {
-        return new AgentExporter(
-            $name,
-            $endpointUrl
-        );
-    }
 }
