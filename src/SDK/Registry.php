@@ -15,43 +15,74 @@ class Registry
     private static array $transportFactories = [];
     private static array $metricExporterFactories = [];
 
-    public static function registerTransportFactory(string $protocol, string $factoryClass): void
+    /**
+     * @param callable-object|class-string $factory
+     * @psalm-suppress PossiblyInvalidArgument
+     */
+    public static function registerTransportFactory(string $protocol, $factory, bool $clobber = false): void
     {
-        if (!is_subclass_of($factoryClass, TransportFactoryInterface::class)) {
+        if (!$clobber && array_key_exists($protocol, self::$transportFactories)) {
+            return;
+        }
+        if (!is_subclass_of($factory, TransportFactoryInterface::class)) {
             trigger_error(
-                sprintf('Cannot register transport factory: %s must exist and implement %s', $factoryClass, TransportFactoryInterface::class),
+                sprintf(
+                    'Cannot register transport factory: %s must exist and implement %s',
+                    is_string($factory) ? $factory : 'callable',
+                    TransportFactoryInterface::class
+                ),
                 E_USER_WARNING
             );
 
             return;
         }
-        self::$transportFactories[$protocol] = $factoryClass;
+        self::$transportFactories[$protocol] = $factory;
     }
 
-    public static function registerSpanExporterFactory(string $protocol, string $factoryClass): void
+    /**
+     * @param callable-object|class-string $factory
+     */
+    public static function registerSpanExporterFactory(string $protocol, $factory, bool $clobber = false): void
     {
-        if (!self::check($factoryClass, SpanExporterFactoryInterface::class)) {
+        if (!$clobber && array_key_exists($protocol, self::$spanExporterFactories)) {
+            return;
+        }
+        if (!self::check($factory, SpanExporterFactoryInterface::class)) {
             trigger_error(
-                sprintf('Cannot register span exporter factory: %s must exist and implement %s', $factoryClass, SpanExporterFactoryInterface::class),
+                sprintf(
+                    'Cannot register span exporter factory: %s must exist and implement %s',
+                    is_string($factory) ? $factory : 'callable',
+                    SpanExporterFactoryInterface::class
+                ),
                 E_USER_WARNING
             );
 
             return;
         }
-        self::$spanExporterFactories[$protocol] = $factoryClass;
+        self::$spanExporterFactories[$protocol] = $factory;
     }
 
-    public static function registerMetricExporterFactory(string $protocol, string $factoryClass): void
+    /**
+     * @param callable-object|class-string $factory
+     */
+    public static function registerMetricExporterFactory(string $protocol, $factory, bool $clobber = false): void
     {
-        if (!self::check($factoryClass, MetricExporterFactoryInterface::class)) {
+        if (!$clobber && array_key_exists($protocol, self::$metricExporterFactories)) {
+            return;
+        }
+        if (!self::check($factory, MetricExporterFactoryInterface::class)) {
             trigger_error(
-                sprintf('Cannot register metric factory: %s must exist and implement %s', $factoryClass, MetricExporterFactoryInterface::class),
+                sprintf(
+                    'Cannot register metric factory: %s must exist and implement %s',
+                    is_string($factory) ? $factory : 'callable',
+                    MetricExporterFactoryInterface::class
+                ),
                 E_USER_WARNING
             );
 
             return;
         }
-        self::$metricExporterFactories[$protocol] = $factoryClass;
+        self::$metricExporterFactories[$protocol] = $factory;
     }
 
     /**
@@ -64,8 +95,10 @@ class Registry
             throw new RuntimeException('Span exporter factory not defined for: ' . $protocol);
         }
         $class = self::$spanExporterFactories[$protocol];
+        $factory = (is_callable($class)) ? $class : new $class();
+        assert($factory instanceof SpanExporterFactoryInterface);
 
-        return new $class();
+        return $factory;
     }
 
     /**
@@ -78,8 +111,10 @@ class Registry
             throw new RuntimeException('Transport factory not defined for protocol: ' . $protocol);
         }
         $class = self::$transportFactories[$protocol];
+        $factory = (is_callable($class)) ? $class : new $class();
+        assert($factory instanceof TransportFactoryInterface);
 
-        return new $class();
+        return $factory;
     }
 
     /**
@@ -92,11 +127,13 @@ class Registry
             throw new RuntimeException('Metric exporter factory not registered for protocol: ' . $protocol);
         }
         $class = self::$metricExporterFactories[$protocol];
+        $factory = (is_callable($class)) ? $class : new $class();
+        assert($factory instanceof MetricExporterFactoryInterface);
 
-        return new $class();
+        return $factory;
     }
 
-    private static function check(string $class, string $interface): bool
+    private static function check($class, string $interface): bool
     {
         if (!class_exists($class)) {
             return false;
