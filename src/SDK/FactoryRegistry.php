@@ -9,14 +9,14 @@ use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use RuntimeException;
 
-class Registry
+class FactoryRegistry
 {
     private static array $spanExporterFactories = [];
     private static array $transportFactories = [];
     private static array $metricExporterFactories = [];
 
     /**
-     * @param callable-object|class-string $factory
+     * @param callable-object|class-string $factory Factory implementing TransportFactoryInterface
      * @psalm-suppress PossiblyInvalidArgument
      */
     public static function registerTransportFactory(string $protocol, $factory, bool $clobber = false): void
@@ -40,7 +40,7 @@ class Registry
     }
 
     /**
-     * @param callable-object|class-string $factory
+     * @param callable-object|class-string $factory Factory implementing SpanExporterFactoryInterface
      */
     public static function registerSpanExporterFactory(string $protocol, $factory, bool $clobber = false): void
     {
@@ -63,7 +63,7 @@ class Registry
     }
 
     /**
-     * @param callable-object|class-string $factory
+     * @param callable-object|class-string $factory Factory implementing MetricExporterFactoryInterface
      */
     public static function registerMetricExporterFactory(string $protocol, $factory, bool $clobber = false): void
     {

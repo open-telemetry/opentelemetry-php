@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Trace;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
-use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\FactoryRegistry;
 use RuntimeException;
 
 class ExporterFactory
@@ -26,7 +26,7 @@ class ExporterFactory
         if ($exporter === 'none') {
             return null;
         }
-        $factory = Registry::spanExporterFactory($exporter);
+        $factory = FactoryRegistry::spanExporterFactory($exporter);
 
         return $factory->fromEnvironment();
     }

@@ -10,13 +10,13 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\FactoryRegistry;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
-use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Sdk;
 
@@ -39,7 +39,7 @@ class MeterProviderFactory
             $exporter = new NoopMetricExporter();
         } else {
             try {
-                $factory = Registry::metricExporterFactory($exporterName);
+                $factory = FactoryRegistry::metricExporterFactory($exporterName);
                 $exporter = $factory->fromEnvironment();
             } catch (\Throwable $t) {
                 self::logWarning(sprintf('Unable to create %s meter provider: %s', $exporterName, $t->getMessage()));
