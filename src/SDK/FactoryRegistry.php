@@ -16,8 +16,7 @@ class FactoryRegistry
     private static array $metricExporterFactories = [];
 
     /**
-     * @param callable-object|class-string $factory Factory implementing TransportFactoryInterface
-     * @psalm-suppress PossiblyInvalidArgument
+     * @param TransportFactoryInterface|class-string<TransportFactoryInterface> $factory
      */
     public static function registerTransportFactory(string $protocol, $factory, bool $clobber = false): void
     {
@@ -40,11 +39,11 @@ class FactoryRegistry
     }
 
     /**
-     * @param callable-object|class-string $factory Factory implementing SpanExporterFactoryInterface
+     * @param SpanExporterFactoryInterface|class-string<SpanExporterFactoryInterface> $factory
      */
-    public static function registerSpanExporterFactory(string $protocol, $factory, bool $clobber = false): void
+    public static function registerSpanExporterFactory(string $exporter, $factory, bool $clobber = false): void
     {
-        if (!$clobber && array_key_exists($protocol, self::$spanExporterFactories)) {
+        if (!$clobber && array_key_exists($exporter, self::$spanExporterFactories)) {
             return;
         }
         if (!self::check($factory, SpanExporterFactoryInterface::class)) {
@@ -59,15 +58,15 @@ class FactoryRegistry
 
             return;
         }
-        self::$spanExporterFactories[$protocol] = $factory;
+        self::$spanExporterFactories[$exporter] = $factory;
     }
 
     /**
-     * @param callable-object|class-string $factory Factory implementing MetricExporterFactoryInterface
+     * @param MetricExporterFactoryInterface|class-string<MetricExporterFactoryInterface> $factory
      */
-    public static function registerMetricExporterFactory(string $protocol, $factory, bool $clobber = false): void
+    public static function registerMetricExporterFactory(string $exporter, $factory, bool $clobber = false): void
     {
-        if (!$clobber && array_key_exists($protocol, self::$metricExporterFactories)) {
+        if (!$clobber && array_key_exists($exporter, self::$metricExporterFactories)) {
             return;
         }
         if (!self::check($factory, MetricExporterFactoryInterface::class)) {
@@ -82,19 +81,15 @@ class FactoryRegistry
 
             return;
         }
-        self::$metricExporterFactories[$protocol] = $factory;
+        self::$metricExporterFactories[$exporter] = $factory;
     }
 
-    /**
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
-     */
-    public static function spanExporterFactory(string $protocol): SpanExporterFactoryInterface
+    public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
     {
-        if (!array_key_exists($protocol, self::$spanExporterFactories)) {
-            throw new RuntimeException('Span exporter factory not defined for: ' . $protocol);
+        if (!array_key_exists($exporter, self::$spanExporterFactories)) {
+            throw new RuntimeException('Span exporter factory not defined for: ' . $exporter);
         }
-        $class = self::$spanExporterFactories[$protocol];
+        $class = self::$spanExporterFactories[$exporter];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof SpanExporterFactoryInterface);
 
@@ -102,11 +97,12 @@ class FactoryRegistry
     }
 
     /**
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
+     * Get transport factory registered for protocol. If $protocol contains a content-type eg `http/xyz` then
+     * only the first part, `http`, is used.
      */
     public static function transportFactory(string $protocol): TransportFactoryInterface
     {
+        $protocol = explode('/', $protocol)[0];
         if (!array_key_exists($protocol, self::$transportFactories)) {
             throw new RuntimeException('Transport factory not defined for protocol: ' . $protocol);
         }
@@ -117,16 +113,12 @@ class FactoryRegistry
         return $factory;
     }
 
-    /**
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
-     */
-    public static function metricExporterFactory(string $protocol): MetricExporterFactoryInterface
+    public static function metricExporterFactory(string $exporter): MetricExporterFactoryInterface
     {
-        if (!array_key_exists($protocol, self::$metricExporterFactories)) {
-            throw new RuntimeException('Metric exporter factory not registered for protocol: ' . $protocol);
+        if (!array_key_exists($exporter, self::$metricExporterFactories)) {
+            throw new RuntimeException('Metric exporter factory not registered for protocol: ' . $exporter);
         }
-        $class = self::$metricExporterFactories[$protocol];
+        $class = self::$metricExporterFactories[$exporter];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof MetricExporterFactoryInterface);
 

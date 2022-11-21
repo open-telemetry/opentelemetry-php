@@ -31,6 +31,8 @@ class FactoryRegistryTest extends TestCase
             ['http/protobuf'],
             ['http/json'],
             ['http/ndjson'],
+            ['http'],
+            ['http/foo'],
         ];
     }
 
