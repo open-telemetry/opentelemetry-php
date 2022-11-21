@@ -35,16 +35,13 @@ class MeterProviderFactory
             throw new InvalidArgumentException(sprintf('Configuration %s requires exactly 1 exporter', Variables::OTEL_METRICS_EXPORTER));
         }
         $exporterName = $exporters[0];
-        if ($exporterName === KnownValues::VALUE_NONE) {
+
+        try {
+            $factory = FactoryRegistry::metricExporterFactory($exporterName);
+            $exporter = $factory->fromEnvironment();
+        } catch (\Throwable $t) {
+            self::logWarning(sprintf('Unable to create %s meter provider: %s', $exporterName, $t->getMessage()));
             $exporter = new NoopMetricExporter();
-        } else {
-            try {
-                $factory = FactoryRegistry::metricExporterFactory($exporterName);
-                $exporter = $factory->fromEnvironment();
-            } catch (\Throwable $t) {
-                self::logWarning(sprintf('Unable to create %s meter provider: %s', $exporterName, $t->getMessage()));
-                $exporter = new NoopMetricExporter();
-            }
         }
 
         $reader = new ExportingReader($exporter, ClockFactory::getDefault());

@@ -6,7 +6,6 @@ namespace OpenTelemetry\Contrib\Newrelic;
 
 use JsonException;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
@@ -27,7 +26,7 @@ class Exporter implements SpanExporterInterface
     use LogsMessagesTrait;
     use UsesSpanConverterTrait;
 
-    private const DATA_FORMAT_VERSION_DEFAULT = '1';
+    public const DATA_FORMAT_VERSION_DEFAULT = '1';
 
     private TransportInterface $transport;
     private string $name;
@@ -43,22 +42,6 @@ class Exporter implements SpanExporterInterface
         $this->endpointUrl = $endpointUrl;
         $this->transport = $transport;
         $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
-    }
-
-    //@todo move to a factory?
-    public static function create(
-        $name,
-        string $endpointUrl,
-        string $licenseKey,
-        string $dataFormatVersion = Exporter::DATA_FORMAT_VERSION_DEFAULT
-    ): self {
-        $transport = PsrTransportFactory::discover()->create($endpointUrl, 'application/json', [
-            'Api-Key' => $licenseKey,
-            'Data-Format' => 'newrelic',
-            'Data-Format-Version' => $dataFormatVersion,
-        ]);
-
-        return new self($name, $transport, $endpointUrl);
     }
 
     /**

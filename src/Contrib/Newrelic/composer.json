@@ -20,6 +20,9 @@
   "autoload": {
     "psr-4": {
       "OpenTelemetry\\Contrib\\Newrelic\\": "."
-    }
+    },
+    "files": [
+      "_register.php"
+    ]
   }
 }

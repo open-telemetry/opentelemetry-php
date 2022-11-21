@@ -3,8 +3,6 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../../vendor/autoload.php';
 
-use OpenTelemetry\Contrib\Newrelic\Exporter as NewrelicExporter;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -29,10 +27,8 @@ if ($licenseKey == false) {
  * Default Trace API endpoint: https://trace-api.newrelic.com/trace/v1
  * EU data centers: https://trace-api.eu.newrelic.com/trace/v1
  */
-
-$endpointUrl = Configuration::getString('NEW_RELIC_ENDPOINT', 'https://trace-api.newrelic.com/trace/v1');
-
-$newrelicExporter = NewrelicExporter::create('alwaysOnNewrelicExample', $endpointUrl, $licenseKey);
+putenv('NEW_RELIC_ENDPOINT', 'https://trace-api.newrelic.com/trace/v1');
+$newrelicExporter = (new \OpenTelemetry\Contrib\Newrelic\SpanExporterFactory())->fromEnvironment();
 
 echo 'Starting Newrelic example';
 $tracerProvider = new TracerProvider(new SimpleSpanProcessor($newrelicExporter));
