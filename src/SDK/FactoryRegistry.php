@@ -27,7 +27,7 @@ class FactoryRegistry
             trigger_error(
                 sprintf(
                     'Cannot register transport factory: %s must exist and implement %s',
-                    is_string($factory) ? $factory : 'callable',
+                    is_string($factory) ? $factory : get_class($factory),
                     TransportFactoryInterface::class
                 ),
                 E_USER_WARNING
@@ -46,11 +46,11 @@ class FactoryRegistry
         if (!$clobber && array_key_exists($exporter, self::$spanExporterFactories)) {
             return;
         }
-        if (!self::check($factory, SpanExporterFactoryInterface::class)) {
+        if (!is_subclass_of($factory, SpanExporterFactoryInterface::class)) {
             trigger_error(
                 sprintf(
                     'Cannot register span exporter factory: %s must exist and implement %s',
-                    is_string($factory) ? $factory : 'callable',
+                    is_string($factory) ? $factory : get_class($factory),
                     SpanExporterFactoryInterface::class
                 ),
                 E_USER_WARNING
@@ -69,11 +69,11 @@ class FactoryRegistry
         if (!$clobber && array_key_exists($exporter, self::$metricExporterFactories)) {
             return;
         }
-        if (!self::check($factory, MetricExporterFactoryInterface::class)) {
+        if (!is_subclass_of($factory, MetricExporterFactoryInterface::class)) {
             trigger_error(
                 sprintf(
                     'Cannot register metric factory: %s must exist and implement %s',
-                    is_string($factory) ? $factory : 'callable',
+                    is_string($factory) ? $factory : get_class($factory),
                     MetricExporterFactoryInterface::class
                 ),
                 E_USER_WARNING
@@ -123,15 +123,5 @@ class FactoryRegistry
         assert($factory instanceof MetricExporterFactoryInterface);
 
         return $factory;
-    }
-
-    private static function check($class, string $interface): bool
-    {
-        if (!class_exists($class)) {
-            return false;
-        }
-        $implements = class_implements($class);
-
-        return in_array($interface, $implements);
     }
 }

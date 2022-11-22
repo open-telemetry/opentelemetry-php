@@ -73,4 +73,39 @@ class FactoryRegistryTest extends TestCase
             ['none'],
         ];
     }
+
+    /**
+     * @dataProvider invalidFactoryProvider
+     */
+    public function test_register_invalid_transport_factory($factory): void
+    {
+        $this->expectWarning();
+        FactoryRegistry::registerTransportFactory('http', $factory, true);
+    }
+
+    /**
+     * @dataProvider invalidFactoryProvider
+     */
+    public function test_register_invalid_span_exporter_factory($factory): void
+    {
+        $this->expectWarning();
+        FactoryRegistry::registerSpanExporterFactory('foo', $factory, true);
+    }
+
+    /**
+     * @dataProvider invalidFactoryProvider
+     */
+    public function test_register_invalid_metric_exporter_factory($factory): void
+    {
+        $this->expectWarning();
+        FactoryRegistry::registerMetricExporterFactory('foo', $factory, true);
+    }
+
+    public function invalidFactoryProvider(): array
+    {
+        return [
+            [new \stdClass()],
+            ['\stdClass'],
+        ];
+    }
 }
