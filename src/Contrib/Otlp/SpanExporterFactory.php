@@ -32,7 +32,7 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
-    public function fromEnvironment(): SpanExporterInterface
+    public function create(): SpanExporterInterface
     {
         $transport = $this->buildTransport();
 

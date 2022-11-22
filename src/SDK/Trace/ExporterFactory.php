@@ -15,7 +15,7 @@ class ExporterFactory
     /**
      * @throws RuntimeException
      */
-    public function fromEnvironment(): ?SpanExporterInterface
+    public function create(): ?SpanExporterInterface
     {
         $exporters = Configuration::getList(Variables::OTEL_TRACES_EXPORTER);
         //TODO "The SDK MAY accept a comma-separated list to enable setting multiple exporters"
@@ -28,6 +28,6 @@ class ExporterFactory
         }
         $factory = FactoryRegistry::spanExporterFactory($exporter);
 
-        return $factory->fromEnvironment();
+        return $factory->create();
     }
 }

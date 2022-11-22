@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class ConsoleSpanExporterFactory implements SpanExporterFactoryInterface
 {
-    public function fromEnvironment(): SpanExporterInterface
+    public function create(): SpanExporterInterface
     {
         $transport = FactoryRegistry::transportFactory('stream')->create('php://stdout', 'application/json');
 

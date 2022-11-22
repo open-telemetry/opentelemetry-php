@@ -12,15 +12,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class SpanExporterFactory implements SpanExporterFactoryInterface
 {
-    public function create(string $name, string $endpointUrl): SpanExporterInterface
-    {
-        return new Exporter(
-            $name,
-            PsrTransportFactory::discover()->create($endpointUrl, 'application/json')
-        );
-    }
-
-    public function fromEnvironment(): SpanExporterInterface
+    public function create(): SpanExporterInterface
     {
         $endpoint = Configuration::getString(Variables::OTEL_EXPORTER_ZIPKIN_ENDPOINT);
         $transport = PsrTransportFactory::discover()->create($endpoint, 'application/json');

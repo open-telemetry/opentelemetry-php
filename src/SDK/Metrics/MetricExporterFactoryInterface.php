@@ -6,5 +6,5 @@ namespace OpenTelemetry\SDK\Metrics;
 
 interface MetricExporterFactoryInterface
 {
-    public function fromEnvironment(): MetricExporterInterface;
+    public function create(): MetricExporterInterface;
 }

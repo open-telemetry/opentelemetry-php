@@ -39,13 +39,13 @@ class SpanExporterFactoryTest extends TestCase
         $this->expectException(\UnexpectedValueException::class);
         $this->setEnvironmentVariable(Variables::OTEL_EXPORTER_OTLP_PROTOCOL, 'foo');
         $factory = new SpanExporterFactory();
-        $factory->fromEnvironment();
+        $factory->create();
     }
 
     /**
-     * @dataProvider fromEnvironmentProvider
+     * @dataProvider configProvider
      */
-    public function test_create_from_environment(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = []): void
+    public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = []): void
     {
         foreach ($env as $k => $v) {
             $this->setEnvironmentVariable($k, $v);
@@ -69,10 +69,10 @@ class SpanExporterFactoryTest extends TestCase
         // @phpstan-ignore-next-line
         $this->transport->method('contentType')->willReturn($protocol);
 
-        $factory->fromEnvironment();
+        $factory->create();
     }
 
-    public function fromEnvironmentProvider(): array
+    public function configProvider(): array
     {
         $defaultHeaderKeys = ['User-Agent'];
 

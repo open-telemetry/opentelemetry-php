@@ -33,13 +33,13 @@ class SdkAutoloader
             return false;
         }
         Globals::registerInitializer(function (Configurator $configurator) {
-            $exporter = (new ExporterFactory())->fromEnvironment();
+            $exporter = (new ExporterFactory())->create();
             $propagator = (new PropagatorFactory())->create();
             $meterProvider = (new MeterProviderFactory())->create();
-            $spanProcessor = (new SpanProcessorFactory())->fromEnvironment($exporter, $meterProvider);
+            $spanProcessor = (new SpanProcessorFactory())->create($exporter, $meterProvider);
             $tracerProvider = (new TracerProviderBuilder())
                 ->addSpanProcessor($spanProcessor)
-                ->setSampler((new SamplerFactory())->fromEnvironment())
+                ->setSampler((new SamplerFactory())->create())
                 ->build();
 
             ShutdownHandler::register([$tracerProvider, 'shutdown']);

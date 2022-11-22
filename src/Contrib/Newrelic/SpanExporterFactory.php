@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class SpanExporterFactory implements SpanExporterFactoryInterface
 {
-    public function fromEnvironment(): SpanExporterInterface
+    public function create(): SpanExporterInterface
     {
         $licenseKey = Configuration::getString('NEW_RELIC_INSERT_KEY');
         $endpointUrl = Configuration::getString('NEW_RELIC_ENDPOINT', 'https://trace-api.newrelic.com/trace/v1');

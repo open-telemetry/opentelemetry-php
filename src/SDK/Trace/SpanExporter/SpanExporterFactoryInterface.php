@@ -8,5 +8,5 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 interface SpanExporterFactoryInterface
 {
-    public function fromEnvironment(): SpanExporterInterface;
+    public function create(): SpanExporterInterface;
 }

@@ -28,7 +28,7 @@ if ($licenseKey == false) {
  * EU data centers: https://trace-api.eu.newrelic.com/trace/v1
  */
 putenv('NEW_RELIC_ENDPOINT', 'https://trace-api.newrelic.com/trace/v1');
-$newrelicExporter = (new \OpenTelemetry\Contrib\Newrelic\SpanExporterFactory())->fromEnvironment();
+$newrelicExporter = (new \OpenTelemetry\Contrib\Newrelic\SpanExporterFactory())->create();
 
 echo 'Starting Newrelic example';
 $tracerProvider = new TracerProvider(new SimpleSpanProcessor($newrelicExporter));

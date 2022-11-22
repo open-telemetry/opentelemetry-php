@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class InMemorySpanExporterFactory implements SpanExporterFactoryInterface
 {
-    public function fromEnvironment(): SpanExporterInterface
+    public function create(): SpanExporterInterface
     {
         return new InMemoryExporter();
     }

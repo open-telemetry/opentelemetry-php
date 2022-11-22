@@ -38,7 +38,7 @@ class MeterProviderFactory
 
         try {
             $factory = FactoryRegistry::metricExporterFactory($exporterName);
-            $exporter = $factory->fromEnvironment();
+            $exporter = $factory->create();
         } catch (\Throwable $t) {
             self::logWarning(sprintf('Unable to create %s meter provider: %s', $exporterName, $t->getMessage()));
             $exporter = new NoopMetricExporter();

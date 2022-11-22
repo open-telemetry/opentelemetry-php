@@ -19,7 +19,7 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
-    public function fromEnvironment(): MetricExporterInterface
+    public function create(): MetricExporterInterface
     {
         $protocol = Configuration::has(Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL)
             ? Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL)

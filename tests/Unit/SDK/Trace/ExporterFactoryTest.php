@@ -37,7 +37,7 @@ class ExporterFactoryTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', 'none');
         $factory = new ExporterFactory();
-        $this->assertNull($factory->fromEnvironment());
+        $this->assertNull($factory->create());
     }
 
     /**
@@ -52,7 +52,7 @@ class ExporterFactoryTest extends TestCase
             $this->setEnvironmentVariable($k, $v);
         }
         $factory = new ExporterFactory();
-        $this->assertInstanceOf($expected, $factory->fromEnvironment());
+        $this->assertInstanceOf($expected, $factory->create());
     }
 
     public function envProvider(): array
@@ -101,7 +101,7 @@ class ExporterFactoryTest extends TestCase
         }
         $factory = new ExporterFactory();
         $this->expectException(Exception::class);
-        $factory->fromEnvironment();
+        $factory->create();
     }
 
     public function invalidEnvProvider(): array

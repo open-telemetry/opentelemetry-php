@@ -41,9 +41,9 @@ class TracerProviderFactoryTest extends TestCase
         $samplerFactory = $this->createMock(SamplerFactory::class);
         $spanProcessorFactory = $this->createMock(SpanProcessorFactory::class);
 
-        $exporterFactory->expects($this->once())->method('fromEnvironment');
-        $samplerFactory->expects($this->once())->method('fromEnvironment');
-        $spanProcessorFactory->expects($this->once())->method('fromEnvironment');
+        $exporterFactory->expects($this->once())->method('create');
+        $samplerFactory->expects($this->once())->method('create');
+        $spanProcessorFactory->expects($this->once())->method('create');
 
         $factory = new TracerProviderFactory($exporterFactory, $samplerFactory, $spanProcessorFactory);
         $factory->create();
@@ -56,13 +56,13 @@ class TracerProviderFactoryTest extends TestCase
         $spanProcessorFactory = $this->createMock(SpanProcessorFactory::class);
 
         $exporterFactory->expects($this->once())
-            ->method('fromEnvironment')
+            ->method('create')
             ->willThrowException(new \InvalidArgumentException('foo'));
         $samplerFactory->expects($this->once())
-            ->method('fromEnvironment')
+            ->method('create')
             ->willThrowException(new \InvalidArgumentException('foo'));
         $spanProcessorFactory->expects($this->once())
-            ->method('fromEnvironment')
+            ->method('create')
             ->willThrowException(new \InvalidArgumentException('foo'));
         $this->logger->expects($this->atLeast(3))->method('log');
 

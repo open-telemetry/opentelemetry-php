@@ -22,7 +22,7 @@ class SamplerFactoryTest extends TestCase
     }
 
     /**
-     * @covers ::fromEnvironment
+     * @covers ::create
      * @dataProvider samplerProvider
      */
     public function test_create_sampler_from_environment(string $samplerName, string $expected, string $arg = null): void
@@ -30,7 +30,7 @@ class SamplerFactoryTest extends TestCase
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $samplerName);
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);
         $factory = new SamplerFactory();
-        $sampler = $factory->fromEnvironment();
+        $sampler = $factory->create();
         $this->assertStringContainsString($expected, $sampler->getDescription());
     }
 
@@ -47,7 +47,7 @@ class SamplerFactoryTest extends TestCase
         ];
     }
     /**
-     * @covers ::fromEnvironment
+     * @covers ::create
      * @dataProvider invalidSamplerProvider
      */
     public function test_throws_exception_for_invalid_or_unsupported(?string $sampler, string $arg = null): void
@@ -56,7 +56,7 @@ class SamplerFactoryTest extends TestCase
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);
         $factory = new SamplerFactory();
         $this->expectException(Exception::class);
-        $factory->fromEnvironment();
+        $factory->create();
     }
 
     public function invalidSamplerProvider(): array

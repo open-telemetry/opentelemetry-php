@@ -17,7 +17,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 
 class SpanProcessorFactory
 {
-    public function fromEnvironment(?SpanExporterInterface $exporter = null, ?MeterProviderInterface $meterProvider = null): SpanProcessorInterface
+    public function create(?SpanExporterInterface $exporter = null, ?MeterProviderInterface $meterProvider = null): SpanProcessorInterface
     {
         if ($exporter === null) {
             return new NoopSpanProcessor();

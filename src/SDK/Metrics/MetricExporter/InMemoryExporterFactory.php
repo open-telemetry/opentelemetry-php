@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 
 class InMemoryExporterFactory implements MetricExporterFactoryInterface
 {
-    public function fromEnvironment(): MetricExporterInterface
+    public function create(): MetricExporterInterface
     {
         return new InMemoryExporter();
     }
