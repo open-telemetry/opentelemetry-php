@@ -34,8 +34,6 @@ final class Context implements ContextInterface
     }
 
     /**
-     * @internal
-     *
      * @param ContextStorageInterface&ExecutionContextAwareInterface $storage
      */
     public static function setStorage(ContextStorageInterface $storage): void
