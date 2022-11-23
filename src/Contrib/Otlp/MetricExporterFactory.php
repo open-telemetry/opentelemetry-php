@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Otlp;
 
 use OpenTelemetry\API\Common\Signal\Signals;
-use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
-use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\FactoryRegistry;
+use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use UnexpectedValueException;
 
-class MetricExporterFactory
+class MetricExporterFactory implements MetricExporterFactoryInterface
 {
     /**
      * @psalm-suppress ArgumentTypeCoercion
@@ -44,19 +44,20 @@ class MetricExporterFactory
             : Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_HEADERS);
         $headers += OtlpUtil::getUserAgentHeader();
 
+        $factory = FactoryRegistry::transportFactory($protocol);
         switch ($protocol) {
             case KnownValues::VALUE_GRPC:
-                return (new GrpcTransportFactory())->create(
+                return $factory->create(
                     $endpoint . OtlpUtil::method(Signals::METRICS),
                     ContentTypes::PROTOBUF,
-                    $headers,
+                    $headers
                 );
             case KnownValues::VALUE_HTTP_PROTOBUF:
             case KnownValues::VALUE_HTTP_JSON:
-                return PsrTransportFactory::discover()->create(
+                return $factory->create(
                     $endpoint,
                     Protocols::contentType($protocol),
-                    $headers,
+                    $headers
                 );
             default:
                 throw new UnexpectedValueException('Unknown otlp protocol: ' . $protocol);

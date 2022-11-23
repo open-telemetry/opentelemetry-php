@@ -6,26 +6,24 @@ namespace OpenTelemetry\Tests\Unit\Contrib\Zipkin;
 
 use OpenTelemetry\Contrib\Zipkin\Exporter;
 
-use OpenTelemetry\Tests\Unit\Contrib\AbstractHttpExporterTest;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
 
 /**
  * @covers OpenTelemetry\Contrib\Zipkin\Exporter
  */
-class ZipkinExporterTest extends AbstractHttpExporterTest
+class ZipkinExporterTest extends AbstractExporterTest
 {
     protected const EXPORTER_NAME = 'test.zipkin';
 
     /**
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function createExporterWithDsn(string $dsn): Exporter
+    public function createExporterWithTransport(TransportInterface $transport): Exporter
     {
         return new Exporter(
             self::EXPORTER_NAME,
-            $dsn,
-            $this->getClientInterfaceMock(),
-            $this->getRequestFactoryInterfaceMock(),
-            $this->getStreamFactoryInterfaceMock()
+            $transport
         );
     }
 

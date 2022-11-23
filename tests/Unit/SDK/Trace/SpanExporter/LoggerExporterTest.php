@@ -6,34 +6,21 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
 
 use Exception;
 use OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter
  */
-class LoggerExporterTest extends AbstractExporterTest
+class LoggerExporterTest extends TestCase
 {
     use LoggerAwareTestTrait;
 
     private const SERVICE_NAME = 'LoggerExporterTest';
     private const LOG_LEVEL = 'debug';
-    private const LOG_FILE = 'debug.log';
 
     public function createExporter(): LoggerExporter
     {
         return new LoggerExporter(self::SERVICE_NAME);
-    }
-
-    public function test_from_connection_string(): void
-    {
-        /** @noinspection UnnecessaryAssertionInspection */
-        $this->assertInstanceOf(
-            LoggerExporter::class,
-            LoggerExporter::fromConnectionString(
-                self::LOG_FILE,
-                self::SERVICE_NAME,
-                self::LOG_LEVEL
-            )
-        );
     }
 
     /**

@@ -5,31 +5,24 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Otlp;
 
 use OpenTelemetry\API\Common\Signal\Signals;
-use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Defaults;
-use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolver;
+use OpenTelemetry\SDK\FactoryRegistry;
+use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use UnexpectedValueException;
 
-class SpanExporterFactory
+class SpanExporterFactory implements SpanExporterFactoryInterface
 {
     use LogsMessagesTrait;
 
     private ?TransportFactoryInterface $transportFactory;
 
     private const DEFAULT_COMPRESSION = 'none';
-    private const FACTORIES = [
-        KnownValues::VALUE_GRPC => GrpcTransportFactory::class,
-        KnownValues::VALUE_HTTP_PROTOBUF => OtlpHttpTransportFactory::class,
-        KnownValues::VALUE_HTTP_JSON => OtlpHttpTransportFactory::class,
-        KnownValues::VALUE_HTTP_NDJSON => OtlpHttpTransportFactory::class,
-    ];
 
     public function __construct(?TransportFactoryInterface $transportFactory = null)
     {
@@ -39,7 +32,7 @@ class SpanExporterFactory
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
-    public function fromEnvironment(): SpanExporterInterface
+    public function create(): SpanExporterInterface
     {
         $transport = $this->buildTransport();
 
@@ -48,6 +41,7 @@ class SpanExporterFactory
 
     /**
      * @psalm-suppress ArgumentTypeCoercion
+     * @psalm-suppress UndefinedClass
      */
     private function buildTransport(): TransportInterface
     {
@@ -57,10 +51,7 @@ class SpanExporterFactory
         $headers = $this->getHeaders();
         $compression = $this->getCompression();
 
-        if (!$this->transportFactory && !array_key_exists($protocol, self::FACTORIES)) {
-            throw new UnexpectedValueException('Unknown OTLP protocol: ' . $protocol);
-        }
-        $factoryClass = self::FACTORIES[$protocol];
+        $factoryClass = FactoryRegistry::transportFactory($protocol);
         $factory = $this->transportFactory ?: new $factoryClass();
 
         return $factory->create($endpoint, $contentType, $headers, $compression);

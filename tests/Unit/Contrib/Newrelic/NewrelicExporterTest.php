@@ -5,28 +5,23 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Contrib\Newrelic;
 
 use OpenTelemetry\Contrib\Newrelic\Exporter;
-use OpenTelemetry\Tests\Unit\Contrib\AbstractHttpExporterTest;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
 
 /**
  * @covers OpenTelemetry\Contrib\Newrelic\Exporter
  */
-class NewrelicExporterTest extends AbstractHttpExporterTest
+class NewrelicExporterTest extends AbstractExporterTest
 {
     protected const EXPORTER_NAME = 'test.newrelic';
     protected const LICENSE_KEY = 'abc123';
 
-    /**
-     * @psalm-suppress PossiblyInvalidArgument
-     */
-    public function createExporterWithDsn(string $dsn): Exporter
+    public function createExporterWithTransport(TransportInterface $transport): Exporter
     {
         return new Exporter(
             self::EXPORTER_NAME,
-            $dsn,
-            self::LICENSE_KEY,
-            $this->getClientInterfaceMock(),
-            $this->getRequestFactoryInterfaceMock(),
-            $this->getStreamFactoryInterfaceMock()
+            $transport,
+            'http://endpoint.url'
         );
     }
 

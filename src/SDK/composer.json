@@ -31,6 +31,8 @@
         },
         "files": [
             "Common/Util/functions.php",
+            "Metrics/MetricExporter/_register.php",
+            "Trace/SpanExporter/_register.php",
             "_autoload.php"
         ]
     },

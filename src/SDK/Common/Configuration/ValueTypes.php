@@ -103,9 +103,9 @@ interface ValueTypes
      * Exporter Selection
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#exporter-selection
      */
-    public const OTEL_TRACES_EXPORTER = VariableTypes::STRING;
-    public const OTEL_METRICS_EXPORTER = VariableTypes::STRING;
-    public const OTEL_LOGS_EXPORTER = VariableTypes::STRING;
+    public const OTEL_TRACES_EXPORTER = VariableTypes::LIST;
+    public const OTEL_METRICS_EXPORTER = VariableTypes::LIST;
+    public const OTEL_LOGS_EXPORTER = VariableTypes::LIST;
     /**
      * Metrics SDK Configuration
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#metrics-sdk-configuration

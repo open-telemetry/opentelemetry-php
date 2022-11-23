@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\ZipkinToNewrelic;
 
-use Exception;
-use Http\Discovery\HttpClientDiscovery;
-use Http\Discovery\Psr17FactoryDiscovery;
 use JsonException;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
@@ -15,9 +12,6 @@ use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
 use Throwable;
 
 /**
@@ -36,20 +30,26 @@ class Exporter implements SpanExporterInterface
     private TransportInterface $transport;
 
     public function __construct(
-        $name,
-        string $endpointUrl,
-        string $licenseKey,
-        ClientInterface $client,
-        RequestFactoryInterface $requestFactory,
-        StreamFactoryInterface $streamFactory,
+        string $name,
+        TransportInterface $transport,
         SpanConverter $spanConverter = null
     ) {
-        $this->transport = (new PsrTransportFactory($client, $requestFactory, $streamFactory))->create($endpointUrl, 'application/json', [
+        $this->transport = $transport;
+        $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
+    }
+
+    public static function create(
+        string $name,
+        string $endpointUrl,
+        string $licenseKey
+    ): self {
+        $transport = PsrTransportFactory::discover()->create($endpointUrl, 'application/json', [
             'Api-Key' => $licenseKey,
             'Data-Format' => 'zipkin',
             'Data-Format-Version' => '2',
         ]);
-        $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
+
+        return new self($name, $transport);
     }
 
     /**
@@ -60,23 +60,6 @@ class Exporter implements SpanExporterInterface
         return json_encode(
             $this->getSpanConverter()->convert($spans),
             JSON_THROW_ON_ERROR
-        );
-    }
-
-    /** @inheritDoc */
-    public static function fromConnectionString(string $endpointUrl, string $name, $args): Exporter
-    {
-        if (!is_string($args)) {
-            throw new Exception('Invalid license key.');
-        }
-
-        return new Exporter(
-            $name,
-            $endpointUrl,
-            $args,
-            HttpClientDiscovery::find(),
-            Psr17FactoryDiscovery::findRequestFactory(),
-            Psr17FactoryDiscovery::findStreamFactory()
         );
     }
 

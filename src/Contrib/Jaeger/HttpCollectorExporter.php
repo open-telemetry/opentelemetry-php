@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Jaeger;
 
-use Http\Discovery\HttpClientDiscovery;
-use Http\Discovery\Psr17FactoryDiscovery;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -44,17 +42,5 @@ class HttpCollectorExporter implements SpanExporterInterface
         $this->sender->send($spans);
 
         return true;
-    }
-
-    /** @inheritDoc */
-    public static function fromConnectionString(string $endpointUrl, string $name, $args = null): HttpCollectorExporter
-    {
-        return new HttpCollectorExporter(
-            $endpointUrl,
-            $name,
-            HttpClientDiscovery::find(),
-            Psr17FactoryDiscovery::findRequestFactory(),
-            Psr17FactoryDiscovery::findStreamFactory()
-        );
     }
 }

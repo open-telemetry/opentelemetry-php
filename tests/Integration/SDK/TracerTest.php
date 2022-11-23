@@ -10,6 +10,7 @@ use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
@@ -110,8 +111,8 @@ class TracerTest extends TestCase
 
     public function test_factory_returns_noop_tracer_when_sdk_disabled(): void
     {
-        self::setEnvironmentVariable('OTEL_SDK_DISABLED', 'true');
-        $tracerProvider = (new TracerProviderFactory('test'))->create();
+        self::setEnvironmentVariable(Variables::OTEL_SDK_DISABLED, 'true');
+        $tracerProvider = (new TracerProviderFactory())->create();
         $tracer = $tracerProvider->getTracer('foo');
         $this->assertInstanceOf(API\NoopTracer::class, $tracer);
     }

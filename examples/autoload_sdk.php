@@ -10,9 +10,14 @@ putenv('OTEL_EXPORTER_OTLP_METRICS_PROTOCOL=grpc');
 putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4317');
 putenv('OTEL_PHP_TRACES_PROCESSOR=batch');
 
+echo 'autoloading SDK example starting...' . PHP_EOL;
+
 // Composer autoloader will execute SDK/_autoload.php which will register global instrumentation from environment configuration
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 $instrumentation = new \OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation('demo');
 
 $instrumentation->tracer()->spanBuilder('root')->startSpan()->end();
+$instrumentation->meter()->createCounter('cnt')->add(1);
+
+echo 'Finished!' . PHP_EOL;

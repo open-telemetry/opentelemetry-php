@@ -19,11 +19,6 @@ class InMemoryExporter implements SpanExporterInterface
         $this->storage = $storage ?? new ArrayObject();
     }
 
-    public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
-    {
-        return new self();
-    }
-
     protected function doExport(iterable $spans): bool
     {
         foreach ($spans as $span) {

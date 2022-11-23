@@ -17,7 +17,7 @@ class SamplerFactory
 {
     private const TRACEIDRATIO_PREFIX = 'traceidratio';
 
-    public function fromEnvironment(): SamplerInterface
+    public function create(): SamplerInterface
     {
         $name = Configuration::getString(Env::OTEL_TRACES_SAMPLER);
 

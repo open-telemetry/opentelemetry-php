@@ -3,14 +3,14 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../vendor/autoload.php';
 
-use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
+use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 // Boilerplate setup to create a new tracer with console output
 $tracerProvider = new TracerProvider(
     new SimpleSpanProcessor(
-        new ConsoleSpanExporter()
+        (new ConsoleSpanExporterFactory())->create()
     )
 );
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');

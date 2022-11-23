@@ -4,42 +4,54 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\SpanExporter;
 
-use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
+use JsonException;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use Throwable;
 
 class ConsoleSpanExporter implements SpanExporterInterface
 {
-    use SpanExporterTrait;
     use UsesSpanConverterTrait;
+    use LogsMessagesTrait;
 
-    public function __construct(?SpanConverterInterface $converter = null)
+    private TransportInterface $transport;
+
+    public function __construct(TransportInterface $transport, ?SpanConverterInterface $converter = null)
     {
+        $this->transport = $transport;
         $this->setSpanConverter($converter ?? new FriendlySpanConverter());
     }
 
-    /** @inheritDoc */
-    public function doExport(iterable $spans): bool
+    public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
-        try {
-            foreach ($spans as $span) {
-                print(json_encode(
+        $payload = '';
+        foreach ($batch as $span) {
+            try {
+                $payload .= json_encode(
                     $this->getSpanConverter()->convert([$span]),
                     JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT
-                ) . PHP_EOL
-                );
+                ) . PHP_EOL;
+            } catch (JsonException $e) {
+                self::logWarning('Error converting span: ' . $e->getMessage());
             }
-        } catch (Throwable $t) {
-            return false;
         }
 
-        return true;
+        return $this->transport->send($payload)
+            ->map(fn () => true)
+            ->catch(fn () => false);
     }
 
-    public static function fromConnectionString(string $endpointUrl = null, string $name = null, $args = null)
+    public function shutdown(?CancellationInterface $cancellation = null): bool
     {
-        return new self();
+        return $this->transport->shutdown();
+    }
+
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
+    {
+        return $this->transport->forceFlush();
     }
 }

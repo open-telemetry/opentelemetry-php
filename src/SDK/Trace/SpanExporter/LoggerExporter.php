@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\SpanExporter;
 
-use OpenTelemetry\SDK\Logs\SimplePsrFileLogger;
 use OpenTelemetry\SDK\Trace\Behavior\LoggerAwareTrait;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
@@ -24,7 +23,6 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
 
     public const GRANULARITY_AGGREGATE = 1;
     public const GRANULARITY_SPAN = 2;
-    public const DEFAULT_LOG_LEVEL = LogLevel::DEBUG;
 
     private string $serviceName;
     private int $granularity = self::GRANULARITY_AGGREGATE;
@@ -60,20 +58,6 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
         }
 
         return true;
-    }
-
-    /**
-     * @param string $endpointUrl
-     * @param string $name
-     * @param string|null $args
-     * @return LoggerExporter
-     */
-    public static function fromConnectionString(string $endpointUrl, string $name, string $args = null): self
-    {
-        return new self(
-            $name,
-            new SimplePsrFileLogger($endpointUrl)
-        );
     }
 
     /**

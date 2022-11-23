@@ -9,7 +9,6 @@ use OpenTelemetry\SDK\Trace\SpanExporter\LoggerDecorator;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
-use RuntimeException;
 
 /**
  * @covers \OpenTelemetry\SDK\Trace\SpanExporter\LoggerDecorator
@@ -20,13 +19,6 @@ class LoggerDecoratorTest extends AbstractLoggerAwareTest
      * @var SpanExporterInterface|null
      */
     private ?SpanExporterInterface $decorated;
-
-    public function test_from_connection_string(): void
-    {
-        $this->expectException(RuntimeException::class);
-
-        LoggerDecorator::fromConnectionString('foo', 'bar', 'baz');
-    }
 
     /**
      * @psalm-suppress PossiblyUndefinedMethod
