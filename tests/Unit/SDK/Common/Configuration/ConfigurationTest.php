@@ -188,8 +188,6 @@ class ConfigurationTest extends TestCase
         return [
             'false' => ['false', true, false],
             'true' => ['true', false, true],
-            'truthy' => ['1', false, true],
-            'falsey' => ['0', true, false],
             'TRUE' => ['TRUE', false, true],
             'FALSE' => ['FALSE', true, false],
         ];

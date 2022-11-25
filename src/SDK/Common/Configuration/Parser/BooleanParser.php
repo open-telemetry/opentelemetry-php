@@ -8,17 +8,8 @@ use InvalidArgumentException;
 
 class BooleanParser
 {
-    private const TRUTHY_VALUES = [
-        'true',
-        'on',
-        '1',
-    ];
-
-    private const FALSY_VALUES = [
-        'false',
-        'off',
-        '0',
-    ];
+    private const TRUE_VALUE = 'true';
+    private const FALSE_VALUE = 'false';
 
     /**
      * @param string|bool $value
@@ -28,11 +19,11 @@ class BooleanParser
         if (is_bool($value)) {
             return $value;
         }
-        if (in_array(strtolower($value), self::TRUTHY_VALUES)) {
+        if (strtolower($value) === self::TRUE_VALUE) {
             return true;
         }
 
-        if (in_array(strtolower($value), self::FALSY_VALUES)) {
+        if (strtolower($value) === self::FALSE_VALUE) {
             return false;
         }
 
