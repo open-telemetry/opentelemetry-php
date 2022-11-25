@@ -155,6 +155,10 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
             return SpanContext::getInvalid();
         }
 
+        // B3 trace id may be 16 or 32 hex chars, but otel requires 32
+        if (strlen($traceId) === 16) {
+            $traceId = str_pad($traceId, 32, '0', STR_PAD_LEFT);
+        }
         // Validates the traceId and spanId
         // Returns an invalid spanContext if any of the checks fail
         if (!SpanContextValidator::isValidTraceId($traceId) || !SpanContextValidator::isValidSpanId($spanId)) {
