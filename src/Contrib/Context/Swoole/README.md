@@ -1,1 +1,0 @@
-# OpenTelemetry Swoole context
