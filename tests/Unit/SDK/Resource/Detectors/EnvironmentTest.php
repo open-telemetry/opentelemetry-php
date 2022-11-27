@@ -16,6 +16,13 @@ class EnvironmentTest extends TestCase
 {
     use EnvironmentVariables;
 
+    private Detectors\Environment $detector;
+
+    public function setUp(): void
+    {
+        $this->detector = new Detectors\Environment();
+    }
+
     public function tearDown(): void
     {
         $this->restoreEnvironmentVariables();
@@ -23,8 +30,7 @@ class EnvironmentTest extends TestCase
 
     public function test_environment_default_get_resource(): void
     {
-        $resouceDetector = new Detectors\Environment();
-        $resource = $resouceDetector->getResource();
+        $resource = $this->detector->getResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertEmpty($resource->getAttributes());
@@ -35,19 +41,38 @@ class EnvironmentTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'key_foo=value_foo,key_bar=value_bar');
 
-        $resouceDetector = new Detectors\Environment();
-        $resource = $resouceDetector->getResource();
+        $resource = $this->detector->getResource();
 
         $this->assertSame('value_foo', $resource->getAttributes()->get('key_foo'));
         $this->assertSame('value_bar', $resource->getAttributes()->get('key_bar'));
+    }
+
+    /**
+     * @dataProvider encodedResourceValueProvider
+     */
+    public function test_environment_get_resource_with_encoded_value(string $value, string $expected): void
+    {
+        $key = '_key';
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', sprintf('%s=%s', $key, $value));
+
+        $resource = $this->detector->getResource();
+
+        $this->assertSame($expected, $resource->getAttributes()->get($key));
+    }
+
+    public function encodedResourceValueProvider(): array
+    {
+        return [
+            ['%28%24foo%29', '($foo)'],
+            ['%21%40%23%24%25%5E', '!@#$%^'],
+        ];
     }
 
     public function test_environment_get_resource_with_service_name(): void
     {
         $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'test-service');
 
-        $resouceDetector = new Detectors\Environment();
-        $resource = $resouceDetector->getResource();
+        $resource = $this->detector->getResource();
 
         $this->assertNotEmpty($resource->getAttributes());
         $this->assertSame('test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
@@ -57,8 +82,7 @@ class EnvironmentTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=test-service');
 
-        $resouceDetector = new Detectors\Environment();
-        $resource = $resouceDetector->getResource();
+        $resource = $this->detector->getResource();
 
         $this->assertNotEmpty($resource->getAttributes());
         $this->assertSame('test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
@@ -69,8 +93,7 @@ class EnvironmentTest extends TestCase
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=env-test-service');
         $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'user-test-service');
 
-        $resouceDetector = new Detectors\Environment();
-        $resource = $resouceDetector->getResource();
+        $resource = $this->detector->getResource();
 
         $this->assertNotEmpty($resource->getAttributes());
         $this->assertSame('user-test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
