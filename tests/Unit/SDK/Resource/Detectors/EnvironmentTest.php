@@ -52,7 +52,7 @@ class EnvironmentTest extends TestCase
      */
     public function test_environment_get_resource_with_encoded_value(string $value, string $expected): void
     {
-        $key = '_key';
+        $key = 'key';
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', sprintf('%s=%s', $key, $value));
 
         $resource = $this->detector->getResource();
