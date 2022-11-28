@@ -22,20 +22,30 @@ class ParserTest extends TestCase
         $this->builder = $this->createMock(BaggageBuilderInterface::class);
     }
 
-    public function test_parse_into(): void
+    /**
+     * @dataProvider headerProvider
+     */
+    public function test_parse_into(string $header): void
     {
-        $header = 'foo_key=foo_value,bar_key=bar_value';
         $parser = new Parser($header);
 
         $this->builder
             ->expects($this->exactly(2))
             ->method('set')
             ->withConsecutive(
-                [$this->equalTo('foo_key'), $this->equalTo('foo_value'), $this->anything()],
-                [$this->equalTo('bar_key'), $this->equalTo('bar_value'), $this->anything()],
+                [$this->equalTo('key1'), $this->equalTo('value1'), $this->anything()],
+                [$this->equalTo('key2'), $this->equalTo('value2'), $this->anything()],
             );
 
         $parser->parseInto($this->builder);
+    }
+
+    public function headerProvider(): array
+    {
+        return [
+            'normal' => ['key1=value1,key2=value2'],
+            'encoded' => ['%6b%65%79%31=value1,%6b%65%79%32=value2'],
+        ];
     }
 
     public function test_parse_into_with_properties(): void
