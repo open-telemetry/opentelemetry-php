@@ -27,7 +27,7 @@ splits:
   - prefix: "src/Contrib/Otlp"
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/exporter-otlp.git"
   - prefix: "src/Contrib/Grpc"
-    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/exporter-otlp-grpc.git"
+    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/transport-grpc.git"
   - prefix: "src/Contrib/Zipkin"
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/exporter-zipkin.git"
   - prefix: "src/Contrib/ZipkinToNewrelic"

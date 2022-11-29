@@ -1,6 +1,6 @@
-# OpenTelemetry gRPC Exporter
+# OpenTelemetry gRPC Transport
 
-OTLP gRPC exporter for OpenTelemetry.
+gRPC transport for OpenTelemetry.
 
 ## Usage
 
