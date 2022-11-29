@@ -32,8 +32,6 @@ splits:
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/exporter-zipkin.git"
   - prefix: "src/Contrib/ZipkinToNewrelic"
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/exporter-zipkintonewrelic.git"
-  - prefix: "src/Contrib/Context/Swoole"
-    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/context-swoole.git"
   - prefix: "src/Extension/Propagator/B3"
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/extension-propagator-b3.git"
 
