@@ -19,6 +19,9 @@
   "autoload": {
     "psr-4": {
       "OpenTelemetry\\Contrib\\Grpc\\": "."
-    }
+    },
+    "files": [
+      "_register.php"
+    ]
   }
 }
