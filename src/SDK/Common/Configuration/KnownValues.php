@@ -60,10 +60,6 @@ interface KnownValues
     public const VALUES_BOOLEAN = [
         self::VALUE_TRUE,
         self::VALUE_FALSE,
-        self::VALUE_ON,
-        self::VALUE_OFF,
-        self::VALUE_1,
-        self::VALUE_0,
     ];
 
     public const VALUES_COMPRESSION= [
