@@ -32,7 +32,14 @@
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\Contrib\\": "."
-        }
+        },
+        "files": [
+            "Grpc/_register.php",
+            "Newrelic/_register.php",
+            "Otlp/_register.php",
+            "Zipkin/_register.php"
+
+        ]
     },
     "suggest": {
         "ext-sockets": "To use the Thrift UDP Exporter for the Jaeger Agent"
