@@ -4,25 +4,21 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Benchmark;
 
-use Mockery;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
+use OpenTelemetry\SDK\Common\Future\FutureInterface;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * TODO https://github.com/open-telemetry/opentelemetry-go/blob/051227c9edded2c772a07a4d4e60dda27c3e4b20/sdk/trace/benchmark_test.go
@@ -32,6 +28,11 @@ class OtlpBench
     private TracerInterface $tracer;
     private SamplerInterface $sampler;
     private ResourceInfo $resource;
+
+    private const PROTOBUF = 'application/x-protobuf';
+    private const JSON = 'application/json';
+    private const SIMPLE = 'simple';
+    private const BATCH = 'batch';
 
     public function __construct()
     {
@@ -50,46 +51,48 @@ class OtlpBench
         $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
     }
 
-    /**
-     * @psalm-suppress InvalidArgument
-     */
-    public function setUpGrpc(): void
+    private function createTransport(string $contentType): TransportInterface
     {
-        $transport = Mockery::mock(TransportInterface::class)->allows([
-            'send' => new CompletedFuture('ok'),
-            'shutdown' => true,
-            'forceFlush' => true,
-            'contentType' => 'application/x-protobuf',
-        ]);
-        $exporter = new SpanExporter($transport);
-        $processor = new SimpleSpanProcessor($exporter);
-        $provider = new TracerProvider($processor, $this->sampler, $this->resource);
-        $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
+        return new class($contentType) implements TransportInterface {
+            private string $contentType;
+
+            public function __construct(string $contentType)
+            {
+                $this->contentType = $contentType;
+            }
+
+            public function contentType(): string
+            {
+                return $this->contentType;
+            }
+
+            public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface
+            {
+                return new CompletedFuture('');
+            }
+
+            public function shutdown(?CancellationInterface $cancellation = null): bool
+            {
+                return true;
+            }
+
+            public function forceFlush(?CancellationInterface $cancellation = null): bool
+            {
+                return true;
+            }
+        };
     }
 
     /**
-     * @psalm-suppress UndefinedMagicMethod
-     * @psalm-suppress InvalidArgument
-     * @psalm-suppress PossiblyUndefinedMethod
+     * @psalm-suppress ArgumentTypeCoercion
      */
-    public function setUpOtlpHttp(): void
+    public function setUpOtlpExporter(array $params): void
     {
-        $response = Mockery::mock(ResponseInterface::class)
-            ->allows(['getStatusCode' => 200]);
-        $stream = Mockery::mock(StreamInterface::class);
-        $request = Mockery::mock(RequestInterface::class);
-        $request->allows('withBody')->andReturnSelf();
-        $request->allows('withHeader')->andReturnSelf();
-        $client = Mockery::mock(ClientInterface::class)
-            ->allows(['sendRequest' => $response]);
-        $requestFactory = Mockery::mock(RequestFactoryInterface::class)
-            ->allows(['createRequest' => $request]);
-        $streamFactory = Mockery::mock(StreamFactoryInterface::class)
-            ->allows(['createStream' => $stream]);
-        $transport = new PsrTransport($client, $requestFactory, $streamFactory, 'http://foo', 'application/x-protobuf', [], [], 0, 0); // @phpstan-ignore-line
+        $transport = $this->createTransport($params[0]);
         $exporter = new SpanExporter($transport);
-
-        $processor = new SimpleSpanProcessor($exporter);
+        $processor = $params[1] === self::SIMPLE
+            ? new SimpleSpanProcessor($exporter)
+            : new BatchSpanProcessor($exporter, ClockFactory::getDefault());
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
     }
@@ -144,19 +147,21 @@ class OtlpBench
 
     public function provideEventCounts(): \Generator
     {
-        yield [1];
-        yield [4];
-        yield [16];
-        yield [256];
+        yield 'no events' => [0];
+        yield '1 event' => [1];
+        yield '4 events' => [4];
+        yield '16 events' => [16];
+        yield '256 events' => [256];
     }
 
     /**
-     * @BeforeMethods("setUpGrpc")
-     * @Revs(1000)
+     * @BeforeMethods("setUpOtlpExporter")
+     * @ParamProviders("provideOtlp")
+     * @Revs({100, 1000})
      * @Iterations(10)
      * @OutputTimeUnit("microseconds")
      */
-    public function benchExportSpans_OltpGrpc(): void
+    public function benchExportSpans_Oltp(): void
     {
         $span = $this->tracer->spanBuilder('foo')
             ->setAttribute('foo', PHP_INT_MAX)
@@ -165,18 +170,11 @@ class OtlpBench
         $span->end();
     }
 
-    /**
-     * @BeforeMethods("setUpOtlpHttp")
-     * @Revs(1000)
-     * @Iterations(10)
-     * @OutputTimeUnit("microseconds")
-     */
-    public function benchExportSpans_OtlpHttp(): void
+    public function provideOtlp(): \Generator
     {
-        $span = $this->tracer->spanBuilder('foo')
-            ->setAttribute('foo', PHP_INT_MAX)
-            ->startSpan();
-        $span->addEvent('my_event');
-        $span->end();
+        yield 'protobuf+simple' => [self::PROTOBUF, self::SIMPLE];
+        yield 'protobuf+batch' => [self::PROTOBUF, self::BATCH];
+        yield 'json+simple' => [self::JSON, self::SIMPLE];
+        yield 'json+batch' => [self::JSON, self::BATCH];
     }
 }
