@@ -19,7 +19,7 @@ final class Environment implements ResourceDetectorInterface
     public function getResource(): ResourceInfo
     {
         $attributes = Configuration::has(Variables::OTEL_RESOURCE_ATTRIBUTES)
-            ? Configuration::getMap(Variables::OTEL_RESOURCE_ATTRIBUTES, [])
+            ? self::decode(Configuration::getMap(Variables::OTEL_RESOURCE_ATTRIBUTES, []))
             : [];
 
         //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration
@@ -31,5 +31,10 @@ final class Environment implements ResourceDetectorInterface
         }
 
         return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
+    }
+
+    private static function decode(array $attributes): array
+    {
+        return array_map('urldecode', $attributes);
     }
 }
