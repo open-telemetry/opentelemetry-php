@@ -10,11 +10,7 @@ final class Metadata implements MetadataInterface
 
     public static function getEmpty(): Metadata
     {
-        if (null === self::$instance) {
-            self::$instance = new self('');
-        }
-
-        return self::$instance;
+        return self::$instance ??= new self('');
     }
 
     private string $metadata;

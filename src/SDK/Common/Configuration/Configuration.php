@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Configuration;
 
+use InvalidArgumentException;
+use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\ListParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
@@ -20,6 +22,8 @@ use UnexpectedValueException;
  */
 class Configuration
 {
+    use LogsMessagesTrait;
+
     public static function has(string $name): bool
     {
         return CompositeResolver::instance()->hasVariable($name);
@@ -48,14 +52,20 @@ class Configuration
 
     public static function getBoolean(string $key, bool $default = null): bool
     {
-        return BooleanParser::parse(
-            self::validateVariableValue(
-                CompositeResolver::instance()->resolve(
-                    self::validateVariableType($key, VariableTypes::BOOL),
-                    null === $default ? $default : ($default ? 'true' : 'false')
-                )
+        $resolved = self::validateVariableValue(
+            CompositeResolver::instance()->resolve(
+                self::validateVariableType($key, VariableTypes::BOOL),
+                null === $default ? $default : ($default ? 'true' : 'false')
             )
         );
+
+        try {
+            return BooleanParser::parse($resolved);
+        } catch (InvalidArgumentException $e) {
+            self::logWarning(sprintf('Invalid boolean value "%s" interpreted as "false" for %s', $resolved, $key));
+
+            return false;
+        }
     }
 
     public static function getMixed(string $key, $default = null)

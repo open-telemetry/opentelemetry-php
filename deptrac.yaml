@@ -88,10 +88,6 @@ deptrac:
           collectors:
               - type: className
                 regex: ^Jaeger\\Thrift\\*
-      -   name: Swoole
-          collectors:
-              - type: className
-                regex: ^Swoole\\*
 
     ruleset:
       Context:
@@ -113,7 +109,6 @@ deptrac:
           - Prometheus
           - Thrift
           - JaegerThrift
-          - Swoole
       Extension:
           - +API
       OtelProto:

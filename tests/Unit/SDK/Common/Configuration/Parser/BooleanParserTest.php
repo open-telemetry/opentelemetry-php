@@ -16,23 +16,30 @@ class BooleanParserTest extends TestCase
     private const TRUTHY_VALUES = [
         'bool uppercase' => ['TRUE'],
         'bool lowercase' => ['true'],
-        'state uppercase' => ['ON'],
-        'state lowercase' => ['on'],
-        'int' => ['1'],
+        'bool mixed case' => ['True'],
     ];
 
     private const FALSY_VALUES = [
         'bool uppercase' => ['FALSE'],
         'bool lowercase' => ['false'],
-        'state uppercase' => ['OFF'],
-        'state lowercase' => ['off'],
-        'int' => ['0'],
+        'bool mixed case' => ['False'],
     ];
 
     private const NON_BOOLEAN_VALUES = [
         'string' => ['Foo'],
         'int' => ['42'],
         'float' => ['0.5'],
+    ];
+
+    private const DISALLOWED_BOOLEAN_VALUES = [
+        ['ON'],
+        ['on'],
+        ['On'],
+        ['1'],
+        ['OFF'],
+        ['off'],
+        ['Off'],
+        ['0'],
     ];
 
     /**
@@ -53,6 +60,20 @@ class BooleanParserTest extends TestCase
         $this->assertFalse(
             BooleanParser::parse($value)
         );
+    }
+
+    /**
+     * @dataProvider disallowedBooleanProvider
+     */
+    public function test_disallowed_boolean_type_values_throw_exception(string $value): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        BooleanParser::parse($value);
+    }
+
+    public function disallowedBooleanProvider(): array
+    {
+        return self::DISALLOWED_BOOLEAN_VALUES;
     }
 
     /**

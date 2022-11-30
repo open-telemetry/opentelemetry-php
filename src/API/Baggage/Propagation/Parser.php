@@ -25,9 +25,6 @@ final class Parser
         $this->baggageHeader = $baggageHeader;
     }
 
-    /**
-     * @todo: Make this algorithm more robust/performant.
-     */
     public function parseInto(BaggageBuilderInterface $baggageBuilder): void
     {
         foreach (explode(',', $this->baggageHeader) as $baggageString) {
