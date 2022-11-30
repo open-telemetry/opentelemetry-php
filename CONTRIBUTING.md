@@ -3,7 +3,7 @@
 
 - [Bob Strecansky](https://github.com/bobstrecansky)
 - [Brett McBride](https://github.com/brettmc/)
-- [Przemek Delweski](https://github.com/pdelewski)
+- [Przemek Delewski](https://github.com/pdelewski)
 
 Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer)
 
