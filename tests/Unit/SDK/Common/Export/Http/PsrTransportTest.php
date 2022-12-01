@@ -12,6 +12,7 @@ use function gzdecode;
 use function gzencode;
 use InvalidArgumentException;
 use Nyholm\Psr7\Response;
+use OpenTelemetry\API\Common\Export\Headers;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -71,6 +72,7 @@ final class PsrTransportTest extends TestCase
     {
         $this->client->expects($this->once())->method('sendRequest')->willReturnCallback(function (RequestInterface $request): ResponseInterface {
             $this->assertSame('bar', $request->getHeaderLine('x-foo'));
+            $this->assertTrue($request->hasHeader(Headers::EXPORTER_HEADER), 'contains custom header for identifying exporter requests');
 
             return new Response();
         });

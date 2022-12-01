@@ -8,6 +8,7 @@ use function assert;
 use BadMethodCallException;
 use function explode;
 use function in_array;
+use OpenTelemetry\API\Common\Export\Headers;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -84,6 +85,7 @@ final class PsrTransport implements TransportInterface
             ->createRequest('POST', $this->endpoint)
             ->withBody($this->streamFactory->createStream($body))
             ->withHeader('Content-Type', $this->contentType)
+            ->withHeader(Headers::EXPORTER_HEADER, 'true')
         ;
         if ($appliedEncodings) {
             $request = $request->withHeader('Content-Encoding', $appliedEncodings);
