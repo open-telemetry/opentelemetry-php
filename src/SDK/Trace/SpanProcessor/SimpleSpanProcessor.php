@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use Closure;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -21,9 +22,10 @@ class SimpleSpanProcessor implements SpanProcessorInterface
     use LogsMessagesTrait;
 
     private SpanExporterInterface $exporter;
+    private ContextInterface $exportContext;
 
     private bool $running = false;
-    /** @var SplQueue<array{Closure, string, bool}> */
+    /** @var SplQueue<array{Closure, string, bool, ContextInterface}> */
     private SplQueue $queue;
 
     private bool $closed = false;
@@ -32,6 +34,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
     {
         $this->exporter = $exporter;
 
+        $this->exportContext = Context::getCurrent();
         $this->queue = new SplQueue();
     }
 
@@ -49,7 +52,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         }
 
         $spanData = $span->toSpanData();
-        $this->flush(fn () => $this->exporter->export([$spanData])->await(), 'export');
+        $this->flush(fn () => $this->exporter->export([$spanData])->await(), 'export', false, $this->exportContext);
     }
 
     public function forceFlush(?CancellationInterface $cancellation = null): bool
@@ -58,7 +61,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
             return false;
         }
 
-        return $this->flush(fn (): bool => $this->exporter->forceFlush($cancellation), __FUNCTION__, true);
+        return $this->flush(fn (): bool => $this->exporter->forceFlush($cancellation), __FUNCTION__, true, Context::getCurrent());
     }
 
     public function shutdown(?CancellationInterface $cancellation = null): bool
@@ -69,12 +72,12 @@ class SimpleSpanProcessor implements SpanProcessorInterface
 
         $this->closed = true;
 
-        return $this->flush(fn (): bool => $this->exporter->shutdown($cancellation), __FUNCTION__, true);
+        return $this->flush(fn (): bool => $this->exporter->shutdown($cancellation), __FUNCTION__, true, Context::getCurrent());
     }
 
-    private function flush(Closure $task, string $taskName, bool $propagateResult = false): bool
+    private function flush(Closure $task, string $taskName, bool $propagateResult, ContextInterface $context): bool
     {
-        $this->queue->enqueue([$task, $taskName, $propagateResult && !$this->running]);
+        $this->queue->enqueue([$task, $taskName, $propagateResult && !$this->running, $context]);
 
         if ($this->running) {
             return false;
@@ -86,7 +89,8 @@ class SimpleSpanProcessor implements SpanProcessorInterface
 
         try {
             while (!$this->queue->isEmpty()) {
-                [$task, $taskName, $propagateResult] = $this->queue->dequeue();
+                [$task, $taskName, $propagateResult, $context] = $this->queue->dequeue();
+                $scope = $context->activate();
 
                 try {
                     $result = $task();
@@ -96,10 +100,11 @@ class SimpleSpanProcessor implements SpanProcessorInterface
                 } catch (Throwable $e) {
                     if ($propagateResult) {
                         $exception = $e;
-
-                        continue;
+                    } else {
+                        self::logError(sprintf('Unhandled %s error', $taskName), ['exception' => $e]);
                     }
-                    self::logError(sprintf('Unhandled %s error', $taskName), ['exception' => $e]);
+                } finally {
+                    $scope->detach();
                 }
             }
         } finally {

@@ -9,6 +9,7 @@ use function count;
 use InvalidArgumentException;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -44,6 +45,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private int $scheduledDelayNanos;
     private int $maxExportBatchSize;
     private bool $autoFlush;
+    private ContextInterface $exportContext;
 
     private ?int $nextScheduledRun = null;
     private bool $running = false;
@@ -55,7 +57,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private array $batch = [];
     /** @var SplQueue<list<SpanDataInterface>> */
     private SplQueue $queue;
-    /** @var SplQueue<array{int, string, ?CancellationInterface, bool}> */
+    /** @var SplQueue<array{int, string, ?CancellationInterface, bool, ContextInterface}> */
     private SplQueue $flush;
 
     private bool $closed = false;
@@ -93,6 +95,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         $this->maxExportBatchSize = $maxExportBatchSize;
         $this->autoFlush = $autoFlush;
 
+        $this->exportContext = Context::getCurrent();
         $this->queue = new SplQueue();
         $this->flush = new SplQueue();
 
@@ -199,7 +202,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     {
         if ($flushMethod !== null) {
             $flushId = $this->batchId + $this->queue->count() + (int) (bool) $this->batch;
-            $this->flush->enqueue([$flushId, $flushMethod, $cancellation, !$this->running]);
+            $this->flush->enqueue([$flushId, $flushMethod, $cancellation, !$this->running, Context::getCurrent()]);
         }
 
         if ($this->running) {
@@ -213,7 +216,8 @@ class BatchSpanProcessor implements SpanProcessorInterface
         try {
             for (;;) {
                 while (!$this->flush->isEmpty() && $this->flush->bottom()[0] <= $this->batchId) {
-                    [, $flushMethod, $cancellation, $propagateResult] = $this->flush->dequeue();
+                    [, $flushMethod, $cancellation, $propagateResult, $context] = $this->flush->dequeue();
+                    $scope = $context->activate();
 
                     try {
                         $result = $this->exporter->$flushMethod($cancellation);
@@ -223,10 +227,11 @@ class BatchSpanProcessor implements SpanProcessorInterface
                     } catch (Throwable $e) {
                         if ($propagateResult) {
                             $exception = $e;
-
-                            continue;
+                        } else {
+                            self::logError(sprintf('Unhandled %s error', $flushMethod), ['exception' => $e]);
                         }
-                        self::logError(sprintf('Unhandled %s error', $flushMethod), ['exception' => $e]);
+                    } finally {
+                        $scope->detach();
                     }
                 }
 
@@ -239,6 +244,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
                 }
                 $batchSize = count($this->queue->bottom());
                 $this->batchId++;
+                $scope = $this->exportContext->activate();
 
                 try {
                     $this->exporter->export($this->queue->dequeue())->await();
@@ -247,6 +253,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
                 } finally {
                     $this->processed += $batchSize;
                     $this->queueSize -= $batchSize;
+                    $scope->detach();
                 }
             }
         } finally {
