@@ -100,10 +100,9 @@ class SimpleSpanProcessor implements SpanProcessorInterface
                 } catch (Throwable $e) {
                     if ($propagateResult) {
                         $exception = $e;
-
-                        continue;
+                    } else {
+                        self::logError(sprintf('Unhandled %s error', $taskName), ['exception' => $e]);
                     }
-                    self::logError(sprintf('Unhandled %s error', $taskName), ['exception' => $e]);
                 } finally {
                     $scope->detach();
                 }
