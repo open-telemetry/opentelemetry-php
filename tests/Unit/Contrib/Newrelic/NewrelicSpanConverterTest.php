@@ -7,6 +7,8 @@ namespace OpenTelemetry\Tests\Unit\Contrib\Newrelic;
 use OpenTelemetry\Contrib\Newrelic\SpanConverter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
@@ -32,13 +34,16 @@ class NewrelicSpanConverterTest extends TestCase
             ->addEvent('validators.list', Attributes::create(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
 
-        $converter = new SpanConverter('test.name');
+        $converter = new SpanConverter();
         $row = $converter->convert([$span])[0];
 
         $this->assertSame($span->getContext()->getSpanId(), $row['id']);
         $this->assertSame($span->getContext()->getTraceId(), $row['trace.id']);
 
-        $this->assertSame('test.name', $row['attributes']['service.name']);
+        $this->assertSame(
+            ResourceInfoFactory::defaultResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME),
+            $row['attributes']['service.name']
+        );
         $this->assertSame($span->getName(), $row['attributes']['name']);
         $this->assertNull($row['attributes']['parent.id']);
         $this->assertSame(1505855794194, $row['attributes']['timestamp']);
@@ -73,7 +78,7 @@ class NewrelicSpanConverterTest extends TestCase
             ->addAttribute('list-of-booleans', $listOfBooleans)
             ->addAttribute('list-of-random', $listOfRandoms);
 
-        $attributes = (new SpanConverter('tags.test'))->convert([$span])[0]['attributes'];
+        $attributes = (new SpanConverter())->convert([$span])[0]['attributes'];
 
         // Check that we can convert all attributes to tags
         $this->assertCount(17, $attributes);

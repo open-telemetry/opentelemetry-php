@@ -14,15 +14,12 @@ use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
  */
 class ZipkinExporterTest extends AbstractExporterTest
 {
-    protected const EXPORTER_NAME = 'test.zipkin';
-
     /**
      * @psalm-suppress PossiblyInvalidArgument
      */
     public function createExporterWithTransport(TransportInterface $transport): Exporter
     {
         return new Exporter(
-            self::EXPORTER_NAME,
             $transport
         );
     }

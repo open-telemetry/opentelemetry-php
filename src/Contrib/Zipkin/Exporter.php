@@ -26,12 +26,11 @@ class Exporter implements SpanExporterInterface
     private TransportInterface $transport;
 
     public function __construct(
-        $name,
         TransportInterface $transport,
         SpanConverterInterface $spanConverter = null
     ) {
         $this->transport = $transport;
-        $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
+        $this->setSpanConverter($spanConverter ?? new SpanConverter());
     }
 
     /**

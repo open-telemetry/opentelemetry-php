@@ -8,6 +8,8 @@ use function implode;
 use OpenTelemetry\Contrib\ZipkinToNewrelic\SpanConverter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
@@ -33,13 +35,16 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
             ->addEvent('validators.list', Attributes::create(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
 
-        $converter = new SpanConverter('test.name');
+        $converter = new SpanConverter();
         $row = $converter->convert([$span])[0];
 
         $this->assertSame($span->getContext()->getSpanId(), $row['id']);
         $this->assertSame($span->getContext()->getTraceId(), $row['traceId']);
 
-        $this->assertSame('test.name', $row['localEndpoint']['serviceName']);
+        $this->assertSame(
+            ResourceInfoFactory::defaultResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME),
+            $row['localEndpoint']['serviceName']
+        );
         $this->assertSame($span->getName(), $row['name']);
 
         $this->assertSame(1505855794194009, $row['timestamp']);
@@ -80,7 +85,7 @@ class ZipkinToNewrelicSpanConverterTest extends TestCase
             ->addAttribute('list-of-booleans', $listOfBooleans)
             ->addAttribute('list-of-random', $listOfRandoms);
 
-        $tags = (new SpanConverter('tags.test'))->convert([$span])[0]['tags'];
+        $tags = (new SpanConverter())->convert([$span])[0]['tags'];
 
         // Check that we can convert all attributes to tags
         $this->assertCount(12, $tags);

@@ -17,6 +17,6 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
         $endpoint = Configuration::getString(Variables::OTEL_EXPORTER_ZIPKIN_ENDPOINT);
         $transport = PsrTransportFactory::discover()->create($endpoint, 'application/json');
 
-        return new Exporter('zipkin', $transport);
+        return new Exporter($transport);
     }
 }

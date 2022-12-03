@@ -13,12 +13,9 @@ use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
  */
 class JaegerExporterTest extends AbstractExporterTest
 {
-    private const EXPORTER_NAME = 'test.jaeger';
-
     public function createExporterWithTransport(TransportInterface $transport): Exporter
     {
         return new Exporter(
-            self::EXPORTER_NAME,
             $transport
         );
     }

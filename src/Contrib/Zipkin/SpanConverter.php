@@ -9,9 +9,11 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
 use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use OpenTelemetry\SemConv\ResourceAttributes;
 
 class SpanConverter implements SpanConverterInterface
 {
@@ -32,11 +34,11 @@ class SpanConverter implements SpanConverterInterface
 
     const NET_PEER_IP_KEY = 'net.peer.ip';
 
-    private string $serviceName;
+    private string $defaultServiceName;
 
-    public function __construct(string $serviceName)
+    public function __construct()
     {
-        $this->serviceName = $serviceName;
+        $this->defaultServiceName = ResourceInfoFactory::defaultResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
     }
 
     private function sanitiseTagValue($value)
@@ -78,11 +80,15 @@ class SpanConverter implements SpanConverterInterface
         $startTimestamp = TimeUtil::nanosToMicros($span->getStartEpochNanos());
         $endTimestamp = TimeUtil::nanosToMicros($span->getEndEpochNanos());
 
+        $serviceName =  $span->getResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME)
+                        ??
+                        $this->defaultServiceName;
+
         $row = [
             'id' => $span->getSpanId(),
             'traceId' => $span->getTraceId(),
             'localEndpoint' => [
-                'serviceName' => $this->serviceName,
+                'serviceName' => $serviceName,
             ],
             'name' => $span->getName(),
             'timestamp' => $startTimestamp,

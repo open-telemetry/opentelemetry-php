@@ -20,7 +20,6 @@ class HttpCollectorExporter implements SpanExporterInterface
 
     public function __construct(
         string $endpointUrl,
-        string $name,
         ClientInterface $client,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory
@@ -32,7 +31,6 @@ class HttpCollectorExporter implements SpanExporterInterface
             $client,
             $requestFactory,
             $streamFactory,
-            $name,
             $parsedEndpoint
         );
     }
