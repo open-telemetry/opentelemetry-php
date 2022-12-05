@@ -97,6 +97,8 @@ final class StreamTransportFactory implements TransportFactoryInterface
         if (!$stream) {
             throw new LogicException(sprintf('Failed opening stream "%s"', $endpoint));
         }
+
+        return $stream;
     }
 
     private static function createHeaderArray(string $contentType, array $headers): array
