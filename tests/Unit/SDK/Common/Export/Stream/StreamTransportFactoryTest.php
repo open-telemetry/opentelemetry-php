@@ -15,7 +15,7 @@ class StreamTransportFactoryTest extends TestCase
     public function test_creates_stream(): void
     {
         $factory = new StreamTransportFactory();
-        $transport = $factory->create('php://stdout', 'a');
+        $transport = $factory->create('php://output', 'a');
         $this->expectOutputString('payload');
         $transport->send('payload')->await();
     }
