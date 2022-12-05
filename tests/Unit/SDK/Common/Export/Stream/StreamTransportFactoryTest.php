@@ -6,7 +6,6 @@ namespace OpenTelemetry\Example\Unit\SDK\Common\Export\Stream;
 
 use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
 use PHPUnit\Framework\TestCase;
-use ReflectionObject;
 
 /**
  * @covers \OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory
