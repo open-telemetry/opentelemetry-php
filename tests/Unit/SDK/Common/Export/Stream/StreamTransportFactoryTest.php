@@ -17,10 +17,7 @@ class StreamTransportFactoryTest extends TestCase
     {
         $factory = new StreamTransportFactory();
         $transport = $factory->create('php://stdout', 'a');
-        $reflection = new ReflectionObject($transport);
-        $property = $reflection->getProperty('stream');
-        $property->setAccessible(true);
-
-        $this->assertIsResource($property->getValue($transport));
+        $this->expectOutputString('payload');
+        $transport->send('payload')->await();
     }
 }
