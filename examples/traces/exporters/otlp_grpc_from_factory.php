@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 
-require __DIR__ . '/../../../../vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
 
 \OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
 
