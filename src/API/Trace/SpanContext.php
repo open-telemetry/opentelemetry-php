@@ -49,9 +49,19 @@ final class SpanContext implements SpanContextInterface
         return $this->traceId;
     }
 
+    public function getTraceIdBytes(): array
+    {
+        return $this->toByteArray($this->traceId);
+    }
+
     public function getSpanId(): string
     {
         return $this->spanId;
+    }
+
+    public function getSpanIdBytes(): array
+    {
+        return $this->toByteArray($this->spanId);
     }
 
     public function getTraceState(): ?TraceStateInterface
@@ -111,5 +121,15 @@ final class SpanContext implements SpanContextInterface
         }
 
         return self::$invalidContext;
+    }
+
+    private function toByteArray(string $id): array
+    {
+        $bytes = [];
+        for ($i=0; $i<strlen($id); $i += 2) {
+            $bytes[] = base_convert($id[$i] . $id[$i+1], 16, 2);
+        }
+
+        return $bytes;
     }
 }
