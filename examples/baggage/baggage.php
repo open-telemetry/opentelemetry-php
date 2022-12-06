@@ -27,7 +27,7 @@ echo 'key2 metadata: ' . $baggage->getEntry('key2')->getMetadata()->getValue() .
 
 //remove a value from baggage and add a value, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/baggage/api.md#clear-baggage-in-the-context
 echo 'removing key1, adding key3 to baggage...' . PHP_EOL;
-$scopes[] = $baggage->removeValue('key1')->setValue('key3', 'value3')->activate();
+$scopes[] = $baggage->toBuilder()->remove('key1')->set('key3', 'value3')->build()->activate();
 
 //extract baggage from context, and store in a different carrier (eg, outbound http request headers)
 $out = [];
