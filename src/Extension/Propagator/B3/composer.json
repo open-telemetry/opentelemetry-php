@@ -18,6 +18,9 @@
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\Extension\\Propagator\\B3\\": "."
-        }
+        },
+        "files": [
+            "_register.php"
+        ]
     }
 }
