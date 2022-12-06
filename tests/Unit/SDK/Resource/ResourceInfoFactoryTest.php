@@ -74,7 +74,7 @@ class ResourceInfoFactoryTest extends TestCase
     public function test_resource_service_name_default(): void
     {
         $resource = ResourceInfoFactory::defaultResource();
-        $this->assertEquals('unknown_service', $resource->getAttributes()->get('service.name'));
+        $this->assertEquals('unknown_service:php', $resource->getAttributes()->get('service.name'));
     }
 
     /**

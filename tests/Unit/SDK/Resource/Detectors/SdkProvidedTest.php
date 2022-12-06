@@ -15,10 +15,10 @@ class SdkProvidedTest extends TestCase
 {
     public function test_sdk_provided_get_resource(): void
     {
-        $resouceDetector = new Detectors\SdkProvided();
-        $resource = $resouceDetector->getResource();
+        $resourceDetector = new Detectors\SdkProvided();
+        $resource = $resourceDetector->getResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
-        $this->assertSame('unknown_service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        $this->assertSame('unknown_service:php', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 }

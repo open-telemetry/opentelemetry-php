@@ -46,7 +46,7 @@ class ResourceInfoFactoryTest extends TestCase
 
         $this->assertEquals('opentelemetry', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
         $this->assertEquals('php', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
-        $this->assertEquals('unknown_service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        $this->assertEquals('unknown_service:php', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 
     public function test_none_default_resources(): void
@@ -182,6 +182,6 @@ class ResourceInfoFactoryTest extends TestCase
 
         $this->assertEquals('opentelemetry', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
         $this->assertEquals('php', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
-        $this->assertEquals('unknown_service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        $this->assertEquals('unknown_service:php', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 }
