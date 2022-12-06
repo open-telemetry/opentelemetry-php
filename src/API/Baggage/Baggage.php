@@ -97,4 +97,22 @@ final class Baggage implements BaggageInterface
     {
         return $context->with(ContextKeys::baggage(), $this);
     }
+
+    /** @inheritDoc */
+    public function setValue(string $key, $value, ?Metadata $metadata = null): BaggageInterface
+    {
+        $baggage = clone($this);
+        $baggage->entries[$key] = new Entry($value, $metadata ?? Metadata::getEmpty());
+
+        return $baggage;
+    }
+
+    /** @inheritDoc */
+    public function removeValue(string $key): BaggageInterface
+    {
+        $baggage = clone($this);
+        unset($baggage->entries[$key]);
+
+        return $baggage;
+    }
 }

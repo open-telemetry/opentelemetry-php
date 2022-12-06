@@ -60,6 +60,16 @@ interface BaggageInterface extends ImplicitContextKeyedInterface
     public function isEmpty(): bool;
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/baggage/api.md#set-value
+     */
+    public function setValue(string $key, $value, ?Metadata $metadata = null): self;
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/baggage/api.md#remove-value
+     */
+    public function removeValue(string $key): self;
+
+    /**
      * Returns a new {@see API\BaggageBuilderInterface} pre-initialized with the contents of `$this`.
      */
     public function toBuilder(): API\BaggageBuilderInterface;

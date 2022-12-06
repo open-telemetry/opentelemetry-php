@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\API\Unit\Baggage;
 
 use OpenTelemetry\API\Baggage\Baggage;
+use OpenTelemetry\API\Baggage\BaggageBuilder;
 use OpenTelemetry\API\Baggage\Entry;
 use OpenTelemetry\API\Baggage\Metadata;
 use OpenTelemetry\Context\Context;
@@ -127,4 +128,33 @@ class BaggageTest extends TestCase
     }
 
     // endregion
+
+    public function test_add_value(): void
+    {
+        $baggage = (new BaggageBuilder())->set('key1', 'value1')->build();
+        $new = $baggage->setValue('key2', 'value2');
+        $this->assertNotSame($new, $baggage);
+
+        $arr = [];
+        foreach ($new->getAll() as $key => $value) {
+            $arr[$key] = $value->getValue();
+        }
+
+        $this->assertEquals(
+            ['key1' => 'value1', 'key2' => 'value2'],
+            $arr
+        );
+    }
+
+    public function test_remove_value(): void
+    {
+        $baggage = (new BaggageBuilder())
+            ->set('foo', 'value1')
+            ->set('bar', 'value2')
+            ->build();
+        $new = $baggage->removeValue('foo');
+        $this->assertNotSame($new, $baggage);
+
+        $this->assertNull($new->getValue('foo'));
+    }
 }
