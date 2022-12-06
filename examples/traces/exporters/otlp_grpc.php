@@ -1,26 +1,27 @@
 <?php
 
 declare(strict_types=1);
-require __DIR__ . '/../../../../vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
 
-use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
-use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\API\Common\Signal\Signals;
+use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
+use OpenTelemetry\Contrib\Otlp\OtlpUtil;
+use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
-$transport = PsrTransportFactory::discover()->create('http://zipkin:9411/api/v2/spans', 'application/json');
-$zipkinExporter = new ZipkinExporter(
-    'alwaysOnZipkinExample',
-    $transport
-);
+\OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
+
+$transport = (new GrpcTransportFactory())->create('http://collector:4317' . OtlpUtil::method(Signals::TRACE));
+$exporter = new SpanExporter($transport);
+echo 'Starting OTLP GRPC example';
+
 $tracerProvider =  new TracerProvider(
     new SimpleSpanProcessor(
-        $zipkinExporter
+        $exporter
     )
 );
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
-
-echo 'Starting Zipkin example';
 
 $root = $span = $tracer->spanBuilder('root')->startSpan();
 $scope = $span->activate();
@@ -42,9 +43,9 @@ for ($i = 0; $i < 3; $i++) {
 
     $span->end();
 }
-$scope->detach();
 $root->end();
-echo PHP_EOL . 'Zipkin example complete!  See the results at http://localhost:9411/';
+$scope->detach();
+echo PHP_EOL . 'OTLP GRPC example complete!  ';
 
 echo PHP_EOL;
 $tracerProvider->shutdown();
