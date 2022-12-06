@@ -265,9 +265,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         if ($this->status->getCode() === API\StatusCode::STATUS_OK) {
             return $this;
         }
-
-        // Description MUST be IGNORED for StatusCode Ok & Unset values.
-        $this->status = StatusData::create($code, ($code === API\StatusCode::STATUS_ERROR) ? $description : null);
+        $this->status = StatusData::create($code, $description);
 
         return $this;
     }

@@ -749,9 +749,9 @@ class SpanTest extends MockeryTestCase
     }
 
     /**
+     * @dataProvider statusCodeProvider
      * @group trace-compliance
      * @psalm-param StatusCode::STATUS_* $code
-     * @dataProvider statusCodeProvider
      *
      * When span status is set to Ok it SHOULD be considered final and any further attempts to change it SHOULD be ignored.
      */
@@ -766,6 +766,14 @@ class SpanTest extends MockeryTestCase
         $this->assertSame(API\StatusCode::STATUS_OK, $span->toSpanData()->getStatus()->getCode());
     }
 
+    public function statusCodeProvider(): array
+    {
+        return [
+            [API\StatusCode::STATUS_UNSET],
+            [API\StatusCode::STATUS_ERROR],
+        ];
+    }
+
     /**
      * @group trace-compliance
      */
@@ -774,14 +782,6 @@ class SpanTest extends MockeryTestCase
         $span = $this->createTestRootSpan();
         $span->setStatus(API\StatusCode::STATUS_ERROR);
         $this->assertSame(API\StatusCode::STATUS_ERROR, $span->toSpanData()->getStatus()->getCode());
-    }
-
-    public function statusCodeProvider(): array
-    {
-        return [
-            [API\StatusCode::STATUS_UNSET],
-            [API\StatusCode::STATUS_ERROR],
-        ];
     }
 
     private function createTestRootSpan(): Span
