@@ -13,6 +13,7 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextValidator;
+use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
@@ -745,6 +746,42 @@ class SpanTest extends MockeryTestCase
         $this->assertEvent($events[0], 'a', Attributes::create([]), self::START_EPOCH);
         $this->assertEvent($events[1], 'b', Attributes::create([]), self::START_EPOCH);
         $this->assertEvent($events[2], 'c', Attributes::create(['key' => 2]), self::START_EPOCH);
+    }
+
+    /**
+     * @group trace-compliance
+     * @psalm-param StatusCode::STATUS_* $code
+     * @dataProvider statusCodeProvider
+     *
+     * When span status is set to Ok it SHOULD be considered final and any further attempts to change it SHOULD be ignored.
+     */
+    public function test_set_status_after_ok_is_ignored(string $code): void
+    {
+        $span = $this->createTestRootSpan();
+        $span->setStatus(API\StatusCode::STATUS_OK);
+        $this->assertSame(API\StatusCode::STATUS_OK, $span->toSpanData()->getStatus()->getCode());
+        $span->setStatus($code);
+        $this->assertNotSame($code, $span->toSpanData()->getStatus()->getCode(), 'update after Ok was ignored');
+        $span->setStatus(API\StatusCode::STATUS_OK);
+        $this->assertSame(API\StatusCode::STATUS_OK, $span->toSpanData()->getStatus()->getCode());
+    }
+
+    /**
+     * @group trace-compliance
+     */
+    public function test_can_set_status_to_ok_after_error(): void
+    {
+        $span = $this->createTestRootSpan();
+        $span->setStatus(API\StatusCode::STATUS_ERROR);
+        $this->assertSame(API\StatusCode::STATUS_ERROR, $span->toSpanData()->getStatus()->getCode());
+    }
+
+    public function statusCodeProvider(): array
+    {
+        return [
+            [API\StatusCode::STATUS_UNSET],
+            [API\StatusCode::STATUS_ERROR],
+        ];
     }
 
     private function createTestRootSpan(): Span
