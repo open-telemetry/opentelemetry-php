@@ -25,7 +25,7 @@ echo 'key1: ' . $baggage->getValue('key1') . PHP_EOL;
 echo 'key2: ' . $baggage->getValue('key2') . PHP_EOL;
 echo 'key2 metadata: ' . $baggage->getEntry('key2')->getMetadata()->getValue() . PHP_EOL;
 
-//remove a value from baggage and add a value, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/baggage/api.md#clear-baggage-in-the-context
+//remove a value from baggage and add a value
 echo 'removing key1, adding key3 to baggage...' . PHP_EOL;
 $scopes[] = $baggage->toBuilder()->remove('key1')->set('key3', 'value3')->build()->activate();
 
@@ -34,12 +34,12 @@ $out = [];
 $propagator->inject($out);
 echo 'Extracted baggage: ' . json_encode($out) . PHP_EOL;
 
-//clear baggage (to avoid sending to an untrusted process)
+//clear baggage (to avoid sending to an untrusted process), see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/baggage/api.md#clear-baggage-in-the-context
 echo 'Clearing baggage...' . PHP_EOL;
 $scopes[] = \OpenTelemetry\API\Baggage\Baggage::getEmpty()->activate();
 $cleared = [];
 $propagator->extract($cleared);
-echo 'Extracted sanitised baggage: ' . json_encode($cleared) . PHP_EOL;
+echo 'Extracted baggage: ' . json_encode($cleared) . PHP_EOL;
 
 //detach scopes
 foreach (array_reverse($scopes) as $scope) {
