@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;

@@ -6,9 +6,11 @@ namespace OpenTelemetry\Example\Unit\SDK\Metrics;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Metrics\MeterInterface;
+use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
+use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -41,5 +43,13 @@ class MeterProviderFactoryTest extends TestCase
             'none' => [KnownValues::VALUE_NONE],
             'unimplemented' => ['foo'],
         ];
+    }
+
+    public function test_sdk_disabled_returns_noop(): void
+    {
+        $this->setEnvironmentVariable('OTEL_SDK_DISABLED', 'true');
+        $provider = (new MeterProviderFactory())->create();
+        $this->assertInstanceOf(NoopMeterProvider::class, $provider);
+        $this->assertInstanceOf(NoopMeter::class, $provider->getMeter('test'));
     }
 }

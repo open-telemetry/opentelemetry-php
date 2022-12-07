@@ -3,7 +3,11 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../vendor/autoload.php';
 
-\OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
+Globals::registerInitializer(function (Configurator $configurator) {
+    $logger = new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)]);
+
+    return $configurator->withLogger($logger);
+});
 
 /**
  * Create an otlp+http/protobuf tracer provider from TracerProviderFactory, using environment variables as input

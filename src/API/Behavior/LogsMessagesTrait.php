@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Behavior;
+namespace OpenTelemetry\API\Behavior;
 
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
+use OpenTelemetry\API\Common\Instrumentation\Globals;
 use Psr\Log\LogLevel;
 
 trait LogsMessagesTrait
@@ -12,7 +12,7 @@ trait LogsMessagesTrait
     private static function doLog(string $level, string $message, array $context): void
     {
         $context['source'] = get_called_class();
-        LoggerHolder::get()->log($level, $message, $context);
+        Globals::logger()->log($level, $message, $context);
     }
 
     protected static function logDebug(string $message, array $context = []): void

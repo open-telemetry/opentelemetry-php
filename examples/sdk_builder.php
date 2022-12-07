@@ -21,8 +21,11 @@ require __DIR__ . '/../vendor/autoload.php';
 
 echo 'Starting SDK builder example' . PHP_EOL;
 
-\OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
+Globals::registerInitializer(function (Configurator $configurator) {
+    $logger = new Logger('grpc', [new StreamHandler(STDOUT, LogLevel::DEBUG)]);
 
+    return $configurator->withLogger($logger);
+});
 $resource = ResourceInfoFactory::defaultResource();
 $spanExporter = new InMemoryExporter();
 

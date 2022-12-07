@@ -11,6 +11,8 @@ use OpenTelemetry\SemConv\ResourceAttributes;
 
 /**
  * @package OpenTelemetry\Exporter
+ * @deprecated Jaeger exports are archived, and suggest switching to otel exporters
+ * @see https://github.com/open-telemetry/opentelemetry-specification/pull/2859
  */
 class AgentExporter implements SpanExporterInterface
 {

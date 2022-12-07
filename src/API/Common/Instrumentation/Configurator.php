@@ -14,6 +14,8 @@ use OpenTelemetry\Context\ImplicitContextKeyedInterface;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Configures the global (context scoped) instrumentation instances.
@@ -25,6 +27,7 @@ final class Configurator implements ImplicitContextKeyedInterface
     private ?TracerProviderInterface $tracerProvider = null;
     private ?MeterProviderInterface $meterProvider = null;
     private ?TextMapPropagatorInterface $propagator = null;
+    private ?LoggerInterface $logger = null;
 
     private function __construct()
     {
@@ -47,6 +50,7 @@ final class Configurator implements ImplicitContextKeyedInterface
             ->withTracerProvider(new NoopTracerProvider())
             ->withMeterProvider(new NoopMeterProvider())
             ->withPropagator(new NoopTextMapPropagator())
+            ->withLogger(new NullLogger())
         ;
     }
 
@@ -67,6 +71,9 @@ final class Configurator implements ImplicitContextKeyedInterface
         }
         if ($this->propagator !== null) {
             $context = $context->with(ContextKeys::propagator(), $this->propagator);
+        }
+        if ($this->logger !== null) {
+            $context = $context->with(ContextKeys::logger(), $this->logger);
         }
 
         return $context;
@@ -92,6 +99,14 @@ final class Configurator implements ImplicitContextKeyedInterface
     {
         $self = clone $this;
         $self->propagator = $propagator;
+
+        return $self;
+    }
+
+    public function withLogger(?LoggerInterface $logger): Configurator
+    {
+        $self = clone $this;
+        $self->logger = $logger;
 
         return $self;
     }

@@ -6,14 +6,16 @@ require __DIR__ . '/../../../vendor/autoload.php';
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use OpenTelemetry\Contrib\Jaeger\AgentExporter;
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use Psr\Log\LogLevel;
 
-$logger = new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)]);
-LoggerHolder::set($logger);
+Globals::registerInitializer(function (Configurator $configurator) {
+    $logger = new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)]);
+
+    return $configurator->withLogger($logger);
+});
 
 $exporter = new AgentExporter('jaeger-thrift', 'jaeger:6831');
 $tracerProvider = new TracerProvider(

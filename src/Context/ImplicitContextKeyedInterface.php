@@ -20,8 +20,6 @@ interface ImplicitContextKeyedInterface
      * {@see ScopeInterface::detach()} _MUST_ be called to properly restore the previous context.
      *
      * This method is equivalent to `Context::getCurrent().with($value).activate();`.
-     *
-     * @todo: Update this to suggest using the new helper method way to doing something in a specific context/span.
      */
     public function activate(): ScopeInterface;
 

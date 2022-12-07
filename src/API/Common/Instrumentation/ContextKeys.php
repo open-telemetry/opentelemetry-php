@@ -9,6 +9,7 @@ use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeyInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @internal
@@ -43,5 +44,15 @@ final class ContextKeys
         static $instance;
 
         return $instance ??= Context::createKey(TextMapPropagatorInterface::class);
+    }
+
+    /**
+     * @return ContextKeyInterface<LoggerInterface>
+     */
+    public static function logger(): ContextKeyInterface
+    {
+        static $instance;
+
+        return $instance ??= Context::createKey(LoggerInterface::class);
     }
 }

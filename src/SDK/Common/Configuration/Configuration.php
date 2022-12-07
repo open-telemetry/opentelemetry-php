@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Configuration;
 
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\ListParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;

@@ -10,8 +10,11 @@ use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
-\OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
+Globals::registerInitializer(function (Configurator $configurator) {
+    $logger = new Logger('grpc', [new StreamHandler(STDOUT, LogLevel::DEBUG)]);
 
+    return $configurator->withLogger($logger);
+});
 $transport = (new GrpcTransportFactory())->create('http://collector:4317' . OtlpUtil::method(Signals::TRACE));
 $exporter = new SpanExporter($transport);
 echo 'Starting OTLP GRPC example';

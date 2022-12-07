@@ -7,11 +7,14 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
-LoggerHolder::set(new Logger('otlp-example', [new StreamHandler('php://stderr')]));
+Globals::registerInitializer(function (Configurator $configurator) {
+    $logger = new Logger('otlp-example', [new StreamHandler(STDOUT, LogLevel::DEBUG)]);
+
+    return $configurator->withLogger($logger);
+});
 
 $transport = (new OtlpHttpTransportFactory())->create('http://collector:4318/v1/traces', 'application/x-protobuf');
 $exporter = new SpanExporter($transport);

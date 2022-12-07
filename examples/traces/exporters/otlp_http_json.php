@@ -8,12 +8,14 @@ use Monolog\Logger;
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
-LoggerHolder::set(new Logger('otlp-example', [new StreamHandler('php://stderr')]));
+Globals::registerInitializer(function (Configurator $configurator) {
+    $logger = new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)]);
 
+    return $configurator->withLogger($logger);
+});
 $transport = (new OtlpHttpTransportFactory())->withProtocol(Protocols::HTTP_JSON)->create('http://collector:4318');
 $exporter = new SpanExporter($transport);
 

@@ -8,7 +8,7 @@ use Jaeger\Thrift\Agent\AgentClient;
 use Jaeger\Thrift\Batch;
 use Jaeger\Thrift\Process;
 use Jaeger\Thrift\Span;
-use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use Thrift\Exception\TTransportException;
 use Thrift\Protocol\TCompactProtocol;
 

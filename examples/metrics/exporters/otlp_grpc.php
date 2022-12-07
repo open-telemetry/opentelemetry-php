@@ -12,8 +12,11 @@ use OpenTelemetry\Example\ExampleMetricsGenerator;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 
-\OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
+Globals::registerInitializer(function (Configurator $configurator) {
+    $logger = new Logger('grpc', [new StreamHandler(STDOUT, LogLevel::DEBUG)]);
 
+    return $configurator->withLogger($logger);
+});
 $clock = ClockFactory::getDefault();
 
 $reader = new ExportingReader(

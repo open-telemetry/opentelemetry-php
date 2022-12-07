@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use OpenTelemetry\API\Common\Instrumentation\Configurator;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
+use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
@@ -22,16 +23,17 @@ class TracerProviderFactoryTest extends TestCase
     use EnvironmentVariables;
 
     private $logger;
+    private ScopeInterface $scope;
 
     public function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
-        LoggerHolder::set($this->logger);
+        $this->scope = Configurator::create()->withLogger($this->logger)->activate();
     }
 
     public function tearDown(): void
     {
-        LoggerHolder::unset();
+        $this->scope->detach();
         $this->restoreEnvironmentVariables();
     }
 

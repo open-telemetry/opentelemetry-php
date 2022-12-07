@@ -13,7 +13,6 @@ use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SDK\Sdk;
 
 final class MeterProvider implements MeterProviderInterface
 {
@@ -65,7 +64,7 @@ final class MeterProvider implements MeterProviderInterface
         ?string $schemaUrl = null,
         iterable $attributes = []
     ): MeterInterface {
-        if ($this->closed || Sdk::isDisabled()) { //@todo create meter provider from factory, and move Sdk::isDisabled() there
+        if ($this->closed) {
             return new NoopMeter();
         }
 

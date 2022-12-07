@@ -8,17 +8,19 @@ use LogicException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
+use OpenTelemetry\API\Common\Instrumentation\Configurator;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -41,6 +43,10 @@ class SimpleSpanProcessorTest extends MockeryTestCase
     private SpanContextInterface $sampledSpanContext;
     private SpanContextInterface $nonSampledSpanContext;
 
+    /** @var MockObject&LoggerInterface */
+    private LoggerInterface $logger;
+    private ScopeInterface $scope;
+
     protected function setUp(): void
     {
         $this->readWriteSpan = Mockery::mock(ReadWriteSpanInterface::class);
@@ -56,6 +62,13 @@ class SimpleSpanProcessorTest extends MockeryTestCase
 
         $this->spanExporter = Mockery::mock(SpanExporterInterface::class);
         $this->simpleSpanProcessor = new SimpleSpanProcessor($this->spanExporter);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->scope = Configurator::create()->withLogger($this->logger)->activate();
+    }
+
+    public function tearDown(): void
+    {
+        $this->scope->detach();
     }
 
     public function test_on_start(): void
@@ -140,23 +153,15 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $exporter->method('forceFlush')->willReturn(true);
         $exporter->method('export')->willThrowException(new LogicException());
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('log')->with(LogLevel::ERROR);
+        $this->logger->expects($this->once())->method('log')->with(LogLevel::ERROR);
 
         $processor = new SimpleSpanProcessor($exporter);
 
         $this->readableSpan->expects('getContext')->andReturn($this->sampledSpanContext);
         $this->readableSpan->expects('toSpanData')->andReturn(new SpanData());
 
-        $previousLogger = LoggerHolder::get();
-        LoggerHolder::set($logger);
-
-        try {
-            $processor->onStart($this->readWriteSpan, Context::getCurrent());
-            $processor->onEnd($this->readableSpan);
-        } finally {
-            LoggerHolder::set($previousLogger);
-        }
+        $processor->onStart($this->readWriteSpan, Context::getCurrent());
+        $processor->onEnd($this->readableSpan);
     }
 
     public function test_throwing_exporter_flush(): void

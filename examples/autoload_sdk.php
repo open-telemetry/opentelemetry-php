@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Psr\Log\LogLevel;
+
 putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
 putenv('OTEL_TRACES_EXPORTER=otlp');
 putenv('OTEL_EXPORTER_OTLP_PROTOCOL=grpc');
@@ -14,6 +18,13 @@ echo 'autoloading SDK example starting...' . PHP_EOL;
 
 // Composer autoloader will execute SDK/_autoload.php which will register global instrumentation from environment configuration
 require dirname(__DIR__) . '/vendor/autoload.php';
+
+//if required, register logger initializer, which SDK autoloading does not do
+\OpenTelemetry\API\Common\Instrumentation\Globals::registerInitializer(function (\OpenTelemetry\API\Common\Instrumentation\Configurator $configurator) {
+    $logger = new Logger('otel-autoload-example', [new StreamHandler(STDOUT, LogLevel::DEBUG)]);
+
+    return $configurator->withLogger($logger);
+});
 
 $instrumentation = new \OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation('demo');
 

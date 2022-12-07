@@ -18,6 +18,8 @@ use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * @covers \OpenTelemetry\API\Common\Instrumentation\Globals
@@ -32,6 +34,7 @@ final class InstrumentationTest extends TestCase
         $this->assertInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
         $this->assertInstanceOf(NoopMeterProvider::class, Globals::meterProvider());
         $this->assertInstanceOf(NoopTextMapPropagator::class, Globals::propagator());
+        $this->assertInstanceOf(NullLogger::class, Globals::logger());
     }
 
     public function test_globals_returns_configured_instances(): void
@@ -39,17 +42,20 @@ final class InstrumentationTest extends TestCase
         $tracerProvider = $this->createMock(TracerProviderInterface::class);
         $meterProvider = $this->createMock(MeterProviderInterface::class);
         $propagator = $this->createMock(TextMapPropagatorInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
 
         $scope = Configurator::create()
             ->withTracerProvider($tracerProvider)
             ->withMeterProvider($meterProvider)
             ->withPropagator($propagator)
+            ->withLogger($logger)
             ->activate();
 
         try {
             $this->assertSame($tracerProvider, Globals::tracerProvider());
             $this->assertSame($meterProvider, Globals::meterProvider());
             $this->assertSame($propagator, Globals::propagator());
+            $this->assertSame($logger, Globals::logger());
         } finally {
             $scope->detach();
         }

@@ -11,6 +11,7 @@ use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use Psr\Log\LoggerInterface;
 use function sprintf;
 use Throwable;
 use function trigger_error;
@@ -26,15 +27,18 @@ final class Globals
     private TracerProviderInterface $tracerProvider;
     private MeterProviderInterface $meterProvider;
     private TextMapPropagatorInterface $propagator;
+    private LoggerInterface $logger;
 
     public function __construct(
         TracerProviderInterface $tracerProvider,
         MeterProviderInterface $meterProvider,
-        TextMapPropagatorInterface $propagator
+        TextMapPropagatorInterface $propagator,
+        LoggerInterface $logger
     ) {
         $this->tracerProvider = $tracerProvider;
         $this->meterProvider = $meterProvider;
         $this->propagator = $propagator;
+        $this->logger = $logger;
     }
 
     public static function tracerProvider(): TracerProviderInterface
@@ -50,6 +54,11 @@ final class Globals
     public static function propagator(): TextMapPropagatorInterface
     {
         return Context::getCurrent()->get(ContextKeys::propagator()) ?? self::globals()->propagator;
+    }
+
+    public static function logger(): LoggerInterface
+    {
+        return Context::getCurrent()->get(ContextKeys::logger()) ?? self::globals()->logger;
     }
 
     /**
@@ -89,9 +98,10 @@ final class Globals
         $tracerProvider = $context->get(ContextKeys::tracerProvider());
         $meterProvider = $context->get(ContextKeys::meterProvider());
         $propagator = $context->get(ContextKeys::propagator());
+        $logger = $context->get(ContextKeys::logger());
 
-        assert(isset($tracerProvider, $meterProvider, $propagator));
+        assert(isset($tracerProvider, $meterProvider, $propagator, $logger));
 
-        return $globals ??= new self($tracerProvider, $meterProvider, $propagator);
+        return $globals ??= new self($tracerProvider, $meterProvider, $propagator, $logger);
     }
 }
