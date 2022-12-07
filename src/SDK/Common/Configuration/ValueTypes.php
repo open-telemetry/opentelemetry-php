@@ -77,16 +77,6 @@ interface ValueTypes
     public const OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = VariableTypes::ENUM;
     public const OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = VariableTypes::ENUM;
     /**
-     * Jaeger Exporter
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#jaeger-exporter
-     */
-    public const OTEL_EXPORTER_JAEGER_AGENT_HOST = VariableTypes::STRING;
-    public const OTEL_EXPORTER_JAEGER_AGENT_PORT = VariableTypes::INTEGER;
-    public const OTEL_EXPORTER_JAEGER_ENDPOINT = VariableTypes::STRING;
-    public const OTEL_EXPORTER_JAEGER_TIMEOUT = VariableTypes::INTEGER;
-    public const OTEL_EXPORTER_JAEGER_USER = VariableTypes::STRING;
-    public const OTEL_EXPORTER_JAEGER_PASSWORD = VariableTypes::STRING;
-    /**
      * Zipkin Exporter
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#zipkin-exporter
      */

@@ -43,7 +43,7 @@ class ConfigurationTest extends TestCase
     private const TYPES = [
         VariableTypes::STRING => [Variables::OTEL_SERVICE_NAME],
         VariableTypes::BOOL => [Variables::OTEL_EXPORTER_OTLP_INSECURE],
-        VariableTypes::INTEGER => [Variables::OTEL_EXPORTER_JAEGER_AGENT_PORT],
+        VariableTypes::INTEGER => [Variables::OTEL_BSP_MAX_QUEUE_SIZE],
         VariableTypes::ENUM => [Variables::OTEL_LOG_LEVEL],
         VariableTypes::LIST => [Variables::OTEL_PROPAGATORS],
         VariableTypes::MAP => [Variables::OTEL_RESOURCE_ATTRIBUTES],
@@ -73,7 +73,7 @@ class ConfigurationTest extends TestCase
     private const LIBRARY_DEFAULTS = [
         VariableTypes::STRING => [Variables::OTEL_EXPORTER_OTLP_ENDPOINT, 'http://localhost:4318'],
         VariableTypes::BOOL => [Variables::OTEL_EXPORTER_OTLP_INSECURE, false],
-        VariableTypes::INTEGER => [Variables::OTEL_EXPORTER_JAEGER_AGENT_PORT, 6831],
+        VariableTypes::INTEGER => [Variables::OTEL_BSP_MAX_QUEUE_SIZE, 2048],
         VariableTypes::ENUM => [Variables::OTEL_LOG_LEVEL, 'info'],
         VariableTypes::LIST => [Variables::OTEL_PROPAGATORS, ['tracecontext', 'baggage']],
     ];
@@ -416,7 +416,7 @@ class ConfigurationTest extends TestCase
         return [
             'bool' => ['OTEL_EXPORTER_OTLP_INSECURE', VariableTypes::BOOL],
             'string' => ['OTEL_SERVICE_NAME', VariableTypes::STRING],
-            'integer' => ['OTEL_EXPORTER_JAEGER_AGENT_PORT', VariableTypes::INTEGER],
+            'integer' => ['OTEL_BSP_MAX_QUEUE_SIZE', VariableTypes::INTEGER],
             'enum' => ['OTEL_LOG_LEVEL', VariableTypes::ENUM],
             'list' => ['OTEL_PROPAGATORS', VariableTypes::LIST],
             'map' => ['OTEL_RESOURCE_ATTRIBUTES', VariableTypes::MAP],

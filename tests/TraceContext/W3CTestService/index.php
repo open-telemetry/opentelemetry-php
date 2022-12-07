@@ -6,7 +6,9 @@ require __DIR__ . '/trace-context-handler.php';
 
 use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Response;
-use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
+use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -23,13 +25,10 @@ function main(): void
     $tracer = (new TracerProvider(
         [
             new BatchSpanProcessor(
-                new JaegerExporter(
-                    'W3C Trace-Context Test Service',
-                    'http://localhost:9412/api/v2/spans',
-                    $httpClient,
-                    $httpClient,
-                    $httpClient,
+                new ZipkinExporter(
+                    PsrTransportFactory::discover()->create('http://zipkin:9412/api/v2/spans')
                 ),
+                ClockFactory::getDefault()
             ),
         ],
     ))->getTracer('W3C Trace-Context Test Service');

@@ -1,1 +1,0 @@
-# OpenTelemetry Jaeger Thrift files

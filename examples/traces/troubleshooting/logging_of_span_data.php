@@ -14,7 +14,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
  * will be the last log entry
  */
 
-use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
+use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\SimplePsrFileLogger;
@@ -35,14 +35,13 @@ if (!is_dir($logDir) && !mkdir($logDir, 0744, true) && !is_dir($logDir)) {
 /**
  * Create the Exporter.
  */
-$exporterEndpoint = 'http://jaeger:9412/api/v2/spans';
+$exporterEndpoint = 'http://zipkin:9411/api/v2/spans';
 /**
  * If you want to simulate a connection error, uncomment the next line
  */
-//$exporterEndpoint = 'http://example.com:9412/api/v2/spans';
-$exporter = new JaegerExporter(
-    'alwaysOnJaegerExample',
-    PsrTransportFactory::discover()->create('http://jaeger:9412/api/v2/spans', 'application/json'),
+//$exporterEndpoint = 'http://example.com:9411/api/v2/spans';
+$exporter = new ZipkinExporter(
+    PsrTransportFactory::discover()->create($exporterEndpoint, 'application/json'),
 );
 /**
  * Decorate the Exporter

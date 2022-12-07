@@ -61,15 +61,6 @@ interface Defaults
     public const OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'http/protobuf';
     public const OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'http/protobuf';
     /**
-     * Jaeger Exporter
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#jaeger-exporter
-     */
-    public const OTEL_EXPORTER_JAEGER_AGENT_HOST = 'localhost';
-    public const OTEL_EXPORTER_JAEGER_AGENT_PORT = 6831;
-    public const OTEL_EXPORTER_JAEGER_ENDPOINT = 'http://localhost:14250';
-    // Timeout (seconds)
-    public const OTEL_EXPORTER_JAEGER_TIMEOUT = 10;
-    /**
      * Zipkin Exporter
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#zipkin-exporter
      */
