@@ -70,7 +70,7 @@ class JaegerSpanConverterTest extends TestCase
                         'telemetry.sdk.language' => 'php',
                         'telemetry.sdk.version' => 'dev',
                         'instance' => 'test-a',
-                        'service.name' => 'unknown_service',
+                        'service.name' => 'unknown_service:php',
                     ])
                 )
             );
@@ -114,7 +114,7 @@ class JaegerSpanConverterTest extends TestCase
         $this->assertSame('test-a', $convertedSpan->tags[11]->vStr);
 
         $this->assertSame('service.name', $convertedSpan->tags[12]->key);
-        $this->assertSame('unknown_service', $convertedSpan->tags[12]->vStr);
+        $this->assertSame('unknown_service:php', $convertedSpan->tags[12]->vStr);
     }
 
     public function test_should_correctly_convert_error_status_to_jaeger_thrift_tags()

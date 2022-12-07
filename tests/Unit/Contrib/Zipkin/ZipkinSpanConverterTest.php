@@ -54,21 +54,21 @@ class ZipkinSpanConverterTest extends TestCase
                         'telemetry.sdk.language' => 'php',
                         'telemetry.sdk.version' => 'dev',
                         'instance' => 'test-a',
-                        'service.name' => 'unknown_service',
+                        'service.name' => 'unknown_service:php',
                     ])
                 )
             )
             ->addEvent('validators.list', Attributes::create(['job' => 'stage.updateTime']), 1505855799433901068)
             ->setHasEnded(true);
 
-        $converter = new SpanConverter('test.name');
+        $converter = new SpanConverter();
         $row = $converter->convert([$span])[0];
 
         $this->assertSame($span->getContext()->getSpanId(), $row['id']);
         $this->assertSame($span->getContext()->getTraceId(), $row['traceId']);
         $this->assertSame('1000000000000000', $row['parentId']);
 
-        $this->assertSame('test.name', $row['localEndpoint']['serviceName']);
+        $this->assertSame('unknown_service:php', $row['localEndpoint']['serviceName']);
         $this->assertSame($span->getName(), $row['name']);
 
         $this->assertSame(1505855794194009, $row['timestamp']);
@@ -85,7 +85,7 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame('php', $row['tags']['telemetry.sdk.language']);
         $this->assertSame('dev', $row['tags']['telemetry.sdk.version']);
         $this->assertSame('test-a', $row['tags']['instance']);
-        $this->assertSame('unknown_service', $row['tags']['service.name']);
+        $this->assertSame('unknown_service:php', $row['tags']['service.name']);
 
         $this->assertSame('instrumentation_scope_name', $row['otel.scope.name']);
         $this->assertSame('instrumentation_scope_version', $row['otel.scope.version']);
@@ -105,7 +105,7 @@ class ZipkinSpanConverterTest extends TestCase
     {
         $span = (new SpanData());
 
-        $converter = new SpanConverter('unused');
+        $converter = new SpanConverter();
         $row = $converter->convert([$span])[0];
 
         $this->assertArrayNotHasKey('kind', $row);
@@ -123,7 +123,7 @@ class ZipkinSpanConverterTest extends TestCase
         $span = (new SpanData())
             ->setKind($internalSpanKind);
 
-        $converter = new SpanConverter('unused');
+        $converter = new SpanConverter();
         $row = $converter->convert([$span])[0];
 
         $this->assertSame($expectedSpanKind, $row['kind']);
@@ -147,7 +147,7 @@ class ZipkinSpanConverterTest extends TestCase
         $span = (new SpanData())
             ->setKind($kind);
 
-        $converter = new SpanConverter('unused');
+        $converter = new SpanConverter();
         $row = $converter->convert([$span])[0];
 
         $this->assertArrayNotHasKey('kind', $row);
@@ -166,7 +166,7 @@ class ZipkinSpanConverterTest extends TestCase
         $span = (new SpanData())
             ->addEvent('event.name', Attributes::create([]));
 
-        $converter = new SpanConverter('test.name');
+        $converter = new SpanConverter();
         $row = $converter->convert([$span])[0];
 
         [$annotation] = $row['annotations'];
@@ -180,7 +180,7 @@ class ZipkinSpanConverterTest extends TestCase
             ->addAttribute('net.peer.port', '80')
             ->setKind(SpanKind::KIND_PRODUCER);
 
-        $converter = new SpanConverter('unused');
+        $converter = new SpanConverter();
         $row = $converter->convert([$span])[0];
 
         $this->assertSame('unknown', $row['remoteEndpoint']['serviceName']);
@@ -194,7 +194,7 @@ class ZipkinSpanConverterTest extends TestCase
             ->addAttribute('net.peer.ip', '::1')
             ->setKind(SpanKind::KIND_PRODUCER);
 
-        $converter = new SpanConverter('unused');
+        $converter = new SpanConverter();
         $row = $converter->convert([$span])[0];
 
         $this->assertSame('00000000000000000000000000000001', bin2hex($row['remoteEndpoint']['ipv6'])); //Couldn't figure out how to do a direct assertion against binary data
@@ -220,7 +220,7 @@ class ZipkinSpanConverterTest extends TestCase
             ->addAttribute('list-of-booleans', $listOfBooleans)
             ->addAttribute('list-of-random', $listOfRandoms);
 
-        $tags = (new SpanConverter('tags.test'))->convert([$span])[0]['tags'];
+        $tags = (new SpanConverter())->convert([$span])[0]['tags'];
 
         // Check that we can convert all attributes to tags
         $this->assertCount(10, $tags);

@@ -23,6 +23,6 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
             'Data-Format-Version' => $dataFormatVersion,
         ]);
 
-        return new Exporter('newrelic', $transport, $endpointUrl);
+        return new Exporter($transport, $endpointUrl);
     }
 }

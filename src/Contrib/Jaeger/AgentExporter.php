@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Jaeger;
 
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Behavior\SpanExporterTrait;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use OpenTelemetry\SemConv\ResourceAttributes;
 
 /**
  * @package OpenTelemetry\Exporter
@@ -14,24 +16,22 @@ class AgentExporter implements SpanExporterInterface
 {
     use SpanExporterTrait;
 
-    private string $serviceName;
-
     private SpanConverter $spanConverter;
 
     private JaegerTransport $jaegerTransport;
 
+    private string $defaultServiceName;
+
     public function __construct(
-        $name,
         string $endpointUrl
     ) {
         $parsedEndpoint = (new ParsedEndpointUrl($endpointUrl))
                                 ->validateHost() //This is because the host is required downstream
                                 ->validatePort(); //This is because the port is required downstream
 
-        $this->serviceName = $name;
-
         $this->spanConverter = new SpanConverter();
         $this->jaegerTransport = new JaegerTransport($parsedEndpoint);
+        $this->defaultServiceName = ResourceInfoFactory::defaultResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
     }
 
     public function closeAgentConnection(): void
@@ -43,9 +43,12 @@ class AgentExporter implements SpanExporterInterface
     {
         // UDP Transport begins here after converting to thrift format span
         foreach ($spans as $span) {
+            $serviceName =  $span->getResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME)
+                            ??
+                            $this->defaultServiceName;
             $this->jaegerTransport->append(
                 $this->spanConverter->convert([$span])[0],
-                $this->serviceName
+                $serviceName
             );
         }
 

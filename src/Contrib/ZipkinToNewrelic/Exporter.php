@@ -30,16 +30,14 @@ class Exporter implements SpanExporterInterface
     private TransportInterface $transport;
 
     public function __construct(
-        string $name,
         TransportInterface $transport,
         SpanConverter $spanConverter = null
     ) {
         $this->transport = $transport;
-        $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
+        $this->setSpanConverter($spanConverter ?? new SpanConverter());
     }
 
     public static function create(
-        string $name,
         string $endpointUrl,
         string $licenseKey
     ): self {
@@ -49,7 +47,7 @@ class Exporter implements SpanExporterInterface
             'Data-Format-Version' => '2',
         ]);
 
-        return new self($name, $transport);
+        return new self($transport);
     }
 
     /**

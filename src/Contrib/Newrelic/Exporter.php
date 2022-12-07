@@ -29,19 +29,16 @@ class Exporter implements SpanExporterInterface
     public const DATA_FORMAT_VERSION_DEFAULT = '1';
 
     private TransportInterface $transport;
-    private string $name;
     private string $endpointUrl;
 
     public function __construct(
-        $name,
         TransportInterface $transport,
         string $endpointUrl,
         SpanConverter $spanConverter = null
     ) {
-        $this->name = $name;
         $this->endpointUrl = $endpointUrl;
         $this->transport = $transport;
-        $this->setSpanConverter($spanConverter ?? new SpanConverter($name));
+        $this->setSpanConverter($spanConverter ?? new SpanConverter());
     }
 
     /**
@@ -54,7 +51,7 @@ class Exporter implements SpanExporterInterface
 
     private function convert(iterable $spans): array
     {
-        $commonAttributes = ['attributes' => [ 'service.name' => $this->name,
+        $commonAttributes = ['attributes' => [
             'host' => $this->endpointUrl, ]];
 
         return [[ 'common' => $commonAttributes,

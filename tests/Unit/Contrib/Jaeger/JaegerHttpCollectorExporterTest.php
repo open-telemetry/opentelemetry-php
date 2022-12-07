@@ -29,7 +29,6 @@ class JaegerHttpCollectorExporterTest extends TestCase
          */
         $exporter = new HttpCollectorExporter(
             'https://hostOfJaegerCollector.com/post',
-            'nameOfThisService',
             $this->getClientInterfaceMock(),
             $this->getRequestFactoryInterfaceMock(),
             $this->getStreamFactoryInterfaceMock()

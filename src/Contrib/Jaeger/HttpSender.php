@@ -11,6 +11,7 @@ use OpenTelemetry\Contrib\Jaeger\BatchAdapter\BatchAdapterInterface;
 use OpenTelemetry\Contrib\Jaeger\TagFactory\TagFactory;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -22,22 +23,19 @@ class HttpSender
 {
     use LogsMessagesTrait;
 
-    private string $serviceName;
-
     private TProtocol $protocol;
 
     private BatchAdapterFactoryInterface $batchAdapterFactory;
+
+    private string $defaultServiceName;
 
     public function __construct(
         ClientInterface $client,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
-        string $serviceName,
         ParsedEndpointUrl $parsedEndpoint,
         BatchAdapterFactoryInterface $batchAdapterFactory = null
     ) {
-        $this->serviceName = $serviceName;
-
         $this->protocol = new TBinaryProtocol(
             new ThriftHttpTransport(
                 $client,
@@ -48,6 +46,7 @@ class HttpSender
         );
 
         $this->batchAdapterFactory = $batchAdapterFactory ?? new BatchAdapterFactory();
+        $this->defaultServiceName = ResourceInfoFactory::defaultResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
     }
 
     public function send(iterable $spans): void
@@ -103,7 +102,8 @@ class HttpSender
 
     private function createProcessFromResource(ResourceInfo $resource): Process
     {
-        $serviceName = $this->serviceName; //Defaulting to (what should be) the default resource's service name
+        //Defaulting to (what should be) the default resource's service name
+        $serviceName = $this->defaultServiceName;
 
         $tags = [];
         foreach ($resource->getAttributes() as $key => $value) {

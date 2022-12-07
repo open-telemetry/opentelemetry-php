@@ -13,13 +13,11 @@ use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
  */
 class NewrelicExporterTest extends AbstractExporterTest
 {
-    protected const EXPORTER_NAME = 'test.newrelic';
     protected const LICENSE_KEY = 'abc123';
 
     public function createExporterWithTransport(TransportInterface $transport): Exporter
     {
         return new Exporter(
-            self::EXPORTER_NAME,
             $transport,
             'http://endpoint.url'
         );

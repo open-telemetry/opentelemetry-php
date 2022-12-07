@@ -14,7 +14,6 @@ use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
  */
 class ZipkinToNewrelicExporterTest extends AbstractExporterTest
 {
-    protected const EXPORTER_NAME = 'test.zipkinToNR';
     protected const LICENSE_KEY = 'abc123';
 
     /**
@@ -23,7 +22,6 @@ class ZipkinToNewrelicExporterTest extends AbstractExporterTest
     public function createExporterWithTransport(TransportInterface $transport): Exporter
     {
         return new Exporter(
-            self::EXPORTER_NAME,
             $transport
         );
     }

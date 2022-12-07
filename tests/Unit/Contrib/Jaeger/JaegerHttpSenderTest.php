@@ -10,6 +10,8 @@ use OpenTelemetry\Contrib\Jaeger\HttpSender;
 use OpenTelemetry\Contrib\Jaeger\ParsedEndpointUrl;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\Unit\Contrib\UsesHttpClientTrait;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
@@ -37,7 +39,6 @@ class JaegerHttpSenderTest extends TestCase
             $this->getClientInterfaceMock(),
             $this->getRequestFactoryInterfaceMock(),
             $this->getStreamFactoryInterfaceMock(),
-            $serviceName,
             $this->createParsedEndpointUrlMock(),
             $mockBatchAdapterFactory
         );
@@ -139,7 +140,10 @@ class JaegerHttpSenderTest extends TestCase
         $interceptedValues = $mockBatchAdapterFactory->getInterceptedValues();
 
         //1st batch
-        $this->assertSame('nameOfThe1stLogicalApp', $interceptedValues[0]['process']->serviceName);
+        $this->assertSame(
+            ResourceInfoFactory::defaultResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME),
+            $interceptedValues[0]['process']->serviceName
+        );
 
         //2nd batch
         $this->assertSame('nameOfThe2ndLogicalApp', $interceptedValues[1]['process']->serviceName);

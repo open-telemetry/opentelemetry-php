@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Newrelic;
 
 use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use OpenTelemetry\SemConv\ResourceAttributes;
 
 /**
  * @see https://docs.newrelic.com/docs/distributed-tracing/trace-api/report-new-relic-format-traces-trace-api/#new-relic-guidelines
@@ -16,11 +18,11 @@ class SpanConverter implements SpanConverterInterface
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
     const STATUS_DESCRIPTION_TAG_KEY = 'otel.status_description';
 
-    private string $serviceName;
+    private string $defaultServiceName;
 
-    public function __construct(string $serviceName)
+    public function __construct()
     {
-        $this->serviceName = $serviceName;
+        $this->defaultServiceName = ResourceInfoFactory::defaultResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
     }
 
     public function convert(iterable $spans): array
@@ -40,12 +42,16 @@ class SpanConverter implements SpanConverterInterface
         $startTimestamp = TimeUtil::nanosToMillis($span->getStartEpochNanos());
         $endTimestamp = TimeUtil::nanosToMillis($span->getEndEpochNanos());
 
+        $serviceName =  $span->getResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME)
+                        ??
+                        $this->defaultServiceName;
+
         $row = [
             'id' => $span->getSpanId(),
             'trace.id' => $span->getTraceId(),
             'attributes' => [
                 'name' => $span->getName(),
-                'service.name' => $this->serviceName,
+                'service.name' => $serviceName,
                 'parent.id' => $spanParent->isValid() ? $spanParent->getSpanId() : null,
                 'timestamp' => $startTimestamp,
                 'duration.ms' => (float) $endTimestamp - $startTimestamp,
