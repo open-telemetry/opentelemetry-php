@@ -18,11 +18,11 @@ interface SpanContextInterface
 
     /** @psalm-mutation-free */
     public function getTraceId(): string;
-    public function getTraceIdBytes(): array;
+    public function getTraceIdBinary(): string;
 
     /** @psalm-mutation-free */
     public function getSpanId(): string;
-    public function getSpanIdBytes(): array;
+    public function getSpanIdBinary(): string;
     public function getTraceFlags(): int;
     public function getTraceState(): ?TraceStateInterface;
     public function isValid(): bool;

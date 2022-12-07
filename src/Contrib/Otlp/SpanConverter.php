@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use function hex2bin;
 use OpenTelemetry\API\Trace as API;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Common\V1\InstrumentationScope;
@@ -140,11 +139,11 @@ final class SpanConverter
     private function convertSpan(SpanDataInterface $span): Span
     {
         $pSpan = new Span();
-        $pSpan->setTraceId(hex2bin($span->getContext()->getTraceId()));
-        $pSpan->setSpanId(hex2bin($span->getContext()->getSpanId()));
+        $pSpan->setTraceId($span->getContext()->getTraceIdBinary());
+        $pSpan->setSpanId($span->getContext()->getSpanIdBinary());
         $pSpan->setTraceState((string) $span->getContext()->getTraceState());
         if ($span->getParentContext()->isValid()) {
-            $pSpan->setParentSpanId(hex2bin($span->getParentContext()->getSpanId()));
+            $pSpan->setParentSpanId($span->getParentContext()->getSpanIdBinary());
         }
         $pSpan->setName($span->getName());
         $pSpan->setKind($this->convertSpanKind($span->getKind()));
@@ -164,8 +163,8 @@ final class SpanConverter
         foreach ($span->getLinks() as $link) {
             /** @psalm-suppress InvalidArgument */
             $pSpan->getLinks()[] = $pLink = new Link();
-            $pLink->setTraceId(hex2bin($link->getSpanContext()->getTraceId()));
-            $pLink->setSpanId(hex2bin($link->getSpanContext()->getSpanId()));
+            $pLink->setTraceId($link->getSpanContext()->getTraceIdBinary());
+            $pLink->setSpanId($link->getSpanContext()->getSpanIdBinary());
             $pLink->setTraceState((string) $link->getSpanContext()->getTraceState());
             $this->setAttributes($pLink, $link->getAttributes());
         }

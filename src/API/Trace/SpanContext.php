@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
+use function hex2bin;
+
 final class SpanContext implements SpanContextInterface
 {
     private static ?SpanContextInterface $invalidContext = null;
@@ -49,9 +51,9 @@ final class SpanContext implements SpanContextInterface
         return $this->traceId;
     }
 
-    public function getTraceIdBytes(): array
+    public function getTraceIdBinary(): string
     {
-        return $this->toByteArray($this->traceId);
+        return hex2bin($this->traceId);
     }
 
     public function getSpanId(): string
@@ -59,9 +61,9 @@ final class SpanContext implements SpanContextInterface
         return $this->spanId;
     }
 
-    public function getSpanIdBytes(): array
+    public function getSpanIdBinary(): string
     {
-        return $this->toByteArray($this->spanId);
+        return hex2bin($this->spanId);
     }
 
     public function getTraceState(): ?TraceStateInterface
@@ -121,15 +123,5 @@ final class SpanContext implements SpanContextInterface
         }
 
         return self::$invalidContext;
-    }
-
-    private function toByteArray(string $id): array
-    {
-        $bytes = [];
-        for ($i=0; $i<strlen($id); $i += 2) {
-            $bytes[] = base_convert($id[$i] . $id[$i+1], 16, 2);
-        }
-
-        return $bytes;
     }
 }
