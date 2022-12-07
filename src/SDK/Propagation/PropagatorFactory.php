@@ -45,9 +45,7 @@ class PropagatorFactory
     private function buildPropagator(string $name): TextMapPropagatorInterface
     {
         try {
-            $factory = FactoryRegistry::textMapPropagatorFactory($name);
-
-            return $factory->create();
+            return FactoryRegistry::textMapPropagator($name);
         } catch (\RuntimeException $e) {
             self::logWarning($e->getMessage());
         }

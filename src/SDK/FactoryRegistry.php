@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
-use OpenTelemetry\Context\Propagation\TextMapPropagatorFactoryInterface;
+use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
@@ -15,7 +15,7 @@ class FactoryRegistry
     private static array $spanExporterFactories = [];
     private static array $transportFactories = [];
     private static array $metricExporterFactories = [];
-    private static array $textMapPropagatorFactories = [];
+    private static array $textMapPropagators = [];
 
     /**
      * @param TransportFactoryInterface|class-string<TransportFactoryInterface> $factory
@@ -86,24 +86,12 @@ class FactoryRegistry
         self::$metricExporterFactories[$exporter] = $factory;
     }
 
-    public static function registerTextMapPropagatorFactory(string $name, $factory, bool $clobber = false): void
+    public static function registerTextMapPropagator(string $name, TextMapPropagatorInterface $propagator, bool $clobber = false): void
     {
-        if (!$clobber && array_key_exists($name, self::$textMapPropagatorFactories)) {
+        if (!$clobber && array_key_exists($name, self::$textMapPropagators)) {
             return;
         }
-        if (!is_subclass_of($factory, TextMapPropagatorFactoryInterface::class)) {
-            trigger_error(
-                sprintf(
-                    'Cannot register text map propagator factory: %s must exist and implement %s',
-                    is_string($factory) ? $factory : get_class($factory),
-                    TextMapPropagatorFactoryInterface::class
-                ),
-                E_USER_WARNING
-            );
-
-            return;
-        }
-        self::$textMapPropagatorFactories[$name] = $factory;
+        self::$textMapPropagators[$name] = $propagator;
     }
 
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
@@ -147,15 +135,12 @@ class FactoryRegistry
         return $factory;
     }
 
-    public static function textMapPropagatorFactory(string $name): TextMapPropagatorFactoryInterface
+    public static function textMapPropagator(string $name): TextMapPropagatorInterface
     {
-        if (!array_key_exists($name, self::$textMapPropagatorFactories)) {
-            throw new RuntimeException('Text map propagator factory not registered for: ' . $name);
+        if (!array_key_exists($name, self::$textMapPropagators)) {
+            throw new RuntimeException('Text map propagator not registered for: ' . $name);
         }
-        $class = self::$textMapPropagatorFactories[$name];
-        $factory = (is_callable($class)) ? $class : new $class();
-        assert($factory instanceof TextMapPropagatorFactoryInterface);
 
-        return $factory;
+        return self::$textMapPropagators[$name];
     }
 }

@@ -2,11 +2,15 @@
 
 declare(strict_types=1);
 
-\OpenTelemetry\SDK\FactoryRegistry::registerTextMapPropagatorFactory(
-    \OpenTelemetry\SDK\Common\Configuration\KnownValues::VALUE_B3,
-    \OpenTelemetry\Extension\Propagator\B3\B3SinglePropagatorFactory::class
+use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
+use OpenTelemetry\SDK\Common\Configuration\KnownValues;
+use OpenTelemetry\SDK\FactoryRegistry;
+
+FactoryRegistry::registerTextMapPropagator(
+    KnownValues::VALUE_B3,
+    B3Propagator::getB3SingleHeaderInstance()
 );
-\OpenTelemetry\SDK\FactoryRegistry::registerTextMapPropagatorFactory(
-    \OpenTelemetry\SDK\Common\Configuration\KnownValues::VALUE_B3_MULTI,
-    \OpenTelemetry\Extension\Propagator\B3\B3MultiPropagatorFactory::class
+FactoryRegistry::registerTextMapPropagator(
+    KnownValues::VALUE_B3_MULTI,
+    B3Propagator::getB3MultiHeaderInstance()
 );
