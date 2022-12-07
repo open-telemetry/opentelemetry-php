@@ -256,6 +256,15 @@ final class Span extends API\Span implements ReadWriteSpanInterface
             return $this;
         }
 
+        // An attempt to set value Unset SHOULD be ignored.
+        if ($code === API\StatusCode::STATUS_UNSET) {
+            return $this;
+        }
+
+        // When span status is set to Ok it SHOULD be considered final and any further attempts to change it SHOULD be ignored.
+        if ($this->status->getCode() === API\StatusCode::STATUS_OK) {
+            return $this;
+        }
         $this->status = StatusData::create($code, $description);
 
         return $this;
