@@ -10,7 +10,11 @@ use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use RuntimeException;
 
-class FactoryRegistry
+/**
+ * A registry to enable central registration of components that the SDK requires but which may be provided
+ * by non-SDK modules, such as contrib and extension.
+ */
+class Registry
 {
     private static array $spanExporterFactories = [];
     private static array $transportFactories = [];

@@ -10,7 +10,7 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
-use OpenTelemetry\SDK\FactoryRegistry;
+use OpenTelemetry\SDK\Registry;
 
 class PropagatorFactory
 {
@@ -45,7 +45,7 @@ class PropagatorFactory
     private function buildPropagator(string $name): TextMapPropagatorInterface
     {
         try {
-            return FactoryRegistry::textMapPropagator($name);
+            return Registry::textMapPropagator($name);
         } catch (\RuntimeException $e) {
             self::logWarning($e->getMessage());
         }
