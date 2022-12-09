@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\Example\Unit\SDK;
 
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
-use OpenTelemetry\SDK\FactoryRegistry;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
+use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\FactoryRegistry
+ * @covers \OpenTelemetry\SDK\Registry
  */
 class FactoryRegistryTest extends TestCase
 {
@@ -20,7 +20,7 @@ class FactoryRegistryTest extends TestCase
      */
     public function test_default_transport_factories(string $name): void
     {
-        $factory = FactoryRegistry::transportFactory($name);
+        $factory = Registry::transportFactory($name);
         $this->assertInstanceOf(TransportFactoryInterface::class, $factory);
     }
 
@@ -41,7 +41,7 @@ class FactoryRegistryTest extends TestCase
      */
     public function test_default_span_exporter_factories(string $name): void
     {
-        $factory = FactoryRegistry::spanExporterFactory($name);
+        $factory = Registry::spanExporterFactory($name);
         $this->assertInstanceOf(SpanExporterFactoryInterface::class, $factory);
     }
 
@@ -61,7 +61,7 @@ class FactoryRegistryTest extends TestCase
      */
     public function test_default_metric_exporter_factories(string $name): void
     {
-        $factory = FactoryRegistry::metricExporterFactory($name);
+        $factory = Registry::metricExporterFactory($name);
         $this->assertInstanceOf(MetricExporterFactoryInterface::class, $factory);
     }
 
@@ -80,7 +80,7 @@ class FactoryRegistryTest extends TestCase
     public function test_register_invalid_transport_factory($factory): void
     {
         $this->expectWarning();
-        FactoryRegistry::registerTransportFactory('http', $factory, true);
+        Registry::registerTransportFactory('http', $factory, true);
     }
 
     /**
@@ -89,7 +89,7 @@ class FactoryRegistryTest extends TestCase
     public function test_register_invalid_span_exporter_factory($factory): void
     {
         $this->expectWarning();
-        FactoryRegistry::registerSpanExporterFactory('foo', $factory, true);
+        Registry::registerSpanExporterFactory('foo', $factory, true);
     }
 
     /**
@@ -98,7 +98,7 @@ class FactoryRegistryTest extends TestCase
     public function test_register_invalid_metric_exporter_factory($factory): void
     {
         $this->expectWarning();
-        FactoryRegistry::registerMetricExporterFactory('foo', $factory, true);
+        Registry::registerMetricExporterFactory('foo', $factory, true);
     }
 
     public function invalidFactoryProvider(): array

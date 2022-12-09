@@ -4,16 +4,22 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
+use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use RuntimeException;
 
-class FactoryRegistry
+/**
+ * A registry to enable central registration of components that the SDK requires but which may be provided
+ * by non-SDK modules, such as contrib and extension.
+ */
+class Registry
 {
     private static array $spanExporterFactories = [];
     private static array $transportFactories = [];
     private static array $metricExporterFactories = [];
+    private static array $textMapPropagators = [];
 
     /**
      * @param TransportFactoryInterface|class-string<TransportFactoryInterface> $factory
@@ -84,6 +90,14 @@ class FactoryRegistry
         self::$metricExporterFactories[$exporter] = $factory;
     }
 
+    public static function registerTextMapPropagator(string $name, TextMapPropagatorInterface $propagator, bool $clobber = false): void
+    {
+        if (!$clobber && array_key_exists($name, self::$textMapPropagators)) {
+            return;
+        }
+        self::$textMapPropagators[$name] = $propagator;
+    }
+
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
     {
         if (!array_key_exists($exporter, self::$spanExporterFactories)) {
@@ -123,5 +137,14 @@ class FactoryRegistry
         assert($factory instanceof MetricExporterFactoryInterface);
 
         return $factory;
+    }
+
+    public static function textMapPropagator(string $name): TextMapPropagatorInterface
+    {
+        if (!array_key_exists($name, self::$textMapPropagators)) {
+            throw new RuntimeException('Text map propagator not registered for: ' . $name);
+        }
+
+        return self::$textMapPropagators[$name];
     }
 }

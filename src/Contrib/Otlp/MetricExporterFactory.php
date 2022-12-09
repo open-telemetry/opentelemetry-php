@@ -9,9 +9,9 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
-use OpenTelemetry\SDK\FactoryRegistry;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
+use OpenTelemetry\SDK\Registry;
 use UnexpectedValueException;
 
 class MetricExporterFactory implements MetricExporterFactoryInterface
@@ -44,7 +44,7 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
             : Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_HEADERS);
         $headers += OtlpUtil::getUserAgentHeader();
 
-        $factory = FactoryRegistry::transportFactory($protocol);
+        $factory = Registry::transportFactory($protocol);
         switch ($protocol) {
             case KnownValues::VALUE_GRPC:
                 return $factory->create(
