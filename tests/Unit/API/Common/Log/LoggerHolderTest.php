@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Log;
+namespace OpenTelemetry\Tests\Unit\API\Common\Log;
 
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Log\LoggerHolder
+ * @covers \OpenTelemetry\API\Common\Log\LoggerHolder
  */
 class LoggerHolderTest extends TestCase
 {

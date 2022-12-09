@@ -21,7 +21,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 echo 'Starting SDK builder example' . PHP_EOL;
 
-\OpenTelemetry\SDK\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
+\OpenTelemetry\API\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
 
 $resource = ResourceInfoFactory::defaultResource();
 $spanExporter = new InMemoryExporter();

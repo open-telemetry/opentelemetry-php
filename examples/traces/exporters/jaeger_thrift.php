@@ -5,8 +5,8 @@ require __DIR__ . '/../../../vendor/autoload.php';
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\Contrib\Jaeger\AgentExporter;
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;

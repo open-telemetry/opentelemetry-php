@@ -40,7 +40,7 @@ class Util
         }
 
         $notice = sprintf(
-            'Class "%s " is deprecated and will be removed in a future release. ',
+            'Class "%s" is deprecated and will be removed in a future release. ',
             $className
         );
 

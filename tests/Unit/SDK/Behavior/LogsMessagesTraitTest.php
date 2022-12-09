@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Behavior;
 
-use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
- * @covers \OpenTelemetry\SDK\Behavior\LogsMessagesTrait
+ * @covers \OpenTelemetry\API\Behavior\LogsMessagesTrait
  */
 class LogsMessagesTraitTest extends TestCase
 {

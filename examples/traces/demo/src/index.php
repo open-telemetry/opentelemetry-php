@@ -22,7 +22,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Routing\RouteContext;
 
-$tracerProvider = (new TracerProviderFactory('example'))->create();
+$tracerProvider = (new TracerProviderFactory())->create();
 ShutdownHandler::register([$tracerProvider, 'shutdown']);
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
