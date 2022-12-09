@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
+use function hex2bin;
+
 final class SpanContext implements SpanContextInterface
 {
     private static ?SpanContextInterface $invalidContext = null;
@@ -49,9 +51,19 @@ final class SpanContext implements SpanContextInterface
         return $this->traceId;
     }
 
+    public function getTraceIdBinary(): string
+    {
+        return hex2bin($this->traceId);
+    }
+
     public function getSpanId(): string
     {
         return $this->spanId;
+    }
+
+    public function getSpanIdBinary(): string
+    {
+        return hex2bin($this->spanId);
     }
 
     public function getTraceState(): ?TraceStateInterface

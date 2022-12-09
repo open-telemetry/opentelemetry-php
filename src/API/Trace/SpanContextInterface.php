@@ -12,20 +12,17 @@ interface SpanContextInterface
     public const TRACE_FLAG_SAMPLED = 0x01;
     public const TRACE_FLAG_DEFAULT = 0x00;
 
-    /** @todo Implement this in the API layer */
     public static function createFromRemoteParent(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface;
-
-    /** @todo Implement this in the API layer */
     public static function getInvalid(): SpanContextInterface;
-
-    /** @todo Implement this in the API layer */
     public static function create(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface;
 
     /** @psalm-mutation-free */
     public function getTraceId(): string;
+    public function getTraceIdBinary(): string;
 
     /** @psalm-mutation-free */
     public function getSpanId(): string;
+    public function getSpanIdBinary(): string;
     public function getTraceFlags(): int;
     public function getTraceState(): ?TraceStateInterface;
     public function isValid(): bool;

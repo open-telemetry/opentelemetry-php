@@ -59,7 +59,6 @@ smoke-test-exporter-examples: FORCE ## Run (some) exporter smoke test examples
 # Note this does not include every exporter at the moment
 	$(DOCKER_COMPOSE) up -d --remove-orphans
 	$(DC_RUN_PHP) php ./examples/traces/features/exporters/zipkin.php
-	$(DC_RUN_PHP) php ./examples/traces/features/exporters/jaeger.php
 	$(DC_RUN_PHP) php ./examples/traces/features/parent_span_example.php
 # The following examples do not use the DC_RUN_PHP global because they need environment variables.
 	$(DOCKER_COMPOSE) run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/features/exporters/newrelic.php
@@ -87,8 +86,6 @@ fiber-ffi-example:
 	@$(DOCKER_COMPOSE) -f docker-compose.fiber-ffi.yaml -p opentelemetry-php_fiber-ffi-example up -d web
 protobuf: ## Generate protobuf files
 	./script/proto_gen.sh
-thrift: ## Generate thrift files
-	./script/thrift_gen.sh
 bash: ## bash shell into container
 	$(DC_RUN_PHP) bash
 style: ## Run style check/fix

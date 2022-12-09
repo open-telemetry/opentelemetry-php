@@ -319,7 +319,6 @@ return [
     'exclude_analysis_directory_list' => [
         'vendor/',
         'proto/',
-        'thrift/',
     ],
 
     // Enable this to enable checks of require/include statements referring to valid paths.
@@ -370,8 +369,6 @@ return [
         'src',
         'proto/otel/GPBMetadata',
         'proto/otel/Opentelemetry',
-        'thrift',
-        'vendor/packaged/thrift',
         'vendor/composer',
         'vendor/grpc/grpc/src/lib',
         'vendor/guzzlehttp',

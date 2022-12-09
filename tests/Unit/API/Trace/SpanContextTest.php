@@ -61,6 +61,16 @@ class SpanContextTest extends TestCase
         $this->assertSame(self::SECOND_TRACE_ID, $this->second->getTraceId());
     }
 
+    public function test_get_trace_and_span_id_binary(): void
+    {
+        $traceId = '7d9df3359179cfd468fdf360f3e29f1a';
+        $spanId = '7d9df3359179cfd4';
+
+        $spanContext = SpanContext::create($traceId, $spanId);
+        $this->assertSame(hex2bin($traceId), $spanContext->getTraceIdBinary());
+        $this->assertSame(hex2bin($spanId), $spanContext->getSpanIdBinary());
+    }
+
     public function test_get_span_id(): void
     {
         $this->assertSame(self::FIRST_SPAN_ID, $this->first->getSpanId());

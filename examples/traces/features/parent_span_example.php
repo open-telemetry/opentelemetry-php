@@ -3,11 +3,9 @@
 declare(strict_types=1);
 require __DIR__ . '/../../../vendor/autoload.php';
 
-use OpenTelemetry\Contrib\Jaeger\Exporter as JaegerExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
@@ -20,16 +18,9 @@ $zipkinExporter = new ZipkinExporter(
     PsrTransportFactory::discover()->create('http://zipkin:9411/api/v2/spans')
 );
 
-// jaeger exporter
-$jaegerExporter = new JaegerExporter(
-    $serviceName,
-    PsrTransportFactory::discover()->create('http://jaeger:9411/api/v2/spans')
-);
-
 $tracerProvider =  new TracerProvider(
     [
         new SimpleSpanProcessor($zipkinExporter),
-        new SimpleSpanProcessor($jaegerExporter),
     ],
     $sampler
 );
@@ -74,7 +65,6 @@ echo '  - ' . $rootSpan->getContext()->getTraceId() . PHP_EOL;
 echo '  - ' . $secondRootSpan->getContext()->getTraceId() . PHP_EOL;
 echo PHP_EOL;
 echo 'See the results at' . PHP_EOL;
-echo 'Jaeger: http://localhost:16686/' . PHP_EOL;
 echo 'Zipkin: http://localhost:9411/' . PHP_EOL;
 
 $tracerProvider->shutdown();

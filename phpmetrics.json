@@ -4,8 +4,7 @@
     ],
     "exclude": [
         "tests",
-        "proto",
-        "thrift"
+        "proto"
     ],
     "report": {
         "html": "var/metrics",
