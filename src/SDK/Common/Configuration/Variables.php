@@ -78,16 +78,6 @@ interface Variables
     public const OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'OTEL_EXPORTER_OTLP_TRACES_PROTOCOL';
     public const OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'OTEL_EXPORTER_OTLP_METRICS_PROTOCOL';
     /**
-     * Jaeger Exporter
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#jaeger-exporter
-     */
-    public const OTEL_EXPORTER_JAEGER_AGENT_HOST = 'OTEL_EXPORTER_JAEGER_AGENT_HOST';
-    public const OTEL_EXPORTER_JAEGER_AGENT_PORT = 'OTEL_EXPORTER_JAEGER_AGENT_PORT';
-    public const OTEL_EXPORTER_JAEGER_ENDPOINT = 'OTEL_EXPORTER_JAEGER_ENDPOINT';
-    public const OTEL_EXPORTER_JAEGER_TIMEOUT = 'OTEL_EXPORTER_JAEGER_TIMEOUT';
-    public const OTEL_EXPORTER_JAEGER_USER = 'OTEL_EXPORTER_JAEGER_USER';
-    public const OTEL_EXPORTER_JAEGER_PASSWORD = 'OTEL_EXPORTER_JAEGER_PASSWORD';
-    /**
      * Zipkin Exporter
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#zipkin-exporter
      */

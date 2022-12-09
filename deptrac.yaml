@@ -13,7 +13,6 @@ deptrac:
     paths:
         - ./src
         - ./proto
-        - ./thrift
         - ./tests
     exclude_files:
         - '#.*test.*#'
@@ -80,14 +79,6 @@ deptrac:
           collectors:
               - type: className
                 regex: ^Composer\\*
-      -   name: Thrift
-          collectors:
-              - type: className
-                regex: ^Thrift\\*
-      -   name: JaegerThrift
-          collectors:
-              - type: className
-                regex: ^Jaeger\\Thrift\\*
 
     ruleset:
       Context:
@@ -107,12 +98,8 @@ deptrac:
           - +OtelProto
           - Grpc
           - Prometheus
-          - Thrift
-          - JaegerThrift
       Extension:
           - +API
       OtelProto:
           - GoogleProtobuf
           - Grpc
-      JaegerThrift:
-          - Thrift

@@ -59,8 +59,6 @@ The [open-telemetry/opentelemetry](https://packagist.org/packages/open-telemetry
 This repository also hosts and distributes generated client code used by individual components as separate packages.  These packages are:
 - Generated [OTLP](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md) ProtoBuf files:
   [open-telemetry/gen-otlp-protobuf](https://packagist.org/packages/open-telemetry/gen-otlp-protobuf)
-- Generated [Jaeger](https://github.com/jaegertracing/jaeger-idl) Thrift files:
-  [open-telemetry/gen-jaeger-thrift](https://packagist.org/packages/open-telemetry/gen-jaeger-thrift)
 
 For now the generated code packages are meant to be only used by library components internally.
 
@@ -308,7 +306,7 @@ See [examples/traces/demo](examples/traces/demo) for a working example.
 
 ### Trace examples
 
-You can use the [zipkin](/examples/traces/exporters/zipkin.php) or [jaeger](/examples/traces/exporters/jaeger.php) example to test out the reference
+You can use the [zipkin](/examples/traces/exporters/zipkin.php) example to test out the reference
 implementations. This example performs a sample trace with a grouping of 5 spans and exports the result
 to a local zipkin or jaeger instance.
 

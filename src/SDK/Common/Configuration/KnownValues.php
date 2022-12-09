@@ -33,14 +33,12 @@ interface KnownValues
     public const VALUE_PARENT_BASED_ALWAYS_ON = 'parentbased_always_on';
     public const VALUE_PARENT_BASED_ALWAYS_OFF = 'parentbased_always_off';
     public const VALUE_PARENT_BASED_TRACE_ID_RATIO = 'parentbased_traceidratio';
-    public const VALUE_JAEGER_REMOTE= 'jaeger_remote';
     public const VALUE_GZIP = 'gzip';
     public const VALUE_GRPC = 'grpc';
     public const VALUE_HTTP_PROTOBUF = 'http/protobuf';
     public const VALUE_HTTP_JSON = 'http/json';
     public const VALUE_HTTP_NDJSON = 'http/ndjson';
     public const VALUE_OTLP = 'otlp';
-    public const VALUE_JAEGER = 'jaeger';
     public const VALUE_ZIPKIN = 'zipkin';
     public const VALUE_NEWRELIC = 'newrelic';
     public const VALUE_PROMETHEUS = 'prometheus';
@@ -103,7 +101,6 @@ interface KnownValues
         self::VALUE_PARENT_BASED_ALWAYS_ON,
         self::VALUE_PARENT_BASED_ALWAYS_OFF,
         self::VALUE_PARENT_BASED_TRACE_ID_RATIO,
-        self::VALUE_JAEGER_REMOTE,
         self::VALUE_XRAY,
     ];
     /**
@@ -128,7 +125,6 @@ interface KnownValues
      */
     public const OTEL_TRACES_EXPORTER = [
         self::VALUE_OTLP,
-        self::VALUE_JAEGER,
         self::VALUE_ZIPKIN,
         self::VALUE_NEWRELIC,
         self::VALUE_NONE,
