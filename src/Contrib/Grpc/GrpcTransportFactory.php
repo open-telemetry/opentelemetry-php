@@ -11,7 +11,7 @@ use Grpc\ChannelCredentials;
 use function in_array;
 use InvalidArgumentException;
 use function json_encode;
-use OpenTelemetry\SDK\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use function parse_url;

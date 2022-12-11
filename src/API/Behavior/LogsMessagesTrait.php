@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Behavior;
+namespace OpenTelemetry\API\Behavior;
 
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use Psr\Log\LogLevel;
 
 trait LogsMessagesTrait

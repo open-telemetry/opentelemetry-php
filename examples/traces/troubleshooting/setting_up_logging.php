@@ -18,7 +18,7 @@ LoggerHolder::set(
 );
 putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://does-not-exist/endpoint'); //invalid endpoint, export will fail
 putenv('OTEL_EXPORTER_OTLP_PROTOCOL=grpc');
-$factory = new TracerProviderFactory('otlp-logging-demo');
+$factory = new TracerProviderFactory();
 $tracerProvider = $factory->create();
 
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
