@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Trace;
 
 use function array_reverse;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use function strlen;
 
 class TraceState implements TraceStateInterface
 {
-    public const MAX_TRACESTATE_LIST_MEMBERS = 32;
-    public const MAX_TRACESTATE_LENGTH = 512;
+    use LogsMessagesTrait;
+
+    public const MAX_TRACESTATE_LIST_MEMBERS = 32; //@see https://www.w3.org/TR/trace-context/#tracestate-header-field-values
+    public const MAX_TRACESTATE_COMBINED_LENGTH = 512; //@see https://www.w3.org/TR/trace-context/#tracestate-limits
     public const LIST_MEMBERS_SEPARATOR = ',';
     public const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
     private const VALID_KEY_CHAR_RANGE = '[_0-9a-z-*\/]';
@@ -39,7 +42,6 @@ class TraceState implements TraceStateInterface
     {
         $clonedTracestate = clone $this;
 
-        //TODO: Log if we can't set the value
         if ($this->validateKey($key) && $this->validateValue($value)) {
 
             /*
@@ -54,6 +56,8 @@ class TraceState implements TraceStateInterface
 
             // Add new or updated entry to the back of the list.
             $clonedTracestate->traceState[$key] = $value;
+        } else {
+            self::logWarning('Invalid tracetrace key/value for: ' . $key);
         }
 
         return $clonedTracestate;
@@ -66,7 +70,6 @@ class TraceState implements TraceStateInterface
     {
         $clonedTracestate = clone $this;
 
-        //TODO: Log if we can't unset the value
         if ($key !== '') {
             unset($clonedTracestate->traceState[$key]);
         }
@@ -125,12 +128,13 @@ class TraceState implements TraceStateInterface
     {
         $parsedTracestate = [];
 
-        if (strlen($rawTracestate) <= self::MAX_TRACESTATE_LENGTH) {
+        if (strlen($rawTracestate) <= self::MAX_TRACESTATE_COMBINED_LENGTH) {
             $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
 
             // Discard tracestate if entries exceed max length.
             if (count($listMembers) > self::MAX_TRACESTATE_LIST_MEMBERS) {
-                // TODO: Log a message when we discard.
+                self::logWarning('tracestate discarded, too many members');
+
                 return [];
             }
 
@@ -139,18 +143,21 @@ class TraceState implements TraceStateInterface
                 $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, trim($listMember));
 
                 // There should only be one list-member per vendor separated by '='
-                // TODO: Log if we can't validate the key and value
                 if (count($vendor) === 2 && ($this->validateKey($vendor[0]) && $this->validateValue($vendor[1]))) {
                     $parsedTracestate[$vendor[0]] = $vendor[1];
 
                     continue;
                 }
+                self::logWarning('Ignored invalid tracestate setting: ' . $listMember);
+
                 $invalid = true;
 
                 break;
             }
             // Discard tracestate if any member is invalid.
             if ($invalid) {
+                self::logWarning('Invalid tracestate discarded');
+
                 return [];
             }
         }
