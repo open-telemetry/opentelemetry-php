@@ -126,40 +126,30 @@ class TraceState implements TraceStateInterface
      */
     private function parse(string $rawTracestate): array
     {
+        if (strlen($rawTracestate) > self::MAX_TRACESTATE_COMBINED_LENGTH) {
+            self::logWarning('tracestate discarded, exceeds max combined length: ' . self::MAX_TRACESTATE_COMBINED_LENGTH);
+
+            return [];
+        }
         $parsedTracestate = [];
+        $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
 
-        if (strlen($rawTracestate) <= self::MAX_TRACESTATE_COMBINED_LENGTH) {
-            $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
+        if (count($listMembers) > self::MAX_TRACESTATE_LIST_MEMBERS) {
+            self::logWarning('tracestate discarded, too many members');
 
-            // Discard tracestate if entries exceed max length.
-            if (count($listMembers) > self::MAX_TRACESTATE_LIST_MEMBERS) {
-                self::logWarning('tracestate discarded, too many members');
+            return [];
+        }
 
-                return [];
-            }
+        foreach ($listMembers as $listMember) {
+            $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, trim($listMember));
 
-            $invalid = false;
-            foreach ($listMembers as $listMember) {
-                $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, trim($listMember));
-
-                // There should only be one list-member per vendor separated by '='
-                if (count($vendor) === 2 && ($this->validateKey($vendor[0]) && $this->validateValue($vendor[1]))) {
-                    $parsedTracestate[$vendor[0]] = $vendor[1];
-
-                    continue;
-                }
-                self::logWarning('Ignored invalid tracestate setting: ' . $listMember);
-
-                $invalid = true;
-
-                break;
-            }
-            // Discard tracestate if any member is invalid.
-            if ($invalid) {
-                self::logWarning('Invalid tracestate discarded');
+            // There should only be one list-member per vendor separated by '='
+            if (count($vendor) !== 2 || !$this->validateKey($vendor[0]) || !$this->validateValue($vendor[1])) {
+                self::logWarning('tracestate discarded, invalid member: ' . $listMember);
 
                 return [];
             }
+            $parsedTracestate[$vendor[0]] = $vendor[1];
         }
 
         /*
