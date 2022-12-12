@@ -9,6 +9,7 @@ services:
       XDEBUG_MODE: ${XDEBUG_MODE:-off}
       XDEBUG_CONFIG: ${XDEBUG_CONFIG:-''}
       PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-''}
+      #PHP_CS_FIXER_IGNORE_ENV: "true"
   zipkin:
     image: openzipkin/zipkin-slim
     ports:
