@@ -9,12 +9,10 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
-        "cloudevents/sdk-php": "^v1.0.1",
         "google/protobuf": "^3.3.0",
         "grpc/grpc": "^1.30",
         "php-http/async-client-implementation": "^1.0",
         "php-http/discovery": "^1.14",
-        "promphp/prometheus_client_php": "^2.2.1",
         "psr/http-factory-implementation": "^1.0",
         "psr/log": "^1.1|^2.0|^3.0",
         "symfony/polyfill-mbstring": "^1.23",
@@ -31,16 +29,8 @@
     },
     "authors": [
         {
-            "name": "Bob Strecansky",
-            "email": "bob.strecansky@gmail.com"
-        },
-        {
-            "name": "Dmitry Krokhin",
-            "email": "nekufa@gmail.com"
-        },
-        {
-            "name": "Levi Morrison",
-            "email": "levim@php.net"
+            "name": "opentelemetry-php contributors",
+            "homepage": "https://github.com/open-telemetry/opentelemetry-php/graphs/contributors"
         }
     ],
     "replace": {
