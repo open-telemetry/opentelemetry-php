@@ -16,8 +16,6 @@ interface BaggageInterface extends ImplicitContextKeyedInterface
     /**
      * Returns the {@see API\BaggageInterface} from the provided *$context*,
      * falling back on {@see API\BaggageInterface::getEmpty()} if there is no baggage in the provided context.
-     *
-     * @todo Implement this in the API layer
      */
     public static function fromContext(ContextInterface $context): API\BaggageInterface;
 
@@ -29,8 +27,6 @@ interface BaggageInterface extends ImplicitContextKeyedInterface
     /**
      * Returns the current {@see Baggage} from the current {@see ContextInterface},
      * falling back on {@see API\BaggageInterface::getEmpty()} if there is no baggage in the current context.
-     *
-     * @todo Implement this in the API layer
      */
     public static function getCurrent(): API\BaggageInterface;
 
