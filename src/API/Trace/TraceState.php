@@ -12,8 +12,8 @@ class TraceState implements TraceStateInterface
 {
     use LogsMessagesTrait;
 
-    public const MAX_TRACESTATE_LIST_MEMBERS = 32; //@see https://www.w3.org/TR/trace-context/#tracestate-header-field-values
-    public const MAX_TRACESTATE_COMBINED_LENGTH = 512; //@see https://www.w3.org/TR/trace-context/#tracestate-limits
+    public const MAX_LIST_MEMBERS = 32; //@see https://www.w3.org/TR/trace-context/#tracestate-header-field-values
+    public const MAX_COMBINED_LENGTH = 512; //@see https://www.w3.org/TR/trace-context/#tracestate-limits
     public const LIST_MEMBERS_SEPARATOR = ',';
     public const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
     private const VALID_KEY_CHAR_RANGE = '[_0-9a-z-*\/]';
@@ -126,15 +126,15 @@ class TraceState implements TraceStateInterface
      */
     private function parse(string $rawTracestate): array
     {
-        if (strlen($rawTracestate) > self::MAX_TRACESTATE_COMBINED_LENGTH) {
-            self::logWarning('tracestate discarded, exceeds max combined length: ' . self::MAX_TRACESTATE_COMBINED_LENGTH);
+        if (strlen($rawTracestate) > self::MAX_COMBINED_LENGTH) {
+            self::logWarning('tracestate discarded, exceeds max combined length: ' . self::MAX_COMBINED_LENGTH);
 
             return [];
         }
         $parsedTracestate = [];
         $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
 
-        if (count($listMembers) > self::MAX_TRACESTATE_LIST_MEMBERS) {
+        if (count($listMembers) > self::MAX_LIST_MEMBERS) {
             self::logWarning('tracestate discarded, too many members');
 
             return [];
