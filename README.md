@@ -55,6 +55,8 @@ All OpenTelemetry libraries are distributed via packagist, notably:
 
 The [open-telemetry/opentelemetry](https://packagist.org/packages/open-telemetry/opentelemetry) package contains all of the above and is the easiest way to try out OpenTelemetry.
 
+The [open-telemetry/opentelemetry-php-instrumentation](https://github.com/open-telemetry/opentelemetry-php-instrumentation) extension can be installed to enable auto-instrumentation of PHP code (in conjunction with contrib modules).
+
 ---
 This repository also hosts and distributes generated client code used by individual components as separate packages.  These packages are:
 - Generated [OTLP](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md) ProtoBuf files:
@@ -76,12 +78,9 @@ Additional packages, demos and tools are hosted or distributed in the [OpenTelem
 
 | Signal  | Status | Project |
 |---------|--------|---------|
-| Traces  | Alpha  | N/A     |
-| Metrics | Alpha  | N/A     |
+| Traces  | Beta   | N/A     |
+| Metrics | Beta   | N/A     |
 | Logs    | N/A    | N/A     |
-
-This project currently lives in a **alpha status**.  Our current release is not production ready; it has been created in order to receive feedback from the community. \
-As long as this project is in alpha status, things may and probably will break once in a while.
 
 ## Specification conformance
 We attempt to keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show which features are available and which have not yet been implemented.
@@ -106,7 +105,11 @@ mentioned in the provided messages, since doing otherwise may break things compl
 
 # Requirements
 
-The library and all separate packages requires a PHP version of 7.4.x, 8.0.x or 8.1.x
+The library and all separate packages requires a PHP version of 7.4+
+
+If you want to try out open-telemetry, you can install the entire [open-telemetry](https://packagist.org/packages/open-telemetry/opentelemetry) package, which includes the API, SDK, exporters and extensions.
+
+For a production install, we recommend installing only the components that you need, for example API, SDK, and an exporter.
 
 ## Required dependencies
 ### 1) Install PSR17/18 implementations
@@ -160,14 +163,14 @@ however most OS` package managers provide a package for the extension.
 
 ### 4) Install PHP [ext-ffi](https://www.php.net/manual/en/book.ffi.php)
 
-_Experimental_ support for using fibers in PHP 8.1 for Context storage requires the `ffi` extension, and can
+Support for using fibers in PHP 8.1 for Context storage requires the `ffi` extension, and can
 be enabled by setting the `OTEL_PHP_FIBERS_ENABLED` environment variable to a truthy value (`1`, `true`, `on`).
 
 Using fibers with non-`CLI` SAPIs may require preloading of bindings. One way to achieve this is setting [`ffi.preload`](https://www.php.net/manual/en/ffi.configuration.php#ini.ffi.preload) to `src/Context/fiber/zend_observer_fiber.h` and setting [`opcache.preload`](https://www.php.net/manual/en/opcache.preloading.php) to `vendor/autoload.php`.
 
 ### 5) Install PHP [ext-protobuf](https://pecl.php.net/package/protobuf)
 
-**The PHP protobuf extension is optional when using either the `OTLPHttp` or `OTLPGrpc` exporters from the Contrib package.**
+**The PHP protobuf extension is recommended when using the `otlp` exporter from the Contrib package.**
 
 The protobuf extension makes both exporters _significantly_ more performant, and we recommend that you do not use the PHP package in production. _Note that protobuf 3.20.0+ is required for php 8.1 support_
 
@@ -233,11 +236,18 @@ For development and testing purposes you also want to install **SDK** and **Cont
 $ composer require --dev open-telemetry/sdk open-telemetry/sdk-contrib
 ```
 
+## SDK autoloading
+
+If all [configuration](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration) is provided via environment variables or `php.ini`, then an SDK can be auto-loaded.
+SDK autoloading must be enabled via the `OTEL_PHP_AUTOLOAD_ENABLED` setting, and will be performed as part of composer autoloading.
+
+See [autoload_sdk.php example](./examples/autoload_sdk.php)
+
 ## Trace signals
 
 ### Auto-instrumentation
 
-_We do not currently support auto-instrumentation, but are internally discussing how to implement it_
+Auto-instrumentation is available via our [otel_instrumentation](https://github.com/open-telemetry/opentelemetry-php-instrumentation) PHP extension, and there are some auto-instrumentation modules available in our [contrib repo](https://github.com/open-telemetry/opentelemetry-php-contrib/tree/main/src/Instrumentation).
 
 ### Framework instrumentation
 
@@ -251,9 +261,12 @@ If you wish to build your own instrumentation for your application, you will nee
 Tracers must be obtained from a `TracerProvider`:
 
 ```php
+$transport = (new OpenTelemetry\Contrib\Grpc\GrpcTransportFactory())->create('http://collector:4317' . OtlpUtil::method(Signals::TRACE));
+$exporter = new OpenTelemetry\Contrib\Otlp\SpanExporter($transport);
 $tracerProvider = new \OpenTelemetry\SDK\Trace\TracerProvider(
     new \OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor(
-        new \OpenTelemetry\Contrib\OtlpGrpc\Exporter('otel-collector:4317')
+        $exporter,
+        ClockFactory::getDefault()
     )
 );
 \OpenTelemetry\SDK\Common\Util\ShutdownHandler::register([$tracerProvider, 'shutdown']);
@@ -320,36 +333,15 @@ Exported spans can be seen in zipkin at [http://127.0.0.1:9411](http://127.0.0.1
 Exported spans can also be seen in jaeger at [http://127.0.0.1:16686](http://127.0.0.1:16686)
 
 ## Metrics signals
-_coming soon_
+
+Meters must be obtained from a `MeterProvider`
 
 ### Metrics examples
 
-<details>
-<summary>This section is deprecated, we have a new metrics implementation in development</summary>
-
-You can use the [examples/prometheus/PrometheusMetricsExample.php](/examples/prometheus/PrometheusMetricsExample.php)
-file to test out the reference implementation we have. This example will create a counter that will be scraped by local
-Prometheus instance.
-
-The easy way to test the example out with docker and docker-compose is:
-
-1) Run `make metrics-prometheus-example`. Make sure that local ports 8080, 6379 and 9090 are available.
-
-2) Open local Prometheus instance: http://localhost:9090
-
-3) Go to Graph section, type "opentelemetry_prometheus_counter" in the search field or select it in the dropdown menu.
-   You will see the counter value. Every other time you run `make metrics-prometheus-example` will increment the counter
-   but remember that Prometheus scrapes values once in 10 seconds.
-
-4) In order to stop docker containers for this example just run `make stop-prometheus`
-</details>
+See [basic example](./examples/metrics/basic.php)
 
 ## Log signals
 _frozen pending delivery of tracing and metrics_
-
-# User Quickstarts
-
-* [Exploring OpenTelemetry in Laravel Applications](./docs/laravel-quickstart.md)
 
 # Versioning
 
