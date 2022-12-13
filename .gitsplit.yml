@@ -34,7 +34,6 @@ splits:
 # List of references to split (defined as regexp)
 origins:
   - ^main$
-  - ^test$
   - ^split$
-  - ^v\d+\.\d+\.\d+$
-  - ^\d+\.\d+\.\d+$
+  - ^v?\d+\.\d+\.\d+$
+  - ^v?\d+\.\d+\.\d+-?beta\d+$
