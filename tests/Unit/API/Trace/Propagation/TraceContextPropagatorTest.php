@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Trace\Propagation;
 
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
@@ -14,6 +15,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 /**
  * @covers \OpenTelemetry\API\Trace\Propagation\TraceContextPropagator
@@ -32,6 +34,7 @@ class TraceContextPropagatorTest extends TestCase
 
     protected function setUp(): void
     {
+        LoggerHolder::set(new NullLogger());
         $this->traceContextPropagator = TraceContextPropagator::getInstance();
         $this->traceState = (new TraceState())->with('bar', 'baz')->with('foo', 'bar');
     }
