@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Behavior;
+namespace OpenTelemetry\Tests\Unit\API\Behavior;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Log\LoggerHolder;
@@ -18,16 +18,47 @@ class LogsMessagesTraitTest extends TestCase
 {
     // @var LoggerInterface|MockObject $logger
     protected MockObject $logger;
+    private $capture;
+    private $backup;
 
     public function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         LoggerHolder::set($this->logger);
+
+        //error_log capturing
+        $this->capture = tmpfile();
+        $this->backup = ini_set('error_log', stream_get_meta_data($this->capture)['uri']);
     }
 
     public function tearDown(): void
     {
         LoggerHolder::unset();
+        ini_set('error_log', $this->backup);
+    }
+
+    /**
+     * @dataProvider errorLogProvider
+     */
+    public function test_defaults_to_error_log(string $method): void
+    {
+        $message = 'something went wrong';
+        LoggerHolder::unset();
+        $this->assertFalse(LoggerHolder::isSet());
+        $instance = $this->createInstance();
+
+        $instance->run($method, 'foo', ['exception' => new \Exception($message)]);
+        $log = stream_get_contents($this->capture);
+        $this->assertStringContainsString('foo', $log);
+        $this->assertStringContainsString($message, $log);
+    }
+
+    public function errorLogProvider(): array
+    {
+        return [
+            ['logWarning'],
+            ['logError'],
+        ];
     }
 
     /**
@@ -60,9 +91,9 @@ class LogsMessagesTraitTest extends TestCase
         return new class() {
             use LogsMessagesTrait;
             //accessor for protected trait methods
-            public function run(string $method, string $message): void
+            public function run(string $method, string $message, array $context = []): void
             {
-                $this->{$method}($message);
+                $this->{$method}($message, $context);
             }
         };
     }

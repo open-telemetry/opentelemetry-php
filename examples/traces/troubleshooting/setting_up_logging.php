@@ -5,14 +5,14 @@ require __DIR__ . '/../../../vendor/autoload.php';
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use OpenTelemetry\SDK\Common\Log\LoggerHolder;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use Psr\Log\LogLevel;
 
 echo 'Starting SettingUpLogging example' . PHP_EOL;
 
-//create a Logger, and register it with library's logger holder. The library will use this logger
-//for all of its internal logging (errors, warnings, etc)
+//By default, opentelemetry's internal logging (errors, warnings, etc) will be sent to PHP's error_log destination.
+//You can instead provide a psr-3 logger to provide greater control of logging output:
 LoggerHolder::set(
     new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)])
 );
