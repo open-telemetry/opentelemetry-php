@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\SdkAutoloader;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 /**
  * @covers \OpenTelemetry\SDK\SdkAutoloader
@@ -15,6 +17,11 @@ use PHPUnit\Framework\TestCase;
 class SdkAutoloaderTest extends TestCase
 {
     use EnvironmentVariables;
+
+    public function setUp(): void
+    {
+        LoggerHolder::set(new NullLogger());
+    }
 
     public function tearDown(): void
     {

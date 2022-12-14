@@ -18,47 +18,40 @@ class LogsMessagesTraitTest extends TestCase
 {
     // @var LoggerInterface|MockObject $logger
     protected MockObject $logger;
-    private $capture;
-    private $backup;
 
     public function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         LoggerHolder::set($this->logger);
-
-        //error_log capturing
-        $this->capture = tmpfile();
-        $this->backup = ini_set('error_log', stream_get_meta_data($this->capture)['uri']);
     }
 
     public function tearDown(): void
     {
         LoggerHolder::unset();
-        ini_set('error_log', $this->backup);
     }
 
-    /**
-     * @dataProvider errorLogProvider
-     */
-    public function test_defaults_to_error_log(string $method): void
+    public function test_defaults_to_trigger_error_with_warning(): void
     {
         $message = 'something went wrong';
         LoggerHolder::unset();
         $this->assertFalse(LoggerHolder::isSet());
         $instance = $this->createInstance();
 
-        $instance->run($method, 'foo', ['exception' => new \Exception($message)]);
-        $log = stream_get_contents($this->capture);
-        $this->assertStringContainsString('foo', $log);
-        $this->assertStringContainsString($message, $log);
+        $this->expectWarning();
+        $this->expectWarningMessageMatches(sprintf('/%s/', $message));
+        $instance->run('logWarning', 'foo', ['exception' => new \Exception($message)]);
     }
 
-    public function errorLogProvider(): array
+    public function test_defaults_to_trigger_error_with_error(): void
     {
-        return [
-            ['logWarning'],
-            ['logError'],
-        ];
+        $message = 'something went wrong';
+        LoggerHolder::unset();
+        $this->assertFalse(LoggerHolder::isSet());
+        $instance = $this->createInstance();
+
+        $this->expectError();
+        $this->expectErrorMessageMatches(sprintf('/%s/', $message));
+        $instance->run('logError', 'foo', ['exception' => new \Exception($message)]);
     }
 
     /**

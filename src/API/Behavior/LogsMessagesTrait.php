@@ -14,7 +14,7 @@ trait LogsMessagesTrait
         return in_array($level, [LogLevel::ERROR, LogLevel::WARNING, LogLevel::CRITICAL, LogLevel::EMERGENCY]);
     }
 
-    private static function map(string $level): int
+    private static function map(string $level)
     {
         switch ($level) {
             case LogLevel::WARNING:
@@ -41,7 +41,7 @@ trait LogsMessagesTrait
                 (array_key_exists('exception', $context) && $context['exception'] instanceof \Throwable) ? $context['exception']->getMessage() : '',
                 get_called_class()
             );
-            error_log($message, self::map($level));
+            trigger_error($message, self::map($level));
         }
     }
 

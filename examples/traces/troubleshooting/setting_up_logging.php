@@ -11,7 +11,7 @@ use Psr\Log\LogLevel;
 
 echo 'Starting SettingUpLogging example' . PHP_EOL;
 
-//By default, opentelemetry's internal logging (errors, warnings, etc) will be sent to PHP's error_log destination.
+//By default, opentelemetry's internal logging (errors, warnings, etc) will be output to console.
 //You can instead provide a psr-3 logger to provide greater control of logging output:
 LoggerHolder::set(
     new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)])
