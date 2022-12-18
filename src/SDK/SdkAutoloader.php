@@ -24,7 +24,7 @@ class SdkAutoloader
     public static function autoload(): bool
     {
         try {
-            self::$enabled ??= Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+            self::$enabled ??= Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED) && !Sdk::isDisabled();
         } catch (InvalidArgumentException $e) {
             //invalid setting, assume false
             self::$enabled = false;

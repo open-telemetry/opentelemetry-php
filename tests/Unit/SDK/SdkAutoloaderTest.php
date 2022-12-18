@@ -27,10 +27,24 @@ class SdkAutoloaderTest extends TestCase
         $this->assertFalse(SdkAutoloader::autoload());
     }
 
-    public function test_enabled(): void
+    /**
+     * @dataProvider configurationProvider
+     */
+    public function test_enabled_by_configuration(string $autoload, string $disabled, bool $expected): void
     {
-        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
-        $this->assertTrue(SdkAutoloader::autoload());
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, $autoload);
+        $this->setEnvironmentVariable(Variables::OTEL_SDK_DISABLED, $disabled);
+        $this->assertSame($expected, SdkAutoloader::autoload());
+    }
+
+    public function configurationProvider(): array
+    {
+        return [
+            'autoload enabled, sdk not disabled' => ['true', 'false', true],
+            'autoload enabled, sdk disabled' => ['true', 'true', false],
+            'autoload disabled, sdk disabled' => ['false', 'true', false],
+            'autoload disabled, sdk not disabled' => ['false', 'false', false],
+        ];
     }
 
     public function test_disabled_with_invalid_flag(): void
