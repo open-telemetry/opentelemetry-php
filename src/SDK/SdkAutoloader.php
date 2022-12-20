@@ -24,7 +24,7 @@ class SdkAutoloader
     public static function autoload(): bool
     {
         try {
-            self::$enabled ??= Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED) && !Sdk::isDisabled();
+            self::$enabled ??= Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
         } catch (InvalidArgumentException $e) {
             //invalid setting, assume false
             self::$enabled = false;
@@ -33,8 +33,13 @@ class SdkAutoloader
             return false;
         }
         Globals::registerInitializer(function (Configurator $configurator) {
-            $exporter = (new ExporterFactory())->create();
             $propagator = (new PropagatorFactory())->create();
+            if (Sdk::isDisabled()) {
+                //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration
+                return $configurator->withPropagator($propagator);
+            }
+
+            $exporter = (new ExporterFactory())->create();
             $meterProvider = (new MeterProviderFactory())->create();
             $spanProcessor = (new SpanProcessorFactory())->create($exporter, $meterProvider);
             $tracerProvider = (new TracerProviderBuilder())

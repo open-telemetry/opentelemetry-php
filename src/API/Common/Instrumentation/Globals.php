@@ -22,6 +22,7 @@ final class Globals
 {
     /** @var list<Closure(Configurator): Configurator> */
     private static array $initializers = [];
+    private static ?self $globals = null;
 
     private TracerProviderInterface $tracerProvider;
     private MeterProviderInterface $meterProvider;
@@ -63,11 +64,13 @@ final class Globals
         self::$initializers[] = $initializer;
     }
 
+    /**
+     * @phan-suppress PhanTypeMismatchReturnNullable
+     */
     private static function globals(): self
     {
-        static $globals;
-        if ($globals) {
-            return $globals;
+        if (self::$globals !== null) {
+            return self::$globals;
         }
 
         $configurator = Configurator::createNoop();
@@ -92,6 +95,14 @@ final class Globals
 
         assert(isset($tracerProvider, $meterProvider, $propagator));
 
-        return $globals ??= new self($tracerProvider, $meterProvider, $propagator);
+        return self::$globals = new self($tracerProvider, $meterProvider, $propagator);
+    }
+
+    /**
+     * @internal
+     */
+    public static function reset(): void
+    {
+        self::$globals = null;
     }
 }
