@@ -55,7 +55,7 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
             case KnownValues::VALUE_HTTP_PROTOBUF:
             case KnownValues::VALUE_HTTP_JSON:
                 return $factory->create(
-                    $endpoint,
+                    $endpoint . OtlpUtil::method(Signals::METRICS),
                     Protocols::contentType($protocol),
                     $headers
                 );
