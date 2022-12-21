@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\API\Unit\Trace;
 
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\API\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use function str_repeat;
 use function strlen;
 
@@ -14,6 +16,11 @@ use function strlen;
  */
 class TraceStateTest extends TestCase
 {
+    public function setUp(): void
+    {
+        LoggerHolder::set(new NullLogger());
+    }
+
     public function test_get_tracestate_value(): void
     {
         $tracestate = new TraceState('vendor1=value1');

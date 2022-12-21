@@ -31,6 +31,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
 
 /**
  * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor
@@ -41,6 +42,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
 
     protected function setUp(): void
     {
+        LoggerHolder::set(new NullLogger());
         $this->testClock = new TestClock();
 
         ClockFactory::setDefault($this->testClock);

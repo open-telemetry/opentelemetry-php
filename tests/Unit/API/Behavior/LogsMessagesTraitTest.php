@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Behavior;
+namespace OpenTelemetry\Tests\Unit\API\Behavior;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Log\LoggerHolder;
@@ -28,6 +28,30 @@ class LogsMessagesTraitTest extends TestCase
     public function tearDown(): void
     {
         LoggerHolder::unset();
+    }
+
+    public function test_defaults_to_trigger_error_with_warning(): void
+    {
+        $message = 'something went wrong';
+        LoggerHolder::unset();
+        $this->assertFalse(LoggerHolder::isSet());
+        $instance = $this->createInstance();
+
+        $this->expectWarning();
+        $this->expectWarningMessageMatches(sprintf('/%s/', $message));
+        $instance->run('logWarning', 'foo', ['exception' => new \Exception($message)]);
+    }
+
+    public function test_defaults_to_trigger_error_with_error(): void
+    {
+        $message = 'something went wrong';
+        LoggerHolder::unset();
+        $this->assertFalse(LoggerHolder::isSet());
+        $instance = $this->createInstance();
+
+        $this->expectError();
+        $this->expectErrorMessageMatches(sprintf('/%s/', $message));
+        $instance->run('logError', 'foo', ['exception' => new \Exception($message)]);
     }
 
     /**
@@ -60,9 +84,9 @@ class LogsMessagesTraitTest extends TestCase
         return new class() {
             use LogsMessagesTrait;
             //accessor for protected trait methods
-            public function run(string $method, string $message): void
+            public function run(string $method, string $message, array $context = []): void
             {
-                $this->{$method}($message);
+                $this->{$method}($message, $context);
             }
         };
     }

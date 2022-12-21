@@ -21,6 +21,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
 
 /**
  * @covers OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor
@@ -43,6 +44,7 @@ class SimpleSpanProcessorTest extends MockeryTestCase
 
     protected function setUp(): void
     {
+        LoggerHolder::set(new NullLogger());
         $this->readWriteSpan = Mockery::mock(ReadWriteSpanInterface::class);
         $this->readableSpan = Mockery::mock(ReadableSpanInterface::class);
 

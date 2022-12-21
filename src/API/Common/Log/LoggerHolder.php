@@ -21,13 +21,14 @@ final class LoggerHolder
 
     /**
      * @suppress PhanTypeMismatchReturnNullable
+     * @internal
      */
-    public static function get(): LoggerInterface
+    public static function get(): ?LoggerInterface
     {
-        return self::$logger ?? new NullLogger();
+        return self::$logger;
     }
 
-    public static function set(LoggerInterface $logger): void
+    public static function set(?LoggerInterface $logger): void
     {
         self::$logger = $logger;
     }

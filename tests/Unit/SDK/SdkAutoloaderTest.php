@@ -6,12 +6,14 @@ namespace OpenTelemetry\Tests\Unit\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Common\Instrumentation\Globals;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\SdkAutoloader;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 /**
  * @covers \OpenTelemetry\SDK\SdkAutoloader
@@ -19,6 +21,11 @@ use PHPUnit\Framework\TestCase;
 class SdkAutoloaderTest extends TestCase
 {
     use EnvironmentVariables;
+
+    public function setUp(): void
+    {
+        LoggerHolder::set(new NullLogger());
+    }
 
     public function tearDown(): void
     {
