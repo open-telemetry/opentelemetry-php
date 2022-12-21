@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Propagation;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
@@ -14,6 +15,7 @@ use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 /**
  * @covers OpenTelemetry\SDK\Propagation\PropagatorFactory
@@ -21,6 +23,11 @@ use PHPUnit\Framework\TestCase;
 class PropagatorFactoryTest extends TestCase
 {
     use EnvironmentVariables;
+
+    public function setUp(): void
+    {
+        LoggerHolder::set(new NullLogger());
+    }
 
     public function tearDown(): void
     {
