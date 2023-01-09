@@ -157,7 +157,6 @@ final class ExportingReaderTest extends TestCase
     public function test_shutdown_calls_exporter_shutdown(): void
     {
         $exporter = $this->createMock(MetricExporterInterface::class);
-        $exporter->expects($this->once())->method('export')->willReturn(true);
         $exporter->expects($this->once())->method('shutdown')->willReturn(true);
         $clock = new TestClock();
         $reader = new ExportingReader($exporter, $clock);
@@ -165,10 +164,43 @@ final class ExportingReaderTest extends TestCase
         $this->assertTrue($reader->shutdown());
     }
 
+    public function test_shutdown_does_not_export_empty_metrics(): void
+    {
+        $exporter = $this->createMock(MetricExporterInterface::class);
+        $exporter->expects($this->never())->method('export');
+        $exporter->expects($this->once())->method('shutdown')->willReturn(true);
+
+        $clock = new TestClock();
+        $reader = new ExportingReader($exporter, $clock);
+
+        $reader->shutdown();
+    }
+
+    public function test_shutdown_exports_metrics(): void
+    {
+        $exporter = $this->createMock(MetricExporterInterface::class);
+        $provider = $this->createMock(MetricSourceProviderInterface::class);
+        $source = $this->createMock(MetricSourceInterface::class);
+        $source->method('collect')->willReturn($this->createMock(Metric::class));
+        $provider->method('create')->willReturn($source);
+        $exporter->method('temporality')->willReturn('foo');
+        $exporter->expects($this->once())->method('export')->willReturn(true);
+        $exporter->expects($this->once())->method('shutdown')->willReturn(true);
+
+        $clock = new TestClock();
+        $reader = new ExportingReader($exporter, $clock);
+        $reader->add(
+            $provider,
+            $this->createMock(MetricMetadataInterface::class),
+            $this->createMock(StalenessHandlerInterface::class)
+        );
+
+        $this->assertTrue($reader->shutdown());
+    }
+
     public function test_force_flush_calls_exporter_force_flush(): void
     {
         $exporter = $this->createMock(MetricExporterInterface::class);
-        $exporter->expects($this->once())->method('export')->willReturn(true);
         $exporter->expects($this->once())->method('forceFlush')->willReturn(true);
         $clock = new TestClock();
         $reader = new ExportingReader($exporter, $clock);
