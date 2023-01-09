@@ -94,7 +94,6 @@ final class MeterProviderTest extends TestCase
             ClockFactory::getDefault(),
             Attributes::factory(),
             new InstrumentationScopeFactory(Attributes::factory()),
-            /** @phpstan-ignore-next-line */
             [$metricReader->reveal()],
             new CriteriaViewRegistry(),
             null,
@@ -123,7 +122,6 @@ final class MeterProviderTest extends TestCase
             ClockFactory::getDefault(),
             Attributes::factory(),
             new InstrumentationScopeFactory(Attributes::factory()),
-            /** @phpstan-ignore-next-line */
             [$metricReader->reveal()],
             new CriteriaViewRegistry(),
             null,

@@ -70,6 +70,10 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
             $metrics[] = $source->collect($timestamp);
         }
 
+        if ($metrics === []) {
+            return true;
+        }
+
         return $this->exporter->export($metrics);
     }
 
