@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\SdkBuilder;
@@ -42,6 +43,26 @@ class SdkTest extends TestCase
         return [
             ['true', true],
             ['false', false],
+        ];
+    }
+
+    /**
+     * @dataProvider instrumentationDisabledProvider
+     */
+    public function test_is_instrumentation_disabled(string $value, string $name, bool $expected): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_DISABLED_INSTRUMENTATIONS, $value);
+
+        $this->assertSame($expected, Sdk::isInstrumentationDisabled($name));
+    }
+
+    public function instrumentationDisabledProvider(): array
+    {
+        return [
+            ['foo,bar', 'foo', true],
+            ['foo,bar', 'bar', true],
+            ['', 'foo', false],
+            ['foo', 'foo', true],
         ];
     }
 
