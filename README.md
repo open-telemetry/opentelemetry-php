@@ -20,6 +20,7 @@
 - [Getting started](#getting-started)
   - [Instrumenting an application](#using-opentelemetry-in-an-application)
   - [Instrumenting a library](#using-opentelemetry-to-instrument-a-library)
+  - [Configuration](#configuration)
   - [Trace signals](#trace-signals)
     - [Auto-instrumentation](#auto-instrumentation)
     - [Framework instrumentation](#framework-instrumentation)
@@ -242,6 +243,21 @@ If all [configuration](https://github.com/open-telemetry/opentelemetry-specifica
 SDK autoloading must be enabled via the `OTEL_PHP_AUTOLOAD_ENABLED` setting, and will be performed as part of composer autoloading.
 
 See [autoload_sdk.php example](./examples/autoload_sdk.php)
+
+## Configuration
+
+The SDK supports most of the configurations described in the specification: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration
+
+There are also a number of PHP-specific configurations:
+
+| Name                                | Default value | Values                                                     | Example        | Description                                         |
+|-------------------------------------|---------------|------------------------------------------------------------|----------------|-----------------------------------------------------|
+| OTEL_PHP_TRACES_PROCESSOR           | batch         | batch, simple                                              | simple         | Span processor selection                            |
+| OTEL_PHP_DETECTORS                  | all           | env, host, os, process, process_runtime, sdk, sdk_provided | env,os,process | Resource detector selection                         |
+| OTEL_PHP_AUTOLOAD_ENABLED           | false         | true, false                                                | true           | Enable/disable SDK autoloading                      |
+| OTEL_PHP_DISABLED_INSTRUMENTATIONS  | []            | Instrumentation name(s)                                    | psr15,psr18    | Disable one or more installed auto-instrumentations |
+
+Configurations can be provided as environment variables, or via `php.ini` (or a file included by `php.ini`)
 
 ## Trace signals
 
