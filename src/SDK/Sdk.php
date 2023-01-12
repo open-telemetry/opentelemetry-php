@@ -31,6 +31,14 @@ class Sdk
         return Configuration::getBoolean(Variables::OTEL_SDK_DISABLED);
     }
 
+    /**
+     * Tests whether an auto-instrumentation package has been disabled by config
+     */
+    public static function isInstrumentationDisabled(string $name): bool
+    {
+        return in_array($name, Configuration::getList(Variables::OTEL_PHP_DISABLED_INSTRUMENTATIONS));
+    }
+
     public static function builder(): SdkBuilder
     {
         return new SdkBuilder();
