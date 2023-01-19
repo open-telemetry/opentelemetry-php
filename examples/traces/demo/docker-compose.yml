@@ -4,7 +4,7 @@ x-otel-common:
   OTEL_TRACES_SAMPLER: parentbased_always_on
   OTEL_TRACES_EXPORTER: otlp
   OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: grpc
-  OTEL_EXPORTER_OTLP_ENDPOINT: collector:4317
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4317
   OTEL_PHP_TRACES_PROCESSOR: simple
 
 version: '3.7'
