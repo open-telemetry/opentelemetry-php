@@ -34,12 +34,12 @@
         }
     ],
     "replace": {
-        "open-telemetry/api": "self.version",
-        "open-telemetry/context": "self.version",
-        "open-telemetry/gen-otlp-protobuf": "self.version",
-        "open-telemetry/sdk": "self.version",
-        "open-telemetry/sdk-contrib": "self.version",
-        "open-telemetry/sem-conv": "self.version"
+        "open-telemetry/api": "^1.0",
+        "open-telemetry/context": "^1.0",
+        "open-telemetry/gen-otlp-protobuf": "^1.0",
+        "open-telemetry/sdk": "^1.0",
+        "open-telemetry/sdk-contrib": "^1.0",
+        "open-telemetry/sem-conv": "^1.0"
     },
     "autoload": {
         "psr-4": {
