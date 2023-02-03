@@ -41,7 +41,9 @@ class SystemClock implements ClockInterface
     }
 }
 
-class_alias(SystemClock::class, OpenTelemetry_SDK_SystemClock);
+if (!class_exists(OpenTelemetry_SDK_SystemClock, false)) {
+    class_alias(SystemClock::class, OpenTelemetry_SDK_SystemClock);
+}
 /**
  * @codeCoverageIgnoreEnd
  */

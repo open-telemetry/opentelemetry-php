@@ -13,7 +13,9 @@ interface ClockInterface extends Moved
 /**
  * @codeCoverageIgnoreStart
  */
-class_alias(ClockInterface::class, 'OpenTelemetry\SDK\ClockInterface');
+if (!interface_exists('OpenTelemetry\SDK\ClockInterface', false)) {
+    class_alias(ClockInterface::class, 'OpenTelemetry\SDK\ClockInterface');
+}
 /**
  * @codeCoverageIgnoreEnd
  */

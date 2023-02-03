@@ -46,6 +46,8 @@ class OtlpExporter implements SpanExporterInterface
     }
 }
 
-class_alias(OtlpExporter::class, 'OpenTelemetry\Contrib\OtlpGrpc\Exporter');
-class_alias(OtlpExporter::class, 'OpenTelemetry\Contrib\OtlpHttp\Exporter');
-class_alias(OtlpExporter::class, 'OpenTelemetry\Contrib\Otlp\Exporter');
+if (!class_exists('OpenTelemetry\Contrib\Otlp\Exporter', false)) {
+    class_alias(OtlpExporter::class, 'OpenTelemetry\Contrib\OtlpGrpc\Exporter');
+    class_alias(OtlpExporter::class, 'OpenTelemetry\Contrib\OtlpHttp\Exporter');
+    class_alias(OtlpExporter::class, 'OpenTelemetry\Contrib\Otlp\Exporter');
+}

@@ -74,4 +74,6 @@ abstract class AbstractClock implements ClockInterface
  * BC class alias
  * @todo: remove in future release. Also in composer.json autoload/files.
  */
-class_alias(AbstractClock::class, 'OpenTelemetry\SDK\AbstractClock');
+if (!class_exists('OpenTelemetry\SDK\AbstractClock', false)) {
+    class_alias(AbstractClock::class, 'OpenTelemetry\SDK\AbstractClock');
+}

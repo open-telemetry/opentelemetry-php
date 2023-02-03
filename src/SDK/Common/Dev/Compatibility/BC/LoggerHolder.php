@@ -25,7 +25,9 @@ final class LoggerHolder
     }
 }
 
-class_alias(LoggerHolder::class, OpenTelemetry_SDK_Common_Log_LoggerHolder);
+if (!class_exists(OpenTelemetry_SDK_Common_Log_LoggerHolder, false)) {
+    class_alias(LoggerHolder::class, OpenTelemetry_SDK_Common_Log_LoggerHolder);
+}
 /**
  * @codeCoverageIgnoreEnd
  */
