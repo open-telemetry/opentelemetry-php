@@ -49,7 +49,9 @@ final class InstrumentationLibrary implements InstrumentationLibraryInterface
     }
 }
 
-class_alias(InstrumentationLibrary::class, OpenTelemetry_SDK_InstrumentationLibrary);
+if (!class_exists(OpenTelemetry_SDK_InstrumentationLibrary, false)) {
+    class_alias(InstrumentationLibrary::class, OpenTelemetry_SDK_InstrumentationLibrary);
+}
 /**
  * @codeCoverageIgnoreEnd
  */
