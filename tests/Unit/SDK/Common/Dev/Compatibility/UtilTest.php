@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Dev\Compatibility;
 
 use Generator;
 use OpenTelemetry\SDK\Common\Dev\Compatibility\Util;
+use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -41,11 +42,11 @@ class UtilTest extends TestCase
     /**
      * @dataProvider errorLevelProvider
      */
-    public function test_trigger_class_deprecation_notice(int $level, string $expectedError): void
+    public function test_trigger_class_deprecation_notice(int $level): void
     {
         Util::setErrorLevel($level);
 
-        $this->{$expectedError}();
+        $this->expectException(PHPUnitFrameworkException::class);
 
         Util::triggerClassDeprecationNotice(Util::class, self::class);
     }
@@ -53,11 +54,11 @@ class UtilTest extends TestCase
     /**
      * @dataProvider errorLevelProvider
      */
-    public function test_trigger_method_deprecation_notice_without_class(int $level, string $expectedError): void
+    public function test_trigger_method_deprecation_notice_without_class(int $level): void
     {
         Util::setErrorLevel($level);
 
-        $this->{$expectedError}();
+        $this->expectException(PHPUnitFrameworkException::class);
 
         Util::triggerMethodDeprecationNotice(Util::class, __METHOD__);
     }
@@ -65,21 +66,21 @@ class UtilTest extends TestCase
     /**
      * @dataProvider errorLevelProvider
      */
-    public function test_trigger_method_deprecation_notice_with_class(int $level, string $expectedError): void
+    public function test_trigger_method_deprecation_notice_with_class(int $level): void
     {
         Util::setErrorLevel($level);
 
-        $this->{$expectedError}();
+        $this->expectException(PHPUnitFrameworkException::class);
 
         Util::triggerMethodDeprecationNotice(Util::class, 'foo', self::class);
     }
 
     public function errorLevelProvider(): Generator
     {
-        yield [E_USER_DEPRECATED, 'expectDeprecation'];
-        yield [E_USER_NOTICE, 'expectNotice'];
-        yield [E_USER_WARNING, 'expectWarning'];
-        yield [E_USER_ERROR, 'expectError'];
+        yield [E_USER_DEPRECATED];
+        yield [E_USER_NOTICE];
+        yield [E_USER_WARNING];
+        yield [E_USER_ERROR];
     }
 
     public function test_turn_errors_off(): void

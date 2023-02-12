@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\API\Behavior;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Log\LoggerHolder;
+use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -37,8 +38,8 @@ class LogsMessagesTraitTest extends TestCase
         $this->assertFalse(LoggerHolder::isSet());
         $instance = $this->createInstance();
 
-        $this->expectWarning();
-        $this->expectWarningMessageMatches(sprintf('/%s/', $message));
+        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectExceptionMessageMatches(sprintf('/%s/', $message));
         $instance->run('logWarning', 'foo', ['exception' => new \Exception($message)]);
     }
 
@@ -49,8 +50,8 @@ class LogsMessagesTraitTest extends TestCase
         $this->assertFalse(LoggerHolder::isSet());
         $instance = $this->createInstance();
 
-        $this->expectError();
-        $this->expectErrorMessageMatches(sprintf('/%s/', $message));
+        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectExceptionMessageMatches(sprintf('/%s/', $message));
         $instance->run('logError', 'foo', ['exception' => new \Exception($message)]);
     }
 

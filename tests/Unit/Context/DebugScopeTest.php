@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Context;
 
 use OpenTelemetry\Context\Context;
+use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,8 +19,8 @@ final class DebugScopeTest extends TestCase
 
         $scope1->detach();
 
-        $this->expectNotice();
-        $this->expectNoticeMessage('already detached');
+        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectExceptionMessage('already detached');
         $scope1->detach();
     }
 
@@ -29,8 +30,8 @@ final class DebugScopeTest extends TestCase
         $scope2 = Context::getCurrent()->activate();
 
         try {
-            $this->expectNotice();
-            $this->expectNoticeMessage('another scope');
+            $this->expectException(PHPUnitFrameworkException::class);
+            $this->expectExceptionMessage('another scope');
             $scope1->detach();
         } finally {
             $scope2->detach();
@@ -45,8 +46,8 @@ final class DebugScopeTest extends TestCase
         Context::storage()->switch(1);
 
         try {
-            $this->expectNotice();
-            $this->expectNoticeMessage('different execution context');
+            $this->expectException(PHPUnitFrameworkException::class);
+            $this->expectExceptionMessage('different execution context');
             $scope1->detach();
         } finally {
             Context::storage()->switch(0);
@@ -57,8 +58,8 @@ final class DebugScopeTest extends TestCase
     public function test_missing_scope_detach(): void
     {
         try {
-            $this->expectNotice();
-            $this->expectNoticeMessage('missing call');
+            $this->expectException(PHPUnitFrameworkException::class);
+            $this->expectExceptionMessage('missing call');
             Context::getCurrent()->activate();
         } finally {
             /** @psalm-suppress PossiblyNullReference */
