@@ -19,6 +19,7 @@ use OpenTelemetry\SDK\Metrics\Stream\MetricAggregator;
 use OpenTelemetry\SDK\Metrics\Stream\StreamWriter;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use const PHP_INT_SIZE;
+use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -337,8 +338,8 @@ final class MetricStreamTest extends TestCase
             $s->register(Temporality::DELTA);
         }
 
-        $this->expectWarning();
-        $this->expectWarningMessageMatches('/^GMP extension required to register over \d++ readers$/');
+        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectExceptionMessageMatches('/^GMP extension required to register over \d++ readers$/');
         $s->register(Temporality::DELTA);
     }
 

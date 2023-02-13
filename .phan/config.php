@@ -376,7 +376,6 @@ return [
         'vendor/php-http',
         'vendor/phan/phan/src/Phan',
         'vendor/phpunit/phpunit/src',
-        'vendor/promphp/prometheus_client_php/src',
         'vendor/google/protobuf/src',
     ],
 
