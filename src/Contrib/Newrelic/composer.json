@@ -12,7 +12,7 @@
   ],
   "require": {
     "php": "^7.4 || ^8.0",
-    "open-telemetry/sdk": "self.version",
+    "open-telemetry/sdk": "^1.0",
     "php-http/async-client-implementation": "^1.0",
     "php-http/discovery": "^1.14",
     "psr/http-factory-implementation": "^1.0"
