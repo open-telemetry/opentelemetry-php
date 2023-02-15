@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\Contrib\Otlp\SpanExporterFactory;
+use OpenTelemetry\Contrib\Otlp\MetricExporterFactory;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
@@ -13,13 +13,12 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\Contrib\Otlp\SpanExporterFactory
+ * @covers \OpenTelemetry\Contrib\Otlp\MetricExporterFactory
  * @psalm-suppress UndefinedInterfaceMethod
  */
-class SpanExporterFactoryTest extends TestCase
+class MetricExporterFactoryTest extends TestCase
 {
     use EnvironmentVariables;
-
     private TransportFactoryInterface $transportFactory;
     private TransportInterface $transport;
 
@@ -36,9 +35,9 @@ class SpanExporterFactoryTest extends TestCase
 
     public function test_unknown_protocol_exception(): void
     {
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(\RuntimeException::class);
         $this->setEnvironmentVariable(Variables::OTEL_EXPORTER_OTLP_PROTOCOL, 'foo');
-        $factory = new SpanExporterFactory();
+        $factory = new MetricExporterFactory();
         $factory->create();
     }
 
@@ -50,7 +49,7 @@ class SpanExporterFactoryTest extends TestCase
         foreach ($env as $k => $v) {
             $this->setEnvironmentVariable($k, $v);
         }
-        $factory = new SpanExporterFactory($this->transportFactory);
+        $factory = new MetricExporterFactory($this->transportFactory);
         // @phpstan-ignore-next-line
         $this->transportFactory
             ->expects($this->once())
@@ -79,8 +78,8 @@ class SpanExporterFactoryTest extends TestCase
         return [
             'signal-specific endpoint unchanged' => [
                 'env' => [
-                    Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL => KnownValues::VALUE_GRPC,
-                    Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT => 'http://collector:4317/foo/bar', //should not be changed, per spec
+                    Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL => KnownValues::VALUE_GRPC,
+                    Variables::OTEL_EXPORTER_OTLP_METRICS_ENDPOINT => 'http://collector:4317/foo/bar', //should not be changed, per spec
                 ],
                 'endpoint' => 'http://collector:4317/foo/bar',
                 'protocol' => 'application/x-protobuf',
@@ -89,10 +88,10 @@ class SpanExporterFactoryTest extends TestCase
             ],
             'endpoint has path appended' => [
                 'env' => [
-                    Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL => KnownValues::VALUE_GRPC,
+                    Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL => KnownValues::VALUE_GRPC,
                     Variables::OTEL_EXPORTER_OTLP_ENDPOINT => 'http://collector:4317',
                 ],
-                'endpoint' => 'http://collector:4317/opentelemetry.proto.collector.trace.v1.TraceService/Export',
+                'endpoint' => 'http://collector:4317/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
                 'protocol' => 'application/x-protobuf',
                 'compression' => 'none',
                 'headerKeys' => $defaultHeaderKeys,
@@ -101,7 +100,7 @@ class SpanExporterFactoryTest extends TestCase
                 'env' => [
                     Variables::OTEL_EXPORTER_OTLP_PROTOCOL => KnownValues::VALUE_HTTP_NDJSON,
                 ],
-                'endpoint' => 'http://localhost:4318/v1/traces',
+                'endpoint' => 'http://localhost:4318/v1/metrics',
                 'protocol' => 'application/x-ndjson',
                 'compression' => 'none',
                 'headerKeys' => $defaultHeaderKeys,
@@ -110,14 +109,14 @@ class SpanExporterFactoryTest extends TestCase
                 'env' => [
                     Variables::OTEL_EXPORTER_OTLP_PROTOCOL => KnownValues::VALUE_HTTP_JSON,
                 ],
-                'endpoint' => 'http://localhost:4318/v1/traces',
+                'endpoint' => 'http://localhost:4318/v1/metrics',
                 'protocol' => 'application/json',
                 'compression' => 'none',
                 'headerKeys' => $defaultHeaderKeys,
             ],
             'defaults' => [
                 'env' => [],
-                'endpoint' => 'http://localhost:4318/v1/traces',
+                'endpoint' => 'http://localhost:4318/v1/metrics',
                 'protocol' => 'application/x-protobuf',
                 'compression' => 'none',
                 'headerKeys' => $defaultHeaderKeys,
@@ -126,16 +125,16 @@ class SpanExporterFactoryTest extends TestCase
                 'env' => [
                     Variables::OTEL_EXPORTER_OTLP_COMPRESSION => 'gzip',
                 ],
-                'endpoint' => 'http://localhost:4318/v1/traces',
+                'endpoint' => 'http://localhost:4318/v1/metrics',
                 'protocol' => 'application/x-protobuf',
                 'compression' => 'gzip',
                 'headerKeys' => $defaultHeaderKeys,
             ],
             'signal-specific compression' => [
                 'env' => [
-                    Variables::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION => 'gzip',
+                    Variables::OTEL_EXPORTER_OTLP_METRICS_COMPRESSION => 'gzip',
                 ],
-                'endpoint' => 'http://localhost:4318/v1/traces',
+                'endpoint' => 'http://localhost:4318/v1/metrics',
                 'protocol' => 'application/x-protobuf',
                 'compression' => 'gzip',
                 'headerKeys' => $defaultHeaderKeys,
@@ -144,16 +143,16 @@ class SpanExporterFactoryTest extends TestCase
                 'env' => [
                     Variables::OTEL_EXPORTER_OTLP_HEADERS => 'key1=foo,key2=bar',
                 ],
-                'endpoint' => 'http://localhost:4318/v1/traces',
+                'endpoint' => 'http://localhost:4318/v1/metrics',
                 'protocol' => 'application/x-protobuf',
                 'compression' => 'none',
                 'headerKeys' => array_merge($defaultHeaderKeys, ['key1', 'key2']),
             ],
             'signal-specific headers' => [
                 'env' => [
-                    Variables::OTEL_EXPORTER_OTLP_TRACES_HEADERS => 'key3=foo,key4=bar',
+                    Variables::OTEL_EXPORTER_OTLP_METRICS_HEADERS => 'key3=foo,key4=bar',
                 ],
-                'endpoint' => 'http://localhost:4318/v1/traces',
+                'endpoint' => 'http://localhost:4318/v1/metrics',
                 'protocol' => 'application/x-protobuf',
                 'compression' => 'none',
                 'headerKeys' => array_merge($defaultHeaderKeys, ['key3', 'key4']),
