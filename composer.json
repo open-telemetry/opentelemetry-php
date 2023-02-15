@@ -41,14 +41,6 @@
         "open-telemetry/sdk-contrib": "self.version",
         "open-telemetry/sem-conv": "self.version"
     },
-    "conflict": {
-        "open-telemetry/api": "*",
-        "open-telemetry/context": "*",
-        "open-telemetry/gen-otlp-protobuf": "*",
-        "open-telemetry/sdk": "*",
-        "open-telemetry/sdk-contrib": "*",
-        "open-telemetry/sem-conv": "*"
-    },
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\": "src/",
