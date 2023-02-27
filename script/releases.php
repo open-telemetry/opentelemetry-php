@@ -65,7 +65,7 @@ class Release
         foreach ($total as $item) {
             if (count($item['new_commits']) > 0) {
                 echo PHP_EOL . PHP_EOL;
-                echo "*** {$item['org']}/{$item['repo']} ***" . PHP_EOL;
+                echo "*** https://github.com/{$item['org']}/{$item['repo']}/releases/new ***" . PHP_EOL;
                 echo "*** Last release: {$item['last_release_version']} ({$item['last_release_date']}) ***" . PHP_EOL;
                 echo "## What's Changed" . PHP_EOL;
                 foreach ($item['new_commits'] as $line) {
