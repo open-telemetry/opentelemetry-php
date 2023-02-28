@@ -97,7 +97,8 @@
         "psalm/psalm": "^4.0",
         "qossmic/deptrac-shim": "^0 || ^1",
         "rector/rector": "^0.13.7",
-        "symfony/http-client": "^5.2"
+        "symfony/http-client": "^5.2",
+        "symfony/yaml": "^6 || ^5"
     },
     "suggest": {
         "ext-gmp": "To support unlimited number of synchronous metric readers",
