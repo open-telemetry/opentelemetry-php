@@ -10,7 +10,6 @@
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
         "google/protobuf": "^3.3.0",
-        "grpc/grpc": "^1.30",
         "php-http/async-client-implementation": "^1.0",
         "php-http/discovery": "^1.14",
         "psr/http-factory-implementation": "^1.0",
@@ -72,6 +71,7 @@
     },
     "require-dev": {
         "ext-grpc": "*",
+        "grpc/grpc": "^1.30",
         "assertwell/phpunit-global-state": "^0.2.1",
         "composer/xdebug-handler": "^2.0",
         "dg/bypass-finals": "^1.3",
