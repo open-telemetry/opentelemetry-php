@@ -14,7 +14,7 @@ use Symfony\Component\Yaml\Parser;
  * 4. use the commits to generate release notes
  *
  * Usage:
- * GH_TOKEN=<token> DEBUG=1 php scripts/releases.php
+ * GH_TOKEN=<token> DEBUG=1 php scripts/create_releases.php
  */
 class Release
 {
@@ -37,16 +37,15 @@ class Release
             $headers['Authorization'] = "token {$token}";
         }
         $this->client = new Client([
-                'headers' => $headers,
-                'http_errors' => false,
-            ],
-        );
+            'headers' => $headers,
+            'http_errors' => false,
+        ]);
         $this->parser = new Parser();
     }
 
     public function run(): void
     {
-        $total = [];
+        $releases = [];
         foreach ($this->repos as $repo) {
             self::debug('Processing repository: ' . $repo);
             $yaml = $this->get_gitsplit_yaml($repo);
@@ -55,24 +54,29 @@ class Release
                 $target = $split['target'];
                 try {
                     $data = $this->process($repo, $path, $target);
-                    $total[] = $data;
+                    $releases[] = $data;
                 } catch (Throwable $t) {
                     echo "ERROR: {$path}: {$t->getMessage()}" . PHP_EOL;
                 }
             }
         }
 
-        foreach ($total as $item) {
-            if (count($item['new_commits']) > 0) {
+        /**
+         * Print out details and generated release notes for each repository that has new commits.
+         * In the future, this could be interactive (would need input on what the next version should
+         * be) and could create the release (requires a github token with appropriate permissions)
+         */
+        foreach ($releases as $release) {
+            if (count($release['new_commits']) > 0) {
                 echo PHP_EOL . PHP_EOL;
-                echo "*** https://github.com/{$item['org']}/{$item['repo']}/releases/new ***" . PHP_EOL;
-                echo "*** Last release: {$item['last_release_version']} ({$item['last_release_date']}) ***" . PHP_EOL;
+                echo "*** https://github.com/{$release['org']}/{$release['repo']}/releases/new ***" . PHP_EOL;
+                echo "*** Last release: {$release['last_release_version']} ({$release['last_release_date']}) ***" . PHP_EOL;
                 echo "## What's Changed" . PHP_EOL;
-                foreach ($item['new_commits'] as $line) {
+                foreach ($release['new_commits'] as $line) {
                     echo "* {$line}" . PHP_EOL;
                 }
                 echo PHP_EOL;
-                echo "**Full Changelog**: https://github.com/{$item['org']}/{$item['repo']}/compare/{$item['last_release_version']}...a.b.c" . PHP_EOL;
+                echo "**Full Changelog**: https://github.com/{$release['org']}/{$release['repo']}/compare/{$release['last_release_version']}...a.b.c" . PHP_EOL;
                 echo PHP_EOL . PHP_EOL;
             }
         }
@@ -96,13 +100,11 @@ class Release
             'last_release_date' => $release->created_at,
             'last_release_version' => $release->tag_name,
             'new_commits' => [],
-            'contributors' => [],
         ];
         if (count($commits) > 0) {
             foreach ($commits as $commit) {
                 $pr = $this->get_pull_request_for_commit($main_repo, $commit->sha);
                 $data['new_commits'][] = "{$pr->title} by @{$pr->user->login} in [#{$pr->number}]({$pr->html_url})";
-                $data['contributors'][$pr->user->login] = $pr->user->login;
             }
         }
         return $data;
