@@ -35,6 +35,8 @@ class Release
         $headers = [];
         if ($token) {
             $headers['Authorization'] = "token {$token}";
+        } else {
+            echo "[WARNING] No github token provided, you may get rate-limited." . PHP_EOL;
         }
         $this->client = new Client([
             'headers' => $headers,
