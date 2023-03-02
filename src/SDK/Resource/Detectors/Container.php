@@ -65,7 +65,7 @@ final class Container implements ResourceDetectorInterface
         }
         $lines = explode(PHP_EOL, $data);
         foreach ($lines as $line) {
-            if (str_contains($line, self::HOSTNAME)) {
+            if (strpos($line, self::HOSTNAME) !== false) {
                 $parts = explode('/', $line);
                 foreach ($parts as $part) {
                     if (strlen($part) === self::CONTAINER_ID_LENGTH) {
