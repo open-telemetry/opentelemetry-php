@@ -44,6 +44,7 @@ class ResourceInfoFactory
                 new Detectors\ProcessRuntime(),
                 new Detectors\Sdk(),
                 new Detectors\SdkProvided(),
+                new Detectors\Container(),
             ]))->getResource();
         }
 
@@ -77,6 +78,10 @@ class ResourceInfoFactory
                     break;
                 case Values::VALUE_DETECTORS_SDK_PROVIDED:
                     $resourceDetectors[] = new Detectors\SdkProvided();
+
+                    break;
+                case Values::VALUE_DETECTORS_CONTAINER:
+                    $resourceDetectors[] = new Detectors\Container();
 
                     break;
                 default:
