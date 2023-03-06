@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Common\Instrumentation;
 
+use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
@@ -43,5 +44,15 @@ final class ContextKeys
         static $instance;
 
         return $instance ??= Context::createKey(TextMapPropagatorInterface::class);
+    }
+
+    /**
+     * @return ContextKeyInterface<LoggerProviderInterface>
+     */
+    public static function loggerProvider(): ContextKeyInterface
+    {
+        static $instance;
+
+        return $instance ??= Context::createKey(LoggerProviderInterface::class);
     }
 }

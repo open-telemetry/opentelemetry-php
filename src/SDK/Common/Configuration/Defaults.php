@@ -31,6 +31,7 @@ interface Defaults
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#attribute-limits
      */
     public const OTEL_ATTRIBUTE_COUNT_LIMIT = 128;
+    public const OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = PHP_INT_MAX;
     /**
      * Span Limits
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#span-limits-
@@ -95,4 +96,5 @@ interface Defaults
     public const OTEL_PHP_DETECTORS = 'all';
     public const OTEL_PHP_AUTOLOAD_ENABLED = 'false';
     public const OTEL_PHP_DISABLED_INSTRUMENTATIONS = [];
+    public const OTEL_PHP_LOGS_PROCESSOR = 'batch';
 }

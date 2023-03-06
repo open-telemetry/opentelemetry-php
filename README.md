@@ -81,7 +81,7 @@ Additional packages, demos and tools are hosted or distributed in the [OpenTelem
 |---------|--------|---------|
 | Traces  | Beta   | N/A     |
 | Metrics | Beta   | N/A     |
-| Logs    | N/A    | N/A     |
+| Logs    | Alpha  | N/A     |
 
 ## Specification conformance
 We attempt to keep the [OpenTelemetry Specification Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/master/spec-compliance-matrix.md) up to date in order to show which features are available and which have not yet been implemented.

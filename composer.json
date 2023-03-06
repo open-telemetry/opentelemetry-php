@@ -55,6 +55,7 @@
             "src/Contrib/Newrelic/_register.php",
             "src/Contrib/Zipkin/_register.php",
             "src/Extension/Propagator/B3/_register.php",
+            "src/SDK/Logs/Exporter/_register.php",
             "src/SDK/Metrics/MetricExporter/_register.php",
             "src/SDK/Propagation/_register.php",
             "src/SDK/Trace/SpanExporter/_register.php",

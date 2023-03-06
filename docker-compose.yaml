@@ -21,3 +21,8 @@ services:
     ports:
     - 9412:9412
     - 16686:16686
+  collector:
+    image: otel/opentelemetry-collector-contrib
+    command: [ "--config=/etc/otel-collector-config.yml" ]
+    volumes:
+      - ./files/collector/otel-collector-config.yml:/etc/otel-collector-config.yml

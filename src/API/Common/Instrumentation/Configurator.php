@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Common\Instrumentation;
 
+use OpenTelemetry\API\Logs\LoggerProviderInterface;
+use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
@@ -25,6 +27,7 @@ final class Configurator implements ImplicitContextKeyedInterface
     private ?TracerProviderInterface $tracerProvider = null;
     private ?MeterProviderInterface $meterProvider = null;
     private ?TextMapPropagatorInterface $propagator = null;
+    private ?LoggerProviderInterface $loggerProvider = null;
 
     private function __construct()
     {
@@ -47,6 +50,7 @@ final class Configurator implements ImplicitContextKeyedInterface
             ->withTracerProvider(new NoopTracerProvider())
             ->withMeterProvider(new NoopMeterProvider())
             ->withPropagator(new NoopTextMapPropagator())
+            ->withLoggerProvider(new NoopLoggerProvider())
         ;
     }
 
@@ -67,6 +71,9 @@ final class Configurator implements ImplicitContextKeyedInterface
         }
         if ($this->propagator !== null) {
             $context = $context->with(ContextKeys::propagator(), $this->propagator);
+        }
+        if ($this->loggerProvider !== null) {
+            $context = $context->with(ContextKeys::loggerProvider(), $this->loggerProvider);
         }
 
         return $context;
@@ -92,6 +99,13 @@ final class Configurator implements ImplicitContextKeyedInterface
     {
         $self = clone $this;
         $self->propagator = $propagator;
+
+        return $self;
+    }
+    public function withLoggerProvider(?LoggerProviderInterface $loggerProvider): Configurator
+    {
+        $self = clone $this;
+        $self->loggerProvider = $loggerProvider;
 
         return $self;
     }
