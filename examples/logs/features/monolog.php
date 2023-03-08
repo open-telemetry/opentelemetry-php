@@ -48,6 +48,8 @@ $otelHandler = new class('demo', 'demo-domain', LogLevel::INFO) extends Abstract
     }
     private function severityNumber(string $level): int
     {
+        //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model-appendix.md#appendix-b-severitynumber-example-mappings
+        //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-severitynumber
         switch (strtolower($level)) {
             case LogLevel::DEBUG:
                 return 5;
@@ -64,7 +66,7 @@ $otelHandler = new class('demo', 'demo-domain', LogLevel::INFO) extends Abstract
             case LogLevel::ALERT:
                 return 19;
             case LogLevel::EMERGENCY:
-                return 20;
+                return 21;
             default:
                 return 0;
         }

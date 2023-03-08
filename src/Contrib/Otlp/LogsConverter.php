@@ -20,6 +20,7 @@ class LogsConverter
 {
     /**
      * @param iterable<ReadableLogRecord> $logs
+     * @psalm-suppress InvalidArgument
      */
     public function convert(iterable $logs): ExportLogsServiceRequest
     {
