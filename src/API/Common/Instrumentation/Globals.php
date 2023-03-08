@@ -38,8 +38,8 @@ final class Globals
     ) {
         $this->tracerProvider = $tracerProvider;
         $this->meterProvider = $meterProvider;
-        $this->propagator = $propagator;
         $this->loggerProvider = $loggerProvider;
+        $this->propagator = $propagator;
     }
 
     public static function tracerProvider(): TracerProviderInterface
@@ -114,5 +114,6 @@ final class Globals
     public static function reset(): void
     {
         self::$globals = null;
+        self::$initializers = [];
     }
 }

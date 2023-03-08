@@ -67,7 +67,7 @@ class SdkAutoloader
     /**
      * @internal
      */
-    public static function shutdown(): void
+    public static function reset(): void
     {
         self::$enabled = null;
     }
