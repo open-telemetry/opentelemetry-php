@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Example\Unit\SDK;
+namespace OpenTelemetry\Tests\Unit\SDK;
 
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;

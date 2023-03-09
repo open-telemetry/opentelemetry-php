@@ -17,7 +17,7 @@ use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
 
 class LogRecordProcessorFactory
 {
-    public function create(LogRecordExporterInterface $exporter, ?MeterProviderInterface $meterProvider): LogRecordProcessorInterface
+    public function create(LogRecordExporterInterface $exporter, ?MeterProviderInterface $meterProvider = null): LogRecordProcessorInterface
     {
         $name = Configuration::getEnum(Variables::OTEL_PHP_LOGS_PROCESSOR);
         switch ($name) {

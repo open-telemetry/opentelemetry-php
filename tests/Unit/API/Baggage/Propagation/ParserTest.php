@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Example\Unit\API\Baggage\Propagation;
+namespace OpenTelemetry\Tests\Unit\API\Baggage\Propagation;
 
 use OpenTelemetry\API\Baggage\BaggageBuilderInterface;
 use OpenTelemetry\API\Baggage\Metadata;
