@@ -2,7 +2,7 @@
 
 ## Usage
 
-See https://github.com/open-telemetry/opentelemetry-php/blob/main/examples/traces/features/exporters/otlp_http.php
+See https://github.com/open-telemetry/opentelemetry-php/blob/main/examples/traces/exporters/otlp_http.php
 
 ## Http transport
 
