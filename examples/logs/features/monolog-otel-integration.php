@@ -12,6 +12,11 @@ use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use Psr\Log\LogLevel;
 
+/**
+ * This example creates a monolog handler which integrates with opentelemetry, as described
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/bridge-api.md#usage
+ */
+
 putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
 putenv('OTEL_METRICS_EXPORTER=none');
 putenv('OTEL_LOGS_EXPORTER=otlp');
