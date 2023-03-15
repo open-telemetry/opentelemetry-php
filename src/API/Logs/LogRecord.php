@@ -8,7 +8,7 @@ use OpenTelemetry\Context\ContextInterface;
 
 class LogRecord
 {
-    public const NANOS_PER_MILLISECOND = 1_000_000;
+    public const NANOS_PER_SECOND = 1_000_000_000;
 
     protected int $timestamp;
     protected ?int $observedTimestamp = null;
@@ -20,7 +20,7 @@ class LogRecord
 
     public function __construct($body)
     {
-        $this->timestamp = (int) (microtime(true) * self::NANOS_PER_MILLISECOND);
+        $this->timestamp = (int) (microtime(true) * self::NANOS_PER_SECOND);
         $this->body = $body;
     }
 

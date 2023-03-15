@@ -9,6 +9,7 @@ use OpenTelemetry\API\Common\Instrumentation\Globals;
 use OpenTelemetry\API\Logs\EventLogger;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\API\Logs\Map\Psr3;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use Psr\Log\LogLevel;
 
@@ -49,33 +50,8 @@ $otelHandler = new class('demo', 'demo-domain', LogLevel::INFO) extends Abstract
         return (new LogRecord($record['message']))
             ->setSeverityText($record['level_name'])
             ->setObservedTimestamp($record['datetime']->format('U') * ClockInterface::NANOS_PER_SECOND)
-            ->setSeverityNumber($this->severityNumber($record['level_name']))
+            ->setSeverityNumber(Psr3::severityNumber($record['level_name']))
             ->setAttributes($record['context'] + $record['extra']);
-    }
-    private function severityNumber(string $level): int
-    {
-        //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model-appendix.md#appendix-b-severitynumber-example-mappings
-        //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-severitynumber
-        switch (strtolower($level)) {
-            case LogLevel::DEBUG:
-                return 5;
-            case LogLevel::INFO:
-                return 9;
-            case LogLevel::NOTICE:
-                return 10;
-            case LogLevel::WARNING:
-                return 13;
-            case LogLevel::ERROR:
-                return 17;
-            case LogLevel::CRITICAL:
-                return 18;
-            case LogLevel::ALERT:
-                return 19;
-            case LogLevel::EMERGENCY:
-                return 21;
-            default:
-                return 0;
-        }
     }
 };
 
