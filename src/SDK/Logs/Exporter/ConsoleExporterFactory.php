@@ -6,11 +6,14 @@ namespace OpenTelemetry\SDK\Logs\Exporter;
 
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
+use OpenTelemetry\SDK\Registry;
 
 class ConsoleExporterFactory implements LogRecordExporterFactoryInterface
 {
     public function create(): LogRecordExporterInterface
     {
-        return new ConsoleExporter();
+        $transport = Registry::transportFactory('stream')->create('php://stdout', 'application/json');
+
+        return new ConsoleExporter($transport);
     }
 }

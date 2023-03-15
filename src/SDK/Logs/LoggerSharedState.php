@@ -20,8 +20,8 @@ class LoggerSharedState
         LogRecordProcessorInterface $processor
     ) {
         $this->resource = $resource;
-        $this->processor = $processor;
         $this->limits = $limits;
+        $this->processor = $processor;
     }
     public function hasShutdown(): bool
     {

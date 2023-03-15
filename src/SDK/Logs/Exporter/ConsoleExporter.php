@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Logs\Exporter;
 
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
@@ -15,6 +16,13 @@ use OpenTelemetry\SDK\Trace\Span;
 
 class ConsoleExporter implements LogRecordExporterInterface
 {
+    private TransportInterface $transport;
+
+    public function __construct(TransportInterface $transport)
+    {
+        $this->transport = $transport;
+    }
+
     /**
      * @param iterable<mixed, ReadableLogRecord> $batch
      */
@@ -36,7 +44,7 @@ class ConsoleExporter implements LogRecordExporterInterface
             'resource' => $resource,
             'scope' => $scope,
         ];
-        echo json_encode($output, JSON_PRETTY_PRINT) . PHP_EOL;
+        $this->transport->send(json_encode($output, JSON_PRETTY_PRINT));
 
         return new CompletedFuture(true);
     }

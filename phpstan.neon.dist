@@ -29,3 +29,7 @@ parameters:
             message: "#Call to an undefined method .*:shouldHaveReceived.*#"
             paths:
                 - tests
+        -
+            message: "#Call to an undefined method .*:expects.*#"
+            paths:
+                - tests
