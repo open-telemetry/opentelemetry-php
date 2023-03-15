@@ -83,7 +83,7 @@ $otelHandler = new class('demo', 'demo-domain', LogLevel::INFO) extends Abstract
 $span = $tracer->spanBuilder('foo')->startSpan();
 $scope = $span->activate();
 
-$monolog = new Logger('otel-php', [$otelHandler, $streamHandler]);
+$monolog = new Logger('otel-php-monolog', [$otelHandler, $streamHandler]);
 
 $monolog->debug('debug message');
 $monolog->info('hello world', ['extra_one' => 'value_one']);
