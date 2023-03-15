@@ -33,7 +33,7 @@ class ConsoleExporterTest extends TestCase
             (new ReadableLogRecord(
                 $this->createMock(InstrumentationScopeInterface::class),
                 $this->createMock(LoggerSharedState::class),
-                (new LogRecord('foo'))->toLogRecordData(),
+                (new LogRecord('foo')),
             )),
         ];
 

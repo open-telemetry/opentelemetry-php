@@ -26,7 +26,7 @@ class Logger implements LoggerInterface
 
     public function logRecord(LogRecord $logRecord): void
     {
-        $readWriteLogRecord = new ReadWriteLogRecord($this->scope, $this->loggerSharedState, $logRecord->toLogRecordData());
+        $readWriteLogRecord = new ReadWriteLogRecord($this->scope, $this->loggerSharedState, $logRecord);
         //@todo explicitly passed context required by spec: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#logrecordprocessor-operations
         $this->loggerSharedState->getProcessor()->onEmit(
             $readWriteLogRecord,

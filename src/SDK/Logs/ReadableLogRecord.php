@@ -4,71 +4,81 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Logs;
 
-use OpenTelemetry\API\Logs\LogRecordData;
+use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
-class ReadableLogRecord
+/**
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#log-and-event-record-definition
+ */
+class ReadableLogRecord extends LogRecord
 {
     private InstrumentationScopeInterface $scope;
     private LoggerSharedState $loggerSharedState;
-    protected LogRecordData $logRecordData;
 
-    public function __construct(InstrumentationScopeInterface $scope, LoggerSharedState $loggerSharedState, LogRecordData $logRecordData)
+    public function __construct(InstrumentationScopeInterface $scope, LoggerSharedState $loggerSharedState, LogRecord $logRecord)
     {
         $this->scope = $scope;
         $this->loggerSharedState = $loggerSharedState;
-        $this->logRecordData = $logRecordData;
+
+        parent::__construct($logRecord->body);
+        $this->timestamp = $logRecord->timestamp;
+        $this->observedTimestamp = $logRecord->observedTimestamp;
+        $this->context = $logRecord->context;
+        $this->severityNumber = $logRecord->severityNumber;
+        $this->severityText = $logRecord->severityText;
+        $this->attributes = $logRecord->attributes;
     }
+
     public function getInstrumentationScope(): InstrumentationScopeInterface
     {
         return $this->scope;
     }
+
     public function getResource(): ResourceInfo
     {
         return $this->loggerSharedState->getResource();
     }
-    public function getLogRecordData(): LogRecordData
+
+    public function getTimestamp(): ?int
     {
-        return $this->logRecordData;
+        return $this->timestamp;
     }
 
-    public function getTimestamp(): int
+    public function getObservedTimestamp(): ?int
     {
-        return $this->logRecordData->data['timestamp'];
+        return $this->observedTimestamp;
     }
 
-    public function getObservedTimestamp(): int
-    {
-        return $this->logRecordData->data['observed_timestamp'] ?? 0;
-    }
     public function getContext(): ?ContextInterface
     {
-        return $this->logRecordData->data['context'] ?? null;
+        return $this->context;
     }
-    public function getSeverityNumber(): int
+
+    public function getSeverityNumber(): ?int
     {
-        return $this->logRecordData->data['severity_number'] ?? 0;
+        return $this->severityNumber;
     }
-    public function getSeverityText(): string
+
+    public function getSeverityText(): ?string
     {
-        return $this->logRecordData->data['severity_text'] ?? '';
+        return $this->severityText;
     }
 
     /**
-     * @return mixed
+     * @return mixed|null
      */
     public function getBody()
     {
-        return $this->logRecordData->data['body'];
+        return $this->body;
     }
 
     public function getAttributes(): AttributesInterface
     {
         $factory = $this->loggerSharedState->getLogRecordLimits()->getAttributeFactory();
-        $builder = $factory->builder($this->logRecordData->data['attributes']);
+        $builder = $factory->builder($this->attributes);
 
         return $builder->build();
     }

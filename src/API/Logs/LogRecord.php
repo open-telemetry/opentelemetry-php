@@ -6,32 +6,29 @@ namespace OpenTelemetry\API\Logs;
 
 use OpenTelemetry\Context\ContextInterface;
 
-class LogRecord
+class LogRecord implements LogRecordInterface
 {
-    public const NANOS_PER_SECOND = 1_000_000_000;
-
-    protected int $timestamp;
+    protected ?int $timestamp = null;
     protected ?int $observedTimestamp = null;
     protected ?ContextInterface $context = null;
-    protected ?int $severityNumber = null;
+    protected int $severityNumber = 0;
     protected ?string $severityText = null;
     protected $body = null;
     protected array $attributes = [];
 
-    public function __construct($body)
+    public function __construct($body = null)
     {
-        $this->timestamp = (int) (microtime(true) * self::NANOS_PER_SECOND);
         $this->body = $body;
     }
 
-    public function setObservedTimestamp(int $observedTimestamp): self
+    public function setTimestamp(int $timestamp): self
     {
-        $this->observedTimestamp = $observedTimestamp;
+        $this->timestamp = $timestamp;
 
         return $this;
     }
 
-    public function setContext(ContextInterface $context): self
+    public function setContext(?ContextInterface $context = null): self
     {
         $this->context = $context;
 
@@ -68,15 +65,17 @@ class LogRecord
         return $this;
     }
 
-    public function toLogRecordData(): LogRecordData
+    public function setBody($body = null): self
     {
-        return new LogRecordData([
-            'timestamp' => $this->timestamp,
-            'observed_timestamp' => $this->observedTimestamp,
-            'severity_number' => $this->severityNumber,
-            'severity_text' => $this->severityText,
-            'body' => $this->body,
-            'attributes' => $this->attributes,
-        ]);
+        $this->body = $body;
+
+        return $this;
+    }
+
+    public function setObservedTimestamp(int $observedTimestamp = null): self
+    {
+        $this->observedTimestamp = $observedTimestamp;
+
+        return $this;
     }
 }

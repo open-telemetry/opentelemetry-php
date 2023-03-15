@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\API\Logs;
 
 use OpenTelemetry\API\Logs\LogRecord;
-use OpenTelemetry\Context\ContextInterface;
+use OpenTelemetry\Context\Context;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,18 +13,30 @@ use PHPUnit\Framework\TestCase;
  */
 class LogRecordTest extends TestCase
 {
-    public function test_setters(): void
+    /**
+     * @dataProvider settersProvider
+     */
+    public function test_setters(string $method, string $propertyName, $value): void
     {
-        $context = $this->createMock(ContextInterface::class);
-        $record = new LogRecord('body');
-        $record
-            ->setAttributes(['foo' => 'bar'])
-            ->setSeverityNumber(5)
-            ->setSeverityText('info')
-            ->setObservedTimestamp(999)
-            ->setContext($context);
+        $record = new LogRecord();
+        $record->{$method}($value);
 
-        $data = $record->toLogRecordData();
-        $this->assertSame('body', $data->data['body']);
+        $reflection = new \ReflectionClass($record);
+        $property = $reflection->getProperty($propertyName);
+        $property->setAccessible(true);
+        $this->assertSame($value, $property->getValue($record));
+    }
+
+    public static function settersProvider(): array
+    {
+        return [
+            ['setBody', 'body', 'foo'],
+            ['setAttributes', 'attributes', ['foo' => 'bar']],
+            ['setSeverityNumber', 'severityNumber', 5],
+            ['setSeverityText', 'severityText', 'info'],
+            ['setObservedTimestamp', 'observedTimestamp', 999],
+            ['setTimestamp', 'timestamp', 888],
+            ['setContext', 'context', Context::getCurrent()],
+        ];
     }
 }

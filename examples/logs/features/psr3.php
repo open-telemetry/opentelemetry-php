@@ -25,10 +25,11 @@ $scope = $span->activate();
 
 $psr3 = Globals::loggerProvider()->getLogger('psr3-logger');
 
-$psr3->debug('debug message');
+/*$psr3->debug('debug message');
 $psr3->info('hello world', ['extra_one' => 'value_one']);
 $psr3->alert('foo', ['extra_two' => 'value_two']);
-$psr3->emergency('something bad happened', ['exception' => new Exception('kaboom')]);
+$psr3->emergency('something bad happened', ['exception' => new Exception('kaboom')]);*/
+$psr3->logRecord(new \OpenTelemetry\API\Logs\LogRecord());
 
 $scope->detach();
 $span->end();

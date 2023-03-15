@@ -49,8 +49,8 @@ class LogsConverter
     {
         $pLogRecord = new LogRecord();
         $pLogRecord->setBody(AttributesConverter::convertAnyValue($record->getBody())); //@todo don't use attributes converter
-        $pLogRecord->setTimeUnixNano($record->getTimestamp());
-        $record->getObservedTimestamp() && $pLogRecord->setObservedTimeUnixNano($record->getObservedTimestamp());
+        $pLogRecord->setTimeUnixNano($record->getTimestamp() ?? '');
+        $pLogRecord->setObservedTimeUnixNano($record->getObservedTimestamp() ?? '');
         $context = $record->getContext();
         if ($context !== null) {
             $spanContext = Span::fromContext($context)->getContext();
@@ -58,8 +58,14 @@ class LogsConverter
             $pLogRecord->setSpanId($spanContext->getSpanIdBinary());
             $pLogRecord->setFlags($spanContext->getTraceFlags());
         }
-        $pLogRecord->setSeverityNumber($record->getSeverityNumber());
-        $pLogRecord->setSeverityText($record->getSeverityText());
+        $severityNumber = $record->getSeverityNumber();
+        if ($severityNumber !== null) {
+            $pLogRecord->setSeverityNumber($severityNumber);
+        }
+        $severityText = $record->getSeverityText();
+        if ($severityText !== null) {
+            $pLogRecord->setSeverityText($severityText);
+        }
         $this->setAttributes($pLogRecord, $record->getAttributes());
         $pLogRecord->setDroppedAttributesCount($record->getAttributes()->getDroppedAttributesCount());
 
