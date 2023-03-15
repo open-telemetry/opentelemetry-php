@@ -9,7 +9,6 @@ use OpenTelemetry\API\Common\Instrumentation\Globals;
 use OpenTelemetry\API\Logs\EventLogger;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\LogRecord;
-use OpenTelemetry\API\Logs\LogRecordInterface;
 use OpenTelemetry\API\Logs\Map\Psr3;
 use Psr\Log\LogLevel;
 
@@ -49,8 +48,8 @@ $otelHandler = new class('demo', 'demo-domain', LogLevel::INFO) extends Abstract
     {
         return (new LogRecord($record['message']))
             ->setSeverityText($record['level_name'])
-            ->setTimestamp((int) (microtime(true) * LogRecordInterface::NANOS_PER_SECOND))
-            ->setObservedTimestamp($record['datetime']->format('U') * LogRecordInterface::NANOS_PER_SECOND)
+            ->setTimestamp((int) (microtime(true) * LogRecord::NANOS_PER_SECOND))
+            ->setObservedTimestamp($record['datetime']->format('U') * LogRecord::NANOS_PER_SECOND)
             ->setSeverityNumber(Psr3::severityNumber($record['level_name']))
             ->setAttributes($record['context'] + $record['extra']);
     }

@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#log-and-event-record-definition
+ * "Note: Typically this will be implemented with a new interface or (immutable) value type."
  */
 class ReadableLogRecord extends LogRecord
 {

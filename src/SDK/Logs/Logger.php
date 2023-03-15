@@ -27,10 +27,11 @@ class Logger implements LoggerInterface
     public function logRecord(LogRecord $logRecord): void
     {
         $readWriteLogRecord = new ReadWriteLogRecord($this->scope, $this->loggerSharedState, $logRecord);
-        //@todo explicitly passed context required by spec: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#logrecordprocessor-operations
+        // @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#onemit
+        $context = $readWriteLogRecord->getContext() ?? ($this->includeTraceContext ? Context::getCurrent() : null);
         $this->loggerSharedState->getProcessor()->onEmit(
             $readWriteLogRecord,
-            $this->includeTraceContext ? Context::getCurrent() : null,
+            $context,
         );
     }
 

@@ -6,8 +6,10 @@ namespace OpenTelemetry\API\Logs;
 
 use OpenTelemetry\Context\ContextInterface;
 
-class LogRecord implements LogRecordInterface
+class LogRecord
 {
+    public const NANOS_PER_SECOND = 1_000_000_000;
+
     protected ?int $timestamp = null;
     protected ?int $observedTimestamp = null;
     protected ?ContextInterface $context = null;

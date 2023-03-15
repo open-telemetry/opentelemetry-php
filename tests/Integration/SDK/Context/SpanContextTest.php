@@ -42,7 +42,6 @@ class SpanContextTest extends TestCase
 
     /**
      * @group trace-compliance
-     * @covers ::isValid
      */
     public function test_valid_span(): void
     {
@@ -52,7 +51,6 @@ class SpanContextTest extends TestCase
 
     /**
      * @group trace-compliance
-     * @covers ::isRemote
      */
     public function test_context_is_remote_from_restore(): void
     {

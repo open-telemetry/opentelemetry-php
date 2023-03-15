@@ -18,6 +18,9 @@ class NoopLogsProcessor implements LogRecordProcessorInterface
         return $instance ??= new self();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function onEmit(ReadWriteLogRecord $record, ?ContextInterface $context = null): void
     {
     }
