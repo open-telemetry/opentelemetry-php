@@ -72,23 +72,13 @@ class LogRecord
 
     public function toLogRecordData(): LogRecordData
     {
-        $spanContext = Span::fromContext($this->context ?? Context::getCurrent())->getContext();
-
-        //@todo improve how this is stored
-        $data = [
+        return new LogRecordData([
             'timestamp' => $this->timestamp,
             'observed_timestamp' => $this->observedTimestamp,
             'severity_number' => $this->severityNumber,
             'severity_text' => $this->severityText,
             'body' => $this->body,
             'attributes' => $this->attributes,
-        ];
-        if ($spanContext->isValid()) {
-            $data['trace_id'] = $spanContext->getTraceId();
-            $data['span_id'] = $spanContext->getSpanId();
-            $data['trace_flags'] = $spanContext->getTraceFlags();
-        }
-
-        return new LogRecordData($data);
+        ]);
     }
 }

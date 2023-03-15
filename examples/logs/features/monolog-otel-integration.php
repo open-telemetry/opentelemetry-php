@@ -21,11 +21,13 @@ putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
 putenv('OTEL_METRICS_EXPORTER=none');
 putenv('OTEL_LOGS_EXPORTER=otlp');
 putenv('OTEL_LOGS_PROCESSOR=batch');
-putenv('OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf');
+putenv('OTEL_TRACE_PROCESSOR=none');
+putenv('OTEL_EXPORTER_OTLP_PROTOCOL=http/json');
 putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318');
 
 require __DIR__ . '/../../../vendor/autoload.php';
 $streamHandler = new StreamHandler(STDOUT, LogLevel::DEBUG);
+$tracer = Globals::tracerProvider()->getTracer('monolog-demo');
 
 //otel handler for Monolog v2, which ignores logs < INFO
 $otelHandler = new class('demo', 'demo-domain', LogLevel::INFO) extends AbstractProcessingHandler {
@@ -78,8 +80,15 @@ $otelHandler = new class('demo', 'demo-domain', LogLevel::INFO) extends Abstract
     }
 };
 
+//start a span (which will not be exported in this example) so that logs contain span context
+$span = $tracer->spanBuilder('foo')->startSpan();
+$scope = $span->activate();
+
 $monolog = new Logger('otel-php', [$otelHandler, $streamHandler]);
 
 $monolog->debug('debug message');
 $monolog->info('hello world', ['extra_one' => 'value_one']);
 $monolog->alert('foo', ['extra_two' => 'value_two']);
+
+$scope->detach();
+$span->end();

@@ -13,7 +13,7 @@ class ReadableLogRecord
 {
     private InstrumentationScopeInterface $scope;
     private LoggerSharedState $loggerSharedState;
-    private LogRecordData $logRecordData;
+    protected LogRecordData $logRecordData;
 
     public function __construct(InstrumentationScopeInterface $scope, LoggerSharedState $loggerSharedState, LogRecordData $logRecordData)
     {

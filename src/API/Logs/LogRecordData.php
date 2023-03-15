@@ -9,6 +9,7 @@ namespace OpenTelemetry\API\Logs;
  */
 class LogRecordData
 {
+    //@todo improve how this is stored, ie not in a freestyle array
     public array $data;
     public function __construct(array $data)
     {

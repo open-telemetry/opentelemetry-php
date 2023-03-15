@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Logs\Processor;
 
+use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
@@ -20,11 +22,19 @@ class SimpleLogsProcessor implements LogRecordProcessorInterface
 
     /**
      * @todo accept cancellation as param?
-     * @todo context is not used (already added to $record in LogRecordData)
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#onemit
      */
     public function onEmit(ReadWriteLogRecord $record, ?ContextInterface $context = null): void
     {
+        if ($context) {
+            // @todo where can this be located to remove duplication? AbstractLogsProcessor?? trait?
+            $spanContext = Span::fromContext($this->context ?? Context::getCurrent())->getContext();
+            if ($spanContext->isValid()) {
+                $record->setTraceId($spanContext->getTraceId());
+                $record->setSpanId($spanContext->getSpanId());
+                $record->setTraceFlags($spanContext->getTraceFlags());
+            }
+        }
         $this->exporter->export([$record]);
     }
 
