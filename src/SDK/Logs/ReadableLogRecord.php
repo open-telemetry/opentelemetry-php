@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Logs;
 
 use OpenTelemetry\API\Logs\LogRecordData;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -43,17 +44,9 @@ class ReadableLogRecord
     {
         return $this->logRecordData->data['observed_timestamp'] ?? 0;
     }
-    public function getTraceId(): string
+    public function getContext(): ?ContextInterface
     {
-        return $this->logRecordData->data['trace_id'] ?? '';
-    }
-    public function getSpanId(): string
-    {
-        return $this->logRecordData->data['span_id'] ?? '';
-    }
-    public function getTraceFlags(): int
-    {
-        return $this->logRecordData->data['trace_flags'] ?? 0;
+        return $this->logRecordData->data['context'] ?? null;
     }
     public function getSeverityNumber(): int
     {

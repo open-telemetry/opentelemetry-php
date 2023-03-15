@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
+use OpenTelemetry\API\Trace\Span;
 use Opentelemetry\Proto\Collector\Logs\V1\ExportLogsServiceRequest;
 use Opentelemetry\Proto\Common\V1\InstrumentationScope;
 use Opentelemetry\Proto\Common\V1\KeyValue;
@@ -50,9 +51,13 @@ class LogsConverter
         $pLogRecord->setBody(AttributesConverter::convertAnyValue($record->getBody())); //@todo don't use attributes converter
         $pLogRecord->setTimeUnixNano($record->getTimestamp());
         $record->getObservedTimestamp() && $pLogRecord->setObservedTimeUnixNano($record->getObservedTimestamp());
-        $pLogRecord->setTraceId($record->getTraceId());
-        $pLogRecord->setSpanId($record->getSpanId());
-        $pLogRecord->setFlags($record->getTraceFlags());
+        $context = $record->getContext();
+        if ($context !== null) {
+            $spanContext = Span::fromContext($context)->getContext();
+            $pLogRecord->setTraceId($spanContext->getTraceIdBinary());
+            $pLogRecord->setSpanId($spanContext->getSpanIdBinary());
+            $pLogRecord->setFlags($spanContext->getTraceFlags());
+        }
         $pLogRecord->setSeverityNumber($record->getSeverityNumber());
         $pLogRecord->setSeverityText($record->getSeverityText());
         $this->setAttributes($pLogRecord, $record->getAttributes());

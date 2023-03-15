@@ -8,7 +8,6 @@ use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
-use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -155,15 +154,7 @@ class BatchLogsProcessor implements LogRecordProcessorInterface
             return;
         }
 
-        if ($context) {
-            // @todo where can this be located to remove duplication? AbstractLogsProcessor?? trait?
-            $spanContext = Span::fromContext($this->context ?? Context::getCurrent())->getContext();
-            if ($spanContext->isValid()) {
-                $record->setTraceId($spanContext->getTraceId());
-                $record->setSpanId($spanContext->getSpanId());
-                $record->setTraceFlags($spanContext->getTraceFlags());
-            }
-        }
+        $record->setContext($context);
 
         $this->queueSize++;
         $this->batch[] = $record;

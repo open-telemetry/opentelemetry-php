@@ -13,7 +13,7 @@ use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use Psr\Log\LogLevel;
 
 /**
- * This example creates a monolog handler which integrates with opentelemetry, as described
+ * This example creates a monolog handler which integrates with opentelemetry, as described in:
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/bridge-api.md#usage
  */
 
@@ -21,9 +21,8 @@ putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
 putenv('OTEL_METRICS_EXPORTER=none');
 putenv('OTEL_LOGS_EXPORTER=otlp');
 putenv('OTEL_LOGS_PROCESSOR=batch');
-putenv('OTEL_TRACE_PROCESSOR=none');
-putenv('OTEL_EXPORTER_OTLP_PROTOCOL=http/json');
-putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318');
+putenv('OTEL_EXPORTER_OTLP_PROTOCOL=grpc');
+putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4317');
 
 require __DIR__ . '/../../../vendor/autoload.php';
 $streamHandler = new StreamHandler(STDOUT, LogLevel::DEBUG);
@@ -80,7 +79,7 @@ $otelHandler = new class('demo', 'demo-domain', LogLevel::INFO) extends Abstract
     }
 };
 
-//start a span (which will not be exported in this example) so that logs contain span context
+//start a span so that logs contain span context
 $span = $tracer->spanBuilder('foo')->startSpan();
 $scope = $span->activate();
 
