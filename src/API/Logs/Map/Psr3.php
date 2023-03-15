@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\API\Logs\Map;
 
 use Psr\Log\LogLevel;

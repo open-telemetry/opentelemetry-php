@@ -61,7 +61,7 @@ class LogRecord
         return $this;
     }
 
-    public function setAttribute(string $name, string $value): self
+    public function setAttribute(string $name, $value): self
     {
         $this->attributes[$name] = $value;
 
