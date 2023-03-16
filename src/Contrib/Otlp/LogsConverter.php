@@ -48,7 +48,7 @@ class LogsConverter
     private function convertLogRecord(ReadableLogRecord $record): LogRecord
     {
         $pLogRecord = new LogRecord();
-        $pLogRecord->setBody(AttributesConverter::convertAnyValue($record->getBody())); //@todo don't use attributes converter
+        $pLogRecord->setBody(AttributesConverter::convertAnyValue($record->getBody()));
         $pLogRecord->setTimeUnixNano($record->getTimestamp() ?? '');
         $pLogRecord->setObservedTimeUnixNano($record->getObservedTimestamp() ?? '');
         $context = $record->getContext();

@@ -19,7 +19,6 @@ class SimpleLogsProcessor implements LogRecordProcessorInterface
     }
 
     /**
-     * @todo accept cancellation as param?
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#onemit
      */
     public function onEmit(ReadWriteLogRecord $record, ?ContextInterface $context = null): void
