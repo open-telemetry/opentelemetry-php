@@ -7,18 +7,22 @@ namespace OpenTelemetry\Tests\API\Unit\Trace;
 use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\API\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 use function str_repeat;
 use function strlen;
 
 /**
  * @covers OpenTelemetry\API\Trace\TraceState
+ * @psalm-suppress UndefinedInterfaceMethod
  */
 class TraceStateTest extends TestCase
 {
+    private LoggerInterface $logger;
+
     public function setUp(): void
     {
-        LoggerHolder::set(new NullLogger());
+        $this->logger = $this->createMock(LoggerInterface::class);
+        LoggerHolder::set($this->logger);
     }
 
     public function test_get_tracestate_value(): void
@@ -26,6 +30,19 @@ class TraceStateTest extends TestCase
         $tracestate = new TraceState('vendor1=value1');
 
         $this->assertSame('value1', $tracestate->get('vendor1'));
+    }
+
+    public function test_get_tracestate_with_empty_string(): void
+    {
+        $this->logger->expects($this->never())->method('log')->with(
+            $this->equalTo('warning'),
+            $this->anything(),
+            $this->anything(),
+        );
+
+        $tracestate = new TraceState('');
+
+        $this->assertSame(0, $tracestate->getListMemberCount());
     }
 
     public function test_with_tracestate_value(): void
