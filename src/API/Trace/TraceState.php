@@ -30,9 +30,10 @@ class TraceState implements TraceStateInterface
 
     public function __construct(string $rawTracestate = null)
     {
-        if ($rawTracestate !== null) {
-            $this->traceState = $this->parse($rawTracestate);
+        if ($rawTracestate === null || trim($rawTracestate) === '') {
+            return;
         }
+        $this->traceState = $this->parse($rawTracestate);
     }
 
     /**
@@ -98,7 +99,7 @@ class TraceState implements TraceStateInterface
      */
     public function __toString(): string
     {
-        if (empty($this->traceState)) {
+        if ($this->traceState === []) {
             return '';
         }
         $traceStateString='';

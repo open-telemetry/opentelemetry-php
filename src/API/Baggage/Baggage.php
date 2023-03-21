@@ -83,7 +83,7 @@ final class Baggage implements BaggageInterface
     /** @inheritDoc */
     public function isEmpty(): bool
     {
-        return empty($this->entries);
+        return $this->entries === [];
     }
 
     /** @inheritDoc */

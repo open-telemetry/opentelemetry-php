@@ -4,4 +4,4 @@ _Experimental_ New Relic exporter for OpenTelemetry, which uses the Zipkin proto
 
 ## Usage
 
-See https://github.com/open-telemetry/opentelemetry-php/blob/main/examples/traces/features/exporters/zipkin_to_newrelic.php
+See https://github.com/open-telemetry/opentelemetry-php/blob/main/examples/traces/exporters/zipkin_to_newrelic.php

@@ -58,17 +58,17 @@ smoke-test-isolated-examples: ## Run smoke test isolated examples
 smoke-test-exporter-examples: FORCE ## Run (some) exporter smoke test examples
 # Note this does not include every exporter at the moment
 	$(DOCKER_COMPOSE) up -d --remove-orphans
-	$(DC_RUN_PHP) php ./examples/traces/features/exporters/zipkin.php
-	$(DC_RUN_PHP) php ./examples/traces/features/parent_span_example.php
+	$(DC_RUN_PHP) php ./examples/traces/exporters/zipkin.php
+	$(DC_RUN_PHP) php ./examples/traces/parent_span_example.php
 # The following examples do not use the DC_RUN_PHP global because they need environment variables.
-	$(DOCKER_COMPOSE) run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/features/exporters/newrelic.php
-	$(DOCKER_COMPOSE) run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/features/exporters/zipkin_to_newrelic.php
+	$(DOCKER_COMPOSE) run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/exporters/newrelic.php
+	$(DOCKER_COMPOSE) run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/exporters/zipkin_to_newrelic.php
 	$(DOCKER_COMPOSE) stop
 smoke-test-collector-integration: ## Run smoke test collector integration
 	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml up -d --remove-orphans
 	sleep 5
-	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml run --rm php php ./examples/traces/features/exporters/otlp_grpc.php
-	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml run --rm php php ./examples/traces/features/exporters/otlp_http.php
+	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml run --rm php php ./examples/traces/exporters/otlp_grpc.php
+	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml run --rm php php ./examples/traces/exporters/otlp_http.php
 	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml stop
 smoke-test-collector-metrics-integration:
 	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml up -d --force-recreate collector
