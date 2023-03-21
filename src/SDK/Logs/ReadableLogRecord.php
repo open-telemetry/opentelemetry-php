@@ -18,6 +18,7 @@ class ReadableLogRecord extends LogRecord
 {
     private InstrumentationScopeInterface $scope;
     private LoggerSharedState $loggerSharedState;
+    protected AttributesInterface $convertedAttributes;
 
     public function __construct(InstrumentationScopeInterface $scope, LoggerSharedState $loggerSharedState, LogRecord $logRecord)
     {
@@ -30,7 +31,13 @@ class ReadableLogRecord extends LogRecord
         $this->context = $logRecord->context;
         $this->severityNumber = $logRecord->severityNumber;
         $this->severityText = $logRecord->severityText;
-        $this->attributes = $logRecord->attributes;
+
+        //convert attributes now so that excess data is not sent to processors
+        $this->convertedAttributes = $this->loggerSharedState
+            ->getLogRecordLimits()
+            ->getAttributeFactory()
+            ->builder($logRecord->attributes)
+            ->build();
     }
 
     public function getInstrumentationScope(): InstrumentationScopeInterface
@@ -78,9 +85,6 @@ class ReadableLogRecord extends LogRecord
 
     public function getAttributes(): AttributesInterface
     {
-        $factory = $this->loggerSharedState->getLogRecordLimits()->getAttributeFactory();
-        $builder = $factory->builder($this->attributes);
-
-        return $builder->build();
+        return $this->convertedAttributes;
     }
 }
