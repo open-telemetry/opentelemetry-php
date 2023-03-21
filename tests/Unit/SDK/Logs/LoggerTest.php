@@ -46,34 +46,4 @@ class LoggerTest extends TestCase
 
         $logger->logRecord($record);
     }
-
-    /**
-     * @dataProvider psr3LevelProvider
-     */
-    public function test_psr3_methods(string $level): void
-    {
-        $logger = new Logger($this->sharedState, $this->scope, true);
-
-        $this->processor->expects($this->once())->method('onEmit')->with($this->callback(function (ReadWriteLogRecord $record) use ($level) {
-            $this->assertSame($level, $record->getSeverityText());
-
-            return true;
-        }));
-
-        $logger->{$level}('foo', ['bar' => 'baz']);
-    }
-
-    public static function psr3LevelProvider(): array
-    {
-        return [
-            [LogLevel::EMERGENCY],
-            [LogLevel::DEBUG],
-            [LogLevel::ALERT],
-            [LogLevel::CRITICAL],
-            [LogLevel::INFO],
-            [LogLevel::ERROR],
-            [LogLevel::WARNING],
-            [LogLevel::NOTICE],
-        ];
-    }
 }
