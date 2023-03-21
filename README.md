@@ -358,18 +358,15 @@ See [basic example](./examples/metrics/basic.php)
 
 ## Log signals
 
-Loggers must be obtained from a `LoggerProvider`. Our loggers implement
-[PSR-3](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md)
-and can be used like any other PSR-3 logger.
+Loggers must be obtained from a `LoggerProvider`.
 
-However, since logging is a mature and well-established function, the
+As logging is a mature and well-established function, the
 [OpenTelemetry approach](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/README.md#introduction)
-is a little different for this signal.
+is a little different for this signal than traces or metrics.
 
-As well as using an opentelemetry logger directly, you can integrate our logger into existing
-logging libraries as a handler (if the library supports such functionality). In this way you
-can choose to have your application logs sent to an opentelemetry collector and further distributed from
-there.
+The OpenTelemetry logger is not designed to be used directly, but rather to be integrated into existing
+logging libraries as a handler. In this way you can choose to have your application logs sent to an
+opentelemetry collector and further distributed from there.
 
 The [monolog-otel-integration example](./examples/logs/features/monolog-otel-integration.php) demonstrates
 using the popular Monolog logger to send some logs to a stream (in their usual format), as well as sending
