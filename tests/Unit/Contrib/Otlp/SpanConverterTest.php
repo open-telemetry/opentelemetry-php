@@ -26,7 +26,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @covers \OpenTelemetry\Contrib\Otlp\SpanConverter
  */
-class OTLPSpanConverterTest extends TestCase
+class SpanConverterTest extends TestCase
 {
     public function test_convert_span_to_payload(): void
     {

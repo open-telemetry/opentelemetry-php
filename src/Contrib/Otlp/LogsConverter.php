@@ -26,21 +26,45 @@ class LogsConverter
     public function convert(iterable $logs): ExportLogsServiceRequest
     {
         $pExportLogsServiceRequest = new ExportLogsServiceRequest();
-        $scopeLogs = new ScopeLogs();
-        $resourceLogs = new ResourceLogs();
+        $scopeLogs = [];
+        $resourceLogs = [];
+        $resourceCache = [];
+        $scopeCache = [];
 
         foreach ($logs as $log) {
-            if ($resourceLogs->getResource() === null) {
-                $resourceLogs->setResource($this->convertResource($log->getResource()));
-            }
-            if ($scopeLogs->getScope() === null) {
-                $scopeLogs->setScope($this->convertInstrumentationScope($log->getInstrumentationScope()));
-            }
-            $scopeLogs->getLogRecords()[] = $this->convertLogRecord($log);
-        }
-        $resourceLogs->getScopeLogs()[] = $scopeLogs;
+            $resource = $log->getResource();
+            $instrumentationScope = $log->getInstrumentationScope();
 
-        $pExportLogsServiceRequest->getResourceLogs()[] = $resourceLogs;
+            $resourceId = $resourceCache[spl_object_id($resource)] ??= serialize([
+                $resource->getSchemaUrl(),
+                $resource->getAttributes()->toArray(),
+                $resource->getAttributes()->getDroppedAttributesCount(),
+            ]);
+            $instrumentationScopeId = $scopeCache[spl_object_id($instrumentationScope)] ??= serialize([
+                $instrumentationScope->getName(),
+                $instrumentationScope->getVersion(),
+                $instrumentationScope->getSchemaUrl(),
+                $instrumentationScope->getAttributes()->toArray(),
+                $instrumentationScope->getAttributes()->getDroppedAttributesCount(),
+            ]);
+
+            if (($pResourceLogs = $resourceLogs[$resourceId] ?? null) === null) {
+                /** @psalm-suppress InvalidArgument */
+                $pExportLogsServiceRequest->getResourceLogs()[]
+                    = $resourceLogs[$resourceId]
+                    = $pResourceLogs
+                    = $this->convertResourceLogs($resource);
+            }
+
+            if (($pScopeLogs = $scopeLogs[$resourceId][$instrumentationScopeId] ?? null) === null) {
+                $pResourceLogs->getScopeLogs()[]
+                    = $scopeLogs[$resourceId][$instrumentationScopeId]
+                    = $pScopeLogs
+                    = $this->convertInstrumentationScope($instrumentationScope);
+            }
+
+            $pScopeLogs->getLogRecords()[] = $this->convertLogRecord($log);
+        }
 
         return $pExportLogsServiceRequest;
     }
@@ -74,24 +98,28 @@ class LogsConverter
         return $pLogRecord;
     }
 
-    private function convertInstrumentationScope(InstrumentationScopeInterface $instrumentationScope): InstrumentationScope
+    private function convertInstrumentationScope(InstrumentationScopeInterface $instrumentationScope): ScopeLogs
     {
+        $pScopeLogs = new ScopeLogs();
         $pInstrumentationScope = new InstrumentationScope();
         $pInstrumentationScope->setName($instrumentationScope->getName());
         $pInstrumentationScope->setVersion((string) $instrumentationScope->getVersion());
         $this->setAttributes($pInstrumentationScope, $instrumentationScope->getAttributes());
         $pInstrumentationScope->setDroppedAttributesCount($instrumentationScope->getAttributes()->getDroppedAttributesCount());
+        $pScopeLogs->setScope($pInstrumentationScope);
 
-        return $pInstrumentationScope;
+        return $pScopeLogs;
     }
 
-    private function convertResource(ResourceInfo $resource): Resource_
+    private function convertResourceLogs(ResourceInfo $resource): ResourceLogs
     {
+        $pResourceLogs = new ResourceLogs();
         $pResource = new Resource_();
         $this->setAttributes($pResource, $resource->getAttributes());
         $pResource->setDroppedAttributesCount($resource->getAttributes()->getDroppedAttributesCount());
+        $pResourceLogs->setResource($pResource);
 
-        return $pResource;
+        return $pResourceLogs;
     }
 
     /**
