@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Logs;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
 /**
  * Note that this logger class is deliberately NOT psr-3 compatible, per spec: "Note: this document defines a log
@@ -17,11 +17,11 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
  */
 class Logger implements LoggerInterface
 {
-    private InstrumentationScope $scope;
+    private InstrumentationScopeInterface $scope;
     private LoggerSharedState $loggerSharedState;
     private bool $includeTraceContext;
 
-    public function __construct(LoggerSharedState $loggerSharedState, InstrumentationScope $scope, bool $includeTraceContext)
+    public function __construct(LoggerSharedState $loggerSharedState, InstrumentationScopeInterface $scope, bool $includeTraceContext)
     {
         $this->loggerSharedState = $loggerSharedState;
         $this->scope = $scope;

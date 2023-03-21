@@ -10,7 +10,9 @@ use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use Opentelemetry\Proto\Logs\V1\SeverityNumber;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
+use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
 use Psr\Log\LogLevel;
 
@@ -26,6 +28,9 @@ $exporter = new LogsExporter($transport);
 $loggerProvider = new LoggerProvider(
     new SimpleLogsProcessor(
         $exporter
+    ),
+    new InstrumentationScopeFactory(
+        (new LogRecordLimitsBuilder())->build()->getAttributeFactory()
     )
 );
 $logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', true, ['foo' => 'bar']);

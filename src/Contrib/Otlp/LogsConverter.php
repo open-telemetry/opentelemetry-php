@@ -49,8 +49,8 @@ class LogsConverter
     {
         $pLogRecord = new LogRecord();
         $pLogRecord->setBody(AttributesConverter::convertAnyValue($record->getBody()));
-        $pLogRecord->setTimeUnixNano($record->getTimestamp() ?? '');
-        $pLogRecord->setObservedTimeUnixNano($record->getObservedTimestamp() ?? '');
+        $pLogRecord->setTimeUnixNano($record->getTimestamp() ?? 0);
+        $pLogRecord->setObservedTimeUnixNano($record->getObservedTimestamp() ?? 0);
         $context = $record->getContext();
         if ($context !== null) {
             $spanContext = Span::fromContext($context)->getContext();

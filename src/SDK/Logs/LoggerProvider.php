@@ -6,23 +6,24 @@ namespace OpenTelemetry\SDK\Logs;
 
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\NoopLogger;
-use OpenTelemetry\SDK\Common\Attribute\AttributesFactory;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
 class LoggerProvider implements LoggerProviderInterface
 {
     private LoggerSharedState $loggerSharedState;
+    private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
 
-    public function __construct(LogRecordProcessorInterface $processor, ?ResourceInfo $resource = null)
+    public function __construct(LogRecordProcessorInterface $processor, InstrumentationScopeFactoryInterface $instrumentationScopeFactory, ?ResourceInfo $resource = null)
     {
         $this->loggerSharedState = new LoggerSharedState(
             $resource ?? ResourceInfoFactory::defaultResource(),
             (new LogRecordLimitsBuilder())->build(),
             $processor
         );
+        $this->instrumentationScopeFactory = $instrumentationScopeFactory;
     }
 
     /**
@@ -33,7 +34,7 @@ class LoggerProvider implements LoggerProviderInterface
         if ($this->loggerSharedState->hasShutdown()) {
             return NoopLogger::getInstance();
         }
-        $scope = new InstrumentationScope($name, $version, $schemaUrl, (new AttributesFactory())->builder($attributes)->build());
+        $scope = $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes);
 
         return new Logger($this->loggerSharedState, $scope, $includeTraceContext);
     }

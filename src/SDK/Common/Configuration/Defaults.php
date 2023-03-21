@@ -42,6 +42,11 @@ interface Defaults
     public const OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT = 128;
     public const OTEL_LINK_ATTRIBUTE_COUNT_LIMIT = 128;
     /**
+     * LogRecord Limits
+     */
+    public const OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = PHP_INT_MAX;
+    public const OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = 128;
+    /**
      * OTLP Exporter
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
      */

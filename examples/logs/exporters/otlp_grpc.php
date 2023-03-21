@@ -12,8 +12,10 @@ use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use Opentelemetry\Proto\Logs\V1\SeverityNumber;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
+use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogsProcessor;
 use Psr\Log\LogLevel;
 
@@ -30,6 +32,9 @@ $loggerProvider = new LoggerProvider(
     new BatchLogsProcessor(
         $exporter,
         ClockFactory::getDefault()
+    ),
+    new InstrumentationScopeFactory(
+        (new LogRecordLimitsBuilder())->build()->getAttributeFactory()
     )
 );
 $logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', true, ['foo' => 'bar']);

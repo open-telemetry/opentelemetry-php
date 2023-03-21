@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
 use OpenTelemetry\API\Logs\NoopLogger;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Logs\Logger;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
@@ -22,13 +23,15 @@ class LoggerProviderTest extends TestCase
      * @var LogRecordProcessorInterface|(LogRecordProcessorInterface&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
      */
     private LogRecordProcessorInterface $processor;
+    private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
     private LoggerProvider $provider;
 
     public function setUp(): void
     {
         $this->processor = $this->createMock(LogRecordProcessorInterface::class);
+        $this->instrumentationScopeFactory = $this->createMock(InstrumentationScopeFactoryInterface::class);
         $resource = $this->createMock(ResourceInfo::class);
-        $this->provider = new LoggerProvider($this->processor, $resource);
+        $this->provider = new LoggerProvider($this->processor, $this->instrumentationScopeFactory, $resource);
     }
 
     public function test_get_logger(): void

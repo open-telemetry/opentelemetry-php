@@ -43,9 +43,9 @@ class LogRecordLimitsBuilder
     public function build(): LogRecordLimits
     {
         $attributeCountLimit = $this->attributeCountLimit
-            ?: Configuration::getInt(Variables::OTEL_ATTRIBUTE_COUNT_LIMIT);
+            ?: Configuration::getInt(Variables::OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT);
         $attributeValueLengthLimit = $this->attributeValueLengthLimit
-            ?: Configuration::getInt(Variables::OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT);
+            ?: Configuration::getInt(Variables::OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT);
 
         if ($attributeValueLengthLimit === PHP_INT_MAX) {
             $attributeValueLengthLimit = null;

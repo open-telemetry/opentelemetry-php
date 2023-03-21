@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Logs;
 
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Sdk;
 
@@ -16,7 +17,8 @@ class LoggerProviderFactory
         }
         $exporter = (new ExporterFactory())->create();
         $processor = (new LogRecordProcessorFactory())->create($exporter, $meterProvider);
+        $instrumentationScopeFactory = new InstrumentationScopeFactory((new LogRecordLimitsBuilder())->build()->getAttributeFactory());
 
-        return new LoggerProvider($processor);
+        return new LoggerProvider($processor, $instrumentationScopeFactory);
     }
 }

@@ -36,6 +36,12 @@ interface Variables
     public const OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT';
     public const OTEL_ATTRIBUTE_COUNT_LIMIT = 'OTEL_ATTRIBUTE_COUNT_LIMIT';
     /**
+     * LogRecord limits
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#logrecord-limits
+     */
+    public const OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT';
+    public const OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = 'OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT';
+    /**
      * Span Limits
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#span-limits-
      */

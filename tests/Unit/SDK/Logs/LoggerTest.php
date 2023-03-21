@@ -13,7 +13,6 @@ use OpenTelemetry\SDK\Logs\LoggerSharedState;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LogLevel;
 
 /**
  * @covers \OpenTelemetry\SDK\Logs\Logger
