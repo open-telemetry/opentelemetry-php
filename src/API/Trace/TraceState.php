@@ -99,7 +99,7 @@ class TraceState implements TraceStateInterface
      */
     public function __toString(): string
     {
-        if (empty($this->traceState)) {
+        if ($this->traceState === []) {
             return '';
         }
         $traceStateString='';
