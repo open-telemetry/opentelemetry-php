@@ -54,9 +54,11 @@ class LogsConverter
         $context = $record->getContext();
         if ($context !== null) {
             $spanContext = Span::fromContext($context)->getContext();
-            $pLogRecord->setTraceId($spanContext->getTraceIdBinary());
-            $pLogRecord->setSpanId($spanContext->getSpanIdBinary());
-            $pLogRecord->setFlags($spanContext->getTraceFlags());
+            if ($spanContext->isValid()) {
+                $pLogRecord->setTraceId($spanContext->getTraceIdBinary());
+                $pLogRecord->setSpanId($spanContext->getSpanIdBinary());
+                $pLogRecord->setFlags($spanContext->getTraceFlags());
+            }
         }
         $severityNumber = $record->getSeverityNumber();
         if ($severityNumber !== null) {
