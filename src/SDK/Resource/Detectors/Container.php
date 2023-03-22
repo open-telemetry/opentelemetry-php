@@ -43,6 +43,9 @@ final class Container implements ResourceDetectorInterface
 
     private function getContainerIdV1(): ?string
     {
+        if (!file_exists(sprintf('%s/%s', $this->dir, self::CGROUP_V1))) {
+            return null;
+        }
         $data = file_get_contents(sprintf('%s/%s', $this->dir, self::CGROUP_V1));
         if (!$data) {
             return null;
@@ -59,6 +62,9 @@ final class Container implements ResourceDetectorInterface
     }
     private function getContainerIdV2(): ?string
     {
+        if (!file_exists(sprintf('%s/%s', $this->dir, self::CGROUP_V1))) {
+            return null;
+        }
         $data = file_get_contents(sprintf('%s/%s', $this->dir, self::CGROUP_V2));
         if (!$data) {
             return null;
