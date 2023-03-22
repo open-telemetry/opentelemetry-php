@@ -12,7 +12,6 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\ReadableLogRecord;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SDK\Trace\Span;
 
 class ConsoleExporter implements LogRecordExporterInterface
 {
@@ -60,8 +59,7 @@ class ConsoleExporter implements LogRecordExporterInterface
     }
     private function convertLogRecord(ReadableLogRecord $record): array
     {
-        $context = $record->getContext();
-        $spanContext = $context !== null ? Span::fromContext($context)->getContext() : null;
+        $spanContext = $record->getSpanContext();
 
         return [
             'timestamp' => $record->getTimestamp(),

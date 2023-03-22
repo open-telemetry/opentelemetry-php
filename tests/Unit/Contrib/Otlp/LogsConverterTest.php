@@ -47,7 +47,7 @@ class LogsConverterTest extends TestCase
         $span = $this->createMock(SpanInterface::class);
         $context = Context::getCurrent()->with(ContextKeys::span(), $span);
         $span->method('getContext')->willReturn($spanContext);
-        $this->record->method('getContext')->willReturn($context);
+        $this->record->method('getSpanContext')->willReturn($spanContext);
         $request = $this->converter->convert([$this->record]);
         /** @psalm-suppress InvalidArgument */
         $row = $request->getResourceLogs()[0]->getScopeLogs()[0]->getLogRecords()[0];

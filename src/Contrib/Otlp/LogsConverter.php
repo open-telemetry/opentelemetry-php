@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use OpenTelemetry\API\Trace\Span;
 use Opentelemetry\Proto\Collector\Logs\V1\ExportLogsServiceRequest;
 use Opentelemetry\Proto\Common\V1\InstrumentationScope;
 use Opentelemetry\Proto\Common\V1\KeyValue;
@@ -75,14 +74,11 @@ class LogsConverter
         $pLogRecord->setBody(AttributesConverter::convertAnyValue($record->getBody()));
         $pLogRecord->setTimeUnixNano($record->getTimestamp() ?? 0);
         $pLogRecord->setObservedTimeUnixNano($record->getObservedTimestamp() ?? 0);
-        $context = $record->getContext();
-        if ($context !== null) {
-            $spanContext = Span::fromContext($context)->getContext();
-            if ($spanContext->isValid()) {
-                $pLogRecord->setTraceId($spanContext->getTraceIdBinary());
-                $pLogRecord->setSpanId($spanContext->getSpanIdBinary());
-                $pLogRecord->setFlags($spanContext->getTraceFlags());
-            }
+        $spanContext = $record->getSpanContext();
+        if ($spanContext !== null && $spanContext->isValid()) {
+            $pLogRecord->setTraceId($spanContext->getTraceIdBinary());
+            $pLogRecord->setSpanId($spanContext->getSpanIdBinary());
+            $pLogRecord->setFlags($spanContext->getTraceFlags());
         }
         $severityNumber = $record->getSeverityNumber();
         if ($severityNumber !== null) {

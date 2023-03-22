@@ -23,7 +23,6 @@ class SimpleLogsProcessor implements LogRecordProcessorInterface
      */
     public function onEmit(ReadWriteLogRecord $record, ?ContextInterface $context = null): void
     {
-        $record->setContext($context);
         $this->exporter->export([$record]);
     }
 

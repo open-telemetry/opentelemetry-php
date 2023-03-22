@@ -6,7 +6,6 @@ namespace OpenTelemetry\SDK\Logs;
 
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
 /**
@@ -30,12 +29,11 @@ class Logger implements LoggerInterface
 
     public function logRecord(LogRecord $logRecord): void
     {
-        $readWriteLogRecord = new ReadWriteLogRecord($this->scope, $this->loggerSharedState, $logRecord);
+        $readWriteLogRecord = new ReadWriteLogRecord($this->scope, $this->loggerSharedState, $logRecord, $this->includeTraceContext);
         // @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#onemit
-        $context = $readWriteLogRecord->getContext() ?? ($this->includeTraceContext ? Context::getCurrent() : null);
         $this->loggerSharedState->getProcessor()->onEmit(
             $readWriteLogRecord,
-            $context,
+            $readWriteLogRecord->getContext(),
         );
     }
 }

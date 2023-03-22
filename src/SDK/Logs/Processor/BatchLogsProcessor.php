@@ -154,8 +154,6 @@ class BatchLogsProcessor implements LogRecordProcessorInterface
             return;
         }
 
-        $record->setContext($context);
-
         $this->queueSize++;
         $this->batch[] = $record;
         $this->nextScheduledRun ??= $this->clock->now() + $this->scheduledDelayNanos;
