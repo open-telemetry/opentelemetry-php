@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK;
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Common\Instrumentation\Globals;
 use OpenTelemetry\API\Common\Log\LoggerHolder;
+use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
@@ -25,12 +26,12 @@ class SdkAutoloaderTest extends TestCase
     public function setUp(): void
     {
         LoggerHolder::set(new NullLogger());
+        Globals::reset();
+        SdkAutoloader::reset();
     }
 
     public function tearDown(): void
     {
-        SdkAutoloader::shutdown();
-        Globals::reset();
         $this->restoreEnvironmentVariables();
     }
 
@@ -42,13 +43,10 @@ class SdkAutoloaderTest extends TestCase
         $this->assertInstanceOf(NoopTextMapPropagator::class, Globals::propagator(), 'propagator not initialized by disabled autoloader');
     }
 
-    public function test_enabled_by_configuration(): void
+    public function test_disabled_with_invalid_flag(): void
     {
-        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
-        SdkAutoloader::autoload();
-        $this->assertNotInstanceOf(NoopTextMapPropagator::class, Globals::propagator());
-        $this->assertNotInstanceOf(NoopMeterProvider::class, Globals::meterProvider());
-        $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'invalid-value');
+        $this->assertFalse(SdkAutoloader::autoload());
     }
 
     public function test_sdk_disabled_does_not_disable_propagator(): void
@@ -61,9 +59,13 @@ class SdkAutoloaderTest extends TestCase
         $this->assertInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
     }
 
-    public function test_disabled_with_invalid_flag(): void
+    public function test_enabled_by_configuration(): void
     {
-        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'invalid-value');
-        $this->assertFalse(SdkAutoloader::autoload());
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        SdkAutoloader::autoload();
+        $this->assertNotInstanceOf(NoopTextMapPropagator::class, Globals::propagator());
+        $this->assertNotInstanceOf(NoopMeterProvider::class, Globals::meterProvider());
+        $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
+        $this->assertNotInstanceOf(NoopLoggerProvider::class, Globals::loggerProvider());
     }
 }

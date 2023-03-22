@@ -9,7 +9,7 @@ exporters:
   zipkin:
     endpoint: "http://zipkin:9411/api/v2/spans"
   logging:
-    loglevel: debug
+    verbosity: detailed
 
 processors:
   batch:
@@ -21,11 +21,18 @@ extensions:
 
 service:
   extensions: [pprof, zpages, health_check]
+  telemetry:
+    logs:
+      level: "debug"
   pipelines:
     traces:
       receivers: [otlp, zipkin]
-      exporters: [zipkin, logging]
+      exporters: [logging]
       processors: [batch]
     metrics:
       receivers: [otlp]
       exporters: [logging]
+    logs:
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ logging ]

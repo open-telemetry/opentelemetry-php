@@ -7,6 +7,8 @@ namespace OpenTelemetry\Tests\Unit\API\Common\Instrumentation;
 use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Common\Instrumentation\Configurator;
 use OpenTelemetry\API\Common\Instrumentation\Globals;
+use OpenTelemetry\API\Logs\LoggerProviderInterface;
+use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
@@ -32,6 +34,7 @@ final class InstrumentationTest extends TestCase
         $this->assertInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
         $this->assertInstanceOf(NoopMeterProvider::class, Globals::meterProvider());
         $this->assertInstanceOf(NoopTextMapPropagator::class, Globals::propagator());
+        $this->assertInstanceOf(NoopLoggerProvider::class, Globals::loggerProvider());
     }
 
     public function test_globals_returns_configured_instances(): void
@@ -39,17 +42,20 @@ final class InstrumentationTest extends TestCase
         $tracerProvider = $this->createMock(TracerProviderInterface::class);
         $meterProvider = $this->createMock(MeterProviderInterface::class);
         $propagator = $this->createMock(TextMapPropagatorInterface::class);
+        $loggerProvider = $this->createMock(LoggerProviderInterface::class);
 
         $scope = Configurator::create()
             ->withTracerProvider($tracerProvider)
             ->withMeterProvider($meterProvider)
             ->withPropagator($propagator)
+            ->withLoggerProvider($loggerProvider)
             ->activate();
 
         try {
             $this->assertSame($tracerProvider, Globals::tracerProvider());
             $this->assertSame($meterProvider, Globals::meterProvider());
             $this->assertSame($propagator, Globals::propagator());
+            $this->assertSame($loggerProvider, Globals::loggerProvider());
         } finally {
             $scope->detach();
         }

@@ -31,6 +31,7 @@ interface Defaults
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#attribute-limits
      */
     public const OTEL_ATTRIBUTE_COUNT_LIMIT = 128;
+    public const OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = PHP_INT_MAX;
     /**
      * Span Limits
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#span-limits-
@@ -41,6 +42,11 @@ interface Defaults
     public const OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT = 128;
     public const OTEL_LINK_ATTRIBUTE_COUNT_LIMIT = 128;
     /**
+     * LogRecord Limits
+     */
+    public const OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = PHP_INT_MAX;
+    public const OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = 128;
+    /**
      * OTLP Exporter
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
      */
@@ -48,18 +54,22 @@ interface Defaults
     public const OTEL_EXPORTER_OTLP_ENDPOINT = 'http://localhost:4318';
     public const OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://localhost:4318';
     public const OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://localhost:4318';
+    public const OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://localhost:4318';
     // Insecure
     public const OTEL_EXPORTER_OTLP_INSECURE = 'false';
     public const OTEL_EXPORTER_OTLP_TRACES_INSECURE = 'false';
     public const OTEL_EXPORTER_OTLP_METRICS_INSECURE = 'false';
+    public const OTEL_EXPORTER_OTLP_LOGS_INSECURE = 'false';
     // Timeout (seconds)
     public const OTEL_EXPORTER_OTLP_TIMEOUT = 10;
     public const OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = 10;
     public const OTEL_EXPORTER_OTLP_METRICS_TIMEOUT = 10;
+    public const OTEL_EXPORTER_OTLP_LOGS_TIMEOUT = 10;
     // Protocol
     public const OTEL_EXPORTER_OTLP_PROTOCOL = 'http/protobuf';
     public const OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'http/protobuf';
     public const OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'http/protobuf';
+    public const OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'http/protobuf';
     /**
      * Zipkin Exporter
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#zipkin-exporter
@@ -95,4 +105,5 @@ interface Defaults
     public const OTEL_PHP_DETECTORS = 'all';
     public const OTEL_PHP_AUTOLOAD_ENABLED = 'false';
     public const OTEL_PHP_DISABLED_INSTRUMENTATIONS = [];
+    public const OTEL_PHP_LOGS_PROCESSOR = 'batch';
 }

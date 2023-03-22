@@ -7,6 +7,8 @@ namespace OpenTelemetry\API\Common\Instrumentation;
 use ArrayAccess;
 use function assert;
 use function class_exists;
+use OpenTelemetry\API\Logs\LoggerInterface;
+use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
@@ -31,6 +33,8 @@ final class CachedInstrumentation
     private ?ArrayAccess $tracers;
     /** @var ArrayAccess<MeterProviderInterface, MeterInterface>|null */
     private ?ArrayAccess $meters;
+    /** @var ArrayAccess<LoggerProviderInterface, LoggerInterface>|null */
+    private ?ArrayAccess $loggers;
 
     public function __construct(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = [])
     {
@@ -40,6 +44,7 @@ final class CachedInstrumentation
         $this->attributes = $attributes;
         $this->tracers = self::createWeakMap();
         $this->meters = self::createWeakMap();
+        $this->loggers = self::createWeakMap();
     }
 
     private static function createWeakMap(): ?ArrayAccess
@@ -77,5 +82,16 @@ final class CachedInstrumentation
         }
 
         return $this->meters[$meterProvider] ??= $meterProvider->getMeter($this->name, $this->version, $this->schemaUrl, $this->attributes);
+    }
+    public function logger(): LoggerInterface
+    {
+        $loggerProvider = Globals::loggerProvider();
+
+        if ($this->loggers === null) {
+            //@todo configurable includeTraceContext?
+            return $loggerProvider->getLogger($this->name, $this->version, $this->schemaUrl, true, $this->attributes);
+        }
+
+        return $this->loggers[$loggerProvider] ??= $loggerProvider->getLogger($this->name, $this->version, $this->schemaUrl, true, $this->attributes);
     }
 }

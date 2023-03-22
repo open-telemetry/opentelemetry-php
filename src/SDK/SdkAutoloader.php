@@ -10,6 +10,7 @@ use OpenTelemetry\API\Common\Instrumentation\Globals;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
+use OpenTelemetry\SDK\Logs\LoggerProviderFactory;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
@@ -47,12 +48,16 @@ class SdkAutoloader
                 ->setSampler((new SamplerFactory())->create())
                 ->build();
 
+            $loggerProvider = (new LoggerProviderFactory())->create($meterProvider);
+
             ShutdownHandler::register([$tracerProvider, 'shutdown']);
             ShutdownHandler::register([$meterProvider, 'shutdown']);
+            ShutdownHandler::register([$loggerProvider, 'shutdown']);
 
             return $configurator
                 ->withTracerProvider($tracerProvider)
                 ->withMeterProvider($meterProvider)
+                ->withLoggerProvider($loggerProvider)
                 ->withPropagator($propagator);
         });
 
@@ -62,7 +67,7 @@ class SdkAutoloader
     /**
      * @internal
      */
-    public static function shutdown(): void
+    public static function reset(): void
     {
         self::$enabled = null;
     }

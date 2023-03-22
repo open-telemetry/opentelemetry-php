@@ -7,6 +7,7 @@ namespace OpenTelemetry\API\Common\Instrumentation;
 use function assert;
 use Closure;
 use const E_USER_WARNING;
+use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
@@ -27,14 +28,17 @@ final class Globals
     private TracerProviderInterface $tracerProvider;
     private MeterProviderInterface $meterProvider;
     private TextMapPropagatorInterface $propagator;
+    private LoggerProviderInterface $loggerProvider;
 
     public function __construct(
         TracerProviderInterface $tracerProvider,
         MeterProviderInterface $meterProvider,
+        LoggerProviderInterface $loggerProvider,
         TextMapPropagatorInterface $propagator
     ) {
         $this->tracerProvider = $tracerProvider;
         $this->meterProvider = $meterProvider;
+        $this->loggerProvider = $loggerProvider;
         $this->propagator = $propagator;
     }
 
@@ -51,6 +55,11 @@ final class Globals
     public static function propagator(): TextMapPropagatorInterface
     {
         return Context::getCurrent()->get(ContextKeys::propagator()) ?? self::globals()->propagator;
+    }
+
+    public static function loggerProvider(): LoggerProviderInterface
+    {
+        return Context::getCurrent()->get(ContextKeys::loggerProvider()) ?? self::globals()->loggerProvider;
     }
 
     /**
@@ -92,10 +101,11 @@ final class Globals
         $tracerProvider = $context->get(ContextKeys::tracerProvider());
         $meterProvider = $context->get(ContextKeys::meterProvider());
         $propagator = $context->get(ContextKeys::propagator());
+        $loggerProvider = $context->get(ContextKeys::loggerProvider());
 
-        assert(isset($tracerProvider, $meterProvider, $propagator));
+        assert(isset($tracerProvider, $meterProvider, $loggerProvider, $propagator));
 
-        return self::$globals = new self($tracerProvider, $meterProvider, $propagator);
+        return self::$globals = new self($tracerProvider, $meterProvider, $loggerProvider, $propagator);
     }
 
     /**
@@ -104,5 +114,6 @@ final class Globals
     public static function reset(): void
     {
         self::$globals = null;
+        self::$initializers = [];
     }
 }

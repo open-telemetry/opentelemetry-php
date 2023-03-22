@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK;
 
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use RuntimeException;
@@ -20,6 +21,7 @@ class Registry
     private static array $transportFactories = [];
     private static array $metricExporterFactories = [];
     private static array $textMapPropagators = [];
+    private static array $logRecordExporterFactories = [];
 
     /**
      * @param TransportFactoryInterface|class-string<TransportFactoryInterface> $factory
@@ -89,6 +91,25 @@ class Registry
         }
         self::$metricExporterFactories[$exporter] = $factory;
     }
+    public static function registerLogRecordExporterFactory(string $exporter, $factory, bool $clobber = false): void
+    {
+        if (!$clobber && array_key_exists($exporter, self::$logRecordExporterFactories)) {
+            return;
+        }
+        if (!is_subclass_of($factory, LogRecordExporterFactoryInterface::class)) {
+            trigger_error(
+                sprintf(
+                    'Cannot register LogRecord exporter factory: %s must exist and implement %s',
+                    is_string($factory) ? $factory : get_class($factory),
+                    LogRecordExporterFactoryInterface::class
+                ),
+                E_USER_WARNING
+            );
+
+            return;
+        }
+        self::$logRecordExporterFactories[$exporter] = $factory;
+    }
 
     public static function registerTextMapPropagator(string $name, TextMapPropagatorInterface $propagator, bool $clobber = false): void
     {
@@ -106,6 +127,18 @@ class Registry
         $class = self::$spanExporterFactories[$exporter];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof SpanExporterFactoryInterface);
+
+        return $factory;
+    }
+
+    public static function logRecordExporterFactory(string $exporter): LogRecordExporterFactoryInterface
+    {
+        if (!array_key_exists($exporter, self::$logRecordExporterFactories)) {
+            throw new RuntimeException('LogRecord exporter factory not defined for: ' . $exporter);
+        }
+        $class = self::$logRecordExporterFactories[$exporter];
+        $factory = (is_callable($class)) ? $class : new $class();
+        assert($factory instanceof LogRecordExporterFactoryInterface);
 
         return $factory;
     }
