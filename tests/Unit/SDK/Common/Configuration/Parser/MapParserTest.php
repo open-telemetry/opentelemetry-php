@@ -32,7 +32,7 @@ class MapParserTest extends TestCase
         'base64 encoded value is split correctly and trailing equals sign is kept in value' => [
             'Authorization=Basic 1234abc=,bar=baz',
             ['Authorization' => 'Basic 1234abc=', 'bar' => 'baz'],
-        ]
+        ],
     ];
 
     private const INVALID_VALUES = [
