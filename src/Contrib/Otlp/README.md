@@ -25,7 +25,7 @@ There exist two protobuf runtime libraries that offer the same set of APIs, allo
 best suits their needs.
 
 The first and easiest option is to install the Protobuf PHP Runtime Library through composer. This can be the easiest
-way to get started quickly. Either run `composer require google/protobuf`. Or update your `composer.json` as follows:
+way to get started quickly. Either run `composer require google/protobuf`, or update your `composer.json` as follows:
 
 ```json
 "require": {
