@@ -43,10 +43,11 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
 
         $this->assertEquals('opentelemetry', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
         $this->assertEquals('php', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
-        $this->assertEquals('unknown_service:php', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        $this->assertEquals('open-telemetry/opentelemetry', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 
     public function test_none_default_resources(): void
@@ -73,6 +74,7 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
     }
 
     public function test_env_default_resources(): void
@@ -183,5 +185,17 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertEquals('opentelemetry', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
         $this->assertEquals('php', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
         $this->assertEquals('unknown_service:php', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+    }
+
+    public function test_composer_default_resources(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'composer');
+
+        $resource = ResourceInfoFactory::defaultResource();
+
+        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+
+        $this->assertEquals('open-telemetry/opentelemetry', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        $this->assertEquals('1.0.0+no-version-set', $resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
     }
 }
