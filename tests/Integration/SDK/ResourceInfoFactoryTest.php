@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Integration\SDK\Resource;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use Composer\InstalledVersions;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
@@ -196,6 +197,6 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
 
         $this->assertEquals('open-telemetry/opentelemetry', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
-        $this->assertEquals('1.0.0+no-version-set', $resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
+        $this->assertEquals(InstalledVersions::getRootPackage()['pretty_version'], $resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
     }
 }
