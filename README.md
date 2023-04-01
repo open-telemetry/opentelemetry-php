@@ -263,7 +263,7 @@ Configurations can be provided as environment variables, or via `php.ini` (or a 
 
 ### Auto-instrumentation
 
-Auto-instrumentation is available via our [otel_instrumentation](https://github.com/open-telemetry/opentelemetry-php-instrumentation) PHP extension, and there are some auto-instrumentation modules available in our [contrib repo](https://github.com/open-telemetry/opentelemetry-php-contrib/tree/main/src/Instrumentation).
+Auto-instrumentation is available via [ext-opentelemetry](https://github.com/open-telemetry/opentelemetry-php-instrumentation) PHP extension, and there are some auto-instrumentation modules available in our [contrib repo](https://github.com/open-telemetry/opentelemetry-php-contrib/tree/main/src/Instrumentation).
 
 ### Framework instrumentation
 
