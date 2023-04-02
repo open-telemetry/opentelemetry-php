@@ -25,7 +25,7 @@ class MapParser
         foreach (explode(self::VARIABLE_SEPARATOR, $value) as $pair) {
             self::validateKeyValuePair($pair);
 
-            [$key, $value] = explode(self::KEY_VALUE_SEPARATOR, $pair);
+            [$key, $value] = explode(self::KEY_VALUE_SEPARATOR, $pair, 2);
             $result[trim($key)] = trim($value);
         }
 

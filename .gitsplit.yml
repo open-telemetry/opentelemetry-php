@@ -16,8 +16,6 @@ splits:
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/api.git"
   - prefix: "src/SDK"
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/sdk.git"
-  - prefix: "src/Contrib"
-    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/sdk-contrib.git"
   - prefix: "src/Contrib/Newrelic"
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/exporter-newrelic.git"
   - prefix: "src/Contrib/Otlp"
@@ -35,5 +33,3 @@ splits:
 origins:
   - ^main$
   - ^split$
-  - ^v?\d+\.\d+\.\d+$
-  - ^v?\d+\.\d+\.\d+-?beta\d+$

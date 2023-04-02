@@ -11,8 +11,7 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
-        "google/protobuf": "^v3.3.0"
+        "php": "^7.4 || ^8.0"
     },
     "autoload": {
         "psr-4": {
@@ -22,6 +21,7 @@
     },
     "suggest": {
         "ext-protobuf": "For better performance, when dealing with the protobuf format",
+        "google/protobuf": "To get started quickly, install the native protobuf library.",
         "ext-grpc": "To use the gRPC based exporters"
     }
 }
