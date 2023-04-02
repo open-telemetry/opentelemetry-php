@@ -36,7 +36,6 @@ $eventLogger = new EventLogger($logger, 'my-domain');
 
 $record = (new LogRecord(['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']))
     ->setSeverityText('INFO')
-
     ->setSeverityNumber(9);
 
 $eventLogger->logEvent('foo', $record);
