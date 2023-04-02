@@ -38,6 +38,7 @@ $eventLogger = new EventLogger($logger, 'my-domain');
 
 $record = (new LogRecord(['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']))
     ->setSeverityText('INFO')
+    ->setTimestamp((new DateTime())->getTimestamp() * LogRecord::NANOS_PER_SECOND)
     ->setSeverityNumber(SeverityNumber::SEVERITY_NUMBER_INFO);
 
 $eventLogger->logEvent('foo', $record);

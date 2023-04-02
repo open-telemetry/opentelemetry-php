@@ -18,11 +18,18 @@ class LogRecord
     protected $body = null;
     protected array $attributes = [];
 
+    /**
+     * @param mixed $body
+     */
     public function __construct($body = null)
     {
         $this->body = $body;
     }
 
+    /**
+     * @param int $timestamp Timestamp, in nanoseconds since the unix epoch, when the event occurred.
+     * @see https://opentelemetry.io/docs/reference/specification/logs/data-model/#field-timestamp
+     */
     public function setTimestamp(int $timestamp): self
     {
         $this->timestamp = $timestamp;
@@ -37,6 +44,10 @@ class LogRecord
         return $this;
     }
 
+    /**
+     * @param int $severityNumber Severity number
+     * @see https://opentelemetry.io/docs/reference/specification/logs/data-model/#field-severitynumber
+     */
     public function setSeverityNumber(int $severityNumber): self
     {
         $this->severityNumber = $severityNumber;
@@ -44,6 +55,10 @@ class LogRecord
         return $this;
     }
 
+    /**
+     * @param string $severityText Severity text, also known as log level
+     * @see https://opentelemetry.io/docs/reference/specification/logs/data-model/#field-severitynumber
+     */
     public function setSeverityText(string $severityText): self
     {
         $this->severityText = $severityText;
@@ -51,6 +66,10 @@ class LogRecord
         return $this;
     }
 
+    /**
+     * @param iterable $attributes Additional information about the specific event occurrence.
+     * @see https://opentelemetry.io/docs/reference/specification/logs/data-model/#field-attributes
+     */
     public function setAttributes(iterable $attributes): self
     {
         foreach ($attributes as $name => $value) {
@@ -67,6 +86,9 @@ class LogRecord
         return $this;
     }
 
+    /**
+     * @param mixed $body The log record body
+     */
     public function setBody($body = null): self
     {
         $this->body = $body;
@@ -74,6 +96,10 @@ class LogRecord
         return $this;
     }
 
+    /**
+     * @param int|null $observedTimestamp Time, in nanoseconds since the unix epoch, when the event was observed
+     *                                    by the collection system.
+     */
     public function setObservedTimestamp(int $observedTimestamp = null): self
     {
         $this->observedTimestamp = $observedTimestamp;
