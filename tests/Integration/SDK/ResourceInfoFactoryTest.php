@@ -51,6 +51,15 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertEquals('open-telemetry/opentelemetry', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 
+    public function test_detector_priority(): void
+    {
+        $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'test-service');
+
+        $resource = ResourceInfoFactory::defaultResource();
+
+        $this->assertEquals('test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+    }
+
     public function test_none_default_resources(): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'none');
