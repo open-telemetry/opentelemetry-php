@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
+use RuntimeException;
 use Throwable;
 
 /**

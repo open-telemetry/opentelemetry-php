@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\ReadableLogRecord;
+use RuntimeException;
 use Throwable;
 
 /**
