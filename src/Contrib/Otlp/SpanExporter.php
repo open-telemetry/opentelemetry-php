@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -27,6 +28,9 @@ final class SpanExporter implements SpanExporterInterface
      */
     public function __construct(TransportInterface $transport)
     {
+        if (!class_exists('\Google\Protobuf\Api')) {
+            throw new RuntimeException('No protobuf implementation found (ext-protobuf or google/protobuf)');
+        }
         $this->transport = $transport;
         $this->serializer = ProtobufSerializer::forTransport($transport);
     }
