@@ -28,6 +28,9 @@ class LogsExporter implements LogRecordExporterInterface
      */
     public function __construct(TransportInterface $transport)
     {
+        if (!class_exists('\Google\Protobuf\Api')) {
+            throw new RuntimeException('No protobuf implementation found (ext-protobuf or google/protobuf)');
+        }
         $this->transport = $transport;
         $this->serializer = ProtobufSerializer::forTransport($transport);
     }
