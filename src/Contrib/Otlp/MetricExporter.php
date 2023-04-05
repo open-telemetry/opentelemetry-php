@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -35,6 +36,9 @@ final class MetricExporter implements MetricExporterInterface
      */
     public function __construct(TransportInterface $transport, $temporality = null)
     {
+        if (!class_exists('\Google\Protobuf\Api')) {
+            throw new RuntimeException('No protobuf implementation found (ext-protobuf or google/protobuf)');
+        }
         $this->transport = $transport;
         $this->serializer = ProtobufSerializer::forTransport($transport);
         $this->temporality = $temporality;

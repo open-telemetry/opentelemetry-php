@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\ReadableLogRecord;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -28,6 +29,9 @@ class LogsExporter implements LogRecordExporterInterface
      */
     public function __construct(TransportInterface $transport)
     {
+        if (!class_exists('\Google\Protobuf\Api')) {
+            throw new RuntimeException('No protobuf implementation found (ext-protobuf or google/protobuf)');
+        }
         $this->transport = $transport;
         $this->serializer = ProtobufSerializer::forTransport($transport);
     }

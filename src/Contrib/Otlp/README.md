@@ -22,7 +22,7 @@ To export over gRPC, you will need to additionally install the `open-telemetry/e
 ## Protobuf Runtime library
 
 There exist two protobuf runtime libraries that offer the same set of APIs, allowing developers to choose the one that
-best suits their needs.
+best suits their needs. You must install one of them, in order to use the OTLP exporter.
 
 The first and easiest option is to install the Protobuf PHP Runtime Library through composer. This can be the easiest
 way to get started quickly. Either run `composer require google/protobuf`, or update your `composer.json` as follows:
