@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\API\Logs;
 
 use OpenTelemetry\API\Common\Instrumentation\Globals;
