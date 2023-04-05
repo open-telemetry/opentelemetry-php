@@ -9,20 +9,24 @@ use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 
 class Sdk
 {
     private TracerProviderInterface $tracerProvider;
     private MeterProviderInterface $meterProvider;
+    private LoggerProviderInterface $loggerProvider;
     private TextMapPropagatorInterface $propagator;
 
     public function __construct(
         TracerProviderInterface $tracerProvider,
         MeterProviderInterface $meterProvider,
+        LoggerProviderInterface $loggerProvider,
         TextMapPropagatorInterface $propagator
     ) {
         $this->tracerProvider = $tracerProvider;
         $this->meterProvider = $meterProvider;
+        $this->loggerProvider = $loggerProvider;
         $this->propagator = $propagator;
     }
 
@@ -52,6 +56,11 @@ class Sdk
     public function getMeterProvider(): MeterProviderInterface
     {
         return $this->meterProvider;
+    }
+
+    public function getLoggerProvider(): LoggerProviderInterface
+    {
+        return $this->loggerProvider;
     }
 
     public function getPropagator(): TextMapPropagatorInterface
