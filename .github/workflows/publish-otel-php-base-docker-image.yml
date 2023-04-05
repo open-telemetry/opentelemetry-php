@@ -34,5 +34,5 @@ jobs:
           push: true
           file: docker/Dockerfile
           build-args: PHP_VERSION=${{ matrix.php-version }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm/v8
           tags: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${{ matrix.php-version }}
