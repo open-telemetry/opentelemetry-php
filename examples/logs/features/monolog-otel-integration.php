@@ -6,7 +6,9 @@ use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use OpenTelemetry\API\Common\Instrumentation\Globals;
+use OpenTelemetry\API\Logs\Bridge;
 use OpenTelemetry\API\Logs\EventLogger;
+use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\API\Logs\Map\Psr3;
@@ -28,20 +30,20 @@ require __DIR__ . '/../../../vendor/autoload.php';
 $streamHandler = new StreamHandler(STDOUT, LogLevel::DEBUG);
 $tracer = Globals::tracerProvider()->getTracer('monolog-demo');
 
-//otel handler for Monolog v2, which ignores logs < INFO
-$otelHandler = new class('demo', 'demo-domain', LogLevel::INFO) extends AbstractProcessingHandler {
-    private EventLogger $eventLogger;
+$bridge = new Bridge('monolog-bridge');
+//otel handler for Monolog v2
+$otelHandler = new class($bridge, LogLevel::INFO) extends AbstractProcessingHandler {
+    private Bridge $bridge;
 
-    public function __construct(string $name, string $domain, string $level, bool $bubble = true, ?LoggerProviderInterface $loggerProvider = null)
+    public function __construct(Bridge $bridge, string $level, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
-        $loggerProvider ??= Globals::loggerProvider();
-        $this->eventLogger = new EventLogger($loggerProvider->getLogger($name), $domain);
+        $this->bridge = $bridge;
     }
 
     protected function write(array $record): void
     {
-        $this->eventLogger->logEvent('foo', $this->convert($record));
+        $this->bridge->emit($this->convert($record));
     }
 
     private function convert(array $record): LogRecord
