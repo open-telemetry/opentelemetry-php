@@ -27,12 +27,12 @@ LoggerHolder::set(
 
 $transport = (new GrpcTransportFactory())->create('http://collector:4317' . OtlpUtil::method(Signals::LOGS));
 $exporter = new LogsExporter($transport);
-
+$processor = new BatchLogsProcessor(
+    $exporter,
+    ClockFactory::getDefault()
+);
 $loggerProvider = new LoggerProvider(
-    new BatchLogsProcessor(
-        $exporter,
-        ClockFactory::getDefault()
-    ),
+    [$processor],
     new InstrumentationScopeFactory(
         (new LogRecordLimitsBuilder())->build()->getAttributeFactory()
     )

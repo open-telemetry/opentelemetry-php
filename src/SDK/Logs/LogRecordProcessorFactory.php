@@ -17,9 +17,22 @@ use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
 
 class LogRecordProcessorFactory
 {
-    public function create(LogRecordExporterInterface $exporter, ?MeterProviderInterface $meterProvider = null): LogRecordProcessorInterface
+    /**
+     * @return array<LogRecordProcessorInterface>
+     */
+    public function create(LogRecordExporterInterface $exporter, ?MeterProviderInterface $meterProvider = null): array
     {
-        $name = Configuration::getEnum(Variables::OTEL_PHP_LOGS_PROCESSOR);
+        $processors = [];
+        $list = Configuration::getList(Variables::OTEL_PHP_LOGS_PROCESSOR);
+        foreach ($list as $name) {
+            $processors[] = $this->createProcessor($name, $exporter, $meterProvider);
+        }
+
+        return $processors;
+    }
+
+    private function createProcessor($name, LogRecordExporterInterface $exporter, ?MeterProviderInterface $meterProvider = null): LogRecordProcessorInterface
+    {
         switch ($name) {
             case KnownValues::VALUE_BATCH:
                 return new BatchLogsProcessor(

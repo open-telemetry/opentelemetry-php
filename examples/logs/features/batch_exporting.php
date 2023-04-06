@@ -14,14 +14,14 @@ use OpenTelemetry\SDK\Logs\Processor\BatchLogsProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 require __DIR__ . '/../../../vendor/autoload.php';
-
-$loggerProvider = new LoggerProvider(
-    new BatchLogsProcessor(
-        new ConsoleExporter(
-            (new StreamTransportFactory())->create(STDOUT, '')
-        ),
-        ClockFactory::getDefault()
+$processor = new BatchLogsProcessor(
+    new ConsoleExporter(
+        (new StreamTransportFactory())->create(STDOUT, '')
     ),
+    ClockFactory::getDefault()
+);
+$loggerProvider = new LoggerProvider(
+    [$processor],
     new InstrumentationScopeFactory(
         (new LogRecordLimitsBuilder())->build()->getAttributeFactory()
     )

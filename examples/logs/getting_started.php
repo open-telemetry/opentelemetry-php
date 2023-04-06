@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 use OpenTelemetry\API\Logs\EventLogger;
 use OpenTelemetry\API\Logs\LogRecord;
-use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
+use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
+$processor = new SimpleLogsProcessor(
+    (new ConsoleExporterFactory())->create()
+);
 $loggerProvider = new LoggerProvider(
-    new SimpleLogsProcessor(
-        new ConsoleExporter()
-    )
+    [$processor],
+    new InstrumentationScopeFactory(Attributes::factory())
 );
 $tracerProvider = new TracerProvider();
 $tracer = $tracerProvider->getTracer('demo-tracer');
