@@ -111,7 +111,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
             $this->running = false;
         }
 
-        if ($exception !== null) {
+        if ($exception instanceof \Throwable) {
             throw $exception;
         }
 

@@ -47,7 +47,7 @@ final class StatusData implements StatusDataInterface
 
     public static function ok(): self
     {
-        if (null === self::$ok) {
+        if (!self::$ok instanceof \OpenTelemetry\SDK\Trace\StatusData) {
             self::$ok = new self(API\StatusCode::STATUS_OK, '');
         }
 
@@ -56,7 +56,7 @@ final class StatusData implements StatusDataInterface
 
     public static function error(): self
     {
-        if (null === self::$error) {
+        if (!self::$error instanceof \OpenTelemetry\SDK\Trace\StatusData) {
             self::$error = new self(API\StatusCode::STATUS_ERROR, '');
         }
 
@@ -65,7 +65,7 @@ final class StatusData implements StatusDataInterface
 
     public static function unset(): self
     {
-        if (null === self::$unset) {
+        if (!self::$unset instanceof \OpenTelemetry\SDK\Trace\StatusData) {
             self::$unset = new self(API\StatusCode::STATUS_UNSET, '');
         }
 

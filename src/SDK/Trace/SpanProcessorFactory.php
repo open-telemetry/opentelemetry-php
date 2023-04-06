@@ -19,7 +19,7 @@ class SpanProcessorFactory
 {
     public function create(?SpanExporterInterface $exporter = null, ?MeterProviderInterface $meterProvider = null): SpanProcessorInterface
     {
-        if ($exporter === null) {
+        if (!$exporter instanceof \OpenTelemetry\SDK\Trace\SpanExporterInterface) {
             return new NoopSpanProcessor();
         }
 

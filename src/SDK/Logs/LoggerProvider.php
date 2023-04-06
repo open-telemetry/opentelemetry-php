@@ -16,12 +16,12 @@ class LoggerProvider implements LoggerProviderInterface
     private LoggerSharedState $loggerSharedState;
     private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
 
-    public function __construct(LogRecordProcessorInterface $processor, InstrumentationScopeFactoryInterface $instrumentationScopeFactory, ?ResourceInfo $resource = null)
+    public function __construct(array $processors, InstrumentationScopeFactoryInterface $instrumentationScopeFactory, ?ResourceInfo $resource = null)
     {
         $this->loggerSharedState = new LoggerSharedState(
             $resource ?? ResourceInfoFactory::defaultResource(),
             (new LogRecordLimitsBuilder())->build(),
-            $processor
+            $processors
         );
         $this->instrumentationScopeFactory = $instrumentationScopeFactory;
     }
@@ -46,6 +46,13 @@ class LoggerProvider implements LoggerProviderInterface
 
     public function forceFlush(CancellationInterface $cancellation = null): bool
     {
-        return $this->loggerSharedState->getProcessor()->forceFlush($cancellation);
+        $result = true;
+        foreach ($this->loggerSharedState->getProcessors() as $processor) {
+            if (!$processor->forceFlush($cancellation)) {
+                $result = false;
+            }
+        }
+
+        return $result;
     }
 }

@@ -31,7 +31,7 @@ class LogRecordProcessorFactoryTest extends TestCase
     {
         $exporter = $this->createMock(LogRecordExporterInterface::class);
         $this->setEnvironmentVariable('OTEL_PHP_LOGS_PROCESSOR', $name);
-        $processor = (new LogRecordProcessorFactory())->create($exporter);
+        $processor = (new LogRecordProcessorFactory())->create($exporter)[0];
 
         $this->assertInstanceOf($expected, $processor);
     }
@@ -54,11 +54,11 @@ class LogRecordProcessorFactoryTest extends TestCase
         (new LogRecordProcessorFactory())->create($this->createMock(LogRecordExporterInterface::class));
     }
 
-    public function test_rejects_multiple(): void
+    public function test_create_multiple(): void
     {
-        $this->setEnvironmentVariable('OTEL_PHP_LOGS_PROCESSOR', 'one,two');
-        $this->expectException(\InvalidArgumentException::class);
+        $this->setEnvironmentVariable('OTEL_PHP_LOGS_PROCESSOR', 'batch,simple');
+        $processors = (new LogRecordProcessorFactory())->create($this->createMock(LogRecordExporterInterface::class));
 
-        (new LogRecordProcessorFactory())->create($this->createMock(LogRecordExporterInterface::class));
+        $this->assertCount(2, $processors);
     }
 }

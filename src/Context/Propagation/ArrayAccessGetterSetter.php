@@ -31,7 +31,7 @@ final class ArrayAccessGetterSetter implements PropagationGetterInterface, Propa
      */
     public static function getInstance(): self
     {
-        if (null === self::$instance) {
+        if (!self::$instance instanceof \OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter) {
             self::$instance = new self();
         }
 

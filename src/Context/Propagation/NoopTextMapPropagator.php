@@ -13,7 +13,7 @@ final class NoopTextMapPropagator implements TextMapPropagatorInterface
 
     public static function getInstance(): self
     {
-        if (null === self::$instance) {
+        if (!self::$instance instanceof \OpenTelemetry\Context\Propagation\NoopTextMapPropagator) {
             self::$instance = new self();
         }
 

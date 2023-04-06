@@ -105,7 +105,7 @@ final class AsynchronousMetricStream implements MetricStreamInterface
 
         $metric = $this->metric;
 
-        if (($lastRead = $this->lastReads[$reader] ?? null) === null) {
+        if (!($lastRead = $this->lastReads[$reader] ?? null) instanceof \OpenTelemetry\SDK\Metrics\Stream\Metric) {
             $temporality = Temporality::CUMULATIVE;
             $startTimestamp = $this->startTimestamp;
         } else {

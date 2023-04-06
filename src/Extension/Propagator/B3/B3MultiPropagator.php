@@ -88,7 +88,7 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
 
     public static function getInstance(): self
     {
-        if (null === self::$instance) {
+        if (!self::$instance instanceof \OpenTelemetry\Extension\Propagator\B3\B3MultiPropagator) {
             self::$instance = new self();
         }
 

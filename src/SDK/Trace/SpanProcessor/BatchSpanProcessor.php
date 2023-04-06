@@ -99,7 +99,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         $this->queue = new SplQueue();
         $this->flush = new SplQueue();
 
-        if ($meterProvider === null) {
+        if (!$meterProvider instanceof \OpenTelemetry\API\Metrics\MeterProviderInterface) {
             return;
         }
 
@@ -260,7 +260,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
             $this->running = false;
         }
 
-        if ($exception !== null) {
+        if ($exception instanceof \Throwable) {
             throw $exception;
         }
 

@@ -40,7 +40,7 @@ final class DeltaStorage
         if (($this->head->prev->readers ?? null) != $readers) {
             $this->head->prev = new Delta($metric, $readers, $this->head->prev);
         } else {
-            assert($this->head->prev !== null);
+            assert($this->head->prev instanceof \OpenTelemetry\SDK\Metrics\Stream\Delta);
             $this->mergeInto($this->head->prev->metric, $metric);
         }
     }
@@ -50,8 +50,8 @@ final class DeltaStorage
         $n = null;
         for ($d = $this->head; $d->prev; $d = $d->prev) {
             if (($d->prev->readers >> $reader & 1) != 0) {
-                if ($n !== null) {
-                    assert($n->prev !== null);
+                if ($n instanceof \OpenTelemetry\SDK\Metrics\Stream\Delta) {
+                    assert($n->prev instanceof \OpenTelemetry\SDK\Metrics\Stream\Delta);
                     $n->prev->readers ^= $d->prev->readers;
                     $this->mergeInto($d->prev->metric, $n->prev->metric);
                     $this->tryUnlink($n);
@@ -68,7 +68,7 @@ final class DeltaStorage
         $metric = $n->prev->metric ?? null;
 
         if (!$retain && $n) {
-            assert($n->prev !== null);
+            assert($n->prev instanceof \OpenTelemetry\SDK\Metrics\Stream\Delta);
             $n->prev->readers ^= ($n->prev->readers & 1 | 1) << $reader;
             $this->tryUnlink($n);
         }
@@ -78,7 +78,7 @@ final class DeltaStorage
 
     private function tryUnlink(Delta $n): void
     {
-        assert($n->prev !== null);
+        assert($n->prev instanceof \OpenTelemetry\SDK\Metrics\Stream\Delta);
         /** @phpstan-ignore-next-line */
         if ($n->prev->readers == 0) {
             $n->prev = $n->prev->prev;

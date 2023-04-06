@@ -31,9 +31,11 @@ class Logger implements LoggerInterface
     {
         $readWriteLogRecord = new ReadWriteLogRecord($this->scope, $this->loggerSharedState, $logRecord, $this->includeTraceContext);
         // @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#onemit
-        $this->loggerSharedState->getProcessor()->onEmit(
-            $readWriteLogRecord,
-            $readWriteLogRecord->getContext(),
-        );
+        foreach ($this->loggerSharedState->getProcessors() as $processor) {
+            $processor->onEmit(
+                $readWriteLogRecord,
+                $readWriteLogRecord->getContext(),
+            );
+        }
     }
 }

@@ -31,7 +31,7 @@ trait LogsMessagesTrait
     private static function doLog(string $level, string $message, array $context): void
     {
         $logger = LoggerHolder::get();
-        if ($logger !== null) {
+        if ($logger instanceof \Psr\Log\LoggerInterface) {
             $context['source'] = get_called_class();
             $logger->log($level, $message, $context);
         } elseif (self::shouldLog($level)) {

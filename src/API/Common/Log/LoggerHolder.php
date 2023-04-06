@@ -35,7 +35,7 @@ final class LoggerHolder
 
     public static function isSet(): bool
     {
-        return null !== self::$logger;
+        return self::$logger instanceof \Psr\Log\LoggerInterface;
     }
 
     public static function unset(): void

@@ -46,12 +46,12 @@ final class StreamFactory implements MetricFactoryInterface
         $observer = new MultiObserver();
         $dedup = [];
         foreach ($views as [$view, $registry]) {
-            if ($view->aggregation === null) {
+            if (!$view->aggregation instanceof \OpenTelemetry\SDK\Metrics\AggregationInterface) {
                 continue;
             }
 
             $streamId = $this->streamId($view->aggregation, $view->attributeKeys);
-            if (($stream = $dedup[$streamId] ?? null) === null) {
+            if (!($stream = $dedup[$streamId] ?? null) instanceof \OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream) {
                 $stream = new AsynchronousMetricStream(
                     $attributesFactory,
                     $this->attributeProcessor($view->attributeKeys, $attributesFactory),
@@ -93,12 +93,12 @@ final class StreamFactory implements MetricFactoryInterface
         $streams = [];
         $dedup = [];
         foreach ($views as [$view, $registry]) {
-            if ($view->aggregation === null) {
+            if (!$view->aggregation instanceof \OpenTelemetry\SDK\Metrics\AggregationInterface) {
                 continue;
             }
 
             $streamId = $this->streamId($view->aggregation, $view->attributeKeys);
-            if (($stream = $dedup[$streamId] ?? null) === null) {
+            if (!($stream = $dedup[$streamId] ?? null) instanceof \OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream) {
                 $stream = new SynchronousMetricStream(
                     $this->attributeProcessor($view->attributeKeys, $attributesFactory),
                     $view->aggregation,
@@ -143,7 +143,7 @@ final class StreamFactory implements MetricFactoryInterface
         ?ExemplarReservoirInterface $exemplarReservoir,
         ?ExemplarFilterInterface $exemplarFilter
     ): ?ExemplarReservoirInterface {
-        return $exemplarReservoir !== null && $exemplarFilter !== null
+        return $exemplarReservoir instanceof \OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface && $exemplarFilter instanceof \OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface
             ? new FilteredReservoir($exemplarReservoir, $exemplarFilter)
             : $exemplarReservoir;
     }

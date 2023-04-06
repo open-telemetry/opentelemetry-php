@@ -67,9 +67,9 @@ class ConsoleExporter implements LogRecordExporterInterface
             'severity_number' => $record->getSeverityNumber(),
             'severity_text' => $record->getSeverityText(),
             'body' => $record->getBody(),
-            'trace_id' => $spanContext !== null ? $spanContext->getTraceId() : '',
-            'span_id' => $spanContext !== null ? $spanContext->getSpanId() : '',
-            'trace_flags' => $spanContext !== null ? $spanContext->getTraceFlags() : null,
+            'trace_id' => $spanContext instanceof \OpenTelemetry\API\Trace\SpanContextInterface ? $spanContext->getTraceId() : '',
+            'span_id' => $spanContext instanceof \OpenTelemetry\API\Trace\SpanContextInterface ? $spanContext->getSpanId() : '',
+            'trace_flags' => $spanContext instanceof \OpenTelemetry\API\Trace\SpanContextInterface ? $spanContext->getTraceFlags() : null,
             'attributes' => $record->getAttributes()->toArray(),
             'dropped_attributes_count' => $record->getAttributes()->getDroppedAttributesCount(),
         ];

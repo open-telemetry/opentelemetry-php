@@ -16,12 +16,12 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 require __DIR__ . '/../../../vendor/autoload.php';
 
 $loggerProvider = new LoggerProvider(
-    new BatchLogsProcessor(
+    [new BatchLogsProcessor(
         new ConsoleExporter(
             (new StreamTransportFactory())->create(STDOUT, '')
         ),
         ClockFactory::getDefault()
-    ),
+    )],
     new InstrumentationScopeFactory(
         (new LogRecordLimitsBuilder())->build()->getAttributeFactory()
     )
