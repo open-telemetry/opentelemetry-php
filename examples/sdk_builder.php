@@ -45,7 +45,7 @@ $meterProvider = MeterProvider::builder()
     ->build();
 
 $loggerProvider = LoggerProvider::builder()
-    ->addLogRecordProcessor(
+    ->setLogRecordProcessor(
         new SimpleLogsProcessor($logRecordExporter)
     )
     ->build();

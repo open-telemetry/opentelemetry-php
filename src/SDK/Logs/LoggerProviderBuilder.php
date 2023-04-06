@@ -11,16 +11,22 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 class LoggerProviderBuilder
 {
-    private ?LogRecordProcessorInterface $processor = null;
+    private LogRecordProcessorInterface $processor;
     private ?ResourceInfo $resource = null;
 
-    public function addLogRecordProcessor(LogRecordProcessorInterface $processor): self
+    public function __construct()
+    {
+        $this->processor = new NoopLogsProcessor();
+    }
+
+    public function setLogRecordProcessor(LogRecordProcessorInterface $processor): self
     {
         $this->processor = $processor;
 
         return $this;
     }
-    public function addResource(ResourceInfo $resource): self
+
+    public function setResource(ResourceInfo $resource): self
     {
         $this->resource = $resource;
 
@@ -30,7 +36,7 @@ class LoggerProviderBuilder
     public function build(): LoggerProviderInterface
     {
         return new LoggerProvider(
-            $this->processor ?? NoopLogsProcessor::getInstance(),
+            $this->processor,
             new InstrumentationScopeFactory(Attributes::factory()),
             $this->resource
         );

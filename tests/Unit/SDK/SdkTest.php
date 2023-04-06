@@ -82,5 +82,6 @@ class SdkTest extends TestCase
         $this->assertSame($propagator, $sdk->getPropagator());
         $this->assertSame($meterProvider, $sdk->getMeterProvider());
         $this->assertSame($tracerProvider, $sdk->getTracerProvider());
+        $this->assertSame($loggerProvider, $sdk->getLoggerProvider());
     }
 }
