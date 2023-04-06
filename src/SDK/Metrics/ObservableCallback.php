@@ -33,14 +33,14 @@ final class ObservableCallback implements ObservableCallbackInterface
 
         $this->metricObserver->cancel($this->token);
         $this->referenceCounter->release();
-        if ($this->callbackDestructor instanceof \OpenTelemetry\SDK\Metrics\MetricObserver\CallbackDestructor) {
+        if ($this->callbackDestructor !== null) {
             unset($this->callbackDestructor->tokens[$this->token]);
         }
     }
 
     public function __destruct()
     {
-        if ($this->callbackDestructor instanceof \OpenTelemetry\SDK\Metrics\MetricObserver\CallbackDestructor) {
+        if ($this->callbackDestructor !== null) {
             return;
         }
         if (!$this->metricObserver->has($this->token)) {

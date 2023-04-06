@@ -17,25 +17,33 @@ final class AttributesConverter
     public static function convertAnyValue($value): AnyValue
     {
         $result = new AnyValue();
-        if (is_array($value)) {
-            $values = new ArrayValue();
-            foreach ($value as $element) {
-                /** @psalm-suppress InvalidArgument */
-                $values->getValues()[] = self::convertAnyValue($element);
-            }
-            $result->setArrayValue($values);
-        }
-        if (is_int($value)) {
-            $result->setIntValue($value);
-        }
-        if (is_bool($value)) {
-            $result->setBoolValue($value);
-        }
-        if (is_float($value)) {
-            $result->setDoubleValue($value);
-        }
-        if (is_string($value)) {
-            $result->setStringValue($value);
+
+        switch (true) {
+            case is_array($value):
+                $values = new ArrayValue();
+                foreach ($value as $element) {
+                    /** @psalm-suppress InvalidArgument */
+                    $values->getValues()[] = self::convertAnyValue($element);
+                }
+                $result->setArrayValue($values);
+
+                break;
+            case is_int($value):
+                $result->setIntValue($value);
+
+                break;
+            case is_bool($value):
+                $result->setBoolValue($value);
+
+                break;
+            case is_float($value):
+                $result->setDoubleValue($value);
+
+                break;
+            case is_string($value):
+                $result->setStringValue($value);
+
+                break;
         }
 
         return $result;

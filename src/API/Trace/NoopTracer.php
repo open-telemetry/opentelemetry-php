@@ -12,7 +12,7 @@ final class NoopTracer implements TracerInterface
 
     public static function getInstance(): self
     {
-        if (!self::$instance instanceof \OpenTelemetry\API\Trace\NoopTracer) {
+        if (null === self::$instance) {
             self::$instance = new self();
         }
 

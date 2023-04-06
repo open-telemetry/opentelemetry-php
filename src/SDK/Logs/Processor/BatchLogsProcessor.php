@@ -94,7 +94,7 @@ class BatchLogsProcessor implements LogRecordProcessorInterface
         $this->queue = new SplQueue();
         $this->flush = new SplQueue();
 
-        if (!$meterProvider instanceof \OpenTelemetry\API\Metrics\MeterProviderInterface) {
+        if ($meterProvider === null) {
             return;
         }
 
@@ -248,7 +248,7 @@ class BatchLogsProcessor implements LogRecordProcessorInterface
             $this->running = false;
         }
 
-        if ($exception instanceof \Throwable) {
+        if ($exception !== null) {
             throw $exception;
         }
 

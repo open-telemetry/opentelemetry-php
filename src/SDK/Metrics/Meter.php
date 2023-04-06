@@ -271,7 +271,7 @@ final class Meter implements MeterInterface
 
         $compositeRegistration = new MultiRegistryRegistration($this->metricRegistries, $stalenessHandler);
         foreach ($views as $view) {
-            if ($view->aggregation instanceof \OpenTelemetry\SDK\Metrics\AggregationInterface) {
+            if ($view->aggregation !== null) {
                 yield [$view, $compositeRegistration];
             } else {
                 foreach ($this->metricRegistries as $metricRegistry) {

@@ -18,7 +18,7 @@ final class B3DebugFlagContextKey
 
     public static function instance(): ContextKeyInterface
     {
-        if (!self::$instance instanceof \OpenTelemetry\Context\ContextKeyInterface) {
+        if (self::$instance === null) {
             self::$instance = Context::createKey(self::KEY_NAME);
         }
 

@@ -10,19 +10,18 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 class LoggerSharedState
 {
     private ResourceInfo $resource;
-    /** @var LogRecordProcessorInterface[] */
-    private array $processors = [];
+    private LogRecordProcessorInterface $processor;
     private LogRecordLimits $limits;
     private ?bool $shutdownResult = null;
 
     public function __construct(
         ResourceInfo $resource,
         LogRecordLimits $limits,
-        array $processors
+        LogRecordProcessorInterface $processor
     ) {
         $this->resource = $resource;
         $this->limits = $limits;
-        $this->processors = $processors;
+        $this->processor = $processor;
     }
     public function hasShutdown(): bool
     {
@@ -34,12 +33,9 @@ class LoggerSharedState
         return $this->resource;
     }
 
-    /**
-     * @return LogRecordProcessorInterface[]
-     */
-    public function getProcessors(): array
+    public function getProcessor(): LogRecordProcessorInterface
     {
-        return $this->processors;
+        return $this->processor;
     }
 
     public function getLogRecordLimits(): LogRecordLimits
@@ -48,21 +44,10 @@ class LoggerSharedState
     }
 
     /**
-     * Returns `true` if all processors shut down successfully, else `false`
-     * Subsequent calls to `shutdown` are a no-op.
+     * Returns `false` if the provider is already shutdown, otherwise `true`.
      */
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
-        if ($this->shutdownResult !== null) {
-            return $this->shutdownResult;
-        }
-        $this->shutdownResult = true;
-        foreach ($this->processors as $processor) {
-            if (!$processor->shutdown($cancellation)) {
-                $this->shutdownResult = false;
-            }
-        }
-
-        return $this->shutdownResult;
+        return $this->shutdownResult ?? ($this->shutdownResult = $this->processor->shutdown($cancellation));
     }
 }

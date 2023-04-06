@@ -48,7 +48,7 @@ final class SpanExporter implements SpanExporterInterface
                 $this->serializer->hydrate($serviceResponse, $payload);
 
                 $partialSuccess = $serviceResponse->getPartialSuccess();
-                if ($partialSuccess instanceof \Opentelemetry\Proto\Collector\Trace\V1\ExportTracePartialSuccess && $partialSuccess->getRejectedSpans()) {
+                if ($partialSuccess !== null && $partialSuccess->getRejectedSpans()) {
                     self::logError('Export partial success', [
                         'rejected_spans' => $partialSuccess->getRejectedSpans(),
                         'error_message' => $partialSuccess->getErrorMessage(),
@@ -56,7 +56,7 @@ final class SpanExporter implements SpanExporterInterface
 
                     return false;
                 }
-                if ($partialSuccess instanceof \Opentelemetry\Proto\Collector\Trace\V1\ExportTracePartialSuccess && $partialSuccess->getErrorMessage()) {
+                if ($partialSuccess !== null && $partialSuccess->getErrorMessage()) {
                     self::logWarning('Export success with warnings/suggestions', ['error_message' => $partialSuccess->getErrorMessage()]);
                 }
 

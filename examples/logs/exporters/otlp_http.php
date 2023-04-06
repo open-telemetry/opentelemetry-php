@@ -24,11 +24,11 @@ LoggerHolder::set(
 
 $transport = (new OtlpHttpTransportFactory())->create('http://collector:4318/v1/logs', 'application/json');
 $exporter = new LogsExporter($transport);
-$processor = new SimpleLogsProcessor(
-    $exporter
-);
+
 $loggerProvider = new LoggerProvider(
-    [$processor],
+    new SimpleLogsProcessor(
+        $exporter
+    ),
     new InstrumentationScopeFactory(
         (new LogRecordLimitsBuilder())->build()->getAttributeFactory()
     )

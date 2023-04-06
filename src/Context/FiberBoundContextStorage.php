@@ -50,7 +50,7 @@ final class FiberBoundContextStorage implements ContextStorageInterface, Executi
     {
         $this->checkFiberMismatch();
 
-        if (!($scope = $this->storage->scope()) instanceof \OpenTelemetry\Context\ContextStorageScopeInterface) {
+        if (($scope = $this->storage->scope()) === null) {
             return null;
         }
 

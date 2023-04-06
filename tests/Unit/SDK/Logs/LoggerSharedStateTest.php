@@ -29,7 +29,7 @@ class LoggerSharedStateTest extends TestCase
         $this->loggerSharedState = new LoggerSharedState(
             $this->resource,
             $this->limits,
-            [$this->processor],
+            $this->processor,
         );
     }
 
@@ -38,22 +38,9 @@ class LoggerSharedStateTest extends TestCase
         $this->assertSame($this->resource, $this->loggerSharedState->getResource());
     }
 
-    public function test_get_processors(): void
+    public function test_get_processor(): void
     {
-        $this->assertCount(1, $this->loggerSharedState->getProcessors());
-        $this->assertSame($this->processor, $this->loggerSharedState->getProcessors()[0]);
-    }
-
-    public function test_no_processors(): void
-    {
-        $sharedState = new LoggerSharedState($this->resource, $this->limits, []);
-        $this->assertCount(0, $sharedState->getProcessors());
-    }
-
-    public function test_multiple_processors(): void
-    {
-        $sharedState = new LoggerSharedState($this->resource, $this->limits, [$this->processor, $this->processor, $this->processor]);
-        $this->assertCount(3, $sharedState->getProcessors());
+        $this->assertSame($this->processor, $this->loggerSharedState->getProcessor());
     }
 
     public function test_get_log_record_limits(): void

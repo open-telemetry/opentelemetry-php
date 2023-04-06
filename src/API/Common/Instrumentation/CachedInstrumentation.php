@@ -66,7 +66,7 @@ final class CachedInstrumentation
     {
         $tracerProvider = Globals::tracerProvider();
 
-        if (!$this->tracers instanceof \ArrayAccess) {
+        if ($this->tracers === null) {
             return $tracerProvider->getTracer($this->name, $this->version, $this->schemaUrl, $this->attributes);
         }
 
@@ -77,7 +77,7 @@ final class CachedInstrumentation
     {
         $meterProvider = Globals::meterProvider();
 
-        if (!$this->meters instanceof \ArrayAccess) {
+        if ($this->meters === null) {
             return $meterProvider->getMeter($this->name, $this->version, $this->schemaUrl, $this->attributes);
         }
 
@@ -87,7 +87,7 @@ final class CachedInstrumentation
     {
         $loggerProvider = Globals::loggerProvider();
 
-        if (!$this->loggers instanceof \ArrayAccess) {
+        if ($this->loggers === null) {
             //@todo configurable includeTraceContext?
             return $loggerProvider->getLogger($this->name, $this->version, $this->schemaUrl, true, $this->attributes);
         }

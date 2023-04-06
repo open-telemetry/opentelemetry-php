@@ -34,7 +34,7 @@ function weaken(Closure $closure, ?object &$target = null): Closure
     if ($name !== '{closure}') {
         /** @psalm-suppress InvalidScope @phpstan-ignore-next-line @phan-suppress-next-line PhanUndeclaredThis */
         $closure = fn (...$args) => $this->$name(...$args);
-        if ($scope instanceof \ReflectionClass) {
+        if ($scope !== null) {
             $closure->bindTo(null, $scope->name);
         }
     }

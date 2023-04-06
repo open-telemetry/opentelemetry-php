@@ -44,7 +44,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
 
     public static function getInstance(): self
     {
-        if (!self::$instance instanceof \OpenTelemetry\API\Trace\Propagation\TraceContextPropagator) {
+        if (null === self::$instance) {
             self::$instance = new self();
         }
 

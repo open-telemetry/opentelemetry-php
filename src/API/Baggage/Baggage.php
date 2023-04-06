@@ -34,7 +34,7 @@ final class Baggage implements BaggageInterface
     /** @inheritDoc */
     public static function getEmpty(): BaggageInterface
     {
-        if (!self::$emptyBaggage instanceof \OpenTelemetry\API\Baggage\Baggage) {
+        if (null === self::$emptyBaggage) {
             self::$emptyBaggage = new self();
         }
 
@@ -65,7 +65,7 @@ final class Baggage implements BaggageInterface
     /** @inheritDoc */
     public function getValue(string $key)
     {
-        if (($entry = $this->getEntry($key)) instanceof \OpenTelemetry\API\Baggage\Entry) {
+        if (($entry = $this->getEntry($key)) !== null) {
             return $entry->getValue();
         }
 

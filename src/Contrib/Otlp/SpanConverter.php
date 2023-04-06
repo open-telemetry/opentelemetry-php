@@ -51,7 +51,7 @@ final class SpanConverter
                 $instrumentationScope->getAttributes()->getDroppedAttributesCount(),
             ]);
 
-            if (!($pResourceSpans = $resourceSpans[$resourceId] ?? null) instanceof \Opentelemetry\Proto\Trace\V1\ResourceSpans) {
+            if (($pResourceSpans = $resourceSpans[$resourceId] ?? null) === null) {
                 /** @psalm-suppress InvalidArgument */
                 $pExportTraceServiceRequest->getResourceSpans()[]
                     = $resourceSpans[$resourceId]
@@ -59,7 +59,7 @@ final class SpanConverter
                     = $this->convertResourceSpans($resource);
             }
 
-            if (!($pScopeSpans = $scopeSpans[$resourceId][$instrumentationScopeId] ?? null) instanceof \Opentelemetry\Proto\Trace\V1\ScopeSpans) {
+            if (($pScopeSpans = $scopeSpans[$resourceId][$instrumentationScopeId] ?? null) === null) {
                 /** @psalm-suppress InvalidArgument */
                 $pResourceSpans->getScopeSpans()[]
                     = $scopeSpans[$resourceId][$instrumentationScopeId]

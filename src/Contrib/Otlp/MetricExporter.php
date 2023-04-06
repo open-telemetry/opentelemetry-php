@@ -62,7 +62,7 @@ final class MetricExporter implements MetricExporterInterface
                 $this->serializer->hydrate($serviceResponse, $payload);
 
                 $partialSuccess = $serviceResponse->getPartialSuccess();
-                if ($partialSuccess instanceof \Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsPartialSuccess && $partialSuccess->getRejectedDataPoints()) {
+                if ($partialSuccess !== null && $partialSuccess->getRejectedDataPoints()) {
                     self::logError('Export partial success', [
                         'rejected_data_points' => $partialSuccess->getRejectedDataPoints(),
                         'error_message' => $partialSuccess->getErrorMessage(),
@@ -70,7 +70,7 @@ final class MetricExporter implements MetricExporterInterface
 
                     return false;
                 }
-                if ($partialSuccess instanceof \Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsPartialSuccess && $partialSuccess->getErrorMessage()) {
+                if ($partialSuccess !== null && $partialSuccess->getErrorMessage()) {
                     self::logWarning('Export success with warnings/suggestions', ['error_message' => $partialSuccess->getErrorMessage()]);
                 }
 

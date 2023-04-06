@@ -52,7 +52,7 @@ class LogsExporter implements LogRecordExporterInterface
                 $this->serializer->hydrate($serviceResponse, $payload);
 
                 $partialSuccess = $serviceResponse->getPartialSuccess();
-                if ($partialSuccess instanceof \Opentelemetry\Proto\Collector\Logs\V1\ExportLogsPartialSuccess && $partialSuccess->getRejectedLogRecords()) {
+                if ($partialSuccess !== null && $partialSuccess->getRejectedLogRecords()) {
                     self::logError('Export partial success', [
                         'rejected_logs' => $partialSuccess->getRejectedLogRecords(),
                         'error_message' => $partialSuccess->getErrorMessage(),
@@ -60,7 +60,7 @@ class LogsExporter implements LogRecordExporterInterface
 
                     return false;
                 }
-                if ($partialSuccess instanceof \Opentelemetry\Proto\Collector\Logs\V1\ExportLogsPartialSuccess && $partialSuccess->getErrorMessage()) {
+                if ($partialSuccess !== null && $partialSuccess->getErrorMessage()) {
                     self::logWarning('Export success with warnings/suggestions', ['error_message' => $partialSuccess->getErrorMessage()]);
                 }
 

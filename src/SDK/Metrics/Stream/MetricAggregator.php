@@ -42,7 +42,7 @@ final class MetricAggregator implements WritableMetricStreamInterface
      */
     public function record($value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
-        $filteredAttributes = $this->attributeProcessor instanceof \OpenTelemetry\SDK\Metrics\AttributeProcessorInterface
+        $filteredAttributes = $this->attributeProcessor !== null
             ? $this->attributeProcessor->process($attributes, $context)
             : $attributes;
         $raw = $filteredAttributes->toArray();
@@ -56,7 +56,7 @@ final class MetricAggregator implements WritableMetricStreamInterface
             $timestamp,
         );
 
-        if ($this->exemplarReservoir instanceof \OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface) {
+        if ($this->exemplarReservoir !== null) {
             $this->exemplarReservoir->offer($index, $value, $attributes, $context, $timestamp, $this->revision);
         }
     }

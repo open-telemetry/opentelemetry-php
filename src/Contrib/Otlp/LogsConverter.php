@@ -47,7 +47,7 @@ class LogsConverter
                 $instrumentationScope->getAttributes()->getDroppedAttributesCount(),
             ]);
 
-            if (!($pResourceLogs = $resourceLogs[$resourceId] ?? null) instanceof \Opentelemetry\Proto\Logs\V1\ResourceLogs) {
+            if (($pResourceLogs = $resourceLogs[$resourceId] ?? null) === null) {
                 /** @psalm-suppress InvalidArgument */
                 $pExportLogsServiceRequest->getResourceLogs()[]
                     = $resourceLogs[$resourceId]
@@ -55,7 +55,7 @@ class LogsConverter
                     = $this->convertResourceLogs($resource);
             }
 
-            if (!($pScopeLogs = $scopeLogs[$resourceId][$instrumentationScopeId] ?? null) instanceof \Opentelemetry\Proto\Logs\V1\ScopeLogs) {
+            if (($pScopeLogs = $scopeLogs[$resourceId][$instrumentationScopeId] ?? null) === null) {
                 $pResourceLogs->getScopeLogs()[]
                     = $scopeLogs[$resourceId][$instrumentationScopeId]
                     = $pScopeLogs
@@ -75,7 +75,7 @@ class LogsConverter
         $pLogRecord->setTimeUnixNano($record->getTimestamp() ?? 0);
         $pLogRecord->setObservedTimeUnixNano($record->getObservedTimestamp() ?? 0);
         $spanContext = $record->getSpanContext();
-        if ($spanContext instanceof \OpenTelemetry\API\Trace\SpanContextInterface && $spanContext->isValid()) {
+        if ($spanContext !== null && $spanContext->isValid()) {
             $pLogRecord->setTraceId($spanContext->getTraceIdBinary());
             $pLogRecord->setSpanId($spanContext->getSpanIdBinary());
             $pLogRecord->setFlags($spanContext->getTraceFlags());

@@ -16,7 +16,7 @@ class NoopSpanProcessor implements SpanProcessorInterface
 
     public static function getInstance(): SpanProcessorInterface
     {
-        if (!self::$instance instanceof \OpenTelemetry\SDK\Trace\SpanProcessorInterface) {
+        if (null === self::$instance) {
             self::$instance = new self();
         }
 

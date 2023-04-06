@@ -55,7 +55,7 @@ final class MetricConverter
                 $instrumentationScope->getAttributes()->getDroppedAttributesCount(),
             ]);
 
-            if (!($pResourceMetrics = $resourceMetrics[$resourceId] ?? null) instanceof \Opentelemetry\Proto\Metrics\V1\ResourceMetrics) {
+            if (($pResourceMetrics = $resourceMetrics[$resourceId] ?? null) === null) {
                 /** @psalm-suppress InvalidArgument */
                 $pExportMetricsServiceRequest->getResourceMetrics()[]
                     = $resourceMetrics[$resourceId]
@@ -63,7 +63,7 @@ final class MetricConverter
                     = $this->convertResourceMetrics($resource);
             }
 
-            if (!($pScopeMetrics = $scopeMetrics[$resourceId][$instrumentationScopeId] ?? null) instanceof \Opentelemetry\Proto\Metrics\V1\ScopeMetrics) {
+            if (($pScopeMetrics = $scopeMetrics[$resourceId][$instrumentationScopeId] ?? null) === null) {
                 /** @psalm-suppress InvalidArgument */
                 $pResourceMetrics->getScopeMetrics()[]
                     = $scopeMetrics[$resourceId][$instrumentationScopeId]

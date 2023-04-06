@@ -22,7 +22,7 @@ final class SystemClock implements ClockInterface
      */
     public static function getInstance(): self
     {
-        if (!self::$instance instanceof \OpenTelemetry\SDK\Common\Time\SystemClock) {
+        if (null === self::$instance) {
             self::$instance = new self();
         }
 

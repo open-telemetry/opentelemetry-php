@@ -28,7 +28,7 @@ abstract class Span implements SpanInterface
     /** @inheritDoc */
     final public static function getInvalid(): SpanInterface
     {
-        if (!self::$invalidSpan instanceof \OpenTelemetry\API\Trace\Span) {
+        if (null === self::$invalidSpan) {
             self::$invalidSpan = new NonRecordingSpan(SpanContext::getInvalid());
         }
 

@@ -118,7 +118,7 @@ final class SpanContext implements SpanContextInterface
     /** @inheritDoc */
     public static function getInvalid(): SpanContextInterface
     {
-        if (!self::$invalidContext instanceof \OpenTelemetry\API\Trace\SpanContextInterface) {
+        if (null === self::$invalidContext) {
             self::$invalidContext = self::create(SpanContextValidator::INVALID_TRACE, SpanContextValidator::INVALID_SPAN, 0);
         }
 

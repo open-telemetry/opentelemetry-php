@@ -63,16 +63,16 @@ final class Configurator implements ImplicitContextKeyedInterface
     {
         $context ??= Context::getCurrent();
 
-        if ($this->tracerProvider instanceof \OpenTelemetry\API\Trace\TracerProviderInterface) {
+        if ($this->tracerProvider !== null) {
             $context = $context->with(ContextKeys::tracerProvider(), $this->tracerProvider);
         }
-        if ($this->meterProvider instanceof \OpenTelemetry\API\Metrics\MeterProviderInterface) {
+        if ($this->meterProvider !== null) {
             $context = $context->with(ContextKeys::meterProvider(), $this->meterProvider);
         }
-        if ($this->propagator instanceof \OpenTelemetry\Context\Propagation\TextMapPropagatorInterface) {
+        if ($this->propagator !== null) {
             $context = $context->with(ContextKeys::propagator(), $this->propagator);
         }
-        if ($this->loggerProvider instanceof \OpenTelemetry\API\Logs\LoggerProviderInterface) {
+        if ($this->loggerProvider !== null) {
             $context = $context->with(ContextKeys::loggerProvider(), $this->loggerProvider);
         }
 

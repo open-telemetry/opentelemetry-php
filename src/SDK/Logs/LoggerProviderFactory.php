@@ -16,9 +16,9 @@ class LoggerProviderFactory
             return NoopLoggerProvider::getInstance();
         }
         $exporter = (new ExporterFactory())->create();
-        $processors = (new LogRecordProcessorFactory())->create($exporter, $meterProvider);
+        $processor = (new LogRecordProcessorFactory())->create($exporter, $meterProvider);
         $instrumentationScopeFactory = new InstrumentationScopeFactory((new LogRecordLimitsBuilder())->build()->getAttributeFactory());
 
-        return new LoggerProvider($processors, $instrumentationScopeFactory);
+        return new LoggerProvider($processor, $instrumentationScopeFactory);
     }
 }

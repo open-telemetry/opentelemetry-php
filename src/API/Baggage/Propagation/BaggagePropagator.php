@@ -27,7 +27,7 @@ final class BaggagePropagator implements TextMapPropagatorInterface
 
     public static function getInstance(): self
     {
-        if (!self::$instance instanceof \OpenTelemetry\API\Baggage\Propagation\BaggagePropagator) {
+        if (null === self::$instance) {
             self::$instance = new self();
         }
 

@@ -74,11 +74,11 @@ final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInt
             return $flags | ScopeInterface::DETACHED;
         }
 
-        assert($this->head->node instanceof \OpenTelemetry\Context\ContextStorageNode);
+        assert($this->head->node !== null);
         for ($n = $this->head->node, $depth = 1;
              $n->previous !== $this;
              $n = $n->previous, $depth++) {
-            assert($n->previous instanceof \OpenTelemetry\Context\ContextStorageNode);
+            assert($n->previous !== null);
         }
         $n->previous = $this->previous;
         $this->previous = $this;

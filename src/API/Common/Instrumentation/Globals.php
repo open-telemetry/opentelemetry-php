@@ -78,7 +78,7 @@ final class Globals
      */
     private static function globals(): self
     {
-        if (self::$globals instanceof \OpenTelemetry\API\Common\Instrumentation\Globals) {
+        if (self::$globals !== null) {
             return self::$globals;
         }
 
