@@ -2,11 +2,16 @@
 
 declare(strict_types=1);
 
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Logs\LoggerProvider;
+use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
@@ -21,10 +26,11 @@ require __DIR__ . '/../vendor/autoload.php';
 
 echo 'Starting SDK builder example' . PHP_EOL;
 
-\OpenTelemetry\API\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
+LoggerHolder::set(new Logger('grpc', [new StreamHandler('php://stderr')]));
 
 $resource = ResourceInfoFactory::defaultResource();
 $spanExporter = new InMemoryExporter();
+$logRecordExporter = new \OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter();
 
 $reader = new ExportingReader(
     new MetricExporter(
@@ -36,6 +42,12 @@ $reader = new ExportingReader(
 $meterProvider = MeterProvider::builder()
     ->setResource($resource)
     ->addReader($reader)
+    ->build();
+
+$loggerProvider = LoggerProvider::builder()
+    ->setLogRecordProcessor(
+        new SimpleLogsProcessor($logRecordExporter)
+    )
     ->build();
 
 $tracerProvider = TracerProvider::builder()
@@ -51,6 +63,7 @@ $tracerProvider = TracerProvider::builder()
 Sdk::builder()
     ->setTracerProvider($tracerProvider)
     ->setMeterProvider($meterProvider)
+    ->setLoggerProvider($loggerProvider)
     ->setPropagator(TraceContextPropagator::getInstance())
     ->setAutoShutdown(true)
     ->buildAndRegisterGlobal();

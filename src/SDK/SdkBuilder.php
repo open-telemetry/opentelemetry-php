@@ -10,6 +10,8 @@ use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
+use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
+use OpenTelemetry\SDK\Logs\NoopLoggerProvider;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Trace\NoopTracerProvider;
@@ -19,6 +21,7 @@ class SdkBuilder
 {
     private ?TracerProviderInterface $tracerProvider = null;
     private ?MeterProviderInterface  $meterProvider = null;
+    private ?LoggerProviderInterface $loggerProvider = null;
     private ?TextMapPropagatorInterface $propagator = null;
     private bool $autoShutdown = false;
 
@@ -46,6 +49,13 @@ class SdkBuilder
         return $this;
     }
 
+    public function setLoggerProvider(LoggerProviderInterface $loggerProvider): self
+    {
+        $this->loggerProvider = $loggerProvider;
+
+        return $this;
+    }
+
     public function setPropagator(TextMapPropagatorInterface $propagator): self
     {
         $this->propagator = $propagator;
@@ -57,15 +67,18 @@ class SdkBuilder
     {
         $tracerProvider = $this->tracerProvider ?? new NoopTracerProvider();
         $meterProvider = $this->meterProvider ?? new NoopMeterProvider();
+        $loggerProvider = $this->loggerProvider ?? new NoopLoggerProvider();
         if ($this->autoShutdown) {
             // rector rule disabled in config, because ShutdownHandler::register() does not keep a strong reference to $this
             ShutdownHandler::register([$tracerProvider, 'shutdown']);
             ShutdownHandler::register([$meterProvider, 'shutdown']);
+            ShutdownHandler::register([$loggerProvider, 'shutdown']);
         }
 
         return new Sdk(
             $tracerProvider,
             $meterProvider,
+            $loggerProvider,
             $this->propagator ?? NoopTextMapPropagator::getInstance(),
         );
     }
@@ -77,9 +90,9 @@ class SdkBuilder
             ->withPropagator($sdk->getPropagator())
             ->withTracerProvider($sdk->getTracerProvider())
             ->withMeterProvider($sdk->getMeterProvider())
+            ->withLoggerProvider($sdk->getLoggerProvider())
             ->storeInContext();
 
-        // @todo could auto-shutdown self?
         return Context::storage()->attach($context);
     }
 }
