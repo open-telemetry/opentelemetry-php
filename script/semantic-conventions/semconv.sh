@@ -30,9 +30,8 @@ git reset --hard FETCH_HEAD
 
 cd "${SCRIPT_DIR}" || exit
 
-rm -rf "${CODE_DIR}/*.php"  || true
 mkdir -p "${CODE_DIR}"
-git checkout HEAD "${CODE_DIR}/composer.json"
+find "${CODE_DIR}" -name "*.php" -exec rm -f {} \;
 
 # Trace
 docker run --rm \
@@ -41,7 +40,7 @@ docker run --rm \
   -v "${CODE_DIR}:/output" \
   -u "${UID}" \
   otel/semconvgen:$GENERATOR_VERSION \
-  --only span,event,attribute_group,scope \
+  --only span \
   -f /source code \
   --template /templates/Attributes.php.j2 \
   --output "/output/TraceAttributes.php" \
@@ -49,18 +48,19 @@ docker run --rm \
   -Dclass="Trace" \
   -DschemaUrl=$SCHEMA_URL
 
+# Event
 docker run --rm \
   -v "${SPEC_DIR}/semantic_conventions:/source" \
   -v "${SCRIPT_DIR}/templates:/templates" \
   -v "${CODE_DIR}:/output" \
   -u "${UID}" \
   otel/semconvgen:$GENERATOR_VERSION \
-  --only span,event,attribute_group,scope \
+  --only event \
   -f /source code \
-  --template /templates/AttributeValues.php.j2 \
-  --output "/output/TraceAttributeValues.php" \
+  --template /templates/Attributes.php.j2 \
+  --output "/output/EventAttributes.php" \
   -Dnamespace="OpenTelemetry\\SemConv" \
-  -Dclass="Trace" \
+  -Dclass="Event" \
   -DschemaUrl=$SCHEMA_URL
 
 # Resource
@@ -78,18 +78,19 @@ docker run --rm \
   -Dclass="Resource" \
   -DschemaUrl=$SCHEMA_URL
 
+# Metric
 docker run --rm \
   -v "${SPEC_DIR}/semantic_conventions:/source" \
   -v "${SCRIPT_DIR}/templates:/templates" \
   -v "${CODE_DIR}:/output" \
   -u "${UID}" \
   otel/semconvgen:$GENERATOR_VERSION \
-  --only resource \
+  --only metric \
   -f /source code \
-  --template /templates/AttributeValues.php.j2 \
-  --output "/output/ResourceAttributeValues.php" \
+  --template /templates/Attributes.php.j2 \
+  --output "/output/MetricAttributes.php" \
   -Dnamespace="OpenTelemetry\\SemConv" \
-  -Dclass="Resource" \
+  -Dclass="Metric" \
   -DschemaUrl=$SCHEMA_URL
 
 rm -rf "${SPEC_DIR}" || true
