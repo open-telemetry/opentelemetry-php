@@ -65,4 +65,19 @@ class LoggerSharedState
 
         return $this->shutdownResult;
     }
+
+    /**
+     * Returns `true` if all processors flush successfully, else `false`.
+     */
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
+    {
+        $result = true;
+        foreach ($this->processors as $processor) {
+            if (!$processor->forceFlush($cancellation)) {
+                $result = false;
+            }
+        }
+
+        return $result;
+    }
 }

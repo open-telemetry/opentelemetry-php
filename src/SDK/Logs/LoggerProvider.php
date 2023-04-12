@@ -46,13 +46,6 @@ class LoggerProvider implements LoggerProviderInterface
 
     public function forceFlush(CancellationInterface $cancellation = null): bool
     {
-        $result = true;
-        foreach ($this->loggerSharedState->getProcessors() as $processor) {
-            if (!$processor->forceFlush($cancellation)) {
-                $result = false;
-            }
-        }
-
-        return $result;
+        return $this->loggerSharedState->forceFlush($cancellation);
     }
 }
