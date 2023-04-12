@@ -166,6 +166,7 @@ interface KnownValues
     public const VALUE_DETECTORS_SDK = 'sdk';
     public const VALUE_DETECTORS_SDK_PROVIDED = 'sdk_provided';
     public const VALUE_DETECTORS_CONTAINER = 'container';
+    public const VALUE_DETECTORS_COMPOSER = 'composer';
     public const OTEL_PHP_DETECTORS = [
         self::VALUE_ALL,
         self::VALUE_DETECTORS_ENVIRONMENT,
@@ -176,6 +177,7 @@ interface KnownValues
         self::VALUE_DETECTORS_SDK,
         self::VALUE_DETECTORS_SDK_PROVIDED,
         self::VALUE_DETECTORS_CONTAINER,
+        self::VALUE_DETECTORS_COMPOSER,
         self::VALUE_NONE,
     ];
 }
