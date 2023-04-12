@@ -10,8 +10,10 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanConverter;
 use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
@@ -246,5 +248,43 @@ class ZipkinSpanConverterTest extends TestCase
         // This currently works, but OpenTelemetry\Trace\Span should stop arrays
         // containing multiple value types from being passed to the Exporter.
         $this->assertSame('true,1,2,3,false,string-1,3.1415', $tags['list-of-random']);
+    }
+
+    /**
+     * @dataProvider droppedProvider
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.20.0/specification/common/mapping-to-non-otlp.md#dropped-attributes-count
+     */
+    public function test_displays_non_zero_dropped_counts(int $dropped, bool $expected): void
+    {
+        $attributes = $this->createMock(AttributesInterface::class);
+        $attributes->method('getDroppedAttributesCount')->willReturn($dropped);
+        $spanData = $this->createMock(SpanDataInterface::class);
+        $spanData->method('getAttributes')->willReturn($attributes);
+        $spanData->method('getLinks')->willReturn([]);
+        $spanData->method('getEvents')->willReturn([]);
+        $spanData->method('getTotalDroppedEvents')->willReturn($dropped);
+        $spanData->method('getTotalDroppedLinks')->willReturn($dropped);
+
+        $converter = new SpanConverter();
+        $converted = $converter->convert([$spanData])[0];
+        $tags = $converted['tags'];
+
+        if ($expected) {
+            $this->assertArrayHasKey(SpanConverter::KEY_DROPPED_EVENTS_COUNT, $tags);
+            $this->assertArrayHasKey(SpanConverter::KEY_DROPPED_LINKS_COUNT, $tags);
+            $this->assertArrayHasKey(SpanConverter::KEY_DROPPED_ATTRIBUTES_COUNT, $tags);
+        } else {
+            $this->assertArrayNotHasKey(SpanConverter::KEY_DROPPED_EVENTS_COUNT, $tags);
+            $this->assertArrayNotHasKey(SpanConverter::KEY_DROPPED_LINKS_COUNT, $tags);
+            $this->assertArrayNotHasKey(SpanConverter::KEY_DROPPED_ATTRIBUTES_COUNT, $tags);
+        }
+    }
+
+    public static function droppedProvider(): array
+    {
+        return [
+            'no dropped' => [0, false],
+            'some dropped' => [1, true],
+        ];
     }
 }
