@@ -11,12 +11,12 @@ interface ResourceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.12.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.19.0';
 
     /**
      * Array of brand name and version separated by a space.
      *
-     * This value is intended to be taken from the UA client hints API (navigator.userAgentData.brands).
+     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.brands`).
      *
      * @example  Not A;Brand 99
      * @example Chromium 99
@@ -27,8 +27,8 @@ interface ResourceAttributes
     /**
      * The platform on which the browser is running.
      *
-     * This value is intended to be taken from the UA client hints API (navigator.userAgentData.platform). If unavailable, the legacy `navigator.platform` API SHOULD NOT be used instead and this attribute SHOULD be left unset in order for the values to be consistent.
-     * The list of possible values is defined in the W3C User-Agent Client Hints specification. Note that some (but not all) of these values can overlap with values in the os.type and os.name attributes. However, for consistency, the values in the `browser.platform` attribute should capture the exact value that the user agent provides.
+     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.platform`). If unavailable, the legacy `navigator.platform` API SHOULD NOT be used instead and this attribute SHOULD be left unset in order for the values to be consistent.
+     * The list of possible values is defined in the W3C User-Agent Client Hints specification. Note that some (but not all) of these values can overlap with values in the `os.type` and `os.name` attributes. However, for consistency, the values in the `browser.platform` attribute should capture the exact value that the user agent provides.
      *
      * @example Windows
      * @example macOS
@@ -37,13 +37,32 @@ interface ResourceAttributes
     public const BROWSER_PLATFORM = 'browser.platform';
 
     /**
+     * A boolean that is true if the browser is running on a mobile device.
+     *
+     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.mobile`). If unavailable, this attribute SHOULD be left unset.
+     */
+    public const BROWSER_MOBILE = 'browser.mobile';
+
+    /**
+     * Preferred language of the user using the browser.
+     *
+     * This value is intended to be taken from the Navigator API `navigator.language`.
+     *
+     * @example en
+     * @example en-US
+     * @example fr
+     * @example fr-FR
+     */
+    public const BROWSER_LANGUAGE = 'browser.language';
+
+    /**
      * Full user-agent string provided by the browser.
      *
      * The user-agent value SHOULD be provided only from browsers that do not have a mechanism to retrieve brands and platform individually from the User-Agent Client Hints API. To retrieve the value, the legacy `navigator.userAgent` API can be used.
      *
      * @example Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36
      */
-    public const BROWSER_USER_AGENT = 'browser.user_agent';
+    public const USER_AGENT_ORIGINAL = 'user_agent.original';
 
     /**
      * Name of the cloud provider.
@@ -67,6 +86,31 @@ interface ResourceAttributes
      * @example us-east-1
      */
     public const CLOUD_REGION = 'cloud.region';
+
+    /**
+     * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an ARN on AWS, a fully qualified resource ID on Azure, a full resource name on GCP).
+     *
+     * On some cloud providers, it may not be possible to determine the full ID at startup,
+     * so it may be necessary to set `cloud.resource_id` as a span attribute instead.The exact value to use for `cloud.resource_id` depends on the cloud provider.
+     * The following well-known definitions MUST be used if you set this attribute and they apply:<ul>
+     * <li><strong>AWS Lambda:</strong> The function ARN.
+     * Take care not to use the &quot;invoked ARN&quot; directly but replace any
+     * alias suffix
+     * with the resolved function version, as the same runtime instance may be invokable with
+     * multiple different aliases.</li>
+     * <li><strong>GCP:</strong> The URI of the resource</li>
+     * <li><strong>Azure:</strong> The Fully Qualified Resource ID of the invoked function,
+     * <em>not</em> the function app, having the form
+     * `/subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>`.
+     * This means that a span attribute MUST be used, as an Azure function app can host multiple functions that would usually share
+     * a TracerProvider.</li>
+     * </ul>
+     *
+     * @example arn:aws:lambda:REGION:ACCOUNT_ID:function:my-function
+     * @example //run.googleapis.com/projects/PROJECT_ID/locations/LOCATION_ID/services/SERVICE_ID
+     * @example /subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>
+     */
+    public const CLOUD_RESOURCE_ID = 'cloud.resource_id';
 
     /**
      * Cloud regions often have multiple, isolated locations known as zones to increase availability. Availability zone represents the zone where the resource is running.
@@ -168,6 +212,27 @@ interface ResourceAttributes
     public const AWS_LOG_STREAM_ARNS = 'aws.log.stream.arns';
 
     /**
+     * Time and date the release was created.
+     *
+     * @example 2022-10-23T18:00:42Z
+     */
+    public const HEROKU_RELEASE_CREATION_TIMESTAMP = 'heroku.release.creation_timestamp';
+
+    /**
+     * Commit hash for the current release.
+     *
+     * @example e6134959463efd8966b20e75b913cafe3f5ec
+     */
+    public const HEROKU_RELEASE_COMMIT = 'heroku.release.commit';
+
+    /**
+     * Unique identifier for the application.
+     *
+     * @example 2daa2797-e42b-4624-9322-ec3f968df4da
+     */
+    public const HEROKU_APP_ID = 'heroku.app.id';
+
+    /**
      * Container name used by container runtime.
      *
      * @example opentelemetry-autoconf
@@ -266,35 +331,13 @@ interface ResourceAttributes
      * can also be seen in the resource JSON for the function).
      * This means that a span attribute MUST be used, as an Azure function
      * app can host multiple functions that would usually share
-     * a TracerProvider (see also the `faas.id` attribute).</li>
+     * a TracerProvider (see also the `cloud.resource_id` attribute).</li>
      * </ul>
      *
      * @example my-function
      * @example myazurefunctionapp/some-function-name
      */
     public const FAAS_NAME = 'faas.name';
-
-    /**
-     * The unique ID of the single function that this runtime instance executes.
-     *
-     * On some cloud providers, it may not be possible to determine the full ID at startup,
-     * so consider setting `faas.id` as a span attribute instead.The exact value to use for `faas.id` depends on the cloud provider:<ul>
-     * <li><strong>AWS Lambda:</strong> The function ARN.
-     * Take care not to use the &quot;invoked ARN&quot; directly but replace any
-     * alias suffix
-     * with the resolved function version, as the same runtime instance may be invokable with
-     * multiple different aliases.</li>
-     * <li><strong>GCP:</strong> The URI of the resource</li>
-     * <li><strong>Azure:</strong> The Fully Qualified Resource ID of the invoked function,
-     * <em>not</em> the function app, having the form
-     * `/subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>`.
-     * This means that a span attribute MUST be used, as an Azure function app can host multiple functions that would usually share
-     * a TracerProvider.</li>
-     * </ul>
-     *
-     * @example arn:aws:lambda:us-west-2:123456789012:function:my-function
-     */
-    public const FAAS_ID = 'faas.id';
 
     /**
      * The immutable version of the function being executed.
@@ -326,18 +369,18 @@ interface ResourceAttributes
     public const FAAS_INSTANCE = 'faas.instance';
 
     /**
-     * The amount of memory available to the serverless function in MiB.
+     * The amount of memory available to the serverless function converted to Bytes.
      *
-     * It's recommended to set this attribute since e.g. too little memory can easily stop a Java AWS Lambda function from working correctly. On AWS Lambda, the environment variable `AWS_LAMBDA_FUNCTION_MEMORY_SIZE` provides this information.
+     * It's recommended to set this attribute since e.g. too little memory can easily stop a Java AWS Lambda function from working correctly. On AWS Lambda, the environment variable `AWS_LAMBDA_FUNCTION_MEMORY_SIZE` provides this information (which must be multiplied by 1,048,576).
      *
-     * @example 128
+     * @example 134217728
      */
     public const FAAS_MAX_MEMORY = 'faas.max_memory';
 
     /**
-     * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider.
+     * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider. For non-containerized systems, this should be the `machine-id`. See the table below for the sources to use to determine the `machine-id` based on operating system.
      *
-     * @example opentelemetry-test
+     * @example fdbf79e8af94cb7f9e8df36789187052
      */
     public const HOST_ID = 'host.id';
 
@@ -560,6 +603,13 @@ interface ResourceAttributes
     public const PROCESS_PID = 'process.pid';
 
     /**
+     * Parent Process identifier (PID).
+     *
+     * @example 111
+     */
+    public const PROCESS_PARENT_PID = 'process.parent_pid';
+
+    /**
      * The name of the process executable. On Linux based systems, can be set to the `Name` in `proc/[pid]/status`. On Windows, can be set to the base name of `GetProcessImageFileNameW`.
      *
      * @example otelcol
@@ -703,4 +753,32 @@ interface ResourceAttributes
      * @example WildFly Full 21.0.0.Final (WildFly Core 13.0.1.Final) - 2.2.2.Final
      */
     public const WEBENGINE_DESCRIPTION = 'webengine.description';
+
+    /**
+     * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
+     *
+     * @example io.opentelemetry.contrib.mongodb
+     */
+    public const OTEL_SCOPE_NAME = 'otel.scope.name';
+
+    /**
+     * The version of the instrumentation scope - (`InstrumentationScope.Version` in OTLP).
+     *
+     * @example 1.0.0
+     */
+    public const OTEL_SCOPE_VERSION = 'otel.scope.version';
+
+    /**
+     * Deprecated, use the `otel.scope.name` attribute.
+     *
+     * @example io.opentelemetry.contrib.mongodb
+     */
+    public const OTEL_LIBRARY_NAME = 'otel.library.name';
+
+    /**
+     * Deprecated, use the `otel.scope.version` attribute.
+     *
+     * @example 1.0.0
+     */
+    public const OTEL_LIBRARY_VERSION = 'otel.library.version';
 }

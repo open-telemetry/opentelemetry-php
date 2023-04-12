@@ -11,12 +11,176 @@ interface TraceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.12.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.19.0';
+
+    /**
+     * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of the exception should be preferred over the static type in languages that support it.
+     *
+     * @example java.net.ConnectException
+     * @example OSError
+     */
+    public const EXCEPTION_TYPE = 'exception.type';
+
+    /**
+     * The exception message.
+     *
+     * @example Division by zero
+     * @example Can't convert 'int' object to str implicitly
+     */
+    public const EXCEPTION_MESSAGE = 'exception.message';
+
+    /**
+     * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
+     *
+     * @example Exception in thread "main" java.lang.RuntimeException: Test exception\n at com.example.GenerateTrace.methodB(GenerateTrace.java:13)\n at com.example.GenerateTrace.methodA(GenerateTrace.java:9)\n at com.example.GenerateTrace.main(GenerateTrace.java:5)
+     */
+    public const EXCEPTION_STACKTRACE = 'exception.stacktrace';
+
+    /**
+     * HTTP request method.
+     *
+     * @example GET
+     * @example POST
+     * @example HEAD
+     */
+    public const HTTP_METHOD = 'http.method';
+
+    /**
+     * HTTP response status code.
+     *
+     * @example 200
+     */
+    public const HTTP_STATUS_CODE = 'http.status_code';
+
+    /**
+     * Kind of HTTP protocol used.
+     */
+    public const HTTP_FLAVOR = 'http.flavor';
+
+    /**
+     * Host identifier of the &quot;URI origin&quot; HTTP request is sent to.
+     *
+     * Determined by using the first of the following that applies<ul>
+     * <li>Host identifier of the request target
+     * if it's sent in absolute-form</li>
+     * <li>Host identifier of the `Host` header</li>
+     * </ul>
+     * SHOULD NOT be set if capturing it would require an extra DNS lookup.
+     *
+     * @example example.com
+     */
+    public const NET_PEER_NAME = 'net.peer.name';
+
+    /**
+     * Port identifier of the &quot;URI origin&quot; HTTP request is sent to.
+     *
+     * When request target is absolute URI, `net.peer.name` MUST match URI port identifier, otherwise it MUST match `Host` header port identifier.
+     *
+     * @example 80
+     * @example 8080
+     * @example 443
+     */
+    public const NET_PEER_PORT = 'net.peer.port';
+
+    /**
+     * The URI scheme identifying the used protocol.
+     *
+     * @example http
+     * @example https
+     */
+    public const HTTP_SCHEME = 'http.scheme';
+
+    /**
+     * The matched route (path template in the format used by the respective server framework). See note below.
+     *
+     * MUST NOT be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
+     * SHOULD include the application root if there is one.
+     *
+     * @example /users/:userID?
+     * @example {controller}/{action}/{id?}
+     */
+    public const HTTP_ROUTE = 'http.route';
+
+    /**
+     * Name of the local HTTP server that received the request.
+     *
+     * Determined by using the first of the following that applies<ul>
+     * <li>The primary server name of the matched virtual host. MUST only
+     * include host identifier.</li>
+     * <li>Host identifier of the request target
+     * if it's sent in absolute-form.</li>
+     * <li>Host identifier of the `Host` header</li>
+     * </ul>
+     * SHOULD NOT be set if only IP address is available and capturing name would require a reverse DNS lookup.
+     *
+     * @example localhost
+     */
+    public const NET_HOST_NAME = 'net.host.name';
+
+    /**
+     * Port of the local HTTP server that received the request.
+     *
+     * Determined by using the first of the following that applies<ul>
+     * <li>Port identifier of the primary server host of the matched virtual host.</li>
+     * <li>Port identifier of the request target
+     * if it's sent in absolute-form.</li>
+     * <li>Port identifier of the `Host` header</li>
+     * </ul>
+     *
+     * @example 8080
+     */
+    public const NET_HOST_PORT = 'net.host.port';
+
+    /**
+     * The name identifies the event.
+     *
+     * @example click
+     * @example exception
+     */
+    public const EVENT_NAME = 'event.name';
+
+    /**
+     * The domain identifies the business context for the events.
+     *
+     * Events across different domains may have same `event.name`, yet be
+     * unrelated events.
+     */
+    public const EVENT_DOMAIN = 'event.domain';
+
+    /**
+     * The unique identifier of the feature flag.
+     *
+     * @example logo-color
+     */
+    public const FEATURE_FLAG_KEY = 'feature_flag.key';
+
+    /**
+     * The name of the service provider that performs the flag evaluation.
+     *
+     * @example Flag Manager
+     */
+    public const FEATURE_FLAG_PROVIDER_NAME = 'feature_flag.provider_name';
+
+    /**
+     * SHOULD be a semantic identifier for a value. If one is unavailable, a stringified version of the value can be used.
+     *
+     * A semantic identifier, commonly referred to as a variant, provides a means
+     * for referring to a value without including the value itself. This can
+     * provide additional context for understanding the meaning behind a value.
+     * For example, the variant `red` maybe be used for the value `#c05543`.A stringified version of the value can be used in situations where a
+     * semantic identifier is unavailable. String representation of the value
+     * should be determined by the implementer.
+     *
+     * @example red
+     * @example true
+     * @example on
+     */
+    public const FEATURE_FLAG_VARIANT = 'feature_flag.variant';
 
     /**
      * The full invoked ARN as provided on the `Context` passed to the function (`Lambda-Runtime-Invoked-Function-Arn` header on the `/runtime/invocation/next` applicable).
      *
-     * This may be different from `faas.id` if an alias is involved.
+     * This may be different from `cloud.resource_id` if an alias is involved.
      *
      * @example arn:aws:lambda:us-east-1:123456:function:myfunction:myalias
      */
@@ -128,29 +292,34 @@ interface TraceAttributes
     public const DB_OPERATION = 'db.operation';
 
     /**
-     * Remote hostname or similar, see note below.
-     *
-     * `net.peer.name` SHOULD NOT be set if capturing it would require an extra DNS lookup.
-     *
-     * @example example.com
-     */
-    public const NET_PEER_NAME = 'net.peer.name';
-
-    /**
-     * Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6).
+     * Remote socket peer address: IPv4 or IPv6 for internet protocols, path for local communication, etc.
      *
      * @example 127.0.0.1
+     * @example /tmp/mysql.sock
      */
-    public const NET_PEER_IP = 'net.peer.ip';
+    public const NET_SOCK_PEER_ADDR = 'net.sock.peer.addr';
 
     /**
-     * Remote port number.
+     * Remote socket peer port.
      *
-     * @example 80
-     * @example 8080
-     * @example 443
+     * @example 16456
      */
-    public const NET_PEER_PORT = 'net.peer.port';
+    public const NET_SOCK_PEER_PORT = 'net.sock.peer.port';
+
+    /**
+     * Protocol address family which is used for communication.
+     *
+     * @example inet6
+     * @example bluetooth
+     */
+    public const NET_SOCK_FAMILY = 'net.sock.family';
+
+    /**
+     * Remote socket peer name.
+     *
+     * @example proxy.example.com
+     */
+    public const NET_SOCK_PEER_NAME = 'net.sock.peer.name';
 
     /**
      * Transport protocol used. See note below.
@@ -240,48 +409,19 @@ interface TraceAttributes
     public const DB_SQL_TABLE = 'db.sql.table';
 
     /**
-     * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of the exception should be preferred over the static type in languages that support it.
-     *
-     * @example java.net.ConnectException
-     * @example OSError
+     * Name of the code, either &quot;OK&quot; or &quot;ERROR&quot;. MUST NOT be set if the status code is UNSET.
      */
-    public const EXCEPTION_TYPE = 'exception.type';
+    public const OTEL_STATUS_CODE = 'otel.status_code';
 
     /**
-     * The exception message.
+     * Description of the Status if it has a value, otherwise not set.
      *
-     * @example Division by zero
-     * @example Can't convert 'int' object to str implicitly
+     * @example resource not found
      */
-    public const EXCEPTION_MESSAGE = 'exception.message';
+    public const OTEL_STATUS_DESCRIPTION = 'otel.status_description';
 
     /**
-     * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
-     *
-     * @example Exception in thread "main" java.lang.RuntimeException: Test exception\n at com.example.GenerateTrace.methodB(GenerateTrace.java:13)\n at com.example.GenerateTrace.methodA(GenerateTrace.java:9)\n at com.example.GenerateTrace.main(GenerateTrace.java:5)
-     */
-    public const EXCEPTION_STACKTRACE = 'exception.stacktrace';
-
-    /**
-     * SHOULD be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
-     *
-     * An exception is considered to have escaped (or left) the scope of a span,
-     * if that span is ended while the exception is still logically &quot;in flight&quot;.
-     * This may be actually &quot;in flight&quot; in some languages (e.g. if the exception
-     * is passed to a Context manager's `__exit__` method in Python) but will
-     * usually be caught at the point of recording the exception in most languages.It is usually not possible to determine at the point where an exception is thrown
-     * whether it will escape the scope of a span.
-     * However, it is trivial to know that an exception
-     * will escape, if one checks for an active exception just before ending the span,
-     * as done in the example above.It follows that an exception may still escape the scope of the span
-     * even if the `exception.escaped` attribute was not set or set to false,
-     * since the event might have been recorded at a time where it was not
-     * clear whether the exception will escape.
-     */
-    public const EXCEPTION_ESCAPED = 'exception.escaped';
-
-    /**
-     * Type of the trigger which caused this function execution.
+     * Type of the trigger which caused this function invocation.
      *
      * For the server/consumer span on the incoming side,
      * `faas.trigger` MUST be set.Clients invoking FaaS instances usually cannot set `faas.trigger`,
@@ -294,11 +434,36 @@ interface TraceAttributes
     public const FAAS_TRIGGER = 'faas.trigger';
 
     /**
-     * The execution ID of the current function execution.
+     * The invocation ID of the current function invocation.
      *
      * @example af9d5aa4-a685-4c5f-a22b-444f80b3cc28
      */
-    public const FAAS_EXECUTION = 'faas.execution';
+    public const FAAS_INVOCATION_ID = 'faas.invocation_id';
+
+    /**
+     * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an ARN on AWS, a fully qualified resource ID on Azure, a full resource name on GCP).
+     *
+     * On some cloud providers, it may not be possible to determine the full ID at startup,
+     * so it may be necessary to set `cloud.resource_id` as a span attribute instead.The exact value to use for `cloud.resource_id` depends on the cloud provider.
+     * The following well-known definitions MUST be used if you set this attribute and they apply:<ul>
+     * <li><strong>AWS Lambda:</strong> The function ARN.
+     * Take care not to use the &quot;invoked ARN&quot; directly but replace any
+     * alias suffix
+     * with the resolved function version, as the same runtime instance may be invokable with
+     * multiple different aliases.</li>
+     * <li><strong>GCP:</strong> The URI of the resource</li>
+     * <li><strong>Azure:</strong> The Fully Qualified Resource ID of the invoked function,
+     * <em>not</em> the function app, having the form
+     * `/subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>`.
+     * This means that a span attribute MUST be used, as an Azure function app can host multiple functions that would usually share
+     * a TracerProvider.</li>
+     * </ul>
+     *
+     * @example arn:aws:lambda:REGION:ACCOUNT_ID:function:my-function
+     * @example //run.googleapis.com/projects/PROJECT_ID/locations/LOCATION_ID/services/SERVICE_ID
+     * @example /subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>
+     */
+    public const CLOUD_RESOURCE_ID = 'cloud.resource_id';
 
     /**
      * The name of the source on which the triggering operation was performed. For example, in Cloud Storage or S3 corresponds to the bucket name, and in Cosmos DB to the database name.
@@ -329,129 +494,22 @@ interface TraceAttributes
     public const FAAS_DOCUMENT_NAME = 'faas.document.name';
 
     /**
-     * HTTP request method.
-     *
-     * @example GET
-     * @example POST
-     * @example HEAD
-     */
-    public const HTTP_METHOD = 'http.method';
-
-    /**
-     * Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`. Usually the fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
-     *
-     * `http.url` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case the attribute's value should be `https://www.example.com/`.
-     *
-     * @example https://www.foo.bar/search?q=OpenTelemetry#SemConv
-     */
-    public const HTTP_URL = 'http.url';
-
-    /**
      * The full request target as passed in a HTTP request line or equivalent.
      *
-     * @example /path/12314/?q=ddds#123
+     * @example /path/12314/?q=ddds
      */
     public const HTTP_TARGET = 'http.target';
 
     /**
-     * The value of the HTTP host header. An empty Host header should also be reported, see note.
-     *
-     * When the header is present but empty the attribute SHOULD be set to the empty string. Note that this is a valid situation that is expected in certain cases, according the aforementioned section of RFC 7230. When the header is not set the attribute MUST NOT be set.
-     *
-     * @example www.example.org
-     */
-    public const HTTP_HOST = 'http.host';
-
-    /**
-     * The URI scheme identifying the used protocol.
-     *
-     * @example http
-     * @example https
-     */
-    public const HTTP_SCHEME = 'http.scheme';
-
-    /**
-     * HTTP response status code.
-     *
-     * @example 200
-     */
-    public const HTTP_STATUS_CODE = 'http.status_code';
-
-    /**
-     * Kind of HTTP protocol used.
-     *
-     * If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
-     */
-    public const HTTP_FLAVOR = 'http.flavor';
-
-    /**
-     * Value of the HTTP User-Agent header sent by the client.
-     *
-     * @example CERN-LineMode/2.15 libwww/2.17b3
-     */
-    public const HTTP_USER_AGENT = 'http.user_agent';
-
-    /**
-     * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the Content-Length header. For requests using transport encoding, this should be the compressed size.
-     *
-     * @example 3495
-     */
-    public const HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length';
-
-    /**
-     * The size of the uncompressed request payload body after transport decoding. Not set if transport encoding not used.
-     *
-     * @example 5493
-     */
-    public const HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED = 'http.request_content_length_uncompressed';
-
-    /**
-     * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the Content-Length header. For requests using transport encoding, this should be the compressed size.
-     *
-     * @example 3495
-     */
-    public const HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length';
-
-    /**
-     * The size of the uncompressed response payload body after transport decoding. Not set if transport encoding not used.
-     *
-     * @example 5493
-     */
-    public const HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED = 'http.response_content_length_uncompressed';
-
-    /**
-     * The ordinal number of request re-sending attempt.
-     *
-     * @example 3
-     */
-    public const HTTP_RETRY_COUNT = 'http.retry_count';
-
-    /**
-     * The primary server name of the matched virtual host. This should be obtained via configuration. If no such configuration can be obtained, this attribute MUST NOT be set ( `net.host.name` should be used instead).
-     *
-     * `http.url` is usually not readily available on the server side but would have to be assembled in a cumbersome and sometimes lossy process from other information (see e.g. open-telemetry/opentelemetry-python/pull/148). It is thus preferred to supply the raw data that is available.
-     *
-     * @example example.com
-     */
-    public const HTTP_SERVER_NAME = 'http.server_name';
-
-    /**
-     * The matched route (path template).
-     *
-     * @example /users/:userID?
-     */
-    public const HTTP_ROUTE = 'http.route';
-
-    /**
      * The IP address of the original client behind all proxies, if known (e.g. from X-Forwarded-For).
      *
-     * This is not necessarily the same as `net.peer.ip`, which would
+     * This is not necessarily the same as `net.sock.peer.addr`, which would
      * identify the network-level peer, which may be a proxy.This attribute should be set when a source of information different
-     * from the one used for `net.peer.ip`, is available even if that other
-     * source just confirms the same value as `net.peer.ip`.
-     * Rationale: For `net.peer.ip`, one typically does not know if it
+     * from the one used for `net.sock.peer.addr`, is available even if that other
+     * source just confirms the same value as `net.sock.peer.addr`.
+     * Rationale: For `net.sock.peer.addr`, one typically does not know if it
      * comes from a proxy, reverse proxy, or the actual client. Setting
-     * `http.client_ip` when it's the same as `net.peer.ip` means that
+     * `http.client_ip` when it's the same as `net.sock.peer.addr` means that
      * one is at least somewhat confident that the address is not that of
      * the closest proxy.
      *
@@ -460,25 +518,91 @@ interface TraceAttributes
     public const HTTP_CLIENT_IP = 'http.client_ip';
 
     /**
-     * Like `net.peer.ip` but for the host IP. Useful in case of a multi-IP host.
+     * Local socket address. Useful in case of a multi-IP host.
      *
      * @example 192.168.0.1
      */
-    public const NET_HOST_IP = 'net.host.ip';
+    public const NET_SOCK_HOST_ADDR = 'net.sock.host.addr';
 
     /**
-     * Like `net.peer.port` but for the host port.
+     * Local socket port number.
      *
      * @example 35555
      */
-    public const NET_HOST_PORT = 'net.host.port';
+    public const NET_SOCK_HOST_PORT = 'net.sock.host.port';
 
     /**
-     * Local hostname or similar, see note below.
+     * A string identifying the messaging system.
      *
-     * @example localhost
+     * @example kafka
+     * @example rabbitmq
+     * @example rocketmq
+     * @example activemq
+     * @example AmazonSQS
      */
-    public const NET_HOST_NAME = 'net.host.name';
+    public const MESSAGING_SYSTEM = 'messaging.system';
+
+    /**
+     * A string identifying the kind of messaging operation as defined in the Operation names section above.
+     *
+     * If a custom value is used, it MUST be of low cardinality.
+     */
+    public const MESSAGING_OPERATION = 'messaging.operation';
+
+    /**
+     * The number of messages sent, received, or processed in the scope of the batching operation.
+     *
+     * Instrumentations SHOULD NOT set `messaging.batch.message_count` on spans that operate with a single message. When a messaging client library supports both batch and single-message API for the same operation, instrumentations SHOULD use `messaging.batch.message_count` for batching APIs and SHOULD NOT use it for single-message APIs.
+     *
+     * @example 1
+     * @example 2
+     */
+    public const MESSAGING_BATCH_MESSAGE_COUNT = 'messaging.batch.message_count';
+
+    /**
+     * A value used by the messaging system as an identifier for the message, represented as a string.
+     *
+     * @example 452a7c7c7c7048c2f887f61572b18fc2
+     */
+    public const MESSAGING_MESSAGE_ID = 'messaging.message.id';
+
+    /**
+     * The conversation ID identifying the conversation to which the message belongs, represented as a string. Sometimes called &quot;Correlation ID&quot;.
+     *
+     * @example MyConversationId
+     */
+    public const MESSAGING_MESSAGE_CONVERSATION_ID = 'messaging.message.conversation_id';
+
+    /**
+     * The (uncompressed) size of the message payload in bytes. Also use this attribute if it is unknown whether the compressed or uncompressed payload size is reported.
+     *
+     * @example 2738
+     */
+    public const MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES = 'messaging.message.payload_size_bytes';
+
+    /**
+     * The compressed size of the message payload in bytes.
+     *
+     * @example 2048
+     */
+    public const MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES = 'messaging.message.payload_compressed_size_bytes';
+
+    /**
+     * Application layer protocol used. The value SHOULD be normalized to lowercase.
+     *
+     * @example amqp
+     * @example mqtt
+     */
+    public const NET_APP_PROTOCOL_NAME = 'net.app.protocol.name';
+
+    /**
+     * Version of the application layer protocol used. See note below.
+     *
+     * `net.app.protocol.version` refers to the version of the protocol used and might be different from the protocol client's version. If the HTTP client used has a version of `0.27.2`, but sends HTTP version `1.1`, this attribute should be set to `1.1`.
+     *
+     * @example 3.1.1
+     */
+    public const NET_APP_PROTOCOL_VERSION = 'net.app.protocol.version';
 
     /**
      * The internet connection type currently being used by the host.
@@ -521,86 +645,6 @@ interface TraceAttributes
      * @example DE
      */
     public const NET_HOST_CARRIER_ICC = 'net.host.carrier.icc';
-
-    /**
-     * A string identifying the messaging system.
-     *
-     * @example kafka
-     * @example rabbitmq
-     * @example rocketmq
-     * @example activemq
-     * @example AmazonSQS
-     */
-    public const MESSAGING_SYSTEM = 'messaging.system';
-
-    /**
-     * The message destination name. This might be equal to the span name but is required nevertheless.
-     *
-     * @example MyQueue
-     * @example MyTopic
-     */
-    public const MESSAGING_DESTINATION = 'messaging.destination';
-
-    /**
-     * The kind of message destination.
-     */
-    public const MESSAGING_DESTINATION_KIND = 'messaging.destination_kind';
-
-    /**
-     * A boolean that is true if the message destination is temporary.
-     */
-    public const MESSAGING_TEMP_DESTINATION = 'messaging.temp_destination';
-
-    /**
-     * The name of the transport protocol.
-     *
-     * @example AMQP
-     * @example MQTT
-     */
-    public const MESSAGING_PROTOCOL = 'messaging.protocol';
-
-    /**
-     * The version of the transport protocol.
-     *
-     * @example 0.9.1
-     */
-    public const MESSAGING_PROTOCOL_VERSION = 'messaging.protocol_version';
-
-    /**
-     * Connection string.
-     *
-     * @example tibjmsnaming://localhost:7222
-     * @example https://queue.amazonaws.com/80398EXAMPLE/MyQueue
-     */
-    public const MESSAGING_URL = 'messaging.url';
-
-    /**
-     * A value used by the messaging system as an identifier for the message, represented as a string.
-     *
-     * @example 452a7c7c7c7048c2f887f61572b18fc2
-     */
-    public const MESSAGING_MESSAGE_ID = 'messaging.message_id';
-
-    /**
-     * The conversation ID identifying the conversation to which the message belongs, represented as a string. Sometimes called &quot;Correlation ID&quot;.
-     *
-     * @example MyConversationId
-     */
-    public const MESSAGING_CONVERSATION_ID = 'messaging.conversation_id';
-
-    /**
-     * The (uncompressed) size of the message payload in bytes. Also use this attribute if it is unknown whether the compressed or uncompressed payload size is reported.
-     *
-     * @example 2738
-     */
-    public const MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES = 'messaging.message_payload_size_bytes';
-
-    /**
-     * The compressed size of the message payload in bytes.
-     *
-     * @example 2048
-     */
-    public const MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES = 'messaging.message_payload_compressed_size_bytes';
 
     /**
      * A string containing the function invocation time in the ISO 8601 format expressed in UTC.
@@ -715,6 +759,52 @@ interface TraceAttributes
      * @example 42
      */
     public const CODE_LINENO = 'code.lineno';
+
+    /**
+     * The column number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
+     *
+     * @example 16
+     */
+    public const CODE_COLUMN = 'code.column';
+
+    /**
+     * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the Content-Length header. For requests using transport encoding, this should be the compressed size.
+     *
+     * @example 3495
+     */
+    public const HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length';
+
+    /**
+     * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the Content-Length header. For requests using transport encoding, this should be the compressed size.
+     *
+     * @example 3495
+     */
+    public const HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length';
+
+    /**
+     * Value of the HTTP User-Agent header sent by the client.
+     *
+     * @example CERN-LineMode/2.15 libwww/2.17b3
+     */
+    public const USER_AGENT_ORIGINAL = 'user_agent.original';
+
+    /**
+     * Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`. Usually the fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
+     *
+     * `http.url` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case the attribute's value should be `https://www.example.com/`.
+     *
+     * @example https://www.foo.bar/search?q=OpenTelemetry#SemConv
+     */
+    public const HTTP_URL = 'http.url';
+
+    /**
+     * The ordinal number of request resending attempt (for any reason, including redirects).
+     *
+     * The resend count SHOULD be updated each time an HTTP request gets resent by the client, regardless of what was the cause of the resending (e.g. redirection, authorization failure, 503 Server Unavailable, network issues, or any other).
+     *
+     * @example 3
+     */
+    public const HTTP_RESEND_COUNT = 'http.resend_count';
 
     /**
      * The value `aws-api`.
@@ -902,39 +992,129 @@ interface TraceAttributes
     public const AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES = 'aws.dynamodb.global_secondary_index_updates';
 
     /**
-     * A string identifying the kind of message consumption as defined in the Operation names section above. If the operation is &quot;send&quot;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
+     * The name of the operation being executed.
+     *
+     * @example findBookById
      */
-    public const MESSAGING_OPERATION = 'messaging.operation';
+    public const GRAPHQL_OPERATION_NAME = 'graphql.operation.name';
 
     /**
-     * The identifier for the consumer receiving a message. For Kafka, set it to `{messaging.kafka.consumer_group} - {messaging.kafka.client_id}`, if both are present, or only `messaging.kafka.consumer_group`. For brokers, such as RabbitMQ and Artemis, set it to the `client_id` of the client consuming the message.
+     * The type of the operation being executed.
+     *
+     * @example query
+     * @example mutation
+     * @example subscription
+     */
+    public const GRAPHQL_OPERATION_TYPE = 'graphql.operation.type';
+
+    /**
+     * The GraphQL document being executed.
+     *
+     * The value may be sanitized to exclude sensitive information.
+     *
+     * @example query findBookById { bookById(id: ?) { name } }
+     */
+    public const GRAPHQL_DOCUMENT = 'graphql.document';
+
+    /**
+     * The message destination name.
+     *
+     * Destination name SHOULD uniquely identify a specific queue, topic or other entity within the broker. If
+     * the broker does not have such notion, the destination name SHOULD uniquely identify the broker.
+     *
+     * @example MyQueue
+     * @example MyTopic
+     */
+    public const MESSAGING_DESTINATION_NAME = 'messaging.destination.name';
+
+    /**
+     * The message source name.
+     *
+     * Source name SHOULD uniquely identify a specific queue, topic, or other entity within the broker. If
+     * the broker does not have such notion, the source name SHOULD uniquely identify the broker.
+     *
+     * @example MyQueue
+     * @example MyTopic
+     */
+    public const MESSAGING_SOURCE_NAME = 'messaging.source.name';
+
+    /**
+     * The kind of message destination.
+     */
+    public const MESSAGING_DESTINATION_KIND = 'messaging.destination.kind';
+
+    /**
+     * Low cardinality representation of the messaging destination name.
+     *
+     * Destination names could be constructed from templates. An example would be a destination name involving a user name or product id. Although the destination name in this case is of high cardinality, the underlying template is of low cardinality and can be effectively used for grouping and aggregation.
+     *
+     * @example /customers/{customerId}
+     */
+    public const MESSAGING_DESTINATION_TEMPLATE = 'messaging.destination.template';
+
+    /**
+     * A boolean that is true if the message destination is temporary and might not exist anymore after messages are processed.
+     */
+    public const MESSAGING_DESTINATION_TEMPORARY = 'messaging.destination.temporary';
+
+    /**
+     * A boolean that is true if the message destination is anonymous (could be unnamed or have auto-generated name).
+     */
+    public const MESSAGING_DESTINATION_ANONYMOUS = 'messaging.destination.anonymous';
+
+    /**
+     * The kind of message source.
+     */
+    public const MESSAGING_SOURCE_KIND = 'messaging.source.kind';
+
+    /**
+     * Low cardinality representation of the messaging source name.
+     *
+     * Source names could be constructed from templates. An example would be a source name involving a user name or product id. Although the source name in this case is of high cardinality, the underlying template is of low cardinality and can be effectively used for grouping and aggregation.
+     *
+     * @example /customers/{customerId}
+     */
+    public const MESSAGING_SOURCE_TEMPLATE = 'messaging.source.template';
+
+    /**
+     * A boolean that is true if the message source is temporary and might not exist anymore after messages are processed.
+     */
+    public const MESSAGING_SOURCE_TEMPORARY = 'messaging.source.temporary';
+
+    /**
+     * A boolean that is true if the message source is anonymous (could be unnamed or have auto-generated name).
+     */
+    public const MESSAGING_SOURCE_ANONYMOUS = 'messaging.source.anonymous';
+
+    /**
+     * The identifier for the consumer receiving a message. For Kafka, set it to `{messaging.kafka.consumer.group} - {messaging.kafka.client_id}`, if both are present, or only `messaging.kafka.consumer.group`. For brokers, such as RabbitMQ and Artemis, set it to the `client_id` of the client consuming the message.
      *
      * @example mygroup - client-6
      */
-    public const MESSAGING_CONSUMER_ID = 'messaging.consumer_id';
+    public const MESSAGING_CONSUMER_ID = 'messaging.consumer.id';
 
     /**
      * RabbitMQ message routing key.
      *
      * @example myKey
      */
-    public const MESSAGING_RABBITMQ_ROUTING_KEY = 'messaging.rabbitmq.routing_key';
+    public const MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY = 'messaging.rabbitmq.destination.routing_key';
 
     /**
-     * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the same partition. They differ from `messaging.message_id` in that they're not unique. If the key is `null`, the attribute MUST NOT be set.
+     * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the same partition. They differ from `messaging.message.id` in that they're not unique. If the key is `null`, the attribute MUST NOT be set.
      *
      * If the key type is not string, it's string representation has to be supplied for the attribute. If the key has no unambiguous, canonical string form, don't include its value.
      *
      * @example myKey
      */
-    public const MESSAGING_KAFKA_MESSAGE_KEY = 'messaging.kafka.message_key';
+    public const MESSAGING_KAFKA_MESSAGE_KEY = 'messaging.kafka.message.key';
 
     /**
      * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not producers.
      *
      * @example my-group
      */
-    public const MESSAGING_KAFKA_CONSUMER_GROUP = 'messaging.kafka.consumer_group';
+    public const MESSAGING_KAFKA_CONSUMER_GROUP = 'messaging.kafka.consumer.group';
 
     /**
      * Client Id for the Consumer or Producer that is handling the message.
@@ -948,12 +1128,26 @@ interface TraceAttributes
      *
      * @example 2
      */
-    public const MESSAGING_KAFKA_PARTITION = 'messaging.kafka.partition';
+    public const MESSAGING_KAFKA_DESTINATION_PARTITION = 'messaging.kafka.destination.partition';
+
+    /**
+     * Partition the message is received from.
+     *
+     * @example 2
+     */
+    public const MESSAGING_KAFKA_SOURCE_PARTITION = 'messaging.kafka.source.partition';
+
+    /**
+     * The offset of a record in the corresponding Kafka partition.
+     *
+     * @example 42
+     */
+    public const MESSAGING_KAFKA_MESSAGE_OFFSET = 'messaging.kafka.message.offset';
 
     /**
      * A boolean that is true if the message is a tombstone.
      */
-    public const MESSAGING_KAFKA_TOMBSTONE = 'messaging.kafka.tombstone';
+    public const MESSAGING_KAFKA_MESSAGE_TOMBSTONE = 'messaging.kafka.message.tombstone';
 
     /**
      * Namespace of RocketMQ resources, resources in different namespaces are individual.
@@ -977,16 +1171,37 @@ interface TraceAttributes
     public const MESSAGING_ROCKETMQ_CLIENT_ID = 'messaging.rocketmq.client_id';
 
     /**
+     * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
+     *
+     * @example 1665987217045
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP = 'messaging.rocketmq.message.delivery_timestamp';
+
+    /**
+     * The delay time level for delay message, which determines the message delay time.
+     *
+     * @example 3
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL = 'messaging.rocketmq.message.delay_time_level';
+
+    /**
+     * It is essential for FIFO message. Messages that belong to the same message group are always processed one by one within the same consumer group.
+     *
+     * @example myMessageGroup
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_GROUP = 'messaging.rocketmq.message.group';
+
+    /**
      * Type of message.
      */
-    public const MESSAGING_ROCKETMQ_MESSAGE_TYPE = 'messaging.rocketmq.message_type';
+    public const MESSAGING_ROCKETMQ_MESSAGE_TYPE = 'messaging.rocketmq.message.type';
 
     /**
      * The secondary classifier of message besides topic.
      *
      * @example tagA
      */
-    public const MESSAGING_ROCKETMQ_MESSAGE_TAG = 'messaging.rocketmq.message_tag';
+    public const MESSAGING_ROCKETMQ_MESSAGE_TAG = 'messaging.rocketmq.message.tag';
 
     /**
      * Key(s) of message, another way to mark message besides message id.
@@ -994,7 +1209,7 @@ interface TraceAttributes
      * @example keyA
      * @example keyB
      */
-    public const MESSAGING_ROCKETMQ_MESSAGE_KEYS = 'messaging.rocketmq.message_keys';
+    public const MESSAGING_ROCKETMQ_MESSAGE_KEYS = 'messaging.rocketmq.message.keys';
 
     /**
      * Model of message consumption. This only applies to consumer spans.
@@ -1059,4 +1274,27 @@ interface TraceAttributes
      * Uncompressed size of the message in bytes.
      */
     public const MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
+
+    /**
+     * The error codes of the Connect request. Error codes are always string values.
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE = 'rpc.connect_rpc.error_code';
+
+    /**
+     * SHOULD be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
+     *
+     * An exception is considered to have escaped (or left) the scope of a span,
+     * if that span is ended while the exception is still logically &quot;in flight&quot;.
+     * This may be actually &quot;in flight&quot; in some languages (e.g. if the exception
+     * is passed to a Context manager's `__exit__` method in Python) but will
+     * usually be caught at the point of recording the exception in most languages.It is usually not possible to determine at the point where an exception is thrown
+     * whether it will escape the scope of a span.
+     * However, it is trivial to know that an exception
+     * will escape, if one checks for an active exception just before ending the span,
+     * as done in the example above.It follows that an exception may still escape the scope of the span
+     * even if the `exception.escaped` attribute was not set or set to false,
+     * since the event might have been recorded at a time where it was not
+     * clear whether the exception will escape.
+     */
+    public const EXCEPTION_ESCAPED = 'exception.escaped';
 }

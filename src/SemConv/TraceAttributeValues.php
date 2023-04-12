@@ -11,7 +11,52 @@ interface TraceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.12.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.19.0';
+    /**
+     * @see TraceAttributes::HTTP_FLAVOR HTTP/1.0
+     */
+    public const HTTP_FLAVOR_HTTP_1_0 = '1.0';
+
+    /**
+     * @see TraceAttributes::HTTP_FLAVOR HTTP/1.1
+     */
+    public const HTTP_FLAVOR_HTTP_1_1 = '1.1';
+
+    /**
+     * @see TraceAttributes::HTTP_FLAVOR HTTP/2
+     */
+    public const HTTP_FLAVOR_HTTP_2_0 = '2.0';
+
+    /**
+     * @see TraceAttributes::HTTP_FLAVOR HTTP/3
+     */
+    public const HTTP_FLAVOR_HTTP_3_0 = '3.0';
+
+    /**
+     * @see TraceAttributes::HTTP_FLAVOR SPDY protocol
+     */
+    public const HTTP_FLAVOR_SPDY = 'SPDY';
+
+    /**
+     * @see TraceAttributes::HTTP_FLAVOR QUIC protocol
+     */
+    public const HTTP_FLAVOR_QUIC = 'QUIC';
+
+    /**
+     * @see TraceAttributes::EVENT_DOMAIN Events from browser apps
+     */
+    public const EVENT_DOMAIN_BROWSER = 'browser';
+
+    /**
+     * @see TraceAttributes::EVENT_DOMAIN Events from mobile apps
+     */
+    public const EVENT_DOMAIN_DEVICE = 'device';
+
+    /**
+     * @see TraceAttributes::EVENT_DOMAIN Events from Kubernetes
+     */
+    public const EVENT_DOMAIN_K8S = 'k8s';
+
     /**
      * @see TraceAttributes::OPENTRACING_REF_TYPE The parent Span depends on the child Span in some capacity
      */
@@ -31,6 +76,11 @@ interface TraceAttributeValues
      * @see TraceAttributes::DB_SYSTEM Microsoft SQL Server
      */
     public const DB_SYSTEM_MSSQL = 'mssql';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Microsoft SQL Server Compact
+     */
+    public const DB_SYSTEM_MSSQLCOMPACT = 'mssqlcompact';
 
     /**
      * @see TraceAttributes::DB_SYSTEM MySQL
@@ -258,6 +308,36 @@ interface TraceAttributeValues
     public const DB_SYSTEM_COCKROACHDB = 'cockroachdb';
 
     /**
+     * @see TraceAttributes::DB_SYSTEM OpenSearch
+     */
+    public const DB_SYSTEM_OPENSEARCH = 'opensearch';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM ClickHouse
+     */
+    public const DB_SYSTEM_CLICKHOUSE = 'clickhouse';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Cloud Spanner
+     */
+    public const DB_SYSTEM_SPANNER = 'spanner';
+
+    /**
+     * @see TraceAttributes::NET_SOCK_FAMILY IPv4 address
+     */
+    public const NET_SOCK_FAMILY_INET = 'inet';
+
+    /**
+     * @see TraceAttributes::NET_SOCK_FAMILY IPv6 address
+     */
+    public const NET_SOCK_FAMILY_INET6 = 'inet6';
+
+    /**
+     * @see TraceAttributes::NET_SOCK_FAMILY Unix domain socket path
+     */
+    public const NET_SOCK_FAMILY_UNIX = 'unix';
+
+    /**
      * @see TraceAttributes::NET_TRANSPORT ip_tcp
      */
     public const NET_TRANSPORT_IP_TCP = 'ip_tcp';
@@ -266,16 +346,6 @@ interface TraceAttributeValues
      * @see TraceAttributes::NET_TRANSPORT ip_udp
      */
     public const NET_TRANSPORT_IP_UDP = 'ip_udp';
-
-    /**
-     * @see TraceAttributes::NET_TRANSPORT Another IP-based protocol
-     */
-    public const NET_TRANSPORT_IP = 'ip';
-
-    /**
-     * @see TraceAttributes::NET_TRANSPORT Unix Domain socket. See below
-     */
-    public const NET_TRANSPORT_UNIX = 'unix';
 
     /**
      * @see TraceAttributes::NET_TRANSPORT Named or anonymous pipe. See note below
@@ -350,6 +420,16 @@ interface TraceAttributeValues
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_LOCAL_SERIAL = 'local_serial';
 
     /**
+     * @see TraceAttributes::OTEL_STATUS_CODE The operation has been validated by an Application developer or Operator to have completed successfully
+     */
+    public const OTEL_STATUS_CODE_OK = 'OK';
+
+    /**
+     * @see TraceAttributes::OTEL_STATUS_CODE The operation contains an error
+     */
+    public const OTEL_STATUS_CODE_ERROR = 'ERROR';
+
+    /**
      * @see TraceAttributes::FAAS_TRIGGER A response to some data source operation such as a database or filesystem read/write
      */
     public const FAAS_TRIGGER_DATASOURCE = 'datasource';
@@ -390,34 +470,19 @@ interface TraceAttributeValues
     public const FAAS_DOCUMENT_OPERATION_DELETE = 'delete';
 
     /**
-     * @see TraceAttributes::HTTP_FLAVOR HTTP/1.0
+     * @see TraceAttributes::MESSAGING_OPERATION publish
      */
-    public const HTTP_FLAVOR_HTTP_1_0 = '1.0';
+    public const MESSAGING_OPERATION_PUBLISH = 'publish';
 
     /**
-     * @see TraceAttributes::HTTP_FLAVOR HTTP/1.1
+     * @see TraceAttributes::MESSAGING_OPERATION receive
      */
-    public const HTTP_FLAVOR_HTTP_1_1 = '1.1';
+    public const MESSAGING_OPERATION_RECEIVE = 'receive';
 
     /**
-     * @see TraceAttributes::HTTP_FLAVOR HTTP/2
+     * @see TraceAttributes::MESSAGING_OPERATION process
      */
-    public const HTTP_FLAVOR_HTTP_2_0 = '2.0';
-
-    /**
-     * @see TraceAttributes::HTTP_FLAVOR HTTP/3
-     */
-    public const HTTP_FLAVOR_HTTP_3_0 = '3.0';
-
-    /**
-     * @see TraceAttributes::HTTP_FLAVOR SPDY protocol
-     */
-    public const HTTP_FLAVOR_SPDY = 'SPDY';
-
-    /**
-     * @see TraceAttributes::HTTP_FLAVOR QUIC protocol
-     */
-    public const HTTP_FLAVOR_QUIC = 'QUIC';
+    public const MESSAGING_OPERATION_PROCESS = 'process';
 
     /**
      * @see TraceAttributes::NET_HOST_CONNECTION_TYPE wifi
@@ -550,16 +615,6 @@ interface TraceAttributeValues
     public const NET_HOST_CONNECTION_SUBTYPE_LTE_CA = 'lte_ca';
 
     /**
-     * @see TraceAttributes::MESSAGING_DESTINATION_KIND A message sent to a queue
-     */
-    public const MESSAGING_DESTINATION_KIND_QUEUE = 'queue';
-
-    /**
-     * @see TraceAttributes::MESSAGING_DESTINATION_KIND A message sent to a topic
-     */
-    public const MESSAGING_DESTINATION_KIND_TOPIC = 'topic';
-
-    /**
      * @see TraceAttributes::FAAS_INVOKED_PROVIDER Alibaba Cloud
      */
     public const FAAS_INVOKED_PROVIDER_ALIBABA_CLOUD = 'alibaba_cloud';
@@ -605,14 +660,44 @@ interface TraceAttributeValues
     public const RPC_SYSTEM_APACHE_DUBBO = 'apache_dubbo';
 
     /**
-     * @see TraceAttributes::MESSAGING_OPERATION receive
+     * @see TraceAttributes::RPC_SYSTEM Connect RPC
      */
-    public const MESSAGING_OPERATION_RECEIVE = 'receive';
+    public const RPC_SYSTEM_CONNECT_RPC = 'connect_rpc';
 
     /**
-     * @see TraceAttributes::MESSAGING_OPERATION process
+     * @see TraceAttributes::GRAPHQL_OPERATION_TYPE GraphQL query
      */
-    public const MESSAGING_OPERATION_PROCESS = 'process';
+    public const GRAPHQL_OPERATION_TYPE_QUERY = 'query';
+
+    /**
+     * @see TraceAttributes::GRAPHQL_OPERATION_TYPE GraphQL mutation
+     */
+    public const GRAPHQL_OPERATION_TYPE_MUTATION = 'mutation';
+
+    /**
+     * @see TraceAttributes::GRAPHQL_OPERATION_TYPE GraphQL subscription
+     */
+    public const GRAPHQL_OPERATION_TYPE_SUBSCRIPTION = 'subscription';
+
+    /**
+     * @see TraceAttributes::MESSAGING_DESTINATION_KIND A message sent to a queue
+     */
+    public const MESSAGING_DESTINATION_KIND_QUEUE = 'queue';
+
+    /**
+     * @see TraceAttributes::MESSAGING_DESTINATION_KIND A message sent to a topic
+     */
+    public const MESSAGING_DESTINATION_KIND_TOPIC = 'topic';
+
+    /**
+     * @see TraceAttributes::MESSAGING_SOURCE_KIND A message received from a queue
+     */
+    public const MESSAGING_SOURCE_KIND_QUEUE = 'queue';
+
+    /**
+     * @see TraceAttributes::MESSAGING_SOURCE_KIND A message received from a topic
+     */
+    public const MESSAGING_SOURCE_KIND_TOPIC = 'topic';
 
     /**
      * @see TraceAttributes::MESSAGING_ROCKETMQ_MESSAGE_TYPE Normal message
@@ -738,4 +823,84 @@ interface TraceAttributeValues
      * @see TraceAttributes::MESSAGE_TYPE received
      */
     public const MESSAGE_TYPE_RECEIVED = 'RECEIVED';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE cancelled
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_CANCELLED = 'cancelled';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE unknown
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_UNKNOWN = 'unknown';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE invalid_argument
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_INVALID_ARGUMENT = 'invalid_argument';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE deadline_exceeded
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_DEADLINE_EXCEEDED = 'deadline_exceeded';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE not_found
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_NOT_FOUND = 'not_found';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE already_exists
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_ALREADY_EXISTS = 'already_exists';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE permission_denied
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_PERMISSION_DENIED = 'permission_denied';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE resource_exhausted
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_RESOURCE_EXHAUSTED = 'resource_exhausted';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE failed_precondition
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_FAILED_PRECONDITION = 'failed_precondition';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE aborted
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_ABORTED = 'aborted';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE out_of_range
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_OUT_OF_RANGE = 'out_of_range';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE unimplemented
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_UNIMPLEMENTED = 'unimplemented';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE internal
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_INTERNAL = 'internal';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE unavailable
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_UNAVAILABLE = 'unavailable';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE data_loss
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_DATA_LOSS = 'data_loss';
+
+    /**
+     * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE unauthenticated
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE_UNAUTHENTICATED = 'unauthenticated';
 }

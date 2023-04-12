@@ -11,7 +11,7 @@ interface ResourceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.12.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.19.0';
     /**
      * @see ResourceAttributes::CLOUD_PROVIDER Alibaba Cloud
      */
@@ -33,6 +33,16 @@ interface ResourceAttributeValues
     public const CLOUD_PROVIDER_GCP = 'gcp';
 
     /**
+     * @see ResourceAttributes::CLOUD_PROVIDER Heroku Platform as a Service
+     */
+    public const CLOUD_PROVIDER_HEROKU = 'heroku';
+
+    /**
+     * @see ResourceAttributes::CLOUD_PROVIDER IBM Cloud
+     */
+    public const CLOUD_PROVIDER_IBM_CLOUD = 'ibm_cloud';
+
+    /**
      * @see ResourceAttributes::CLOUD_PROVIDER Tencent Cloud
      */
     public const CLOUD_PROVIDER_TENCENT_CLOUD = 'tencent_cloud';
@@ -46,6 +56,11 @@ interface ResourceAttributeValues
      * @see ResourceAttributes::CLOUD_PLATFORM Alibaba Cloud Function Compute
      */
     public const CLOUD_PLATFORM_ALIBABA_CLOUD_FC = 'alibaba_cloud_fc';
+
+    /**
+     * @see ResourceAttributes::CLOUD_PLATFORM Red Hat OpenShift on Alibaba Cloud
+     */
+    public const CLOUD_PLATFORM_ALIBABA_CLOUD_OPENSHIFT = 'alibaba_cloud_openshift';
 
     /**
      * @see ResourceAttributes::CLOUD_PLATFORM AWS Elastic Compute Cloud
@@ -78,6 +93,11 @@ interface ResourceAttributeValues
     public const CLOUD_PLATFORM_AWS_APP_RUNNER = 'aws_app_runner';
 
     /**
+     * @see ResourceAttributes::CLOUD_PLATFORM Red Hat OpenShift on AWS (ROSA)
+     */
+    public const CLOUD_PLATFORM_AWS_OPENSHIFT = 'aws_openshift';
+
+    /**
      * @see ResourceAttributes::CLOUD_PLATFORM Azure Virtual Machines
      */
     public const CLOUD_PLATFORM_AZURE_VM = 'azure_vm';
@@ -103,6 +123,11 @@ interface ResourceAttributeValues
     public const CLOUD_PLATFORM_AZURE_APP_SERVICE = 'azure_app_service';
 
     /**
+     * @see ResourceAttributes::CLOUD_PLATFORM Azure Red Hat OpenShift
+     */
+    public const CLOUD_PLATFORM_AZURE_OPENSHIFT = 'azure_openshift';
+
+    /**
      * @see ResourceAttributes::CLOUD_PLATFORM Google Cloud Compute Engine (GCE)
      */
     public const CLOUD_PLATFORM_GCP_COMPUTE_ENGINE = 'gcp_compute_engine';
@@ -126,6 +151,16 @@ interface ResourceAttributeValues
      * @see ResourceAttributes::CLOUD_PLATFORM Google Cloud App Engine (GAE)
      */
     public const CLOUD_PLATFORM_GCP_APP_ENGINE = 'gcp_app_engine';
+
+    /**
+     * @see ResourceAttributes::CLOUD_PLATFORM Red Hat OpenShift on Google Cloud
+     */
+    public const CLOUD_PLATFORM_GCP_OPENSHIFT = 'gcp_openshift';
+
+    /**
+     * @see ResourceAttributes::CLOUD_PLATFORM Red Hat OpenShift on IBM Cloud
+     */
+    public const CLOUD_PLATFORM_IBM_CLOUD_OPENSHIFT = 'ibm_cloud_openshift';
 
     /**
      * @see ResourceAttributes::CLOUD_PLATFORM Tencent Cloud Cloud Virtual Machine (CVM)
