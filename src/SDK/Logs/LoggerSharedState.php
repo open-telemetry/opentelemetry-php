@@ -22,7 +22,10 @@ class LoggerSharedState
     ) {
         $this->resource = $resource;
         $this->limits = $limits;
-        $this->processors = $processors;
+        foreach ($processors as $processor) {
+            assert($processor instanceof LogRecordProcessorInterface);
+            $this->processors[] = $processor;
+        }
     }
     public function hasShutdown(): bool
     {
