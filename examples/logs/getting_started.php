@@ -13,11 +13,10 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-$processor = new SimpleLogsProcessor(
-    (new ConsoleExporterFactory())->create()
-);
 $loggerProvider = new LoggerProvider(
-    [$processor],
+    new SimpleLogsProcessor(
+        (new ConsoleExporterFactory())->create()
+    ),
     new InstrumentationScopeFactory(Attributes::factory())
 );
 $tracerProvider = new TracerProvider();

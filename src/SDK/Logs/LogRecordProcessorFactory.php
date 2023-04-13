@@ -12,15 +12,13 @@ use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogsProcessor;
+use OpenTelemetry\SDK\Logs\Processor\MultiLogsProcessor;
 use OpenTelemetry\SDK\Logs\Processor\NoopLogsProcessor;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
 
 class LogRecordProcessorFactory
 {
-    /**
-     * @return array<LogRecordProcessorInterface>
-     */
-    public function create(LogRecordExporterInterface $exporter, ?MeterProviderInterface $meterProvider = null): array
+    public function create(LogRecordExporterInterface $exporter, ?MeterProviderInterface $meterProvider = null): LogRecordProcessorInterface
     {
         $processors = [];
         $list = Configuration::getList(Variables::OTEL_PHP_LOGS_PROCESSOR);
@@ -28,7 +26,14 @@ class LogRecordProcessorFactory
             $processors[] = $this->createProcessor($name, $exporter, $meterProvider);
         }
 
-        return $processors;
+        switch (count($processors)) {
+            case 0:
+                return NoopLogsProcessor::getInstance();
+            case 1:
+                return $processors[0];
+            default:
+                return new MultiLogsProcessor($processors);
+        }
     }
 
     private function createProcessor($name, LogRecordExporterInterface $exporter, ?MeterProviderInterface $meterProvider = null): LogRecordProcessorInterface

@@ -10,22 +10,18 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 class LoggerSharedState
 {
     private ResourceInfo $resource;
-    /** @var LogRecordProcessorInterface[] */
-    private array $processors = [];
+    private LogRecordProcessorInterface $processor;
     private LogRecordLimits $limits;
     private ?bool $shutdownResult = null;
 
     public function __construct(
         ResourceInfo $resource,
         LogRecordLimits $limits,
-        array $processors
+        LogRecordProcessorInterface $processor
     ) {
         $this->resource = $resource;
         $this->limits = $limits;
-        foreach ($processors as $processor) {
-            assert($processor instanceof LogRecordProcessorInterface);
-            $this->processors[] = $processor;
-        }
+        $this->processor = $processor;
     }
     public function hasShutdown(): bool
     {
@@ -37,12 +33,9 @@ class LoggerSharedState
         return $this->resource;
     }
 
-    /**
-     * @return LogRecordProcessorInterface[]
-     */
-    public function getProcessors(): array
+    public function getProcessor(): LogRecordProcessorInterface
     {
-        return $this->processors;
+        return $this->processor;
     }
 
     public function getLogRecordLimits(): LogRecordLimits
@@ -50,37 +43,18 @@ class LoggerSharedState
         return $this->limits;
     }
 
-    /**
-     * Returns `true` if all processors shut down successfully, else `false`
-     * Subsequent calls to `shutdown` are a no-op.
-     */
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if ($this->shutdownResult !== null) {
             return $this->shutdownResult;
         }
-        $this->shutdownResult = true;
-        foreach ($this->processors as $processor) {
-            if (!$processor->shutdown($cancellation)) {
-                $this->shutdownResult = false;
-            }
-        }
+        $this->shutdownResult = $this->processor->shutdown($cancellation);
 
         return $this->shutdownResult;
     }
 
-    /**
-     * Returns `true` if all processors flush successfully, else `false`.
-     */
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
-        $result = true;
-        foreach ($this->processors as $processor) {
-            if (!$processor->forceFlush($cancellation)) {
-                $result = false;
-            }
-        }
-
-        return $result;
+        return $this->processor->forceFlush($cancellation);
     }
 }
