@@ -29,7 +29,6 @@ use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricCollector;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use function assert;
 use function serialize;
 use function spl_object_id;
 use Throwable;
