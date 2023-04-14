@@ -39,6 +39,10 @@ trait LoggerAwareTrait
 
     protected function getLogger(): LoggerInterface
     {
-        return $this->logger instanceof LoggerInterface ? $this->logger : $this->logger = new NullLogger();
+        if ($this->logger !== null) {
+            return $this->logger;
+        }
+
+        return new NullLogger();
     }
 }
