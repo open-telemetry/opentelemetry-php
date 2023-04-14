@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 
 /**
  * @internal
@@ -23,16 +24,21 @@ final class Metric
      */
     public array $summaries;
     public int $timestamp;
-    public int $revision;
+    /**
+     * @var array<Exemplar>
+     */
+    public array $exemplars;
+
     /**
      * @param array<AttributesInterface> $attributes
      * @param array<T> $summaries
+     * @param array<Exemplar> $exemplars
      */
-    public function __construct(array $attributes, array $summaries, int $timestamp, int $revision)
+    public function __construct(array $attributes, array $summaries, int $timestamp, array $exemplars = [])
     {
         $this->attributes = $attributes;
         $this->summaries = $summaries;
         $this->timestamp = $timestamp;
-        $this->revision = $revision;
+        $this->exemplars = $exemplars;
     }
 }

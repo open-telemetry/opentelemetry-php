@@ -19,12 +19,17 @@ use OpenTelemetry\SDK\Metrics\MetricObserver\MultiObserver;
 use OpenTelemetry\SDK\Metrics\MetricObserverInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistrationInterface;
 use OpenTelemetry\SDK\Metrics\MetricWriterInterface;
+use OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricCollector;
 use OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream;
+use OpenTelemetry\SDK\Metrics\Stream\MetricAggregator;
+use OpenTelemetry\SDK\Metrics\Stream\MetricCollectorInterface;
 use OpenTelemetry\SDK\Metrics\Stream\MetricStreamInterface;
 use OpenTelemetry\SDK\Metrics\Stream\MultiStreamWriter;
+use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricCollector;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use function assert;
 use function serialize;
 use function spl_object_id;
 use Throwable;
@@ -51,28 +56,26 @@ final class StreamFactory implements MetricFactoryInterface
             }
 
             $streamId = $this->streamId($view->aggregation, $view->attributeKeys);
-            if (($stream = $dedup[$streamId] ?? null) === null) {
-                $stream = new AsynchronousMetricStream(
-                    $attributesFactory,
+            if (([$stream, $collector] = $dedup[$streamId] ?? null) === null) {
+                $collector = new AsynchronousMetricCollector(
+                    $observer,
                     $this->attributeProcessor($view->attributeKeys, $attributesFactory),
                     $view->aggregation,
-                    $this->applyExemplarFilter(
-                        $view->aggregation->exemplarReservoir($attributesFactory),
-                        $exemplarFilter,
-                    ),
-                    $observer,
-                    $timestamp,
+                    $attributesFactory,
                 );
+                $stream = new AsynchronousMetricStream($view->aggregation, $timestamp);
 
-                $dedup[$streamId] = $stream;
+                $dedup[$streamId] = [$stream, $collector];
             }
 
+            /** @psalm-suppress PossiblyNullArgument */
             $this->registerSource(
                 $view,
                 $instrument,
                 $instrumentationScope,
                 $resource,
                 $stream,
+                $collector,
                 $registry,
             );
         }
@@ -98,27 +101,30 @@ final class StreamFactory implements MetricFactoryInterface
             }
 
             $streamId = $this->streamId($view->aggregation, $view->attributeKeys);
-            if (($stream = $dedup[$streamId] ?? null) === null) {
-                $stream = new SynchronousMetricStream(
+            if (([$stream, $collector] = $dedup[$streamId] ?? null) === null) {
+                $aggregator = new MetricAggregator(
                     $this->attributeProcessor($view->attributeKeys, $attributesFactory),
                     $view->aggregation,
                     $this->applyExemplarFilter(
                         $view->aggregation->exemplarReservoir($attributesFactory),
                         $exemplarFilter,
                     ),
-                    $timestamp,
                 );
-                $streams[] = $stream->writable();
+                $collector = new SynchronousMetricCollector($aggregator);
+                $stream = new SynchronousMetricStream($view->aggregation, $timestamp);
+                $streams[] = $aggregator;
 
-                $dedup[$streamId] = $stream;
+                $dedup[$streamId] = [$stream, $collector];
             }
 
+            /** @psalm-suppress PossiblyNullArgument */
             $this->registerSource(
                 $view,
                 $instrument,
                 $instrumentationScope,
                 $resource,
                 $stream,
+                $collector,
                 $registry,
             );
         }
@@ -154,6 +160,7 @@ final class StreamFactory implements MetricFactoryInterface
         InstrumentationScopeInterface $instrumentationScope,
         ResourceInfo $resource,
         MetricStreamInterface $stream,
+        MetricCollectorInterface $metricCollector,
         MetricRegistrationInterface $metricRegistration
     ): void {
         $provider = new StreamMetricSourceProvider(
@@ -162,6 +169,7 @@ final class StreamFactory implements MetricFactoryInterface
             $instrumentationScope,
             $resource,
             $stream,
+            $metricCollector,
         );
 
         $metricRegistration->register($provider, $provider);

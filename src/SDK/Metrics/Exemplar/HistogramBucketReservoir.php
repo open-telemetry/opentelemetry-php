@@ -26,16 +26,16 @@ final class HistogramBucketReservoir implements ExemplarReservoirInterface
         $this->boundaries = $boundaries;
     }
 
-    public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp, int $revision): void
+    public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $boundariesCount = count($this->boundaries);
         for ($i = 0; $i < $boundariesCount && $this->boundaries[$i] < $value; $i++) {
         }
-        $this->storage->store($i, $index, $value, $attributes, $context, $timestamp, $revision);
+        $this->storage->store($i, $index, $value, $attributes, $context, $timestamp);
     }
 
-    public function collect(array $dataPointAttributes, int $revision, int $limit): array
+    public function collect(array $dataPointAttributes): array
     {
-        return $this->storage->collect($dataPointAttributes, $revision, $limit);
+        return $this->storage->collect($dataPointAttributes);
     }
 }

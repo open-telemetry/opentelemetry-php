@@ -34,13 +34,12 @@ final class DeltaStorageTest extends TestCase
     {
         $ds = new DeltaStorage(new SumAggregation());
 
-        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(3)], 0, 0), 0b1);
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(3)], 0), 0b1);
 
         $metric = $ds->collect(0);
         $this->assertEquals(new Metric(
             [Attributes::create(['a'])],
             [new SumSummary(3)],
-            0,
             0,
         ), $metric);
     }
@@ -49,15 +48,14 @@ final class DeltaStorageTest extends TestCase
     {
         $ds = new DeltaStorage(new SumAggregation());
 
-        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(3)], 0, 0), 0b1);
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(3)], 0), 0b1);
         $ds->collect(0, true);
-        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(5)], 1, 1), 0b1);
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(5)], 1), 0b1);
         for ($i = 0; $i < 2; $i++) {
             $metric = $ds->collect(0, true);
             $this->assertEquals(new Metric(
                 [Attributes::create(['a'])],
                 [new SumSummary(8)],
-                0,
                 0,
             ), $metric);
         }
@@ -67,7 +65,7 @@ final class DeltaStorageTest extends TestCase
     {
         $ds = new DeltaStorage(new SumAggregation());
 
-        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(3)], 0, 0), 0b0);
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(3)], 0), 0b0);
 
         $this->assertNull($ds->collect(0));
     }
@@ -76,30 +74,27 @@ final class DeltaStorageTest extends TestCase
     {
         $ds = new DeltaStorage(new SumAggregation());
 
-        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(3)], 0, 0), 0b111);
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(3)], 0), 0b111);
         $metric = $ds->collect(0);
         $this->assertEquals(new Metric(
             [Attributes::create(['a'])],
             [new SumSummary(3)],
             0,
-            0,
         ), $metric);
 
-        $ds->add(new Metric([Attributes::create(['a']), Attributes::create(['b'])], [new SumSummary(7), new SumSummary(12)], 1, 1), 0b111);
+        $ds->add(new Metric([Attributes::create(['a']), Attributes::create(['b'])], [new SumSummary(7), new SumSummary(12)], 1), 0b111);
         $metric = $ds->collect(1);
         $this->assertEquals(new Metric(
             [Attributes::create(['a']), Attributes::create(['b'])],
             [new SumSummary(10), new SumSummary(12)],
             0,
-            0,
         ), $metric);
 
-        $ds->add(new Metric([Attributes::create(['a']), Attributes::create(['b'])], [new SumSummary(5), new SumSummary(9)], 2, 2), 0b111);
+        $ds->add(new Metric([Attributes::create(['a']), Attributes::create(['b'])], [new SumSummary(5), new SumSummary(9)], 2), 0b111);
         $metric = $ds->collect(1);
         $this->assertEquals(new Metric(
             [Attributes::create(['a']), Attributes::create(['b'])],
             [new SumSummary(5), new SumSummary(9)],
-            2,
             2,
         ), $metric);
 
@@ -108,7 +103,6 @@ final class DeltaStorageTest extends TestCase
             [Attributes::create(['a']), Attributes::create(['b'])],
             [new SumSummary(12), new SumSummary(21)],
             1,
-            1,
         ), $metric);
 
         $metric = $ds->collect(2);
@@ -116,19 +110,18 @@ final class DeltaStorageTest extends TestCase
             [Attributes::create(['a']), Attributes::create(['b'])],
             [new SumSummary(15), new SumSummary(21)],
             0,
-            0,
         ), $metric);
     }
 
     public function test_storage_keeps_constant_memory_on_one_active_reader(): void
     {
         $ds = new DeltaStorage(new SumAggregation());
-        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 0), 0b11);
-        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 1), 0b11);
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0), 0b11);
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0), 0b11);
 
         $memory = memory_get_usage();
         for ($i = 0; $i < 10000; $i++) {
-            $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(1)], 0, 2 + $i), 0b11);
+            $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(1)], 0), 0b11);
             $ds->collect(0);
         }
         $this->assertLessThan(2000, memory_get_usage() - $memory);
@@ -140,12 +133,12 @@ final class DeltaStorageTest extends TestCase
     public function test_storage_keeps_constant_memory_on_one_active_retaining_reader(): void
     {
         $ds = new DeltaStorage(new SumAggregation());
-        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 0), 0b01);
-        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 1), 0b11);
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0), 0b01);
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0), 0b11);
 
         $memory = memory_get_usage();
         for ($i = 0; $i < 10000; $i++) {
-            $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(1)], 0, 2 + $i), 0b11);
+            $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(1)], 0), 0b11);
             $ds->collect(0, true);
         }
         $this->assertLessThan(2000, memory_get_usage() - $memory);
@@ -159,13 +152,13 @@ final class DeltaStorageTest extends TestCase
     public function test_storage_keeps_constant_memory_on_alternating_active_retaining_readers(): void
     {
         $ds = new DeltaStorage(new SumAggregation());
-        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 0), 0b100);
-        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 1), 0b110);
-        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0, 2), 0b111);
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0), 0b100);
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0), 0b110);
+        $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(0)], 0), 0b111);
 
         $memory = memory_get_usage();
         for ($i = 0; $i < 10000; $i++) {
-            $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(1)], 0, 3 + $i), 0b111);
+            $ds->add(new Metric([Attributes::create(['a'])], [new SumSummary(1)], 0), 0b111);
             $ds->collect($i % 3, true);
         }
         $this->assertLessThan(2000, memory_get_usage() - $memory);

@@ -18,15 +18,15 @@ final class FilteredReservoir implements ExemplarReservoirInterface
         $this->filter = $filter;
     }
 
-    public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp, int $revision): void
+    public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         if ($this->filter->accepts($value, $attributes, $context, $timestamp)) {
-            $this->reservoir->offer($index, $value, $attributes, $context, $timestamp, $revision);
+            $this->reservoir->offer($index, $value, $attributes, $context, $timestamp);
         }
     }
 
-    public function collect(array $dataPointAttributes, int $revision, int $limit): array
+    public function collect(array $dataPointAttributes): array
     {
-        return $this->reservoir->collect($dataPointAttributes, $revision, $limit);
+        return $this->reservoir->collect($dataPointAttributes);
     }
 }

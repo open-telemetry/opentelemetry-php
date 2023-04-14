@@ -8,6 +8,11 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class Exemplar
 {
+
+    /**
+     * @var int|string
+     */
+    private $index;
     /**
      * @var float|int
      * @readonly
@@ -29,15 +34,32 @@ final class Exemplar
      * @readonly
      */
     public ?string $spanId;
+
     /**
+     * @param int|string $index
      * @param float|int $value
      */
-    public function __construct($value, int $timestamp, AttributesInterface $attributes, ?string $traceId, ?string $spanId)
+    public function __construct($index, $value, int $timestamp, AttributesInterface $attributes, ?string $traceId, ?string $spanId)
     {
+        $this->index = $index;
         $this->value = $value;
         $this->timestamp = $timestamp;
         $this->attributes = $attributes;
         $this->traceId = $traceId;
         $this->spanId = $spanId;
+    }
+
+    /**
+     * @param iterable<Exemplar> $exemplars
+     * @return array<list<Exemplar>>
+     */
+    public static function groupByIndex(iterable $exemplars): array
+    {
+        $grouped = [];
+        foreach ($exemplars as $exemplar) {
+            $grouped[$exemplar->index][] = $exemplar;
+        }
+
+        return $grouped;
     }
 }

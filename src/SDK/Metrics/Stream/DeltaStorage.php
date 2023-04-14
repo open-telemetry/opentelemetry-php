@@ -19,7 +19,7 @@ final class DeltaStorage
     public function __construct(AggregationInterface $aggregation)
     {
         $this->aggregation = $aggregation;
-        $this->head = new Delta(new Metric([], [], 0, 0), 0);
+        $this->head = new Delta(new Metric([], [], 0), 0);
 
         /** @phan-suppress-next-line PhanTypeObjectUnsetDeclaredProperty */
         unset($this->head->metric);
@@ -99,13 +99,12 @@ final class DeltaStorage
 
     private function mergeInto(Metric $into, Metric $metric): void
     {
-        assert($into->revision < $metric->revision);
-
         foreach ($metric->summaries as $k => $summary) {
             $into->attributes[$k] ??= $metric->attributes[$k];
             $into->summaries[$k] = isset($into->summaries[$k])
                 ? $this->aggregation->merge($into->summaries[$k], $summary)
                 : $summary;
         }
+        $into->exemplars += $metric->exemplars;
     }
 }

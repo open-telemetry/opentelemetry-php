@@ -8,7 +8,6 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
-use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 use function serialize;
 
@@ -25,12 +24,10 @@ final class MetricAggregator implements WritableMetricStreamInterface
     private array $attributes = [];
     private array $summaries = [];
 
-    public int $revision = 0;
-
     public function __construct(
         ?AttributeProcessorInterface $attributeProcessor,
         AggregationInterface $aggregation,
-        ?ExemplarReservoirInterface $exemplarReservoir
+        ?ExemplarReservoirInterface $exemplarReservoir = null
     ) {
         $this->attributeProcessor = $attributeProcessor;
         $this->aggregation = $aggregation;
@@ -57,28 +54,20 @@ final class MetricAggregator implements WritableMetricStreamInterface
         );
 
         if ($this->exemplarReservoir !== null) {
-            $this->exemplarReservoir->offer($index, $value, $attributes, $context, $timestamp, $this->revision);
+            $this->exemplarReservoir->offer($index, $value, $attributes, $context, $timestamp);
         }
     }
 
     public function collect(int $timestamp): Metric
     {
-        $metric = new Metric($this->attributes, $this->summaries, $timestamp, $this->revision);
+        $exemplars = $this->exemplarReservoir
+            ? $this->exemplarReservoir->collect($this->attributes)
+            : [];
+        $metric = new Metric($this->attributes, $this->summaries, $timestamp, $exemplars);
 
         $this->attributes = [];
         $this->summaries = [];
-        $this->revision++;
 
         return $metric;
-    }
-
-    /**
-     * @return array<list<Exemplar>>
-     */
-    public function exemplars(Metric $metric): array
-    {
-        return $this->exemplarReservoir && $metric->revision !== -1
-            ? $this->exemplarReservoir->collect($metric->attributes, $metric->revision, $this->revision)
-            : [];
     }
 }

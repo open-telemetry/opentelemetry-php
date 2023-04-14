@@ -9,12 +9,12 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class NoopReservoir implements ExemplarReservoirInterface
 {
-    public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp, int $revision): void
+    public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         // no-op
     }
 
-    public function collect(array $dataPointAttributes, int $revision, int $limit): array
+    public function collect(array $dataPointAttributes): array
     {
         return [];
     }
