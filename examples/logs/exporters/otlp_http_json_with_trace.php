@@ -31,9 +31,6 @@ LoggerHolder::set(
     new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)])
 );
 
-$transport = (new OtlpHttpTransportFactory())->create('http://collector:4318/v1/logs', 'application/json');
-$exporter = new LogsExporter($transport);
-
 $tracerProvider =  new TracerProvider(
     new SimpleSpanProcessor(
         new SpanExporter(
@@ -41,17 +38,20 @@ $tracerProvider =  new TracerProvider(
         )
     )
 );
-$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 
 $loggerProvider = new LoggerProvider(
     new SimpleLogsProcessor(
-        $exporter
+        new LogsExporter(
+            (new OtlpHttpTransportFactory())->create('http://collector:4318/v1/logs', 'application/json')
+        )
     ),
     new InstrumentationScopeFactory(
         (new LogRecordLimitsBuilder())->build()->getAttributeFactory()
     )
 );
-$logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', true, ['foo' => 'bar']);
+
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
+$logger = $loggerProvider->getLogger('io.opentelemetry.contrib.php', '1.0', 'http://schema.url', true, ['extra' => 'added-to-all-logs']);
 
 $record = (new LogRecord(['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']))
     ->setSeverityText('INFO')
