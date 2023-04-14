@@ -1,0 +1,37 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {},
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "io.opentelemetry.contrib.php"
+          },
+          "spans": [
+            {
+              "traceId": "fba5aa62be94880d3c86360870f68832",
+              "spanId": "51dbb6fa9869efbd",
+              "parentSpanId": "bb78dad25599483c",
+              "name": "child",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1681444402662544763",
+              "endTimeUnixNano": "1681444402662548104",
+              "status": {}
+            },
+            {
+              "traceId": "fba5aa62be94880d3c86360870f68832",
+              "spanId": "bb78dad25599483c",
+              "name": "root",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1681444402662132127",
+              "endTimeUnixNano": "1681444402662704219",
+              "status": {
+                "code": "STATUS_CODE_OK"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -50,10 +50,9 @@ final class ProtobufSerializer
             case self::PROTOBUF:
                 return $message->serializeToString();
             case self::JSON:
-                //@todo https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#json-protobuf-encoding
-                return $message->serializeToJsonString();
+                return self::fixJsonOutput($message->serializeToJsonString());
             case self::NDJSON:
-                return $message->serializeToJsonString() . "\n";
+                return self::fixJsonOutput($message->serializeToJsonString()) . "\n";
             default:
                 throw new AssertionError();
         }
@@ -77,5 +76,32 @@ final class ProtobufSerializer
             default:
                 throw new AssertionError();
         }
+    }
+
+    /**
+     * JSON encoding of traceid + spanid requires the hexadecimal-encoded values, which is different to protobuf
+     * which requires base64-encoded binary representation. This finds all traceId + spanId JSON fields, and
+     * reverses the operation to get back to hexadecimal.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.20.0/specification/protocol/otlp.md#json-protobuf-encoding
+     * @todo "Values of enum fields MUST be encoded as integer values"
+     */
+    public static function fixJsonOutput(string $json): string
+    {
+        $patterns = [
+            "|\"traceId\"\:[\s]*\"([A-Za-z0-9+/]*={0,2})\"|",
+            "|\"spanId\"\:[\s]*\"([A-Za-z0-9+/]*={0,2})\"|",
+            "|\"parentSpanId\"\:[\s]*\"([A-Za-z0-9+/]*={0,2})\"|",
+        ];
+
+        return preg_replace_callback($patterns, fn ($matches) => str_replace($matches[1], self::base64BinaryToHex($matches[1]), $matches[0]), $json);
+    }
+
+    /**
+     * Reverse protobuf-encoding of binary value to its hexadecimal representation
+     */
+    public static function base64BinaryToHex(string $value): string
+    {
+        return bin2hex(base64_decode($value));
     }
 }
