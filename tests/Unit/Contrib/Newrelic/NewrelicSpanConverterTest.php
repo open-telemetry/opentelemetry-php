@@ -6,8 +6,10 @@ namespace OpenTelemetry\Tests\Unit\Contrib\Newrelic;
 
 use OpenTelemetry\Contrib\Newrelic\SpanConverter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
@@ -100,5 +102,33 @@ class NewrelicSpanConverterTest extends TestCase
         // This currently works, but OpenTelemetry\Trace\Span should stop arrays
         // containing multiple value types from being passed to the Exporter.
         $this->assertSame($listOfRandoms, $attributes['list-of-random']);
+    }
+
+    /**
+     * @dataProvider droppedProvider
+     */
+    public function test_displays_non_zero_dropped_counts(int $dropped, bool $expected): void
+    {
+        $attributes = $this->createMock(AttributesInterface::class);
+        $attributes->method('getDroppedAttributesCount')->willReturn($dropped);
+        $spanData = $this->createMock(SpanDataInterface::class);
+        $spanData->method('getAttributes')->willReturn($attributes);
+
+        $converter = new SpanConverter();
+        $converted = $converter->convert([$spanData])[0];
+
+        if ($expected) {
+            $this->assertArrayHasKey(SpanConverter::KEY_DROPPED_ATTRIBUTES_COUNT, $converted['attributes']);
+        } else {
+            $this->assertArrayNotHasKey(SpanConverter::KEY_DROPPED_ATTRIBUTES_COUNT, $converted['attributes']);
+        }
+    }
+
+    public static function droppedProvider(): array
+    {
+        return [
+            'no dropped' => [0, false],
+            'some dropped' => [1, true],
+        ];
     }
 }

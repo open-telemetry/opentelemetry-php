@@ -21,6 +21,9 @@ class SpanConverter implements SpanConverterInterface
     const STATUS_DESCRIPTION_TAG_KEY = 'error';
     const KEY_INSTRUMENTATION_SCOPE_NAME = 'otel.scope.name';
     const KEY_INSTRUMENTATION_SCOPE_VERSION = 'otel.scope.version';
+    const KEY_DROPPED_ATTRIBUTES_COUNT = 'otel.dropped_attributes_count';
+    const KEY_DROPPED_EVENTS_COUNT = 'otel.dropped_events_count';
+    const KEY_DROPPED_LINKS_COUNT = 'otel.dropped_links_count';
 
     const REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP = [
         'peer.service' => 1,
@@ -136,6 +139,22 @@ class SpanConverter implements SpanConverterInterface
             $row['annotations'][] = SpanConverter::toAnnotation($event);
         }
 
+        if ($span->getTotalDroppedEvents() > 0) {
+            $row['tags'][self::KEY_DROPPED_EVENTS_COUNT] = $span->getTotalDroppedEvents();
+        }
+
+        if ($span->getTotalDroppedLinks() > 0) {
+            $row['tags'][self::KEY_DROPPED_LINKS_COUNT] = $span->getTotalDroppedLinks();
+        }
+
+        $droppedAttributes = $span->getAttributes()->getDroppedAttributesCount()
+            + $span->getInstrumentationScope()->getAttributes()->getDroppedAttributesCount()
+            + $span->getResource()->getAttributes()->getDroppedAttributesCount();
+
+        if ($droppedAttributes > 0) {
+            $row['tags'][self::KEY_DROPPED_ATTRIBUTES_COUNT] = $droppedAttributes;
+        }
+
         if (($span->getKind() === SpanKind::KIND_CLIENT) || ($span->getKind() === SpanKind::KIND_PRODUCER)) {
             $remoteEndpointData = SpanConverter::toRemoteEndpoint($span);
             if ($remoteEndpointData !== null) {
@@ -175,10 +194,15 @@ class SpanConverter implements SpanConverterInterface
 
         $value = ($attributesAsJson !== null) ? sprintf('"%s": %s', $eventName, $attributesAsJson) : sprintf('"%s"', $eventName);
 
-        return [
+        $annotation = [
             'timestamp' => TimeUtil::nanosToMicros($event->getEpochNanos()),
             'value' => $value,
         ];
+        if ($event->getAttributes()->getDroppedAttributesCount() > 0) {
+            $annotation[self::KEY_DROPPED_ATTRIBUTES_COUNT] = $event->getAttributes()->getDroppedAttributesCount();
+        }
+
+        return $annotation;
     }
 
     private static function convertEventAttributesToJson(EventInterface $event): ?string
