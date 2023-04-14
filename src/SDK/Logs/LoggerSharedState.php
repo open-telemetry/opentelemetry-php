@@ -43,11 +43,18 @@ class LoggerSharedState
         return $this->limits;
     }
 
-    /**
-     * Returns `false` if the provider is already shutdown, otherwise `true`.
-     */
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
-        return $this->shutdownResult ?? ($this->shutdownResult = $this->processor->shutdown($cancellation));
+        if ($this->shutdownResult !== null) {
+            return $this->shutdownResult;
+        }
+        $this->shutdownResult = $this->processor->shutdown($cancellation);
+
+        return $this->shutdownResult;
+    }
+
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
+    {
+        return $this->processor->forceFlush($cancellation);
     }
 }
