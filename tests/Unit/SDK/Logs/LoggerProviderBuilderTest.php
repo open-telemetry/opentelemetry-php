@@ -20,7 +20,7 @@ class LoggerProviderBuilderTest extends TestCase
         $processor = $this->createMock(LogRecordProcessorInterface::class);
         $resource = $this->createMock(ResourceInfo::class);
         $provider = LoggerProvider::builder()
-            ->setLogRecordProcessor($processor)
+            ->addLogRecordProcessor($processor)
             ->setResource($resource)
             ->build();
         $this->assertInstanceOf(LoggerProviderInterface::class, $provider);

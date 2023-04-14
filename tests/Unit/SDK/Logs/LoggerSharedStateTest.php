@@ -53,7 +53,14 @@ class LoggerSharedStateTest extends TestCase
         $this->processor->expects($this->once())->method('shutdown')->willReturn(true);
 
         $this->assertFalse($this->loggerSharedState->hasShutdown());
-        $this->loggerSharedState->shutdown();
+        $this->assertTrue($this->loggerSharedState->shutdown());
         $this->assertTrue($this->loggerSharedState->hasShutdown());
+    }
+
+    public function test_force_flush(): void
+    {
+        $this->processor->expects($this->once())->method('forceFlush')->willReturn(true);
+
+        $this->assertTrue($this->loggerSharedState->forceFlush());
     }
 }
