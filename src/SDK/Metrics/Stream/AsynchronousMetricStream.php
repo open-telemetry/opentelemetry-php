@@ -5,54 +5,30 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
 use function array_search;
-use function assert;
 use function count;
-use OpenTelemetry\API\Metrics\ObserverInterface;
-use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
-use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
+use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
-use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 
 /**
  * @internal
  */
 final class AsynchronousMetricStream implements MetricStreamInterface
 {
-    private MetricAggregator $metricAggregator;
-    private AttributesFactoryInterface $attributesFactory;
     private AggregationInterface $aggregation;
-    private $instrument;
 
     private int $startTimestamp;
     private Metric $metric;
-    private bool $locked = false;
 
     /** @var array<int, Metric|null> */
     private array $lastReads = [];
 
-    /**
-     * @param callable(ObserverInterface): void $instrument
-     */
-    public function __construct(
-        AttributesFactoryInterface $attributesFactory,
-        ?AttributeProcessorInterface $attributeProcessor,
-        AggregationInterface $aggregation,
-        ?ExemplarReservoirInterface $exemplarReservoir,
-        callable $instrument,
-        int $startTimestamp
-    ) {
-        $this->metricAggregator = new MetricAggregator(
-            $attributeProcessor,
-            $aggregation,
-            $exemplarReservoir,
-        );
-        $this->attributesFactory = $attributesFactory;
+    public function __construct(AggregationInterface $aggregation, int $startTimestamp)
+    {
         $this->aggregation = $aggregation;
-        $this->instrument = $instrument;
         $this->startTimestamp = $startTimestamp;
-        $this->metric = new Metric([], [], $startTimestamp, -1);
+        $this->metric = new Metric([], [], $startTimestamp);
     }
 
     public function temporality()
@@ -60,9 +36,14 @@ final class AsynchronousMetricStream implements MetricStreamInterface
         return Temporality::CUMULATIVE;
     }
 
-    public function collectionTimestamp(): int
+    public function timestamp(): int
     {
         return $this->metric->timestamp;
+    }
+
+    public function push(Metric $metric): void
+    {
+        $this->metric = $metric;
     }
 
     public function register($temporality): int
@@ -89,20 +70,8 @@ final class AsynchronousMetricStream implements MetricStreamInterface
         $this->lastReads[$reader] = null;
     }
 
-    public function collect(int $reader, ?int $timestamp): DataInterface
+    public function collect(int $reader): DataInterface
     {
-        if ($timestamp !== null && !$this->locked) {
-            $this->locked = true;
-
-            try {
-                ($this->instrument)(new AsynchronousMetricStreamObserver($this->metricAggregator, $this->attributesFactory, $timestamp));
-
-                $this->metric = $this->metricAggregator->collect($timestamp);
-            } finally {
-                $this->locked = false;
-            }
-        }
-
         $metric = $this->metric;
 
         if (($lastRead = $this->lastReads[$reader] ?? null) === null) {
@@ -119,7 +88,7 @@ final class AsynchronousMetricStream implements MetricStreamInterface
         return $this->aggregation->toData(
             $metric->attributes,
             $metric->summaries,
-            $this->metricAggregator->exemplars($metric),
+            Exemplar::groupByIndex($metric->exemplars),
             $startTimestamp,
             $metric->timestamp,
             $temporality,
@@ -128,8 +97,6 @@ final class AsynchronousMetricStream implements MetricStreamInterface
 
     private function diff(Metric $lastRead, Metric $metric): Metric
     {
-        assert($lastRead->revision <= $metric->revision);
-
         $diff = clone $metric;
         foreach ($metric->summaries as $k => $summary) {
             if (!isset($lastRead->summaries[$k])) {

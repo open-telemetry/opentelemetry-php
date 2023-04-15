@@ -29,13 +29,13 @@ final class FilteredReservoirTest extends TestCase
     public function test_all_reservoir_returns_exemplars(): void
     {
         $reservoir = new FilteredReservoir(new FixedSizeReservoir(Attributes::factory(), 4), new AllExemplarFilter());
-        $reservoir->offer(0, 5, Attributes::create([]), Context::getRoot(), 7, 0);
+        $reservoir->offer(0, 5, Attributes::create([]), Context::getRoot(), 7);
 
         $this->assertEquals([
             0 => [
-                new Exemplar(5, 7, Attributes::create([]), null, null),
+                new Exemplar(0, 5, 7, Attributes::create([]), null, null),
             ],
-        ], $reservoir->collect([0 => Attributes::create([])], 0, 1));
+        ], Exemplar::groupByIndex($reservoir->collect([0 => Attributes::create([])])));
     }
 
     /**
@@ -44,10 +44,10 @@ final class FilteredReservoirTest extends TestCase
     public function test_none_reservoir_doesnt_return_exemplars(): void
     {
         $reservoir = new FilteredReservoir(new FixedSizeReservoir(Attributes::factory(), 4), new NoneExemplarFilter());
-        $reservoir->offer(0, 5, Attributes::create([]), Context::getRoot(), 7, 0);
+        $reservoir->offer(0, 5, Attributes::create([]), Context::getRoot(), 7);
 
         $this->assertEquals([
-        ], $reservoir->collect([0 => Attributes::create([])], 0, 1));
+        ], Exemplar::groupByIndex($reservoir->collect([0 => Attributes::create([])])));
     }
 
     /**
@@ -60,13 +60,13 @@ final class FilteredReservoirTest extends TestCase
         $context = Span::wrap(SpanContext::create('12345678901234567890123456789012', '1234567890123456', SpanContextInterface::TRACE_FLAG_SAMPLED))
             ->storeInContext(Context::getRoot());
 
-        $reservoir->offer(0, 5, Attributes::create([]), $context, 7, 0);
+        $reservoir->offer(0, 5, Attributes::create([]), $context, 7);
 
         $this->assertEquals([
             0 => [
-                new Exemplar(5, 7, Attributes::create([]), '12345678901234567890123456789012', '1234567890123456'),
+                new Exemplar(0, 5, 7, Attributes::create([]), '12345678901234567890123456789012', '1234567890123456'),
             ],
-        ], $reservoir->collect([0 => Attributes::create([])], 0, 1));
+        ], Exemplar::groupByIndex($reservoir->collect([0 => Attributes::create([])])));
     }
 
     /**
@@ -79,9 +79,9 @@ final class FilteredReservoirTest extends TestCase
         $context = Span::wrap(SpanContext::create('12345678901234567890123456789012', '1234567890123456'))
             ->storeInContext(Context::getRoot());
 
-        $reservoir->offer(0, 5, Attributes::create([]), $context, 7, 0);
+        $reservoir->offer(0, 5, Attributes::create([]), $context, 7);
 
         $this->assertEquals([
-        ], $reservoir->collect([0 => Attributes::create([])], 0, 1));
+        ], Exemplar::groupByIndex($reservoir->collect([0 => Attributes::create([])])));
     }
 }

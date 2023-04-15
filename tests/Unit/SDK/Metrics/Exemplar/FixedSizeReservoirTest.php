@@ -18,12 +18,12 @@ final class FixedSizeReservoirTest extends TestCase
     public function test_reservoir_returns_exemplars(): void
     {
         $reservoir = new FixedSizeReservoir(Attributes::factory(), 4);
-        $reservoir->offer(0, 5, Attributes::create([]), Context::getRoot(), 7, 0);
+        $reservoir->offer(0, 5, Attributes::create([]), Context::getRoot(), 7);
 
         $this->assertEquals([
             0 => [
-                new Exemplar(5, 7, Attributes::create([]), null, null),
+                new Exemplar(0, 5, 7, Attributes::create([]), null, null),
             ],
-        ], $reservoir->collect([0 => Attributes::create([])], 0, 1));
+        ], Exemplar::groupByIndex($reservoir->collect([0 => Attributes::create([])])));
     }
 }

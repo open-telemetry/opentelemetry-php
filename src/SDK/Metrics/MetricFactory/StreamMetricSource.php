@@ -22,18 +22,22 @@ final class StreamMetricSource implements MetricSourceInterface
 
     public function collectionTimestamp(): int
     {
-        return $this->provider->stream->collectionTimestamp();
+        return $this->provider->stream->timestamp();
     }
 
     public function collect(?int $timestamp): Metric
     {
+        if ($timestamp !== null) {
+            $this->provider->stream->push($this->provider->metricCollector->collect($timestamp));
+        }
+
         return new Metric(
             $this->provider->instrumentationLibrary,
             $this->provider->resource,
             $this->provider->view->name,
             $this->provider->view->unit,
             $this->provider->view->description,
-            $this->provider->stream->collect($this->reader, $timestamp),
+            $this->provider->stream->collect($this->reader),
         );
     }
 

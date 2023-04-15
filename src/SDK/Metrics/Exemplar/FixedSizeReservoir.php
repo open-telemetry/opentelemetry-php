@@ -21,19 +21,19 @@ final class FixedSizeReservoir implements ExemplarReservoirInterface
         $this->size = $size;
     }
 
-    public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp, int $revision): void
+    public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $bucket = random_int(0, $this->measurements);
         $this->measurements++;
         if ($bucket < $this->size) {
-            $this->storage->store($bucket, $index, $value, $attributes, $context, $timestamp, $revision);
+            $this->storage->store($bucket, $index, $value, $attributes, $context, $timestamp);
         }
     }
 
-    public function collect(array $dataPointAttributes, int $revision, int $limit): array
+    public function collect(array $dataPointAttributes): array
     {
         $this->measurements = 0;
 
-        return $this->storage->collect($dataPointAttributes, $revision, $limit);
+        return $this->storage->collect($dataPointAttributes);
     }
 }

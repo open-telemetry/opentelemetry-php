@@ -32,7 +32,7 @@ final class BucketStorage
      * @param int|string $index
      * @param float|int $value
      */
-    public function store(int $bucket, $index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp, int $revision): void
+    public function store(int $bucket, $index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         assert($bucket <= count($this->buckets));
 
@@ -41,7 +41,6 @@ final class BucketStorage
         $exemplar->value = $value;
         $exemplar->timestamp = $timestamp;
         $exemplar->attributes = $attributes;
-        $exemplar->revision = $revision;
 
         if (($spanContext = Span::fromContext($context)->getContext())->isValid()) {
             $exemplar->traceId = $spanContext->getTraceId();
@@ -54,17 +53,18 @@ final class BucketStorage
 
     /**
      * @param array<AttributesInterface> $dataPointAttributes
-     * @return array<list<Exemplar>>
+     * @return array<Exemplar>
      */
-    public function collect(array $dataPointAttributes, int $revision, int $limit): array
+    public function collect(array $dataPointAttributes): array
     {
         $exemplars = [];
-        foreach ($this->buckets as $exemplar) {
-            if (!$exemplar || $exemplar->revision < $revision || $exemplar->revision >= $limit) {
+        foreach ($this->buckets as $index => &$exemplar) {
+            if (!$exemplar) {
                 continue;
             }
 
-            $exemplars[$exemplar->index][] = new Exemplar(
+            $exemplars[$index] = new Exemplar(
+                $exemplar->index,
                 $exemplar->value,
                 $exemplar->timestamp,
                 $this->filterExemplarAttributes(
@@ -74,6 +74,7 @@ final class BucketStorage
                 $exemplar->traceId,
                 $exemplar->spanId,
             );
+            $exemplar = null;
         }
 
         return $exemplars;

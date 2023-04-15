@@ -11,10 +11,9 @@ use GMP;
 use function gmp_init;
 use function is_int;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
-use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
+use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
-use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 use const PHP_INT_SIZE;
 use function sprintf;
 use function trigger_error;
@@ -24,7 +23,6 @@ use function trigger_error;
  */
 final class SynchronousMetricStream implements MetricStreamInterface
 {
-    private MetricAggregator $metricAggregator;
     private AggregationInterface $aggregation;
 
     private int $timestamp;
@@ -43,25 +41,11 @@ final class SynchronousMetricStream implements MetricStreamInterface
      */
     private $cumulative = 0;
 
-    public function __construct(
-        ?AttributeProcessorInterface $attributeProcessor,
-        AggregationInterface $aggregation,
-        ?ExemplarReservoirInterface $exemplarReservoir,
-        int $startTimestamp
-    ) {
-        $this->metricAggregator = new MetricAggregator(
-            $attributeProcessor,
-            $aggregation,
-            $exemplarReservoir,
-        );
+    public function __construct(AggregationInterface $aggregation, int $startTimestamp)
+    {
         $this->aggregation = $aggregation;
         $this->timestamp = $startTimestamp;
         $this->delta = new DeltaStorage($aggregation);
-    }
-
-    public function writable(): WritableMetricStreamInterface
-    {
-        return $this->metricAggregator;
     }
 
     public function temporality()
@@ -69,9 +53,15 @@ final class SynchronousMetricStream implements MetricStreamInterface
         return Temporality::DELTA;
     }
 
-    public function collectionTimestamp(): int
+    public function timestamp(): int
     {
         return $this->timestamp;
+    }
+
+    public function push(Metric $metric): void
+    {
+        [$this->timestamp, $metric->timestamp] = [$metric->timestamp, $this->timestamp];
+        $this->delta->add($metric, $this->readers);
     }
 
     public function register($temporality): int
@@ -115,18 +105,10 @@ final class SynchronousMetricStream implements MetricStreamInterface
         }
     }
 
-    public function collect(int $reader, ?int $timestamp): DataInterface
+    public function collect(int $reader): DataInterface
     {
-        if ($timestamp !== null) {
-            $this->delta->add(
-                $this->metricAggregator->collect($this->timestamp),
-                $this->readers,
-            );
-            $this->timestamp = $timestamp;
-        }
-
         $cumulative = ($this->cumulative >> $reader & 1) != 0;
-        $metric = $this->delta->collect($reader, $cumulative) ?? new Metric([], [], $this->timestamp, -1);
+        $metric = $this->delta->collect($reader, $cumulative) ?? new Metric([], [], $this->timestamp);
 
         $temporality = $cumulative
             ? Temporality::CUMULATIVE
@@ -135,7 +117,7 @@ final class SynchronousMetricStream implements MetricStreamInterface
         return $this->aggregation->toData(
             $metric->attributes,
             $metric->summaries,
-            $this->metricAggregator->exemplars($metric),
+            Exemplar::groupByIndex($metric->exemplars),
             $metric->timestamp,
             $this->timestamp,
             $temporality,

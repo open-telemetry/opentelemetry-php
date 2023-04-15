@@ -20,11 +20,18 @@ interface MetricStreamInterface
     public function temporality();
 
     /**
-     * Returns the last collection timestamp.
+     * Returns the last metric timestamp.
      *
-     * @return int collection timestamp
+     * @return int metric timestamp
      */
-    public function collectionTimestamp(): int;
+    public function timestamp(): int;
+
+    /**
+     * Pushes metric data to the stream.
+     *
+     * @param Metric $metric metric data to push
+     */
+    public function push(Metric $metric): void;
 
     /**
      * Registers a new reader with the given temporality.
@@ -45,9 +52,7 @@ interface MetricStreamInterface
      * Collects metric data for the given reader.
      *
      * @param int $reader reader id
-     * @param int|null $timestamp timestamp for newly collected data, null to
-     *        skip collection of new metric data
      * @return DataInterface metric data
      */
-    public function collect(int $reader, ?int $timestamp): DataInterface;
+    public function collect(int $reader): DataInterface;
 }
