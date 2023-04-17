@@ -52,7 +52,7 @@ final class MetricExporter implements MetricExporterInterface
     public function export(iterable $batch): bool
     {
         return $this->transport
-            ->send($this->serializer->serialize((new MetricConverter())->convert($batch)))
+            ->send($this->serializer->serialize((new MetricConverter($this->serializer))->convert($batch)))
             ->map(function (?string $payload): bool {
                 if ($payload === null) {
                     return true;
