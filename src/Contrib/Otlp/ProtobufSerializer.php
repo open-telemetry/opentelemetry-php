@@ -104,7 +104,7 @@ final class ProtobufSerializer
                 break;
             case self::JSON:
             case self::NDJSON:
-                $message->mergeFromJsonString($payload);
+                $message->mergeFromJsonString($payload, true);
 
                 break;
             default:
