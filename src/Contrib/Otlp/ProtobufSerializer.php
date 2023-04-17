@@ -104,6 +104,7 @@ final class ProtobufSerializer
                 break;
             case self::JSON:
             case self::NDJSON:
+                // @phan-suppress-next-line PhanParamTooManyInternal
                 $message->mergeFromJsonString($payload, true);
 
                 break;
