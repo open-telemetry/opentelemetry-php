@@ -14,7 +14,7 @@ use function serialize;
 /**
  * @internal
  */
-final class MetricAggregator implements WritableMetricStreamInterface
+final class MetricAggregator implements MetricAggregatorInterface
 {
     private ?AttributeProcessorInterface $attributeProcessor;
     private AggregationInterface $aggregation;
