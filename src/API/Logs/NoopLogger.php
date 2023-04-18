@@ -20,7 +20,7 @@ class NoopLogger implements LoggerInterface
     /**
      * @codeCoverageIgnore
      */
-    public function logRecord(LogRecord $logRecord): void
+    public function emit(LogRecord $logRecord): void
     {
     }
 

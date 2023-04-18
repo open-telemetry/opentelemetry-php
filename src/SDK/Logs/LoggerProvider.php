@@ -29,14 +29,14 @@ class LoggerProvider implements LoggerProviderInterface
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#logger-creation
      */
-    public function getLogger(string $name, ?string $version = null, ?string $schemaUrl = null, bool $includeTraceContext = true, iterable $attributes = []): LoggerInterface
+    public function getLogger(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = []): LoggerInterface
     {
         if ($this->loggerSharedState->hasShutdown()) {
             return NoopLogger::getInstance();
         }
         $scope = $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes);
 
-        return new Logger($this->loggerSharedState, $scope, $includeTraceContext);
+        return new Logger($this->loggerSharedState, $scope);
     }
 
     public function shutdown(CancellationInterface $cancellation = null): bool

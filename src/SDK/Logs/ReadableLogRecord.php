@@ -24,19 +24,18 @@ class ReadableLogRecord extends LogRecord
     protected AttributesInterface $convertedAttributes;
     protected SpanContextInterface $spanContext;
 
-    public function __construct(InstrumentationScopeInterface $scope, LoggerSharedState $loggerSharedState, LogRecord $logRecord, bool $includeTraceContext)
+    public function __construct(InstrumentationScopeInterface $scope, LoggerSharedState $loggerSharedState, LogRecord $logRecord)
     {
         $this->scope = $scope;
         $this->loggerSharedState = $loggerSharedState;
 
         parent::__construct($logRecord->body);
         $this->timestamp = $logRecord->timestamp;
-        $this->observedTimestamp = $logRecord->observedTimestamp;
+        $this->observedTimestamp = $logRecord->observedTimestamp
+            ?? (int) (microtime(true) * LogRecord::NANOS_PER_SECOND);
         $this->context = $logRecord->context;
-        if ($includeTraceContext) {
-            $context = $this->context ?? Context::getCurrent();
-            $this->spanContext = Span::fromContext($context)->getContext();
-        };
+        $context = $this->context ?? Context::getCurrent();
+        $this->spanContext = Span::fromContext($context)->getContext();
         $this->severityNumber = $logRecord->severityNumber;
         $this->severityText = $logRecord->severityText;
 

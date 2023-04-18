@@ -6,5 +6,5 @@ namespace OpenTelemetry\API\Logs;
 
 interface LoggerInterface
 {
-    public function logRecord(LogRecord $logRecord): void;
+    public function emit(LogRecord $logRecord): void;
 }

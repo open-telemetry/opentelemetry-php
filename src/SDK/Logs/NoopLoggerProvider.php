@@ -16,7 +16,7 @@ class NoopLoggerProvider implements LoggerProviderInterface
         return $instance ??= new self();
     }
 
-    public function getLogger(string $name, ?string $version = null, ?string $schemaUrl = null, bool $includeTraceContext = true, iterable $attributes = []): LoggerInterface
+    public function getLogger(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = []): LoggerInterface
     {
         return NoopLogger::getInstance();
     }

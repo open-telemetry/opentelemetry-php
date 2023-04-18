@@ -45,7 +45,7 @@ $otelHandler = new class(LogLevel::INFO) extends AbstractProcessingHandler {
 
     protected function write(array $record): void
     {
-        $this->logger->logRecord($this->convert($record));
+        $this->logger->emit($this->convert($record));
     }
 
     private function convert(array $record): LogRecord
