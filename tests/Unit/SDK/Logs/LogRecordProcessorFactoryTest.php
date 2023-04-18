@@ -8,6 +8,7 @@ use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorFactory;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogsProcessor;
+use OpenTelemetry\SDK\Logs\Processor\MultiLogsProcessor;
 use OpenTelemetry\SDK\Logs\Processor\NoopLogsProcessor;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
 use PHPUnit\Framework\TestCase;
@@ -54,11 +55,11 @@ class LogRecordProcessorFactoryTest extends TestCase
         (new LogRecordProcessorFactory())->create($this->createMock(LogRecordExporterInterface::class));
     }
 
-    public function test_rejects_multiple(): void
+    public function test_create_multiple(): void
     {
-        $this->setEnvironmentVariable('OTEL_PHP_LOGS_PROCESSOR', 'one,two');
-        $this->expectException(\InvalidArgumentException::class);
+        $this->setEnvironmentVariable('OTEL_PHP_LOGS_PROCESSOR', 'batch,simple');
+        $processor = (new LogRecordProcessorFactory())->create($this->createMock(LogRecordExporterInterface::class));
 
-        (new LogRecordProcessorFactory())->create($this->createMock(LogRecordExporterInterface::class));
+        $this->assertInstanceOf(MultiLogsProcessor::class, $processor);
     }
 }

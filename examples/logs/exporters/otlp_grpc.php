@@ -27,7 +27,6 @@ LoggerHolder::set(
 
 $transport = (new GrpcTransportFactory())->create('http://collector:4317' . OtlpUtil::method(Signals::LOGS));
 $exporter = new LogsExporter($transport);
-
 $loggerProvider = new LoggerProvider(
     new BatchLogsProcessor(
         $exporter,

@@ -17,6 +17,7 @@ class SpanConverter implements SpanConverterInterface
 {
     const STATUS_CODE_TAG_KEY = 'otel.status_code';
     const STATUS_DESCRIPTION_TAG_KEY = 'otel.status_description';
+    const KEY_DROPPED_ATTRIBUTES_COUNT = 'otel.dropped_attributes_count';
 
     private string $defaultServiceName;
 
@@ -69,6 +70,14 @@ class SpanConverter implements SpanConverterInterface
         }
         foreach ($span->getInstrumentationScope()->getAttributes() as $k => $v) {
             $row['attributes'][$k] = $v;
+        }
+
+        $droppedAttributes = $span->getAttributes()->getDroppedAttributesCount()
+            + $span->getInstrumentationScope()->getAttributes()->getDroppedAttributesCount()
+            + $span->getResource()->getAttributes()->getDroppedAttributesCount();
+
+        if ($droppedAttributes > 0) {
+            $row['attributes'][self::KEY_DROPPED_ATTRIBUTES_COUNT] = $droppedAttributes;
         }
 
         /*
