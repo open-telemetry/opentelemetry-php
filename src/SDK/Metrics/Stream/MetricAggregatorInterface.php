@@ -9,5 +9,4 @@ namespace OpenTelemetry\SDK\Metrics\Stream;
  */
 interface MetricAggregatorInterface extends WritableMetricStreamInterface, MetricCollectorInterface
 {
-
 }

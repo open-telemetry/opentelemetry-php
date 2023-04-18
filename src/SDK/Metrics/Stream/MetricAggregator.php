@@ -44,7 +44,7 @@ final class MetricAggregator implements MetricAggregatorInterface
             : $attributes;
         $raw = $filteredAttributes->toArray();
         $index = $raw !== [] ? serialize($raw) : 0;
-        $this->attributes[$index] = $filteredAttributes;
+        $this->attributes[$index] ??= $filteredAttributes;
         $this->aggregation->record(
             $this->summaries[$index] ??= $this->aggregation->initialize(),
             $value,

@@ -17,7 +17,7 @@ final class HistogramBucketReservoirTest extends TestCase
 {
     public function test_reservoir_returns_exemplars(): void
     {
-        $reservoir = new HistogramBucketReservoir(Attributes::factory(), [0]);
+        $reservoir = new HistogramBucketReservoir([0]);
         $reservoir->offer(0, 5, Attributes::create([]), Context::getRoot(), 7);
         $reservoir->offer(0, -5, Attributes::create([]), Context::getRoot(), 8);
         $reservoir->offer(0, 7, Attributes::create([]), Context::getRoot(), 9);

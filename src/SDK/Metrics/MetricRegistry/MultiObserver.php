@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\MetricRegistry;
 
 use OpenTelemetry\API\Metrics\ObserverInterface;
@@ -6,15 +9,19 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Metrics\Stream\WritableMetricStreamInterface;
 
-final class MultiObserver implements ObserverInterface {
-
+/**
+ * @internal
+ */
+final class MultiObserver implements ObserverInterface
+{
     private AttributesFactoryInterface $attributesFactory;
     private int $timestamp;
 
     /** @var list<WritableMetricStreamInterface>  */
     public array $writers = [];
 
-    public function __construct(AttributesFactoryInterface $attributesFactory, int $timestamp) {
+    public function __construct(AttributesFactoryInterface $attributesFactory, int $timestamp)
+    {
         $this->attributesFactory = $attributesFactory;
         $this->timestamp = $timestamp;
     }

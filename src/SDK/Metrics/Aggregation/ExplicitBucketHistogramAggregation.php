@@ -9,13 +9,9 @@ use function count;
 use const INF;
 use const NAN;
 use OpenTelemetry\Context\ContextInterface;
-use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\Data;
-use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
-use OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir;
-use OpenTelemetry\SDK\Metrics\Exemplar\HistogramBucketReservoir;
 
 /**
  * @implements AggregationInterface<ExplicitBucketHistogramSummary>
@@ -145,13 +141,6 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
             $dataPoints,
             $temporality,
         );
-    }
-
-    public function exemplarReservoir(AttributesFactoryInterface $attributesFactory): ExemplarReservoirInterface
-    {
-        return $this->boundaries
-            ? new HistogramBucketReservoir($attributesFactory, $this->boundaries)
-            : new FixedSizeReservoir($attributesFactory);
     }
 
     /**

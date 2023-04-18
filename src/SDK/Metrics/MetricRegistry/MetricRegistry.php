@@ -1,19 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\MetricRegistry;
 
+use function array_key_last;
 use Closure;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregatorFactoryInterface;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregatorInterface;
-use OpenTelemetry\SDK\Metrics\Stream\MetricCollectorInterface;
 use OpenTelemetry\SDK\Metrics\Stream\MetricStreamInterface;
-use function array_key_last;
+use function spl_object_id;
 
-final class MetricRegistry implements MetricRegistryInterface, MetricWriterInterface {
-
+/**
+ * @internal
+ */
+final class MetricRegistry implements MetricRegistryInterface, MetricWriterInterface
+{
     private ?ContextStorageInterface $contextStorage;
     private AttributesFactoryInterface $attributesFactory;
     private ClockInterface $clock;
@@ -46,20 +53,24 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         $this->clock = $clock;
     }
 
-    public function registerSynchronousStream(int $instrumentId, MetricStreamInterface $stream, MetricCollectorInterface $collector): int {
+    public function registerSynchronousStream(Instrument $instrument, MetricStreamInterface $stream, MetricAggregatorInterface $aggregator): int
+    {
         $this->streams[] = $stream;
         $streamId = array_key_last($this->streams);
+        $instrumentId = spl_object_id($instrument);
 
-        $this->synchronousAggregators[$streamId] = $collector;
+        $this->synchronousAggregators[$streamId] = $aggregator;
         $this->instrumentToStreams[$instrumentId][$streamId] = $streamId;
         $this->streamToInstrument[$streamId] = $instrumentId;
 
         return $streamId;
     }
 
-    public function registerAsynchronousStream(int $instrumentId, MetricStreamInterface $stream, MetricAggregatorFactoryInterface $aggregatorFactory): int {
+    public function registerAsynchronousStream(Instrument $instrument, MetricStreamInterface $stream, MetricAggregatorFactoryInterface $aggregatorFactory): int
+    {
         $this->streams[] = $stream;
         $streamId = array_key_last($this->streams);
+        $instrumentId = spl_object_id($instrument);
 
         $this->asynchronousAggregatorFactories[$streamId] = $aggregatorFactory;
         $this->instrumentToStreams[$instrumentId][$streamId] = $streamId;
@@ -68,7 +79,8 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         return $streamId;
     }
 
-    public function unregisterStream(int $streamId): void {
+    public function unregisterStream(int $streamId): void
+    {
         $instrumentId = $this->streamToInstrument[$streamId];
         unset(
             $this->streams[$streamId],
@@ -82,10 +94,12 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         }
     }
 
-    public function record(int $instrumentId, $value, iterable $attributes = [], $context = null): void {
+    public function record(Instrument $instrument, $value, iterable $attributes = [], $context = null): void
+    {
         $context = Context::resolve($context, $this->contextStorage);
         $attributes = $this->attributesFactory->builder($attributes)->build();
         $timestamp = $this->clock->now();
+        $instrumentId = spl_object_id($instrument);
         foreach ($this->instrumentToStreams[$instrumentId] ?? [] as $streamId) {
             if ($aggregator = $this->synchronousAggregators[$streamId] ?? null) {
                 $aggregator->record($value, $attributes, $context, $timestamp);
@@ -93,19 +107,25 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         }
     }
 
-    public function registerCallback(Closure $callback, int ...$instrumentIds): int {
+    public function registerCallback(Closure $callback, Instrument $instrument, Instrument ...$instruments): int
+    {
         $callbackId = array_key_last($this->asynchronousCallbacks) + 1;
         $this->asynchronousCallbacks[$callbackId] = $callback;
-        $this->asynchronousCallbackArguments[$callbackId] = $instrumentIds;
 
-        foreach ($instrumentIds as $instrumentId) {
+        $instrumentId = spl_object_id($instrument);
+        $this->asynchronousCallbackArguments[$callbackId] = [$instrumentId];
+        $this->instrumentToCallbacks[$instrumentId][$callbackId] = $callbackId;
+        foreach ($instruments as $instrument) {
+            $instrumentId = spl_object_id($instrument);
+            $this->asynchronousCallbackArguments[$callbackId][] = $instrumentId;
             $this->instrumentToCallbacks[$instrumentId][$callbackId] = $callbackId;
         }
 
         return $callbackId;
     }
 
-    public function unregisterCallback(int $callbackId): void {
+    public function unregisterCallback(int $callbackId): void
+    {
         $instrumentIds = $this->asynchronousCallbackArguments[$callbackId];
         unset(
             $this->asynchronousCallbacks[$callbackId],
@@ -119,7 +139,8 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         }
     }
 
-    public function collectAndPush(array $streamIds): void {
+    public function collectAndPush(iterable $streamIds): void
+    {
         $timestamp = $this->clock->now();
         $collectors = [];
         $observers = [];
@@ -147,7 +168,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
                 $args[] = $observers[$instrumentId] ?? $noopObserver;
             }
             $callback = $this->asynchronousCallbacks[$callbackId];
-            $callbacks[] = static fn() => $callback(...$args);
+            $callbacks[] = static fn () => $callback(...$args);
         }
         foreach ($callbacks as $callback) {
             $callback();

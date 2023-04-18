@@ -1,13 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\SDK\Metrics\MetricRegistry;
 
 use Closure;
+use OpenTelemetry\SDK\Metrics\Instrument;
 
-interface MetricWriterInterface {
+/**
+ * @internal
+ */
+interface MetricWriterInterface
+{
+    public function record(Instrument $instrument, $value, iterable $attributes = [], $context = null): void;
 
-    public function record(int $instrumentId, $value, iterable $attributes = [], $context = null): void;
-
-    public function registerCallback(Closure $callback, int ...$instrumentIds): int;
+    public function registerCallback(Closure $callback, Instrument $instrument, Instrument ...$instruments): int;
 
     public function unregisterCallback(int $callbackId): void;
 }

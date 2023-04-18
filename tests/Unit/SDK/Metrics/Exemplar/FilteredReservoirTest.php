@@ -28,7 +28,7 @@ final class FilteredReservoirTest extends TestCase
      */
     public function test_all_reservoir_returns_exemplars(): void
     {
-        $reservoir = new FilteredReservoir(new FixedSizeReservoir(Attributes::factory(), 4), new AllExemplarFilter());
+        $reservoir = new FilteredReservoir(new FixedSizeReservoir(4), new AllExemplarFilter());
         $reservoir->offer(0, 5, Attributes::create([]), Context::getRoot(), 7);
 
         $this->assertEquals([
@@ -43,7 +43,7 @@ final class FilteredReservoirTest extends TestCase
      */
     public function test_none_reservoir_doesnt_return_exemplars(): void
     {
-        $reservoir = new FilteredReservoir(new FixedSizeReservoir(Attributes::factory(), 4), new NoneExemplarFilter());
+        $reservoir = new FilteredReservoir(new FixedSizeReservoir(4), new NoneExemplarFilter());
         $reservoir->offer(0, 5, Attributes::create([]), Context::getRoot(), 7);
 
         $this->assertEquals([
@@ -55,7 +55,7 @@ final class FilteredReservoirTest extends TestCase
      */
     public function test_with_sampled_trace_reservoir_returns_sampled_exemplars(): void
     {
-        $reservoir = new FilteredReservoir(new FixedSizeReservoir(Attributes::factory(), 4), new WithSampledTraceExemplarFilter());
+        $reservoir = new FilteredReservoir(new FixedSizeReservoir(4), new WithSampledTraceExemplarFilter());
 
         $context = Span::wrap(SpanContext::create('12345678901234567890123456789012', '1234567890123456', SpanContextInterface::TRACE_FLAG_SAMPLED))
             ->storeInContext(Context::getRoot());
@@ -74,7 +74,7 @@ final class FilteredReservoirTest extends TestCase
      */
     public function test_with_sampled_trace_reservoir_doesnt_return_not_sampled_exemplars(): void
     {
-        $reservoir = new FilteredReservoir(new FixedSizeReservoir(Attributes::factory(), 4), new WithSampledTraceExemplarFilter());
+        $reservoir = new FilteredReservoir(new FixedSizeReservoir(4), new WithSampledTraceExemplarFilter());
 
         $context = Span::wrap(SpanContext::create('12345678901234567890123456789012', '1234567890123456'))
             ->storeInContext(Context::getRoot());

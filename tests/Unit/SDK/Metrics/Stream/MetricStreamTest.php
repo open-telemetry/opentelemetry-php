@@ -24,8 +24,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream
- * @covers \OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStreamObserver
- *
  * @covers \OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream
  *
  * @covers \OpenTelemetry\SDK\Metrics\Stream\Metric
@@ -33,7 +31,6 @@ use PHPUnit\Framework\TestCase;
  *
  * @uses \OpenTelemetry\SDK\Metrics\Stream\Delta
  * @uses \OpenTelemetry\SDK\Metrics\Stream\DeltaStorage
- * @uses \OpenTelemetry\SDK\Metrics\Stream\StreamWriter
  *
  * @uses \OpenTelemetry\SDK\Metrics\Data\NumberDataPoint
  * @uses \OpenTelemetry\SDK\Metrics\Data\Sum
@@ -345,7 +342,7 @@ final class MetricStreamTest extends TestCase
 
     public function test_metric_aggregator_applies_attribute_filter(): void
     {
-        $aggregator = new MetricAggregator(new FilteredAttributeProcessor(Attributes::factory(), ['foo', 'bar']), new SumAggregation(), null);
+        $aggregator = new MetricAggregator(new FilteredAttributeProcessor(['foo', 'bar']), new SumAggregation(), null);
         $aggregator->record(5, Attributes::create(['foo' => 1, 'bar' => 2, 'baz' => 3]), Context::getRoot(), 0);
 
         $this->assertEquals(
@@ -358,7 +355,7 @@ final class MetricStreamTest extends TestCase
     {
         $exemplarReservoir = $this->createMock(ExemplarReservoirInterface::class);
         $exemplarReservoir->expects($this->once())->method('offer')->with($this->anything(), 5, Attributes::create(['foo' => 1]), Context::getRoot(), 3);
-        $aggregator = new MetricAggregator(new FilteredAttributeProcessor(Attributes::factory(), ['foo', 'bar']), new SumAggregation(), $exemplarReservoir);
+        $aggregator = new MetricAggregator(new FilteredAttributeProcessor(['foo', 'bar']), new SumAggregation(), $exemplarReservoir);
         $aggregator->record(5, Attributes::create(['foo' => 1]), Context::getRoot(), 3);
     }
 }

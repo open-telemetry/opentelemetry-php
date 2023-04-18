@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
-use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
+use OpenTelemetry\SDK\Metrics\MetricFactory\StreamMetricSourceProvider;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricCollectorInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
@@ -22,16 +23,19 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
     use DefaultAggregationProviderTrait { defaultAggregation as private _defaultAggregation; }
 
     private MetricExporterInterface $exporter;
-    private ClockInterface $clock;
     /** @var array<int, MetricSourceInterface> */
     private array $sources = [];
 
+    /** @var array<int, MetricCollectorInterface> */
+    private array $registries = [];
+    /** @var array<int, array<int, int>> */
+    private array $streamIds = [];
+
     private bool $closed = false;
 
-    public function __construct(MetricExporterInterface $exporter, ClockInterface $clock)
+    public function __construct(MetricExporterInterface $exporter)
     {
         $this->exporter = $exporter;
-        $this->clock = $clock;
     }
 
     public function defaultAggregation($instrumentType): ?AggregationInterface
@@ -56,18 +60,47 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         $sourceId = spl_object_id($source);
 
         $this->sources[$sourceId] = $source;
-
         $stalenessHandler->onStale(function () use ($sourceId): void {
             unset($this->sources[$sourceId]);
+        });
+
+        if (!$provider instanceof StreamMetricSourceProvider) {
+            return;
+        }
+
+        $streamId = $provider->streamId;
+        $registry = $provider->metricCollector;
+        $registryId = spl_object_id($registry);
+
+        $this->registries[$registryId] = $registry;
+        $this->streamIds[$registryId][$streamId] ??= 0;
+        $this->streamIds[$registryId][$streamId]++;
+
+        $stalenessHandler->onStale(function () use ($streamId, $registryId): void {
+            if (!--$this->streamIds[$registryId][$streamId]) {
+                unset($this->streamIds[$registryId][$streamId]);
+                if (!$this->streamIds[$registryId]) {
+                    unset(
+                        $this->registries[$registryId],
+                        $this->streamIds[$registryId],
+                    );
+                }
+            }
         });
     }
 
     private function doCollect(): bool
     {
-        $timestamp = $this->clock->now();
+        foreach ($this->registries as $registryId => $_) {
+            // @phpstan-ignore-next-line
+            if ($registry = $this->registries[$registryId]) {
+                $registry->collectAndPush(array_keys($this->streamIds[$registryId]));
+            }
+        }
+
         $metrics = [];
         foreach ($this->sources as $source) {
-            $metrics[] = $source->collect($timestamp);
+            $metrics[] = $source->collect();
         }
 
         if ($metrics === []) {

@@ -9,23 +9,28 @@ use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use function OpenTelemetry\SDK\Common\Util\closure;
 use function OpenTelemetry\SDK\Common\Util\weaken;
-use OpenTelemetry\SDK\Metrics\MetricObserver\CallbackDestructor;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 
 /**
  * @internal
  */
 trait ObservableInstrumentTrait
 {
-    private MetricObserverInterface $metricObserver;
+    private MetricWriterInterface $writer;
+    private Instrument $instrument;
     private ReferenceCounterInterface $referenceCounter;
-    private ArrayAccess $callbackDestructors;
+    private ArrayAccess $destructors;
 
     public function __construct(
-        MetricObserverInterface $metricObserver,
-        ReferenceCounterInterface $referenceCounter
+        MetricWriterInterface $writer,
+        Instrument $instrument,
+        ReferenceCounterInterface $referenceCounter,
+        ArrayAccess $destructors
     ) {
-        $this->metricObserver = $metricObserver;
+        $this->writer = $writer;
+        $this->instrument = $instrument;
         $this->referenceCounter = $referenceCounter;
+        $this->destructors = $destructors;
 
         $this->referenceCounter->acquire();
     }
@@ -46,16 +51,15 @@ trait ObservableInstrumentTrait
             $callback = weaken($callback, $target);
         }
 
-        /** @psalm-var \Closure(ObserverInterface): void $callback */
-        $token = $this->metricObserver->observe($callback);
+        $callbackId = $this->writer->registerCallback($callback, $this->instrument);
         $this->referenceCounter->acquire();
 
         $destructor = null;
         if ($object = $target) {
-            $destructor = $this->metricObserver->destructors()[$object] ??= new CallbackDestructor($this->metricObserver, $this->referenceCounter);
-            $destructor->tokens[$token] = $token;
+            $destructor = $this->destructors[$object] ??= new ObservableCallbackDestructor($this->writer, $this->referenceCounter);
+            $destructor->callbackIds[$callbackId] = $callbackId;
         }
 
-        return new ObservableCallback($this->metricObserver, $this->referenceCounter, $token, $destructor);
+        return new ObservableCallback($this->writer, $this->referenceCounter, $callbackId, $destructor);
     }
 }

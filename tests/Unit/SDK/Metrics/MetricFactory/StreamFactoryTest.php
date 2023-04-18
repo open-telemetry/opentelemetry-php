@@ -19,12 +19,14 @@ use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\RegistryRegistration;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;
 use OpenTelemetry\SDK\Metrics\MetricSourceProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandler;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -39,11 +41,15 @@ final class StreamFactoryTest extends TestCase
         $resource = ResourceInfoFactory::emptyResource();
         $instrumentationScope = new InstrumentationScope('test', null, null, Attributes::create([]));
 
-        $registry = new CollectingSourceRegistry();
-        $observer = (new StreamFactory())->createAsynchronousObserver(
+        $clock = new TestClock();
+        $registry = new MetricRegistry(null, Attributes::factory(), $clock);
+        $instrument = new Instrument(InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER, 'name', '{unit}', 'description');
+        $sourceRegistry = new CollectingSourceRegistry();
+        $streamIds = (new StreamFactory())->createAsynchronousObserver(
+            $registry,
             $resource,
             $instrumentationScope,
-            new Instrument(InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER, 'name', '{unit}', 'description'),
+            $instrument,
             1,
             [
                 [new ViewProjection(
@@ -52,14 +58,12 @@ final class StreamFactoryTest extends TestCase
                     'view-description',
                     null,
                     new SumAggregation(),
-                ), new RegistryRegistration($registry, new NoopStalenessHandler())],
+                ), new RegistryRegistration($sourceRegistry, new NoopStalenessHandler())],
             ],
-            Attributes::factory(),
-            new NoneExemplarFilter(),
         );
 
-        $this->assertCount(1, $registry->sources);
-        [$provider, $metadata] = $registry->sources[0];
+        $this->assertCount(1, $sourceRegistry->sources);
+        [$provider, $metadata] = $sourceRegistry->sources[0];
 
         $this->assertSame(InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER, $metadata->instrumentType());
         $this->assertSame('view-name', $metadata->name());
@@ -68,7 +72,10 @@ final class StreamFactoryTest extends TestCase
         $this->assertSame(Temporality::CUMULATIVE, $metadata->temporality());
 
         $source = $provider->create(Temporality::CUMULATIVE);
-        $observer->observe(static fn (ObserverInterface $observer) => $observer->observe(5));
+        $registry->registerCallback(static fn (ObserverInterface $observer) => $observer->observe(5), $instrument);
+
+        $clock->setTime(3);
+        $registry->collectAndPush($streamIds);
 
         $this->assertEquals(
             new Metric(
@@ -85,7 +92,7 @@ final class StreamFactoryTest extends TestCase
                     false
                 ),
             ),
-            $source->collect(3),
+            $source->collect(),
         );
         $this->assertSame(3, $source->collectionTimestamp());
     }
@@ -95,11 +102,15 @@ final class StreamFactoryTest extends TestCase
         $resource = ResourceInfoFactory::emptyResource();
         $instrumentationScope = new InstrumentationScope('test', null, null, Attributes::create([]));
 
-        $registry = new CollectingSourceRegistry();
-        $writer = (new StreamFactory())->createSynchronousWriter(
+        $clock = new TestClock();
+        $registry = new MetricRegistry(null, Attributes::factory(), $clock);
+        $instrument = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'name', '{unit}', 'description');
+        $sourceRegistry = new CollectingSourceRegistry();
+        $streamIds = (new StreamFactory())->createSynchronousWriter(
+            $registry,
             $resource,
             $instrumentationScope,
-            new Instrument(InstrumentType::UP_DOWN_COUNTER, 'name', '{unit}', 'description'),
+            $instrument,
             1,
             [
                 [new ViewProjection(
@@ -108,14 +119,13 @@ final class StreamFactoryTest extends TestCase
                     'view-description',
                     null,
                     new SumAggregation(),
-                ), new RegistryRegistration($registry, new NoopStalenessHandler())],
+                ), new RegistryRegistration($sourceRegistry, new NoopStalenessHandler())],
             ],
-            Attributes::factory(),
             new NoneExemplarFilter(),
         );
 
-        $this->assertCount(1, $registry->sources);
-        [$provider, $metadata] = $registry->sources[0];
+        $this->assertCount(1, $sourceRegistry->sources);
+        [$provider, $metadata] = $sourceRegistry->sources[0];
 
         $this->assertSame(InstrumentType::UP_DOWN_COUNTER, $metadata->instrumentType());
         $this->assertSame('view-name', $metadata->name());
@@ -124,7 +134,10 @@ final class StreamFactoryTest extends TestCase
         $this->assertSame(Temporality::DELTA, $metadata->temporality());
 
         $source = $provider->create(Temporality::DELTA);
-        $writer->record(5, [], null, 2);
+        $registry->record($instrument, 5);
+
+        $clock->setTime(3);
+        $registry->collectAndPush($streamIds);
 
         $this->assertEquals(
             new Metric(
@@ -141,7 +154,7 @@ final class StreamFactoryTest extends TestCase
                     false
                 ),
             ),
-            $source->collect(3),
+            $source->collect(),
         );
         $this->assertSame(3, $source->collectionTimestamp());
     }
