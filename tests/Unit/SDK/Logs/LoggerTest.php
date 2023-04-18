@@ -34,7 +34,7 @@ class LoggerTest extends TestCase
 
     public function test_log_record(): void
     {
-        $logger = new Logger($this->sharedState, $this->scope, true);
+        $logger = new Logger($this->sharedState, $this->scope);
         $record = (new LogRecord())->setContext($this->createMock(ContextInterface::class));
 
         $this->processor->expects($this->once())->method('onEmit')
@@ -43,6 +43,26 @@ class LoggerTest extends TestCase
                 $this->isInstanceOf(ContextInterface::class)
             );
 
-        $logger->logRecord($record);
+        $logger->emit($record);
+    }
+
+    public function test_sets_observed_timestamp_on_emit(): void
+    {
+        $logger = new Logger($this->sharedState, $this->scope);
+        $record = new LogRecord();
+        $time = microtime(true) * LogRecord::NANOS_PER_SECOND;
+
+        $this->processor->expects($this->once())->method('onEmit')
+            ->with(
+                $this->callback(function (ReadWriteLogRecord $record) use ($time) {
+                    $this->assertNotNull($record->getObservedTimestamp());
+                    $this->assertGreaterThan($time, $record->getObservedTimestamp());
+
+                    return true;
+                }),
+                $this->anything(),
+            );
+
+        $logger->emit($record);
     }
 }

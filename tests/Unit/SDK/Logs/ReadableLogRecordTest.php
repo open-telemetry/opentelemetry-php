@@ -37,7 +37,7 @@ class ReadableLogRecordTest extends TestCase
             ->setObservedTimestamp(22)
             ->setAttributes(['foo' => 'bar'])
             ->setContext($context);
-        $record = new ReadableLogRecord($scope, $sharedState, $logRecord, true);
+        $record = new ReadableLogRecord($scope, $sharedState, $logRecord);
 
         $this->assertSame($scope, $record->getInstrumentationScope());
         $this->assertSame($resource, $record->getResource());

@@ -21,6 +21,6 @@ class EventLogger implements EventLoggerInterface
             'event.name' => $eventName,
             'event.domain' => $this->domain,
         ]);
-        $this->logger->logRecord($logRecord);
+        $this->logger->emit($logRecord);
     }
 }

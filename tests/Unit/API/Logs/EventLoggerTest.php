@@ -21,7 +21,7 @@ class EventLoggerTest extends TestCase
         $logRecord = $this->createMock(LogRecord::class);
         $eventLogger = new EventLogger($logger, $domain);
         $logRecord->expects($this->once())->method('setAttributes');
-        $logger->expects($this->once())->method('logRecord')->with($this->equalTo($logRecord));
+        $logger->expects($this->once())->method('emit')->with($this->equalTo($logRecord));
 
         $eventLogger->logEvent('some.event', $logRecord);
     }

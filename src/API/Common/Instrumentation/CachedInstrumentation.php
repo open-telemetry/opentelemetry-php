@@ -88,10 +88,9 @@ final class CachedInstrumentation
         $loggerProvider = Globals::loggerProvider();
 
         if ($this->loggers === null) {
-            //@todo configurable includeTraceContext?
-            return $loggerProvider->getLogger($this->name, $this->version, $this->schemaUrl, true, $this->attributes);
+            return $loggerProvider->getLogger($this->name, $this->version, $this->schemaUrl, $this->attributes);
         }
 
-        return $this->loggers[$loggerProvider] ??= $loggerProvider->getLogger($this->name, $this->version, $this->schemaUrl, true, $this->attributes);
+        return $this->loggers[$loggerProvider] ??= $loggerProvider->getLogger($this->name, $this->version, $this->schemaUrl, $this->attributes);
     }
 }
