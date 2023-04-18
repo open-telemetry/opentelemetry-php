@@ -18,6 +18,13 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 class LogsConverter
 {
+    private ProtobufSerializer $serializer;
+
+    public function __construct(?ProtobufSerializer $serializer = null)
+    {
+        $this->serializer = $serializer ?? ProtobufSerializer::getDefault();
+    }
+
     /**
      * @param iterable<ReadableLogRecord> $logs
      * @psalm-suppress InvalidArgument
@@ -76,8 +83,8 @@ class LogsConverter
         $pLogRecord->setObservedTimeUnixNano($record->getObservedTimestamp() ?? 0);
         $spanContext = $record->getSpanContext();
         if ($spanContext !== null && $spanContext->isValid()) {
-            $pLogRecord->setTraceId($spanContext->getTraceIdBinary());
-            $pLogRecord->setSpanId($spanContext->getSpanIdBinary());
+            $pLogRecord->setTraceId($this->serializer->serializeTraceId($spanContext->getTraceIdBinary()));
+            $pLogRecord->setSpanId($this->serializer->serializeSpanId($spanContext->getSpanIdBinary()));
             $pLogRecord->setFlags($spanContext->getTraceFlags());
         }
         $severityNumber = $record->getSeverityNumber();

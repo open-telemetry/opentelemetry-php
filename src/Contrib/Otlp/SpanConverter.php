@@ -26,6 +26,13 @@ use function spl_object_id;
 
 final class SpanConverter
 {
+    private ProtobufSerializer $serializer;
+
+    public function __construct(?ProtobufSerializer $serializer = null)
+    {
+        $this->serializer = $serializer ?? ProtobufSerializer::getDefault();
+    }
+
     public function convert(iterable $spans): ExportTraceServiceRequest
     {
         $pExportTraceServiceRequest = new ExportTraceServiceRequest();
@@ -139,11 +146,11 @@ final class SpanConverter
     private function convertSpan(SpanDataInterface $span): Span
     {
         $pSpan = new Span();
-        $pSpan->setTraceId($span->getContext()->getTraceIdBinary());
-        $pSpan->setSpanId($span->getContext()->getSpanIdBinary());
+        $pSpan->setTraceId($this->serializer->serializeTraceId($span->getContext()->getTraceIdBinary()));
+        $pSpan->setSpanId($this->serializer->serializeSpanId($span->getContext()->getSpanIdBinary()));
         $pSpan->setTraceState((string) $span->getContext()->getTraceState());
         if ($span->getParentContext()->isValid()) {
-            $pSpan->setParentSpanId($span->getParentContext()->getSpanIdBinary());
+            $pSpan->setParentSpanId($this->serializer->serializeSpanId($span->getParentContext()->getSpanIdBinary()));
         }
         $pSpan->setName($span->getName());
         $pSpan->setKind($this->convertSpanKind($span->getKind()));
@@ -163,8 +170,8 @@ final class SpanConverter
         foreach ($span->getLinks() as $link) {
             /** @psalm-suppress InvalidArgument */
             $pSpan->getLinks()[] = $pLink = new Link();
-            $pLink->setTraceId($link->getSpanContext()->getTraceIdBinary());
-            $pLink->setSpanId($link->getSpanContext()->getSpanIdBinary());
+            $pLink->setTraceId($this->serializer->serializeTraceId($link->getSpanContext()->getTraceIdBinary()));
+            $pLink->setSpanId($this->serializer->serializeSpanId($link->getSpanContext()->getSpanIdBinary()));
             $pLink->setTraceState((string) $link->getSpanContext()->getTraceState());
             $this->setAttributes($pLink, $link->getAttributes());
         }

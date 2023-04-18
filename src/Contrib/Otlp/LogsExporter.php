@@ -42,7 +42,7 @@ class LogsExporter implements LogRecordExporterInterface
     public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         return $this->transport
-            ->send($this->serializer->serialize((new LogsConverter())->convert($batch)), $cancellation)
+            ->send($this->serializer->serialize((new LogsConverter($this->serializer))->convert($batch)), $cancellation)
             ->map(function (?string $payload): bool {
                 if ($payload === null) {
                     return true;

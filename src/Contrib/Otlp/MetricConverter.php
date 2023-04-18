@@ -27,6 +27,13 @@ use function serialize;
 
 final class MetricConverter
 {
+    private ProtobufSerializer $serializer;
+
+    public function __construct(?ProtobufSerializer $serializer = null)
+    {
+        $this->serializer = $serializer ?? ProtobufSerializer::getDefault();
+    }
+
     /**
      * @param iterable<SDK\Metrics\Data\Metric> $batch
      */
@@ -218,8 +225,8 @@ final class MetricConverter
         $pExemplar = new Exemplar();
         $this->setFilteredAttributes($pExemplar, $exemplar->attributes);
         $pExemplar->setTimeUnixNano($exemplar->timestamp);
-        $pExemplar->setSpanId(hex2bin((string) $exemplar->spanId));
-        $pExemplar->setTraceId(hex2bin((string) $exemplar->traceId));
+        $pExemplar->setSpanId($this->serializer->serializeSpanId(hex2bin((string) $exemplar->spanId)));
+        $pExemplar->setTraceId($this->serializer->serializeTraceId(hex2bin((string) $exemplar->traceId)));
         if (is_int($exemplar->value)) {
             $pExemplar->setAsInt($exemplar->value);
         }

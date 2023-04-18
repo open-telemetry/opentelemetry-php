@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Otlp;
 
 use AssertionError;
+use function base64_decode;
+use function bin2hex;
 use Exception;
 use Google\Protobuf\Internal\Message;
 use InvalidArgumentException;
@@ -29,6 +31,11 @@ final class ProtobufSerializer
         $this->contentType = $contentType;
     }
 
+    public static function getDefault(): ProtobufSerializer
+    {
+        return new self(self::PROTOBUF);
+    }
+
     /**
      * @psalm-param TransportInterface<SUPPORTED_CONTENT_TYPES> $transport
      */
@@ -41,6 +48,32 @@ final class ProtobufSerializer
                 return new self($contentType);
             default:
                 throw new InvalidArgumentException(sprintf('Not supported content type "%s"', $contentType));
+        }
+    }
+
+    public function serializeTraceId(string $traceId): string
+    {
+        switch ($this->contentType) {
+            case self::PROTOBUF:
+                return $traceId;
+            case self::JSON:
+            case self::NDJSON:
+                return base64_decode(bin2hex($traceId));
+            default:
+                throw new AssertionError();
+        }
+    }
+
+    public function serializeSpanId(string $spanId): string
+    {
+        switch ($this->contentType) {
+            case self::PROTOBUF:
+                return $spanId;
+            case self::JSON:
+            case self::NDJSON:
+                return base64_decode(bin2hex($spanId));
+            default:
+                throw new AssertionError();
         }
     }
 
@@ -71,7 +104,8 @@ final class ProtobufSerializer
                 break;
             case self::JSON:
             case self::NDJSON:
-                $message->mergeFromJsonString($payload);
+                // @phan-suppress-next-line PhanParamTooManyInternal
+                $message->mergeFromJsonString($payload, true);
 
                 break;
             default:
