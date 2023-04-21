@@ -1343,7 +1343,6 @@ interface TraceAttributes
      */
     public const MESSAGING_DESTINATION = 'messaging.destination';
 
-
     /**
      * @deprecated
      */
