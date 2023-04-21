@@ -1,0 +1,9 @@
+    /**
+     * @deprecated
+     */
+    public const BROWSER_USER_AGENT = 'browser.user_agent';
+
+    /**
+     * @deprecated
+     */
+    public const FAAS_ID = 'faas.id';

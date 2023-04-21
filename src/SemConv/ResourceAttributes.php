@@ -771,6 +771,7 @@ interface ResourceAttributes
     /**
      * Deprecated, use the `otel.scope.name` attribute.
      *
+     * @deprecated Deprecated, use the `otel.scope.name` attribute..
      * @example io.opentelemetry.contrib.mongodb
      */
     public const OTEL_LIBRARY_NAME = 'otel.library.name';
@@ -778,7 +779,18 @@ interface ResourceAttributes
     /**
      * Deprecated, use the `otel.scope.version` attribute.
      *
+     * @deprecated Deprecated, use the `otel.scope.version` attribute..
      * @example 1.0.0
      */
     public const OTEL_LIBRARY_VERSION = 'otel.library.version';
+
+    /**
+     * @deprecated
+     */
+    public const BROWSER_USER_AGENT = 'browser.user_agent';
+
+    /**
+     * @deprecated
+     */
+    public const FAAS_ID = 'faas.id';
 }

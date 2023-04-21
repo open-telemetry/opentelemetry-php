@@ -19,10 +19,10 @@ interface {{ class }}Attributes
      *
      * {{ attribute.note | render_markdown(code="`{0}`", paragraph="{0}", link="{1}") | trim("\n")| regex_replace(pattern="\n", replace="\n     * ") }}
      {%- endif %}
-     {%- if attribute.examples or attribute.deprecated %}
+     {%- if attribute.examples or attribute.stability == "deprecated" %}
      *
-     {%- if attribute.deprecated %}
-     * @deprecated {{ attribute.deprecated | render_markdown(code="`{0}`", paragraph="{0}", link="{{@link {0} {1}}}") | regex_replace(pattern="\n", replace="\n    * ") }}
+     {%- if (attribute.stability | string()) == "StabilityLevel.DEPRECATED" %}
+     * @deprecated {{attribute.brief}}.
      {%- endif %}
      {%- for example in attribute.examples if example %}
      * @example {{ example }}
@@ -32,5 +32,7 @@ interface {{ class }}Attributes
     public const {{ attribute.fqn | to_const_name }} = '{{ attribute.fqn }}';
 {% if not loop.last %}{# blank line #}{% endif %}
 {%- endfor -%}
+{# add our own deprecations for moved/removed attributes, so we don't break things #}
+{% include class|lower + "_deprecations.php.partial" ignore missing without context %}
 }
 {# blank line #}

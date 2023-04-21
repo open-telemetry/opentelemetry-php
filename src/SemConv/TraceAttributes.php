@@ -37,6 +37,147 @@ interface TraceAttributes
     public const EXCEPTION_STACKTRACE = 'exception.stacktrace';
 
     /**
+     * HTTP request method.
+     *
+     * @example GET
+     * @example POST
+     * @example HEAD
+     */
+    public const HTTP_METHOD = 'http.method';
+
+    /**
+     * HTTP response status code.
+     *
+     * @example 200
+     */
+    public const HTTP_STATUS_CODE = 'http.status_code';
+
+    /**
+     * Kind of HTTP protocol used.
+     */
+    public const HTTP_FLAVOR = 'http.flavor';
+
+    /**
+     * Host identifier of the &quot;URI origin&quot; HTTP request is sent to.
+     *
+     * Determined by using the first of the following that applies<ul>
+     * <li>Host identifier of the request target
+     * if it's sent in absolute-form</li>
+     * <li>Host identifier of the `Host` header</li>
+     * </ul>
+     * SHOULD NOT be set if capturing it would require an extra DNS lookup.
+     *
+     * @example example.com
+     */
+    public const NET_PEER_NAME = 'net.peer.name';
+
+    /**
+     * Port identifier of the &quot;URI origin&quot; HTTP request is sent to.
+     *
+     * When request target is absolute URI, `net.peer.name` MUST match URI port identifier, otherwise it MUST match `Host` header port identifier.
+     *
+     * @example 80
+     * @example 8080
+     * @example 443
+     */
+    public const NET_PEER_PORT = 'net.peer.port';
+
+    /**
+     * The URI scheme identifying the used protocol.
+     *
+     * @example http
+     * @example https
+     */
+    public const HTTP_SCHEME = 'http.scheme';
+
+    /**
+     * The matched route (path template in the format used by the respective server framework). See note below.
+     *
+     * MUST NOT be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
+     * SHOULD include the application root if there is one.
+     *
+     * @example /users/:userID?
+     * @example {controller}/{action}/{id?}
+     */
+    public const HTTP_ROUTE = 'http.route';
+
+    /**
+     * Name of the local HTTP server that received the request.
+     *
+     * Determined by using the first of the following that applies<ul>
+     * <li>The primary server name of the matched virtual host. MUST only
+     * include host identifier.</li>
+     * <li>Host identifier of the request target
+     * if it's sent in absolute-form.</li>
+     * <li>Host identifier of the `Host` header</li>
+     * </ul>
+     * SHOULD NOT be set if only IP address is available and capturing name would require a reverse DNS lookup.
+     *
+     * @example localhost
+     */
+    public const NET_HOST_NAME = 'net.host.name';
+
+    /**
+     * Port of the local HTTP server that received the request.
+     *
+     * Determined by using the first of the following that applies<ul>
+     * <li>Port identifier of the primary server host of the matched virtual host.</li>
+     * <li>Port identifier of the request target
+     * if it's sent in absolute-form.</li>
+     * <li>Port identifier of the `Host` header</li>
+     * </ul>
+     *
+     * @example 8080
+     */
+    public const NET_HOST_PORT = 'net.host.port';
+
+    /**
+     * The name identifies the event.
+     *
+     * @example click
+     * @example exception
+     */
+    public const EVENT_NAME = 'event.name';
+
+    /**
+     * The domain identifies the business context for the events.
+     *
+     * Events across different domains may have same `event.name`, yet be
+     * unrelated events.
+     */
+    public const EVENT_DOMAIN = 'event.domain';
+
+    /**
+     * The unique identifier of the feature flag.
+     *
+     * @example logo-color
+     */
+    public const FEATURE_FLAG_KEY = 'feature_flag.key';
+
+    /**
+     * The name of the service provider that performs the flag evaluation.
+     *
+     * @example Flag Manager
+     */
+    public const FEATURE_FLAG_PROVIDER_NAME = 'feature_flag.provider_name';
+
+    /**
+     * SHOULD be a semantic identifier for a value. If one is unavailable, a stringified version of the value can be used.
+     *
+     * A semantic identifier, commonly referred to as a variant, provides a means
+     * for referring to a value without including the value itself. This can
+     * provide additional context for understanding the meaning behind a value.
+     * For example, the variant `red` maybe be used for the value `#c05543`.A stringified version of the value can be used in situations where a
+     * semantic identifier is unavailable. String representation of the value
+     * should be determined by the implementer.
+     *
+     * @example red
+     * @example true
+     * @example on
+     */
+    public const FEATURE_FLAG_VARIANT = 'feature_flag.variant';
+
+    /**
      * The full invoked ARN as provided on the `Context` passed to the function (`Lambda-Runtime-Invoked-Function-Arn` header on the `/runtime/invocation/next` applicable).
      *
      * This may be different from `cloud.resource_id` if an alias is involved.
@@ -149,24 +290,6 @@ interface TraceAttributes
      * @example SELECT
      */
     public const DB_OPERATION = 'db.operation';
-
-    /**
-     * Name of the database host.
-     *
-     * `net.peer.name` SHOULD NOT be set if capturing it would require an extra DNS lookup.
-     *
-     * @example example.com
-     */
-    public const NET_PEER_NAME = 'net.peer.name';
-
-    /**
-     * Logical remote port number.
-     *
-     * @example 80
-     * @example 8080
-     * @example 443
-     */
-    public const NET_PEER_PORT = 'net.peer.port';
 
     /**
      * Remote socket peer address: IPv4 or IPv6 for internet protocols, path for local communication, etc.
@@ -369,55 +492,6 @@ interface TraceAttributes
      * @example myTableName
      */
     public const FAAS_DOCUMENT_NAME = 'faas.document.name';
-
-    /**
-     * The URI scheme identifying the used protocol.
-     *
-     * @example http
-     * @example https
-     */
-    public const HTTP_SCHEME = 'http.scheme';
-
-    /**
-     * The matched route (path template in the format used by the respective server framework). See note below.
-     *
-     * MUST NOT be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
-     * SHOULD include the application root if there is one.
-     *
-     * @example /users/:userID?
-     * @example {controller}/{action}/{id?}
-     */
-    public const HTTP_ROUTE = 'http.route';
-
-    /**
-     * Name of the local HTTP server that received the request.
-     *
-     * Determined by using the first of the following that applies<ul>
-     * <li>The primary server name of the matched virtual host. MUST only
-     * include host identifier.</li>
-     * <li>Host identifier of the request target
-     * if it's sent in absolute-form.</li>
-     * <li>Host identifier of the `Host` header</li>
-     * </ul>
-     * SHOULD NOT be set if only IP address is available and capturing name would require a reverse DNS lookup.
-     *
-     * @example localhost
-     */
-    public const NET_HOST_NAME = 'net.host.name';
-
-    /**
-     * Port of the local HTTP server that received the request.
-     *
-     * Determined by using the first of the following that applies<ul>
-     * <li>Port identifier of the primary server host of the matched virtual host.</li>
-     * <li>Port identifier of the request target
-     * if it's sent in absolute-form.</li>
-     * <li>Port identifier of the `Host` header</li>
-     * </ul>
-     *
-     * @example 8080
-     */
-    public const NET_HOST_PORT = 'net.host.port';
 
     /**
      * The full request target as passed in a HTTP request line or equivalent.
@@ -694,6 +768,27 @@ interface TraceAttributes
     public const CODE_COLUMN = 'code.column';
 
     /**
+     * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the Content-Length header. For requests using transport encoding, this should be the compressed size.
+     *
+     * @example 3495
+     */
+    public const HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length';
+
+    /**
+     * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the Content-Length header. For requests using transport encoding, this should be the compressed size.
+     *
+     * @example 3495
+     */
+    public const HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length';
+
+    /**
+     * Value of the HTTP User-Agent header sent by the client.
+     *
+     * @example CERN-LineMode/2.15 libwww/2.17b3
+     */
+    public const USER_AGENT_ORIGINAL = 'user_agent.original';
+
+    /**
      * Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`. Usually the fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
      *
      * `http.url` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case the attribute's value should be `https://www.example.com/`.
@@ -933,6 +1028,17 @@ interface TraceAttributes
     public const MESSAGING_DESTINATION_NAME = 'messaging.destination.name';
 
     /**
+     * The message source name.
+     *
+     * Source name SHOULD uniquely identify a specific queue, topic, or other entity within the broker. If
+     * the broker does not have such notion, the source name SHOULD uniquely identify the broker.
+     *
+     * @example MyQueue
+     * @example MyTopic
+     */
+    public const MESSAGING_SOURCE_NAME = 'messaging.source.name';
+
+    /**
      * The kind of message destination.
      */
     public const MESSAGING_DESTINATION_KIND = 'messaging.destination.kind';
@@ -957,24 +1063,6 @@ interface TraceAttributes
     public const MESSAGING_DESTINATION_ANONYMOUS = 'messaging.destination.anonymous';
 
     /**
-     * The identifier for the consumer receiving a message. For Kafka, set it to `{messaging.kafka.consumer.group} - {messaging.kafka.client_id}`, if both are present, or only `messaging.kafka.consumer.group`. For brokers, such as RabbitMQ and Artemis, set it to the `client_id` of the client consuming the message.
-     *
-     * @example mygroup - client-6
-     */
-    public const MESSAGING_CONSUMER_ID = 'messaging.consumer.id';
-
-    /**
-     * The message source name.
-     *
-     * Source name SHOULD uniquely identify a specific queue, topic, or other entity within the broker. If
-     * the broker does not have such notion, the source name SHOULD uniquely identify the broker.
-     *
-     * @example MyQueue
-     * @example MyTopic
-     */
-    public const MESSAGING_SOURCE_NAME = 'messaging.source.name';
-
-    /**
      * The kind of message source.
      */
     public const MESSAGING_SOURCE_KIND = 'messaging.source.kind';
@@ -997,6 +1085,136 @@ interface TraceAttributes
      * A boolean that is true if the message source is anonymous (could be unnamed or have auto-generated name).
      */
     public const MESSAGING_SOURCE_ANONYMOUS = 'messaging.source.anonymous';
+
+    /**
+     * The identifier for the consumer receiving a message. For Kafka, set it to `{messaging.kafka.consumer.group} - {messaging.kafka.client_id}`, if both are present, or only `messaging.kafka.consumer.group`. For brokers, such as RabbitMQ and Artemis, set it to the `client_id` of the client consuming the message.
+     *
+     * @example mygroup - client-6
+     */
+    public const MESSAGING_CONSUMER_ID = 'messaging.consumer.id';
+
+    /**
+     * RabbitMQ message routing key.
+     *
+     * @example myKey
+     */
+    public const MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY = 'messaging.rabbitmq.destination.routing_key';
+
+    /**
+     * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the same partition. They differ from `messaging.message.id` in that they're not unique. If the key is `null`, the attribute MUST NOT be set.
+     *
+     * If the key type is not string, it's string representation has to be supplied for the attribute. If the key has no unambiguous, canonical string form, don't include its value.
+     *
+     * @example myKey
+     */
+    public const MESSAGING_KAFKA_MESSAGE_KEY = 'messaging.kafka.message.key';
+
+    /**
+     * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not producers.
+     *
+     * @example my-group
+     */
+    public const MESSAGING_KAFKA_CONSUMER_GROUP = 'messaging.kafka.consumer.group';
+
+    /**
+     * Client Id for the Consumer or Producer that is handling the message.
+     *
+     * @example client-5
+     */
+    public const MESSAGING_KAFKA_CLIENT_ID = 'messaging.kafka.client_id';
+
+    /**
+     * Partition the message is sent to.
+     *
+     * @example 2
+     */
+    public const MESSAGING_KAFKA_DESTINATION_PARTITION = 'messaging.kafka.destination.partition';
+
+    /**
+     * Partition the message is received from.
+     *
+     * @example 2
+     */
+    public const MESSAGING_KAFKA_SOURCE_PARTITION = 'messaging.kafka.source.partition';
+
+    /**
+     * The offset of a record in the corresponding Kafka partition.
+     *
+     * @example 42
+     */
+    public const MESSAGING_KAFKA_MESSAGE_OFFSET = 'messaging.kafka.message.offset';
+
+    /**
+     * A boolean that is true if the message is a tombstone.
+     */
+    public const MESSAGING_KAFKA_MESSAGE_TOMBSTONE = 'messaging.kafka.message.tombstone';
+
+    /**
+     * Namespace of RocketMQ resources, resources in different namespaces are individual.
+     *
+     * @example myNamespace
+     */
+    public const MESSAGING_ROCKETMQ_NAMESPACE = 'messaging.rocketmq.namespace';
+
+    /**
+     * Name of the RocketMQ producer/consumer group that is handling the message. The client type is identified by the SpanKind.
+     *
+     * @example myConsumerGroup
+     */
+    public const MESSAGING_ROCKETMQ_CLIENT_GROUP = 'messaging.rocketmq.client_group';
+
+    /**
+     * The unique identifier for each client.
+     *
+     * @example myhost@8742@s8083jm
+     */
+    public const MESSAGING_ROCKETMQ_CLIENT_ID = 'messaging.rocketmq.client_id';
+
+    /**
+     * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
+     *
+     * @example 1665987217045
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP = 'messaging.rocketmq.message.delivery_timestamp';
+
+    /**
+     * The delay time level for delay message, which determines the message delay time.
+     *
+     * @example 3
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL = 'messaging.rocketmq.message.delay_time_level';
+
+    /**
+     * It is essential for FIFO message. Messages that belong to the same message group are always processed one by one within the same consumer group.
+     *
+     * @example myMessageGroup
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_GROUP = 'messaging.rocketmq.message.group';
+
+    /**
+     * Type of message.
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_TYPE = 'messaging.rocketmq.message.type';
+
+    /**
+     * The secondary classifier of message besides topic.
+     *
+     * @example tagA
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_TAG = 'messaging.rocketmq.message.tag';
+
+    /**
+     * Key(s) of message, another way to mark message besides message id.
+     *
+     * @example keyA
+     * @example keyB
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_KEYS = 'messaging.rocketmq.message.keys';
+
+    /**
+     * Model of message consumption. This only applies to consumer spans.
+     */
+    public const MESSAGING_ROCKETMQ_CONSUMPTION_MODEL = 'messaging.rocketmq.consumption_model';
 
     /**
      * The numeric status code of the gRPC request.
@@ -1036,7 +1254,138 @@ interface TraceAttributes
     public const RPC_JSONRPC_ERROR_MESSAGE = 'rpc.jsonrpc.error_message';
 
     /**
+     * Whether this is a received or sent message.
+     */
+    public const MESSAGE_TYPE = 'message.type';
+
+    /**
+     * MUST be calculated as two different counters starting from `1` one for sent messages and one for received message.
+     *
+     * This way we guarantee that the values will be consistent between different implementations.
+     */
+    public const MESSAGE_ID = 'message.id';
+
+    /**
+     * Compressed size of the message in bytes.
+     */
+    public const MESSAGE_COMPRESSED_SIZE = 'message.compressed_size';
+
+    /**
+     * Uncompressed size of the message in bytes.
+     */
+    public const MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
+
+    /**
      * The error codes of the Connect request. Error codes are always string values.
      */
     public const RPC_CONNECT_RPC_ERROR_CODE = 'rpc.connect_rpc.error_code';
+
+    /**
+     * SHOULD be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
+     *
+     * An exception is considered to have escaped (or left) the scope of a span,
+     * if that span is ended while the exception is still logically &quot;in flight&quot;.
+     * This may be actually &quot;in flight&quot; in some languages (e.g. if the exception
+     * is passed to a Context manager's `__exit__` method in Python) but will
+     * usually be caught at the point of recording the exception in most languages.It is usually not possible to determine at the point where an exception is thrown
+     * whether it will escape the scope of a span.
+     * However, it is trivial to know that an exception
+     * will escape, if one checks for an active exception just before ending the span,
+     * as done in the example above.It follows that an exception may still escape the scope of the span
+     * even if the `exception.escaped` attribute was not set or set to false,
+     * since the event might have been recorded at a time where it was not
+     * clear whether the exception will escape.
+     */
+    public const EXCEPTION_ESCAPED = 'exception.escaped';
+
+    /**
+     * @deprecated
+     */
+    public const FAAS_EXECUTION = 'faas.execution';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_HOST = 'http.host';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED = 'http.request_content_length_uncompressed';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED = 'http.response_content_length_uncompressed';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_RETRY_COUNT = 'http.retry_count';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_SERVER_NAME = 'http.server_name';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_USER_AGENT = 'http.user_agent';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_CONVERSATION_ID = 'messaging.conversation_id';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_DESTINATION = 'messaging.destination';
+
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_KAFKA_PARTITION = 'messaging.kafka.partition';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_KAFKA_TOMBSTONE = 'messaging.kafka.tombstone';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_PROTOCOL = 'messaging.protocol';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_PROTOCOL_VERSION = 'messaging.protocol_version';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_RABBITMQ_ROUTING_KEY = 'messaging.rabbitmq.routing_key';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_TEMP_DESTINATION = 'messaging.temp_destination';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_URL = 'messaging.url';
+
+    /**
+     * @deprecated
+     */
+    public const NET_HOST_IP = 'net.host.ip';
+
+    /**
+     * @deprecated
+     */
+    public const NET_PEER_IP = 'net.peer.ip';
 }

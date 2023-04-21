@@ -40,27 +40,12 @@ docker run --rm \
   -v "${CODE_DIR}:/output" \
   -u "${UID}" \
   otel/semconvgen:$GENERATOR_VERSION \
-  --only span \
+  --only span,event,attribute_group,scope \
   -f /source code \
   --template /templates/Attributes.php.j2 \
   --output "/output/TraceAttributes.php" \
   -Dnamespace="OpenTelemetry\\SemConv" \
   -Dclass="Trace" \
-  -DschemaUrl=$SCHEMA_URL
-
-# Event
-docker run --rm \
-  -v "${SPEC_DIR}/semantic_conventions:/source" \
-  -v "${SCRIPT_DIR}/templates:/templates" \
-  -v "${CODE_DIR}:/output" \
-  -u "${UID}" \
-  otel/semconvgen:$GENERATOR_VERSION \
-  --only event \
-  -f /source code \
-  --template /templates/Attributes.php.j2 \
-  --output "/output/EventAttributes.php" \
-  -Dnamespace="OpenTelemetry\\SemConv" \
-  -Dclass="Event" \
   -DschemaUrl=$SCHEMA_URL
 
 # Resource
@@ -76,21 +61,6 @@ docker run --rm \
   --output "/output/ResourceAttributes.php" \
   -Dnamespace="OpenTelemetry\\SemConv" \
   -Dclass="Resource" \
-  -DschemaUrl=$SCHEMA_URL
-
-# Metric
-docker run --rm \
-  -v "${SPEC_DIR}/semantic_conventions:/source" \
-  -v "${SCRIPT_DIR}/templates:/templates" \
-  -v "${CODE_DIR}:/output" \
-  -u "${UID}" \
-  otel/semconvgen:$GENERATOR_VERSION \
-  --only metric \
-  -f /source code \
-  --template /templates/Attributes.php.j2 \
-  --output "/output/MetricAttributes.php" \
-  -Dnamespace="OpenTelemetry\\SemConv" \
-  -Dclass="Metric" \
   -DschemaUrl=$SCHEMA_URL
 
 rm -rf "${SPEC_DIR}" || true

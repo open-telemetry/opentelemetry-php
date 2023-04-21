@@ -1,0 +1,90 @@
+    /**
+     * @deprecated
+     */
+    public const FAAS_EXECUTION = 'faas.execution';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_HOST = 'http.host';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED = 'http.request_content_length_uncompressed';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED = 'http.response_content_length_uncompressed';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_RETRY_COUNT = 'http.retry_count';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_SERVER_NAME = 'http.server_name';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_USER_AGENT = 'http.user_agent';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_CONVERSATION_ID = 'messaging.conversation_id';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_DESTINATION = 'messaging.destination';
+
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_KAFKA_PARTITION = 'messaging.kafka.partition';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_KAFKA_TOMBSTONE = 'messaging.kafka.tombstone';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_PROTOCOL = 'messaging.protocol';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_PROTOCOL_VERSION = 'messaging.protocol_version';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_RABBITMQ_ROUTING_KEY = 'messaging.rabbitmq.routing_key';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_TEMP_DESTINATION = 'messaging.temp_destination';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_URL = 'messaging.url';
+
+    /**
+     * @deprecated
+     */
+    public const NET_HOST_IP = 'net.host.ip';
+
+    /**
+     * @deprecated
+     */
+    public const NET_PEER_IP = 'net.peer.ip';
