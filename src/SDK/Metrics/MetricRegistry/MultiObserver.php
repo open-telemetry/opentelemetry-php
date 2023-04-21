@@ -30,8 +30,8 @@ final class MultiObserver implements ObserverInterface
     {
         $context = Context::getRoot();
         $attributes = $this->attributesFactory->builder($attributes)->build();
-        foreach ($this->writers as $aggregator) {
-            $aggregator->record($amount, $attributes, $context, $this->timestamp);
+        foreach ($this->writers as $writer) {
+            $writer->record($amount, $attributes, $context, $this->timestamp);
         }
     }
 }

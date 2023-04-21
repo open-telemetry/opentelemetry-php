@@ -142,22 +142,22 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     public function collectAndPush(iterable $streamIds): void
     {
         $timestamp = $this->clock->now();
-        $collectors = [];
+        $aggregators = [];
         $observers = [];
         $callbackIds = [];
         foreach ($streamIds as $streamId) {
-            if (!$collector = $this->synchronousAggregators[$streamId] ?? null) {
-                $collector = $this->asynchronousAggregatorFactories[$streamId]->create();
+            if (!$aggregator = $this->synchronousAggregators[$streamId] ?? null) {
+                $aggregator = $this->asynchronousAggregatorFactories[$streamId]->create();
 
                 $instrumentId = $this->streamToInstrument[$streamId];
                 $observers[$instrumentId] ??= new MultiObserver($this->attributesFactory, $timestamp);
-                $observers[$instrumentId]->writers[] = $collector;
+                $observers[$instrumentId]->writers[] = $aggregator;
                 foreach ($this->instrumentToCallbacks[$instrumentId] ?? [] as $callbackId) {
                     $callbackIds[$callbackId] = $callbackId;
                 }
             }
 
-            $collectors[$streamId] = $collector;
+            $aggregators[$streamId] = $aggregator;
         }
 
         $noopObserver = new NoopObserver();
@@ -175,9 +175,9 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         }
 
         $timestamp = $this->clock->now();
-        foreach ($collectors as $streamId => $collector) {
+        foreach ($aggregators as $streamId => $aggregator) {
             if ($stream = $this->streams[$streamId] ?? null) {
-                $stream->push($collector->collect($timestamp));
+                $stream->push($aggregator->collect($timestamp));
             }
         }
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
+use function array_keys;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
@@ -91,11 +92,9 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
     private function doCollect(): bool
     {
-        foreach ($this->registries as $registryId => $_) {
-            // @phpstan-ignore-next-line
-            if ($registry = $this->registries[$registryId]) {
-                $registry->collectAndPush(array_keys($this->streamIds[$registryId]));
-            }
+        foreach ($this->registries as $registryId => $registry) {
+            $streamIds = $this->streamIds[$registryId] ?? [];
+            $registry->collectAndPush(array_keys($streamIds));
         }
 
         $metrics = [];
