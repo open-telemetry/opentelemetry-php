@@ -134,7 +134,7 @@ See https://opentelemetry.io/docs/instrumentation/php/automatic/
 
 ### Framework instrumentation
 
-* [Symfony SDK Bundle](https://github.com/open-telemetry/opentelemetry-php-contrib/tree/main/src/Symfony/OtelSdkBundle) is the recommended way to use opentelemetry-php with symfony
+* [Symfony SDK Bundle](https://github.com/open-telemetry/opentelemetry-php-contrib/tree/main/src/Symfony/)
 
 ### Distributed tracing
 
