@@ -5,9 +5,8 @@ For repeatability and consistency across different operating systems, we use the
 
 Skipping the step above would result in a "`The "PHP_USER" variable is not set. Defaulting to a blank string`" warning
 
-We use `docker` and `docker-compose` to perform a lot of our static analysis and testing. If you're planning to develop for this library, it'll help to install `docker engine` and `docker-compose`.
-
-The installation instructions for these tools are [here](https://docs.docker.com/install/), under the `Docker Engine` and `Docker Compose` submenus respectively.
+We use `docker` and `docker compose` to perform a lot of our static analysis and testing. If you're planning to develop for this library, it'll help to install
+[docker engine](https://docs.docker.com/engine/install/) and the [compose plugin](https://docs.docker.com/compose/install/).
 
 Development tasks are generally run through a `Makefile`. Running `make` or `make help` will list available targets.
 
@@ -115,21 +114,21 @@ We use [Rector](https://github.com/rectorphp/rector) to automatically refactor o
 and upgrade the code to supported PHP versions.
 The associated configuration can be found [here](./.rector.php)
 
-To refactor your code following our given standards, you can run:
+If you want to check what changes would be applied by rector, you can run:
 
 ```bash
 make rector
 ```
+This command will simply print out the changes `rector` would make without actually changing any code.
+
+To refactor your code following our given standards, you can run:
+
+```bash
+make rector-write
+```
 
 This command applies the changes to the code base.
 Make sure to run `make style` (see below) after running the `rector`command as the changes might not follow our coding standard.
-
-If you want to simply check what changes would be applied by rector, you can run:
-
-```bash
-make rector-dry
-```
-This command will simply print out the changes `rector`would make without actually changing any code.
 
 ## Styling
 

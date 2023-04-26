@@ -5,11 +5,8 @@ services:
     volumes:
     - ./:/usr/src/myapp
     user: "${PHP_USER}:root"
-    environment:
-      XDEBUG_MODE: ${XDEBUG_MODE:-off}
-      XDEBUG_CONFIG: ${XDEBUG_CONFIG:-''}
-      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-''}
-      #PHP_CS_FIXER_IGNORE_ENV: "true"
+    env_file:
+      - .env
   zipkin:
     image: openzipkin/zipkin-slim
     ports:
