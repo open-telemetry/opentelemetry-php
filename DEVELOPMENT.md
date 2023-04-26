@@ -26,6 +26,12 @@ To update these dependencies, you can run
 make update
 ```
 
+To downgrade to the lowest dependencies, you can run
+
+```shell
+make update-lowest
+```
+
 ## Coding Guidelines
 Even though it may not be reflected everywhere in the codebase yet, we aim to provide software which is easy to read and change.
 The methods described in Clean Code book(s) by Robert C. Martin (Uncle Bob) are a de facto industry standards nowadays.
@@ -48,7 +54,8 @@ To ensure your PR doesn't emit a failure with GitHub actions, it's recommended t
 locally with the following command:
 
 ```bash
-make all
+make all # composer update, then run all checks
+make all-lowest # composer update to lowest dependencies, then run all checks
 ```
 
 This does the following things:
@@ -65,7 +72,7 @@ This does the following things:
 ### Other PHP versions
 
 We aim to support officially supported PHP versions, according to https://www.php.net/supported-versions.php. The
-developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `7.4`, `8.0` and `8.1`
+developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `7.4`, `8.0`, `8.1` and `8.2`
 respectively, with `7.4` being the default. You can execute the test suite against other PHP versions by running the
 following command:
 
