@@ -18,7 +18,7 @@ final class FilteredAttributeProcessorTest extends TestCase
     {
         $this->assertEquals(
             ['foo' => 3],
-            (new AttributeProcessor\FilteredAttributeProcessor(Attributes::factory(), ['foo']))
+            (new AttributeProcessor\FilteredAttributeProcessor(['foo']))
                 ->process(Attributes::create(['foo' => 3, 'bar' => 5]), Context::getRoot())
                 ->toArray(),
         );

@@ -23,6 +23,4 @@ final class BucketEntry
     public AttributesInterface $attributes;
     public ?string $traceId = null;
     public ?string $spanId = null;
-
-    public int $revision;
 }

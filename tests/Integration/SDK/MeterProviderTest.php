@@ -46,7 +46,7 @@ final class MeterProviderTest extends TestCase
     {
         $clock = new TestClock();
         $exporter = new InMemoryExporter();
-        $reader = new ExportingReader($exporter, $clock);
+        $reader = new ExportingReader($exporter);
         $meterProvider = $this->meterProvider($reader, $clock);
 
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -95,7 +95,7 @@ final class MeterProviderTest extends TestCase
         self::setEnvironmentVariable('OTEL_SDK_DISABLED', 'true');
         $clock = new TestClock();
         $exporter = new InMemoryExporter();
-        $reader = new ExportingReader($exporter, $clock);
+        $reader = new ExportingReader($exporter);
         $meterProvider = $this->meterProvider($reader, $clock);
 
         $this->assertInstanceOf(NoopMeter::class, $meterProvider->getMeter('test'));

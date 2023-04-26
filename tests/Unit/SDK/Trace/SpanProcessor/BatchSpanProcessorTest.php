@@ -470,7 +470,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
     {
         $clock = new TestClock();
         $metrics = new InMemoryExporter();
-        $reader = new ExportingReader($metrics, $clock);
+        $reader = new ExportingReader($metrics);
         $meterProvider = new MeterProvider(
             null,
             ResourceInfoFactory::emptyResource(),
