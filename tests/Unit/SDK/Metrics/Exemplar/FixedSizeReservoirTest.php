@@ -17,7 +17,7 @@ final class FixedSizeReservoirTest extends TestCase
 {
     public function test_reservoir_returns_exemplars(): void
     {
-        $reservoir = new FixedSizeReservoir(Attributes::factory(), 4);
+        $reservoir = new FixedSizeReservoir(4);
         $reservoir->offer(0, 5, Attributes::create([]), Context::getRoot(), 7);
 
         $this->assertEquals([

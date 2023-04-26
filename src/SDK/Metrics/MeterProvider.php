@@ -12,22 +12,25 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterfac
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistryInterface;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 
 final class MeterProvider implements MeterProviderInterface
 {
-    private ?ContextStorageInterface $contextStorage;
     private MetricFactoryInterface $metricFactory;
     private ResourceInfo $resource;
     private ClockInterface $clock;
-    private AttributesFactoryInterface $attributesFactory;
     private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
     private iterable $metricReaders;
     private ViewRegistryInterface $viewRegistry;
     private ?ExemplarFilterInterface $exemplarFilter;
     private StalenessHandlerFactoryInterface $stalenessHandlerFactory;
     private MeterInstruments $instruments;
+    private MetricRegistryInterface $registry;
+    private MetricWriterInterface $writer;
 
     private bool $closed = false;
 
@@ -46,17 +49,19 @@ final class MeterProvider implements MeterProviderInterface
         StalenessHandlerFactoryInterface $stalenessHandlerFactory,
         MetricFactoryInterface $metricFactory = null
     ) {
-        $this->contextStorage = $contextStorage;
         $this->metricFactory = $metricFactory ?? new StreamFactory();
         $this->resource = $resource;
         $this->clock = $clock;
-        $this->attributesFactory = $attributesFactory;
         $this->instrumentationScopeFactory = $instrumentationScopeFactory;
         $this->metricReaders = $metricReaders;
         $this->viewRegistry = $viewRegistry;
         $this->exemplarFilter = $exemplarFilter;
         $this->stalenessHandlerFactory = $stalenessHandlerFactory;
         $this->instruments = new MeterInstruments();
+
+        $registry = new MetricRegistry($contextStorage, $attributesFactory, $clock);
+        $this->registry = $registry;
+        $this->writer = $registry;
     }
 
     public function getMeter(
@@ -70,17 +75,17 @@ final class MeterProvider implements MeterProviderInterface
         }
 
         return new Meter(
-            $this->contextStorage,
             $this->metricFactory,
             $this->resource,
             $this->clock,
-            $this->attributesFactory,
             $this->stalenessHandlerFactory,
             $this->metricReaders,
             $this->viewRegistry,
             $this->exemplarFilter,
             $this->instruments,
             $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes),
+            $this->registry,
+            $this->writer,
         );
     }
 

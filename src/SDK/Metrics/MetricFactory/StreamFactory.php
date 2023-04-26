@@ -4,28 +4,26 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\MetricFactory;
 
-use OpenTelemetry\Context\ContextStorageInterface;
-use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
+use function array_keys;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\AttributeProcessor\FilteredAttributeProcessor;
 use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\FilteredReservoir;
+use OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir;
+use OpenTelemetry\SDK\Metrics\Exemplar\HistogramBucketReservoir;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\MetricFactoryInterface;
-use OpenTelemetry\SDK\Metrics\MetricObserver\MultiObserver;
-use OpenTelemetry\SDK\Metrics\MetricObserverInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistrationInterface;
-use OpenTelemetry\SDK\Metrics\MetricWriterInterface;
-use OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricCollector;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricCollectorInterface;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistryInterface;
 use OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregator;
-use OpenTelemetry\SDK\Metrics\Stream\MetricCollectorInterface;
+use OpenTelemetry\SDK\Metrics\Stream\MetricAggregatorFactory;
 use OpenTelemetry\SDK\Metrics\Stream\MetricStreamInterface;
-use OpenTelemetry\SDK\Metrics\Stream\MultiStreamWriter;
-use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricCollector;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -39,118 +37,114 @@ use Throwable;
 final class StreamFactory implements MetricFactoryInterface
 {
     public function createAsynchronousObserver(
+        MetricRegistryInterface $registry,
         ResourceInfo $resource,
         InstrumentationScopeInterface $instrumentationScope,
         Instrument $instrument,
         int $timestamp,
-        iterable $views,
-        AttributesFactoryInterface $attributesFactory,
-        ?ExemplarFilterInterface $exemplarFilter = null
-    ): MetricObserverInterface {
-        $observer = new MultiObserver();
+        iterable $views
+    ): array {
+        $streams = [];
         $dedup = [];
-        foreach ($views as [$view, $registry]) {
+        foreach ($views as [$view, $registration]) {
             if ($view->aggregation === null) {
                 continue;
             }
 
-            $streamId = $this->streamId($view->aggregation, $view->attributeKeys);
-            if (([$stream, $collector] = $dedup[$streamId] ?? null) === null) {
-                $collector = new AsynchronousMetricCollector(
-                    $observer,
-                    $this->attributeProcessor($view->attributeKeys, $attributesFactory),
-                    $view->aggregation,
-                    $attributesFactory,
-                );
+            $dedupId = $this->streamId($view->aggregation, $view->attributeKeys);
+            if (($streamId = $dedup[$dedupId] ?? null) === null) {
                 $stream = new AsynchronousMetricStream($view->aggregation, $timestamp);
+                $streamId = $registry->registerAsynchronousStream($instrument, $stream, new MetricAggregatorFactory(
+                    $this->attributeProcessor($view->attributeKeys),
+                    $view->aggregation,
+                ));
 
-                $dedup[$streamId] = [$stream, $collector];
+                $streams[$streamId] = $stream;
+                $dedup[$dedupId] = $streamId;
             }
 
-            /** @psalm-suppress PossiblyNullArgument */
             $this->registerSource(
                 $view,
                 $instrument,
                 $instrumentationScope,
                 $resource,
-                $stream,
-                $collector,
+                $streams[$streamId],
                 $registry,
+                $registration,
+                $streamId,
             );
         }
 
-        return $observer;
+        return array_keys($streams);
     }
 
     public function createSynchronousWriter(
+        MetricRegistryInterface $registry,
         ResourceInfo $resource,
         InstrumentationScopeInterface $instrumentationScope,
         Instrument $instrument,
         int $timestamp,
         iterable $views,
-        AttributesFactoryInterface $attributesFactory,
-        ?ExemplarFilterInterface $exemplarFilter = null,
-        ?ContextStorageInterface $contextStorage = null
-    ): MetricWriterInterface {
+        ?ExemplarFilterInterface $exemplarFilter = null
+    ): array {
         $streams = [];
         $dedup = [];
-        foreach ($views as [$view, $registry]) {
+        foreach ($views as [$view, $registration]) {
             if ($view->aggregation === null) {
                 continue;
             }
 
-            $streamId = $this->streamId($view->aggregation, $view->attributeKeys);
-            if (([$stream, $collector] = $dedup[$streamId] ?? null) === null) {
-                $aggregator = new MetricAggregator(
-                    $this->attributeProcessor($view->attributeKeys, $attributesFactory),
-                    $view->aggregation,
-                    $this->applyExemplarFilter(
-                        $view->aggregation->exemplarReservoir($attributesFactory),
-                        $exemplarFilter,
-                    ),
-                );
-                $collector = new SynchronousMetricCollector($aggregator);
+            $dedupId = $this->streamId($view->aggregation, $view->attributeKeys);
+            if (($streamId = $dedup[$dedupId] ?? null) === null) {
                 $stream = new SynchronousMetricStream($view->aggregation, $timestamp);
-                $streams[] = $aggregator;
+                $streamId = $registry->registerSynchronousStream($instrument, $stream, new MetricAggregator(
+                    $this->attributeProcessor($view->attributeKeys),
+                    $view->aggregation,
+                    $this->createExemplarReservoir($view->aggregation, $exemplarFilter),
+                ));
 
-                $dedup[$streamId] = [$stream, $collector];
+                $streams[$streamId] = $stream;
+                $dedup[$dedupId] = $streamId;
             }
 
-            /** @psalm-suppress PossiblyNullArgument */
             $this->registerSource(
                 $view,
                 $instrument,
                 $instrumentationScope,
                 $resource,
-                $stream,
-                $collector,
+                $streams[$streamId],
                 $registry,
+                $registration,
+                $streamId,
             );
         }
 
-        return new MultiStreamWriter(
-            $contextStorage,
-            $attributesFactory,
-            $streams,
-        );
+        return array_keys($streams);
     }
 
     private function attributeProcessor(
-        ?array $attributeKeys,
-        AttributesFactoryInterface $attributesFactory
+        ?array $attributeKeys
     ): ?AttributeProcessorInterface {
         return $attributeKeys !== null
-            ? new FilteredAttributeProcessor($attributesFactory, $attributeKeys)
+            ? new FilteredAttributeProcessor($attributeKeys)
             : null;
     }
 
-    private function applyExemplarFilter(
-        ?ExemplarReservoirInterface $exemplarReservoir,
+    private function createExemplarReservoir(
+        AggregationInterface $aggregation,
         ?ExemplarFilterInterface $exemplarFilter
     ): ?ExemplarReservoirInterface {
-        return $exemplarReservoir !== null && $exemplarFilter !== null
-            ? new FilteredReservoir($exemplarReservoir, $exemplarFilter)
-            : $exemplarReservoir;
+        if (!$exemplarFilter) {
+            return null;
+        }
+
+        if ($aggregation instanceof ExplicitBucketHistogramAggregation && $aggregation->boundaries) {
+            $exemplarReservoir = new HistogramBucketReservoir($aggregation->boundaries);
+        } else {
+            $exemplarReservoir = new FixedSizeReservoir();
+        }
+
+        return new FilteredReservoir($exemplarReservoir, $exemplarFilter);
     }
 
     private function registerSource(
@@ -160,7 +154,8 @@ final class StreamFactory implements MetricFactoryInterface
         ResourceInfo $resource,
         MetricStreamInterface $stream,
         MetricCollectorInterface $metricCollector,
-        MetricRegistrationInterface $metricRegistration
+        MetricRegistrationInterface $metricRegistration,
+        int $streamId
     ): void {
         $provider = new StreamMetricSourceProvider(
             $view,
@@ -169,6 +164,7 @@ final class StreamFactory implements MetricFactoryInterface
             $resource,
             $stream,
             $metricCollector,
+            $streamId,
         );
 
         $metricRegistration->register($provider, $provider);

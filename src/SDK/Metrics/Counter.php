@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics\CounterInterface;
-use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 
 /**
  * @internal
@@ -13,14 +13,14 @@ use OpenTelemetry\SDK\Common\Time\ClockInterface;
 final class Counter implements CounterInterface
 {
     private MetricWriterInterface $writer;
+    private Instrument $instrument;
     private ReferenceCounterInterface $referenceCounter;
-    private ClockInterface $clock;
 
-    public function __construct(MetricWriterInterface $writer, ReferenceCounterInterface $referenceCounter, ClockInterface $clock)
+    public function __construct(MetricWriterInterface $writer, Instrument $instrument, ReferenceCounterInterface $referenceCounter)
     {
         $this->writer = $writer;
+        $this->instrument = $instrument;
         $this->referenceCounter = $referenceCounter;
-        $this->clock = $clock;
 
         $this->referenceCounter->acquire();
     }
@@ -32,6 +32,6 @@ final class Counter implements CounterInterface
 
     public function add($amount, iterable $attributes = [], $context = null): void
     {
-        $this->writer->record($amount, $attributes, $context, $this->clock->now());
+        $this->writer->record($this->instrument, $amount, $attributes, $context);
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\Exemplar;
 
 use OpenTelemetry\Context\ContextInterface;
-use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use function random_int;
 
@@ -15,9 +14,9 @@ final class FixedSizeReservoir implements ExemplarReservoirInterface
     private int $size;
     private int $measurements = 0;
 
-    public function __construct(AttributesFactoryInterface $attributesFactory, int $size = 4)
+    public function __construct(int $size = 4)
     {
-        $this->storage = new BucketStorage($attributesFactory, $size);
+        $this->storage = new BucketStorage($size);
         $this->size = $size;
     }
 

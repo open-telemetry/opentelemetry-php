@@ -18,11 +18,10 @@ trait LogsMessagesTrait
     {
         switch ($level) {
             case LogLevel::WARNING:
-                return E_USER_WARNING;
             case LogLevel::ERROR:
             case LogLevel::CRITICAL:
             case LogLevel::EMERGENCY:
-                return E_USER_ERROR;
+                return E_USER_WARNING;
             default:
                 return E_USER_NOTICE;
         }

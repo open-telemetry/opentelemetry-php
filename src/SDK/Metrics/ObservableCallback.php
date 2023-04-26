@@ -5,37 +5,39 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
-use OpenTelemetry\SDK\Metrics\MetricObserver\CallbackDestructor;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 
 /**
  * @internal
  */
 final class ObservableCallback implements ObservableCallbackInterface
 {
-    private MetricObserverInterface $metricObserver;
+    private MetricWriterInterface $writer;
     private ReferenceCounterInterface $referenceCounter;
-    private int $token;
-    private ?CallbackDestructor $callbackDestructor;
+    private ?int $callbackId;
+    private ?ObservableCallbackDestructor $callbackDestructor;
 
-    public function __construct(MetricObserverInterface $metricObserver, ReferenceCounterInterface $referenceCounter, int $token, ?CallbackDestructor $callbackDestructor)
+    public function __construct(MetricWriterInterface $writer, ReferenceCounterInterface $referenceCounter, int $callbackId, ?ObservableCallbackDestructor $callbackDestructor)
     {
-        $this->metricObserver = $metricObserver;
+        $this->writer = $writer;
         $this->referenceCounter =  $referenceCounter;
-        $this->token = $token;
+        $this->callbackId = $callbackId;
         $this->callbackDestructor = $callbackDestructor;
     }
 
     public function detach(): void
     {
-        if (!$this->metricObserver->has($this->token)) {
+        if ($this->callbackId === null) {
             return;
         }
 
-        $this->metricObserver->cancel($this->token);
+        $this->writer->unregisterCallback($this->callbackId);
         $this->referenceCounter->release();
         if ($this->callbackDestructor !== null) {
-            unset($this->callbackDestructor->tokens[$this->token]);
+            unset($this->callbackDestructor->callbackIds[$this->callbackId]);
         }
+
+        $this->callbackId = null;
     }
 
     public function __destruct()
@@ -43,7 +45,7 @@ final class ObservableCallback implements ObservableCallbackInterface
         if ($this->callbackDestructor !== null) {
             return;
         }
-        if (!$this->metricObserver->has($this->token)) {
+        if ($this->callbackId === null) {
             return;
         }
 

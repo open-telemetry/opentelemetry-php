@@ -19,14 +19,14 @@ final class BucketStorageTest extends TestCase
 {
     public function test_empty_storage_returns_no_exemplars(): void
     {
-        $storage = new BucketStorage(Attributes::factory());
+        $storage = new BucketStorage();
 
         $this->assertEquals([], $storage->collect([]));
     }
 
     public function test_storage_returns_stored_exemplars(): void
     {
-        $storage = new BucketStorage(Attributes::factory());
+        $storage = new BucketStorage();
 
         $storage->store(0, 0, 5, Attributes::create([]), Context::getRoot(), 7);
         $storage->store(1, 1, 3, Attributes::create([]), Context::getRoot(), 8);
@@ -45,7 +45,7 @@ final class BucketStorageTest extends TestCase
 
     public function test_storage_stores_trace_information(): void
     {
-        $storage = new BucketStorage(Attributes::factory());
+        $storage = new BucketStorage();
 
         $context = Span::wrap(SpanContext::create('12345678901234567890123456789012', '1234567890123456'))
             ->storeInContext(Context::getRoot());
@@ -61,7 +61,7 @@ final class BucketStorageTest extends TestCase
 
     public function test_storage_returns_filtered_attributes(): void
     {
-        $storage = new BucketStorage(Attributes::factory());
+        $storage = new BucketStorage();
 
         $storage->store(0, 0, 5, Attributes::create(['foo' => 5, 'bar' => 7]), Context::getRoot(), 7);
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Trace;
 
 use Closure;
-use OpenTelemetry\SemConv\TraceAttributes;
 use Throwable;
 
 /**
@@ -35,7 +34,7 @@ function trace(SpanInterface $span, Closure $closure, iterable $args = [])
         return $c(...$a, ...($a = []));
     } catch (Throwable $e) {
         $s->setStatus(StatusCode::STATUS_ERROR, $e->getMessage());
-        $s->recordException($e, [TraceAttributes::EXCEPTION_ESCAPED => true]);
+        $s->recordException($e, ['exception.escaped' => true]);
 
         throw $e;
     } finally {
