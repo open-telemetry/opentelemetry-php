@@ -29,6 +29,9 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertEmpty($resource->getAttributes());
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.20.0/specification/resource/sdk.md#merge
+     */
     public function test_merge(): void
     {
         $primary = ResourceInfo::create(Attributes::create(['name' => 'primary', 'empty' => '']));
@@ -42,7 +45,21 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertCount(3, $result->getAttributes());
         $this->assertEquals('primary', $name);
         $this->assertEquals('1.0.0', $version);
-        $this->assertEquals('', $empty);
+        $this->assertEquals('value', $empty);
+    }
+
+    /**
+     * @group compliance
+     * "If a key exists on both the old and updating resource, the value of the updating resource MUST be picked (even if the updated value is empty)"
+     */
+    public function test_merge_uses_value_of_updating_resource(): void
+    {
+        $old = ResourceInfo::create(Attributes::create(['name' => 'original', 'foo' => 'bar']));
+        $updating = ResourceInfo::create(Attributes::create(['name' => 'updated', 'foo' => '']));
+        $merged = ResourceInfoFactory::merge($old, $updating);
+
+        $this->assertSame('updated', $merged->getAttributes()->get('name'));
+        $this->assertSame('', $merged->getAttributes()->get('foo'));
     }
 
     /**
