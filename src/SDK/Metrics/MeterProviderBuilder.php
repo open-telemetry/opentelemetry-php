@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
-use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
+use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandlerFactory;
 use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
@@ -63,7 +63,7 @@ class MeterProviderBuilder
             $this->metricReaders,
             new CriteriaViewRegistry(),
             $this->exemplarFilter ?? new WithSampledTraceExemplarFilter(),
-            new ImmediateStalenessHandlerFactory(),
+            new NoopStalenessHandlerFactory(),
         );
     }
 }
