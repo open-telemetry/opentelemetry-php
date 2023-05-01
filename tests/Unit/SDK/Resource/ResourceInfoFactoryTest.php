@@ -62,6 +62,16 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertSame('', $merged->getAttributes()->get('foo'));
     }
 
+    public function test_merge_with_numeric_attribute_keys(): void
+    {
+        $old = ResourceInfo::create(Attributes::create([1 => 'one', '2' => 'two']));
+        $updating = ResourceInfo::create(Attributes::create(['1' => 'one.upd', 2 => 'two.upd']));
+        $merged = ResourceInfoFactory::merge($old, $updating);
+
+        $this->assertSame('one.upd', $merged->getAttributes()->get('1'));
+        $this->assertSame('two.upd', $merged->getAttributes()->get('2'));
+    }
+
     /**
      * @dataProvider schemaUrlsToMergeProvider
      */

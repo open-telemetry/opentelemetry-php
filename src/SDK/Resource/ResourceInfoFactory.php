@@ -22,8 +22,8 @@ class ResourceInfoFactory
     {
         $attributes = [];
 
-        foreach ($resources as $resource) {
-            $attributes = array_merge($attributes, $resource->getAttributes()->toArray());
+        foreach (array_reverse($resources) as $resource) {
+            $attributes += $resource->getAttributes()->toArray();
         }
 
         $schemaUrl = self::mergeSchemaUrl(...$resources);

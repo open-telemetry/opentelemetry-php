@@ -41,6 +41,16 @@ class AttributesTest extends TestCase
         }
     }
 
+    public function test_integer_attribute_key_is_cast_to_string(): void
+    {
+        $attributes = Attributes::create([1 => 2]);
+        $this->assertCount(1, $attributes);
+        foreach ($attributes as $key => $value) {
+            $this->assertIsString($key);
+            $this->assertSame('1', $key);
+        }
+    }
+
     /**
      * @psalm-suppress PossiblyNullReference
      */
