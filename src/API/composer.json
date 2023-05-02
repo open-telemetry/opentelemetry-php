@@ -25,5 +25,10 @@
         "files": [
             "Trace/functions.php"
         ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        }
     }
 }

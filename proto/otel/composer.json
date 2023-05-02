@@ -23,5 +23,10 @@
         "ext-protobuf": "For better performance, when dealing with the protobuf format",
         "google/protobuf": "To get started quickly, install the native protobuf library.",
         "ext-grpc": "To use the gRPC based exporters"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.x-dev"
+        }
     }
 }
