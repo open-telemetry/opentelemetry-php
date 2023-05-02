@@ -42,5 +42,10 @@
     "suggest": {
         "ext-gmp": "To support unlimited number of synchronous metric readers",
         "ext-mbstring": "To increase performance of string operations"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        }
     }
 }

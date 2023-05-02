@@ -26,5 +26,10 @@
     },
     "suggest": {
         "ext-ffi": "To allow context switching in Fibers"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        }
     }
 }
