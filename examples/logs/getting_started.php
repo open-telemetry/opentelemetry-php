@@ -30,7 +30,7 @@ echo 'Span id: ' . $span->getContext()->getSpanId() . PHP_EOL;
 
 //get a logger, and emit a log record from an EventLogger. The active context (trace id + span id) will be
 //attached to the log record
-$logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', true, ['foo' => 'bar']);
+$logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', ['foo' => 'bar']);
 $eventLogger = new EventLogger($logger, 'my-domain');
 
 $record = (new LogRecord(['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']))
