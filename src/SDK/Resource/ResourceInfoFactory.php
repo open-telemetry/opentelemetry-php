@@ -13,16 +13,16 @@ use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 class ResourceInfoFactory
 {
     /**
-     * Merges resources into a new one.
+     * Merges resources into a new one. Duplicate keys from later resources take priority and will overwrite
+     * values from earlier.
      *
-     * @param ResourceInfo ...$resources
-     * @return ResourceInfo
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.20.0/specification/resource/sdk.md#merge
      */
     public static function merge(ResourceInfo ...$resources): ResourceInfo
     {
         $attributes = [];
 
-        foreach ($resources as $resource) {
+        foreach (array_reverse($resources) as $resource) {
             $attributes += $resource->getAttributes()->toArray();
         }
 
@@ -36,16 +36,17 @@ class ResourceInfoFactory
         $detectors = Configuration::getList(Env::OTEL_PHP_DETECTORS);
 
         if (in_array(Values::VALUE_ALL, $detectors)) {
+            // ascending priority: keys from later detectors will overwrite earlier
             return (new Detectors\Composite([
-                new Detectors\Environment(),
                 new Detectors\Host(),
                 new Detectors\OperatingSystem(),
                 new Detectors\Process(),
                 new Detectors\ProcessRuntime(),
-                new Detectors\Sdk(),
-                new Detectors\Composer(),
-                new Detectors\SdkProvided(),
                 new Detectors\Container(),
+                new Detectors\Sdk(),
+                new Detectors\SdkProvided(),
+                new Detectors\Composer(),
+                new Detectors\Environment(),
             ]))->getResource();
         }
 

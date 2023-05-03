@@ -30,14 +30,13 @@ class AttributesTest extends TestCase
         $this->assertTrue($attributes->has('bar'));
     }
 
-    /** Test numeric attribute key is not cast to integer value */
-    public function test_numeric_attribute_name(): void
+    public function test_integer_attribute_key_is_cast_to_string(): void
     {
-        $attributes = Attributes::create(['1' => '2']);
+        $attributes = Attributes::create([1 => 2]);
         $this->assertCount(1, $attributes);
         foreach ($attributes as $key => $value) {
             $this->assertIsString($key);
-            $this->assertIsString($value);
+            $this->assertSame('1', $key);
         }
     }
 
