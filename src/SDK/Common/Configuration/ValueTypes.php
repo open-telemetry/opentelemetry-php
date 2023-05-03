@@ -103,6 +103,8 @@ interface ValueTypes
     public const OTEL_METRICS_EXEMPLAR_FILTER = VariableTypes::ENUM;
     public const OTEL_METRIC_EXPORT_INTERVAL = VariableTypes::INTEGER;
     public const OTEL_METRIC_EXPORT_TIMEOUT = VariableTypes::INTEGER;
+    public const OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = VariableTypes::ENUM;
+    public const OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION = VariableTypes::ENUM;
     /**
      * Language Specific Environment Variables
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#language-specific-environment-variables

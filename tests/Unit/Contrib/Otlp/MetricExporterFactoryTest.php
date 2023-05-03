@@ -10,6 +10,8 @@ use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -39,6 +41,53 @@ class MetricExporterFactoryTest extends TestCase
         $this->setEnvironmentVariable(Variables::OTEL_EXPORTER_OTLP_PROTOCOL, 'foo');
         $factory = new MetricExporterFactory();
         $factory->create();
+    }
+
+    /**
+     * @dataProvider temporalityProvider
+     */
+    public function test_create_with_temporality(array $env, string $expected): void
+    {
+        // @phpstan-ignore-next-line
+        $this->transportFactory->method('create')->willReturn($this->transport);
+        // @phpstan-ignore-next-line
+        $this->transport->method('contentType')->willReturn('application/json');
+
+        foreach ($env as $k => $v) {
+            $this->setEnvironmentVariable($k, $v);
+        }
+        $factory = new MetricExporterFactory($this->transportFactory);
+        $exporter = $factory->create();
+
+        $this->assertSame($expected, $exporter->temporality($this->createMock(MetricMetadataInterface::class)));
+    }
+
+    public static function temporalityProvider(): array
+    {
+        return [
+            'default' => [
+                [],
+                Temporality::CUMULATIVE,
+            ],
+            'cumulative' => [
+                [
+                    'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'cumulative',
+                ],
+                Temporality::CUMULATIVE,
+            ],
+            'delta' => [
+                [
+                    'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'delta',
+                ],
+                Temporality::DELTA,
+            ],
+            'CuMuLaTiVe (mixed case)' => [
+                [
+                    'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'cumulative',
+                ],
+                Temporality::CUMULATIVE,
+            ],
+        ];
     }
 
     /**

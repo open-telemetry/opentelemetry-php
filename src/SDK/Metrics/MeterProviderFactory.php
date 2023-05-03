@@ -23,6 +23,11 @@ class MeterProviderFactory
 {
     use LogsMessagesTrait;
 
+    /**
+     * @todo https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md#general
+     *       - "The exporter MUST configure the default aggregation on the basis of instrument kind using the
+     *         OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION variable as described below if it is implemented."
+     */
     public function create(): MeterProviderInterface
     {
         if (Sdk::isDisabled()) {
@@ -43,6 +48,7 @@ class MeterProviderFactory
             $exporter = new NoopMetricExporter();
         }
 
+        // @todo "The exporter MUST be paired with a periodic exporting MetricReader"
         $reader = new ExportingReader($exporter);
         $resource = ResourceInfoFactory::defaultResource();
         $exemplarFilter = $this->createExemplarFilter(Configuration::getEnum(Variables::OTEL_METRICS_EXEMPLAR_FILTER));
