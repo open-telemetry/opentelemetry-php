@@ -22,7 +22,7 @@ class BatchLogsProcessor implements LogRecordProcessorInterface
 {
     use LogsMessagesTrait;
 
-    public const DEFAULT_SCHEDULE_DELAY = 5000;
+    public const DEFAULT_SCHEDULE_DELAY = 1000;
     public const DEFAULT_EXPORT_TIMEOUT = 30000;
     public const DEFAULT_MAX_QUEUE_SIZE = 2048;
     public const DEFAULT_MAX_EXPORT_BATCH_SIZE = 512;
