@@ -54,6 +54,11 @@ interface KnownValues
     public const VALUE_LOG_NOTICE = LogLevel::NOTICE;
     public const VALUE_LOG_INFO = LogLevel::INFO;
     public const VALUE_LOG_DEBUG = LogLevel::DEBUG;
+    public const VALUE_TEMPORALITY_CUMULATIVE = 'cumulative';
+    public const VALUE_TEMPORALITY_DELTA = 'delta';
+    public const VALUE_TEMPORALITY_LOW_MEMORY = 'lowmemory';
+    public const VALUE_HISTOGRAM_AGGREGATION_EXPLICIT = 'explicit_bucket_histogram';
+    public const VALUE_HISTOGRAM_AGGREGATION_BASE2_EXPONENTIAL = 'base2_exponential_bucket_histogram';
 
     public const VALUES_BOOLEAN = [
         self::VALUE_TRUE,
@@ -69,6 +74,17 @@ interface KnownValues
         self::VALUE_GRPC,
         self::VALUE_HTTP_PROTOBUF,
         self::VALUE_HTTP_JSON,
+    ];
+
+    public const VALUES_TEMPORALITY_PREFERENCE = [
+        self::VALUE_TEMPORALITY_CUMULATIVE,
+        self::VALUE_TEMPORALITY_DELTA,
+        self::VALUE_TEMPORALITY_LOW_MEMORY,
+    ];
+
+    public const VALUES_HISTOGRAM_AGGREGATION = [
+        self::VALUE_HISTOGRAM_AGGREGATION_EXPLICIT,
+        self::VALUE_HISTOGRAM_AGGREGATION_BASE2_EXPONENTIAL,
     ];
 
     /**

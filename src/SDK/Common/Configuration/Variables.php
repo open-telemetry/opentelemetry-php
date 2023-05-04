@@ -125,6 +125,8 @@ interface Variables
     public const OTEL_METRICS_EXEMPLAR_FILTER = 'OTEL_METRICS_EXEMPLAR_FILTER';
     public const OTEL_METRIC_EXPORT_INTERVAL = 'OTEL_METRIC_EXPORT_INTERVAL';
     public const OTEL_METRIC_EXPORT_TIMEOUT = 'OTEL_METRIC_EXPORT_TIMEOUT';
+    public const OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE';
+    public const OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION = 'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION';
     /**
      * Language Specific Environment Variables
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#language-specific-environment-variables

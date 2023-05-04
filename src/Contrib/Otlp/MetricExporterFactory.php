@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolver;
+use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Registry;
@@ -34,8 +35,9 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
         $protocol = Configuration::has(Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL)
             ? Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL)
             : Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_PROTOCOL);
+        $temporality = $this->getTemporality();
 
-        return new MetricExporter($this->buildTransport($protocol));
+        return new MetricExporter($this->buildTransport($protocol), $temporality);
     }
 
     /**
@@ -65,6 +67,24 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
             $headers,
             $compression,
         );
+    }
+
+    /**
+     * @todo return string|Temporality|null (php >= 8.0)
+     */
+    private function getTemporality()
+    {
+        $value = Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE);
+        switch (strtolower($value)) {
+            case 'cumulative':
+                return Temporality::CUMULATIVE;
+            case 'delta':
+                return Temporality::DELTA;
+            case 'lowmemory':
+                return null;
+            default:
+                throw new \UnexpectedValueException('Unknown temporality: ' . $value);
+        }
     }
 
     private function getCompression(): string
