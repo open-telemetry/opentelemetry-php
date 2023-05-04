@@ -10,7 +10,6 @@ use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -46,7 +45,7 @@ class MetricExporterFactoryTest extends TestCase
     /**
      * @dataProvider temporalityProvider
      */
-    public function test_create_with_temporality(array $env, string $expected): void
+    public function test_create_with_temporality(array $env, ?string $expected): void
     {
         // @phpstan-ignore-next-line
         $this->transportFactory->method('create')->willReturn($this->transport);
@@ -67,25 +66,31 @@ class MetricExporterFactoryTest extends TestCase
         return [
             'default' => [
                 [],
-                Temporality::CUMULATIVE,
+                'cumulative',
             ],
             'cumulative' => [
                 [
                     'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'cumulative',
                 ],
-                Temporality::CUMULATIVE,
+                'cumulative',
             ],
             'delta' => [
                 [
                     'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'delta',
                 ],
-                Temporality::DELTA,
+                'delta',
+            ],
+            'low memory' => [
+                [
+                    'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'lowmemory',
+                ],
+                null,
             ],
             'CuMuLaTiVe (mixed case)' => [
                 [
                     'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'cumulative',
                 ],
-                Temporality::CUMULATIVE,
+                'cumulative',
             ],
         ];
     }

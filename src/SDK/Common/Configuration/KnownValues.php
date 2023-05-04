@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Configuration;
 
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use Psr\Log\LogLevel;
 
 /**
@@ -55,9 +54,9 @@ interface KnownValues
     public const VALUE_LOG_NOTICE = LogLevel::NOTICE;
     public const VALUE_LOG_INFO = LogLevel::INFO;
     public const VALUE_LOG_DEBUG = LogLevel::DEBUG;
-    public const VALUE_TEMPORALITY_CUMULATIVE = Temporality::CUMULATIVE;
-    public const VALUE_TEMPORALITY_DELTA = Temporality::DELTA;
-    public const VALUE_TEMPORALITY_LOW_MEMORY = 'LowMemory';
+    public const VALUE_TEMPORALITY_CUMULATIVE = 'cumulative';
+    public const VALUE_TEMPORALITY_DELTA = 'delta';
+    public const VALUE_TEMPORALITY_LOW_MEMORY = 'lowmemory';
     public const VALUE_HISTOGRAM_AGGREGATION_EXPLICIT = 'explicit_bucket_histogram';
     public const VALUE_HISTOGRAM_AGGREGATION_BASE2_EXPONENTIAL = 'base2_exponential_bucket_histogram';
 
@@ -80,7 +79,7 @@ interface KnownValues
     public const VALUES_TEMPORALITY_PREFERENCE = [
         self::VALUE_TEMPORALITY_CUMULATIVE,
         self::VALUE_TEMPORALITY_DELTA,
-        //self::VALUE_TEMPORALITY_LOW_MEMORY, //not implemented
+        self::VALUE_TEMPORALITY_LOW_MEMORY,
     ];
 
     public const VALUES_HISTOGRAM_AGGREGATION = [
