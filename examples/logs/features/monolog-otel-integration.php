@@ -18,6 +18,8 @@ use Psr\Log\LogLevel;
  * configured from environment, and autoloaded as part of composer where is can be retrieved from `Globals`.
  *
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/bridge-api.md#usage
+ *
+ * We have an official monolog handler, @see https://packagist.org/packages/open-telemetry/opentelemetry-logger-monolog
  */
 
 // create env vars before requiring composer
@@ -40,7 +42,7 @@ $otelHandler = new class(LogLevel::INFO) extends AbstractProcessingHandler {
     {
         parent::__construct($level, $bubble);
         $provider ??= Globals::loggerProvider();
-        $this->logger = $provider->getLogger('monolog-demo', null, null, true, ['logging.library' => 'monolog']);
+        $this->logger = $provider->getLogger('monolog-demo', null, null, ['logging.library' => 'monolog']);
     }
 
     protected function write(array $record): void
