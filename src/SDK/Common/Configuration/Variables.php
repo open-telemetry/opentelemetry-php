@@ -30,6 +30,14 @@ interface Variables
     public const OTEL_BSP_MAX_QUEUE_SIZE = 'OTEL_BSP_MAX_QUEUE_SIZE';
     public const OTEL_BSP_MAX_EXPORT_BATCH_SIZE = 'OTEL_BSP_MAX_EXPORT_BATCH_SIZE';
     /**
+     * Batch LogRecord Processor
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#batch-logrecord-processor
+     */
+    public const OTEL_BLRP_SCHEDULE_DELAY = 'OTEL_BLRP_SCHEDULE_DELAY';
+    public const OTEL_BLRP_EXPORT_TIMEOUT = 'OTEL_BLRP_EXPORT_TIMEOUT';
+    public const OTEL_BLRP_MAX_QUEUE_SIZE = 'OTEL_BLRP_MAX_QUEUE_SIZE';
+    public const OTEL_BLRP_MAX_EXPORT_BATCH_SIZE = 'OTEL_BLRP_MAX_EXPORT_BATCH_SIZE';
+    /**
      * Attribute Limits
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#attribute-limits
      */

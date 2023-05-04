@@ -43,10 +43,10 @@ class LogRecordProcessorFactory
                 return new BatchLogsProcessor(
                     $exporter,
                     ClockFactory::getDefault(),
-                    BatchLogsProcessor::DEFAULT_MAX_QUEUE_SIZE,
-                    BatchLogsProcessor::DEFAULT_SCHEDULE_DELAY,
-                    BatchLogsProcessor::DEFAULT_EXPORT_TIMEOUT,
-                    BatchLogsProcessor::DEFAULT_MAX_EXPORT_BATCH_SIZE,
+                    Configuration::getInt(Variables::OTEL_BLRP_MAX_QUEUE_SIZE),
+                    Configuration::getInt(Variables::OTEL_BLRP_SCHEDULE_DELAY),
+                    Configuration::getInt(Variables::OTEL_BLRP_EXPORT_TIMEOUT),
+                    Configuration::getInt(Variables::OTEL_BLRP_MAX_EXPORT_BATCH_SIZE),
                     true,
                     $meterProvider,
                 );
