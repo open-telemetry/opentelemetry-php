@@ -13,16 +13,17 @@ use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 class ResourceInfoFactory
 {
     /**
-     * Merges resources into a new one. Duplicate keys from later resources take priority and will overwrite
-     * values from earlier.
+     * Merges resources into a new one.
      *
+     * @deprecated Use `ResourceInfo::merge($resource)`
+     * @phan-suppress PhanDeprecatedFunction
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.20.0/specification/resource/sdk.md#merge
      */
     public static function merge(ResourceInfo ...$resources): ResourceInfo
     {
         $attributes = [];
 
-        foreach (array_reverse($resources) as $resource) {
+        foreach ($resources as $resource) {
             $attributes += $resource->getAttributes()->toArray();
         }
 
@@ -103,6 +104,9 @@ class ResourceInfoFactory
         return ResourceInfo::create(Attributes::create([]));
     }
 
+    /**
+     * @deprecated
+     */
     private static function mergeSchemaUrl(ResourceInfo ...$resources): ?string
     {
         $schemaUrl = null;
