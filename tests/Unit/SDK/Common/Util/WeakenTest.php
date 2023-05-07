@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Util;
 
+use Closure;
 use function OpenTelemetry\SDK\Common\Util\closure;
 use function OpenTelemetry\SDK\Common\Util\weaken;
 use PHPUnit\Framework\TestCase;
@@ -67,4 +68,25 @@ final class WeakenTest extends TestCase
 
         $this->assertSame($closure, weaken($closure));
     }
+
+    public function test_weaken_preserves_scope(): void
+    {
+        $b = new B();
+        $this->assertSame(5, weaken($b->closure())());
+    }
+}
+
+class A
+{
+    public function closure(): \Closure
+    {
+        return Closure::fromCallable([$this, 'private']);
+    }
+    private function private(): int
+    {
+        return 5;
+    }
+}
+class B extends A
+{
 }
