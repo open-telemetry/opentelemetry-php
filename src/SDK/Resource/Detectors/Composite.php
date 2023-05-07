@@ -22,11 +22,11 @@ final class Composite implements ResourceDetectorInterface
 
     public function getResource(): ResourceInfo
     {
-        $resources = [];
+        $resource = ResourceInfoFactory::emptyResource();
         foreach ($this->resourceDetectors as $resourceDetector) {
-            $resources[] = $resourceDetector->getResource();
+            $resource = $resource->merge($resourceDetector->getResource());
         }
 
-        return ResourceInfoFactory::merge(...$resources);
+        return $resource;
     }
 }

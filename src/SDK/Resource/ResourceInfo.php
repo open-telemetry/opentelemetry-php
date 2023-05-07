@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Resource;
 
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 use OpenTelemetry\SDK\Common\Dev\Compatibility\Util as BcUtil;
@@ -17,6 +19,8 @@ use OpenTelemetry\SDK\Common\Dev\Compatibility\Util as BcUtil;
  */
 class ResourceInfo
 {
+    use LogsMessagesTrait;
+
     private AttributesInterface $attributes;
     private ?string $schemaUrl;
 
@@ -54,19 +58,41 @@ class ResourceInfo
     }
 
     /**
-     * Backward compatibility methods
+     * Merge current resource with an updating resource, combining all attributes. If a key exists on both the old and updating
+     * resource, the value of the updating resource MUST be picked (even if the updated value is empty)
      *
-     * @codeCoverageIgnore
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.20.0/specification/resource/sdk.md#merge
      */
-    public static function merge(ResourceInfo ...$resources): ResourceInfo
+    public function merge(ResourceInfo $updating): ResourceInfo
     {
-        BcUtil::triggerMethodDeprecationNotice(
-            __METHOD__,
-            'merge',
-            ResourceInfoFactory::class
-        );
+        $schemaUrl = self::mergeSchemaUrl($this->getSchemaUrl(), $updating->getSchemaUrl());
+        $attributes = $updating->getAttributes()->toArray() + $this->getAttributes()->toArray();
 
-        return ResourceInfoFactory::merge(...$resources);
+        return ResourceInfo::create(Attributes::create($attributes), $schemaUrl);
+    }
+
+    /**
+     * Merge the schema URLs from the old and updating resource.
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.20.0/specification/resource/sdk.md#merge
+     */
+    private static function mergeSchemaUrl(?string $old, ?string $updating): ?string
+    {
+        if ($old === null) {
+            return $updating;
+        }
+        if ($updating === null) {
+            return $old;
+        }
+        if ($old === $updating) {
+            return $old;
+        }
+
+        self::logWarning('Merging resources with different schema URLs', [
+            'old' => $old,
+            'updating' => $updating,
+        ]);
+
+        return null;
     }
 
     /**
