@@ -51,11 +51,9 @@ class ResourceInfoFactory
                 new Detectors\Sdk(),
                 new Detectors\SdkProvided(),
                 new Detectors\Composer(),
+                ...Registry::resourceDetectors(),
                 new Detectors\Environment(),
             ]))->getResource();
-            foreach (Registry::resourceDetectors() as $detector) {
-                $all = $all->merge($detector->getResource());
-            }
 
             return $all;
         }

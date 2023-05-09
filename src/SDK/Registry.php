@@ -199,10 +199,10 @@ class Registry
     }
 
     /**
-     * @return ResourceDetectorInterface[]
+     * @return array<int, ResourceDetectorInterface>
      */
     public static function resourceDetectors(): array
     {
-        return self::$resourceDetectors;
+        return array_values(self::$resourceDetectors);
     }
 }
