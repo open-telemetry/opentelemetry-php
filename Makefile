@@ -66,10 +66,6 @@ smoke-test-exporter-examples: FORCE ## Run (some) exporter smoke test examples
 	$(DOCKER_COMPOSE) up -d --remove-orphans
 	$(DC_RUN_PHP) php ./examples/traces/exporters/zipkin.php
 	$(DC_RUN_PHP) php ./examples/traces/features/parent_span_example.php
-# The following examples do not use the DC_RUN_PHP global because they need environment variables.
-	$(DOCKER_COMPOSE) run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/exporters/newrelic.php
-	$(DOCKER_COMPOSE) run -e NEW_RELIC_ENDPOINT -e NEW_RELIC_INSERT_KEY --rm php php ./examples/traces/exporters/zipkin_to_newrelic.php
-	$(DOCKER_COMPOSE) stop
 smoke-test-collector-integration: ## Run smoke test collector integration
 	$(DOCKER_COMPOSE) -f docker-compose.collector.yaml up -d --remove-orphans
 	sleep 5
