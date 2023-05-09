@@ -43,7 +43,7 @@ class ResourceInfoFactory
 
         if (in_array(Values::VALUE_ALL, $detectors)) {
             // ascending priority: keys from later detectors will overwrite earlier
-            $all = (new Detectors\Composite([
+            return (new Detectors\Composite([
                 new Detectors\Host(),
                 new Detectors\OperatingSystem(),
                 new Detectors\Process(),
@@ -54,8 +54,6 @@ class ResourceInfoFactory
                 ...Registry::resourceDetectors(),
                 new Detectors\Environment(),
             ]))->getResource();
-
-            return $all;
         }
 
         $resourceDetectors = [];
