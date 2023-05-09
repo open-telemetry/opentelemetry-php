@@ -8,6 +8,7 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
+use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use RuntimeException;
 
@@ -22,6 +23,7 @@ class Registry
     private static array $metricExporterFactories = [];
     private static array $textMapPropagators = [];
     private static array $logRecordExporterFactories = [];
+    private static array $resourceDetectors = [];
 
     /**
      * @param TransportFactoryInterface|class-string<TransportFactoryInterface> $factory
@@ -91,6 +93,7 @@ class Registry
         }
         self::$metricExporterFactories[$exporter] = $factory;
     }
+
     public static function registerLogRecordExporterFactory(string $exporter, $factory, bool $clobber = false): void
     {
         if (!$clobber && array_key_exists($exporter, self::$logRecordExporterFactories)) {
@@ -117,6 +120,11 @@ class Registry
             return;
         }
         self::$textMapPropagators[$name] = $propagator;
+    }
+
+    public static function registerResourceDetector(string $name, ResourceDetectorInterface $detector): void
+    {
+        self::$resourceDetectors[$name] = $detector;
     }
 
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
@@ -179,5 +187,22 @@ class Registry
         }
 
         return self::$textMapPropagators[$name];
+    }
+
+    public static function resourceDetector(string $name): ResourceDetectorInterface
+    {
+        if (!array_key_exists($name, self::$resourceDetectors)) {
+            throw new RuntimeException('Resource detector not registered for: ' . $name);
+        }
+
+        return self::$resourceDetectors[$name];
+    }
+
+    /**
+     * @return array<int, ResourceDetectorInterface>
+     */
+    public static function resourceDetectors(): array
+    {
+        return array_values(self::$resourceDetectors);
     }
 }

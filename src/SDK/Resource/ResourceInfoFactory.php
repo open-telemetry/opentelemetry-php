@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Resource;
 
 use function in_array;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
+use OpenTelemetry\SDK\Registry;
+use RuntimeException;
 
 class ResourceInfoFactory
 {
+    use LogsMessagesTrait;
+
     /**
      * Merges resources into a new one.
      *
@@ -43,10 +48,10 @@ class ResourceInfoFactory
                 new Detectors\OperatingSystem(),
                 new Detectors\Process(),
                 new Detectors\ProcessRuntime(),
-                new Detectors\Container(),
                 new Detectors\Sdk(),
                 new Detectors\SdkProvided(),
                 new Detectors\Composer(),
+                ...Registry::resourceDetectors(),
                 new Detectors\Environment(),
             ]))->getResource();
         }
@@ -83,16 +88,20 @@ class ResourceInfoFactory
                     $resourceDetectors[] = new Detectors\SdkProvided();
 
                     break;
-                case Values::VALUE_DETECTORS_CONTAINER:
-                    $resourceDetectors[] = new Detectors\Container();
-
-                    break;
 
                 case Values::VALUE_DETECTORS_COMPOSER:
                     $resourceDetectors[] = new Detectors\Composer();
 
                     break;
+                case Values::VALUE_NONE:
+
+                    break;
                 default:
+                    try {
+                        $resourceDetectors[] = Registry::resourceDetector($detector);
+                    } catch (RuntimeException $e) {
+                        self::logWarning($e->getMessage());
+                    }
             }
         }
 
