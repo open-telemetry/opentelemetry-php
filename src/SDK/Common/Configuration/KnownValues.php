@@ -40,7 +40,6 @@ interface KnownValues
     public const VALUE_HTTP_NDJSON = 'http/ndjson';
     public const VALUE_OTLP = 'otlp';
     public const VALUE_ZIPKIN = 'zipkin';
-    public const VALUE_NEWRELIC = 'newrelic';
     public const VALUE_PROMETHEUS = 'prometheus';
     public const VALUE_WITH_SAMPLED_TRACE = 'with_sampled_trace';
     public const VALUE_BATCH = 'batch';
@@ -142,7 +141,6 @@ interface KnownValues
     public const OTEL_TRACES_EXPORTER = [
         self::VALUE_OTLP,
         self::VALUE_ZIPKIN,
-        self::VALUE_NEWRELIC,
         self::VALUE_NONE,
     ];
     public const OTEL_METRICS_EXPORTER = [

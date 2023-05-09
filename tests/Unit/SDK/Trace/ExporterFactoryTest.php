@@ -107,14 +107,12 @@ class ExporterFactoryTest extends TestCase
     public function invalidEnvProvider(): array
     {
         return [
-            'newrelic' => ['newrelic'],
-            'zipkintonewrelic' => ['zipkintonewrelic'],
             'otlp+invalid protocol' => [
                 'otlp',
                 ['OTEL_EXPORTER_OTLP_PROTOCOL' => 'foo'],
             ],
             'unknown exporter' => ['foo'],
-            'multiple exporters' => ['newrelic,zipkin'],
+            'multiple exporters' => ['console,zipkin'],
         ];
     }
 }

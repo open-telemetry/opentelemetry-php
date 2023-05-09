@@ -51,7 +51,6 @@ class FactoryRegistryTest extends TestCase
         return [
             ['otlp'],
             ['zipkin'],
-            ['newrelic'],
             ['console'],
             ['memory'],
         ];
