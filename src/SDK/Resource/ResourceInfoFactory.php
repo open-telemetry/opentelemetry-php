@@ -97,6 +97,9 @@ class ResourceInfoFactory
                     $resourceDetectors[] = new Detectors\Composer();
 
                     break;
+                case Values::VALUE_NONE:
+
+                    break;
                 default:
                     try {
                         $resourceDetectors[] = Registry::resourceDetector($detector);
