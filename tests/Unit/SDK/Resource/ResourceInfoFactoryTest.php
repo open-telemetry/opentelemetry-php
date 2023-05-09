@@ -6,7 +6,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use InvalidArgumentException;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use PHPUnit\Framework\TestCase;
@@ -21,6 +24,7 @@ class ResourceInfoFactoryTest extends TestCase
     public function tearDown(): void
     {
         $this->restoreEnvironmentVariables();
+        LoggerHolder::unset();
     }
 
     public function test_empty_resource(): void
@@ -115,5 +119,47 @@ class ResourceInfoFactoryTest extends TestCase
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');
         $resource = ResourceInfoFactory::defaultResource();
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
+    }
+
+    public function test_resource_from_registry(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'foo');
+        $detector = $this->createMock(ResourceDetectorInterface::class);
+        $detector->expects($this->once())->method('getResource')->willReturn($this->createMock(ResourceInfo::class));
+
+        Registry::registerResourceDetector('foo', $detector);
+        ResourceInfoFactory::defaultResource();
+    }
+
+    public function test_all_resources_uses_extra_resource_from_registry(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'all');
+        $detector = $this->createMock(ResourceDetectorInterface::class);
+        $resource = $this->createMock(ResourceInfo::class);
+        $detector->expects($this->once())->method('getResource')->willReturn($resource);
+
+        Registry::registerResourceDetector('foo', $detector);
+        ResourceInfoFactory::defaultResource();
+    }
+
+    public function test_composite_default_with_extra_resource_from_registry(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'foo,env');
+        $resource = $this->createMock(ResourceInfo::class);
+        $detector = $this->createMock(ResourceDetectorInterface::class);
+        $detector->expects($this->once())->method('getResource')->willReturn($resource);
+
+        Registry::registerResourceDetector('foo', $detector);
+        ResourceInfoFactory::defaultResource();
+    }
+
+    public function test_logs_warning_for_unknown_detector(): void
+    {
+        $logger = $this->createMock(\Psr\Log\LoggerInterface::class);
+        $logger->expects($this->once())->method('log')->with($this->equalTo('warning'));
+        LoggerHolder::set($logger);
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'does-not-exist');
+
+        ResourceInfoFactory::defaultResource();
     }
 }

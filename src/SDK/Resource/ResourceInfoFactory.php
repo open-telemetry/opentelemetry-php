@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Resource;
 
 use function in_array;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
+use OpenTelemetry\SDK\Registry;
+use RuntimeException;
 
 class ResourceInfoFactory
 {
+    use LogsMessagesTrait;
+
     /**
      * Merges resources into a new one.
      *
@@ -38,17 +43,21 @@ class ResourceInfoFactory
 
         if (in_array(Values::VALUE_ALL, $detectors)) {
             // ascending priority: keys from later detectors will overwrite earlier
-            return (new Detectors\Composite([
+            $all = (new Detectors\Composite([
                 new Detectors\Host(),
                 new Detectors\OperatingSystem(),
                 new Detectors\Process(),
                 new Detectors\ProcessRuntime(),
-                new Detectors\Container(),
                 new Detectors\Sdk(),
                 new Detectors\SdkProvided(),
                 new Detectors\Composer(),
                 new Detectors\Environment(),
             ]))->getResource();
+            foreach (Registry::resourceDetectors() as $detector) {
+                $all = $all->merge($detector->getResource());
+            }
+
+            return $all;
         }
 
         $resourceDetectors = [];
@@ -83,16 +92,17 @@ class ResourceInfoFactory
                     $resourceDetectors[] = new Detectors\SdkProvided();
 
                     break;
-                case Values::VALUE_DETECTORS_CONTAINER:
-                    $resourceDetectors[] = new Detectors\Container();
-
-                    break;
 
                 case Values::VALUE_DETECTORS_COMPOSER:
                     $resourceDetectors[] = new Detectors\Composer();
 
                     break;
                 default:
+                    try {
+                        $resourceDetectors[] = Registry::resourceDetector($detector);
+                    } catch (RuntimeException $e) {
+                        self::logWarning($e->getMessage());
+                    }
             }
         }
 
