@@ -15,7 +15,6 @@ $reader = new ExportingReader(
     new MetricExporter(
         PsrTransportFactory::discover()->create('http://collector:4318/v1/metrics', \OpenTelemetry\Contrib\Otlp\ContentTypes::JSON)
     ),
-    $clock
 );
 
 $metricsGenerator = new ExampleMetricsGenerator($reader, $clock);

@@ -15,7 +15,6 @@ $reader = new ExportingReader(
     new MetricExporter(
         new StreamTransport(STDOUT, 'application/x-ndjson')
     ),
-    $clock
 );
 
 $metricsGenerator = new ExampleMetricsGenerator($reader, $clock);
