@@ -20,7 +20,6 @@ $reader = new ExportingReader(
     new MetricExporter(
         (new GrpcTransportFactory())->create('http://collector:4317' . OtlpUtil::method(Signals::METRICS))
     ),
-    $clock
 );
 
 $metricsGenerator = new ExampleMetricsGenerator($reader, $clock);
