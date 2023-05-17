@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+namespace OpenTelemetry\Example;
+
 require __DIR__ . '/../../../vendor/autoload.php';
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;

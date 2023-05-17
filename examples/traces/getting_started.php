@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+namespace OpenTelemetry\Example;
+
 require __DIR__ . '/../../vendor/autoload.php';
 
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
@@ -34,7 +37,7 @@ try {
         $span1Scope->detach();
         $span1->end();
     }
-} catch (Throwable $t) {
+} catch (\Throwable $t) {
     //The library's code shouldn't be throwing unhandled exceptions (it should emit any errors via diagnostic events)
     //This is intended to illustrate a way you can capture unhandled exceptions coming from your app code
     $rootSpan->recordException($t);

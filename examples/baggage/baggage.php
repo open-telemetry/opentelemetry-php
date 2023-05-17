@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace OpenTelemetry\Example;
+
 require __DIR__ . '/../../vendor/autoload.php';
 
 echo 'Starting baggage example' . PHP_EOL;
@@ -23,7 +25,8 @@ echo 'Retrieving baggage values...' . PHP_EOL;
 $baggage = \OpenTelemetry\API\Baggage\Baggage::getCurrent();
 echo 'key1: ' . $baggage->getValue('key1') . PHP_EOL;
 echo 'key2: ' . $baggage->getValue('key2') . PHP_EOL;
-echo 'key2 metadata: ' . $baggage->getEntry('key2')->getMetadata()->getValue() . PHP_EOL;
+$entry = $baggage->getEntry('key2');
+echo 'key2 metadata: ' . ($entry !== null ? $entry->getMetadata()->getValue() : '-unset-') . PHP_EOL;
 
 //remove a value from baggage and add a value
 echo 'removing key1, adding key3 to baggage...' . PHP_EOL;

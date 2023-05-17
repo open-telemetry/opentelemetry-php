@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+namespace OpenTelemetry\Example;
+
 require __DIR__ . '/../../../vendor/autoload.php';
 
 \OpenTelemetry\API\Common\Log\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));

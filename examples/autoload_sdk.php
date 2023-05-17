@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace OpenTelemetry\Example;
+
 use OpenTelemetry\API\Logs\EventLogger;
 use OpenTelemetry\API\Logs\LogRecord;
 

@@ -9,7 +9,6 @@ use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
@@ -35,8 +34,7 @@ $logRecordExporter = new \OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter();
 $reader = new ExportingReader(
     new MetricExporter(
         PsrTransportFactory::discover()->create('http://collector:4318/v1/metrics', 'application/x-protobuf')
-    ),
-    ClockFactory::getDefault()
+    )
 );
 
 $meterProvider = MeterProvider::builder()

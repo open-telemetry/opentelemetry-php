@@ -3,6 +3,8 @@
 // Example based on https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/supplementary-guidelines.md#synchronous-example
 declare(strict_types=1);
 
+namespace OpenTelemetry\Example;
+
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
@@ -21,7 +23,7 @@ use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
 $clock = ClockFactory::getDefault();
-$reader = new ExportingReader(new MetricExporter((new StreamTransportFactory())->create(STDOUT, 'application/x-ndjson'), /*Temporality::CUMULATIVE*/), $clock);
+$reader = new ExportingReader(new MetricExporter((new StreamTransportFactory())->create(STDOUT, 'application/x-ndjson'), /*Temporality::CUMULATIVE*/));
 
 // Let's imagine we export the metrics as Histogram, and to simplify the story we will only have one histogram bucket (-Inf, +Inf):
 $views = new CriteriaViewRegistry();

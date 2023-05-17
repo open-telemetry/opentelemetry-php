@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace OpenTelemetry\Example;
+
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -38,6 +40,9 @@ $tracer = Globals::tracerProvider()->getTracer('monolog-demo');
 $otelHandler = new class(LogLevel::INFO) extends AbstractProcessingHandler {
     private LoggerInterface $logger;
 
+    /**
+     * @psalm-suppress ArgumentTypeCoercion
+     */
     public function __construct(string $level, bool $bubble = true, ?LoggerProviderInterface $provider = null)
     {
         parent::__construct($level, $bubble);
