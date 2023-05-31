@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+namespace OpenTelemetry\Example;
+
 require __DIR__ . '/../../../vendor/autoload.php';
 
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
@@ -36,6 +39,7 @@ try {
             ->setAttribute('http.response_content_length', 1024)
             ->startSpan();
     }
+    /** @psalm-suppress ArgumentTypeCoercion */
     foreach ($spans as $span) {
         usleep((int) (0.3 * 1e6));
         $span->end();

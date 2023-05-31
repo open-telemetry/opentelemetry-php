@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace OpenTelemetry\Example;
+
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use OpenTelemetry\API\Common\Log\LoggerHolder;
@@ -36,7 +38,7 @@ $loggerProvider = new LoggerProvider(
         (new LogRecordLimitsBuilder())->build()->getAttributeFactory()
     )
 );
-$logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', true, ['foo' => 'bar']);
+$logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', ['foo' => 'bar']);
 $eventLogger = new EventLogger($logger, 'my-domain');
 
 $eventLogger->logEvent(

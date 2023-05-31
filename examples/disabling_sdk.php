@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace OpenTelemetry\Example;
+
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
@@ -24,11 +26,11 @@ echo 'Creating (disabled) signals' . PHP_EOL;
 
 //trace
 $tracer = (new TracerProvider())->getTracer('io.opentelemetry.contrib.php');
-var_dump(get_class($tracer));
+echo get_class($tracer) . PHP_EOL;
 
 //metrics
 $clock = ClockFactory::getDefault();
-$reader = new ExportingReader(new MetricExporter((new StreamTransportFactory())->create(STDOUT, 'application/x-ndjson')), $clock);
+$reader = new ExportingReader(new MetricExporter((new StreamTransportFactory())->create(STDOUT, 'application/x-ndjson')));
 $views = new CriteriaViewRegistry();
 $meterProvider = new MeterProvider(
     null,
@@ -42,4 +44,4 @@ $meterProvider = new MeterProvider(
     new ImmediateStalenessHandlerFactory(),
 );
 $meter = $meterProvider->getMeter('io.opentelemetry.contrib.php');
-var_dump(get_class($meter));
+echo get_class($meter) . PHP_EOL;

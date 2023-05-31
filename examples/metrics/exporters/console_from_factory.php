@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace OpenTelemetry\Example;
+
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
 
 require __DIR__ . '/../../../vendor/autoload.php';

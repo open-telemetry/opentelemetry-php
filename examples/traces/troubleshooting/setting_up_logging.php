@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+namespace OpenTelemetry\Example;
+
 require __DIR__ . '/../../../vendor/autoload.php';
 
 use Monolog\Handler\StreamHandler;
@@ -11,7 +14,7 @@ use Psr\Log\LogLevel;
 
 echo 'Starting SettingUpLogging example' . PHP_EOL;
 
-//By default, opentelemetry's internal logging (errors, warnings, etc) will be output to console.
+//By default, opentelemetry's internal logging (errors, warnings, etc) will use `trigger_error`.
 //You can instead provide a psr-3 logger to provide greater control of logging output:
 LoggerHolder::set(
     new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)])
