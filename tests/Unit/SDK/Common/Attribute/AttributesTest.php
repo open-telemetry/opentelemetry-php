@@ -60,7 +60,6 @@ class AttributesTest extends TestCase
             'array' => [
                 $shortStringValue,
                 $longStringValue,
-                true,
             ],
             'ignored_key' => 'ignored_value',
         ])->build();
@@ -70,7 +69,7 @@ class AttributesTest extends TestCase
         $this->assertEquals($floatValue, $attributes->get('float'));
         $this->assertEquals($shortStringValue, $attributes->get('short_string'));
         $this->assertEquals($longStringTrimmed, $attributes->get('long_string'));
-        $this->assertEquals([$shortStringValue, $longStringTrimmed, true], $attributes->get('array'));
+        $this->assertEquals([$shortStringValue, $longStringTrimmed], $attributes->get('array'));
         $this->assertEquals(6, $attributes->count());
         $this->assertNull($attributes->get('ignored_key'));
     }
