@@ -11,6 +11,7 @@ use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanContextValidator;
+use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
@@ -131,7 +132,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
 
         // Only the sampled flag is extracted from the traceFlags (00000001)
         $convertedTraceFlags = hexdec($traceFlags);
-        $isSampled = ($convertedTraceFlags & SpanContextInterface::TRACE_FLAG_SAMPLED) === SpanContextInterface::TRACE_FLAG_SAMPLED;
+        $isSampled = ($convertedTraceFlags & TraceFlags::SAMPLED) === TraceFlags::SAMPLED;
 
         // Tracestate = 'Vendor1=Value1,...,VendorN=ValueN'
         $rawTracestate = $getter->get($carrier, self::TRACESTATE);
@@ -141,7 +142,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
             return SpanContext::createFromRemoteParent(
                 $traceId,
                 $spanId,
-                $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT,
+                $isSampled ? TraceFlags::SAMPLED : TraceFlags::DEFAULT,
                 $tracestate
             );
         }
@@ -150,7 +151,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
         return SpanContext::createFromRemoteParent(
             $traceId,
             $spanId,
-            $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT
+            $isSampled ? TraceFlags::SAMPLED : TraceFlags::DEFAULT
         );
     }
 }

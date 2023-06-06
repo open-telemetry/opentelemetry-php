@@ -44,7 +44,7 @@ class AlwaysOffSamplerTest extends TestCase
 
     private function createParentContext(bool $sampled, bool $isRemote, ?API\TraceStateInterface $traceState = null): ContextInterface
     {
-        $traceFlag = $sampled ? API\SpanContextInterface::TRACE_FLAG_SAMPLED : API\SpanContextInterface::TRACE_FLAG_DEFAULT;
+        $traceFlag = $sampled ? API\TraceFlags::SAMPLED : API\TraceFlags::DEFAULT;
 
         if ($isRemote) {
             $spanContext = SpanContext::createFromRemoteParent(

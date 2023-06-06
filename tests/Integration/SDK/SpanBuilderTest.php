@@ -48,7 +48,7 @@ class SpanBuilderTest extends MockeryTestCase
         $this->sampledSpanContext = SpanContext::create(
             '12345678876543211234567887654321',
             '8765432112345678',
-            API\SpanContextInterface::TRACE_FLAG_SAMPLED,
+            API\TraceFlags::SAMPLED,
         );
     }
 
@@ -186,7 +186,7 @@ class SpanBuilderTest extends MockeryTestCase
                 SpanContext::create(
                     '00000000000004d20000000000001a85',
                     '0000000000002694',
-                    API\SpanContextInterface::TRACE_FLAG_SAMPLED
+                    API\TraceFlags::SAMPLED
                 )
             );
 

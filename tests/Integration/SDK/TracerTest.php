@@ -48,7 +48,7 @@ class TracerTest extends TestCase
         $span = $tracer->spanBuilder('test.span')->startSpan();
 
         $this->assertInstanceOf(NonRecordingSpan::class, $span);
-        $this->assertNotEquals(API\SpanContextInterface::TRACE_FLAG_SAMPLED, $span->getContext()->getTraceFlags());
+        $this->assertNotEquals(API\TraceFlags::SAMPLED, $span->getContext()->getTraceFlags());
     }
 
     public function test_sampler_may_override_parents_trace_state(): void
@@ -60,7 +60,7 @@ class TracerTest extends TestCase
                     SpanContext::create(
                         '4bf92f3577b34da6a3ce929d0e0e4736',
                         '00f067aa0ba902b7',
-                        API\SpanContextInterface::TRACE_FLAG_SAMPLED
+                        API\TraceFlags::SAMPLED
                     )
                 )
             );

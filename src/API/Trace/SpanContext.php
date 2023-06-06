@@ -42,7 +42,7 @@ final class SpanContext implements SpanContextInterface
         $this->spanId = $spanId;
         $this->traceState = $traceState;
         $this->isRemote = $isRemote;
-        $this->isSampled = ($traceFlags & self::TRACE_FLAG_SAMPLED) === self::TRACE_FLAG_SAMPLED;
+        $this->isSampled = ($traceFlags & TraceFlags::SAMPLED) === TraceFlags::SAMPLED;
         $this->traceFlags = $traceFlags;
     }
 
@@ -92,7 +92,7 @@ final class SpanContext implements SpanContextInterface
     }
 
     /** @inheritDoc */
-    public static function createFromRemoteParent(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface
+    public static function createFromRemoteParent(string $traceId, string $spanId, int $traceFlags = TraceFlags::DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface
     {
         return new self(
             $traceId,
@@ -104,7 +104,7 @@ final class SpanContext implements SpanContextInterface
     }
 
     /** @inheritDoc */
-    public static function create(string $traceId, string $spanId, int $traceFlags = self::TRACE_FLAG_DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface
+    public static function create(string $traceId, string $spanId, int $traceFlags = TraceFlags::DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface
     {
         return new self(
             $traceId,

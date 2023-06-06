@@ -12,6 +12,7 @@ use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanContextValidator;
+use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
@@ -51,7 +52,7 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $this->sampledSpanContext = SpanContext::create(
             SpanContextValidator::INVALID_TRACE,
             SpanContextValidator::INVALID_SPAN,
-            SpanContextInterface::TRACE_FLAG_SAMPLED
+            TraceFlags::SAMPLED
         );
 
         $this->nonSampledSpanContext = SpanContext::getInvalid();
