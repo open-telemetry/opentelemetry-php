@@ -25,9 +25,9 @@ class Buckets extends \Google\Protobuf\Internal\Message
      */
     protected $offset = 0;
     /**
-     * Count is an array of counts, where count[i] carries the count
-     * of the bucket at index (offset+i).  count[i] is the count of
-     * values greater than or equal to base^(offset+i) and less than
+     * bucket_counts is an array of count values, where bucket_counts[i] carries
+     * the count of the bucket at index (offset+i). bucket_counts[i] is the count
+     * of values greater than base^(offset+i) and less than or equal to
      * base^(offset+i+1).
      * Note: By contrast, the explicit HistogramDataPoint uses
      * fixed64.  This field is expected to have many buckets,
@@ -49,9 +49,9 @@ class Buckets extends \Google\Protobuf\Internal\Message
      *           
      *           Note: This uses a varint encoding as a simple form of compression.
      *     @type int[]|string[]|\Google\Protobuf\Internal\RepeatedField $bucket_counts
-     *           Count is an array of counts, where count[i] carries the count
-     *           of the bucket at index (offset+i).  count[i] is the count of
-     *           values greater than or equal to base^(offset+i) and less than
+     *           bucket_counts is an array of count values, where bucket_counts[i] carries
+     *           the count of the bucket at index (offset+i). bucket_counts[i] is the count
+     *           of values greater than base^(offset+i) and less than or equal to
      *           base^(offset+i+1).
      *           Note: By contrast, the explicit HistogramDataPoint uses
      *           fixed64.  This field is expected to have many buckets,
@@ -95,9 +95,9 @@ class Buckets extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Count is an array of counts, where count[i] carries the count
-     * of the bucket at index (offset+i).  count[i] is the count of
-     * values greater than or equal to base^(offset+i) and less than
+     * bucket_counts is an array of count values, where bucket_counts[i] carries
+     * the count of the bucket at index (offset+i). bucket_counts[i] is the count
+     * of values greater than base^(offset+i) and less than or equal to
      * base^(offset+i+1).
      * Note: By contrast, the explicit HistogramDataPoint uses
      * fixed64.  This field is expected to have many buckets,
@@ -113,9 +113,9 @@ class Buckets extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Count is an array of counts, where count[i] carries the count
-     * of the bucket at index (offset+i).  count[i] is the count of
-     * values greater than or equal to base^(offset+i) and less than
+     * bucket_counts is an array of count values, where bucket_counts[i] carries
+     * the count of the bucket at index (offset+i). bucket_counts[i] is the count
+     * of values greater than base^(offset+i) and less than or equal to
      * base^(offset+i+1).
      * Note: By contrast, the explicit HistogramDataPoint uses
      * fixed64.  This field is expected to have many buckets,
