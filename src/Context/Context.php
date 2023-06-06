@@ -53,7 +53,7 @@ final class Context implements ContextInterface
     /**
      * @param ContextInterface|false|null $context
      *
-     * @internal
+     * @internal OpenTelemetry
      */
     public static function resolve($context, ?ContextStorageInterface $contextStorage = null): ContextInterface
     {
