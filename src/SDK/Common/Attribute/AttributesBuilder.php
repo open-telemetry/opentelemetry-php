@@ -118,7 +118,7 @@ final class AttributesBuilder implements AttributesBuilderInterface
      */
     private function isHomogeneous(array $value): bool
     {
-        if ($value === [] || count($value) <= 1) {
+        if (count($value) <= 1) {
             return true;
         }
         $type = gettype($value[0]);
