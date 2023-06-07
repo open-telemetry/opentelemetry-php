@@ -8,11 +8,11 @@ use const PHP_INT_SIZE;
 
 interface ScopeInterface
 {
-    /** Already detached. */
+    /** The associated context was already detached. */
     public const DETACHED = 1 << (PHP_INT_SIZE << 3) - 1;
-    /** Execution context inactive. */
+    /** The associated context is not in the active execution context. */
     public const INACTIVE = 1 << (PHP_INT_SIZE << 3) - 2;
-    /** Not current context. */
+    /** The associated context is not the active context. */
     public const MISMATCH = 1 << (PHP_INT_SIZE << 3) - 3;
 
     /**
