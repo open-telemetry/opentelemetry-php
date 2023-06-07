@@ -42,7 +42,7 @@ final class NoopSpanBuilder implements SpanBuilderInterface
         return $this;
     }
 
-    public function setStartTimestamp(int $timestamp): SpanBuilderInterface
+    public function setStartTimestamp(int $timestampNanos): SpanBuilderInterface
     {
         return $this;
     }

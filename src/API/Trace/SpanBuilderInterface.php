@@ -32,7 +32,7 @@ interface SpanBuilderInterface
      *
      * Defaults to the timestamp when {@see SpanBuilderInterface::startSpan} was called if not explicitly set.
      */
-    public function setStartTimestamp(int $timestamp): SpanBuilderInterface;
+    public function setStartTimestamp(int $timestampNanos): SpanBuilderInterface;
 
     /**
      * @psalm-param SpanKind::KIND_* $spanKind

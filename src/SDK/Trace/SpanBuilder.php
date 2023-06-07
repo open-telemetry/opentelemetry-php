@@ -116,13 +116,13 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
-    public function setStartTimestamp(int $timestamp): API\SpanBuilderInterface
+    public function setStartTimestamp(int $timestampNanos): API\SpanBuilderInterface
     {
-        if (0 > $timestamp) {
+        if (0 > $timestampNanos) {
             return $this;
         }
 
-        $this->startEpochNanos = $timestamp;
+        $this->startEpochNanos = $timestampNanos;
 
         return $this;
     }
