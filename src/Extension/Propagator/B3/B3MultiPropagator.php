@@ -8,6 +8,7 @@ use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanContextValidator;
+use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
@@ -178,16 +179,16 @@ final class B3MultiPropagator implements TextMapPropagatorInterface
 
         if ($debug && $debug === self::IS_SAMPLED) {
             $context = $context->with(B3DebugFlagContextKey::instance(), self::IS_SAMPLED);
-            $isSampled = SpanContextInterface::TRACE_FLAG_SAMPLED;
+            $isSampled = TraceFlags::SAMPLED;
         } else {
-            $isSampled = ($sampled === SpanContextInterface::TRACE_FLAG_SAMPLED);
+            $isSampled = ($sampled === TraceFlags::SAMPLED);
         }
 
         // Only traceparent header is extracted. No tracestate.
         return SpanContext::createFromRemoteParent(
             $traceId,
             $spanId,
-            $isSampled ? SpanContextInterface::TRACE_FLAG_SAMPLED : SpanContextInterface::TRACE_FLAG_DEFAULT
+            $isSampled ? TraceFlags::SAMPLED : TraceFlags::DEFAULT
         );
     }
 }

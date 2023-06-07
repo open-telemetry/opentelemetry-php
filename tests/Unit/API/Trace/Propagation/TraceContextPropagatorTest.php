@@ -9,6 +9,7 @@ use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanContextValidator;
+use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
@@ -66,7 +67,7 @@ class TraceContextPropagatorTest extends TestCase
                     SpanContext::create(
                         SpanContextValidator::INVALID_TRACE,
                         SpanContextValidator::INVALID_SPAN,
-                        SpanContextInterface::TRACE_FLAG_SAMPLED
+                        TraceFlags::SAMPLED
                     ),
                     Context::getCurrent()
                 )
@@ -83,7 +84,7 @@ class TraceContextPropagatorTest extends TestCase
                 $carrier,
                 null,
                 $this->withSpanContext(
-                    SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+                    SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::SAMPLED),
                     Context::getCurrent()
                 )
             );
@@ -103,7 +104,7 @@ class TraceContextPropagatorTest extends TestCase
                 $carrier,
                 null,
                 $this->withSpanContext(
-                    SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED, $this->traceState),
+                    SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::SAMPLED, $this->traceState),
                     Context::getCurrent()
                 )
             );
@@ -146,7 +147,7 @@ class TraceContextPropagatorTest extends TestCase
                 $carrier,
                 null,
                 $this->withSpanContext(
-                    SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT, $this->traceState),
+                    SpanContext::create(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::DEFAULT, $this->traceState),
                     Context::getCurrent()
                 )
             );
@@ -175,7 +176,7 @@ class TraceContextPropagatorTest extends TestCase
         ];
 
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::SAMPLED),
             $this->getSpanContext($this->traceContextPropagator->extract($carrier))
         );
     }
@@ -188,7 +189,7 @@ class TraceContextPropagatorTest extends TestCase
         ];
 
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_SAMPLED, $this->traceState),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::SAMPLED, $this->traceState),
             $this->getSpanContext($this->traceContextPropagator->extract($carrier))
         );
     }
@@ -213,7 +214,7 @@ class TraceContextPropagatorTest extends TestCase
         ];
 
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT, $this->traceState),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::DEFAULT, $this->traceState),
             $this->getSpanContext($this->traceContextPropagator->extract($carrier))
         );
     }
@@ -238,7 +239,7 @@ class TraceContextPropagatorTest extends TestCase
         ];
 
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT, $this->traceState),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::DEFAULT, $this->traceState),
             $this->getSpanContext($this->traceContextPropagator->extract($carrier))
         );
     }
@@ -251,7 +252,7 @@ class TraceContextPropagatorTest extends TestCase
         ];
 
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT, new TraceState()),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::DEFAULT, new TraceState()),
             $this->getSpanContext($this->traceContextPropagator->extract($carrier))
         );
     }
@@ -272,7 +273,7 @@ class TraceContextPropagatorTest extends TestCase
 
         // Tolerant of future versions with same parts.
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT, $this->traceState),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::DEFAULT, $this->traceState),
             $this->getSpanContext($this->traceContextPropagator->extract($carrierFuture)),
         );
 
@@ -283,7 +284,7 @@ class TraceContextPropagatorTest extends TestCase
 
         // Tolerant of future versions with more parts.
         $this->assertEquals(
-            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, SpanContextInterface::TRACE_FLAG_DEFAULT, $this->traceState),
+            SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::DEFAULT, $this->traceState),
             $this->getSpanContext($this->traceContextPropagator->extract($carrierFutureMoreParts)),
         );
     }

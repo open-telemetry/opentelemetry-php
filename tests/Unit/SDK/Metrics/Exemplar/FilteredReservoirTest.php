@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Metrics\Exemplar;
 
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
-use OpenTelemetry\API\Trace\SpanContextInterface;
+use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Metrics\Data\Exemplar;
@@ -57,7 +57,7 @@ final class FilteredReservoirTest extends TestCase
     {
         $reservoir = new FilteredReservoir(new FixedSizeReservoir(4), new WithSampledTraceExemplarFilter());
 
-        $context = Span::wrap(SpanContext::create('12345678901234567890123456789012', '1234567890123456', SpanContextInterface::TRACE_FLAG_SAMPLED))
+        $context = Span::wrap(SpanContext::create('12345678901234567890123456789012', '1234567890123456', TraceFlags::SAMPLED))
             ->storeInContext(Context::getRoot());
 
         $reservoir->offer(0, 5, Attributes::create([]), $context, 7);
