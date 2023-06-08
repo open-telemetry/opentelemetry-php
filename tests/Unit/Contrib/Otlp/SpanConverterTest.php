@@ -117,25 +117,6 @@ class SpanConverterTest extends TestCase
                     ]),
                 ]),
             ],
-            'Array of Randoms' => [
-                ['Answer',42,true,['Nested Array']],
-                new AnyValue([
-                    'array_value' => new ArrayValue([
-                        'values' => [
-                            new AnyValue(['string_value' => 'Answer']),
-                            new AnyValue(['int_value' => '42']),
-                            new AnyValue(['bool_value' => true]),
-                            new AnyValue([
-                                'array_value' => new ArrayValue([
-                                    'values' => [
-                                        new AnyValue(['string_value' => 'Nested Array']),
-                                    ],
-                                ]),
-                            ]),
-                        ],
-                    ]),
-                ]),
-            ],
         ];
     }
 

@@ -6,19 +6,24 @@ namespace OpenTelemetry\SDK\Common\Attribute;
 
 use function array_key_exists;
 use function count;
+use function gettype;
 use function is_array;
 use function is_string;
 use function mb_substr;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 
 /**
  * @internal
  */
 final class AttributesBuilder implements AttributesBuilderInterface
 {
+    use LogsMessagesTrait;
+
     private array $attributes;
     private ?int $attributeCountLimit;
     private ?int $attributeValueLengthLimit;
     private int $droppedAttributesCount;
+    private const NUMERICS = ['integer', 'double'];
 
     public function __construct(array $attributes, ?int $attributeCountLimit, ?int $attributeValueLengthLimit, int $droppedAttributesCount)
     {
@@ -61,6 +66,11 @@ final class AttributesBuilder implements AttributesBuilderInterface
 
             return;
         }
+        if (is_array($value) && !$this->isHomogeneous($value)) {
+            self::logWarning('attribute with non-homogeneous array values dropped: ' . $offset);
+
+            return;
+        }
         if (count($this->attributes) === $this->attributeCountLimit && !array_key_exists($offset, $this->attributes)) {
             $this->droppedAttributesCount++;
 
@@ -100,5 +110,27 @@ final class AttributesBuilder implements AttributesBuilderInterface
         }
 
         return $value;
+    }
+
+    /**
+     * Test whether an array contains only values of the same type, treating int/double as equivalent.
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.21.0/specification/common/README.md#attribute
+     */
+    private function isHomogeneous(array $value): bool
+    {
+        if (count($value) <= 1) {
+            return true;
+        }
+        $type = gettype($value[0]);
+        foreach ($value as $v) {
+            if (in_array(gettype($v), self::NUMERICS) && in_array($type, self::NUMERICS)) {
+                continue;
+            }
+            if (gettype($v) !== $type) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -207,7 +207,6 @@ class ZipkinSpanConverterTest extends TestCase
         $listOfStrings = ['string-1', 'string-2'];
         $listOfNumbers = [1, 2, 3, 3.1415, 42];
         $listOfBooleans = [true, true, false, true];
-        $listOfRandoms = [true, [1, 2, 3], false, 'string-1', 3.1415];
 
         $span = (new SpanData())
             ->setName('tags.test')
@@ -219,13 +218,12 @@ class ZipkinSpanConverterTest extends TestCase
             ->addAttribute('boolean-2', false)
             ->addAttribute('list-of-strings', $listOfStrings)
             ->addAttribute('list-of-numbers', $listOfNumbers)
-            ->addAttribute('list-of-booleans', $listOfBooleans)
-            ->addAttribute('list-of-random', $listOfRandoms);
+            ->addAttribute('list-of-booleans', $listOfBooleans);
 
         $tags = (new SpanConverter())->convert([$span])[0]['tags'];
 
         // Check that we can convert all attributes to tags
-        $this->assertCount(10, $tags);
+        $this->assertCount(9, $tags);
 
         // Tags destined for Zipkin must be pairs of strings
         foreach ($tags as $tagKey => $tagValue) {
@@ -240,14 +238,10 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame('true', $tags['boolean-1']);
         $this->assertSame('false', $tags['boolean-2']);
 
-        // Lists must be casted to strings and joined with a separator
+        // Lists must be cast to strings and joined with a separator
         $this->assertSame(implode(',', $listOfStrings), $tags['list-of-strings']);
         $this->assertSame(implode(',', $listOfNumbers), $tags['list-of-numbers']);
         $this->assertSame('true,true,false,true', $tags['list-of-booleans']);
-
-        // This currently works, but OpenTelemetry\Trace\Span should stop arrays
-        // containing multiple value types from being passed to the Exporter.
-        $this->assertSame('true,1,2,3,false,string-1,3.1415', $tags['list-of-random']);
     }
 
     /**

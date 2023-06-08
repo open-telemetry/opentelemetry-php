@@ -9,6 +9,7 @@ use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
+use OpenTelemetry\API\Common\Log\LoggerHolder;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
@@ -37,6 +38,7 @@ use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
+use Psr\Log\LoggerInterface;
 
 use function range;
 use function str_repeat;
@@ -57,6 +59,7 @@ class SpanTest extends MockeryTestCase
 
     /** @var MockInterface&SpanProcessorInterface */
     private $spanProcessor;
+    private $logger;
 
     private IdGeneratorInterface $idGenerator;
     private ResourceInfo $resource;
@@ -96,11 +99,14 @@ class SpanTest extends MockeryTestCase
         );
 
         ClockFactory::setDefault($this->testClock);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        LoggerHolder::set($this->logger);
     }
 
     protected function tearDown(): void
     {
         ClockFactory::setDefault(null);
+        LoggerHolder::unset();
     }
 
     // region API
@@ -484,6 +490,53 @@ class SpanTest extends MockeryTestCase
         $span = $this->createTestRootSpan();
         $span->setAttributes([]);
         $this->assertEmpty($span->toSpanData()->getAttributes());
+    }
+
+    /**
+     * @dataProvider nonHomogeneousArrayProvider
+     */
+    public function test_set_attribute_drops_non_homogeneous_array(array $values): void
+    {
+        $this->logger->expects($this->once())
+            ->method('log')
+            ->with(
+                $this->equalTo('warning'),
+                $this->stringContains('non-homogeneous')
+            );
+        $span = $this->createTestRootSpan();
+        $span->setAttribute('attr', $values);
+        $this->assertNull($span->getAttribute('attr'));
+    }
+
+    public static function nonHomogeneousArrayProvider(): array
+    {
+        return [
+            [[true, 'foo']],
+            [['foo', false]],
+            [['foo', 'bar', 3]],
+            [[5, 3.14, true]],
+        ];
+    }
+
+    /**
+     * @dataProvider homogeneousArrayProvider
+     */
+    public function test_set_attribute_with_homogeneous_array(array $values): void
+    {
+        $span = $this->createTestRootSpan();
+        $span->setAttribute('attr', $values);
+        $this->assertIsArray($span->getAttribute('attr'));
+    }
+
+    public static function homogeneousArrayProvider(): array
+    {
+        return [
+            'booleans' => [[true, false, true]],
+            'strings' => [['foo', 'false', 'bar']],
+            'int and double' => [[3, 3.14159]],
+            'integers' => [[3, 1, 5]],
+            'doubles' => [[1.25, 3.11]],
+        ];
     }
 
     /**

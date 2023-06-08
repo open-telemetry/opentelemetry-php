@@ -50,15 +50,18 @@ interface SpanInterface extends ImplicitContextKeyedInterface
 
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-attributes
-     * Adding attributes at span creation is preferred to calling SetAttribute later, as samplers can only consider information
+     * Adding attributes at span creation is preferred to calling setAttribute later, as samplers can only consider information
      * already present during span creation
      * @param non-empty-string $key
-     * @param bool|int|float|string|array|null $value Note: the array MUST be homogeneous, i.e. it MUST NOT contain values of different types.
+     * @param bool|int|float|string|array|null $value Note: arrays MUST be homogeneous, i.e. it MUST NOT contain values of different types.
      */
     public function setAttribute(string $key, $value): SpanInterface;
 
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-attributes
+     * An attribute with a null key will be dropped, and an attribute with a null value will be dropped but also remove any existing
+     * attribute with the same key.
+     * @param iterable<non-empty-string, bool|int|float|string|array|null> $attributes
      */
     public function setAttributes(iterable $attributes): SpanInterface;
 
