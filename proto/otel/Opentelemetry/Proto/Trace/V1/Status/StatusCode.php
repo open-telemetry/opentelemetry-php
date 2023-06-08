@@ -21,8 +21,8 @@ class StatusCode
      */
     const STATUS_CODE_UNSET = 0;
     /**
-     * The Span has been validated by an Application developers or Operator to have
-     * completed successfully.
+     * The Span has been validated by an Application developer or Operator to 
+     * have completed successfully.
      *
      * Generated from protobuf enum <code>STATUS_CODE_OK = 1;</code>
      */

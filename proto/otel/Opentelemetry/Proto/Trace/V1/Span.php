@@ -18,10 +18,9 @@ class Span extends \Google\Protobuf\Internal\Message
 {
     /**
      * A unique identifier for a trace. All spans from the same trace share
-     * the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes
-     * is considered invalid.
-     * This field is semantically required. Receiver should generate new
-     * random trace_id if empty or invalid trace_id was received.
+     * the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes OR
+     * of length other than 16 bytes is considered invalid (empty string in OTLP/JSON
+     * is zero-length and thus is also invalid).
      * This field is required.
      *
      * Generated from protobuf field <code>bytes trace_id = 1;</code>
@@ -29,10 +28,9 @@ class Span extends \Google\Protobuf\Internal\Message
     protected $trace_id = '';
     /**
      * A unique identifier for a span within a trace, assigned when the span
-     * is created. The ID is an 8-byte array. An ID with all zeroes is considered
-     * invalid.
-     * This field is semantically required. Receiver should generate new
-     * random span_id if empty or invalid span_id was received.
+     * is created. The ID is an 8-byte array. An ID with all zeroes OR of length
+     * other than 8 bytes is considered invalid (empty string in OTLP/JSON
+     * is zero-length and thus is also invalid).
      * This field is required.
      *
      * Generated from protobuf field <code>bytes span_id = 2;</code>
@@ -99,8 +97,8 @@ class Span extends \Google\Protobuf\Internal\Message
      * like server name can be set using the resource API. Examples of attributes:
      *     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
      *     "/http/server_latency": 300
-     *     "abc.com/myattribute": true
-     *     "abc.com/score": 10.239
+     *     "example.com/myattribute": true
+     *     "example.com/score": 10.239
      * The OpenTelemetry API specification further restricts the allowed value types:
      * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
      * Attribute keys MUST be unique (it is not allowed to have more than one
@@ -160,17 +158,15 @@ class Span extends \Google\Protobuf\Internal\Message
      *
      *     @type string $trace_id
      *           A unique identifier for a trace. All spans from the same trace share
-     *           the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes
-     *           is considered invalid.
-     *           This field is semantically required. Receiver should generate new
-     *           random trace_id if empty or invalid trace_id was received.
+     *           the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes OR
+     *           of length other than 16 bytes is considered invalid (empty string in OTLP/JSON
+     *           is zero-length and thus is also invalid).
      *           This field is required.
      *     @type string $span_id
      *           A unique identifier for a span within a trace, assigned when the span
-     *           is created. The ID is an 8-byte array. An ID with all zeroes is considered
-     *           invalid.
-     *           This field is semantically required. Receiver should generate new
-     *           random span_id if empty or invalid span_id was received.
+     *           is created. The ID is an 8-byte array. An ID with all zeroes OR of length
+     *           other than 8 bytes is considered invalid (empty string in OTLP/JSON
+     *           is zero-length and thus is also invalid).
      *           This field is required.
      *     @type string $trace_state
      *           trace_state conveys information about request position in multiple distributed tracing graphs.
@@ -209,8 +205,8 @@ class Span extends \Google\Protobuf\Internal\Message
      *           like server name can be set using the resource API. Examples of attributes:
      *               "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
      *               "/http/server_latency": 300
-     *               "abc.com/myattribute": true
-     *               "abc.com/score": 10.239
+     *               "example.com/myattribute": true
+     *               "example.com/score": 10.239
      *           The OpenTelemetry API specification further restricts the allowed value types:
      *           https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
      *           Attribute keys MUST be unique (it is not allowed to have more than one
@@ -242,10 +238,9 @@ class Span extends \Google\Protobuf\Internal\Message
 
     /**
      * A unique identifier for a trace. All spans from the same trace share
-     * the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes
-     * is considered invalid.
-     * This field is semantically required. Receiver should generate new
-     * random trace_id if empty or invalid trace_id was received.
+     * the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes OR
+     * of length other than 16 bytes is considered invalid (empty string in OTLP/JSON
+     * is zero-length and thus is also invalid).
      * This field is required.
      *
      * Generated from protobuf field <code>bytes trace_id = 1;</code>
@@ -258,10 +253,9 @@ class Span extends \Google\Protobuf\Internal\Message
 
     /**
      * A unique identifier for a trace. All spans from the same trace share
-     * the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes
-     * is considered invalid.
-     * This field is semantically required. Receiver should generate new
-     * random trace_id if empty or invalid trace_id was received.
+     * the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes OR
+     * of length other than 16 bytes is considered invalid (empty string in OTLP/JSON
+     * is zero-length and thus is also invalid).
      * This field is required.
      *
      * Generated from protobuf field <code>bytes trace_id = 1;</code>
@@ -278,10 +272,9 @@ class Span extends \Google\Protobuf\Internal\Message
 
     /**
      * A unique identifier for a span within a trace, assigned when the span
-     * is created. The ID is an 8-byte array. An ID with all zeroes is considered
-     * invalid.
-     * This field is semantically required. Receiver should generate new
-     * random span_id if empty or invalid span_id was received.
+     * is created. The ID is an 8-byte array. An ID with all zeroes OR of length
+     * other than 8 bytes is considered invalid (empty string in OTLP/JSON
+     * is zero-length and thus is also invalid).
      * This field is required.
      *
      * Generated from protobuf field <code>bytes span_id = 2;</code>
@@ -294,10 +287,9 @@ class Span extends \Google\Protobuf\Internal\Message
 
     /**
      * A unique identifier for a span within a trace, assigned when the span
-     * is created. The ID is an 8-byte array. An ID with all zeroes is considered
-     * invalid.
-     * This field is semantically required. Receiver should generate new
-     * random span_id if empty or invalid span_id was received.
+     * is created. The ID is an 8-byte array. An ID with all zeroes OR of length
+     * other than 8 bytes is considered invalid (empty string in OTLP/JSON
+     * is zero-length and thus is also invalid).
      * This field is required.
      *
      * Generated from protobuf field <code>bytes span_id = 2;</code>
@@ -513,8 +505,8 @@ class Span extends \Google\Protobuf\Internal\Message
      * like server name can be set using the resource API. Examples of attributes:
      *     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
      *     "/http/server_latency": 300
-     *     "abc.com/myattribute": true
-     *     "abc.com/score": 10.239
+     *     "example.com/myattribute": true
+     *     "example.com/score": 10.239
      * The OpenTelemetry API specification further restricts the allowed value types:
      * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
      * Attribute keys MUST be unique (it is not allowed to have more than one
@@ -533,8 +525,8 @@ class Span extends \Google\Protobuf\Internal\Message
      * like server name can be set using the resource API. Examples of attributes:
      *     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
      *     "/http/server_latency": 300
-     *     "abc.com/myattribute": true
-     *     "abc.com/score": 10.239
+     *     "example.com/myattribute": true
+     *     "example.com/score": 10.239
      * The OpenTelemetry API specification further restricts the allowed value types:
      * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
      * Attribute keys MUST be unique (it is not allowed to have more than one

@@ -27,6 +27,10 @@ class InstrumentationScope extends \Google\Protobuf\Internal\Message
      */
     protected $version = '';
     /**
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     private $attributes;
@@ -45,6 +49,9 @@ class InstrumentationScope extends \Google\Protobuf\Internal\Message
      *           An empty instrumentation scope name means the name is unknown.
      *     @type string $version
      *     @type \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $attributes
+     *           Additional attributes that describe the scope. [Optional].
+     *           Attribute keys MUST be unique (it is not allowed to have more than one
+     *           attribute with the same key).
      *     @type int $dropped_attributes_count
      * }
      */
@@ -102,6 +109,10 @@ class InstrumentationScope extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -111,6 +122,10 @@ class InstrumentationScope extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this

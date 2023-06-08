@@ -11,28 +11,31 @@ use UnexpectedValueException;
  * bit-field representing 32 distinct boolean flags.  Each flag defined in this
  * enum is a bit-mask.  To test the presence of a single flag in the flags of
  * a data point, for example, use an expression like:
- *   (point.flags & FLAG_NO_RECORDED_VALUE) == FLAG_NO_RECORDED_VALUE
+ *   (point.flags & DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK) == DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK
  *
  * Protobuf type <code>opentelemetry.proto.metrics.v1.DataPointFlags</code>
  */
 class DataPointFlags
 {
     /**
-     * Generated from protobuf enum <code>FLAG_NONE = 0;</code>
+     * The zero value for the enum. Should not be used for comparisons.
+     * Instead use bitwise "and" with the appropriate mask as shown above.
+     *
+     * Generated from protobuf enum <code>DATA_POINT_FLAGS_DO_NOT_USE = 0;</code>
      */
-    const FLAG_NONE = 0;
+    const DATA_POINT_FLAGS_DO_NOT_USE = 0;
     /**
      * This DataPoint is valid but has no recorded value.  This value
      * SHOULD be used to reflect explicitly missing data in a series, as
      * for an equivalent to the Prometheus "staleness marker".
      *
-     * Generated from protobuf enum <code>FLAG_NO_RECORDED_VALUE = 1;</code>
+     * Generated from protobuf enum <code>DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK = 1;</code>
      */
-    const FLAG_NO_RECORDED_VALUE = 1;
+    const DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK = 1;
 
     private static $valueToName = [
-        self::FLAG_NONE => 'FLAG_NONE',
-        self::FLAG_NO_RECORDED_VALUE => 'FLAG_NO_RECORDED_VALUE',
+        self::DATA_POINT_FLAGS_DO_NOT_USE => 'DATA_POINT_FLAGS_DO_NOT_USE',
+        self::DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK => 'DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK',
     ];
 
     public static function name($value)

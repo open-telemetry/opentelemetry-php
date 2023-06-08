@@ -7,24 +7,32 @@ namespace Opentelemetry\Proto\Logs\V1;
 use UnexpectedValueException;
 
 /**
- * Masks for LogRecord.flags field.
+ * LogRecordFlags is defined as a protobuf 'uint32' type and is to be used as
+ * bit-fields. Each non-zero value defined in this enum is a bit-mask.
+ * To extract the bit-field, for example, use an expression like:
+ *   (logRecord.flags & LOG_RECORD_FLAGS_TRACE_FLAGS_MASK)
  *
  * Protobuf type <code>opentelemetry.proto.logs.v1.LogRecordFlags</code>
  */
 class LogRecordFlags
 {
     /**
-     * Generated from protobuf enum <code>LOG_RECORD_FLAG_UNSPECIFIED = 0;</code>
+     * The zero value for the enum. Should not be used for comparisons.
+     * Instead use bitwise "and" with the appropriate mask as shown above.
+     *
+     * Generated from protobuf enum <code>LOG_RECORD_FLAGS_DO_NOT_USE = 0;</code>
      */
-    const LOG_RECORD_FLAG_UNSPECIFIED = 0;
+    const LOG_RECORD_FLAGS_DO_NOT_USE = 0;
     /**
-     * Generated from protobuf enum <code>LOG_RECORD_FLAG_TRACE_FLAGS_MASK = 255;</code>
+     * Bits 0-7 are used for trace flags.
+     *
+     * Generated from protobuf enum <code>LOG_RECORD_FLAGS_TRACE_FLAGS_MASK = 255;</code>
      */
-    const LOG_RECORD_FLAG_TRACE_FLAGS_MASK = 255;
+    const LOG_RECORD_FLAGS_TRACE_FLAGS_MASK = 255;
 
     private static $valueToName = [
-        self::LOG_RECORD_FLAG_UNSPECIFIED => 'LOG_RECORD_FLAG_UNSPECIFIED',
-        self::LOG_RECORD_FLAG_TRACE_FLAGS_MASK => 'LOG_RECORD_FLAG_TRACE_FLAGS_MASK',
+        self::LOG_RECORD_FLAGS_DO_NOT_USE => 'LOG_RECORD_FLAGS_DO_NOT_USE',
+        self::LOG_RECORD_FLAGS_TRACE_FLAGS_MASK => 'LOG_RECORD_FLAGS_TRACE_FLAGS_MASK',
     ];
 
     public static function name($value)
