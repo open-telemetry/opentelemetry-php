@@ -20,7 +20,7 @@ echo 'autoloading SDK example starting...' . PHP_EOL;
 // Composer autoloader will execute SDK/_autoload.php which will register global instrumentation from environment configuration
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-$instrumentation = new \OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation('demo');
+$instrumentation = new \OpenTelemetry\API\Instrumentation\CachedInstrumentation('demo');
 
 $instrumentation->tracer()->spanBuilder('root')->startSpan()->end();
 $instrumentation->meter()->createCounter('cnt')->add(1);

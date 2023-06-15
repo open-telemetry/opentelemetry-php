@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\API\Common\Instrumentation\Globals;
-use OpenTelemetry\API\Common\Log\LoggerHolder;
+use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\API\Trace\NoopTracerProvider;

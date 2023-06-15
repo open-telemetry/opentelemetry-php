@@ -8,7 +8,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use OpenTelemetry\API\Common\Log\LoggerHolder;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use Psr\Log\LogLevel;
 

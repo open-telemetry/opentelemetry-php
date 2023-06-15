@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Common\Instrumentation;
+namespace OpenTelemetry\API;
 
 use function assert;
 use Closure;
 use const E_USER_WARNING;
+use OpenTelemetry\API\Instrumentation\Configurator;
+use OpenTelemetry\API\Instrumentation\ContextKeys;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
@@ -21,7 +23,7 @@ use function trigger_error;
  */
 final class Globals
 {
-    /** @var list<Closure(Configurator): Configurator> */
+    /** @var Closure[] */
     private static array $initializers = [];
     private static ?self $globals = null;
 

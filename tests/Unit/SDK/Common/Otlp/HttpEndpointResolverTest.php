@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Otlp;
 
 use Generator;
 use InvalidArgumentException;
-use OpenTelemetry\API\Common\Signal\Signals;
+use OpenTelemetry\API\Signals;
 use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolver;
 use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolverInterface;
 use PHPUnit\Framework\TestCase;

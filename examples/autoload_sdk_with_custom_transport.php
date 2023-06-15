@@ -48,7 +48,7 @@ $factory = new class() implements \OpenTelemetry\SDK\Common\Export\TransportFact
 
 \OpenTelemetry\SDK\Registry::registerTransportFactory('grpc', $factory, true);
 
-$instrumentation = new \OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation('demo');
+$instrumentation = new \OpenTelemetry\API\Instrumentation\CachedInstrumentation('demo');
 
 $instrumentation->tracer()->spanBuilder('root')->startSpan()->end();
 $instrumentation->meter()->createCounter('cnt')->add(1);

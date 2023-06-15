@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Common\Signal;
+namespace OpenTelemetry\API;
 
 use InvalidArgumentException;
 

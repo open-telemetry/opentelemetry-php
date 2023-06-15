@@ -6,10 +6,10 @@ namespace OpenTelemetry\Example;
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use OpenTelemetry\API\Common\Log\LoggerHolder;
-use OpenTelemetry\API\Common\Signal\Signals;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Logs\EventLogger;
 use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\API\Signals;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
