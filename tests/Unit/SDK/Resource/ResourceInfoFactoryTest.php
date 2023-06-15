@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use InvalidArgumentException;
-use OpenTelemetry\API\Common\Log\LoggerHolder;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
-use OpenTelemetry\API\Common\Instrumentation\Configurator;
+use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;

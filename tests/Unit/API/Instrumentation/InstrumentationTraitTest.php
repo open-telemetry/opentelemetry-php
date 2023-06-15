@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\API\Common\Instrumentation;
+namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 
-use OpenTelemetry\API\Common\Instrumentation\InstrumentationInterface;
-use OpenTelemetry\API\Common\Instrumentation\InstrumentationTrait;
+use OpenTelemetry\API\Instrumentation\InstrumentationInterface;
+use OpenTelemetry\API\Instrumentation\InstrumentationTrait;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
@@ -20,7 +20,7 @@ use Psr\Log\NullLogger;
 use RuntimeException;
 
 /**
- * @covers \OpenTelemetry\API\Common\Instrumentation\InstrumentationTrait
+ * @covers \OpenTelemetry\API\Instrumentation\InstrumentationTrait
  */
 class InstrumentationTraitTest extends TestCase
 {
@@ -116,12 +116,12 @@ class InstrumentationTraitTest extends TestCase
 
     private function createValidImplementation(): InstrumentationInterface
     {
-        return new ValidInstrumentation();
+        return new \OpenTelemetry\Tests\Unit\API\Instrumentation\ValidInstrumentation();
     }
 
     private function createInvalidImplementation(): object
     {
-        return new InvalidInstrumentation();
+        return new \OpenTelemetry\Tests\Unit\API\Instrumentation\InvalidInstrumentation();
     }
 }
 

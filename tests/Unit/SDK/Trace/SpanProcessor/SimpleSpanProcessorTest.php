@@ -8,7 +8,7 @@ use LogicException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
-use OpenTelemetry\API\Common\Log\LoggerHolder;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanContextValidator;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
-use OpenTelemetry\API\Common\Log\LoggerHolder;
+use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;

@@ -9,21 +9,26 @@ require __DIR__ . '/../../../vendor/autoload.php';
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use OpenTelemetry\API\LoggerHolder;
-use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
+use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
-use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 LoggerHolder::set(new Logger('otlp-example', [new StreamHandler('php://stderr')]));
 
-$transport = (new OtlpHttpTransportFactory())->create('http://collector:4318/v1/traces', 'application/x-protobuf');
+$filename = sys_get_temp_dir() . '/traces.jsonl';
+$file = fopen($filename, 'a');
+$transport = (new StreamTransportFactory())->create($file, ContentTypes::NDJSON);
 $exporter = new SpanExporter($transport);
 
 echo 'Starting OTLP example';
 
 $tracerProvider =  new TracerProvider(
-    new SimpleSpanProcessor(
-        $exporter
+    new BatchSpanProcessor(
+        $exporter,
+        ClockFactory::getDefault()
     )
 );
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
@@ -50,7 +55,7 @@ for ($i = 0; $i < 3; $i++) {
 }
 $root->end();
 $scope->detach();
-echo PHP_EOL . 'OTLP example complete!  ';
+echo PHP_EOL . 'OTLP example complete!  Traces written to: ' . $filename;
 
 echo PHP_EOL;
 $tracerProvider->shutdown();

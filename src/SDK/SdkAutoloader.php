@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK;
 
 use InvalidArgumentException;
-use OpenTelemetry\API\Common\Instrumentation\Configurator;
-use OpenTelemetry\API\Common\Instrumentation\Globals;
+use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;

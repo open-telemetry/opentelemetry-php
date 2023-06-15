@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\API\Unit\Trace;
 
-use OpenTelemetry\API\Common\Log\LoggerHolder;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;

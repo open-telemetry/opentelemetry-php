@@ -7,7 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Composer\InstalledVersions;
 use Generator;
-use OpenTelemetry\API\Common\Log\LoggerHolder;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\ResourceInfo;

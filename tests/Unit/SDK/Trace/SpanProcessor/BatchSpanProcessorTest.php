@@ -9,7 +9,7 @@ use InvalidArgumentException;
 use LogicException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use OpenTelemetry\API\Common\Log\LoggerHolder;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;

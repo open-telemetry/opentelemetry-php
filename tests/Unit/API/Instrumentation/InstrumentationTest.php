@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\API\Common\Instrumentation;
+namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 
-use OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation;
-use OpenTelemetry\API\Common\Instrumentation\Configurator;
-use OpenTelemetry\API\Common\Instrumentation\Globals;
+use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
+use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\MeterInterface;
@@ -22,10 +22,10 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\API\Common\Instrumentation\Globals
- * @covers \OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation
- * @covers \OpenTelemetry\API\Common\Instrumentation\Configurator
- * @covers \OpenTelemetry\API\Common\Instrumentation\ContextKeys
+ * @covers \OpenTelemetry\API\Globals
+ * @covers \OpenTelemetry\API\Instrumentation\CachedInstrumentation
+ * @covers \OpenTelemetry\API\Instrumentation\Configurator
+ * @covers \OpenTelemetry\API\Instrumentation\ContextKeys
  */
 final class InstrumentationTest extends TestCase
 {

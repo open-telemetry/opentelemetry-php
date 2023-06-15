@@ -7,7 +7,7 @@ namespace OpenTelemetry\Example;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use OpenTelemetry\API\Common\Instrumentation\Globals;
+use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Logs\Bridge;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;

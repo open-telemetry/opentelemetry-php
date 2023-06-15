@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Otlp;
 
-use OpenTelemetry\API\Common\Signal\Signals;
+use OpenTelemetry\API\Signals;
 use Psr\Http\Message\UriInterface;
 
 interface HttpEndpointResolverInterface

@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Common\Instrumentation;
+namespace OpenTelemetry\API\Instrumentation;
 
 use ArrayAccess;
 use function assert;
 use function class_exists;
+use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;

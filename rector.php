@@ -25,5 +25,8 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__ . '/src/SDK/SdkAutoloader.php',
         ],
         FlipTypeControlToUseExclusiveTypeRector::class,
+        \Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector::class,
+        \Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
+        \Rector\RemovingStatic\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector::class,
     ]);
 };

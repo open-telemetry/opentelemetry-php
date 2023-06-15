@@ -25,8 +25,8 @@ SDK autoloading will be attempted as part of composer's autoloader:
 ```php
 require 'vendor/autoload.php';
 
-$tracer = OpenTelemetry\API\Common\Instrumentation\Globals::tracerProvider()->getTracer('example');
-$meter = OpenTelemetry\API\Common\Instrumentation\Globals::meterProvider()->getMeter('example');
+$tracer = \OpenTelemetry\API\Globals::tracerProvider()->getTracer('example');
+$meter = \OpenTelemetry\API\Globals::meterProvider()->getMeter('example');
 ```
 
 If autoloading was not successful (or partially successful), no-op implementations of the above may be returned.

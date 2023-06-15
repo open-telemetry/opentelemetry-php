@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Propagation;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
-use OpenTelemetry\API\Common\Log\LoggerHolder;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;

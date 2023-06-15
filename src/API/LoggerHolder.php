@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Common\Log;
+namespace OpenTelemetry\API;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;

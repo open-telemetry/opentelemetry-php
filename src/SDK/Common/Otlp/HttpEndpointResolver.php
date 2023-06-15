@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Otlp;
 
 use InvalidArgumentException;
-use OpenTelemetry\API\Common\Signal\Signals;
+use OpenTelemetry\API\Signals;
 use OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\MessageFactoryResolver;
 use OpenTelemetry\SDK\Common\Http\Psr\Message\FactoryResolverInterface;
 use Psr\Http\Message\UriInterface;

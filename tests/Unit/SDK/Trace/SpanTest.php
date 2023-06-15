@@ -9,7 +9,7 @@ use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
-use OpenTelemetry\API\Common\Log\LoggerHolder;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
@@ -39,7 +39,6 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use Psr\Log\LoggerInterface;
-
 use function range;
 use function str_repeat;
 
