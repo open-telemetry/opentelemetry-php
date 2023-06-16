@@ -6,6 +6,9 @@ namespace OpenTelemetry\SDK\Common\Dsn;
 
 use InvalidArgumentException;
 
+/**
+ * @deprecated
+ */
 final class Factory implements FactoryInterface
 {
     /** @var array  */

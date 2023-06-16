@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Dsn;
 
+/**
+ * @deprecated
+ */
 class Dsn implements DsnInterface
 {
     private string $type;

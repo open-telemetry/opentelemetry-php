@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Dsn;
 
+/**
+ * @deprecated
+ */
 interface DsnInterface
 {
     /** @var string  */

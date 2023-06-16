@@ -6,6 +6,9 @@ namespace OpenTelemetry\SDK\Common\Dsn;
 
 use InvalidArgumentException;
 
+/**
+ * @deprecated
+ */
 class Parser implements ParserInterface
 {
     private const QUERY_ATTRIBUTE = 'query';
