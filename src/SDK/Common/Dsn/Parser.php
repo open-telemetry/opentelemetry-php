@@ -8,6 +8,8 @@ use InvalidArgumentException;
 
 /**
  * @deprecated
+ * @phan-suppress PhanDeprecatedInterface
+ * @phan-suppress PhanDeprecatedClass
  */
 class Parser implements ParserInterface
 {
@@ -22,6 +24,9 @@ class Parser implements ParserInterface
         $this->factory = $factory ?? Factory::create();
     }
 
+    /**
+     * @phan-suppress PhanDeprecatedClass
+     */
     public static function create(FactoryInterface $factory = null): self
     {
         return new self($factory);

@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Common\Dsn;
 
 /**
  * @deprecated
+ * @phan-suppress PhanDeprecatedInterface
  */
 class Dsn implements DsnInterface
 {
@@ -40,6 +41,9 @@ class Dsn implements DsnInterface
         $this->password = $password;
     }
 
+    /**
+     * @phan-suppress PhanDeprecatedClass
+     */
     public static function create(
         string $type,
         string $scheme,
