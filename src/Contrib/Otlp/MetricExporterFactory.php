@@ -10,7 +10,6 @@ use OpenTelemetry\SDK\Common\Configuration\Defaults;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
-use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolver;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Otlp;
+namespace OpenTelemetry\Contrib\Otlp;
 
 use InvalidArgumentException;
 use OpenTelemetry\API\Signals;

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Otlp;
+namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use Generator;
 use InvalidArgumentException;
 use OpenTelemetry\API\Signals;
-use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolver;
-use OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolverInterface;
+use OpenTelemetry\Contrib\Otlp\HttpEndpointResolver;
+use OpenTelemetry\Contrib\Otlp\HttpEndpointResolverInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Otlp\HttpEndpointResolver
+ * @covers \OpenTelemetry\Contrib\Otlp\HttpEndpointResolver
  */
 class HttpEndpointResolverTest extends TestCase
 {
