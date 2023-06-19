@@ -8,7 +8,6 @@ use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\LoggerHolder;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
 use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -104,7 +103,7 @@ class LogsMessagesTraitTest extends TestCase
     public function test_error_log_with_configured_otel_log_level(string $otelLogLevel, string $method, bool $expected): void
     {
         LoggerHolder::unset();
-        $this->setEnvironmentVariable(Variables::OTEL_LOG_LEVEL, $otelLogLevel);
+        $this->setEnvironmentVariable('OTEL_LOG_LEVEL', $otelLogLevel);
         $instance = $this->createInstance();
         if ($expected === true) {
             $this->expectException(PHPUnitFrameworkException::class);
