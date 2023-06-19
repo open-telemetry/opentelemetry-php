@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Behavior;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\LoggerHolder;
 use Psr\Log\LogLevel;
 
@@ -11,20 +12,7 @@ trait LogsMessagesTrait
 {
     private static function shouldLog(string $level): bool
     {
-        return in_array($level, [LogLevel::ERROR, LogLevel::WARNING, LogLevel::CRITICAL, LogLevel::EMERGENCY]);
-    }
-
-    private static function map(string $level)
-    {
-        switch ($level) {
-            case LogLevel::WARNING:
-            case LogLevel::ERROR:
-            case LogLevel::CRITICAL:
-            case LogLevel::EMERGENCY:
-                return E_USER_WARNING;
-            default:
-                return E_USER_NOTICE;
-        }
+        return Logging::level($level) >= Logging::logLevel();
     }
 
     private static function doLog(string $level, string $message, array $context): void
@@ -34,13 +22,28 @@ trait LogsMessagesTrait
             $context['source'] = get_called_class();
             $logger->log($level, $message, $context);
         } elseif (self::shouldLog($level)) {
-            $message = sprintf(
-                '%s: %s in %s',
-                $message,
-                (array_key_exists('exception', $context) && $context['exception'] instanceof \Throwable) ? $context['exception']->getMessage() : '',
-                get_called_class()
-            );
-            trigger_error($message, self::map($level));
+            $exception = (array_key_exists('exception', $context) && $context['exception'] instanceof \Throwable)
+            ? $context['exception']
+            : null;
+            if ($exception) {
+                $message = sprintf(
+                    '%s: %s%s%s',
+                    $message,
+                    $exception->getMessage(),
+                    PHP_EOL,
+                    $exception->getTraceAsString()
+                );
+            } else {
+                //get calling location, skipping over trait
+                $caller = debug_backtrace()[1];
+                $message = sprintf(
+                    '%s(%s): %s',
+                    $caller['file'],
+                    $caller['line'],
+                    $message,
+                );
+            }
+            trigger_error($message, Logging::map($level));
         }
     }
 

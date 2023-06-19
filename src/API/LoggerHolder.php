@@ -44,7 +44,7 @@ final class LoggerHolder
     }
 
     /**
-     * Disable logging
+     * Disable psr-3 logging
      */
     public static function disable(): void
     {
