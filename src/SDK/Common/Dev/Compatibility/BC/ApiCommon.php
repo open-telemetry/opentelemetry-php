@@ -16,14 +16,14 @@ use OpenTelemetry\API\Signals;
 /**
  * @codeCoverageIgnoreStart
  */
-const OpenTelemetry_API_Common_Instrumentation_CachedInstrumentation = 'OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation.php';
-const OpenTelemetry_API_Common_Instrumentation_Configurator = 'OpenTelemetry\API\Common\Instrumentation\Configurator.php';
-const OpenTelemetry_API_Common_Instrumentation_ContextKeys = 'OpenTelemetry\API\Common\Instrumentation\ContextKeys.php';
-const OpenTelemetry_API_Common_Instrumentation_Globals = 'OpenTelemetry\API\Common\Instrumentation\Globals.php';
-const OpenTelemetry_API_Common_Instrumentation_InstrumentationInterface = 'OpenTelemetry\API\Common\Instrumentation\InstrumentationInterface.php';
-const OpenTelemetry_API_Common_Instrumentation_InstrumentationTrait = 'OpenTelemetry\API\Common\Instrumentation\InstrumentationTrait.php';
-const OpenTelemetry_API_Common_Log_LoggerHolder = 'OpenTelemetry\API\LoggerHolder.php';
-const OpenTelemetry_API_Common_Signal_Signals = 'OpenTelemetry\API\Common\Signal\Signals.php';
+const OpenTelemetry_API_Common_Instrumentation_CachedInstrumentation = '\OpenTelemetry\API\Common\Instrumentation\CachedInstrumentation';
+const OpenTelemetry_API_Common_Instrumentation_Configurator = '\OpenTelemetry\API\Common\Instrumentation\Configurator';
+const OpenTelemetry_API_Common_Instrumentation_ContextKeys = '\OpenTelemetry\API\Common\Instrumentation\ContextKeys';
+const OpenTelemetry_API_Common_Instrumentation_Globals = '\OpenTelemetry\API\Common\Instrumentation\Globals';
+const OpenTelemetry_API_Common_Instrumentation_InstrumentationInterface = '\OpenTelemetry\API\Common\Instrumentation\InstrumentationInterface';
+const OpenTelemetry_API_Common_Instrumentation_InstrumentationTrait = '\OpenTelemetry\API\Common\Instrumentation\InstrumentationTrait';
+const OpenTelemetry_API_Common_Log_LoggerHolder = '\OpenTelemetry\API\Common\Log\LoggerHolder';
+const OpenTelemetry_API_Common_Signal_Signals = '\OpenTelemetry\API\Common\Signal\Signals';
 
 const MAP = [
     OpenTelemetry_API_Common_Instrumentation_CachedInstrumentation => CachedInstrumentation::class,
@@ -41,7 +41,6 @@ foreach (MAP as $old => $new) {
         class_alias($new, $old);
     }
 }
-
 /**
  * @codeCoverageIgnoreEnd
  */
