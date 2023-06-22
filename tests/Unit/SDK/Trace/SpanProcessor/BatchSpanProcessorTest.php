@@ -27,6 +27,7 @@ use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessorBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use Psr\Log\LoggerInterface;
@@ -540,6 +541,12 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $this->expectException(InvalidArgumentException::class);
         $exporter = $this->createMock(SpanExporterInterface::class);
         new BatchSpanProcessor($exporter, $this->testClock, 2, 5000, 30000, 3);
+    }
+
+    public function test_get_builder(): void
+    {
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $this->assertInstanceOf(BatchSpanProcessorBuilder::class, BatchSpanProcessor::builder($exporter));
     }
 
     private function createSampledSpanMock()
