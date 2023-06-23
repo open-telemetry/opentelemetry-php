@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Behavior;
 
+use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\LoggerHolder;
 use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
@@ -14,9 +16,12 @@ use Psr\Log\LogLevel;
 
 /**
  * @covers \OpenTelemetry\API\Behavior\LogsMessagesTrait
+ * @covers \OpenTelemetry\API\Behavior\Logging
  */
 class LogsMessagesTraitTest extends TestCase
 {
+    use EnvironmentVariables;
+
     // @var LoggerInterface|MockObject $logger
     protected MockObject $logger;
 
@@ -29,6 +34,7 @@ class LogsMessagesTraitTest extends TestCase
     public function tearDown(): void
     {
         LoggerHolder::unset();
+        $this->restoreEnvironmentVariables();
     }
 
     public function test_defaults_to_trigger_error_with_warning(): void
@@ -39,7 +45,7 @@ class LogsMessagesTraitTest extends TestCase
         $instance = $this->createInstance();
 
         $this->expectException(PHPUnitFrameworkException::class);
-        $this->expectExceptionMessageMatches(sprintf('/%s/', $message));
+        $this->expectExceptionMessageMatches('/LogsMessagesTraitTest->test_defaults_to_trigger_error_with_warning()/');
         $instance->run('logWarning', 'foo', ['exception' => new \Exception($message)]);
     }
 
@@ -53,6 +59,17 @@ class LogsMessagesTraitTest extends TestCase
         $this->expectException(PHPUnitFrameworkException::class);
         $this->expectExceptionMessageMatches(sprintf('/%s/', $message));
         $instance->run('logError', 'foo', ['exception' => new \Exception($message)]);
+    }
+
+    public function test_error_log_without_exception_contains_code_location(): void
+    {
+        LoggerHolder::unset();
+        $this->assertFalse(LoggerHolder::isSet());
+        $instance = $this->createInstance();
+
+        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectExceptionMessageMatches(sprintf('/%s\(/', addcslashes(__FILE__, '/')));
+        $instance->run('logWarning', 'no exception here');
     }
 
     /**
@@ -80,8 +97,36 @@ class LogsMessagesTraitTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider otelLogLevelProvider
+     */
+    public function test_error_log_with_configured_otel_log_level(string $otelLogLevel, string $method, bool $expected): void
+    {
+        LoggerHolder::unset();
+        $this->setEnvironmentVariable('OTEL_LOG_LEVEL', $otelLogLevel);
+        $instance = $this->createInstance();
+        if ($expected === true) {
+            $this->expectException(PHPUnitFrameworkException::class);
+        } else {
+            $this->assertTrue(true, 'dummy assertion');
+        }
+        $instance->run($method, 'test message');
+    }
+
+    public static function otelLogLevelProvider(): array
+    {
+        return [
+            ['warning', 'logWarning', true],
+            ['warning', 'logError', true],
+            ['warning', 'logInfo', false],
+            ['none', 'logError', false],
+        ];
+    }
+
     private function createInstance(): object
     {
+        Logging::reset();
+
         return new class() {
             use LogsMessagesTrait;
             //accessor for protected trait methods
