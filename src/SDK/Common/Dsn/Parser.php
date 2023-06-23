@@ -6,6 +6,11 @@ namespace OpenTelemetry\SDK\Common\Dsn;
 
 use InvalidArgumentException;
 
+/**
+ * @deprecated
+ * @phan-suppress PhanDeprecatedInterface
+ * @phan-suppress PhanDeprecatedClass
+ */
 class Parser implements ParserInterface
 {
     private const QUERY_ATTRIBUTE = 'query';
@@ -19,6 +24,9 @@ class Parser implements ParserInterface
         $this->factory = $factory ?? Factory::create();
     }
 
+    /**
+     * @phan-suppress PhanDeprecatedClass
+     */
     public static function create(FactoryInterface $factory = null): self
     {
         return new self($factory);

@@ -6,6 +6,10 @@ namespace OpenTelemetry\SDK\Common\Dsn;
 
 use InvalidArgumentException;
 
+/**
+ * @phan-suppress PhanDeprecatedInterface
+ * @phan-suppress PhanDeprecatedClass
+ */
 final class Factory implements FactoryInterface
 {
     /** @var array  */
@@ -29,6 +33,7 @@ final class Factory implements FactoryInterface
 
     /**
      * @phan-suppress PhanUndeclaredClassAttribute
+     * @phan-suppress PhanDeprecatedClass
      */
     #[\ReturnTypeWillChange]
     public function fromArray(array $dsn): Dsn
