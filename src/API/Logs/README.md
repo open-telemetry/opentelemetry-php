@@ -15,5 +15,5 @@ This means that a "log appender" in the 3rd party logging library (sometimes kno
 - convert logs from its own log format into OpenTelemetry's `LogRecord` format
 - send the logs to OpenTelemetry via `Logger::logRecord()`
 
-See [monolog-otel-integration](examples/logs/features/monolog-otel-integration.md) for an example.
+See [monolog-otel-integration](/examples/logs/features/monolog-otel-integration.md) for an example.
 
