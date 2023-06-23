@@ -159,7 +159,7 @@ Exported spans can also be seen in jaeger at [http://127.0.0.1:16686](http://127
 
 ## Metrics signals
 
-Meters must be obtained from a `MeterProvider`
+See https://opentelemetry.io/docs/instrumentation/php/manual/#metrics
 
 ### Metrics examples
 
@@ -167,7 +167,7 @@ See [basic example](./examples/metrics/basic.php)
 
 ## Log signals
 
-See https://opentelemetry.io/docs/instrumentation/php/logging/
+See https://opentelemetry.io/docs/instrumentation/php/manual/#logging
 
 ### Logging examples
 
