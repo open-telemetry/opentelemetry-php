@@ -198,6 +198,11 @@ class BatchSpanProcessor implements SpanProcessorInterface
         return $this->flush(__FUNCTION__, $cancellation);
     }
 
+    public static function builder(SpanExporterInterface $exporter): BatchSpanProcessorBuilder
+    {
+        return new BatchSpanProcessorBuilder($exporter);
+    }
+
     private function flush(?string $flushMethod = null, ?CancellationInterface $cancellation = null): bool
     {
         if ($flushMethod !== null) {

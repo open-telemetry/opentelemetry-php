@@ -18,7 +18,7 @@ use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
-use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessorBuilder;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -50,7 +50,7 @@ $loggerProvider = LoggerProvider::builder()
 
 $tracerProvider = TracerProvider::builder()
     ->addSpanProcessor(
-        (new BatchSpanProcessorBuilder($spanExporter))
+        BatchSpanProcessor::builder($spanExporter)
             ->setMeterProvider($meterProvider)
             ->build()
     )
