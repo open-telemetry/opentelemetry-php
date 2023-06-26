@@ -1,3 +1,9 @@
+[![Releases](https://img.shields.io/badge/releases-purple)](https://github.com/opentelemetry-php/gen-otlp-protobuf/releases)
+[![Source](https://img.shields.io/badge/source-gen--otlp--protobuf-green)](https://github.com/open-telemetry/opentelemetry-php/tree/main/proto/otel)
+[![Mirror](https://img.shields.io/badge/mirror-opentelemetry--php:gen--otlp--protobuf-blue)](https://github.com/opentelemetry-php/gen-otlp-protobuf)
+[![Latest Version](http://poser.pugx.org/open-telemetry/gen-otlp-protobuf/v/unstable)](https://packagist.org/packages/open-telemetry/gen-otlp-protobuf/)
+[![Stable](http://poser.pugx.org/open-telemetry/gen-otlp-protobuf/v/stable)](https://packagist.org/packages/open-telemetry/gen-otlp-protobuf/)
+
 # OpenTelemetry protobuf files
 
 ## Protobuf Runtime library

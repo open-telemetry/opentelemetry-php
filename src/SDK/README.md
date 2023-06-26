@@ -1,6 +1,16 @@
+[![Releases](https://img.shields.io/badge/releases-purple)](https://github.com/opentelemetry-php/sdk/releases)
+[![Source](https://img.shields.io/badge/source-sdk-green)](https://github.com/open-telemetry/opentelemetry-php/tree/main/src/SDK)
+[![Mirror](https://img.shields.io/badge/mirror-opentelemetry--php:sdk-blue)](https://github.com/opentelemetry-php/sdk)
+[![Latest Version](http://poser.pugx.org/open-telemetry/sdk/v/unstable)](https://packagist.org/packages/open-telemetry/sdk/)
+[![Stable](http://poser.pugx.org/open-telemetry/sdk/v/stable)](https://packagist.org/packages/open-telemetry/sdk/)
+
 # OpenTelemetry SDK
 
 The OpenTelemetry PHP SDK implements the API, and should be used in conjunction with contributed exporter(s) to generate and export telemetry.
+
+## Documentation
+
+https://opentelemetry.io/docs/instrumentation/php/sdk/
 
 ## Getting started
 
