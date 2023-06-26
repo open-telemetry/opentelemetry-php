@@ -1,3 +1,4 @@
+[![Releases](https://img.shields.io/badge/releases-purple)](https://github.com/opentelemetry-php/sdk/releases)
 [![Source](https://img.shields.io/badge/source-sdk-green)](https://github.com/open-telemetry/opentelemetry-php/tree/main/src/SDK)
 [![Mirror](https://img.shields.io/badge/mirror-opentelemetry--php:sdk-blue)](https://github.com/opentelemetry-php/sdk)
 [![Latest Version](http://poser.pugx.org/open-telemetry/sdk/v/unstable)](https://packagist.org/packages/open-telemetry/sdk/)

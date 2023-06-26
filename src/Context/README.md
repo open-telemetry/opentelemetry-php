@@ -1,3 +1,4 @@
+[![Releases](https://img.shields.io/badge/releases-purple)](https://github.com/opentelemetry-php/context/releases)
 [![Source](https://img.shields.io/badge/source-context-green)](https://github.com/open-telemetry/opentelemetry-php/tree/main/src/Context)
 [![Mirror](https://img.shields.io/badge/mirror-opentelemetry--php:context-blue)](https://github.com/opentelemetry-php/context)
 [![Latest Version](http://poser.pugx.org/open-telemetry/context/v/unstable)](https://packagist.org/packages/open-telemetry/context/)
