@@ -121,7 +121,7 @@ final class AttributesBuilder implements AttributesBuilderInterface
         if (count($value) <= 1) {
             return true;
         }
-        $type = gettype($value[0]);
+        $type = gettype(reset($value));
         foreach ($value as $v) {
             if (in_array(gettype($v), self::NUMERICS) && in_array($type, self::NUMERICS)) {
                 continue;
