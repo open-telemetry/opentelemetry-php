@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Example;
 
 use OpenTelemetry\API\Metrics\ObserverInterface;
-use OpenTelemetry\Contrib\Otlp\ConsoleMetricExporterFactory;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporterFactory;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 
 require_once __DIR__ . '/../../vendor/autoload.php';

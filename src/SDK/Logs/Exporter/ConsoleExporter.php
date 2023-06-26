@@ -13,6 +13,10 @@ use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\ReadableLogRecord;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
+/**
+ * A JSON console exporter for LogRecords. This is only useful for testing; the
+ * output is human-readable, and is not compatible with the OTLP format.
+ */
 class ConsoleExporter implements LogRecordExporterInterface
 {
     private TransportInterface $transport;

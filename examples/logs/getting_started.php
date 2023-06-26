@@ -13,6 +13,13 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
+/**
+ * Example of logging used in conjunction with tracing. The trace id and span id
+ * will be injected into the logged record.
+ * Note that logging output is human-readable JSON, and is not compatible with the
+ * OTEL format.
+ */
+
 $loggerProvider = new LoggerProvider(
     new SimpleLogsProcessor(
         (new ConsoleExporterFactory())->create()
