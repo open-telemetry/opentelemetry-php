@@ -1,3 +1,8 @@
+[![Source](https://img.shields.io/badge/source-extension--propagator--b3-green)](https://github.com/open-telemetry/opentelemetry-php/tree/main/src/Extension/Propagator/B3)
+[![Mirror](https://img.shields.io/badge/mirror-opentelemetry--php:extension--propagator--b3-blue)](https://github.com/opentelemetry-php/extension-propagator-b3)
+[![Latest Version](http://poser.pugx.org/open-telemetry/extension-propagator-b3/v/unstable)](https://packagist.org/packages/open-telemetry/extension-propagator-b3/)
+[![Stable](http://poser.pugx.org/open-telemetry/extension-propagator-b3/v/stable)](https://packagist.org/packages/open-telemetry/extension-propagator-b3/)
+
 # OpenTelemetry Extension
 ### B3 Propagator
 

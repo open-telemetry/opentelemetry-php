@@ -1,4 +1,13 @@
+[![Source](https://img.shields.io/badge/source-exporter--otlp-green)](https://github.com/open-telemetry/opentelemetry-php/tree/main/src/Contrib/Otlp)
+[![Mirror](https://img.shields.io/badge/mirror-opentelemetry--php:exporter--otlp-blue)](https://github.com/opentelemetry-php/exporter-otlp)
+[![Latest Version](http://poser.pugx.org/open-telemetry/exporter-otlp/v/unstable)](https://packagist.org/packages/open-telemetry/exporter-otlp/)
+[![Stable](http://poser.pugx.org/open-telemetry/exporter-otlp/v/stable)](https://packagist.org/packages/open-telemetry/exporter-otlp/)
+
 # OpenTelemetry OTLP exporter
+
+## Documentation
+
+https://opentelemetry.io/docs/instrumentation/php/exporters/#otlp
 
 ## Usage
 
