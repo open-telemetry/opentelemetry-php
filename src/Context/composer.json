@@ -3,6 +3,12 @@
     "description": "Context implementation for OpenTelemetry PHP.",
     "keywords": ["opentelemetry", "otel", "context"],
     "type": "library",
+    "support": {
+        "issues": "https://github.com/open-telemetry/opentelemetry-php/issues",
+        "source": "https://github.com/open-telemetry/opentelemetry-php",
+        "docs": "https://opentelemetry.io/docs/php",
+        "chat": "https://app.slack.com/client/T08PSQ7BQ/C01NFPCV44V"
+    },
     "license": "Apache-2.0",
     "authors": [
         {
