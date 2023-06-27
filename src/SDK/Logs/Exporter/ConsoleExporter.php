@@ -32,20 +32,20 @@ class ConsoleExporter implements LogRecordExporterInterface
     public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         $resource = null;
-        $scope = null;
+        $scopes = [];
         foreach ($batch as $record) {
             if (!$resource) {
                 $resource = $this->convertResource($record->getResource());
             }
-            if (!$scope) {
-                $scope = $this->convertInstrumentationScope($record->getInstrumentationScope());
-                $scope['logs'] = [];
+            $key = $this->scopeKey($record->getInstrumentationScope());
+            if (!array_key_exists($key, $scopes)) {
+                $scopes[$key] = $this->convertInstrumentationScope($record->getInstrumentationScope());
             }
-            $scope['logs'][] = $this->convertLogRecord($record);
+            $scopes[$key]['logs'][] = $this->convertLogRecord($record);
         }
         $output = [
             'resource' => $resource,
-            'scope' => $scope,
+            'scopes' => array_values($scopes),
         ];
         $this->transport->send(json_encode($output, JSON_PRETTY_PRINT));
 
@@ -86,6 +86,12 @@ class ConsoleExporter implements LogRecordExporterInterface
             'dropped_attributes_count' => $resource->getAttributes()->getDroppedAttributesCount(),
         ];
     }
+
+    private function scopeKey(InstrumentationScopeInterface $scope): string
+    {
+        return serialize([$scope->getName(), $scope->getVersion(), $scope->getSchemaUrl(), $scope->getAttributes()]);
+    }
+
     private function convertInstrumentationScope(InstrumentationScopeInterface $scope): array
     {
         return [
@@ -94,6 +100,7 @@ class ConsoleExporter implements LogRecordExporterInterface
             'attributes' => $scope->getAttributes()->toArray(),
             'dropped_attributes_count' => $scope->getAttributes()->getDroppedAttributesCount(),
             'schema_url' => $scope->getSchemaUrl(),
+            'logs' => [],
         ];
     }
 }
