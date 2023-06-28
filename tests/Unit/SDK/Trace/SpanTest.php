@@ -514,6 +514,7 @@ class SpanTest extends MockeryTestCase
             [['foo', false]],
             [['foo', 'bar', 3]],
             [[5, 3.14, true]],
+            [['one' => 1, 'two' => true]],
         ];
     }
 
@@ -535,6 +536,7 @@ class SpanTest extends MockeryTestCase
             'int and double' => [[3, 3.14159]],
             'integers' => [[3, 1, 5]],
             'doubles' => [[1.25, 3.11]],
+            'strings with non-numeric keys' => [['foo' => 'foo', 'bar' => 'bar']],
         ];
     }
 
