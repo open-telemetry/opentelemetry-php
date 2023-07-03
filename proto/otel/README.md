@@ -8,20 +8,19 @@
 
 ## Protobuf Runtime library
 
+OTLP exporting requires a [protobuf runtime library](https://github.com/protocolbuffers/protobuf/tree/main/php).
+
 There exist two protobuf runtime libraries that offer the same set of APIs, allowing developers to choose the one that 
 best suits their needs.
 
-The first and easiest option is to install the Protobuf PHP Runtime Library through composer. This can be the easiest 
-way to get started quickly. Either run `composer require google/protobuf`, or update your `composer.json` as follows:
-
-```json
-"require": {
-  "google/protobuf": "^v3.3.0"
-}
-```
+This package requires `google/protobuf`, which is the native implementation. It is easy to install and a good way to get
+started quickly.
 
 Alternatively, and the recommended option for production is to install the Protobuf C extension for PHP. The extension
-makes both exporters _significantly_ more performant. This can be easily installed with the following command:
-```sh
-$ sudo pecl install protobuf
+makes OTLP exporting _significantly_ more performant. The extension can be installed with the following command:
+
+```shell
+pecl install protobuf
 ```
+
+The extension can be installed alongside the native library, and it will be used instead if available.

@@ -24,9 +24,6 @@
     "open-telemetry/sdk": "^1.0"
   },
   "suggest": {
-    "php-http/async-client-implementation": "For otlp/http exporting",
-    "php-http/discovery": "For otlp/http exporting",
-    "psr/http-factory-implementation": "For otlp/http exporting"
   },
   "autoload": {
     "psr-4": {

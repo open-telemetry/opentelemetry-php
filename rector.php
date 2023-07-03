@@ -28,5 +28,6 @@ return static function (RectorConfig $rectorConfig): void {
         \Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector::class,
         \Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
         \Rector\RemovingStatic\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector::class,
+        \Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector::class,
     ]);
 };
