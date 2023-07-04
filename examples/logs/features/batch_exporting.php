@@ -22,8 +22,7 @@ $loggerProvider = new LoggerProvider(
     ),
     new InstrumentationScopeFactory(Attributes::factory())
 );
-//get a logger, and emit a log record from an EventLogger. The active context (trace id + span id) will be
-//attached to the log record
+//get a logger, and emit a log record from an EventLogger.
 $loggerOne = $loggerProvider->getLogger('demo', '1.0');
 $loggerTwo = $loggerProvider->getLogger('demo', '2.0');
 $eventLoggerOne = new EventLogger($loggerOne, 'my-domain');
