@@ -11,10 +11,10 @@ use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
-use OpenTelemetry\SDK\Logs\Processor\BatchLogsProcessor;
-use OpenTelemetry\SDK\Logs\Processor\MultiLogsProcessor;
-use OpenTelemetry\SDK\Logs\Processor\NoopLogsProcessor;
-use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
+use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 
 class LogRecordProcessorFactory
 {
@@ -28,11 +28,11 @@ class LogRecordProcessorFactory
 
         switch (count($processors)) {
             case 0:
-                return NoopLogsProcessor::getInstance();
+                return NoopLogRecordProcessor::getInstance();
             case 1:
                 return $processors[0];
             default:
-                return new MultiLogsProcessor($processors);
+                return new MultiLogRecordProcessor($processors);
         }
     }
 
@@ -40,7 +40,7 @@ class LogRecordProcessorFactory
     {
         switch ($name) {
             case KnownValues::VALUE_BATCH:
-                return new BatchLogsProcessor(
+                return new BatchLogRecordProcessor(
                     $exporter,
                     ClockFactory::getDefault(),
                     Configuration::getInt(Variables::OTEL_BLRP_MAX_QUEUE_SIZE),
@@ -51,10 +51,10 @@ class LogRecordProcessorFactory
                     $meterProvider,
                 );
             case KnownValues::VALUE_SIMPLE:
-                return new SimpleLogsProcessor($exporter);
+                return new SimpleLogRecordProcessor($exporter);
             case Values::VALUE_NOOP:
             case Values::VALUE_NONE:
-                return NoopLogsProcessor::getInstance();
+                return NoopLogRecordProcessor::getInstance();
             default:
                 throw new InvalidArgumentException('Unknown processor: ' . $name);
         }

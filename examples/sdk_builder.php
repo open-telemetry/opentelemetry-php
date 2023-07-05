@@ -10,7 +10,7 @@ use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
-use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
+use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
@@ -44,7 +44,7 @@ $meterProvider = MeterProvider::builder()
 
 $loggerProvider = LoggerProvider::builder()
     ->addLogRecordProcessor(
-        new SimpleLogsProcessor($logRecordExporter)
+        new SimpleLogRecordProcessor($logRecordExporter)
     )
     ->build();
 

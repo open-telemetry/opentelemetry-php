@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 
-class NoopLogsProcessor implements LogRecordProcessorInterface
+class NoopLogRecordProcessor implements LogRecordProcessorInterface
 {
     public static function getInstance(): self
     {
