@@ -6,7 +6,6 @@ namespace OpenTelemetry\SDK\Common\Attribute;
 
 use function array_key_exists;
 use function count;
-use function gettype;
 use function is_array;
 use function is_string;
 use function mb_substr;
@@ -23,14 +22,20 @@ final class AttributesBuilder implements AttributesBuilderInterface
     private ?int $attributeCountLimit;
     private ?int $attributeValueLengthLimit;
     private int $droppedAttributesCount;
-    private const NUMERICS = ['integer', 'double'];
+    private AttributeValidatorInterface $attributeValidator;
 
-    public function __construct(array $attributes, ?int $attributeCountLimit, ?int $attributeValueLengthLimit, int $droppedAttributesCount)
-    {
+    public function __construct(
+        array $attributes,
+        ?int $attributeCountLimit,
+        ?int $attributeValueLengthLimit,
+        int $droppedAttributesCount,
+        ?AttributeValidatorInterface $attributeValidator
+    ) {
         $this->attributes = $attributes;
         $this->attributeCountLimit = $attributeCountLimit;
         $this->attributeValueLengthLimit = $attributeValueLengthLimit;
         $this->droppedAttributesCount = $droppedAttributesCount;
+        $this->attributeValidator = $attributeValidator ?? new AttributeValidator();
     }
 
     public function build(): AttributesInterface
@@ -66,8 +71,9 @@ final class AttributesBuilder implements AttributesBuilderInterface
 
             return;
         }
-        if (is_array($value) && !$this->isHomogeneous($value)) {
-            self::logWarning('attribute with non-homogeneous array values dropped: ' . $offset);
+        if (!$this->attributeValidator->validate($value)) {
+            self::logWarning($this->attributeValidator->getInvalidMessage() . ': ' . $offset);
+            $this->droppedAttributesCount++;
 
             return;
         }
@@ -110,27 +116,5 @@ final class AttributesBuilder implements AttributesBuilderInterface
         }
 
         return $value;
-    }
-
-    /**
-     * Test whether an array contains only values of the same type, treating int/double as equivalent.
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.21.0/specification/common/README.md#attribute
-     */
-    private function isHomogeneous(array $value): bool
-    {
-        if (count($value) <= 1) {
-            return true;
-        }
-        $type = gettype(reset($value));
-        foreach ($value as $v) {
-            if (in_array(gettype($v), self::NUMERICS) && in_array($type, self::NUMERICS)) {
-                continue;
-            }
-            if (gettype($v) !== $type) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

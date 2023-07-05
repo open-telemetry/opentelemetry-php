@@ -10,6 +10,7 @@ use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Common\Attribute\LogRecordAttributeValidator;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
@@ -43,7 +44,7 @@ class ReadableLogRecord extends LogRecord
         $this->convertedAttributes = $this->loggerSharedState
             ->getLogRecordLimits()
             ->getAttributeFactory()
-            ->builder($logRecord->attributes)
+            ->builder($logRecord->attributes, new LogRecordAttributeValidator())
             ->build();
     }
 
