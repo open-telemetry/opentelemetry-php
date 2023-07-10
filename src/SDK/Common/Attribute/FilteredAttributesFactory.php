@@ -21,9 +21,9 @@ final class FilteredAttributesFactory implements AttributesFactoryInterface
         $this->rejectedKeys = $rejectedKeys;
     }
 
-    public function builder(iterable $attributes = []): AttributesBuilderInterface
+    public function builder(iterable $attributes = [], ?AttributeValidatorInterface $attributeValidator = null): AttributesBuilderInterface
     {
-        $builder = new FilteredAttributesBuilder($this->factory->builder(), $this->rejectedKeys);
+        $builder = new FilteredAttributesBuilder($this->factory->builder([], $attributeValidator), $this->rejectedKeys);
         foreach ($attributes as $attribute => $value) {
             $builder[$attribute] = $value;
         }
