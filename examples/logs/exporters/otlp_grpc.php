@@ -18,7 +18,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
-use OpenTelemetry\SDK\Logs\Processor\BatchLogsProcessor;
+use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use Psr\Log\LogLevel;
 
 require __DIR__ . '/../../../vendor/autoload.php';
@@ -30,7 +30,7 @@ LoggerHolder::set(
 $transport = (new GrpcTransportFactory())->create('http://collector:4317' . OtlpUtil::method(Signals::LOGS));
 $exporter = new LogsExporter($transport);
 $loggerProvider = new LoggerProvider(
-    new BatchLogsProcessor(
+    new BatchLogRecordProcessor(
         $exporter,
         ClockFactory::getDefault()
     ),

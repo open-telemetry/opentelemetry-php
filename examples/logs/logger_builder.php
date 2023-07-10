@@ -7,14 +7,14 @@ use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
-use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
+use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
 $loggerProvider = LoggerProvider::builder()
     ->addLogRecordProcessor(
-        new SimpleLogsProcessor(
+        new SimpleLogRecordProcessor(
             (new ConsoleExporterFactory())->create()
         )
     )

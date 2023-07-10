@@ -6,8 +6,8 @@ namespace OpenTelemetry\SDK\Logs;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
-use OpenTelemetry\SDK\Logs\Processor\MultiLogsProcessor;
-use OpenTelemetry\SDK\Logs\Processor\NoopLogsProcessor;
+use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 class LoggerProviderBuilder
@@ -45,11 +45,11 @@ class LoggerProviderBuilder
     {
         switch (count($this->processors)) {
             case 0:
-                return NoopLogsProcessor::getInstance();
+                return NoopLogRecordProcessor::getInstance();
             case 1:
                 return $this->processors[0];
             default:
-                return new MultiLogsProcessor($this->processors);
+                return new MultiLogRecordProcessor($this->processors);
         }
     }
 }
