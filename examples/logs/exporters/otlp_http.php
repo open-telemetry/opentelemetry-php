@@ -35,7 +35,7 @@ $loggerProvider = new LoggerProvider(
         (new LogRecordLimitsBuilder())->build()->getAttributeFactory()
     )
 );
-$logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', ['foo' => 'bar']);
+$logger = $loggerProvider->getLogger('demo', '1.0', 'https://opentelemetry.io/schemas/1.7.1', ['foo' => 'bar']);
 $eventLogger = new EventLogger($logger, 'my-domain');
 
 $record = (new LogRecord(['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']))
