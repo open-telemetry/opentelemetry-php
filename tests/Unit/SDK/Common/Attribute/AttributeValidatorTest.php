@@ -68,7 +68,7 @@ class AttributeValidatorTest extends TestCase
         return [
             'empty array' => [[], true],
             'array of strings' => [['one', 'two'], true],
-            'array of int' => [[1, 2], true],
+            'array of ints' => [[1, 2], true],
             'array of double' => [[1.1, 1.2], true],
             'mixed numerics' => [[2, 3.5, PHP_INT_MAX], true],
             'array of bool' => [[true, false], true],
