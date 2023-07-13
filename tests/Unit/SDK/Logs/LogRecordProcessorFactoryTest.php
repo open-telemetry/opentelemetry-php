@@ -8,10 +8,10 @@ use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorFactory;
-use OpenTelemetry\SDK\Logs\Processor\BatchLogsProcessor;
-use OpenTelemetry\SDK\Logs\Processor\MultiLogsProcessor;
-use OpenTelemetry\SDK\Logs\Processor\NoopLogsProcessor;
-use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
+use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -43,10 +43,10 @@ class LogRecordProcessorFactoryTest extends TestCase
     public static function exporterProvider(): array
     {
         return [
-            ['batch', BatchLogsProcessor::class],
-            ['simple', SimpleLogsProcessor::class],
-            ['noop', NoopLogsProcessor::class],
-            ['none', NoopLogsProcessor::class],
+            ['batch', BatchLogRecordProcessor::class],
+            ['simple', SimpleLogRecordProcessor::class],
+            ['noop', NoopLogRecordProcessor::class],
+            ['none', NoopLogRecordProcessor::class],
         ];
     }
 
@@ -63,7 +63,7 @@ class LogRecordProcessorFactoryTest extends TestCase
         $this->setEnvironmentVariable('OTEL_PHP_LOGS_PROCESSOR', 'batch,simple');
         $processor = (new LogRecordProcessorFactory())->create($this->createMock(LogRecordExporterInterface::class));
 
-        $this->assertInstanceOf(MultiLogsProcessor::class, $processor);
+        $this->assertInstanceOf(MultiLogRecordProcessor::class, $processor);
     }
 
     public function test_create_from_environment(): void
@@ -80,7 +80,7 @@ class LogRecordProcessorFactoryTest extends TestCase
         $this->setEnvironmentVariable(Variables::OTEL_BLRP_MAX_EXPORT_BATCH_SIZE, 1);
 
         $processor = (new LogRecordProcessorFactory())->create($this->createMock(LogRecordExporterInterface::class));
-        $this->assertInstanceOf(BatchLogsProcessor::class, $processor);
+        $this->assertInstanceOf(BatchLogRecordProcessor::class, $processor);
 
         $reflection = new ReflectionClass($processor);
         foreach ($expected as $propertyName => $value) {

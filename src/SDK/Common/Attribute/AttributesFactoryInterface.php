@@ -6,5 +6,5 @@ namespace OpenTelemetry\SDK\Common\Attribute;
 
 interface AttributesFactoryInterface
 {
-    public function builder(iterable $attributes = []): AttributesBuilderInterface;
+    public function builder(iterable $attributes = [], ?AttributeValidatorInterface $attributeValidator = null): AttributesBuilderInterface;
 }

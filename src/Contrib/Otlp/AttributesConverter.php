@@ -11,6 +11,8 @@ use function is_int;
 use function is_string;
 use Opentelemetry\Proto\Common\V1\AnyValue;
 use Opentelemetry\Proto\Common\V1\ArrayValue;
+use Opentelemetry\Proto\Common\V1\KeyValue;
+use Opentelemetry\Proto\Common\V1\KeyValueList;
 
 final class AttributesConverter
 {
@@ -18,12 +20,21 @@ final class AttributesConverter
     {
         $result = new AnyValue();
         if (is_array($value)) {
-            $values = new ArrayValue();
-            foreach ($value as $element) {
-                /** @psalm-suppress InvalidArgument */
-                $values->getValues()[] = self::convertAnyValue($element);
+            if (self::isSimpleArray($value)) {
+                $values = new ArrayValue();
+                foreach ($value as $element) {
+                    /** @psalm-suppress InvalidArgument */
+                    $values->getValues()[] = self::convertAnyValue($element);
+                }
+                $result->setArrayValue($values);
+            } else {
+                $values = new KeyValueList();
+                foreach ($value as $key => $element) {
+                    /** @psalm-suppress InvalidArgument */
+                    $values->getValues()[] = new KeyValue(['key' => $key, 'value' => self::convertAnyValue($element)]);
+                }
+                $result->setKvlistValue($values);
             }
-            $result->setArrayValue($values);
         }
         if (is_int($value)) {
             $result->setIntValue($value);
@@ -39,5 +50,13 @@ final class AttributesConverter
         }
 
         return $result;
+    }
+
+    /**
+     * Test whether an array is simple (non-KeyValue)
+     */
+    public static function isSimpleArray(array $value): bool
+    {
+        return $value === [] || array_key_first($value) === 0;
     }
 }

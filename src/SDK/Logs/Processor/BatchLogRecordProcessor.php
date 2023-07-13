@@ -18,7 +18,7 @@ use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use SplQueue;
 use Throwable;
 
-class BatchLogsProcessor implements LogRecordProcessorInterface
+class BatchLogRecordProcessor implements LogRecordProcessorInterface
 {
     use LogsMessagesTrait;
 

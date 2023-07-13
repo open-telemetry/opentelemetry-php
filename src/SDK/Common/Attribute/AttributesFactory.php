@@ -18,13 +18,14 @@ final class AttributesFactory implements AttributesFactoryInterface
         $this->attributeValueLengthLimit = $attributeValueLengthLimit;
     }
 
-    public function builder(iterable $attributes = []): AttributesBuilderInterface
+    public function builder(iterable $attributes = [], ?AttributeValidatorInterface $attributeValidator = null): AttributesBuilderInterface
     {
         $builder = new AttributesBuilder(
             [],
             $this->attributeCountLimit,
             $this->attributeValueLengthLimit,
             0,
+            $attributeValidator,
         );
         foreach ($attributes as $key => $value) {
             $builder[$key] = $value;

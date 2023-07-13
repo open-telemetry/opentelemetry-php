@@ -110,6 +110,7 @@ class LogsConverter
         $this->setAttributes($pInstrumentationScope, $instrumentationScope->getAttributes());
         $pInstrumentationScope->setDroppedAttributesCount($instrumentationScope->getAttributes()->getDroppedAttributesCount());
         $pScopeLogs->setScope($pInstrumentationScope);
+        $pScopeLogs->setSchemaUrl((string) $instrumentationScope->getSchemaUrl());
 
         return $pScopeLogs;
     }

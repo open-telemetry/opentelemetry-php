@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 
-class MultiLogsProcessor implements LogRecordProcessorInterface
+class MultiLogRecordProcessor implements LogRecordProcessorInterface
 {
     // @var LogRecordProcessorInterface[]
     private array $processors = [];

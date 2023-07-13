@@ -11,12 +11,12 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
-use OpenTelemetry\SDK\Logs\Processor\BatchLogsProcessor;
+use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
 $loggerProvider = new LoggerProvider(
-    new BatchLogsProcessor(
+    new BatchLogRecordProcessor(
         (new ConsoleExporterFactory())->create(),
         ClockFactory::getDefault()
     ),

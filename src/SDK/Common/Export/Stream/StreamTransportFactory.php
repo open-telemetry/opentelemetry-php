@@ -59,8 +59,8 @@ final class StreamTransportFactory implements TransportFactoryInterface
     }
 
     /**
-     * @return resource
      * @throws ErrorException
+     * @return resource
      */
     private static function createStream(
         string $endpoint,

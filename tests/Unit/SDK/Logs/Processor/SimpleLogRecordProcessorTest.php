@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Logs\Processor;
 
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
-use OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor;
+use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Logs\Processor\SimpleLogsProcessor
+ * @covers \OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor
  * @psalm-suppress UndefinedInterfaceMethod
  * @psalm-suppress  PossiblyUndefinedMethod
  */
-class SimpleLogsProcessorTest extends TestCase
+class SimpleLogRecordProcessorTest extends TestCase
 {
-    private SimpleLogsProcessor $processor;
+    private SimpleLogRecordProcessor $processor;
     /** @var LogRecordExporterInterface&MockObject $exporter */
     private LogRecordExporterInterface $exporter;
     private ReadWriteLogRecord $readWriteLogRecord;
@@ -26,7 +26,7 @@ class SimpleLogsProcessorTest extends TestCase
     {
         $this->exporter = $this->createMock(LogRecordExporterInterface::class);
         $this->readWriteLogRecord = $this->createMock(ReadWriteLogRecord::class);
-        $this->processor = new SimpleLogsProcessor($this->exporter);
+        $this->processor = new SimpleLogRecordProcessor($this->exporter);
     }
 
     public function test_on_emit(): void

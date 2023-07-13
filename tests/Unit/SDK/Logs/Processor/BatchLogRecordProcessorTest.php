@@ -17,7 +17,7 @@ use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
-use OpenTelemetry\SDK\Logs\Processor\BatchLogsProcessor;
+use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
@@ -31,9 +31,9 @@ use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 
 /**
- * @covers \OpenTelemetry\SDK\Logs\Processor\BatchLogsProcessor
+ * @covers \OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor
  */
-class BatchLogsProcessorTest extends MockeryTestCase
+class BatchLogRecordProcessorTest extends MockeryTestCase
 {
     private TestClock $testClock;
 
@@ -65,7 +65,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
         $exporter = $this->createMock(LogRecordExporterInterface::class);
         $exporter->expects($this->atLeastOnce())->method('export');
 
-        $processor = new BatchLogsProcessor(
+        $processor = new BatchLogRecordProcessor(
             $exporter,
             $this->testClock,
             $queueSize,
@@ -96,7 +96,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
         $exporter = $this->createMock(LogRecordExporterInterface::class);
         $exporter->expects($this->exactly($expectedFlush ? 1 : 0))->method('export');
 
-        $processor = new BatchLogsProcessor(
+        $processor = new BatchLogRecordProcessor(
             $exporter,
             $this->testClock,
             $queueSize,
@@ -150,7 +150,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
             )
             ->andReturn(new CompletedFuture(0));
 
-        $processor = new BatchLogsProcessor(
+        $processor = new BatchLogRecordProcessor(
             $exporter,
             $this->testClock,
             $queueSize,
@@ -179,7 +179,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
         $exporter = $this->createMock(LogRecordExporterInterface::class);
         $exporter->expects($this->never())->method('export');
 
-        $processor = new BatchLogsProcessor(
+        $processor = new BatchLogRecordProcessor(
             $exporter,
             $this->testClock,
             $queueSize,
@@ -202,7 +202,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
         $exporter->expects($this->once())->method('export');
         $exporter->expects($this->once())->method('shutdown');
 
-        $proc = new BatchLogsProcessor($exporter, $this->createMock(ClockInterface::class));
+        $proc = new BatchLogRecordProcessor($exporter, $this->createMock(ClockInterface::class));
 
         for ($i = 0; $i < $batchSize - 1; $i++) {
             $record = $this->createMock(ReadWriteLogRecord::class);
@@ -217,7 +217,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
         $exporter = $this->createMock(LogRecordExporterInterface::class);
         $exporter->expects($this->atLeastOnce())->method('shutdown');
 
-        $proc = new BatchLogsProcessor($exporter, $this->createMock(ClockInterface::class));
+        $proc = new BatchLogRecordProcessor($exporter, $this->createMock(ClockInterface::class));
         $proc->shutdown();
 
         $record = $this->createMock(ReadWriteLogRecord::class);
@@ -249,7 +249,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
             )
             ->andReturn(new CompletedFuture(0));
 
-        $processor = new BatchLogsProcessor(
+        $processor = new BatchLogRecordProcessor(
             $exporter,
             $this->testClock,
             $queueSize,
@@ -269,7 +269,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
     public function test_queue_size_exceeded_drops_spans(): void
     {
         $exporter = $this->createMock(LogRecordExporterInterface::class);
-        $processor = new BatchLogsProcessor($exporter, $this->testClock, 5, 5000, 30000, 5);
+        $processor = new BatchLogRecordProcessor($exporter, $this->testClock, 5, 5000, 30000, 5);
 
         $exporter->expects($this->exactly(2))->method('export')->willReturnCallback(function (iterable $batch) use ($processor, &$i) {
             if ($i) {
@@ -295,7 +295,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
     public function test_force_flush_applies_only_to_current_logs(): void
     {
         $exporter = $this->createMock(LogRecordExporterInterface::class);
-        $processor = new BatchLogsProcessor($exporter, $this->testClock);
+        $processor = new BatchLogRecordProcessor($exporter, $this->testClock);
 
         $exporter->expects($this->exactly(1))->method('export')->willReturnCallback(function (iterable $batch) use ($processor) {
             $this->assertCount(1, $batch);
@@ -315,7 +315,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
     public function test_shutdown_shutdowns_exporter(): void
     {
         $exporter = $this->createMock(LogRecordExporterInterface::class);
-        $processor = new BatchLogsProcessor($exporter, $this->testClock);
+        $processor = new BatchLogRecordProcessor($exporter, $this->testClock);
 
         $exporter->expects($this->once())->method('shutdown');
         $processor->shutdown();
@@ -330,7 +330,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('log')->with(LogLevel::ERROR);
 
-        $processor = new BatchLogsProcessor($exporter, $this->testClock);
+        $processor = new BatchLogRecordProcessor($exporter, $this->testClock);
 
         $record = $this->createMock(ReadWriteLogRecord::class);
         $processor->onEmit($record);
@@ -352,7 +352,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
 
         $this->expectException(LogicException::class);
 
-        $processor = new BatchLogsProcessor($exporter, $this->testClock);
+        $processor = new BatchLogRecordProcessor($exporter, $this->testClock);
         $record = $this->createMock(ReadWriteLogRecord::class);
         $processor->onEmit($record);
 
@@ -374,7 +374,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('log')->with(LogLevel::ERROR);
 
-        $processor = new BatchLogsProcessor($exporter, $this->testClock);
+        $processor = new BatchLogRecordProcessor($exporter, $this->testClock);
 
         $record = $this->createMock(ReadWriteLogRecord::class);
         $processor->onEmit($record);
@@ -404,7 +404,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
 
         $this->expectException(LogicException::class);
 
-        $processor = new BatchLogsProcessor($exporter, $this->testClock);
+        $processor = new BatchLogRecordProcessor($exporter, $this->testClock);
 
         $record = $this->createMock(ReadWriteLogRecord::class);
         $processor->onEmit($record);
@@ -434,7 +434,7 @@ class BatchLogsProcessorTest extends MockeryTestCase
 
         $exporter = $this->createMock(LogRecordExporterInterface::class);
 
-        $processor = new BatchLogsProcessor(
+        $processor = new BatchLogRecordProcessor(
             $exporter,
             ClockFactory::getDefault(),
             2048,
@@ -460,34 +460,34 @@ class BatchLogsProcessorTest extends MockeryTestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $exporter = $this->createMock(LogRecordExporterInterface::class);
-        new BatchLogsProcessor($exporter, $this->testClock, -1);
+        new BatchLogRecordProcessor($exporter, $this->testClock, -1);
     }
 
     public function test_logs_processor_throws_on_invalid_scheduled_delay(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $exporter = $this->createMock(LogRecordExporterInterface::class);
-        new BatchLogsProcessor($exporter, $this->testClock, 2048, -1);
+        new BatchLogRecordProcessor($exporter, $this->testClock, 2048, -1);
     }
 
     public function test_logs_processor_throws_on_invalid_export_timeout(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $exporter = $this->createMock(LogRecordExporterInterface::class);
-        new BatchLogsProcessor($exporter, $this->testClock, 2048, 5000, -1);
+        new BatchLogRecordProcessor($exporter, $this->testClock, 2048, 5000, -1);
     }
 
     public function test_logs_processor_throws_on_invalid_max_export_batch_size(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $exporter = $this->createMock(LogRecordExporterInterface::class);
-        new BatchLogsProcessor($exporter, $this->testClock, 2048, 5000, 30000, -1);
+        new BatchLogRecordProcessor($exporter, $this->testClock, 2048, 5000, 30000, -1);
     }
 
     public function test_logs_processor_throws_on_invalid_max_export_batch_size_exceeding_max_queue_size(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $exporter = $this->createMock(LogRecordExporterInterface::class);
-        new BatchLogsProcessor($exporter, $this->testClock, 2, 5000, 30000, 3);
+        new BatchLogRecordProcessor($exporter, $this->testClock, 2, 5000, 30000, 3);
     }
 }
