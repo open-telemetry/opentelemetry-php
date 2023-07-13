@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Zipkin;
 
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;

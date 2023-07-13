@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\API\Configuration\Resolver;
 
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\API\Configuration;
 
 /**
- * @interal
+ * Resolve variables from php.ini
+ * @internal
  * @psalm-suppress TypeDoesNotContainType
  */
 class PhpIniResolver implements ResolverInterface

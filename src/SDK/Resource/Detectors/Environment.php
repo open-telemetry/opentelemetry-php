@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Resource\Detectors;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;

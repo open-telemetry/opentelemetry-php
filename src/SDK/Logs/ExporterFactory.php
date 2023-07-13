@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Logs;
 
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Logs\Exporter\NoopExporter;
 use OpenTelemetry\SDK\Registry;

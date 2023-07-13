@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\FilteredAttributesFactory;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 use OpenTelemetry\SemConv\TraceAttributes;
 use const PHP_INT_MAX;

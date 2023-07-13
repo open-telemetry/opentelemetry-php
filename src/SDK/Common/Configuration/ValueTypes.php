@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Configuration;
 
+use OpenTelemetry\API\Configuration\VariableTypes;
+
 /**
  * Environment variables defined by the OpenTelemetry specification and language specific variables for the PHP SDK.
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md

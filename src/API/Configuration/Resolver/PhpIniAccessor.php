@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\API\Configuration\Resolver;
 
+/**
+ * @internal
+ */
 class PhpIniAccessor
 {
     /**

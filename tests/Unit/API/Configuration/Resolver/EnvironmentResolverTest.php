@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\Tests\Unit\API\Configuration\Resolver;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver;
+use OpenTelemetry\API\Configuration\Resolver\EnvironmentResolver;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver
+ * @covers \OpenTelemetry\API\Configuration\Resolver\EnvironmentResolver
+ * @psalm-suppress InternalClass
+ * @psalm-suppress InternalMethod
  */
 class EnvironmentResolverTest extends TestCase
 {
@@ -88,7 +90,7 @@ class EnvironmentResolverTest extends TestCase
     public function test_retrieve_value_with_injected_value(): void
     {
         $value = 'simple';
-        $variable = 'OTEL_PHP_TRACES_PROCESSOR';
+        $variable = 'FOO_BAR_BAZ';
 
         $this->assertFalse(
             $this->resolver->hasVariable($variable)

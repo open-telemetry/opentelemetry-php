@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Util;
+namespace OpenTelemetry\API\Configuration;
 
 use LogicException;
 
+/**
+ * @psalm-internal \OpenTelemetry
+ */
 class ClassConstantAccessor
 {
     public static function requireValue(string $className, string $constantName)

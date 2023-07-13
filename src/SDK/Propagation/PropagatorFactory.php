@@ -8,7 +8,7 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Registry;
 

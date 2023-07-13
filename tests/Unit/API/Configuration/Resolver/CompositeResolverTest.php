@@ -2,21 +2,24 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\Tests\Unit\API\Configuration\Resolver;
 
-use OpenTelemetry\SDK\Common\Configuration\Defaults;
-use OpenTelemetry\SDK\Common\Configuration\Resolver\CompositeResolver;
-use OpenTelemetry\SDK\Common\Configuration\Resolver\ResolverInterface;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\API\Configuration\Resolver\CompositeResolver;
+use OpenTelemetry\API\Configuration\Resolver\ResolverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Configuration\Resolver\CompositeResolver
+ * @covers \OpenTelemetry\API\Configuration\Resolver\CompositeResolver
  * @psalm-suppress UndefinedInterfaceMethod
+ * @psalm-suppress InternalClass
+ * @psalm-suppress InternalMethod
  */
 class CompositeResolverTest extends TestCase
 {
+    /** @var ResolverInterface&MockObject $one */
     private ResolverInterface $one;
+    /** @var ResolverInterface&MockObject $two */
     private ResolverInterface $two;
     private CompositeResolver $resolver;
 
@@ -61,32 +64,5 @@ class CompositeResolverTest extends TestCase
             ->willReturn('foo');
 
         $this->assertSame('foo', $this->resolver->resolve($var));
-    }
-
-    public function test_resolve_uses_default_when_not_empty(): void
-    {
-        $this->one->method('hasVariable')->willReturn(false);
-        $this->two->method('hasVariable')->willReturn(false);
-
-        $this->assertSame('foo', $this->resolver->resolve(Variables::OTEL_EXPORTER_OTLP_PROTOCOL, 'foo'));
-    }
-
-    /**
-     * @dataProvider emptyProvider
-     */
-    public function test_resolve_uses_library_default_when_empty(?string $value): void
-    {
-        $this->one->method('hasVariable')->willReturn(false);
-        $this->two->method('hasVariable')->willReturn(false);
-
-        $this->assertSame(Defaults::OTEL_EXPORTER_OTLP_PROTOCOL, $this->resolver->resolve(Variables::OTEL_EXPORTER_OTLP_PROTOCOL, $value));
-    }
-
-    public function emptyProvider(): array
-    {
-        return [
-            [''],
-            [null],
-        ];
     }
 }

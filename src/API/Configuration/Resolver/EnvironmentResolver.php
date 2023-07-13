@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\API\Configuration\Resolver;
 
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\API\Configuration;
 
 /**
- * @internal
+ * Resolve variables from environment, via $_SERVER then `getenv()`
+ * @psalm-internal \OpenTelemetry\API\Configuration
  */
 class EnvironmentResolver implements ResolverInterface
 {

@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Parser;
+namespace OpenTelemetry\Tests\Unit\API\Configuration\Parser;
 
 use InvalidArgumentException;
+use OpenTelemetry\API\Configuration\Parser\MapParser;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Configuration\Parser\MapParser
+ * @covers \OpenTelemetry\API\Configuration\Parser\MapParser
  */
 class MapParserTest extends TestCase
 {
@@ -46,7 +47,7 @@ class MapParserTest extends TestCase
     public function test_map_values_return_array(string $value, array $expected): void
     {
         $this->assertSame(
-            \OpenTelemetry\SDK\Common\Configuration\Parser\MapParser::parse($value),
+            MapParser::parse($value),
             $expected
         );
     }
@@ -58,7 +59,7 @@ class MapParserTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        \OpenTelemetry\SDK\Common\Configuration\Parser\MapParser::parse($value);
+        MapParser::parse($value);
     }
 
     public function mapValueProvider(): array

@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
-
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
+namespace OpenTelemetry\API\Configuration\Resolver;
 
 /**
- * @interal
+ * @psalm-internal \OpenTelemetry\API\Configuration
  */
 class CompositeResolver
 {
@@ -20,6 +18,7 @@ class CompositeResolver
         $instance ??= new self([
             new PhpIniResolver(),
             new EnvironmentResolver(),
+            new DotEnvResolver(),
         ]);
 
         return $instance;
@@ -50,9 +49,7 @@ class CompositeResolver
             }
         }
 
-        return Configuration::isEmpty($default)
-            ? Configuration::getDefault($variableName)
-            : $default;
+        return $default;
     }
 
     public function hasVariable(string $variableName): bool

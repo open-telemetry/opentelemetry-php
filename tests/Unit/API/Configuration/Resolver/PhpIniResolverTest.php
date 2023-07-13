@@ -2,18 +2,20 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\Tests\Unit\API\Configuration\Resolver;
 
-use OpenTelemetry\SDK\Common\Configuration\Resolver\PhpIniAccessor;
-use OpenTelemetry\SDK\Common\Configuration\Resolver\PhpIniResolver;
+use OpenTelemetry\API\Configuration\Resolver\PhpIniAccessor;
+use OpenTelemetry\API\Configuration\Resolver\PhpIniResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Configuration\Resolver\PhpIniResolver
+ * @covers \OpenTelemetry\API\Configuration\Resolver\PhpIniResolver
  * @psalm-suppress UndefinedMethod
  */
 class PhpIniResolverTest extends TestCase
 {
+    /** @var PhpIniAccessor&MockObject $accessor */
     private PhpIniAccessor $accessor;
     private PhpIniResolver $resolver;
 

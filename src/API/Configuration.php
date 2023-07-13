@@ -2,23 +2,25 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Configuration;
+namespace OpenTelemetry\API;
 
 use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser;
-use OpenTelemetry\SDK\Common\Configuration\Parser\ListParser;
-use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
-use OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser;
-use OpenTelemetry\SDK\Common\Configuration\Resolver\CompositeResolver;
-use OpenTelemetry\SDK\Common\Util\ClassConstantAccessor;
+use OpenTelemetry\API\Configuration\Parser\BooleanParser;
+use OpenTelemetry\API\Configuration\Parser\ListParser;
+use OpenTelemetry\API\Configuration\Parser\MapParser;
+use OpenTelemetry\API\Configuration\Parser\RatioParser;
+use OpenTelemetry\API\Configuration\Resolver\CompositeResolver;
+use OpenTelemetry\API\Configuration\VariableTypes;
 use UnexpectedValueException;
 
 /**
  * Configuration can come from one or more of the following sources (from highest to lowest priority):
- * - values defined in php.ini
- * - environment variable ($_SERVER)
- * - configuration file (todo)
+ * - values defined in `php.ini`
+ * - environment variable (`$_SERVER` or `getenv`)
+ * - `.env` file
+ *
+ * @psalm-internal \OpenTelemetry
  */
 class Configuration
 {
@@ -33,8 +35,8 @@ class Configuration
     {
         return (int) self::validateVariableValue(
             CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::INTEGER),
-                $default
+                static::validateVariableType($key, VariableTypes::INTEGER),
+                static::getDefault($key, $default)
             ),
             FILTER_VALIDATE_INT
         );
@@ -44,18 +46,21 @@ class Configuration
     {
         return (string) self::validateVariableValue(
             CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::STRING),
-                $default
+                static::validateVariableType($key, VariableTypes::STRING),
+                static::getDefault($key, $default)
             )
         );
     }
 
     public static function getBoolean(string $key, bool $default = null): bool
     {
+        if ($default !== null) {
+            $default = $default ? 'true' : 'false';
+        }
         $resolved = self::validateVariableValue(
             CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::BOOL),
-                null === $default ? $default : ($default ? 'true' : 'false')
+                static::validateVariableType($key, VariableTypes::BOOL),
+                static::getDefault($key, $default)
             )
         );
 
@@ -73,7 +78,7 @@ class Configuration
         return self::validateVariableValue(
             CompositeResolver::instance()->resolve(
                 $key,
-                $default
+                static::getDefault($key, $default)
             )
         );
     }
@@ -82,8 +87,8 @@ class Configuration
     {
         return MapParser::parse(
             CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::MAP),
-                $default
+                static::validateVariableType($key, VariableTypes::MAP),
+                static::getDefault($key, $default)
             )
         );
     }
@@ -92,8 +97,8 @@ class Configuration
     {
         return ListParser::parse(
             CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::LIST),
-                $default
+                static::validateVariableType($key, VariableTypes::LIST),
+                static::getDefault($key, $default)
             )
         );
     }
@@ -102,8 +107,8 @@ class Configuration
     {
         return (string) self::validateVariableValue(
             CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::ENUM),
-                $default
+                static::validateVariableType($key, VariableTypes::ENUM),
+                static::getDefault($key, $default)
             )
         );
     }
@@ -112,8 +117,8 @@ class Configuration
     {
         return (float) self::validateVariableValue(
             CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::FLOAT),
-                $default
+                static::validateVariableType($key, VariableTypes::FLOAT),
+                static::getDefault($key, $default)
             ),
             FILTER_VALIDATE_FLOAT
         );
@@ -124,26 +129,21 @@ class Configuration
         return RatioParser::parse(
             self::validateVariableValue(
                 CompositeResolver::instance()->resolve(
-                    self::validateVariableType($key, VariableTypes::RATIO),
-                    $default
+                    static::validateVariableType($key, VariableTypes::RATIO),
+                    static::getDefault($key, $default)
                 )
             )
         );
     }
 
-    public static function getKnownValues(string $variableName): ?array
+    public static function getDefault(string $key, $default)
     {
-        return ClassConstantAccessor::getValue(KnownValues::class, $variableName);
-    }
-
-    public static function getDefault(string $variableName)
-    {
-        return ClassConstantAccessor::getValue(Defaults::class, $variableName);
+        return $default;
     }
 
     public static function getType(string $variableName): ?string
     {
-        return ClassConstantAccessor::getValue(ValueTypes::class, $variableName);
+        return VariableTypes::MIXED;
     }
 
     public static function isEmpty($value): bool
@@ -152,16 +152,8 @@ class Configuration
         return $value === null || $value === '';
     }
 
-    private static function validateVariableType(string $variableName, string $type): string
+    protected static function validateVariableType(string $variableName, string $type): string
     {
-        $variableType = self::getType($variableName);
-
-        if ($variableType !== null && $variableType !== $type && $variableType !== VariableTypes::MIXED) {
-            throw new UnexpectedValueException(
-                sprintf('Variable "%s" is not supposed to be of type "%s" but type "%s"', $variableName, $type, $variableType)
-            );
-        }
-
         return $variableName;
     }
 

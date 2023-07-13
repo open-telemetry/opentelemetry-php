@@ -16,7 +16,6 @@ use Psr\Log\LogLevel;
 
 /**
  * @covers \OpenTelemetry\API\Behavior\LogsMessagesTrait
- * @covers \OpenTelemetry\API\Behavior\Logging
  */
 class LogsMessagesTraitTest extends TestCase
 {

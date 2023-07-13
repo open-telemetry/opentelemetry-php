@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Logs;
 
 use InvalidArgumentException;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
