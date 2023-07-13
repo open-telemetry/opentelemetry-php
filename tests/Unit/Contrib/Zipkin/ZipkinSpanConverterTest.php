@@ -19,7 +19,7 @@ use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\Contrib\Zipkin\SpanConverter
+ * @covers \OpenTelemetry\Contrib\Zipkin\SpanConverter
  */
 class ZipkinSpanConverterTest extends TestCase
 {
@@ -131,7 +131,7 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame($expectedSpanKind, $row['kind']);
     }
 
-    public function spanKindProvider(): array
+    public static function spanKindProvider(): array
     {
         return [
             'server' => [SpanKind::KIND_SERVER, ZipkinSpanKind::SERVER],
@@ -155,7 +155,7 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertArrayNotHasKey('kind', $row);
     }
 
-    public function unmappedSpanKindProvider(): array
+    public static function unmappedSpanKindProvider(): array
     {
         return [
             'internal' => [SpanKind::KIND_INTERNAL],

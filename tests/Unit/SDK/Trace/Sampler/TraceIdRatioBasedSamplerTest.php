@@ -45,7 +45,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         new TraceIdRatioBasedSampler($probability);
     }
 
-    public function invalidProbabilityProvider(): array
+    public static function invalidProbabilityProvider(): array
     {
         return [
             'negative' => [-0.05],

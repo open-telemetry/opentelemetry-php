@@ -11,7 +11,7 @@ use OpenTelemetry\API\Trace\TraceState;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\API\Trace\SpanContext
+ * @covers \OpenTelemetry\API\Trace\SpanContext
  */
 class SpanContextTest extends TestCase
 {

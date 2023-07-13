@@ -86,7 +86,7 @@ class LogsMessagesTraitTest extends TestCase
         $instance->run($method, 'foo');
     }
 
-    public function logLevelProvider(): array
+    public static function logLevelProvider(): array
     {
         return [
             'debug' => ['logDebug', LogLevel::DEBUG],

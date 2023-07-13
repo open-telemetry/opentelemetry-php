@@ -24,8 +24,9 @@ class ExporterFactoryTest extends TestCase
 
     /**
      * @dataProvider exporterProvider
+     * @param class-string $expected
      */
-    public function test_create($name, $expected): void
+    public function test_create(string $name, string $expected): void
     {
         $this->setEnvironmentVariable('OTEL_LOGS_EXPORTER', $name);
         $exporter = (new ExporterFactory())->create();

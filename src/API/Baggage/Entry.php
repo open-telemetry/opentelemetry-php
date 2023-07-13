@@ -23,6 +23,9 @@ final class Entry
         $this->metadata = $metadata;
     }
 
+    /**
+     * @return mixed
+     */
     public function getValue()
     {
         return $this->value;

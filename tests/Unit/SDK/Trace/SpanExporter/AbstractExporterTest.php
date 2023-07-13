@@ -81,7 +81,7 @@ abstract class AbstractExporterTest extends MockeryTestCase
         $this->assertSame($expected, $exporter->export([$span])->await());
     }
 
-    public function futureProvider(): array
+    public static function futureProvider(): array
     {
         return [
             'error future' => [

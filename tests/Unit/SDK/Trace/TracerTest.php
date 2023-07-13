@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Trace\TracerSharedState;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\Tracer
+ * @covers \OpenTelemetry\SDK\Trace\Tracer
  */
 class TracerTest extends TestCase
 {
@@ -41,7 +41,7 @@ class TracerTest extends TestCase
         $this->assertSame($expected, $property->getValue($spanBuilder));
     }
 
-    public function nameProvider(): array
+    public static function nameProvider(): array
     {
         return [
             'valid name' => ['name', 'name'],

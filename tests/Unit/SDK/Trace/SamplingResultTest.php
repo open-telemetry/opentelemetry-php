@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\SamplingResult
+ * @covers \OpenTelemetry\SDK\Trace\SamplingResult
  */
 class SamplingResultTest extends TestCase
 {

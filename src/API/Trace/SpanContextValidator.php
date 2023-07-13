@@ -20,7 +20,7 @@ class SpanContextValidator
     /**
      * @return bool Returns a value that indicates whether a trace id is valid
      */
-    public static function isValidTraceId($traceId): bool
+    public static function isValidTraceId(string $traceId): bool
     {
         return ctype_xdigit($traceId) && strlen($traceId) === self::TRACE_LENGTH && $traceId !== self::INVALID_TRACE && $traceId === strtolower($traceId);
     }
@@ -28,7 +28,7 @@ class SpanContextValidator
     /**
      * @return bool Returns a value that indicates whether a span id is valid
      */
-    public static function isValidSpanId($spanId): bool
+    public static function isValidSpanId(string $spanId): bool
     {
         return ctype_xdigit($spanId) && strlen($spanId) === self::SPAN_LENGTH && $spanId !== self::INVALID_SPAN && $spanId === strtolower($spanId);
     }

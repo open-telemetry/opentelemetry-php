@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use ReflectionClass;
+use Stringable;
 use Throwable;
 
 class SimplePsrFileLogger implements LoggerInterface
@@ -34,7 +35,7 @@ class SimplePsrFileLogger implements LoggerInterface
 
     /**
      * @param string $level
-     * @param mixed $message
+     * @param string|Stringable $message
      * @param array $context
      * @psalm-suppress MoreSpecificImplementedParamType
      */

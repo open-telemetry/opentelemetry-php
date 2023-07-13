@@ -39,7 +39,7 @@ class ParentBasedTest extends TestCase
      * @dataProvider parentContextData
      */
     public function test_parent_based(
-        $parentContext,
+        ContextInterface $parentContext,
         ?SamplerInterface $remoteParentSampled = null,
         ?SamplerInterface $remoteParentNotSampled = null,
         ?SamplerInterface $localParentSampled = null,

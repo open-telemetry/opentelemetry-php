@@ -94,7 +94,7 @@ class HttpEndpointResolver implements HttpEndpointResolverInterface
         }
     }
 
-    private static function parseEndpoint(string $endpoint)
+    private static function parseEndpoint(string $endpoint): array
     {
         $result = parse_url($endpoint);
 

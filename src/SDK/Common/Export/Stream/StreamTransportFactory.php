@@ -58,8 +58,12 @@ final class StreamTransportFactory implements TransportFactoryInterface
         return new StreamTransport($stream, $contentType);
     }
 
+    /**
+     * @return resource
+     * @throws ErrorException
+     */
     private static function createStream(
-        $endpoint,
+        string $endpoint,
         string $contentType,
         array $headers = [],
         float $timeout = 10.,

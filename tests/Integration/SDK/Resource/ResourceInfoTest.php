@@ -38,7 +38,7 @@ class ResourceInfoTest extends TestCase
         }
     }
 
-    public function environmentResourceProvider()
+    public static function environmentResourceProvider(): array
     {
         return [
             'attributes from env var' => [

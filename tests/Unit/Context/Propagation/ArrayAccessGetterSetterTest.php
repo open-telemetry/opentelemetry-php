@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 use stdClass;
 
 /**
- * @covers OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter
+ * @covers \OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter
  */
 class ArrayAccessGetterSetterTest extends TestCase
 {

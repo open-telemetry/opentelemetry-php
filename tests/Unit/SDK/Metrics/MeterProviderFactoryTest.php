@@ -41,7 +41,7 @@ class MeterProviderFactoryTest extends TestCase
         $this->assertInstanceOf(MeterInterface::class, $provider->getMeter('test'));
     }
 
-    public function exporterProvider(): array
+    public static function exporterProvider(): array
     {
         return [
             'otlp' => [KnownValues::VALUE_OTLP],

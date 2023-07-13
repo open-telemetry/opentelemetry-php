@@ -72,7 +72,7 @@ class SpanExporterFactoryTest extends TestCase
         $factory->create();
     }
 
-    public function configProvider(): array
+    public static function configProvider(): array
     {
         $defaultHeaderKeys = ['User-Agent'];
 

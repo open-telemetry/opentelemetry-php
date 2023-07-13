@@ -25,7 +25,7 @@ use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor
+ * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor
  */
 class SimpleSpanProcessorTest extends MockeryTestCase
 {

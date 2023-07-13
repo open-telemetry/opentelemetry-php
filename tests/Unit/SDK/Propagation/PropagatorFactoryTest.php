@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 /**
- * @covers OpenTelemetry\SDK\Propagation\PropagatorFactory
+ * @covers \OpenTelemetry\SDK\Propagation\PropagatorFactory
  */
 class PropagatorFactoryTest extends TestCase
 {
@@ -45,7 +45,7 @@ class PropagatorFactoryTest extends TestCase
         $this->assertInstanceOf($expected, $propagator);
     }
 
-    public function propagatorsProvider(): array
+    public static function propagatorsProvider(): array
     {
         return [
             [KnownValues::VALUE_BAGGAGE, BaggagePropagator::class],
@@ -68,7 +68,7 @@ class PropagatorFactoryTest extends TestCase
         $this->assertInstanceOf(NoopTextMapPropagator::class, $propagator);
     }
 
-    public function unimplementedPropagatorProvider(): array
+    public static function unimplementedPropagatorProvider(): array
     {
         return [
             [KnownValues::VALUE_OTTRACE],

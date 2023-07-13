@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Resource\Detectors\Composite
+ * @covers \OpenTelemetry\SDK\Resource\Detectors\Composite
  */
 class CompositeTest extends TestCase
 {

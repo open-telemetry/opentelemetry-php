@@ -29,8 +29,9 @@ class LogRecordProcessorFactoryTest extends TestCase
 
     /**
      * @dataProvider exporterProvider
+     * @param class-string $expected
      */
-    public function test_create($name, $expected): void
+    public function test_create(string $name, string $expected): void
     {
         $exporter = $this->createMock(LogRecordExporterInterface::class);
         $this->setEnvironmentVariable('OTEL_PHP_LOGS_PROCESSOR', $name);

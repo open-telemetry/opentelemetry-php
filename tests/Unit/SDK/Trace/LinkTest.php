@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Trace\Link;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\Link
+ * @covers \OpenTelemetry\SDK\Trace\Link
  */
 class LinkTest extends TestCase
 {

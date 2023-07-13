@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Resource\Detectors\Constant
+ * @covers \OpenTelemetry\SDK\Resource\Detectors\Constant
  */
 class ConstantTest extends TestCase
 {
