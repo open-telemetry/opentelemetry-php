@@ -49,6 +49,7 @@ EOS;
         return [
             ['FOO', 'foo', true],
             ['BAR', 'bar', true],
+            ['BAZ', null, false],
             ['MISSING', null, false],
             ['BAT', 'key1=value1,key2=value2', true],
         ];
