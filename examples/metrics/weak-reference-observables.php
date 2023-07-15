@@ -36,7 +36,7 @@ $callback = new class() {
 $meterProvider
     ->getMeter('demo_meter')
     ->createObservableGauge('number', 'items', 'Random number')
-    ->observe($callback, true); //weak-ref to callback
+    ->observe($callback); //weak-ref to callback
 
 $reader->collect(); //metrics (data-points) collected (callback invoked)
 unset($callback);

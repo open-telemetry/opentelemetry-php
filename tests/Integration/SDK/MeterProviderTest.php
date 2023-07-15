@@ -56,7 +56,7 @@ final class MeterProviderTest extends TestCase
                 $meterProvider
                     ->getMeter('test')
                     ->createObservableUpDownCounter('test')
-                    ->observe(fn (ObserverInterface $observer) => $observer->observe($this->count()), true);
+                    ->observe(fn (ObserverInterface $observer) => $observer->observe($this->count()));
             }
             public function count(): int
             {

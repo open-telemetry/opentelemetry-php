@@ -43,13 +43,9 @@ trait ObservableInstrumentTrait
     /**
      * @param callable(ObserverInterface): void $callback
      */
-    public function observe(callable $callback, bool $weaken = false): ObservableCallbackInterface
+    public function observe(callable $callback): ObservableCallbackInterface
     {
-        $target = null;
-        $callback = closure($callback);
-        if ($weaken) {
-            $callback = weaken($callback, $target);
-        }
+        $callback = weaken(closure($callback), $target);
 
         $callbackId = $this->writer->registerCallback($callback, $this->instrument);
         $this->referenceCounter->acquire();
@@ -60,6 +56,6 @@ trait ObservableInstrumentTrait
             $destructor->callbackIds[$callbackId] = $callbackId;
         }
 
-        return new ObservableCallback($this->writer, $this->referenceCounter, $callbackId, $destructor);
+        return new ObservableCallback($this->writer, $this->referenceCounter, $callbackId, $destructor, $target);
     }
 }

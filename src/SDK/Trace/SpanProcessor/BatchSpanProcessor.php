@@ -120,7 +120,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
                 $observer->observe($pending, self::ATTRIBUTES_PENDING);
                 $observer->observe($processed, self::ATTRIBUTES_PROCESSED);
                 $observer->observe($dropped, self::ATTRIBUTES_DROPPED);
-            }, true);
+            });
         $meter
             ->createObservableUpDownCounter(
                 'otel.trace.span_processor.queue.limit',
@@ -129,7 +129,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
             )
             ->observe(function (ObserverInterface $observer): void {
                 $observer->observe($this->maxQueueSize, self::ATTRIBUTES_PROCESSOR);
-            }, true);
+            });
         $meter
             ->createObservableUpDownCounter(
                 'otel.trace.span_processor.queue.usage',
@@ -144,7 +144,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
                 $observer->observe($queued, self::ATTRIBUTES_QUEUED);
                 $observer->observe($pending, self::ATTRIBUTES_PENDING);
                 $observer->observe($free, self::ATTRIBUTES_FREE);
-            }, true);
+            });
     }
 
     public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void

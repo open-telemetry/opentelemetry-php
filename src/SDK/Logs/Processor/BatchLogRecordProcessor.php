@@ -115,7 +115,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
                 $observer->observe($pending, self::ATTRIBUTES_PENDING);
                 $observer->observe($processed, self::ATTRIBUTES_PROCESSED);
                 $observer->observe($dropped, self::ATTRIBUTES_DROPPED);
-            }, true);
+            });
         $meter
             ->createObservableUpDownCounter(
                 'otel.logs.log_processor.queue.limit',
@@ -124,7 +124,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
             )
             ->observe(function (ObserverInterface $observer): void {
                 $observer->observe($this->maxQueueSize, self::ATTRIBUTES_PROCESSOR);
-            }, true);
+            });
         $meter
             ->createObservableUpDownCounter(
                 'otel.logs.log_processor.queue.usage',
@@ -139,7 +139,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
                 $observer->observe($queued, self::ATTRIBUTES_QUEUED);
                 $observer->observe($pending, self::ATTRIBUTES_PENDING);
                 $observer->observe($free, self::ATTRIBUTES_FREE);
-            }, true);
+            });
     }
 
     public function onEmit(ReadWriteLogRecord $record, ?ContextInterface $context = null): void

@@ -116,7 +116,7 @@ final class InstrumentTest extends TestCase
         };
 
         $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), WeakMap::create());
-        $c->observe($instance, true);
+        $c->observe($instance);
         $instance = null;
 
         $w->collectAndPush([$n]);
@@ -209,7 +209,7 @@ final class InstrumentTest extends TestCase
         $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
         $referenceCounter->expects($this->once())->method('release');
 
-        $callback = new ObservableCallback($writer, $referenceCounter, 1, null);
+        $callback = new ObservableCallback($writer, $referenceCounter, 1, null, null);
         $callback->detach();
     }
 
@@ -224,7 +224,7 @@ final class InstrumentTest extends TestCase
         $callbackDestructor = new ObservableCallbackDestructor($writer, $referenceCounter);
         $callbackDestructor->callbackIds[1] = 1;
 
-        $callback = new ObservableCallback($writer, $referenceCounter, 1, $callbackDestructor);
+        $callback = new ObservableCallback($writer, $referenceCounter, 1, $callbackDestructor, null);
         $callback->detach();
 
         $this->assertArrayNotHasKey(1, $callbackDestructor->callbackIds);
@@ -241,7 +241,7 @@ final class InstrumentTest extends TestCase
         $referenceCounter->expects($this->once())->method('release');
 
         /** @noinspection PhpExpressionResultUnusedInspection */
-        new ObservableCallback($writer, $referenceCounter, 1, null);
+        new ObservableCallback($writer, $referenceCounter, 1, null, null);
     }
 
     /**
@@ -257,6 +257,6 @@ final class InstrumentTest extends TestCase
         $callbackDestructor->callbackIds[1] = 1;
 
         /** @noinspection PhpExpressionResultUnusedInspection */
-        new ObservableCallback($writer, $referenceCounter, 1, $callbackDestructor);
+        new ObservableCallback($writer, $referenceCounter, 1, $callbackDestructor, null);
     }
 }
