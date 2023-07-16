@@ -55,8 +55,8 @@ trait ObservableInstrumentTrait
         $this->referenceCounter->acquire();
 
         $destructor = null;
-        if ($object = $target) {
-            $destructor = $this->destructors[$object] ??= new ObservableCallbackDestructor($this->writer, $this->referenceCounter);
+        if ($target) {
+            $destructor = $this->destructors[$target] ??= new ObservableCallbackDestructor($this->writer, $this->referenceCounter);
             $destructor->callbackIds[$callbackId] = $callbackId;
         }
 
