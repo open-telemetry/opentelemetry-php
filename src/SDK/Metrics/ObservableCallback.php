@@ -16,13 +16,16 @@ final class ObservableCallback implements ObservableCallbackInterface
     private ReferenceCounterInterface $referenceCounter;
     private ?int $callbackId;
     private ?ObservableCallbackDestructor $callbackDestructor;
+    /** @phpstan-ignore-next-line */
+    private ?object $target;
 
-    public function __construct(MetricWriterInterface $writer, ReferenceCounterInterface $referenceCounter, int $callbackId, ?ObservableCallbackDestructor $callbackDestructor)
+    public function __construct(MetricWriterInterface $writer, ReferenceCounterInterface $referenceCounter, int $callbackId, ?ObservableCallbackDestructor $callbackDestructor, ?object $target)
     {
         $this->writer = $writer;
         $this->referenceCounter =  $referenceCounter;
         $this->callbackId = $callbackId;
         $this->callbackDestructor = $callbackDestructor;
+        $this->target = $target;
     }
 
     public function detach(): void
