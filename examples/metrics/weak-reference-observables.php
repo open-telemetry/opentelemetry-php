@@ -12,9 +12,10 @@ use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 require 'vendor/autoload.php';
 
 /**
- * Example of using `weaken` on observer callbacks. Creates a weak reference to the
- * callback, so that internal references to the callback do not stop garbage collection on
- * the original object
+ * Example of using weakly referenced observer callbacks. Binds the lifetime of
+ * a callback to its bound object, the returned `ObserverCallbackInterface` is
+ * ignored to automatically detach the callback once the original object is
+ * garbage collected.
  */
 
 $reader = new ExportingReader(
