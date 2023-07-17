@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration\ConfigurationResolver;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Logs\LoggerProviderFactory;
@@ -58,7 +59,9 @@ class SdkAutoloader
                 ->withTracerProvider($tracerProvider)
                 ->withMeterProvider($meterProvider)
                 ->withLoggerProvider($loggerProvider)
-                ->withPropagator($propagator);
+                ->withPropagator($propagator)
+                ->withConfigurationResolver(new ConfigurationResolver())
+                ;
         });
 
         return true;
