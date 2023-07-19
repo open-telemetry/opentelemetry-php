@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Instrumentation\Configurator;
+use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\MeterInterface;
@@ -79,17 +80,22 @@ final class InstrumentationTest extends TestCase
         $meter = $this->createMock(MeterInterface::class);
         $meterProvider = $this->createMock(MeterProviderInterface::class);
         $meterProvider->method('getMeter')->willReturn($meter);
+        $logger = $this->createMock(LoggerInterface::class);
+        $loggerProvider = $this->createMock(LoggerProviderInterface::class);
+        $loggerProvider->method('getLogger')->willReturn($logger);
         $propagator = $this->createMock(TextMapPropagatorInterface::class);
 
         $scope = Configurator::create()
             ->withTracerProvider($tracerProvider)
             ->withMeterProvider($meterProvider)
+            ->withLoggerProvider($loggerProvider)
             ->withPropagator($propagator)
             ->activate();
 
         try {
             $this->assertSame($tracer, $instrumentation->tracer());
             $this->assertSame($meter, $instrumentation->meter());
+            $this->assertSame($logger, $instrumentation->logger());
         } finally {
             $scope->detach();
         }

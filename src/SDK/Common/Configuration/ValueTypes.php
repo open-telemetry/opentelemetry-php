@@ -118,5 +118,6 @@ interface ValueTypes
      */
     public const OTEL_PHP_TRACES_PROCESSOR = VariableTypes::ENUM;
     public const OTEL_PHP_DETECTORS = VariableTypes::LIST;
+    public const OTEL_PHP_AUTOLOAD_ENABLED = VariableTypes::BOOL;
     public const OTEL_PHP_DISABLED_INSTRUMENTATIONS = VariableTypes::LIST;
 }
