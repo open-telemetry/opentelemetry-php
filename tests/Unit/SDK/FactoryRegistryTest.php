@@ -25,7 +25,7 @@ class FactoryRegistryTest extends TestCase
         $this->assertInstanceOf(TransportFactoryInterface::class, $factory);
     }
 
-    public function transportProtocolsProvider(): array
+    public static function transportProtocolsProvider(): array
     {
         return [
             ['grpc'],
@@ -46,7 +46,7 @@ class FactoryRegistryTest extends TestCase
         $this->assertInstanceOf(SpanExporterFactoryInterface::class, $factory);
     }
 
-    public function spanExporterProvider(): array
+    public static function spanExporterProvider(): array
     {
         return [
             ['otlp'],
@@ -65,7 +65,7 @@ class FactoryRegistryTest extends TestCase
         $this->assertInstanceOf(MetricExporterFactoryInterface::class, $factory);
     }
 
-    public function metricExporterProvider(): array
+    public static function metricExporterProvider(): array
     {
         return [
             ['otlp'],
@@ -101,7 +101,7 @@ class FactoryRegistryTest extends TestCase
         Registry::registerMetricExporterFactory('foo', $factory, true);
     }
 
-    public function invalidFactoryProvider(): array
+    public static function invalidFactoryProvider(): array
     {
         return [
             [new \stdClass()],

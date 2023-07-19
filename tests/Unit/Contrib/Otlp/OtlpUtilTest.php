@@ -35,7 +35,7 @@ class OtlpUtilTest extends TestCase
         $this->assertStringContainsString($expected, $method);
     }
 
-    public function methodProvider(): array
+    public static function methodProvider(): array
     {
         return [
             [Signals::TRACE, 'TraceService'],

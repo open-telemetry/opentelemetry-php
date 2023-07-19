@@ -15,7 +15,7 @@ use OpenTelemetry\SDK\Trace\StatusDataInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\ImmutableSpan
+ * @covers \OpenTelemetry\SDK\Trace\ImmutableSpan
  */
 class ImmutableSpanTest extends TestCase
 {

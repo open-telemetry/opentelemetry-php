@@ -6,7 +6,6 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Adapter\HttpDiscovery;
 
 use Generator;
 use Http\Client\HttpAsyncClient;
-use Http\Client\HttpClient;
 use OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\DependencyResolver;
 use OpenTelemetry\SDK\Common\Http\HttpPlug\Client\ResolverInterface as HttpPlugClientResolverInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\ResolverInterface as PsrClientResolverInterface;
@@ -39,7 +38,6 @@ class DependencyResolverTest extends TestCase
             PsrClientInterface::class,
         ],
         HttpPlugClientResolverInterface::class => [
-            HttpClient::class,
             HttpAsyncClient::class,
         ],
     ];

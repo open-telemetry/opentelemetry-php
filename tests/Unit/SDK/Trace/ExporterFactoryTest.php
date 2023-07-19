@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
-use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\Psr18ClientDiscovery;
 use Http\Discovery\Strategy\MockClientStrategy;
 use OpenTelemetry\Contrib;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
@@ -27,7 +27,7 @@ class ExporterFactoryTest extends TestCase
 
     public function setUp(): void
     {
-        HttpClientDiscovery::prependStrategy(MockClientStrategy::class);
+        Psr18ClientDiscovery::prependStrategy(MockClientStrategy::class);
     }
 
     /**
@@ -55,7 +55,7 @@ class ExporterFactoryTest extends TestCase
         $this->assertInstanceOf($expected, $factory->create());
     }
 
-    public function envProvider(): array
+    public static function envProvider(): array
     {
         return [
             'otlp+http/protobuf from traces protocol' => [
@@ -104,7 +104,7 @@ class ExporterFactoryTest extends TestCase
         $factory->create();
     }
 
-    public function invalidEnvProvider(): array
+    public static function invalidEnvProvider(): array
     {
         return [
             'otlp+invalid protocol' => [

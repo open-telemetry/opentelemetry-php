@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Logs\Processor;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,9 +18,7 @@ use PHPUnit\Framework\TestCase;
 class SimpleLogRecordProcessorTest extends TestCase
 {
     private SimpleLogRecordProcessor $processor;
-    /**
-     * @var LogRecordExporterInterface|(LogRecordExporterInterface&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var LogRecordExporterInterface&MockObject $exporter */
     private LogRecordExporterInterface $exporter;
     private ReadWriteLogRecord $readWriteLogRecord;
 

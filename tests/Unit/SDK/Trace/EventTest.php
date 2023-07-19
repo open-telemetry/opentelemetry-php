@@ -10,7 +10,7 @@ use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\Event
+ * @covers \OpenTelemetry\SDK\Trace\Event
  */
 class EventTest extends TestCase
 {

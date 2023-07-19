@@ -15,7 +15,7 @@ use OpenTelemetry\SDK\Trace\TracerSharedState;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\TracerSharedState
+ * @covers \OpenTelemetry\SDK\Trace\TracerSharedState
  */
 class TracerSharedStateTest extends TestCase
 {

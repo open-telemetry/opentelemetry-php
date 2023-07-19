@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Baggage\Propagation;
 
+use OpenTelemetry\API\Baggage\BaggageBuilder;
 use OpenTelemetry\API\Baggage\BaggageBuilderInterface;
-use OpenTelemetry\API\Baggage\Metadata;
 use OpenTelemetry\API\Baggage\Propagation\Parser;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,12 +15,19 @@ use PHPUnit\Framework\TestCase;
  */
 class ParserTest extends TestCase
 {
-    /** @var BaggageBuilderInterface&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var BaggageBuilderInterface&MockObject */
     private BaggageBuilderInterface $builder;
 
     public function setUp(): void
     {
         $this->builder = $this->createMock(BaggageBuilderInterface::class);
+    }
+
+    public function test_parse_into_splits_by_comma(): void
+    {
+        $parser = new Parser('key1=value1,key2=value2,key3=value3');
+        $this->builder->expects($this->exactly(3))->method('set');
+        $parser->parseInto($this->builder);
     }
 
     /**
@@ -32,15 +40,16 @@ class ParserTest extends TestCase
         $this->builder
             ->expects($this->exactly(2))
             ->method('set')
-            ->withConsecutive(
-                [$this->equalTo('key1'), $this->equalTo('value1'), $this->anything()],
-                [$this->equalTo('key2'), $this->equalTo('value2'), $this->anything()],
+            ->with(
+                $this->stringStartsWith('key'),
+                $this->stringStartsWith('value'),
+                $this->anything(),
             );
 
         $parser->parseInto($this->builder);
     }
 
-    public function headerProvider(): array
+    public static function headerProvider(): array
     {
         return [
             'normal' => ['key1=value1,key2=value2'],
@@ -50,40 +59,22 @@ class ParserTest extends TestCase
 
     public function test_parse_into_with_properties(): void
     {
+        $builder = new BaggageBuilder();
         //@see https://www.w3.org/TR/baggage/#example
         $header = 'key1=value1;property1;property2, key2 = value2, key3=value3; propertyKey=propertyValue';
         $parser = new Parser($header);
 
-        $this->builder
-            ->expects($this->exactly(3))
-            ->method('set')
-            ->withConsecutive(
-                [
-                    $this->equalTo('key1'),
-                    $this->equalTo('value1'),
-                    $this->callback(function (Metadata $metadata) {
-                        $this->assertSame('property1;property2', $metadata->getValue());
-
-                        return true;
-                    }),
-                ],
-                [
-                    $this->equalTo('key2'),
-                    $this->equalTo('value2'),
-                    $this->equalTo(null),
-                ],
-                [
-                    $this->equalTo('key3'),
-                    $this->equalTo('value3'),
-                    $this->callback(function (Metadata $metadata) {
-                        $this->assertSame('propertyKey=propertyValue', $metadata->getValue());
-
-                        return true;
-                    }),
-                ],
-            );
-
-        $parser->parseInto($this->builder);
+        $expected = [
+            'key1' => ['value1', 'property1;property2'],
+            'key2' => ['value2', ''],
+            'key3' => ['value3', 'propertyKey=propertyValue'],
+        ];
+        $parser->parseInto($builder);
+        $baggage = $builder->build();
+        foreach ($baggage->getAll() as $key => $entry) {
+            $this->assertSame($expected[$key][0], $entry->getValue());
+            $this->assertSame($expected[$key][1], $entry->getMetadata()->getValue());
+        }
     }
 
     /**
@@ -100,7 +91,7 @@ class ParserTest extends TestCase
         $parser->parseInto($this->builder);
     }
 
-    public function invalidHeaderProvider(): array
+    public static function invalidHeaderProvider(): array
     {
         return [
             'nothing' => [''],

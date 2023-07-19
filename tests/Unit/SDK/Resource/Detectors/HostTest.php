@@ -9,7 +9,7 @@ use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Resource\Detectors\Host
+ * @covers \OpenTelemetry\SDK\Resource\Detectors\Host
  */
 class HostTest extends TestCase
 {

@@ -8,7 +8,7 @@ use OpenTelemetry\API\Trace\SpanContextValidator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\API\Trace\SpanContextValidator
+ * @covers \OpenTelemetry\API\Trace\SpanContextValidator
  */
 class SpanContextValidatorTest extends TestCase
 {

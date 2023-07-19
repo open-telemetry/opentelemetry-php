@@ -14,7 +14,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\SpanProcessorFactory
+ * @covers \OpenTelemetry\SDK\Trace\SpanProcessorFactory
  */
 class SpanProcessorFactoryTest extends TestCase
 {
@@ -36,7 +36,7 @@ class SpanProcessorFactoryTest extends TestCase
         $this->assertInstanceOf($expected, $factory->create($this->createMock(SpanExporterInterface::class)));
     }
 
-    public function processorProvider()
+    public static function processorProvider(): array
     {
         return [
             'batch' => ['batch', BatchSpanProcessor::class],

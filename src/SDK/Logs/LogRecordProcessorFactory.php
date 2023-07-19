@@ -36,7 +36,7 @@ class LogRecordProcessorFactory
         }
     }
 
-    private function createProcessor($name, LogRecordExporterInterface $exporter, ?MeterProviderInterface $meterProvider = null): LogRecordProcessorInterface
+    private function createProcessor(string $name, LogRecordExporterInterface $exporter, ?MeterProviderInterface $meterProvider = null): LogRecordProcessorInterface
     {
         switch ($name) {
             case KnownValues::VALUE_BATCH:

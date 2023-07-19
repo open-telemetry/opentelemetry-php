@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 /**
- * @covers OpenTelemetry\SDK\Resource\ResourceInfo
+ * @covers \OpenTelemetry\SDK\Resource\ResourceInfo
  */
 class ResourceInfoTest extends TestCase
 {
@@ -64,7 +64,7 @@ class ResourceInfoTest extends TestCase
         $this->assertSame($resource1->serialize(), $resource2->serialize());
     }
 
-    public function sameResourcesProvider(): iterable
+    public static function sameResourcesProvider(): iterable
     {
         yield 'Attribute keys sorted in ascending order vs Attribute keys sorted in descending order' => [
             ResourceInfo::create(Attributes::create([
@@ -88,7 +88,7 @@ class ResourceInfoTest extends TestCase
         $this->assertNotSame($resource1->serialize(), $resource2->serialize());
     }
 
-    public function differentResourcesProvider(): iterable
+    public static function differentResourcesProvider(): iterable
     {
         yield 'Null schema url vs Some schema url' => [
             ResourceInfo::create(Attributes::create([]), null),
@@ -160,7 +160,7 @@ class ResourceInfoTest extends TestCase
         $this->assertSame($expectedSchemaUrl, $result->getSchemaUrl());
     }
 
-    public function schemaUrlsToMergeProvider(): Generator
+    public static function schemaUrlsToMergeProvider(): Generator
     {
         yield 'Should keep old schemaUrl when the updating one is empty' => [['http://url', null], 'http://url'];
         yield 'Should override empty old schemaUrl with non-empty updating one' => [[null, 'http://url'], 'http://url'];

@@ -12,7 +12,7 @@ use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
 
 /**
- * @covers OpenTelemetry\SDK\Logs\SimplePsrFileLogger
+ * @covers \OpenTelemetry\SDK\Logs\SimplePsrFileLogger
  */
 class SimplePsrFileLoggerTest extends TestCase
 {
@@ -54,7 +54,7 @@ class SimplePsrFileLoggerTest extends TestCase
         $this->assertTrue($this->root->hasChild(self::LOG_FILE));
     }
 
-    public function logLevelProvider(): array
+    public static function logLevelProvider(): array
     {
         $result = [];
 

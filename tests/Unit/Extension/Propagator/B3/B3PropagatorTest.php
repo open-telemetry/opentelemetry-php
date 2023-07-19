@@ -193,7 +193,7 @@ class B3PropagatorTest extends TestCase
         );
     }
 
-    public function validTraceIdProvider(): array
+    public static function validTraceIdProvider(): array
     {
         return [
             '16 char trace id' => [
@@ -289,7 +289,7 @@ class B3PropagatorTest extends TestCase
         );
     }
 
-    public function invalidB3SingleHeaderValueProvider(): array
+    public static function invalidB3SingleHeaderValueProvider(): array
     {
         return [
             'invalid traceid' => ['abcdefghijklmnopabcdefghijklmnop-' . self::B3_SPAN_ID . '-1'],

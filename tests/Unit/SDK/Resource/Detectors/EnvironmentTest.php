@@ -10,7 +10,7 @@ use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Resource\Detectors\Environment
+ * @covers \OpenTelemetry\SDK\Resource\Detectors\Environment
  */
 class EnvironmentTest extends TestCase
 {
@@ -60,7 +60,7 @@ class EnvironmentTest extends TestCase
         $this->assertSame($expected, $resource->getAttributes()->get($key));
     }
 
-    public function encodedResourceValueProvider(): array
+    public static function encodedResourceValueProvider(): array
     {
         return [
             ['%28%24foo%29', '($foo)'],
