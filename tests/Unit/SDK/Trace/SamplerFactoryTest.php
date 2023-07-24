@@ -34,7 +34,7 @@ class SamplerFactoryTest extends TestCase
         $this->assertStringContainsString($expected, $sampler->getDescription());
     }
 
-    public function samplerProvider(): array
+    public static function samplerProvider(): array
     {
         return [
             'default sampler' => ['', 'ParentBased+AlwaysOn'],
@@ -59,7 +59,7 @@ class SamplerFactoryTest extends TestCase
         $factory->create();
     }
 
-    public function invalidSamplerProvider(): array
+    public static function invalidSamplerProvider(): array
     {
         return [
             'ratio without arg' => ['traceidratio'],

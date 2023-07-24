@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Trace\StatusData;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\StatusData
+ * @covers \OpenTelemetry\SDK\Trace\StatusData
  */
 class StatusDataTest extends TestCase
 {

@@ -75,7 +75,7 @@ class UtilTest extends TestCase
         Util::triggerMethodDeprecationNotice(Util::class, 'foo', self::class);
     }
 
-    public function errorLevelProvider(): Generator
+    public static function errorLevelProvider(): Generator
     {
         yield [E_USER_DEPRECATED];
         yield [E_USER_NOTICE];

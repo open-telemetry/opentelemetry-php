@@ -254,7 +254,7 @@ class SpanTest extends MockeryTestCase
 
     /**
      * @group trace-compliance
-     * @covers OpenTelemetry\SDK\Trace\Span::isRecording
+     * @covers \OpenTelemetry\SDK\Trace\Span::isRecording
      */
     public function test_to_span_data_active_span(): void
     {
@@ -453,7 +453,7 @@ class SpanTest extends MockeryTestCase
 
     /**
      * @group trace-compliance
-     * @covers OpenTelemetry\SDK\Trace\Span::setAttributes
+     * @covers \OpenTelemetry\SDK\Trace\Span::setAttributes
      */
     public function test_set_attributes(): void
     {
@@ -542,7 +542,7 @@ class SpanTest extends MockeryTestCase
 
     /**
      * @group trace-compliance
-     * @covers OpenTelemetry\SDK\Trace\Span::addEvent
+     * @covers \OpenTelemetry\SDK\Trace\Span::addEvent
      */
     public function test_add_event(): void
     {
@@ -820,7 +820,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSame(API\StatusCode::STATUS_OK, $span->toSpanData()->getStatus()->getCode());
     }
 
-    public function statusCodeProvider(): array
+    public static function statusCodeProvider(): array
     {
         return [
             [API\StatusCode::STATUS_UNSET],

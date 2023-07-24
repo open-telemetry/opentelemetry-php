@@ -12,7 +12,7 @@ use function str_repeat;
 use function strlen;
 
 /**
- * @covers OpenTelemetry\API\Trace\TraceState
+ * @covers \OpenTelemetry\API\Trace\TraceState
  * @psalm-suppress UndefinedInterfaceMethod
  */
 class TraceStateTest extends TestCase

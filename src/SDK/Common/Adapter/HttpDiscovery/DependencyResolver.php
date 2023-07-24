@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Adapter\HttpDiscovery;
 
 use Http\Client\HttpAsyncClient;
-use Http\Client\HttpClient;
 use OpenTelemetry\SDK\Common\Http\DependencyResolverInterface;
 use OpenTelemetry\SDK\Common\Http\HttpPlug\Client\ResolverInterface as HttpPlugClientResolverInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\ResolverInterface as PsrClientResolverInterface;
@@ -72,9 +71,9 @@ final class DependencyResolver implements DependencyResolverInterface
         return $this->messageFactoryResolver->resolveUriFactory();
     }
 
-    public function resolveHttpPlugClient(): HttpClient
+    public function resolveHttpClient(): ClientInterface
     {
-        return $this->httpPlugClientResolver->resolveHttpPlugClient();
+        return $this->psrClientResolver->resolvePsrClient();
     }
 
     public function resolveHttpPlugAsyncClient(): HttpAsyncClient

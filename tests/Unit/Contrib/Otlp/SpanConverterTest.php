@@ -88,7 +88,7 @@ class SpanConverterTest extends TestCase
         $this->assertEquals($protoSpan->getAttributes(), $attributes);
     }
 
-    public function attributeAreCoercedCorrectlyDataProvider()
+    public static function attributeAreCoercedCorrectlyDataProvider(): array
     {
         return [
             'String' => [
@@ -280,7 +280,7 @@ class SpanConverterTest extends TestCase
         $this->assertSame($expected, $row->getKind());
     }
 
-    public function spanKindProvider(): array
+    public static function spanKindProvider(): array
     {
         return [
             'internal' => [SpanKind::KIND_INTERNAL, ProtoSpanKind::SPAN_KIND_INTERNAL],

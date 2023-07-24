@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ClassConstantAccessorTest extends TestCase
 {
-    public function test_get_value_return_correct_value()
+    public function test_get_value_return_correct_value(): void
     {
         $this->assertSame(
             ClassConstantAccessorTestClass::FOO,
@@ -21,14 +21,14 @@ class ClassConstantAccessorTest extends TestCase
         );
     }
 
-    public function test_get_value_returns_null_on_non_existing_constant()
+    public function test_get_value_returns_null_on_non_existing_constant(): void
     {
         $this->assertNull(
             ClassConstantAccessor::getValue(ClassConstantAccessorTestClass::class, 'BAR')
         );
     }
 
-    public function test_require_value_return_correct_value()
+    public function test_require_value_return_correct_value(): void
     {
         $this->assertSame(
             ClassConstantAccessorTestClass::FOO,
@@ -36,7 +36,7 @@ class ClassConstantAccessorTest extends TestCase
         );
     }
 
-    public function test_require_value_throws_exception_on_non_existing_constant()
+    public function test_require_value_throws_exception_on_non_existing_constant(): void
     {
         $this->expectException(LogicException::class);
 

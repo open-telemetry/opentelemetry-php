@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTest;
 
 /**
- * @covers OpenTelemetry\Contrib\Zipkin\Exporter
+ * @covers \OpenTelemetry\Contrib\Zipkin\Exporter
  */
 class ZipkinExporterTest extends AbstractExporterTest
 {

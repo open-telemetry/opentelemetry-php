@@ -9,7 +9,7 @@ use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Resource\Detectors\SdkProvided
+ * @covers \OpenTelemetry\SDK\Resource\Detectors\SdkProvided
  */
 class SdkProvidedTest extends TestCase
 {

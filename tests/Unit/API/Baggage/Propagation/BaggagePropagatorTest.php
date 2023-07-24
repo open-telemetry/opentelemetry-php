@@ -11,7 +11,7 @@ use OpenTelemetry\Context\Context;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\API\Baggage\Propagation\BaggagePropagator
+ * @covers \OpenTelemetry\API\Baggage\Propagation\BaggagePropagator
  */
 class BaggagePropagatorTest extends TestCase
 {
@@ -97,7 +97,7 @@ class BaggagePropagatorTest extends TestCase
         );
     }
 
-    public function headerProvider(): array
+    public static function headerProvider(): array
     {
         return [
             'key - duplicate key' => ['key=value1,key=value2', Baggage::getBuilder()->set('key', 'value2')->build()],

@@ -11,7 +11,7 @@ use OpenTelemetry\Context\Context;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\API\Baggage\Baggage
+ * @covers \OpenTelemetry\API\Baggage\Baggage
  */
 class BaggageTest extends TestCase
 {

@@ -8,7 +8,7 @@ use OpenTelemetry\API\Trace as API;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\API\Trace\NonRecordingSpan
+ * @covers \OpenTelemetry\API\Trace\NonRecordingSpan
  */
 class NonRecordingSpanTest extends TestCase
 {

@@ -8,7 +8,7 @@ use OpenTelemetry\Extension\Propagator\B3\B3DebugFlagContextKey;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\Extension\Propagator\B3\B3DebugFlagContextKey
+ * @covers \OpenTelemetry\Extension\Propagator\B3\B3DebugFlagContextKey
  */
 class B3DebugFlagContextKeyTest extends TestCase
 {

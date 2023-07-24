@@ -77,10 +77,10 @@ class ResourceInfo
      */
     private static function mergeSchemaUrl(?string $old, ?string $updating): ?string
     {
-        if ($old === null) {
+        if (empty($old)) {
             return $updating;
         }
-        if ($updating === null) {
+        if (empty($updating)) {
             return $old;
         }
         if ($old === $updating) {

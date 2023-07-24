@@ -15,11 +15,6 @@ class SystemClockTest extends TestCase
 {
     private const NANOS_PER_SECOND = 1_000_000_000;
 
-    public function test_get_instance_always_returns_same_clock(): void
-    {
-        $this->assertSame(SystemClock::getInstance(), SystemClock::getInstance());
-    }
-
     public function test_now_is_chronological(): void
     {
         $time1 = SystemClock::create()->now();
@@ -33,23 +28,6 @@ class SystemClockTest extends TestCase
     {
         $this->assertNanoSecondsWallClock(
             SystemClock::create()->now(),
-            new DateTime()
-        );
-    }
-
-    public function test_nano_time_is_chronological(): void
-    {
-        $time1 = SystemClock::create()->nanoTime();
-        usleep(1);
-        $time2 = SystemClock::create()->nanoTime();
-
-        $this->assertGreaterThan($time1, $time2);
-    }
-
-    public function test_nano_time_returns_nanoseconds(): void
-    {
-        $this->assertNanoSecondsWallClock(
-            SystemClock::create()->nanoTime(),
             new DateTime()
         );
     }

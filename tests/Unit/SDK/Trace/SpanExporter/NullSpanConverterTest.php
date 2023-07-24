@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Trace\SpanExporter\NullSpanConverter;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\SpanExporter\NullSpanConverter
+ * @covers \OpenTelemetry\SDK\Trace\SpanExporter\NullSpanConverter
  */
 class NullSpanConverterTest extends TestCase
 {

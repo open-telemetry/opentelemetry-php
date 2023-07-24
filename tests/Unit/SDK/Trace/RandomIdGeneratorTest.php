@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Trace\RandomIdGenerator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\SDK\Trace\RandomIdGenerator
+ * @covers \OpenTelemetry\SDK\Trace\RandomIdGenerator
  */
 class RandomIdGeneratorTest extends TestCase
 {

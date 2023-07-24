@@ -44,7 +44,7 @@ class SpanConverter implements SpanConverterInterface
         $this->defaultServiceName = ResourceInfoFactory::defaultResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
     }
 
-    private function sanitiseTagValue($value)
+    private function sanitiseTagValue($value): string
     {
         // Casting false to string makes an empty string
         if (is_bool($value)) {

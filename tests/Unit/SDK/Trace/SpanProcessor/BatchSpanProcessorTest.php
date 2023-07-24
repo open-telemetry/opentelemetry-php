@@ -119,7 +119,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
-    public function scheduledDelayProvider()
+    public static function scheduledDelayProvider(): array
     {
         return [
             'no clock advance' => [1000, 0, false],

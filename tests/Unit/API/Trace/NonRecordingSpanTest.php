@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers OpenTelemetry\API\Trace\NonRecordingSpan
+ * @covers \OpenTelemetry\API\Trace\NonRecordingSpan
  */
 class NonRecordingSpanTest extends TestCase
 {

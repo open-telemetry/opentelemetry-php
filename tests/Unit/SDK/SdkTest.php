@@ -39,7 +39,8 @@ class SdkTest extends TestCase
         self::setEnvironmentVariable('OTEL_SDK_DISABLED', $value);
         $this->assertSame($expected, Sdk::isDisabled());
     }
-    public function disabledProvider(): array
+
+    public static function disabledProvider(): array
     {
         return [
             ['true', true],
@@ -57,7 +58,7 @@ class SdkTest extends TestCase
         $this->assertSame($expected, Sdk::isInstrumentationDisabled($name));
     }
 
-    public function instrumentationDisabledProvider(): array
+    public static function instrumentationDisabledProvider(): array
     {
         return [
             ['foo,bar', 'foo', true],

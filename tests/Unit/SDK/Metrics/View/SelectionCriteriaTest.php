@@ -79,7 +79,7 @@ final class SelectionCriteriaTest extends TestCase
         ));
     }
 
-    public function instrumentNameProvider(): iterable
+    public static function instrumentNameProvider(): iterable
     {
         yield 'exact - matching' => ['foobar', 'foobar', true];
         yield 'exact - not matching' => ['foobar', 'foobaz', false];

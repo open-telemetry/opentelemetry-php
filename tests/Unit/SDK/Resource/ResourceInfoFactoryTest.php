@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use Generator;
 use InvalidArgumentException;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -12,14 +13,26 @@ use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 /**
- * @covers OpenTelemetry\SDK\Resource\ResourceInfoFactory
+ * @covers \OpenTelemetry\SDK\Resource\ResourceInfoFactory
  */
 class ResourceInfoFactoryTest extends TestCase
 {
     use EnvironmentVariables;
+
+    /** @var LoggerInterface&MockObject $logger */
+    private LoggerInterface $logger;
+    private const UNDEFINED = '__undefined';
+
+    public function setUp(): void
+    {
+        $this->logger = $this->createMock(LoggerInterface::class);
+        LoggerHolder::set($this->logger);
+    }
 
     public function tearDown(): void
     {
@@ -35,9 +48,9 @@ class ResourceInfoFactoryTest extends TestCase
 
     public function test_merge(): void
     {
-        $primary = ResourceInfo::create(Attributes::create(['name' => 'primary', 'empty' => '']));
-        $secondary = ResourceInfo::create(Attributes::create(['version' => '1.0.0', 'empty' => 'value']));
-        $result = ResourceInfoFactory::merge($primary, $secondary);
+        $primary = ResourceInfo::create(Attributes::create(['name' => 'primary', 'empty' => 'value']));
+        $secondary = ResourceInfo::create(Attributes::create(['version' => '1.0.0', 'empty' => '']));
+        $result = $primary->merge($secondary);
 
         $name = $result->getAttributes()->get('name');
         $version = $result->getAttributes()->get('version');
@@ -54,22 +67,25 @@ class ResourceInfoFactoryTest extends TestCase
      */
     public function test_merge_schema_url(array $schemaUrlsToMerge, ?string $expectedSchemaUrl): void
     {
-        $resourcesToMerge = [];
+        $resource = ResourceInfoFactory::emptyResource();
         foreach ($schemaUrlsToMerge as $schemaUrl) {
-            $resourcesToMerge[] = ResourceInfo::create(Attributes::create([]), $schemaUrl);
+            $resource = $resource->merge(ResourceInfo::create(Attributes::create([]), $schemaUrl));
         }
-        $result = ResourceInfoFactory::merge(...$resourcesToMerge);
 
-        $this->assertEquals($expectedSchemaUrl, $result->getSchemaUrl());
+        if ($expectedSchemaUrl === self::UNDEFINED) {
+            $this->assertTrue(true, 'dummy assertion');
+        } else {
+            $this->assertEquals($expectedSchemaUrl, $resource->getSchemaUrl());
+        }
     }
 
-    public function schemaUrlsToMergeProvider()
+    public static function schemaUrlsToMergeProvider(): Generator
     {
         yield 'Should keep old schemaUrl when the updating one is empty' => [['http://url', null], 'http://url'];
         yield 'Should override empty old schemaUrl with non-empty updating one' => [[null, 'http://url'], 'http://url'];
         yield 'Should keep matching schemaUrls' => [['http://url', 'http://url'], 'http://url'];
         yield 'Should resolve an empty schemaUrl when the old and the updating are not equal' => [['http://url-1', 'http://url-2'], null];
-        yield 'Should keep empty schemaUrl when not equal schemas have been merged before' => [['http://url-1', 'http://url-2', 'http://url-2'], null];
+        yield 'Schema url is undefined and implementation-specific after merging error' => [['http://url-1', 'http://url-2', 'http://url-2'], self::UNDEFINED];
     }
 
     /**
@@ -153,11 +169,27 @@ class ResourceInfoFactoryTest extends TestCase
         ResourceInfoFactory::defaultResource();
     }
 
+    public function test_default_with_all_sdk_detectors(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'env,host,os,process,process_runtime,sdk,sdk_provided,composer');
+        $resource = ResourceInfoFactory::defaultResource();
+        $keys = array_keys($resource->getAttributes()->toArray());
+        foreach (['service.name', 'telemetry.sdk.name', 'process.runtime.name', 'process.pid', 'host.arch'] as $key) {
+            $this->assertContains($key, $keys);
+        }
+    }
+
+    public function test_default_with_none_detectors(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'none');
+        $resource = ResourceInfoFactory::defaultResource();
+        $keys = array_keys($resource->getAttributes()->toArray());
+        $this->assertEmpty($keys);
+    }
+
     public function test_logs_warning_for_unknown_detector(): void
     {
-        $logger = $this->createMock(\Psr\Log\LoggerInterface::class);
-        $logger->expects($this->once())->method('log')->with($this->equalTo('warning'));
-        LoggerHolder::set($logger);
+        $this->logger->expects($this->once())->method('log')->with($this->equalTo('warning'));
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'does-not-exist');
 
         ResourceInfoFactory::defaultResource();

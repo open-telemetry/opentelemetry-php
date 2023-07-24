@@ -127,7 +127,7 @@ class HttpEndpointResolverTest extends TestCase
         }
     }
 
-    public function provideReferences(): Generator
+    public static function provideReferences(): Generator
     {
         yield 'signals'       => [self::SIGNALS, Signals::SIGNALS];
         yield 'default paths' => [self::DEFAULT_PATHS, HttpEndpointResolverInterface::DEFAULT_PATHS];

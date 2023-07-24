@@ -24,7 +24,7 @@ class TraceContextValidator
      * @return bool Returns a value that indicates whether trace flag is valid
      * TraceFlags must be exactly 1 bytes (1 char) representing a bit field
      */
-    public static function isValidTraceFlag($traceFlag): bool
+    public static function isValidTraceFlag(string $traceFlag): bool
     {
         return ctype_xdigit($traceFlag) && strlen($traceFlag) === self::TRACE_FLAG_LENGTH;
     }
