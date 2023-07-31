@@ -55,4 +55,14 @@ final class ContextKeys
 
         return $instance ??= Context::createKey(LoggerProviderInterface::class);
     }
+
+    /**
+     * @return ContextKeyInterface<ConfigurationResolverInterface>
+     */
+    public static function configurationResolver(): ContextKeyInterface
+    {
+        static $instance;
+
+        return $instance ??= Context::createKey(ConfigurationResolverInterface::class);
+    }
 }
