@@ -110,7 +110,7 @@ final class PsrTransport implements TransportInterface
                 return new ErrorFuture($e);
             }
 
-            if ($retries === $this->maxRetries) {
+            if ($retries >= $this->maxRetries) {
                 return new ErrorFuture(new RuntimeException('Export retry limit exceeded', 0, $e));
             }
 
