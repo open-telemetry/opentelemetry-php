@@ -131,7 +131,19 @@ final class PsrTransportTest extends TestCase
     public function test_send_returns_error_if_retry_limit_exceeded(): void
     {
         $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(500));
-        $transport = $this->factory->create('http://localhost', 'text/plain', [], null, 10., 100, 1);
+        $transport = $this->factory->create('http://localhost', 'text/plain', [], null, 10., 100, 0);
+
+        $response = $transport->send('');
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('retry limit');
+        $response->await();
+    }
+
+    public function test_send_number_of_retries(): void
+    {
+        $this->client->expects($this->exactly(4))->method('sendRequest')->willReturn(new Response(500));
+        $transport = $this->factory->create('http://localhost', 'text/plain', [], null, 10., 100, 3);
 
         $response = $transport->send('');
 
