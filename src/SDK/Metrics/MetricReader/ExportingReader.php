@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
 use function array_keys;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
+use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
@@ -52,6 +53,9 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
     public function add(MetricSourceProviderInterface $provider, MetricMetadataInterface $metadata, StalenessHandlerInterface $stalenessHandler): void
     {
         if ($this->closed) {
+            return;
+        }
+        if (!$this->exporter instanceof AggregationTemporalitySelectorInterface) {
             return;
         }
         if (!$temporality = $this->exporter->temporality($metadata)) {

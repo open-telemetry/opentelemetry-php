@@ -8,6 +8,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\LastValueAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
+use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
@@ -78,7 +79,6 @@ final class ExportingReaderTest extends TestCase
     public function test_add_does_not_create_metric_source_if_exporter_temporality_null(): void
     {
         $exporter = $this->createMock(MetricExporterInterface::class);
-        $exporter->method('temporality')->willReturn(null);
         $reader = new ExportingReader($exporter);
 
         $provider = $this->createMock(MetricSourceProviderInterface::class);
@@ -168,7 +168,7 @@ final class ExportingReaderTest extends TestCase
 
     public function test_shutdown_exports_metrics(): void
     {
-        $exporter = $this->createMock(MetricExporterInterface::class);
+        $exporter = $this->createMock(MetricExporterWithTemporalityInterface::class);
         $provider = $this->createMock(MetricSourceProviderInterface::class);
         $source = $this->createMock(MetricSourceInterface::class);
         $source->method('collect')->willReturn($this->createMock(Metric::class));
@@ -222,5 +222,9 @@ final class ExportingReaderTest extends TestCase
 }
 
 interface DefaultAggregationProviderExporterInterface extends MetricExporterInterface, DefaultAggregationProviderInterface
+{
+}
+
+interface MetricExporterWithTemporalityInterface extends MetricExporterInterface, AggregationTemporalitySelectorInterface
 {
 }

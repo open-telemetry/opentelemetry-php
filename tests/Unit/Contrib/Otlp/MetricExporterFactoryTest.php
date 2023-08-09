@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use PHPUnit\Framework\TestCase;
@@ -59,6 +60,7 @@ class MetricExporterFactoryTest extends TestCase
         $factory = new MetricExporterFactory($this->transportFactory);
         $exporter = $factory->create();
 
+        $this->assertInstanceOf(AggregationTemporalitySelectorInterface::class, $exporter);
         $this->assertSame($expected, $exporter->temporality($this->createMock(MetricMetadataInterface::class)));
     }
 

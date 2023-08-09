@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricExporter;
 
 use function array_push;
+use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
@@ -13,7 +14,7 @@ use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/in-memory.md
  */
-final class InMemoryExporter implements MetricExporterInterface
+final class InMemoryExporter implements MetricExporterInterface, AggregationTemporalitySelectorInterface
 {
     /**
      * @var list<Metric>
