@@ -74,9 +74,4 @@ final class InMemoryExporter implements MetricExporterInterface
 
         return true;
     }
-
-    public function forceFlush(): bool
-    {
-        return !$this->closed;
-    }
 }

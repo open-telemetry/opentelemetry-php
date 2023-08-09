@@ -26,6 +26,4 @@ interface MetricExporterInterface
     public function export(iterable $batch): bool;
 
     public function shutdown(): bool;
-
-    public function forceFlush(): bool;
 }

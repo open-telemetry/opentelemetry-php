@@ -11,6 +11,6 @@ class ConsoleMetricExporterFactory implements MetricExporterFactoryInterface
 {
     public function create(): MetricExporterInterface
     {
-        return new ConsoleMetricsExporter();
+        return new ConsoleMetricExporter();
     }
 }

@@ -7,15 +7,15 @@ namespace OpenTelemetry\SDK\Metrics\MetricExporter;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
-use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
+use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 /**
  * Console metrics exporter.
  * Note that the output is human-readable JSON, not compatible with OTLP.
  */
-class ConsoleMetricsExporter implements MetricExporterInterface
+class ConsoleMetricExporter implements PushMetricExporterInterface
 {
     /**
      * @var string|Temporality|null

@@ -30,9 +30,4 @@ class NoopMetricExporter implements MetricExporterInterface
     {
         return true;
     }
-
-    public function forceFlush(): bool
-    {
-        return true;
-    }
 }
