@@ -19,6 +19,7 @@ use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\MetricSourceInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceProviderInterface;
+use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandler;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -186,10 +187,18 @@ final class ExportingReaderTest extends TestCase
         $this->assertTrue($reader->shutdown());
     }
 
-    public function test_force_flush_calls_exporter_force_flush(): void
+    public function test_force_flush_calls_push_exporter_force_flush(): void
+    {
+        $exporter = $this->createMock(PushMetricExporterInterface::class);
+        $exporter->expects($this->once())->method('forceFlush')->willReturn(true);
+        $reader = new ExportingReader($exporter);
+
+        $this->assertTrue($reader->forceFlush());
+    }
+
+    public function test_force_flush_with_non_push_exporter(): void
     {
         $exporter = $this->createMock(MetricExporterInterface::class);
-        $exporter->expects($this->once())->method('forceFlush')->willReturn(true);
         $reader = new ExportingReader($exporter);
 
         $this->assertTrue($reader->forceFlush());
@@ -197,7 +206,7 @@ final class ExportingReaderTest extends TestCase
 
     public function test_closed_reader_does_not_call_exporter_methods(): void
     {
-        $exporter = $this->createMock(MetricExporterInterface::class);
+        $exporter = $this->createMock(PushMetricExporterInterface::class);
         $reader = new ExportingReader($exporter);
 
         $reader->shutdown();
