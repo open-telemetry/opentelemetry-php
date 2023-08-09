@@ -9,8 +9,8 @@ use Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsServiceResponse;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
-use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
+use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use RuntimeException;
 use Throwable;
 
@@ -19,7 +19,7 @@ use Throwable;
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/experimental/serialization/json.md#json-file-serialization
  * @psalm-import-type SUPPORTED_CONTENT_TYPES from ProtobufSerializer
  */
-final class MetricExporter implements MetricExporterInterface, AggregationTemporalitySelectorInterface
+final class MetricExporter implements PushMetricExporterInterface, AggregationTemporalitySelectorInterface
 {
     use LogsMessagesTrait;
 

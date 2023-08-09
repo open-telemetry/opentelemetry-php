@@ -17,6 +17,7 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricCollectorInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
+use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use function spl_object_id;
 
@@ -143,10 +144,13 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         if ($this->closed) {
             return false;
         }
+        if ($this->exporter instanceof PushMetricExporterInterface) {
+            $collect = $this->doCollect();
+            $forceFlush = $this->exporter->forceFlush();
 
-        $collect = $this->doCollect();
-        $forceFlush = $this->exporter->forceFlush();
+            return $collect && $forceFlush;
+        }
 
-        return $collect && $forceFlush;
+        return true;
     }
 }

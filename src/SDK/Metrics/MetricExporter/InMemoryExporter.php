@@ -75,9 +75,4 @@ final class InMemoryExporter implements MetricExporterInterface, AggregationTemp
 
         return true;
     }
-
-    public function forceFlush(): bool
-    {
-        return !$this->closed;
-    }
 }
