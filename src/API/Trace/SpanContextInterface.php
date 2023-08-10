@@ -9,11 +9,6 @@ namespace OpenTelemetry\API\Trace;
  */
 interface SpanContextInterface
 {
-    /** @deprecated */
-    public const TRACE_FLAG_SAMPLED = 0x01;
-    /** @deprecated */
-    public const TRACE_FLAG_DEFAULT = 0x00;
-
     public static function createFromRemoteParent(string $traceId, string $spanId, int $traceFlags = TraceFlags::DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface;
     public static function getInvalid(): SpanContextInterface;
     public static function create(string $traceId, string $spanId, int $traceFlags = TraceFlags::DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface;
