@@ -17,23 +17,6 @@ class ResourceInfoFactory
 {
     use LogsMessagesTrait;
 
-    /**
-     * Merges resources into a new one.
-     *
-     * @deprecated Use `ResourceInfo::merge($resource)`
-     * @phan-suppress PhanDeprecatedFunction
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.20.0/specification/resource/sdk.md#merge
-     */
-    public static function merge(ResourceInfo ...$resources): ResourceInfo
-    {
-        $merged = ResourceInfoFactory::emptyResource();
-        foreach ($resources as $resource) {
-            $merged = $merged->merge($resource);
-        }
-
-        return $merged;
-    }
-
     public static function defaultResource(): ResourceInfo
     {
         $detectors = Configuration::getList(Env::OTEL_PHP_DETECTORS);

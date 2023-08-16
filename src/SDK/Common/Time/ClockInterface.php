@@ -16,9 +16,4 @@ interface ClockInterface
      * Returns the current epoch wall-clock timestamp in nanoseconds
      */
     public function now(): int;
-
-    /**
-     * @deprecated
-     */
-    public function nanoTime(): int;
 }

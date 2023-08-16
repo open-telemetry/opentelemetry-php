@@ -9,24 +9,11 @@ use function microtime;
 
 final class SystemClock implements ClockInterface
 {
-    private static ?self $instance = null;
     private static int $referenceTime = 0;
 
     public function __construct()
     {
         self::init();
-    }
-
-    /**
-     * @deprecated
-     */
-    public static function getInstance(): self
-    {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
     }
 
     public static function create(): self
@@ -38,14 +25,6 @@ final class SystemClock implements ClockInterface
     public function now(): int
     {
         return self::$referenceTime + hrtime(true);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function nanoTime(): int
-    {
-        return $this->now();
     }
 
     private static function init(): void
