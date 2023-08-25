@@ -7,7 +7,8 @@ namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Generator;
 use InvalidArgumentException;
-use OpenTelemetry\API\LoggerHolder;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
@@ -15,7 +16,6 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 
 /**
  * @covers \OpenTelemetry\SDK\Resource\ResourceInfoFactory
@@ -24,20 +24,20 @@ class ResourceInfoFactoryTest extends TestCase
 {
     use EnvironmentVariables;
 
-    /** @var LoggerInterface&MockObject $logger */
-    private LoggerInterface $logger;
+    /** @var LogWriterInterface&MockObject $logWriter */
+    private LogWriterInterface $logWriter;
     private const UNDEFINED = '__undefined';
 
     public function setUp(): void
     {
-        $this->logger = $this->createMock(LoggerInterface::class);
-        LoggerHolder::set($this->logger);
+        $this->logWriter = $this->createMock(LogWriterInterface::class);
+        Logging::setLogWriter($this->logWriter);
     }
 
     public function tearDown(): void
     {
         $this->restoreEnvironmentVariables();
-        LoggerHolder::unset();
+        Logging::reset();
     }
 
     public function test_empty_resource(): void
@@ -189,7 +189,7 @@ class ResourceInfoFactoryTest extends TestCase
 
     public function test_logs_warning_for_unknown_detector(): void
     {
-        $this->logger->expects($this->once())->method('log')->with($this->equalTo('warning'));
+        $this->logWriter->expects($this->once())->method('write')->with($this->equalTo('warning'));
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'does-not-exist');
 
         ResourceInfoFactory::defaultResource();

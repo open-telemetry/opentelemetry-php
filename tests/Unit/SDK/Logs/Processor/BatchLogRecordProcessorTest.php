@@ -8,7 +8,8 @@ use InvalidArgumentException;
 use LogicException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use OpenTelemetry\API\LoggerHolder;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -26,9 +27,8 @@ use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
 use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
-use Psr\Log\LoggerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
-use Psr\Log\NullLogger;
 
 /**
  * @covers \OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor
@@ -36,10 +36,13 @@ use Psr\Log\NullLogger;
 class BatchLogRecordProcessorTest extends MockeryTestCase
 {
     private TestClock $testClock;
+    /** @var LogWriterInterface&MockObject $logWriter */
+    private LogWriterInterface $logWriter;
 
     protected function setUp(): void
     {
-        LoggerHolder::set(new NullLogger());
+        $this->logWriter = $this->createMock(LogWriterInterface::class);
+        Logging::setLogWriter($this->logWriter);
         $this->testClock = new TestClock();
 
         ClockFactory::setDefault($this->testClock);
@@ -48,6 +51,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
     protected function tearDown(): void
     {
         ClockFactory::setDefault(null);
+        Logging::reset();
     }
 
     public function test_export_batch_size_met(): void
@@ -327,22 +331,14 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $exporter->method('forceFlush')->willReturn(true);
         $exporter->method('export')->willThrowException(new LogicException());
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('log')->with(LogLevel::ERROR);
+        $this->logWriter->expects($this->once())->method('write')->with(LogLevel::ERROR);
 
         $processor = new BatchLogRecordProcessor($exporter, $this->testClock);
 
         $record = $this->createMock(ReadWriteLogRecord::class);
         $processor->onEmit($record);
 
-        $previousLogger = LoggerHolder::get();
-        LoggerHolder::set($logger);
-
-        try {
-            $processor->forceFlush();
-        } finally {
-            LoggerHolder::set($previousLogger);
-        }
+        $processor->forceFlush();
     }
 
     public function test_throwing_exporter_flush(): void
@@ -371,22 +367,14 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         });
         $exporter->method('shutdown')->willThrowException(new LogicException());
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('log')->with(LogLevel::ERROR);
+        $this->logWriter->expects($this->once())->method('write')->with(LogLevel::ERROR);
 
         $processor = new BatchLogRecordProcessor($exporter, $this->testClock);
 
         $record = $this->createMock(ReadWriteLogRecord::class);
         $processor->onEmit($record);
 
-        $previousLogger = LoggerHolder::get();
-        LoggerHolder::set($logger);
-
-        try {
-            $processor->forceFlush();
-        } finally {
-            LoggerHolder::set($previousLogger);
-        }
+        $processor->forceFlush();
     }
 
     public function test_throwing_exporter_flush_rethrows_in_original_caller(): void

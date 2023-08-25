@@ -4,23 +4,19 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Example;
 
-require __DIR__ . '/../../../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
-use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
-use Psr\Log\LogLevel;
 
-echo 'Starting SettingUpLogging example' . PHP_EOL;
+echo 'Starting PSR-3 Logging example' . PHP_EOL;
 
-//By default, opentelemetry's internal logging (errors, warnings, etc) will use `trigger_error`.
-//You can instead provide a psr-3 logger to provide greater control of logging output:
-LoggerHolder::set(
-    new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)])
-);
+putenv('OTEL_PHP_LOG_DESTINATION=default'); //or "psr3"
 putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://does-not-exist/endpoint'); //invalid endpoint, export will fail
 putenv('OTEL_EXPORTER_OTLP_PROTOCOL=grpc');
+
+$filename = __DIR__ . '/var/otel.log';
+\OpenTelemetry\API\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler($filename)]));
+
 $factory = new TracerProviderFactory();
 $tracerProvider = $factory->create();
 
@@ -28,3 +24,5 @@ $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
 $span = $tracer->spanBuilder('root-span')->startSpan();
 $span->end();
 $tracerProvider->shutdown();
+
+echo sprintf("Logs written to: %s\n", $filename);

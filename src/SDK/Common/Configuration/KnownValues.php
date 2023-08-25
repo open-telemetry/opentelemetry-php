@@ -172,6 +172,11 @@ interface KnownValues
         self::VALUE_NONE,
     ];
     public const OTEL_PHP_AUTOLOAD_ENABLED = self::VALUES_BOOLEAN;
+    public const VALUE_ERROR_LOG = 'error_log';
+    public const VALUE_STDERR = 'stderr';
+    public const VALUE_STDOUT = 'stdout';
+    public const VALUE_PSR3 = 'psr3';
+    public const VALUE_DEFAULT = 'default';
     public const VALUE_DETECTORS_ENVIRONMENT = 'env';
     public const VALUE_DETECTORS_HOST = 'host';
     public const VALUE_DETECTORS_OS = 'os';
@@ -190,6 +195,14 @@ interface KnownValues
         self::VALUE_DETECTORS_SDK,
         self::VALUE_DETECTORS_SDK_PROVIDED,
         self::VALUE_DETECTORS_COMPOSER,
+        self::VALUE_NONE,
+    ];
+    public const OTEL_PHP_LOG_DESTINATION = [
+        self::VALUE_ERROR_LOG,
+        self::VALUE_STDERR,
+        self::VALUE_STDOUT,
+        self::VALUE_PSR3,
+        self::VALUE_DEFAULT,
         self::VALUE_NONE,
     ];
 }

@@ -9,7 +9,8 @@ use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
-use OpenTelemetry\API\LoggerHolder;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
@@ -38,7 +39,7 @@ use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
-use Psr\Log\LoggerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use function range;
 use function str_repeat;
 
@@ -58,7 +59,8 @@ class SpanTest extends MockeryTestCase
 
     /** @var MockInterface&SpanProcessorInterface */
     private $spanProcessor;
-    private $logger;
+    /** @var LogWriterInterface&MockObject $logWriter */
+    private LogWriterInterface $logWriter;
 
     private IdGeneratorInterface $idGenerator;
     private ResourceInfo $resource;
@@ -98,14 +100,15 @@ class SpanTest extends MockeryTestCase
         );
 
         ClockFactory::setDefault($this->testClock);
-        $this->logger = $this->createMock(LoggerInterface::class);
-        LoggerHolder::set($this->logger);
+        $this->logWriter = $this->createMock(LogWriterInterface::class);
+        Logging::setLogWriter($this->logWriter);
     }
 
     protected function tearDown(): void
     {
         ClockFactory::setDefault(null);
-        LoggerHolder::unset();
+        Logging::reset();
+//        LoggerHolder::unset();
     }
 
     // region API
@@ -496,8 +499,8 @@ class SpanTest extends MockeryTestCase
      */
     public function test_set_attribute_drops_non_homogeneous_array(array $values): void
     {
-        $this->logger->expects($this->once())
-            ->method('log')
+        $this->logWriter->expects($this->once())
+            ->method('write')
             ->with(
                 $this->equalTo('warning'),
                 $this->stringContains('non-homogeneous')

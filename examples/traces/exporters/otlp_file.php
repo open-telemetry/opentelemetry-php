@@ -6,17 +6,12 @@ namespace OpenTelemetry\Example;
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
-use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
-
-LoggerHolder::set(new Logger('otlp-example', [new StreamHandler('php://stderr')]));
 
 $filename = sys_get_temp_dir() . '/traces.jsonl';
 $file = fopen($filename, 'a');

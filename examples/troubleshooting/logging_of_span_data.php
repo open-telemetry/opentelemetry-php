@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Example;
 
-require __DIR__ . '/../../../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 /**
  * If you want to observe or debug the span data, which is sent to an exporter/collector,
@@ -29,7 +29,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 /**
  * Create the log directory
  */
-$logDir = __DIR__ . '/../var/log';
+$logDir = __DIR__ . '/var/log';
 $logFile = $logDir . '/otel.log';
 if (!is_dir($logDir) && !mkdir($logDir, 0744, true) && !is_dir($logDir)) {
     throw new \RuntimeException(sprintf('Directory "%s" was not created', $logDir));

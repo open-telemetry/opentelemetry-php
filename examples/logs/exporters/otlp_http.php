@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Example;
 
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
-use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Logs\EventLogger;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
@@ -16,13 +13,8 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
-use Psr\Log\LogLevel;
 
 require __DIR__ . '/../../../vendor/autoload.php';
-
-LoggerHolder::set(
-    new Logger('otel-php', [new StreamHandler(STDOUT, LogLevel::DEBUG)])
-);
 
 $transport = (new OtlpHttpTransportFactory())->create('http://collector:4318/v1/logs', 'application/json');
 $exporter = new LogsExporter($transport);
