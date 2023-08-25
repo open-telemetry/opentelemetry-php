@@ -15,7 +15,7 @@ putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://does-not-exist/endpoint'); //invalid 
 putenv('OTEL_EXPORTER_OTLP_PROTOCOL=grpc');
 
 $filename = __DIR__ . '/var/otel.log';
-\OpenTelemetry\API\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler($filename)]));
+\OpenTelemetry\API\LoggerHolder::set(new \Monolog\Logger('otel', [new \Monolog\Handler\StreamHandler($filename)]));
 
 $factory = new TracerProviderFactory();
 $tracerProvider = $factory->create();

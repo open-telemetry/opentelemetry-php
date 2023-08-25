@@ -8,8 +8,11 @@ use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\ErrorLogWriter;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\NoopLogWriter;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\Psr3LogWriter;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\StreamLogWriter;
+use OpenTelemetry\API\LoggerHolder;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 /**
  * @covers \OpenTelemetry\API\Behavior\Internal\Logging
@@ -22,6 +25,7 @@ class LoggingTest extends TestCase
     {
         self::restoreEnvironmentVariables();
         Logging::reset();
+        LoggerHolder::unset();
     }
 
     /**
@@ -41,7 +45,14 @@ class LoggingTest extends TestCase
             ['stdout', StreamLogWriter::class],
             ['stderr', StreamLogWriter::class],
             ['none', NoopLogWriter::class],
+            ['default', ErrorLogWriter::class],
             ['', ErrorLogWriter::class],
         ];
+    }
+
+    public function test_psr3_log_destination(): void
+    {
+        LoggerHolder::set($this->createMock(LoggerInterface::class));
+        $this->assertInstanceOf(Psr3LogWriter::class, Logging::logWriter());
     }
 }
