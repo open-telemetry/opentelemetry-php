@@ -12,13 +12,12 @@ use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 echo 'Starting Logging example' . PHP_EOL;
 
 /**
- * How to configure error output from OpenTelemetry.
- * Errors and warnings from the SDK itself (for example misconfiguration, exporter errors) will be logged through
- * the chosen mechanism.
+ * By default errors and warnings from the SDK itself (for example misconfiguration, exporter errors) will be sent to PHP's error_log.
+ * You can change that by setting OTEL_PHP_LOG_DESTINATION.
  * Valid values for OTEL_PHP_LOG_DESTINATION: error_log, stdout, stderr, none, psr3, default
  * (default = psr-3 if LoggerHolder::set called, otherwise error_log
  *
- * Note that PSR-3 logging will only work if a value PSR-3 logger is configured by OpenTelemetry\API\LoggerHolder::set()
+ * Note that PSR-3 logging will only work if a PSR-3 logger is registered in OpenTelemetry\API\LoggerHolder::set()
  * If no PSR-3 logger is available, it will fall back to using error_log.
  */
 

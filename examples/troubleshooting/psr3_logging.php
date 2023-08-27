@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 
 echo 'Starting PSR-3 Logging example' . PHP_EOL;
 
-putenv('OTEL_PHP_LOG_DESTINATION=default'); //or "psr3"
+putenv('OTEL_PHP_LOG_DESTINATION=psr3'); //or, do not set this at all.
 putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://does-not-exist/endpoint'); //invalid endpoint, export will fail
 putenv('OTEL_EXPORTER_OTLP_PROTOCOL=grpc');
 
