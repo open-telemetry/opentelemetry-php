@@ -18,7 +18,7 @@ class LogWriterFactory
 
     public function create(): LogWriterInterface
     {
-        $dest = Globals::configurationResolver()->getString(self::OTEL_PHP_LOG_DESTINATION);
+        $dest = Globals::configurationResolver()->getEnum(self::OTEL_PHP_LOG_DESTINATION);
         //we might not have an SDK, so attempt to get from environment
         if (!$dest) {
             $dest = array_key_exists(self::OTEL_PHP_LOG_DESTINATION, $_SERVER)

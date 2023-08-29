@@ -30,4 +30,9 @@ class NoopConfigurationResolver implements ConfigurationResolverInterface
     {
         return [];
     }
+
+    public function getEnum(string $name): ?string
+    {
+        return null;
+    }
 }
