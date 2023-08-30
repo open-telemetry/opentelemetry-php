@@ -6,12 +6,10 @@ namespace OpenTelemetry\Tests\Unit\API\Behavior;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
-use OpenTelemetry\API\LoggerHolder;
-use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
@@ -21,54 +19,42 @@ class LogsMessagesTraitTest extends TestCase
 {
     use EnvironmentVariables;
 
-    // @var LoggerInterface|MockObject $logger
-    protected MockObject $logger;
+    protected MockObject $writer;
 
     public function setUp(): void
     {
-        $this->logger = $this->createMock(LoggerInterface::class);
-        LoggerHolder::set($this->logger);
+        $this->writer = $this->createMock(LogWriterInterface::class);
+        Logging::setLogWriter($this->writer);
     }
 
     public function tearDown(): void
     {
-        LoggerHolder::unset();
+        Logging::reset();
         $this->restoreEnvironmentVariables();
     }
 
-    public function test_defaults_to_trigger_error_with_warning(): void
+    /**
+     * @dataProvider logProvider
+     */
+    public function test_log(string $method, string $expectedLevel): void
     {
-        $message = 'something went wrong';
-        LoggerHolder::unset();
-        $this->assertFalse(LoggerHolder::isSet());
         $instance = $this->createInstance();
 
-        $this->expectException(PHPUnitFrameworkException::class);
-        $this->expectExceptionMessageMatches('/LogsMessagesTraitTest->test_defaults_to_trigger_error_with_warning()/');
-        $instance->run('logWarning', 'foo', ['exception' => new \Exception($message)]);
+        $this->writer->expects($this->once())->method('write')->with(
+            $this->equalTo($expectedLevel),
+            $this->stringContains('foo'),
+            $this->anything()
+        );
+
+        $instance->run($method, 'foo', ['exception' => new \Exception('bang')]);
     }
 
-    public function test_defaults_to_trigger_error_with_error(): void
+    public static function logProvider(): array
     {
-        $message = 'something went wrong';
-        LoggerHolder::unset();
-        $this->assertFalse(LoggerHolder::isSet());
-        $instance = $this->createInstance();
-
-        $this->expectException(PHPUnitFrameworkException::class);
-        $this->expectExceptionMessageMatches(sprintf('/%s/', $message));
-        $instance->run('logError', 'foo', ['exception' => new \Exception($message)]);
-    }
-
-    public function test_error_log_without_exception_contains_code_location(): void
-    {
-        LoggerHolder::unset();
-        $this->assertFalse(LoggerHolder::isSet());
-        $instance = $this->createInstance();
-
-        $this->expectException(PHPUnitFrameworkException::class);
-        $this->expectExceptionMessageMatches(sprintf('/%s\(/', addcslashes(__FILE__, '/')));
-        $instance->run('logWarning', 'no exception here');
+        return [
+            ['logWarning', 'warning'],
+            ['logError', 'error'],
+        ];
     }
 
     /**
@@ -78,7 +64,7 @@ class LogsMessagesTraitTest extends TestCase
     public function test_log_methods(string $method, string $expectedLogLevel): void
     {
         $instance = $this->createInstance();
-        $this->logger->expects($this->once())->method('log')->with(
+        $this->writer->expects($this->once())->method('write')->with(
             $this->equalTo($expectedLogLevel),
             $this->equalTo('foo'),
         );
@@ -99,15 +85,14 @@ class LogsMessagesTraitTest extends TestCase
     /**
      * @dataProvider otelLogLevelProvider
      */
-    public function test_error_log_with_configured_otel_log_level(string $otelLogLevel, string $method, bool $expected): void
+    public function test_logging_respects_configured_otel_log_level(string $otelLogLevel, string $method, bool $expected): void
     {
-        LoggerHolder::unset();
         $this->setEnvironmentVariable('OTEL_LOG_LEVEL', $otelLogLevel);
         $instance = $this->createInstance();
         if ($expected === true) {
-            $this->expectException(PHPUnitFrameworkException::class);
+            $this->writer->expects($this->once())->method('write');
         } else {
-            $this->assertTrue(true, 'dummy assertion');
+            $this->writer->expects($this->never())->method('write');
         }
         $instance->run($method, 'test message');
     }
@@ -124,8 +109,6 @@ class LogsMessagesTraitTest extends TestCase
 
     private function createInstance(): object
     {
-        Logging::reset();
-
         return new class() {
             use LogsMessagesTrait;
             //accessor for protected trait methods

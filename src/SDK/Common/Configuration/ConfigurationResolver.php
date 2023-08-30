@@ -32,4 +32,9 @@ class ConfigurationResolver implements ConfigurationResolverInterface
     {
         return Configuration::getList($name);
     }
+
+    public function getEnum(string $name): ?string
+    {
+        return Configuration::getEnum($name);
+    }
 }

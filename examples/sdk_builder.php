@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
-use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
@@ -24,8 +21,6 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 require __DIR__ . '/../vendor/autoload.php';
 
 echo 'Starting SDK builder example' . PHP_EOL;
-
-LoggerHolder::set(new Logger('grpc', [new StreamHandler('php://stderr')]));
 
 $resource = ResourceInfoFactory::defaultResource();
 $spanExporter = new InMemoryExporter();

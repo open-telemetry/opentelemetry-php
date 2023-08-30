@@ -8,8 +8,6 @@ use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
-\OpenTelemetry\API\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
-
 /**
  * Create an otlp+grpc tracer provider from TracerProviderFactory, using environment variables as input
  */

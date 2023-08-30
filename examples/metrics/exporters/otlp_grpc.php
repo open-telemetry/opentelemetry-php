@@ -13,8 +13,6 @@ use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 
-\OpenTelemetry\API\LoggerHolder::set(new \Monolog\Logger('grpc', [new \Monolog\Handler\StreamHandler('php://stderr')]));
-
 $clock = ClockFactory::getDefault();
 
 $reader = new ExportingReader(

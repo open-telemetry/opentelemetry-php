@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Behavior;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
-use OpenTelemetry\API\LoggerHolder;
 use Psr\Log\LogLevel;
 
 trait LogsMessagesTrait
@@ -17,33 +16,10 @@ trait LogsMessagesTrait
 
     private static function doLog(string $level, string $message, array $context): void
     {
-        $logger = LoggerHolder::get();
-        if ($logger !== null) {
+        $writer = Logging::logWriter();
+        if (self::shouldLog($level)) {
             $context['source'] = get_called_class();
-            $logger->log($level, $message, $context);
-        } elseif (self::shouldLog($level)) {
-            $exception = (array_key_exists('exception', $context) && $context['exception'] instanceof \Throwable)
-            ? $context['exception']
-            : null;
-            if ($exception) {
-                $message = sprintf(
-                    '%s: %s%s%s',
-                    $message,
-                    $exception->getMessage(),
-                    PHP_EOL,
-                    $exception->getTraceAsString()
-                );
-            } else {
-                //get calling location, skipping over trait
-                $caller = debug_backtrace()[1];
-                $message = sprintf(
-                    '%s(%s): %s',
-                    $caller['file'],
-                    $caller['line'],
-                    $message,
-                );
-            }
-            trigger_error($message, Logging::map($level));
+            $writer->write($level, $message, $context);
         }
     }
 
