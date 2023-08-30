@@ -116,7 +116,7 @@ class ScopeTest extends TestCase
         $scope['key'] = 'value';
         $scope = $storage->scope();
         $this->assertNotNull($scope);
-        $this->assertArrayHasKey('key', $scope);
+        $this->assertArrayHasKey('key', $scope); /** @phpstan-ignore-line */
         $this->assertSame('value', $scope['key']);
 
         unset($scope['key']);
