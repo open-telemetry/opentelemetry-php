@@ -21,16 +21,6 @@ class MeterProviderBuilder
     private ?ResourceInfo $resource = null;
     private ?ExemplarFilterInterface $exemplarFilter = null;
 
-    /**
-     * @deprecated
-     */
-    public function registerMetricReader(MetricReaderInterface $reader): self
-    {
-        $this->metricReaders[] = $reader;
-
-        return $this;
-    }
-
     public function setResource(ResourceInfo $resource): self
     {
         $this->resource = $resource;

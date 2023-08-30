@@ -113,6 +113,7 @@ interface Defaults
     public const OTEL_PHP_TRACES_PROCESSOR = 'batch';
     public const OTEL_PHP_DETECTORS = 'all';
     public const OTEL_PHP_AUTOLOAD_ENABLED = 'false';
+    public const OTEL_PHP_INTERNAL_METRICS_ENABLED = 'false';
     public const OTEL_PHP_DISABLED_INSTRUMENTATIONS = [];
     public const OTEL_PHP_LOGS_PROCESSOR = 'batch';
     public const OTEL_PHP_LOG_DESTINATION = 'default';

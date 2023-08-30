@@ -40,16 +40,17 @@ class SdkAutoloader
                 //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration
                 return $configurator->withPropagator($propagator);
             }
+            $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED);
 
             $exporter = (new ExporterFactory())->create();
             $meterProvider = (new MeterProviderFactory())->create();
-            $spanProcessor = (new SpanProcessorFactory())->create($exporter, $meterProvider);
+            $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
             $tracerProvider = (new TracerProviderBuilder())
                 ->addSpanProcessor($spanProcessor)
                 ->setSampler((new SamplerFactory())->create())
                 ->build();
 
-            $loggerProvider = (new LoggerProviderFactory())->create($meterProvider);
+            $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null);
 
             ShutdownHandler::register([$tracerProvider, 'shutdown']);
             ShutdownHandler::register([$meterProvider, 'shutdown']);

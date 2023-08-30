@@ -128,5 +128,6 @@ interface ValueTypes
     public const OTEL_PHP_DETECTORS = VariableTypes::LIST;
     public const OTEL_PHP_AUTOLOAD_ENABLED = VariableTypes::BOOL;
     public const OTEL_PHP_LOG_DESTINATION = VariableTypes::ENUM;
+    public const OTEL_PHP_INTERNAL_METRICS_ENABLED = VariableTypes::BOOL;
     public const OTEL_PHP_DISABLED_INSTRUMENTATIONS = VariableTypes::LIST;
 }
