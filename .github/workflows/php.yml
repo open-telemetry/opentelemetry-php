@@ -50,6 +50,8 @@ jobs:
 
     - name: Check Style
       continue-on-error: ${{ matrix.experimental }}
+      env:
+        PHP_CS_FIXER_IGNORE_ENV: 1
       run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
 
     - name: Check Dependencies
@@ -57,6 +59,7 @@ jobs:
 
     - name: Run Phan
       env:
+        XDEBUG_MODE: off
         PHAN_DISABLE_XDEBUG_WARN: 1
       run: vendor/bin/phan
 
