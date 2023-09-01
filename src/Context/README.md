@@ -55,4 +55,9 @@ function bindContext(Closure $closure): Closure {
 }
 ```
 
+## Contributing
+
+This repository is a read-only git subtree split.
+To contribute, please see the main [OpenTelemetry PHP monorepo](https://github.com/open-telemetry/opentelemetry-php).
+
 [1]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/README.md#context

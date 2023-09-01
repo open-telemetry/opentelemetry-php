@@ -24,4 +24,9 @@ B3Propagator::getB3MultiHeaderInstance()
 ```
 
 Both of the above have `extract` and `inject` methods available to extract and inject respectively into the
-header.  
+header.
+
+## Contributing
+
+This repository is a read-only git subtree split.
+To contribute, please see the main [OpenTelemetry PHP monorepo](https://github.com/open-telemetry/opentelemetry-php).

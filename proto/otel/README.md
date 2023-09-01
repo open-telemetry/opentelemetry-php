@@ -10,7 +10,7 @@
 
 OTLP exporting requires a [protobuf runtime library](https://github.com/protocolbuffers/protobuf/tree/main/php).
 
-There exist two protobuf runtime libraries that offer the same set of APIs, allowing developers to choose the one that 
+There exist two protobuf runtime libraries that offer the same set of APIs, allowing developers to choose the one that
 best suits their needs.
 
 This package requires `google/protobuf`, which is the native implementation. It is easy to install and a good way to get
@@ -24,3 +24,8 @@ pecl install protobuf
 ```
 
 The extension can be installed alongside the native library, and it will be used instead if available.
+
+## Contributing
+
+This repository is a read-only git subtree split.
+To contribute, please see the main [OpenTelemetry PHP monorepo](https://github.com/open-telemetry/opentelemetry-php).

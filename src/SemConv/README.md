@@ -15,3 +15,8 @@ See https://opentelemetry.io/docs/concepts/semantic-conventions/.
 ```shell
 composer require open-telemetry/sem-conv
 ```
+
+## Contributing
+
+This repository is a read-only git subtree split.
+To contribute, please see the main [OpenTelemetry PHP monorepo](https://github.com/open-telemetry/opentelemetry-php).

@@ -38,3 +38,8 @@ makes exporting _significantly_ more performant. This can be easily installed wi
 ```shell
 pecl install protobuf
 ```
+
+## Contributing
+
+This repository is a read-only git subtree split.
+To contribute, please see the main [OpenTelemetry PHP monorepo](https://github.com/open-telemetry/opentelemetry-php).

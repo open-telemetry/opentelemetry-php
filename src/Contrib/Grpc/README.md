@@ -24,3 +24,8 @@ See https://github.com/open-telemetry/opentelemetry-php/blob/main/examples/trace
 $transport = (new \OpenTelemetry\Contrib\Grpc\GrpcTransportFactory())->create('http://collector:4317');
 $exporter = new \OpenTelemetry\Contrib\Otlp\SpanExporter($transport);
 ```
+
+## Contributing
+
+This repository is a read-only git subtree split.
+To contribute, please see the main [OpenTelemetry PHP monorepo](https://github.com/open-telemetry/opentelemetry-php).
