@@ -104,6 +104,24 @@ final class PsrUtils
         return $value;
     }
 
+    /**
+     * Resolve an array or CSV of compression types to a list
+     */
+    public static function compression($compression): array
+    {
+        if (is_array($compression)) {
+            return $compression;
+        }
+        if (!$compression) {
+            return [];
+        }
+        if (strpos($compression, ',') === false) {
+            return [$compression];
+        }
+
+        return array_map('trim', explode(',', $compression));
+    }
+
     private static function encoder(string $encoding): ?callable
     {
         static $encoders;

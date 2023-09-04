@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 class OtlpHttpTransportFactory implements TransportFactoryInterface
 {
     private const DEFAULT_COMPRESSION = 'none';
+
     public function create(
         string $endpoint,
         string $contentType,

@@ -71,11 +71,6 @@ final class DependencyResolver implements DependencyResolverInterface
         return $this->messageFactoryResolver->resolveUriFactory();
     }
 
-    public function resolveHttpClient(): ClientInterface
-    {
-        return $this->psrClientResolver->resolvePsrClient();
-    }
-
     public function resolveHttpPlugAsyncClient(): HttpAsyncClient
     {
         return $this->httpPlugClientResolver->resolveHttpPlugAsyncClient();
