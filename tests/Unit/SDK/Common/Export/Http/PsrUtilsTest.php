@@ -91,4 +91,23 @@ final class PsrUtilsTest extends TestCase
 
         PsrUtils::decode('', ['invalid']);
     }
+
+    /**
+     * @dataProvider compressionProvider
+     */
+    public function test_resolve_compression($input, $expected): void
+    {
+        $this->assertSame($expected, PsrUtils::compression($input));
+    }
+
+    public static function compressionProvider(): array
+    {
+        return [
+            ['gzip', ['gzip']],
+            ['', []],
+            ['gzip,br', ['gzip','br']],
+            ['gzip , brotli', ['gzip','brotli']],
+            [['gzip'], ['gzip']],
+        ];
+    }
 }

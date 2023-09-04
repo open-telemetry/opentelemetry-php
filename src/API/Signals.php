@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API;
 
-use InvalidArgumentException;
-
-class Signals
+interface Signals
 {
     /** @var string  */
     public const TRACE = 'trace';
@@ -20,11 +18,4 @@ class Signals
         self::METRICS,
         self::LOGS,
     ];
-
-    public static function validate(string $signal): void
-    {
-        if (!in_array($signal, self::SIGNALS)) {
-            throw new InvalidArgumentException('Unknown signal: ' . $signal);
-        }
-    }
 }

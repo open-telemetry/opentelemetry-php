@@ -34,6 +34,7 @@ $childSpan2 = $tracer->spanBuilder('bar')->startSpan();
 $childSpan2->end();
 $childSpan1->end();
 $rootSpan->end();
+$rootScope->detach();
 
 /** @var SpanDataInterface $span */
 foreach ($storage as $span) {

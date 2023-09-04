@@ -57,7 +57,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
             $endpoint,
             $contentType,
             $headers,
-            (array) $compression,
+            PsrUtils::compression($compression),
             $retryDelay,
             $maxRetries,
         );
