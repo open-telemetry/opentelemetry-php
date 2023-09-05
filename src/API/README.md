@@ -7,3 +7,8 @@
 # OpenTelemetry API
 
 Documentation: https://opentelemetry.io/docs/instrumentation/php
+
+## Contributing
+
+This repository is a read-only git subtree split.
+To contribute, please see the main [OpenTelemetry PHP monorepo](https://github.com/open-telemetry/opentelemetry-php).

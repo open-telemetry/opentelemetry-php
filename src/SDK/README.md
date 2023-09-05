@@ -42,3 +42,8 @@ $meter = \OpenTelemetry\API\Globals::meterProvider()->getMeter('example');
 If autoloading was not successful (or partially successful), no-op implementations of the above may be returned.
 
 See https://github.com/open-telemetry/opentelemetry-php/blob/main/examples/autoload_sdk.php for a more detailed example.
+
+## Contributing
+
+This repository is a read-only git subtree split.
+To contribute, please see the main [OpenTelemetry PHP monorepo](https://github.com/open-telemetry/opentelemetry-php).
