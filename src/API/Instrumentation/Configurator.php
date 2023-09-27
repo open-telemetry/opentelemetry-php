@@ -28,7 +28,6 @@ final class Configurator implements ImplicitContextKeyedInterface
     private ?MeterProviderInterface $meterProvider = null;
     private ?TextMapPropagatorInterface $propagator = null;
     private ?LoggerProviderInterface $loggerProvider = null;
-    private ?ConfigurationResolverInterface $configurationResolver = null;
 
     private function __construct()
     {
@@ -52,7 +51,6 @@ final class Configurator implements ImplicitContextKeyedInterface
             ->withMeterProvider(new NoopMeterProvider())
             ->withPropagator(new NoopTextMapPropagator())
             ->withLoggerProvider(new NoopLoggerProvider())
-            ->withConfigurationResolver(new NoopConfigurationResolver())
         ;
     }
 
@@ -76,9 +74,6 @@ final class Configurator implements ImplicitContextKeyedInterface
         }
         if ($this->loggerProvider !== null) {
             $context = $context->with(ContextKeys::loggerProvider(), $this->loggerProvider);
-        }
-        if ($this->configurationResolver !== null) {
-            $context = $context->with(ContextKeys::configurationResolver(), $this->configurationResolver);
         }
 
         return $context;
@@ -112,14 +107,6 @@ final class Configurator implements ImplicitContextKeyedInterface
     {
         $self = clone $this;
         $self->loggerProvider = $loggerProvider;
-
-        return $self;
-    }
-
-    public function withConfigurationResolver(?ConfigurationResolverInterface $configurationResolver): Configurator
-    {
-        $self = clone $this;
-        $self->configurationResolver = $configurationResolver;
 
         return $self;
     }

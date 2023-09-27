@@ -7,7 +7,6 @@ namespace OpenTelemetry\API;
 use function assert;
 use Closure;
 use const E_USER_WARNING;
-use OpenTelemetry\API\Instrumentation\ConfigurationResolverInterface;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Instrumentation\ContextKeys;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
@@ -32,20 +31,17 @@ final class Globals
     private MeterProviderInterface $meterProvider;
     private TextMapPropagatorInterface $propagator;
     private LoggerProviderInterface $loggerProvider;
-    private ConfigurationResolverInterface $configurationResolver;
 
     public function __construct(
         TracerProviderInterface $tracerProvider,
         MeterProviderInterface $meterProvider,
         LoggerProviderInterface $loggerProvider,
-        TextMapPropagatorInterface $propagator,
-        ConfigurationResolverInterface $configurationResolver
+        TextMapPropagatorInterface $propagator
     ) {
         $this->tracerProvider = $tracerProvider;
         $this->meterProvider = $meterProvider;
         $this->loggerProvider = $loggerProvider;
         $this->propagator = $propagator;
-        $this->configurationResolver = $configurationResolver;
     }
 
     public static function tracerProvider(): TracerProviderInterface
@@ -66,11 +62,6 @@ final class Globals
     public static function loggerProvider(): LoggerProviderInterface
     {
         return Context::getCurrent()->get(ContextKeys::loggerProvider()) ?? self::globals()->loggerProvider;
-    }
-
-    public static function configurationResolver(): ConfigurationResolverInterface
-    {
-        return Context::getCurrent()->get(ContextKeys::configurationResolver()) ?? self::globals()->configurationResolver;
     }
 
     /**
@@ -113,11 +104,10 @@ final class Globals
         $meterProvider = $context->get(ContextKeys::meterProvider());
         $propagator = $context->get(ContextKeys::propagator());
         $loggerProvider = $context->get(ContextKeys::loggerProvider());
-        $configurationResolver = $context->get(ContextKeys::configurationResolver());
 
-        assert(isset($tracerProvider, $meterProvider, $loggerProvider, $propagator, $configurationResolver));
+        assert(isset($tracerProvider, $meterProvider, $loggerProvider, $propagator));
 
-        return self::$globals = new self($tracerProvider, $meterProvider, $loggerProvider, $propagator, $configurationResolver);
+        return self::$globals = new self($tracerProvider, $meterProvider, $loggerProvider, $propagator);
     }
 
     /**

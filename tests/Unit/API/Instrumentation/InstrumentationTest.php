@@ -6,9 +6,7 @@ namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
-use OpenTelemetry\API\Instrumentation\ConfigurationResolverInterface;
 use OpenTelemetry\API\Instrumentation\Configurator;
-use OpenTelemetry\API\Instrumentation\NoopConfigurationResolver;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
@@ -43,7 +41,6 @@ final class InstrumentationTest extends TestCase
         $this->assertInstanceOf(NoopMeterProvider::class, Globals::meterProvider());
         $this->assertInstanceOf(NoopTextMapPropagator::class, Globals::propagator());
         $this->assertInstanceOf(NoopLoggerProvider::class, Globals::loggerProvider());
-        $this->assertInstanceOf(NoopConfigurationResolver::class, Globals::configurationResolver());
     }
 
     public function test_globals_returns_configured_instances(): void
@@ -52,14 +49,12 @@ final class InstrumentationTest extends TestCase
         $meterProvider = $this->createMock(MeterProviderInterface::class);
         $propagator = $this->createMock(TextMapPropagatorInterface::class);
         $loggerProvider = $this->createMock(LoggerProviderInterface::class);
-        $configurationResolver = $this->createMock(ConfigurationResolverInterface::class);
 
         $scope = Configurator::create()
             ->withTracerProvider($tracerProvider)
             ->withMeterProvider($meterProvider)
             ->withPropagator($propagator)
             ->withLoggerProvider($loggerProvider)
-            ->withConfigurationResolver($configurationResolver)
             ->activate();
 
         try {
@@ -67,7 +62,6 @@ final class InstrumentationTest extends TestCase
             $this->assertSame($meterProvider, Globals::meterProvider());
             $this->assertSame($propagator, Globals::propagator());
             $this->assertSame($loggerProvider, Globals::loggerProvider());
-            $this->assertSame($configurationResolver, Globals::configurationResolver());
         } finally {
             $scope->detach();
         }

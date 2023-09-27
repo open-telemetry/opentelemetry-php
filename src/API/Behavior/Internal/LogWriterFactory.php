@@ -9,7 +9,7 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\NoopLogWriter;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\Psr3LogWriter;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\StreamLogWriter;
-use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Instrumentation\ConfigurationResolver;
 use OpenTelemetry\API\LoggerHolder;
 
 class LogWriterFactory
@@ -18,16 +18,7 @@ class LogWriterFactory
 
     public function create(): LogWriterInterface
     {
-        $dest = Globals::configurationResolver()->getEnum(self::OTEL_PHP_LOG_DESTINATION);
-        //we might not have an SDK, so attempt to get from environment
-        if (!$dest) {
-            $dest = array_key_exists(self::OTEL_PHP_LOG_DESTINATION, $_SERVER)
-                ? $_SERVER[self::OTEL_PHP_LOG_DESTINATION]
-                : getenv(self::OTEL_PHP_LOG_DESTINATION);
-        }
-        if (!$dest) {
-            $dest = ini_get(self::OTEL_PHP_LOG_DESTINATION);
-        }
+        $dest = (new ConfigurationResolver())->getString(self::OTEL_PHP_LOG_DESTINATION);
         $logger = LoggerHolder::get();
 
         switch ($dest) {
