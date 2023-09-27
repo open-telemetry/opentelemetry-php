@@ -6,7 +6,6 @@ namespace OpenTelemetry\Tests\Unit\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Globals;
-use OpenTelemetry\API\Instrumentation\NoopConfigurationResolver;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
@@ -42,7 +41,6 @@ class SdkAutoloaderTest extends TestCase
         $this->assertInstanceOf(NoopMeterProvider::class, Globals::meterProvider());
         $this->assertInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
         $this->assertInstanceOf(NoopLoggerProvider::class, Globals::loggerProvider());
-        $this->assertInstanceOf(NoopConfigurationResolver::class, Globals::configurationResolver());
         $this->assertInstanceOf(NoopTextMapPropagator::class, Globals::propagator(), 'propagator not initialized by disabled autoloader');
     }
 
@@ -60,7 +58,6 @@ class SdkAutoloaderTest extends TestCase
         $this->assertNotInstanceOf(NoopTextMapPropagator::class, Globals::propagator());
         $this->assertInstanceOf(NoopMeterProvider::class, Globals::meterProvider());
         $this->assertInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
-        $this->assertInstanceOf(NoopConfigurationResolver::class, Globals::configurationResolver());
     }
 
     public function test_enabled_by_configuration(): void
@@ -71,6 +68,5 @@ class SdkAutoloaderTest extends TestCase
         $this->assertNotInstanceOf(NoopMeterProvider::class, Globals::meterProvider());
         $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
         $this->assertNotInstanceOf(NoopLoggerProvider::class, Globals::loggerProvider());
-        $this->assertNotInstanceOf(NoopConfigurationResolver::class, Globals::configurationResolver());
     }
 }

@@ -11,5 +11,4 @@ interface ConfigurationResolverInterface
     public function getBoolean(string $name): ?bool;
     public function getInt(string $name): ?int;
     public function getList(string $name): array;
-    public function getEnum(string $name): ?string;
 }
