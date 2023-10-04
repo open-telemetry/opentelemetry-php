@@ -20,6 +20,7 @@ jobs:
           - php-version: 8.3
             experimental: true
             composer_args: "--ignore-platform-reqs"
+            dummy: true
 
     steps:
     - uses: actions/checkout@v3
