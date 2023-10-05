@@ -22,7 +22,7 @@ final class Environment implements ResourceDetectorInterface
             ? self::decode(Configuration::getMap(Variables::OTEL_RESOURCE_ATTRIBUTES, []))
             : [];
 
-        //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration
+        //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
         $serviceName = Configuration::has(Variables::OTEL_SERVICE_NAME)
             ? Configuration::getString(Variables::OTEL_SERVICE_NAME)
             : null;
