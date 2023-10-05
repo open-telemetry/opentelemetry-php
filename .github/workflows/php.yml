@@ -13,11 +13,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.4', '8.0', '8.1']
+        php-version: ['7.4', '8.0', '8.1', '8.2']
         experimental: [false]
+        composer_args: [""]
         include:
-          - php-version: 8.2
+          - php-version: 8.3
             experimental: true
+            composer_args: "--ignore-platform-reqs"
+            dummy: true
 
     steps:
     - uses: actions/checkout@v3
@@ -44,10 +47,12 @@ jobs:
 
     - name: Install dependencies
       if: steps.composer-cache.outputs.cache-hit != 'true'
-      run: composer install --prefer-dist --no-progress --no-suggest
+      run: composer install --prefer-dist --no-progress --no-suggest ${{ matrix.composer_args }}
 
     - name: Check Style
       continue-on-error: ${{ matrix.experimental }}
+      env:
+        PHP_CS_FIXER_IGNORE_ENV: 1
       run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
 
     - name: Check Dependencies
@@ -55,11 +60,12 @@ jobs:
 
     - name: Run Phan
       env:
+        XDEBUG_MODE: off
         PHAN_DISABLE_XDEBUG_WARN: 1
       run: vendor/bin/phan
 
     - name: Run Psalm
-      run: vendor/bin/psalm --output-format=github --php-version=${{ matrix.php-version }}
+      run: vendor/bin/psalm --output-format=github
 
     - name: Run Phpstan
       run: vendor/bin/phpstan analyse --error-format=github
