@@ -36,7 +36,7 @@ class SdkAutoloader
         Globals::registerInitializer(function (Configurator $configurator) {
             $propagator = (new PropagatorFactory())->create();
             if (Sdk::isDisabled()) {
-                //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration
+                //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
                 return $configurator->withPropagator($propagator);
             }
             $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED);

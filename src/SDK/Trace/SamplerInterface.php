@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 /**
  * This interface is used to organize sampling logic.
  *
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sdk-tracing.md#sampler
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#sampler
  */
 interface SamplerInterface
 {

@@ -38,7 +38,7 @@ class LogRecordLimitsBuilder
     }
 
     /**
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#attribute-limits
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#attribute-limits
      */
     public function build(): LogRecordLimits
     {
