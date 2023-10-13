@@ -6,13 +6,13 @@ namespace OpenTelemetry\SDK\Common\Configuration;
 
 /**
  * Environment variables defined by the OpenTelemetry specification and language specific variables for the PHP SDK.
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md
  */
 interface Variables
 {
     /**
      * General SDK Configuration
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.24.0/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
      */
     public const OTEL_RESOURCE_ATTRIBUTES = 'OTEL_RESOURCE_ATTRIBUTES';
     public const OTEL_SERVICE_NAME = 'OTEL_SERVICE_NAME';
@@ -23,7 +23,7 @@ interface Variables
     public const OTEL_SDK_DISABLED = 'OTEL_SDK_DISABLED';
     /**
      * Batch Span Processor
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.24.0/specification/configuration/sdk-environment-variables.md#batch-span-processor
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#batch-span-processor
      */
     public const OTEL_BSP_SCHEDULE_DELAY = 'OTEL_BSP_SCHEDULE_DELAY';
     public const OTEL_BSP_EXPORT_TIMEOUT = 'OTEL_BSP_EXPORT_TIMEOUT';
@@ -31,7 +31,7 @@ interface Variables
     public const OTEL_BSP_MAX_EXPORT_BATCH_SIZE = 'OTEL_BSP_MAX_EXPORT_BATCH_SIZE';
     /**
      * Batch LogRecord Processor
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.24.0/specification/configuration/sdk-environment-variables.md#batch-logrecord-processor
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#batch-logrecord-processor
      */
     public const OTEL_BLRP_SCHEDULE_DELAY = 'OTEL_BLRP_SCHEDULE_DELAY';
     public const OTEL_BLRP_EXPORT_TIMEOUT = 'OTEL_BLRP_EXPORT_TIMEOUT';
@@ -39,19 +39,19 @@ interface Variables
     public const OTEL_BLRP_MAX_EXPORT_BATCH_SIZE = 'OTEL_BLRP_MAX_EXPORT_BATCH_SIZE';
     /**
      * Attribute Limits
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.24.0/specification/configuration/sdk-environment-variables.md#attribute-limits
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#attribute-limits
      */
     public const OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT';
     public const OTEL_ATTRIBUTE_COUNT_LIMIT = 'OTEL_ATTRIBUTE_COUNT_LIMIT';
     /**
      * LogRecord limits
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.24.0/specification/configuration/sdk-environment-variables.md#logrecord-limits
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#logrecord-limits
      */
     public const OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT';
     public const OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = 'OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT';
     /**
      * Span Limits
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.24.0/specification/configuration/sdk-environment-variables.md#span-limits
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#span-limits
      */
     public const OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT';
     public const OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT = 'OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT';
@@ -61,7 +61,7 @@ interface Variables
     public const OTEL_LINK_ATTRIBUTE_COUNT_LIMIT = 'OTEL_LINK_ATTRIBUTE_COUNT_LIMIT';
     /**
      * OTLP Exporter
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.24.0/specification/protocol/exporter.md#configuration-options
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
      */
     // Endpoint
     public const OTEL_EXPORTER_OTLP_ENDPOINT = 'OTEL_EXPORTER_OTLP_ENDPOINT';
@@ -100,28 +100,28 @@ interface Variables
     public const OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'OTEL_EXPORTER_OTLP_LOGS_PROTOCOL';
     /**
      * Zipkin Exporter
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.24.0/specification/configuration/sdk-environment-variables.md#zipkin-exporter
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#zipkin-exporter
      */
     public const OTEL_EXPORTER_ZIPKIN_ENDPOINT = 'OTEL_EXPORTER_ZIPKIN_ENDPOINT';
     public const OTEL_EXPORTER_ZIPKIN_TIMEOUT = 'OTEL_EXPORTER_ZIPKIN_TIMEOUT';
     public const OTEL_EXPORTER_ZIPKIN_PROTOCOL = 'OTEL_EXPORTER_ZIPKIN_PROTOCOL';
     /**
      * Prometheus Exporter
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.24.0/specification/configuration/sdk-environment-variables.md#prometheus-exporter
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#prometheus-exporter
      */
     public const OTEL_EXPORTER_PROMETHEUS_HOST = 'OTEL_EXPORTER_PROMETHEUS_HOST';
     public const OTEL_EXPORTER_PROMETHEUS_PORT = 'OTEL_EXPORTER_PROMETHEUS_PORT';
     /**
      * Exporter Selection
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.24.0/specification/configuration/sdk-environment-variables.md#exporter-selection
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#exporter-selection
      */
     public const OTEL_TRACES_EXPORTER = 'OTEL_TRACES_EXPORTER';
     public const OTEL_METRICS_EXPORTER = 'OTEL_METRICS_EXPORTER';
     public const OTEL_LOGS_EXPORTER = 'OTEL_LOGS_EXPORTER';
     /**
      * Metrics SDK Configuration
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.24.0/specification/configuration/sdk-environment-variables.md#metrics-sdk-configuration
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.24.0/specification/configuration/sdk-environment-variables.md#periodic-exporting-metricreader
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#metrics-sdk-configuration
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#periodic-exporting-metricreader
      */
     public const OTEL_METRICS_EXEMPLAR_FILTER = 'OTEL_METRICS_EXEMPLAR_FILTER';
     public const OTEL_METRIC_EXPORT_INTERVAL = 'OTEL_METRIC_EXPORT_INTERVAL';
@@ -130,7 +130,7 @@ interface Variables
     public const OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION = 'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION';
     /**
      * Language Specific Environment Variables
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#language-specific-environment-variables
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#language-specific-environment-variables
      */
     public const OTEL_PHP_TRACES_PROCESSOR = 'OTEL_PHP_TRACES_PROCESSOR';
     public const OTEL_PHP_LOGS_PROCESSOR = 'OTEL_PHP_LOGS_PROCESSOR';

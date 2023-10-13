@@ -8,7 +8,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
 
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 
-//@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md
+//@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md
 putenv('OTEL_RESOURCE_ATTRIBUTES=service.version=1.0.0');
 putenv('OTEL_SERVICE_NAME=example-app');
 putenv('OTEL_LOG_LEVEL=warning');

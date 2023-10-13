@@ -17,7 +17,7 @@ use OpenTelemetry\SemConv\ResourceAttributes;
 echo 'Starting ConsoleSpanExporter' . PHP_EOL;
 
 $resource = ResourceInfoFactory::defaultResource()->merge(ResourceInfo::create(Attributes::create([
-    //@see https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/resource/semantic_conventions
+    //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/semantic-conventions.md
     ResourceAttributes::SERVICE_NAMESPACE => 'foo',
     ResourceAttributes::SERVICE_NAME => 'bar',
     ResourceAttributes::SERVICE_INSTANCE_ID => 1,

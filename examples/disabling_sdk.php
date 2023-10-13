@@ -19,7 +19,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-//@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration
+//@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
 putenv('OTEL_SDK_DISABLED=true');
 
 echo 'Creating (disabled) signals' . PHP_EOL;

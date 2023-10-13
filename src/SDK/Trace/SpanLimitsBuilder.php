@@ -96,7 +96,7 @@ class SpanLimitsBuilder
     /**
      * @param bool $retain whether general identity attributes should be retained
      *
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/span-general.md#general-identity-attributes
+     * @see https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/attributes.md#general-identity-attributes
      */
     public function retainGeneralIdentityAttributes(bool $retain = true): SpanLimitsBuilder
     {
@@ -106,7 +106,7 @@ class SpanLimitsBuilder
     }
 
     /**
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#span-limits-
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#span-limits
      */
     public function build(): SpanLimits
     {

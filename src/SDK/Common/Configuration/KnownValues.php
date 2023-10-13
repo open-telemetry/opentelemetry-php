@@ -8,7 +8,7 @@ use Psr\Log\LogLevel;
 
 /**
  * "Known values" for OpenTelemetry configurataion variables.
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md
  * Notice: Values specific to the PHP SDK have been added
  */
 interface KnownValues
@@ -88,7 +88,7 @@ interface KnownValues
 
     /**
      * General SDK Configuration
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
      */
     public const OTEL_LOG_LEVEL = [
         self::VALUE_LOG_EMERGENCY,
@@ -136,7 +136,7 @@ interface KnownValues
     public const OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = self::VALUES_OTLP_PROTOCOL;
     /**
      * Exporter Selection
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#exporter-selection
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#exporter-selection
      */
     public const OTEL_TRACES_EXPORTER = [
         self::VALUE_OTLP,
@@ -154,7 +154,7 @@ interface KnownValues
     ];
     /**
      * Metrics SDK Configuration
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#metrics-sdk-configuration
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#metrics-sdk-configuration
      */
     public const OTEL_METRICS_EXEMPLAR_FILTER = [
         self::VALUE_WITH_SAMPLED_TRACE,
@@ -163,7 +163,7 @@ interface KnownValues
     ];
     /**
      * Language Specific Environment Variables
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#language-specific-environment-variables
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#language-specific-environment-variables
      */
     public const OTEL_PHP_TRACES_PROCESSOR = [
         self::VALUE_BATCH,
