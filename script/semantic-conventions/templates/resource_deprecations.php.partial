@@ -1,9 +1,19 @@
     /**
-     * @deprecated
+     * @deprecated Use USER_AGENT_ORIGINAL
      */
     public const BROWSER_USER_AGENT = 'browser.user_agent';
 
     /**
-     * @deprecated
+     * @deprecated Use CLOUD_RESOURCE_ID
      */
     public const FAAS_ID = 'faas.id';
+
+    /**
+     * @deprecated Use TELEMETRY_DISTRO_VERSION
+     */
+    public const TELEMETRY_AUTO_VERSION = 'telemetry.auto.version';
+
+    /**
+     * @deprecated Use CONTAINER_IMAGE_TAGS
+     */
+    public const CONTAINER_IMAGE_TAG = 'container.image.tag';
