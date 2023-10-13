@@ -44,7 +44,8 @@ final class Sdk implements ResourceDetectorInterface
         }
 
         if (extension_loaded('opentelemetry')) {
-            $attributes[ResourceAttributes::TELEMETRY_AUTO_VERSION] = phpversion('opentelemetry');
+            $attributes[ResourceAttributes::TELEMETRY_DISTRO_NAME] = 'opentelemetry-php-instrumentation';
+            $attributes[ResourceAttributes::TELEMETRY_DISTRO_VERSION] = phpversion('opentelemetry');
         }
 
         return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
