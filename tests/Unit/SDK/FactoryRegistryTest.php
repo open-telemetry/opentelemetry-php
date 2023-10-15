@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
+use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
@@ -75,6 +77,41 @@ class FactoryRegistryTest extends TestCase
     }
 
     /**
+     * @dataProvider logRecordExporterProvider
+     */
+    public function test_default_log_record_exporter_factories(string $name): void
+    {
+        $factory = Registry::logRecordExporterFactory($name);
+        $this->assertInstanceOf(LogRecordExporterFactoryInterface::class, $factory);
+    }
+
+    public static function logRecordExporterProvider(): array
+    {
+        return [
+            ['console'],
+            ['memory'],
+        ];
+    }
+
+    /**
+     * @dataProvider textMapPropagator
+     */
+    public function test_default_text_map_propagator(string $name): void
+    {
+        $propagator = Registry::textMapPropagator($name);
+        $this->assertInstanceOf(TextMapPropagatorInterface::class, $propagator);
+    }
+
+    public static function textMapPropagator(): array
+    {
+        return [
+            ['tracecontext'],
+            ['b3multi'],
+            ['b3'],
+        ];
+    }
+
+    /**
      * @dataProvider invalidFactoryProvider
      */
     public function test_register_invalid_transport_factory($factory): void
@@ -99,6 +136,15 @@ class FactoryRegistryTest extends TestCase
     {
         $this->expectException(PHPUnitFrameworkException::class);
         Registry::registerMetricExporterFactory('foo', $factory, true);
+    }
+
+    /**
+     * @dataProvider invalidFactoryProvider
+     */
+    public function test_register_invalid_log_record_exporter_factory($factory): void
+    {
+        $this->expectException(PHPUnitFrameworkException::class);
+        Registry::registerLogRecordExporterFactory('foo', $factory, true);
     }
 
     public static function invalidFactoryProvider(): array

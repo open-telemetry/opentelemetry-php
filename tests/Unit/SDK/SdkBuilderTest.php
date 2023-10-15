@@ -33,7 +33,8 @@ class SdkBuilderTest extends TestCase
             ->setMeterProvider($this->meterProvider)
             ->setLoggerProvider($this->loggerProvider)
             ->setPropagator($this->propagator)
-            ->setTracerProvider($this->tracerProvider);
+            ->setTracerProvider($this->tracerProvider)
+            ->setAutoShutdown(true);
     }
 
     public function test_build(): void
