@@ -11,7 +11,15 @@ interface ResourceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.19.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.22.0';
+
+    /**
+     * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found here.
+     *
+     * @example 33
+     * @example 32
+     */
+    public const ANDROID_OS_API_LEVEL = 'android.os.api_level';
 
     /**
      * Array of brand name and version separated by a space.
@@ -23,25 +31,6 @@ interface ResourceAttributes
      * @example Chrome 99
      */
     public const BROWSER_BRANDS = 'browser.brands';
-
-    /**
-     * The platform on which the browser is running.
-     *
-     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.platform`). If unavailable, the legacy `navigator.platform` API SHOULD NOT be used instead and this attribute SHOULD be left unset in order for the values to be consistent.
-     * The list of possible values is defined in the W3C User-Agent Client Hints specification. Note that some (but not all) of these values can overlap with values in the `os.type` and `os.name` attributes. However, for consistency, the values in the `browser.platform` attribute should capture the exact value that the user agent provides.
-     *
-     * @example Windows
-     * @example macOS
-     * @example Android
-     */
-    public const BROWSER_PLATFORM = 'browser.platform';
-
-    /**
-     * A boolean that is true if the browser is running on a mobile device.
-     *
-     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.mobile`). If unavailable, this attribute SHOULD be left unset.
-     */
-    public const BROWSER_MOBILE = 'browser.mobile';
 
     /**
      * Preferred language of the user using the browser.
@@ -56,6 +45,25 @@ interface ResourceAttributes
     public const BROWSER_LANGUAGE = 'browser.language';
 
     /**
+     * A boolean that is true if the browser is running on a mobile device.
+     *
+     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.mobile`). If unavailable, this attribute SHOULD be left unset.
+     */
+    public const BROWSER_MOBILE = 'browser.mobile';
+
+    /**
+     * The platform on which the browser is running.
+     *
+     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.platform`). If unavailable, the legacy `navigator.platform` API SHOULD NOT be used instead and this attribute SHOULD be left unset in order for the values to be consistent.
+     * The list of possible values is defined in the W3C User-Agent Client Hints specification. Note that some (but not all) of these values can overlap with values in the `os.type` and `os.name` attributes. However, for consistency, the values in the `browser.platform` attribute should capture the exact value that the user agent provides.
+     *
+     * @example Windows
+     * @example macOS
+     * @example Android
+     */
+    public const BROWSER_PLATFORM = 'browser.platform';
+
+    /**
      * Full user-agent string provided by the browser.
      *
      * The user-agent value SHOULD be provided only from browsers that do not have a mechanism to retrieve brands and platform individually from the User-Agent Client Hints API. To retrieve the value, the legacy `navigator.userAgent` API can be used.
@@ -65,17 +73,33 @@ interface ResourceAttributes
     public const USER_AGENT_ORIGINAL = 'user_agent.original';
 
     /**
-     * Name of the cloud provider.
-     */
-    public const CLOUD_PROVIDER = 'cloud.provider';
-
-    /**
      * The cloud account ID the resource is assigned to.
      *
      * @example 111111111111
      * @example opentelemetry
      */
     public const CLOUD_ACCOUNT_ID = 'cloud.account.id';
+
+    /**
+     * Cloud regions often have multiple, isolated locations known as zones to increase availability. Availability zone represents the zone where the resource is running.
+     *
+     * Availability zones are called &quot;zones&quot; on Alibaba Cloud and Google Cloud.
+     *
+     * @example us-east-1c
+     */
+    public const CLOUD_AVAILABILITY_ZONE = 'cloud.availability_zone';
+
+    /**
+     * The cloud platform in use.
+     *
+     * The prefix of the service SHOULD match the one specified in `cloud.provider`.
+     */
+    public const CLOUD_PLATFORM = 'cloud.platform';
+
+    /**
+     * Name of the cloud provider.
+     */
+    public const CLOUD_PROVIDER = 'cloud.provider';
 
     /**
      * The geographical region the resource is running.
@@ -113,20 +137,11 @@ interface ResourceAttributes
     public const CLOUD_RESOURCE_ID = 'cloud.resource_id';
 
     /**
-     * Cloud regions often have multiple, isolated locations known as zones to increase availability. Availability zone represents the zone where the resource is running.
+     * The ARN of an ECS cluster.
      *
-     * Availability zones are called &quot;zones&quot; on Alibaba Cloud and Google Cloud.
-     *
-     * @example us-east-1c
+     * @example arn:aws:ecs:us-west-2:123456789123:cluster/my-cluster
      */
-    public const CLOUD_AVAILABILITY_ZONE = 'cloud.availability_zone';
-
-    /**
-     * The cloud platform in use.
-     *
-     * The prefix of the service SHOULD match the one specified in `cloud.provider`.
-     */
-    public const CLOUD_PLATFORM = 'cloud.platform';
+    public const AWS_ECS_CLUSTER_ARN = 'aws.ecs.cluster.arn';
 
     /**
      * The Amazon Resource Name (ARN) of an ECS container instance.
@@ -134,13 +149,6 @@ interface ResourceAttributes
      * @example arn:aws:ecs:us-west-1:123456789123:container/32624152-9086-4f0e-acae-1a75b14fe4d9
      */
     public const AWS_ECS_CONTAINER_ARN = 'aws.ecs.container.arn';
-
-    /**
-     * The ARN of an ECS cluster.
-     *
-     * @example arn:aws:ecs:us-west-2:123456789123:cluster/my-cluster
-     */
-    public const AWS_ECS_CLUSTER_ARN = 'aws.ecs.cluster.arn';
 
     /**
      * The launch type for an ECS task.
@@ -177,16 +185,6 @@ interface ResourceAttributes
     public const AWS_EKS_CLUSTER_ARN = 'aws.eks.cluster.arn';
 
     /**
-     * The name(s) of the AWS log group(s) an application is writing to.
-     *
-     * Multiple log groups must be supported for cases like multi-container applications, where a single application has sidecar containers, and each write to their own log group.
-     *
-     * @example /aws/lambda/my-function
-     * @example opentelemetry-service
-     */
-    public const AWS_LOG_GROUP_NAMES = 'aws.log.group.names';
-
-    /**
      * The Amazon Resource Name(s) (ARN) of the AWS log group(s).
      *
      * See the log group ARN format documentation.
@@ -196,11 +194,14 @@ interface ResourceAttributes
     public const AWS_LOG_GROUP_ARNS = 'aws.log.group.arns';
 
     /**
-     * The name(s) of the AWS log stream(s) an application is writing to.
+     * The name(s) of the AWS log group(s) an application is writing to.
      *
-     * @example logs/main/10838bed-421f-43ef-870a-f43feacbbb5b
+     * Multiple log groups must be supported for cases like multi-container applications, where a single application has sidecar containers, and each write to their own log group.
+     *
+     * @example /aws/lambda/my-function
+     * @example opentelemetry-service
      */
-    public const AWS_LOG_STREAM_NAMES = 'aws.log.stream.names';
+    public const AWS_LOG_GROUP_NAMES = 'aws.log.group.names';
 
     /**
      * The ARN(s) of the AWS log stream(s).
@@ -212,18 +213,42 @@ interface ResourceAttributes
     public const AWS_LOG_STREAM_ARNS = 'aws.log.stream.arns';
 
     /**
-     * Time and date the release was created.
+     * The name(s) of the AWS log stream(s) an application is writing to.
      *
-     * @example 2022-10-23T18:00:42Z
+     * @example logs/main/10838bed-421f-43ef-870a-f43feacbbb5b
      */
-    public const HEROKU_RELEASE_CREATION_TIMESTAMP = 'heroku.release.creation_timestamp';
+    public const AWS_LOG_STREAM_NAMES = 'aws.log.stream.names';
 
     /**
-     * Commit hash for the current release.
+     * The name of the Cloud Run execution being run for the Job, as set by the `CLOUD_RUN_EXECUTION` environment variable.
      *
-     * @example e6134959463efd8966b20e75b913cafe3f5ec
+     * @example job-name-xxxx
+     * @example sample-job-mdw84
      */
-    public const HEROKU_RELEASE_COMMIT = 'heroku.release.commit';
+    public const GCP_CLOUD_RUN_JOB_EXECUTION = 'gcp.cloud_run.job.execution';
+
+    /**
+     * The index for a task within an execution as provided by the `CLOUD_RUN_TASK_INDEX` environment variable.
+     *
+     * @example 1
+     */
+    public const GCP_CLOUD_RUN_JOB_TASK_INDEX = 'gcp.cloud_run.job.task_index';
+
+    /**
+     * The hostname of a GCE instance. This is the full value of the default or custom hostname.
+     *
+     * @example my-host1234.example.com
+     * @example sample-vm.us-west1-b.c.my-project.internal
+     */
+    public const GCP_GCE_INSTANCE_HOSTNAME = 'gcp.gce.instance.hostname';
+
+    /**
+     * The instance name of a GCE instance. This is the value provided by `host.name`, the visible name of the instance in the Cloud Console UI, and the prefix for the default hostname of the instance as defined by the default internal DNS name.
+     *
+     * @example instance-1
+     * @example my-vm-name
+     */
+    public const GCP_GCE_INSTANCE_NAME = 'gcp.gce.instance.name';
 
     /**
      * Unique identifier for the application.
@@ -233,11 +258,41 @@ interface ResourceAttributes
     public const HEROKU_APP_ID = 'heroku.app.id';
 
     /**
-     * Container name used by container runtime.
+     * Commit hash for the current release.
      *
-     * @example opentelemetry-autoconf
+     * @example e6134959463efd8966b20e75b913cafe3f5ec
      */
-    public const CONTAINER_NAME = 'container.name';
+    public const HEROKU_RELEASE_COMMIT = 'heroku.release.commit';
+
+    /**
+     * Time and date the release was created.
+     *
+     * @example 2022-10-23T18:00:42Z
+     */
+    public const HEROKU_RELEASE_CREATION_TIMESTAMP = 'heroku.release.creation_timestamp';
+
+    /**
+     * The command used to run the container (i.e. the command name).
+     *
+     * If using embedded credentials or sensitive data, it is recommended to remove them to prevent potential leakage.
+     *
+     * @example otelcontribcol
+     */
+    public const CONTAINER_COMMAND = 'container.command';
+
+    /**
+     * All the command arguments (including the command/executable itself) run by the container. [2].
+     *
+     * @example otelcontribcol, --config, config.yaml
+     */
+    public const CONTAINER_COMMAND_ARGS = 'container.command_args';
+
+    /**
+     * The full command run by the container as a single string representing the full command. [2].
+     *
+     * @example otelcontribcol --config config.yaml
+     */
+    public const CONTAINER_COMMAND_LINE = 'container.command_line';
 
     /**
      * Container ID. Usually a UUID, as for example used to identify Docker containers. The UUID might be abbreviated.
@@ -247,13 +302,15 @@ interface ResourceAttributes
     public const CONTAINER_ID = 'container.id';
 
     /**
-     * The container runtime managing this container.
+     * Runtime specific image identifier. Usually a hash algorithm followed by a UUID.
      *
-     * @example docker
-     * @example containerd
-     * @example rkt
+     * Docker defines a sha256 of the image id; `container.image.id` corresponds to the `Image` field from the Docker container inspect API endpoint.
+     * K8s defines a link to the container registry repository with digest `"imageID": "registry.azurecr.io /namespace/service/dockerfile@sha256:bdeabd40c3a8a492eaf9e8e44d0ebbb84bac7ee25ac0cf8a7159d25f62555625"`.
+     * The ID is assinged by the container runtime and can vary in different environments. Consider using `oci.manifest.digest` if it is important to identify the same image in different environments/runtimes.
+     *
+     * @example sha256:19c92d0a00d1b66d897bceaa7319bee0dd38a10a851c60bcec9474aa3f01e50f
      */
-    public const CONTAINER_RUNTIME = 'container.runtime';
+    public const CONTAINER_IMAGE_ID = 'container.image.id';
 
     /**
      * Name of the image the container was built on.
@@ -263,11 +320,38 @@ interface ResourceAttributes
     public const CONTAINER_IMAGE_NAME = 'container.image.name';
 
     /**
-     * Container image tag.
+     * Repo digests of the container image as provided by the container runtime.
      *
-     * @example 0.1
+     * Docker and CRI report those under the `RepoDigests` field.
+     *
+     * @example example@sha256:afcc7f1ac1b49db317a7196c902e61c6c3c4607d63599ee1a82d702d249a0ccb
+     * @example internal.registry.example.com:5000/example@sha256:b69959407d21e8a062e0416bf13405bb2b71ed7a84dde4158ebafacfa06f5578
      */
-    public const CONTAINER_IMAGE_TAG = 'container.image.tag';
+    public const CONTAINER_IMAGE_REPO_DIGESTS = 'container.image.repo_digests';
+
+    /**
+     * Container image tags. An example can be found in Docker Image Inspect. Should be only the `<tag>` section of the full name for example from `registry.example.com/my-org/my-image:<tag>`.
+     *
+     * @example v1.27.1
+     * @example 3.5.7-0
+     */
+    public const CONTAINER_IMAGE_TAGS = 'container.image.tags';
+
+    /**
+     * Container name used by container runtime.
+     *
+     * @example opentelemetry-autoconf
+     */
+    public const CONTAINER_NAME = 'container.name';
+
+    /**
+     * The container runtime managing this container.
+     *
+     * @example docker
+     * @example containerd
+     * @example rkt
+     */
+    public const CONTAINER_RUNTIME = 'container.runtime';
 
     /**
      * Name of the deployment environment (aka deployment tier).
@@ -285,6 +369,16 @@ interface ResourceAttributes
      * @example 2ab2916d-a51f-4ac8-80ee-45ac31a28092
      */
     public const DEVICE_ID = 'device.id';
+
+    /**
+     * The name of the device manufacturer.
+     *
+     * The Android OS provides this field via Build. iOS apps SHOULD hardcode the value `Apple`.
+     *
+     * @example Apple
+     * @example Samsung
+     */
+    public const DEVICE_MANUFACTURER = 'device.manufacturer';
 
     /**
      * The model identifier for the device.
@@ -307,14 +401,24 @@ interface ResourceAttributes
     public const DEVICE_MODEL_NAME = 'device.model.name';
 
     /**
-     * The name of the device manufacturer.
+     * The execution environment ID as a string, that will be potentially reused for other invocations to the same function/function version.
      *
-     * The Android OS provides this field via Build. iOS apps SHOULD hardcode the value `Apple`.
+     * <ul>
+     * <li><strong>AWS Lambda:</strong> Use the (full) log stream name.</li>
+     * </ul>
      *
-     * @example Apple
-     * @example Samsung
+     * @example 2021/06/28/[$LATEST]2f399eb14537447da05ab2a2e39309de
      */
-    public const DEVICE_MANUFACTURER = 'device.manufacturer';
+    public const FAAS_INSTANCE = 'faas.instance';
+
+    /**
+     * The amount of memory available to the serverless function converted to Bytes.
+     *
+     * It's recommended to set this attribute since e.g. too little memory can easily stop a Java AWS Lambda function from working correctly. On AWS Lambda, the environment variable `AWS_LAMBDA_FUNCTION_MEMORY_SIZE` provides this information (which must be multiplied by 1,048,576).
+     *
+     * @example 134217728
+     */
+    public const FAAS_MAX_MEMORY = 'faas.max_memory';
 
     /**
      * The name of the single function that this runtime instance executes.
@@ -345,7 +449,7 @@ interface ResourceAttributes
      * Depending on the cloud provider and platform, use:<ul>
      * <li><strong>AWS Lambda:</strong> The function version
      * (an integer represented as a decimal string).</li>
-     * <li><strong>Google Cloud Run:</strong> The revision
+     * <li><strong>Google Cloud Run (Services):</strong> The revision
      * (i.e., the function name plus the revision suffix).</li>
      * <li><strong>Google Cloud Functions:</strong> The value of the
      * `K_REVISION` environment variable.</li>
@@ -358,24 +462,9 @@ interface ResourceAttributes
     public const FAAS_VERSION = 'faas.version';
 
     /**
-     * The execution environment ID as a string, that will be potentially reused for other invocations to the same function/function version.
-     *
-     * <ul>
-     * <li><strong>AWS Lambda:</strong> Use the (full) log stream name.</li>
-     * </ul>
-     *
-     * @example 2021/06/28/[$LATEST]2f399eb14537447da05ab2a2e39309de
+     * The CPU architecture the host system is running on.
      */
-    public const FAAS_INSTANCE = 'faas.instance';
-
-    /**
-     * The amount of memory available to the serverless function converted to Bytes.
-     *
-     * It's recommended to set this attribute since e.g. too little memory can easily stop a Java AWS Lambda function from working correctly. On AWS Lambda, the environment variable `AWS_LAMBDA_FUNCTION_MEMORY_SIZE` provides this information (which must be multiplied by 1,048,576).
-     *
-     * @example 134217728
-     */
-    public const FAAS_MAX_MEMORY = 'faas.max_memory';
+    public const HOST_ARCH = 'host.arch';
 
     /**
      * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider. For non-containerized systems, this should be the `machine-id`. See the table below for the sources to use to determine the `machine-id` based on operating system.
@@ -383,6 +472,38 @@ interface ResourceAttributes
      * @example fdbf79e8af94cb7f9e8df36789187052
      */
     public const HOST_ID = 'host.id';
+
+    /**
+     * VM image ID or host OS image ID. For Cloud, this value is from the provider.
+     *
+     * @example ami-07b06b442921831e5
+     */
+    public const HOST_IMAGE_ID = 'host.image.id';
+
+    /**
+     * Name of the VM image or OS install the host was instantiated from.
+     *
+     * @example infra-ami-eks-worker-node-7d4ec78312
+     * @example CentOS-8-x86_64-1905
+     */
+    public const HOST_IMAGE_NAME = 'host.image.name';
+
+    /**
+     * The version string of the VM image or host OS as defined in Version Attributes.
+     *
+     * @example 0.1
+     */
+    public const HOST_IMAGE_VERSION = 'host.image.version';
+
+    /**
+     * Available IP addresses of the host, excluding loopback interfaces.
+     *
+     * IPv4 Addresses MUST be specified in dotted-quad notation. IPv6 addresses MUST be specified in the RFC 5952 format.
+     *
+     * @example 192.168.1.140
+     * @example fe80::abc2:4a28:737a:609e
+     */
+    public const HOST_IP = 'host.ip';
 
     /**
      * Name of the host. On Unix systems, it may contain what the hostname command returns, or the fully qualified hostname, or another name specified by the user.
@@ -399,31 +520,48 @@ interface ResourceAttributes
     public const HOST_TYPE = 'host.type';
 
     /**
-     * The CPU architecture the host system is running on.
+     * The amount of level 2 memory cache available to the processor (in Bytes).
+     *
+     * @example 12288000
      */
-    public const HOST_ARCH = 'host.arch';
+    public const HOST_CPU_CACHE_L2_SIZE = 'host.cpu.cache.l2.size';
 
     /**
-     * Name of the VM image or OS install the host was instantiated from.
+     * Numeric value specifying the family or generation of the CPU.
      *
-     * @example infra-ami-eks-worker-node-7d4ec78312
-     * @example CentOS-8-x86_64-1905
+     * @example 6
      */
-    public const HOST_IMAGE_NAME = 'host.image.name';
+    public const HOST_CPU_FAMILY = 'host.cpu.family';
 
     /**
-     * VM image ID. For Cloud, this value is from the provider.
+     * Model identifier. It provides more granular information about the CPU, distinguishing it from other CPUs within the same family.
      *
-     * @example ami-07b06b442921831e5
+     * @example 6
      */
-    public const HOST_IMAGE_ID = 'host.image.id';
+    public const HOST_CPU_MODEL_ID = 'host.cpu.model.id';
 
     /**
-     * The version string of the VM image as defined in Version Attributes.
+     * Model designation of the processor.
      *
-     * @example 0.1
+     * @example 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz
      */
-    public const HOST_IMAGE_VERSION = 'host.image.version';
+    public const HOST_CPU_MODEL_NAME = 'host.cpu.model.name';
+
+    /**
+     * Stepping or core revisions.
+     *
+     * @example 1
+     */
+    public const HOST_CPU_STEPPING = 'host.cpu.stepping';
+
+    /**
+     * Processor manufacturer identifier. A maximum 12-character string.
+     *
+     * CPUID command returns the vendor ID string in EBX, EDX and ECX registers. Writing these to memory in this order results in a 12-character string.
+     *
+     * @example GenuineIntel
+     */
+    public const HOST_CPU_VENDOR_ID = 'host.cpu.vendor.id';
 
     /**
      * The name of the cluster.
@@ -431,6 +569,31 @@ interface ResourceAttributes
      * @example opentelemetry-cluster
      */
     public const K8S_CLUSTER_NAME = 'k8s.cluster.name';
+
+    /**
+     * A pseudo-ID for the cluster, set to the UID of the `kube-system` namespace.
+     *
+     * K8s does not have support for obtaining a cluster ID. If this is ever
+     * added, we will recommend collecting the `k8s.cluster.uid` through the
+     * official APIs. In the meantime, we are able to use the `uid` of the
+     * `kube-system` namespace as a proxy for cluster ID. Read on for the
+     * rationale.Every object created in a K8s cluster is assigned a distinct UID. The
+     * `kube-system` namespace is used by Kubernetes itself and will exist
+     * for the lifetime of the cluster. Using the `uid` of the `kube-system`
+     * namespace is a reasonable proxy for the K8s ClusterID as it will only
+     * change if the cluster is rebuilt. Furthermore, Kubernetes UIDs are
+     * UUIDs as standardized by
+     * ISO/IEC 9834-8 and ITU-T X.667.
+     * Which states:<blockquote>
+     * If generated according to one of the mechanisms defined in Rec.</blockquote>
+     * ITU-T X.667 | ISO/IEC 9834-8, a UUID is either guaranteed to be
+     *   different from all other UUIDs generated before 3603 A.D., or is
+     *   extremely likely to be different (depending on the mechanism chosen).Therefore, UIDs between clusters should be extremely unlikely to
+     * conflict.
+     *
+     * @example 218fc5a9-a5f1-4b54-aa05-46717d0ab26d
+     */
+    public const K8S_CLUSTER_UID = 'k8s.cluster.uid';
 
     /**
      * The name of the Node.
@@ -454,18 +617,18 @@ interface ResourceAttributes
     public const K8S_NAMESPACE_NAME = 'k8s.namespace.name';
 
     /**
-     * The UID of the Pod.
-     *
-     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
-     */
-    public const K8S_POD_UID = 'k8s.pod.uid';
-
-    /**
      * The name of the Pod.
      *
      * @example opentelemetry-pod-autoconf
      */
     public const K8S_POD_NAME = 'k8s.pod.name';
+
+    /**
+     * The UID of the Pod.
+     *
+     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+     */
+    public const K8S_POD_UID = 'k8s.pod.uid';
 
     /**
      * The name of the Container from Pod specification, must be unique within a Pod. Container runtime usually uses different globally unique name (`container.name`).
@@ -482,13 +645,6 @@ interface ResourceAttributes
     public const K8S_CONTAINER_RESTART_COUNT = 'k8s.container.restart_count';
 
     /**
-     * The UID of the ReplicaSet.
-     *
-     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
-     */
-    public const K8S_REPLICASET_UID = 'k8s.replicaset.uid';
-
-    /**
      * The name of the ReplicaSet.
      *
      * @example opentelemetry
@@ -496,11 +652,11 @@ interface ResourceAttributes
     public const K8S_REPLICASET_NAME = 'k8s.replicaset.name';
 
     /**
-     * The UID of the Deployment.
+     * The UID of the ReplicaSet.
      *
      * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
      */
-    public const K8S_DEPLOYMENT_UID = 'k8s.deployment.uid';
+    public const K8S_REPLICASET_UID = 'k8s.replicaset.uid';
 
     /**
      * The name of the Deployment.
@@ -510,11 +666,11 @@ interface ResourceAttributes
     public const K8S_DEPLOYMENT_NAME = 'k8s.deployment.name';
 
     /**
-     * The UID of the StatefulSet.
+     * The UID of the Deployment.
      *
      * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
      */
-    public const K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
+    public const K8S_DEPLOYMENT_UID = 'k8s.deployment.uid';
 
     /**
      * The name of the StatefulSet.
@@ -524,11 +680,11 @@ interface ResourceAttributes
     public const K8S_STATEFULSET_NAME = 'k8s.statefulset.name';
 
     /**
-     * The UID of the DaemonSet.
+     * The UID of the StatefulSet.
      *
      * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
      */
-    public const K8S_DAEMONSET_UID = 'k8s.daemonset.uid';
+    public const K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
 
     /**
      * The name of the DaemonSet.
@@ -538,11 +694,11 @@ interface ResourceAttributes
     public const K8S_DAEMONSET_NAME = 'k8s.daemonset.name';
 
     /**
-     * The UID of the Job.
+     * The UID of the DaemonSet.
      *
      * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
      */
-    public const K8S_JOB_UID = 'k8s.job.uid';
+    public const K8S_DAEMONSET_UID = 'k8s.daemonset.uid';
 
     /**
      * The name of the Job.
@@ -552,11 +708,11 @@ interface ResourceAttributes
     public const K8S_JOB_NAME = 'k8s.job.name';
 
     /**
-     * The UID of the CronJob.
+     * The UID of the Job.
      *
      * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
      */
-    public const K8S_CRONJOB_UID = 'k8s.cronjob.uid';
+    public const K8S_JOB_UID = 'k8s.job.uid';
 
     /**
      * The name of the CronJob.
@@ -566,9 +722,30 @@ interface ResourceAttributes
     public const K8S_CRONJOB_NAME = 'k8s.cronjob.name';
 
     /**
-     * The operating system type.
+     * The UID of the CronJob.
+     *
+     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
      */
-    public const OS_TYPE = 'os.type';
+    public const K8S_CRONJOB_UID = 'k8s.cronjob.uid';
+
+    /**
+     * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
+     *
+     * Follows OCI Image Manifest Specification, and specifically the Digest property.
+     * An example can be found in Example Image Manifest.
+     *
+     * @example sha256:e4ca62c0d62f3e886e684806dfe9d4e0cda60d54986898173c1083856cfda0f4
+     */
+    public const OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
+
+    /**
+     * Unique identifier for a particular build or compilation of the operating system.
+     *
+     * @example TQ3C.230805.001.B2
+     * @example 20E247
+     * @example 22621
+     */
+    public const OS_BUILD_ID = 'os.build_id';
 
     /**
      * Human readable (not intended to be parsed) OS version information, like e.g. reported by `ver` or `lsb_release -a` commands.
@@ -588,6 +765,11 @@ interface ResourceAttributes
     public const OS_NAME = 'os.name';
 
     /**
+     * The operating system type.
+     */
+    public const OS_TYPE = 'os.type';
+
+    /**
      * The version string of the operating system as defined in Version Attributes.
      *
      * @example 14.2.1
@@ -596,18 +778,26 @@ interface ResourceAttributes
     public const OS_VERSION = 'os.version';
 
     /**
-     * Process identifier (PID).
+     * The command used to launch the process (i.e. the command name). On Linux based systems, can be set to the zeroth string in `proc/[pid]/cmdline`. On Windows, can be set to the first parameter extracted from `GetCommandLineW`.
      *
-     * @example 1234
+     * @example cmd/otelcol
      */
-    public const PROCESS_PID = 'process.pid';
+    public const PROCESS_COMMAND = 'process.command';
 
     /**
-     * Parent Process identifier (PID).
+     * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`.
      *
-     * @example 111
+     * @example cmd/otecol
+     * @example --config=config.yaml
      */
-    public const PROCESS_PARENT_PID = 'process.parent_pid';
+    public const PROCESS_COMMAND_ARGS = 'process.command_args';
+
+    /**
+     * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead.
+     *
+     * @example C:\cmd\otecol --config="my directory\config.yaml"
+     */
+    public const PROCESS_COMMAND_LINE = 'process.command_line';
 
     /**
      * The name of the process executable. On Linux based systems, can be set to the `Name` in `proc/[pid]/status`. On Windows, can be set to the base name of `GetProcessImageFileNameW`.
@@ -624,33 +814,32 @@ interface ResourceAttributes
     public const PROCESS_EXECUTABLE_PATH = 'process.executable.path';
 
     /**
-     * The command used to launch the process (i.e. the command name). On Linux based systems, can be set to the zeroth string in `proc/[pid]/cmdline`. On Windows, can be set to the first parameter extracted from `GetCommandLineW`.
-     *
-     * @example cmd/otelcol
-     */
-    public const PROCESS_COMMAND = 'process.command';
-
-    /**
-     * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead.
-     *
-     * @example C:\cmd\otecol --config="my directory\config.yaml"
-     */
-    public const PROCESS_COMMAND_LINE = 'process.command_line';
-
-    /**
-     * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`.
-     *
-     * @example cmd/otecol
-     * @example --config=config.yaml
-     */
-    public const PROCESS_COMMAND_ARGS = 'process.command_args';
-
-    /**
      * The username of the user that owns the process.
      *
      * @example root
      */
     public const PROCESS_OWNER = 'process.owner';
+
+    /**
+     * Parent Process identifier (PID).
+     *
+     * @example 111
+     */
+    public const PROCESS_PARENT_PID = 'process.parent_pid';
+
+    /**
+     * Process identifier (PID).
+     *
+     * @example 1234
+     */
+    public const PROCESS_PID = 'process.pid';
+
+    /**
+     * An additional description about the runtime of the process, for example a specific vendor customization of the runtime environment.
+     *
+     * @example Eclipse OpenJ9 Eclipse OpenJ9 VM openj9-0.21.0
+     */
+    public const PROCESS_RUNTIME_DESCRIPTION = 'process.runtime.description';
 
     /**
      * The name of the runtime of this process. For compiled native binaries, this SHOULD be the name of the compiler.
@@ -667,13 +856,6 @@ interface ResourceAttributes
     public const PROCESS_RUNTIME_VERSION = 'process.runtime.version';
 
     /**
-     * An additional description about the runtime of the process, for example a specific vendor customization of the runtime environment.
-     *
-     * @example Eclipse OpenJ9 Eclipse OpenJ9 VM openj9-0.21.0
-     */
-    public const PROCESS_RUNTIME_DESCRIPTION = 'process.runtime.description';
-
-    /**
      * Logical name of the service.
      *
      * MUST be the same for all instances of horizontally scaled services. If the value was not specified, SDKs MUST fallback to `unknown_service:` concatenated with `process.executable.name`, e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value MUST be set to `unknown_service`.
@@ -681,6 +863,24 @@ interface ResourceAttributes
      * @example shoppingcart
      */
     public const SERVICE_NAME = 'service.name';
+
+    /**
+     * The version string of the service API or implementation. The format is not defined by these conventions.
+     *
+     * @example 2.0.0
+     * @example a01dbef8a
+     */
+    public const SERVICE_VERSION = 'service.version';
+
+    /**
+     * The string ID of the service instance.
+     *
+     * MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words `service.namespace,service.name,service.instance.id` triplet MUST be globally unique). The ID helps to distinguish instances of the same service that exist at the same time (e.g. instances of a horizontally scaled service). It is preferable for the ID to be persistent and stay the same for the lifetime of the service instance, however it is acceptable that the ID is ephemeral and changes during important lifetime events for the service (e.g. service restarts). If the service has no inherent unique ID that can be used as the value of this attribute it is recommended to generate a random Version 1 or Version 4 RFC 4122 UUID (services aiming for reproducible UUIDs may also use Version 5, see RFC 4122 for more recommendations).
+     *
+     * @example my-k8s-pod-deployment-1
+     * @example 627cc493-f310-47de-96bd-71410b7dec09
+     */
+    public const SERVICE_INSTANCE_ID = 'service.instance.id';
 
     /**
      * A namespace for `service.name`.
@@ -692,32 +892,23 @@ interface ResourceAttributes
     public const SERVICE_NAMESPACE = 'service.namespace';
 
     /**
-     * The string ID of the service instance.
-     *
-     * MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words `service.namespace,service.name,service.instance.id` triplet MUST be globally unique). The ID helps to distinguish instances of the same service that exist at the same time (e.g. instances of a horizontally scaled service). It is preferable for the ID to be persistent and stay the same for the lifetime of the service instance, however it is acceptable that the ID is ephemeral and changes during important lifetime events for the service (e.g. service restarts). If the service has no inherent unique ID that can be used as the value of this attribute it is recommended to generate a random Version 1 or Version 4 RFC 4122 UUID (services aiming for reproducible UUIDs may also use Version 5, see RFC 4122 for more recommendations).
-     *
-     * @example 627cc493-f310-47de-96bd-71410b7dec09
+     * The language of the telemetry SDK.
      */
-    public const SERVICE_INSTANCE_ID = 'service.instance.id';
-
-    /**
-     * The version string of the service API or implementation.
-     *
-     * @example 2.0.0
-     */
-    public const SERVICE_VERSION = 'service.version';
+    public const TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language';
 
     /**
      * The name of the telemetry SDK as defined above.
      *
+     * The OpenTelemetry SDK MUST set the `telemetry.sdk.name` attribute to `opentelemetry`.
+     * If another SDK, like a fork or a vendor-provided implementation, is used, this SDK MUST set the
+     * `telemetry.sdk.name` attribute to the fully-qualified class or module name of this SDK's main entry point
+     * or another suitable identifier depending on the language.
+     * The identifier `opentelemetry` is reserved and MUST NOT be used in this case.
+     * All custom identifiers SHOULD be stable across different versions of an implementation.
+     *
      * @example opentelemetry
      */
     public const TELEMETRY_SDK_NAME = 'telemetry.sdk.name';
-
-    /**
-     * The language of the telemetry SDK.
-     */
-    public const TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language';
 
     /**
      * The version string of the telemetry SDK.
@@ -727,11 +918,28 @@ interface ResourceAttributes
     public const TELEMETRY_SDK_VERSION = 'telemetry.sdk.version';
 
     /**
-     * The version string of the auto instrumentation agent, if used.
+     * The name of the auto instrumentation agent or distribution, if used.
+     *
+     * Official auto instrumentation agents and distributions SHOULD set the `telemetry.distro.name` attribute to
+     * a string starting with `opentelemetry-`, e.g. `opentelemetry-java-instrumentation`.
+     *
+     * @example parts-unlimited-java
+     */
+    public const TELEMETRY_DISTRO_NAME = 'telemetry.distro.name';
+
+    /**
+     * The version string of the auto instrumentation agent or distribution, if used.
      *
      * @example 1.2.3
      */
-    public const TELEMETRY_AUTO_VERSION = 'telemetry.auto.version';
+    public const TELEMETRY_DISTRO_VERSION = 'telemetry.distro.version';
+
+    /**
+     * Additional description of the web engine (e.g. detailed version and edition information).
+     *
+     * @example WildFly Full 21.0.0.Final (WildFly Core 13.0.1.Final) - 2.2.2.Final
+     */
+    public const WEBENGINE_DESCRIPTION = 'webengine.description';
 
     /**
      * The name of the web engine.
@@ -746,13 +954,6 @@ interface ResourceAttributes
      * @example 21.0.0
      */
     public const WEBENGINE_VERSION = 'webengine.version';
-
-    /**
-     * Additional description of the web engine (e.g. detailed version and edition information).
-     *
-     * @example WildFly Full 21.0.0.Final (WildFly Core 13.0.1.Final) - 2.2.2.Final
-     */
-    public const WEBENGINE_DESCRIPTION = 'webengine.description';
 
     /**
      * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
@@ -785,12 +986,22 @@ interface ResourceAttributes
     public const OTEL_LIBRARY_VERSION = 'otel.library.version';
 
     /**
-     * @deprecated
+     * @deprecated Use USER_AGENT_ORIGINAL
      */
     public const BROWSER_USER_AGENT = 'browser.user_agent';
 
     /**
-     * @deprecated
+     * @deprecated Use CLOUD_RESOURCE_ID
      */
     public const FAAS_ID = 'faas.id';
+
+    /**
+     * @deprecated Use TELEMETRY_DISTRO_VERSION
+     */
+    public const TELEMETRY_AUTO_VERSION = 'telemetry.auto.version';
+
+    /**
+     * @deprecated Use CONTAINER_IMAGE_TAGS
+     */
+    public const CONTAINER_IMAGE_TAG = 'container.image.tag';
 }
