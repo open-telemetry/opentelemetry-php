@@ -8,6 +8,9 @@
 
 Common semantic conventions used by OpenTelemetry implementations across all languages.
 
+Please note that Semantic Conventions are tagged with the version of the
+[Semantic Conventions](https://github.com/open-telemetry/semantic-conventions/tags) that they were generated from.
+
 See https://opentelemetry.io/docs/concepts/semantic-conventions/.
 
 ## Installation
