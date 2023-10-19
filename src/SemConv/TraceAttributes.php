@@ -1939,4 +1939,114 @@ interface TraceAttributes
      * @deprecated
      */
     public const NET_PEER_IP = 'net.peer.ip';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_CLIENT_IP = 'http.client_ip';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_FLAVOR = 'http.flavor';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_CONSUMER_ID = 'messaging.consumer.id';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_DESTINATION_KIND = 'messaging.destination.kind';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_KAFKA_CLIENT_ID = 'messaging.kafka.client_id';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_KAFKA_SOURCE_PARTITION = 'messaging.kafka.source.partition';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES = 'messaging.message.payload_compressed_size_bytes';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES = 'messaging.message.payload_size_bytes';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_ROCKETMQ_CLIENT_ID = 'messaging.rocketmq.client_id';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_SOURCE_ANONYMOUS = 'messaging.source.anonymous';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_SOURCE_KIND = 'messaging.source.kind';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_SOURCE_NAME = 'messaging.source.name';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_SOURCE_TEMPLATE = 'messaging.source.template';
+
+    /**
+     * @deprecated
+     */
+    public const MESSAGING_SOURCE_TEMPORARY = 'messaging.source.temporary';
+
+    /**
+     * @deprecated
+     */
+    public const NET_APP_PROTOCOL_NAME = 'net.app.protocol.name';
+
+    /**
+     * @deprecated
+     */
+    public const NET_APP_PROTOCOL_VERSION = 'net.app.protocol.version';
+
+    /**
+     * @deprecated
+     */
+    public const NET_HOST_CARRIER_ICC = 'net.host.carrier.icc';
+
+    /**
+     * @deprecated
+     */
+    public const NET_HOST_CARRIER_MCC = 'net.host.carrier.mcc';
+
+    /**
+     * @deprecated
+     */
+    public const NET_HOST_CARRIER_MNC = 'net.host.carrier.mnc';
+
+    /**
+     * @deprecated
+     */
+    public const NET_HOST_CARRIER_NAME = 'net.host.carrier.name';
+
+    /**
+     * @deprecated
+     */
+    public const NET_HOST_CONNECTION_SUBTYPE = 'net.host.connection.subtype';
+
+    /**
+     * @deprecated
+     */
+    public const NET_HOST_CONNECTION_TYPE = 'net.host.connection.type';
 }

@@ -14,11 +14,18 @@ If attributes have been removed in an update, you can add them back in via `temp
 the contents will be included in the generated output. Please remember to mark them as deprecated to discourage their future
 use.
 
-After generating new sementic conventions, you can locate removed attributes via:
+After generating new semantic conventions, you can locate removed attributes via:
 
 ```shell
 diff <(grep "public const" src/SemConv/ResourceAttributes.php | sort -u) \
      <(git show main:src/SemConv/ResourceAttributes.php | grep "public const" | sort -u) \
+     | grep '^>' \
+     | grep -v SCHEMA_URL
+```
+
+```shell
+diff <(grep "public const" src/SemConv/TraceAttributes.php | sort -u) \
+     <(git show main:src/SemConv/TraceAttributes.php | grep "public const" | sort -u) \
      | grep '^>' \
      | grep -v SCHEMA_URL
 ```
