@@ -25,6 +25,7 @@ interface KnownValues
     public const VALUE_BAGGAGE = 'baggage';
     public const VALUE_B3 = 'b3';
     public const VALUE_B3_MULTI = 'b3multi';
+    public const VALUE_XCLOUD_TRACE = 'xcloudtrace';
     public const VALUE_XRAY = 'xray';
     public const VALUE_OTTRACE = 'ottrace';
     public const VALUE_ALWAYS_ON = 'always_on';
