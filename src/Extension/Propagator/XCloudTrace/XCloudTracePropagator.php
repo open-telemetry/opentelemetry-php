@@ -12,6 +12,11 @@ use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 
+/**
+ * XCloudTracePropagator is a propagator that supports the specification for the X-Cloud-Trace-Context
+ * header used for trace context propagation across service boundaries.
+ * (https://cloud.google.com/trace/docs/setup#force-trace)
+ */
 final class XCloudTracePropagator implements TextMapPropagatorInterface
 {
 
