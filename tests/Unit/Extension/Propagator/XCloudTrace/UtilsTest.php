@@ -14,14 +14,14 @@ class UtilsTest extends TestCase
 {
 
     /**
-     * @dataProvider for_test_leftZeroPad
+     * @dataProvider for_test_left_zero_pad
      */
-    public function test_leftZeroPad(string $pad, int $howMuch, string $equalsTo) : void
+    public function test_left_zero_pad(string $pad, int $howMuch, string $equalsTo) : void
     {
         $this->assertEquals(Utils::leftZeroPad($pad, $howMuch), $equalsTo, "Given leftZeroPad($pad, $howMuch) != $equalsTo");
     }
 
-    public function for_test_leftZeroPad() : array {
+    public function for_test_left_zero_pad() : array {
         return [
             ['a', 3, '00a'],
             ['aaa', 3, 'aaa'],
@@ -31,14 +31,14 @@ class UtilsTest extends TestCase
     }
 
     /**
-     * @dataProvider for_test_decToHex
+     * @dataProvider for_test_dec_to_hex
      */
-    public function test_decToHex(string $decNum, string $equalsTo) : void
+    public function test_dec_to_hex(string $decNum, string $equalsTo) : void
     {
         $this->assertEquals(Utils::decToHex($decNum), $equalsTo, "Given decToHex($decNum) != $equalsTo");
     }
 
-    public function for_test_decToHex() : array {
+    public function for_test_dec_to_hex() : array {
         return [
             ['10', 'a'],
             ['1', '1'],
@@ -49,14 +49,14 @@ class UtilsTest extends TestCase
     }
 
     /**
-     * @dataProvider for_test_hexToDec
+     * @dataProvider for_test_hex_to_dec
      */
-    public function test_hexToDec(string $hexNum, string $equalsTo) : void
+    public function test_hex_to_dec(string $hexNum, string $equalsTo) : void
     {
         $this->assertEquals(Utils::hexToDec($hexNum), $equalsTo, "Given hexToDec($hexNum) != $equalsTo");
     }
 
-    public function for_test_hexToDec() : array {
+    public function for_test_hex_to_dec() : array {
         return [
             ['a', '10'],
             ['B', '11'],
@@ -74,14 +74,14 @@ class UtilsTest extends TestCase
     }
 
     /**
-     * @dataProvider for_test_isBigNum
+     * @dataProvider for_test_is_big_num
      */
-    public function test_isBigNum(int|float $num, bool $equalsTo) : void
+    public function test_is_big_num(int|float $num, bool $equalsTo) : void
     {
         $this->assertEquals(Utils::isBigNum($num), $equalsTo, "Given isBigNum($num) != $equalsTo");
     }
 
-    public function for_test_isBigNum() : array {
+    public function for_test_is_big_num() : array {
         return [
             [-100.5, false],
             [-1, false],
@@ -96,15 +96,15 @@ class UtilsTest extends TestCase
     }
 
     /**
-     * @dataProvider for_test_baseConvert
+     * @dataProvider for_test_base_convert
      */
-    public function test_baseConvert(string $num, int $fromBase, int $toBase, string $equalsTo) : void
+    public function test_base_convert(string $num, int $fromBase, int $toBase, string $equalsTo) : void
     {
         $result = Utils::baseConvert($num, $fromBase, $toBase);
         $this->assertEquals($result, $equalsTo, "Given baseConvert($num, $fromBase, $toBase) != $equalsTo (result=$result)");
     }
 
-    public function for_test_baseConvert() : array {
+    public function for_test_base_convert() : array {
         return [
             ['b', 16, 10, '11'],
             ['c', 16, 10, '12'],
