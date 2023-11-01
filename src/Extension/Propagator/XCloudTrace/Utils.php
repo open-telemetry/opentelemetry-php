@@ -69,7 +69,7 @@ final class Utils
      * @param int|float $number The number to test.
      * @return bool Whether it was bigger or not than the max.
      */
-    public static function isBigNum(int|float $number) : bool
+    public static function isBigNum($number) : bool
     {
         return $number >= PHP_INT_MAX;
     }
@@ -94,6 +94,7 @@ final class Utils
         $length = strlen($num);
         $result = '';
 
+        $number = [];
         for ($i = 0; $i < $length; $i++) {
             $number[$i] = strpos($chars, $num[$i]);
         }
@@ -102,10 +103,13 @@ final class Utils
             $divide = 0;
             $newlen = 0;
             for ($i = 0; $i < $length; $i++) {
+                if (!isset($number[$i]) || $number[$i] === false) {
+                    return '';
+                }
                 $divide = $divide * $fromBase + $number[$i];
                 if ($divide >= $toBase) {
                     $number[$newlen++] = (int) ($divide / $toBase);
-                    $divide = $divide % $toBase;
+                    $divide %= $toBase;
                 } elseif ($newlen > 0) {
                     $number[$newlen++] = 0;
                 }

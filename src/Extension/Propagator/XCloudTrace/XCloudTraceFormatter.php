@@ -26,19 +26,23 @@ final class XCloudTraceFormatter
      */
     public static function deserialize(string $header) : SpanContextInterface
     {
-        if (preg_match(self::CONTEXT_HEADER_FORMAT, $header, $matches)) {
-            return SpanContext::createFromRemoteParent(
-                strtolower($matches[1]),
-                array_key_exists(2, $matches) && !empty($matches[2])
-                    ? Utils::leftZeroPad(Utils::decToHex($matches[2]))
-                    : null,
-                array_key_exists(3, $matches)
-                    ? (int) ($matches[3] == '1')
-                    : null
-            );
+        $matched = preg_match(self::CONTEXT_HEADER_FORMAT, $header, $matches);
+
+        if (!$matched) {
+            return SpanContext::getInvalid();
+        }
+        if (!array_key_exists(2, $matches) || empty($matches[2])) {
+            return SpanContext::getInvalid();
+        }
+        if (!array_key_exists(3, $matches)) {
+            return SpanContext::getInvalid();
         }
 
-        return SpanContext::getInvalid();
+        return SpanContext::createFromRemoteParent(
+            strtolower($matches[1]),
+            Utils::leftZeroPad(Utils::decToHex($matches[2])),
+            (int) ($matches[3] == '1')
+        );
     }
 
     /**
@@ -53,8 +57,7 @@ final class XCloudTraceFormatter
         if ($context->getSpanId()) {
             $ret .= '/' . Utils::hexToDec($context->getSpanId());
         }
-        $ret .= ';o=' . ($context->isSampled() ? '1' : '0');
 
-        return $ret;
+        return $ret . (';o=' . ($context->isSampled() ? '1' : '0'));
     }
 }

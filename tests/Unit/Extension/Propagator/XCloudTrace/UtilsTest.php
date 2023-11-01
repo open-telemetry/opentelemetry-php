@@ -79,7 +79,7 @@ class UtilsTest extends TestCase
     /**
      * @dataProvider for_test_is_big_num
      */
-    public function test_is_big_num(int|float $num, bool $equalsTo) : void
+    public function test_is_big_num($num, bool $equalsTo) : void
     {
         $this->assertEquals(Utils::isBigNum($num), $equalsTo, "Given isBigNum($num) != $equalsTo");
     }
