@@ -6,14 +6,8 @@ namespace OpenTelemetry\Tests\Unit\Extension\Propagator\XCloudTrace;
 
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
-use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\API\Trace\TraceFlags;
-use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextInterface;
-use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Extension\Propagator\XCloudTrace\XCloudTraceFormatter;
-use OpenTelemetry\Extension\Propagator\XCloudTrace\XCloudTracePropagator;
-use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
 /**

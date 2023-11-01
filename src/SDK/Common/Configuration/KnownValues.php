@@ -106,6 +106,7 @@ interface KnownValues
         self::VALUE_BAGGAGE, // W3C Baggage
         self::VALUE_B3, // B3 Single
         self::VALUE_B3_MULTI, // B3 Multi
+        self::VALUE_XCLOUD_TRACE, // GCP XCloudTraceContext
         self::VALUE_XRAY, // AWS X-Ray (third party)
         self::VALUE_OTTRACE, // OT Trace (third party)
         self::VALUE_NONE, // No automatically configured propagator.

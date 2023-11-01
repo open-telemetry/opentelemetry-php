@@ -16,7 +16,7 @@ use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\Extension\Propagator\XCloudTrace\XCloudTracePropagatorTest
+ * @covers \OpenTelemetry\Extension\Propagator\XCloudTrace\XCloudTracePropagator
  */
 class XCloudTracePropagatorTest extends TestCase
 {
