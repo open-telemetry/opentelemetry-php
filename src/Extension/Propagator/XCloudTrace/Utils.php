@@ -9,7 +9,8 @@ namespace OpenTelemetry\Extension\Propagator\XCloudTrace;
  * This class mostly contains numerical handling functions to work with
  * trace and span IDs.
  */
-final class Utils {
+final class Utils
+{
 
     /**
      * Pads the string with zero string characters on left hand side, to max total string size.
@@ -18,7 +19,8 @@ final class Utils {
      * @param int $amount Total String size, default is 16.
      * @return string The padded string
      */
-    public static function leftZeroPad(string $str, int $amount = 16) : string {
+    public static function leftZeroPad(string $str, int $amount = 16) : string
+    {
         return str_pad($str, $amount, '0', STR_PAD_LEFT);
     }
 
@@ -35,6 +37,7 @@ final class Utils {
         if (Utils::isBigNum($int)) {
             return Utils::baseConvert($num, 10, 16);
         }
+
         return dechex($int);
     }
 
@@ -51,7 +54,8 @@ final class Utils {
         if (Utils::isBigNum($dec)) {
             return Utils::baseConvert($num, 16, 10);
         }
-        return strval($dec);
+
+        return (string) $dec;
     }
 
     /**
@@ -84,7 +88,7 @@ final class Utils {
     public static function baseConvert(string $num, int $fromBase, int $toBase) : string
     {
         $num = strtolower($num);
-        $chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+        $chars = '0123456789abcdefghijklmnopqrstuvwxyz';
         $newstring = substr($chars, 0, $toBase);
 
         $length = strlen($num);
@@ -100,7 +104,7 @@ final class Utils {
             for ($i = 0; $i < $length; $i++) {
                 $divide = $divide * $fromBase + $number[$i];
                 if ($divide >= $toBase) {
-                    $number[$newlen++] = (int)($divide / $toBase);
+                    $number[$newlen++] = (int) ($divide / $toBase);
                     $divide = $divide % $toBase;
                 } elseif ($newlen > 0) {
                     $number[$newlen++] = 0;
@@ -112,5 +116,4 @@ final class Utils {
 
         return $result;
     }
-
 }

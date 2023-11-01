@@ -19,10 +19,8 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
  */
 final class XCloudTracePropagator implements TextMapPropagatorInterface
 {
-
     private static ?TextMapPropagatorInterface $oneWayInstance = null;
     private static ?TextMapPropagatorInterface $instance = null;
-
 
     public static function getOneWayInstance(): TextMapPropagatorInterface
     {
@@ -50,7 +48,8 @@ final class XCloudTracePropagator implements TextMapPropagatorInterface
 
     private bool $oneWay;
 
-    private function __construct(bool $oneWay) {
+    private function __construct(bool $oneWay)
+    {
         $this->oneWay = $oneWay;
     }
 
@@ -63,7 +62,7 @@ final class XCloudTracePropagator implements TextMapPropagatorInterface
     /** {@inheritdoc} */
     public function inject(&$carrier, PropagationSetterInterface $setter = null, ContextInterface $context = null): void
     {
-        if($this->oneWay) {
+        if ($this->oneWay) {
             return;
         }
 
@@ -97,5 +96,4 @@ final class XCloudTracePropagator implements TextMapPropagatorInterface
 
         return $context->withContextValue(Span::wrap($spanContext));
     }
-
 }

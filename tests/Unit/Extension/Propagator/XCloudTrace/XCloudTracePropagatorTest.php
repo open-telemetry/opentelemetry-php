@@ -20,7 +20,6 @@ use PHPUnit\Framework\TestCase;
  */
 class XCloudTracePropagatorTest extends TestCase
 {
-
     private const TRACE_ID_BASE16 = 'ff000000000000000000000000000041';
     private const SPAN_ID_BASE16 = '0000000000000013';
     private const SPAN_ID_BASE10 = '19';
@@ -136,7 +135,7 @@ class XCloudTracePropagatorTest extends TestCase
     public function test_extract_sampled_context(): void
     {
         $carrier = [
-            $this->xcloud => self::TRACE_ID_BASE16 . '/' . self::SPAN_ID_BASE10 . ';o=' . self::TRACE_ENABLED
+            $this->xcloud => self::TRACE_ID_BASE16 . '/' . self::SPAN_ID_BASE10 . ';o=' . self::TRACE_ENABLED,
         ];
 
         $context = $this->xCloudTracePropagator->extract($carrier);
@@ -150,7 +149,7 @@ class XCloudTracePropagatorTest extends TestCase
     public function test_extract_non_sampled_context(): void
     {
         $carrier = [
-            $this->xcloud => self::TRACE_ID_BASE16 . '/' . self::SPAN_ID_BASE10 . ';o=' . self::TRACE_DISABLED
+            $this->xcloud => self::TRACE_ID_BASE16 . '/' . self::SPAN_ID_BASE10 . ';o=' . self::TRACE_DISABLED,
         ];
 
         $context = $this->xCloudTracePropagator->extract($carrier);
@@ -170,5 +169,4 @@ class XCloudTracePropagatorTest extends TestCase
     {
         return $context->withContextValue(Span::wrap($spanContext));
     }
-
 }

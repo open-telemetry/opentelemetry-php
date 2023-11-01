@@ -33,10 +33,11 @@ final class XCloudTraceFormatter
                     ? Utils::leftZeroPad(Utils::decToHex($matches[2]))
                     : null,
                 array_key_exists(3, $matches)
-                    ? (int)($matches[3] == '1')
+                    ? (int) ($matches[3] == '1')
                     : null
             );
         }
+
         return SpanContext::getInvalid();
     }
 
@@ -53,7 +54,7 @@ final class XCloudTraceFormatter
             $ret .= '/' . Utils::hexToDec($context->getSpanId());
         }
         $ret .= ';o=' . ($context->isSampled() ? '1' : '0');
+
         return $ret;
     }
-
 }

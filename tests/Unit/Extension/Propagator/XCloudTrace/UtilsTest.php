@@ -21,7 +21,8 @@ class UtilsTest extends TestCase
         $this->assertEquals(Utils::leftZeroPad($pad, $howMuch), $equalsTo, "Given leftZeroPad($pad, $howMuch) != $equalsTo");
     }
 
-    public function for_test_left_zero_pad() : array {
+    public function for_test_left_zero_pad() : array
+    {
         return [
             ['a', 3, '00a'],
             ['aaa', 3, 'aaa'],
@@ -38,13 +39,14 @@ class UtilsTest extends TestCase
         $this->assertEquals(Utils::decToHex($decNum), $equalsTo, "Given decToHex($decNum) != $equalsTo");
     }
 
-    public function for_test_dec_to_hex() : array {
+    public function for_test_dec_to_hex() : array
+    {
         return [
             ['10', 'a'],
             ['1', '1'],
             ['9223372036854775807', '7fffffffffffffff'],
             ['18446744073709551615', 'ffffffffffffffff'],
-            ['28446744073709551615', '18ac7230489e7ffff']
+            ['28446744073709551615', '18ac7230489e7ffff'],
         ];
     }
 
@@ -56,7 +58,8 @@ class UtilsTest extends TestCase
         $this->assertEquals(Utils::hexToDec($hexNum), $equalsTo, "Given hexToDec($hexNum) != $equalsTo");
     }
 
-    public function for_test_hex_to_dec() : array {
+    public function for_test_hex_to_dec() : array
+    {
         return [
             ['a', '10'],
             ['B', '11'],
@@ -69,7 +72,7 @@ class UtilsTest extends TestCase
             ['7fffffffffffffff', '9223372036854775807'],
             ['8000000000000000', '9223372036854775808'],
             ['ffffffffffffffff', '18446744073709551615'],
-            ['18ac7230489e7ffff', '28446744073709551615']
+            ['18ac7230489e7ffff', '28446744073709551615'],
         ];
     }
 
@@ -81,7 +84,8 @@ class UtilsTest extends TestCase
         $this->assertEquals(Utils::isBigNum($num), $equalsTo, "Given isBigNum($num) != $equalsTo");
     }
 
-    public function for_test_is_big_num() : array {
+    public function for_test_is_big_num() : array
+    {
         return [
             [-100.5, false],
             [-1, false],
@@ -104,7 +108,8 @@ class UtilsTest extends TestCase
         $this->assertEquals($result, $equalsTo, "Given baseConvert($num, $fromBase, $toBase) != $equalsTo (result=$result)");
     }
 
-    public function for_test_base_convert() : array {
+    public function for_test_base_convert() : array
+    {
         return [
             ['b', 16, 10, '11'],
             ['c', 16, 10, '12'],
@@ -115,8 +120,7 @@ class UtilsTest extends TestCase
             ['8000000000000000', 16, 10, '9223372036854775808'], // bigger than signed int max 64 bit
             ['18ac7230489e7ffff', 16, 10, '28446744073709551615'],
             ['28446744073709551615', 10, 16, '18ac7230489e7ffff'],
-            ['10', 10, 16, 'a']
+            ['10', 10, 16, 'a'],
         ];
     }
-
 }
