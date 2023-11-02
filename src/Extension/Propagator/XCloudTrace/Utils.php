@@ -34,8 +34,8 @@ final class Utils
     public static function decToHex(string $num) : string
     {
         $int = (int) $num;
-        if (Utils::isBigNum($int)) {
-            return Utils::baseConvert($num, 10, 16);
+        if (self::isBigNum($int)) {
+            return self::baseConvert($num, 10, 16);
         }
 
         return dechex($int);
@@ -51,8 +51,8 @@ final class Utils
     public static function hexToDec(string $num) : string
     {
         $dec = hexdec($num);
-        if (Utils::isBigNum($dec)) {
-            return Utils::baseConvert($num, 16, 10);
+        if (self::isBigNum($dec)) {
+            return self::baseConvert($num, 16, 10);
         }
 
         return (string) $dec;
