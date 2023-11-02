@@ -79,6 +79,7 @@ jobs:
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash) -F ${{ matrix.php-version }}
 
+    - uses: anchore/sbom-action@v0
   packages:
     uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@main
     needs: php
