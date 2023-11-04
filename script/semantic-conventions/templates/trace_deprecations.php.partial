@@ -197,3 +197,13 @@
      * @deprecated
      */
     public const NET_HOST_CONNECTION_TYPE = 'net.host.connection.type';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_RESEND_COUNT = 'http.resend_count';
+
+    /**
+     * @deprecated
+     */
+    public const THREAD_DAEMON = 'thread.daemon';

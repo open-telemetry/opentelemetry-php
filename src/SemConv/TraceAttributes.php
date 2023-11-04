@@ -11,12 +11,12 @@ interface TraceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.22.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.23.0';
 
     /**
-     * Client address - domain name if available without reverse DNS lookup, otherwise IP address or Unix domain socket name.
+     * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
      *
-     * When observed from the server side, and when communicating through an intermediary, `client.address` SHOULD represent the client address behind any intermediaries (e.g. proxies) if it's available.
+     * When observed from the server side, and when communicating through an intermediary, `client.address` SHOULD represent the client address behind any intermediaries,  for example proxies, if it's available.
      *
      * @example client.example.com
      * @example 10.1.2.80
@@ -27,116 +27,16 @@ interface TraceAttributes
     /**
      * Client port number.
      *
-     * When observed from the server side, and when communicating through an intermediary, `client.port` SHOULD represent the client port behind any intermediaries (e.g. proxies) if it's available.
+     * When observed from the server side, and when communicating through an intermediary, `client.port` SHOULD represent the client port behind any intermediaries,  for example proxies, if it's available.
      *
      * @example 65123
      */
     public const CLIENT_PORT = 'client.port';
 
     /**
-     * Deprecated, use `server.address`.
+     * Destination address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
      *
-     * @deprecated Deprecated, use `server.address`..
-     * @example example.com
-     */
-    public const NET_HOST_NAME = 'net.host.name';
-
-    /**
-     * Deprecated, use `server.port`.
-     *
-     * @deprecated Deprecated, use `server.port`..
-     * @example 8080
-     */
-    public const NET_HOST_PORT = 'net.host.port';
-
-    /**
-     * Deprecated, use `server.address` on client spans and `client.address` on server spans.
-     *
-     * @deprecated Deprecated, use `server.address` on client spans and `client.address` on server spans..
-     * @example example.com
-     */
-    public const NET_PEER_NAME = 'net.peer.name';
-
-    /**
-     * Deprecated, use `server.port` on client spans and `client.port` on server spans.
-     *
-     * @deprecated Deprecated, use `server.port` on client spans and `client.port` on server spans..
-     * @example 8080
-     */
-    public const NET_PEER_PORT = 'net.peer.port';
-
-    /**
-     * Deprecated, use `network.protocol.name`.
-     *
-     * @deprecated Deprecated, use `network.protocol.name`..
-     * @example amqp
-     * @example http
-     * @example mqtt
-     */
-    public const NET_PROTOCOL_NAME = 'net.protocol.name';
-
-    /**
-     * Deprecated, use `network.protocol.version`.
-     *
-     * @deprecated Deprecated, use `network.protocol.version`..
-     * @example 3.1.1
-     */
-    public const NET_PROTOCOL_VERSION = 'net.protocol.version';
-
-    /**
-     * Deprecated, use `network.transport` and `network.type`.
-     */
-    public const NET_SOCK_FAMILY = 'net.sock.family';
-
-    /**
-     * Deprecated, use `network.local.address`.
-     *
-     * @deprecated Deprecated, use `network.local.address`..
-     * @example /var/my.sock
-     */
-    public const NET_SOCK_HOST_ADDR = 'net.sock.host.addr';
-
-    /**
-     * Deprecated, use `network.local.port`.
-     *
-     * @deprecated Deprecated, use `network.local.port`..
-     * @example 8080
-     */
-    public const NET_SOCK_HOST_PORT = 'net.sock.host.port';
-
-    /**
-     * Deprecated, use `network.peer.address`.
-     *
-     * @deprecated Deprecated, use `network.peer.address`..
-     * @example 192.168.0.1
-     */
-    public const NET_SOCK_PEER_ADDR = 'net.sock.peer.addr';
-
-    /**
-     * Deprecated, no replacement at this time.
-     *
-     * @deprecated Deprecated, no replacement at this time..
-     * @example /var/my.sock
-     */
-    public const NET_SOCK_PEER_NAME = 'net.sock.peer.name';
-
-    /**
-     * Deprecated, use `network.peer.port`.
-     *
-     * @deprecated Deprecated, use `network.peer.port`..
-     * @example 65531
-     */
-    public const NET_SOCK_PEER_PORT = 'net.sock.peer.port';
-
-    /**
-     * Deprecated, use `network.transport`.
-     */
-    public const NET_TRANSPORT = 'net.transport';
-
-    /**
-     * Destination address - domain name if available without reverse DNS lookup, otherwise IP address or Unix domain socket name.
-     *
-     * When observed from the source side, and when communicating through an intermediary, `destination.address` SHOULD represent the destination address behind any intermediaries (e.g. proxies) if it's available.
+     * When observed from the source side, and when communicating through an intermediary, `destination.address` SHOULD represent the destination address behind any intermediaries, for example proxies, if it's available.
      *
      * @example destination.example.com
      * @example 10.1.2.80
@@ -156,12 +56,14 @@ interface TraceAttributes
      * Describes a class of error the operation ended with.
      *
      * The `error.type` SHOULD be predictable and SHOULD have low cardinality.
-     * Instrumentations SHOULD document the list of errors they report.The cardinality of `error.type` within one instrumentation library SHOULD be low, but
-     * telemetry consumers that aggregate data from multiple instrumentation libraries and applications
-     * should be prepared for `error.type` to have high cardinality at query time, when no
-     * additional filters are applied.If the operation has completed successfully, instrumentations SHOULD NOT set `error.type`.If a specific domain defines its own set of error codes (such as HTTP or gRPC status codes),
-     * it's RECOMMENDED to use a domain-specific attribute and also set `error.type` to capture
-     * all errors, regardless of whether they are defined within the domain-specific set or not.
+     * Instrumentations SHOULD document the list of errors they report.The cardinality of `error.type` within one instrumentation library SHOULD be low.
+     * Telemetry consumers that aggregate data from multiple instrumentation libraries and applications
+     * should be prepared for `error.type` to have high cardinality at query time when no
+     * additional filters are applied.If the operation has completed successfully, instrumentations SHOULD NOT set `error.type`.If a specific domain defines its own set of error identifiers (such as HTTP or gRPC status codes),
+     * it's RECOMMENDED to:<ul>
+     * <li>Use a domain-specific attribute</li>
+     * <li>Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not.</li>
+     * </ul>
      *
      * @example timeout
      * @example java.net.UnknownHostException
@@ -252,11 +154,6 @@ interface TraceAttributes
     public const ENDUSER_SCOPE = 'enduser.scope';
 
     /**
-     * Whether the thread is daemon or not.
-     */
-    public const THREAD_DAEMON = 'thread.daemon';
-
-    /**
      * Current &quot;managed&quot; thread ID (as opposed to OS thread ID).
      *
      * @example 42
@@ -343,7 +240,7 @@ interface TraceAttributes
     /**
      * Version of the protocol specified in `network.protocol.name`.
      *
-     * `network.protocol.version` refers to the version of the protocol used and might be different from the protocol client's version. If the HTTP client used has a version of `0.27.2`, but sends HTTP version `1.1`, this attribute should be set to `1.1`.
+     * `network.protocol.version` refers to the version of the protocol used and might be different from the protocol client's version. If the HTTP client has a version of `0.27.2`, but sends HTTP version `1.1`, this attribute should be set to `1.1`.
      *
      * @example 1.0
      * @example 1.1
@@ -355,13 +252,7 @@ interface TraceAttributes
     /**
      * Host identifier of the &quot;URI origin&quot; HTTP request is sent to.
      *
-     * Determined by using the first of the following that applies<ul>
-     * <li>Host identifier of the request target
-     * if it's sent in absolute-form</li>
-     * <li>Host identifier of the `Host` header</li>
-     * </ul>
-     * If an HTTP client request is explicitly made to an IP address, e.g. `http://x.x.x.x:8080`, then
-     * `server.address` SHOULD be the IP address `x.x.x.x`. A DNS lookup SHOULD NOT be used.
+     * If an HTTP client request is explicitly made to an IP address, e.g. `http://x.x.x.x:8080`, then `server.address` SHOULD be the IP address `x.x.x.x`. A DNS lookup SHOULD NOT be used.
      *
      * @example example.com
      * @example 10.1.2.80
@@ -372,24 +263,13 @@ interface TraceAttributes
     /**
      * Port identifier of the &quot;URI origin&quot; HTTP request is sent to.
      *
-     * When request target is absolute URI, `server.port` MUST match URI port identifier, otherwise it MUST match `Host` header port identifier.
+     * When observed from the client side, and when communicating through an intermediary, `server.port` SHOULD represent the server port behind any intermediaries, for example proxies, if it's available.
      *
      * @example 80
      * @example 8080
      * @example 443
      */
     public const SERVER_PORT = 'server.port';
-
-    /**
-     * The matched route (path template in the format used by the respective server framework). See note below.
-     *
-     * MUST NOT be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
-     * SHOULD include the application root if there is one.
-     *
-     * @example /users/:userID?
-     * @example {controller}/{action}/{id?}
-     */
-    public const HTTP_ROUTE = 'http.route';
 
     /**
      * The URI scheme component identifying the used protocol.
@@ -400,10 +280,20 @@ interface TraceAttributes
     public const URL_SCHEME = 'url.scheme';
 
     /**
+     * The matched route, that is, the path template in the format used by the respective server framework.
+     *
+     * MUST NOT be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
+     * SHOULD include the application root if there is one.
+     *
+     * @example /users/:userID?
+     * @example {controller}/{action}/{id?}
+     */
+    public const HTTP_ROUTE = 'http.route';
+
+    /**
      * The domain identifies the business context for the events.
      *
-     * Events across different domains may have same `event.name`, yet be
-     * unrelated events.
+     * Events across different domains may have same `event.name`, yet be unrelated events.
      */
     public const EVENT_DOMAIN = 'event.domain';
 
@@ -489,7 +379,21 @@ interface TraceAttributes
     public const LOG_FILE_PATH_RESOLVED = 'log.file.path_resolved';
 
     /**
-     * The name of the connection pool; unique within the instrumented application. In case the connection pool implementation does not provide a name, then the db.connection_string should be used.
+     * This attribute represents the state the application has transitioned into at the occurrence of the event.
+     *
+     * The iOS lifecycle states are defined in the UIApplicationDelegate documentation, and from which the `OS terminology` column values are derived.
+     */
+    public const IOS_STATE = 'ios.state';
+
+    /**
+     * This attribute represents the state the application has transitioned into at the occurrence of the event.
+     *
+     * The Android lifecycle states are defined in Activity lifecycle callbacks, and from which the `OS identifiers` are derived.
+     */
+    public const ANDROID_STATE = 'android.state';
+
+    /**
+     * The name of the connection pool; unique within the instrumented application. In case the connection pool implementation doesn't provide a name, then the db.connection_string should be used.
      *
      * @example myDataSource
      */
@@ -535,7 +439,7 @@ interface TraceAttributes
      * OSI transport layer or inter-process communication method.
      *
      * The value SHOULD be normalized to lowercase.Consider always setting the transport when setting a port number, since
-     * a port number is ambiguous without knowing the transport, for example
+     * a port number is ambiguous without knowing the transport. For example
      * different processes could be listening on TCP port 12345 and UDP port 12345.
      *
      * @example tcp
@@ -756,6 +660,152 @@ interface TraceAttributes
     public const NETWORK_CONNECTION_TYPE = 'network.connection.type';
 
     /**
+     * The cloud account ID the resource is assigned to.
+     *
+     * @example 111111111111
+     * @example opentelemetry
+     */
+    public const CLOUD_ACCOUNT_ID = 'cloud.account.id';
+
+    /**
+     * Cloud regions often have multiple, isolated locations known as zones to increase availability. Availability zone represents the zone where the resource is running.
+     *
+     * Availability zones are called &quot;zones&quot; on Alibaba Cloud and Google Cloud.
+     *
+     * @example us-east-1c
+     */
+    public const CLOUD_AVAILABILITY_ZONE = 'cloud.availability_zone';
+
+    /**
+     * The cloud platform in use.
+     *
+     * The prefix of the service SHOULD match the one specified in `cloud.provider`.
+     */
+    public const CLOUD_PLATFORM = 'cloud.platform';
+
+    /**
+     * Name of the cloud provider.
+     */
+    public const CLOUD_PROVIDER = 'cloud.provider';
+
+    /**
+     * The geographical region the resource is running.
+     *
+     * Refer to your provider's docs to see the available regions, for example Alibaba Cloud regions, AWS regions, Azure regions, Google Cloud regions, or Tencent Cloud regions.
+     *
+     * @example us-central1
+     * @example us-east-1
+     */
+    public const CLOUD_REGION = 'cloud.region';
+
+    /**
+     * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an ARN on AWS, a fully qualified resource ID on Azure, a full resource name on GCP).
+     *
+     * On some cloud providers, it may not be possible to determine the full ID at startup,
+     * so it may be necessary to set `cloud.resource_id` as a span attribute instead.The exact value to use for `cloud.resource_id` depends on the cloud provider.
+     * The following well-known definitions MUST be used if you set this attribute and they apply:<ul>
+     * <li><strong>AWS Lambda:</strong> The function ARN.
+     * Take care not to use the &quot;invoked ARN&quot; directly but replace any
+     * alias suffix
+     * with the resolved function version, as the same runtime instance may be invokable with
+     * multiple different aliases.</li>
+     * <li><strong>GCP:</strong> The URI of the resource</li>
+     * <li><strong>Azure:</strong> The Fully Qualified Resource ID of the invoked function,
+     * <em>not</em> the function app, having the form
+     * `/subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>`.
+     * This means that a span attribute MUST be used, as an Azure function app can host multiple functions that would usually share
+     * a TracerProvider.</li>
+     * </ul>
+     *
+     * @example arn:aws:lambda:REGION:ACCOUNT_ID:function:my-function
+     * @example //run.googleapis.com/projects/PROJECT_ID/locations/LOCATION_ID/services/SERVICE_ID
+     * @example /subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>
+     */
+    public const CLOUD_RESOURCE_ID = 'cloud.resource_id';
+
+    /**
+     * The command used to run the container (i.e. the command name).
+     *
+     * If using embedded credentials or sensitive data, it is recommended to remove them to prevent potential leakage.
+     *
+     * @example otelcontribcol
+     */
+    public const CONTAINER_COMMAND = 'container.command';
+
+    /**
+     * All the command arguments (including the command/executable itself) run by the container. [2].
+     *
+     * @example otelcontribcol, --config, config.yaml
+     */
+    public const CONTAINER_COMMAND_ARGS = 'container.command_args';
+
+    /**
+     * The full command run by the container as a single string representing the full command. [2].
+     *
+     * @example otelcontribcol --config config.yaml
+     */
+    public const CONTAINER_COMMAND_LINE = 'container.command_line';
+
+    /**
+     * Container ID. Usually a UUID, as for example used to identify Docker containers. The UUID might be abbreviated.
+     *
+     * @example a3bf90e006b2
+     */
+    public const CONTAINER_ID = 'container.id';
+
+    /**
+     * Runtime specific image identifier. Usually a hash algorithm followed by a UUID.
+     *
+     * Docker defines a sha256 of the image id; `container.image.id` corresponds to the `Image` field from the Docker container inspect API endpoint.
+     * K8s defines a link to the container registry repository with digest `"imageID": "registry.azurecr.io /namespace/service/dockerfile@sha256:bdeabd40c3a8a492eaf9e8e44d0ebbb84bac7ee25ac0cf8a7159d25f62555625"`.
+     * The ID is assinged by the container runtime and can vary in different environments. Consider using `oci.manifest.digest` if it is important to identify the same image in different environments/runtimes.
+     *
+     * @example sha256:19c92d0a00d1b66d897bceaa7319bee0dd38a10a851c60bcec9474aa3f01e50f
+     */
+    public const CONTAINER_IMAGE_ID = 'container.image.id';
+
+    /**
+     * Name of the image the container was built on.
+     *
+     * @example gcr.io/opentelemetry/operator
+     */
+    public const CONTAINER_IMAGE_NAME = 'container.image.name';
+
+    /**
+     * Repo digests of the container image as provided by the container runtime.
+     *
+     * Docker and CRI report those under the `RepoDigests` field.
+     *
+     * @example example@sha256:afcc7f1ac1b49db317a7196c902e61c6c3c4607d63599ee1a82d702d249a0ccb
+     * @example internal.registry.example.com:5000/example@sha256:b69959407d21e8a062e0416bf13405bb2b71ed7a84dde4158ebafacfa06f5578
+     */
+    public const CONTAINER_IMAGE_REPO_DIGESTS = 'container.image.repo_digests';
+
+    /**
+     * Container image tags. An example can be found in Docker Image Inspect. Should be only the `<tag>` section of the full name for example from `registry.example.com/my-org/my-image:<tag>`.
+     *
+     * @example v1.27.1
+     * @example 3.5.7-0
+     */
+    public const CONTAINER_IMAGE_TAGS = 'container.image.tags';
+
+    /**
+     * Container name used by container runtime.
+     *
+     * @example opentelemetry-autoconf
+     */
+    public const CONTAINER_NAME = 'container.name';
+
+    /**
+     * The container runtime managing this container.
+     *
+     * @example docker
+     * @example containerd
+     * @example rkt
+     */
+    public const CONTAINER_RUNTIME = 'container.runtime';
+
+    /**
      * Deprecated, use `http.request.method` instead.
      *
      * @deprecated Deprecated, use `http.request.method` instead..
@@ -766,17 +816,17 @@ interface TraceAttributes
     public const HTTP_METHOD = 'http.method';
 
     /**
-     * Deprecated, use `http.request.body.size` instead.
+     * Deprecated, use `http.request.header.content-length` instead.
      *
-     * @deprecated Deprecated, use `http.request.body.size` instead..
+     * @deprecated Deprecated, use `http.request.header.content-length` instead..
      * @example 3495
      */
     public const HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length';
 
     /**
-     * Deprecated, use `http.response.body.size` instead.
+     * Deprecated, use `http.response.header.content-length` instead.
      *
-     * @deprecated Deprecated, use `http.response.body.size` instead..
+     * @deprecated Deprecated, use `http.response.header.content-length` instead..
      * @example 3495
      */
     public const HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length';
@@ -815,6 +865,106 @@ interface TraceAttributes
     public const HTTP_URL = 'http.url';
 
     /**
+     * Deprecated, use `server.address`.
+     *
+     * @deprecated Deprecated, use `server.address`..
+     * @example example.com
+     */
+    public const NET_HOST_NAME = 'net.host.name';
+
+    /**
+     * Deprecated, use `server.port`.
+     *
+     * @deprecated Deprecated, use `server.port`..
+     * @example 8080
+     */
+    public const NET_HOST_PORT = 'net.host.port';
+
+    /**
+     * Deprecated, use `server.address` on client spans and `client.address` on server spans.
+     *
+     * @deprecated Deprecated, use `server.address` on client spans and `client.address` on server spans..
+     * @example example.com
+     */
+    public const NET_PEER_NAME = 'net.peer.name';
+
+    /**
+     * Deprecated, use `server.port` on client spans and `client.port` on server spans.
+     *
+     * @deprecated Deprecated, use `server.port` on client spans and `client.port` on server spans..
+     * @example 8080
+     */
+    public const NET_PEER_PORT = 'net.peer.port';
+
+    /**
+     * Deprecated, use `network.protocol.name`.
+     *
+     * @deprecated Deprecated, use `network.protocol.name`..
+     * @example amqp
+     * @example http
+     * @example mqtt
+     */
+    public const NET_PROTOCOL_NAME = 'net.protocol.name';
+
+    /**
+     * Deprecated, use `network.protocol.version`.
+     *
+     * @deprecated Deprecated, use `network.protocol.version`..
+     * @example 3.1.1
+     */
+    public const NET_PROTOCOL_VERSION = 'net.protocol.version';
+
+    /**
+     * Deprecated, use `network.transport` and `network.type`.
+     */
+    public const NET_SOCK_FAMILY = 'net.sock.family';
+
+    /**
+     * Deprecated, use `network.local.address`.
+     *
+     * @deprecated Deprecated, use `network.local.address`..
+     * @example /var/my.sock
+     */
+    public const NET_SOCK_HOST_ADDR = 'net.sock.host.addr';
+
+    /**
+     * Deprecated, use `network.local.port`.
+     *
+     * @deprecated Deprecated, use `network.local.port`..
+     * @example 8080
+     */
+    public const NET_SOCK_HOST_PORT = 'net.sock.host.port';
+
+    /**
+     * Deprecated, use `network.peer.address`.
+     *
+     * @deprecated Deprecated, use `network.peer.address`..
+     * @example 192.168.0.1
+     */
+    public const NET_SOCK_PEER_ADDR = 'net.sock.peer.addr';
+
+    /**
+     * Deprecated, no replacement at this time.
+     *
+     * @deprecated Deprecated, no replacement at this time..
+     * @example /var/my.sock
+     */
+    public const NET_SOCK_PEER_NAME = 'net.sock.peer.name';
+
+    /**
+     * Deprecated, use `network.peer.port`.
+     *
+     * @deprecated Deprecated, use `network.peer.port`..
+     * @example 65531
+     */
+    public const NET_SOCK_PEER_PORT = 'net.sock.peer.port';
+
+    /**
+     * Deprecated, use `network.transport`.
+     */
+    public const NET_TRANSPORT = 'net.transport';
+
+    /**
      * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the Content-Length header. For requests using transport encoding, this should be the compressed size.
      *
      * @example 3495
@@ -837,7 +987,7 @@ interface TraceAttributes
      *
      * @example 3
      */
-    public const HTTP_RESEND_COUNT = 'http.resend_count';
+    public const HTTP_REQUEST_RESEND_COUNT = 'http.request.resend_count';
 
     /**
      * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the Content-Length header. For requests using transport encoding, this should be the compressed size.
@@ -847,6 +997,319 @@ interface TraceAttributes
     public const HTTP_RESPONSE_BODY_SIZE = 'http.response.body.size';
 
     /**
+     * The number of messages sent, received, or processed in the scope of the batching operation.
+     *
+     * Instrumentations SHOULD NOT set `messaging.batch.message_count` on spans that operate with a single message. When a messaging client library supports both batch and single-message API for the same operation, instrumentations SHOULD use `messaging.batch.message_count` for batching APIs and SHOULD NOT use it for single-message APIs.
+     *
+     * @example 1
+     * @example 2
+     */
+    public const MESSAGING_BATCH_MESSAGE_COUNT = 'messaging.batch.message_count';
+
+    /**
+     * A unique identifier for the client that consumes or produces a message.
+     *
+     * @example client-5
+     * @example myhost@8742@s8083jm
+     */
+    public const MESSAGING_CLIENT_ID = 'messaging.client_id';
+
+    /**
+     * A boolean that is true if the message destination is anonymous (could be unnamed or have auto-generated name).
+     */
+    public const MESSAGING_DESTINATION_ANONYMOUS = 'messaging.destination.anonymous';
+
+    /**
+     * The message destination name.
+     *
+     * Destination name SHOULD uniquely identify a specific queue, topic or other entity within the broker. If
+     * the broker doesn't have such notion, the destination name SHOULD uniquely identify the broker.
+     *
+     * @example MyQueue
+     * @example MyTopic
+     */
+    public const MESSAGING_DESTINATION_NAME = 'messaging.destination.name';
+
+    /**
+     * Low cardinality representation of the messaging destination name.
+     *
+     * Destination names could be constructed from templates. An example would be a destination name involving a user name or product id. Although the destination name in this case is of high cardinality, the underlying template is of low cardinality and can be effectively used for grouping and aggregation.
+     *
+     * @example /customers/{customerId}
+     */
+    public const MESSAGING_DESTINATION_TEMPLATE = 'messaging.destination.template';
+
+    /**
+     * A boolean that is true if the message destination is temporary and might not exist anymore after messages are processed.
+     */
+    public const MESSAGING_DESTINATION_TEMPORARY = 'messaging.destination.temporary';
+
+    /**
+     * A boolean that is true if the publish message destination is anonymous (could be unnamed or have auto-generated name).
+     */
+    public const MESSAGING_DESTINATION_PUBLISH_ANONYMOUS = 'messaging.destination_publish.anonymous';
+
+    /**
+     * The name of the original destination the message was published to.
+     *
+     * The name SHOULD uniquely identify a specific queue, topic, or other entity within the broker. If
+     * the broker doesn't have such notion, the original destination name SHOULD uniquely identify the broker.
+     *
+     * @example MyQueue
+     * @example MyTopic
+     */
+    public const MESSAGING_DESTINATION_PUBLISH_NAME = 'messaging.destination_publish.name';
+
+    /**
+     * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not producers.
+     *
+     * @example my-group
+     */
+    public const MESSAGING_KAFKA_CONSUMER_GROUP = 'messaging.kafka.consumer.group';
+
+    /**
+     * Partition the message is sent to.
+     *
+     * @example 2
+     */
+    public const MESSAGING_KAFKA_DESTINATION_PARTITION = 'messaging.kafka.destination.partition';
+
+    /**
+     * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the same partition. They differ from `messaging.message.id` in that they're not unique. If the key is `null`, the attribute MUST NOT be set.
+     *
+     * If the key type is not string, it's string representation has to be supplied for the attribute. If the key has no unambiguous, canonical string form, don't include its value.
+     *
+     * @example myKey
+     */
+    public const MESSAGING_KAFKA_MESSAGE_KEY = 'messaging.kafka.message.key';
+
+    /**
+     * The offset of a record in the corresponding Kafka partition.
+     *
+     * @example 42
+     */
+    public const MESSAGING_KAFKA_MESSAGE_OFFSET = 'messaging.kafka.message.offset';
+
+    /**
+     * A boolean that is true if the message is a tombstone.
+     */
+    public const MESSAGING_KAFKA_MESSAGE_TOMBSTONE = 'messaging.kafka.message.tombstone';
+
+    /**
+     * The size of the message body in bytes.
+     *
+     * This can refer to both the compressed or uncompressed body size. If both sizes are known, the uncompressed
+     * body size should be used.
+     *
+     * @example 1439
+     */
+    public const MESSAGING_MESSAGE_BODY_SIZE = 'messaging.message.body.size';
+
+    /**
+     * The conversation ID identifying the conversation to which the message belongs, represented as a string. Sometimes called &quot;Correlation ID&quot;.
+     *
+     * @example MyConversationId
+     */
+    public const MESSAGING_MESSAGE_CONVERSATION_ID = 'messaging.message.conversation_id';
+
+    /**
+     * The size of the message body and metadata in bytes.
+     *
+     * This can refer to both the compressed or uncompressed size. If both sizes are known, the uncompressed
+     * size should be used.
+     *
+     * @example 2738
+     */
+    public const MESSAGING_MESSAGE_ENVELOPE_SIZE = 'messaging.message.envelope.size';
+
+    /**
+     * A value used by the messaging system as an identifier for the message, represented as a string.
+     *
+     * @example 452a7c7c7c7048c2f887f61572b18fc2
+     */
+    public const MESSAGING_MESSAGE_ID = 'messaging.message.id';
+
+    /**
+     * A string identifying the kind of messaging operation.
+     *
+     * If a custom value is used, it MUST be of low cardinality.
+     */
+    public const MESSAGING_OPERATION = 'messaging.operation';
+
+    /**
+     * RabbitMQ message routing key.
+     *
+     * @example myKey
+     */
+    public const MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY = 'messaging.rabbitmq.destination.routing_key';
+
+    /**
+     * Name of the RocketMQ producer/consumer group that is handling the message. The client type is identified by the SpanKind.
+     *
+     * @example myConsumerGroup
+     */
+    public const MESSAGING_ROCKETMQ_CLIENT_GROUP = 'messaging.rocketmq.client_group';
+
+    /**
+     * Model of message consumption. This only applies to consumer spans.
+     */
+    public const MESSAGING_ROCKETMQ_CONSUMPTION_MODEL = 'messaging.rocketmq.consumption_model';
+
+    /**
+     * The delay time level for delay message, which determines the message delay time.
+     *
+     * @example 3
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL = 'messaging.rocketmq.message.delay_time_level';
+
+    /**
+     * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
+     *
+     * @example 1665987217045
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP = 'messaging.rocketmq.message.delivery_timestamp';
+
+    /**
+     * It is essential for FIFO message. Messages that belong to the same message group are always processed one by one within the same consumer group.
+     *
+     * @example myMessageGroup
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_GROUP = 'messaging.rocketmq.message.group';
+
+    /**
+     * Key(s) of message, another way to mark message besides message id.
+     *
+     * @example keyA
+     * @example keyB
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_KEYS = 'messaging.rocketmq.message.keys';
+
+    /**
+     * The secondary classifier of message besides topic.
+     *
+     * @example tagA
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_TAG = 'messaging.rocketmq.message.tag';
+
+    /**
+     * Type of message.
+     */
+    public const MESSAGING_ROCKETMQ_MESSAGE_TYPE = 'messaging.rocketmq.message.type';
+
+    /**
+     * Namespace of RocketMQ resources, resources in different namespaces are individual.
+     *
+     * @example myNamespace
+     */
+    public const MESSAGING_ROCKETMQ_NAMESPACE = 'messaging.rocketmq.namespace';
+
+    /**
+     * A string identifying the messaging system.
+     *
+     * @example kafka
+     * @example rabbitmq
+     * @example rocketmq
+     * @example activemq
+     * @example AmazonSQS
+     */
+    public const MESSAGING_SYSTEM = 'messaging.system';
+
+    /**
+     * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
+     *
+     * Follows OCI Image Manifest Specification, and specifically the Digest property.
+     * An example can be found in Example Image Manifest.
+     *
+     * @example sha256:e4ca62c0d62f3e886e684806dfe9d4e0cda60d54986898173c1083856cfda0f4
+     */
+    public const OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
+
+    /**
+     * The error codes of the Connect request. Error codes are always string values.
+     */
+    public const RPC_CONNECT_RPC_ERROR_CODE = 'rpc.connect_rpc.error_code';
+
+    /**
+     * The numeric status code of the gRPC request.
+     */
+    public const RPC_GRPC_STATUS_CODE = 'rpc.grpc.status_code';
+
+    /**
+     * `error.code` property of response if it is an error response.
+     *
+     * @example -32700
+     * @example 100
+     */
+    public const RPC_JSONRPC_ERROR_CODE = 'rpc.jsonrpc.error_code';
+
+    /**
+     * `error.message` property of response if it is an error response.
+     *
+     * @example Parse error
+     * @example User already exists
+     */
+    public const RPC_JSONRPC_ERROR_MESSAGE = 'rpc.jsonrpc.error_message';
+
+    /**
+     * `id` property of request or response. Since protocol allows id to be int, string, `null` or missing (for notifications), value is expected to be cast to string for simplicity. Use empty string in case of `null` value. Omit entirely if this is a notification.
+     *
+     * @example 10
+     * @example request-7
+     */
+    public const RPC_JSONRPC_REQUEST_ID = 'rpc.jsonrpc.request_id';
+
+    /**
+     * Protocol version as in `jsonrpc` property of request/response. Since JSON-RPC 1.0 doesn't specify this, the value can be omitted.
+     *
+     * @example 2.0
+     * @example 1.0
+     */
+    public const RPC_JSONRPC_VERSION = 'rpc.jsonrpc.version';
+
+    /**
+     * The URI fragment component.
+     *
+     * @example SemConv
+     */
+    public const URL_FRAGMENT = 'url.fragment';
+
+    /**
+     * Absolute URL describing a network resource according to RFC3986.
+     *
+     * For network calls, URL usually has `scheme://host[:port][path][?query][#fragment]` format, where the fragment is not transmitted over HTTP, but if it is known, it SHOULD be included nevertheless.
+     * `url.full` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case username and password SHOULD be redacted and attribute's value SHOULD be `https://REDACTED:REDACTED@www.example.com/`.
+     * `url.full` SHOULD capture the absolute URL when it is available (or can be reconstructed) and SHOULD NOT be validated or modified except for sanitizing purposes.
+     *
+     * @example https://www.foo.bar/search?q=OpenTelemetry#SemConv
+     * @example //localhost
+     */
+    public const URL_FULL = 'url.full';
+
+    /**
+     * The URI path component.
+     *
+     * @example /search
+     */
+    public const URL_PATH = 'url.path';
+
+    /**
+     * The URI query component.
+     *
+     * Sensitive content provided in query string SHOULD be scrubbed when instrumentations can identify it.
+     *
+     * @example q=OpenTelemetry
+     */
+    public const URL_QUERY = 'url.query';
+
+    /**
+     * Value of the HTTP User-Agent header sent by the client.
+     *
+     * @example CERN-LineMode/2.15 libwww/2.17b3
+     * @example Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1
+     */
+    public const USER_AGENT_ORIGINAL = 'user_agent.original';
+
+    /**
      * A unique id to identify a session.
      *
      * @example 00112233-4455-6677-8899-aabbccddeeff
@@ -854,9 +1317,16 @@ interface TraceAttributes
     public const SESSION_ID = 'session.id';
 
     /**
-     * Source address - domain name if available without reverse DNS lookup, otherwise IP address or Unix domain socket name.
+     * The previous `session.id` for this user, when known.
      *
-     * When observed from the destination side, and when communicating through an intermediary, `source.address` SHOULD represent the source address behind any intermediaries (e.g. proxies) if it's available.
+     * @example 00112233-4455-6677-8899-aabbccddeeff
+     */
+    public const SESSION_PREVIOUS_ID = 'session.previous_id';
+
+    /**
+     * Source address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
+     *
+     * When observed from the destination side, and when communicating through an intermediary, `source.address` SHOULD represent the source address behind any intermediaries, for example proxies, if it's available.
      *
      * @example source.example.com
      * @example 10.1.2.80
@@ -1071,17 +1541,6 @@ interface TraceAttributes
     public const DB_ELASTICSEARCH_NODE_NAME = 'db.elasticsearch.node.name';
 
     /**
-     * Absolute URL describing a network resource according to RFC3986.
-     *
-     * For network calls, URL usually has `scheme://host[:port][path][?query][#fragment]` format, where the fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
-     * `url.full` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case username and password should be redacted and attribute's value should be `https://REDACTED:REDACTED@www.example.com/`.
-     * `url.full` SHOULD capture the absolute URL when it is available (or can be reconstructed) and SHOULD NOT be validated or modified except for sanitizing purposes.
-     *
-     * @example https://localhost:9200/index/_search?q=user.id:kimchy
-     */
-    public const URL_FULL = 'url.full';
-
-    /**
      * The name of the primary table that the operation is acting upon, including the database name (if applicable).
      *
      * It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
@@ -1145,17 +1604,6 @@ interface TraceAttributes
     public const DB_COSMOSDB_SUB_STATUS_CODE = 'db.cosmosdb.sub_status_code';
 
     /**
-     * Full user-agent string is generated by Cosmos DB SDK.
-     *
-     * The user-agent value is generated by SDK which is a combination of&lt;br&gt; `sdk_version` : Current version of SDK. e.g. 'cosmos-netstandard-sdk/3.23.0'&lt;br&gt; `direct_pkg_version` : Direct package version used by Cosmos DB SDK. e.g. '3.23.1'&lt;br&gt; `number_of_client_instances` : Number of cosmos client instances created by the application. e.g. '1'&lt;br&gt; `type_of_machine_architecture` : Machine architecture. e.g. 'X64'&lt;br&gt; `operating_system` : Operating System. e.g. 'Linux 5.4.0-1098-azure 104 18'&lt;br&gt; `runtime_framework` : Runtime Framework. e.g. '.NET Core 3.1.32'&lt;br&gt; `failover_information` : Generated key to determine if region failover enabled.
-     *    Format Reg-{D (Disabled discovery)}-S(application region)|L(List of preferred regions)|N(None, user did not configure it).
-     *    Default value is &quot;NS&quot;.
-     *
-     * @example cosmos-netstandard-sdk/3.23.0\|3.23.1\|1\|X64\|Linux 5.4.0-1098-azure 104 18\|.NET Core 3.1.32\|S\|
-     */
-    public const USER_AGENT_ORIGINAL = 'user_agent.original';
-
-    /**
      * Name of the code, either &quot;OK&quot; or &quot;ERROR&quot;. MUST NOT be set if the status code is UNSET.
      */
     public const OTEL_STATUS_CODE = 'otel.status_code';
@@ -1166,31 +1614,6 @@ interface TraceAttributes
      * @example resource not found
      */
     public const OTEL_STATUS_DESCRIPTION = 'otel.status_description';
-
-    /**
-     * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an ARN on AWS, a fully qualified resource ID on Azure, a full resource name on GCP).
-     *
-     * On some cloud providers, it may not be possible to determine the full ID at startup,
-     * so it may be necessary to set `cloud.resource_id` as a span attribute instead.The exact value to use for `cloud.resource_id` depends on the cloud provider.
-     * The following well-known definitions MUST be used if you set this attribute and they apply:<ul>
-     * <li><strong>AWS Lambda:</strong> The function ARN.
-     * Take care not to use the &quot;invoked ARN&quot; directly but replace any
-     * alias suffix
-     * with the resolved function version, as the same runtime instance may be invokable with
-     * multiple different aliases.</li>
-     * <li><strong>GCP:</strong> The URI of the resource</li>
-     * <li><strong>Azure:</strong> The Fully Qualified Resource ID of the invoked function,
-     * <em>not</em> the function app, having the form
-     * `/subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>`.
-     * This means that a span attribute MUST be used, as an Azure function app can host multiple functions that would usually share
-     * a TracerProvider.</li>
-     * </ul>
-     *
-     * @example arn:aws:lambda:REGION:ACCOUNT_ID:function:my-function
-     * @example //run.googleapis.com/projects/PROJECT_ID/locations/LOCATION_ID/services/SERVICE_ID
-     * @example /subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>
-     */
-    public const CLOUD_RESOURCE_ID = 'cloud.resource_id';
 
     /**
      * The invocation ID of the current function invocation.
@@ -1226,124 +1649,6 @@ interface TraceAttributes
      * @example 2020-01-23T13:47:06Z
      */
     public const FAAS_DOCUMENT_TIME = 'faas.document.time';
-
-    /**
-     * The URI path component.
-     *
-     * When missing, the value is assumed to be `/`
-     *
-     * @example /search
-     */
-    public const URL_PATH = 'url.path';
-
-    /**
-     * The URI query component.
-     *
-     * Sensitive content provided in query string SHOULD be scrubbed when instrumentations can identify it.
-     *
-     * @example q=OpenTelemetry
-     */
-    public const URL_QUERY = 'url.query';
-
-    /**
-     * The number of messages sent, received, or processed in the scope of the batching operation.
-     *
-     * Instrumentations SHOULD NOT set `messaging.batch.message_count` on spans that operate with a single message. When a messaging client library supports both batch and single-message API for the same operation, instrumentations SHOULD use `messaging.batch.message_count` for batching APIs and SHOULD NOT use it for single-message APIs.
-     *
-     * @example 1
-     * @example 2
-     */
-    public const MESSAGING_BATCH_MESSAGE_COUNT = 'messaging.batch.message_count';
-
-    /**
-     * A unique identifier for the client that consumes or produces a message.
-     *
-     * @example client-5
-     * @example myhost@8742@s8083jm
-     */
-    public const MESSAGING_CLIENT_ID = 'messaging.client_id';
-
-    /**
-     * A boolean that is true if the message destination is anonymous (could be unnamed or have auto-generated name).
-     */
-    public const MESSAGING_DESTINATION_ANONYMOUS = 'messaging.destination.anonymous';
-
-    /**
-     * The message destination name.
-     *
-     * Destination name SHOULD uniquely identify a specific queue, topic or other entity within the broker. If
-     * the broker does not have such notion, the destination name SHOULD uniquely identify the broker.
-     *
-     * @example MyQueue
-     * @example MyTopic
-     */
-    public const MESSAGING_DESTINATION_NAME = 'messaging.destination.name';
-
-    /**
-     * Low cardinality representation of the messaging destination name.
-     *
-     * Destination names could be constructed from templates. An example would be a destination name involving a user name or product id. Although the destination name in this case is of high cardinality, the underlying template is of low cardinality and can be effectively used for grouping and aggregation.
-     *
-     * @example /customers/{customerId}
-     */
-    public const MESSAGING_DESTINATION_TEMPLATE = 'messaging.destination.template';
-
-    /**
-     * A boolean that is true if the message destination is temporary and might not exist anymore after messages are processed.
-     */
-    public const MESSAGING_DESTINATION_TEMPORARY = 'messaging.destination.temporary';
-
-    /**
-     * The size of the message body in bytes.
-     *
-     * This can refer to both the compressed or uncompressed body size. If both sizes are known, the uncompressed
-     * body size should be used.
-     *
-     * @example 1439
-     */
-    public const MESSAGING_MESSAGE_BODY_SIZE = 'messaging.message.body.size';
-
-    /**
-     * The conversation ID identifying the conversation to which the message belongs, represented as a string. Sometimes called &quot;Correlation ID&quot;.
-     *
-     * @example MyConversationId
-     */
-    public const MESSAGING_MESSAGE_CONVERSATION_ID = 'messaging.message.conversation_id';
-
-    /**
-     * The size of the message body and metadata in bytes.
-     *
-     * This can refer to both the compressed or uncompressed size. If both sizes are known, the uncompressed
-     * size should be used.
-     *
-     * @example 2738
-     */
-    public const MESSAGING_MESSAGE_ENVELOPE_SIZE = 'messaging.message.envelope.size';
-
-    /**
-     * A value used by the messaging system as an identifier for the message, represented as a string.
-     *
-     * @example 452a7c7c7c7048c2f887f61572b18fc2
-     */
-    public const MESSAGING_MESSAGE_ID = 'messaging.message.id';
-
-    /**
-     * A string identifying the kind of messaging operation as defined in the Operation names section above.
-     *
-     * If a custom value is used, it MUST be of low cardinality.
-     */
-    public const MESSAGING_OPERATION = 'messaging.operation';
-
-    /**
-     * A string identifying the messaging system.
-     *
-     * @example kafka
-     * @example rabbitmq
-     * @example rocketmq
-     * @example activemq
-     * @example AmazonSQS
-     */
-    public const MESSAGING_SYSTEM = 'messaging.system';
 
     /**
      * A string containing the schedule period as Cron Expression.
@@ -1644,161 +1949,6 @@ interface TraceAttributes
     public const GRAPHQL_OPERATION_TYPE = 'graphql.operation.type';
 
     /**
-     * A boolean that is true if the publish message destination is anonymous (could be unnamed or have auto-generated name).
-     */
-    public const MESSAGING_DESTINATION_PUBLISH_ANONYMOUS = 'messaging.destination_publish.anonymous';
-
-    /**
-     * The name of the original destination the message was published to.
-     *
-     * The name SHOULD uniquely identify a specific queue, topic, or other entity within the broker. If
-     * the broker does not have such notion, the original destination name SHOULD uniquely identify the broker.
-     *
-     * @example MyQueue
-     * @example MyTopic
-     */
-    public const MESSAGING_DESTINATION_PUBLISH_NAME = 'messaging.destination_publish.name';
-
-    /**
-     * RabbitMQ message routing key.
-     *
-     * @example myKey
-     */
-    public const MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY = 'messaging.rabbitmq.destination.routing_key';
-
-    /**
-     * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not producers.
-     *
-     * @example my-group
-     */
-    public const MESSAGING_KAFKA_CONSUMER_GROUP = 'messaging.kafka.consumer.group';
-
-    /**
-     * Partition the message is sent to.
-     *
-     * @example 2
-     */
-    public const MESSAGING_KAFKA_DESTINATION_PARTITION = 'messaging.kafka.destination.partition';
-
-    /**
-     * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the same partition. They differ from `messaging.message.id` in that they're not unique. If the key is `null`, the attribute MUST NOT be set.
-     *
-     * If the key type is not string, it's string representation has to be supplied for the attribute. If the key has no unambiguous, canonical string form, don't include its value.
-     *
-     * @example myKey
-     */
-    public const MESSAGING_KAFKA_MESSAGE_KEY = 'messaging.kafka.message.key';
-
-    /**
-     * The offset of a record in the corresponding Kafka partition.
-     *
-     * @example 42
-     */
-    public const MESSAGING_KAFKA_MESSAGE_OFFSET = 'messaging.kafka.message.offset';
-
-    /**
-     * A boolean that is true if the message is a tombstone.
-     */
-    public const MESSAGING_KAFKA_MESSAGE_TOMBSTONE = 'messaging.kafka.message.tombstone';
-
-    /**
-     * Name of the RocketMQ producer/consumer group that is handling the message. The client type is identified by the SpanKind.
-     *
-     * @example myConsumerGroup
-     */
-    public const MESSAGING_ROCKETMQ_CLIENT_GROUP = 'messaging.rocketmq.client_group';
-
-    /**
-     * Model of message consumption. This only applies to consumer spans.
-     */
-    public const MESSAGING_ROCKETMQ_CONSUMPTION_MODEL = 'messaging.rocketmq.consumption_model';
-
-    /**
-     * The delay time level for delay message, which determines the message delay time.
-     *
-     * @example 3
-     */
-    public const MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL = 'messaging.rocketmq.message.delay_time_level';
-
-    /**
-     * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
-     *
-     * @example 1665987217045
-     */
-    public const MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP = 'messaging.rocketmq.message.delivery_timestamp';
-
-    /**
-     * It is essential for FIFO message. Messages that belong to the same message group are always processed one by one within the same consumer group.
-     *
-     * @example myMessageGroup
-     */
-    public const MESSAGING_ROCKETMQ_MESSAGE_GROUP = 'messaging.rocketmq.message.group';
-
-    /**
-     * Key(s) of message, another way to mark message besides message id.
-     *
-     * @example keyA
-     * @example keyB
-     */
-    public const MESSAGING_ROCKETMQ_MESSAGE_KEYS = 'messaging.rocketmq.message.keys';
-
-    /**
-     * The secondary classifier of message besides topic.
-     *
-     * @example tagA
-     */
-    public const MESSAGING_ROCKETMQ_MESSAGE_TAG = 'messaging.rocketmq.message.tag';
-
-    /**
-     * Type of message.
-     */
-    public const MESSAGING_ROCKETMQ_MESSAGE_TYPE = 'messaging.rocketmq.message.type';
-
-    /**
-     * Namespace of RocketMQ resources, resources in different namespaces are individual.
-     *
-     * @example myNamespace
-     */
-    public const MESSAGING_ROCKETMQ_NAMESPACE = 'messaging.rocketmq.namespace';
-
-    /**
-     * The numeric status code of the gRPC request.
-     */
-    public const RPC_GRPC_STATUS_CODE = 'rpc.grpc.status_code';
-
-    /**
-     * `error.code` property of response if it is an error response.
-     *
-     * @example -32700
-     * @example 100
-     */
-    public const RPC_JSONRPC_ERROR_CODE = 'rpc.jsonrpc.error_code';
-
-    /**
-     * `error.message` property of response if it is an error response.
-     *
-     * @example Parse error
-     * @example User already exists
-     */
-    public const RPC_JSONRPC_ERROR_MESSAGE = 'rpc.jsonrpc.error_message';
-
-    /**
-     * `id` property of request or response. Since protocol allows id to be int, string, `null` or missing (for notifications), value is expected to be cast to string for simplicity. Use empty string in case of `null` value. Omit entirely if this is a notification.
-     *
-     * @example 10
-     * @example request-7
-     */
-    public const RPC_JSONRPC_REQUEST_ID = 'rpc.jsonrpc.request_id';
-
-    /**
-     * Protocol version as in `jsonrpc` property of request/response. Since JSON-RPC 1.0 does not specify this, the value can be omitted.
-     *
-     * @example 2.0
-     * @example 1.0
-     */
-    public const RPC_JSONRPC_VERSION = 'rpc.jsonrpc.version';
-
-    /**
      * Compressed size of the message in bytes.
      */
     public const MESSAGE_COMPRESSED_SIZE = 'message.compressed_size';
@@ -1821,11 +1971,6 @@ interface TraceAttributes
     public const MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
 
     /**
-     * The error codes of the Connect request. Error codes are always string values.
-     */
-    public const RPC_CONNECT_RPC_ERROR_CODE = 'rpc.connect_rpc.error_code';
-
-    /**
      * SHOULD be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
      *
      * An exception is considered to have escaped (or left) the scope of a span,
@@ -1842,13 +1987,6 @@ interface TraceAttributes
      * clear whether the exception will escape.
      */
     public const EXCEPTION_ESCAPED = 'exception.escaped';
-
-    /**
-     * The URI fragment component.
-     *
-     * @example SemConv
-     */
-    public const URL_FRAGMENT = 'url.fragment';
 
     /**
      * @deprecated
@@ -2049,4 +2187,14 @@ interface TraceAttributes
      * @deprecated
      */
     public const NET_HOST_CONNECTION_TYPE = 'net.host.connection.type';
+
+    /**
+     * @deprecated
+     */
+    public const HTTP_RESEND_COUNT = 'http.resend_count';
+
+    /**
+     * @deprecated
+     */
+    public const THREAD_DAEMON = 'thread.daemon';
 }
