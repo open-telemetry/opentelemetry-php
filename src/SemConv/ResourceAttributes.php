@@ -11,7 +11,7 @@ interface ResourceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.22.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.23.0';
 
     /**
      * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found here.
@@ -354,6 +354,16 @@ interface ResourceAttributes
     public const CONTAINER_RUNTIME = 'container.runtime';
 
     /**
+     * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
+     *
+     * Follows OCI Image Manifest Specification, and specifically the Digest property.
+     * An example can be found in Example Image Manifest.
+     *
+     * @example sha256:e4ca62c0d62f3e886e684806dfe9d4e0cda60d54986898173c1083856cfda0f4
+     */
+    public const OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
+
+    /**
      * Name of the deployment environment (aka deployment tier).
      *
      * @example staging
@@ -506,6 +516,16 @@ interface ResourceAttributes
     public const HOST_IP = 'host.ip';
 
     /**
+     * Available MAC addresses of the host, excluding loopback interfaces.
+     *
+     * MAC Addresses MUST be represented in IEEE RA hexadecimal form: as hyphen-separated octets in uppercase hexadecimal form from most to least significant.
+     *
+     * @example AC-DE-48-23-45-67
+     * @example AC-DE-48-23-45-67-01-9F
+     */
+    public const HOST_MAC = 'host.mac';
+
+    /**
      * Name of the host. On Unix systems, it may contain what the hostname command returns, or the fully qualified hostname, or another name specified by the user.
      *
      * @example opentelemetry-test
@@ -573,7 +593,7 @@ interface ResourceAttributes
     /**
      * A pseudo-ID for the cluster, set to the UID of the `kube-system` namespace.
      *
-     * K8s does not have support for obtaining a cluster ID. If this is ever
+     * K8s doesn't have support for obtaining a cluster ID. If this is ever
      * added, we will recommend collecting the `k8s.cluster.uid` through the
      * official APIs. In the meantime, we are able to use the `uid` of the
      * `kube-system` namespace as a proxy for cluster ID. Read on for the
@@ -727,16 +747,6 @@ interface ResourceAttributes
      * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
      */
     public const K8S_CRONJOB_UID = 'k8s.cronjob.uid';
-
-    /**
-     * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
-     *
-     * Follows OCI Image Manifest Specification, and specifically the Digest property.
-     * An example can be found in Example Image Manifest.
-     *
-     * @example sha256:e4ca62c0d62f3e886e684806dfe9d4e0cda60d54986898173c1083856cfda0f4
-     */
-    public const OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
 
     /**
      * Unique identifier for a particular build or compilation of the operating system.
