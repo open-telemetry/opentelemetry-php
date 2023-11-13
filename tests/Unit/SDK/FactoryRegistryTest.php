@@ -108,6 +108,7 @@ class FactoryRegistryTest extends TestCase
             ['tracecontext'],
             ['b3multi'],
             ['b3'],
+            ['xcloudtrace'],
         ];
     }
 
