@@ -13,7 +13,7 @@ use function spl_object_id;
 final class Context implements ContextInterface
 {
     /** @var ContextStorageInterface&ExecutionContextAwareInterface */
-    private static ?ContextStorageInterface $storage;
+    private static ContextStorageInterface $storage;
 
     // Optimization for spans to avoid copying the context array.
     private static ContextKeyInterface $spanContextKey;
@@ -39,15 +39,6 @@ final class Context implements ContextInterface
     public static function setStorage(ContextStorageInterface $storage): void
     {
         self::$storage = $storage;
-    }
-
-    /**
-     * Function for resetting storage for test cases, should not be used normally.
-     * @return void
-     */
-    public static function resetStorage(): void
-    {
-        self::$storage = null;
     }
 
     /**
