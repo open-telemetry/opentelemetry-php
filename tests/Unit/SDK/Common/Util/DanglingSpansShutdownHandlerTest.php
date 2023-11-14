@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Trace;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Util;
 
-use OpenTelemetry\SDK\Trace\ContextHelper;
+use OpenTelemetry\SDK\Common\Util\DanglingSpansShutdownHandler;
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\API\Trace\NoopTracer;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Trace\ContextHelper
+ * @covers \OpenTelemetry\SDK\Common\Util\DanglingSpansShutdownHandler
  */
-class ContextHelperTest extends TestCase
+class DanglingSpansShutdownHelperTest extends TestCase
 {
     public function test_cleanup(): void
     {
@@ -21,6 +23,6 @@ class ContextHelperTest extends TestCase
         // Intentionally no detach call
 
         // Will trigger_error without this
-        ContextHelper::cleanup(function() {});
+        DanglingSpansShutdownHandler::shutdown();
     }
 }
