@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Extension\Propagator\XCloudTrace;
+namespace OpenTelemetry\Tests\Unit\Extension\Propagator\CloudTrace;
 
-use OpenTelemetry\Extension\Propagator\XCloudTrace\Utils;
+use OpenTelemetry\Extension\Propagator\CloudTrace\Utils;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\Extension\Propagator\XCloudTrace\Utils
+ * @covers \OpenTelemetry\Extension\Propagator\CloudTrace\Utils
  */
 class UtilsTest extends TestCase
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Extension\Propagator\XCloudTrace;
+namespace OpenTelemetry\Extension\Propagator\CloudTrace;
 
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
@@ -14,7 +14,7 @@ use OpenTelemetry\API\Trace\SpanContextInterface;
  * least significant bit which signals whether the request was traced or not
  * (1 = traced, 0 = not traced).
  */
-final class XCloudTraceFormatter
+final class CloudTraceFormatter
 {
     const CONTEXT_HEADER_FORMAT = '/([0-9a-fA-F]{32})(?:\/(\d+))?(?:;o=(\d+))?/';
 

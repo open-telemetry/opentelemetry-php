@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Extension\Propagator\XCloudTrace;
+namespace OpenTelemetry\Tests\Unit\Extension\Propagator\CloudTrace;
 
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
@@ -11,14 +11,14 @@ use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
-use OpenTelemetry\Extension\Propagator\XCloudTrace\XCloudTracePropagator;
+use OpenTelemetry\Extension\Propagator\CloudTrace\CloudTracePropagator;
 use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\Extension\Propagator\XCloudTrace\XCloudTracePropagator
+ * @covers \OpenTelemetry\Extension\Propagator\CloudTrace\CloudTracePropagator
  */
-class XCloudTracePropagatorTest extends TestCase
+class CloudTracePropagatorOneWayTest extends TestCase
 {
     private const TRACE_ID_BASE16 = 'ff000000000000000000000000000041';
     private const SPAN_ID_BASE16 = '0000000000000013';
@@ -28,19 +28,19 @@ class XCloudTracePropagatorTest extends TestCase
 
     private string $xcloud;
 
-    private TextMapPropagatorInterface $xCloudTracePropagator;
+    private TextMapPropagatorInterface $cloudTracePropagator;
 
     protected function setUp(): void
     {
-        $this->xCloudTracePropagator = XCloudTracePropagator::getInstance();
-        [$this->xcloud] = $this->xCloudTracePropagator->fields();
+        $this->cloudTracePropagator = CloudTracePropagator::getOneWayInstance();
+        [$this->xcloud] = $this->cloudTracePropagator->fields();
     }
 
     public function test_fields(): void
     {
         $this->assertSame(
             ['x-cloud-trace-context'],
-            $this->xCloudTracePropagator->fields()
+            $this->cloudTracePropagator->fields()
         );
     }
 
@@ -48,7 +48,7 @@ class XCloudTracePropagatorTest extends TestCase
     {
         $carrier = [];
         $this
-            ->xCloudTracePropagator
+            ->cloudTracePropagator
             ->inject(
                 $carrier,
                 null,
@@ -68,7 +68,7 @@ class XCloudTracePropagatorTest extends TestCase
     {
         $carrier = [];
         $this
-            ->xCloudTracePropagator
+            ->cloudTracePropagator
             ->inject(
                 $carrier,
                 null,
@@ -77,18 +77,14 @@ class XCloudTracePropagatorTest extends TestCase
                     Context::getCurrent()
                 )
             );
-
-        $this->assertSame(
-            [$this->xcloud => self::TRACE_ID_BASE16 . '/' . self::SPAN_ID_BASE10 . ';o=' . self::TRACE_ENABLED],
-            $carrier
-        );
+        $this->assertEmpty($carrier);
     }
 
     public function test_inject_non_sampled_context(): void
     {
         $carrier = [];
         $this
-            ->xCloudTracePropagator
+            ->cloudTracePropagator
             ->inject(
                 $carrier,
                 null,
@@ -97,18 +93,14 @@ class XCloudTracePropagatorTest extends TestCase
                     Context::getCurrent()
                 )
             );
-
-        $this->assertSame(
-            [$this->xcloud => self::TRACE_ID_BASE16 . '/' . self::SPAN_ID_BASE10 . ';o=' . self::TRACE_DISABLED],
-            $carrier
-        );
+        $this->assertEmpty($carrier);
     }
 
     public function test_inject_non_sampled_default_context(): void
     {
         $carrier = [];
         $this
-            ->xCloudTracePropagator
+            ->cloudTracePropagator
             ->inject(
                 $carrier,
                 null,
@@ -117,18 +109,14 @@ class XCloudTracePropagatorTest extends TestCase
                     Context::getCurrent()
                 )
             );
-
-        $this->assertSame(
-            [$this->xcloud => self::TRACE_ID_BASE16 . '/' . self::SPAN_ID_BASE10 . ';o=' . self::TRACE_DISABLED],
-            $carrier
-        );
+        $this->assertEmpty($carrier);
     }
 
     public function test_extract_nothing(): void
     {
         $this->assertSame(
             Context::getCurrent(),
-            $this->xCloudTracePropagator->extract([])
+            $this->cloudTracePropagator->extract([])
         );
     }
 
@@ -138,7 +126,7 @@ class XCloudTracePropagatorTest extends TestCase
             $this->xcloud => self::TRACE_ID_BASE16 . '/' . self::SPAN_ID_BASE10 . ';o=' . self::TRACE_ENABLED,
         ];
 
-        $context = $this->xCloudTracePropagator->extract($carrier);
+        $context = $this->cloudTracePropagator->extract($carrier);
 
         $this->assertEquals(
             SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::SAMPLED),
@@ -152,7 +140,7 @@ class XCloudTracePropagatorTest extends TestCase
             $this->xcloud => self::TRACE_ID_BASE16 . '/' . self::SPAN_ID_BASE10 . ';o=' . self::TRACE_DISABLED,
         ];
 
-        $context = $this->xCloudTracePropagator->extract($carrier);
+        $context = $this->cloudTracePropagator->extract($carrier);
 
         $this->assertEquals(
             SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::DEFAULT),
