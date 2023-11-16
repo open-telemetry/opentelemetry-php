@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Util;
 
-use \OpenTelemetry\Context\DebugScope;
-use OpenTelemetry\SDK\Trace\Context;
+use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\DebugScope;
 
 /**
  * SDK helper classes for dealing with dangling spans
@@ -23,7 +24,7 @@ final class DanglingSpansShutdownHandler
      *
      * @return void
      */
-    public static function shutdown(callable $fn): void
+    public static function shutdown(): void
     {
         $ctx = Context::storage();
         while ($ctx->current() !== Context::getRoot()) {
