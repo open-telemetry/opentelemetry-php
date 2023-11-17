@@ -43,6 +43,15 @@ class Sdk
         return in_array($name, Configuration::getList(Variables::OTEL_PHP_DISABLED_INSTRUMENTATIONS));
     }
 
+    /**
+     * Tests whether developer mode has been enabled by config.
+     */
+    public static function isDeveloperModeEnabled(): bool
+    {
+        return Configuration::has(Variables::OTEL_PHP_DEVELOPER_MODE_ENABLED)
+            && Configuration::getBoolean(Variables::OTEL_PHP_DEVELOPER_MODE_ENABLED);
+    }
+
     public static function builder(): SdkBuilder
     {
         return new SdkBuilder();

@@ -68,6 +68,16 @@ class SdkTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider disabledProvider
+     */
+    public function test_developer_mode_can_be_toggled(string $value, bool $expected): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_DEVELOPER_MODE_ENABLED, $value);
+
+        $this->assertEquals($expected, Sdk::isDeveloperModeEnabled());
+    }
+
     public function test_builder(): void
     {
         $this->assertInstanceOf(SdkBuilder::class, Sdk::builder());
