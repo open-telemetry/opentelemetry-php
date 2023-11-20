@@ -13,7 +13,7 @@ interface {{ class }}AttributeValues
      */
     public const SCHEMA_URL = '{{schemaUrl}}';
 
-{%- for attribute in attributes | unique(attribute="fqn") %}
+{%- for attribute in attributes | unique(attribute="fqn") | sort(attribute="fqn") %}
 {%- if attribute.attr_type.members %}
 {%- for member in attribute.attr_type.members %}
     {%- if member.brief %}
