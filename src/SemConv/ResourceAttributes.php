@@ -11,7 +11,7 @@ interface ResourceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.23.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.23.1';
 
     /**
      * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found here.
@@ -20,121 +20,6 @@ interface ResourceAttributes
      * @example 32
      */
     public const ANDROID_OS_API_LEVEL = 'android.os.api_level';
-
-    /**
-     * Array of brand name and version separated by a space.
-     *
-     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.brands`).
-     *
-     * @example  Not A;Brand 99
-     * @example Chromium 99
-     * @example Chrome 99
-     */
-    public const BROWSER_BRANDS = 'browser.brands';
-
-    /**
-     * Preferred language of the user using the browser.
-     *
-     * This value is intended to be taken from the Navigator API `navigator.language`.
-     *
-     * @example en
-     * @example en-US
-     * @example fr
-     * @example fr-FR
-     */
-    public const BROWSER_LANGUAGE = 'browser.language';
-
-    /**
-     * A boolean that is true if the browser is running on a mobile device.
-     *
-     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.mobile`). If unavailable, this attribute SHOULD be left unset.
-     */
-    public const BROWSER_MOBILE = 'browser.mobile';
-
-    /**
-     * The platform on which the browser is running.
-     *
-     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.platform`). If unavailable, the legacy `navigator.platform` API SHOULD NOT be used instead and this attribute SHOULD be left unset in order for the values to be consistent.
-     * The list of possible values is defined in the W3C User-Agent Client Hints specification. Note that some (but not all) of these values can overlap with values in the `os.type` and `os.name` attributes. However, for consistency, the values in the `browser.platform` attribute should capture the exact value that the user agent provides.
-     *
-     * @example Windows
-     * @example macOS
-     * @example Android
-     */
-    public const BROWSER_PLATFORM = 'browser.platform';
-
-    /**
-     * Full user-agent string provided by the browser.
-     *
-     * The user-agent value SHOULD be provided only from browsers that do not have a mechanism to retrieve brands and platform individually from the User-Agent Client Hints API. To retrieve the value, the legacy `navigator.userAgent` API can be used.
-     *
-     * @example Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36
-     */
-    public const USER_AGENT_ORIGINAL = 'user_agent.original';
-
-    /**
-     * The cloud account ID the resource is assigned to.
-     *
-     * @example 111111111111
-     * @example opentelemetry
-     */
-    public const CLOUD_ACCOUNT_ID = 'cloud.account.id';
-
-    /**
-     * Cloud regions often have multiple, isolated locations known as zones to increase availability. Availability zone represents the zone where the resource is running.
-     *
-     * Availability zones are called &quot;zones&quot; on Alibaba Cloud and Google Cloud.
-     *
-     * @example us-east-1c
-     */
-    public const CLOUD_AVAILABILITY_ZONE = 'cloud.availability_zone';
-
-    /**
-     * The cloud platform in use.
-     *
-     * The prefix of the service SHOULD match the one specified in `cloud.provider`.
-     */
-    public const CLOUD_PLATFORM = 'cloud.platform';
-
-    /**
-     * Name of the cloud provider.
-     */
-    public const CLOUD_PROVIDER = 'cloud.provider';
-
-    /**
-     * The geographical region the resource is running.
-     *
-     * Refer to your provider's docs to see the available regions, for example Alibaba Cloud regions, AWS regions, Azure regions, Google Cloud regions, or Tencent Cloud regions.
-     *
-     * @example us-central1
-     * @example us-east-1
-     */
-    public const CLOUD_REGION = 'cloud.region';
-
-    /**
-     * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an ARN on AWS, a fully qualified resource ID on Azure, a full resource name on GCP).
-     *
-     * On some cloud providers, it may not be possible to determine the full ID at startup,
-     * so it may be necessary to set `cloud.resource_id` as a span attribute instead.The exact value to use for `cloud.resource_id` depends on the cloud provider.
-     * The following well-known definitions MUST be used if you set this attribute and they apply:<ul>
-     * <li><strong>AWS Lambda:</strong> The function ARN.
-     * Take care not to use the &quot;invoked ARN&quot; directly but replace any
-     * alias suffix
-     * with the resolved function version, as the same runtime instance may be invokable with
-     * multiple different aliases.</li>
-     * <li><strong>GCP:</strong> The URI of the resource</li>
-     * <li><strong>Azure:</strong> The Fully Qualified Resource ID of the invoked function,
-     * <em>not</em> the function app, having the form
-     * `/subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>`.
-     * This means that a span attribute MUST be used, as an Azure function app can host multiple functions that would usually share
-     * a TracerProvider.</li>
-     * </ul>
-     *
-     * @example arn:aws:lambda:REGION:ACCOUNT_ID:function:my-function
-     * @example //run.googleapis.com/projects/PROJECT_ID/locations/LOCATION_ID/services/SERVICE_ID
-     * @example /subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>
-     */
-    public const CLOUD_RESOURCE_ID = 'cloud.resource_id';
 
     /**
      * The ARN of an ECS cluster.
@@ -220,56 +105,110 @@ interface ResourceAttributes
     public const AWS_LOG_STREAM_NAMES = 'aws.log.stream.names';
 
     /**
-     * The name of the Cloud Run execution being run for the Job, as set by the `CLOUD_RUN_EXECUTION` environment variable.
+     * Array of brand name and version separated by a space.
      *
-     * @example job-name-xxxx
-     * @example sample-job-mdw84
+     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.brands`).
+     *
+     * @example  Not A;Brand 99
+     * @example Chromium 99
+     * @example Chrome 99
      */
-    public const GCP_CLOUD_RUN_JOB_EXECUTION = 'gcp.cloud_run.job.execution';
+    public const BROWSER_BRANDS = 'browser.brands';
 
     /**
-     * The index for a task within an execution as provided by the `CLOUD_RUN_TASK_INDEX` environment variable.
+     * Preferred language of the user using the browser.
      *
-     * @example 1
+     * This value is intended to be taken from the Navigator API `navigator.language`.
+     *
+     * @example en
+     * @example en-US
+     * @example fr
+     * @example fr-FR
      */
-    public const GCP_CLOUD_RUN_JOB_TASK_INDEX = 'gcp.cloud_run.job.task_index';
+    public const BROWSER_LANGUAGE = 'browser.language';
 
     /**
-     * The hostname of a GCE instance. This is the full value of the default or custom hostname.
+     * A boolean that is true if the browser is running on a mobile device.
      *
-     * @example my-host1234.example.com
-     * @example sample-vm.us-west1-b.c.my-project.internal
+     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.mobile`). If unavailable, this attribute SHOULD be left unset.
      */
-    public const GCP_GCE_INSTANCE_HOSTNAME = 'gcp.gce.instance.hostname';
+    public const BROWSER_MOBILE = 'browser.mobile';
 
     /**
-     * The instance name of a GCE instance. This is the value provided by `host.name`, the visible name of the instance in the Cloud Console UI, and the prefix for the default hostname of the instance as defined by the default internal DNS name.
+     * The platform on which the browser is running.
      *
-     * @example instance-1
-     * @example my-vm-name
+     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.platform`). If unavailable, the legacy `navigator.platform` API SHOULD NOT be used instead and this attribute SHOULD be left unset in order for the values to be consistent.
+     * The list of possible values is defined in the W3C User-Agent Client Hints specification. Note that some (but not all) of these values can overlap with values in the `os.type` and `os.name` attributes. However, for consistency, the values in the `browser.platform` attribute should capture the exact value that the user agent provides.
+     *
+     * @example Windows
+     * @example macOS
+     * @example Android
      */
-    public const GCP_GCE_INSTANCE_NAME = 'gcp.gce.instance.name';
+    public const BROWSER_PLATFORM = 'browser.platform';
 
     /**
-     * Unique identifier for the application.
+     * The cloud account ID the resource is assigned to.
      *
-     * @example 2daa2797-e42b-4624-9322-ec3f968df4da
+     * @example 111111111111
+     * @example opentelemetry
      */
-    public const HEROKU_APP_ID = 'heroku.app.id';
+    public const CLOUD_ACCOUNT_ID = 'cloud.account.id';
 
     /**
-     * Commit hash for the current release.
+     * Cloud regions often have multiple, isolated locations known as zones to increase availability. Availability zone represents the zone where the resource is running.
      *
-     * @example e6134959463efd8966b20e75b913cafe3f5ec
+     * Availability zones are called &quot;zones&quot; on Alibaba Cloud and Google Cloud.
+     *
+     * @example us-east-1c
      */
-    public const HEROKU_RELEASE_COMMIT = 'heroku.release.commit';
+    public const CLOUD_AVAILABILITY_ZONE = 'cloud.availability_zone';
 
     /**
-     * Time and date the release was created.
+     * The cloud platform in use.
      *
-     * @example 2022-10-23T18:00:42Z
+     * The prefix of the service SHOULD match the one specified in `cloud.provider`.
      */
-    public const HEROKU_RELEASE_CREATION_TIMESTAMP = 'heroku.release.creation_timestamp';
+    public const CLOUD_PLATFORM = 'cloud.platform';
+
+    /**
+     * Name of the cloud provider.
+     */
+    public const CLOUD_PROVIDER = 'cloud.provider';
+
+    /**
+     * The geographical region the resource is running.
+     *
+     * Refer to your provider's docs to see the available regions, for example Alibaba Cloud regions, AWS regions, Azure regions, Google Cloud regions, or Tencent Cloud regions.
+     *
+     * @example us-central1
+     * @example us-east-1
+     */
+    public const CLOUD_REGION = 'cloud.region';
+
+    /**
+     * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an ARN on AWS, a fully qualified resource ID on Azure, a full resource name on GCP).
+     *
+     * On some cloud providers, it may not be possible to determine the full ID at startup,
+     * so it may be necessary to set `cloud.resource_id` as a span attribute instead.The exact value to use for `cloud.resource_id` depends on the cloud provider.
+     * The following well-known definitions MUST be used if you set this attribute and they apply:<ul>
+     * <li><strong>AWS Lambda:</strong> The function ARN.
+     * Take care not to use the &quot;invoked ARN&quot; directly but replace any
+     * alias suffix
+     * with the resolved function version, as the same runtime instance may be invokable with
+     * multiple different aliases.</li>
+     * <li><strong>GCP:</strong> The URI of the resource</li>
+     * <li><strong>Azure:</strong> The Fully Qualified Resource ID of the invoked function,
+     * <em>not</em> the function app, having the form
+     * `/subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>`.
+     * This means that a span attribute MUST be used, as an Azure function app can host multiple functions that would usually share
+     * a TracerProvider.</li>
+     * </ul>
+     *
+     * @example arn:aws:lambda:REGION:ACCOUNT_ID:function:my-function
+     * @example //run.googleapis.com/projects/PROJECT_ID/locations/LOCATION_ID/services/SERVICE_ID
+     * @example /subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>
+     */
+    public const CLOUD_RESOURCE_ID = 'cloud.resource_id';
 
     /**
      * The command used to run the container (i.e. the command name).
@@ -352,16 +291,6 @@ interface ResourceAttributes
      * @example rkt
      */
     public const CONTAINER_RUNTIME = 'container.runtime';
-
-    /**
-     * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
-     *
-     * Follows OCI Image Manifest Specification, and specifically the Digest property.
-     * An example can be found in Example Image Manifest.
-     *
-     * @example sha256:e4ca62c0d62f3e886e684806dfe9d4e0cda60d54986898173c1083856cfda0f4
-     */
-    public const OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
 
     /**
      * Name of the deployment environment (aka deployment tier).
@@ -472,9 +401,105 @@ interface ResourceAttributes
     public const FAAS_VERSION = 'faas.version';
 
     /**
+     * The name of the Cloud Run execution being run for the Job, as set by the `CLOUD_RUN_EXECUTION` environment variable.
+     *
+     * @example job-name-xxxx
+     * @example sample-job-mdw84
+     */
+    public const GCP_CLOUD_RUN_JOB_EXECUTION = 'gcp.cloud_run.job.execution';
+
+    /**
+     * The index for a task within an execution as provided by the `CLOUD_RUN_TASK_INDEX` environment variable.
+     *
+     * @example 1
+     */
+    public const GCP_CLOUD_RUN_JOB_TASK_INDEX = 'gcp.cloud_run.job.task_index';
+
+    /**
+     * The hostname of a GCE instance. This is the full value of the default or custom hostname.
+     *
+     * @example my-host1234.example.com
+     * @example sample-vm.us-west1-b.c.my-project.internal
+     */
+    public const GCP_GCE_INSTANCE_HOSTNAME = 'gcp.gce.instance.hostname';
+
+    /**
+     * The instance name of a GCE instance. This is the value provided by `host.name`, the visible name of the instance in the Cloud Console UI, and the prefix for the default hostname of the instance as defined by the default internal DNS name.
+     *
+     * @example instance-1
+     * @example my-vm-name
+     */
+    public const GCP_GCE_INSTANCE_NAME = 'gcp.gce.instance.name';
+
+    /**
+     * Unique identifier for the application.
+     *
+     * @example 2daa2797-e42b-4624-9322-ec3f968df4da
+     */
+    public const HEROKU_APP_ID = 'heroku.app.id';
+
+    /**
+     * Commit hash for the current release.
+     *
+     * @example e6134959463efd8966b20e75b913cafe3f5ec
+     */
+    public const HEROKU_RELEASE_COMMIT = 'heroku.release.commit';
+
+    /**
+     * Time and date the release was created.
+     *
+     * @example 2022-10-23T18:00:42Z
+     */
+    public const HEROKU_RELEASE_CREATION_TIMESTAMP = 'heroku.release.creation_timestamp';
+
+    /**
      * The CPU architecture the host system is running on.
      */
     public const HOST_ARCH = 'host.arch';
+
+    /**
+     * The amount of level 2 memory cache available to the processor (in Bytes).
+     *
+     * @example 12288000
+     */
+    public const HOST_CPU_CACHE_L2_SIZE = 'host.cpu.cache.l2.size';
+
+    /**
+     * Numeric value specifying the family or generation of the CPU.
+     *
+     * @example 6
+     */
+    public const HOST_CPU_FAMILY = 'host.cpu.family';
+
+    /**
+     * Model identifier. It provides more granular information about the CPU, distinguishing it from other CPUs within the same family.
+     *
+     * @example 6
+     */
+    public const HOST_CPU_MODEL_ID = 'host.cpu.model.id';
+
+    /**
+     * Model designation of the processor.
+     *
+     * @example 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz
+     */
+    public const HOST_CPU_MODEL_NAME = 'host.cpu.model.name';
+
+    /**
+     * Stepping or core revisions.
+     *
+     * @example 1
+     */
+    public const HOST_CPU_STEPPING = 'host.cpu.stepping';
+
+    /**
+     * Processor manufacturer identifier. A maximum 12-character string.
+     *
+     * CPUID command returns the vendor ID string in EBX, EDX and ECX registers. Writing these to memory in this order results in a 12-character string.
+     *
+     * @example GenuineIntel
+     */
+    public const HOST_CPU_VENDOR_ID = 'host.cpu.vendor.id';
 
     /**
      * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider. For non-containerized systems, this should be the `machine-id`. See the table below for the sources to use to determine the `machine-id` based on operating system.
@@ -540,50 +565,6 @@ interface ResourceAttributes
     public const HOST_TYPE = 'host.type';
 
     /**
-     * The amount of level 2 memory cache available to the processor (in Bytes).
-     *
-     * @example 12288000
-     */
-    public const HOST_CPU_CACHE_L2_SIZE = 'host.cpu.cache.l2.size';
-
-    /**
-     * Numeric value specifying the family or generation of the CPU.
-     *
-     * @example 6
-     */
-    public const HOST_CPU_FAMILY = 'host.cpu.family';
-
-    /**
-     * Model identifier. It provides more granular information about the CPU, distinguishing it from other CPUs within the same family.
-     *
-     * @example 6
-     */
-    public const HOST_CPU_MODEL_ID = 'host.cpu.model.id';
-
-    /**
-     * Model designation of the processor.
-     *
-     * @example 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz
-     */
-    public const HOST_CPU_MODEL_NAME = 'host.cpu.model.name';
-
-    /**
-     * Stepping or core revisions.
-     *
-     * @example 1
-     */
-    public const HOST_CPU_STEPPING = 'host.cpu.stepping';
-
-    /**
-     * Processor manufacturer identifier. A maximum 12-character string.
-     *
-     * CPUID command returns the vendor ID string in EBX, EDX and ECX registers. Writing these to memory in this order results in a 12-character string.
-     *
-     * @example GenuineIntel
-     */
-    public const HOST_CPU_VENDOR_ID = 'host.cpu.vendor.id';
-
-    /**
      * The name of the cluster.
      *
      * @example opentelemetry-cluster
@@ -616,41 +597,6 @@ interface ResourceAttributes
     public const K8S_CLUSTER_UID = 'k8s.cluster.uid';
 
     /**
-     * The name of the Node.
-     *
-     * @example node-1
-     */
-    public const K8S_NODE_NAME = 'k8s.node.name';
-
-    /**
-     * The UID of the Node.
-     *
-     * @example 1eb3a0c6-0477-4080-a9cb-0cb7db65c6a2
-     */
-    public const K8S_NODE_UID = 'k8s.node.uid';
-
-    /**
-     * The name of the namespace that the pod is running in.
-     *
-     * @example default
-     */
-    public const K8S_NAMESPACE_NAME = 'k8s.namespace.name';
-
-    /**
-     * The name of the Pod.
-     *
-     * @example opentelemetry-pod-autoconf
-     */
-    public const K8S_POD_NAME = 'k8s.pod.name';
-
-    /**
-     * The UID of the Pod.
-     *
-     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
-     */
-    public const K8S_POD_UID = 'k8s.pod.uid';
-
-    /**
      * The name of the Container from Pod specification, must be unique within a Pod. Container runtime usually uses different globally unique name (`container.name`).
      *
      * @example redis
@@ -665,46 +611,18 @@ interface ResourceAttributes
     public const K8S_CONTAINER_RESTART_COUNT = 'k8s.container.restart_count';
 
     /**
-     * The name of the ReplicaSet.
+     * The name of the CronJob.
      *
      * @example opentelemetry
      */
-    public const K8S_REPLICASET_NAME = 'k8s.replicaset.name';
+    public const K8S_CRONJOB_NAME = 'k8s.cronjob.name';
 
     /**
-     * The UID of the ReplicaSet.
+     * The UID of the CronJob.
      *
      * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
      */
-    public const K8S_REPLICASET_UID = 'k8s.replicaset.uid';
-
-    /**
-     * The name of the Deployment.
-     *
-     * @example opentelemetry
-     */
-    public const K8S_DEPLOYMENT_NAME = 'k8s.deployment.name';
-
-    /**
-     * The UID of the Deployment.
-     *
-     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
-     */
-    public const K8S_DEPLOYMENT_UID = 'k8s.deployment.uid';
-
-    /**
-     * The name of the StatefulSet.
-     *
-     * @example opentelemetry
-     */
-    public const K8S_STATEFULSET_NAME = 'k8s.statefulset.name';
-
-    /**
-     * The UID of the StatefulSet.
-     *
-     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
-     */
-    public const K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
+    public const K8S_CRONJOB_UID = 'k8s.cronjob.uid';
 
     /**
      * The name of the DaemonSet.
@@ -721,6 +639,20 @@ interface ResourceAttributes
     public const K8S_DAEMONSET_UID = 'k8s.daemonset.uid';
 
     /**
+     * The name of the Deployment.
+     *
+     * @example opentelemetry
+     */
+    public const K8S_DEPLOYMENT_NAME = 'k8s.deployment.name';
+
+    /**
+     * The UID of the Deployment.
+     *
+     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+     */
+    public const K8S_DEPLOYMENT_UID = 'k8s.deployment.uid';
+
+    /**
      * The name of the Job.
      *
      * @example opentelemetry
@@ -735,18 +667,77 @@ interface ResourceAttributes
     public const K8S_JOB_UID = 'k8s.job.uid';
 
     /**
-     * The name of the CronJob.
+     * The name of the namespace that the pod is running in.
      *
-     * @example opentelemetry
+     * @example default
      */
-    public const K8S_CRONJOB_NAME = 'k8s.cronjob.name';
+    public const K8S_NAMESPACE_NAME = 'k8s.namespace.name';
 
     /**
-     * The UID of the CronJob.
+     * The name of the Node.
+     *
+     * @example node-1
+     */
+    public const K8S_NODE_NAME = 'k8s.node.name';
+
+    /**
+     * The UID of the Node.
+     *
+     * @example 1eb3a0c6-0477-4080-a9cb-0cb7db65c6a2
+     */
+    public const K8S_NODE_UID = 'k8s.node.uid';
+
+    /**
+     * The name of the Pod.
+     *
+     * @example opentelemetry-pod-autoconf
+     */
+    public const K8S_POD_NAME = 'k8s.pod.name';
+
+    /**
+     * The UID of the Pod.
      *
      * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
      */
-    public const K8S_CRONJOB_UID = 'k8s.cronjob.uid';
+    public const K8S_POD_UID = 'k8s.pod.uid';
+
+    /**
+     * The name of the ReplicaSet.
+     *
+     * @example opentelemetry
+     */
+    public const K8S_REPLICASET_NAME = 'k8s.replicaset.name';
+
+    /**
+     * The UID of the ReplicaSet.
+     *
+     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+     */
+    public const K8S_REPLICASET_UID = 'k8s.replicaset.uid';
+
+    /**
+     * The name of the StatefulSet.
+     *
+     * @example opentelemetry
+     */
+    public const K8S_STATEFULSET_NAME = 'k8s.statefulset.name';
+
+    /**
+     * The UID of the StatefulSet.
+     *
+     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+     */
+    public const K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
+
+    /**
+     * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
+     *
+     * Follows OCI Image Manifest Specification, and specifically the Digest property.
+     * An example can be found in Example Image Manifest.
+     *
+     * @example sha256:e4ca62c0d62f3e886e684806dfe9d4e0cda60d54986898173c1083856cfda0f4
+     */
+    public const OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
 
     /**
      * Unique identifier for a particular build or compilation of the operating system.
@@ -786,6 +777,36 @@ interface ResourceAttributes
      * @example 18.04.1
      */
     public const OS_VERSION = 'os.version';
+
+    /**
+     * Deprecated, use the `otel.scope.name` attribute.
+     *
+     * @deprecated Deprecated, use the `otel.scope.name` attribute..
+     * @example io.opentelemetry.contrib.mongodb
+     */
+    public const OTEL_LIBRARY_NAME = 'otel.library.name';
+
+    /**
+     * Deprecated, use the `otel.scope.version` attribute.
+     *
+     * @deprecated Deprecated, use the `otel.scope.version` attribute..
+     * @example 1.0.0
+     */
+    public const OTEL_LIBRARY_VERSION = 'otel.library.version';
+
+    /**
+     * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
+     *
+     * @example io.opentelemetry.contrib.mongodb
+     */
+    public const OTEL_SCOPE_NAME = 'otel.scope.name';
+
+    /**
+     * The version of the instrumentation scope - (`InstrumentationScope.Version` in OTLP).
+     *
+     * @example 1.0.0
+     */
+    public const OTEL_SCOPE_VERSION = 'otel.scope.version';
 
     /**
      * The command used to launch the process (i.e. the command name). On Linux based systems, can be set to the zeroth string in `proc/[pid]/cmdline`. On Windows, can be set to the first parameter extracted from `GetCommandLineW`.
@@ -866,23 +887,6 @@ interface ResourceAttributes
     public const PROCESS_RUNTIME_VERSION = 'process.runtime.version';
 
     /**
-     * Logical name of the service.
-     *
-     * MUST be the same for all instances of horizontally scaled services. If the value was not specified, SDKs MUST fallback to `unknown_service:` concatenated with `process.executable.name`, e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value MUST be set to `unknown_service`.
-     *
-     * @example shoppingcart
-     */
-    public const SERVICE_NAME = 'service.name';
-
-    /**
-     * The version string of the service API or implementation. The format is not defined by these conventions.
-     *
-     * @example 2.0.0
-     * @example a01dbef8a
-     */
-    public const SERVICE_VERSION = 'service.version';
-
-    /**
      * The string ID of the service instance.
      *
      * MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words `service.namespace,service.name,service.instance.id` triplet MUST be globally unique). The ID helps to distinguish instances of the same service that exist at the same time (e.g. instances of a horizontally scaled service). It is preferable for the ID to be persistent and stay the same for the lifetime of the service instance, however it is acceptable that the ID is ephemeral and changes during important lifetime events for the service (e.g. service restarts). If the service has no inherent unique ID that can be used as the value of this attribute it is recommended to generate a random Version 1 or Version 4 RFC 4122 UUID (services aiming for reproducible UUIDs may also use Version 5, see RFC 4122 for more recommendations).
@@ -893,6 +897,15 @@ interface ResourceAttributes
     public const SERVICE_INSTANCE_ID = 'service.instance.id';
 
     /**
+     * Logical name of the service.
+     *
+     * MUST be the same for all instances of horizontally scaled services. If the value was not specified, SDKs MUST fallback to `unknown_service:` concatenated with `process.executable.name`, e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value MUST be set to `unknown_service`.
+     *
+     * @example shoppingcart
+     */
+    public const SERVICE_NAME = 'service.name';
+
+    /**
      * A namespace for `service.name`.
      *
      * A string value having a meaning that helps to distinguish a group of services, for example the team name that owns a group of services. `service.name` is expected to be unique within the same namespace. If `service.namespace` is not specified in the Resource then `service.name` is expected to be unique for all services that have no explicit namespace defined (so the empty/unspecified namespace is simply one more valid namespace). Zero-length namespace string is assumed equal to unspecified namespace.
@@ -900,6 +913,31 @@ interface ResourceAttributes
      * @example Shop
      */
     public const SERVICE_NAMESPACE = 'service.namespace';
+
+    /**
+     * The version string of the service API or implementation. The format is not defined by these conventions.
+     *
+     * @example 2.0.0
+     * @example a01dbef8a
+     */
+    public const SERVICE_VERSION = 'service.version';
+
+    /**
+     * The name of the auto instrumentation agent or distribution, if used.
+     *
+     * Official auto instrumentation agents and distributions SHOULD set the `telemetry.distro.name` attribute to
+     * a string starting with `opentelemetry-`, e.g. `opentelemetry-java-instrumentation`.
+     *
+     * @example parts-unlimited-java
+     */
+    public const TELEMETRY_DISTRO_NAME = 'telemetry.distro.name';
+
+    /**
+     * The version string of the auto instrumentation agent or distribution, if used.
+     *
+     * @example 1.2.3
+     */
+    public const TELEMETRY_DISTRO_VERSION = 'telemetry.distro.version';
 
     /**
      * The language of the telemetry SDK.
@@ -928,21 +966,13 @@ interface ResourceAttributes
     public const TELEMETRY_SDK_VERSION = 'telemetry.sdk.version';
 
     /**
-     * The name of the auto instrumentation agent or distribution, if used.
+     * Full user-agent string provided by the browser.
      *
-     * Official auto instrumentation agents and distributions SHOULD set the `telemetry.distro.name` attribute to
-     * a string starting with `opentelemetry-`, e.g. `opentelemetry-java-instrumentation`.
+     * The user-agent value SHOULD be provided only from browsers that do not have a mechanism to retrieve brands and platform individually from the User-Agent Client Hints API. To retrieve the value, the legacy `navigator.userAgent` API can be used.
      *
-     * @example parts-unlimited-java
+     * @example Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36
      */
-    public const TELEMETRY_DISTRO_NAME = 'telemetry.distro.name';
-
-    /**
-     * The version string of the auto instrumentation agent or distribution, if used.
-     *
-     * @example 1.2.3
-     */
-    public const TELEMETRY_DISTRO_VERSION = 'telemetry.distro.version';
+    public const USER_AGENT_ORIGINAL = 'user_agent.original';
 
     /**
      * Additional description of the web engine (e.g. detailed version and edition information).
@@ -964,36 +994,6 @@ interface ResourceAttributes
      * @example 21.0.0
      */
     public const WEBENGINE_VERSION = 'webengine.version';
-
-    /**
-     * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
-     *
-     * @example io.opentelemetry.contrib.mongodb
-     */
-    public const OTEL_SCOPE_NAME = 'otel.scope.name';
-
-    /**
-     * The version of the instrumentation scope - (`InstrumentationScope.Version` in OTLP).
-     *
-     * @example 1.0.0
-     */
-    public const OTEL_SCOPE_VERSION = 'otel.scope.version';
-
-    /**
-     * Deprecated, use the `otel.scope.name` attribute.
-     *
-     * @deprecated Deprecated, use the `otel.scope.name` attribute..
-     * @example io.opentelemetry.contrib.mongodb
-     */
-    public const OTEL_LIBRARY_NAME = 'otel.library.name';
-
-    /**
-     * Deprecated, use the `otel.scope.version` attribute.
-     *
-     * @deprecated Deprecated, use the `otel.scope.version` attribute..
-     * @example 1.0.0
-     */
-    public const OTEL_LIBRARY_VERSION = 'otel.library.version';
 
     /**
      * @deprecated Use USER_AGENT_ORIGINAL
