@@ -1,7 +1,7 @@
 {
-    "name": "open-telemetry/extension-propagator-xcloudtrace",
-    "description": "XCloudTraceContext propagator extension for OpenTelemetry PHP.",
-    "keywords": ["opentelemetry", "otel", "tracing", "apm", "extension", "propagator", "xcloudtrace"],
+    "name": "open-telemetry/extension-propagator-cloudtrace",
+    "description": "CloudTraceContext propagator extension for OpenTelemetry PHP.",
+    "keywords": ["opentelemetry", "otel", "tracing", "apm", "extension", "propagator", "cloudtrace"],
     "type": "library",
     "support": {
         "issues": "https://github.com/open-telemetry/opentelemetry-php/issues",
@@ -23,7 +23,7 @@
     },
     "autoload": {
         "psr-4": {
-            "OpenTelemetry\\Extension\\Propagator\\XCloudTrace\\": "."
+            "OpenTelemetry\\Extension\\Propagator\\CloudTrace\\": "."
         },
         "files": [
             "_register.php"

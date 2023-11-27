@@ -11,7 +11,7 @@ use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
-use OpenTelemetry\Extension\Propagator\XCloudTrace\XCloudTracePropagator;
+use OpenTelemetry\Extension\Propagator\CloudTrace\CloudTracePropagator;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
@@ -52,7 +52,8 @@ class PropagatorFactoryTest extends TestCase
             [KnownValues::VALUE_BAGGAGE, BaggagePropagator::class],
             [KnownValues::VALUE_TRACECONTEXT, TraceContextPropagator::class],
             [KnownValues::VALUE_B3, B3Propagator::class],
-            [KnownValues::VALUE_XCLOUD_TRACE, XCloudTracePropagator::class],
+            [KnownValues::VALUE_CLOUD_TRACE, CloudTracePropagator::class],
+            [KnownValues::VALUE_CLOUD_TRACE_ONEWAY, CloudTracePropagator::class],
             [KnownValues::VALUE_B3_MULTI, B3Propagator::class],
             [KnownValues::VALUE_NONE, NoopTextMapPropagator::class],
             [sprintf('%s,%s', KnownValues::VALUE_B3, KnownValues::VALUE_BAGGAGE), MultiTextMapPropagator::class],

@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Extension\Propagator\XCloudTrace;
+namespace OpenTelemetry\Tests\Unit\Extension\Propagator\CloudTrace;
 
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\TraceFlags;
-use OpenTelemetry\Extension\Propagator\XCloudTrace\XCloudTraceFormatter;
+use OpenTelemetry\Extension\Propagator\CloudTrace\CloudTraceFormatter;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\Extension\Propagator\XCloudTrace\XCloudTraceFormatter
+ * @covers \OpenTelemetry\Extension\Propagator\CloudTrace\CloudTraceFormatter
  */
-class XCloudTraceFormatterTest extends TestCase
+class CloudTraceFormatterTest extends TestCase
 {
 
     /**
@@ -21,7 +21,7 @@ class XCloudTraceFormatterTest extends TestCase
      */
     public function test_deserialize(string $header, string $traceId, string $spanId, int $sample) : void
     {
-        $result = XCloudTraceFormatter::deserialize($header);
+        $result = CloudTraceFormatter::deserialize($header);
         $this->assertEquals($result->getTraceId(), $traceId, "Given deserialize($header), traceId != $traceId (result={$result->getTraceId()}");
         $this->assertEquals($result->getSpanId(), $spanId, "Given deserialize($header), spanId != $spanId (result={$result->getSpanId()}");
         $this->assertEquals($result->getTraceFlags(), $sample, "Given deserialize($header), traceFlags != $sample (result={$result->getTraceFlags()}");
@@ -40,7 +40,7 @@ class XCloudTraceFormatterTest extends TestCase
      */
     public function test_serialize(SpanContextInterface $span, string $header) : void
     {
-        $result = XCloudTraceFormatter::serialize($span);
+        $result = CloudTraceFormatter::serialize($span);
         $this->assertEquals($result, $header, "Given serialize(header), result != $header (result=$result");
     }
 

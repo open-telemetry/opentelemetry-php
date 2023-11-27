@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Extension\Propagator\XCloudTrace;
+namespace OpenTelemetry\Extension\Propagator\CloudTrace;
 
 /**
- * This class contains utilities that are used by the XCloudTracePropagator.
+ * This class contains utilities that are used by the CloudTracePropagator.
  * This class mostly contains numerical handling functions to work with
  * trace and span IDs.
  */

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Extension\Propagator\XCloudTrace;
+namespace OpenTelemetry\Extension\Propagator\CloudTrace;
 
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\Context\Context;
@@ -13,11 +13,11 @@ use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 
 /**
- * XCloudTracePropagator is a propagator that supports the specification for the X-Cloud-Trace-Context
+ * CloudTracePropagator is a propagator that supports the specification for the X-Cloud-Trace-Context
  * header used for trace context propagation across service boundaries.
  * (https://cloud.google.com/trace/docs/setup#force-trace)
  */
-final class XCloudTracePropagator implements TextMapPropagatorInterface
+final class CloudTracePropagator implements TextMapPropagatorInterface
 {
     private static ?TextMapPropagatorInterface $oneWayInstance = null;
     private static ?TextMapPropagatorInterface $instance = null;
@@ -25,7 +25,7 @@ final class XCloudTracePropagator implements TextMapPropagatorInterface
     public static function getOneWayInstance(): TextMapPropagatorInterface
     {
         if (self::$oneWayInstance === null) {
-            self::$oneWayInstance = new XCloudTracePropagator(true);
+            self::$oneWayInstance = new CloudTracePropagator(true);
         }
 
         return self::$oneWayInstance;
@@ -34,7 +34,7 @@ final class XCloudTracePropagator implements TextMapPropagatorInterface
     public static function getInstance(): TextMapPropagatorInterface
     {
         if (self::$instance === null) {
-            self::$instance = new XCloudTracePropagator(false);
+            self::$instance = new CloudTracePropagator(false);
         }
 
         return self::$instance;
@@ -74,7 +74,7 @@ final class XCloudTracePropagator implements TextMapPropagatorInterface
             return;
         }
 
-        $headerValue = XCloudTraceFormatter::serialize($spanContext);
+        $headerValue = CloudTraceFormatter::serialize($spanContext);
         $setter->set($carrier, self::XCLOUD, $headerValue);
     }
 
@@ -89,7 +89,7 @@ final class XCloudTracePropagator implements TextMapPropagatorInterface
             return $context;
         }
 
-        $spanContext = XCloudTraceFormatter::deserialize($headerValue);
+        $spanContext = CloudTraceFormatter::deserialize($headerValue);
         if (!$spanContext->isValid()) {
             return $context;
         }
