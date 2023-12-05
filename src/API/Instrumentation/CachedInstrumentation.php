@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Instrumentation;
 
 use ArrayAccess;
-use OpenTelemetry\SemConv\TraceAttributes;
 use function assert;
 use function class_exists;
 use OpenTelemetry\API\Globals;
@@ -15,6 +14,7 @@ use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\SemConv\TraceAttributes;
 use const PHP_VERSION_ID;
 
 /**
