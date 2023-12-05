@@ -38,11 +38,11 @@ final class CachedInstrumentation
     /** @var ArrayAccess<LoggerProviderInterface, LoggerInterface>|null */
     private ?ArrayAccess $loggers;
 
-    public function __construct(string $name, ?string $version = null, string $schemaUrl = TraceAttributes::SCHEMA_URL, iterable $attributes = [])
+    public function __construct(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = [])
     {
         $this->name = $name;
         $this->version = $version;
-        $this->schemaUrl = $schemaUrl;
+        $this->schemaUrl = ($schemaUrl !== null && $schemaUrl !== '') ? $schemaUrl : TraceAttributes::SCHEMA_URL;
         $this->attributes = $attributes;
         $this->tracers = self::createWeakMap();
         $this->meters = self::createWeakMap();
