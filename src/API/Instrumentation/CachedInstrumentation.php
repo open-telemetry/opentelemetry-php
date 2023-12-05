@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Instrumentation;
 
 use ArrayAccess;
+use OpenTelemetry\SemConv\TraceAttributes;
 use function assert;
 use function class_exists;
 use OpenTelemetry\API\Globals;
@@ -37,7 +38,7 @@ final class CachedInstrumentation
     /** @var ArrayAccess<LoggerProviderInterface, LoggerInterface>|null */
     private ?ArrayAccess $loggers;
 
-    public function __construct(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = [])
+    public function __construct(string $name, ?string $version = null, string $schemaUrl = TraceAttributes::SCHEMA_URL, iterable $attributes = [])
     {
         $this->name = $name;
         $this->version = $version;
