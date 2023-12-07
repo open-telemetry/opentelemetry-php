@@ -86,10 +86,10 @@ deptrac:
       SemConv: ~
       API:
           - Context
-          - SemConv
           - PsrLog
       SDK:
           - +API
+          - SemConv
           - PsrHttp
           - HttpPlug
           - Composer
