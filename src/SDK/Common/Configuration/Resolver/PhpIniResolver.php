@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 
 /**
- * @interal
+ * @internal
  * @psalm-suppress TypeDoesNotContainType
  */
 class PhpIniResolver implements ResolverInterface

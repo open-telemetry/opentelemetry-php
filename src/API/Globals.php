@@ -67,7 +67,7 @@ final class Globals
     /**
      * @param Closure(Configurator): Configurator $initializer
      *
-     * @interal
+     * @internal
      * @psalm-internal OpenTelemetry
      */
     public static function registerInitializer(Closure $initializer): void
