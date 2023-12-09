@@ -49,7 +49,7 @@ final class ExportingReaderTest extends TestCase
         $this->assertEquals(new SumAggregation(true), $reader->defaultAggregation(InstrumentType::ASYNCHRONOUS_COUNTER));
         $this->assertEquals(new SumAggregation(), $reader->defaultAggregation(InstrumentType::UP_DOWN_COUNTER));
         $this->assertEquals(new SumAggregation(), $reader->defaultAggregation(InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER));
-        $this->assertEquals(new ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 2500, 5000, 7500, 10000]), $reader->defaultAggregation(InstrumentType::HISTOGRAM));
+        $this->assertEquals(new ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]), $reader->defaultAggregation(InstrumentType::HISTOGRAM));
         $this->assertEquals(new LastValueAggregation(), $reader->defaultAggregation(InstrumentType::ASYNCHRONOUS_GAUGE));
     }
 
