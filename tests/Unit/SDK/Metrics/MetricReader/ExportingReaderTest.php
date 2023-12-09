@@ -49,8 +49,19 @@ final class ExportingReaderTest extends TestCase
         $this->assertEquals(new SumAggregation(true), $reader->defaultAggregation(InstrumentType::ASYNCHRONOUS_COUNTER));
         $this->assertEquals(new SumAggregation(), $reader->defaultAggregation(InstrumentType::UP_DOWN_COUNTER));
         $this->assertEquals(new SumAggregation(), $reader->defaultAggregation(InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER));
-        $this->assertEquals(new ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]), $reader->defaultAggregation(InstrumentType::HISTOGRAM));
+        $this->assertEquals(new ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 2500, 5000, 7500, 10000]), $reader->defaultAggregation(InstrumentType::HISTOGRAM));
         $this->assertEquals(new LastValueAggregation(), $reader->defaultAggregation(InstrumentType::ASYNCHRONOUS_GAUGE));
+    }
+
+    public function test_default_aggregation_returns_histogram_with_advisory_buckets(): void
+    {
+        $exporter = new InMemoryExporter();
+        $reader = new ExportingReader($exporter);
+
+        $this->assertEquals(
+            new ExplicitBucketHistogramAggregation([0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10]),
+            $reader->defaultAggregation(InstrumentType::HISTOGRAM, ['ExplicitBucketBoundaries' => [0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10]]),
+        );
     }
 
     public function test_default_aggregation_returns_exporter_aggregation_if_default_aggregation_provider(): void
