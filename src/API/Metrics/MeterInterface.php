@@ -32,7 +32,7 @@ interface MeterInterface
      * @param string|null $unit unit of measure
      * @param string|null $description description of the instrument
      * @param array|callable $advisory an optional set of recommendations, or
-     *        the first callback to report measurements
+     *        deprecated: the first callback to report measurements
      * @param callable ...$callbacks responsible for reporting measurements
      * @return ObservableCounterInterface created instrument
      *
@@ -72,7 +72,7 @@ interface MeterInterface
      * @param string|null $unit unit of measure
      * @param string|null $description description of the instrument
      * @param array|callable $advisory an optional set of recommendations, or
-     *        the first callback to report measurements
+     *        deprecated: the first callback to report measurements
      * @param callable ...$callbacks responsible for reporting measurements
      * @return ObservableGaugeInterface created instrument
      *
@@ -111,7 +111,7 @@ interface MeterInterface
      * @param string|null $unit unit of measure
      * @param string|null $description description of the instrument
      * @param array|callable $advisory an optional set of recommendations, or
-     *        the first callback to report measurements
+     *        deprecated: the first callback to report measurements
      * @param callable ...$callbacks responsible for reporting measurements
      * @return ObservableUpDownCounterInterface created instrument
      *
