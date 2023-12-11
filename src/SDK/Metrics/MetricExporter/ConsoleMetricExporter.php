@@ -92,6 +92,7 @@ class ConsoleMetricExporter implements PushMetricExporterInterface, AggregationT
             'dropped_attributes_count' => $resource->getAttributes()->getDroppedAttributesCount(),
         ];
     }
+
     private function convertInstrumentationScope(InstrumentationScopeInterface $scope): array
     {
         return [

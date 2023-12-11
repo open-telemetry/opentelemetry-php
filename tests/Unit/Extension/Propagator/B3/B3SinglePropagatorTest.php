@@ -307,6 +307,7 @@ class B3SinglePropagatorTest extends TestCase
             $this->B3 => '-' . self::SPAN_ID_BASE16 . '-1',
         ]);
     }
+
     public function test_invalid_trace_id(): void
     {
         $this->assertInvalid([
