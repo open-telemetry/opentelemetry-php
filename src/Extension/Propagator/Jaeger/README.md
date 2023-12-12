@@ -11,7 +11,7 @@ Jaeger is a propagator that supports the specification for the header "uber-trac
 service boundaries.(https://www.jaegertracing.io/docs/1.52/client-libraries/#propagation-format).
 
 ### Usage
-For Jager single header:
+For Jaeger single header:
 ```text
 JaegerPropagator::getInstance()
 ```
