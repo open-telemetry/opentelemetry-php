@@ -24,13 +24,19 @@ final class Instrument
      */
     public ?string $description;
     /**
+     * @readonly
+     */
+    public array $advisory;
+
+    /**
      * @param string|InstrumentType $type
      */
-    public function __construct($type, string $name, ?string $unit, ?string $description)
+    public function __construct($type, string $name, ?string $unit, ?string $description, array $advisory = [])
     {
         $this->type = $type;
         $this->name = $name;
         $this->unit = $unit;
         $this->description = $description;
+        $this->advisory = $advisory;
     }
 }

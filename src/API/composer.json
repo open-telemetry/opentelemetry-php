@@ -24,6 +24,9 @@
         "symfony/polyfill-php81": "^1.26",
         "symfony/polyfill-php82": "^1.26"
     },
+    "conflict": {
+        "open-telemetry/sdk": "<=1.0.1"
+    },
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\API\\": "."
