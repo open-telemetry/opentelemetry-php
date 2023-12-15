@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Extension\Propagator\Jaeger;
 
-use OpenTelemetry\API\Baggage\Baggage;
-use OpenTelemetry\API\Baggage\Entry; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
@@ -26,12 +24,11 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 class JaegerPropagator implements TextMapPropagatorInterface
 {
     private const UBER_TRACE_ID_HEADER = 'uber-trace-id';
-    private const UBER_BAGGAGE_HEADER_PREFIX = 'uberctx';
 
-    private const IS_NOT_SAMPLED = '0';
-    private const IS_SAMPLED = '1';
-    private const IS_DEBUG = '2';
-    private const DEFAULT_PARENT_SPAN_ID = '0';
+    private const IS_NOT_SAMPLED = 0;
+    private const IS_SAMPLED = 1;
+    private const IS_DEBUG = 2;
+    private const DEFAULT_PARENT_SPAN_ID = 0;
 
     private const FIELDS = [
         self::UBER_TRACE_ID_HEADER,
@@ -67,7 +64,7 @@ class JaegerPropagator implements TextMapPropagatorInterface
         $flag = $this->getFlag($spanContext, $context);
 
         $uberTraceId = sprintf(
-            '%s:%s:%s:%s',
+            '%s:%s:%d:%d',
             $spanContext->getTraceId(),
             $spanContext->getSpanId(),
             self::DEFAULT_PARENT_SPAN_ID,
@@ -75,22 +72,6 @@ class JaegerPropagator implements TextMapPropagatorInterface
         );
 
         $setter->set($carrier, self::UBER_TRACE_ID_HEADER, $uberTraceId);
-
-        $baggage = Baggage::fromContext($context);
-
-        if ($baggage->isEmpty()) {
-            return;
-        }
-
-        /** @var Entry $entry */
-        foreach ($baggage->getAll() as $key => $entry) {
-            $value = rawurlencode((string) $entry->getValue());
-            $setter->set(
-                $carrier,
-                sprintf('%s-%s', self::UBER_BAGGAGE_HEADER_PREFIX, $key),
-                $value
-            );
-        }
     }
 
     /** {@inheritdoc} */
@@ -107,11 +88,11 @@ class JaegerPropagator implements TextMapPropagatorInterface
         return $context->withContextValue(Span::wrap($spanContext));
     }
 
-    private function getFlag(SpanContextInterface $spanContext, ContextInterface $context): string
+    private function getFlag(SpanContextInterface $spanContext, ContextInterface $context): int
     {
         if ($spanContext->isSampled()) {
             if ($context->get(JaegerDebugFlagContextKey::instance())) {
-                return self::IS_DEBUG;
+                return self::IS_DEBUG | self::IS_SAMPLED;
             }
 
             return self::IS_SAMPLED;
@@ -143,11 +124,9 @@ class JaegerPropagator implements TextMapPropagatorInterface
             return SpanContext::getInvalid();
         }
 
-        if ($traceFlags === self::IS_DEBUG) {
+        if ((int) $traceFlags & self::IS_DEBUG) {
             $context = $context->with(JaegerDebugFlagContextKey::instance(), true);
         }
-
-        $context = self::extractBaggage($carrier, $context);
 
         $isSampled = ((int) $traceFlags) & 1;
 
@@ -156,19 +135,5 @@ class JaegerPropagator implements TextMapPropagatorInterface
             $spanId,
             $isSampled ? TraceFlags::SAMPLED : TraceFlags::DEFAULT
         );
-    }
-
-    private static function extractBaggage($carrier, ContextInterface $context): ContextInterface
-    {
-        $baggageBuilder = Baggage::getBuilder();
-
-        foreach ($carrier as $key => $value) {
-            if (strpos($key, self::UBER_BAGGAGE_HEADER_PREFIX) === 0) {
-                $baggageKey = substr($key, strlen(self::UBER_BAGGAGE_HEADER_PREFIX));
-                $baggageBuilder->set($baggageKey, rawurldecode($value));
-            }
-        }
-
-        return $context->withContextValue($baggageBuilder->build());
     }
 }
