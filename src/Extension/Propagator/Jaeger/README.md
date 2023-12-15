@@ -9,11 +9,17 @@
 
 Jaeger is a propagator that supports the specification for the header "uber-trace-id" used for trace context propagation across
 service boundaries.(https://www.jaegertracing.io/docs/1.52/client-libraries/#propagation-format).
+OpenTelemetry PHP Jaeger Propagator Extension provides option to use Jaeger Baggage (https://www.jaegertracing.io/docs/1.52/client-libraries/#baggage) propagator.
 
 ### Usage
-For Jaeger single header:
+For Jaeger trace propagator:
 ```text
 JaegerPropagator::getInstance()
+```
+
+For Jaeger baggage propagator:
+```text
+JaegerBaggagePropagator::getInstance()
 ```
 
 Both of the above have `extract` and `inject` methods available to extract and inject respectively into the

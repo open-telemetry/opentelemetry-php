@@ -28,6 +28,7 @@ interface KnownValues
     public const VALUE_CLOUD_TRACE = 'cloudtrace';
     public const VALUE_CLOUD_TRACE_ONEWAY = 'cloudtrace-oneway';
     public const VALUE_JAEGER = 'jaeger';
+    public const VALUE_JAEGER_BAGGAGE = 'jaeger-baggage';
     public const VALUE_XRAY = 'xray';
     public const VALUE_OTTRACE = 'ottrace';
     public const VALUE_ALWAYS_ON = 'always_on';
