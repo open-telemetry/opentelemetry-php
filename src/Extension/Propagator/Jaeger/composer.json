@@ -1,0 +1,37 @@
+{
+    "name": "open-telemetry/extension-propagator-jaeger",
+    "description": "Jaeger propagator extension for OpenTelemetry PHP.",
+    "keywords": ["opentelemetry", "otel", "tracing", "apm", "extension", "propagator", "jaeger"],
+    "type": "library",
+    "support": {
+        "issues": "https://github.com/open-telemetry/opentelemetry-php/issues",
+        "source": "https://github.com/open-telemetry/opentelemetry-php",
+        "docs": "https://opentelemetry.io/docs/php",
+        "chat": "https://app.slack.com/client/T08PSQ7BQ/C01NFPCV44V"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "opentelemetry-php contributors",
+            "homepage": "https://github.com/open-telemetry/opentelemetry-php/graphs/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "open-telemetry/api": "^1.0",
+        "open-telemetry/context": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "OpenTelemetry\\Extension\\Propagator\\Jaeger\\": "."
+        },
+        "files": [
+            "_register.php"
+        ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        }
+    }
+}

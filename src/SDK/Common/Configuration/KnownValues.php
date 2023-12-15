@@ -27,6 +27,8 @@ interface KnownValues
     public const VALUE_B3_MULTI = 'b3multi';
     public const VALUE_CLOUD_TRACE = 'cloudtrace';
     public const VALUE_CLOUD_TRACE_ONEWAY = 'cloudtrace-oneway';
+    public const VALUE_JAEGER = 'jaeger';
+    public const VALUE_JAEGER_BAGGAGE = 'jaeger-baggage';
     public const VALUE_XRAY = 'xray';
     public const VALUE_OTTRACE = 'ottrace';
     public const VALUE_ALWAYS_ON = 'always_on';
@@ -109,6 +111,8 @@ interface KnownValues
         self::VALUE_B3_MULTI, // B3 Multi
         self::VALUE_CLOUD_TRACE, // GCP XCloudTraceContext
         self::VALUE_CLOUD_TRACE_ONEWAY, // GCP XCloudTraceContext OneWay (Extract)
+        self::VALUE_JAEGER, // Jaeger Propagator
+        self::VALUE_JAEGER_BAGGAGE, // Jaeger Baggage Propagator
         self::VALUE_XRAY, // AWS X-Ray (third party)
         self::VALUE_OTTRACE, // OT Trace (third party)
         self::VALUE_NONE, // No automatically configured propagator.
