@@ -73,7 +73,7 @@ class JaegerBaggagePropagator implements TextMapPropagatorInterface
         $baggageBuilder = Baggage::getBuilder();
 
         foreach ($baggageKeys as $key) {
-            if (str_starts_with($key, self::UBER_BAGGAGE_HEADER_PREFIX)) {
+            if (strpos($key, self::UBER_BAGGAGE_HEADER_PREFIX) === 0) {
                 $baggageKey = substr($key, strlen(self::UBER_BAGGAGE_HEADER_PREFIX));
                 $value = $getter->get($carrier, $key) ?? '';
                 $baggageBuilder->set($baggageKey, rawurldecode($value));
