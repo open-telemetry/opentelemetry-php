@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Extension\Propagator\Jaeger;
 
-use OpenTelemetry\API\Baggage\Baggage;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanContextValidator;
@@ -143,40 +142,7 @@ class JaegerPropagatorTest extends TestCase
         $this->assertEmpty($carrier);
     }
 
-    public function test_inject_baggage(): void
-    {
-        $carrier = [];
-        $this->propagator->inject(
-            $carrier,
-            null,
-            $this->withSpanContext(
-                SpanContext::create(
-                    self::TRACE_ID_BASE16,
-                    self::SPAN_ID_BASE16,
-                    TraceFlags::SAMPLED
-                ),
-                Context::getCurrent()
-            )->withContextValue(
-                Baggage::getBuilder()
-                    ->set('foo', 'bar')
-                    ->build()
-            )
-        );
-
-        $this->assertSame(
-            [
-                $this->fields => $this->generateTraceIdHeaderValue(
-                    self::TRACE_ID_BASE16,
-                    self::SPAN_ID_BASE16,
-                    '1'
-                ),
-                'uberctx-foo' => 'bar',
-            ],
-            $carrier
-        );
-    }
-
-    public function test_inject_debug_context(): void
+    public function test_inject_sampled_with_debug_context(): void
     {
         $carrier = [];
         $this->propagator->inject(
@@ -196,13 +162,13 @@ class JaegerPropagatorTest extends TestCase
             [$this->fields => $this->generateTraceIdHeaderValue(
                 self::TRACE_ID_BASE16,
                 self::SPAN_ID_BASE16,
-                '2'
+                '3'
             )],
             $carrier
         );
     }
 
-    public function test_inject_baggage_encoding(): void
+    public function test_inject_not_sampled_with_debug_context(): void
     {
         $carrier = [];
         $this->propagator->inject(
@@ -212,25 +178,17 @@ class JaegerPropagatorTest extends TestCase
                 SpanContext::create(
                     self::TRACE_ID_BASE16,
                     self::SPAN_ID_BASE16,
-                    TraceFlags::SAMPLED
                 ),
                 Context::getCurrent()
-            )->withContextValue(
-                Baggage::getBuilder()
-                    ->set('foo', 'foo / bar')
-                    ->build()
-            )
+            )->with(JaegerDebugFlagContextKey::instance(), self::DEBUG_FLAG)
         );
 
         $this->assertSame(
-            [
-                $this->fields => $this->generateTraceIdHeaderValue(
-                    self::TRACE_ID_BASE16,
-                    self::SPAN_ID_BASE16,
-                    '1'
-                ),
-                'uberctx-foo' => 'foo%20%2F%20bar',
-            ],
+            [$this->fields => $this->generateTraceIdHeaderValue(
+                self::TRACE_ID_BASE16,
+                self::SPAN_ID_BASE16,
+                '0'
+            )],
             $carrier
         );
     }
@@ -284,30 +242,6 @@ class JaegerPropagatorTest extends TestCase
             ),
             Span::fromContext($context)->getContext()
         );
-    }
-
-    public function test_extract_sampled_context_with_baggage(): void
-    {
-        $carrier = [
-            $this->fields => $this->generateTraceIdHeaderValue(
-                self::TRACE_ID_BASE16,
-                self::SPAN_ID_BASE16,
-                '1'
-            ),
-            'uberctx-foo' => 'bar',
-        ];
-
-        $context = $this->propagator->extract($carrier);
-
-        $this->assertEquals(
-            SpanContext::createFromRemoteParent(
-                self::TRACE_ID_BASE16,
-                self::SPAN_ID_BASE16,
-                TraceFlags::SAMPLED
-            ),
-            Span::fromContext($context)->getContext()
-        );
-        $this->assertFalse(Baggage::fromContext($context)->isEmpty());
     }
 
     public function test_extract_debug_context(): void
