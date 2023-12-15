@@ -69,6 +69,37 @@ final class MeterTest extends TestCase
         $meter->createHistogram('name', 'unit', 'description');
     }
 
+    public function test_create_histogram_advisory(): void
+    {
+        $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $metricFactory->expects($this->once())->method('createSynchronousWriter')
+            ->with(
+                $this->anything(),
+                $this->anything(),
+                new InstrumentationScope('test', null, null, Attributes::create([])),
+                new Instrument(
+                    InstrumentType::HISTOGRAM,
+                    'http.server.duration',
+                    's',
+                    'Measures the duration of inbound HTTP requests.',
+                    ['ExplicitBucketBoundaries' => [0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10]],
+                ),
+                $this->anything(),
+                $this->anything(),
+                $this->anything(),
+            )
+            ->willReturn([]);
+
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
+        $meter->createHistogram(
+            'http.server.duration',
+            's',
+            'Measures the duration of inbound HTTP requests.',
+            ['ExplicitBucketBoundaries' => [0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10]],
+        );
+    }
+
     public function test_create_up_down_counter(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);

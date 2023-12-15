@@ -13,6 +13,7 @@ interface MeterInterface
      * @param string $name name of the instrument
      * @param string|null $unit unit of measure
      * @param string|null $description description of the instrument
+     * @param array $advisory an optional set of recommendations
      * @return CounterInterface created instrument
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#counter-creation
@@ -20,7 +21,8 @@ interface MeterInterface
     public function createCounter(
         string $name,
         ?string $unit = null,
-        ?string $description = null
+        ?string $description = null,
+        array $advisory = []
     ): CounterInterface;
 
     /**
@@ -29,6 +31,8 @@ interface MeterInterface
      * @param string $name name of the instrument
      * @param string|null $unit unit of measure
      * @param string|null $description description of the instrument
+     * @param array|callable $advisory an optional set of recommendations, or
+     *        deprecated: the first callback to report measurements
      * @param callable ...$callbacks responsible for reporting measurements
      * @return ObservableCounterInterface created instrument
      *
@@ -38,6 +42,7 @@ interface MeterInterface
         string $name,
         ?string $unit = null,
         ?string $description = null,
+        $advisory = [],
         callable ...$callbacks
     ): ObservableCounterInterface;
 
@@ -47,6 +52,8 @@ interface MeterInterface
      * @param string $name name of the instrument
      * @param string|null $unit unit of measure
      * @param string|null $description description of the instrument
+     * @param array $advisory an optional set of recommendations, e.g.
+     *        <code>['ExplicitBucketBoundaries' => [0.25, 0.5, 1, 5]]</code>
      * @return HistogramInterface created instrument
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#histogram-creation
@@ -54,7 +61,8 @@ interface MeterInterface
     public function createHistogram(
         string $name,
         ?string $unit = null,
-        ?string $description = null
+        ?string $description = null,
+        array $advisory = []
     ): HistogramInterface;
 
     /**
@@ -63,6 +71,8 @@ interface MeterInterface
      * @param string $name name of the instrument
      * @param string|null $unit unit of measure
      * @param string|null $description description of the instrument
+     * @param array|callable $advisory an optional set of recommendations, or
+     *        deprecated: the first callback to report measurements
      * @param callable ...$callbacks responsible for reporting measurements
      * @return ObservableGaugeInterface created instrument
      *
@@ -72,6 +82,7 @@ interface MeterInterface
         string $name,
         ?string $unit = null,
         ?string $description = null,
+        $advisory = [],
         callable ...$callbacks
     ): ObservableGaugeInterface;
 
@@ -81,6 +92,7 @@ interface MeterInterface
      * @param string $name name of the instrument
      * @param string|null $unit unit of measure
      * @param string|null $description description of the instrument
+     * @param array $advisory an optional set of recommendations
      * @return UpDownCounterInterface created instrument
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#updowncounter-creation
@@ -88,7 +100,8 @@ interface MeterInterface
     public function createUpDownCounter(
         string $name,
         ?string $unit = null,
-        ?string $description = null
+        ?string $description = null,
+        array $advisory = []
     ): UpDownCounterInterface;
 
     /**
@@ -97,6 +110,8 @@ interface MeterInterface
      * @param string $name name of the instrument
      * @param string|null $unit unit of measure
      * @param string|null $description description of the instrument
+     * @param array|callable $advisory an optional set of recommendations, or
+     *        deprecated: the first callback to report measurements
      * @param callable ...$callbacks responsible for reporting measurements
      * @return ObservableUpDownCounterInterface created instrument
      *
@@ -106,6 +121,7 @@ interface MeterInterface
         string $name,
         ?string $unit = null,
         ?string $description = null,
+        $advisory = [],
         callable ...$callbacks
     ): ObservableUpDownCounterInterface;
 }
