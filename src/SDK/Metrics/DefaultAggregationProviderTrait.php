@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Metrics;
 
 trait DefaultAggregationProviderTrait
 {
-    public function defaultAggregation($instrumentType): ?AggregationInterface
+    public function defaultAggregation($instrumentType, array $advisory = []): ?AggregationInterface
     {
         switch ($instrumentType) {
             case InstrumentType::COUNTER:
@@ -16,7 +16,7 @@ trait DefaultAggregationProviderTrait
             case InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER:
                 return new Aggregation\SumAggregation();
             case InstrumentType::HISTOGRAM:
-                return new Aggregation\ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
+                return new Aggregation\ExplicitBucketHistogramAggregation($advisory['ExplicitBucketBoundaries'] ?? [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
             case InstrumentType::ASYNCHRONOUS_GAUGE:
                 return new Aggregation\LastValueAggregation();
         }
