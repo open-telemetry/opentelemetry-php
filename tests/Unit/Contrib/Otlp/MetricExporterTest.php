@@ -50,7 +50,7 @@ final class MetricExporterTest extends TestCase
 
         fseek($this->stream, 0);
         $this->assertSame(<<<METRICS
-            {"resourceMetrics":[{"resource":{},"scopeMetrics":[{"scope":{"name":"test"},"metrics":[{"name":"test","sum":{"dataPoints":[{"startTimeUnixNano":"17","timeUnixNano":"42","asInt":"5"}],"aggregationTemporality":"AGGREGATION_TEMPORALITY_DELTA"}}]}]}]}
+            {"resourceMetrics":[{"resource":{},"scopeMetrics":[{"scope":{"name":"test"},"metrics":[{"name":"test","sum":{"dataPoints":[{"startTimeUnixNano":"17","timeUnixNano":"42","asInt":"5"}],"aggregationTemporality":1}}]}]}]}
 
             METRICS, stream_get_contents($this->stream));
     }
@@ -84,8 +84,8 @@ final class MetricExporterTest extends TestCase
 
         fseek($this->stream, 0);
         $this->assertSame(<<<METRICS
-            {"resourceMetrics":[{"resource":{},"scopeMetrics":[{"scope":{"name":"test"},"metrics":[{"name":"test","sum":{"dataPoints":[{"startTimeUnixNano":"17","timeUnixNano":"42","asInt":"5"}],"aggregationTemporality":"AGGREGATION_TEMPORALITY_DELTA"}}]}]}]}
-            {"resourceMetrics":[{"resource":{},"scopeMetrics":[{"scope":{"name":"test"},"metrics":[{"name":"test","sum":{"dataPoints":[{"startTimeUnixNano":"42","timeUnixNano":"57","asInt":"7"}],"aggregationTemporality":"AGGREGATION_TEMPORALITY_DELTA"}}]}]}]}
+            {"resourceMetrics":[{"resource":{},"scopeMetrics":[{"scope":{"name":"test"},"metrics":[{"name":"test","sum":{"dataPoints":[{"startTimeUnixNano":"17","timeUnixNano":"42","asInt":"5"}],"aggregationTemporality":1}}]}]}]}
+            {"resourceMetrics":[{"resource":{},"scopeMetrics":[{"scope":{"name":"test"},"metrics":[{"name":"test","sum":{"dataPoints":[{"startTimeUnixNano":"42","timeUnixNano":"57","asInt":"7"}],"aggregationTemporality":1}}]}]}]}
 
             METRICS, stream_get_contents($this->stream));
     }
