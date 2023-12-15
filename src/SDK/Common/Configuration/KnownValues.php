@@ -112,6 +112,7 @@ interface KnownValues
         self::VALUE_CLOUD_TRACE, // GCP XCloudTraceContext
         self::VALUE_CLOUD_TRACE_ONEWAY, // GCP XCloudTraceContext OneWay (Extract)
         self::VALUE_JAEGER, // Jaeger Propagator
+        self::VALUE_JAEGER_BAGGAGE, // Jaeger Baggage Propagator
         self::VALUE_XRAY, // AWS X-Ray (third party)
         self::VALUE_OTTRACE, // OT Trace (third party)
         self::VALUE_NONE, // No automatically configured propagator.
