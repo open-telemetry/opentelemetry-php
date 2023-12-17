@@ -8,10 +8,23 @@ use AssertionError;
 use function base64_decode;
 use function bin2hex;
 use Exception;
+use function get_class;
+use Google\Protobuf\Descriptor;
+use Google\Protobuf\DescriptorPool;
+use Google\Protobuf\FieldDescriptor;
+use Google\Protobuf\Internal\GPBLabel;
+use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\Message;
 use InvalidArgumentException;
+use function json_decode;
+use function json_encode;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
+use function lcfirst;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use function property_exists;
 use function sprintf;
+use function ucwords;
 
 /**
  * @internal
@@ -83,10 +96,9 @@ final class ProtobufSerializer
             case self::PROTOBUF:
                 return $message->serializeToString();
             case self::JSON:
-                //@todo https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#json-protobuf-encoding
-                return $message->serializeToJsonString();
+                return self::postProcessJsonEnumValues($message, $message->serializeToJsonString());
             case self::NDJSON:
-                return $message->serializeToJsonString() . "\n";
+                return self::postProcessJsonEnumValues($message, $message->serializeToJsonString()) . "\n";
             default:
                 throw new AssertionError();
         }
@@ -111,5 +123,70 @@ final class ProtobufSerializer
             default:
                 throw new AssertionError();
         }
+    }
+
+    /**
+     * Workaround until protobuf exposes `FormatEnumsAsIntegers` option.
+     *
+     * [JSON Protobuf Encoding](https://opentelemetry.io/docs/specs/otlp/#json-protobuf-encoding):
+     * > Values of enum fields MUST be encoded as integer values.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-php/issues/978
+     * @see https://github.com/protocolbuffers/protobuf/pull/12707
+     */
+    private static function postProcessJsonEnumValues(Message $message, string $payload): string
+    {
+        $pool = DescriptorPool::getGeneratedPool();
+        $desc = $pool->getDescriptorByClassName(get_class($message));
+        if (!$desc instanceof Descriptor) {
+            return $payload;
+        }
+
+        $data = json_decode($payload);
+        unset($payload);
+        self::traverseDescriptor($data, $desc);
+
+        return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
+    private static function traverseDescriptor(object $data, Descriptor $desc): void
+    {
+        for ($i = 0, $n = $desc->getFieldCount(); $i < $n; $i++) {
+            // @phan-suppress-next-line PhanParamTooManyInternal
+            $field = $desc->getField($i);
+            $name = lcfirst(strtr(ucwords($field->getName(), '_'), ['_' => '']));
+            if (!property_exists($data, $name)) {
+                continue;
+            }
+
+            if ($field->getLabel() === GPBLabel::REPEATED) {
+                foreach ($data->$name as $key => $value) {
+                    $data->$name[$key] = self::traverseFieldDescriptor($value, $field);
+                }
+            } else {
+                $data->$name = self::traverseFieldDescriptor($data->$name, $field);
+            }
+        }
+    }
+
+    private static function traverseFieldDescriptor($data, FieldDescriptor $field)
+    {
+        switch ($field->getType()) {
+            case GPBType::MESSAGE:
+                self::traverseDescriptor($data, $field->getMessageType());
+
+                break;
+            case GPBType::ENUM:
+                $enum = $field->getEnumType();
+                for ($i = 0, $n = $enum->getValueCount(); $i < $n; $i++) {
+                    if ($data === $enum->getValue($i)->getName()) {
+                        return $enum->getValue($i)->getNumber();
+                    }
+                }
+
+                break;
+        }
+
+        return $data;
     }
 }
