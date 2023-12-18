@@ -3,7 +3,6 @@
 
 - [Bob Strecansky](https://github.com/bobstrecansky)
 - [Brett McBride](https://github.com/brettmc/), Deakin University
-- [Przemek Delewski](https://github.com/pdelewski), Sumo Logic
 
 Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer)
 
@@ -31,6 +30,7 @@ Find more information about the member role in the [community repository](https:
 - [Levi Morrison](https://github.com/morrisonlevi)
 - [Amber Zsistla](https://github.com/zsistla)
 - [Jodee Varney](https://github.com/jodeev)
+- [Przemek Delewski](https://github.com/pdelewski), Sumo Logic
 
 Find more about emeritus roles in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager)
 
