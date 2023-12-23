@@ -19,34 +19,32 @@ deptrac:
     layers:
       -   name: API
           collectors:
-              -   type: className
-                  regex: ^OpenTelemetry\\API\\*
+              -   type: directory
+                  value: src/API/.*
       -   name: SDK
           collectors:
-              -   type: className
-                  regex: ^OpenTelemetry\\SDK\\*
+              -   type: directory
+                  value: src/SDK/.*
       -   name: Context
           collectors:
-              -   type: className
-                  regex: ^OpenTelemetry\\Context\\*
+              -   type: directory
+                  value: src/Context/.*
       -   name: SemConv
           collectors:
-              -   type: className
-                  regex: ^OpenTelemetry\\SemConv\\*
+              -   type: directory
+                  value: src/SemConv/.*
       -   name: Contrib
           collectors:
-              -   type: className
-                  regex: ^OpenTelemetry\\Contrib\\*
+              -   type: directory
+                  value: src/Contrib/.*
       -   name: Extension
           collectors:
-            -   type: className
-                regex: ^OpenTelemetry\\Extension\\*
+              -   type: directory
+                  value: src/Extension/.*
       -   name: OtelProto
           collectors:
-              -   type: className
-                  regex: ^OpenTelemetry\\Proto\\*
-              -   type: className
-                  regex: ^GPBMetadata\\Opentelemetry\\*
+              -   type: directory
+                  value: proto/otel/.*
       -   name: GoogleProtobuf
           collectors:
               -   type: className

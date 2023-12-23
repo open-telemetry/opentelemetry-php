@@ -7,6 +7,10 @@ use OpenTelemetry\Extension\Propagator\Jaeger\JaegerPropagator;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Registry;
 
+if (!class_exists(Registry::class)) {
+    return;
+}
+
 Registry::registerTextMapPropagator(
     KnownValues::VALUE_JAEGER,
     JaegerPropagator::getInstance()

@@ -1,2 +1,11 @@
 deptrac:
   skip_violations:
+    /src/Extension/Propagator/B3/_register.php:
+      - OpenTelemetry\SDK\Common\Configuration\KnownValues
+      - OpenTelemetry\SDK\Registry
+    /src/Extension/Propagator/CloudTrace/_register.php:
+      - OpenTelemetry\SDK\Common\Configuration\KnownValues
+      - OpenTelemetry\SDK\Registry
+    /src/Extension/Propagator/Jaeger/_register.php:
+      - OpenTelemetry\SDK\Common\Configuration\KnownValues
+      - OpenTelemetry\SDK\Registry
