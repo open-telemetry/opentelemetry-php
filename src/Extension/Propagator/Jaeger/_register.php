@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use OpenTelemetry\Extension\Propagator\Jaeger\JaegerBaggagePropagator;
 use OpenTelemetry\Extension\Propagator\Jaeger\JaegerPropagator;
-use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Registry;
 
 if (!class_exists(Registry::class)) {
@@ -12,11 +11,11 @@ if (!class_exists(Registry::class)) {
 }
 
 Registry::registerTextMapPropagator(
-    KnownValues::VALUE_JAEGER,
+    'jaeger',
     JaegerPropagator::getInstance()
 );
 
 Registry::registerTextMapPropagator(
-    KnownValues::VALUE_JAEGER_BAGGAGE,
+    'jaeger-baggage',
     JaegerBaggagePropagator::getInstance()
 );
