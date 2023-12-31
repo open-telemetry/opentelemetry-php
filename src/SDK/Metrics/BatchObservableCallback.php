@@ -11,21 +11,29 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 /**
  * @internal
  */
-final class ObservableCallback implements ObservableCallbackInterface
+final class BatchObservableCallback implements ObservableCallbackInterface
 {
     private MetricWriterInterface $writer;
-    private ReferenceCounterInterface $referenceCounter;
+    private array $referenceCounters;
     private ?int $callbackId;
-    private ?ObservableCallbackDestructor $callbackDestructor;
+    private ?BatchObservableCallbackDestructor $callbackDestructor;
     private ?object $target;
 
-    public function __construct(MetricWriterInterface $writer, ReferenceCounterInterface $referenceCounter, int $callbackId, ?ObservableCallbackDestructor $callbackDestructor, ?object $target)
-    {
-        $this->writer = $writer;
-        $this->referenceCounter =  $referenceCounter;
-        $this->callbackId = $callbackId;
-        $this->callbackDestructor = $callbackDestructor;
+    /**
+     * @param list<ReferenceCounterInterface> $referenceCounters
+     */
+    public function __construct(
+        MetricWriterInterface $writer,
+        array $referenceCounters,
+        ?int $callbackId,
+        ?BatchObservableCallbackDestructor $callbackDestructor,
+        ?object $target
+    ) {
         $this->target = $target;
+        $this->callbackDestructor = $callbackDestructor;
+        $this->callbackId = $callbackId;
+        $this->referenceCounters = $referenceCounters;
+        $this->writer = $writer;
     }
 
     public function detach(): void
@@ -35,7 +43,9 @@ final class ObservableCallback implements ObservableCallbackInterface
         }
 
         $this->writer->unregisterCallback($this->callbackId);
-        $this->referenceCounter->release();
+        foreach ($this->referenceCounters as $referenceCounter) {
+            $referenceCounter->release();
+        }
         if ($this->callbackDestructor !== null) {
             unset($this->callbackDestructor->callbackIds[$this->callbackId]);
             if (!$this->callbackDestructor->callbackIds) {
@@ -57,7 +67,9 @@ final class ObservableCallback implements ObservableCallbackInterface
             return;
         }
 
-        $this->referenceCounter->acquire(true);
-        $this->referenceCounter->release();
+        foreach ($this->referenceCounters as $referenceCounter) {
+            $referenceCounter->acquire(true);
+            $referenceCounter->release();
+        }
     }
 }

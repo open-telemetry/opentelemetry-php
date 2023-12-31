@@ -7,6 +7,7 @@ namespace OpenTelemetry\API\Metrics\Noop;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;
+use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
 use OpenTelemetry\API\Metrics\ObservableCounterInterface;
 use OpenTelemetry\API\Metrics\ObservableGaugeInterface;
 use OpenTelemetry\API\Metrics\ObservableUpDownCounterInterface;
@@ -14,6 +15,11 @@ use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 
 final class NoopMeter implements MeterInterface
 {
+    public function batchObserve(callable $callback, $instrument, ...$instruments): ObservableCallbackInterface
+    {
+        return new NoopObservableCallback();
+    }
+
     public function createCounter(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): CounterInterface
     {
         return new NoopCounter();
