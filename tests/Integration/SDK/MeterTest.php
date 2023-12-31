@@ -232,6 +232,26 @@ final class MeterTest extends TestCase
     }
 
     /**
+     * @coversNothing
+     */
+    public function test_batch_observe_detach_with_repeated_instrument_does_not_trigger_undefined_offset_warning(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $mp = (new MeterProviderBuilder())
+            ->addReader(new ExportingReader(new InMemoryExporter()))
+            ->build();
+        $m = $mp->getMeter('test');
+
+        try {
+            $c = $m->batchObserve(static fn () => null, $m->createObservableCounter('a'), $m->createObservableCounter('a'));
+            $c->detach();
+        } finally {
+            $mp->shutdown();
+        }
+    }
+
+    /**
      * @return array<string, float|int>
      */
     private function sumMetricsToMap(array $metrics): array
