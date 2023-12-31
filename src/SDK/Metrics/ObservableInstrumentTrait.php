@@ -57,7 +57,7 @@ trait ObservableInstrumentTrait
             $this->writer,
             $this->destructors,
             $callback,
-            $this->instrument,
+            [$this->instrument],
             $this->referenceCounter,
         );
     }

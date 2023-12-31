@@ -33,7 +33,7 @@ final class MeterProvider implements MeterProviderInterface
     private MeterInstruments $instruments;
     private MetricRegistryInterface $registry;
     private MetricWriterInterface $writer;
-    private ArrayAccess $batchDestructors;
+    private ArrayAccess $destructors;
 
     private bool $closed = false;
 
@@ -65,7 +65,7 @@ final class MeterProvider implements MeterProviderInterface
         $registry = new MetricRegistry($contextStorage, $attributesFactory, $clock);
         $this->registry = $registry;
         $this->writer = $registry;
-        $this->batchDestructors = WeakMap::create();
+        $this->destructors = WeakMap::create();
     }
 
     public function getMeter(
@@ -90,7 +90,7 @@ final class MeterProvider implements MeterProviderInterface
             $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes),
             $this->registry,
             $this->writer,
-            $this->batchDestructors,
+            $this->destructors,
         );
     }
 
