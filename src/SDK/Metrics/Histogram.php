@@ -11,5 +11,5 @@ use OpenTelemetry\API\Metrics\HistogramInterface;
  */
 final class Histogram implements HistogramInterface, InstrumentHandle
 {
-    use SynchronousInstrument { write as record; }
+    use SynchronousInstrumentTrait { write as record; }
 }

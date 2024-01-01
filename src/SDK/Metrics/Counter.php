@@ -11,5 +11,5 @@ use OpenTelemetry\API\Metrics\CounterInterface;
  */
 final class Counter implements CounterInterface, InstrumentHandle
 {
-    use SynchronousInstrument { write as add; }
+    use SynchronousInstrumentTrait { write as add; }
 }

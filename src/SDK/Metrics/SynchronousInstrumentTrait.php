@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 /**
  * @internal
  */
-trait SynchronousInstrument
+trait SynchronousInstrumentTrait
 {
     private MetricWriterInterface $writer;
     private Instrument $instrument;
@@ -19,7 +19,6 @@ trait SynchronousInstrument
     public function __construct(MetricWriterInterface $writer, Instrument $instrument, ReferenceCounterInterface $referenceCounter)
     {
         assert($this instanceof InstrumentHandle);
-        assert($this instanceof \OpenTelemetry\API\Metrics\SynchronousInstrument);
 
         $this->writer = $writer;
         $this->instrument = $instrument;

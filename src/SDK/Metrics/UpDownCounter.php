@@ -11,5 +11,5 @@ use OpenTelemetry\API\Metrics\UpDownCounterInterface;
  */
 final class UpDownCounter implements UpDownCounterInterface, InstrumentHandle
 {
-    use SynchronousInstrument { write as add; }
+    use SynchronousInstrumentTrait { write as add; }
 }

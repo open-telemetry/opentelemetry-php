@@ -6,7 +6,6 @@ namespace OpenTelemetry\SDK\Metrics;
 
 use ArrayAccess;
 use function assert;
-use OpenTelemetry\API\Metrics\AsynchronousInstrument;
 use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
@@ -28,7 +27,6 @@ trait ObservableInstrumentTrait
         ArrayAccess $destructors
     ) {
         assert($this instanceof InstrumentHandle);
-        assert($this instanceof AsynchronousInstrument);
 
         $this->writer = $writer;
         $this->instrument = $instrument;
