@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Context;
 
 use function assert;
+use const FILTER_VALIDATE_BOOLEAN;
+use function filter_var;
+use function ini_get;
 use function spl_object_id;
 
 /**
@@ -80,10 +83,17 @@ final class Context implements ContextInterface
     public function activate(): ScopeInterface
     {
         $scope = self::storage()->attach($this);
-        /** @psalm-suppress RedundantCondition */
-        assert((bool) $scope = new DebugScope($scope));
+        /** @psalm-suppress RedundantCondition @phpstan-ignore-next-line */
+        assert(self::debugScopesDisabled() || $scope = new DebugScope($scope));
 
         return $scope;
+    }
+
+    private static function debugScopesDisabled(): bool
+    {
+        $disabled = $_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED'] ?? ini_get('OTEL_PHP_DEBUG_SCOPES_DISABLED');
+
+        return filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
     }
 
     public function withContextValue(ImplicitContextKeyedInterface $value): ContextInterface
