@@ -68,6 +68,24 @@ class SdkTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider autoloadEnabledProvider
+     */
+    public function test_is_autoload_enabled(string $value, bool $expected): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, $value);
+
+        $this->assertSame($expected, Sdk::isAutoloadEnabled());
+    }
+
+    public static function autoloadEnabledProvider(): array
+    {
+        return [
+            ['true', true],
+            ['false', false],
+        ];
+    }
+
     public function test_builder(): void
     {
         $this->assertInstanceOf(SdkBuilder::class, Sdk::builder());

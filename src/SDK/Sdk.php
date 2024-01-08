@@ -43,6 +43,11 @@ class Sdk
         return in_array($name, Configuration::getList(Variables::OTEL_PHP_DISABLED_INSTRUMENTATIONS));
     }
 
+    public static function isAutoloadEnabled(): bool
+    {
+        return Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+    }
+
     public static function builder(): SdkBuilder
     {
         return new SdkBuilder();
