@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use ArrayAccess;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Common\Util\WeakMap;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;
@@ -31,6 +33,7 @@ final class MeterProvider implements MeterProviderInterface
     private MeterInstruments $instruments;
     private MetricRegistryInterface $registry;
     private MetricWriterInterface $writer;
+    private ArrayAccess $destructors;
 
     private bool $closed = false;
 
@@ -62,6 +65,7 @@ final class MeterProvider implements MeterProviderInterface
         $registry = new MetricRegistry($contextStorage, $attributesFactory, $clock);
         $this->registry = $registry;
         $this->writer = $registry;
+        $this->destructors = WeakMap::create();
     }
 
     public function getMeter(
@@ -86,6 +90,7 @@ final class MeterProvider implements MeterProviderInterface
             $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes),
             $this->registry,
             $this->writer,
+            $this->destructors,
         );
     }
 

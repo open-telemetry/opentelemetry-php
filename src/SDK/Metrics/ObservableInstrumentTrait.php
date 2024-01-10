@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use ArrayAccess;
+use function assert;
 use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
-use function OpenTelemetry\SDK\Common\Util\closure;
-use function OpenTelemetry\SDK\Common\Util\weaken;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 
 /**
@@ -27,6 +26,8 @@ trait ObservableInstrumentTrait
         ReferenceCounterInterface $referenceCounter,
         ArrayAccess $destructors
     ) {
+        assert($this instanceof InstrumentHandle);
+
         $this->writer = $writer;
         $this->instrument = $instrument;
         $this->referenceCounter = $referenceCounter;
@@ -40,22 +41,22 @@ trait ObservableInstrumentTrait
         $this->referenceCounter->release();
     }
 
+    public function getHandle(): Instrument
+    {
+        return $this->instrument;
+    }
+
     /**
      * @param callable(ObserverInterface): void $callback
      */
     public function observe(callable $callback): ObservableCallbackInterface
     {
-        $callback = weaken(closure($callback), $target);
-
-        $callbackId = $this->writer->registerCallback($callback, $this->instrument);
-        $this->referenceCounter->acquire();
-
-        $destructor = null;
-        if ($target) {
-            $destructor = $this->destructors[$target] ??= new ObservableCallbackDestructor($this->writer, $this->referenceCounter);
-            $destructor->callbackIds[$callbackId] = $callbackId;
-        }
-
-        return new ObservableCallback($this->writer, $this->referenceCounter, $callbackId, $destructor, $target);
+        return AsynchronousInstruments::observe(
+            $this->writer,
+            $this->destructors,
+            $callback,
+            [$this->instrument],
+            $this->referenceCounter,
+        );
     }
 }

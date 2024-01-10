@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use ArrayAccess;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 
 /**
@@ -11,22 +12,25 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
  */
 final class ObservableCallbackDestructor
 {
-    /** @var array<int, int> */
+    public ArrayAccess $destructors;
+    /** @var array<int, ReferenceCounterInterface> */
     public array $callbackIds = [];
     private MetricWriterInterface $writer;
-    private ReferenceCounterInterface $referenceCounter;
 
-    public function __construct(MetricWriterInterface $writer, ReferenceCounterInterface $referenceCounter)
+    /**
+     * @param ArrayAccess<object, ObservableCallbackDestructor> $destructors
+     */
+    public function __construct(ArrayAccess $destructors, MetricWriterInterface $writer)
     {
+        $this->destructors = $destructors;
         $this->writer = $writer;
-        $this->referenceCounter = $referenceCounter;
     }
 
     public function __destruct()
     {
-        foreach ($this->callbackIds as $callbackId) {
+        foreach ($this->callbackIds as $callbackId => $referenceCounter) {
             $this->writer->unregisterCallback($callbackId);
-            $this->referenceCounter->release();
+            $referenceCounter->release();
         }
     }
 }

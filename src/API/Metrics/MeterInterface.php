@@ -8,6 +8,40 @@ interface MeterInterface
 {
 
     /**
+     * Reports measurements for multiple asynchronous instrument from a single callback.
+     *
+     * The callback receives an {@link ObserverInterface} for each instrument. All provided
+     * instruments have to be created by this meter.
+     *
+     * ```php
+     * $callback = $meter->batchObserve(
+     *     function(
+     *         ObserverInterface $usageObserver,
+     *         ObserverInterface $pressureObserver,
+     *     ): void {
+     *         [$usage, $pressure] = expensive_system_call();
+     *         $usageObserver->observe($usage);
+     *         $pressureObserver->observe($pressure);
+     *     },
+     *     $meter->createObservableCounter('usage', description: 'count of items used'),
+     *     $meter->createObservableGauge('pressure', description: 'force per unit area'),
+     * );
+     * ```
+     *
+     * @param callable $callback function responsible for reporting the measurements
+     * @param AsynchronousInstrument $instrument first instrument to report measurements for
+     * @param AsynchronousInstrument ...$instruments additional instruments to report measurements for
+     * @return ObservableCallbackInterface token to detach callback
+     *
+     * @see https://opentelemetry.io/docs/specs/otel/metrics/api/#multiple-instrument-callbacks
+     */
+    public function batchObserve(
+        callable $callback,
+        AsynchronousInstrument $instrument,
+        AsynchronousInstrument ...$instruments
+    ): ObservableCallbackInterface;
+
+    /**
      * Creates a `Counter`.
      *
      * @param string $name name of the instrument
