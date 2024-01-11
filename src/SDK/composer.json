@@ -19,6 +19,7 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
+        "ext-pcre": "*",
         "open-telemetry/api": "^1.0",
         "open-telemetry/context": "^1.0",
         "open-telemetry/sem-conv": "^1.0",

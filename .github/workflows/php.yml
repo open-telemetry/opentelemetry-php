@@ -30,7 +30,7 @@ jobs:
         php-version: ${{ matrix.php-version }}
         coverage: xdebug
         tools: php-cs-fixer
-        extensions: "ast, grpc, protobuf"
+        extensions: "ast, grpc, pcre, protobuf"
 
     - name: Validate composer.json
       run: composer validate

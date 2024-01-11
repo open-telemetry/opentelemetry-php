@@ -75,6 +75,7 @@
     },
     "require-dev": {
         "ext-grpc": "*",
+        "ext-pcre": "*",
         "grpc/grpc": "^1.30",
         "assertwell/phpunit-global-state": "^0.2.2",
         "composer/xdebug-handler": "^2.0",
