@@ -19,20 +19,19 @@ use function trigger_error;
  */
 final class DebugScope implements ScopeInterface
 {
-    private const DEBUG_TRACE_CREATE = '__debug_trace_create';
-    private const DEBUG_TRACE_DETACH = '__debug_trace_detach';
-
     private static bool $shutdownHandlerInitialized = false;
     private static bool $finalShutdownPhase = false;
 
     private ContextStorageScopeInterface $scope;
     private ?int $fiberId;
+    private array $createdAt;
+    private ?array $detachedAt = null;
 
-    public function __construct(ContextStorageScopeInterface $node)
+    public function __construct(ContextStorageScopeInterface $scope)
     {
-        $this->scope = $node;
-        $this->scope[self::DEBUG_TRACE_CREATE] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $this->scope = $scope;
         $this->fiberId = self::currentFiberId();
+        $this->createdAt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
         if (!self::$shutdownHandlerInitialized) {
             self::$shutdownHandlerInitialized = true;
@@ -42,7 +41,7 @@ final class DebugScope implements ScopeInterface
 
     public function detach(): int
     {
-        $this->scope[self::DEBUG_TRACE_DETACH] ??= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $this->detachedAt ??= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
         $flags = $this->scope->detach();
 
@@ -50,7 +49,7 @@ final class DebugScope implements ScopeInterface
             trigger_error(sprintf(
                 'Scope: unexpected call to Scope::detach() for scope #%d, scope was already detached %s',
                 spl_object_id($this),
-                self::formatBacktrace($this->scope[self::DEBUG_TRACE_DETACH]),
+                self::formatBacktrace($this->detachedAt),
             ));
         } elseif (($flags & ScopeInterface::MISMATCH) !== 0) {
             trigger_error(sprintf(
@@ -69,7 +68,7 @@ final class DebugScope implements ScopeInterface
 
     public function __destruct()
     {
-        if (!isset($this->scope[self::DEBUG_TRACE_DETACH])) {
+        if (!$this->detachedAt) {
             // Handle destructors invoked during final shutdown
             // DebugScope::__destruct() might be called before fiber finally blocks run
             if (self::$finalShutdownPhase && $this->fiberId !== self::currentFiberId()) {
@@ -79,7 +78,7 @@ final class DebugScope implements ScopeInterface
             trigger_error(sprintf(
                 'Scope: missing call to Scope::detach() for scope #%d, created %s',
                 spl_object_id($this->scope),
-                self::formatBacktrace($this->scope[self::DEBUG_TRACE_CREATE]),
+                self::formatBacktrace($this->createdAt),
             ));
         }
     }
