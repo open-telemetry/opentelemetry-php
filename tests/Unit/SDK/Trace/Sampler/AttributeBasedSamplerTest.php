@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
@@ -29,7 +30,7 @@ class AttributeBasedSamplerTest extends TestCase
 
     public function tearDown(): void
     {
-        LoggerHolder::unset();
+        Logging::reset();
     }
 
     /**
@@ -173,7 +174,7 @@ class AttributeBasedSamplerTest extends TestCase
     {
         $logger = $this->createMock(LoggerInterface::class);
         LoggerHolder::set($logger);
-        $logger->expects($this->once())->method('log');//->with($this->equalTo(LogLevel::WARNING), $this->anything(), $this->anything());
+        $logger->expects($this->once())->method('log')->with($this->equalTo(LogLevel::WARNING), $this->anything(), $this->anything());
         $delegate = $this->createMock(SamplerInterface::class);
         $delegate->expects($this->once())->method('shouldSample')->willReturn(new SamplingResult(SamplingResult::RECORD_AND_SAMPLE));
         $sampler = new AttributeBasedSampler($delegate, 'allow', 'url.path', '/invalid-regex');

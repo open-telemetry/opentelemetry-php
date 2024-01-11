@@ -108,7 +108,6 @@ class SpanTest extends MockeryTestCase
     {
         ClockFactory::setDefault(null);
         Logging::reset();
-//        LoggerHolder::unset();
     }
 
     // region API

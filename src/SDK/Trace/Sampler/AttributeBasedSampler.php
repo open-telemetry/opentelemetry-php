@@ -79,6 +79,10 @@ class AttributeBasedSampler implements SamplerInterface
         return $this->delegate->shouldSample(...func_get_args());
     }
 
+    /**
+     * @todo call preg_last_error_msg directly after 7.4 support dropped
+     * @phan-suppress PhanUndeclaredFunctionInCallable
+     */
     private function matches(string $value): bool
     {
         $result = @preg_match($this->pattern, $value);
@@ -87,7 +91,7 @@ class AttributeBasedSampler implements SamplerInterface
                 'attribute.name' => $this->attribute,
                 'attribute.value' => $value,
                 'pattern' => $this->pattern,
-                'error' => preg_last_error_msg(),
+                'error' => function_exists('preg_last_error_msg') ? call_user_func('preg_last_error_msg') : '',
             ]);
 
             return false;
