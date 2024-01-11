@@ -14,9 +14,16 @@ use OpenTelemetry\SDK\Trace\SamplingResult;
 /**
  * @phan-file-suppress PhanParamTooFewUnpack
  *
- * Attribute-based sampler for root spans.
- * "allow" mode: only sample root span if attribute exists and matches the pattern, else do not sample
- * "deny" mode: do not sample root span if attribute exists and matches the pattern, else defer to next sampler
+ * Attribute-based sampler. This sampler should be called after a ParentBased sampler, and requires
+ * another sampler (such as AlwaysOnSampler).
+ * For example, ParentBased,AttributeBased(<deny if url.path attribute matches /health>),TradeIdRatio(0.5) means
+ * 1. Trace if parent is already sampled; otherwise
+ * 2. Do not sample if url.path attribute is set and matches /health; otherwise
+ * 3. Sample 50% of traces
+ *
+ * Two modes exist:
+ * "allow" mode: always sample if attribute exists and matches the pattern, else do not sample
+ * "deny" mode: do not sample if attribute exists and matches the pattern, else defer to next sampler
  */
 class AttributeBasedSampler implements SamplerInterface
 {
