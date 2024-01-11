@@ -119,4 +119,14 @@ class SamplerFactoryTest extends TestCase
 
         (new SamplerFactory())->create();
     }
+
+    public function test_create_composite_sampler_invalid_args(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', 'parentbased,attribute');
+        $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', 'attribute.foo-bar'); //no equals sign
+
+        (new SamplerFactory())->create();
+    }
+
 }
