@@ -128,5 +128,4 @@ class SamplerFactoryTest extends TestCase
 
         (new SamplerFactory())->create();
     }
-
 }
