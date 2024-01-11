@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Trace\SamplerFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass OpenTelemetry\SDK\Trace\SamplerFactory
+ * @covers \OpenTelemetry\SDK\Trace\SamplerFactory
  */
 class SamplerFactoryTest extends TestCase
 {
@@ -22,7 +22,6 @@ class SamplerFactoryTest extends TestCase
     }
 
     /**
-     * @covers ::create
      * @dataProvider samplerProvider
      */
     public function test_create_sampler_from_environment(string $samplerName, string $expected, string $arg = null): void
@@ -46,8 +45,8 @@ class SamplerFactoryTest extends TestCase
             'parent based trade id ratio' => ['parentbased_traceidratio', 'ParentBased+TraceIdRatio', '0.95'],
         ];
     }
+
     /**
-     * @covers ::create
      * @dataProvider invalidSamplerProvider
      */
     public function test_throws_exception_for_invalid_or_unsupported(?string $sampler, string $arg = null): void
@@ -68,5 +67,56 @@ class SamplerFactoryTest extends TestCase
             'parent ratio with invalid arg' => ['parentbased_traceidratio', 'foo'],
             'unknown sampler' => ['foo'],
         ];
+    }
+
+    /**
+     * @dataProvider compositeProvider
+     */
+    public function test_create_composite_sampler(string $sampler, string $arg, string $expected): void
+    {
+        $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $sampler);
+        $arg && $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);
+        $factory = new SamplerFactory();
+        $sampler = $factory->create();
+        $this->assertSame($expected, $sampler->getDescription());
+    }
+
+    public static function compositeProvider(): array
+    {
+        return [
+            [
+                'parentbased,attribute,always_on',
+                'attribute.mode=allow,attribute.name=http.path,attribute.pattern=foo',
+                'ParentBased+AttributeSampler{mode=allow,attribute=http.path,pattern=/foo/}+AlwaysOnSampler',
+            ],
+            [
+                'parentbased,traceidratio',
+                'traceidratio.probability=0.1',
+                'ParentBased+TraceIdRatioBasedSampler{0.100000}',
+            ],
+            [
+                'parentbased,traceidratio',
+                '0.2',
+                'ParentBased+TraceIdRatioBasedSampler{0.200000}',
+            ],
+            [
+                'parentbased,always_on',
+                '',
+                'ParentBased+AlwaysOnSampler',
+            ],
+            [
+                'parentbased,always_off',
+                '',
+                'ParentBased+AlwaysOffSampler',
+            ],
+        ];
+    }
+
+    public function test_create_composite_sampler_invalid(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', 'parentbased,foo');
+
+        (new SamplerFactory())->create();
     }
 }

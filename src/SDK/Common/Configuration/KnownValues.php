@@ -34,6 +34,8 @@ interface KnownValues
     public const VALUE_ALWAYS_ON = 'always_on';
     public const VALUE_ALWAYS_OFF = 'always_off';
     public const VALUE_TRACE_ID_RATIO = 'traceidratio';
+    public const VALUE_ATTRIBUTE = 'attribute';
+    public const VALUE_PARENT_BASED = 'parentbased';
     public const VALUE_PARENT_BASED_ALWAYS_ON = 'parentbased_always_on';
     public const VALUE_PARENT_BASED_ALWAYS_OFF = 'parentbased_always_off';
     public const VALUE_PARENT_BASED_TRACE_ID_RATIO = 'parentbased_traceidratio';
