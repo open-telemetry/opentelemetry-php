@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
+use function assert;
 use function basename;
+use function class_exists;
 use function count;
 use function debug_backtrace;
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
+use Fiber;
 use const PHP_VERSION_ID;
 use function register_shutdown_function;
 use function spl_object_id;
@@ -83,12 +86,22 @@ final class DebugScope implements ScopeInterface
         }
     }
 
+    /**
+     * @phan-suppress PhanUndeclaredClassReference
+     * @phan-suppress PhanUndeclaredClassMethod
+     */
     private static function currentFiberId(): ?int
     {
-        /** @psalm-suppress UndefinedClass @phan-suppress-next-line PhanUndeclaredClassMethod @phpstan-ignore-next-line */
-        return PHP_VERSION_ID >= 80100 && ($fiber = \Fiber::getCurrent())
-            ? spl_object_id($fiber)
-            : null;
+        if (PHP_VERSION_ID < 80100) {
+            return null;
+        }
+
+        assert(class_exists(Fiber::class, false));
+        if (!$fiber = Fiber::getCurrent()) {
+            return null;
+        }
+
+        return spl_object_id($fiber);
     }
 
     private static function formatBacktrace(array $trace): string
