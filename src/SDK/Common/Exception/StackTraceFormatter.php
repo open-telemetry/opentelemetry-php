@@ -40,7 +40,7 @@ final class StackTraceFormatter
         $s = '';
         $seen = [];
 
-        /** @var Frames|null $enclosing */
+        /** @psalm-var Frames|null $enclosing */
         $enclosing = null;
         do {
             if ($enclosing) {
@@ -68,9 +68,9 @@ final class StackTraceFormatter
 
     /**
      * @phan-suppress-next-line PhanTypeMismatchDeclaredParam
-     * @param Frames $frames
+     * @psalm-param Frames $frames
      * @phan-suppress-next-line PhanTypeMismatchDeclaredParam
-     * @param Frames|null $enclosing
+     * @psalm-param Frames|null $enclosing
      */
     private static function writeFrames(string &$s, array $frames, ?array $enclosing): void
     {
@@ -124,7 +124,7 @@ final class StackTraceFormatter
     }
 
     /**
-     * @return Frames
+     * @psalm-return Frames
      *
      * @psalm-suppress PossiblyUndefinedArrayOffset
      */
@@ -144,7 +144,7 @@ final class StackTraceFormatter
         $frames[0]['file'] = $e->getFile();
         $frames[0]['line'] = $e->getLine();
 
-        /** @var Frames $frames */
+        /** @psalm-var Frames $frames */
         return $frames;
     }
 
