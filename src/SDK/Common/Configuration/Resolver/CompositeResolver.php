@@ -18,8 +18,8 @@ class CompositeResolver
     {
         static $instance;
         $instance ??= new self([
-            new PhpIniResolver(),
             new EnvironmentResolver(),
+            new PhpIniResolver(),
         ]);
 
         return $instance;

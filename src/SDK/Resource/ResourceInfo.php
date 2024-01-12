@@ -50,7 +50,7 @@ class ResourceInfo
         $copyOfAttributesAsArray = array_slice($this->attributes->toArray(), 0); //This may be overly cautious (in trying to avoid mutating the source array)
         ksort($copyOfAttributesAsArray); //sort the associative array by keys since the serializer will consider equal arrays different otherwise
 
-        //The exact return value doesn't matter, as long as it can distingusih between instances that represent the same/different resources
+        //The exact return value doesn't matter, as long as it can distinguish between instances that represent the same/different resources
         return serialize([
             'schemaUrl' => $this->schemaUrl,
             'attributes' => $copyOfAttributesAsArray,
@@ -62,6 +62,7 @@ class ResourceInfo
      * resource, the value of the updating resource MUST be picked (even if the updated value is empty)
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.20.0/specification/resource/sdk.md#merge
+     * @todo can we optimize this to avoid re-validating the attributes on merge?
      */
     public function merge(ResourceInfo $updating): ResourceInfo
     {
