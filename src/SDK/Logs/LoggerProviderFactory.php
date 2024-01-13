@@ -6,11 +6,12 @@ namespace OpenTelemetry\SDK\Logs;
 
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 
 class LoggerProviderFactory
 {
-    public function create(?MeterProviderInterface $meterProvider = null): LoggerProviderInterface
+    public function create(?MeterProviderInterface $meterProvider = null, ?ResourceInfo $resource = null): LoggerProviderInterface
     {
         if (Sdk::isDisabled()) {
             return NoopLoggerProvider::getInstance();
@@ -19,6 +20,6 @@ class LoggerProviderFactory
         $processor = (new LogRecordProcessorFactory())->create($exporter, $meterProvider);
         $instrumentationScopeFactory = new InstrumentationScopeFactory((new LogRecordLimitsBuilder())->build()->getAttributeFactory());
 
-        return new LoggerProvider($processor, $instrumentationScopeFactory);
+        return new LoggerProvider($processor, $instrumentationScopeFactory, $resource);
     }
 }

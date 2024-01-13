@@ -35,11 +35,16 @@ class OtlpUtil
      */
     public static function getUserAgentHeader(): array
     {
-        $resource = (new Sdk())->getResource();
+        static $header;
+        if ($header === null) {
+            $resource = (new Sdk())->getResource();
 
-        return ['User-Agent' => sprintf(
-            'OTel OTLP Exporter PHP/%s',
-            $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION) ?: 'unknown'
-        )];
+            $header = ['User-Agent' => sprintf(
+                'OTel OTLP Exporter PHP/%s',
+                $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION) ?: 'unknown'
+            )];
+        }
+
+        return $header;
     }
 }
