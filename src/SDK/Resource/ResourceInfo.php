@@ -67,9 +67,9 @@ class ResourceInfo
     public function merge(ResourceInfo $updating): ResourceInfo
     {
         $schemaUrl = self::mergeSchemaUrl($this->getSchemaUrl(), $updating->getSchemaUrl());
-        $attributes = $updating->getAttributes()->toArray() + $this->getAttributes()->toArray();
+        $attributes = Attributes::factory()->builder()->merge($this->getAttributes(), $updating->getAttributes());
 
-        return ResourceInfo::create(Attributes::create($attributes), $schemaUrl);
+        return ResourceInfo::create($attributes, $schemaUrl);
     }
 
     /**

@@ -37,6 +37,11 @@ final class FilteredAttributesBuilder implements AttributesBuilderInterface
         return new Attributes($attributes->toArray(), $dropped);
     }
 
+    public function merge(AttributesInterface $old, AttributesInterface $updating): AttributesInterface
+    {
+        return $this->builder->merge($old, $updating);
+    }
+
     public function offsetExists($offset): bool
     {
         return $this->builder->offsetExists($offset);

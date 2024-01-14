@@ -9,4 +9,5 @@ use ArrayAccess;
 interface AttributesBuilderInterface extends ArrayAccess
 {
     public function build(): AttributesInterface;
+    public function merge(AttributesInterface $old, AttributesInterface $updating): AttributesInterface;
 }

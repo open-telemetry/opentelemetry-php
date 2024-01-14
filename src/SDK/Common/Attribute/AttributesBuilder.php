@@ -43,6 +43,21 @@ final class AttributesBuilder implements AttributesBuilderInterface
         return new Attributes($this->attributes, $this->droppedAttributesCount);
     }
 
+    public function merge(AttributesInterface $old, AttributesInterface $updating): AttributesInterface
+    {
+        $new = $old->toArray();
+        $dropped = $old->getDroppedAttributesCount() + $updating->getDroppedAttributesCount();
+        foreach ($updating->toArray() as $key => $value) {
+            if (count($new) === $this->attributeCountLimit && !array_key_exists($key, $new)) {
+                $dropped++;
+            } else {
+                $new[$key] = $value;
+            }
+        }
+
+        return new Attributes($new, $dropped);
+    }
+
     public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->attributes);
