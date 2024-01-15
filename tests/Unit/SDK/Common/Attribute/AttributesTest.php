@@ -169,4 +169,17 @@ class AttributesTest extends TestCase
         $attributesBuilder['foo'] = 'bar';
         $this->assertEquals(0, $attributesBuilder->build()->getDroppedAttributesCount());
     }
+
+    public function test_merge_attributes(): void
+    {
+        $one = Attributes::factory(1)->builder(['foo' => 'foo', 'foobar' => 'foobar'])->build();
+        $two = Attributes::factory(2)->builder(['bar' => 'bar', 'baz' => 'baz'])->build();
+        $merged = Attributes::factory(2)->builder()->merge($one, $two);
+
+        $this->assertEquals([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ], $merged->toArray());
+        $this->assertSame(2, $merged->getDroppedAttributesCount(), 'foobar and baz dropped');
+    }
 }

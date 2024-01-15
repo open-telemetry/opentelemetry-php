@@ -30,6 +30,6 @@ class ClassConstantAccessor
 
     private static function getFullName(string $className, string $constantName): string
     {
-        return sprintf('%s::%s', $className, $constantName);
+        return $className . '::' . $constantName;
     }
 }
