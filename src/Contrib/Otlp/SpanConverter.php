@@ -148,6 +148,7 @@ final class SpanConverter
         $pSpan = new Span();
         $pSpan->setTraceId($this->serializer->serializeTraceId($span->getContext()->getTraceIdBinary()));
         $pSpan->setSpanId($this->serializer->serializeSpanId($span->getContext()->getSpanIdBinary()));
+        $pSpan->setFlags($span->getContext()->getTraceFlags());
         $pSpan->setTraceState((string) $span->getContext()->getTraceState());
         if ($span->getParentContext()->isValid()) {
             $pSpan->setParentSpanId($this->serializer->serializeSpanId($span->getParentContext()->getSpanIdBinary()));
@@ -172,6 +173,7 @@ final class SpanConverter
             $pSpan->getLinks()[] = $pLink = new Link();
             $pLink->setTraceId($this->serializer->serializeTraceId($link->getSpanContext()->getTraceIdBinary()));
             $pLink->setSpanId($this->serializer->serializeSpanId($link->getSpanContext()->getSpanIdBinary()));
+            $pLink->setFlags($span->getContext()->getTraceFlags());
             $pLink->setTraceState((string) $link->getSpanContext()->getTraceState());
             $this->setAttributes($pLink, $link->getAttributes());
         }

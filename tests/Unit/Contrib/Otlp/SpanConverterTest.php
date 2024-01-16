@@ -46,6 +46,7 @@ class SpanConverterTest extends TestCase
 
         $this->assertSame($span->getContext()->getSpanId(), bin2hex($row->getSpanId()));
         $this->assertSame($span->getContext()->getTraceId(), bin2hex($row->getTraceId()));
+        $this->assertSame($span->getContext()->getTraceFlags(), $row->getFlags());
         $this->assertSame($span->getName(), $row->getName());
 
         $this->assertCount(2, $row->getAttributes());
@@ -56,6 +57,7 @@ class SpanConverterTest extends TestCase
 
         $this->assertSame($context->getTraceId(), bin2hex($link->getTraceId()));
         $this->assertSame($context->getSpanId(), bin2hex($link->getSpanId()));
+        $this->assertSame($context->getTraceFlags(), $link->getFlags());
         $this->assertCount(1, $link->getAttributes());
     }
 
