@@ -31,6 +31,7 @@ class FriendlySpanConverterTest extends TestCase
             'trace_id' => '00000000000000000000000000000000',
             'span_id' => '0000000000000000',
             'trace_state' => 'foz=baz,foo=bar',
+            'trace_flags' => 0,
         ],
         'resource' => [
             'telemetry.sdk.name' => 'opentelemetry',
@@ -62,6 +63,7 @@ class FriendlySpanConverterTest extends TestCase
                 'trace_id' => '20000000000000000000000000000000',
                 'span_id' => '2000000000000000',
                 'trace_state' => 'foo=baz,foz=bar',
+                'trace_flags' => 0,
             ],
             'attributes' => [
                 'foo' => 'bar',
@@ -70,6 +72,7 @@ class FriendlySpanConverterTest extends TestCase
                 'trace_id' => '20000000000000000000000000000000',
                 'span_id' => '3000000000000000',
                 'trace_state' => 'baz=foz,bar=foo',
+                'trace_flags' => 0,
             ],
             'attributes' => [
                 'foz' => 'baz',

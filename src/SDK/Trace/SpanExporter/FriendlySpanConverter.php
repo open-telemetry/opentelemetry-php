@@ -22,6 +22,7 @@ class FriendlySpanConverter implements SpanConverterInterface
     private const TRACE_ID_ATTR = 'trace_id';
     private const SPAN_ID_ATTR = 'span_id';
     private const TRACE_STATE_ATTR = 'trace_state';
+    private const TRACE_FLAGS_ATTR = 'trace_flags';
     private const RESOURCE_ATTR = 'resource';
     private const PARENT_SPAN_ATTR = 'parent_span_id';
     private const KIND_ATTR = 'kind';
@@ -78,6 +79,7 @@ class FriendlySpanConverter implements SpanConverterInterface
             self::TRACE_ID_ATTR => $context->getTraceId(),
             self::SPAN_ID_ATTR => $context->getSpanId(),
             self::TRACE_STATE_ATTR => (string) $context->getTraceState(),
+            self::TRACE_FLAGS_ATTR => $context->getTraceFlags(),
         ];
     }
 
