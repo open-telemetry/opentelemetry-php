@@ -30,6 +30,9 @@ class ScopeSpans extends \Google\Protobuf\Internal\Message
      */
     private $spans;
     /**
+     * The Schema URL, if known. This is the identifier of the Schema that the span data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to all spans and span events in the "spans" field.
      *
      * Generated from protobuf field <code>string schema_url = 3;</code>
@@ -49,6 +52,9 @@ class ScopeSpans extends \Google\Protobuf\Internal\Message
      *     @type \Opentelemetry\Proto\Trace\V1\Span[]|\Google\Protobuf\Internal\RepeatedField $spans
      *           A list of Spans that originate from an instrumentation scope.
      *     @type string $schema_url
+     *           The Schema URL, if known. This is the identifier of the Schema that the span data
+     *           is recorded in. To learn more about Schema URL see
+     *           https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      *           This schema_url applies to all spans and span events in the "spans" field.
      * }
      */
@@ -124,6 +130,9 @@ class ScopeSpans extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * The Schema URL, if known. This is the identifier of the Schema that the span data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to all spans and span events in the "spans" field.
      *
      * Generated from protobuf field <code>string schema_url = 3;</code>
@@ -135,6 +144,9 @@ class ScopeSpans extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * The Schema URL, if known. This is the identifier of the Schema that the span data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to all spans and span events in the "spans" field.
      *
      * Generated from protobuf field <code>string schema_url = 3;</code>

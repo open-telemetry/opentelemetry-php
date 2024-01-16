@@ -52,6 +52,22 @@ class Span extends \Google\Protobuf\Internal\Message
      */
     protected $parent_span_id = '';
     /**
+     * Flags, a bit field. 8 least significant bits are the trace
+     * flags as defined in W3C Trace Context specification. Readers
+     * MUST not assume that 24 most significant bits will be zero.
+     * To read the 8-bit W3C trace flag, use `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     * When creating span messages, if the message is logically forwarded from another source
+     * with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
+     * be copied as-is. If creating from a source that does not have an equivalent flags field
+     * (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+     * be set to zero.
+     * [Optional].
+     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     *
+     * Generated from protobuf field <code>fixed32 flags = 16;</code>
+     */
+    protected $flags = 0;
+    /**
      * A description of the span's operation.
      * For example, the name can be a qualified method name or a file name
      * and a line number where the operation is called. A best practice is to use
@@ -175,6 +191,18 @@ class Span extends \Google\Protobuf\Internal\Message
      *     @type string $parent_span_id
      *           The `span_id` of this span's parent span. If this is a root span, then this
      *           field must be empty. The ID is an 8-byte array.
+     *     @type int $flags
+     *           Flags, a bit field. 8 least significant bits are the trace
+     *           flags as defined in W3C Trace Context specification. Readers
+     *           MUST not assume that 24 most significant bits will be zero.
+     *           To read the 8-bit W3C trace flag, use `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     *           When creating span messages, if the message is logically forwarded from another source
+     *           with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
+     *           be copied as-is. If creating from a source that does not have an equivalent flags field
+     *           (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+     *           be set to zero.
+     *           [Optional].
+     *           See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
      *     @type string $name
      *           A description of the span's operation.
      *           For example, the name can be a qualified method name or a file name
@@ -358,6 +386,52 @@ class Span extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, False);
         $this->parent_span_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Flags, a bit field. 8 least significant bits are the trace
+     * flags as defined in W3C Trace Context specification. Readers
+     * MUST not assume that 24 most significant bits will be zero.
+     * To read the 8-bit W3C trace flag, use `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     * When creating span messages, if the message is logically forwarded from another source
+     * with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
+     * be copied as-is. If creating from a source that does not have an equivalent flags field
+     * (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+     * be set to zero.
+     * [Optional].
+     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     *
+     * Generated from protobuf field <code>fixed32 flags = 16;</code>
+     * @return int
+     */
+    public function getFlags()
+    {
+        return $this->flags;
+    }
+
+    /**
+     * Flags, a bit field. 8 least significant bits are the trace
+     * flags as defined in W3C Trace Context specification. Readers
+     * MUST not assume that 24 most significant bits will be zero.
+     * To read the 8-bit W3C trace flag, use `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     * When creating span messages, if the message is logically forwarded from another source
+     * with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
+     * be copied as-is. If creating from a source that does not have an equivalent flags field
+     * (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+     * be set to zero.
+     * [Optional].
+     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     *
+     * Generated from protobuf field <code>fixed32 flags = 16;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setFlags($var)
+    {
+        GPBUtil::checkUint32($var);
+        $this->flags = $var;
 
         return $this;
     }

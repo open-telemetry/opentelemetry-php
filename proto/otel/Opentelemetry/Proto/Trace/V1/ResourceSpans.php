@@ -29,6 +29,9 @@ class ResourceSpans extends \Google\Protobuf\Internal\Message
      */
     private $scope_spans;
     /**
+     * The Schema URL, if known. This is the identifier of the Schema that the resource data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to the data in the "resource" field. It does not apply
      * to the data in the "scope_spans" field which have their own schema_url field.
      *
@@ -48,6 +51,9 @@ class ResourceSpans extends \Google\Protobuf\Internal\Message
      *     @type \Opentelemetry\Proto\Trace\V1\ScopeSpans[]|\Google\Protobuf\Internal\RepeatedField $scope_spans
      *           A list of ScopeSpans that originate from a resource.
      *     @type string $schema_url
+     *           The Schema URL, if known. This is the identifier of the Schema that the resource data
+     *           is recorded in. To learn more about Schema URL see
+     *           https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      *           This schema_url applies to the data in the "resource" field. It does not apply
      *           to the data in the "scope_spans" field which have their own schema_url field.
      * }
@@ -122,6 +128,9 @@ class ResourceSpans extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * The Schema URL, if known. This is the identifier of the Schema that the resource data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to the data in the "resource" field. It does not apply
      * to the data in the "scope_spans" field which have their own schema_url field.
      *
@@ -134,6 +143,9 @@ class ResourceSpans extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * The Schema URL, if known. This is the identifier of the Schema that the resource data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to the data in the "resource" field. It does not apply
      * to the data in the "scope_spans" field which have their own schema_url field.
      *
