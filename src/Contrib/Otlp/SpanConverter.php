@@ -173,7 +173,7 @@ final class SpanConverter
             $pSpan->getLinks()[] = $pLink = new Link();
             $pLink->setTraceId($this->serializer->serializeTraceId($link->getSpanContext()->getTraceIdBinary()));
             $pLink->setSpanId($this->serializer->serializeSpanId($link->getSpanContext()->getSpanIdBinary()));
-            $pLink->setFlags($span->getContext()->getTraceFlags());
+            $pLink->setFlags($link->getSpanContext()->getTraceFlags());
             $pLink->setTraceState((string) $link->getSpanContext()->getTraceState());
             $this->setAttributes($pLink, $link->getAttributes());
         }
