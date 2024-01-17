@@ -28,6 +28,7 @@ use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\UpDownCounter;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 final class InstrumentTest extends TestCase
 {
@@ -221,10 +222,10 @@ final class InstrumentTest extends TestCase
         $writer = $this->createMock(MetricWriterInterface::class);
         $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
 
-        $callbackDestructor = new ObservableCallbackDestructor($writer, $referenceCounter);
-        $callbackDestructor->callbackIds[1] = 1;
+        $callbackDestructor = new ObservableCallbackDestructor(WeakMap::create(), $writer);
+        $callbackDestructor->callbackIds[1] = $referenceCounter;
 
-        $callback = new ObservableCallback($writer, $referenceCounter, 1, $callbackDestructor, null);
+        $callback = new ObservableCallback($writer, $referenceCounter, 1, $callbackDestructor, new stdClass());
         $callback->detach();
 
         $this->assertArrayNotHasKey(1, $callbackDestructor->callbackIds);
@@ -253,10 +254,10 @@ final class InstrumentTest extends TestCase
         $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
         $referenceCounter->expects($this->never())->method('acquire')->with(true);
 
-        $callbackDestructor = new ObservableCallbackDestructor($writer, $referenceCounter);
-        $callbackDestructor->callbackIds[1] = 1;
+        $callbackDestructor = new ObservableCallbackDestructor(WeakMap::create(), $writer);
+        $callbackDestructor->callbackIds[1] = $referenceCounter;
 
         /** @noinspection PhpExpressionResultUnusedInspection */
-        new ObservableCallback($writer, $referenceCounter, 1, $callbackDestructor, null);
+        new ObservableCallback($writer, $referenceCounter, 1, $callbackDestructor, new stdClass());
     }
 }

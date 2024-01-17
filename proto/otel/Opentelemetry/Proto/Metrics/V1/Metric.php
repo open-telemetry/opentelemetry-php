@@ -86,7 +86,7 @@ use Google\Protobuf\Internal\GPBUtil;
 class Metric extends \Google\Protobuf\Internal\Message
 {
     /**
-     * name of the metric, including its DNS name prefix. It must be unique.
+     * name of the metric.
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
@@ -113,7 +113,7 @@ class Metric extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           name of the metric, including its DNS name prefix. It must be unique.
+     *           name of the metric.
      *     @type string $description
      *           description of the metric, which can be used in documentation.
      *     @type string $unit
@@ -132,7 +132,7 @@ class Metric extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * name of the metric, including its DNS name prefix. It must be unique.
+     * name of the metric.
      *
      * Generated from protobuf field <code>string name = 1;</code>
      * @return string
@@ -143,7 +143,7 @@ class Metric extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * name of the metric, including its DNS name prefix. It must be unique.
+     * name of the metric.
      *
      * Generated from protobuf field <code>string name = 1;</code>
      * @param string $var

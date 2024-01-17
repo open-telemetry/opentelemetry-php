@@ -16,6 +16,7 @@ use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Sdk;
 
@@ -28,7 +29,7 @@ class MeterProviderFactory
      *       - "The exporter MUST configure the default aggregation on the basis of instrument kind using the
      *         OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION variable as described below if it is implemented."
      */
-    public function create(): MeterProviderInterface
+    public function create(?ResourceInfo $resource = null): MeterProviderInterface
     {
         if (Sdk::isDisabled()) {
             return new NoopMeterProvider();
@@ -50,7 +51,7 @@ class MeterProviderFactory
 
         // @todo "The exporter MUST be paired with a periodic exporting MetricReader"
         $reader = new ExportingReader($exporter);
-        $resource = ResourceInfoFactory::defaultResource();
+        $resource ??= ResourceInfoFactory::defaultResource();
         $exemplarFilter = $this->createExemplarFilter(Configuration::getEnum(Variables::OTEL_METRICS_EXEMPLAR_FILTER));
 
         return MeterProvider::builder()

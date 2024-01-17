@@ -6,10 +6,14 @@ namespace OpenTelemetry\SDK\Metrics;
 
 use function array_unshift;
 use ArrayAccess;
+use function assert;
 use function is_callable;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Metrics\AsynchronousInstrument;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;
+use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
 use OpenTelemetry\API\Metrics\ObservableCounterInterface;
 use OpenTelemetry\API\Metrics\ObservableGaugeInterface;
 use OpenTelemetry\API\Metrics\ObservableUpDownCounterInterface;
@@ -17,14 +21,13 @@ use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use function OpenTelemetry\SDK\Common\Util\closure;
-use OpenTelemetry\SDK\Common\Util\WeakMap;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\MultiRegistryRegistration;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\RegistryRegistration;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistryInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
+use OpenTelemetry\SDK\Metrics\StalenessHandler\MultiReferenceCounter;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use const PHP_VERSION_ID;
 use function serialize;
 
 /**
@@ -32,6 +35,8 @@ use function serialize;
  */
 final class Meter implements MeterInterface
 {
+    use LogsMessagesTrait;
+
     private MetricFactoryInterface $metricFactory;
     private ResourceInfo $resource;
     private ClockInterface $clock;
@@ -45,11 +50,13 @@ final class Meter implements MeterInterface
 
     private MetricRegistryInterface $registry;
     private MetricWriterInterface $writer;
+    private ArrayAccess $destructors;
 
     private ?string $instrumentationScopeId = null;
 
     /**
      * @param iterable<MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricRegistries
+     * @param ArrayAccess<object, ObservableCallbackDestructor> $destructors
      */
     public function __construct(
         MetricFactoryInterface $metricFactory,
@@ -62,7 +69,8 @@ final class Meter implements MeterInterface
         MeterInstruments $instruments,
         InstrumentationScopeInterface $instrumentationScope,
         MetricRegistryInterface $registry,
-        MetricWriterInterface $writer
+        MetricWriterInterface $writer,
+        ArrayAccess $destructors
     ) {
         $this->metricFactory = $metricFactory;
         $this->resource = $resource;
@@ -75,6 +83,53 @@ final class Meter implements MeterInterface
         $this->instrumentationScope = $instrumentationScope;
         $this->registry = $registry;
         $this->writer = $writer;
+        $this->destructors = $destructors;
+    }
+
+    private static function dummyInstrument(): Instrument
+    {
+        static $dummy;
+
+        return $dummy ??= (new \ReflectionClass(Instrument::class))->newInstanceWithoutConstructor();
+    }
+
+    public function batchObserve(callable $callback, AsynchronousInstrument $instrument, AsynchronousInstrument ...$instruments): ObservableCallbackInterface
+    {
+        $referenceCounters = [];
+        $handles = [];
+
+        array_unshift($instruments, $instrument);
+        foreach ($instruments as $instrument) {
+            if (!$instrument instanceof InstrumentHandle) {
+                self::logWarning('Ignoring invalid instrument provided to batchObserve, instrument not created by this SDK', ['instrument' => $instrument]);
+                $handles[] = self::dummyInstrument();
+
+                continue;
+            }
+
+            $asynchronousInstrument = $this->getAsynchronousInstrument($instrument->getHandle(), $this->instrumentationScope);
+            if (!$asynchronousInstrument) {
+                self::logWarning('Ignoring invalid instrument provided to batchObserve, instrument not created by this meter', ['instrument' => $instrument]);
+                $handles[] = self::dummyInstrument();
+
+                continue;
+            }
+
+            [
+                $handles[],
+                $referenceCounters[],
+            ] = $asynchronousInstrument;
+        }
+
+        assert($handles !== []);
+
+        return AsynchronousInstruments::observe(
+            $this->writer,
+            $this->destructors,
+            $callback,
+            $handles,
+            new MultiReferenceCounter($referenceCounters),
+        );
     }
 
     public function createCounter(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): CounterInterface
@@ -96,7 +151,7 @@ final class Meter implements MeterInterface
             array_unshift($callbacks, $advisory);
             $advisory = [];
         }
-        [$instrument, $referenceCounter, $destructors] = $this->createAsynchronousObserver(
+        [$instrument, $referenceCounter] = $this->createAsynchronousObserver(
             InstrumentType::ASYNCHRONOUS_COUNTER,
             $name,
             $unit,
@@ -109,7 +164,7 @@ final class Meter implements MeterInterface
             $referenceCounter->acquire(true);
         }
 
-        return new ObservableCounter($this->writer, $instrument, $referenceCounter, $destructors);
+        return new ObservableCounter($this->writer, $instrument, $referenceCounter, $this->destructors);
     }
 
     public function createHistogram(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): HistogramInterface
@@ -131,7 +186,7 @@ final class Meter implements MeterInterface
             array_unshift($callbacks, $advisory);
             $advisory = [];
         }
-        [$instrument, $referenceCounter, $destructors] = $this->createAsynchronousObserver(
+        [$instrument, $referenceCounter] = $this->createAsynchronousObserver(
             InstrumentType::ASYNCHRONOUS_GAUGE,
             $name,
             $unit,
@@ -144,7 +199,7 @@ final class Meter implements MeterInterface
             $referenceCounter->acquire(true);
         }
 
-        return new ObservableGauge($this->writer, $instrument, $referenceCounter, $destructors);
+        return new ObservableGauge($this->writer, $instrument, $referenceCounter, $this->destructors);
     }
 
     public function createUpDownCounter(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): UpDownCounterInterface
@@ -166,7 +221,7 @@ final class Meter implements MeterInterface
             array_unshift($callbacks, $advisory);
             $advisory = [];
         }
-        [$instrument, $referenceCounter, $destructors] = $this->createAsynchronousObserver(
+        [$instrument, $referenceCounter] = $this->createAsynchronousObserver(
             InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER,
             $name,
             $unit,
@@ -179,7 +234,23 @@ final class Meter implements MeterInterface
             $referenceCounter->acquire(true);
         }
 
-        return new ObservableUpDownCounter($this->writer, $instrument, $referenceCounter, $destructors);
+        return new ObservableUpDownCounter($this->writer, $instrument, $referenceCounter, $this->destructors);
+    }
+
+    /**
+     * @return array{Instrument, ReferenceCounterInterface}|null
+     */
+    private function getAsynchronousInstrument(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): ?array
+    {
+        $instrumentationScopeId = $this->instrumentationScopeId($instrumentationScope);
+        $instrumentId = $this->instrumentId($instrument);
+
+        $asynchronousInstrument = $this->instruments->observers[$instrumentationScopeId][$instrumentId] ?? null;
+        if (!$asynchronousInstrument || $asynchronousInstrument[0] !== $instrument) {
+            return null;
+        }
+
+        return $asynchronousInstrument;
     }
 
     /**
@@ -231,7 +302,7 @@ final class Meter implements MeterInterface
 
     /**
      * @param string|InstrumentType $instrumentType
-     * @return array{Instrument, ReferenceCounterInterface, ArrayAccess<object, ObservableCallbackDestructor>}
+     * @return array{Instrument, ReferenceCounterInterface}
      */
     private function createAsynchronousObserver($instrumentType, string $name, ?string $unit, ?string $description, array $advisory): array
     {
@@ -241,8 +312,6 @@ final class Meter implements MeterInterface
         $instrumentId = $this->instrumentId($instrument);
 
         $instruments = $this->instruments;
-        /** @phan-suppress-next-line PhanDeprecatedProperty */
-        $instruments->staleObservers = [];
         if ($observer = $instruments->observers[$instrumentationScopeId][$instrumentId] ?? null) {
             return $observer;
         }
@@ -260,11 +329,6 @@ final class Meter implements MeterInterface
 
         $registry = $this->registry;
         $stalenessHandler->onStale(static function () use ($instruments, $instrumentationScopeId, $instrumentId, $registry, $streamIds): void {
-            if (PHP_VERSION_ID < 80000) {
-                /** @phan-suppress-next-line PhanDeprecatedProperty */
-                $instruments->staleObservers[] = $instruments->observers[$instrumentationScopeId][$instrumentId][2];
-            }
-
             unset($instruments->observers[$instrumentationScopeId][$instrumentId]);
             if (!$instruments->observers[$instrumentationScopeId]) {
                 unset($instruments->observers[$instrumentationScopeId]);
@@ -276,13 +340,9 @@ final class Meter implements MeterInterface
             $instruments->startTimestamp = null;
         });
 
-        /** @var ArrayAccess<object, ObservableCallbackDestructor> $destructors */
-        $destructors = WeakMap::create();
-
         return $instruments->observers[$instrumentationScopeId][$instrumentId] = [
             $instrument,
             $stalenessHandler,
-            $destructors,
         ];
     }
 

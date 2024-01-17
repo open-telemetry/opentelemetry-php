@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use function assert;
 use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 
@@ -16,7 +17,6 @@ final class ObservableCallback implements ObservableCallbackInterface
     private ReferenceCounterInterface $referenceCounter;
     private ?int $callbackId;
     private ?ObservableCallbackDestructor $callbackDestructor;
-    /** @phpstan-ignore-next-line */
     private ?object $target;
 
     public function __construct(MetricWriterInterface $writer, ReferenceCounterInterface $referenceCounter, int $callbackId, ?ObservableCallbackDestructor $callbackDestructor, ?object $target)
@@ -38,9 +38,14 @@ final class ObservableCallback implements ObservableCallbackInterface
         $this->referenceCounter->release();
         if ($this->callbackDestructor !== null) {
             unset($this->callbackDestructor->callbackIds[$this->callbackId]);
+            if (!$this->callbackDestructor->callbackIds) {
+                assert($this->target !== null);
+                unset($this->callbackDestructor->destructors[$this->target]);
+            }
         }
 
         $this->callbackId = null;
+        $this->target = null;
     }
 
     public function __destruct()

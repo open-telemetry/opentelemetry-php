@@ -20,9 +20,50 @@ jobs:
           - php-version: 8.4
             experimental: true
             composer_args: "--ignore-platform-reqs"
+    env:
+      extensions: ast, grpc, protobuf
 
     steps:
+    - name: Set cache key
+      id: key
+      run: |
+        echo "key=$(date +'%Y-%U')" >> $GITHUB_ENV
+
     - uses: actions/checkout@v3
+
+    - uses: gacts/run-and-post-run@v1
+      id: post-run-command
+      with:
+        post: |
+          echo "::group::Steps"
+          echo "composer=${{steps.composer.outcome}}"
+          echo "style=${{steps.style.outcome}}"
+          echo "deps=${{steps.deps.outcome}}"
+          echo "phan=${{steps.phan.outcome}}"
+          echo "psalm=${{steps.psalm.outcome}}"
+          echo "phpstan=${{steps.phpstan.outcome}}"
+          echo "unit=${{steps.unit.outcome}}"
+          echo "integration=${{steps.integration.outcome}}"
+          echo "::endgroup::"
+
+          if [ ${{ steps.composer.outcome == 'failure' || steps.style.outcome == 'failure' || steps.deps.outcome == 'failure' || steps.phan.outcome == 'failure' || steps.psalm.outcome == 'failure' || steps.phpstan.outcome == 'failure' || steps.unit.outcome == 'failure' || steps.integration.outcome == 'failure' }} == true ]; then \
+            echo "::error::One or more steps failed"; \
+          fi
+
+    - name: Setup cache environment
+      id: extcache
+      uses: shivammathur/cache-extensions@v1
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: ${{ env.extensions }}
+        key: ${{ env.key }}
+
+    - name: Cache extensions
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.extcache.outputs.dir }}
+        key: ${{ steps.extcache.outputs.key }}
+        restore-keys: ${{ steps.extcache.outputs.key }}
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -30,7 +71,7 @@ jobs:
         php-version: ${{ matrix.php-version }}
         coverage: xdebug
         tools: php-cs-fixer
-        extensions: "ast, grpc, pcre, protobuf"
+        extensions: ${{ env.extensions }}
 
     - name: Validate composer.json
       run: composer validate
@@ -45,34 +86,48 @@ jobs:
           ${{ runner.os }}-${{ matrix.php-version }}-php-
 
     - name: Install dependencies
+      id: composer
       if: steps.composer-cache.outputs.cache-hit != 'true'
       run: composer install --prefer-dist --no-progress --no-suggest ${{ matrix.composer_args }}
 
     - name: Check Style
+      id: style
       continue-on-error: ${{ matrix.experimental }}
       env:
         PHP_CS_FIXER_IGNORE_ENV: 1
       run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
 
     - name: Check Dependencies
+      id: deps
+      continue-on-error: ${{ matrix.experimental }}
       run: vendor/bin/deptrac --formatter=github-actions --report-uncovered
 
     - name: Run Phan
+      id: phan
+      continue-on-error: ${{ matrix.experimental }}
       env:
         XDEBUG_MODE: off
         PHAN_DISABLE_XDEBUG_WARN: 1
       run: vendor/bin/phan
 
     - name: Run Psalm
+      id: psalm
+      continue-on-error: ${{ matrix.experimental }}
       run: vendor/bin/psalm --output-format=github
 
     - name: Run Phpstan
+      id: phpstan
+      continue-on-error: ${{ matrix.experimental }}
       run: vendor/bin/phpstan analyse --error-format=github
 
     - name: Run PHPUnit (unit tests)
+      id: unit
+      continue-on-error: ${{ matrix.experimental }}
       run: php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover --testsuite unit
 
     - name: Run PHPUnit (integration tests)
+      id: integration
+      continue-on-error: ${{ matrix.experimental }}
       run: vendor/bin/phpunit --testsuite integration
 
     - name: Code Coverage

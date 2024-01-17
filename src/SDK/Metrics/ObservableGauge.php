@@ -9,7 +9,7 @@ use OpenTelemetry\API\Metrics\ObservableGaugeInterface;
 /**
  * @internal
  */
-final class ObservableGauge implements ObservableGaugeInterface
+final class ObservableGauge implements ObservableGaugeInterface, InstrumentHandle
 {
     use ObservableInstrumentTrait;
 }

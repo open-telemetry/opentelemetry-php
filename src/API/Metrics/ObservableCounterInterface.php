@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Metrics;
 
-interface ObservableCounterInterface
+interface ObservableCounterInterface extends AsynchronousInstrument
 {
 
     /**

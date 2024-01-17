@@ -6,7 +6,7 @@ namespace OpenTelemetry\API\Metrics;
 
 use OpenTelemetry\Context\ContextInterface;
 
-interface CounterInterface
+interface CounterInterface extends SynchronousInstrument
 {
 
     /**

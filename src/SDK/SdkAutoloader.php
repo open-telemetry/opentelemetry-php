@@ -13,6 +13,7 @@ use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Logs\LoggerProviderFactory;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
@@ -41,15 +42,17 @@ class SdkAutoloader
             }
             $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED);
 
+            $resource = ResourceInfoFactory::defaultResource();
             $exporter = (new ExporterFactory())->create();
-            $meterProvider = (new MeterProviderFactory())->create();
+            $meterProvider = (new MeterProviderFactory())->create($resource);
             $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
             $tracerProvider = (new TracerProviderBuilder())
                 ->addSpanProcessor($spanProcessor)
+                ->setResource($resource)
                 ->setSampler((new SamplerFactory())->create())
                 ->build();
 
-            $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null);
+            $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null, $resource);
 
             ShutdownHandler::register([$tracerProvider, 'shutdown']);
             ShutdownHandler::register([$meterProvider, 'shutdown']);
