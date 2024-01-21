@@ -1,0 +1,20 @@
+file_format: '0.1'
+
+resource:
+  attributes:
+    service.name: opentelemetry-demo
+
+tracer_provider:
+  sampler:
+    parent_based:
+      root:
+        always_on: {}
+  processors:
+    - simple:
+        exporter:
+          console: {}
+    - batch:
+        exporter:
+          otlp:
+            protocol: http/protobuf
+            endpoint: http://collector:4318
