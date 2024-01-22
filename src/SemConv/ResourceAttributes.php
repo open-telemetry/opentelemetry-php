@@ -11,7 +11,7 @@ interface ResourceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.23.1';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.24.0';
 
     /**
      * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found here.
@@ -295,6 +295,14 @@ interface ResourceAttributes
     /**
      * Name of the deployment environment (aka deployment tier).
      *
+     * `deployment.environment` does not affect the uniqueness constraints defined through
+     * the `service.namespace`, `service.name` and `service.instance.id` resource attributes.
+     * This implies that resources carrying the following attribute combinations MUST be
+     * considered to be identifying the same service:<ul>
+     * <li>`service.name=frontend`, `deployment.environment=production`</li>
+     * <li>`service.name=frontend`, `deployment.environment=staging`.</li>
+     * </ul>
+     *
      * @example staging
      * @example production
      */
@@ -322,7 +330,7 @@ interface ResourceAttributes
     /**
      * The model identifier for the device.
      *
-     * It's recommended this value represents a machine readable version of the model identifier rather than the market or consumer-friendly name of the device.
+     * It's recommended this value represents a machine-readable version of the model identifier rather than the market or consumer-friendly name of the device.
      *
      * @example iPhone3,4
      * @example SM-G920F
@@ -332,7 +340,7 @@ interface ResourceAttributes
     /**
      * The marketing name for the device model.
      *
-     * It's recommended this value represents a human readable version of the device model rather than a machine readable alternative.
+     * It's recommended this value represents a human-readable version of the device model rather than a machine-readable alternative.
      *
      * @example iPhone 6s Plus
      * @example Samsung Galaxy S6
@@ -465,9 +473,10 @@ interface ResourceAttributes
     public const HOST_CPU_CACHE_L2_SIZE = 'host.cpu.cache.l2.size';
 
     /**
-     * Numeric value specifying the family or generation of the CPU.
+     * Family or generation of the CPU.
      *
      * @example 6
+     * @example PA-RISC 1.1e
      */
     public const HOST_CPU_FAMILY = 'host.cpu.family';
 
@@ -475,6 +484,7 @@ interface ResourceAttributes
      * Model identifier. It provides more granular information about the CPU, distinguishing it from other CPUs within the same family.
      *
      * @example 6
+     * @example 9000/778/B180L
      */
     public const HOST_CPU_MODEL_ID = 'host.cpu.model.id';
 
@@ -852,7 +862,7 @@ interface ResourceAttributes
     public const PROCESS_OWNER = 'process.owner';
 
     /**
-     * Parent Process identifier (PID).
+     * Parent Process identifier (PPID).
      *
      * @example 111
      */
