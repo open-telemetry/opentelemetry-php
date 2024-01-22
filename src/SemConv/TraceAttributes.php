@@ -2174,11 +2174,6 @@ interface TraceAttributes
     /**
      * @deprecated
      */
-    public const HTTP_USER_AGENT = 'http.user_agent';
-
-    /**
-     * @deprecated
-     */
     public const MESSAGING_CONVERSATION_ID = 'messaging.conversation_id';
 
     /**
@@ -2235,11 +2230,6 @@ interface TraceAttributes
      * @deprecated
      */
     public const HTTP_CLIENT_IP = 'http.client_ip';
-
-    /**
-     * @deprecated
-     */
-    public const HTTP_FLAVOR = 'http.flavor';
 
     /**
      * @deprecated
