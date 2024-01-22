@@ -5,6 +5,10 @@
 # Supported semantic conventions:
 #  - Trace
 #  - Resource
+#
+# Source repositories:
+#  - https://github.com/open-telemetry/semantic-conventions/releases
+#  - https://github.com/open-telemetry/build-tools/releases
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
