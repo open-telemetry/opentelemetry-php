@@ -11,7 +11,7 @@ interface TraceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.23.1';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.24.0';
 
     /**
      * This attribute represents the state the application has transitioned into at the occurrence of the event.
@@ -19,6 +19,44 @@ interface TraceAttributes
      * The Android lifecycle states are defined in Activity lifecycle callbacks, and from which the `OS identifiers` are derived.
      */
     public const ANDROID_STATE = 'android.state';
+
+    /**
+     * Full type name of the `IExceptionHandler` implementation that handled the exception.
+     *
+     * @example Contoso.MyHandler
+     */
+    public const ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE = 'aspnetcore.diagnostics.handler.type';
+
+    /**
+     * Rate limiting policy name.
+     *
+     * @example fixed
+     * @example sliding
+     * @example token
+     */
+    public const ASPNETCORE_RATE_LIMITING_POLICY = 'aspnetcore.rate_limiting.policy';
+
+    /**
+     * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason.
+     *
+     * @example acquired
+     * @example request_canceled
+     */
+    public const ASPNETCORE_RATE_LIMITING_RESULT = 'aspnetcore.rate_limiting.result';
+
+    /**
+     * Flag indicating if request was handled by the application pipeline.
+     *
+     * @example True
+     */
+    public const ASPNETCORE_REQUEST_IS_UNHANDLED = 'aspnetcore.request.is_unhandled';
+
+    /**
+     * A value that indicates whether the matched route is a fallback route.
+     *
+     * @example True
+     */
+    public const ASPNETCORE_ROUTING_IS_FALLBACK = 'aspnetcore.routing.is_fallback';
 
     /**
      * The JSON-serialized value of each item in the `AttributeDefinitions` request field.
@@ -403,6 +441,13 @@ interface TraceAttributes
     public const CODE_NAMESPACE = 'code.namespace';
 
     /**
+     * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
+     *
+     * @example at com.example.GenerateTrace.methodB(GenerateTrace.java:13)\n at com.example.GenerateTrace.methodA(GenerateTrace.java:9)\n at com.example.GenerateTrace.main(GenerateTrace.java:5)
+     */
+    public const CODE_STACKTRACE = 'code.stacktrace';
+
+    /**
      * The consistency level of the query. Based on consistency values from CQL.
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL = 'db.cassandra.consistency_level';
@@ -441,7 +486,7 @@ interface TraceAttributes
     public const DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT = 'db.cassandra.speculative_execution_count';
 
     /**
-     * The name of the primary table that the operation is acting upon, including the keyspace name (if applicable).
+     * The name of the primary Cassandra table that the operation is acting upon, including the keyspace name (if applicable).
      *
      * This mirrors the db.sql.table attribute but references cassandra rather than sql. It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
      *
@@ -524,6 +569,13 @@ interface TraceAttributes
     public const DB_ELASTICSEARCH_NODE_NAME = 'db.elasticsearch.node.name';
 
     /**
+     * An identifier (address, unique name, or any other identifier) of the database instance that is executing queries or mutations on the current connection. This is useful in cases where the database is running in a clustered environment and the instrumentation is able to record the node executing the query. The client may obtain this value in databases like MySQL using queries like `select @@hostname`.
+     *
+     * @example mysql-e26b99z.example.com
+     */
+    public const DB_INSTANCE_ID = 'db.instance.id';
+
+    /**
      * The fully-qualified class name of the Java Database Connectivity (JDBC) driver used to connect.
      *
      * @example org.postgresql.Driver
@@ -532,7 +584,7 @@ interface TraceAttributes
     public const DB_JDBC_DRIVER_CLASSNAME = 'db.jdbc.driver_classname';
 
     /**
-     * The collection being accessed within the database stated in `db.name`.
+     * The MongoDB collection being accessed within the database stated in `db.name`.
      *
      * @example customers
      * @example products
@@ -628,6 +680,13 @@ interface TraceAttributes
     public const DESTINATION_PORT = 'destination.port';
 
     /**
+     * The disk IO operation direction.
+     *
+     * @example read
+     */
+    public const DISK_IO_DIRECTION = 'disk.io.direction';
+
+    /**
      * Username or client_id extracted from the access token or Authorization header in the inbound request from outside the system.
      *
      * @example username
@@ -651,15 +710,14 @@ interface TraceAttributes
     /**
      * Describes a class of error the operation ended with.
      *
-     * The `error.type` SHOULD be predictable and SHOULD have low cardinality.
-     * Instrumentations SHOULD document the list of errors they report.The cardinality of `error.type` within one instrumentation library SHOULD be low.
-     * Telemetry consumers that aggregate data from multiple instrumentation libraries and applications
-     * should be prepared for `error.type` to have high cardinality at query time when no
-     * additional filters are applied.If the operation has completed successfully, instrumentations SHOULD NOT set `error.type`.If a specific domain defines its own set of error identifiers (such as HTTP or gRPC status codes),
-     * it's RECOMMENDED to:<ul>
-     * <li>Use a domain-specific attribute</li>
-     * <li>Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not.</li>
-     * </ul>
+     * If the request fails with an error before response status code was sent or received,
+     * `error.type` SHOULD be set to exception type (its fully-qualified class name, if applicable)
+     * or a component-specific low cardinality error identifier.If response status code was sent or received and status indicates an error according to HTTP span status definition,
+     * `error.type` SHOULD be set to the status code number (represented as a string), an exception type (if thrown) or a component-specific error identifier.The `error.type` value SHOULD be predictable and SHOULD have low cardinality.
+     * Instrumentations SHOULD document the list of errors they report.The cardinality of `error.type` within one instrumentation library SHOULD be low, but
+     * telemetry consumers that aggregate data from multiple instrumentation libraries and applications
+     * should be prepared for `error.type` to have high cardinality at query time, when no
+     * additional filters are applied.If the request has completed successfully, instrumentations SHOULD NOT set `error.type`.
      *
      * @example timeout
      * @example java.net.UnknownHostException
@@ -669,17 +727,12 @@ interface TraceAttributes
     public const ERROR_TYPE = 'error.type';
 
     /**
-     * The domain identifies the business context for the events.
+     * Identifies the class / type of event.
      *
-     * Events across different domains may have same `event.name`, yet be unrelated events.
-     */
-    public const EVENT_DOMAIN = 'event.domain';
-
-    /**
-     * The name identifies the event.
+     * Event names are subject to the same rules as attribute names. Notably, event names are namespaced to avoid collisions and provide a clean separation of semantics for events in separate domains like browser, mobile, and kubernetes.
      *
-     * @example click
-     * @example exception
+     * @example browser.mouse.click
+     * @example device.app.lifecycle
      */
     public const EVENT_NAME = 'event.name';
 
@@ -694,7 +747,7 @@ interface TraceAttributes
      * whether it will escape the scope of a span.
      * However, it is trivial to know that an exception
      * will escape, if one checks for an active exception just before ending the span,
-     * as done in the example above.It follows that an exception may still escape the scope of the span
+     * as done in the example for recording span exceptions.It follows that an exception may still escape the scope of the span
      * even if the `exception.escaped` attribute was not set or set to false,
      * since the event might have been recorded at a time where it was not
      * clear whether the exception will escape.
@@ -864,6 +917,11 @@ interface TraceAttributes
     public const GRAPHQL_OPERATION_TYPE = 'graphql.operation.type';
 
     /**
+     * Deprecated, use `network.protocol.name` instead.
+     */
+    public const HTTP_FLAVOR = 'http.flavor';
+
+    /**
      * Deprecated, use `http.request.method` instead.
      *
      * @deprecated Deprecated, use `http.request.method` instead..
@@ -989,6 +1047,15 @@ interface TraceAttributes
      * @example https://www.foo.bar/search?q=OpenTelemetry#SemConv
      */
     public const HTTP_URL = 'http.url';
+
+    /**
+     * Deprecated, use `user_agent.original` instead.
+     *
+     * @deprecated Deprecated, use `user_agent.original` instead..
+     * @example CERN-LineMode/2.15 libwww/2.17b3
+     * @example Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1
+     */
+    public const HTTP_USER_AGENT = 'http.user_agent';
 
     /**
      * This attribute represents the state the application has transitioned into at the occurrence of the event.
@@ -1156,6 +1223,13 @@ interface TraceAttributes
     public const MESSAGING_DESTINATION_PUBLISH_NAME = 'messaging.destination_publish.name';
 
     /**
+     * The ordering key for a given message. If the attribute is not present, the message does not have an ordering key.
+     *
+     * @example ordering_key
+     */
+    public const MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY = 'messaging.gcp_pubsub.message.ordering_key';
+
+    /**
      * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not producers.
      *
      * @example my-group
@@ -1299,13 +1373,7 @@ interface TraceAttributes
     public const MESSAGING_ROCKETMQ_NAMESPACE = 'messaging.rocketmq.namespace';
 
     /**
-     * A string identifying the messaging system.
-     *
-     * @example kafka
-     * @example rabbitmq
-     * @example rocketmq
-     * @example activemq
-     * @example AmazonSQS
+     * An identifier for the messaging system being used. See below for a list of well-known identifiers.
      */
     public const MESSAGING_SYSTEM = 'messaging.system';
 
@@ -1452,6 +1520,13 @@ interface TraceAttributes
     public const NETWORK_CONNECTION_TYPE = 'network.connection.type';
 
     /**
+     * The network IO operation direction.
+     *
+     * @example transmit
+     */
+    public const NETWORK_IO_DIRECTION = 'network.io.direction';
+
+    /**
      * Local address of the network connection - IP address or Unix domain socket name.
      *
      * @example 10.1.2.80
@@ -1511,7 +1586,7 @@ interface TraceAttributes
      * different processes could be listening on TCP port 12345 and UDP port 12345.
      *
      * @example tcp
-     * @example udp
+     * @example unix
      */
     public const NETWORK_TRANSPORT = 'network.transport';
 
@@ -1624,9 +1699,9 @@ interface TraceAttributes
     public const RPC_SYSTEM = 'rpc.system';
 
     /**
-     * Host identifier of the &quot;URI origin&quot; HTTP request is sent to.
+     * Server domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
      *
-     * If an HTTP client request is explicitly made to an IP address, e.g. `http://x.x.x.x:8080`, then `server.address` SHOULD be the IP address `x.x.x.x`. A DNS lookup SHOULD NOT be used.
+     * When observed from the client side, and when communicating through an intermediary, `server.address` SHOULD represent the server address behind any intermediaries, for example proxies, if it's available.
      *
      * @example example.com
      * @example 10.1.2.80
@@ -1635,7 +1710,7 @@ interface TraceAttributes
     public const SERVER_ADDRESS = 'server.address';
 
     /**
-     * Port identifier of the &quot;URI origin&quot; HTTP request is sent to.
+     * Server port number.
      *
      * When observed from the client side, and when communicating through an intermediary, `server.port` SHOULD represent the server port behind any intermediaries, for example proxies, if it's available.
      *
@@ -1658,6 +1733,22 @@ interface TraceAttributes
      * @example 00112233-4455-6677-8899-aabbccddeeff
      */
     public const SESSION_PREVIOUS_ID = 'session.previous_id';
+
+    /**
+     * SignalR HTTP connection closure status.
+     *
+     * @example app_shutdown
+     * @example timeout
+     */
+    public const SIGNALR_CONNECTION_STATUS = 'signalr.connection.status';
+
+    /**
+     * SignalR transport type.
+     *
+     * @example web_sockets
+     * @example long_polling
+     */
+    public const SIGNALR_TRANSPORT = 'signalr.transport';
 
     /**
      * Source address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
@@ -1708,13 +1799,6 @@ interface TraceAttributes
     public const SYSTEM_DEVICE = 'system.device';
 
     /**
-     * The disk operation direction.
-     *
-     * @example read
-     */
-    public const SYSTEM_DISK_DIRECTION = 'system.disk.direction';
-
-    /**
      * The filesystem mode.
      *
      * @example rw, ro
@@ -1749,13 +1833,6 @@ interface TraceAttributes
      * @example cached
      */
     public const SYSTEM_MEMORY_STATE = 'system.memory.state';
-
-    /**
-     * .
-     *
-     * @example transmit
-     */
-    public const SYSTEM_NETWORK_DIRECTION = 'system.network.direction';
 
     /**
      * A stateless protocol MUST NOT set this attribute.
@@ -1805,6 +1882,213 @@ interface TraceAttributes
      * @example main
      */
     public const THREAD_NAME = 'thread.name';
+
+    /**
+     * String indicating the cipher used during the current connection.
+     *
+     * The values allowed for `tls.cipher` MUST be one of the `Descriptions` of the registered TLS Cipher Suits.
+     *
+     * @example TLS_RSA_WITH_3DES_EDE_CBC_SHA
+     * @example TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+     */
+    public const TLS_CIPHER = 'tls.cipher';
+
+    /**
+     * PEM-encoded stand-alone certificate offered by the client. This is usually mutually-exclusive of `client.certificate_chain` since this value also exists in that list.
+     *
+     * @example MII...
+     */
+    public const TLS_CLIENT_CERTIFICATE = 'tls.client.certificate';
+
+    /**
+     * Array of PEM-encoded certificates that make up the certificate chain offered by the client. This is usually mutually-exclusive of `client.certificate` since that value should be the first certificate in the chain.
+     *
+     * @example MII...
+     * @example MI...
+     */
+    public const TLS_CLIENT_CERTIFICATE_CHAIN = 'tls.client.certificate_chain';
+
+    /**
+     * Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
+     *
+     * @example 0F76C7F2C55BFD7D8E8B8F4BFBF0C9EC
+     */
+    public const TLS_CLIENT_HASH_MD5 = 'tls.client.hash.md5';
+
+    /**
+     * Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
+     *
+     * @example 9E393D93138888D288266C2D915214D1D1CCEB2A
+     */
+    public const TLS_CLIENT_HASH_SHA1 = 'tls.client.hash.sha1';
+
+    /**
+     * Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
+     *
+     * @example 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
+     */
+    public const TLS_CLIENT_HASH_SHA256 = 'tls.client.hash.sha256';
+
+    /**
+     * Distinguished name of subject of the issuer of the x.509 certificate presented by the client.
+     *
+     * @example CN=Example Root CA, OU=Infrastructure Team, DC=example, DC=com
+     */
+    public const TLS_CLIENT_ISSUER = 'tls.client.issuer';
+
+    /**
+     * A hash that identifies clients based on how they perform an SSL/TLS handshake.
+     *
+     * @example d4e5b18d6b55c71272893221c96ba240
+     */
+    public const TLS_CLIENT_JA3 = 'tls.client.ja3';
+
+    /**
+     * Date/Time indicating when client certificate is no longer considered valid.
+     *
+     * @example 2021-01-01T00:00:00.000Z
+     */
+    public const TLS_CLIENT_NOT_AFTER = 'tls.client.not_after';
+
+    /**
+     * Date/Time indicating when client certificate is first considered valid.
+     *
+     * @example 1970-01-01T00:00:00.000Z
+     */
+    public const TLS_CLIENT_NOT_BEFORE = 'tls.client.not_before';
+
+    /**
+     * Also called an SNI, this tells the server which hostname to which the client is attempting to connect to.
+     *
+     * @example opentelemetry.io
+     */
+    public const TLS_CLIENT_SERVER_NAME = 'tls.client.server_name';
+
+    /**
+     * Distinguished name of subject of the x.509 certificate presented by the client.
+     *
+     * @example CN=myclient, OU=Documentation Team, DC=example, DC=com
+     */
+    public const TLS_CLIENT_SUBJECT = 'tls.client.subject';
+
+    /**
+     * Array of ciphers offered by the client during the client hello.
+     *
+     * @example "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "..."
+     */
+    public const TLS_CLIENT_SUPPORTED_CIPHERS = 'tls.client.supported_ciphers';
+
+    /**
+     * String indicating the curve used for the given cipher, when applicable.
+     *
+     * @example secp256r1
+     */
+    public const TLS_CURVE = 'tls.curve';
+
+    /**
+     * Boolean flag indicating if the TLS negotiation was successful and transitioned to an encrypted tunnel.
+     *
+     * @example True
+     */
+    public const TLS_ESTABLISHED = 'tls.established';
+
+    /**
+     * String indicating the protocol being tunneled. Per the values in the IANA registry, this string should be lower case.
+     *
+     * @example http/1.1
+     */
+    public const TLS_NEXT_PROTOCOL = 'tls.next_protocol';
+
+    /**
+     * Normalized lowercase protocol name parsed from original string of the negotiated SSL/TLS protocol version.
+     */
+    public const TLS_PROTOCOL_NAME = 'tls.protocol.name';
+
+    /**
+     * Numeric part of the version parsed from the original string of the negotiated SSL/TLS protocol version.
+     *
+     * @example 1.2
+     * @example 3
+     */
+    public const TLS_PROTOCOL_VERSION = 'tls.protocol.version';
+
+    /**
+     * Boolean flag indicating if this TLS connection was resumed from an existing TLS negotiation.
+     *
+     * @example True
+     */
+    public const TLS_RESUMED = 'tls.resumed';
+
+    /**
+     * PEM-encoded stand-alone certificate offered by the server. This is usually mutually-exclusive of `server.certificate_chain` since this value also exists in that list.
+     *
+     * @example MII...
+     */
+    public const TLS_SERVER_CERTIFICATE = 'tls.server.certificate';
+
+    /**
+     * Array of PEM-encoded certificates that make up the certificate chain offered by the server. This is usually mutually-exclusive of `server.certificate` since that value should be the first certificate in the chain.
+     *
+     * @example MII...
+     * @example MI...
+     */
+    public const TLS_SERVER_CERTIFICATE_CHAIN = 'tls.server.certificate_chain';
+
+    /**
+     * Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
+     *
+     * @example 0F76C7F2C55BFD7D8E8B8F4BFBF0C9EC
+     */
+    public const TLS_SERVER_HASH_MD5 = 'tls.server.hash.md5';
+
+    /**
+     * Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
+     *
+     * @example 9E393D93138888D288266C2D915214D1D1CCEB2A
+     */
+    public const TLS_SERVER_HASH_SHA1 = 'tls.server.hash.sha1';
+
+    /**
+     * Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
+     *
+     * @example 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
+     */
+    public const TLS_SERVER_HASH_SHA256 = 'tls.server.hash.sha256';
+
+    /**
+     * Distinguished name of subject of the issuer of the x.509 certificate presented by the client.
+     *
+     * @example CN=Example Root CA, OU=Infrastructure Team, DC=example, DC=com
+     */
+    public const TLS_SERVER_ISSUER = 'tls.server.issuer';
+
+    /**
+     * A hash that identifies servers based on how they perform an SSL/TLS handshake.
+     *
+     * @example d4e5b18d6b55c71272893221c96ba240
+     */
+    public const TLS_SERVER_JA3S = 'tls.server.ja3s';
+
+    /**
+     * Date/Time indicating when server certificate is no longer considered valid.
+     *
+     * @example 2021-01-01T00:00:00.000Z
+     */
+    public const TLS_SERVER_NOT_AFTER = 'tls.server.not_after';
+
+    /**
+     * Date/Time indicating when server certificate is first considered valid.
+     *
+     * @example 1970-01-01T00:00:00.000Z
+     */
+    public const TLS_SERVER_NOT_BEFORE = 'tls.server.not_before';
+
+    /**
+     * Distinguished name of subject of the x.509 certificate presented by the server.
+     *
+     * @example CN=myserver, OU=Documentation Team, DC=example, DC=com
+     */
+    public const TLS_SERVER_SUBJECT = 'tls.server.subject';
 
     /**
      * The URI fragment component.
@@ -1890,11 +2174,6 @@ interface TraceAttributes
     /**
      * @deprecated
      */
-    public const HTTP_USER_AGENT = 'http.user_agent';
-
-    /**
-     * @deprecated
-     */
     public const MESSAGING_CONVERSATION_ID = 'messaging.conversation_id';
 
     /**
@@ -1951,11 +2230,6 @@ interface TraceAttributes
      * @deprecated
      */
     public const HTTP_CLIENT_IP = 'http.client_ip';
-
-    /**
-     * @deprecated
-     */
-    public const HTTP_FLAVOR = 'http.flavor';
 
     /**
      * @deprecated
@@ -2066,4 +2340,19 @@ interface TraceAttributes
      * @deprecated
      */
     public const THREAD_DAEMON = 'thread.daemon';
+
+    /**
+     * @deprecated
+     */
+    public const EVENT_DOMAIN = 'event.domain';
+
+    /**
+     * @deprecated
+     */
+    public const SYSTEM_DISK_DIRECTION = 'system.disk.direction';
+
+    /**
+     * @deprecated
+     */
+    public const SYSTEM_NETWORK_DIRECTION = 'system.network.direction';
 }
