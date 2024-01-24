@@ -65,6 +65,9 @@ class SdkTest extends TestCase
             ['foo,bar', 'bar', true],
             ['', 'foo', false],
             ['foo', 'foo', true],
+            ['all', 'foo', true],
+            ['all,bar', 'foo', false],
+            ['all,foo', 'foo', true],
         ];
     }
 
