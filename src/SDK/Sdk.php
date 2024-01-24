@@ -13,6 +13,8 @@ use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 
 class Sdk
 {
+    private const OTEL_PHP_DISABLED_INSTRUMENTATIONS_ALL = 'all';
+
     private TracerProviderInterface $tracerProvider;
     private MeterProviderInterface $meterProvider;
     private LoggerProviderInterface $loggerProvider;
@@ -40,7 +42,9 @@ class Sdk
      */
     public static function isInstrumentationDisabled(string $name): bool
     {
-        return in_array($name, Configuration::getList(Variables::OTEL_PHP_DISABLED_INSTRUMENTATIONS));
+        $disabledInstrumentations = Configuration::getList(Variables::OTEL_PHP_DISABLED_INSTRUMENTATIONS);
+
+        return [self::OTEL_PHP_DISABLED_INSTRUMENTATIONS_ALL] === $disabledInstrumentations || in_array($name, $disabledInstrumentations);
     }
 
     public static function builder(): SdkBuilder
