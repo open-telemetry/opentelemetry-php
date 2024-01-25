@@ -46,4 +46,7 @@ See [compatibility readme](src/SDK/Common/Dev/Compatibility/README.md).
 
 ## Versioning
 
+OpenTelemetry for PHP aims to support all officially supported PHP versions according to https://www.php.net/supported-versions.php, and
+support will be dropped for PHP versions within 12 months of that version going _End of life_.
+
 Versioning rationale can be found in the [Versioning Documentation](/docs/versioning.md)
