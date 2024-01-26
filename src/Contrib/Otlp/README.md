@@ -17,7 +17,7 @@ See https://github.com/open-telemetry/opentelemetry-php/blob/main/examples/trace
 ## Http transport
 
 ```php
-$transport = (new \OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory())->create('http://collector:4318');
+$transport = (new \OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory())->create('http://collector:4318', 'application/json');
 $exporter = new \OpenTelemetry\Contrib\Otlp\SpanExporter($transport);
 ```
 
