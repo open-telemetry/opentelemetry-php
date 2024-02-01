@@ -69,4 +69,59 @@ class SdkAutoloaderTest extends TestCase
         $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
         $this->assertNotInstanceOf(NoopLoggerProvider::class, Globals::loggerProvider());
     }
+
+    public function test_ignore_urls_without_request_uri(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_URLS, '*');
+        unset($_SERVER['REQUEST_URI']);
+        $this->assertFalse(SdkAutoloader::isIgnoredUrl());
+    }
+
+    /**
+     * @dataProvider ignoreUrlsProvider
+     */
+    public function test_ignore_urls(string $ignore, string $uri, bool $expected): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_URLS, $ignore);
+        $_SERVER['REQUEST_URI'] = $uri;
+        $this->assertSame($expected, SdkAutoloader::isIgnoredUrl());
+    }
+
+    public static function ignoreUrlsProvider(): array
+    {
+        return [
+            [
+                'foo',
+                '/foo?bar=baz',
+                true,
+            ],
+            [
+                'foo',
+                '/bar',
+                false,
+            ],
+            [
+                'foo,bar',
+                'https://example.com/bar?p1=2',
+                true,
+            ],
+            [
+                'foo,bar',
+                'https://example.com/baz?p1=2',
+                false,
+            ],
+            [
+                'client/.*/info,healthcheck',
+                'https://site/client/123/info',
+                true,
+            ],
+            [
+                'client/.*/info,healthcheck',
+                'https://site/xyz/healthcheck',
+                true,
+            ],
+        ];
+    }
 }

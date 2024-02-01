@@ -31,7 +31,7 @@ class SdkAutoloader
             //invalid setting, assume false
             self::$enabled = false;
         }
-        if (!self::$enabled) {
+        if (!self::$enabled || self::isIgnoredUrl()) {
             return false;
         }
         Globals::registerInitializer(function (Configurator $configurator) {
@@ -67,6 +67,30 @@ class SdkAutoloader
         });
 
         return true;
+    }
+
+    /**
+     * Test whether a request URI is set, and if it matches the excluded urls configuration option
+     *
+     * @internal
+     */
+    public static function isIgnoredUrl(): bool
+    {
+        $ignoreUrls = Configuration::getList(Variables::OTEL_PHP_EXCLUDED_URLS, []);
+        if ($ignoreUrls === []) {
+            return false;
+        }
+        $url = $_SERVER['REQUEST_URI'] ?? null;
+        if (!$url) {
+            return false;
+        }
+        foreach ($ignoreUrls as $ignore) {
+            if (preg_match(sprintf('|%s|', $ignore), $url) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
