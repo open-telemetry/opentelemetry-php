@@ -21,17 +21,9 @@ use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
 
 class SdkAutoloader
 {
-    private static ?bool $enabled = null;
-
     public static function autoload(): bool
     {
-        try {
-            self::$enabled ??= Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
-        } catch (InvalidArgumentException $e) {
-            //invalid setting, assume false
-            self::$enabled = false;
-        }
-        if (!self::$enabled || self::isIgnoredUrl()) {
+        if (!self::isEnabled() || self::isExcludedUrl()) {
             return false;
         }
         Globals::registerInitializer(function (Configurator $configurator) {
@@ -96,8 +88,39 @@ class SdkAutoloader
     /**
      * @internal
      */
-    public static function reset(): void
+    public static function isEnabled(): bool
     {
-        self::$enabled = null;
+        try {
+            $enabled = Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+        } catch (InvalidArgumentException $e) {
+            //invalid setting, assume false
+            return false;
+        }
+
+        return $enabled;
+    }
+
+    /**
+     * Test whether a request URI is set, and if it matches the excluded urls configuration option
+     *
+     * @internal
+     */
+    public static function isExcludedUrl(): bool
+    {
+        $excludedUrls = Configuration::getList(Variables::OTEL_PHP_EXCLUDED_URLS, []);
+        if ($excludedUrls === []) {
+            return false;
+        }
+        $url = $_SERVER['REQUEST_URI'] ?? null;
+        if (!$url) {
+            return false;
+        }
+        foreach ($excludedUrls as $excludedUrl) {
+            if (preg_match(sprintf('|%s|', $excludedUrl), $url) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
