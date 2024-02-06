@@ -12,11 +12,13 @@ class Formatter
             ? $context['exception']
             : null;
         if ($exception) {
+            $previous = $exception->getPrevious() ? $exception->getPrevious()->getMessage() : '';
             $message = sprintf(
-                'OpenTelemetry: [%s] %s [exception] %s%s%s',
+                'OpenTelemetry: [%s] %s [exception] %s [previous] %s%s%s',
                 $level,
                 $message,
                 $exception->getMessage(),
+                $previous,
                 PHP_EOL,
                 $exception->getTraceAsString()
             );
