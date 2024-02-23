@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\Context;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeys;
+use OpenTelemetry\Context\DebugScope;
 use OpenTelemetry\Context\ImplicitContextKeyedInterface;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -173,6 +174,21 @@ class ContextTest extends TestCase
 
             $token->detach();
             $this->assertSame(Context::getCurrent()->get($key), '111');
+        } finally {
+            $scope->detach();
+        }
+    }
+
+    public function test_debug_scopes_disabled_env_var(): void
+    {
+        \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED=1');
+
+        $context = Context::getRoot();
+
+        $scope = $context->activate();
+
+        try {
+            $this->assertNotInstanceOf(DebugScope::class, $scope);
         } finally {
             $scope->detach();
         }
