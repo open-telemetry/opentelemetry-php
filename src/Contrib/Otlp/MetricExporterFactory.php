@@ -63,7 +63,7 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
         return $factory->create(
             $endpoint,
             Protocols::contentType($protocol),
-            $headers,
+            array_map('urldecode', $headers),
             $compression,
         );
     }

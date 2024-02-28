@@ -47,7 +47,7 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
         $protocol = $this->getProtocol();
         $contentType = Protocols::contentType($protocol);
         $endpoint = $this->getEndpoint($protocol);
-        $headers = $this->getHeaders();
+        $headers = array_map('urldecode', $this->getHeaders());
         $compression = $this->getCompression();
 
         $factoryClass = Registry::transportFactory($protocol);

@@ -56,7 +56,7 @@ class LogsExporterFactory implements LogRecordExporterFactoryInterface
         return $factory->create(
             $endpoint,
             Protocols::contentType($protocol),
-            $headers,
+            array_map('urldecode', $headers),
             $compression,
         );
     }
