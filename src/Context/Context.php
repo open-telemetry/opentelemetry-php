@@ -7,7 +7,6 @@ namespace OpenTelemetry\Context;
 use function assert;
 use const FILTER_VALIDATE_BOOLEAN;
 use function filter_var;
-use function ini_get;
 use function spl_object_id;
 
 /**
@@ -15,6 +14,8 @@ use function spl_object_id;
  */
 final class Context implements ContextInterface
 {
+    private const OTEL_PHP_DEBUG_SCOPES_DISABLED = 'OTEL_PHP_DEBUG_SCOPES_DISABLED';
+
     /** @var ContextStorageInterface&ExecutionContextAwareInterface */
     private static ContextStorageInterface $storage;
 
@@ -91,11 +92,11 @@ final class Context implements ContextInterface
 
     private static function debugScopesDisabled(): bool
     {
-        if (isset($_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED']) && filter_var($_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED'], FILTER_VALIDATE_BOOLEAN)) {
+        if (isset($_SERVER[self::OTEL_PHP_DEBUG_SCOPES_DISABLED]) && filter_var($_SERVER[self::OTEL_PHP_DEBUG_SCOPES_DISABLED], FILTER_VALIDATE_BOOLEAN)) {
             return true;
-        } elseif (($env = \getenv('OTEL_PHP_DEBUG_SCOPES_DISABLED')) && filter_var($env, FILTER_VALIDATE_BOOLEAN)) {
+        } elseif (($env = \getenv(self::OTEL_PHP_DEBUG_SCOPES_DISABLED)) && filter_var($env, FILTER_VALIDATE_BOOLEAN)) {
             return true;
-        } elseif (($ini = \ini_get('OTEL_PHP_DEBUG_SCOPES_DISABLED')) && filter_var($ini, FILTER_VALIDATE_BOOLEAN)) {
+        } elseif (($ini = \ini_get(self::OTEL_PHP_DEBUG_SCOPES_DISABLED)) && filter_var($ini, FILTER_VALIDATE_BOOLEAN)) {
             return true;
         }
 
