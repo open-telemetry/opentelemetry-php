@@ -191,6 +191,7 @@ class ContextTest extends TestCase
             $this->assertNotInstanceOf(DebugScope::class, $scope);
         } finally {
             $scope->detach();
+            \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED');
         }
     }
 }

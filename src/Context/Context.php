@@ -93,9 +93,9 @@ final class Context implements ContextInterface
     {
         if (isset($_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED']) && filter_var($_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED'], FILTER_VALIDATE_BOOLEAN)) {
             return true;
-        } elseif (($ini = \ini_get('OTEL_PHP_DEBUG_SCOPES_DISABLED')) && filter_var($ini, FILTER_VALIDATE_BOOLEAN)) {
-            return true;
         } elseif (($env = \getenv('OTEL_PHP_DEBUG_SCOPES_DISABLED')) && filter_var($env, FILTER_VALIDATE_BOOLEAN)) {
+            return true;
+        } elseif (($ini = \ini_get('OTEL_PHP_DEBUG_SCOPES_DISABLED')) && filter_var($ini, FILTER_VALIDATE_BOOLEAN)) {
             return true;
         }
 
