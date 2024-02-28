@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Otlp;
 
 use OpenTelemetry\API\Signals;
+use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Resource\Detectors\Sdk;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use UnexpectedValueException;
@@ -20,6 +22,11 @@ class OtlpUtil
         Signals::METRICS => '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
         Signals::LOGS => '/opentelemetry.proto.collector.logs.v1.LogsService/Export',
     ];
+    private const HEADER_VARS = [
+        Signals::TRACE => Variables::OTEL_EXPORTER_OTLP_TRACES_HEADERS,
+        Signals::METRICS => Variables::OTEL_EXPORTER_OTLP_METRICS_HEADERS,
+        Signals::LOGS => Variables::OTEL_EXPORTER_OTLP_LOGS_HEADERS,
+    ];
 
     public static function method(string $signal): string
     {
@@ -28,6 +35,16 @@ class OtlpUtil
         }
 
         return self::METHODS[$signal];
+    }
+
+    public static function getHeaders(string $signal): array
+    {
+        $headers = Configuration::has(self::HEADER_VARS[$signal]) ?
+            Configuration::getMap(self::HEADER_VARS[$signal]) :
+            Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_HEADERS);
+        $headers += self::getUserAgentHeader();
+
+        return array_map('rawurldecode', $headers);
     }
 
     /**

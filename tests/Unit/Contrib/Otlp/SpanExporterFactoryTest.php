@@ -45,7 +45,7 @@ class SpanExporterFactoryTest extends TestCase
     /**
      * @dataProvider configProvider
      */
-    public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = []): void
+    public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = [], array $expectedValues = []): void
     {
         foreach ($env as $k => $v) {
             $this->setEnvironmentVariable($k, $v);
@@ -58,8 +58,11 @@ class SpanExporterFactoryTest extends TestCase
             ->with(
                 $this->equalTo($endpoint),
                 $this->equalTo($protocol),
-                $this->callback(function ($headers) use ($headerKeys) {
+                $this->callback(function ($headers) use ($headerKeys, $expectedValues) {
                     $this->assertEqualsCanonicalizing($headerKeys, array_keys($headers));
+                    foreach ($expectedValues as $key => $value) {
+                        $this->assertSame($headers[$key], $value);
+                    }
 
                     return true;
                 }),
@@ -157,6 +160,22 @@ class SpanExporterFactoryTest extends TestCase
                 'protocol' => 'application/x-protobuf',
                 'compression' => 'none',
                 'headerKeys' => array_merge($defaultHeaderKeys, ['key3', 'key4']),
+                'expectedValues' => [
+                    'key3' => 'foo',
+                    'key4' => 'bar',
+                ],
+            ],
+            'url-encoded headers' => [
+                'env' => [
+                    Variables::OTEL_EXPORTER_OTLP_HEADERS => 'Authorization=Basic%20AAA',
+                ],
+                'endpoint' => 'http://localhost:4318/v1/traces',
+                'protocol' => 'application/x-protobuf',
+                'compression' => 'none',
+                'headerKeys' => array_merge($defaultHeaderKeys, ['Authorization']),
+                'expectedValues' => [
+                    'Authorization' => 'Basic AAA',
+                ],
             ],
         ];
     }

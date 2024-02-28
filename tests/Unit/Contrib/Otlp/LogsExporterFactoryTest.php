@@ -48,7 +48,7 @@ class LogsExporterFactoryTest extends TestCase
     /**
      * @dataProvider configProvider
      */
-    public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = []): void
+    public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = [], array $expectedValues = []): void
     {
         foreach ($env as $k => $v) {
             $this->setEnvironmentVariable($k, $v);
@@ -61,8 +61,11 @@ class LogsExporterFactoryTest extends TestCase
             ->with(
                 $this->equalTo($endpoint),
                 $this->equalTo($protocol),
-                $this->callback(function ($headers) use ($headerKeys) {
+                $this->callback(function ($headers) use ($headerKeys, $expectedValues) {
                     $this->assertEqualsCanonicalizing($headerKeys, array_keys($headers));
+                    foreach ($expectedValues as $key => $value) {
+                        $this->assertSame($value, $headers[$key]);
+                    }
 
                     return true;
                 }),
@@ -160,6 +163,18 @@ class LogsExporterFactoryTest extends TestCase
                 'protocol' => 'application/x-protobuf',
                 'compression' => 'none',
                 'headerKeys' => array_merge($defaultHeaderKeys, ['key3', 'key4']),
+            ],
+            'url-encoded headers' => [
+                'env' => [
+                    Variables::OTEL_EXPORTER_OTLP_HEADERS => 'Authorization=Basic%20AAA',
+                ],
+                'endpoint' => 'http://localhost:4318/v1/logs',
+                'protocol' => 'application/x-protobuf',
+                'compression' => 'none',
+                'headerKeys' => array_merge($defaultHeaderKeys, ['Authorization']),
+                'expectedValues' => [
+                    'Authorization' => 'Basic AAA',
+                ],
             ],
         ];
     }

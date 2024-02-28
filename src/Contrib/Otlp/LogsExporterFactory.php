@@ -44,10 +44,7 @@ class LogsExporterFactory implements LogRecordExporterFactoryInterface
     {
         $endpoint = $this->getEndpoint($protocol);
 
-        $headers = Configuration::has(Variables::OTEL_EXPORTER_OTLP_LOGS_HEADERS)
-            ? Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_LOGS_HEADERS)
-            : Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_HEADERS);
-        $headers += OtlpUtil::getUserAgentHeader();
+        $headers = OtlpUtil::getHeaders(Signals::LOGS);
         $compression = $this->getCompression();
 
         $factoryClass = Registry::transportFactory($protocol);

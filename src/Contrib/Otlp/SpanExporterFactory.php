@@ -47,7 +47,7 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
         $protocol = $this->getProtocol();
         $contentType = Protocols::contentType($protocol);
         $endpoint = $this->getEndpoint($protocol);
-        $headers = $this->getHeaders();
+        $headers = OtlpUtil::getHeaders(Signals::TRACE);
         $compression = $this->getCompression();
 
         $factoryClass = Registry::transportFactory($protocol);
@@ -76,15 +76,6 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
         }
 
         return HttpEndpointResolver::create()->resolveToString($endpoint, Signals::TRACE);
-    }
-
-    private function getHeaders(): array
-    {
-        $headers = Configuration::has(Variables::OTEL_EXPORTER_OTLP_TRACES_HEADERS) ?
-            Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_TRACES_HEADERS) :
-            Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_HEADERS);
-
-        return $headers + OtlpUtil::getUserAgentHeader();
     }
 
     private function getCompression(): string

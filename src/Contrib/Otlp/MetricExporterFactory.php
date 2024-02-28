@@ -51,10 +51,7 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
          */
         $endpoint = $this->getEndpoint($protocol);
 
-        $headers = Configuration::has(Variables::OTEL_EXPORTER_OTLP_METRICS_HEADERS)
-            ? Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_METRICS_HEADERS)
-            : Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_HEADERS);
-        $headers += OtlpUtil::getUserAgentHeader();
+        $headers = OtlpUtil::getHeaders(Signals::METRICS);
         $compression = $this->getCompression();
 
         $factoryClass = Registry::transportFactory($protocol);
