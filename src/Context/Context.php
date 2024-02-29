@@ -96,7 +96,6 @@ final class Context implements ContextInterface
             $_SERVER[self::OTEL_PHP_DEBUG_SCOPES_DISABLED] ?? \getenv(self::OTEL_PHP_DEBUG_SCOPES_DISABLED) ?: \ini_get(self::OTEL_PHP_DEBUG_SCOPES_DISABLED),
             FILTER_VALIDATE_BOOLEAN
         );
-
     }
 
     public function withContextValue(ImplicitContextKeyedInterface $value): ContextInterface
