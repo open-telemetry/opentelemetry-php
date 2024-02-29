@@ -10,8 +10,10 @@ final class StopWatchFactory implements StopWatchFactoryInterface
 
     private ClockInterface $clock;
 
-    public function __construct(?ClockInterface $clock = null, private ?int $initialStartTime = null)
-    {
+    public function __construct(
+        ?ClockInterface $clock = null,
+        private ?int $initialStartTime = null
+    ) {
         $this->clock = $clock ?? ClockFactory::getDefault();
     }
 

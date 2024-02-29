@@ -9,8 +9,10 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class Link implements LinkInterface
 {
-    public function __construct(private API\SpanContextInterface $context, private AttributesInterface $attributes)
-    {
+    public function __construct(
+        private API\SpanContextInterface $context,
+        private AttributesInterface $attributes
+    ) {
     }
 
     public function getSpanContext(): API\SpanContextInterface

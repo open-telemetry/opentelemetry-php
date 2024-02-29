@@ -11,9 +11,13 @@ class LoggerSharedState
 {
     private ?bool $shutdownResult = null;
 
-    public function __construct(private ResourceInfo $resource, private LogRecordLimits $limits, private LogRecordProcessorInterface $processor)
-    {
+    public function __construct(
+        private ResourceInfo $resource,
+        private LogRecordLimits $limits,
+        private LogRecordProcessorInterface $processor
+    ) {
     }
+
     public function hasShutdown(): bool
     {
         return null !== $this->shutdownResult;

@@ -45,7 +45,12 @@ final class SpanLimits
     /**
      * @internal Use {@see SpanLimitsBuilder} to create {@see SpanLimits} instance.
      */
-    public function __construct(private AttributesFactoryInterface $attributesFactory, private AttributesFactoryInterface $eventAttributesFactory, private AttributesFactoryInterface $linkAttributesFactory, private int $eventCountLimit, private int $linkCountLimit)
-    {
+    public function __construct(
+        private AttributesFactoryInterface $attributesFactory,
+        private AttributesFactoryInterface $eventAttributesFactory,
+        private AttributesFactoryInterface $linkAttributesFactory,
+        private int $eventCountLimit,
+        private int $linkCountLimit
+    ) {
     }
 }

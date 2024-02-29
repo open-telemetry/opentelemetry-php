@@ -43,8 +43,20 @@ final class Meter implements MeterInterface
      * @param iterable<MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricRegistries
      * @param ArrayAccess<object, ObservableCallbackDestructor> $destructors
      */
-    public function __construct(private MetricFactoryInterface $metricFactory, private ResourceInfo $resource, private ClockInterface $clock, private StalenessHandlerFactoryInterface $stalenessHandlerFactory, private iterable $metricRegistries, private ViewRegistryInterface $viewRegistry, private ?ExemplarFilterInterface $exemplarFilter, private MeterInstruments $instruments, private InstrumentationScopeInterface $instrumentationScope, private MetricRegistryInterface $registry, private MetricWriterInterface $writer, private ArrayAccess $destructors)
-    {
+    public function __construct(
+        private MetricFactoryInterface $metricFactory,
+        private ResourceInfo $resource,
+        private ClockInterface $clock,
+        private StalenessHandlerFactoryInterface $stalenessHandlerFactory,
+        private iterable $metricRegistries,
+        private ViewRegistryInterface $viewRegistry,
+        private ?ExemplarFilterInterface $exemplarFilter,
+        private MeterInstruments $instruments,
+        private InstrumentationScopeInterface $instrumentationScope,
+        private MetricRegistryInterface $registry,
+        private MetricWriterInterface $writer,
+        private ArrayAccess $destructors
+    ) {
     }
 
     private static function dummyInstrument(): Instrument

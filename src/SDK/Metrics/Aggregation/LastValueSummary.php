@@ -6,10 +6,9 @@ namespace OpenTelemetry\SDK\Metrics\Aggregation;
 
 final class LastValueSummary
 {
-    /**
-     * @param float|int|null $value
-     */
-    public function __construct(public $value, public int $timestamp)
-    {
+    public function __construct(
+        public float|int|null $value,
+        public int $timestamp
+    ) {
     }
 }

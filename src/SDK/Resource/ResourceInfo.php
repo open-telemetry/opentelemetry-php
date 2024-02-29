@@ -21,8 +21,10 @@ class ResourceInfo
 {
     use LogsMessagesTrait;
 
-    private function __construct(private AttributesInterface $attributes, private ?string $schemaUrl = null)
-    {
+    private function __construct(
+        private AttributesInterface $attributes,
+        private ?string $schemaUrl = null
+    ) {
     }
 
     public static function create(AttributesInterface $attributes, ?string $schemaUrl = null): self

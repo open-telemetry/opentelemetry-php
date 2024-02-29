@@ -18,8 +18,10 @@ final class DelayedStalenessHandler implements StalenessHandlerInterface, Refere
     private ?array $onStale = [];
     private int $count = 0;
 
-    public function __construct(private Closure $stale, private Closure $freshen)
-    {
+    public function __construct(
+        private Closure $stale,
+        private Closure $freshen
+    ) {
     }
 
     public function acquire(bool $persistent = false): void

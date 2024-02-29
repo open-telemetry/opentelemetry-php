@@ -13,8 +13,10 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
  */
 final class FilteredReservoir implements ExemplarReservoirInterface
 {
-    public function __construct(private ExemplarReservoirInterface $reservoir, private ExemplarFilterInterface $filter)
-    {
+    public function __construct(
+        private ExemplarReservoirInterface $reservoir,
+        private ExemplarFilterInterface $filter
+    ) {
     }
 
     public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void

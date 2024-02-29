@@ -23,8 +23,11 @@ class ReadableLogRecord extends LogRecord
     protected AttributesInterface $convertedAttributes;
     protected SpanContextInterface $spanContext;
 
-    public function __construct(private InstrumentationScopeInterface $scope, private LoggerSharedState $loggerSharedState, LogRecord $logRecord)
-    {
+    public function __construct(
+        private InstrumentationScopeInterface $scope,
+        private LoggerSharedState $loggerSharedState,
+        LogRecord $logRecord
+    ) {
         parent::__construct($logRecord->body);
         $this->timestamp = $logRecord->timestamp;
         $this->observedTimestamp = $logRecord->observedTimestamp

@@ -11,8 +11,10 @@ final class StopWatch implements StopWatchInterface
     private ?int $startTime = null;
     private ?int $stopTime = null;
 
-    public function __construct(private ClockInterface $clock, private ?int $initialStartTime = null)
-    {
+    public function __construct(
+        private ClockInterface $clock,
+        private ?int $initialStartTime = null
+    ) {
     }
 
     public function isRunning(): bool

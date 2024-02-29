@@ -6,8 +6,10 @@ namespace OpenTelemetry\API\Logs;
 
 class EventLogger implements EventLoggerInterface
 {
-    public function __construct(private LoggerInterface $logger, private string $domain)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private string $domain
+    ) {
     }
 
     public function logEvent(string $eventName, LogRecord $logRecord): void

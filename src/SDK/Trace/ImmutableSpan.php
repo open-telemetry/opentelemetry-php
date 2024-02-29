@@ -20,8 +20,17 @@ final class ImmutableSpan implements SpanDataInterface
      * @param list<LinkInterface> $links
      * @param list<EventInterface> $events
      */
-    public function __construct(private Span $span, private string $name, private array $links, private array $events, private AttributesInterface $attributes, private int $totalRecordedEvents, private StatusDataInterface $status, private int $endEpochNanos, private bool $hasEnded)
-    {
+    public function __construct(
+        private Span $span,
+        private string $name,
+        private array $links,
+        private array $events,
+        private AttributesInterface $attributes,
+        private int $totalRecordedEvents,
+        private StatusDataInterface $status,
+        private int $endEpochNanos,
+        private bool $hasEnded
+    ) {
     }
 
     public function getKind(): int

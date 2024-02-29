@@ -39,8 +39,11 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     /** @var array<int, list<int>> */
     private array $asynchronousCallbackArguments = [];
 
-    public function __construct(private ?ContextStorageInterface $contextStorage, private AttributesFactoryInterface $attributesFactory, private ClockInterface $clock)
-    {
+    public function __construct(
+        private ?ContextStorageInterface $contextStorage,
+        private AttributesFactoryInterface $attributesFactory,
+        private ClockInterface $clock
+    ) {
     }
 
     public function registerSynchronousStream(Instrument $instrument, MetricStreamInterface $stream, MetricAggregatorInterface $aggregator): int

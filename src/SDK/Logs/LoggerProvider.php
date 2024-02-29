@@ -15,8 +15,11 @@ class LoggerProvider implements LoggerProviderInterface
 {
     private LoggerSharedState $loggerSharedState;
 
-    public function __construct(LogRecordProcessorInterface $processor, private InstrumentationScopeFactoryInterface $instrumentationScopeFactory, ?ResourceInfo $resource = null)
-    {
+    public function __construct(
+        LogRecordProcessorInterface $processor,
+        private InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
+        ?ResourceInfo $resource = null
+    ) {
         $this->loggerSharedState = new LoggerSharedState(
             $resource ?? ResourceInfoFactory::defaultResource(),
             (new LogRecordLimitsBuilder())->build(),

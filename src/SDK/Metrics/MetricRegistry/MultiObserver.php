@@ -17,8 +17,10 @@ final class MultiObserver implements ObserverInterface
     /** @var list<WritableMetricStreamInterface>  */
     public array $writers = [];
 
-    public function __construct(private AttributesFactoryInterface $attributesFactory, private int $timestamp)
-    {
+    public function __construct(
+        private AttributesFactoryInterface $attributesFactory,
+        private int $timestamp
+    ) {
     }
 
     public function observe($amount, iterable $attributes = []): void

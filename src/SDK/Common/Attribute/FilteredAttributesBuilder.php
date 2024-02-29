@@ -16,8 +16,10 @@ final class FilteredAttributesBuilder implements AttributesBuilderInterface
     /**
      * @param list<string> $rejectedKeys
      */
-    public function __construct(private AttributesBuilderInterface $builder, private array $rejectedKeys)
-    {
+    public function __construct(
+        private AttributesBuilderInterface $builder,
+        private array $rejectedKeys
+    ) {
     }
 
     public function __clone()

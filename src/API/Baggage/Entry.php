@@ -6,8 +6,10 @@ namespace OpenTelemetry\API\Baggage;
 
 final class Entry
 {
-    public function __construct(private mixed $value, private MetadataInterface $metadata)
-    {
+    public function __construct(
+        private mixed $value,
+        private MetadataInterface $metadata
+    ) {
     }
 
     /**

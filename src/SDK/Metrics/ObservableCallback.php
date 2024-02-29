@@ -13,8 +13,13 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
  */
 final class ObservableCallback implements ObservableCallbackInterface
 {
-    public function __construct(private MetricWriterInterface $writer, private ReferenceCounterInterface $referenceCounter, private ?int $callbackId, private ?ObservableCallbackDestructor $callbackDestructor, private ?object $target)
-    {
+    public function __construct(
+        private MetricWriterInterface $writer,
+        private ReferenceCounterInterface $referenceCounter,
+        private ?int $callbackId,
+        private ?ObservableCallbackDestructor $callbackDestructor,
+        private ?object $target
+    ) {
     }
 
     public function detach(): void

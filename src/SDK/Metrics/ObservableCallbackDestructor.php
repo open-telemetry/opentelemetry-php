@@ -18,8 +18,10 @@ final class ObservableCallbackDestructor
     /**
      * @param ArrayAccess<object, ObservableCallbackDestructor> $destructors
      */
-    public function __construct(public ArrayAccess $destructors, private MetricWriterInterface $writer)
-    {
+    public function __construct(
+        public ArrayAccess $destructors,
+        private MetricWriterInterface $writer
+    ) {
     }
 
     public function __destruct()

@@ -32,8 +32,10 @@ final class StreamTransport implements TransportInterface
      *
      * @psalm-param CONTENT_TYPE $contentType
      */
-    public function __construct(private $stream, private string $contentType)
-    {
+    public function __construct(
+        private $stream,
+        private string $contentType
+    ) {
     }
 
     public function contentType(): string

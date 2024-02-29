@@ -13,8 +13,11 @@ final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInt
 {
     private array $localStorage = [];
 
-    public function __construct(public ContextInterface $context, public ContextStorageHead $head, private ?ContextStorageNode $previous = null)
-    {
+    public function __construct(
+        public ContextInterface $context,
+        public ContextStorageHead $head,
+        private ?ContextStorageNode $previous = null
+    ) {
     }
 
     public function offsetExists($offset): bool

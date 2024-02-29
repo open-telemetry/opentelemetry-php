@@ -16,8 +16,11 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class PsrTransportFactory implements TransportFactoryInterface
 {
-    public function __construct(private ClientInterface $client, private RequestFactoryInterface $requestFactory, private StreamFactoryInterface $streamFactory)
-    {
+    public function __construct(
+        private ClientInterface $client,
+        private RequestFactoryInterface $requestFactory,
+        private StreamFactoryInterface $streamFactory
+    ) {
     }
 
     /**

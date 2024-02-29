@@ -11,8 +11,12 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
  */
 final class InstrumentationScope implements InstrumentationScopeInterface
 {
-    public function __construct(private string $name, private ?string $version, private ?string $schemaUrl, private AttributesInterface $attributes)
-    {
+    public function __construct(
+        private string $name,
+        private ?string $version,
+        private ?string $schemaUrl,
+        private AttributesInterface $attributes
+    ) {
     }
 
     public function getName(): string

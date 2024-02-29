@@ -15,8 +15,14 @@ use Psr\Http\Message\UriFactoryInterface;
 
 final class MessageFactoryResolver implements FactoryResolverInterface
 {
-    public function __construct(private ?RequestFactoryInterface $requestFactory = null, private ?ResponseFactoryInterface $responseFactory = null, private ?ServerRequestFactoryInterface $serverRequestFactory = null, private ?StreamFactoryInterface $streamFactory = null, private ?UploadedFileFactoryInterface $uploadedFileFactory = null, private ?UriFactoryInterface $uriFactory = null)
-    {
+    public function __construct(
+        private ?RequestFactoryInterface $requestFactory = null,
+        private ?ResponseFactoryInterface $responseFactory = null,
+        private ?ServerRequestFactoryInterface $serverRequestFactory = null,
+        private ?StreamFactoryInterface $streamFactory = null,
+        private ?UploadedFileFactoryInterface $uploadedFileFactory = null,
+        private ?UriFactoryInterface $uriFactory = null
+    ) {
     }
 
     public static function create(

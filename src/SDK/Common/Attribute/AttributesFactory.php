@@ -9,8 +9,10 @@ namespace OpenTelemetry\SDK\Common\Attribute;
  */
 final class AttributesFactory implements AttributesFactoryInterface
 {
-    public function __construct(private ?int $attributeCountLimit = null, private ?int $attributeValueLengthLimit = null)
-    {
+    public function __construct(
+        private ?int $attributeCountLimit = null,
+        private ?int $attributeValueLengthLimit = null
+    ) {
     }
 
     public function builder(iterable $attributes = [], ?AttributeValidatorInterface $attributeValidator = null): AttributesBuilderInterface

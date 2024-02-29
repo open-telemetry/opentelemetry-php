@@ -14,13 +14,16 @@ use OpenTelemetry\SDK\Metrics\Data\Exemplar;
  */
 final class Metric
 {
-
     /**
      * @param array<AttributesInterface> $attributes
      * @param array<T> $summaries
      * @param array<Exemplar> $exemplars
      */
-    public function __construct(public array $attributes, public array $summaries, public int $timestamp, public array $exemplars = [])
-    {
+    public function __construct(
+        public array $attributes,
+        public array $summaries,
+        public int $timestamp,
+        public array $exemplars = []
+    ) {
     }
 }

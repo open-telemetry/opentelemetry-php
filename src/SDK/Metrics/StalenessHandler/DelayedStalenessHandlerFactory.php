@@ -25,8 +25,10 @@ final class DelayedStalenessHandlerFactory implements StalenessHandlerFactoryInt
     /**
      * @param float $delay delay in seconds
      */
-    public function __construct(private ClockInterface $clock, float $delay)
-    {
+    public function __construct(
+        private ClockInterface $clock,
+        float $delay
+    ) {
         $this->nanoDelay = (int) ($delay * 1e9);
 
         $this->stale = function (DelayedStalenessHandler $handler): void {

@@ -15,8 +15,10 @@ use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
  */
 final class RegistryRegistration implements MetricRegistrationInterface
 {
-    public function __construct(private MetricSourceRegistryInterface $registry, private StalenessHandlerInterface $stalenessHandler)
-    {
+    public function __construct(
+        private MetricSourceRegistryInterface $registry,
+        private StalenessHandlerInterface $stalenessHandler
+    ) {
     }
 
     public function register(MetricSourceProviderInterface $provider, MetricMetadataInterface $metadata): void

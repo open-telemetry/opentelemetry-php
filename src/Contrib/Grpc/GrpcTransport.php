@@ -18,6 +18,7 @@ use const Grpc\OP_SEND_INITIAL_METADATA;
 use const Grpc\OP_SEND_MESSAGE;
 use const Grpc\STATUS_OK;
 use Grpc\Timeval;
+use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -50,7 +51,7 @@ final class GrpcTransport implements TransportInterface
 
     public function contentType(): string
     {
-        return 'application/x-protobuf';
+        return ContentTypes::PROTOBUF;
     }
 
     public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface

@@ -12,8 +12,10 @@ final class FilteredAttributesFactory implements AttributesFactoryInterface
     /**
      * @param list<string> $rejectedKeys
      */
-    public function __construct(private AttributesFactoryInterface $factory, private array $rejectedKeys)
-    {
+    public function __construct(
+        private AttributesFactoryInterface $factory,
+        private array $rejectedKeys
+    ) {
     }
 
     public function builder(iterable $attributes = [], ?AttributeValidatorInterface $attributeValidator = null): AttributesBuilderInterface
