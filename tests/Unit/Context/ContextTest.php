@@ -194,4 +194,38 @@ class ContextTest extends TestCase
             \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED');
         }
     }
+
+    public function test_debug_scopes_disabled_server_var(): void
+    {
+        $_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED'] = '1';
+
+        $context = Context::getRoot();
+
+        $scope = $context->activate();
+
+        try {
+            $this->assertNotInstanceOf(DebugScope::class, $scope);
+        } finally {
+            $scope->detach();
+            unset($_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED']);
+        }
+    }
+
+    public function test_debug_scopes_disabled_order_server(): void
+    {
+        $_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED'] = '1';
+        \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED=0');
+
+        $context = Context::getRoot();
+
+        $scope = $context->activate();
+
+        try {
+            $this->assertNotInstanceOf(DebugScope::class, $scope);
+        } finally {
+            $scope->detach();
+            unset($_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED']);
+            \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED');
+        }
+    }
 }
