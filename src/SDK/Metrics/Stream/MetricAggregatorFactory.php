@@ -12,13 +12,8 @@ use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
  */
 final class MetricAggregatorFactory implements MetricAggregatorFactoryInterface
 {
-    private ?AttributeProcessorInterface $attributeProcessor;
-    private AggregationInterface $aggregation;
-
-    public function __construct(?AttributeProcessorInterface $attributeProcessor, AggregationInterface $aggregation)
+    public function __construct(private ?AttributeProcessorInterface $attributeProcessor, private AggregationInterface $aggregation)
     {
-        $this->attributeProcessor = $attributeProcessor;
-        $this->aggregation = $aggregation;
     }
 
     public function create(): MetricAggregatorInterface

@@ -24,8 +24,6 @@ interface TraceStateInterface
      * Return a new TraceState object that inherits from this TraceState
      * and contains the given key value pair.
      *
-     * @param string $key
-     * @param string $value
      * @return TraceStateInterface
      */
     public function with(string $key, string $value): TraceStateInterface;
@@ -34,7 +32,6 @@ interface TraceStateInterface
      * Return a new TraceState object that inherits from this TraceState
      * without the given key value pair.
      *
-     * @param string $key
      * @return TraceStateInterface
      */
     public function without(string $key): TraceStateInterface;
@@ -42,7 +39,6 @@ interface TraceStateInterface
     /**
      * Return the value of a given key from this TraceState if it exists
      *
-     * @param string $key
      * @return string|null
      */
     public function get(string $key): ?string;

@@ -121,15 +121,14 @@ final class SpanConverter
 
     private function convertSpanKind(int $kind): int
     {
-        switch ($kind) {
-            case API\SpanKind::KIND_INTERNAL: return SpanKind::SPAN_KIND_INTERNAL;
-            case API\SpanKind::KIND_CLIENT: return SpanKind::SPAN_KIND_CLIENT;
-            case API\SpanKind::KIND_SERVER: return SpanKind::SPAN_KIND_SERVER;
-            case API\SpanKind::KIND_PRODUCER: return SpanKind::SPAN_KIND_PRODUCER;
-            case API\SpanKind::KIND_CONSUMER: return SpanKind::SPAN_KIND_CONSUMER;
-        }
-
-        return SpanKind::SPAN_KIND_UNSPECIFIED;
+        return match ($kind) {
+            API\SpanKind::KIND_INTERNAL => SpanKind::SPAN_KIND_INTERNAL,
+            API\SpanKind::KIND_CLIENT => SpanKind::SPAN_KIND_CLIENT,
+            API\SpanKind::KIND_SERVER => SpanKind::SPAN_KIND_SERVER,
+            API\SpanKind::KIND_PRODUCER => SpanKind::SPAN_KIND_PRODUCER,
+            API\SpanKind::KIND_CONSUMER => SpanKind::SPAN_KIND_CONSUMER,
+            default => SpanKind::SPAN_KIND_UNSPECIFIED,
+        };
     }
 
     private function convertStatusCode(string $status): int

@@ -16,25 +16,16 @@ class Psr3
      */
     public static function severityNumber(string $level): int
     {
-        switch (strtolower($level)) {
-            case LogLevel::DEBUG:
-                return 5;
-            case LogLevel::INFO:
-                return 9;
-            case LogLevel::NOTICE:
-                return 10;
-            case LogLevel::WARNING:
-                return 13;
-            case LogLevel::ERROR:
-                return 17;
-            case LogLevel::CRITICAL:
-                return 18;
-            case LogLevel::ALERT:
-                return 19;
-            case LogLevel::EMERGENCY:
-                return 21;
-            default:
-                return 0;
-        }
+        return match (strtolower($level)) {
+            LogLevel::DEBUG => 5,
+            LogLevel::INFO => 9,
+            LogLevel::NOTICE => 10,
+            LogLevel::WARNING => 13,
+            LogLevel::ERROR => 17,
+            LogLevel::CRITICAL => 18,
+            LogLevel::ALERT => 19,
+            LogLevel::EMERGENCY => 21,
+            default => 0,
+        };
     }
 }

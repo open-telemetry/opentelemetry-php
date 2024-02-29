@@ -8,7 +8,6 @@ use AssertionError;
 use function base64_decode;
 use function bin2hex;
 use Exception;
-use function get_class;
 use Google\Protobuf\Descriptor;
 use Google\Protobuf\DescriptorPool;
 use Google\Protobuf\FieldDescriptor;
@@ -37,11 +36,8 @@ final class ProtobufSerializer
     private const JSON = 'application/json';
     private const NDJSON = 'application/x-ndjson';
 
-    private string $contentType;
-
-    private function __construct(string $contentType)
+    private function __construct(private string $contentType)
     {
-        $this->contentType = $contentType;
     }
 
     public static function getDefault(): ProtobufSerializer
@@ -54,54 +50,38 @@ final class ProtobufSerializer
      */
     public static function forTransport(TransportInterface $transport): ProtobufSerializer
     {
-        switch ($contentType = $transport->contentType()) {
-            case self::PROTOBUF:
-            case self::JSON:
-            case self::NDJSON:
-                return new self($contentType);
-            default:
-                throw new InvalidArgumentException(sprintf('Not supported content type "%s"', $contentType));
-        }
+        return match ($contentType = $transport->contentType()) {
+            self::PROTOBUF, self::JSON, self::NDJSON => new self($contentType),
+            default => throw new InvalidArgumentException(sprintf('Not supported content type "%s"', $contentType)),
+        };
     }
 
     public function serializeTraceId(string $traceId): string
     {
-        switch ($this->contentType) {
-            case self::PROTOBUF:
-                return $traceId;
-            case self::JSON:
-            case self::NDJSON:
-                return base64_decode(bin2hex($traceId));
-            default:
-                throw new AssertionError();
-        }
+        return match ($this->contentType) {
+            self::PROTOBUF => $traceId,
+            self::JSON, self::NDJSON => base64_decode(bin2hex($traceId)),
+            default => throw new AssertionError(),
+        };
     }
 
     public function serializeSpanId(string $spanId): string
     {
-        switch ($this->contentType) {
-            case self::PROTOBUF:
-                return $spanId;
-            case self::JSON:
-            case self::NDJSON:
-                return base64_decode(bin2hex($spanId));
-            default:
-                throw new AssertionError();
-        }
+        return match ($this->contentType) {
+            self::PROTOBUF => $spanId,
+            self::JSON, self::NDJSON => base64_decode(bin2hex($spanId)),
+            default => throw new AssertionError(),
+        };
     }
 
     public function serialize(Message $message): string
     {
-        switch ($this->contentType) {
-            case self::PROTOBUF:
-                return $message->serializeToString();
-            case self::JSON:
-                return self::postProcessJsonEnumValues($message, $message->serializeToJsonString());
-            case self::NDJSON:
-                return self::postProcessJsonEnumValues($message, $message->serializeToJsonString()) . "\n";
-            default:
-                throw new AssertionError();
-        }
+        return match ($this->contentType) {
+            self::PROTOBUF => $message->serializeToString(),
+            self::JSON => self::postProcessJsonEnumValues($message, $message->serializeToJsonString()),
+            self::NDJSON => self::postProcessJsonEnumValues($message, $message->serializeToJsonString()) . "\n",
+            default => throw new AssertionError(),
+        };
     }
 
     /**
@@ -109,20 +89,11 @@ final class ProtobufSerializer
      */
     public function hydrate(Message $message, string $payload): void
     {
-        switch ($this->contentType) {
-            case self::PROTOBUF:
-                $message->mergeFromString($payload);
-
-                break;
-            case self::JSON:
-            case self::NDJSON:
-                // @phan-suppress-next-line PhanParamTooManyInternal
-                $message->mergeFromJsonString($payload, true);
-
-                break;
-            default:
-                throw new AssertionError();
-        }
+        match ($this->contentType) {
+            self::PROTOBUF => $message->mergeFromString($payload),
+            self::JSON, self::NDJSON => $message->mergeFromJsonString($payload, true),
+            default => throw new AssertionError(),
+        };
     }
 
     /**
@@ -137,7 +108,7 @@ final class ProtobufSerializer
     private static function postProcessJsonEnumValues(Message $message, string $payload): string
     {
         $pool = DescriptorPool::getGeneratedPool();
-        $desc = $pool->getDescriptorByClassName(get_class($message));
+        $desc = $pool->getDescriptorByClassName($message::class);
         if (!$desc instanceof Descriptor) {
             return $payload;
         }

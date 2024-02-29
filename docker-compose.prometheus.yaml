@@ -23,7 +23,7 @@ services:
       context: .
       dockerfile: docker/examples/Dockerfile
       args:
-        - PHP_VERSION=7.4-fpm
+        - PHP_VERSION=8.0-fpm
         - EXT_ENABLE=redis
     volumes:
       - ./examples/prometheus/index.php:/var/www/public/index.php

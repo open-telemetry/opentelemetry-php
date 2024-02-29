@@ -16,19 +16,14 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
  */
 final class AsynchronousMetricStream implements MetricStreamInterface
 {
-    private AggregationInterface $aggregation;
-
-    private int $startTimestamp;
     private Metric $metric;
 
     /** @var array<int, Metric|null> */
     private array $lastReads = [];
 
-    public function __construct(AggregationInterface $aggregation, int $startTimestamp)
+    public function __construct(private AggregationInterface $aggregation, private int $startTimestamp)
     {
-        $this->aggregation = $aggregation;
-        $this->startTimestamp = $startTimestamp;
-        $this->metric = new Metric([], [], $startTimestamp);
+        $this->metric = new Metric([], [], $this->startTimestamp);
     }
 
     public function temporality()

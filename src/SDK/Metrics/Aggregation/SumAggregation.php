@@ -14,11 +14,8 @@ use OpenTelemetry\SDK\Metrics\Data;
  */
 final class SumAggregation implements AggregationInterface
 {
-    private bool $monotonic;
-
-    public function __construct(bool $monotonic = false)
+    public function __construct(private bool $monotonic = false)
     {
-        $this->monotonic = $monotonic;
     }
 
     public function initialize(): SumSummary

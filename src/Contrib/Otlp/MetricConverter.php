@@ -132,15 +132,11 @@ final class MetricConverter
 
     private function convertTemporality($temporality): int
     {
-        switch ($temporality) {
-            case SDK\Metrics\Data\Temporality::DELTA:
-                return AggregationTemporality::AGGREGATION_TEMPORALITY_DELTA;
-            case SDK\Metrics\Data\Temporality::CUMULATIVE:
-                return AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE;
-        }
-
-        // @codeCoverageIgnoreStart
-        return AggregationTemporality::AGGREGATION_TEMPORALITY_UNSPECIFIED;
+        return match ($temporality) {
+            SDK\Metrics\Data\Temporality::DELTA => AggregationTemporality::AGGREGATION_TEMPORALITY_DELTA,
+            SDK\Metrics\Data\Temporality::CUMULATIVE => AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE,
+            default => AggregationTemporality::AGGREGATION_TEMPORALITY_UNSPECIFIED,
+        };
         // @codeCoverageIgnoreEnd
     }
 

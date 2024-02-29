@@ -8,22 +8,18 @@ final class Histogram implements DataInterface
 {
 
     /**
-     * @var iterable<HistogramDataPoint>
-     * @readonly
-     */
-    public iterable $dataPoints;
-    /**
-     * @var string|Temporality
-     * @readonly
-     */
-    public $temporality;
-    /**
      * @param iterable<HistogramDataPoint> $dataPoints
      * @param string|Temporality $temporality
      */
-    public function __construct(iterable $dataPoints, $temporality)
-    {
-        $this->dataPoints = $dataPoints;
-        $this->temporality = $temporality;
+    public function __construct(
+        /**
+         * @readonly
+         */
+        public iterable $dataPoints,
+        /**
+         * @readonly
+         */
+        public $temporality
+    ) {
     }
 }

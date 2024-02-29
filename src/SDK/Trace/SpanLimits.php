@@ -15,12 +15,6 @@ final class SpanLimits
     public const DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT = 128;
     public const DEFAULT_LINK_ATTRIBUTE_COUNT_LIMIT = 128;
 
-    private AttributesFactoryInterface $attributesFactory;
-    private AttributesFactoryInterface $eventAttributesFactory;
-    private AttributesFactoryInterface $linkAttributesFactory;
-    private int $eventCountLimit;
-    private int $linkCountLimit;
-
     public function getAttributesFactory(): AttributesFactoryInterface
     {
         return $this->attributesFactory;
@@ -51,17 +45,7 @@ final class SpanLimits
     /**
      * @internal Use {@see SpanLimitsBuilder} to create {@see SpanLimits} instance.
      */
-    public function __construct(
-        AttributesFactoryInterface $attributesFactory,
-        AttributesFactoryInterface $eventAttributesFactory,
-        AttributesFactoryInterface $linkAttributesFactory,
-        int $eventCountLimit,
-        int $linkCountLimit
-    ) {
-        $this->attributesFactory = $attributesFactory;
-        $this->eventAttributesFactory = $eventAttributesFactory;
-        $this->linkAttributesFactory = $linkAttributesFactory;
-        $this->eventCountLimit = $eventCountLimit;
-        $this->linkCountLimit = $linkCountLimit;
+    public function __construct(private AttributesFactoryInterface $attributesFactory, private AttributesFactoryInterface $eventAttributesFactory, private AttributesFactoryInterface $linkAttributesFactory, private int $eventCountLimit, private int $linkCountLimit)
+    {
     }
 }

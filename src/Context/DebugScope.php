@@ -24,15 +24,12 @@ final class DebugScope implements ScopeInterface
 {
     private static bool $shutdownHandlerInitialized = false;
     private static bool $finalShutdownPhase = false;
-
-    private ContextStorageScopeInterface $scope;
     private ?int $fiberId;
     private array $createdAt;
     private ?array $detachedAt = null;
 
-    public function __construct(ContextStorageScopeInterface $scope)
+    public function __construct(private ContextStorageScopeInterface $scope)
     {
-        $this->scope = $scope;
         $this->fiberId = self::currentFiberId();
         $this->createdAt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 

@@ -20,8 +20,6 @@ use Throwable;
 class SimpleSpanProcessor implements SpanProcessorInterface
 {
     use LogsMessagesTrait;
-
-    private SpanExporterInterface $exporter;
     private ContextInterface $exportContext;
 
     private bool $running = false;
@@ -30,10 +28,8 @@ class SimpleSpanProcessor implements SpanProcessorInterface
 
     private bool $closed = false;
 
-    public function __construct(SpanExporterInterface $exporter)
+    public function __construct(private SpanExporterInterface $exporter)
     {
-        $this->exporter = $exporter;
-
         $this->exportContext = Context::getCurrent();
         $this->queue = new SplQueue();
     }

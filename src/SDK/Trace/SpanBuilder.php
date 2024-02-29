@@ -13,18 +13,6 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
 final class SpanBuilder implements API\SpanBuilderInterface
 {
-    /**
-     * @var non-empty-string
-     * @readonly
-     */
-    private string $spanName;
-
-    /** @readonly */
-    private InstrumentationScopeInterface $instrumentationScope;
-
-    /** @readonly */
-    private TracerSharedState $tracerSharedState;
-
     /** @var ContextInterface|false|null */
     private $parentContext = null;
 
@@ -42,14 +30,16 @@ final class SpanBuilder implements API\SpanBuilderInterface
 
     /** @param non-empty-string $spanName */
     public function __construct(
-        string $spanName,
-        InstrumentationScopeInterface $instrumentationScope,
-        TracerSharedState $tracerSharedState
+        /**
+         * @readonly
+         */
+        private string $spanName,
+        /** @readonly */
+        private InstrumentationScopeInterface $instrumentationScope,
+        /** @readonly */
+        private TracerSharedState $tracerSharedState
     ) {
-        $this->spanName = $spanName;
-        $this->instrumentationScope = $instrumentationScope;
-        $this->tracerSharedState = $tracerSharedState;
-        $this->attributesBuilder = $tracerSharedState->getSpanLimits()->getAttributesFactory()->builder();
+        $this->attributesBuilder = $this->tracerSharedState->getSpanLimits()->getAttributesFactory()->builder();
     }
 
     /** @inheritDoc */

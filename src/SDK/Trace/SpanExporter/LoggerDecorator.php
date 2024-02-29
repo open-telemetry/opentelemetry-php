@@ -35,10 +35,6 @@ class LoggerDecorator implements SpanExporterInterface, LoggerAwareInterface
         return $spans;
     }
 
-    /**
-     * @param iterable $spans
-     * @param bool $exportSuccess
-     */
     protected function afterExport(iterable $spans, bool $exportSuccess): void
     {
         if ($exportSuccess) {

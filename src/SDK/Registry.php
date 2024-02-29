@@ -37,7 +37,7 @@ class Registry
             trigger_error(
                 sprintf(
                     'Cannot register transport factory: %s must exist and implement %s',
-                    is_string($factory) ? $factory : get_class($factory),
+                    is_string($factory) ? $factory : $factory::class,
                     TransportFactoryInterface::class
                 ),
                 E_USER_WARNING
@@ -60,7 +60,7 @@ class Registry
             trigger_error(
                 sprintf(
                     'Cannot register span exporter factory: %s must exist and implement %s',
-                    is_string($factory) ? $factory : get_class($factory),
+                    is_string($factory) ? $factory : $factory::class,
                     SpanExporterFactoryInterface::class
                 ),
                 E_USER_WARNING
@@ -83,7 +83,7 @@ class Registry
             trigger_error(
                 sprintf(
                     'Cannot register metric factory: %s must exist and implement %s',
-                    is_string($factory) ? $factory : get_class($factory),
+                    is_string($factory) ? $factory : $factory::class,
                     MetricExporterFactoryInterface::class
                 ),
                 E_USER_WARNING
@@ -103,7 +103,7 @@ class Registry
             trigger_error(
                 sprintf(
                     'Cannot register LogRecord exporter factory: %s must exist and implement %s',
-                    is_string($factory) ? $factory : get_class($factory),
+                    is_string($factory) ? $factory : $factory::class,
                     LogRecordExporterFactoryInterface::class
                 ),
                 E_USER_WARNING

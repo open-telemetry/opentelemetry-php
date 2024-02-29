@@ -18,11 +18,8 @@ use Fiber;
  */
 final class FiberBoundContextStorageScope implements ScopeInterface, ContextStorageScopeInterface
 {
-    private ContextStorageScopeInterface $scope;
-
-    public function __construct(ContextStorageScopeInterface $scope)
+    public function __construct(private ContextStorageScopeInterface $scope)
     {
-        $this->scope = $scope;
     }
 
     public function offsetExists($offset): bool

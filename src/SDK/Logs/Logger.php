@@ -16,13 +16,8 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
  */
 class Logger implements LoggerInterface
 {
-    private InstrumentationScopeInterface $scope;
-    private LoggerSharedState $loggerSharedState;
-
-    public function __construct(LoggerSharedState $loggerSharedState, InstrumentationScopeInterface $scope)
+    public function __construct(private LoggerSharedState $loggerSharedState, private InstrumentationScopeInterface $scope)
     {
-        $this->loggerSharedState = $loggerSharedState;
-        $this->scope = $scope;
     }
 
     public function emit(LogRecord $logRecord): void

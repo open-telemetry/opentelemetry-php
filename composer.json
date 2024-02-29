@@ -7,7 +7,7 @@
     "readme": "./README.md",
     "license": "Apache-2.0",
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.0",
         "ext-json": "*",
         "google/protobuf": "^3.22",
         "php-http/discovery": "^1.14",

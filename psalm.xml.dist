@@ -18,4 +18,11 @@
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
         <pluginClass class="Psalm\MockeryPlugin\Plugin"/>
     </plugins>
+    <issueHandlers>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+              <referencedClass name="GMP" />
+            </errorLevel>
+          </UndefinedClass>
+    </issueHandlers>
 </psalm>

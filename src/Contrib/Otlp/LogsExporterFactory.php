@@ -18,11 +18,8 @@ class LogsExporterFactory implements LogRecordExporterFactoryInterface
 {
     private const DEFAULT_COMPRESSION = 'none';
 
-    private ?TransportFactoryInterface $transportFactory;
-
-    public function __construct(?TransportFactoryInterface $transportFactory = null)
+    public function __construct(private ?TransportFactoryInterface $transportFactory = null)
     {
-        $this->transportFactory = $transportFactory;
     }
 
     /**

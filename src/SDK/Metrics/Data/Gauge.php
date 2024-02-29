@@ -8,15 +8,13 @@ final class Gauge implements DataInterface
 {
 
     /**
-     * @var iterable<NumberDataPoint>
-     * @readonly
-     */
-    public iterable $dataPoints;
-    /**
      * @param iterable<NumberDataPoint> $dataPoints
      */
-    public function __construct(iterable $dataPoints)
-    {
-        $this->dataPoints = $dataPoints;
+    public function __construct(
+        /**
+         * @readonly
+         */
+        public iterable $dataPoints
+    ) {
     }
 }

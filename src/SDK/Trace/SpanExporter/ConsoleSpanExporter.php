@@ -18,11 +18,8 @@ class ConsoleSpanExporter implements SpanExporterInterface
     use UsesSpanConverterTrait;
     use LogsMessagesTrait;
 
-    private TransportInterface $transport;
-
-    public function __construct(TransportInterface $transport, ?SpanConverterInterface $converter = null)
+    public function __construct(private TransportInterface $transport, ?SpanConverterInterface $converter = null)
     {
-        $this->transport = $transport;
         $this->setSpanConverter($converter ?? new FriendlySpanConverter());
     }
 

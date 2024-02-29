@@ -20,16 +20,11 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
  */
 class ReadableLogRecord extends LogRecord
 {
-    private InstrumentationScopeInterface $scope;
-    private LoggerSharedState $loggerSharedState;
     protected AttributesInterface $convertedAttributes;
     protected SpanContextInterface $spanContext;
 
-    public function __construct(InstrumentationScopeInterface $scope, LoggerSharedState $loggerSharedState, LogRecord $logRecord)
+    public function __construct(private InstrumentationScopeInterface $scope, private LoggerSharedState $loggerSharedState, LogRecord $logRecord)
     {
-        $this->scope = $scope;
-        $this->loggerSharedState = $loggerSharedState;
-
         parent::__construct($logRecord->body);
         $this->timestamp = $logRecord->timestamp;
         $this->observedTimestamp = $logRecord->observedTimestamp

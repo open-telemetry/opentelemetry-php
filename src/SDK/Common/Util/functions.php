@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Util;
 
 use Closure;
-use function get_class;
 use ReflectionFunction;
 use stdClass;
 use WeakReference;
@@ -46,7 +45,7 @@ function weaken(Closure $closure, ?object &$target = null): Closure
     $ref = WeakReference::create($target);
 
     /** @psalm-suppress PossiblyInvalidFunctionCall */
-    return $scope && get_class($target) === $scope->name && !$scope->isInternal()
+    return $scope && $target::class === $scope->name && !$scope->isInternal()
         ? static fn (...$args) => ($obj = $ref->get()) ? $closure->call($obj, ...$args) : null
         : static fn (...$args) => ($obj = $ref->get()) ? $closure->bindTo($obj)(...$args) : null;
 }

@@ -23,13 +23,6 @@ use OpenTelemetry\SDK\Sdk;
 final class MeterProvider implements MeterProviderInterface
 {
     private MetricFactoryInterface $metricFactory;
-    private ResourceInfo $resource;
-    private ClockInterface $clock;
-    private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
-    private iterable $metricReaders;
-    private ViewRegistryInterface $viewRegistry;
-    private ?ExemplarFilterInterface $exemplarFilter;
-    private StalenessHandlerFactoryInterface $stalenessHandlerFactory;
     private MeterInstruments $instruments;
     private MetricRegistryInterface $registry;
     private MetricWriterInterface $writer;
@@ -42,27 +35,20 @@ final class MeterProvider implements MeterProviderInterface
      */
     public function __construct(
         ?ContextStorageInterface $contextStorage,
-        ResourceInfo $resource,
-        ClockInterface $clock,
+        private ResourceInfo $resource,
+        private ClockInterface $clock,
         AttributesFactoryInterface $attributesFactory,
-        InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
-        iterable $metricReaders,
-        ViewRegistryInterface $viewRegistry,
-        ?ExemplarFilterInterface $exemplarFilter,
-        StalenessHandlerFactoryInterface $stalenessHandlerFactory,
+        private InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
+        private iterable $metricReaders,
+        private ViewRegistryInterface $viewRegistry,
+        private ?ExemplarFilterInterface $exemplarFilter,
+        private StalenessHandlerFactoryInterface $stalenessHandlerFactory,
         MetricFactoryInterface $metricFactory = null
     ) {
         $this->metricFactory = $metricFactory ?? new StreamFactory();
-        $this->resource = $resource;
-        $this->clock = $clock;
-        $this->instrumentationScopeFactory = $instrumentationScopeFactory;
-        $this->metricReaders = $metricReaders;
-        $this->viewRegistry = $viewRegistry;
-        $this->exemplarFilter = $exemplarFilter;
-        $this->stalenessHandlerFactory = $stalenessHandlerFactory;
         $this->instruments = new MeterInstruments();
 
-        $registry = new MetricRegistry($contextStorage, $attributesFactory, $clock);
+        $registry = new MetricRegistry($contextStorage, $attributesFactory, $this->clock);
         $this->registry = $registry;
         $this->writer = $registry;
         $this->destructors = WeakMap::create();

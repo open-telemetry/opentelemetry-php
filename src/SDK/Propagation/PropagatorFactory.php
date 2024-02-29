@@ -19,14 +19,12 @@ class PropagatorFactory
     public function create(): TextMapPropagatorInterface
     {
         $propagators = Configuration::getList(Variables::OTEL_PROPAGATORS);
-        switch (count($propagators)) {
-            case 0:
-                return new NoopTextMapPropagator();
-            case 1:
-                return $this->buildPropagator($propagators[0]);
-            default:
-                return new MultiTextMapPropagator($this->buildPropagators($propagators));
-        }
+
+        return match (count($propagators)) {
+            0 => new NoopTextMapPropagator(),
+            1 => $this->buildPropagator($propagators[0]),
+            default => new MultiTextMapPropagator($this->buildPropagators($propagators)),
+        };
     }
 
     /**

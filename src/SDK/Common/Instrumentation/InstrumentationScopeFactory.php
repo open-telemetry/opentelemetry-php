@@ -8,11 +8,8 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 
 final class InstrumentationScopeFactory implements InstrumentationScopeFactoryInterface
 {
-    private AttributesFactoryInterface $attributesFactory;
-
-    public function __construct(AttributesFactoryInterface $attributesFactory)
+    public function __construct(private AttributesFactoryInterface $attributesFactory)
     {
-        $this->attributesFactory = $attributesFactory;
     }
 
     public function create(

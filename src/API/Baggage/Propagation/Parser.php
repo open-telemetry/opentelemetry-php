@@ -17,12 +17,10 @@ final class Parser
     private const EXCLUDED_VALUE_CHARS = [' ', '"', ',', ';', '\\'];
     private const EQUALS = '=';
 
-    /** @readonly */
-    private string $baggageHeader;
-
-    public function __construct(string $baggageHeader)
-    {
-        $this->baggageHeader = $baggageHeader;
+    public function __construct(
+        /** @readonly */
+        private string $baggageHeader
+    ) {
     }
 
     public function parseInto(BaggageBuilderInterface $baggageBuilder): void

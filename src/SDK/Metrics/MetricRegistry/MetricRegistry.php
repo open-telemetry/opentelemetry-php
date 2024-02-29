@@ -21,10 +21,6 @@ use function spl_object_id;
  */
 final class MetricRegistry implements MetricRegistryInterface, MetricWriterInterface
 {
-    private ?ContextStorageInterface $contextStorage;
-    private AttributesFactoryInterface $attributesFactory;
-    private ClockInterface $clock;
-
     /** @var array<int, MetricStreamInterface> */
     private array $streams = [];
     /** @var array<int, MetricAggregatorInterface> */
@@ -43,14 +39,8 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     /** @var array<int, list<int>> */
     private array $asynchronousCallbackArguments = [];
 
-    public function __construct(
-        ?ContextStorageInterface $contextStorage,
-        AttributesFactoryInterface $attributesFactory,
-        ClockInterface $clock
-    ) {
-        $this->contextStorage = $contextStorage;
-        $this->attributesFactory = $attributesFactory;
-        $this->clock = $clock;
+    public function __construct(private ?ContextStorageInterface $contextStorage, private AttributesFactoryInterface $attributesFactory, private ClockInterface $clock)
+    {
     }
 
     public function registerSynchronousStream(Instrument $instrument, MetricStreamInterface $stream, MetricAggregatorInterface $aggregator): int

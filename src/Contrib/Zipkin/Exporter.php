@@ -23,13 +23,10 @@ class Exporter implements SpanExporterInterface
     use LogsMessagesTrait;
     use UsesSpanConverterTrait;
 
-    private TransportInterface $transport;
-
     public function __construct(
-        TransportInterface $transport,
+        private TransportInterface $transport,
         SpanConverterInterface $spanConverter = null
     ) {
-        $this->transport = $transport;
         $this->setSpanConverter($spanConverter ?? new SpanConverter());
     }
 

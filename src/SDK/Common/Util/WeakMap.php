@@ -10,7 +10,6 @@ use function class_exists;
 use function count;
 use Countable;
 use Error;
-use function get_class;
 use function is_object;
 use IteratorAggregate;
 use const PHP_VERSION_ID;
@@ -75,7 +74,7 @@ final class WeakMap implements ArrayAccess, Countable, IteratorAggregate
             throw new TypeError('WeakMap key must be an object');
         }
         if (!$this->contains($offset)) {
-            throw new Error(sprintf('Object %s#%d not contained in WeakMap', get_class($offset), spl_object_id($offset)));
+            throw new Error(sprintf('Object %s#%d not contained in WeakMap', $offset::class, spl_object_id($offset)));
         }
 
         return $offset->{self::KEY}[spl_object_id($this)];

@@ -179,7 +179,7 @@ final class StreamFactory implements MetricFactoryInterface
     {
         try {
             return serialize($object);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
         }
 
         return spl_object_id($object);

@@ -43,13 +43,10 @@ class LoggerProviderBuilder
 
     private function buildProcessor(): LogRecordProcessorInterface
     {
-        switch (count($this->processors)) {
-            case 0:
-                return NoopLogRecordProcessor::getInstance();
-            case 1:
-                return $this->processors[0];
-            default:
-                return new MultiLogRecordProcessor($this->processors);
-        }
+        return match (count($this->processors)) {
+            0 => NoopLogRecordProcessor::getInstance(),
+            1 => $this->processors[0],
+            default => new MultiLogRecordProcessor($this->processors),
+        };
     }
 }

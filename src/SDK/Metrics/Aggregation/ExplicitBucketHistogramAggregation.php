@@ -19,17 +19,14 @@ use OpenTelemetry\SDK\Metrics\Data;
 final class ExplicitBucketHistogramAggregation implements AggregationInterface
 {
     /**
-     * @var list<float|int>
-     * @readonly
-     */
-    public array $boundaries;
-
-    /**
      * @param list<float|int> $boundaries strictly ascending histogram bucket boundaries
      */
-    public function __construct(array $boundaries)
-    {
-        $this->boundaries = $boundaries;
+    public function __construct(
+        /**
+         * @readonly
+         */
+        public array $boundaries
+    ) {
     }
 
     public function initialize(): ExplicitBucketHistogramSummary

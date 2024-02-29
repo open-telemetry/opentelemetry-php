@@ -37,53 +37,14 @@ final class Meter implements MeterInterface
 {
     use LogsMessagesTrait;
 
-    private MetricFactoryInterface $metricFactory;
-    private ResourceInfo $resource;
-    private ClockInterface $clock;
-    private StalenessHandlerFactoryInterface $stalenessHandlerFactory;
-    /** @var iterable<MetricSourceRegistryInterface&DefaultAggregationProviderInterface> */
-    private iterable $metricRegistries;
-    private ViewRegistryInterface $viewRegistry;
-    private ?ExemplarFilterInterface $exemplarFilter;
-    private MeterInstruments $instruments;
-    private InstrumentationScopeInterface $instrumentationScope;
-
-    private MetricRegistryInterface $registry;
-    private MetricWriterInterface $writer;
-    private ArrayAccess $destructors;
-
     private ?string $instrumentationScopeId = null;
 
     /**
      * @param iterable<MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricRegistries
      * @param ArrayAccess<object, ObservableCallbackDestructor> $destructors
      */
-    public function __construct(
-        MetricFactoryInterface $metricFactory,
-        ResourceInfo $resource,
-        ClockInterface $clock,
-        StalenessHandlerFactoryInterface $stalenessHandlerFactory,
-        iterable $metricRegistries,
-        ViewRegistryInterface $viewRegistry,
-        ?ExemplarFilterInterface $exemplarFilter,
-        MeterInstruments $instruments,
-        InstrumentationScopeInterface $instrumentationScope,
-        MetricRegistryInterface $registry,
-        MetricWriterInterface $writer,
-        ArrayAccess $destructors
-    ) {
-        $this->metricFactory = $metricFactory;
-        $this->resource = $resource;
-        $this->clock = $clock;
-        $this->stalenessHandlerFactory = $stalenessHandlerFactory;
-        $this->metricRegistries = $metricRegistries;
-        $this->viewRegistry = $viewRegistry;
-        $this->exemplarFilter = $exemplarFilter;
-        $this->instruments = $instruments;
-        $this->instrumentationScope = $instrumentationScope;
-        $this->registry = $registry;
-        $this->writer = $writer;
-        $this->destructors = $destructors;
+    public function __construct(private MetricFactoryInterface $metricFactory, private ResourceInfo $resource, private ClockInterface $clock, private StalenessHandlerFactoryInterface $stalenessHandlerFactory, private iterable $metricRegistries, private ViewRegistryInterface $viewRegistry, private ?ExemplarFilterInterface $exemplarFilter, private MeterInstruments $instruments, private InstrumentationScopeInterface $instrumentationScope, private MetricRegistryInterface $registry, private MetricWriterInterface $writer, private ArrayAccess $destructors)
+    {
     }
 
     private static function dummyInstrument(): Instrument

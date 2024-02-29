@@ -10,14 +10,11 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
 
 final class AllCriteria implements SelectionCriteriaInterface
 {
-    private iterable $criteria;
-
     /**
      * @param iterable<SelectionCriteriaInterface> $criteria
      */
-    public function __construct(iterable $criteria)
+    public function __construct(private iterable $criteria)
     {
-        $this->criteria = $criteria;
     }
 
     public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool

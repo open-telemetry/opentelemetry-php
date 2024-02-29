@@ -18,11 +18,8 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
  */
 final class B3Propagator implements TextMapPropagatorInterface
 {
-    private TextMapPropagatorInterface $propagator;
-
-    private function __construct(TextMapPropagatorInterface $propagator)
+    private function __construct(private TextMapPropagatorInterface $propagator)
     {
-        $this->propagator = $propagator;
     }
 
     public static function getB3SingleHeaderInstance(): self

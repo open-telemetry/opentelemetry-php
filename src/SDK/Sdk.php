@@ -15,21 +15,8 @@ class Sdk
 {
     private const OTEL_PHP_DISABLED_INSTRUMENTATIONS_ALL = 'all';
 
-    private TracerProviderInterface $tracerProvider;
-    private MeterProviderInterface $meterProvider;
-    private LoggerProviderInterface $loggerProvider;
-    private TextMapPropagatorInterface $propagator;
-
-    public function __construct(
-        TracerProviderInterface $tracerProvider,
-        MeterProviderInterface $meterProvider,
-        LoggerProviderInterface $loggerProvider,
-        TextMapPropagatorInterface $propagator
-    ) {
-        $this->tracerProvider = $tracerProvider;
-        $this->meterProvider = $meterProvider;
-        $this->loggerProvider = $loggerProvider;
-        $this->propagator = $propagator;
+    public function __construct(private TracerProviderInterface $tracerProvider, private MeterProviderInterface $meterProvider, private LoggerProviderInterface $loggerProvider, private TextMapPropagatorInterface $propagator)
+    {
     }
 
     public static function isDisabled(): bool

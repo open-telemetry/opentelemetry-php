@@ -13,12 +13,8 @@ use Throwable;
  */
 final class NonRecordingSpan extends Span
 {
-    private SpanContextInterface $context;
-
-    public function __construct(
-        SpanContextInterface $context
-    ) {
-        $this->context = $context;
+    public function __construct(private SpanContextInterface $context)
+    {
     }
 
     /** @inheritDoc */

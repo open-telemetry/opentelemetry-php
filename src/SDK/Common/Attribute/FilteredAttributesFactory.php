@@ -9,16 +9,11 @@ namespace OpenTelemetry\SDK\Common\Attribute;
  */
 final class FilteredAttributesFactory implements AttributesFactoryInterface
 {
-    private AttributesFactoryInterface $factory;
-    private array $rejectedKeys;
-
     /**
      * @param list<string> $rejectedKeys
      */
-    public function __construct(AttributesFactoryInterface $factory, array $rejectedKeys)
+    public function __construct(private AttributesFactoryInterface $factory, private array $rejectedKeys)
     {
-        $this->factory = $factory;
-        $this->rejectedKeys = $rejectedKeys;
     }
 
     public function builder(iterable $attributes = [], ?AttributeValidatorInterface $attributeValidator = null): AttributesBuilderInterface

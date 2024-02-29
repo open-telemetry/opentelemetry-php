@@ -38,13 +38,9 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private const ATTRIBUTES_PROCESSED = self::ATTRIBUTES_PROCESSOR + ['state' => 'processed'];
     private const ATTRIBUTES_DROPPED   = self::ATTRIBUTES_PROCESSOR + ['state' => 'dropped'];
     private const ATTRIBUTES_FREE      = self::ATTRIBUTES_PROCESSOR + ['state' => 'free'];
-
-    private SpanExporterInterface $exporter;
-    private ClockInterface $clock;
     private int $maxQueueSize;
     private int $scheduledDelayNanos;
     private int $maxExportBatchSize;
-    private bool $autoFlush;
     private ContextInterface $exportContext;
 
     private ?int $nextScheduledRun = null;
@@ -63,13 +59,13 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private bool $closed = false;
 
     public function __construct(
-        SpanExporterInterface $exporter,
-        ClockInterface $clock,
+        private SpanExporterInterface $exporter,
+        private ClockInterface $clock,
         int $maxQueueSize = self::DEFAULT_MAX_QUEUE_SIZE,
         int $scheduledDelayMillis = self::DEFAULT_SCHEDULE_DELAY,
         int $exportTimeoutMillis = self::DEFAULT_EXPORT_TIMEOUT,
         int $maxExportBatchSize = self::DEFAULT_MAX_EXPORT_BATCH_SIZE,
-        bool $autoFlush = true,
+        private bool $autoFlush = true,
         ?MeterProviderInterface $meterProvider = null
     ) {
         if ($maxQueueSize <= 0) {
@@ -87,13 +83,9 @@ class BatchSpanProcessor implements SpanProcessorInterface
         if ($maxExportBatchSize > $maxQueueSize) {
             throw new InvalidArgumentException(sprintf('Maximum export batch size (%d) must be less than or equal to maximum queue size (%d)', $maxExportBatchSize, $maxQueueSize));
         }
-
-        $this->exporter = $exporter;
-        $this->clock = $clock;
         $this->maxQueueSize = $maxQueueSize;
         $this->scheduledDelayNanos = $scheduledDelayMillis * 1_000_000;
         $this->maxExportBatchSize = $maxExportBatchSize;
-        $this->autoFlush = $autoFlush;
 
         $this->exportContext = Context::getCurrent();
         $this->queue = new SplQueue();

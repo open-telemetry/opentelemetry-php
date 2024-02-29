@@ -21,7 +21,7 @@ class SamplerFactory
     {
         $name = Configuration::getString(Env::OTEL_TRACES_SAMPLER);
 
-        if (strpos($name, self::TRACEIDRATIO_PREFIX) !== false) {
+        if (str_contains($name, self::TRACEIDRATIO_PREFIX)) {
             $arg = Configuration::getRatio(Env::OTEL_TRACES_SAMPLER_ARG);
 
             switch ($name) {
@@ -32,17 +32,12 @@ class SamplerFactory
             }
         }
 
-        switch ($name) {
-            case Values::VALUE_ALWAYS_ON:
-                return new AlwaysOnSampler();
-            case Values::VALUE_ALWAYS_OFF:
-                return new AlwaysOffSampler();
-            case Values::VALUE_PARENT_BASED_ALWAYS_ON:
-                return new ParentBased(new AlwaysOnSampler());
-            case Values::VALUE_PARENT_BASED_ALWAYS_OFF:
-                return new ParentBased(new AlwaysOffSampler());
-            default:
-                throw new InvalidArgumentException(sprintf('Unknown sampler: %s', $name));
-        }
+        return match ($name) {
+            Values::VALUE_ALWAYS_ON => new AlwaysOnSampler(),
+            Values::VALUE_ALWAYS_OFF => new AlwaysOffSampler(),
+            Values::VALUE_PARENT_BASED_ALWAYS_ON => new ParentBased(new AlwaysOnSampler()),
+            Values::VALUE_PARENT_BASED_ALWAYS_OFF => new ParentBased(new AlwaysOffSampler()),
+            default => throw new InvalidArgumentException(sprintf('Unknown sampler: %s', $name)),
+        };
     }
 }

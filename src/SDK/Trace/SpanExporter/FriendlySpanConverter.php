@@ -49,7 +49,6 @@ class FriendlySpanConverter implements SpanConverterInterface
     /**
      * friendlySpan does the heavy lifting converting a span into an array
      *
-     * @param SpanDataInterface $span
      * @return array
      */
     private function convertSpan(SpanDataInterface $span): array
@@ -70,7 +69,6 @@ class FriendlySpanConverter implements SpanConverterInterface
     }
 
     /**
-     * @param SpanContextInterface $context
      * @return array
      */
     private function convertContext(SpanContextInterface $context): array
@@ -84,7 +82,6 @@ class FriendlySpanConverter implements SpanConverterInterface
     }
 
     /**
-     * @param ResourceInfo $resource
      * @return array
      */
     private function convertResource(ResourceInfo $resource): array
@@ -93,7 +90,6 @@ class FriendlySpanConverter implements SpanConverterInterface
     }
 
     /**
-     * @param SpanContextInterface $context
      * @return string
      */
     private function covertParentContext(SpanContextInterface $context): string
@@ -104,7 +100,6 @@ class FriendlySpanConverter implements SpanConverterInterface
     /**
      * Translates SpanKind from its integer representation to a more human friendly string.
      *
-     * @param int $kind
      * @return string
      */
     private function convertKind(int $kind): string
@@ -116,7 +111,6 @@ class FriendlySpanConverter implements SpanConverterInterface
     }
 
     /**
-     * @param \OpenTelemetry\SDK\Common\Attribute\AttributesInterface $attributes
      * @return array
      */
     private function convertAttributes(AttributesInterface $attributes): array
@@ -125,7 +119,6 @@ class FriendlySpanConverter implements SpanConverterInterface
     }
 
     /**
-     * @param StatusDataInterface $status
      * @return array
      */
     private function covertStatus(StatusDataInterface $status): array

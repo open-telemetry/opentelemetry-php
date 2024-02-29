@@ -10,12 +10,10 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class BatchSpanProcessorBuilder
 {
-    private SpanExporterInterface $exporter;
     private ?MeterProviderInterface $meterProvider = null;
 
-    public function __construct(SpanExporterInterface $exporter)
+    public function __construct(private SpanExporterInterface $exporter)
     {
-        $this->exporter = $exporter;
     }
 
     public function setMeterProvider(MeterProviderInterface $meterProvider): self

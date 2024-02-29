@@ -36,17 +36,15 @@ final class GrpcTransport implements TransportInterface
 {
     private array $metadata;
     private Channel $channel;
-    private string $method;
     private bool $closed = false;
 
     public function __construct(
         string $endpoint,
         array $opts,
-        string $method,
+        private string $method,
         array $headers = []
     ) {
         $this->channel = new Channel($endpoint, $opts);
-        $this->method = $method;
         $this->metadata = $this->formatMetadata(array_change_key_case($headers));
     }
 

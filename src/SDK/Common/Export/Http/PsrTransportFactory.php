@@ -16,18 +16,8 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class PsrTransportFactory implements TransportFactoryInterface
 {
-    private ClientInterface $client;
-    private RequestFactoryInterface $requestFactory;
-    private StreamFactoryInterface $streamFactory;
-
-    public function __construct(
-        ClientInterface $client,
-        RequestFactoryInterface $requestFactory,
-        StreamFactoryInterface $streamFactory
-    ) {
-        $this->client = $client;
-        $this->requestFactory = $requestFactory;
-        $this->streamFactory = $streamFactory;
+    public function __construct(private ClientInterface $client, private RequestFactoryInterface $requestFactory, private StreamFactoryInterface $streamFactory)
+    {
     }
 
     /**

@@ -24,8 +24,6 @@ use function spl_object_id;
 final class ExportingReader implements MetricReaderInterface, MetricSourceRegistryInterface, DefaultAggregationProviderInterface
 {
     use DefaultAggregationProviderTrait { defaultAggregation as private _defaultAggregation; }
-
-    private MetricExporterInterface $exporter;
     /** @var array<int, MetricSourceInterface> */
     private array $sources = [];
 
@@ -36,9 +34,8 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
     private bool $closed = false;
 
-    public function __construct(MetricExporterInterface $exporter)
+    public function __construct(private MetricExporterInterface $exporter)
     {
-        $this->exporter = $exporter;
     }
 
     public function defaultAggregation($instrumentType, array $advisory = []): ?AggregationInterface

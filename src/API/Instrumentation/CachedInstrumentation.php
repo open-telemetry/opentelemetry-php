@@ -26,10 +26,6 @@ use const PHP_VERSION_ID;
  */
 final class CachedInstrumentation
 {
-    private string $name;
-    private ?string $version;
-    private ?string $schemaUrl;
-    private iterable $attributes;
     /** @var ArrayAccess<TracerProviderInterface, TracerInterface>|null */
     private ?ArrayAccess $tracers;
     /** @var ArrayAccess<MeterProviderInterface, MeterInterface>|null */
@@ -37,12 +33,8 @@ final class CachedInstrumentation
     /** @var ArrayAccess<LoggerProviderInterface, LoggerInterface>|null */
     private ?ArrayAccess $loggers;
 
-    public function __construct(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = [])
+    public function __construct(private string $name, private ?string $version = null, private ?string $schemaUrl = null, private iterable $attributes = [])
     {
-        $this->name = $name;
-        $this->version = $version;
-        $this->schemaUrl = $schemaUrl;
-        $this->attributes = $attributes;
         $this->tracers = self::createWeakMap();
         $this->meters = self::createWeakMap();
         $this->loggers = self::createWeakMap();
