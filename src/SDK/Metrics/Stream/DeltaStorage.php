@@ -85,7 +85,7 @@ final class DeltaStorage
              $c = $c->prev) {
         }
 
-        if ($c && $n->prev->readers == $c->readers) {
+        if ($c && $n->prev->readers === $c->readers) {
             $this->mergeInto($c->metric, $n->prev->metric);
             $n->prev = $n->prev->prev;
         }

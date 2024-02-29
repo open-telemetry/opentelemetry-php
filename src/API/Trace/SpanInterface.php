@@ -55,7 +55,7 @@ interface SpanInterface extends ImplicitContextKeyedInterface
      * @param non-empty-string $key
      * @param bool|int|float|string|array|null $value Note: arrays MUST be homogeneous, i.e. it MUST NOT contain values of different types.
      */
-    public function setAttribute(string $key, $value): SpanInterface;
+    public function setAttribute(string $key, bool|int|float|string|array|null $value): SpanInterface;
 
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-attributes

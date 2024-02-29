@@ -40,7 +40,6 @@ class LogRecord
     }
 
     /**
-     * @param int $severityNumber Severity number
      * @see https://opentelemetry.io/docs/reference/specification/logs/data-model/#field-severitynumber
      */
     public function setSeverityNumber(int $severityNumber): self

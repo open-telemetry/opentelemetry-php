@@ -24,7 +24,6 @@ class TraceIdRatioBasedSampler implements SamplerInterface
     private float $probability;
 
     /**
-     * TraceIdRatioBasedSampler constructor.
      * @param float $probability Probability float value between 0.0 and 1.0.
      */
     public function __construct(float $probability)

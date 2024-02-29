@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
 use PHPUnit\Framework\TestCase;
+use TypeError;
 
 /**
  * @covers \OpenTelemetry\SDK\Registry
@@ -121,7 +122,7 @@ class FactoryRegistryTest extends TestCase
      */
     public function test_register_invalid_transport_factory($factory): void
     {
-        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectException(TypeError::class);
         Registry::registerTransportFactory('http', $factory, true);
     }
 
@@ -130,7 +131,7 @@ class FactoryRegistryTest extends TestCase
      */
     public function test_register_invalid_span_exporter_factory($factory): void
     {
-        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectException(TypeError::class);
         Registry::registerSpanExporterFactory('foo', $factory, true);
     }
 
@@ -139,7 +140,7 @@ class FactoryRegistryTest extends TestCase
      */
     public function test_register_invalid_metric_exporter_factory($factory): void
     {
-        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectException(TypeError::class);
         Registry::registerMetricExporterFactory('foo', $factory, true);
     }
 

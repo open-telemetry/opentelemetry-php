@@ -45,8 +45,8 @@ interface MeterInterface
      * Creates a `Counter`.
      *
      * @param string $name name of the instrument
-     * @param string|null $unit unit of measure
-     * @param string|null $description description of the instrument
+     * @param ?string $unit unit of measure
+     * @param ?string $description description of the instrument
      * @param array $advisory an optional set of recommendations
      * @return CounterInterface created instrument
      *
@@ -63,8 +63,8 @@ interface MeterInterface
      * Creates an `ObservableCounter`.
      *
      * @param string $name name of the instrument
-     * @param string|null $unit unit of measure
-     * @param string|null $description description of the instrument
+     * @param ?string $unit unit of measure
+     * @param ?string $description description of the instrument
      * @param array|callable $advisory an optional set of recommendations, or
      *        deprecated: the first callback to report measurements
      * @param callable ...$callbacks responsible for reporting measurements

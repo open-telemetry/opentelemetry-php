@@ -63,9 +63,9 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
     }
 
     /**
-     * @todo return string|Temporality|null (php >= 8.0)
+     * @phpstan-ignore-next-line
      */
-    private function getTemporality()
+    private function getTemporality(): string|Temporality|null
     {
         $value = Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE);
 
