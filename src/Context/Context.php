@@ -7,7 +7,6 @@ namespace OpenTelemetry\Context;
 use function assert;
 use const FILTER_VALIDATE_BOOLEAN;
 use function filter_var;
-use function ini_get;
 use function spl_object_id;
 
 /**
@@ -15,6 +14,8 @@ use function spl_object_id;
  */
 final class Context implements ContextInterface
 {
+    private const OTEL_PHP_DEBUG_SCOPES_DISABLED = 'OTEL_PHP_DEBUG_SCOPES_DISABLED';
+
     /** @var ContextStorageInterface&ExecutionContextAwareInterface */
     private static ContextStorageInterface $storage;
 
@@ -91,9 +92,10 @@ final class Context implements ContextInterface
 
     private static function debugScopesDisabled(): bool
     {
-        $disabled = $_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED'] ?? ini_get('OTEL_PHP_DEBUG_SCOPES_DISABLED');
-
-        return filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
+        return filter_var(
+            $_SERVER[self::OTEL_PHP_DEBUG_SCOPES_DISABLED] ?? \getenv(self::OTEL_PHP_DEBUG_SCOPES_DISABLED) ?: \ini_get(self::OTEL_PHP_DEBUG_SCOPES_DISABLED),
+            FILTER_VALIDATE_BOOLEAN
+        );
     }
 
     public function withContextValue(ImplicitContextKeyedInterface $value): ContextInterface
