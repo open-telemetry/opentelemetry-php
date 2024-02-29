@@ -23,14 +23,11 @@ final class InMemoryExporter implements MetricExporterInterface, AggregationTemp
 
     private bool $closed = false;
 
-    /**
-     * @param string|Temporality|null $temporality
-     */
-    public function __construct(private $temporality = null)
+    public function __construct(private string|Temporality|null $temporality = null)
     {
     }
 
-    public function temporality(MetricMetadataInterface $metric)
+    public function temporality(MetricMetadataInterface $metric): string|Temporality|null
     {
         return $this->temporality ?? $metric->temporality();
     }

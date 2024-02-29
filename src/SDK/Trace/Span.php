@@ -45,9 +45,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         /** @readonly */
         private ResourceInfo $resource,
         private AttributesBuilderInterface $attributesBuilder,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         private array $links,
         /** @readonly */
         private int $totalRecordedLinks,

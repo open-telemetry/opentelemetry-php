@@ -9,52 +9,29 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 final class HistogramDataPoint
 {
     /**
-     * @param float|int $sum
-     * @param float|int $min
-     * @param float|int $max
      * @param int[] $bucketCounts
      * @param list<float|int> $explicitBounds
      */
     public function __construct(
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public int $count,
-        /**
-         * @readonly
-         */
-        public $sum,
-        /**
-         * @readonly
-         */
-        public $min,
-        /**
-         * @readonly
-         */
-        public $max,
-        /**
-         * @readonly
-         */
+        /** @readonly */
+        public float|int $sum,
+        /** @readonly */
+        public float|int $min,
+        /** @readonly */
+        public float|int $max,
+        /** @readonly */
         public array $bucketCounts,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public array $explicitBounds,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public AttributesInterface $attributes,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public int $startTimestamp,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public int $timestamp,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public iterable $exemplars = []
     ) {
     }

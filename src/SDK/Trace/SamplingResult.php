@@ -23,18 +23,12 @@ final class SamplingResult
      */
     public const RECORD_AND_SAMPLE = 2;
 
+    /**
+     * @param ?API\TraceStateInterface $traceState A Tracestate that will be associated with the Span through the new SpanContext.
+     */
     public function __construct(
-        /**
-         * @var int A sampling Decision.
-         */
         private int $decision,
-        /**
-         * @var iterable A set of span Attributes that will also be added to the Span.
-         */
         private iterable $attributes = [],
-        /**
-         * @var ?API\TraceStateInterface A Tracestate that will be associated with the Span through the new SpanContext.
-         */
         private ?API\TraceStateInterface $traceState = null
     ) {
     }

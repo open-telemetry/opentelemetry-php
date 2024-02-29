@@ -28,21 +28,17 @@ use function ucwords;
 /**
  * @internal
  *
- * @psalm-type SUPPORTED_CONTENT_TYPES = self::PROTOBUF|self::JSON|self::NDJSON
+ * @psalm-type SUPPORTED_CONTENT_TYPES = ContentTypes::PROTOBUF|ContentTypes::JSON|ContentTypes::NDJSON
  */
 final class ProtobufSerializer
 {
-    private const PROTOBUF = 'application/x-protobuf';
-    private const JSON = 'application/json';
-    private const NDJSON = 'application/x-ndjson';
-
     private function __construct(private string $contentType)
     {
     }
 
     public static function getDefault(): ProtobufSerializer
     {
-        return new self(self::PROTOBUF);
+        return new self(ContentTypes::PROTOBUF);
     }
 
     /**
@@ -51,7 +47,7 @@ final class ProtobufSerializer
     public static function forTransport(TransportInterface $transport): ProtobufSerializer
     {
         return match ($contentType = $transport->contentType()) {
-            self::PROTOBUF, self::JSON, self::NDJSON => new self($contentType),
+            ContentTypes::PROTOBUF, ContentTypes::JSON, ContentTypes::NDJSON => new self($contentType),
             default => throw new InvalidArgumentException(sprintf('Not supported content type "%s"', $contentType)),
         };
     }
@@ -59,8 +55,8 @@ final class ProtobufSerializer
     public function serializeTraceId(string $traceId): string
     {
         return match ($this->contentType) {
-            self::PROTOBUF => $traceId,
-            self::JSON, self::NDJSON => base64_decode(bin2hex($traceId)),
+            ContentTypes::PROTOBUF => $traceId,
+            ContentTypes::JSON, ContentTypes::NDJSON => base64_decode(bin2hex($traceId)),
             default => throw new AssertionError(),
         };
     }
@@ -68,8 +64,8 @@ final class ProtobufSerializer
     public function serializeSpanId(string $spanId): string
     {
         return match ($this->contentType) {
-            self::PROTOBUF => $spanId,
-            self::JSON, self::NDJSON => base64_decode(bin2hex($spanId)),
+            ContentTypes::PROTOBUF => $spanId,
+            ContentTypes::JSON, ContentTypes::NDJSON => base64_decode(bin2hex($spanId)),
             default => throw new AssertionError(),
         };
     }
@@ -77,9 +73,9 @@ final class ProtobufSerializer
     public function serialize(Message $message): string
     {
         return match ($this->contentType) {
-            self::PROTOBUF => $message->serializeToString(),
-            self::JSON => self::postProcessJsonEnumValues($message, $message->serializeToJsonString()),
-            self::NDJSON => self::postProcessJsonEnumValues($message, $message->serializeToJsonString()) . "\n",
+            ContentTypes::PROTOBUF => $message->serializeToString(),
+            ContentTypes::JSON => self::postProcessJsonEnumValues($message, $message->serializeToJsonString()),
+            ContentTypes::NDJSON => self::postProcessJsonEnumValues($message, $message->serializeToJsonString()) . "\n",
             default => throw new AssertionError(),
         };
     }
@@ -90,8 +86,8 @@ final class ProtobufSerializer
     public function hydrate(Message $message, string $payload): void
     {
         match ($this->contentType) {
-            self::PROTOBUF => $message->mergeFromString($payload),
-            self::JSON, self::NDJSON => $message->mergeFromJsonString($payload, true),
+            ContentTypes::PROTOBUF => $message->mergeFromString($payload),
+            ContentTypes::JSON, ContentTypes::NDJSON => $message->mergeFromJsonString($payload, true),
             default => throw new AssertionError(),
         };
     }

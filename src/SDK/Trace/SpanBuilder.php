@@ -30,9 +30,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
 
     /** @param non-empty-string $spanName */
     public function __construct(
-        /**
-         * @readonly
-         */
+        /** @readonly */
         private string $spanName,
         /** @readonly */
         private InstrumentationScopeInterface $instrumentationScope,

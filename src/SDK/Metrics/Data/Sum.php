@@ -6,23 +6,15 @@ namespace OpenTelemetry\SDK\Metrics\Data;
 
 final class Sum implements DataInterface
 {
-
     /**
      * @param iterable<NumberDataPoint> $dataPoints
-     * @param string|Temporality $temporality
      */
     public function __construct(
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public iterable $dataPoints,
-        /**
-         * @readonly
-         */
-        public $temporality,
-        /**
-         * @readonly
-         */
+        /** @readonly */
+        public string|Temporality $temporality,
+        /** @readonly */
         public bool $monotonic
     ) {
     }

@@ -47,9 +47,7 @@ class FriendlySpanConverter implements SpanConverterInterface
     }
 
     /**
-     * friendlySpan does the heavy lifting converting a span into an array
-     *
-     * @return array
+     * convertSpan does the heavy lifting converting a span into an array
      */
     private function convertSpan(SpanDataInterface $span): array
     {
@@ -68,9 +66,6 @@ class FriendlySpanConverter implements SpanConverterInterface
         ];
     }
 
-    /**
-     * @return array
-     */
     private function convertContext(SpanContextInterface $context): array
     {
         return [
@@ -81,17 +76,11 @@ class FriendlySpanConverter implements SpanConverterInterface
         ];
     }
 
-    /**
-     * @return array
-     */
     private function convertResource(ResourceInfo $resource): array
     {
         return $resource->getAttributes()->toArray();
     }
 
-    /**
-     * @return string
-     */
     private function covertParentContext(SpanContextInterface $context): string
     {
         return $context->isValid() ? $context->getSpanId() : '';
@@ -99,8 +88,6 @@ class FriendlySpanConverter implements SpanConverterInterface
 
     /**
      * Translates SpanKind from its integer representation to a more human friendly string.
-     *
-     * @return string
      */
     private function convertKind(int $kind): string
     {
@@ -110,17 +97,11 @@ class FriendlySpanConverter implements SpanConverterInterface
         )[$kind];
     }
 
-    /**
-     * @return array
-     */
     private function convertAttributes(AttributesInterface $attributes): array
     {
         return $attributes->toArray();
     }
 
-    /**
-     * @return array
-     */
     private function covertStatus(StatusDataInterface $status): array
     {
         return [
@@ -131,7 +112,6 @@ class FriendlySpanConverter implements SpanConverterInterface
 
     /**
      * @param array<EventInterface> $events
-     * @return array
      */
     private function convertEvents(array $events): array
     {
@@ -150,7 +130,6 @@ class FriendlySpanConverter implements SpanConverterInterface
 
     /**
      * @param array<LinkInterface> $links
-     * @return array
      */
     private function convertLinks(array $links): array
     {

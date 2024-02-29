@@ -48,7 +48,7 @@ final class MeterProvider implements MeterProviderInterface
         $this->metricFactory = $metricFactory ?? new StreamFactory();
         $this->instruments = new MeterInstruments();
 
-        $registry = new MetricRegistry($contextStorage, $attributesFactory, $this->clock);
+        $registry = new MetricRegistry($contextStorage, $attributesFactory, $clock);
         $this->registry = $registry;
         $this->writer = $registry;
         $this->destructors = WeakMap::create();

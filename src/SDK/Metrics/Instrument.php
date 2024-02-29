@@ -6,29 +6,16 @@ namespace OpenTelemetry\SDK\Metrics;
 
 final class Instrument
 {
-    /**
-     * @param string|InstrumentType $type
-     */
     public function __construct(
-        /**
-         * @readonly
-         */
-        public $type,
-        /**
-         * @readonly
-         */
+        /** @readonly */
+        public string|InstrumentType $type,
+        /** @readonly */
         public string $name,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public ?string $unit,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public ?string $description,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public array $advisory = []
     ) {
     }

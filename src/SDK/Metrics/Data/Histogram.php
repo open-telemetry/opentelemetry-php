@@ -6,20 +6,14 @@ namespace OpenTelemetry\SDK\Metrics\Data;
 
 final class Histogram implements DataInterface
 {
-
     /**
      * @param iterable<HistogramDataPoint> $dataPoints
-     * @param string|Temporality $temporality
      */
     public function __construct(
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public iterable $dataPoints,
-        /**
-         * @readonly
-         */
-        public $temporality
+        /** @readonly */
+        public string|Temporality $temporality
     ) {
     }
 }

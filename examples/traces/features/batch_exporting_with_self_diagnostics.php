@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Example;
 
 use OpenTelemetry\API\Globals;
-use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 
 putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
 putenv('OTEL_TRACES_EXPORTER=console');
@@ -14,12 +13,14 @@ putenv('OTEL_PHP_INTERNAL_METRICS_ENABLED=true');
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
-$tracerProvider = Globals::tracerProvider();
+/**
+ * Demonstrates batch span processing which also emits metrics for the internal state
+ * of the processor (eg spans received, queue length)
+ */
 
-$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
+echo 'Starting ConsoleSpanExporter with BatchSpanProcessor and metrics' . PHP_EOL;
 
-$span = $tracer->spanBuilder('root')->startSpan();
-$span->end();
+$tracer = Globals::tracerProvider()->getTracer('io.opentelemetry.contrib.php');
+$tracer->spanBuilder('root')->startSpan()->end();
 
-echo PHP_EOL;
-$tracerProvider instanceof TracerProviderInterface && $tracerProvider->shutdown();
+echo PHP_EOL . 'Example complete!  ' . PHP_EOL;

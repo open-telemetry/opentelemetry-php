@@ -27,11 +27,6 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
     private string $serviceName;
     private int $granularity = self::GRANULARITY_AGGREGATE;
 
-    /**
-     * @param LoggerInterface|null $logger
-     * @param string|null $defaultLogLevel
-     * @param SpanConverterInterface|null $converter
-     */
     public function __construct(
         string $serviceName,
         ?LoggerInterface $logger = null,

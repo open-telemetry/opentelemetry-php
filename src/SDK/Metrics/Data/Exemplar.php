@@ -8,32 +8,17 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class Exemplar
 {
-
-    /**
-     * @param int|string $index
-     * @param float|int $value
-     */
     public function __construct(
-        private $index,
-        /**
-         * @readonly
-         */
-        public $value,
-        /**
-         * @readonly
-         */
+        private int|string $index,
+        /** @readonly */
+        public float|int $value,
+        /** @readonly */
         public int $timestamp,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public AttributesInterface $attributes,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public ?string $traceId,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public ?string $spanId
     ) {
     }

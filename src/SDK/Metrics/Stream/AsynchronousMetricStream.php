@@ -25,7 +25,7 @@ final class AsynchronousMetricStream implements MetricStreamInterface
         private AggregationInterface $aggregation,
         private int $startTimestamp
     ) {
-        $this->metric = new Metric([], [], $this->startTimestamp);
+        $this->metric = new Metric([], [], $startTimestamp);
     }
 
     public function temporality()
