@@ -10,25 +10,15 @@ final class ViewProjection
      * @param list<string>|null $attributeKeys
      */
     public function __construct(
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public string $name,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public ?string $unit,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public ?string $description,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public ?array $attributeKeys,
-        /**
-         * @readonly
-         */
+        /** @readonly */
         public ?AggregationInterface $aggregation
     ) {
     }
