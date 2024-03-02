@@ -29,7 +29,7 @@ final class TracerProvider implements TracerProviderInterface
         ResourceInfo $resource = null,
         SpanLimits $spanLimits = null,
         IdGeneratorInterface $idGenerator = null,
-        ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null
+        ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
     ) {
         if (null === $spanProcessors) {
             $spanProcessors = [];
@@ -63,7 +63,7 @@ final class TracerProvider implements TracerProviderInterface
         string $name,
         ?string $version = null,
         ?string $schemaUrl = null,
-        iterable $attributes = []
+        iterable $attributes = [],
     ): API\TracerInterface {
         if ($this->tracerSharedState->hasShutdown()) {
             return NoopTracer::getInstance();

@@ -23,7 +23,7 @@ class ResourceInfo
 
     private function __construct(
         private AttributesInterface $attributes,
-        private ?string $schemaUrl = null
+        private ?string $schemaUrl = null,
     ) {
     }
 

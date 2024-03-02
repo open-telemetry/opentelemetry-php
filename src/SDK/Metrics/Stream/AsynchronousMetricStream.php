@@ -23,7 +23,7 @@ final class AsynchronousMetricStream implements MetricStreamInterface
 
     public function __construct(
         private AggregationInterface $aggregation,
-        private int $startTimestamp
+        private int $startTimestamp,
     ) {
         $this->metric = new Metric([], [], $startTimestamp);
     }

@@ -21,7 +21,7 @@ class SimplePsrFileLogger implements LoggerInterface
 
     public function __construct(
         private string $filename,
-        private string $loggerName = self::DEFAULT_LOGGER_NAME
+        private string $loggerName = self::DEFAULT_LOGGER_NAME,
     ) {
     }
 

@@ -14,7 +14,7 @@ final class StreamMetricSource implements MetricSourceInterface
 {
     public function __construct(
         private StreamMetricSourceProvider $provider,
-        private int $reader
+        private int $reader,
     ) {
     }
 

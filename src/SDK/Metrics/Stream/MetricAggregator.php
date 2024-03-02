@@ -23,7 +23,7 @@ final class MetricAggregator implements MetricAggregatorInterface
     public function __construct(
         private ?AttributeProcessorInterface $attributeProcessor,
         private AggregationInterface $aggregation,
-        private ?ExemplarReservoirInterface $exemplarReservoir = null
+        private ?ExemplarReservoirInterface $exemplarReservoir = null,
     ) {
     }
 

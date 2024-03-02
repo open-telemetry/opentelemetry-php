@@ -24,7 +24,7 @@ final class AttributesBuilder implements AttributesBuilderInterface
         private ?int $attributeCountLimit,
         private ?int $attributeValueLengthLimit,
         private int $droppedAttributesCount,
-        ?AttributeValidatorInterface $attributeValidator
+        ?AttributeValidatorInterface $attributeValidator,
     ) {
         $this->attributeValidator = $attributeValidator ?? new AttributeValidator();
     }

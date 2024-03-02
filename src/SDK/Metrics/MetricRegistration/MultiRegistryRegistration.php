@@ -20,7 +20,7 @@ final class MultiRegistryRegistration implements MetricRegistrationInterface
      */
     public function __construct(
         private iterable $registries,
-        private StalenessHandlerInterface $stalenessHandler
+        private StalenessHandlerInterface $stalenessHandler,
     ) {
     }
 

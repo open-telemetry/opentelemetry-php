@@ -43,7 +43,7 @@ final class MeterProvider implements MeterProviderInterface
         private ViewRegistryInterface $viewRegistry,
         private ?ExemplarFilterInterface $exemplarFilter,
         private StalenessHandlerFactoryInterface $stalenessHandlerFactory,
-        MetricFactoryInterface $metricFactory = null
+        MetricFactoryInterface $metricFactory = null,
     ) {
         $this->metricFactory = $metricFactory ?? new StreamFactory();
         $this->instruments = new MeterInstruments();
@@ -58,7 +58,7 @@ final class MeterProvider implements MeterProviderInterface
         string $name,
         ?string $version = null,
         ?string $schemaUrl = null,
-        iterable $attributes = []
+        iterable $attributes = [],
     ): MeterInterface {
         if ($this->closed || Sdk::isDisabled()) { //@todo create meter provider from factory, and move Sdk::isDisabled() there
             return new NoopMeter();

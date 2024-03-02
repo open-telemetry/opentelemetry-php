@@ -20,7 +20,7 @@ class ConsoleSpanExporter implements SpanExporterInterface
 
     public function __construct(
         private TransportInterface $transport,
-        ?SpanConverterInterface $converter = null
+        ?SpanConverterInterface $converter = null,
     ) {
         $this->setSpanConverter($converter ?? new FriendlySpanConverter());
     }

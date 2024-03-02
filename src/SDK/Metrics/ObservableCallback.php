@@ -18,7 +18,7 @@ final class ObservableCallback implements ObservableCallbackInterface
         private ReferenceCounterInterface $referenceCounter,
         private ?int $callbackId,
         private ?ObservableCallbackDestructor $callbackDestructor,
-        private ?object $target
+        private ?object $target,
     ) {
     }
 

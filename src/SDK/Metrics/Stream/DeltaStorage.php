@@ -81,8 +81,8 @@ final class DeltaStorage
         }
 
         for ($c = $n->prev->prev;
-             $c && ($n->prev->readers & $c->readers) == 0;
-             $c = $c->prev) {
+            $c && ($n->prev->readers & $c->readers) == 0;
+            $c = $c->prev) {
         }
 
         if ($c && $n->prev->readers === $c->readers) {

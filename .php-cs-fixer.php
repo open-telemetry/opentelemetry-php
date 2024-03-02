@@ -25,10 +25,10 @@ return $config->setRules([
     'blank_line_before_statement' => true,
     'cast_spaces' => true,
     'declare_strict_types' => true,
-    'function_typehint_space' => true,
+    'type_declaration_spaces' => true,
     'include' => true,
     'lowercase_cast' => true,
-    'new_with_braces' => true,
+    'new_with_parentheses' => true,
     'no_extra_blank_lines' => true,
     'no_leading_import_slash' => true,
     'no_trailing_whitespace' => true,
@@ -41,9 +41,9 @@ return $config->setRules([
     'phpdoc_scalar' => true,
     'phpdoc_types' => true,
     'short_scalar_cast' => true,
-    'single_blank_line_before_namespace' => true,
+    'blank_lines_before_namespace' => true,
     'single_quote' => true,
-    'trailing_comma_in_multiline' => true,
+    'trailing_comma_in_multiline' => ['elements' => ['arrays', 'parameters', 'match']],
     ])
     ->setRiskyAllowed(true)
     ->setFinder($finder);

@@ -22,7 +22,7 @@ final class SpanContext implements SpanContextInterface
         private string $spanId,
         private int $traceFlags,
         private bool $isRemote,
-        private ?TraceStateInterface $traceState = null
+        private ?TraceStateInterface $traceState = null,
     ) {
         // TraceId must be exactly 16 bytes (32 chars) and at least one non-zero byte
         // SpanId must be exactly 8 bytes (16 chars) and at least one non-zero byte

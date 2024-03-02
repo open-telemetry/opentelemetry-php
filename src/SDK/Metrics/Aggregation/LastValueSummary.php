@@ -8,7 +8,7 @@ final class LastValueSummary
 {
     public function __construct(
         public float|int|null $value,
-        public int $timestamp
+        public int $timestamp,
     ) {
     }
 }

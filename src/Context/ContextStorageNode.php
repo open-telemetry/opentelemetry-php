@@ -16,7 +16,7 @@ final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInt
     public function __construct(
         public ContextInterface $context,
         public ContextStorageHead $head,
-        private ?ContextStorageNode $previous = null
+        private ?ContextStorageNode $previous = null,
     ) {
     }
 
@@ -70,8 +70,8 @@ final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInt
 
         assert($this->head->node !== null);
         for ($n = $this->head->node, $depth = 1;
-             $n->previous !== $this;
-             $n = $n->previous, $depth++) {
+            $n->previous !== $this;
+            $n = $n->previous, $depth++) {
             assert($n->previous !== null);
         }
         $n->previous = $this->previous;

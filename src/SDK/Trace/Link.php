@@ -11,7 +11,7 @@ final class Link implements LinkInterface
 {
     public function __construct(
         private API\SpanContextInterface $context,
-        private AttributesInterface $attributes
+        private AttributesInterface $attributes,
     ) {
     }
 

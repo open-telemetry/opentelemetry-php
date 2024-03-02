@@ -14,7 +14,7 @@ final class FilteredAttributesFactory implements AttributesFactoryInterface
      */
     public function __construct(
         private AttributesFactoryInterface $factory,
-        private array $rejectedKeys
+        private array $rejectedKeys,
     ) {
     }
 

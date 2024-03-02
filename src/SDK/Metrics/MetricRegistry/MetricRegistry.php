@@ -42,7 +42,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     public function __construct(
         private ?ContextStorageInterface $contextStorage,
         private AttributesFactoryInterface $attributesFactory,
-        private ClockInterface $clock
+        private ClockInterface $clock,
     ) {
     }
 

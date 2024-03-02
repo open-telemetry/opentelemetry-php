@@ -13,7 +13,7 @@ final class Histogram implements DataInterface
         /** @readonly */
         public iterable $dataPoints,
         /** @readonly */
-        public string|Temporality $temporality
+        public string|Temporality $temporality,
     ) {
     }
 }

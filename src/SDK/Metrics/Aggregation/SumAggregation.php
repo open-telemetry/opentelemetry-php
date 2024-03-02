@@ -66,7 +66,7 @@ final class SumAggregation implements AggregationInterface
         array $exemplars,
         int $startTimestamp,
         int $timestamp,
-        $temporality
+        $temporality,
     ): Data\Sum {
         $dataPoints = [];
         foreach ($attributes as $key => $dataPointAttributes) {

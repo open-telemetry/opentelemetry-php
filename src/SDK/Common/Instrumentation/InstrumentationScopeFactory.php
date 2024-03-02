@@ -16,7 +16,7 @@ final class InstrumentationScopeFactory implements InstrumentationScopeFactoryIn
         string $name,
         ?string $version = null,
         ?string $schemaUrl = null,
-        iterable $attributes = []
+        iterable $attributes = [],
     ): InstrumentationScopeInterface {
         return new InstrumentationScope(
             $name,

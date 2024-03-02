@@ -8,7 +8,7 @@ class EventLogger implements EventLoggerInterface
 {
     public function __construct(
         private LoggerInterface $logger,
-        private string $domain
+        private string $domain,
     ) {
     }
 

@@ -35,7 +35,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
         /** @readonly */
         private InstrumentationScopeInterface $instrumentationScope,
         /** @readonly */
-        private TracerSharedState $tracerSharedState
+        private TracerSharedState $tracerSharedState,
     ) {
         $this->attributesBuilder = $this->tracerSharedState->getSpanLimits()->getAttributesFactory()->builder();
     }

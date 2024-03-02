@@ -37,7 +37,7 @@ final class CachedInstrumentation
         private string $name,
         private ?string $version = null,
         private ?string $schemaUrl = null,
-        private iterable $attributes = []
+        private iterable $attributes = [],
     ) {
         $this->tracers = self::createWeakMap();
         $this->meters = self::createWeakMap();

@@ -25,7 +25,7 @@ class Exporter implements SpanExporterInterface
 
     public function __construct(
         private TransportInterface $transport,
-        SpanConverterInterface $spanConverter = null
+        SpanConverterInterface $spanConverter = null,
     ) {
         $this->setSpanConverter($spanConverter ?? new SpanConverter());
     }

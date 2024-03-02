@@ -40,7 +40,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         int $maxRetries = 3,
         ?string $cacert = null,
         ?string $cert = null,
-        ?string $key = null
+        ?string $key = null,
     ): TransportInterface {
         $parts = parse_url($endpoint);
         if (!isset($parts['scheme'], $parts['host'], $parts['path'])) {
@@ -87,7 +87,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         $compression,
         float $timeout,
         int $maxRetries,
-        int $retryDelay
+        int $retryDelay,
     ): array {
         $opts = [];
 

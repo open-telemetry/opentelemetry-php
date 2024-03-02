@@ -32,7 +32,7 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
         ?LoggerInterface $logger = null,
         ?string $defaultLogLevel = LogLevel::DEBUG,
         ?SpanConverterInterface $converter = null,
-        int $granularity = 1
+        int $granularity = 1,
     ) {
         $this->setServiceName($serviceName);
         $this->setLogger($logger ?? new NullLogger());

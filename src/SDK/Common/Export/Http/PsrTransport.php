@@ -44,7 +44,7 @@ final class PsrTransport implements TransportInterface
         private array $headers,
         private array $compression,
         private int $retryDelay,
-        private int $maxRetries
+        private int $maxRetries,
     ) {
     }
 

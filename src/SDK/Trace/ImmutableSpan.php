@@ -29,7 +29,7 @@ final class ImmutableSpan implements SpanDataInterface
         private int $totalRecordedEvents,
         private StatusDataInterface $status,
         private int $endEpochNanos,
-        private bool $hasEnded
+        private bool $hasEnded,
     ) {
     }
 

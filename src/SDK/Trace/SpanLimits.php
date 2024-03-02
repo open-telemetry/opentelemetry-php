@@ -50,7 +50,7 @@ final class SpanLimits
         private AttributesFactoryInterface $eventAttributesFactory,
         private AttributesFactoryInterface $linkAttributesFactory,
         private int $eventCountLimit,
-        private int $linkCountLimit
+        private int $linkCountLimit,
     ) {
     }
 }

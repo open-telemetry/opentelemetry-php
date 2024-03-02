@@ -18,7 +18,7 @@ final class FilteredAttributesBuilder implements AttributesBuilderInterface
      */
     public function __construct(
         private AttributesBuilderInterface $builder,
-        private array $rejectedKeys
+        private array $rejectedKeys,
     ) {
     }
 

@@ -51,7 +51,7 @@ class ParentBased implements SamplerInterface
         ?SamplerInterface $remoteParentSampler = null,
         ?SamplerInterface $remoteParentNotSampler = null,
         ?SamplerInterface $localParentSampler = null,
-        ?SamplerInterface $localParentNotSampler = null
+        ?SamplerInterface $localParentNotSampler = null,
     ) {
         $this->remoteParentSampler = $remoteParentSampler ?? new AlwaysOnSampler();
         $this->remoteParentNotSampler = $remoteParentNotSampler ?? new AlwaysOffSampler();
@@ -69,7 +69,7 @@ class ParentBased implements SamplerInterface
         string $spanName,
         int $spanKind,
         AttributesInterface $attributes,
-        array $links
+        array $links,
     ): SamplingResult {
         $parentSpan = Span::fromContext($parentContext);
         $parentSpanContext = $parentSpan->getContext();

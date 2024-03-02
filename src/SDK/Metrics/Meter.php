@@ -55,7 +55,7 @@ final class Meter implements MeterInterface
         private InstrumentationScopeInterface $instrumentationScope,
         private MetricRegistryInterface $registry,
         private MetricWriterInterface $writer,
-        private ArrayAccess $destructors
+        private ArrayAccess $destructors,
     ) {
     }
 

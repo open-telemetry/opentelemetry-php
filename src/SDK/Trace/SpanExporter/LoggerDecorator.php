@@ -23,7 +23,7 @@ class LoggerDecorator implements SpanExporterInterface, LoggerAwareInterface
     public function __construct(
         SpanExporterInterface $decorated,
         ?LoggerInterface $logger = null,
-        ?SpanConverterInterface $converter = null
+        ?SpanConverterInterface $converter = null,
     ) {
         $this->setDecorated($decorated);
         $this->setLogger($logger ?? new NullLogger());

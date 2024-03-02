@@ -32,7 +32,7 @@ final class HistogramDataPoint
         /** @readonly */
         public int $timestamp,
         /** @readonly */
-        public iterable $exemplars = []
+        public iterable $exemplars = [],
     ) {
     }
 }

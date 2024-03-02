@@ -13,7 +13,7 @@ final class NoopMeterProvider implements MeterProviderInterface
         string $name,
         ?string $version = null,
         ?string $schemaUrl = null,
-        iterable $attributes = []
+        iterable $attributes = [],
     ): MeterInterface {
         return new NoopMeter();
     }

@@ -61,7 +61,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         int $exportTimeoutMillis = self::DEFAULT_EXPORT_TIMEOUT,
         int $maxExportBatchSize = self::DEFAULT_MAX_EXPORT_BATCH_SIZE,
         private bool $autoFlush = true,
-        ?MeterProviderInterface $meterProvider = null
+        ?MeterProviderInterface $meterProvider = null,
     ) {
         if ($maxQueueSize <= 0) {
             throw new InvalidArgumentException(sprintf('Maximum queue size (%d) must be greater than zero', $maxQueueSize));

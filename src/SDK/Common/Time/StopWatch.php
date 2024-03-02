@@ -13,7 +13,7 @@ final class StopWatch implements StopWatchInterface
 
     public function __construct(
         private ClockInterface $clock,
-        private ?int $initialStartTime = null
+        private ?int $initialStartTime = null,
     ) {
     }
 

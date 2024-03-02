@@ -33,7 +33,7 @@ final class StreamMetricSourceProvider implements MetricSourceProviderInterface,
         /** @readonly */
         public MetricCollectorInterface $metricCollector,
         /** @readonly */
-        public int $streamId
+        public int $streamId,
     ) {
     }
 

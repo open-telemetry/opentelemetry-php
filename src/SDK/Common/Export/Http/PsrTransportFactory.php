@@ -19,7 +19,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
     public function __construct(
         private ClientInterface $client,
         private RequestFactoryInterface $requestFactory,
-        private StreamFactoryInterface $streamFactory
+        private StreamFactoryInterface $streamFactory,
     ) {
     }
 
@@ -36,7 +36,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
         int $maxRetries = 3,
         ?string $cacert = null,
         ?string $cert = null,
-        ?string $key = null
+        ?string $key = null,
     ): PsrTransport {
         if (!filter_var($endpoint, FILTER_VALIDATE_URL)) {
             throw new InvalidArgumentException(sprintf('Invalid endpoint url "%s"', $endpoint));

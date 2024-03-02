@@ -50,7 +50,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         /** @readonly */
         private int $totalRecordedLinks,
         /** @readonly */
-        private int $startEpochNanos
+        private int $startEpochNanos,
     ) {
         $this->status = StatusData::unset();
     }
@@ -79,7 +79,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         AttributesBuilderInterface $attributesBuilder,
         array $links,
         int $totalRecordedLinks,
-        int $startEpochNanos
+        int $startEpochNanos,
     ): self {
         $span = new self(
             $name,

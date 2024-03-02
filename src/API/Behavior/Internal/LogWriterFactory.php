@@ -33,6 +33,7 @@ class LogWriterFactory
                     return new Psr3LogWriter($logger);
                 }
                 error_log('OpenTelemetry: cannot use OTEL_PHP_LOG_DESTINATION=psr3 without providing a PSR-3 logger');
+
                 //default to error log
                 return new ErrorLogWriter();
             case 'error_log':

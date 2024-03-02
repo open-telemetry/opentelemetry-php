@@ -17,7 +17,7 @@ class Tracer implements API\TracerInterface
         /** @readonly */
         private TracerSharedState $tracerSharedState,
         /** @readonly */
-        private InstrumentationScopeInterface $instrumentationScope
+        private InstrumentationScopeInterface $instrumentationScope,
     ) {
     }
 

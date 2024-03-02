@@ -57,7 +57,7 @@ class Util
     public static function triggerMethodDeprecationNotice(
         string $methodName,
         string $alternativeMethodName = null,
-        string $alternativeClassName = null
+        string $alternativeClassName = null,
     ): void {
         if (self::getErrorLevel() === self::E_NONE) {
             return;

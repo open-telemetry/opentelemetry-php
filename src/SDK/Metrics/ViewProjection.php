@@ -19,7 +19,7 @@ final class ViewProjection
         /** @readonly */
         public ?array $attributeKeys,
         /** @readonly */
-        public ?AggregationInterface $aggregation
+        public ?AggregationInterface $aggregation,
     ) {
     }
 }

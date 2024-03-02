@@ -19,7 +19,7 @@ class Sdk
         private TracerProviderInterface $tracerProvider,
         private MeterProviderInterface $meterProvider,
         private LoggerProviderInterface $loggerProvider,
-        private TextMapPropagatorInterface $propagator
+        private TextMapPropagatorInterface $propagator,
     ) {
     }
 

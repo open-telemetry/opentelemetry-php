@@ -15,7 +15,7 @@ final class FilteredReservoir implements ExemplarReservoirInterface
 {
     public function __construct(
         private ExemplarReservoirInterface $reservoir,
-        private ExemplarFilterInterface $filter
+        private ExemplarFilterInterface $filter,
     ) {
     }
 

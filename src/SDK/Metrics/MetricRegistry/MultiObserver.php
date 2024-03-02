@@ -19,7 +19,7 @@ final class MultiObserver implements ObserverInterface
 
     public function __construct(
         private AttributesFactoryInterface $attributesFactory,
-        private int $timestamp
+        private int $timestamp,
     ) {
     }
 

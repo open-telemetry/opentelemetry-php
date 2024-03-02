@@ -8,7 +8,7 @@ final class Entry
 {
     public function __construct(
         private mixed $value,
-        private MetadataInterface $metadata
+        private MetadataInterface $metadata,
     ) {
     }
 

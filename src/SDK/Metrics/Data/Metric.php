@@ -21,7 +21,7 @@ final class Metric
         /** @readonly */
         public ?string $description,
         /** @readonly */
-        public DataInterface $data
+        public DataInterface $data,
     ) {
     }
 }

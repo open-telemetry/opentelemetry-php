@@ -23,7 +23,7 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
      */
     public function __construct(
         /** @readonly */
-        public array $boundaries
+        public array $boundaries,
     ) {
     }
 
@@ -110,7 +110,7 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
         array $exemplars,
         int $startTimestamp,
         int $timestamp,
-        $temporality
+        $temporality,
     ): Data\Histogram {
         $dataPoints = [];
         foreach ($attributes as $key => $dataPointAttributes) {

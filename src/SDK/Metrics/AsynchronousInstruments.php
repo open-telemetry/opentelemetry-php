@@ -24,7 +24,7 @@ final class AsynchronousInstruments
         ArrayAccess $destructors,
         callable $callback,
         array $instruments,
-        ReferenceCounterInterface $referenceCounter
+        ReferenceCounterInterface $referenceCounter,
     ): ObservableCallbackInterface {
         $target = null;
         $callback = weaken(closure($callback), $target);

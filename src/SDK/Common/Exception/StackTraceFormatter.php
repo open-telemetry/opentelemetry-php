@@ -76,8 +76,8 @@ final class StackTraceFormatter
         $n = count($frames);
         if ($enclosing) {
             for ($m = count($enclosing);
-                 $n && $m && $frames[$n - 1] === $enclosing[$m - 1];
-                 $n--, $m--) {
+                $n && $m && $frames[$n - 1] === $enclosing[$m - 1];
+                $n--, $m--) {
             }
         }
         for ($i = 0; $i < $n; $i++) {

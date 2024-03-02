@@ -14,6 +14,6 @@ interface TracerProviderInterface
         string $name,
         ?string $version = null,
         ?string $schemaUrl = null,
-        iterable $attributes = []
+        iterable $attributes = [],
     ): TracerInterface;
 }

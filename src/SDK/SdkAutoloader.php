@@ -55,7 +55,7 @@ class SdkAutoloader
                 ->withMeterProvider($meterProvider)
                 ->withLoggerProvider($loggerProvider)
                 ->withPropagator($propagator)
-                ;
+            ;
         });
 
         return true;

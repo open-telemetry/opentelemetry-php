@@ -18,7 +18,7 @@ class Logger implements LoggerInterface
 {
     public function __construct(
         private LoggerSharedState $loggerSharedState,
-        private InstrumentationScopeInterface $scope
+        private InstrumentationScopeInterface $scope,
     ) {
     }
 

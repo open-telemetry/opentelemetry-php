@@ -17,7 +17,7 @@ final class RegistryRegistration implements MetricRegistrationInterface
 {
     public function __construct(
         private MetricSourceRegistryInterface $registry,
-        private StalenessHandlerInterface $stalenessHandler
+        private StalenessHandlerInterface $stalenessHandler,
     ) {
     }
 

@@ -38,7 +38,7 @@ class JaegerPropagatorTest extends TestCase
     private function generateTraceIdHeaderValue(
         string $traceId,
         string $spanId,
-        string $flag
+        string $flag,
     ): string {
         return sprintf(
             '%s:%s:0:%s',

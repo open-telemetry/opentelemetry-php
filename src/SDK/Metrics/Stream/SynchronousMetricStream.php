@@ -30,7 +30,7 @@ final class SynchronousMetricStream implements MetricStreamInterface
 
     public function __construct(
         private AggregationInterface $aggregation,
-        private int $timestamp
+        private int $timestamp,
     ) {
         $this->delta = new DeltaStorage($this->aggregation);
     }

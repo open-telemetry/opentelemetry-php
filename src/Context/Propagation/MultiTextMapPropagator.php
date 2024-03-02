@@ -26,7 +26,7 @@ final class MultiTextMapPropagator implements TextMapPropagatorInterface
      */
     public function __construct(
         /** @readonly */
-        private array $propagators
+        private array $propagators,
     ) {
         $this->fields = $this->extractFields($this->propagators);
     }

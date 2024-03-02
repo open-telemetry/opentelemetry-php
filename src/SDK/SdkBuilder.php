@@ -20,7 +20,7 @@ use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 class SdkBuilder
 {
     private ?TracerProviderInterface $tracerProvider = null;
-    private ?MeterProviderInterface  $meterProvider = null;
+    private ?MeterProviderInterface $meterProvider = null;
     private ?LoggerProviderInterface $loggerProvider = null;
     private ?TextMapPropagatorInterface $propagator = null;
     private bool $autoShutdown = false;

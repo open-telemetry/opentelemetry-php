@@ -19,7 +19,7 @@ final class Exemplar
         /** @readonly */
         public ?string $traceId,
         /** @readonly */
-        public ?string $spanId
+        public ?string $spanId,
     ) {
     }
 

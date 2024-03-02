@@ -15,7 +15,7 @@ final class InstrumentationScope implements InstrumentationScopeInterface
         private string $name,
         private ?string $version,
         private ?string $schemaUrl,
-        private AttributesInterface $attributes
+        private AttributesInterface $attributes,
     ) {
     }
 

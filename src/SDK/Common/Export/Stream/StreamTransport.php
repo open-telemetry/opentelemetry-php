@@ -34,7 +34,7 @@ final class StreamTransport implements TransportInterface
      */
     public function __construct(
         private $stream,
-        private string $contentType
+        private string $contentType,
     ) {
     }
 

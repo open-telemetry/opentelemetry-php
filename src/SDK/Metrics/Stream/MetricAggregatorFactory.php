@@ -14,7 +14,7 @@ final class MetricAggregatorFactory implements MetricAggregatorFactoryInterface
 {
     public function __construct(
         private ?AttributeProcessorInterface $attributeProcessor,
-        private AggregationInterface $aggregation
+        private AggregationInterface $aggregation,
     ) {
     }
 

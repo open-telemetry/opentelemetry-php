@@ -12,7 +12,7 @@ final class Gauge implements DataInterface
      */
     public function __construct(
         /** @readonly */
-        public iterable $dataPoints
+        public iterable $dataPoints,
     ) {
     }
 }

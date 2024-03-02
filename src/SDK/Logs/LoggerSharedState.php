@@ -14,7 +14,7 @@ class LoggerSharedState
     public function __construct(
         private ResourceInfo $resource,
         private LogRecordLimits $limits,
-        private LogRecordProcessorInterface $processor
+        private LogRecordProcessorInterface $processor,
     ) {
     }
 

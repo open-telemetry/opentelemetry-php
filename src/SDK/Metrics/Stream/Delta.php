@@ -15,7 +15,7 @@ final class Delta
     public function __construct(
         public Metric $metric,
         public int|GMP $readers,
-        public ?self $prev = null
+        public ?self $prev = null,
     ) {
     }
 }

@@ -16,7 +16,7 @@ final class Instrument
         /** @readonly */
         public ?string $description,
         /** @readonly */
-        public array $advisory = []
+        public array $advisory = [],
     ) {
     }
 }

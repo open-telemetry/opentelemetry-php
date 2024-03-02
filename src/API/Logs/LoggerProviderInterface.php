@@ -13,6 +13,6 @@ interface LoggerProviderInterface
         string $name,
         ?string $version = null,
         ?string $schemaUrl = null,
-        iterable $attributes = [] //instrumentation scope attributes
+        iterable $attributes = [], //instrumentation scope attributes
     ): LoggerInterface;
 }

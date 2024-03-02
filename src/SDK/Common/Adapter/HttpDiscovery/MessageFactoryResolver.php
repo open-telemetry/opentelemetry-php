@@ -21,7 +21,7 @@ final class MessageFactoryResolver implements FactoryResolverInterface
         private ?ServerRequestFactoryInterface $serverRequestFactory = null,
         private ?StreamFactoryInterface $streamFactory = null,
         private ?UploadedFileFactoryInterface $uploadedFileFactory = null,
-        private ?UriFactoryInterface $uriFactory = null
+        private ?UriFactoryInterface $uriFactory = null,
     ) {
     }
 
@@ -31,7 +31,7 @@ final class MessageFactoryResolver implements FactoryResolverInterface
         ?ServerRequestFactoryInterface $serverRequestFactory = null,
         ?StreamFactoryInterface $streamFactory = null,
         ?UploadedFileFactoryInterface $uploadedFileFactory = null,
-        ?UriFactoryInterface $uriFactory = null
+        ?UriFactoryInterface $uriFactory = null,
     ): self {
         return new self(
             $requestFactory,

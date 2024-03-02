@@ -23,7 +23,7 @@ final class Metric
         public array $attributes,
         public array $summaries,
         public int $timestamp,
-        public array $exemplars = []
+        public array $exemplars = [],
     ) {
     }
 }

@@ -15,7 +15,7 @@ final class Sum implements DataInterface
         /** @readonly */
         public string|Temporality $temporality,
         /** @readonly */
-        public bool $monotonic
+        public bool $monotonic,
     ) {
     }
 }

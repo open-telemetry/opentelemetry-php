@@ -20,7 +20,7 @@ final class ObservableCallbackDestructor
      */
     public function __construct(
         public ArrayAccess $destructors,
-        private MetricWriterInterface $writer
+        private MetricWriterInterface $writer,
     ) {
     }
 

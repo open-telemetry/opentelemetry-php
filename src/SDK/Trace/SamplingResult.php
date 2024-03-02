@@ -29,7 +29,7 @@ final class SamplingResult
     public function __construct(
         private int $decision,
         private iterable $attributes = [],
-        private ?API\TraceStateInterface $traceState = null
+        private ?API\TraceStateInterface $traceState = null,
     ) {
     }
 

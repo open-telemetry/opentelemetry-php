@@ -14,7 +14,7 @@ final class ExplicitBucketHistogramSummary
         public float|int $sum,
         public float|int $min,
         public float|int $max,
-        public array $buckets
+        public array $buckets,
     ) {
     }
 }

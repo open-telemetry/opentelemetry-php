@@ -12,7 +12,7 @@ final class StopWatchFactory implements StopWatchFactoryInterface
 
     public function __construct(
         ?ClockInterface $clock = null,
-        private ?int $initialStartTime = null
+        private ?int $initialStartTime = null,
     ) {
         $this->clock = $clock ?? ClockFactory::getDefault();
     }

@@ -29,7 +29,7 @@ final class TracerSharedState
         private SpanLimits $spanLimits,
         /** @readonly */
         private SamplerInterface $sampler,
-        array $spanProcessors
+        array $spanProcessors,
     ) {
         $this->spanProcessor = match (count($spanProcessors)) {
             0 => NoopSpanProcessor::getInstance(),

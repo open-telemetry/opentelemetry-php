@@ -16,14 +16,14 @@ final class MessageFactory implements MessageFactoryInterface
     public function __construct(
         private RequestFactoryInterface $requestFactory,
         private ResponseFactoryInterface $responseFactory,
-        private ServerRequestFactoryInterface $serverRequestFactory
+        private ServerRequestFactoryInterface $serverRequestFactory,
     ) {
     }
 
     public static function create(
         RequestFactoryInterface $requestFactory,
         ResponseFactoryInterface $responseFactory,
-        ServerRequestFactoryInterface $serverRequestFactory
+        ServerRequestFactoryInterface $serverRequestFactory,
     ): self {
         return new self($requestFactory, $responseFactory, $serverRequestFactory);
     }
