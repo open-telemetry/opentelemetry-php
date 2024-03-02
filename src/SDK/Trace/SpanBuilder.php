@@ -13,8 +13,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
 final class SpanBuilder implements API\SpanBuilderInterface
 {
-    /** @var ContextInterface|false|null */
-    private $parentContext = null;
+    private ContextInterface|false|null $parentContext = null;
 
     /**
      * @psalm-var API\SpanKind::KIND_*
@@ -41,7 +40,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
-    public function setParent($context): API\SpanBuilderInterface
+    public function setParent(ContextInterface|false|null $context): API\SpanBuilderInterface
     {
         $this->parentContext = $context;
 
@@ -74,7 +73,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
-    public function setAttribute(string $key, $value): API\SpanBuilderInterface
+    public function setAttribute(string $key, mixed $value): API\SpanBuilderInterface
     {
         $this->attributesBuilder[$key] = $value;
 

@@ -76,7 +76,7 @@ interface MeterInterface
         string $name,
         ?string $unit = null,
         ?string $description = null,
-        $advisory = [],
+        array|callable $advisory = [],
         callable ...$callbacks,
     ): ObservableCounterInterface;
 
@@ -116,7 +116,7 @@ interface MeterInterface
         string $name,
         ?string $unit = null,
         ?string $description = null,
-        $advisory = [],
+        array|callable $advisory = [],
         callable ...$callbacks,
     ): ObservableGaugeInterface;
 
@@ -155,7 +155,7 @@ interface MeterInterface
         string $name,
         ?string $unit = null,
         ?string $description = null,
-        $advisory = [],
+        array|callable $advisory = [],
         callable ...$callbacks,
     ): ObservableUpDownCounterInterface;
 }
