@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Instrumentation;
 
-use ArrayAccess;
-use function assert;
-use function class_exists;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
@@ -14,7 +11,7 @@ use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
-use const PHP_VERSION_ID;
+use WeakMap;
 
 /**
  * Provides access to cached {@link TracerInterface} and {@link MeterInterface}
@@ -26,37 +23,25 @@ use const PHP_VERSION_ID;
  */
 final class CachedInstrumentation
 {
-    /** @var ArrayAccess<TracerProviderInterface, TracerInterface>|null */
-    private ?ArrayAccess $tracers;
-    /** @var ArrayAccess<MeterProviderInterface, MeterInterface>|null */
-    private ?ArrayAccess $meters;
-    /** @var ArrayAccess<LoggerProviderInterface, LoggerInterface>|null */
-    private ?ArrayAccess $loggers;
+    /** @var WeakMap<TracerProviderInterface, TracerInterface> */
+    private WeakMap $tracers;
+    /** @var WeakMap<MeterProviderInterface, MeterInterface> */
+    private WeakMap $meters;
+    /** @var WeakMap<LoggerProviderInterface, LoggerInterface> */
+    private WeakMap $loggers;
 
+    /**
+     * @psalm-suppress PropertyTypeCoercion
+     */
     public function __construct(
         private string $name,
         private ?string $version = null,
         private ?string $schemaUrl = null,
         private iterable $attributes = [],
     ) {
-        $this->tracers = self::createWeakMap();
-        $this->meters = self::createWeakMap();
-        $this->loggers = self::createWeakMap();
-    }
-
-    private static function createWeakMap(): ?ArrayAccess
-    {
-        if (PHP_VERSION_ID < 80000) {
-            return null;
-        }
-
-        /** @phan-suppress-next-line PhanUndeclaredClassReference */
-        assert(class_exists(\WeakMap::class, false));
-        /** @phan-suppress-next-line PhanUndeclaredClassMethod */
-        $map = new \WeakMap();
-        assert($map instanceof ArrayAccess);
-
-        return $map;
+        $this->tracers = new \WeakMap();
+        $this->meters = new \WeakMap();
+        $this->loggers = new \WeakMap();
     }
 
     public function tracer(): TracerInterface

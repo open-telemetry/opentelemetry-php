@@ -11,7 +11,6 @@ use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
-use OpenTelemetry\SDK\Common\Util\WeakMap;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;
@@ -19,6 +18,7 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistryInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
+use WeakMap;
 
 final class MeterProvider implements MeterProviderInterface
 {
@@ -51,7 +51,7 @@ final class MeterProvider implements MeterProviderInterface
         $registry = new MetricRegistry($contextStorage, $attributesFactory, $clock);
         $this->registry = $registry;
         $this->writer = $registry;
-        $this->destructors = WeakMap::create();
+        $this->destructors = new WeakMap();
     }
 
     public function getMeter(

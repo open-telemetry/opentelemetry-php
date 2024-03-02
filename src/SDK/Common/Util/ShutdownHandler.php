@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Util;
 
 use function array_key_last;
-use ArrayAccess;
 use Closure;
 use function register_shutdown_function;
+use WeakMap;
 
 final class ShutdownHandler
 {
     /** @var array<int, Closure>|null */
     private static ?array $handlers = null;
-    /** @var ArrayAccess<object, self>|null  */
-    private static ?ArrayAccess $weakMap = null;
+    /** @var WeakMap<object, self>|null  */
+    private static ?WeakMap $weakMap = null;
 
     private array $ids = [];
 
@@ -56,7 +56,7 @@ final class ShutdownHandler
             return;
         }
 
-        self::$weakMap ??= WeakMap::create();
+        self::$weakMap ??= new WeakMap();
         $handler = self::$weakMap[$object] ??= new self();
         $handler->ids[] = array_key_last(self::$handlers);
     }
