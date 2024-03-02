@@ -48,10 +48,6 @@ final class CachedInstrumentation
     {
         $tracerProvider = Globals::tracerProvider();
 
-        if ($this->tracers === null) {
-            return $tracerProvider->getTracer($this->name, $this->version, $this->schemaUrl, $this->attributes);
-        }
-
         return $this->tracers[$tracerProvider] ??= $tracerProvider->getTracer($this->name, $this->version, $this->schemaUrl, $this->attributes);
     }
 
@@ -59,19 +55,11 @@ final class CachedInstrumentation
     {
         $meterProvider = Globals::meterProvider();
 
-        if ($this->meters === null) {
-            return $meterProvider->getMeter($this->name, $this->version, $this->schemaUrl, $this->attributes);
-        }
-
         return $this->meters[$meterProvider] ??= $meterProvider->getMeter($this->name, $this->version, $this->schemaUrl, $this->attributes);
     }
     public function logger(): LoggerInterface
     {
         $loggerProvider = Globals::loggerProvider();
-
-        if ($this->loggers === null) {
-            return $loggerProvider->getLogger($this->name, $this->version, $this->schemaUrl, $this->attributes);
-        }
 
         return $this->loggers[$loggerProvider] ??= $loggerProvider->getLogger($this->name, $this->version, $this->schemaUrl, $this->attributes);
     }
