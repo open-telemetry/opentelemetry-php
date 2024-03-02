@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use AssertionError;
 use function base64_decode;
 use function bin2hex;
 use Exception;
@@ -27,7 +26,6 @@ use function ucwords;
 
 /**
  * @internal
- *
  * @psalm-type SUPPORTED_CONTENT_TYPES = ContentTypes::PROTOBUF|ContentTypes::JSON|ContentTypes::NDJSON
  */
 final class ProtobufSerializer
@@ -54,29 +52,29 @@ final class ProtobufSerializer
 
     public function serializeTraceId(string $traceId): string
     {
+        // @phpstan-ignore-next-line
         return match ($this->contentType) {
             ContentTypes::PROTOBUF => $traceId,
             ContentTypes::JSON, ContentTypes::NDJSON => base64_decode(bin2hex($traceId)),
-            default => throw new AssertionError(),
         };
     }
 
     public function serializeSpanId(string $spanId): string
     {
+        // @phpstan-ignore-next-line
         return match ($this->contentType) {
             ContentTypes::PROTOBUF => $spanId,
             ContentTypes::JSON, ContentTypes::NDJSON => base64_decode(bin2hex($spanId)),
-            default => throw new AssertionError(),
         };
     }
 
     public function serialize(Message $message): string
     {
+        // @phpstan-ignore-next-line
         return match ($this->contentType) {
             ContentTypes::PROTOBUF => $message->serializeToString(),
             ContentTypes::JSON => self::postProcessJsonEnumValues($message, $message->serializeToJsonString()),
             ContentTypes::NDJSON => self::postProcessJsonEnumValues($message, $message->serializeToJsonString()) . "\n",
-            default => throw new AssertionError(),
         };
     }
 
@@ -86,10 +84,10 @@ final class ProtobufSerializer
      */
     public function hydrate(Message $message, string $payload): void
     {
+        // @phpstan-ignore-next-line
         match ($this->contentType) {
             ContentTypes::PROTOBUF => $message->mergeFromString($payload),
             ContentTypes::JSON, ContentTypes::NDJSON => $message->mergeFromJsonString($payload, true),
-            default => throw new AssertionError(),
         };
     }
 
