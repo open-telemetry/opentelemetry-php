@@ -9,7 +9,7 @@ namespace OpenTelemetry\Context;
  */
 final class ContextKey implements ContextKeyInterface
 {
-    public function __construct(private ?string $name=null)
+    public function __construct(private ?string $name = null)
     {
     }
 
