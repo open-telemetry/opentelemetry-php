@@ -50,7 +50,7 @@ class PhpIniResolverTest extends TestCase
             'string' => ['foo', true],
             'array' => [['foo'], true],
             'empty string' => ['', false],
-            'null' => [null, false],
+            'false' => [false, false],
             'empty array' => [[], false],
         ];
     }
