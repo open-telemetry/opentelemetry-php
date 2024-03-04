@@ -6,9 +6,9 @@ namespace OpenTelemetry\SDK;
 
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Config\Configuration;
+use OpenTelemetry\Config\Variables;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 
 class Sdk

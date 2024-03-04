@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration;
+namespace OpenTelemetry\Tests\Unit\Config;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
 use Generator;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\Defaults;
-use OpenTelemetry\SDK\Common\Configuration\KnownValues;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
-use OpenTelemetry\SDK\Common\Configuration\VariableTypes;
+use OpenTelemetry\Config\Configuration;
+use OpenTelemetry\Config\Defaults;
+use OpenTelemetry\Config\KnownValues;
+use OpenTelemetry\Config\Variables;
+use OpenTelemetry\Config\VariableTypes;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Configuration\Configuration
+ * @covers \OpenTelemetry\Config\Configuration
  */
 class ConfigurationTest extends TestCase
 {

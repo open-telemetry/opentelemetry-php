@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Util;
+namespace OpenTelemetry\Config\Accessor;
 
 use LogicException;
 

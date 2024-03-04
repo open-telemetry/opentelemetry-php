@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Logs;
 
+use OpenTelemetry\Config\Configuration;
+use OpenTelemetry\Config\Variables;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
 use const PHP_INT_MAX;
 
 class LogRecordLimitsBuilder

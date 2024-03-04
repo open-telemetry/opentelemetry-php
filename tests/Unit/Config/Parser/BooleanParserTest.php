@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Parser;
+namespace OpenTelemetry\Tests\Unit\Config\Parser;
 
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser;
+use OpenTelemetry\Config\Parser\BooleanParser;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser
+ * @covers \OpenTelemetry\Config\Parser\BooleanParser
  */
 class BooleanParserTest extends TestCase
 {

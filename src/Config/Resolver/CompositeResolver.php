@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\Config\Resolver;
 
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\Config\Configuration;
 
 /**
  * @internal

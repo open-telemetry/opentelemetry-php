@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
-use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
+use OpenTelemetry\Config\Configuration;
+use OpenTelemetry\Config\KnownValues as Values;
+use OpenTelemetry\Config\Variables as Env;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;

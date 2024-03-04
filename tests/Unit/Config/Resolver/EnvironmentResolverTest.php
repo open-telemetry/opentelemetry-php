@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\Tests\Unit\Config\Resolver;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver;
+use OpenTelemetry\Config\Resolver\EnvironmentResolver;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver
+ * @covers \OpenTelemetry\Config\Resolver\EnvironmentResolver
  */
 class EnvironmentResolverTest extends TestCase
 {

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\Tests\Unit\Config\Resolver;
 
-use OpenTelemetry\SDK\Common\Configuration\Defaults;
-use OpenTelemetry\SDK\Common\Configuration\Resolver\CompositeResolver;
-use OpenTelemetry\SDK\Common\Configuration\Resolver\ResolverInterface;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\Config\Defaults;
+use OpenTelemetry\Config\Resolver\CompositeResolver;
+use OpenTelemetry\Config\Resolver\ResolverInterface;
+use OpenTelemetry\Config\Variables;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Configuration\Resolver\CompositeResolver
+ * @covers \OpenTelemetry\Config\Resolver\CompositeResolver
  * @psalm-suppress UndefinedInterfaceMethod
  */
 class CompositeResolverTest extends TestCase

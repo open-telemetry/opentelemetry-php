@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use OpenTelemetry\SDK\Common\Configuration\KnownValues;
+use OpenTelemetry\Config\KnownValues;
 use UnexpectedValueException;
 
 class Protocols

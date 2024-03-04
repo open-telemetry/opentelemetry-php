@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\Config\Configuration;
+use OpenTelemetry\Config\Variables;
 use OpenTelemetry\SDK\Registry;
 use RuntimeException;
 

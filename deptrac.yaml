@@ -25,6 +25,10 @@ deptrac:
           collectors:
               -   type: directory
                   value: src/SDK/.*
+      - name: Config
+        collectors:
+          - type: directory
+            value: src/Config/.*
       -   name: Context
           collectors:
               -   type: directory
@@ -83,6 +87,7 @@ deptrac:
           - FFI
       SemConv: ~
       API:
+          - Config
           - Context
           - PsrLog
       SDK:
@@ -91,6 +96,8 @@ deptrac:
           - PsrHttp
           - HttpPlug
           - Composer
+      Config:
+          - PsrLog
       Contrib:
           - +SDK
           - +OtelProto
