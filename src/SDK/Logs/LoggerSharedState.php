@@ -9,20 +9,15 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 class LoggerSharedState
 {
-    private ResourceInfo $resource;
-    private LogRecordProcessorInterface $processor;
-    private LogRecordLimits $limits;
     private ?bool $shutdownResult = null;
 
     public function __construct(
-        ResourceInfo $resource,
-        LogRecordLimits $limits,
-        LogRecordProcessorInterface $processor
+        private ResourceInfo $resource,
+        private LogRecordLimits $limits,
+        private LogRecordProcessorInterface $processor,
     ) {
-        $this->resource = $resource;
-        $this->limits = $limits;
-        $this->processor = $processor;
     }
+
     public function hasShutdown(): bool
     {
         return null !== $this->shutdownResult;

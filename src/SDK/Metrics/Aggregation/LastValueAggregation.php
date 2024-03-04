@@ -57,7 +57,7 @@ final class LastValueAggregation implements AggregationInterface
         array $exemplars,
         int $startTimestamp,
         int $timestamp,
-        $temporality
+        $temporality,
     ): Data\Gauge {
         $dataPoints = [];
         foreach ($attributes as $key => $dataPointAttributes) {

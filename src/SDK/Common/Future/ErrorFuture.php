@@ -9,11 +9,8 @@ use Throwable;
 
 final class ErrorFuture implements FutureInterface
 {
-    private Throwable $throwable;
-
-    public function __construct(Throwable $throwable)
+    public function __construct(private Throwable $throwable)
     {
-        $this->throwable = $throwable;
     }
 
     public function await()

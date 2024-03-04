@@ -18,7 +18,7 @@ final class TracerProviderFactory
     public function __construct(
         ?ExporterFactory $exporterFactory = null,
         ?SamplerFactory $samplerFactory = null,
-        ?SpanProcessorFactory $spanProcessorFactory = null
+        ?SpanProcessorFactory $spanProcessorFactory = null,
     ) {
         $this->exporterFactory = $exporterFactory ?: new ExporterFactory();
         $this->samplerFactory = $samplerFactory ?: new SamplerFactory();

@@ -29,6 +29,7 @@ final class StreamTransportFactory implements TransportFactoryInterface
      * @psalm-template CONTENT_TYPE of string
      * @psalm-param CONTENT_TYPE $contentType
      * @psalm-return TransportInterface<CONTENT_TYPE>
+     * @throws ErrorException
      */
     public function create(
         $endpoint,
@@ -40,7 +41,7 @@ final class StreamTransportFactory implements TransportFactoryInterface
         int $maxRetries = 3,
         ?string $cacert = null,
         ?string $cert = null,
-        ?string $key = null
+        ?string $key = null,
     ): TransportInterface {
         assert(!empty($endpoint));
         $stream = is_resource($endpoint)
@@ -69,7 +70,7 @@ final class StreamTransportFactory implements TransportFactoryInterface
         float $timeout = 10.,
         ?string $cacert = null,
         ?string $cert = null,
-        ?string $key = null
+        ?string $key = null,
     ) {
         $context = stream_context_create([
             'http' => [

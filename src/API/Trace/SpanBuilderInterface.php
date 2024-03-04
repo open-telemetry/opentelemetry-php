@@ -20,10 +20,10 @@ interface SpanBuilderInterface
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#span-creation
      */
-    public function setParent($context): SpanBuilderInterface;
+    public function setParent(ContextInterface|false|null $context): SpanBuilderInterface;
 
     public function addLink(SpanContextInterface $context, iterable $attributes = []): SpanBuilderInterface;
-    public function setAttribute(string $key, $value): SpanBuilderInterface;
+    public function setAttribute(string $key, mixed $value): SpanBuilderInterface;
     public function setAttributes(iterable $attributes): SpanBuilderInterface;
 
     /**

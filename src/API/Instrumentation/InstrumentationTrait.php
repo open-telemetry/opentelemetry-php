@@ -111,6 +111,7 @@ trait InstrumentationTrait
     public function activate(): bool
     {
         $this->validateImplementation();
+
         // activate instrumentation with the API. not implemented yet.
         return true;
     }

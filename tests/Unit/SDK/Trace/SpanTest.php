@@ -108,7 +108,7 @@ class SpanTest extends MockeryTestCase
     {
         ClockFactory::setDefault(null);
         Logging::reset();
-//        LoggerHolder::unset();
+        //        LoggerHolder::unset();
     }
 
     // region API
@@ -860,7 +860,7 @@ class SpanTest extends MockeryTestCase
         SpanLimits $spanLimits = null,
         string $parentSpanId = null,
         iterable $attributes = [],
-        array $links = []
+        array $links = [],
     ): Span {
         $parentSpanId = $parentSpanId ?? $this->parentSpanId;
         $spanLimits = $spanLimits ?? (new SpanLimitsBuilder())->build();
@@ -924,7 +924,7 @@ class SpanTest extends MockeryTestCase
         EventInterface $event,
         string $expectedName,
         AttributesInterface $expectedAttributes,
-        int $expectedEpochNanos
+        int $expectedEpochNanos,
     ): void {
         $this->assertSame($expectedName, $event->getName());
         $this->assertEquals($expectedAttributes, $event->getAttributes());
@@ -945,7 +945,7 @@ class SpanTest extends MockeryTestCase
         int $startEpochNanos,
         int $endEpochNanos,
         string $status,
-        bool $hasEnded
+        bool $hasEnded,
     ): void {
         $this->assertSame($spanName, $spanData->getName());
         $this->assertSame($this->traceId, $spanData->getTraceId());

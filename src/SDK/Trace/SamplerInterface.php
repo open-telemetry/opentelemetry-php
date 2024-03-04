@@ -34,7 +34,7 @@ interface SamplerInterface
         string $spanName,
         int $spanKind,
         AttributesInterface $attributes,
-        array $links
+        array $links,
     ): SamplingResult;
 
     /**

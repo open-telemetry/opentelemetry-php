@@ -29,8 +29,6 @@ use OpenTelemetry\SDK\Trace\Span;
  */
 class ParentBased implements SamplerInterface
 {
-    private SamplerInterface $root;
-
     private SamplerInterface $remoteParentSampler;
 
     private SamplerInterface $remoteParentNotSampler;
@@ -49,13 +47,12 @@ class ParentBased implements SamplerInterface
      * @param SamplerInterface|null $localParentNotSampler Sampler called for the span with the local not sampled parent. When null, `AlwaysOffSampler` is used.
      */
     public function __construct(
-        SamplerInterface $root,
+        private SamplerInterface $root,
         ?SamplerInterface $remoteParentSampler = null,
         ?SamplerInterface $remoteParentNotSampler = null,
         ?SamplerInterface $localParentSampler = null,
-        ?SamplerInterface $localParentNotSampler = null
+        ?SamplerInterface $localParentNotSampler = null,
     ) {
-        $this->root = $root;
         $this->remoteParentSampler = $remoteParentSampler ?? new AlwaysOnSampler();
         $this->remoteParentNotSampler = $remoteParentNotSampler ?? new AlwaysOffSampler();
         $this->localParentSampler = $localParentSampler ?? new AlwaysOnSampler();
@@ -72,7 +69,7 @@ class ParentBased implements SamplerInterface
         string $spanName,
         int $spanKind,
         AttributesInterface $attributes,
-        array $links
+        array $links,
     ): SamplingResult {
         $parentSpan = Span::fromContext($parentContext);
         $parentSpanContext = $parentSpan->getContext();

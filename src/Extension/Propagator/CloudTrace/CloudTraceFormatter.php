@@ -20,9 +20,6 @@ final class CloudTraceFormatter
 
     /**
      * Generate a SpanContext object from the Trace Context header
-     *
-     * @param string $header
-     * @return SpanContextInterface
      */
     public static function deserialize(string $header) : SpanContextInterface
     {
@@ -47,9 +44,6 @@ final class CloudTraceFormatter
 
     /**
      * Convert a SpanContextInterface to header string
-     *
-     * @param SpanContextInterface $context
-     * @return string
      */
     public static function serialize(SpanContextInterface $context) : string
     {

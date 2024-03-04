@@ -15,16 +15,13 @@ use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
  */
 final class MultiRegistryRegistration implements MetricRegistrationInterface
 {
-    private iterable $registries;
-    private StalenessHandlerInterface $stalenessHandler;
-
     /**
      * @param iterable<MetricSourceRegistryInterface> $registries
      */
-    public function __construct(iterable $registries, StalenessHandlerInterface $stalenessHandler)
-    {
-        $this->registries = $registries;
-        $this->stalenessHandler = $stalenessHandler;
+    public function __construct(
+        private iterable $registries,
+        private StalenessHandlerInterface $stalenessHandler,
+    ) {
     }
 
     public function register(MetricSourceProviderInterface $provider, MetricMetadataInterface $metadata): void

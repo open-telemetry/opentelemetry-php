@@ -61,7 +61,7 @@ class Configuration
 
         try {
             return BooleanParser::parse($resolved);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             self::logWarning(sprintf('Invalid boolean value "%s" interpreted as "false" for %s', $resolved, $key));
 
             return false;

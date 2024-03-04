@@ -11,15 +11,11 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
  */
 class LogRecordLimits
 {
-    private AttributesFactoryInterface $attributesFactory;
-
     /**
      * @internal Use {@see SpanLimitsBuilder} to create {@see SpanLimits} instance.
      */
-    public function __construct(
-        AttributesFactoryInterface $attributesFactory
-    ) {
-        $this->attributesFactory = $attributesFactory;
+    public function __construct(private AttributesFactoryInterface $attributesFactory)
+    {
     }
 
     public function getAttributeFactory(): AttributesFactoryInterface

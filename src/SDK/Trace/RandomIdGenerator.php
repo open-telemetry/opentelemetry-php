@@ -37,7 +37,7 @@ class RandomIdGenerator implements IdGeneratorInterface
     {
         try {
             return bin2hex(random_bytes(intdiv($hexLength, 2)));
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return $this->fallbackAlgorithm($hexLength);
         }
     }

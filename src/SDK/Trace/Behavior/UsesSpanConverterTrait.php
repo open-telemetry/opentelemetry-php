@@ -12,9 +12,6 @@ trait UsesSpanConverterTrait
 {
     private ?SpanConverterInterface $converter = null;
 
-    /**
-     * @param SpanConverterInterface $converter
-     */
     protected function setSpanConverter(SpanConverterInterface $converter): void
     {
         $this->converter = $converter;
@@ -30,7 +27,6 @@ trait UsesSpanConverterTrait
     }
 
     /**
-     * @param SpanDataInterface $span
      * @return array
      * @psalm-suppress PossiblyNullReference
      */

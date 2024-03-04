@@ -6,15 +6,7 @@ namespace OpenTelemetry\SDK\Metrics\Aggregation;
 
 final class SumSummary
 {
-    /**
-     * @var float|int
-     */
-    public $value;
-    /**
-     * @param float|int $value
-     */
-    public function __construct($value)
+    public function __construct(public float|int $value)
     {
-        $this->value = $value;
     }
 }

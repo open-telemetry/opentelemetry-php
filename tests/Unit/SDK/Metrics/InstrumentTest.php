@@ -6,7 +6,6 @@ namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Util\WeakMap;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\Counter;
@@ -29,6 +28,7 @@ use OpenTelemetry\SDK\Metrics\UpDownCounter;
 use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use WeakMap;
 
 final class InstrumentTest extends TestCase
 {
@@ -77,7 +77,7 @@ final class InstrumentTest extends TestCase
         $n = $w->registerAsynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::CUMULATIVE);
 
-        $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), WeakMap::create());
+        $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), new WeakMap());
         $c->observe(static function (ObserverInterface $observer): void {
             $observer->observe(5);
         });
@@ -116,7 +116,7 @@ final class InstrumentTest extends TestCase
             }
         };
 
-        $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), WeakMap::create());
+        $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), new WeakMap());
         $c->observe($instance);
         $instance = null;
 
@@ -222,7 +222,7 @@ final class InstrumentTest extends TestCase
         $writer = $this->createMock(MetricWriterInterface::class);
         $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
 
-        $callbackDestructor = new ObservableCallbackDestructor(WeakMap::create(), $writer);
+        $callbackDestructor = new ObservableCallbackDestructor(new WeakMap(), $writer);
         $callbackDestructor->callbackIds[1] = $referenceCounter;
 
         $callback = new ObservableCallback($writer, $referenceCounter, 1, $callbackDestructor, new stdClass());
@@ -254,7 +254,7 @@ final class InstrumentTest extends TestCase
         $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
         $referenceCounter->expects($this->never())->method('acquire')->with(true);
 
-        $callbackDestructor = new ObservableCallbackDestructor(WeakMap::create(), $writer);
+        $callbackDestructor = new ObservableCallbackDestructor(new WeakMap(), $writer);
         $callbackDestructor->callbackIds[1] = $referenceCounter;
 
         /** @noinspection PhpExpressionResultUnusedInspection */

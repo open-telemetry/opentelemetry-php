@@ -10,16 +10,13 @@ use Traversable;
 
 final class Attributes implements AttributesInterface, IteratorAggregate
 {
-    private array $attributes;
-    private int $droppedAttributesCount;
-
     /**
      * @internal
      */
-    public function __construct(array $attributes, int $droppedAttributesCount)
-    {
-        $this->attributes = $attributes;
-        $this->droppedAttributesCount = $droppedAttributesCount;
+    public function __construct(
+        private array $attributes,
+        private int $droppedAttributesCount,
+    ) {
     }
 
     public static function create(iterable $attributes): AttributesInterface

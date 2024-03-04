@@ -11,14 +11,11 @@ use OpenTelemetry\SDK\Metrics\ReferenceCounterInterface;
  */
 final class MultiReferenceCounter implements ReferenceCounterInterface
 {
-    private array $referenceCounters;
-
     /**
      * @param list<ReferenceCounterInterface> $referenceCounters
      */
-    public function __construct(array $referenceCounters)
+    public function __construct(private array $referenceCounters)
     {
-        $this->referenceCounters = $referenceCounters;
     }
 
     public function acquire(bool $persistent = false): void

@@ -27,6 +27,6 @@ interface TransportFactoryInterface
         int $maxRetries = 3,
         ?string $cacert = null,
         ?string $cert = null,
-        ?string $key = null
+        ?string $key = null,
     ): TransportInterface;
 }

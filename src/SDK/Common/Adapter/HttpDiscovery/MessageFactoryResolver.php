@@ -15,27 +15,14 @@ use Psr\Http\Message\UriFactoryInterface;
 
 final class MessageFactoryResolver implements FactoryResolverInterface
 {
-    private ?RequestFactoryInterface $requestFactory;
-    private ?ResponseFactoryInterface $responseFactory;
-    private ?ServerRequestFactoryInterface $serverRequestFactory;
-    private ?StreamFactoryInterface $streamFactory;
-    private ?UploadedFileFactoryInterface $uploadedFileFactory;
-    private ?UriFactoryInterface $uriFactory;
-
     public function __construct(
-        ?RequestFactoryInterface $requestFactory = null,
-        ?ResponseFactoryInterface $responseFactory = null,
-        ?ServerRequestFactoryInterface $serverRequestFactory = null,
-        ?StreamFactoryInterface $streamFactory = null,
-        ?UploadedFileFactoryInterface $uploadedFileFactory = null,
-        ?UriFactoryInterface $uriFactory = null
+        private ?RequestFactoryInterface $requestFactory = null,
+        private ?ResponseFactoryInterface $responseFactory = null,
+        private ?ServerRequestFactoryInterface $serverRequestFactory = null,
+        private ?StreamFactoryInterface $streamFactory = null,
+        private ?UploadedFileFactoryInterface $uploadedFileFactory = null,
+        private ?UriFactoryInterface $uriFactory = null,
     ) {
-        $this->requestFactory = $requestFactory;
-        $this->responseFactory = $responseFactory;
-        $this->serverRequestFactory = $serverRequestFactory;
-        $this->streamFactory = $streamFactory;
-        $this->uploadedFileFactory = $uploadedFileFactory;
-        $this->uriFactory = $uriFactory;
     }
 
     public static function create(
@@ -44,7 +31,7 @@ final class MessageFactoryResolver implements FactoryResolverInterface
         ?ServerRequestFactoryInterface $serverRequestFactory = null,
         ?StreamFactoryInterface $streamFactory = null,
         ?UploadedFileFactoryInterface $uploadedFileFactory = null,
-        ?UriFactoryInterface $uriFactory = null
+        ?UriFactoryInterface $uriFactory = null,
     ): self {
         return new self(
             $requestFactory,

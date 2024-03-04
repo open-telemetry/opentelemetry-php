@@ -10,11 +10,8 @@ use OpenTelemetry\SDK\Common\Http\HttpPlug\Client\ResolverInterface;
 
 final class HttpPlugClientResolver implements ResolverInterface
 {
-    private ?HttpAsyncClient $httpAsyncClient;
-
-    public function __construct(?HttpAsyncClient $httpAsyncClient = null)
+    public function __construct(private ?HttpAsyncClient $httpAsyncClient = null)
     {
-        $this->httpAsyncClient = $httpAsyncClient;
     }
 
     public static function create(?HttpAsyncClient $httpAsyncClient = null): self

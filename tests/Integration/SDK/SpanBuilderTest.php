@@ -343,7 +343,7 @@ class SpanBuilderTest extends MockeryTestCase
                 string $spanName,
                 int $spanKind,
                 AttributesInterface $attributes,
-                array $links
+                array $links,
             ): SamplingResult {
                 return new SamplingResult(SamplingResult::RECORD_AND_SAMPLE, ['cat' => 'meow']);
             }

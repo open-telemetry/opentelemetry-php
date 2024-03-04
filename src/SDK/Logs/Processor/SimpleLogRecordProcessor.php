@@ -12,10 +12,8 @@ use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 
 class SimpleLogRecordProcessor implements LogRecordProcessorInterface
 {
-    private LogRecordExporterInterface $exporter;
-    public function __construct(LogRecordExporterInterface $exporter)
+    public function __construct(private LogRecordExporterInterface $exporter)
     {
-        $this->exporter = $exporter;
     }
 
     /**

@@ -22,27 +22,19 @@ use Throwable;
 final class MetricExporter implements PushMetricExporterInterface, AggregationTemporalitySelectorInterface
 {
     use LogsMessagesTrait;
-
-    private TransportInterface $transport;
     private ProtobufSerializer $serializer;
-    /**
-     * @var string|Temporality|null
-     */
-    private $temporality;
 
     /**
-     * @param string|Temporality|null $temporality
-     *
      * @psalm-param TransportInterface<SUPPORTED_CONTENT_TYPES> $transport
      */
-    public function __construct(TransportInterface $transport, $temporality = null)
-    {
+    public function __construct(
+        private TransportInterface $transport,
+        private string|Temporality|null $temporality = null,
+    ) {
         if (!class_exists('\Google\Protobuf\Api')) {
             throw new RuntimeException('No protobuf implementation found (ext-protobuf or google/protobuf)');
         }
-        $this->transport = $transport;
-        $this->serializer = ProtobufSerializer::forTransport($transport);
-        $this->temporality = $temporality;
+        $this->serializer = ProtobufSerializer::forTransport($this->transport);
     }
 
     public function temporality(MetricMetadataInterface $metric)

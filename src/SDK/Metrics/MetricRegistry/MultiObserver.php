@@ -14,16 +14,13 @@ use OpenTelemetry\SDK\Metrics\Stream\WritableMetricStreamInterface;
  */
 final class MultiObserver implements ObserverInterface
 {
-    private AttributesFactoryInterface $attributesFactory;
-    private int $timestamp;
-
     /** @var list<WritableMetricStreamInterface>  */
     public array $writers = [];
 
-    public function __construct(AttributesFactoryInterface $attributesFactory, int $timestamp)
-    {
-        $this->attributesFactory = $attributesFactory;
-        $this->timestamp = $timestamp;
+    public function __construct(
+        private AttributesFactoryInterface $attributesFactory,
+        private int $timestamp,
+    ) {
     }
 
     public function observe($amount, iterable $attributes = []): void

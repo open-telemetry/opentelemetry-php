@@ -18,6 +18,7 @@ use const Grpc\OP_SEND_INITIAL_METADATA;
 use const Grpc\OP_SEND_MESSAGE;
 use const Grpc\STATUS_OK;
 use Grpc\Timeval;
+use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -36,23 +37,21 @@ final class GrpcTransport implements TransportInterface
 {
     private array $metadata;
     private Channel $channel;
-    private string $method;
     private bool $closed = false;
 
     public function __construct(
         string $endpoint,
         array $opts,
-        string $method,
-        array $headers = []
+        private string $method,
+        array $headers = [],
     ) {
         $this->channel = new Channel($endpoint, $opts);
-        $this->method = $method;
         $this->metadata = $this->formatMetadata(array_change_key_case($headers));
     }
 
     public function contentType(): string
     {
-        return 'application/x-protobuf';
+        return ContentTypes::PROTOBUF;
     }
 
     public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface

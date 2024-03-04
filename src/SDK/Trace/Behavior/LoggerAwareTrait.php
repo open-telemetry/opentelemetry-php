@@ -15,19 +15,11 @@ trait LoggerAwareTrait
 
     private string $defaultLogLevel = LogLevel::INFO;
 
-    /**
-     * @param string $logLevel
-     */
     public function setDefaultLogLevel(string $logLevel): void
     {
         $this->defaultLogLevel = $logLevel;
     }
 
-    /**
-     * @param string $message
-     * @param array $context
-     * @param string|null $level
-     */
     protected function log(string $message, array $context = [], ?string $level = null): void
     {
         $this->getLogger()->log(

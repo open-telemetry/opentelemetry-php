@@ -16,18 +16,11 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class PsrTransportFactory implements TransportFactoryInterface
 {
-    private ClientInterface $client;
-    private RequestFactoryInterface $requestFactory;
-    private StreamFactoryInterface $streamFactory;
-
     public function __construct(
-        ClientInterface $client,
-        RequestFactoryInterface $requestFactory,
-        StreamFactoryInterface $streamFactory
+        private ClientInterface $client,
+        private RequestFactoryInterface $requestFactory,
+        private StreamFactoryInterface $streamFactory,
     ) {
-        $this->client = $client;
-        $this->requestFactory = $requestFactory;
-        $this->streamFactory = $streamFactory;
     }
 
     /**
@@ -43,7 +36,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
         int $maxRetries = 3,
         ?string $cacert = null,
         ?string $cert = null,
-        ?string $key = null
+        ?string $key = null,
     ): PsrTransport {
         if (!filter_var($endpoint, FILTER_VALIDATE_URL)) {
             throw new InvalidArgumentException(sprintf('Invalid endpoint url "%s"', $endpoint));

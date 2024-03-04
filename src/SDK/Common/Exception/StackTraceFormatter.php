@@ -6,7 +6,6 @@ namespace OpenTelemetry\SDK\Common\Exception;
 
 use function basename;
 use function count;
-use function get_class;
 use function sprintf;
 use function str_repeat;
 
@@ -77,8 +76,8 @@ final class StackTraceFormatter
         $n = count($frames);
         if ($enclosing) {
             for ($m = count($enclosing);
-                 $n && $m && $frames[$n - 1] === $enclosing[$m - 1];
-                 $n--, $m--) {
+                $n && $m && $frames[$n - 1] === $enclosing[$m - 1];
+                $n--, $m--) {
             }
         }
         for ($i = 0; $i < $n; $i++) {
@@ -110,7 +109,7 @@ final class StackTraceFormatter
 
     private static function writeInlineHeader(string &$s, Throwable $e): void
     {
-        $s .= self::formatName(get_class($e));
+        $s .= self::formatName($e::class);
         if ($e->getMessage() !== '') {
             $s .= ': ';
             $s .= $e->getMessage();

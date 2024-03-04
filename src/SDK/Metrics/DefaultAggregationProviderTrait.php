@@ -8,21 +8,13 @@ trait DefaultAggregationProviderTrait
 {
     public function defaultAggregation($instrumentType, array $advisory = []): ?AggregationInterface
     {
-        switch ($instrumentType) {
-            case InstrumentType::COUNTER:
-            case InstrumentType::ASYNCHRONOUS_COUNTER:
-                return new Aggregation\SumAggregation(true);
-            case InstrumentType::UP_DOWN_COUNTER:
-            case InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER:
-                return new Aggregation\SumAggregation();
-            case InstrumentType::HISTOGRAM:
-                return new Aggregation\ExplicitBucketHistogramAggregation($advisory['ExplicitBucketBoundaries'] ?? [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
-            case InstrumentType::ASYNCHRONOUS_GAUGE:
-                return new Aggregation\LastValueAggregation();
-        }
-
-        // @codeCoverageIgnoreStart
-        return null;
+        return match ($instrumentType) {
+            InstrumentType::COUNTER, InstrumentType::ASYNCHRONOUS_COUNTER => new Aggregation\SumAggregation(true),
+            InstrumentType::UP_DOWN_COUNTER, InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER => new Aggregation\SumAggregation(),
+            InstrumentType::HISTOGRAM => new Aggregation\ExplicitBucketHistogramAggregation($advisory['ExplicitBucketBoundaries'] ?? [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]),
+            InstrumentType::ASYNCHRONOUS_GAUGE => new Aggregation\LastValueAggregation(),
+            default => null,
+        };
         // @codeCoverageIgnoreEnd
     }
 }

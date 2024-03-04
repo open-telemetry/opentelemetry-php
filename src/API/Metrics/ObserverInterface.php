@@ -14,5 +14,5 @@ interface ObserverInterface
      * @param iterable<non-empty-string, string|bool|float|int|array|null> $attributes
      *        attributes of the data point
      */
-    public function observe($amount, iterable $attributes = []): void;
+    public function observe(float|int $amount, iterable $attributes = []): void;
 }

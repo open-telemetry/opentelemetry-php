@@ -24,7 +24,7 @@ trait ObservableInstrumentTrait
         MetricWriterInterface $writer,
         Instrument $instrument,
         ReferenceCounterInterface $referenceCounter,
-        ArrayAccess $destructors
+        ArrayAccess $destructors,
     ) {
         assert($this instanceof InstrumentHandle);
 

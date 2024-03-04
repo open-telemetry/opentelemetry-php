@@ -14,17 +14,14 @@ use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
  */
 final class DelayedStalenessHandler implements StalenessHandlerInterface, ReferenceCounterInterface
 {
-    private Closure $stale;
-    private Closure $freshen;
-
     /** @var Closure[]|null */
     private ?array $onStale = [];
     private int $count = 0;
 
-    public function __construct(Closure $stale, Closure $freshen)
-    {
-        $this->stale = $stale;
-        $this->freshen = $freshen;
+    public function __construct(
+        private Closure $stale,
+        private Closure $freshen,
+    ) {
     }
 
     public function acquire(bool $persistent = false): void

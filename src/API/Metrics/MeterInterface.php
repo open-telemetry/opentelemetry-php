@@ -38,15 +38,15 @@ interface MeterInterface
     public function batchObserve(
         callable $callback,
         AsynchronousInstrument $instrument,
-        AsynchronousInstrument ...$instruments
+        AsynchronousInstrument ...$instruments,
     ): ObservableCallbackInterface;
 
     /**
      * Creates a `Counter`.
      *
      * @param string $name name of the instrument
-     * @param string|null $unit unit of measure
-     * @param string|null $description description of the instrument
+     * @param ?string $unit unit of measure
+     * @param ?string $description description of the instrument
      * @param array $advisory an optional set of recommendations
      * @return CounterInterface created instrument
      *
@@ -56,15 +56,15 @@ interface MeterInterface
         string $name,
         ?string $unit = null,
         ?string $description = null,
-        array $advisory = []
+        array $advisory = [],
     ): CounterInterface;
 
     /**
      * Creates an `ObservableCounter`.
      *
      * @param string $name name of the instrument
-     * @param string|null $unit unit of measure
-     * @param string|null $description description of the instrument
+     * @param ?string $unit unit of measure
+     * @param ?string $description description of the instrument
      * @param array|callable $advisory an optional set of recommendations, or
      *        deprecated: the first callback to report measurements
      * @param callable ...$callbacks responsible for reporting measurements
@@ -76,8 +76,8 @@ interface MeterInterface
         string $name,
         ?string $unit = null,
         ?string $description = null,
-        $advisory = [],
-        callable ...$callbacks
+        array|callable $advisory = [],
+        callable ...$callbacks,
     ): ObservableCounterInterface;
 
     /**
@@ -96,7 +96,7 @@ interface MeterInterface
         string $name,
         ?string $unit = null,
         ?string $description = null,
-        array $advisory = []
+        array $advisory = [],
     ): HistogramInterface;
 
     /**
@@ -116,8 +116,8 @@ interface MeterInterface
         string $name,
         ?string $unit = null,
         ?string $description = null,
-        $advisory = [],
-        callable ...$callbacks
+        array|callable $advisory = [],
+        callable ...$callbacks,
     ): ObservableGaugeInterface;
 
     /**
@@ -135,7 +135,7 @@ interface MeterInterface
         string $name,
         ?string $unit = null,
         ?string $description = null,
-        array $advisory = []
+        array $advisory = [],
     ): UpDownCounterInterface;
 
     /**
@@ -155,7 +155,7 @@ interface MeterInterface
         string $name,
         ?string $unit = null,
         ?string $description = null,
-        $advisory = [],
-        callable ...$callbacks
+        array|callable $advisory = [],
+        callable ...$callbacks,
     ): ObservableUpDownCounterInterface;
 }

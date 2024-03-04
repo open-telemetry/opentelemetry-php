@@ -42,7 +42,7 @@ final class StreamFactory implements MetricFactoryInterface
         InstrumentationScopeInterface $instrumentationScope,
         Instrument $instrument,
         int $timestamp,
-        iterable $views
+        iterable $views,
     ): array {
         $streams = [];
         $dedup = [];
@@ -85,7 +85,7 @@ final class StreamFactory implements MetricFactoryInterface
         Instrument $instrument,
         int $timestamp,
         iterable $views,
-        ?ExemplarFilterInterface $exemplarFilter = null
+        ?ExemplarFilterInterface $exemplarFilter = null,
     ): array {
         $streams = [];
         $dedup = [];
@@ -123,7 +123,7 @@ final class StreamFactory implements MetricFactoryInterface
     }
 
     private function attributeProcessor(
-        ?array $attributeKeys
+        ?array $attributeKeys,
     ): ?AttributeProcessorInterface {
         return $attributeKeys !== null
             ? new FilteredAttributeProcessor($attributeKeys)
@@ -132,7 +132,7 @@ final class StreamFactory implements MetricFactoryInterface
 
     private function createExemplarReservoir(
         AggregationInterface $aggregation,
-        ?ExemplarFilterInterface $exemplarFilter
+        ?ExemplarFilterInterface $exemplarFilter,
     ): ?ExemplarReservoirInterface {
         if (!$exemplarFilter) {
             return null;
@@ -155,7 +155,7 @@ final class StreamFactory implements MetricFactoryInterface
         MetricStreamInterface $stream,
         MetricCollectorInterface $metricCollector,
         MetricRegistrationInterface $metricRegistration,
-        int $streamId
+        int $streamId,
     ): void {
         $provider = new StreamMetricSourceProvider(
             $view,
@@ -179,7 +179,7 @@ final class StreamFactory implements MetricFactoryInterface
     {
         try {
             return serialize($object);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
         }
 
         return spl_object_id($object);

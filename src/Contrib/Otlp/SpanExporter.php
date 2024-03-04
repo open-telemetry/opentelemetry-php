@@ -19,20 +19,17 @@ use Throwable;
 final class SpanExporter implements SpanExporterInterface
 {
     use LogsMessagesTrait;
-
-    private TransportInterface $transport;
     private ProtobufSerializer $serializer;
 
     /**
      * @psalm-param TransportInterface<SUPPORTED_CONTENT_TYPES> $transport
      */
-    public function __construct(TransportInterface $transport)
+    public function __construct(private TransportInterface $transport)
     {
         if (!class_exists('\Google\Protobuf\Api')) {
             throw new RuntimeException('No protobuf implementation found (ext-protobuf or google/protobuf)');
         }
-        $this->transport = $transport;
-        $this->serializer = ProtobufSerializer::forTransport($transport);
+        $this->serializer = ProtobufSerializer::forTransport($this->transport);
     }
 
     public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface

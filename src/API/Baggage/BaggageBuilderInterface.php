@@ -10,9 +10,8 @@ interface BaggageBuilderInterface
 {
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/baggage/api.md#set-value
-     * @param mixed $value
      */
-    public function set(string $key, $value, API\MetadataInterface $metadata = null): API\BaggageBuilderInterface;
+    public function set(string $key, mixed $value, API\MetadataInterface $metadata = null): API\BaggageBuilderInterface;
 
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/baggage/api.md#remove-value

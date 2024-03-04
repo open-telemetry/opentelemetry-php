@@ -34,7 +34,7 @@ class MapParser
 
     private static function validateKeyValuePair(string $pair)
     {
-        if (strpos($pair, self::KEY_VALUE_SEPARATOR) === false) {
+        if (!str_contains($pair, self::KEY_VALUE_SEPARATOR)) {
             throw new InvalidArgumentException(sprintf(
                 'Key-Value pair "%s" does not contain separator "%s"',
                 $pair,

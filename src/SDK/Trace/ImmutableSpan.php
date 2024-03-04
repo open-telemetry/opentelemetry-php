@@ -15,48 +15,22 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
  */
 final class ImmutableSpan implements SpanDataInterface
 {
-    private Span $span;
-
-    /** @var non-empty-string */
-    private string $name;
-
-    /** @var list<EventInterface> */
-    private array $events;
-
-    /** @var list<LinkInterface> */
-    private array $links;
-
-    private AttributesInterface $attributes;
-    private int $totalRecordedEvents;
-    private StatusDataInterface $status;
-    private int $endEpochNanos;
-    private bool $hasEnded;
-
     /**
      * @param non-empty-string $name
      * @param list<LinkInterface> $links
      * @param list<EventInterface> $events
      */
     public function __construct(
-        Span $span,
-        string $name,
-        array $links,
-        array $events,
-        AttributesInterface $attributes,
-        int $totalRecordedEvents,
-        StatusDataInterface $status,
-        int $endEpochNanos,
-        bool $hasEnded
+        private Span $span,
+        private string $name,
+        private array $links,
+        private array $events,
+        private AttributesInterface $attributes,
+        private int $totalRecordedEvents,
+        private StatusDataInterface $status,
+        private int $endEpochNanos,
+        private bool $hasEnded,
     ) {
-        $this->span = $span;
-        $this->name = $name;
-        $this->links = $links;
-        $this->events = $events;
-        $this->attributes = $attributes;
-        $this->totalRecordedEvents = $totalRecordedEvents;
-        $this->status = $status;
-        $this->endEpochNanos = $endEpochNanos;
-        $this->hasEnded = $hasEnded;
     }
 
     public function getKind(): int

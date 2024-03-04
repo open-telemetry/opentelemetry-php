@@ -10,27 +10,21 @@ use OpenTelemetry\SDK\Metrics\AggregationInterface;
 
 /**
  * @internal
+ * @phan-file-suppress PhanUndeclaredTypeParameter, PhanUndeclaredTypeProperty
  */
 final class DeltaStorage
 {
-    private AggregationInterface $aggregation;
     private Delta $head;
 
-    public function __construct(AggregationInterface $aggregation)
+    public function __construct(private AggregationInterface $aggregation)
     {
-        $this->aggregation = $aggregation;
         $this->head = new Delta(new Metric([], [], 0), 0);
 
         /** @phan-suppress-next-line PhanTypeObjectUnsetDeclaredProperty */
         unset($this->head->metric);
     }
 
-    /**
-     * @psalm-suppress UndefinedDocblockClass
-     * @phan-suppress PhanUndeclaredTypeParameter
-     * @param int|GMP $readers
-     */
-    public function add(Metric $metric, $readers): void
+    public function add(Metric $metric, int|GMP $readers): void
     {
         /** @phpstan-ignore-next-line */
         if ($readers == 0) {
@@ -87,11 +81,11 @@ final class DeltaStorage
         }
 
         for ($c = $n->prev->prev;
-             $c && ($n->prev->readers & $c->readers) == 0;
-             $c = $c->prev) {
+            $c && ($n->prev->readers & $c->readers) == 0;
+            $c = $c->prev) {
         }
 
-        if ($c && $n->prev->readers == $c->readers) {
+        if ($c && $n->prev->readers === $c->readers) {
             $this->mergeInto($c->metric, $n->prev->metric);
             $n->prev = $n->prev->prev;
         }

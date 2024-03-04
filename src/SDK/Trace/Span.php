@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use function get_class;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesBuilderInterface;
@@ -18,47 +17,8 @@ use Throwable;
 final class Span extends API\Span implements ReadWriteSpanInterface
 {
 
-    /** @readonly */
-    private API\SpanContextInterface $context;
-
-    /** @readonly */
-    private API\SpanContextInterface $parentSpanContext;
-
-    /** @readonly */
-    private SpanLimits $spanLimits;
-
-    /** @readonly */
-    private SpanProcessorInterface $spanProcessor;
-
-    /**
-     * @readonly
-     *
-     * @var list<LinkInterface>
-     */
-    private array $links;
-
-    /** @readonly */
-    private int $totalRecordedLinks;
-
-    /** @readonly */
-    private int $kind;
-
-    /** @readonly */
-    private ResourceInfo $resource;
-
-    /** @readonly */
-    private InstrumentationScopeInterface $instrumentationScope;
-
-    /** @readonly */
-    private int $startEpochNanos;
-
-    /** @var non-empty-string */
-    private string $name;
-
     /** @var list<EventInterface> */
     private array $events = [];
-
-    private AttributesBuilderInterface $attributesBuilder;
     private int $totalRecordedEvents = 0;
     private StatusDataInterface $status;
     private int $endEpochNanos = 0;
@@ -69,32 +29,30 @@ final class Span extends API\Span implements ReadWriteSpanInterface
      * @param list<LinkInterface> $links
      */
     private function __construct(
-        string $name,
-        API\SpanContextInterface $context,
-        InstrumentationScopeInterface $instrumentationScope,
-        int $kind,
-        API\SpanContextInterface $parentSpanContext,
-        SpanLimits $spanLimits,
-        SpanProcessorInterface $spanProcessor,
-        ResourceInfo $resource,
-        AttributesBuilderInterface $attributesBuilder,
-        array $links,
-        int $totalRecordedLinks,
-        int $startEpochNanos
+        private string $name,
+        /** @readonly */
+        private API\SpanContextInterface $context,
+        /** @readonly */
+        private InstrumentationScopeInterface $instrumentationScope,
+        /** @readonly */
+        private int $kind,
+        /** @readonly */
+        private API\SpanContextInterface $parentSpanContext,
+        /** @readonly */
+        private SpanLimits $spanLimits,
+        /** @readonly */
+        private SpanProcessorInterface $spanProcessor,
+        /** @readonly */
+        private ResourceInfo $resource,
+        private AttributesBuilderInterface $attributesBuilder,
+        /** @readonly */
+        private array $links,
+        /** @readonly */
+        private int $totalRecordedLinks,
+        /** @readonly */
+        private int $startEpochNanos,
     ) {
-        $this->context = $context;
-        $this->instrumentationScope = $instrumentationScope;
-        $this->parentSpanContext = $parentSpanContext;
-        $this->links = $links;
-        $this->totalRecordedLinks = $totalRecordedLinks;
-        $this->name = $name;
-        $this->kind = $kind;
-        $this->spanProcessor = $spanProcessor;
-        $this->resource = $resource;
-        $this->startEpochNanos = $startEpochNanos;
-        $this->attributesBuilder = $attributesBuilder;
         $this->status = StatusData::unset();
-        $this->spanLimits = $spanLimits;
     }
 
     /**
@@ -121,7 +79,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         AttributesBuilderInterface $attributesBuilder,
         array $links,
         int $totalRecordedLinks,
-        int $startEpochNanos
+        int $startEpochNanos,
     ): self {
         $span = new self(
             $name,
@@ -224,7 +182,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
 
         $timestamp ??= ClockFactory::getDefault()->now();
         $eventAttributesBuilder = $this->spanLimits->getEventAttributesFactory()->builder([
-            'exception.type' => get_class($exception),
+            'exception.type' => $exception::class,
             'exception.message' => $exception->getMessage(),
             'exception.stacktrace' => StackTraceFormatter::format($exception),
         ]);

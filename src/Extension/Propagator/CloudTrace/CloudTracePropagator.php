@@ -46,11 +46,8 @@ final class CloudTracePropagator implements TextMapPropagatorInterface
         self::XCLOUD,
     ];
 
-    private bool $oneWay;
-
-    private function __construct(bool $oneWay)
+    private function __construct(private bool $oneWay)
     {
-        $this->oneWay = $oneWay;
     }
 
     /** {@inheritdoc} */

@@ -20,32 +20,19 @@ use function trigger_error;
 
 /**
  * @internal
+ * @phan-file-suppress PhanUndeclaredTypeParameter, PhanUndeclaredTypeProperty
  */
 final class SynchronousMetricStream implements MetricStreamInterface
 {
-    private AggregationInterface $aggregation;
-
-    private int $timestamp;
-
     private DeltaStorage $delta;
-    /**
-     * @psalm-suppress UndefinedDocblockClass
-     * @phan-suppress PhanUndeclaredTypeProperty
-     * @var int|GMP
-     */
-    private $readers = 0;
-    /**
-     * @psalm-suppress UndefinedDocblockClass
-     * @phan-suppress PhanUndeclaredTypeProperty
-     * @var int|GMP
-     */
-    private $cumulative = 0;
+    private int|GMP $readers = 0;
+    private int|GMP $cumulative = 0;
 
-    public function __construct(AggregationInterface $aggregation, int $startTimestamp)
-    {
-        $this->aggregation = $aggregation;
-        $this->timestamp = $startTimestamp;
-        $this->delta = new DeltaStorage($aggregation);
+    public function __construct(
+        private AggregationInterface $aggregation,
+        private int $timestamp,
+    ) {
+        $this->delta = new DeltaStorage($this->aggregation);
     }
 
     public function temporality()

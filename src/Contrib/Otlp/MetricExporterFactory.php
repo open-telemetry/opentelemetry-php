@@ -19,11 +19,8 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
 {
     private const DEFAULT_COMPRESSION = 'none';
 
-    private ?TransportFactoryInterface $transportFactory;
-
-    public function __construct(?TransportFactoryInterface $transportFactory = null)
+    public function __construct(private ?TransportFactoryInterface $transportFactory = null)
     {
-        $this->transportFactory = $transportFactory;
     }
 
     /**
@@ -66,21 +63,18 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
     }
 
     /**
-     * @todo return string|Temporality|null (php >= 8.0)
+     * @phpstan-ignore-next-line
      */
-    private function getTemporality()
+    private function getTemporality(): string|Temporality|null
     {
         $value = Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE);
-        switch (strtolower($value)) {
-            case 'cumulative':
-                return Temporality::CUMULATIVE;
-            case 'delta':
-                return Temporality::DELTA;
-            case 'lowmemory':
-                return null;
-            default:
-                throw new \UnexpectedValueException('Unknown temporality: ' . $value);
-        }
+
+        return match (strtolower($value)) {
+            'cumulative' => Temporality::CUMULATIVE,
+            'delta' => Temporality::DELTA,
+            'lowmemory' => null,
+            default => throw new \UnexpectedValueException('Unknown temporality: ' . $value),
+        };
     }
 
     private function getCompression(): string

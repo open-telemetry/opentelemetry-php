@@ -8,6 +8,7 @@ namespace OpenTelemetry\SDK\Metrics\Data;
  * Metric aggregation temporality.
  *
  * Has to be type-hinted as `string|Temporality` to be forward compatible.
+ * @todo convert to enum (php >= 8.1)
  */
 final class Temporality
 {

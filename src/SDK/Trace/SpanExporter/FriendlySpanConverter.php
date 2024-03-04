@@ -47,10 +47,7 @@ class FriendlySpanConverter implements SpanConverterInterface
     }
 
     /**
-     * friendlySpan does the heavy lifting converting a span into an array
-     *
-     * @param SpanDataInterface $span
-     * @return array
+     * convertSpan does the heavy lifting converting a span into an array
      */
     private function convertSpan(SpanDataInterface $span): array
     {
@@ -69,10 +66,6 @@ class FriendlySpanConverter implements SpanConverterInterface
         ];
     }
 
-    /**
-     * @param SpanContextInterface $context
-     * @return array
-     */
     private function convertContext(SpanContextInterface $context): array
     {
         return [
@@ -83,19 +76,11 @@ class FriendlySpanConverter implements SpanConverterInterface
         ];
     }
 
-    /**
-     * @param ResourceInfo $resource
-     * @return array
-     */
     private function convertResource(ResourceInfo $resource): array
     {
         return $resource->getAttributes()->toArray();
     }
 
-    /**
-     * @param SpanContextInterface $context
-     * @return string
-     */
     private function covertParentContext(SpanContextInterface $context): string
     {
         return $context->isValid() ? $context->getSpanId() : '';
@@ -103,9 +88,6 @@ class FriendlySpanConverter implements SpanConverterInterface
 
     /**
      * Translates SpanKind from its integer representation to a more human friendly string.
-     *
-     * @param int $kind
-     * @return string
      */
     private function convertKind(int $kind): string
     {
@@ -115,19 +97,11 @@ class FriendlySpanConverter implements SpanConverterInterface
         )[$kind];
     }
 
-    /**
-     * @param \OpenTelemetry\SDK\Common\Attribute\AttributesInterface $attributes
-     * @return array
-     */
     private function convertAttributes(AttributesInterface $attributes): array
     {
         return $attributes->toArray();
     }
 
-    /**
-     * @param StatusDataInterface $status
-     * @return array
-     */
     private function covertStatus(StatusDataInterface $status): array
     {
         return [
@@ -138,7 +112,6 @@ class FriendlySpanConverter implements SpanConverterInterface
 
     /**
      * @param array<EventInterface> $events
-     * @return array
      */
     private function convertEvents(array $events): array
     {
@@ -157,7 +130,6 @@ class FriendlySpanConverter implements SpanConverterInterface
 
     /**
      * @param array<LinkInterface> $links
-     * @return array
      */
     private function convertLinks(array $links): array
     {

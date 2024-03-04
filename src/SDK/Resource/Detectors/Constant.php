@@ -9,11 +9,8 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 final class Constant implements ResourceDetectorInterface
 {
-    private ResourceInfo $resourceInfo;
-
-    public function __construct(ResourceInfo $resourceInfo)
+    public function __construct(private ResourceInfo $resourceInfo)
     {
-        $this->resourceInfo = $resourceInfo;
     }
 
     public function getResource(): ResourceInfo

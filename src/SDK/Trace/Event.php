@@ -9,15 +9,11 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class Event implements EventInterface
 {
-    private string $name;
-    private int $timestamp;
-    private AttributesInterface $attributes;
-
-    public function __construct(string $name, int $timestamp, AttributesInterface $attributes)
-    {
-        $this->name = $name;
-        $this->timestamp = $timestamp;
-        $this->attributes = $attributes;
+    public function __construct(
+        private string $name,
+        private int $timestamp,
+        private AttributesInterface $attributes,
+    ) {
     }
 
     public function getAttributes(): AttributesInterface

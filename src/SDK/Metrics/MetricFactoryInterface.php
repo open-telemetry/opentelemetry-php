@@ -23,7 +23,7 @@ interface MetricFactoryInterface
         InstrumentationScopeInterface $instrumentationScope,
         Instrument $instrument,
         int $timestamp,
-        iterable $views
+        iterable $views,
     ): array;
 
     /**
@@ -36,6 +36,6 @@ interface MetricFactoryInterface
         Instrument $instrument,
         int $timestamp,
         iterable $views,
-        ?ExemplarFilterInterface $exemplarFilter = null
+        ?ExemplarFilterInterface $exemplarFilter = null,
     ): array;
 }

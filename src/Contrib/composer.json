@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.0",
         "ext-json": "*",
         "open-telemetry/api": "^1.0",
         "open-telemetry/context": "^1.0",
@@ -23,7 +23,6 @@
         "psr/http-factory-implementation": "^1.0",
         "psr/log": "^1.1|^2.0|^3.0",
         "symfony/polyfill-mbstring": "^1.23",
-        "symfony/polyfill-php80": "^1.26",
         "symfony/polyfill-php81": "^1.26",
         "symfony/polyfill-php82": "^1.26"
     },

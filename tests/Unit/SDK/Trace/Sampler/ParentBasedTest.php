@@ -70,7 +70,7 @@ class ParentBasedTest extends MockeryTestCase
         ?SamplerInterface $remoteParentNotSampled = null,
         ?SamplerInterface $localParentSampled = null,
         ?SamplerInterface $localParentNotSampled = null,
-        ?int $expectedDecision = null
+        ?int $expectedDecision = null,
     ): void {
         $rootSampler = $this->createMockSamplerNeverInvoked();
 

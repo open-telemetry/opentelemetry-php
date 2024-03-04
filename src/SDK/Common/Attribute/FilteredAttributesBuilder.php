@@ -11,17 +11,15 @@ use function in_array;
  */
 final class FilteredAttributesBuilder implements AttributesBuilderInterface
 {
-    private AttributesBuilderInterface $builder;
-    private array $rejectedKeys;
     private int $rejected = 0;
 
     /**
      * @param list<string> $rejectedKeys
      */
-    public function __construct(AttributesBuilderInterface $builder, array $rejectedKeys)
-    {
-        $this->builder = $builder;
-        $this->rejectedKeys = $rejectedKeys;
+    public function __construct(
+        private AttributesBuilderInterface $builder,
+        private array $rejectedKeys,
+    ) {
     }
 
     public function __clone()

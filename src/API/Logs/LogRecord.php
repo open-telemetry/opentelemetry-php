@@ -15,15 +15,10 @@ class LogRecord
     protected ?ContextInterface $context = null;
     protected int $severityNumber = 0;
     protected ?string $severityText = null;
-    protected $body = null;
     protected array $attributes = [];
 
-    /**
-     * @param mixed $body
-     */
-    public function __construct($body = null)
+    public function __construct(protected mixed $body = null)
     {
-        $this->body = $body;
     }
 
     /**
@@ -45,7 +40,6 @@ class LogRecord
     }
 
     /**
-     * @param int $severityNumber Severity number
      * @see https://opentelemetry.io/docs/reference/specification/logs/data-model/#field-severitynumber
      */
     public function setSeverityNumber(int $severityNumber): self
@@ -79,7 +73,7 @@ class LogRecord
         return $this;
     }
 
-    public function setAttribute(string $name, $value): self
+    public function setAttribute(string $name, mixed $value): self
     {
         $this->attributes[$name] = $value;
 
@@ -89,7 +83,7 @@ class LogRecord
     /**
      * @param mixed $body The log record body
      */
-    public function setBody($body = null): self
+    public function setBody(mixed $body = null): self
     {
         $this->body = $body;
 

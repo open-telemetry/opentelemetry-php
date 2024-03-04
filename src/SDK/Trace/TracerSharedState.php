@@ -16,48 +16,26 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 final class TracerSharedState
 {
     /** @readonly */
-    private IdGeneratorInterface $idGenerator;
-
-    /** @readonly */
-    private ResourceInfo $resource;
-
-    /** @readonly */
-    private SpanLimits $spanLimits;
-
-    /** @readonly */
-    private SamplerInterface $sampler;
-
-    /** @readonly */
     private SpanProcessorInterface $spanProcessor;
 
     private ?bool $shutdownResult = null;
 
     public function __construct(
-        IdGeneratorInterface $idGenerator,
-        ResourceInfo $resource,
-        SpanLimits $spanLimits,
-        SamplerInterface $sampler,
-        array $spanProcessors
+        /** @readonly */
+        private IdGeneratorInterface $idGenerator,
+        /** @readonly */
+        private ResourceInfo $resource,
+        /** @readonly */
+        private SpanLimits $spanLimits,
+        /** @readonly */
+        private SamplerInterface $sampler,
+        array $spanProcessors,
     ) {
-        $this->idGenerator = $idGenerator;
-        $this->resource = $resource;
-        $this->spanLimits = $spanLimits;
-        $this->sampler = $sampler;
-
-        switch (count($spanProcessors)) {
-            case 0:
-                $this->spanProcessor = NoopSpanProcessor::getInstance();
-
-                break;
-            case 1:
-                $this->spanProcessor = $spanProcessors[0];
-
-                break;
-            default:
-                $this->spanProcessor = new MultiSpanProcessor(...$spanProcessors);
-
-                break;
-        }
+        $this->spanProcessor = match (count($spanProcessors)) {
+            0 => NoopSpanProcessor::getInstance(),
+            1 => $spanProcessors[0],
+            default => new MultiSpanProcessor(...$spanProcessors),
+        };
     }
 
     public function hasShutdown(): bool

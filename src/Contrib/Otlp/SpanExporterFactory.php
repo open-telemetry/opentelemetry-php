@@ -19,13 +19,10 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
 {
     use LogsMessagesTrait;
 
-    private ?TransportFactoryInterface $transportFactory;
-
     private const DEFAULT_COMPRESSION = 'none';
 
-    public function __construct(?TransportFactoryInterface $transportFactory = null)
+    public function __construct(private ?TransportFactoryInterface $transportFactory = null)
     {
-        $this->transportFactory = $transportFactory;
     }
 
     /**

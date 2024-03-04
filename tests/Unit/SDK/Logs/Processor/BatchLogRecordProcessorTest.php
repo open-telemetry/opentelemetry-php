@@ -400,9 +400,6 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $processor->forceFlush();
     }
 
-    /**
-     * @requires PHP >= 8.0
-     */
     public function test_self_diagnostics(): void
     {
         $clock = new TestClock();

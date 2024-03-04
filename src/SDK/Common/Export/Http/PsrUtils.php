@@ -75,7 +75,7 @@ final class PsrUtils
 
             try {
                 $value = $encoder($value);
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 unset($encodings[$i]);
             }
         }
@@ -115,7 +115,7 @@ final class PsrUtils
         if (!$compression) {
             return [];
         }
-        if (strpos($compression, ',') === false) {
+        if (!str_contains($compression, ',')) {
             return [$compression];
         }
 

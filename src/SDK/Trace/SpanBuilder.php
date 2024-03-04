@@ -13,20 +13,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
 final class SpanBuilder implements API\SpanBuilderInterface
 {
-    /**
-     * @var non-empty-string
-     * @readonly
-     */
-    private string $spanName;
-
-    /** @readonly */
-    private InstrumentationScopeInterface $instrumentationScope;
-
-    /** @readonly */
-    private TracerSharedState $tracerSharedState;
-
-    /** @var ContextInterface|false|null */
-    private $parentContext = null;
+    private ContextInterface|false|null $parentContext = null;
 
     /**
      * @psalm-var API\SpanKind::KIND_*
@@ -42,18 +29,18 @@ final class SpanBuilder implements API\SpanBuilderInterface
 
     /** @param non-empty-string $spanName */
     public function __construct(
-        string $spanName,
-        InstrumentationScopeInterface $instrumentationScope,
-        TracerSharedState $tracerSharedState
+        /** @readonly */
+        private string $spanName,
+        /** @readonly */
+        private InstrumentationScopeInterface $instrumentationScope,
+        /** @readonly */
+        private TracerSharedState $tracerSharedState,
     ) {
-        $this->spanName = $spanName;
-        $this->instrumentationScope = $instrumentationScope;
-        $this->tracerSharedState = $tracerSharedState;
-        $this->attributesBuilder = $tracerSharedState->getSpanLimits()->getAttributesFactory()->builder();
+        $this->attributesBuilder = $this->tracerSharedState->getSpanLimits()->getAttributesFactory()->builder();
     }
 
     /** @inheritDoc */
-    public function setParent($context): API\SpanBuilderInterface
+    public function setParent(ContextInterface|false|null $context): API\SpanBuilderInterface
     {
         $this->parentContext = $context;
 
@@ -86,7 +73,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
-    public function setAttribute(string $key, $value): API\SpanBuilderInterface
+    public function setAttribute(string $key, mixed $value): API\SpanBuilderInterface
     {
         $this->attributesBuilder[$key] = $value;
 

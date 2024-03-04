@@ -7,17 +7,14 @@ namespace OpenTelemetry\SDK\Common\Time;
 final class StopWatch implements StopWatchInterface
 {
     private const INITIAL_ELAPSED_TIME = 0;
-
-    private ClockInterface $clock;
     private bool $running = false;
-    private ?int $initialStartTime;
     private ?int $startTime = null;
     private ?int $stopTime = null;
 
-    public function __construct(ClockInterface $clock, ?int $initialStartTime = null)
-    {
-        $this->clock = $clock;
-        $this->initialStartTime = $initialStartTime;
+    public function __construct(
+        private ClockInterface $clock,
+        private ?int $initialStartTime = null,
+    ) {
     }
 
     public function isRunning(): bool

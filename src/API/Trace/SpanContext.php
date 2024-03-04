@@ -15,35 +15,24 @@ final class SpanContext implements SpanContextInterface
      * @see https://www.w3.org/TR/trace-context/#sampled-flag
      */
     private bool $isSampled;
-
-    private string $traceId;
-    private string $spanId;
-    private ?TraceStateInterface $traceState;
     private bool $isValid = true;
-    private bool $isRemote;
-    private int $traceFlags;
 
     private function __construct(
-        string $traceId,
-        string $spanId,
-        int $traceFlags,
-        bool $isRemote,
-        TraceStateInterface $traceState = null
+        private string $traceId,
+        private string $spanId,
+        private int $traceFlags,
+        private bool $isRemote,
+        private ?TraceStateInterface $traceState = null,
     ) {
         // TraceId must be exactly 16 bytes (32 chars) and at least one non-zero byte
         // SpanId must be exactly 8 bytes (16 chars) and at least one non-zero byte
         if (!SpanContextValidator::isValidTraceId($traceId) || !SpanContextValidator::isValidSpanId($spanId)) {
-            $traceId = SpanContextValidator::INVALID_TRACE;
-            $spanId = SpanContextValidator::INVALID_SPAN;
+            $this->traceId = SpanContextValidator::INVALID_TRACE;
+            $this->spanId = SpanContextValidator::INVALID_SPAN;
             $this->isValid=false;
         }
 
-        $this->traceId = $traceId;
-        $this->spanId = $spanId;
-        $this->traceState = $traceState;
-        $this->isRemote = $isRemote;
         $this->isSampled = ($traceFlags & TraceFlags::SAMPLED) === TraceFlags::SAMPLED;
-        $this->traceFlags = $traceFlags;
     }
 
     public function getTraceId(): string

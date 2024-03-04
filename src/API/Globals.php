@@ -27,21 +27,12 @@ final class Globals
     private static array $initializers = [];
     private static ?self $globals = null;
 
-    private TracerProviderInterface $tracerProvider;
-    private MeterProviderInterface $meterProvider;
-    private TextMapPropagatorInterface $propagator;
-    private LoggerProviderInterface $loggerProvider;
-
     public function __construct(
-        TracerProviderInterface $tracerProvider,
-        MeterProviderInterface $meterProvider,
-        LoggerProviderInterface $loggerProvider,
-        TextMapPropagatorInterface $propagator
+        private TracerProviderInterface $tracerProvider,
+        private MeterProviderInterface $meterProvider,
+        private LoggerProviderInterface $loggerProvider,
+        private TextMapPropagatorInterface $propagator,
     ) {
-        $this->tracerProvider = $tracerProvider;
-        $this->meterProvider = $meterProvider;
-        $this->loggerProvider = $loggerProvider;
-        $this->propagator = $propagator;
     }
 
     public static function tracerProvider(): TracerProviderInterface

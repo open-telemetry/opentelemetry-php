@@ -19,16 +19,10 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 class ConsoleMetricExporter implements PushMetricExporterInterface, AggregationTemporalitySelectorInterface
 {
     /**
-     * @var string|Temporality|null
-     */
-    private $temporality;
-
-    /**
      * @param string|Temporality|null $temporality
      */
-    public function __construct($temporality = null)
+    public function __construct(private $temporality = null)
     {
-        $this->temporality = $temporality;
     }
     /**
      * @inheritDoc

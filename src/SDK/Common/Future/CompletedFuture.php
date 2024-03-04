@@ -13,15 +13,11 @@ use Throwable;
  */
 final class CompletedFuture implements FutureInterface
 {
-    /** @var T */
-    private $value;
-
     /**
      * @param T $value
      */
-    public function __construct($value)
+    public function __construct(private $value)
     {
-        $this->value = $value;
     }
 
     public function await()

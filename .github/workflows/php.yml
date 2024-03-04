@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.4', '8.0', '8.1', '8.2', '8.3']
+        php-version: ['8.0', '8.1', '8.2', '8.3']
         experimental: [false]
         composer_args: [""]
         include:
@@ -138,4 +138,5 @@ jobs:
     needs: php
     with:
       matrix_extension: '["ast, json, grpc"]'
+      matrix_php_version: '["8.0", "8.1", "8.2", "8.3"]'
       install_directory: '~/.test/.packages'

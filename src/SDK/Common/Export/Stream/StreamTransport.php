@@ -28,20 +28,14 @@ use Throwable;
 final class StreamTransport implements TransportInterface
 {
     /**
-     * @var resource|null
-     */
-    private $stream;
-    private string $contentType;
-
-    /**
-     * @param resource $stream
+     * @param resource|null $stream
      *
      * @psalm-param CONTENT_TYPE $contentType
      */
-    public function __construct($stream, string $contentType)
-    {
-        $this->stream = $stream;
-        $this->contentType = $contentType;
+    public function __construct(
+        private $stream,
+        private string $contentType,
+    ) {
     }
 
     public function contentType(): string

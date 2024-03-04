@@ -6,11 +6,8 @@ namespace OpenTelemetry\Context\Propagation;
 
 use function array_key_first;
 use ArrayAccess;
-use function get_class;
-use function gettype;
 use InvalidArgumentException;
 use function is_array;
-use function is_object;
 use function is_string;
 use function sprintf;
 use function strcasecmp;
@@ -53,7 +50,7 @@ final class ArrayAccessGetterSetter implements PropagationGetterInterface, Propa
         throw new InvalidArgumentException(
             sprintf(
                 'Unsupported carrier type: %s.',
-                is_object($carrier) ? get_class($carrier) : gettype($carrier),
+                get_debug_type($carrier),
             )
         );
     }
@@ -75,7 +72,7 @@ final class ArrayAccessGetterSetter implements PropagationGetterInterface, Propa
         throw new InvalidArgumentException(
             sprintf(
                 'Unsupported carrier type: %s. Unable to get value associated with key:%s',
-                is_object($carrier) ? get_class($carrier) : gettype($carrier),
+                get_debug_type($carrier),
                 $key
             )
         );
@@ -100,7 +97,7 @@ final class ArrayAccessGetterSetter implements PropagationGetterInterface, Propa
         throw new InvalidArgumentException(
             sprintf(
                 'Unsupported carrier type: %s. Unable to set value associated with key:%s',
-                is_object($carrier) ? get_class($carrier) : gettype($carrier),
+                get_debug_type($carrier),
                 $key
             )
         );

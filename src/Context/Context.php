@@ -39,6 +39,7 @@ final class Context implements ContextInterface
 
     /**
      * @param ContextStorageInterface&ExecutionContextAwareInterface $storage
+     * @todo update type-hint (php >= 8.1)
      */
     public static function setStorage(ContextStorageInterface $storage): void
     {
@@ -47,6 +48,7 @@ final class Context implements ContextInterface
 
     /**
      * @return ContextStorageInterface&ExecutionContextAwareInterface
+     * @todo update return type-hint (php >= 8.1)
      */
     public static function storage(): ContextStorageInterface
     {
@@ -55,11 +57,9 @@ final class Context implements ContextInterface
     }
 
     /**
-     * @param ContextInterface|false|null $context
-     *
      * @internal OpenTelemetry
      */
-    public static function resolve($context, ?ContextStorageInterface $contextStorage = null): ContextInterface
+    public static function resolve(ContextInterface|false|null $context, ?ContextStorageInterface $contextStorage = null): ContextInterface
     {
         return $context
             ?? ($contextStorage ?? self::storage())->current()

@@ -30,42 +30,22 @@ use function trim;
  */
 final class PsrTransport implements TransportInterface
 {
-    private ClientInterface $client;
-    private RequestFactoryInterface $requestFactory;
-    private StreamFactoryInterface $streamFactory;
-
-    private string $endpoint;
-    private string $contentType;
-    private array $headers;
-    private array $compression;
-    private int $retryDelay;
-    private int $maxRetries;
-
     private bool $closed = false;
 
     /**
      * @psalm-param CONTENT_TYPE $contentType
      */
     public function __construct(
-        ClientInterface $client,
-        RequestFactoryInterface $requestFactory,
-        StreamFactoryInterface $streamFactory,
-        string $endpoint,
-        string $contentType,
-        array $headers,
-        array $compression,
-        int $retryDelay,
-        int $maxRetries
+        private ClientInterface $client,
+        private RequestFactoryInterface $requestFactory,
+        private StreamFactoryInterface $streamFactory,
+        private string $endpoint,
+        private string $contentType,
+        private array $headers,
+        private array $compression,
+        private int $retryDelay,
+        private int $maxRetries,
     ) {
-        $this->client = $client;
-        $this->requestFactory = $requestFactory;
-        $this->streamFactory = $streamFactory;
-        $this->endpoint = $endpoint;
-        $this->contentType = $contentType;
-        $this->headers = $headers;
-        $this->compression = $compression;
-        $this->retryDelay = $retryDelay;
-        $this->maxRetries = $maxRetries;
     }
 
     public function contentType(): string

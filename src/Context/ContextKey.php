@@ -9,11 +9,8 @@ namespace OpenTelemetry\Context;
  */
 final class ContextKey implements ContextKeyInterface
 {
-    private ?string $name;
-
-    public function __construct(?string $name=null)
+    public function __construct(private ?string $name = null)
     {
-        $this->name = $name;
     }
 
     public function name(): ?string

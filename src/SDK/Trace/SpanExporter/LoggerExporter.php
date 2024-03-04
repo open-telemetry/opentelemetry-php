@@ -27,19 +27,12 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
     private string $serviceName;
     private int $granularity = self::GRANULARITY_AGGREGATE;
 
-    /**
-     * @param string $serviceName
-     * @param LoggerInterface|null $logger
-     * @param string|null $defaultLogLevel
-     * @param SpanConverterInterface|null $converter
-     * @param int $granularity
-     */
     public function __construct(
         string $serviceName,
         ?LoggerInterface $logger = null,
         ?string $defaultLogLevel = LogLevel::DEBUG,
         ?SpanConverterInterface $converter = null,
-        int $granularity = 1
+        int $granularity = 1,
     ) {
         $this->setServiceName($serviceName);
         $this->setLogger($logger ?? new NullLogger());
@@ -53,24 +46,18 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
     {
         try {
             $this->doLog($spans);
-        } catch (Throwable $t) {
+        } catch (Throwable) {
             return false;
         }
 
         return true;
     }
 
-    /**
-     * @param string $serviceName
-     */
     private function setServiceName(string $serviceName): void
     {
         $this->serviceName = $serviceName;
     }
 
-    /**
-     * @param int $granularity
-     */
     public function setGranularity(int $granularity): void
     {
         $this->granularity = $granularity === self::GRANULARITY_SPAN
@@ -78,9 +65,6 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
             : self::GRANULARITY_AGGREGATE;
     }
 
-    /**
-     * @param iterable $spans
-     */
     private function doLog(iterable $spans): void
     {
         if ($this->granularity === self::GRANULARITY_AGGREGATE) {

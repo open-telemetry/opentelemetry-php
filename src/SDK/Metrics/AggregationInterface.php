@@ -52,6 +52,6 @@ interface AggregationInterface
         array $exemplars,
         int $startTimestamp,
         int $timestamp,
-        $temporality
+        $temporality,
     ): DataInterface;
 }

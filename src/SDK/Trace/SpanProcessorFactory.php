@@ -24,25 +24,21 @@ class SpanProcessorFactory
         }
 
         $name = Configuration::getEnum(Env::OTEL_PHP_TRACES_PROCESSOR);
-        switch ($name) {
-            case Values::VALUE_BATCH:
-                return new BatchSpanProcessor(
-                    $exporter,
-                    ClockFactory::getDefault(),
-                    Configuration::getInt(Env::OTEL_BSP_MAX_QUEUE_SIZE, BatchSpanProcessor::DEFAULT_MAX_QUEUE_SIZE),
-                    Configuration::getInt(Env::OTEL_BSP_SCHEDULE_DELAY, BatchSpanProcessor::DEFAULT_SCHEDULE_DELAY),
-                    Configuration::getInt(Env::OTEL_BSP_EXPORT_TIMEOUT, BatchSpanProcessor::DEFAULT_EXPORT_TIMEOUT),
-                    Configuration::getInt(Env::OTEL_BSP_MAX_EXPORT_BATCH_SIZE, BatchSpanProcessor::DEFAULT_MAX_EXPORT_BATCH_SIZE),
-                    true, //autoflush
-                    $meterProvider ?? new NoopMeterProvider(),
-                );
-            case Values::VALUE_SIMPLE:
-                return new SimpleSpanProcessor($exporter);
-            case Values::VALUE_NOOP:
-            case Values::VALUE_NONE:
-                return NoopSpanProcessor::getInstance();
-            default:
-                throw new InvalidArgumentException('Unknown processor: ' . $name);
-        }
+
+        return match ($name) {
+            Values::VALUE_BATCH => new BatchSpanProcessor(
+                $exporter,
+                ClockFactory::getDefault(),
+                Configuration::getInt(Env::OTEL_BSP_MAX_QUEUE_SIZE, BatchSpanProcessor::DEFAULT_MAX_QUEUE_SIZE),
+                Configuration::getInt(Env::OTEL_BSP_SCHEDULE_DELAY, BatchSpanProcessor::DEFAULT_SCHEDULE_DELAY),
+                Configuration::getInt(Env::OTEL_BSP_EXPORT_TIMEOUT, BatchSpanProcessor::DEFAULT_EXPORT_TIMEOUT),
+                Configuration::getInt(Env::OTEL_BSP_MAX_EXPORT_BATCH_SIZE, BatchSpanProcessor::DEFAULT_MAX_EXPORT_BATCH_SIZE),
+                true, //autoflush
+                $meterProvider ?? new NoopMeterProvider(),
+            ),
+            Values::VALUE_SIMPLE => new SimpleSpanProcessor($exporter),
+            Values::VALUE_NOOP, Values::VALUE_NONE => NoopSpanProcessor::getInstance(),
+            default => throw new InvalidArgumentException('Unknown processor: ' . $name),
+        };
     }
 }

@@ -12,6 +12,7 @@ use function in_array;
 use InvalidArgumentException;
 use function json_encode;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use function parse_url;
@@ -31,7 +32,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
      */
     public function create(
         string $endpoint,
-        string $contentType = 'application/x-protobuf',
+        string $contentType = ContentTypes::PROTOBUF,
         array $headers = [],
         $compression = null,
         float $timeout = 10.,
@@ -39,15 +40,15 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         int $maxRetries = 3,
         ?string $cacert = null,
         ?string $cert = null,
-        ?string $key = null
+        ?string $key = null,
     ): TransportInterface {
         $parts = parse_url($endpoint);
         if (!isset($parts['scheme'], $parts['host'], $parts['path'])) {
             throw new InvalidArgumentException('Endpoint has to contain scheme, host and path');
         }
         /** @phpstan-ignore-next-line */
-        if ($contentType !== 'application/x-protobuf') {
-            throw new InvalidArgumentException(sprintf('Unsupported content type "%s", grpc transport supports only application/x-protobuf', $contentType));
+        if ($contentType !== ContentTypes::PROTOBUF) {
+            throw new InvalidArgumentException(sprintf('Unsupported content type "%s", grpc transport supports only %s', $contentType, ContentTypes::PROTOBUF));
         }
 
         $scheme = $parts['scheme'];
@@ -86,7 +87,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         $compression,
         float $timeout,
         int $maxRetries,
-        int $retryDelay
+        int $retryDelay,
     ): array {
         $opts = [];
 
