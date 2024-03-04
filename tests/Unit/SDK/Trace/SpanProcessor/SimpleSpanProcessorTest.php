@@ -100,6 +100,9 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $this->simpleSpanProcessor->onEnd($this->readableSpan);
     }
 
+    /**
+     * @psalm-suppress UndefinedVariable
+     */
     public function test_does_not_trigger_concurrent_export(): void
     {
         $spanData = new SpanData();

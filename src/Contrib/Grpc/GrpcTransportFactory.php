@@ -29,6 +29,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
      * @psalm-return TransportInterface<"application/x-protobuf">
      * @psalm-suppress MoreSpecificImplementedParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress NoValue
      */
     public function create(
         string $endpoint,

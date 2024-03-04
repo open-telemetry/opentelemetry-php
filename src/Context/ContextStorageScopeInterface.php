@@ -6,6 +6,9 @@ namespace OpenTelemetry\Context;
 
 use ArrayAccess;
 
+/**
+ * @psalm-suppress MissingTemplateParam
+ */
 interface ContextStorageScopeInterface extends ScopeInterface, ArrayAccess
 {
     /**

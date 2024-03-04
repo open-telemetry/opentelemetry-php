@@ -62,6 +62,9 @@ final class MetricRegistryTest extends TestCase
         ], Temporality::CUMULATIVE, true), $stream->collect($reader));
     }
 
+    /**
+     * @psalm-suppress RedundantFunctionCall
+     */
     public function test_collect_and_push_invokes_requested_callback_only_once(): void
     {
         $this->expectOutputString('0');
@@ -79,6 +82,9 @@ final class MetricRegistryTest extends TestCase
         $registry->collectAndPush([$streamId0, $streamId1]);
     }
 
+    /**
+     * @psalm-suppress RedundantFunctionCall
+     */
     public function test_collect_and_push_invokes_only_requested_callbacks(): void
     {
         $this->expectOutputString('0011');

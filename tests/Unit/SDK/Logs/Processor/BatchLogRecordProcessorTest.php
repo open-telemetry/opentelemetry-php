@@ -270,6 +270,10 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $processor->forceFlush();
     }
 
+    /**
+     * @psalm-suppress UndefinedVariable
+     * @psalm-suppress RedundantCondition
+     */
     public function test_queue_size_exceeded_drops_spans(): void
     {
         $exporter = $this->createMock(LogRecordExporterInterface::class);
@@ -357,6 +361,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
 
     public function test_throwing_exporter_flush_cannot_rethrow_in_original_caller_logs_error(): void
     {
+        $processor = null;
         $exporter = $this->createMock(LogRecordExporterInterface::class);
         $exporter->method('forceFlush')->willReturnCallback(function () use (&$processor) {
             /** @var LogRecordProcessorInterface $processor */
@@ -380,6 +385,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
     public function test_throwing_exporter_flush_rethrows_in_original_caller(): void
     {
         $exporter = $this->createMock(LogRecordExporterInterface::class);
+        $processor = null;
         $exporter->method('forceFlush')->willReturnCallback(function () use (&$processor) {
             /** @var LogRecordProcessorInterface $processor */
             $record = $this->createMock(ReadWriteLogRecord::class);

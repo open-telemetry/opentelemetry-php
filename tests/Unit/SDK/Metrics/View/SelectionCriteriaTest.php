@@ -68,6 +68,7 @@ final class SelectionCriteriaTest extends TestCase
     }
 
     /**
+     * @param non-empty-string $pattern
      * @covers \OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria
      * @dataProvider instrumentNameProvider
      */

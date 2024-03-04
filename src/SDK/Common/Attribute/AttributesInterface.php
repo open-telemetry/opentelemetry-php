@@ -7,6 +7,9 @@ namespace OpenTelemetry\SDK\Common\Attribute;
 use Countable;
 use Traversable;
 
+/**
+ * @psalm-suppress MissingTemplateParam
+ */
 interface AttributesInterface extends Traversable, Countable
 {
     public function has(string $name): bool;

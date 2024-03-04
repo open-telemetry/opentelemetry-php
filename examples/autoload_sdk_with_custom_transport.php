@@ -21,6 +21,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
  * create a transport factory to override the default grpc one (for both traces and metrics):
  * @psalm-suppress InvalidReturnType
  * @psalm-suppress InvalidReturnStatement
+ * @psalm-suppress MissingTemplateParam
  */
 $factory = new class() implements \OpenTelemetry\SDK\Common\Export\TransportFactoryInterface {
     public function create(string $endpoint, string $contentType, array $headers = [], $compression = null, float $timeout = 10., int $retryDelay = 100, int $maxRetries = 3, ?string $cacert = null, ?string $cert = null, ?string $key = null): \OpenTelemetry\SDK\Common\Export\TransportInterface

@@ -22,7 +22,7 @@ class InMemoryExporter implements SpanExporterInterface
     protected function doExport(iterable $spans): bool
     {
         foreach ($spans as $span) {
-            $this->storage[] = $span;
+            $this->storage->append($span);
         }
 
         return true;

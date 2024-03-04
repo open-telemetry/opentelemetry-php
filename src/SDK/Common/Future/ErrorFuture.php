@@ -7,6 +7,9 @@ namespace OpenTelemetry\SDK\Common\Future;
 use Closure;
 use Throwable;
 
+/**
+ * @psalm-suppress MissingTemplateParam
+ */
 final class ErrorFuture implements FutureInterface
 {
     public function __construct(private Throwable $throwable)
