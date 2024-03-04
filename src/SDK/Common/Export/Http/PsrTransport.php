@@ -53,6 +53,9 @@ final class PsrTransport implements TransportInterface
         return $this->contentType;
     }
 
+    /**
+     * @psalm-suppress ArgumentTypeCoercion
+     */
     public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface
     {
         if ($this->closed) {
@@ -118,6 +121,9 @@ final class PsrTransport implements TransportInterface
         return new CompletedFuture($body);
     }
 
+    /**
+     * @return list<string>
+     */
     private static function parseContentEncoding(ResponseInterface $response): array
     {
         $encodings = [];

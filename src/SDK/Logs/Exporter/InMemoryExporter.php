@@ -25,7 +25,7 @@ class InMemoryExporter implements LogRecordExporterInterface
     public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         foreach ($batch as $record) {
-            $this->storage[] = $record;
+            $this->storage->append($record);
         }
 
         return new CompletedFuture(true);

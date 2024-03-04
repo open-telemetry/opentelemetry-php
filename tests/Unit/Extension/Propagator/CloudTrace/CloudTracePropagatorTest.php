@@ -30,6 +30,9 @@ class CloudTracePropagatorTest extends TestCase
 
     private TextMapPropagatorInterface $cloudTracePropagator;
 
+    /**
+     * @psalm-suppress PossiblyUndefinedArrayOffset
+     */
     protected function setUp(): void
     {
         $this->cloudTracePropagator = CloudTracePropagator::getInstance();

@@ -40,11 +40,14 @@ function weaken(Closure $closure, ?object &$target = null): Closure
 
     static $placeholder;
     $placeholder ??= new stdClass();
+    /** @psalm-suppress PossiblyNullReference */
     $closure = $closure->bindTo($placeholder);
 
     $ref = WeakReference::create($target);
 
-    /** @psalm-suppress PossiblyInvalidFunctionCall */
+    /**
+     * @psalm-suppress all
+     */
     return $scope && $target::class === $scope->name && !$scope->isInternal()
         ? static fn (...$args) => ($obj = $ref->get()) ? $closure->call($obj, ...$args) : null
         : static fn (...$args) => ($obj = $ref->get()) ? $closure->bindTo($obj)(...$args) : null;

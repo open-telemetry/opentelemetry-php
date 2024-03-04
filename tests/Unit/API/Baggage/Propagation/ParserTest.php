@@ -100,6 +100,7 @@ class ParserTest extends TestCase
             'empty key' => ['=value'],
             'key with invalid char' => ['@foo=bar'],
             'value with invalid char' => ['foo="bar"'],
+            'missing value' => ['key1='],
         ];
     }
 }

@@ -8,6 +8,9 @@ use function array_key_exists;
 use IteratorAggregate;
 use Traversable;
 
+/**
+ * @psalm-suppress MissingTemplateParam
+ */
 final class Attributes implements AttributesInterface, IteratorAggregate
 {
     /**

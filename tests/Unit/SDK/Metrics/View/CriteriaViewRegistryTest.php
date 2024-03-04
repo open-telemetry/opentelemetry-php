@@ -28,6 +28,9 @@ final class CriteriaViewRegistryTest extends TestCase
         ));
     }
 
+    /**
+     * @psalm-suppress InvalidOperand
+     */
     public function test_registry_returns_matching_entry(): void
     {
         $views = new CriteriaViewRegistry();

@@ -28,7 +28,7 @@ class PropagatorFactory
     }
 
     /**
-     * @return array<TextMapPropagatorInterface>
+     * @return list<TextMapPropagatorInterface>
      */
     private function buildPropagators(array $names): array
     {

@@ -22,6 +22,9 @@ final class CriteriaViewRegistry implements ViewRegistryInterface
         $this->views[] = $view;
     }
 
+    /**
+     * @todo is null the best return type here? what about empty array or exception?
+     */
     public function find(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): ?iterable
     {
         $views = $this->generateViews($instrument, $instrumentationScope);

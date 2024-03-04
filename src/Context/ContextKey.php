@@ -6,6 +6,7 @@ namespace OpenTelemetry\Context;
 
 /**
  * @internal
+ * @psalm-suppress MissingTemplateParam
  */
 final class ContextKey implements ContextKeyInterface
 {
