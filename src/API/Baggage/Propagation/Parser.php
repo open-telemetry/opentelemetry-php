@@ -46,6 +46,7 @@ final class Parser
                 $metadata = null;
             }
 
+            /** @psalm-suppress PossiblyUndefinedArrayOffset */
             [$key, $value] = explode(self::EQUALS, $keyValue, 2);
 
             $key = urldecode($key);

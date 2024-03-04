@@ -51,6 +51,9 @@ class OtlpBench
         $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
     }
 
+    /**
+     * @psalm-suppress MissingTemplateParam
+     */
     private function createTransport(string $contentType): TransportInterface
     {
         return new class($contentType) implements TransportInterface {

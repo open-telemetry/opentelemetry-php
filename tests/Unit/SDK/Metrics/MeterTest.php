@@ -261,6 +261,10 @@ final class MeterTest extends TestCase
         $meter->createObservableCounter('name', 'unit', 'description');
     }
 
+    /**
+     * @psalm-suppress InvalidOperand
+     * @psalm-suppress PossiblyUndefinedArrayOffset
+     */
     public function test_uses_view_registry_to_create_views(): void
     {
         $aggregation = $this->createMock(AggregationInterface::class);
@@ -289,6 +293,10 @@ final class MeterTest extends TestCase
         $meter->createCounter('name');
     }
 
+    /**
+     * @psalm-suppress InvalidOperand
+     * @psalm-suppress PossiblyUndefinedArrayOffset
+     */
     public function test_uses_default_aggregation_if_view_aggregation_null(): void
     {
         $aggregation = $this->createMock(AggregationInterface::class);
@@ -316,6 +324,10 @@ final class MeterTest extends TestCase
         $meter->createCounter('name');
     }
 
+    /**
+     * @psalm-suppress InvalidOperand
+     * @psalm-suppress PossiblyUndefinedArrayOffset
+     */
     public function test_uses_default_view_if_null_views_returned(): void
     {
         $aggregation = $this->createMock(AggregationInterface::class);

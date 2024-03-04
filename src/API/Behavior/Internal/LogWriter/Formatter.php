@@ -25,6 +25,10 @@ class Formatter
         } else {
             //get calling location, skipping over trait, formatter etc
             $caller = debug_backtrace()[3];
+            /**
+             * @psalm-suppress PossiblyNullArgument
+             * @psalm-suppress PossiblyUndefinedArrayOffset
+             */
             $message = sprintf(
                 'OpenTelemetry: [%s] %s in %s(%s)',
                 $level,

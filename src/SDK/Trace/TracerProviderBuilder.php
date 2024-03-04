@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 class TracerProviderBuilder
 {
-    // @var array<SpanProcessorInterface>
+    /** @var list<SpanProcessorInterface> */
     private ?array $spanProcessors = [];
     private ?ResourceInfo $resource = null;
     private ?SamplerInterface $sampler = null;

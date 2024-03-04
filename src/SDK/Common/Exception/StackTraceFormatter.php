@@ -124,8 +124,8 @@ final class StackTraceFormatter
 
     /**
      * @psalm-return Frames
-     *
      * @psalm-suppress PossiblyUndefinedArrayOffset
+     * @psalm-suppress InvalidArrayOffset
      */
     private static function frames(Throwable $e): array
     {

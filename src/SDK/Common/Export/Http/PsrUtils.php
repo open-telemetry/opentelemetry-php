@@ -87,6 +87,7 @@ final class PsrUtils
 
     /**
      * @param list<string> $encodings
+     * @psalm-suppress InvalidArrayOffset
      */
     public static function decode(string $value, array $encodings): string
     {
