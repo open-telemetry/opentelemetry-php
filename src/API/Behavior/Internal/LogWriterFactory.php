@@ -9,26 +9,26 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\NoopLogWriter;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\Psr3LogWriter;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\StreamLogWriter;
-use OpenTelemetry\API\Instrumentation\ConfigurationResolver;
 use OpenTelemetry\API\LoggerHolder;
+use OpenTelemetry\Config\Configuration;
+use OpenTelemetry\Config\KnownValues;
+use OpenTelemetry\Config\Variables;
 
 class LogWriterFactory
 {
-    private const OTEL_PHP_LOG_DESTINATION = 'OTEL_PHP_LOG_DESTINATION';
-
     public function create(): LogWriterInterface
     {
-        $dest = (new ConfigurationResolver())->getString(self::OTEL_PHP_LOG_DESTINATION);
+        $dest = (new Configuration())->getEnum(Variables::OTEL_PHP_LOG_DESTINATION);
         $logger = LoggerHolder::get();
 
         switch ($dest) {
-            case 'none':
+            case KnownValues::VALUE_NONE:
                 return new NoopLogWriter();
-            case 'stderr':
+            case KnownValues::VALUE_STDERR:
                 return new StreamLogWriter('php://stderr');
-            case 'stdout':
+            case KnownValues::VALUE_STDOUT:
                 return new StreamLogWriter('php://stdout');
-            case 'psr3':
+            case KnownValues::VALUE_PSR3:
                 if ($logger) {
                     return new Psr3LogWriter($logger);
                 }
@@ -36,7 +36,7 @@ class LogWriterFactory
 
                 //default to error log
                 return new ErrorLogWriter();
-            case 'error_log':
+            case KnownValues::VALUE_ERROR_LOG:
                 return new ErrorLogWriter();
             default:
                 if ($logger) {

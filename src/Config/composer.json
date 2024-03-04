@@ -1,7 +1,7 @@
 {
-    "name": "open-telemetry/api",
-    "description": "API for OpenTelemetry PHP.",
-    "keywords": ["opentelemetry", "otel", "metrics", "tracing", "logging", "apm", "api"],
+    "name": "open-telemetry/config",
+    "description": "Configuration management for OpenTelemetry PHP.",
+    "keywords": ["opentelemetry", "otel", "config"],
     "type": "library",
     "support": {
         "issues": "https://github.com/open-telemetry/opentelemetry-php/issues",
@@ -18,22 +18,12 @@
     ],
     "require": {
         "php": "^8.0",
-        "open-telemetry/config": "*",
-        "open-telemetry/context": "^1.0",
-        "psr/log": "^1.1|^2.0|^3.0",
-        "symfony/polyfill-php81": "^1.26",
-        "symfony/polyfill-php82": "^1.26"
-    },
-    "conflict": {
-        "open-telemetry/sdk": "<=1.0.4"
+        "psr/log": "^1.1|^2.0|^3.0"
     },
     "autoload": {
         "psr-4": {
-            "OpenTelemetry\\API\\": "."
-        },
-        "files": [
-            "Trace/functions.php"
-        ]
+            "OpenTelemetry\\Config\\": "."
+        }
     },
     "extra": {
         "branch-alias": {
