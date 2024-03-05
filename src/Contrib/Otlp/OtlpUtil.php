@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Resource\Detectors\Sdk;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use UnexpectedValueException;
+use function explode;
 
 class OtlpUtil
 {
@@ -35,6 +36,17 @@ class OtlpUtil
         }
 
         return self::METHODS[$signal];
+    }
+
+    public static function path(string $signal, string $protocol): string {
+        return match (explode('/', $protocol)[0]) {
+            'grpc' => self::method($signal),
+            'http' => match ($signal) {
+                Signals::TRACE => '/v1/traces',
+                Signals::METRICS => '/v1/metrics',
+                Signals::LOGS => '/v1/logs',
+            }
+        };
     }
 
     public static function getHeaders(string $signal): array

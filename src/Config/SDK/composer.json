@@ -33,6 +33,13 @@
         },
         "spi": {
             "Nevay\\OTelSDK\\Configuration\\ComponentProvider": [
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorComposite",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorJaeger",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorTraceContext",
+
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOff",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOn",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerParentBased",
@@ -41,7 +48,17 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlp",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterZipkin",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorBatch",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorSimple"
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorSimple",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverDefault",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlp",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricReaderPeriodic",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlp",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorBatch",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple"
             ]
         }
     }

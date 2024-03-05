@@ -4,6 +4,14 @@ resource:
   attributes:
     service.name: opentelemetry-demo
 
+propagators:
+  composite: [ tracecontext, baggage ]
+
+exporters:
+  otlp: &otlp-exporter
+    protocol: http/protobuf
+    endpoint: http://collector:4318
+
 tracer_provider:
   sampler:
     parent_based:
@@ -15,6 +23,22 @@ tracer_provider:
           console: {}
     - batch:
         exporter:
+          otlp: *otlp-exporter
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console: {}
+    - periodic:
+        exporter:
           otlp:
-            protocol: http/protobuf
-            endpoint: http://collector:4318
+            <<: *otlp-exporter
+            temporality_preference: lowmemory
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console: {}
+    - batch:
+        exporter:
+          otlp: *otlp-exporter

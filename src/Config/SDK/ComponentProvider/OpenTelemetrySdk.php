@@ -9,6 +9,24 @@ use Nevay\OTelSDK\Configuration\Validation;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Logs\LoggerProvider;
+use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
+use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
+use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
+use OpenTelemetry\SDK\Metrics\InstrumentType;
+use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
+use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandlerFactory;
+use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
+use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\AllCriteria;
+use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeNameCriteria;
+use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeSchemaUrlCriteria;
+use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeVersionCriteria;
+use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
+use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria;
+use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\SdkBuilder;
@@ -50,6 +68,32 @@ final class OpenTelemetrySdk implements ComponentProvider {
      *         sampler: ?ComponentPlugin<SamplerInterface>,
      *         processors: list<ComponentPlugin<SpanProcessorInterface>>,
      *     },
+     *     meter_provider: array{
+     *         views: list<array{
+     *             stream: array{
+     *                 name: ?string,
+     *                 description: ?string,
+     *                 attribute_keys: list<string>,
+     *                 aggregation: ?ComponentPlugin<DefaultAggregationProviderInterface>,
+     *             },
+     *             selector: array{
+     *                 instrument_type: 'counter'|'histogram'|'observable_counter'|'observable_gauge'|'observable_up_down_counter'|'up_down_counter'|null,
+     *                 instrument_name: ?string,
+     *                 unit: ?string,
+     *                 meter_name: ?string,
+     *                 meter_version: ?string,
+     *                 meter_schema_url: ?string,
+     *             },
+     *         }>,
+     *         readers: list<ComponentPlugin<MetricReaderInterface>>,
+     *     },
+     *     logger_provider: array{
+     *         limits: array{
+     *             attribute_value_length_limit: ?int<0, max>,
+     *             attribute_count_limit: ?int<0, max>,
+     *         },
+     *         processors: list<ComponentPlugin<LogRecordProcessorInterface>>,
+     *     },
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): SdkBuilder {
@@ -73,6 +117,8 @@ final class OpenTelemetrySdk implements ComponentProvider {
             $spanProcessors[] = $processor->create($context);
         }
 
+        // <editor-fold desc="tracer_provider">
+
         $tracerProvider = new TracerProvider(
             spanProcessors: $spanProcessors,
             sampler: $properties['tracer_provider']['sampler']?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
@@ -80,30 +126,120 @@ final class OpenTelemetrySdk implements ComponentProvider {
             spanLimits: new SpanLimits(
                 attributesFactory: Attributes::factory(
                     attributeCountLimit: $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
+                        ?? $properties['attribute_limits']['attribute_count_limit']
+                        ?? 128,
                     attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
                         ?? $properties['attribute_limits']['attribute_value_length_limit'],
                 ),
                 eventAttributesFactory: Attributes::factory(
                     attributeCountLimit: $properties['tracer_provider']['limits']['event_attribute_count_limit']
                         ?? $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
+                        ?? $properties['attribute_limits']['attribute_count_limit']
+                        ?? 128,
                     attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
                         ?? $properties['attribute_limits']['attribute_value_length_limit'],
                 ),
                 linkAttributesFactory: Attributes::factory(
                     attributeCountLimit: $properties['tracer_provider']['limits']['link_attribute_count_limit']
                         ?? $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
+                        ?? $properties['attribute_limits']['attribute_count_limit']
+                        ?? 128,
                     attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
                         ?? $properties['attribute_limits']['attribute_value_length_limit'],
                 ),
-                eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'],
-                linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
+                eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'] ?? 128,
+                linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'] ?? 128,
             ),
         );
 
+        // </editor-fold>
+
+        // <editor-fold desc="meter_provider">
+
+        $metricReaders = [];
+        foreach ($properties['meter_provider']['readers'] as $reader) {
+            $metricReaders[] = $reader->create($context);
+        }
+
+        $viewRegistry = new CriteriaViewRegistry();
+        foreach ($properties['meter_provider']['views'] as $view) {
+            $criteria = [];
+            if (isset($view['selector']['instrument_type'])) {
+                $criteria[] = new InstrumentTypeCriteria(match ($view['selector']['instrument_type']) {
+                    'counter' => InstrumentType::COUNTER,
+                    'histogram' => InstrumentType::HISTOGRAM,
+                    'observable_counter' => InstrumentType::ASYNCHRONOUS_COUNTER,
+                    'observable_gauge' => InstrumentType::ASYNCHRONOUS_GAUGE,
+                    'observable_up_down_counter' => InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER,
+                    'up_down_counter' => InstrumentType::UP_DOWN_COUNTER,
+                });
+            }
+            if (isset($view['selector']['name'])) {
+                $criteria[] = new InstrumentNameCriteria($view['selector']['name']);
+            }
+            if (isset($view['selector']['unit'])) {
+                // TODO Add unit criteria
+            }
+            if (isset($view['selector']['meter_name'])) {
+                $criteria[] = new InstrumentationScopeNameCriteria($view['selector']['meter_name']);
+            }
+            if (isset($view['selector']['meter_version'])) {
+                $criteria[] = new InstrumentationScopeVersionCriteria($view['selector']['meter_version']);
+            }
+            if (isset($view['selector']['meter_schema_url'])) {
+                $criteria[] = new InstrumentationScopeSchemaUrlCriteria($view['selector']['meter_schema_url']);
+            }
+
+            $viewTemplate = ViewTemplate::create();
+            if (isset($view['stream']['name'])) {
+                $viewTemplate = $viewTemplate->withName($view['stream']['name']);
+            }
+            if (isset($view['stream']['description'])) {
+                $viewTemplate = $viewTemplate->withDescription($view['stream']['description']);
+            }
+            if (isset($view['stream']['attribute_keys'])) {
+                $viewTemplate = $viewTemplate->withAttributeKeys($view['stream']['attribute_keys']);
+            }
+            if (isset($view['stream']['aggregation'])) {
+                // TODO Add support for aggregation providers in views to allow usage of advisory
+            }
+
+            $viewRegistry->register(new AllCriteria($criteria), $viewTemplate);
+        }
+
+        $meterProvider = new MeterProvider(
+            contextStorage: null,
+            resource: $resource,
+            clock: ClockFactory::getDefault(),
+            attributesFactory: Attributes::factory(),
+            instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
+            metricReaders: $metricReaders,
+            viewRegistry: $viewRegistry,
+            exemplarFilter: null,
+            stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
+        );
+
+        // </editor-fold>
+
+        // <editor-fold desc="logger_provider">
+
+        $logRecordProcessors = [];
+        foreach ($properties['logger_provider']['processors'] as $processor) {
+            $logRecordProcessors[] = $processor->create($context);
+        }
+
+        // TODO Allow injecting log record attributes factory
+        $loggerProvider = new LoggerProvider(
+            processor: new MultiLogRecordProcessor($logRecordProcessors),
+            instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
+            resource: $resource,
+        );
+
+        // </editor-fold>
+
         $sdkBuilder->setTracerProvider($tracerProvider);
+        $sdkBuilder->setMeterProvider($meterProvider);
+        $sdkBuilder->setLoggerProvider($loggerProvider);
 
         return $sdkBuilder;
     }
@@ -125,8 +261,8 @@ final class OpenTelemetrySdk implements ComponentProvider {
                 ->append($this->getAttributeLimitsConfig())
                 ->append($registry->component('propagator', TextMapPropagatorInterface::class))
                 ->append($this->getTracerProviderConfig($registry))
-                # ->append($this->getMeterProviderConfig($registry))
-                # ->append($this->getLoggerProviderConfig($registry))
+                ->append($this->getMeterProviderConfig($registry))
+                ->append($this->getLoggerProviderConfig($registry))
             ->end();
 
         return $node;
@@ -176,6 +312,75 @@ final class OpenTelemetrySdk implements ComponentProvider {
                 ->end()
                 ->append($registry->component('sampler', SamplerInterface::class))
                 ->append($registry->componentList('processors', SpanProcessorInterface::class))
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    private function getMeterProviderConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+        $node = new ArrayNodeDefinition('meter_provider');
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->arrayNode('views')
+                    ->arrayPrototype()
+                        ->children()
+                            ->arrayNode('stream')
+                                ->addDefaultsIfNotSet()
+                                ->children()
+                                    ->scalarNode('name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                                    ->scalarNode('description')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                                    ->arrayNode('attribute_keys')
+                                        ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                    ->end()
+                                    ->append($registry->component('aggregation', DefaultAggregationProviderInterface::class))
+                                ->end()
+                            ->end()
+                            ->arrayNode('selector')
+                                ->addDefaultsIfNotSet()
+                                ->children()
+                                    ->enumNode('instrument_type')
+                                        ->values([
+                                            'counter',
+                                            'histogram',
+                                            'observable_counter',
+                                            'observable_gauge',
+                                            'observable_up_down_counter',
+                                            'up_down_counter',
+                                        ])
+                                        ->defaultNull()
+                                    ->end()
+                                    ->scalarNode('instrument_name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                                    ->scalarNode('unit')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                                    ->scalarNode('meter_name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                                    ->scalarNode('meter_version')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                                    ->scalarNode('meter_schema_url')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->append($registry->componentList('readers', MetricReaderInterface::class))
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    private function getLoggerProviderConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+        $node = new ArrayNodeDefinition('logger_provider');
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->arrayNode('limits')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->integerNode('attribute_value_length_limit')->min(0)->defaultNull()->end()
+                        ->integerNode('attribute_count_limit')->min(0)->defaultNull()->end()
+                    ->end()
+                ->end()
+                ->append($registry->componentList('processors', LogRecordProcessorInterface::class))
             ->end()
         ;
 

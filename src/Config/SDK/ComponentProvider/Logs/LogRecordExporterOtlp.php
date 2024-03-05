@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
+namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
 use Nevay\OTelSDK\Configuration\ComponentProvider;
 use Nevay\OTelSDK\Configuration\ComponentProviderRegistry;
@@ -7,16 +7,15 @@ use Nevay\OTelSDK\Configuration\Context;
 use Nevay\OTelSDK\Configuration\Validation;
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\API\Signals;
+use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\Protocols;
-use OpenTelemetry\Contrib\Otlp\SpanExporter;
+use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Registry;
-use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use function str_starts_with;
 
 #[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
-final class SpanExporterOtlp implements ComponentProvider {
+final class LogRecordExporterOtlp implements ComponentProvider {
 
     /**
      * @param array{
@@ -30,11 +29,11 @@ final class SpanExporterOtlp implements ComponentProvider {
      *     timeout: int<0, max>,
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): SpanExporterInterface {
+    public function createPlugin(array $properties, Context $context): LogRecordExporterInterface {
         $protocol = $properties['protocol'];
 
-        return new SpanExporter(Registry::transportFactory($protocol)->create(
-            endpoint: $properties['endpoint'] . OtlpUtil::path(Signals::TRACE, $protocol),
+        return new LogsExporter(Registry::transportFactory($protocol)->create(
+            endpoint: $properties['endpoint'] . OtlpUtil::path(Signals::LOGS, $protocol),
             contentType: Protocols::contentType($protocol),
             headers: $properties['headers'],
             compression: $properties['compression'],
