@@ -11,9 +11,8 @@ namespace OpenTelemetry\Context;
 
 use function extension_loaded;
 use FFI;
-use const FILTER_VALIDATE_BOOLEAN;
-use function filter_var;
-use function is_string;
+use OpenTelemetry\Config\Configuration;
+use OpenTelemetry\Config\Variables;
 use const PHP_VERSION_ID;
 use const PHP_ZTS;
 use function sprintf;
@@ -26,11 +25,7 @@ final class ZendObserverFiber
 {
     public static function isEnabled(): bool
     {
-        $enabled = $_SERVER['OTEL_PHP_FIBERS_ENABLED'] ?? false;
-
-        return is_string($enabled)
-            ? filter_var($enabled, FILTER_VALIDATE_BOOLEAN)
-            : (bool) $enabled;
+        return Configuration::getBoolean(Variables::OTEL_PHP_FIBERS_ENABLED, false);
     }
 
     public static function init(): bool
