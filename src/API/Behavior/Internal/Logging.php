@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Behavior\Internal;
 
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
+use OpenTelemetry\Config\Configuration;
+use OpenTelemetry\Config\Variables;
 use Psr\Log\LogLevel;
 
 /**
@@ -69,15 +71,7 @@ class Logging
 
     private static function getLogLevel(): int
     {
-        $level = array_key_exists(self::OTEL_LOG_LEVEL, $_SERVER)
-            ? $_SERVER[self::OTEL_LOG_LEVEL]
-            : getenv(self::OTEL_LOG_LEVEL);
-        if (!$level) {
-            $level = ini_get(self::OTEL_LOG_LEVEL);
-        }
-        if (!$level) {
-            $level = self::DEFAULT_LEVEL;
-        }
+        $level = Configuration::getEnum(Variables::OTEL_LOG_LEVEL, self::DEFAULT_LEVEL);
 
         return self::level($level);
     }

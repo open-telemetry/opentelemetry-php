@@ -85,6 +85,7 @@ deptrac:
     ruleset:
       Context:
           - FFI
+          - Config
       SemConv: ~
       API:
           - Config

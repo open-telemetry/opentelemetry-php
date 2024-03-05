@@ -18,6 +18,7 @@
     ],
     "require": {
         "php": "^8.0",
+        "open-telemetry/config": "*",
         "symfony/polyfill-php81": "^1.26",
         "symfony/polyfill-php82": "^1.26"
     },

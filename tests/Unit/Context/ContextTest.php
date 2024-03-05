@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Context;
 
+use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use OpenTelemetry\Config\Variables;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Context\DebugScope;
@@ -16,6 +18,15 @@ use stdClass;
  */
 class ContextTest extends TestCase
 {
+    use EnvironmentVariables;
+
+    public function tearDown(): void
+    {
+        $this->restoreEnvironmentVariables();
+        unset($_SERVER[Variables::OTEL_PHP_DEBUG_SCOPES_DISABLED]);
+        \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED');
+    }
+
     public function test_activate(): void
     {
         $context = Context::getRoot();
@@ -179,87 +190,31 @@ class ContextTest extends TestCase
         }
     }
 
-    public function test_debug_scopes_disabled_env_var(): void
+    public function test_debug_scopes_disabled(): void
     {
-        \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED=1');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_DEBUG_SCOPES_DISABLED, 'true');
 
         $context = Context::getRoot();
-
         $scope = $context->activate();
 
         try {
             $this->assertNotInstanceOf(DebugScope::class, $scope);
         } finally {
             $scope->detach();
-            \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED');
         }
     }
 
-    public function test_debug_scopes_disabled_server_var(): void
+    public function test_debug_scopes_disabled_false(): void
     {
-        $_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED'] = '1';
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_DEBUG_SCOPES_DISABLED, 'false');
 
         $context = Context::getRoot();
-
-        $scope = $context->activate();
-
-        try {
-            $this->assertNotInstanceOf(DebugScope::class, $scope);
-        } finally {
-            $scope->detach();
-            unset($_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED']);
-        }
-    }
-
-    public function test_debug_scopes_disabled_order_server(): void
-    {
-        $_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED'] = '1';
-        \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED=0');
-
-        $context = Context::getRoot();
-
-        $scope = $context->activate();
-
-        try {
-            $this->assertNotInstanceOf(DebugScope::class, $scope);
-        } finally {
-            $scope->detach();
-            unset($_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED']);
-            \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED');
-        }
-    }
-
-    public function test_debug_scopes_disabled_falsey_server(): void
-    {
-        $_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED'] = '0';
-        \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED=1');
-
-        $context = Context::getRoot();
-
         $scope = $context->activate();
 
         try {
             $this->assertInstanceOf(DebugScope::class, $scope);
         } finally {
             $scope->detach();
-            unset($_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED']);
-            \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED');
-        }
-    }
-
-    public function test_debug_scopes_disabled_falsey_env(): void
-    {
-        \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED=0');
-
-        $context = Context::getRoot();
-
-        $scope = $context->activate();
-
-        try {
-            $this->assertInstanceOf(DebugScope::class, $scope);
-        } finally {
-            $scope->detach();
-            \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED');
         }
     }
 }
