@@ -24,7 +24,6 @@ class ContextTest extends TestCase
     {
         $this->restoreEnvironmentVariables();
         unset($_SERVER[Variables::OTEL_PHP_DEBUG_SCOPES_DISABLED]);
-        \putenv('OTEL_PHP_DEBUG_SCOPES_DISABLED');
     }
 
     public function test_activate(): void
