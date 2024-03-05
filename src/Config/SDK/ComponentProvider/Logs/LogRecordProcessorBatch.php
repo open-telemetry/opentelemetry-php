@@ -5,14 +5,12 @@ use Nevay\OTelSDK\Configuration\ComponentPlugin;
 use Nevay\OTelSDK\Configuration\ComponentProvider;
 use Nevay\OTelSDK\Configuration\ComponentProviderRegistry;
 use Nevay\OTelSDK\Configuration\Context;
-use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
-#[PackageDependency('open-telemetry/exporter-otlp', '^1.0')]
 final class LogRecordProcessorBatch implements ComponentProvider {
 
     /**
