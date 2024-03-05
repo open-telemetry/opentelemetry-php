@@ -25,7 +25,7 @@ final class ZendObserverFiber
 {
     public static function isEnabled(): bool
     {
-        return Configuration::getBoolean(Variables::OTEL_PHP_FIBERS_ENABLED, false);
+        return Configuration::getBoolean(Variables::OTEL_PHP_FIBERS_ENABLED);
     }
 
     public static function init(): bool

@@ -119,4 +119,6 @@ interface Defaults
     public const OTEL_PHP_DISABLED_INSTRUMENTATIONS = [];
     public const OTEL_PHP_LOGS_PROCESSOR = 'batch';
     public const OTEL_PHP_LOG_DESTINATION = 'default';
+    public const OTEL_PHP_DEBUG_SCOPES_DISABLED = 'false';
+    public const OTEL_PHP_FIBERS_ENABLED = 'false';
 }

@@ -90,7 +90,7 @@ final class Context implements ContextInterface
 
     private static function debugScopesDisabled(): bool
     {
-        return Configuration::getBoolean(Variables::OTEL_PHP_DEBUG_SCOPES_DISABLED, false);
+        return Configuration::getBoolean(Variables::OTEL_PHP_DEBUG_SCOPES_DISABLED);
     }
 
     public function withContextValue(ImplicitContextKeyedInterface $value): ContextInterface
