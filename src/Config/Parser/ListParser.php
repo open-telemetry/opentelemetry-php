@@ -8,10 +8,7 @@ class ListParser
 {
     private const DEFAULT_SEPARATOR = ',';
 
-    /**
-     * @param string|array $value
-     */
-    public static function parse($value): array
+    public static function parse(string|array $value): array
     {
         if (is_array($value)) {
             return $value;

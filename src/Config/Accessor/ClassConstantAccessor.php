@@ -8,7 +8,7 @@ use LogicException;
 
 class ClassConstantAccessor
 {
-    public static function requireValue(string $className, string $constantName)
+    public static function requireValue(string $className, string $constantName): mixed
     {
         $constant = self::getFullName($className, $constantName);
 
@@ -21,7 +21,7 @@ class ClassConstantAccessor
         return constant($constant);
     }
 
-    public static function getValue(string $className, string $constantName)
+    public static function getValue(string $className, string $constantName): mixed
     {
         $constant = self::getFullName($className, $constantName);
 

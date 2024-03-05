@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Config\Parser;
 
+use OpenTelemetry\Config\Parser\ListParser;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,20 +33,24 @@ class ListParserTest extends TestCase
             'foo, bar , faz, baz',
             ['foo', 'bar', 'faz', 'baz'],
         ],
+        'array' => [
+            ['foo', 'bar'],
+            ['foo', 'bar'],
+        ],
     ];
 
     /**
      * @dataProvider listValueProvider
      */
-    public function test_comma_separated_list_returns_array(string $value, array $expected): void
+    public function test_comma_separated_list_returns_array(mixed $value, array $expected): void
     {
         $this->assertSame(
-            \OpenTelemetry\Config\Parser\ListParser::parse($value),
+            ListParser::parse($value),
             $expected
         );
     }
 
-    public function listValueProvider(): array
+    public static function listValueProvider(): array
     {
         return self::LIST_VALUES;
     }

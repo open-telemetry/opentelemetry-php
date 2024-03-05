@@ -42,7 +42,7 @@ class CompositeResolver
         return $this->resolvers;
     }
 
-    public function resolve(string $variableName, $default = '')
+    public function resolve(string $variableName, mixed $default = ''): mixed
     {
         foreach ($this->resolvers as $resolver) {
             if ($resolver->hasVariable($variableName)) {

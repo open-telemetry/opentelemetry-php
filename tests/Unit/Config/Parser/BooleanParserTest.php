@@ -71,7 +71,7 @@ class BooleanParserTest extends TestCase
         BooleanParser::parse($value);
     }
 
-    public function disallowedBooleanProvider(): array
+    public static function disallowedBooleanProvider(): array
     {
         return self::DISALLOWED_BOOLEAN_VALUES;
     }
@@ -86,18 +86,34 @@ class BooleanParserTest extends TestCase
         BooleanParser::parse($value);
     }
 
-    public function truthyValueProvider(): array
+    public static function truthyValueProvider(): array
     {
         return self::TRUTHY_VALUES;
     }
 
-    public function falsyValueProvider(): array
+    public static function falsyValueProvider(): array
     {
         return self::FALSY_VALUES;
     }
 
-    public function nonBooleanValueProvider(): array
+    public static function nonBooleanValueProvider(): array
     {
         return self::NON_BOOLEAN_VALUES;
+    }
+
+    /**
+     * @dataProvider boolProvider
+     */
+    public function test_boolean(bool $bool): void
+    {
+        $this->assertSame($bool, BooleanParser::parse($bool));
+    }
+
+    public static function boolProvider(): array
+    {
+        return [
+            [true],
+            [false],
+        ];
     }
 }

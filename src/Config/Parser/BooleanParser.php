@@ -11,10 +11,7 @@ class BooleanParser
     private const TRUE_VALUE = 'true';
     private const FALSE_VALUE = 'false';
 
-    /**
-     * @param string|bool $value
-     */
-    public static function parse($value): bool
+    public static function parse(string|bool $value): bool
     {
         if (is_bool($value)) {
             return $value;

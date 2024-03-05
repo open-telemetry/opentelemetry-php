@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\Resolver;
 
+use OpenTelemetry\Config\Accessor\PhpIniAccessor;
 use OpenTelemetry\Config\Configuration;
 
 /**
@@ -19,7 +20,7 @@ class PhpIniResolver implements ResolverInterface
         $this->accessor = $accessor ?? new PhpIniAccessor();
     }
 
-    public function retrieveValue(string $variableName)
+    public function retrieveValue(string $variableName): string|bool
     {
         $value = $this->accessor->get($variableName) ?: '';
         if (is_array($value)) {

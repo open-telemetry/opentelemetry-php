@@ -58,7 +58,7 @@ class Configuration
         return BooleanParser::parse($resolved);
     }
 
-    public static function getMixed(string $key, $default = null)
+    public static function getMixed(string $key, $default = null): mixed
     {
         return self::validateVariableValue(
             CompositeResolver::instance()->resolve(
@@ -155,7 +155,7 @@ class Configuration
         return $variableName;
     }
 
-    private static function validateVariableValue($value, ?int $filterType = null)
+    private static function validateVariableValue(mixed $value, ?int $filterType = null): mixed
     {
         if ($filterType !== null && filter_var($value, $filterType) === false) {
             throw new UnexpectedValueException(sprintf('Value has invalid type "%s"', gettype($value)));

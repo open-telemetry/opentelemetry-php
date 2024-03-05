@@ -12,7 +12,7 @@ class RatioParser
     private const MAX_VALUE = 1;
     private const MIN_VALUE = 0;
 
-    public static function parse($value): float
+    public static function parse(string|int|float $value): float
     {
         if (filter_var($value, FILTER_VALIDATE_FLOAT) === false) {
             throw new InvalidArgumentException(

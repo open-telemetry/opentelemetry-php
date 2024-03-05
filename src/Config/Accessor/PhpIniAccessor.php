@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Config\Resolver;
+namespace OpenTelemetry\Config\Accessor;
 
 class PhpIniAccessor
 {
     /**
      * Mockable accessor for php.ini values
      * @internal
-     * @return array|false|string
      */
-    public function get(string $variableName)
+    public function get(string $variableName): array|false|string
     {
         return get_cfg_var($variableName);
     }

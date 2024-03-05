@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Config\Resolver;
 
-use OpenTelemetry\Config\Resolver\PhpIniAccessor;
+use OpenTelemetry\Config\Accessor\PhpIniAccessor;
 use OpenTelemetry\Config\Resolver\PhpIniResolver;
 use PHPUnit\Framework\TestCase;
 
