@@ -6,6 +6,9 @@ namespace OpenTelemetry\Config\Parser;
 
 use InvalidArgumentException;
 
+/**
+ * @internal
+ */
 class BooleanParser
 {
     private const TRUE_VALUE = 'true';

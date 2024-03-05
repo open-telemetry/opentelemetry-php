@@ -6,6 +6,9 @@ namespace OpenTelemetry\Config\Parser;
 
 use InvalidArgumentException;
 
+/**
+ * @internal
+ */
 class MapParser
 {
     private const VARIABLE_SEPARATOR = ',';

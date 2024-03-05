@@ -7,6 +7,9 @@ namespace OpenTelemetry\Config\Parser;
 use InvalidArgumentException;
 use RangeException;
 
+/**
+ * @internal
+ */
 class RatioParser
 {
     private const MAX_VALUE = 1;

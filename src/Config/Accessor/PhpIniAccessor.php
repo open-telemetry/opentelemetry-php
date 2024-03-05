@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\Accessor;
 
+/**
+ * @internal
+ */
 class PhpIniAccessor
 {
     /**
      * Mockable accessor for php.ini values
-     * @internal
      */
     public function get(string $variableName): array|false|string
     {

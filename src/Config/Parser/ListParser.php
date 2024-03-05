@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\Parser;
 
+/**
+ * @internal
+ */
 class ListParser
 {
     private const DEFAULT_SEPARATOR = ',';

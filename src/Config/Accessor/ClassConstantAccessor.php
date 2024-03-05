@@ -6,6 +6,9 @@ namespace OpenTelemetry\Config\Accessor;
 
 use LogicException;
 
+/**
+ * @internal
+ */
 class ClassConstantAccessor
 {
     public static function requireValue(string $className, string $constantName): mixed

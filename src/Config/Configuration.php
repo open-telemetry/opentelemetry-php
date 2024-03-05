@@ -15,7 +15,7 @@ use UnexpectedValueException;
 /**
  * Configuration can come from one or more of the following sources (from highest to lowest priority):
  * - values defined in php.ini
- * - environment variable ($_SERVER)
+ * - environment variable (getenv, $_SERVER)
  * - configuration file (todo)
  */
 class Configuration
