@@ -53,15 +53,15 @@ final class OpenTelemetrySdk implements ComponentProvider {
      *     },
      *     attribute_limits: array{
      *         attribute_value_length_limit: ?int<0, max>,
-     *         attribute_count_limit: ?int<0, max>,
+     *         attribute_count_limit: int<0, max>,
      *     },
      *     propagator: ?ComponentPlugin<TextMapPropagatorInterface>,
      *     tracer_provider: array{
      *         limits: array{
      *             attribute_value_length_limit: ?int<0, max>,
      *             attribute_count_limit: ?int<0, max>,
-     *             event_count_limit: ?int<0, max>,
-     *             link_count_limit: ?int<0, max>,
+     *             event_count_limit: int<0, max>,
+     *             link_count_limit: int<0, max>,
      *             event_attribute_count_limit: ?int<0, max>,
      *             link_attribute_count_limit: ?int<0, max>,
      *         },
@@ -126,29 +126,26 @@ final class OpenTelemetrySdk implements ComponentProvider {
             spanLimits: new SpanLimits(
                 attributesFactory: Attributes::factory(
                     attributeCountLimit: $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit']
-                        ?? 128,
+                        ?? $properties['attribute_limits']['attribute_count_limit'],
                     attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
                         ?? $properties['attribute_limits']['attribute_value_length_limit'],
                 ),
                 eventAttributesFactory: Attributes::factory(
                     attributeCountLimit: $properties['tracer_provider']['limits']['event_attribute_count_limit']
                         ?? $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit']
-                        ?? 128,
+                        ?? $properties['attribute_limits']['attribute_count_limit'],
                     attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
                         ?? $properties['attribute_limits']['attribute_value_length_limit'],
                 ),
                 linkAttributesFactory: Attributes::factory(
                     attributeCountLimit: $properties['tracer_provider']['limits']['link_attribute_count_limit']
                         ?? $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit']
-                        ?? 128,
+                        ?? $properties['attribute_limits']['attribute_count_limit'],
                     attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
                         ?? $properties['attribute_limits']['attribute_value_length_limit'],
                 ),
-                eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'] ?? 128,
-                linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'] ?? 128,
+                eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'],
+                linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
             ),
         );
 
@@ -287,7 +284,7 @@ final class OpenTelemetrySdk implements ComponentProvider {
         $node
             ->addDefaultsIfNotSet()
             ->children()
-                ->integerNode('attribute_value_length_limit')->min(0)->defaultValue(4096)->end()
+                ->integerNode('attribute_value_length_limit')->min(0)->defaultNull()->end()
                 ->integerNode('attribute_count_limit')->min(0)->defaultValue(128)->end()
             ->end();
 
