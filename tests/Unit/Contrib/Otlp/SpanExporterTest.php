@@ -104,4 +104,48 @@ class SpanExporterTest extends TestCase
             }
             TRACE, stream_get_contents($stream));
     }
+
+    public function test_json_invalid_utf8_sequence_is_encoded_as_bytes_value(): void
+    {
+        $stream = fopen('php://memory', 'a+b');
+        $transport = new StreamTransport($stream, 'application/json');
+        $exporter = new SpanExporter($transport);
+
+        $exporter->export([
+            (new SpanData())
+                ->setContext(SpanContext::create('0af7651916cd43dd8448eb211c80319c', 'b7ad6b7169203331'))
+                ->addAttribute('invalid-utf8', "\xe2"),
+        ]);
+
+        fseek($stream, 0);
+        $this->assertJsonStringEqualsJsonString(<<<TRACE
+            {
+                "resourceSpans": [
+                    {
+                        "resource": {},
+                        "scopeSpans": [
+                            {
+                                "scope": {},
+                                "spans": [
+                                    {
+                                        "traceId": "0af7651916cd43dd8448eb211c80319c",
+                                        "spanId": "b7ad6b7169203331",
+                                        "name": "test-span-data",
+                                        "kind": 1,
+                                        "startTimeUnixNano": "1505855794194009601",
+                                        "endTimeUnixNano": "1505855799465726528",
+                                        "status": {},
+                                        "attributes": [{
+                                            "key": "invalid-utf8",
+                                            "value": {"bytesValue": "4g=="}
+                                        }]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+            TRACE, stream_get_contents($stream));
+    }
 }
