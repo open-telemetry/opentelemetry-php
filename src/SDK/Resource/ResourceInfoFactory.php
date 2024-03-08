@@ -19,7 +19,6 @@ class ResourceInfoFactory
 
     private static ?ResourceInfo $emptyResource = null;
 
-
     public static function defaultResource(): ResourceInfo
     {
         $detectors = Configuration::getList(Env::OTEL_PHP_DETECTORS);
