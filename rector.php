@@ -25,6 +25,9 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__ . '/src/SDK/SdkAutoloader.php',
         ],
         FlipTypeControlToUseExclusiveTypeRector::class,
+        \Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
+            __DIR__ . '/src/SDK/Metrics/Stream/SynchronousMetricStream.php',
+        ],
         \Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector::class,
         \Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
         \Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector::class,
