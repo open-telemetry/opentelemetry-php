@@ -23,12 +23,12 @@ final class AsynchronousMetricStream implements MetricStreamInterface
 
     public function __construct(
         private readonly AggregationInterface $aggregation,
-        private int $startTimestamp,
+        private readonly int $startTimestamp,
     ) {
         $this->metric = new Metric([], [], $startTimestamp);
     }
 
-    public function temporality()
+    public function temporality(): Temporality|string
     {
         return Temporality::CUMULATIVE;
     }

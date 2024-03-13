@@ -3,8 +3,12 @@
 declare(strict_types=1);
 
 use Rector\CodeQuality\Rector\Array_\CallableThisArrayToAnonymousFunctionRector;
+use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
+use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
+use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
+use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\ValueObject\PhpVersion;
 use Rector\Set\ValueObject\SetList;
 
@@ -25,11 +29,11 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__ . '/src/SDK/SdkAutoloader.php',
         ],
         FlipTypeControlToUseExclusiveTypeRector::class,
-        \Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
+        ReadOnlyPropertyRector::class => [
             __DIR__ . '/src/SDK/Metrics/Stream/SynchronousMetricStream.php',
         ],
-        \Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector::class,
-        \Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
-        \Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector::class,
+        DisallowedEmptyRuleFixerRector::class,
+        ExplicitBoolCompareRector::class,
+        LocallyCalledStaticMethodToNonStaticRector::class,
     ]);
 };

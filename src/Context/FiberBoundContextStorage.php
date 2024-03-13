@@ -24,17 +24,17 @@ final class FiberBoundContextStorage implements ContextStorageInterface, Executi
     {
     }
 
-    public function fork($id): void
+    public function fork(int|string $id): void
     {
         $this->storage->fork($id);
     }
 
-    public function switch($id): void
+    public function switch(int|string $id): void
     {
         $this->storage->switch($id);
     }
 
-    public function destroy($id): void
+    public function destroy(int|string $id): void
     {
         $this->storage->destroy($id);
     }

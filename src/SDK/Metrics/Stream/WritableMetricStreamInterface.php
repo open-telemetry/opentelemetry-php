@@ -12,8 +12,5 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
  */
 interface WritableMetricStreamInterface
 {
-    /**
-     * @param float|int $value
-     */
-    public function record($value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void;
+    public function record(float|int $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void;
 }

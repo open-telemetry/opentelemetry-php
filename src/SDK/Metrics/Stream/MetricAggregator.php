@@ -27,10 +27,7 @@ final class MetricAggregator implements MetricAggregatorInterface
     ) {
     }
 
-    /**
-     * @param float|int $value
-     */
-    public function record($value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
+    public function record(float|int $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $filteredAttributes = $this->attributeProcessor !== null
             ? $this->attributeProcessor->process($attributes, $context)
