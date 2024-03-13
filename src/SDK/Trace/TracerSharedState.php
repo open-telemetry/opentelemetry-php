@@ -15,7 +15,6 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
  */
 final class TracerSharedState
 {
-    /** @readonly */
     private readonly SpanProcessorInterface $spanProcessor;
 
     private ?bool $shutdownResult = null;

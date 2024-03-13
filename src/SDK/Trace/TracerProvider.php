@@ -18,7 +18,6 @@ use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 
 final class TracerProvider implements TracerProviderInterface
 {
-    /** @readonly */
     private readonly TracerSharedState $tracerSharedState;
     private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
 

@@ -14,7 +14,6 @@ use OpenTelemetry\Context\ContextInterface;
 final class MultiTextMapPropagator implements TextMapPropagatorInterface
 {
     /**
-     * @readonly
      * @var list<string>
      */
     private readonly array $fields;
@@ -25,7 +24,6 @@ final class MultiTextMapPropagator implements TextMapPropagatorInterface
      * @param list<TextMapPropagatorInterface> $propagators
      */
     public function __construct(
-        /** @readonly */
         private readonly array $propagators,
     ) {
         $this->fields = $this->extractFields($this->propagators);
