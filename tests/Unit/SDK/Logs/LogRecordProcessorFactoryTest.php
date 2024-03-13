@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\Config\Variables;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorFactory;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;

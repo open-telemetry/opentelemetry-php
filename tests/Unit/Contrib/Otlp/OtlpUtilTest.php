@@ -6,8 +6,8 @@ namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Signals;
+use OpenTelemetry\Config\Variables;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -36,6 +36,7 @@
     ],
     "replace": {
         "open-telemetry/api": "self.version",
+        "open-telemetry/config": "self.version",
         "open-telemetry/context": "self.version",
         "open-telemetry/gen-otlp-protobuf": "self.version",
         "open-telemetry/sdk": "self.version",

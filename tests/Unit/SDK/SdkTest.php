@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use OpenTelemetry\Config\Variables;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Sdk;

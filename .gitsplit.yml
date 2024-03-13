@@ -10,6 +10,8 @@ splits:
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/gen-otlp-protobuf.git"
   - prefix: "src/Context"
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/context.git"
+  - prefix: "src/Config"
+    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/config.git"
   - prefix: "src/SemConv"
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/sem-conv.git"
   - prefix: "src/API"

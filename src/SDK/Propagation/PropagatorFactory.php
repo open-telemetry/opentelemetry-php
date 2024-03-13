@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Propagation;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\Config\Configuration;
+use OpenTelemetry\Config\Variables;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Registry;
 
 class PropagatorFactory

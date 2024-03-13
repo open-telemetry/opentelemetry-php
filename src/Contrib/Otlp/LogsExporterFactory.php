@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Otlp;
 
 use OpenTelemetry\API\Signals;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\Defaults;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\Config\Configuration;
+use OpenTelemetry\Config\Defaults;
+use OpenTelemetry\Config\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
