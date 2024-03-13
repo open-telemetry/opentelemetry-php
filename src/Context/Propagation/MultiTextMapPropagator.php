@@ -13,9 +13,7 @@ use OpenTelemetry\Context\ContextInterface;
 
 final class MultiTextMapPropagator implements TextMapPropagatorInterface
 {
-    /**
-     * @var list<string>
-     */
+    /** @var list<string> */
     private readonly array $fields;
 
     /**

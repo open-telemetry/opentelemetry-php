@@ -12,9 +12,7 @@ final class ViewTemplate
 {
     private ?string $name = null;
     private ?string $description = null;
-    /**
-     * @var list<string>
-     */
+    /** @var list<string> */
     private ?array $attributeKeys = null;
     private ?AggregationInterface $aggregation = null;
 
