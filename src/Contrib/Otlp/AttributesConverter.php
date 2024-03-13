@@ -46,10 +46,21 @@ final class AttributesConverter
             $result->setDoubleValue($value);
         }
         if (is_string($value)) {
-            $result->setStringValue($value);
+            if (self::isUtf8($value)) {
+                $result->setStringValue($value);
+            } else {
+                $result->setBytesValue($value);
+            }
         }
 
         return $result;
+    }
+
+    private static function isUtf8(string $value): bool
+    {
+        return \extension_loaded('mbstring')
+            ? \mb_check_encoding($value, 'UTF-8')
+            : (bool) \preg_match('//u', $value);
     }
 
     /**

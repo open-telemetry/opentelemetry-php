@@ -36,6 +36,13 @@ class AttributesConverterTest extends TestCase
         ];
     }
 
+    public function test_convert_bytes(): void
+    {
+        $anyValue = AttributesConverter::convertAnyValue("\xe2");
+        $this->assertTrue($anyValue->hasBytesValue());
+        $this->assertSame("\xe2", $anyValue->getBytesValue());
+    }
+
     /**
      * @dataProvider arrayProvider
      */
