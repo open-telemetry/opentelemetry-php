@@ -28,7 +28,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
 
     private bool $closed = false;
 
-    public function __construct(private SpanExporterInterface $exporter)
+    public function __construct(private readonly SpanExporterInterface $exporter)
     {
         $this->exportContext = Context::getCurrent();
         $this->queue = new SplQueue();

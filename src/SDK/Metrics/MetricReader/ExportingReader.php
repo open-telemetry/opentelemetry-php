@@ -34,7 +34,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
     private bool $closed = false;
 
-    public function __construct(private MetricExporterInterface $exporter)
+    public function __construct(private readonly MetricExporterInterface $exporter)
     {
     }
 

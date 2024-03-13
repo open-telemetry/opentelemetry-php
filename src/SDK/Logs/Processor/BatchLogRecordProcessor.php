@@ -54,13 +54,13 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
     private bool $closed = false;
 
     public function __construct(
-        private LogRecordExporterInterface $exporter,
-        private ClockInterface $clock,
+        private readonly LogRecordExporterInterface $exporter,
+        private readonly ClockInterface $clock,
         int $maxQueueSize = self::DEFAULT_MAX_QUEUE_SIZE,
         int $scheduledDelayMillis = self::DEFAULT_SCHEDULE_DELAY,
         int $exportTimeoutMillis = self::DEFAULT_EXPORT_TIMEOUT,
         int $maxExportBatchSize = self::DEFAULT_MAX_EXPORT_BATCH_SIZE,
-        private bool $autoFlush = true,
+        private readonly bool $autoFlush = true,
         ?MeterProviderInterface $meterProvider = null,
     ) {
         if ($maxQueueSize <= 0) {

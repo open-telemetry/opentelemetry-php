@@ -20,10 +20,7 @@ use function trigger_error;
  */
 final class FiberBoundContextStorage implements ContextStorageInterface, ExecutionContextAwareInterface
 {
-    /**
-     * @param ContextStorageInterface&ExecutionContextAwareInterface $storage
-     */
-    public function __construct(private readonly ContextStorageInterface $storage)
+    public function __construct(private readonly ContextStorageInterface&ExecutionContextAwareInterface $storage)
     {
     }
 

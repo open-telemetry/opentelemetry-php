@@ -20,8 +20,8 @@ class SimplePsrFileLogger implements LoggerInterface
     private static ?array $logLevels = null;
 
     public function __construct(
-        private string $filename,
-        private string $loggerName = self::DEFAULT_LOGGER_NAME,
+        private readonly string $filename,
+        private readonly string $loggerName = self::DEFAULT_LOGGER_NAME,
     ) {
     }
 

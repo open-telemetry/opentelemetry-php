@@ -22,7 +22,7 @@ final class AttributesFactory implements AttributesFactoryInterface
             $this->attributeCountLimit,
             $this->attributeValueLengthLimit,
             0,
-            $attributeValidator,
+            $attributeValidator ?? new AttributeValidator(),
         );
         foreach ($attributes as $key => $value) {
             $builder[$key] = $value;

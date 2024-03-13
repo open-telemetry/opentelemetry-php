@@ -19,6 +19,9 @@ use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
 
+/**
+ * @psalm-suppress RedundantCast
+ */
 class SdkAutoloader
 {
     public static function autoload(): bool

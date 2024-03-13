@@ -21,13 +21,9 @@ final class TracerSharedState
     private ?bool $shutdownResult = null;
 
     public function __construct(
-        /** @readonly */
         private readonly IdGeneratorInterface $idGenerator,
-        /** @readonly */
         private readonly ResourceInfo $resource,
-        /** @readonly */
         private readonly SpanLimits $spanLimits,
-        /** @readonly */
         private readonly SamplerInterface $sampler,
         array $spanProcessors,
     ) {

@@ -11,18 +11,11 @@ final class TracerProviderFactory
 {
     use LogsMessagesTrait;
 
-    private ExporterFactory $exporterFactory;
-    private SamplerFactory $samplerFactory;
-    private SpanProcessorFactory $spanProcessorFactory;
-
     public function __construct(
-        ?ExporterFactory $exporterFactory = null,
-        ?SamplerFactory $samplerFactory = null,
-        ?SpanProcessorFactory $spanProcessorFactory = null,
+        private readonly ExporterFactory $exporterFactory = new ExporterFactory(),
+        private readonly SamplerFactory $samplerFactory = new SamplerFactory(),
+        private readonly SpanProcessorFactory $spanProcessorFactory = new SpanProcessorFactory(),
     ) {
-        $this->exporterFactory = $exporterFactory ?: new ExporterFactory();
-        $this->samplerFactory = $samplerFactory ?: new SamplerFactory();
-        $this->spanProcessorFactory = $spanProcessorFactory ?: new SpanProcessorFactory();
     }
 
     public function create(): TracerProviderInterface

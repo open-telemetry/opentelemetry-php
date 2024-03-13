@@ -12,7 +12,7 @@ class InMemoryExporter implements SpanExporterInterface
 {
     use SpanExporterTrait;
 
-    public function __construct(private ArrayObject $storage = new ArrayObject())
+    public function __construct(private readonly ArrayObject $storage = new ArrayObject())
     {
     }
 

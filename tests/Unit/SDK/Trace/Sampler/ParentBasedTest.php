@@ -66,15 +66,12 @@ class ParentBasedTest extends MockeryTestCase
      */
     public function test_should_sample_parent_based(
         $parentContext,
-        ?SamplerInterface $remoteParentSampled = null,
-        ?SamplerInterface $remoteParentNotSampled = null,
-        ?SamplerInterface $localParentSampled = null,
-        ?SamplerInterface $localParentNotSampled = null,
+        array $args = [],
         ?int $expectedDecision = null,
     ): void {
-        $rootSampler = $this->createMockSamplerNeverInvoked();
+        $args['root'] = $this->createMockSamplerNeverInvoked();
+        $sampler = new ParentBased(...$args);
 
-        $sampler = new ParentBased($rootSampler, $remoteParentSampled, $remoteParentNotSampled, $localParentSampled, $localParentNotSampled);
         $decision = $sampler->shouldSample(
             $parentContext,
             '4bf92f3577b34da6a3ce929d0e0e4736',
@@ -89,14 +86,46 @@ class ParentBasedTest extends MockeryTestCase
     public static function parentContextProvider(): array
     {
         return [
-            'remote, sampled, default sampler' => [self::createParentContext(true, true), null, null, null, null, SamplingResult::RECORD_AND_SAMPLE],
-            'remote, not sampled, default sampler' => [self::createParentContext(false, true), null, null, null, null, SamplingResult::DROP],
-            'local, sampled, default sampler' => [self::createParentContext(true, false), null, null, null, null, SamplingResult::RECORD_AND_SAMPLE],
-            'local, not sampled, default sampler' => [self::createParentContext(false, false), null, null, null, null, SamplingResult::DROP],
-            'remote, sampled' => [self::createParentContext(true, true), self::createMockSamplerInvokedOnce(SamplingResult::RECORD_AND_SAMPLE), null, null, null, SamplingResult::RECORD_AND_SAMPLE],
-            'remote, not sampled' => [self::createParentContext(false, true), null, self::createMockSamplerInvokedOnce(SamplingResult::DROP), null, null, SamplingResult::DROP],
-            'local, sampled' => [self::createParentContext(true, false), null, null, self::createMockSamplerInvokedOnce(SamplingResult::RECORD_AND_SAMPLE), null, SamplingResult::RECORD_AND_SAMPLE],
-            'local, not sampled' => [self::createParentContext(false, false), null, null, null, self::createMockSamplerInvokedOnce(SamplingResult::DROP), SamplingResult::DROP],
+            'remote, sampled, default sampler' => [
+                self::createParentContext(true, true),
+                [],
+                SamplingResult::RECORD_AND_SAMPLE,
+            ],
+            'remote, not sampled, default sampler' => [
+                self::createParentContext(false, true),
+                [],
+                SamplingResult::DROP,
+            ],
+            'local, sampled, default sampler' => [
+                self::createParentContext(true, false),
+                [],
+                SamplingResult::RECORD_AND_SAMPLE,
+            ],
+            'local, not sampled, default sampler' => [
+                self::createParentContext(false, false),
+                [],
+                SamplingResult::DROP,
+            ],
+            'remote, sampled' => [
+                self::createParentContext(true, true),
+                ['remoteParentSampler' => self::createMockSamplerInvokedOnce(SamplingResult::RECORD_AND_SAMPLE)],
+                SamplingResult::RECORD_AND_SAMPLE,
+            ],
+            'remote, not sampled' => [
+                self::createParentContext(false, true),
+                ['remoteParentNotSampler' => self::createMockSamplerInvokedOnce(SamplingResult::DROP)],
+                SamplingResult::DROP,
+            ],
+            'local, sampled' => [
+                self::createParentContext(true, false),
+                ['localParentSampler' => self::createMockSamplerInvokedOnce(SamplingResult::RECORD_AND_SAMPLE)],
+                SamplingResult::RECORD_AND_SAMPLE,
+            ],
+            'local, not sampled' => [
+                self::createParentContext(false, false),
+                ['localParentNotSampler' => self::createMockSamplerInvokedOnce(SamplingResult::DROP)],
+                SamplingResult::DROP,
+            ],
         ];
     }
 

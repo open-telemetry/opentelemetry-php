@@ -10,16 +10,11 @@ final class Exemplar
 {
     public function __construct(
         private readonly int|string $index,
-        /** @readonly */
-        public float|int $value,
-        /** @readonly */
-        public int $timestamp,
-        /** @readonly */
-        public AttributesInterface $attributes,
-        /** @readonly */
-        public ?string $traceId,
-        /** @readonly */
-        public ?string $spanId,
+        public readonly float|int $value,
+        public readonly int $timestamp,
+        public readonly AttributesInterface $attributes,
+        public readonly ?string $traceId,
+        public readonly ?string $spanId,
     ) {
     }
 
