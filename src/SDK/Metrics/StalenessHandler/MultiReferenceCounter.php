@@ -14,7 +14,7 @@ final class MultiReferenceCounter implements ReferenceCounterInterface
     /**
      * @param list<ReferenceCounterInterface> $referenceCounters
      */
-    public function __construct(private array $referenceCounters)
+    public function __construct(private readonly array $referenceCounters)
     {
     }
 

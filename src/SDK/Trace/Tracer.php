@@ -15,9 +15,9 @@ class Tracer implements API\TracerInterface
 
     public function __construct(
         /** @readonly */
-        private TracerSharedState $tracerSharedState,
+        private readonly TracerSharedState $tracerSharedState,
         /** @readonly */
-        private InstrumentationScopeInterface $instrumentationScope,
+        private readonly InstrumentationScopeInterface $instrumentationScope,
     ) {
     }
 

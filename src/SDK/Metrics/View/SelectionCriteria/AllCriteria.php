@@ -13,7 +13,7 @@ final class AllCriteria implements SelectionCriteriaInterface
     /**
      * @param iterable<SelectionCriteriaInterface> $criteria
      */
-    public function __construct(private iterable $criteria)
+    public function __construct(private readonly iterable $criteria)
     {
     }
 

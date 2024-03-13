@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 final class Exemplar
 {
     public function __construct(
-        private int|string $index,
+        private readonly int|string $index,
         /** @readonly */
         public float|int $value,
         /** @readonly */

@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
 
 final class InstrumentationScopeSchemaUrlCriteria implements SelectionCriteriaInterface
 {
-    public function __construct(private ?string $schemaUrl)
+    public function __construct(private readonly ?string $schemaUrl)
     {
     }
 

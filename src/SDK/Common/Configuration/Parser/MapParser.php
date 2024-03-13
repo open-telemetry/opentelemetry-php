@@ -18,11 +18,11 @@ class MapParser
         }
         $result = [];
 
-        if (null === $value || trim($value) === '') {
+        if (null === $value || trim((string) $value) === '') {
             return $result;
         }
 
-        foreach (explode(self::VARIABLE_SEPARATOR, $value) as $pair) {
+        foreach (explode(self::VARIABLE_SEPARATOR, (string) $value) as $pair) {
             self::validateKeyValuePair($pair);
 
             /** @psalm-suppress PossiblyUndefinedArrayOffset */

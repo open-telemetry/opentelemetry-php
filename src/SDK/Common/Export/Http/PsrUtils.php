@@ -116,11 +116,11 @@ final class PsrUtils
         if (!$compression) {
             return [];
         }
-        if (!str_contains($compression, ',')) {
+        if (!str_contains((string) $compression, ',')) {
             return [$compression];
         }
 
-        return array_map('trim', explode(',', $compression));
+        return array_map('trim', explode(',', (string) $compression));
     }
 
     private static function encoder(string $encoding): ?callable

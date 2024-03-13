@@ -19,9 +19,9 @@ use Psr\Http\Message\UriFactoryInterface;
 
 final class DependencyResolver implements DependencyResolverInterface
 {
-    private MessageFactoryResolverInterface $messageFactoryResolver;
-    private PsrClientResolverInterface $psrClientResolver;
-    private HttpPlugClientResolverInterface $httpPlugClientResolver;
+    private readonly MessageFactoryResolverInterface $messageFactoryResolver;
+    private readonly PsrClientResolverInterface $psrClientResolver;
+    private readonly HttpPlugClientResolverInterface $httpPlugClientResolver;
 
     public function __construct(
         ?MessageFactoryResolverInterface $messageFactoryResolver = null,

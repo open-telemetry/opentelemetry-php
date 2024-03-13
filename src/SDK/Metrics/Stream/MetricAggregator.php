@@ -21,9 +21,9 @@ final class MetricAggregator implements MetricAggregatorInterface
     private array $summaries = [];
 
     public function __construct(
-        private ?AttributeProcessorInterface $attributeProcessor,
-        private AggregationInterface $aggregation,
-        private ?ExemplarReservoirInterface $exemplarReservoir = null,
+        private readonly ?AttributeProcessorInterface $attributeProcessor,
+        private readonly AggregationInterface $aggregation,
+        private readonly ?ExemplarReservoirInterface $exemplarReservoir = null,
     ) {
     }
 

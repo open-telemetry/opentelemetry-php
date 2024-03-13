@@ -25,7 +25,7 @@ class HttpEndpointResolver implements HttpEndpointResolverInterface
     private const DEFAULT_SCHEME = 'https';
     private const ROOT_PATH = '/';
 
-    private FactoryResolverInterface $httpFactoryResolver;
+    private readonly FactoryResolverInterface $httpFactoryResolver;
 
     public function __construct(?FactoryResolverInterface $httpFactoryResolver = null)
     {

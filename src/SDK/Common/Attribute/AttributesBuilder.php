@@ -17,16 +17,9 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 final class AttributesBuilder implements AttributesBuilderInterface
 {
     use LogsMessagesTrait;
-    private AttributeValidatorInterface $attributeValidator;
 
-    public function __construct(
-        private array $attributes,
-        private ?int $attributeCountLimit,
-        private ?int $attributeValueLengthLimit,
-        private int $droppedAttributesCount,
-        ?AttributeValidatorInterface $attributeValidator,
-    ) {
-        $this->attributeValidator = $attributeValidator ?? new AttributeValidator();
+    public function __construct(private array $attributes, private ?int $attributeCountLimit, private ?int $attributeValueLengthLimit, private int $droppedAttributesCount, private AttributeValidatorInterface $attributeValidator = new AttributeValidator())
+    {
     }
 
     public function build(): AttributesInterface

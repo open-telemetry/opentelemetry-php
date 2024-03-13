@@ -13,11 +13,11 @@ use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
 class LoggerProvider implements LoggerProviderInterface
 {
-    private LoggerSharedState $loggerSharedState;
+    private readonly LoggerSharedState $loggerSharedState;
 
     public function __construct(
         LogRecordProcessorInterface $processor,
-        private InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
+        private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
         ?ResourceInfo $resource = null,
     ) {
         $this->loggerSharedState = new LoggerSharedState(

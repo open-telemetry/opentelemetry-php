@@ -19,7 +19,7 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
 {
     private const DEFAULT_COMPRESSION = 'none';
 
-    public function __construct(private ?TransportFactoryInterface $transportFactory = null)
+    public function __construct(private readonly ?TransportFactoryInterface $transportFactory = null)
     {
     }
 

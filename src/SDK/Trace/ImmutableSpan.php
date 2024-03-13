@@ -21,15 +21,15 @@ final class ImmutableSpan implements SpanDataInterface
      * @param list<EventInterface> $events
      */
     public function __construct(
-        private Span $span,
-        private string $name,
-        private array $links,
-        private array $events,
-        private AttributesInterface $attributes,
-        private int $totalRecordedEvents,
-        private StatusDataInterface $status,
-        private int $endEpochNanos,
-        private bool $hasEnded,
+        private readonly Span $span,
+        private readonly string $name,
+        private readonly array $links,
+        private readonly array $events,
+        private readonly AttributesInterface $attributes,
+        private readonly int $totalRecordedEvents,
+        private readonly StatusDataInterface $status,
+        private readonly int $endEpochNanos,
+        private readonly bool $hasEnded,
     ) {
     }
 

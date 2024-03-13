@@ -16,19 +16,19 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 final class TracerSharedState
 {
     /** @readonly */
-    private SpanProcessorInterface $spanProcessor;
+    private readonly SpanProcessorInterface $spanProcessor;
 
     private ?bool $shutdownResult = null;
 
     public function __construct(
         /** @readonly */
-        private IdGeneratorInterface $idGenerator,
+        private readonly IdGeneratorInterface $idGenerator,
         /** @readonly */
-        private ResourceInfo $resource,
+        private readonly ResourceInfo $resource,
         /** @readonly */
-        private SpanLimits $spanLimits,
+        private readonly SpanLimits $spanLimits,
         /** @readonly */
-        private SamplerInterface $sampler,
+        private readonly SamplerInterface $sampler,
         array $spanProcessors,
     ) {
         $this->spanProcessor = match (count($spanProcessors)) {

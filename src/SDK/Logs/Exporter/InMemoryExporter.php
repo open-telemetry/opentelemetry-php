@@ -12,11 +12,8 @@ use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 
 class InMemoryExporter implements LogRecordExporterInterface
 {
-    private ArrayObject $storage;
-
-    public function __construct(?ArrayObject $storage = null)
+    public function __construct(private readonly ArrayObject $storage = new ArrayObject())
     {
-        $this->storage = $storage ?? new ArrayObject();
     }
 
     /**

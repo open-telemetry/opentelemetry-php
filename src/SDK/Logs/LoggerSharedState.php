@@ -12,9 +12,9 @@ class LoggerSharedState
     private ?bool $shutdownResult = null;
 
     public function __construct(
-        private ResourceInfo $resource,
-        private LogRecordLimits $limits,
-        private LogRecordProcessorInterface $processor,
+        private readonly ResourceInfo $resource,
+        private readonly LogRecordLimits $limits,
+        private readonly LogRecordProcessorInterface $processor,
     ) {
     }
 

@@ -70,9 +70,9 @@ class SdkBuilder
         $loggerProvider = $this->loggerProvider ?? new NoopLoggerProvider();
         if ($this->autoShutdown) {
             // rector rule disabled in config, because ShutdownHandler::register() does not keep a strong reference to $this
-            ShutdownHandler::register([$tracerProvider, 'shutdown']);
-            ShutdownHandler::register([$meterProvider, 'shutdown']);
-            ShutdownHandler::register([$loggerProvider, 'shutdown']);
+            ShutdownHandler::register($tracerProvider->shutdown(...));
+            ShutdownHandler::register($meterProvider->shutdown(...));
+            ShutdownHandler::register($loggerProvider->shutdown(...));
         }
 
         return new Sdk(

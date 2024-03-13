@@ -30,7 +30,7 @@ class SimplePsrFileLogger implements LoggerInterface
      */
     public function log($level, $message, array $context = []): void
     {
-        $level = strtolower($level);
+        $level = strtolower((string) $level);
 
         if (!in_array($level, self::getLogLevels(), true)) {
             throw new InvalidArgumentException(

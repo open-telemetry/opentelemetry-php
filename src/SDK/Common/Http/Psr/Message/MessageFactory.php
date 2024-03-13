@@ -14,9 +14,9 @@ use Psr\Http\Message\ServerRequestInterface;
 final class MessageFactory implements MessageFactoryInterface
 {
     public function __construct(
-        private RequestFactoryInterface $requestFactory,
-        private ResponseFactoryInterface $responseFactory,
-        private ServerRequestFactoryInterface $serverRequestFactory,
+        private readonly RequestFactoryInterface $requestFactory,
+        private readonly ResponseFactoryInterface $responseFactory,
+        private readonly ServerRequestFactoryInterface $serverRequestFactory,
     ) {
     }
 

@@ -23,7 +23,7 @@ final class FiberBoundContextStorage implements ContextStorageInterface, Executi
     /**
      * @param ContextStorageInterface&ExecutionContextAwareInterface $storage
      */
-    public function __construct(private ContextStorageInterface $storage)
+    public function __construct(private readonly ContextStorageInterface $storage)
     {
     }
 

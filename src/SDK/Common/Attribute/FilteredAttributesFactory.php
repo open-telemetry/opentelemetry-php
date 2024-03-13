@@ -13,8 +13,8 @@ final class FilteredAttributesFactory implements AttributesFactoryInterface
      * @param list<string> $rejectedKeys
      */
     public function __construct(
-        private AttributesFactoryInterface $factory,
-        private array $rejectedKeys,
+        private readonly AttributesFactoryInterface $factory,
+        private readonly array $rejectedKeys,
     ) {
     }
 

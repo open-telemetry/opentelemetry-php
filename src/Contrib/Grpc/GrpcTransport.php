@@ -35,14 +35,14 @@ use Throwable;
  */
 final class GrpcTransport implements TransportInterface
 {
-    private array $metadata;
-    private Channel $channel;
+    private readonly array $metadata;
+    private readonly Channel $channel;
     private bool $closed = false;
 
     public function __construct(
         string $endpoint,
         array $opts,
-        private string $method,
+        private readonly string $method,
         array $headers = [],
     ) {
         $this->channel = new Channel($endpoint, $opts);

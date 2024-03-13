@@ -18,7 +18,7 @@ final class Attributes implements AttributesInterface, IteratorAggregate
      */
     public function __construct(
         private array $attributes,
-        private int $droppedAttributesCount,
+        private readonly int $droppedAttributesCount,
     ) {
     }
 

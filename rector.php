@@ -9,14 +9,14 @@ use Rector\ValueObject\PhpVersion;
 use Rector\Set\ValueObject\SetList;
 
 return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->phpVersion(PhpVersion::PHP_80);
+    $rectorConfig->phpVersion(PhpVersion::PHP_81);
 
     $rectorConfig->paths([
         __DIR__ . '/src',
     ]);
 
     $rectorConfig->sets([
-        SetList::PHP_80,
+        SetList::PHP_81,
         SetList::CODE_QUALITY,
     ]);
     $rectorConfig->skip([

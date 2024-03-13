@@ -18,8 +18,8 @@ final class MultiObserver implements ObserverInterface
     public array $writers = [];
 
     public function __construct(
-        private AttributesFactoryInterface $attributesFactory,
-        private int $timestamp,
+        private readonly AttributesFactoryInterface $attributesFactory,
+        private readonly int $timestamp,
     ) {
     }
 

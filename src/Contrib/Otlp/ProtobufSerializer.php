@@ -30,7 +30,7 @@ use function ucwords;
  */
 final class ProtobufSerializer
 {
-    private function __construct(private string $contentType)
+    private function __construct(private readonly string $contentType)
     {
     }
 
@@ -120,7 +120,7 @@ final class ProtobufSerializer
         for ($i = 0, $n = $desc->getFieldCount(); $i < $n; $i++) {
             // @phan-suppress-next-line PhanParamTooManyInternal
             $field = $desc->getField($i);
-            $name = lcfirst(strtr(ucwords($field->getName(), '_'), ['_' => '']));
+            $name = lcfirst(strtr(ucwords((string) $field->getName(), '_'), ['_' => '']));
             if (!property_exists($data, $name)) {
                 continue;
             }

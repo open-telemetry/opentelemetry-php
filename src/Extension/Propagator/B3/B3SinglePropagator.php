@@ -97,15 +97,15 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
             return null;
         }
 
-        if (strtolower($value) === self::IS_DEBUG) {
+        if (strtolower((string) $value) === self::IS_DEBUG) {
             return (int) self::IS_SAMPLED;
         }
 
-        if (in_array(strtolower($value), self::VALID_SAMPLED)) {
+        if (in_array(strtolower((string) $value), self::VALID_SAMPLED)) {
             return (int) self::IS_SAMPLED;
         }
 
-        if (in_array(strtolower($value), self::VALID_NON_SAMPLED)) {
+        if (in_array(strtolower((string) $value), self::VALID_NON_SAMPLED)) {
             return (int) self::IS_NOT_SAMPLED;
         }
 

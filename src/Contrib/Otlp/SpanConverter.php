@@ -26,7 +26,7 @@ use function spl_object_id;
 
 final class SpanConverter
 {
-    private ProtobufSerializer $serializer;
+    private readonly ProtobufSerializer $serializer;
 
     public function __construct(?ProtobufSerializer $serializer = null)
     {

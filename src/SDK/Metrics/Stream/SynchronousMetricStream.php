@@ -24,13 +24,13 @@ use function trigger_error;
  */
 final class SynchronousMetricStream implements MetricStreamInterface
 {
-    private DeltaStorage $delta;
+    private readonly DeltaStorage $delta;
     private int|GMP $readers = 0;
     private int|GMP $cumulative = 0;
 
     public function __construct(
-        private AggregationInterface $aggregation,
-        private int $timestamp,
+        private readonly AggregationInterface $aggregation,
+        private readonly int $timestamp,
     ) {
         $this->delta = new DeltaStorage($this->aggregation);
     }

@@ -24,8 +24,8 @@ class ReadableLogRecord extends LogRecord
     protected SpanContextInterface $spanContext;
 
     public function __construct(
-        private InstrumentationScopeInterface $scope,
-        private LoggerSharedState $loggerSharedState,
+        private readonly InstrumentationScopeInterface $scope,
+        private readonly LoggerSharedState $loggerSharedState,
         LogRecord $logRecord,
     ) {
         parent::__construct($logRecord->body);

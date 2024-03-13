@@ -14,15 +14,15 @@ final class SpanContext implements SpanContextInterface
      * @see https://www.w3.org/TR/trace-context/#trace-flags
      * @see https://www.w3.org/TR/trace-context/#sampled-flag
      */
-    private bool $isSampled;
+    private readonly bool $isSampled;
     private bool $isValid = true;
 
     private function __construct(
         private string $traceId,
         private string $spanId,
-        private int $traceFlags,
-        private bool $isRemote,
-        private ?TraceStateInterface $traceState = null,
+        private readonly int $traceFlags,
+        private readonly bool $isRemote,
+        private readonly ?TraceStateInterface $traceState = null,
     ) {
         // TraceId must be exactly 16 bytes (32 chars) and at least one non-zero byte
         // SpanId must be exactly 8 bytes (16 chars) and at least one non-zero byte

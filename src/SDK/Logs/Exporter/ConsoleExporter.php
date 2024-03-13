@@ -19,7 +19,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
  */
 class ConsoleExporter implements LogRecordExporterInterface
 {
-    public function __construct(private TransportInterface $transport)
+    public function __construct(private readonly TransportInterface $transport)
     {
     }
 

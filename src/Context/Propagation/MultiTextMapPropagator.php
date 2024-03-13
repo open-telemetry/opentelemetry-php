@@ -17,7 +17,7 @@ final class MultiTextMapPropagator implements TextMapPropagatorInterface
      * @readonly
      * @var list<string>
      */
-    private array $fields;
+    private readonly array $fields;
 
     /**
      * @no-named-arguments
@@ -26,7 +26,7 @@ final class MultiTextMapPropagator implements TextMapPropagatorInterface
      */
     public function __construct(
         /** @readonly */
-        private array $propagators,
+        private readonly array $propagators,
     ) {
         $this->fields = $this->extractFields($this->propagators);
     }

@@ -14,8 +14,8 @@ final class StatusData implements StatusDataInterface
 
     /** @psalm-param API\StatusCode::STATUS_* $code */
     public function __construct(
-        private string $code,
-        private string $description,
+        private readonly string $code,
+        private readonly string $description,
     ) {
     }
 

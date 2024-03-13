@@ -54,7 +54,7 @@ final class BaggagePropagator implements TextMapPropagatorInterface
 
         /** @var Entry $entry */
         foreach ($baggage->getAll() as $key => $entry) {
-            $value = urlencode($entry->getValue());
+            $value = urlencode((string) $entry->getValue());
             $headerString.= "{$key}={$value}";
 
             if (($metadata = $entry->getMetadata()->getValue()) !== '' && ($metadata = $entry->getMetadata()->getValue()) !== '0') {

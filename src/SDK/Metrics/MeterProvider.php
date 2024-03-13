@@ -22,11 +22,11 @@ use WeakMap;
 
 final class MeterProvider implements MeterProviderInterface
 {
-    private MetricFactoryInterface $metricFactory;
-    private MeterInstruments $instruments;
-    private MetricRegistryInterface $registry;
-    private MetricWriterInterface $writer;
-    private ArrayAccess $destructors;
+    private readonly MetricFactoryInterface $metricFactory;
+    private readonly MeterInstruments $instruments;
+    private readonly MetricRegistryInterface $registry;
+    private readonly MetricWriterInterface $writer;
+    private readonly ArrayAccess $destructors;
 
     private bool $closed = false;
 
@@ -35,14 +35,14 @@ final class MeterProvider implements MeterProviderInterface
      */
     public function __construct(
         ?ContextStorageInterface $contextStorage,
-        private ResourceInfo $resource,
-        private ClockInterface $clock,
+        private readonly ResourceInfo $resource,
+        private readonly ClockInterface $clock,
         AttributesFactoryInterface $attributesFactory,
-        private InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
-        private iterable $metricReaders,
-        private ViewRegistryInterface $viewRegistry,
-        private ?ExemplarFilterInterface $exemplarFilter,
-        private StalenessHandlerFactoryInterface $stalenessHandlerFactory,
+        private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
+        private readonly iterable $metricReaders,
+        private readonly ViewRegistryInterface $viewRegistry,
+        private readonly ?ExemplarFilterInterface $exemplarFilter,
+        private readonly StalenessHandlerFactoryInterface $stalenessHandlerFactory,
         MetricFactoryInterface $metricFactory = null,
     ) {
         $this->metricFactory = $metricFactory ?? new StreamFactory();

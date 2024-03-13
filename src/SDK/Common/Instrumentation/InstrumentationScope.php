@@ -12,10 +12,10 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 final class InstrumentationScope implements InstrumentationScopeInterface
 {
     public function __construct(
-        private string $name,
-        private ?string $version,
-        private ?string $schemaUrl,
-        private AttributesInterface $attributes,
+        private readonly string $name,
+        private readonly ?string $version,
+        private readonly ?string $schemaUrl,
+        private readonly AttributesInterface $attributes,
     ) {
     }
 

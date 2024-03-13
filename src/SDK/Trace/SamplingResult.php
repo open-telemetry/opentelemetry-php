@@ -27,9 +27,9 @@ final class SamplingResult
      * @param ?API\TraceStateInterface $traceState A Tracestate that will be associated with the Span through the new SpanContext.
      */
     public function __construct(
-        private int $decision,
-        private iterable $attributes = [],
-        private ?API\TraceStateInterface $traceState = null,
+        private readonly int $decision,
+        private readonly iterable $attributes = [],
+        private readonly ?API\TraceStateInterface $traceState = null,
     ) {
     }
 

@@ -19,7 +19,7 @@ final class Parser
 
     public function __construct(
         /** @readonly */
-        private string $baggageHeader,
+        private readonly string $baggageHeader,
     ) {
     }
 
