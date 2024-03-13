@@ -13,8 +13,5 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
  */
 interface ExemplarFilterInterface
 {
-    /**
-     * @param float|int $value
-     */
-    public function accepts($value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): bool;
+    public function accepts(float|int $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): bool;
 }

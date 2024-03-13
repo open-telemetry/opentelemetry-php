@@ -16,7 +16,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
 class MeterProviderBuilder
 {
-    /** @var list<MetricReaderInterface> */
+    // @var array<MetricReaderInterface>
     private array $metricReaders = [];
     private ?ResourceInfo $resource = null;
     private ?ExemplarFilterInterface $exemplarFilter = null;
