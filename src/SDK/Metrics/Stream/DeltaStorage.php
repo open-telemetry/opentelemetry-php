@@ -16,7 +16,7 @@ final class DeltaStorage
 {
     private Delta $head;
 
-    public function __construct(private AggregationInterface $aggregation)
+    public function __construct(private readonly AggregationInterface $aggregation)
     {
         $this->head = new Delta(new Metric([], [], 0), 0);
 

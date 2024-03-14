@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 final class Constant implements ResourceDetectorInterface
 {
-    public function __construct(private ResourceInfo $resourceInfo)
+    public function __construct(private readonly ResourceInfo $resourceInfo)
     {
     }
 

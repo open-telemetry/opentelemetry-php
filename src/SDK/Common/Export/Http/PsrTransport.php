@@ -36,15 +36,15 @@ final class PsrTransport implements TransportInterface
      * @psalm-param CONTENT_TYPE $contentType
      */
     public function __construct(
-        private ClientInterface $client,
-        private RequestFactoryInterface $requestFactory,
-        private StreamFactoryInterface $streamFactory,
-        private string $endpoint,
-        private string $contentType,
-        private array $headers,
-        private array $compression,
-        private int $retryDelay,
-        private int $maxRetries,
+        private readonly ClientInterface $client,
+        private readonly RequestFactoryInterface $requestFactory,
+        private readonly StreamFactoryInterface $streamFactory,
+        private readonly string $endpoint,
+        private readonly string $contentType,
+        private readonly array $headers,
+        private readonly array $compression,
+        private readonly int $retryDelay,
+        private readonly int $maxRetries,
     ) {
     }
 

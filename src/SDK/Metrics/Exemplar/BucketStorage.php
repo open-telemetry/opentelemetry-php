@@ -26,11 +26,7 @@ final class BucketStorage
         $this->buckets = array_fill(0, $size, null);
     }
 
-    /**
-     * @param int|string $index
-     * @param float|int $value
-     */
-    public function store(int $bucket, $index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
+    public function store(int $bucket, int|string $index, float|int $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         assert($bucket <= count($this->buckets));
 

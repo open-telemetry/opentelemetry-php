@@ -6,16 +6,17 @@ namespace OpenTelemetry\SDK\Metrics\StalenessHandler;
 
 use Closure;
 use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\SDK\Metrics\ReferenceCounterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerFactoryInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use WeakMap;
 
 final class DelayedStalenessHandlerFactory implements StalenessHandlerFactoryInterface
 {
-    private int $nanoDelay;
+    private readonly int $nanoDelay;
 
-    private Closure $stale;
-    private Closure $freshen;
+    private readonly Closure $stale;
+    private readonly Closure $freshen;
 
     /** @var WeakMap<DelayedStalenessHandler, int> */
     private WeakMap $staleHandlers;
@@ -25,7 +26,7 @@ final class DelayedStalenessHandlerFactory implements StalenessHandlerFactoryInt
      * @psalm-suppress PropertyTypeCoercion
      */
     public function __construct(
-        private ClockInterface $clock,
+        private readonly ClockInterface $clock,
         float $delay,
     ) {
         $this->nanoDelay = (int) ($delay * 1e9);
@@ -40,7 +41,7 @@ final class DelayedStalenessHandlerFactory implements StalenessHandlerFactoryInt
         $this->staleHandlers = new WeakMap();
     }
 
-    public function create(): StalenessHandlerInterface
+    public function create(): ReferenceCounterInterface&StalenessHandlerInterface
     {
         $this->triggerStaleHandlers();
 

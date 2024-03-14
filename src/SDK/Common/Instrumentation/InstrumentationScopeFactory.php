@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 
 final class InstrumentationScopeFactory implements InstrumentationScopeFactoryInterface
 {
-    public function __construct(private AttributesFactoryInterface $attributesFactory)
+    public function __construct(private readonly AttributesFactoryInterface $attributesFactory)
     {
     }
 

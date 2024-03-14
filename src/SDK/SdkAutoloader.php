@@ -19,6 +19,9 @@ use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
 
+/**
+ * @psalm-suppress RedundantCast
+ */
 class SdkAutoloader
 {
     public static function autoload(): bool
@@ -46,9 +49,9 @@ class SdkAutoloader
 
             $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null, $resource);
 
-            ShutdownHandler::register([$tracerProvider, 'shutdown']);
-            ShutdownHandler::register([$meterProvider, 'shutdown']);
-            ShutdownHandler::register([$loggerProvider, 'shutdown']);
+            ShutdownHandler::register($tracerProvider->shutdown(...));
+            ShutdownHandler::register($meterProvider->shutdown(...));
+            ShutdownHandler::register($loggerProvider->shutdown(...));
 
             return $configurator
                 ->withTracerProvider($tracerProvider)
@@ -77,7 +80,7 @@ class SdkAutoloader
             return false;
         }
         foreach ($ignoreUrls as $ignore) {
-            if (preg_match(sprintf('|%s|', $ignore), $url) === 1) {
+            if (preg_match(sprintf('|%s|', $ignore), (string) $url) === 1) {
                 return true;
             }
         }
@@ -116,7 +119,7 @@ class SdkAutoloader
             return false;
         }
         foreach ($excludedUrls as $excludedUrl) {
-            if (preg_match(sprintf('|%s|', $excludedUrl), $url) === 1) {
+            if (preg_match(sprintf('|%s|', $excludedUrl), (string) $url) === 1) {
                 return true;
             }
         }

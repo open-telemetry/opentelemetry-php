@@ -10,11 +10,7 @@ use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 
 interface ExemplarReservoirInterface
 {
-    /**
-     * @param int|string $index
-     * @param float|int $value
-     */
-    public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void;
+    public function offer(int|string $index, float|int $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void;
 
     /**
      * @param array<AttributesInterface> $dataPointAttributes

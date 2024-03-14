@@ -28,10 +28,10 @@ final class Globals
     private static ?self $globals = null;
 
     public function __construct(
-        private TracerProviderInterface $tracerProvider,
-        private MeterProviderInterface $meterProvider,
-        private LoggerProviderInterface $loggerProvider,
-        private TextMapPropagatorInterface $propagator,
+        private readonly TracerProviderInterface $tracerProvider,
+        private readonly MeterProviderInterface $meterProvider,
+        private readonly LoggerProviderInterface $loggerProvider,
+        private readonly TextMapPropagatorInterface $propagator,
     ) {
     }
 

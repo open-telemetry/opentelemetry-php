@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
  */
 class CompositeResolver
 {
-    // @var array<ResolverInterface>
+    /** @var list<ResolverInterface> */
     private array $resolvers = [];
 
     public static function instance(): self

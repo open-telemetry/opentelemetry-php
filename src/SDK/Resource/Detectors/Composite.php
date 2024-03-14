@@ -13,7 +13,7 @@ final class Composite implements ResourceDetectorInterface
     /**
      * @param iterable<ResourceDetectorInterface> $resourceDetectors
      */
-    public function __construct(private iterable $resourceDetectors)
+    public function __construct(private readonly iterable $resourceDetectors)
     {
     }
 

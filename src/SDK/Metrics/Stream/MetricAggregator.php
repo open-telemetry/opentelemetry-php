@@ -21,16 +21,13 @@ final class MetricAggregator implements MetricAggregatorInterface
     private array $summaries = [];
 
     public function __construct(
-        private ?AttributeProcessorInterface $attributeProcessor,
-        private AggregationInterface $aggregation,
-        private ?ExemplarReservoirInterface $exemplarReservoir = null,
+        private readonly ?AttributeProcessorInterface $attributeProcessor,
+        private readonly AggregationInterface $aggregation,
+        private readonly ?ExemplarReservoirInterface $exemplarReservoir = null,
     ) {
     }
 
-    /**
-     * @param float|int $value
-     */
-    public function record($value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
+    public function record(float|int $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $filteredAttributes = $this->attributeProcessor !== null
             ? $this->attributeProcessor->process($attributes, $context)

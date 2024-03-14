@@ -20,8 +20,8 @@ class SimplePsrFileLogger implements LoggerInterface
     private static ?array $logLevels = null;
 
     public function __construct(
-        private string $filename,
-        private string $loggerName = self::DEFAULT_LOGGER_NAME,
+        private readonly string $filename,
+        private readonly string $loggerName = self::DEFAULT_LOGGER_NAME,
     ) {
     }
 
@@ -30,7 +30,7 @@ class SimplePsrFileLogger implements LoggerInterface
      */
     public function log($level, $message, array $context = []): void
     {
-        $level = strtolower($level);
+        $level = strtolower((string) $level);
 
         if (!in_array($level, self::getLogLevels(), true)) {
             throw new InvalidArgumentException(

@@ -23,9 +23,7 @@ class TraceState implements TraceStateInterface
     private const VALID_VALUE_BASE_REGEX = '/^[ -~]{0,255}[!-~]$/';
     private const INVALID_VALUE_COMMA_EQUAL_REGEX = '/,|=/';
 
-    /**
-     * @var string[]
-     */
+    /** @var string[] */
     private array $traceState = [];
 
     public function __construct(string $rawTracestate = null)

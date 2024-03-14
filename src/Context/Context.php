@@ -16,8 +16,7 @@ final class Context implements ContextInterface
 {
     private const OTEL_PHP_DEBUG_SCOPES_DISABLED = 'OTEL_PHP_DEBUG_SCOPES_DISABLED';
 
-    /** @var ContextStorageInterface&ExecutionContextAwareInterface */
-    private static ContextStorageInterface $storage;
+    private static ContextStorageInterface&ExecutionContextAwareInterface $storage;
 
     // Optimization for spans to avoid copying the context array.
     private static ContextKeyInterface $spanContextKey;
@@ -37,20 +36,12 @@ final class Context implements ContextInterface
         return new ContextKey($key);
     }
 
-    /**
-     * @param ContextStorageInterface&ExecutionContextAwareInterface $storage
-     * @todo update type-hint (php >= 8.1)
-     */
-    public static function setStorage(ContextStorageInterface $storage): void
+    public static function setStorage(ContextStorageInterface&ExecutionContextAwareInterface $storage): void
     {
         self::$storage = $storage;
     }
 
-    /**
-     * @return ContextStorageInterface&ExecutionContextAwareInterface
-     * @todo update return type-hint (php >= 8.1)
-     */
-    public static function storage(): ContextStorageInterface
+    public static function storage(): ContextStorageInterface&ExecutionContextAwareInterface
     {
         /** @psalm-suppress RedundantPropertyInitializationCheck */
         return self::$storage ??= new ContextStorage();

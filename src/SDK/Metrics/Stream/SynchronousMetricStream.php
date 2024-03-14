@@ -24,18 +24,21 @@ use function trigger_error;
  */
 final class SynchronousMetricStream implements MetricStreamInterface
 {
-    private DeltaStorage $delta;
+    private readonly DeltaStorage $delta;
     private int|GMP $readers = 0;
     private int|GMP $cumulative = 0;
 
+    /**
+     * @todo rector mistakenly makes $timestamp readonly, which conflicts with `self::push`. disabled in rector.php
+     */
     public function __construct(
-        private AggregationInterface $aggregation,
+        private readonly AggregationInterface $aggregation,
         private int $timestamp,
     ) {
         $this->delta = new DeltaStorage($this->aggregation);
     }
 
-    public function temporality()
+    public function temporality(): Temporality|string
     {
         return Temporality::DELTA;
     }

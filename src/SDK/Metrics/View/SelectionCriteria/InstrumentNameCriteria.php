@@ -14,7 +14,7 @@ use function strtr;
 
 final class InstrumentNameCriteria implements SelectionCriteriaInterface
 {
-    private string $pattern;
+    private readonly string $pattern;
 
     /**
      * @param non-empty-string $name

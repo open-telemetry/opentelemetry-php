@@ -12,11 +12,8 @@ class InMemoryExporter implements SpanExporterInterface
 {
     use SpanExporterTrait;
 
-    private ArrayObject $storage;
-
-    public function __construct(?ArrayObject $storage = null)
+    public function __construct(private readonly ArrayObject $storage = new ArrayObject())
     {
-        $this->storage = $storage ?? new ArrayObject();
     }
 
     protected function doExport(iterable $spans): bool

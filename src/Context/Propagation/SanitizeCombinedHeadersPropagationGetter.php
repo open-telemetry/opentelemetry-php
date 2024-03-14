@@ -18,7 +18,7 @@ final class SanitizeCombinedHeadersPropagationGetter implements PropagationGette
     private const SERVER_CONCAT_HEADERS_REGEX = '/;(?=[^,=;]*=|$)/';
     private const TRAILING_LEADING_SEPARATOR_REGEX = '/^' . self::LIST_MEMBERS_SEPARATOR . '+|' . self::LIST_MEMBERS_SEPARATOR . '+$/';
 
-    public function __construct(private PropagationGetterInterface $getter)
+    public function __construct(private readonly PropagationGetterInterface $getter)
     {
     }
 

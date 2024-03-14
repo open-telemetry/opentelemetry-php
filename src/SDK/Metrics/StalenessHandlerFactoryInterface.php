@@ -6,8 +6,5 @@ namespace OpenTelemetry\SDK\Metrics;
 
 interface StalenessHandlerFactoryInterface
 {
-    /**
-     * @return StalenessHandlerInterface&ReferenceCounterInterface
-     */
-    public function create(): StalenessHandlerInterface;
+    public function create(): StalenessHandlerInterface&ReferenceCounterInterface;
 }

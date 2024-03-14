@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 final class HistogramBucketReservoir implements ExemplarReservoirInterface
 {
-    private BucketStorage $storage;
+    private readonly BucketStorage $storage;
     /**
      * @var list<float|int>
      */

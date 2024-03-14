@@ -10,18 +10,12 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 final class Metric
 {
     public function __construct(
-        /** @readonly */
-        public InstrumentationScopeInterface $instrumentationScope,
-        /** @readonly */
-        public ResourceInfo $resource,
-        /** @readonly */
-        public string $name,
-        /** @readonly */
-        public ?string $unit,
-        /** @readonly */
-        public ?string $description,
-        /** @readonly */
-        public DataInterface $data,
+        public readonly InstrumentationScopeInterface $instrumentationScope,
+        public readonly ResourceInfo $resource,
+        public readonly string $name,
+        public readonly ?string $unit,
+        public readonly ?string $description,
+        public readonly DataInterface $data,
     ) {
     }
 }

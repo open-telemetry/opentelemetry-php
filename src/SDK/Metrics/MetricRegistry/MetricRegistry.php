@@ -40,9 +40,9 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     private array $asynchronousCallbackArguments = [];
 
     public function __construct(
-        private ?ContextStorageInterface $contextStorage,
-        private AttributesFactoryInterface $attributesFactory,
-        private ClockInterface $clock,
+        private readonly ?ContextStorageInterface $contextStorage,
+        private readonly AttributesFactoryInterface $attributesFactory,
+        private readonly ClockInterface $clock,
     ) {
     }
 

@@ -13,26 +13,16 @@ final class HistogramDataPoint
      * @param list<float|int> $explicitBounds
      */
     public function __construct(
-        /** @readonly */
-        public int $count,
-        /** @readonly */
-        public float|int $sum,
-        /** @readonly */
-        public float|int $min,
-        /** @readonly */
-        public float|int $max,
-        /** @readonly */
-        public array $bucketCounts,
-        /** @readonly */
-        public array $explicitBounds,
-        /** @readonly */
-        public AttributesInterface $attributes,
-        /** @readonly */
-        public int $startTimestamp,
-        /** @readonly */
-        public int $timestamp,
-        /** @readonly */
-        public iterable $exemplars = [],
+        public readonly int $count,
+        public readonly float|int $sum,
+        public readonly float|int $min,
+        public readonly float|int $max,
+        public readonly array $bucketCounts,
+        public readonly array $explicitBounds,
+        public readonly AttributesInterface $attributes,
+        public readonly int $startTimestamp,
+        public readonly int $timestamp,
+        public readonly iterable $exemplars = [],
     ) {
     }
 }

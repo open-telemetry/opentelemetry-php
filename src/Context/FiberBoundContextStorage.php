@@ -20,24 +20,21 @@ use function trigger_error;
  */
 final class FiberBoundContextStorage implements ContextStorageInterface, ExecutionContextAwareInterface
 {
-    /**
-     * @param ContextStorageInterface&ExecutionContextAwareInterface $storage
-     */
-    public function __construct(private ContextStorageInterface $storage)
+    public function __construct(private readonly ContextStorageInterface&ExecutionContextAwareInterface $storage)
     {
     }
 
-    public function fork($id): void
+    public function fork(int|string $id): void
     {
         $this->storage->fork($id);
     }
 
-    public function switch($id): void
+    public function switch(int|string $id): void
     {
         $this->storage->switch($id);
     }
 
-    public function destroy($id): void
+    public function destroy(int|string $id): void
     {
         $this->storage->destroy($id);
     }

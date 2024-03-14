@@ -10,12 +10,9 @@ final class Sum implements DataInterface
      * @param iterable<NumberDataPoint> $dataPoints
      */
     public function __construct(
-        /** @readonly */
-        public iterable $dataPoints,
-        /** @readonly */
-        public string|Temporality $temporality,
-        /** @readonly */
-        public bool $monotonic,
+        public readonly iterable $dataPoints,
+        public readonly string|Temporality $temporality,
+        public readonly bool $monotonic,
     ) {
     }
 }
