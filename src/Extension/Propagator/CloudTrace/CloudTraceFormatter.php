@@ -38,7 +38,7 @@ final class CloudTraceFormatter
         return SpanContext::createFromRemoteParent(
             strtolower($matches[1]),
             Utils::leftZeroPad(Utils::decToHex($matches[2])),
-            (int) ($matches[3] == '1')
+            (int) ($matches[3] === '1')
         );
     }
 

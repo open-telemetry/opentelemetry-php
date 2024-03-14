@@ -7,6 +7,7 @@ use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRe
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
+use Rector\Php81\Rector\ClassMethod\NewInInitializerRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\ValueObject\PhpVersion;
@@ -29,6 +30,9 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__ . '/src/SDK/SdkAutoloader.php',
         ],
         FlipTypeControlToUseExclusiveTypeRector::class,
+        NewInInitializerRector::class => [
+            __DIR__ . '/src/SDK/Trace/Sampler/ParentBased.php',
+        ],
         ReadOnlyPropertyRector::class => [
             __DIR__ . '/src/SDK/Metrics/Stream/SynchronousMetricStream.php',
         ],

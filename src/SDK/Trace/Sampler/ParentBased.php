@@ -29,22 +29,31 @@ use OpenTelemetry\SDK\Trace\Span;
  */
 class ParentBased implements SamplerInterface
 {
+    private readonly SamplerInterface $remoteParentSampler;
+    private readonly SamplerInterface $remoteParentNotSampler;
+    private readonly SamplerInterface $localParentSampler;
+    private readonly SamplerInterface $localParentNotSampler;
+
     /**
      * ParentBased sampler delegates the sampling decision based on the parent context.
      *
      * @param SamplerInterface $root Sampler called for the span with no parent (root span).
-     * @param SamplerInterface $remoteParentSampler Sampler called for the span with the remote sampled parent. When null, `AlwaysOnSampler` is used.
-     * @param SamplerInterface $remoteParentNotSampler Sampler called for the span with the remote not sampled parent. When null, `AlwaysOffSampler` is used.
-     * @param SamplerInterface $localParentSampler Sampler called for the span with local the sampled parent. When null, `AlwaysOnSampler` is used.
-     * @param SamplerInterface $localParentNotSampler Sampler called for the span with the local not sampled parent. When null, `AlwaysOffSampler` is used.
+     * @param SamplerInterface|null $remoteParentSampler Sampler called for the span with the remote sampled parent. When null, `AlwaysOnSampler` is used.
+     * @param SamplerInterface|null $remoteParentNotSampler Sampler called for the span with the remote not sampled parent. When null, `AlwaysOffSampler` is used.
+     * @param SamplerInterface|null $localParentSampler Sampler called for the span with local the sampled parent. When null, `AlwaysOnSampler` is used.
+     * @param SamplerInterface|null $localParentNotSampler Sampler called for the span with the local not sampled parent. When null, `AlwaysOffSampler` is used.
      */
     public function __construct(
         private readonly SamplerInterface $root,
-        private readonly SamplerInterface $remoteParentSampler = new AlwaysOnSampler(),
-        private readonly SamplerInterface $remoteParentNotSampler = new AlwaysOffSampler(),
-        private readonly SamplerInterface $localParentSampler = new AlwaysOnSampler(),
-        private readonly SamplerInterface $localParentNotSampler = new AlwaysOffSampler(),
+        ?SamplerInterface $remoteParentSampler = null,
+        ?SamplerInterface $remoteParentNotSampler = null,
+        ?SamplerInterface $localParentSampler = null,
+        ?SamplerInterface $localParentNotSampler = null,
     ) {
+        $this->remoteParentSampler = $remoteParentSampler ?? new AlwaysOnSampler();
+        $this->remoteParentNotSampler = $remoteParentNotSampler ?? new AlwaysOffSampler();
+        $this->localParentSampler = $localParentSampler ?? new AlwaysOnSampler();
+        $this->localParentNotSampler = $localParentNotSampler ?? new AlwaysOffSampler();
     }
 
     /**
