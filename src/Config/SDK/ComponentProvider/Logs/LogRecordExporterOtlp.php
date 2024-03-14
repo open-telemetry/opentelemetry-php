@@ -19,7 +19,7 @@ final class LogRecordExporterOtlp implements ComponentProvider {
 
     /**
      * @param array{
-     *     protocol: 'http/protobuf'|'http/json'|'grpc/protobuf'|'grpc/json',
+     *     protocol: 'http/protobuf'|'http/json'|'grpc',
      *     endpoint: string,
      *     certificate: ?string,
      *     client_key: ?string,
@@ -48,7 +48,7 @@ final class LogRecordExporterOtlp implements ComponentProvider {
         $node = new ArrayNodeDefinition('otlp');
         $node
             ->children()
-                ->enumNode('protocol')->isRequired()->values(['http/protobuf', 'http/json', 'grpc/protobuf', 'grpc/json'])->end()
+                ->enumNode('protocol')->isRequired()->values(['http/protobuf', 'http/json', 'grpc'])->end()
                 ->scalarNode('endpoint')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_key')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()

@@ -38,8 +38,12 @@ class OtlpUtil
         return self::METHODS[$signal];
     }
 
+    /**
+     * @param 'trace'|'metrics'|'logs' $signal
+     * @param 'grpc'|'http/protobuf'|'http/json' $protocol
+     */
     public static function path(string $signal, string $protocol): string {
-        return match (explode('/', $protocol)[0]) {
+        return match (explode('/', $protocol)[0]) { // @phpstan-ignore-line
             'grpc' => self::method($signal),
             'http' => match ($signal) {
                 Signals::TRACE => '/v1/traces',

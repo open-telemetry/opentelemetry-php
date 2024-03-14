@@ -171,8 +171,8 @@ final class OpenTelemetrySdk implements ComponentProvider {
                     'up_down_counter' => InstrumentType::UP_DOWN_COUNTER,
                 });
             }
-            if (isset($view['selector']['name'])) {
-                $criteria[] = new InstrumentNameCriteria($view['selector']['name']);
+            if (isset($view['selector']['instrument_name'])) {
+                $criteria[] = new InstrumentNameCriteria($view['selector']['instrument_name']);
             }
             if (isset($view['selector']['unit'])) {
                 // TODO Add unit criteria
@@ -194,7 +194,7 @@ final class OpenTelemetrySdk implements ComponentProvider {
             if (isset($view['stream']['description'])) {
                 $viewTemplate = $viewTemplate->withDescription($view['stream']['description']);
             }
-            if (isset($view['stream']['attribute_keys'])) {
+            if ($view['stream']['attribute_keys']) {
                 $viewTemplate = $viewTemplate->withAttributeKeys($view['stream']['attribute_keys']);
             }
             if (isset($view['stream']['aggregation'])) {
@@ -211,7 +211,7 @@ final class OpenTelemetrySdk implements ComponentProvider {
             clock: ClockFactory::getDefault(),
             attributesFactory: Attributes::factory(),
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
-            metricReaders: $metricReaders,
+            metricReaders: $metricReaders, // @phpstan-ignore-line
             viewRegistry: $viewRegistry,
             exemplarFilter: null,
             stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
