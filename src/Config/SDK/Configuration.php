@@ -5,9 +5,9 @@ use Nevay\OTelSDK\Configuration\ComponentPlugin;
 use Nevay\OTelSDK\Configuration\ComponentProvider;
 use Nevay\OTelSDK\Configuration\ConfigurationFactory;
 use Nevay\OTelSDK\Configuration\Context;
-use Nevay\OTelSDK\Configuration\Environment\ArrayEnvSource;
 use Nevay\OTelSDK\Configuration\Environment\EnvSourceReader;
 use Nevay\OTelSDK\Configuration\Environment\PhpIniEnvSource;
+use Nevay\OTelSDK\Configuration\Environment\ServerEnvSource;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
 use OpenTelemetry\SDK\SdkBuilder;
@@ -42,7 +42,7 @@ final class Configuration {
             ServiceLoader::load(ComponentProvider::class),
             new OpenTelemetrySdk(),
             new EnvSourceReader([
-                new ArrayEnvSource($_SERVER),
+                new ServerEnvSource(),
                 new PhpIniEnvSource(),
             ]),
         );

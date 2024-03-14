@@ -27,6 +27,9 @@ class Protocols
         }
     }
 
+    /**
+     * @return ContentTypes::*
+     */
     public static function contentType(string $protocol): string
     {
         self::validate($protocol);

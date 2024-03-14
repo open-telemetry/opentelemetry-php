@@ -204,6 +204,7 @@ final class OpenTelemetrySdk implements ComponentProvider {
             $viewRegistry->register(new AllCriteria($criteria), $viewTemplate);
         }
 
+        /** @psalm-suppress InvalidArgument TODO update metric reader interface */
         $meterProvider = new MeterProvider(
             contextStorage: null,
             resource: $resource,

@@ -6,7 +6,6 @@ use Nevay\OTelSDK\Configuration\ComponentProviderRegistry;
 use Nevay\OTelSDK\Configuration\Context;
 use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
-use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 final class MetricExporterConsole implements ComponentProvider {
@@ -15,10 +14,7 @@ final class MetricExporterConsole implements ComponentProvider {
      * @param array{} $properties
      */
     public function createPlugin(array $properties, Context $context): MetricExporterInterface {
-        return new ConsoleMetricExporter(Registry::transportFactory('stream')->create(
-            endpoint: 'php://stdout',
-            contentType: 'application/json',
-        ));
+        return new ConsoleMetricExporter();
     }
 
     public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
