@@ -45,6 +45,8 @@
         "open-telemetry/context": "self.version",
         "open-telemetry/exporter-otlp": "1.0.x-dev",
         "open-telemetry/exporter-zipkin": "1.0.x-dev",
+        "open-telemetry/extension-propagator-b3": "1.0.x-dev",
+        "open-telemetry/extension-propagator-jaeger": "0.0.2",
         "open-telemetry/gen-otlp-protobuf": "self.version",
         "open-telemetry/sdk": "self.version",
         "open-telemetry/sdk-contrib": "self.version",
