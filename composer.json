@@ -9,7 +9,7 @@
     "require": {
         "php": "^8.1",
         "google/protobuf": "^3.22",
-        "open-telemetry/sdk-configuration": "^1.0-dev",
+        "open-telemetry/sdk-configuration": "^0.1-dev",
         "php-http/discovery": "^1.14",
         "psr/http-client-implementation": "^1.0",
         "psr/http-factory-implementation": "^1.0",
