@@ -28,7 +28,7 @@ class Protocols
     }
 
     /**
-     * @return ContentTypes::*
+     * @psalm-return ContentTypes::*
      */
     public static function contentType(string $protocol): string
     {
