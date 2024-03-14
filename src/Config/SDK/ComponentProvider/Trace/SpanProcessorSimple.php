@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
 use Nevay\OTelSDK\Configuration\ComponentPlugin;
@@ -10,20 +13,23 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
-final class SpanProcessorSimple implements ComponentProvider {
+final class SpanProcessorSimple implements ComponentProvider
+{
 
     /**
      * @param array{
      *     exporter: ComponentPlugin<SpanExporterInterface>,
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): SpanProcessorInterface {
+    public function createPlugin(array $properties, Context $context): SpanProcessorInterface
+    {
         return new SimpleSpanProcessor(
             exporter: $properties['exporter']->create($context),
         );
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('simple');
         $node
             ->children()

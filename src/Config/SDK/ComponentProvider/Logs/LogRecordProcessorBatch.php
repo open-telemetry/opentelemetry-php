@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
 use Nevay\OTelSDK\Configuration\ComponentPlugin;
@@ -11,7 +14,8 @@ use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
-final class LogRecordProcessorBatch implements ComponentProvider {
+final class LogRecordProcessorBatch implements ComponentProvider
+{
 
     /**
      * @param array{
@@ -22,7 +26,8 @@ final class LogRecordProcessorBatch implements ComponentProvider {
      *     exporter: ComponentPlugin<LogRecordExporterInterface>,
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): LogRecordProcessorInterface {
+    public function createPlugin(array $properties, Context $context): LogRecordProcessorInterface
+    {
         return new BatchLogRecordProcessor(
             exporter: $properties['exporter']->create($context),
             clock: ClockFactory::getDefault(),
@@ -34,7 +39,8 @@ final class LogRecordProcessorBatch implements ComponentProvider {
         );
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('batch');
         $node
             ->children()

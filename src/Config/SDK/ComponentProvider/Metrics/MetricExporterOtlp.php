@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 
 use Nevay\OTelSDK\Configuration\ComponentProvider;
@@ -16,7 +19,8 @@ use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 #[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
-final class MetricExporterOtlp implements ComponentProvider {
+final class MetricExporterOtlp implements ComponentProvider
+{
 
     /**
      * @param array{
@@ -32,7 +36,8 @@ final class MetricExporterOtlp implements ComponentProvider {
      *     default_histogram_aggregation: 'explicit_bucket_histogram',
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): MetricExporterInterface {
+    public function createPlugin(array $properties, Context $context): MetricExporterInterface
+    {
         $protocol = $properties['protocol'];
 
         $temporality = match ($properties['temporality_preference']) {
@@ -53,7 +58,8 @@ final class MetricExporterOtlp implements ComponentProvider {
         ), $temporality);
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('otlp');
         $node
             ->children()

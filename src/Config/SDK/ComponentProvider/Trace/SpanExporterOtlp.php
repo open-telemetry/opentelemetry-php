@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
 use Nevay\OTelSDK\Configuration\ComponentProvider;
@@ -13,10 +16,10 @@ use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use function str_starts_with;
 
 #[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
-final class SpanExporterOtlp implements ComponentProvider {
+final class SpanExporterOtlp implements ComponentProvider
+{
 
     /**
      * @param array{
@@ -30,7 +33,8 @@ final class SpanExporterOtlp implements ComponentProvider {
      *     timeout: int<0, max>,
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): SpanExporterInterface {
+    public function createPlugin(array $properties, Context $context): SpanExporterInterface
+    {
         $protocol = $properties['protocol'];
 
         return new SpanExporter(Registry::transportFactory($protocol)->create(
@@ -45,7 +49,8 @@ final class SpanExporterOtlp implements ComponentProvider {
         ));
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('otlp');
         $node
             ->children()

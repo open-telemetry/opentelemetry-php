@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
 use Nevay\OTelSDK\Configuration\ComponentProvider;
@@ -12,7 +15,8 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 #[PackageDependency('open-telemetry/exporter-zipkin', '^1.0')]
-final class SpanExporterZipkin implements ComponentProvider {
+final class SpanExporterZipkin implements ComponentProvider
+{
 
     /**
      * @param array{
@@ -20,7 +24,8 @@ final class SpanExporterZipkin implements ComponentProvider {
      *     timeout: int<0, max>,
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): SpanExporterInterface {
+    public function createPlugin(array $properties, Context $context): SpanExporterInterface
+    {
         return new Zipkin\Exporter(Registry::transportFactory('http')->create(
             endpoint: $properties['endpoint'],
             contentType: 'application/json',
@@ -28,7 +33,8 @@ final class SpanExporterZipkin implements ComponentProvider {
         ));
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('zipkin');
         $node
             ->children()

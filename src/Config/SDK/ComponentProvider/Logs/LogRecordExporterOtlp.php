@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
 use Nevay\OTelSDK\Configuration\ComponentProvider;
@@ -15,7 +18,8 @@ use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 #[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
-final class LogRecordExporterOtlp implements ComponentProvider {
+final class LogRecordExporterOtlp implements ComponentProvider
+{
 
     /**
      * @param array{
@@ -29,7 +33,8 @@ final class LogRecordExporterOtlp implements ComponentProvider {
      *     timeout: int<0, max>,
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): LogRecordExporterInterface {
+    public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
+    {
         $protocol = $properties['protocol'];
 
         return new LogsExporter(Registry::transportFactory($protocol)->create(
@@ -44,7 +49,8 @@ final class LogRecordExporterOtlp implements ComponentProvider {
         ));
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('otlp');
         $node
             ->children()

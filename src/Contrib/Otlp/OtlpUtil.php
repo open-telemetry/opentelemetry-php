@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
+use function explode;
 use OpenTelemetry\API\Signals;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Resource\Detectors\Sdk;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use UnexpectedValueException;
-use function explode;
 
 class OtlpUtil
 {
@@ -42,7 +42,8 @@ class OtlpUtil
      * @param 'trace'|'metrics'|'logs' $signal
      * @param 'grpc'|'http/protobuf'|'http/json' $protocol
      */
-    public static function path(string $signal, string $protocol): string {
+    public static function path(string $signal, string $protocol): string
+    {
         return match (explode('/', $protocol)[0]) { // @phpstan-ignore-line
             'grpc' => self::method($signal),
             'http' => match ($signal) {

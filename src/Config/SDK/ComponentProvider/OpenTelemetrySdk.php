@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
 use Nevay\OTelSDK\Configuration\ComponentPlugin;
@@ -41,7 +44,8 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 /**
  * @internal
  */
-final class OpenTelemetrySdk implements ComponentProvider {
+final class OpenTelemetrySdk implements ComponentProvider
+{
 
     /**
      * @param array{
@@ -96,7 +100,8 @@ final class OpenTelemetrySdk implements ComponentProvider {
      *     },
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): SdkBuilder {
+    public function createPlugin(array $properties, Context $context): SdkBuilder
+    {
         $sdkBuilder = new SdkBuilder();
 
         $propagator = $properties['propagator']?->create($context) ?? NoopTextMapPropagator::getInstance();
@@ -242,7 +247,8 @@ final class OpenTelemetrySdk implements ComponentProvider {
         return $sdkBuilder;
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('open_telemetry');
         $node
             ->addDefaultsIfNotSet()
@@ -266,7 +272,8 @@ final class OpenTelemetrySdk implements ComponentProvider {
         return $node;
     }
 
-    private function getResourceConfig(): ArrayNodeDefinition {
+    private function getResourceConfig(): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('resource');
         $node
             ->addDefaultsIfNotSet()
@@ -280,7 +287,8 @@ final class OpenTelemetrySdk implements ComponentProvider {
         return $node;
     }
 
-    private function getAttributeLimitsConfig(): ArrayNodeDefinition {
+    private function getAttributeLimitsConfig(): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('attribute_limits');
         $node
             ->addDefaultsIfNotSet()
@@ -292,7 +300,8 @@ final class OpenTelemetrySdk implements ComponentProvider {
         return $node;
     }
 
-    private function getTracerProviderConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    private function getTracerProviderConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('tracer_provider');
         $node
             ->addDefaultsIfNotSet()
@@ -316,7 +325,8 @@ final class OpenTelemetrySdk implements ComponentProvider {
         return $node;
     }
 
-    private function getMeterProviderConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    private function getMeterProviderConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('meter_provider');
         $node
             ->addDefaultsIfNotSet()
@@ -366,7 +376,8 @@ final class OpenTelemetrySdk implements ComponentProvider {
         return $node;
     }
 
-    private function getLoggerProviderConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    private function getLoggerProviderConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('logger_provider');
         $node
             ->addDefaultsIfNotSet()

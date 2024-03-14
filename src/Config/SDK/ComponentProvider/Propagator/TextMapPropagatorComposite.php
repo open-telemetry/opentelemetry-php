@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Propagator;
 
 use Nevay\OTelSDK\Configuration\ComponentPlugin;
@@ -9,12 +12,14 @@ use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
-final class TextMapPropagatorComposite implements ComponentProvider {
+final class TextMapPropagatorComposite implements ComponentProvider
+{
 
     /**
      * @param list<ComponentPlugin<TextMapPropagatorInterface>> $properties
      */
-    public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface {
+    public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface
+    {
         $propagators = [];
         foreach ($properties as $plugin) {
             $propagators[] = $plugin->create($context);
@@ -23,7 +28,8 @@ final class TextMapPropagatorComposite implements ComponentProvider {
         return new MultiTextMapPropagator($propagators);
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         return $registry->componentNames('composite', TextMapPropagatorInterface::class);
     }
 }

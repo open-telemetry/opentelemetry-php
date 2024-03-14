@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
 use Nevay\OTelSDK\Configuration\ComponentPlugin;
@@ -11,7 +14,8 @@ use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
-final class SamplerParentBased implements ComponentProvider {
+final class SamplerParentBased implements ComponentProvider
+{
 
     /**
      * @param array{
@@ -22,7 +26,8 @@ final class SamplerParentBased implements ComponentProvider {
      *     local_parent_not_sampled: ?ComponentPlugin<SamplerInterface>,
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): SamplerInterface {
+    public function createPlugin(array $properties, Context $context): SamplerInterface
+    {
         return new ParentBased(
             root: $properties['root']->create($context),
             remoteParentSampler: $properties['remote_parent_sampled']?->create($context) ?? new AlwaysOnSampler(),
@@ -32,8 +37,8 @@ final class SamplerParentBased implements ComponentProvider {
         );
     }
 
-
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('parent_based');
         $node
             ->children()

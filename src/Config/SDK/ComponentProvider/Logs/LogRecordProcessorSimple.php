@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
 use Nevay\OTelSDK\Configuration\ComponentPlugin;
@@ -10,20 +13,23 @@ use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
-final class LogRecordProcessorSimple implements ComponentProvider {
+final class LogRecordProcessorSimple implements ComponentProvider
+{
 
     /**
      * @param array{
      *     exporter: ComponentPlugin<LogRecordExporterInterface>,
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): LogRecordProcessorInterface {
+    public function createPlugin(array $properties, Context $context): LogRecordProcessorInterface
+    {
         return new SimpleLogRecordProcessor(
             exporter: $properties['exporter']->create($context),
         );
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('simple');
         $node
             ->children()

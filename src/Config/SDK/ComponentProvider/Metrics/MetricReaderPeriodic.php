@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 
 use Nevay\OTelSDK\Configuration\ComponentPlugin;
@@ -10,7 +13,8 @@ use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
-final class MetricReaderPeriodic implements ComponentProvider {
+final class MetricReaderPeriodic implements ComponentProvider
+{
 
     /**
      * @param array{
@@ -19,13 +23,15 @@ final class MetricReaderPeriodic implements ComponentProvider {
      *     exporter: ComponentPlugin<MetricExporterInterface>,
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): MetricReaderInterface {
+    public function createPlugin(array $properties, Context $context): MetricReaderInterface
+    {
         return new ExportingReader(
             exporter: $properties['exporter']->create($context),
         );
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
+    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
         $node = new ArrayNodeDefinition('periodic');
         $node
             ->children()
