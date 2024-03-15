@@ -82,7 +82,7 @@ class CompositeResolverTest extends TestCase
         $this->assertSame(Defaults::OTEL_EXPORTER_OTLP_PROTOCOL, $this->resolver->resolve(Variables::OTEL_EXPORTER_OTLP_PROTOCOL, $value));
     }
 
-    public function emptyProvider(): array
+    public static function emptyProvider(): array
     {
         return [
             [''],

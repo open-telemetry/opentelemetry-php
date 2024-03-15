@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Context;
 
+use Exception;
 use function ini_set;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\DebugScope;
-use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,6 +15,17 @@ use PHPUnit\Framework\TestCase;
  */
 final class DebugScopeTest extends TestCase
 {
+    public function setUp(): void
+    {
+        set_error_handler(static function (int $errno, string $errstr): never {
+            throw new Exception($errstr, $errno);
+        }, E_USER_NOTICE);
+    }
+
+    public function tearDown(): void
+    {
+        restore_error_handler();
+    }
 
     /**
      * @covers \OpenTelemetry\Context\Context::activate
@@ -70,7 +81,7 @@ final class DebugScopeTest extends TestCase
 
         $scope1->detach();
 
-        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('already detached');
         $scope1->detach();
     }
@@ -81,7 +92,7 @@ final class DebugScopeTest extends TestCase
         $scope2 = Context::getCurrent()->activate();
 
         try {
-            $this->expectException(PHPUnitFrameworkException::class);
+            $this->expectException(Exception::class);
             $this->expectExceptionMessage('another scope');
             $scope1->detach();
         } finally {
@@ -97,7 +108,7 @@ final class DebugScopeTest extends TestCase
         Context::storage()->switch(1);
 
         try {
-            $this->expectException(PHPUnitFrameworkException::class);
+            $this->expectException(Exception::class);
             $this->expectExceptionMessage('different execution context');
             $scope1->detach();
         } finally {
@@ -109,7 +120,7 @@ final class DebugScopeTest extends TestCase
     public function test_missing_scope_detach(): void
     {
         try {
-            $this->expectException(PHPUnitFrameworkException::class);
+            $this->expectException(Exception::class);
             $this->expectExceptionMessage('missing call');
             Context::getCurrent()->activate();
         } finally {

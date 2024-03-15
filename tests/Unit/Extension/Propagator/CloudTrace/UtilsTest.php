@@ -21,7 +21,7 @@ class UtilsTest extends TestCase
         $this->assertEquals(Utils::leftZeroPad($pad, $howMuch), $equalsTo, "Given leftZeroPad($pad, $howMuch) != $equalsTo");
     }
 
-    public function for_test_left_zero_pad() : array
+    public static function for_test_left_zero_pad() : array
     {
         return [
             ['a', 3, '00a'],
@@ -39,7 +39,7 @@ class UtilsTest extends TestCase
         $this->assertEquals(Utils::decToHex($decNum), $equalsTo, "Given decToHex($decNum) != $equalsTo");
     }
 
-    public function for_test_dec_to_hex() : array
+    public static function for_test_dec_to_hex() : array
     {
         return [
             ['10', 'a'],
@@ -58,7 +58,7 @@ class UtilsTest extends TestCase
         $this->assertEquals(Utils::hexToDec($hexNum), $equalsTo, "Given hexToDec($hexNum) != $equalsTo");
     }
 
-    public function for_test_hex_to_dec() : array
+    public static function for_test_hex_to_dec() : array
     {
         return [
             ['a', '10'],
@@ -84,7 +84,7 @@ class UtilsTest extends TestCase
         $this->assertEquals(Utils::isBigNum($num), $equalsTo, "Given isBigNum($num) != $equalsTo");
     }
 
-    public function for_test_is_big_num() : array
+    public static function for_test_is_big_num() : array
     {
         return [
             [-100.5, false],
@@ -108,7 +108,7 @@ class UtilsTest extends TestCase
         $this->assertEquals($result, $equalsTo, "Given baseConvert($num, $fromBase, $toBase) != $equalsTo (result=$result)");
     }
 
-    public function for_test_base_convert() : array
+    public static function for_test_base_convert() : array
     {
         return [
             ['b', 16, 10, '11'],

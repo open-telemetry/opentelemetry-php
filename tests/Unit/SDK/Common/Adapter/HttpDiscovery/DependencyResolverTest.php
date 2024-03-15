@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Adapter\HttpDiscovery;
 
 use Generator;
 use Http\Client\HttpAsyncClient;
+use Mockery;
 use OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\DependencyResolver;
 use OpenTelemetry\SDK\Common\Http\HttpPlug\Client\ResolverInterface as HttpPlugClientResolverInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\ResolverInterface as PsrClientResolverInterface;
@@ -60,18 +61,18 @@ class DependencyResolverTest extends TestCase
         );
     }
 
-    public function provideDependencies(): Generator
+    public static function provideDependencies(): Generator
     {
         $arguments = [];
         $dependencies = [];
 
         foreach (self::DEPENDENCIES as $resolverInterface => $interfaces) {
-            $resolver = $this->createMock($resolverInterface);
+            $resolver = Mockery::mock($resolverInterface);
 
             foreach ($interfaces as $interface) {
-                $method = $this->resolveMethodName($interface, self::METHOD_NAME_REPLACEMENTS[$resolverInterface]);
-                $dependency = $this->createMock($interface);
-                $resolver->method($method)->willReturn($dependency);
+                $method = self::resolveMethodName($interface, self::METHOD_NAME_REPLACEMENTS[$resolverInterface]);
+                $dependency = Mockery::mock($interface);
+                $resolver->allows([$method => $dependency]);
                 $dependencies[$method] = $dependency;
             }
 
@@ -86,7 +87,7 @@ class DependencyResolverTest extends TestCase
     /**
      *  @psalm-param class-string $interface
      */
-    private function resolveMethodName(string $interface, array $replacements = []): string
+    private static function resolveMethodName(string $interface, array $replacements = []): string
     {
         $interface = (new ReflectionClass($interface))->getShortName();
 

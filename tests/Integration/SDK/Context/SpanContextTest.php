@@ -26,7 +26,7 @@ class SpanContextTest extends TestCase
         $this->assertSame(SpanContextValidator::INVALID_SPAN, $spanContext->getSpanId());
     }
 
-    public function invalidSpanData(): array
+    public static function invalidSpanData(): array
     {
         return [
             // Too long TraceID

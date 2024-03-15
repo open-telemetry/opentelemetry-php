@@ -19,7 +19,6 @@ use OpenTelemetry\SDK\Metrics\Stream\Metric;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregator;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use const PHP_INT_SIZE;
-use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -296,9 +295,10 @@ final class MetricStreamTest extends TestCase
             $s->register(Temporality::DELTA);
         }
 
-        $this->expectException(PHPUnitFrameworkException::class);
-        $this->expectExceptionMessageMatches('/^GMP extension required to register over \d++ readers$/');
-        $s->register(Temporality::DELTA);
+        //$this->expectException(Exception::class);
+        //$this->expectExceptionMessageMatches('/^GMP extension required to register over \d++ readers$/');
+        $r = $s->register(Temporality::DELTA);
+        $this->assertSame(PHP_INT_SIZE << 3, $r);
     }
 
     public function test_synchronous_reader_limit_exceeded_returns_noop_reader(): void

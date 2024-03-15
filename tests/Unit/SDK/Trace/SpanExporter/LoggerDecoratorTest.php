@@ -13,7 +13,7 @@ use Psr\Log\LogLevel;
 /**
  * @covers \OpenTelemetry\SDK\Trace\SpanExporter\LoggerDecorator
  */
-class LoggerDecoratorTest extends AbstractLoggerAwareTest
+class LoggerDecoratorTest extends AbstractLoggerAwareTestCase
 {
     /**
      * @var SpanExporterInterface|null

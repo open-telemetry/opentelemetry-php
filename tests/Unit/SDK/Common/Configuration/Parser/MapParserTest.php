@@ -61,12 +61,12 @@ class MapParserTest extends TestCase
         \OpenTelemetry\SDK\Common\Configuration\Parser\MapParser::parse($value);
     }
 
-    public function mapValueProvider(): array
+    public static function mapValueProvider(): array
     {
         return self::MAP_VALUES;
     }
 
-    public function invalidValueProvider(): array
+    public static function invalidValueProvider(): array
     {
         return self::INVALID_VALUES;
     }

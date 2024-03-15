@@ -45,7 +45,7 @@ class ListParserTest extends TestCase
         );
     }
 
-    public function listValueProvider(): array
+    public static function listValueProvider(): array
     {
         return self::LIST_VALUES;
     }
