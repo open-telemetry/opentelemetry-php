@@ -1,7 +1,7 @@
 include .env
 
 PHP_VERSION ?= 8.1
-DOCKER_COMPOSE ?= docker-compose
+DOCKER_COMPOSE ?= docker compose
 DC_RUN_PHP = $(DOCKER_COMPOSE) run --rm php
 
 .DEFAULT_GOAL : help
