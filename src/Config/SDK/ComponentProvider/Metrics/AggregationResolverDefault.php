@@ -11,6 +11,9 @@ use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<DefaultAggregationProviderInterface>
+ */
 final class AggregationResolverDefault implements ComponentProvider
 {
 

@@ -31,11 +31,11 @@
                 <directory name="./examples"/>
             </errorLevel>
         </ArgumentTypeCoercion>
-        <PossiblyUndefinedMethod>
+        <UndefinedInterfaceMethod>
             <errorLevel type="suppress">
                 <directory name="src/Config/SDK/ComponentProvider"/>
             </errorLevel>
-        </PossiblyUndefinedMethod>
+        </UndefinedInterfaceMethod>
         <PossiblyNullReference>
             <errorLevel type="suppress">
                 <directory name="src/Config/SDK/ComponentProvider"/>

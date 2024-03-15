@@ -11,6 +11,9 @@ use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<SamplerInterface>
+ */
 final class SamplerTraceIdRatioBased implements ComponentProvider
 {
 

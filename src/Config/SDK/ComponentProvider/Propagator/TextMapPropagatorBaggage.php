@@ -11,6 +11,9 @@ use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<TextMapPropagatorInterface>
+ */
 final class TextMapPropagatorBaggage implements ComponentProvider
 {
 

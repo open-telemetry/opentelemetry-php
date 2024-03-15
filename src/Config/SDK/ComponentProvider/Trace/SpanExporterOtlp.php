@@ -17,6 +17,9 @@ use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<SpanExporterInterface>
+ */
 #[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
 final class SpanExporterOtlp implements ComponentProvider
 {

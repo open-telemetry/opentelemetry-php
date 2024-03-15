@@ -18,6 +18,9 @@ use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<MetricExporterInterface>
+ */
 #[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
 final class MetricExporterOtlp implements ComponentProvider
 {

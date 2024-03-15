@@ -13,6 +13,9 @@ use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<MetricReaderInterface>
+ */
 final class MetricReaderPeriodic implements ComponentProvider
 {
 

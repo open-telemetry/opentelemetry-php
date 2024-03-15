@@ -12,6 +12,9 @@ use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<LogRecordExporterInterface>
+ */
 final class LogRecordExporterConsole implements ComponentProvider
 {
 

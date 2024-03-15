@@ -11,6 +11,9 @@ use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<MetricExporterInterface>
+ */
 final class MetricExporterConsole implements ComponentProvider
 {
 

@@ -12,6 +12,9 @@ use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<SpanExporterInterface>
+ */
 final class SpanExporterConsole implements ComponentProvider
 {
 

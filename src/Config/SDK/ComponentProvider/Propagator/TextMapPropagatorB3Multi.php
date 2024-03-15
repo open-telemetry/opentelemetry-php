@@ -12,6 +12,9 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<TextMapPropagatorInterface>
+ */
 #[PackageDependency('open-telemetry/extension-propagator-b3', '^1.0.1')]
 final class TextMapPropagatorB3Multi implements ComponentProvider
 {

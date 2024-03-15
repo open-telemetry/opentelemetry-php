@@ -14,6 +14,9 @@ use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<LogRecordProcessorInterface>
+ */
 final class LogRecordProcessorBatch implements ComponentProvider
 {
 

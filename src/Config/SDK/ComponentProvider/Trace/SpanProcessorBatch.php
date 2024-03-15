@@ -14,6 +14,9 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<SpanProcessorInterface>
+ */
 final class SpanProcessorBatch implements ComponentProvider
 {
 

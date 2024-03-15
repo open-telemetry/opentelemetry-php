@@ -12,6 +12,9 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Extension\Propagator\Jaeger\JaegerPropagator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<TextMapPropagatorInterface>
+ */
 #[PackageDependency('open-telemetry/extension-propagator-jaeger', '^0.0.2')]
 final class TextMapPropagatorJaeger implements ComponentProvider
 {

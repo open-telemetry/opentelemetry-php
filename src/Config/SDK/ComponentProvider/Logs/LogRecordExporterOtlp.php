@@ -17,6 +17,9 @@ use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<LogRecordExporterInterface>
+ */
 #[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
 final class LogRecordExporterOtlp implements ComponentProvider
 {

@@ -13,6 +13,9 @@ use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<LogRecordProcessorInterface>
+ */
 final class LogRecordProcessorSimple implements ComponentProvider
 {
 

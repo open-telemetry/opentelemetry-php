@@ -31,6 +31,9 @@ final class Configuration
         return $this->sdkPlugin->create($context);
     }
 
+    /**
+     * @param string|list<string> $file
+     */
     public static function parseFile(
         string|array $file,
         ?string $cacheFile = null,

@@ -43,6 +43,8 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
  * @internal
+ *
+ * @implements ComponentProvider<SdkBuilder>
  */
 final class OpenTelemetrySdk implements ComponentProvider
 {
@@ -82,7 +84,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             },
      *             selector: array{
      *                 instrument_type: 'counter'|'histogram'|'observable_counter'|'observable_gauge'|'observable_up_down_counter'|'up_down_counter'|null,
-     *                 instrument_name: ?string,
+     *                 instrument_name: ?non-empty-string,
      *                 unit: ?string,
      *                 meter_name: ?string,
      *                 meter_version: ?string,
@@ -359,7 +361,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                                         ])
                                         ->defaultNull()
                                     ->end()
-                                    ->scalarNode('instrument_name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                                    ->scalarNode('instrument_name')->defaultNull()->validate()->always(Validation::ensureString())->end()->cannotBeEmpty()->end()
                                     ->scalarNode('unit')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->scalarNode('meter_name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->scalarNode('meter_version')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()

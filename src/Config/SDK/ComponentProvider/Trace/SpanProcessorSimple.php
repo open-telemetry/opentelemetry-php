@@ -13,6 +13,9 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
+/**
+ * @implements ComponentProvider<SpanProcessorInterface>
+ */
 final class SpanProcessorSimple implements ComponentProvider
 {
 

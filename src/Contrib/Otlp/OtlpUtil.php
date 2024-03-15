@@ -50,7 +50,7 @@ class OtlpUtil
                 Signals::TRACE => '/v1/traces',
                 Signals::METRICS => '/v1/metrics',
                 Signals::LOGS => '/v1/logs',
-            }
+            },
         };
     }
 
