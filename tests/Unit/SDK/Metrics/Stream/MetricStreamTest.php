@@ -295,8 +295,6 @@ final class MetricStreamTest extends TestCase
             $s->register(Temporality::DELTA);
         }
 
-        //$this->expectException(Exception::class);
-        //$this->expectExceptionMessageMatches('/^GMP extension required to register over \d++ readers$/');
         $r = $s->register(Temporality::DELTA);
         $this->assertSame(PHP_INT_SIZE << 3, $r);
     }

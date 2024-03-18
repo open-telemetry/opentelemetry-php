@@ -56,7 +56,7 @@ class InMemoryExporterTest extends TestCase
         $spans = [];
 
         for ($x = 0; $x < 3; $x++) {
-            $spans[] = Mockery::mock(SpanDataInterface::class);// $this->createMock(SpanDataInterface::class);
+            $spans[] = Mockery::mock(SpanDataInterface::class);
 
             yield $x => [$spans];
         }
