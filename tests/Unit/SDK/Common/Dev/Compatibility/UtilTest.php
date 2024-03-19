@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Dev\Compatibility;
 
+use Exception;
 use Generator;
 use OpenTelemetry\SDK\Common\Dev\Compatibility\Util;
-use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,9 +14,17 @@ use PHPUnit\Framework\TestCase;
  */
 class UtilTest extends TestCase
 {
+    public function setUp(): void
+    {
+        set_error_handler(static function (int $errno, string $errstr): never {
+            throw new Exception($errstr, $errno);
+        }, E_USER_WARNING|E_USER_NOTICE|E_USER_ERROR|E_USER_DEPRECATED);
+    }
+
     public function tearDown(): void
     {
         Util::setErrorLevel();
+        restore_error_handler();
     }
 
     /**
@@ -46,7 +54,7 @@ class UtilTest extends TestCase
     {
         Util::setErrorLevel($level);
 
-        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectException(Exception::class);
 
         Util::triggerClassDeprecationNotice(Util::class, self::class);
     }
@@ -58,7 +66,7 @@ class UtilTest extends TestCase
     {
         Util::setErrorLevel($level);
 
-        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectException(Exception::class);
 
         Util::triggerMethodDeprecationNotice(Util::class, __METHOD__);
     }
@@ -70,7 +78,7 @@ class UtilTest extends TestCase
     {
         Util::setErrorLevel($level);
 
-        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectException(Exception::class);
 
         Util::triggerMethodDeprecationNotice(Util::class, 'foo', self::class);
     }

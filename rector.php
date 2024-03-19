@@ -9,6 +9,7 @@ use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
 use Rector\Php81\Rector\ClassMethod\NewInInitializerRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
+use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\ValueObject\PhpVersion;
 use Rector\Set\ValueObject\SetList;
@@ -18,11 +19,13 @@ return static function (RectorConfig $rectorConfig): void {
 
     $rectorConfig->paths([
         __DIR__ . '/src',
+        __DIR__ . '/tests',
     ]);
 
     $rectorConfig->sets([
         SetList::PHP_81,
         SetList::CODE_QUALITY,
+        PHPUnitSetList::PHPUNIT_100,
     ]);
     $rectorConfig->skip([
         CallableThisArrayToAnonymousFunctionRector::class => [

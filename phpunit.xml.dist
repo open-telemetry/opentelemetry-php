@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
     backupGlobals="true"
-    backupStaticAttributes="false"
     bootstrap="./tests/bootstrap.php"
     cacheResult="false"
     colors="false"
-    convertErrorsToExceptions="true"
-    convertWarningsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertDeprecationsToExceptions="true"
-    forceCoversAnnotation="true"
     processIsolation="false"
     stopOnError="false"
     stopOnFailure="false"
@@ -22,34 +15,33 @@
     timeoutForSmallTests="1"
     timeoutForMediumTests="10"
     timeoutForLargeTests="60"
-    verbose="true">
-
-    <coverage processUncoveredFiles="true">
-        <include>
-            <directory>src</directory>
-        </include>
-        <exclude>
-            <directory suffix=".php">src/SDK/Common/Dev/Compatibility/BC</directory>
-        </exclude>
-    </coverage>
-
+    cacheDirectory=".phpunit.cache"
+    backupStaticProperties="false"
+    requireCoverageMetadata="true">
     <php>
-        <ini name="date.timezone" value="UTC" />
-        <ini name="display_errors" value="On" />
-        <ini name="display_startup_errors" value="On" />
-        <ini name="error_reporting" value="E_ALL" />
-        <ini name="assert.active" value="True" />
-        <ini name="assert.exception" value="True" />
-        <env name="OTEL_PHP_FIBERS_ENABLED" value="true" />
+        <ini name="date.timezone" value="UTC"/>
+        <ini name="display_errors" value="On"/>
+        <ini name="display_startup_errors" value="On"/>
+        <ini name="error_reporting" value="E_ALL"/>
+        <ini name="assert.active" value="True"/>
+        <ini name="assert.exception" value="True"/>
+        <env name="OTEL_PHP_FIBERS_ENABLED" value="true"/>
     </php>
-
     <testsuites>
         <testsuite name="unit">
             <directory>./tests/Unit</directory>
         </testsuite>
         <testsuite name="integration">
             <directory>./tests/Integration</directory>
-            <directory phpVersion="8.1.0" suffix=".phpt">./tests/Integration/Context/Fiber</directory>
+            <directory suffix=".phpt">./tests/Integration/Context/Fiber</directory>
         </testsuite>
     </testsuites>
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">src/SDK/Common/Dev/Compatibility/BC</directory>
+        </exclude>
+      </source>
 </phpunit>

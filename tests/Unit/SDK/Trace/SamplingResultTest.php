@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
+use Mockery;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
@@ -27,12 +28,12 @@ class SamplingResultTest extends TestCase
     /**
      * Provide different sets of data to test SamplingResult constructor and getters
      */
-    public function provideAttributesAndLinks(): array
+    public static function provideAttributesAndLinks(): array
     {
         return [
             [
                 ['foo' => 'bar'],
-                $this->createMock(TraceStateInterface::class),
+                Mockery::mock(TraceStateInterface::class),
             ],
             [
                 [],

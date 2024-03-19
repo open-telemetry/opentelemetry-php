@@ -102,7 +102,7 @@ class EnvironmentResolverTest extends TestCase
         );
     }
 
-    public function rawValueProvider(): array
+    public static function rawValueProvider(): array
     {
         return self::RAW_VALUES;
     }

@@ -202,6 +202,9 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame('00000000000000000000000000000001', bin2hex($row['remoteEndpoint']['ipv6'])); //Couldn't figure out how to do a direct assertion against binary data
     }
 
+    /**
+     * @psalm-suppress UndefinedInterfaceMethod,PossiblyInvalidArrayAccess
+     */
     public function test_tags_are_coerced_correctly_to_strings(): void
     {
         $listOfStrings = ['string-1', 'string-2'];

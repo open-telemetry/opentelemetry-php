@@ -65,7 +65,7 @@ class StatusDataTest extends TestCase
         $this->assertSame($code, $status->getCode());
     }
 
-    public function getStatuses(): array
+    public static function getStatuses(): array
     {
         return [
             [StatusCode::STATUS_ERROR],

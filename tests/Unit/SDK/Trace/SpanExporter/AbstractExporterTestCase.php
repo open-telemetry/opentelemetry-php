@@ -18,7 +18,7 @@ use Psr\Log\NullLogger;
 /**
  * @psalm-suppress UndefinedInterfaceMethod
  */
-abstract class AbstractExporterTest extends MockeryTestCase
+abstract class AbstractExporterTestCase extends MockeryTestCase
 {
     protected TransportInterface $transport;
     protected FutureInterface $future;

@@ -89,22 +89,23 @@ class Registry
         self::$metricExporterFactories[$exporter] = $factory;
     }
 
-    public static function registerLogRecordExporterFactory(string $exporter, $factory, bool $clobber = false): void
+    /**
+     * @param LogRecordExporterFactoryInterface|class-string<LogRecordExporterFactoryInterface> $factory
+     * @throws TypeError
+     */
+    public static function registerLogRecordExporterFactory(string $exporter, LogRecordExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
         if (!$clobber && array_key_exists($exporter, self::$logRecordExporterFactories)) {
             return;
         }
         if (!is_subclass_of($factory, LogRecordExporterFactoryInterface::class)) {
-            trigger_error(
+            throw new TypeError(
                 sprintf(
                     'Cannot register LogRecord exporter factory: %s must exist and implement %s',
                     is_string($factory) ? $factory : $factory::class,
                     LogRecordExporterFactoryInterface::class
-                ),
-                E_USER_WARNING
+                )
             );
-
-            return;
         }
         self::$logRecordExporterFactories[$exporter] = $factory;
     }

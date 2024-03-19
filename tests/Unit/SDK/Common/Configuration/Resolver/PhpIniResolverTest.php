@@ -44,7 +44,7 @@ class PhpIniResolverTest extends TestCase
         $this->assertSame($expected, $this->resolver->hasVariable('OTEL_FOO'));
     }
 
-    public function hasVariableProvider(): array
+    public static function hasVariableProvider(): array
     {
         return [
             'string' => ['foo', true],

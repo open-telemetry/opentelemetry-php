@@ -27,7 +27,7 @@ class CloudTraceFormatterTest extends TestCase
         $this->assertEquals($result->getTraceFlags(), $sample, "Given deserialize($header), traceFlags != $sample (result={$result->getTraceFlags()}");
     }
 
-    public function for_test_deserialize() : array
+    public static function for_test_deserialize() : array
     {
         return [
             ['00000000000000000000000000000001/1;o=0', '00000000000000000000000000000001', '0000000000000001', 0],
@@ -44,7 +44,7 @@ class CloudTraceFormatterTest extends TestCase
         $this->assertEquals($result, $header, "Given serialize(header), result != $header (result=$result");
     }
 
-    public function for_test_serialize() : array
+    public static function for_test_serialize() : array
     {
         return [
             [SpanContext::createFromRemoteParent('00000000000000000000000000000001', '0000000000000001', TraceFlags::DEFAULT), '00000000000000000000000000000001/1;o=0'],

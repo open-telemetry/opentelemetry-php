@@ -60,17 +60,17 @@ class RatioParserTest extends TestCase
         RatioParser::parse($value);
     }
 
-    public function ratioValueProvider(): array
+    public static function ratioValueProvider(): array
     {
         return self::RATIO_VALUES;
     }
 
-    public function nonNumericValueProvider(): array
+    public static function nonNumericValueProvider(): array
     {
         return self::NON_NUMERIC_VALUES;
     }
 
-    public function outOfRangeValueProvider(): array
+    public static function outOfRangeValueProvider(): array
     {
         return self::OUT_OF_RANGE_VALUES;
     }

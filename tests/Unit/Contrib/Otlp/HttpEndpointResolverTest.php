@@ -76,7 +76,7 @@ class HttpEndpointResolverTest extends TestCase
             ->resolve('/\/', $signal);
     }
 
-    public function provideEndpoints(): Generator
+    public static function provideEndpoints(): Generator
     {
         foreach (self::DEFAULT_PATHS as $signal => $path) {
             $baseEndpoint = 'http://collector';
@@ -113,14 +113,14 @@ class HttpEndpointResolverTest extends TestCase
         );
     }
 
-    public function provideSignals(): Generator
+    public static function provideSignals(): Generator
     {
         foreach (self::SIGNALS as $signal) {
             yield [$signal];
         }
     }
 
-    public function provideSchemes(): Generator
+    public static function provideSchemes(): Generator
     {
         foreach (self::VALID_SCHEMES as $scheme) {
             yield [$scheme];
