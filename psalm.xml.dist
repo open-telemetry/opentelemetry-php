@@ -23,13 +23,33 @@
     <issueHandlers>
         <UndefinedClass>
             <errorLevel type="suppress">
-              <referencedClass name="GMP" />
+                <referencedClass name="GMP"/>
             </errorLevel>
-          </UndefinedClass>
-          <ArgumentTypeCoercion>
+        </UndefinedClass>
+        <ArgumentTypeCoercion>
             <errorLevel type="suppress">
-              <directory name="./examples" />
+                <directory name="./examples"/>
             </errorLevel>
-          </ArgumentTypeCoercion>
+        </ArgumentTypeCoercion>
+        <UndefinedInterfaceMethod>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/ComponentProvider"/>
+            </errorLevel>
+        </UndefinedInterfaceMethod>
+        <PossiblyNullReference>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/ComponentProvider"/>
+            </errorLevel>
+        </PossiblyNullReference>
+        <MoreSpecificImplementedParamType>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/ComponentProvider"/>
+            </errorLevel>
+        </MoreSpecificImplementedParamType>
+        <InvalidDocblock>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/ComponentProvider"/>
+            </errorLevel>
+        </InvalidDocblock>
     </issueHandlers>
 </psalm>

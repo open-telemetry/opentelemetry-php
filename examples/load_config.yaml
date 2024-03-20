@@ -1,0 +1,44 @@
+file_format: '0.1'
+
+resource:
+  attributes:
+    service.name: opentelemetry-demo
+
+propagators:
+  composite: [ tracecontext, baggage ]
+
+exporters:
+  otlp: &otlp-exporter
+    protocol: http/protobuf
+    endpoint: http://collector:4318
+
+tracer_provider:
+  sampler:
+    parent_based:
+      root:
+        always_on: {}
+  processors:
+    - simple:
+        exporter:
+          console: {}
+    - batch:
+        exporter:
+          otlp: *otlp-exporter
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console: {}
+    - periodic:
+        exporter:
+          otlp:
+            <<: *otlp-exporter
+            temporality_preference: lowmemory
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console: {}
+    - batch:
+        exporter:
+          otlp: *otlp-exporter

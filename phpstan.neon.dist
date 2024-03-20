@@ -33,3 +33,7 @@ parameters:
             message: "#Call to an undefined method .*:expects.*#"
             paths:
                 - tests
+        -
+            message: "#Call to an undefined method Symfony\\\\Component\\\\Config\\\\Definition\\\\Builder\\\\NodeParentInterface::.*#"
+            paths:
+                - src/Config/SDK

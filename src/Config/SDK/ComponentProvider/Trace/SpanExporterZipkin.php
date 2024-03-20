@@ -1,0 +1,51 @@
+<?php
+
+declare(strict_types=1);
+
+namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
+
+use Nevay\OTelSDK\Configuration\ComponentProvider;
+use Nevay\OTelSDK\Configuration\ComponentProviderRegistry;
+use Nevay\OTelSDK\Configuration\Context;
+use Nevay\OTelSDK\Configuration\Validation;
+use Nevay\SPI\ServiceProviderDependency\PackageDependency;
+use OpenTelemetry\Contrib\Zipkin;
+use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+
+/**
+ * @implements ComponentProvider<SpanExporterInterface>
+ */
+#[PackageDependency('open-telemetry/exporter-zipkin', '^1.0')]
+final class SpanExporterZipkin implements ComponentProvider
+{
+
+    /**
+     * @param array{
+     *     endpoint: string,
+     *     timeout: int<0, max>,
+     * } $properties
+     */
+    public function createPlugin(array $properties, Context $context): SpanExporterInterface
+    {
+        return new Zipkin\Exporter(Registry::transportFactory('http')->create(
+            endpoint: $properties['endpoint'],
+            contentType: 'application/json',
+            timeout: $properties['timeout'],
+        ));
+    }
+
+    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    {
+        $node = new ArrayNodeDefinition('zipkin');
+        $node
+            ->children()
+                ->scalarNode('endpoint')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
+                ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+            ->end()
+        ;
+
+        return $node;
+    }
+}

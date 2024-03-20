@@ -1,0 +1,49 @@
+file_format: '0.1'
+
+disabled: ${OTEL_SDK_DISABLED}
+
+resource:
+  attributes:
+    service.name: ${OTEL_SERVICE_NAME}
+
+propagators:
+  composite: [ tracecontext, baggage ]
+
+attribute_limits:
+  attribute_value_length_limit: ${OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT}
+  attribute_count_limit: ${OTEL_ATTRIBUTE_COUNT_LIMIT}
+
+exporters:
+  otlp: &otlp-exporter
+    protocol: ${OTEL_EXPORTER_OTLP_PROTOCOL}
+    endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+    certificate: ${OTEL_EXPORTER_OTLP_CERTIFICATE}
+    client_key: ${OTEL_EXPORTER_OTLP_CLIENT_KEY}
+    client_certificate: ${OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE}
+    compression: ${OTEL_EXPORTER_OTLP_COMPRESSION}
+    timeout: ${OTEL_EXPORTER_OTLP_TIMEOUT}
+
+tracer_provider:
+  sampler:
+    parent_based:
+      root:
+        trace_id_ratio_based:
+          ratio: ${OTEL_TRACES_SAMPLER_ARG}
+  limits:
+    attribute_value_length_limit: ${OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT}
+    attribute_count_limit: ${OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT}
+    event_count_limit: ${OTEL_SPAN_EVENT_COUNT_LIMIT}
+    link_count_limit: ${OTEL_SPAN_LINK_COUNT_LIMIT}
+    event_attribute_count_limit: ${OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT}
+    link_attribute_count_limit: ${OTEL_LINK_ATTRIBUTE_COUNT_LIMIT}
+  processors:
+    - simple:
+        exporter:
+          console: {}
+    - batch:
+        schedule_delay: ${OTEL_BSP_SCHEDULE_DELAY}
+        export_timeout: ${OTEL_BSP_EXPORT_TIMEOUT}
+        max_queue_size: ${OTEL_BSP_MAX_QUEUE_SIZE}
+        max_export_batch_size: ${OTEL_BSP_MAX_EXPORT_BATCH_SIZE}
+        exporter:
+          otlp: *otlp-exporter
