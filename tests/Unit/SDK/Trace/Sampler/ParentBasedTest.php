@@ -7,7 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\Sampler;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\API\Trace\NonRecordingSpan;
+use OpenTelemetry\API\Trace\Noop\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;

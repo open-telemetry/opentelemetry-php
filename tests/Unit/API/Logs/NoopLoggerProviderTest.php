@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Logs;
 
-use OpenTelemetry\API\Logs\NoopLogger;
-use OpenTelemetry\API\Logs\NoopLoggerProvider;
+use OpenTelemetry\API\Logs\Noop\NoopLogger;
+use OpenTelemetry\API\Logs\Noop\NoopLoggerProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\API\Logs\NoopLoggerProvider
+ * @covers \OpenTelemetry\API\Logs\Noop\NoopLoggerProvider
  */
 class NoopLoggerProviderTest extends TestCase
 {

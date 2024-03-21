@@ -27,7 +27,7 @@ class Tracer implements API\TracerInterface
         }
 
         if ($this->tracerSharedState->hasShutdown()) {
-            return new API\NoopSpanBuilder(Context::storage());
+            return new API\Noop\NoopSpanBuilder(Context::storage());
         }
 
         return new SpanBuilder(

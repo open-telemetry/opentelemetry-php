@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Trace;
 use OpenTelemetry\API;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 
-class NoopTracerProvider extends API\Trace\NoopTracerProvider implements TracerProviderInterface
+class NoopTracerProvider extends API\Trace\Noop\NoopTracerProvider implements TracerProviderInterface
 {
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {

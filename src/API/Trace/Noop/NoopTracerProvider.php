@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Trace;
+namespace OpenTelemetry\API\Trace\Noop;
+
+use OpenTelemetry\API\Trace\TracerInterface;
+use OpenTelemetry\API\Trace\TracerProviderInterface;
 
 class NoopTracerProvider implements TracerProviderInterface
 {

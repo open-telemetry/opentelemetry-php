@@ -8,18 +8,18 @@ use OpenTelemetry\API\Trace as API;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\API\Trace\NonRecordingSpan
+ * @covers \OpenTelemetry\API\Trace\Noop\NonRecordingSpan
  */
 class NonRecordingSpanTest extends TestCase
 {
     public function test_is_not_recording(): void
     {
-        $this->assertFalse(API\NonRecordingSpan::getInvalid()->isRecording());
+        $this->assertFalse(API\Noop\NonRecordingSpan::getInvalid()->isRecording());
     }
 
     public function test_has_invalid_context_and_default_span_options(): void
     {
-        $context = API\NonRecordingSpan::getInvalid()->getContext();
+        $context = API\Noop\NonRecordingSpan::getInvalid()->getContext();
         $this->assertSame(API\TraceFlags::DEFAULT, $context->getTraceFlags());
         $this->assertNull($context->getTraceState());
     }

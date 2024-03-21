@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Trace;
 
-use OpenTelemetry\API\Trace\NonRecordingSpan;
-use OpenTelemetry\API\Trace\NoopSpanBuilder;
+use OpenTelemetry\API\Trace\Noop\NonRecordingSpan;
+use OpenTelemetry\API\Trace\Noop\NoopSpanBuilder;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
@@ -15,7 +15,7 @@ use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\API\Trace\NoopSpanBuilder
+ * @covers \OpenTelemetry\API\Trace\Noop\NoopSpanBuilder
  */
 class NoopSpanBuilderTest extends TestCase
 {

@@ -12,7 +12,7 @@ use Mockery\MockInterface;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\API\Trace\NonRecordingSpan;
+use OpenTelemetry\API\Trace\Noop\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\API\Trace\StatusCode;

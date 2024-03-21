@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Integration\SDK;
 
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\API\Trace\NonRecordingSpan;
+use OpenTelemetry\API\Trace\Noop\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;

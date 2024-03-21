@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Integration\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Trace as API;
-use OpenTelemetry\API\Trace\NonRecordingSpan;
+use OpenTelemetry\API\Trace\Noop\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\Context\Context;
@@ -107,7 +107,7 @@ class TracerTest extends TestCase
         $tracer = $tracerProvider->getTracer('foo');
         $this->assertInstanceOf(SpanBuilder::class, $tracer->spanBuilder('bar'));
         $tracerProvider->shutdown();
-        $this->assertInstanceOf(API\NoopSpanBuilder::class, $tracer->spanBuilder('baz'));
+        $this->assertInstanceOf(API\Noop\NoopSpanBuilder::class, $tracer->spanBuilder('baz'));
     }
 
     public function test_factory_returns_noop_tracer_when_sdk_disabled(): void
@@ -115,7 +115,7 @@ class TracerTest extends TestCase
         self::setEnvironmentVariable(Variables::OTEL_SDK_DISABLED, 'true');
         $tracerProvider = (new TracerProviderFactory())->create();
         $tracer = $tracerProvider->getTracer('foo');
-        $this->assertInstanceOf(API\NoopTracer::class, $tracer);
+        $this->assertInstanceOf(API\Noop\NoopTracer::class, $tracer);
     }
 
     public function test_general_identity_attributes_are_dropped_by_default(): void

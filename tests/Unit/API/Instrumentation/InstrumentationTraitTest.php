@@ -9,7 +9,7 @@ use OpenTelemetry\API\Instrumentation\InstrumentationTrait;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
-use OpenTelemetry\API\Trace\NoopTracer;
+use OpenTelemetry\API\Trace\Noop\NoopTracer;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;

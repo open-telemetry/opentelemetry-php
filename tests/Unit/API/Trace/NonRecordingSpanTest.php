@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\API\Unit\Trace;
 
 use Exception;
-use OpenTelemetry\API\Trace\NonRecordingSpan;
+use OpenTelemetry\API\Trace\Noop\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\API\Trace\NonRecordingSpan
+ * @covers \OpenTelemetry\API\Trace\Noop\NonRecordingSpan
  */
 class NonRecordingSpanTest extends TestCase
 {

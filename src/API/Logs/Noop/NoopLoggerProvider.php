@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Logs;
+namespace OpenTelemetry\API\Logs\Noop;
+
+use OpenTelemetry\API\Logs\LoggerInterface;
+use OpenTelemetry\API\Logs\LoggerProviderInterface;
 
 class NoopLoggerProvider implements LoggerProviderInterface
 {
