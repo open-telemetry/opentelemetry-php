@@ -59,7 +59,7 @@ class HostTest extends TestCase
         $etc = [
             'etc' => [
               'machine-id' => '1234567890',
-            ]
+            ],
         ];
         $varLibDbus = [
             'var' => [
