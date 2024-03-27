@@ -15,6 +15,8 @@ use function php_uname;
  */
 final class Host implements ResourceDetectorInterface
 {
+    private const PATH_ETC_MACHINEID = 'etc/machine-id';
+    private const PATH_VAR_LIB_DBUS_MACHINEID = 'var/lib/dbus/machine-id';
     private readonly string $dir;
 
     public function __construct(string $dir = '/')
@@ -65,7 +67,7 @@ final class Host implements ResourceDetectorInterface
 
     private function getLinuxId(): string
     {
-        $paths = ['etc/machine-id', 'var/lib/dbus/machine-id'];
+        $paths = [self::PATH_ETC_MACHINEID, self::PATH_VAR_LIB_DBUS_MACHINEID];
 
         foreach ($paths as $path) {
             if (file_exists($this->dir . $path)) {
