@@ -44,10 +44,10 @@ class HostTest extends TestCase
     /**
      * @dataProvider hostIdData
      */
-    public function test_host_id_linux(array $files, string $expectedId): void
+    public function test_host_id_filesystem(string $os, array $files, string $expectedId): void
     {
         $root = vfsStream::setup('/', null, $files);
-        $resouceDetector = new Detectors\Host($root->url());
+        $resouceDetector = new Detectors\Host($root->url(), $os);
         $resource = $resouceDetector->getResource();
         $hostId = $resource->getAttributes()->get(ResourceAttributes::HOST_ID);
         $this->assertIsString($hostId);
@@ -56,7 +56,7 @@ class HostTest extends TestCase
 
     public static function hostIdData(): array
     {
-        $etc = [
+        $etc_machineid = [
             'etc' => [
               'machine-id' => '1234567890',
             ],
@@ -70,12 +70,19 @@ class HostTest extends TestCase
                 ],
             ],
         ];
+        $etc_hostid = [
+            'etc' => [
+              'hostid' => '1234567890',
+            ],
+        ];
 
         return [
-            [[], ''],
-            [$etc, '1234567890'],
-            [array_merge($etc, $varLibDbus), '1234567890'],
-            [$varLibDbus, '0987654321'],
+            ['Linux', [], ''],
+            ['Linux', $etc_machineid, '1234567890'],
+            ['Linux', array_merge($etc_machineid, $varLibDbus), '1234567890'],
+            ['Linux', $etc_machineid, '1234567890'],
+            ['OpenBSD', [], ''],
+            ['OpenBSD', $etc_hostid, '1234567890'],
         ];
     }
 }

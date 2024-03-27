@@ -17,11 +17,14 @@ final class Host implements ResourceDetectorInterface
 {
     private const PATH_ETC_MACHINEID = 'etc/machine-id';
     private const PATH_VAR_LIB_DBUS_MACHINEID = 'var/lib/dbus/machine-id';
+    private const PATH_ETC_HOSTID = 'etc/hostid';
     private readonly string $dir;
+    private readonly string $os;
 
-    public function __construct(string $dir = '/')
+    public function __construct(string $dir = '/', string $os = PHP_OS_FAMILY)
     {
         $this->dir = $dir;
+        $this->os = $os;
     }
 
     public function getResource(): ResourceInfo
@@ -37,7 +40,7 @@ final class Host implements ResourceDetectorInterface
 
     private function getMachineId()
     {
-        switch (strtolower(PHP_OS_FAMILY)) {
+        switch (strtolower($this->os)) {
             case 'linux':
                 {
                     return $this->getLinuxId();
@@ -80,8 +83,8 @@ final class Host implements ResourceDetectorInterface
 
     private function getBsdId(): string
     {
-        if (file_exists('/etc/hostid')) {
-            return trim(file_get_contents('/etc/hostid'));
+        if (file_exists($this->dir . self::PATH_ETC_HOSTID)) {
+            return trim(file_get_contents($this->dir . self::PATH_ETC_HOSTID));
         }
 
         $out = exec('kenv -q smbios.system.uuid');
