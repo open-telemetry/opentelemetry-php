@@ -22,17 +22,22 @@ class HostTest extends TestCase
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
-        $this->assertTrue($resource->getAttributes()->has(ResourceAttributes::HOST_ID));
     }
 
     /**
      * @dataProvider hostIdData
      */
-    public function test_host_id_filesystem(string $os, array $files, string $expectedId): void
+    public function test_host_id_filesystem(string $os, array $files, ?string $expectedId): void
     {
         $root = vfsStream::setup('/', null, $files);
         $resouceDetector = new Detectors\Host($root->url(), $os);
         $resource = $resouceDetector->getResource();
+        
+        if ($expectedId === null) {
+            $this->assertFalse($resource->getAttributes()->has(ResourceAttributes::HOST_ID));
+            return;
+        }
+
         $hostId = $resource->getAttributes()->get(ResourceAttributes::HOST_ID);
         $this->assertIsString($hostId);
         $this->assertSame($expectedId, $hostId);
@@ -61,12 +66,12 @@ class HostTest extends TestCase
         ];
 
         return [
-            ['Linux', [], ''],
+            ['Linux', [], null],
             ['Linux', $etc_machineid, '1234567890'],
             ['Linux', array_merge($etc_machineid, $varLibDbus), '1234567890'],
             ['Linux', $etc_machineid, '1234567890'],
-            ['OpenBSD', [], ''],
-            ['OpenBSD', $etc_hostid, '1234567890'],
+            ['BSD', [], null],
+            ['BSD', $etc_hostid, '1234567890'],
         ];
     }
 }
