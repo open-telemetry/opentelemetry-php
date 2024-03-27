@@ -57,9 +57,7 @@ final class Host implements ResourceDetectorInterface
                 }
             case 'Windows':
                 {
-                    $out = $this->getWindowsId();
-
-                    return self::parseWindowsId($out);
+                    return $this->getWindowsId();
                 }
         }
 
@@ -129,12 +127,5 @@ final class Host implements ResourceDetectorInterface
         }
 
         return null;
-    }
-
-    public static function parseWindowsId(string $out): string
-    {
-        $parts = explode('REG_SZ', $out);
-
-        return trim($parts[1]);
     }
 }

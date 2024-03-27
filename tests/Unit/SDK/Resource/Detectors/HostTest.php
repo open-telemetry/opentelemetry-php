@@ -62,14 +62,6 @@ END;
         $this->assertSame('1AB2345C-03E4-57D4-A375-1234D48DE123', $hostId);
     }
 
-    public function test_host_parse_windows_id(): void
-    {
-        $out = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography\MachineGuid    REG_SZ    1234567890';
-        $hostId = Detectors\Host::parseWindowsId($out);
-        $this->assertIsString($hostId);
-        $this->assertSame('1234567890', $hostId);
-    }
-
     /**
      * @dataProvider hostIdData
      */
