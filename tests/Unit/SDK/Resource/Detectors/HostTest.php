@@ -32,9 +32,10 @@ class HostTest extends TestCase
         $root = vfsStream::setup('/', null, $files);
         $resouceDetector = new Detectors\Host($root->url(), $os);
         $resource = $resouceDetector->getResource();
-        
+
         if ($expectedId === null) {
             $this->assertFalse($resource->getAttributes()->has(ResourceAttributes::HOST_ID));
+
             return;
         }
 
