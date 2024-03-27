@@ -38,7 +38,7 @@ final class Host implements ResourceDetectorInterface
         return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
     }
 
-    private function getMachineId()
+    private function getMachineId(): ?string
     {
         switch ($this->os) {
             case 'Linux':
@@ -62,7 +62,7 @@ final class Host implements ResourceDetectorInterface
         return null;
     }
 
-    private function getLinuxId(): string
+    private function getLinuxId(): ?string
     {
         $paths = [self::PATH_ETC_MACHINEID, self::PATH_VAR_LIB_DBUS_MACHINEID];
 
@@ -75,7 +75,7 @@ final class Host implements ResourceDetectorInterface
         return null;
     }
 
-    private function getBsdId(): string
+    private function getBsdId(): ?string
     {
         if (file_exists($this->dir . self::PATH_ETC_HOSTID)) {
             return trim(file_get_contents($this->dir . self::PATH_ETC_HOSTID));
@@ -90,7 +90,7 @@ final class Host implements ResourceDetectorInterface
         return null;
     }
 
-    private function getMacOsId(): string
+    private function getMacOsId(): ?string
     {
         $out = exec('ioreg -rd1 -c IOPlatformExpertDevice | awk \'/IOPlatformUUID/ { split($0, line, "\""); printf("%s\n", line[4]); }\'');
 
@@ -101,7 +101,7 @@ final class Host implements ResourceDetectorInterface
         return null;
     }
 
-    private function getWindowsId(): string
+    private function getWindowsId(): ?string
     {
         $out = exec('powershell.exe -Command "Get-ItemPropertyValue -Path HKLM:\SOFTWARE\Microsoft\Cryptography -Name MachineGuid"');
 
