@@ -51,12 +51,12 @@ final class Host implements ResourceDetectorInterface
             case 'darwin':
             {
                 $out = $this->getMacOsId();
-                return Host::parseMacOsId($out);
+                return self::parseMacOsId($out);
             }
             case 'windows':
             {
                 $out = $this->getWindowsId();
-                return Host::parseWindowsId($out);
+                return self::parseWindowsId($out);
             }
         }
 
@@ -125,7 +125,7 @@ final class Host implements ResourceDetectorInterface
 
         foreach ($lines as $line)
         {
-            if (strpos($line, 'IOPlatformUUID') !== FALSE)
+            if (str_contains($line, 'IOPlatformUUID') !== FALSE)
             {
                 $parts = explode('=', $line);
                 return trim($parts[1]);
