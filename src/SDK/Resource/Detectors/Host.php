@@ -117,7 +117,7 @@ final class Host implements ResourceDetectorInterface
 
     public static function parseMacOsId(string $out): string
     {
-        $lines = explode("\n", $out);
+        $lines = explode(PHP_EOL, $out);
 
         foreach ($lines as $line) {
             if (str_contains($line, 'IOPlatformUUID')) {
