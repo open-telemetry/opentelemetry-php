@@ -40,24 +40,22 @@ final class Host implements ResourceDetectorInterface
 
     private function getMachineId()
     {
-        switch (strtolower($this->os)) {
-            case 'linux':
+        switch ($this->os) {
+            case 'Linux':
                 {
                     return $this->getLinuxId();
                 }
-            case 'freebsd':
-            case 'netbsd':
-            case 'openbsd':
+            case 'BSD':
                 {
                     return $this->getBsdId();
                 }
-            case 'darwin':
+            case 'Darwin':
                 {
                     $out = $this->getMacOsId();
 
                     return self::parseMacOsId($out);
                 }
-            case 'windows':
+            case 'Windows':
                 {
                     $out = $this->getWindowsId();
 
