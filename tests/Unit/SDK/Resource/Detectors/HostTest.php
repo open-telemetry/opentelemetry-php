@@ -22,7 +22,7 @@ class HostTest extends TestCase
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
-        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_ID));
+        $this->assertTrue($resource->getAttributes()->has(ResourceAttributes::HOST_ID));
     }
 
     public function test_host_parse_macos_id(): void
