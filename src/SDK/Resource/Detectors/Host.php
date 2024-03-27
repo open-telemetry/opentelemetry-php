@@ -51,9 +51,7 @@ final class Host implements ResourceDetectorInterface
                 }
             case 'Darwin':
                 {
-                    $out = $this->getMacOsId();
-
-                    return self::parseMacOsId($out);
+                    return $this->getMacOsId();
                 }
             case 'Windows':
                 {
@@ -94,7 +92,7 @@ final class Host implements ResourceDetectorInterface
 
     private function getMacOsId(): string
     {
-        $out = exec('ioreg -rd1 -c "IOPlatformExpertDevice"');
+        $out = exec('ioreg -rd1 -c IOPlatformExpertDevice | awk \'/IOPlatformUUID/ { split($0, line, "\""); printf("%s\n", line[4]); }\'');
 
         if ($out != false) {
             return $out;
@@ -109,21 +107,6 @@ final class Host implements ResourceDetectorInterface
 
         if ($out != false) {
             return $out;
-        }
-
-        return null;
-    }
-
-    public static function parseMacOsId(string $out): string
-    {
-        $lines = explode(PHP_EOL, $out);
-
-        foreach ($lines as $line) {
-            if (str_contains($line, 'IOPlatformUUID')) {
-                $parts = explode('=', $line);
-
-                return trim(str_replace('"', '', $parts[1]));
-            }
         }
 
         return null;
