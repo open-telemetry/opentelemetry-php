@@ -8,7 +8,6 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
-use MachineIdSource;
 use function php_uname;
 
 /**
@@ -16,7 +15,7 @@ use function php_uname;
  */
 final class Host implements ResourceDetectorInterface
 {
-    private string $dir;
+    private readonly string $dir;
 
     public function __construct(string $dir = '/')
     {
@@ -36,28 +35,29 @@ final class Host implements ResourceDetectorInterface
 
     private function getMachineId()
     {
-        switch (strtolower(PHP_OS_FAMILY))
-        {
+        switch (strtolower(PHP_OS_FAMILY)) {
             case 'linux':
-            {
-                return $this->getLinuxId();
-            }
+                {
+                    return $this->getLinuxId();
+                }
             case 'freebsd':
             case 'netbsd':
             case 'openbsd':
-            {
-                return $this->getBsdId();
-            }
+                {
+                    return $this->getBsdId();
+                }
             case 'darwin':
-            {
-                $out = $this->getMacOsId();
-                return self::parseMacOsId($out);
-            }
+                {
+                    $out = $this->getMacOsId();
+
+                    return self::parseMacOsId($out);
+                }
             case 'windows':
-            {
-                $out = $this->getWindowsId();
-                return self::parseWindowsId($out);
-            }
+                {
+                    $out = $this->getWindowsId();
+
+                    return self::parseWindowsId($out);
+                }
         }
 
         return '';
@@ -67,10 +67,8 @@ final class Host implements ResourceDetectorInterface
     {
         $paths = ['etc/machine-id', 'var/lib/dbus/machine-id'];
 
-        foreach ($paths as $path)
-        {
-            if (file_exists($this->dir . $path))
-            {
+        foreach ($paths as $path) {
+            if (file_exists($this->dir . $path)) {
                 return trim(file_get_contents($this->dir . $path));
             }
         }
@@ -80,15 +78,13 @@ final class Host implements ResourceDetectorInterface
 
     private function getBsdId(): string
     {
-        if (file_exists('/etc/hostid'))
-        {
+        if (file_exists('/etc/hostid')) {
             return trim(file_get_contents('/etc/hostid'));
         }
 
         $out = exec('kenv -q smbios.system.uuid');
 
-        if ($out != FALSE)
-        {
+        if ($out != false) {
             return $out;
         }
 
@@ -99,8 +95,7 @@ final class Host implements ResourceDetectorInterface
     {
         $out = exec('ioreg -rd1 -c "IOPlatformExpertDevice"');
 
-        if ($out != FALSE)
-        {
+        if ($out != false) {
             return $out;
         }
 
@@ -111,8 +106,7 @@ final class Host implements ResourceDetectorInterface
     {
         $out = exec('%windir%\System32\REG.exe QUERY HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography /v MachineGuid');
 
-        if ($out != FALSE)
-        {
+        if ($out != false) {
             return $out;
         }
 
@@ -123,11 +117,10 @@ final class Host implements ResourceDetectorInterface
     {
         $lines = explode("\n", $out);
 
-        foreach ($lines as $line)
-        {
-            if (str_contains($line, 'IOPlatformUUID') !== FALSE)
-            {
+        foreach ($lines as $line) {
+            if (str_contains($line, 'IOPlatformUUID')) {
                 $parts = explode('=', $line);
+
                 return trim($parts[1]);
             }
         }
@@ -138,6 +131,7 @@ final class Host implements ResourceDetectorInterface
     public static function parseWindowsId(string $out): string
     {
         $parts = explode('REG_SZ', $out);
+
         return trim($parts[1]);
     }
 }
