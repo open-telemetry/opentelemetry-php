@@ -109,7 +109,7 @@ final class Host implements ResourceDetectorInterface
 
     private function getWindowsId(): string
     {
-        $out = exec('%windir%\System32\REG.exe QUERY HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography /v MachineGuid');
+        $out = exec('powershell.exe -Command "Get-ItemPropertyValue -Path HKLM:\SOFTWARE\Microsoft\Cryptography -Name MachineGuid"');
 
         if ($out != false) {
             return $out;
