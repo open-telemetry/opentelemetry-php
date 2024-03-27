@@ -56,7 +56,7 @@ class HostTest extends TestCase
           "#size-cells" = <02000000>
           "IOPlatformUUID" = "1AB2345C-03E4-57D4-A375-1234D48DE123"
         }
-END;    
+END;
         $hostId = Detectors\Host::parseMacOsId($out);
         $this->assertIsString($hostId);
         $this->assertSame('1AB2345C-03E4-57D4-A375-1234D48DE123', $hostId);
@@ -87,7 +87,7 @@ END;
     {
         $etc_machineid = [
             'etc' => [
-              'machine-id' => '1234567890',
+                'machine-id' => '1234567890',
             ],
         ];
         $varLibDbus = [
@@ -101,7 +101,7 @@ END;
         ];
         $etc_hostid = [
             'etc' => [
-              'hostid' => '1234567890',
+                'hostid' => '1234567890',
             ],
         ];
 
