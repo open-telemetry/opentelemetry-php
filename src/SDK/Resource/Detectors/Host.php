@@ -63,7 +63,7 @@ final class Host implements ResourceDetectorInterface
                 }
         }
 
-        return '';
+        return null;
     }
 
     private function getLinuxId(): string
@@ -76,7 +76,7 @@ final class Host implements ResourceDetectorInterface
             }
         }
 
-        return '';
+        return null;
     }
 
     private function getBsdId(): string
@@ -91,7 +91,7 @@ final class Host implements ResourceDetectorInterface
             return $out;
         }
 
-        return '';
+        return null;
     }
 
     private function getMacOsId(): string
@@ -102,7 +102,7 @@ final class Host implements ResourceDetectorInterface
             return $out;
         }
 
-        return '';
+        return null;
     }
 
     private function getWindowsId(): string
@@ -113,7 +113,7 @@ final class Host implements ResourceDetectorInterface
             return $out;
         }
 
-        return '';
+        return null;
     }
 
     public static function parseMacOsId(string $out): string
@@ -128,7 +128,7 @@ final class Host implements ResourceDetectorInterface
             }
         }
 
-        return '';
+        return null;
     }
 
     public static function parseWindowsId(string $out): string
