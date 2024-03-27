@@ -126,7 +126,7 @@ final class Host implements ResourceDetectorInterface
             if (str_contains($line, 'IOPlatformUUID')) {
                 $parts = explode('=', $line);
 
-                return trim($parts[1]);
+                return trim(str_replace('"', '', $parts[1]));
             }
         }
 
