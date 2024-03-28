@@ -9,7 +9,6 @@
     "require": {
         "php": "^8.1",
         "google/protobuf": "^3.22",
-        "open-telemetry/sdk-configuration": "@dev",
         "php-http/discovery": "^1.14",
         "psr/http-client-implementation": "^1.0",
         "psr/http-factory-implementation": "^1.0",
@@ -17,14 +16,10 @@
         "psr/http-message": "^1.0.1|^2.0",
         "psr/log": "^1.1|^2.0|^3.0",
         "symfony/polyfill-mbstring": "^1.23",
-        "symfony/polyfill-php82": "^1.26"
+        "symfony/polyfill-php82": "^1.26",
+        "tbachert/otel-sdk-configuration": "^0.1",
+        "tbachert/spi": "^0.2"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "src/Config/SDK"
-        }
-    ],
     "config": {
         "sort-packages": true,
         "allow-plugins": {
@@ -49,6 +44,7 @@
         "open-telemetry/extension-propagator-jaeger": "0.0.2",
         "open-telemetry/gen-otlp-protobuf": "1.0.x-dev",
         "open-telemetry/sdk": "1.0.x-dev",
+        "open-telemetry/sdk-configuration": "0.1.x-dev",
         "open-telemetry/sdk-contrib": "1.0.x-dev",
         "open-telemetry/sem-conv": "1.0.x-dev"
     },
@@ -120,5 +116,37 @@
         "ext-gmp": "To support unlimited number of synchronous metric readers",
         "ext-grpc": "To use the OTLP GRPC Exporter",
         "ext-protobuf": "For more performant protobuf/grpc exporting"
+    },
+    "extra": {
+        "spi": {
+            "Nevay\\OTelSDK\\Configuration\\ComponentProvider": [
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorComposite",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorJaeger",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorTraceContext",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOff",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOn",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerParentBased",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerTraceIdRatioBased",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlp",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterZipkin",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorBatch",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorSimple",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverDefault",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlp",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricReaderPeriodic",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlp",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorBatch",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple"
+            ]
+        }
     }
 }
