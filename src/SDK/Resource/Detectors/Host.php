@@ -18,13 +18,10 @@ final class Host implements ResourceDetectorInterface
     private const PATH_ETC_MACHINEID = 'etc/machine-id';
     private const PATH_VAR_LIB_DBUS_MACHINEID = 'var/lib/dbus/machine-id';
     private const PATH_ETC_HOSTID = 'etc/hostid';
-    private readonly string $dir;
-    private readonly string $os;
-
-    public function __construct(string $dir = '/', string $os = PHP_OS_FAMILY)
-    {
-        $this->dir = $dir;
-        $this->os = $os;
+    public function __construct(
+        private readonly string $dir = '/',
+        private readonly string $os = PHP_OS_FAMILY,
+    ) {
     }
 
     public function getResource(): ResourceInfo
