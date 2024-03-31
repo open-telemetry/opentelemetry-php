@@ -1,24 +1,29 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace API\Trace;
 
-use OpenTelemetry\API\Trace\TraceState;
-use OpenTelemetry\API\Trace\TraceStateInterface;
-use PHPUnit\Framework\TestCase;
 use function array_reverse;
 use function chr;
 use function implode;
+use OpenTelemetry\API\Trace\TraceState;
+use OpenTelemetry\API\Trace\TraceStateInterface;
+use PHPUnit\Framework\TestCase;
 use function range;
 use function str_repeat;
 
 /**
  * @covers \OpenTelemetry\API\Trace\TraceState
  */
-final class TraceStateOTelTest extends TestCase {
+final class TraceStateOTelTest extends TestCase
+{
 
     /**
      * @dataProvider emptyTraceState
      */
-    public function testSetDoesNotModifyOriginalTraceState(TraceStateInterface $traceState): void {
+    public function test_set_does_not_modify_original_trace_state(TraceStateInterface $traceState): void
+    {
         $traceState->with('key', 'value');
 
         $this->assertNull($traceState->get('key'));
@@ -27,7 +32,8 @@ final class TraceStateOTelTest extends TestCase {
     /**
      * @dataProvider emptyTraceState
      */
-    public function testSetReturnsTraceStateWithSetValue(TraceStateInterface $traceState): void {
+    public function test_set_returns_trace_state_with_set_value(TraceStateInterface $traceState): void
+    {
         $traceState = $traceState->with('key', 'value');
 
         $this->assertSame('value', $traceState->get('key'));
@@ -36,7 +42,8 @@ final class TraceStateOTelTest extends TestCase {
     /**
      * @dataProvider emptyTraceState
      */
-    public function testSetReturnsTraceStateWithOverriddenValue(TraceStateInterface $traceState): void {
+    public function test_set_returns_trace_state_with_overridden_value(TraceStateInterface $traceState): void
+    {
         $traceState = $traceState->with('key', 'value');
         $traceState = $traceState->with('key', 'other');
 
@@ -46,7 +53,8 @@ final class TraceStateOTelTest extends TestCase {
     /**
      * @dataProvider emptyTraceState
      */
-    public function testSetIsAddedToBeginningOfTraceState(TraceStateInterface $traceState): void {
+    public function test_set_is_added_to_beginning_of_trace_state(TraceStateInterface $traceState): void
+    {
         $traceState = $traceState->with('key1', 'value1');
         $traceState = $traceState->with('key2', 'value2');
 
@@ -56,7 +64,8 @@ final class TraceStateOTelTest extends TestCase {
     /**
      * @dataProvider emptyTraceState
      */
-    public function testSetIsAddedToBeginningOfTraceStateOnOverriddenValue(TraceStateInterface $traceState): void {
+    public function test_set_is_added_to_beginning_of_trace_state_on_overridden_value(TraceStateInterface $traceState): void
+    {
         $traceState = $traceState->with('key1', 'value1');
         $traceState = $traceState->with('key2', 'value2');
         $traceState = $traceState->with('key1', 'value3');
@@ -67,7 +76,8 @@ final class TraceStateOTelTest extends TestCase {
     /**
      * @dataProvider emptyTraceState
      */
-    public function testSetIsAddedToBeginningOfTraceStateOnOverriddenSameValue(TraceStateInterface $traceState): void {
+    public function test_set_is_added_to_beginning_of_trace_state_on_overridden_same_value(TraceStateInterface $traceState): void
+    {
         $traceState = $traceState->with('key1', 'value1');
         $traceState = $traceState->with('key2', 'value2');
         $traceState = $traceState->with('key1', 'value1');
@@ -78,7 +88,8 @@ final class TraceStateOTelTest extends TestCase {
     /**
      * @dataProvider emptyTraceState
      */
-    public function testDeleteDoesNotModifyOriginalTraceState(TraceStateInterface $traceState): void {
+    public function test_delete_does_not_modify_original_trace_state(TraceStateInterface $traceState): void
+    {
         $traceState = $traceState->with('key', 'value');
         $traceState->without('key');
 
@@ -88,7 +99,8 @@ final class TraceStateOTelTest extends TestCase {
     /**
      * @dataProvider emptyTraceState
      */
-    public function testDeleteReturnsTraceStateWithUnsetValue(TraceStateInterface $traceState): void {
+    public function test_delete_returns_trace_state_with_unset_value(TraceStateInterface $traceState): void
+    {
         $traceState = $traceState->with('key', 'value');
         $traceState = $traceState->without('key');
 
@@ -98,7 +110,8 @@ final class TraceStateOTelTest extends TestCase {
     /**
      * @dataProvider emptyTraceState
      */
-    public function testAllowsOnly32Members(TraceStateInterface $traceState): void {
+    public function test_allows_only32_members(TraceStateInterface $traceState): void
+    {
         for ($i = 0; $i < 33; $i++) {
             $traceState = $traceState->with('key' . $i, 'test');
         }
@@ -109,7 +122,8 @@ final class TraceStateOTelTest extends TestCase {
     /**
      * @dataProvider validKeyValue
      */
-    public function testValidKeyValue(TraceStateInterface $traceState, string $key, string $value): void {
+    public function test_valid_key_value(TraceStateInterface $traceState, string $key, string $value): void
+    {
         $traceState = $traceState->with($key, $value);
 
         $this->assertSame($value, $traceState->get($key));
@@ -118,19 +132,22 @@ final class TraceStateOTelTest extends TestCase {
     /**
      * @dataProvider invalidKeyValue
      */
-    public function testInvalidKeyValue(TraceStateInterface $traceState, string $key, string $value): void {
+    public function test_invalid_key_value(TraceStateInterface $traceState, string $key, string $value): void
+    {
         $traceState = $traceState->with($key, $value);
 
         $this->assertNull($traceState->get($key));
     }
 
-    public static function emptyTraceState(): array {
+    public static function emptyTraceState(): array
+    {
         return [
             [new TraceState()],
         ];
     }
 
-    public static function validKeyValue(): array {
+    public static function validKeyValue(): array
+    {
         return [
             [new TraceState(), 'valid@key', 'value'],
             [new TraceState(), 'valid@key', '0'],
@@ -142,7 +159,8 @@ final class TraceStateOTelTest extends TestCase {
         ];
     }
 
-    public static function invalidKeyValue(): array {
+    public static function invalidKeyValue(): array
+    {
         return [
             [new TraceState(), '', 'value'],
             [new TraceState(), 'invalid.key', 'value'],
@@ -165,9 +183,8 @@ final class TraceStateOTelTest extends TestCase {
     /**
      * @dataProvider toStringConfigurations
      */
-    public function testToString(TraceStateInterface $traceState, array $entries, ?int $limit, string $expected): void {
-        $this->markTestSkipped('Not yet implemented');
-
+    public function test_to_string(TraceStateInterface $traceState, array $entries, ?int $limit, string $expected): void
+    {
         foreach (array_reverse($entries) as $key => $value) {
             $traceState = $traceState->with($key, $value);
         }
@@ -175,7 +192,8 @@ final class TraceStateOTelTest extends TestCase {
         $this->assertSame($expected, $traceState->toString(limit: $limit));
     }
 
-    public static function toStringConfigurations(): array {
+    public static function toStringConfigurations(): array
+    {
         return [
             [new TraceState(), [], null, ''],
             [new TraceState(), ['key' => 'value'], null, 'key=value'],
@@ -196,19 +214,18 @@ final class TraceStateOTelTest extends TestCase {
     /**
      * @dataProvider parseConfigurations
      */
-    public function testParse(string|array $tracestate, ?string $expected): void {
+    public function test_parse(string $tracestate, ?string $expected): void
+    {
         $traceState = new TraceState($tracestate);
         $this->assertSame($expected ?? '', (string) $traceState);
     }
 
-    public static function parseConfigurations(): array {
+    public static function parseConfigurations(): array
+    {
         return [
             ['key=value', 'key=value'],
             ['key=value,key2=value2', 'key=value,key2=value2'],
             ['key=value,key2=value2,key=value3', 'key=value,key2=value2'],
-
-            // [['key=value', 'key2=value2'], 'key=value,key2=value2'],
-            // [['key=value', 'key=value2'], 'key=value'],
 
             ['', ''],
             ['  ', ''],

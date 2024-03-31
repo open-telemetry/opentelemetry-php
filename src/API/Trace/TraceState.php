@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use function count;
 use function end;
 use function explode;
 use function key;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use function prev;
 use function sprintf;
 use function strlen;
@@ -42,6 +42,7 @@ class TraceState implements TraceStateInterface
     {
         if (!self::validateMember($this->traceState, $key, $value)) {
             self::logWarning('Invalid tracestate key/value for: ' . $key);
+
             return $this;
         }
 
@@ -73,13 +74,14 @@ class TraceState implements TraceStateInterface
         return count($this->traceState);
     }
 
-    public function toString(?int $limit = null): string {
+    public function toString(?int $limit = null): string
+    {
         $traceState = $this->traceState;
 
         if ($limit !== null) {
             $length = 0;
             foreach ($traceState as $key => $value) {
-                $length and $length += 1;
+                $length && ($length += 1);
                 $length += strlen($key) + 1 + strlen($value);
             }
             if ($length > $limit) {
@@ -104,7 +106,7 @@ class TraceState implements TraceStateInterface
 
         $s = '';
         foreach ($traceState as $key => $value) {
-            $s and $s .= ',';
+            $s && ($s .= ',');
             $s .= $key;
             $s .= '=';
             $s .= $value;
@@ -130,12 +132,14 @@ class TraceState implements TraceStateInterface
             $member = explode('=', $member, 2);
             if (count($member) !== 2) {
                 self::logWarning(sprintf('Incomplete list member in tracestate "%s"', $rawTracestate));
+
                 return [];
             }
 
             [$key, $value] = $member;
             if (!self::validateMember($traceState, $key, $value)) {
                 self::logWarning(sprintf('Invalid list member "%s=%s" in tracestate "%s"', $key, $value, $rawTracestate));
+
                 return [];
             }
 
@@ -145,15 +149,11 @@ class TraceState implements TraceStateInterface
         return $traceState;
     }
 
-    private static function validateMember(array $traceState, string $key, string $value): bool {
-        if (!isset($traceState[$key]) && !self::validateKey($key) || !self::validateValue($value)) {
-            return false;
-        }
-        if (count($traceState) === self::MAX_LIST_MEMBERS && !isset($traceState[$key])) {
-            return false;
-        }
-
-        return true;
+    private static function validateMember(array $traceState, string $key, string $value): bool
+    {
+        return (isset($traceState[$key]) || self::validateKey($key))
+            && self::validateValue($value)
+            && (count($traceState) < self::MAX_LIST_MEMBERS || isset($traceState[$key]));
     }
 
     /**
