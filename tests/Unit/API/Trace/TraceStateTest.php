@@ -124,22 +124,13 @@ class TraceStateTest extends TestCase
     public function test_max_tracestate_length(): void
     {
         // Build a vendor key with a length of 256 characters. The max characters allowed.
-        $vendorKey = str_repeat('k', TraceState::MAX_COMBINED_LENGTH / 2);
+        $vendorKey = str_repeat('k', 256);
 
-        // Build a vendor value with a length of 255 characters. One below the max allowed.
-        $vendorValue = str_repeat('v', TraceState::MAX_COMBINED_LENGTH / 2 - 1);
+        // Build a vendor value with a length of 256 characters. The max characters allowed.
+        $vendorValue = str_repeat('v', 256);
 
-        // tracestate length = 513 characters (not accepted).
-        $rawTraceState = $vendorKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $vendorValue . 'v';
-        $this->assertGreaterThan(TraceState::MAX_COMBINED_LENGTH, strlen($rawTraceState));
-
-        $validTracestate = new TraceState($rawTraceState);
-        $this->assertNull($validTracestate->get($vendorKey));
-
-        // tracestate length = 512 characters (accepted).
+        // tracestate length = 513 characters (accepted).
         $rawTraceState = $vendorKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $vendorValue;
-        $this->assertSame(TraceState::MAX_COMBINED_LENGTH, strlen($rawTraceState));
-
         $validTracestate = new TraceState($rawTraceState);
         $this->assertSame($rawTraceState, (string) $validTracestate);
     }

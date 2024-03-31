@@ -51,6 +51,16 @@ interface TraceStateInterface
     public function getListMemberCount(): int;
 
     /**
+     * Returns the concatenated string representation.
+     *
+     * @param int|null $limit maximum length of the returned representation
+     * @return string the string representation
+     *
+     * @see https://www.w3.org/TR/trace-context/#tracestate-limits
+     */
+    public function toString(?int $limit = null): string;
+
+    /**
      * Returns a string representation of this TraceSate
      */
     public function __toString(): string;
