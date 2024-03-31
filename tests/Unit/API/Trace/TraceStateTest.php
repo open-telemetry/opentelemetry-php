@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\API\Unit\Trace;
 
+use function array_reverse;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace\TraceState;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use function str_repeat;
@@ -84,6 +86,16 @@ class TraceStateTest extends TestCase
         $this->assertSame('value2', $tracestateWithoutNewValue->get('vendor2'));
         $this->assertSame('value1', $tracestate->get('vendor1'));
         $this->assertSame('value2', $tracestate->get('vendor2'));
+    }
+
+    public function test_with_allows_only32_members(): void
+    {
+        $traceState = new TraceState();
+        for ($i = 0; $i < 33; $i++) {
+            $traceState = $traceState->with('key' . $i, 'test');
+        }
+
+        $this->assertSame(32, $traceState->getListMemberCount());
     }
 
     public function test_to_string_tracestate(): void
@@ -200,5 +212,59 @@ class TraceStateTest extends TestCase
 
         $this->assertSame(257, strlen($invalidValue));
         $this->assertNull($tracestate->get($validKey));
+    }
+
+    #[DataProvider('toStringProvider')]
+    public function test_to_string(array $entries, ?int $limit, string $expected): void
+    {
+        $traceState = new TraceState();
+        foreach (array_reverse($entries) as $key => $value) {
+            $traceState = $traceState->with($key, $value);
+        }
+
+        $this->assertSame($expected, $traceState->toString(limit: $limit));
+    }
+
+    public static function toStringProvider(): array
+    {
+        return [
+            [[], null, ''],
+            [['key' => 'value'], null, 'key=value'],
+            [['key' => 'value', 'key2' => 'value2'], null, 'key=value,key2=value2'],
+            [['key' => 'value', 'key2' => 'value2'], 21, 'key=value,key2=value2'],
+            [['key' => 'value', 'key2' => 'value2'], 14, 'key=value'],
+            [['key' => 'value', 'key2' => 'value2'], 9, 'key=value'],
+            [['key' => 'value', 'key2' => 'value2'], 5, ''],
+            [['key' => 'value', 'a' => 'b'], 5, ''],
+            [[str_repeat('a', 10) => str_repeat('v', 50), 'key' => 'value', 'key2' => 'value2'], 50, ''],
+            [[str_repeat('a', 10) => str_repeat('v', 150), 'key' => 'value', 'key2' => 'value2'], 50, 'key=value,key2=value2'],
+            [[str_repeat('a', 10) => str_repeat('v', 117), 'key' => 'value', 'key2' => 'value2'], 50, ''],
+            [[str_repeat('a', 10) => str_repeat('v', 118), 'key' => 'value', 'key2' => 'value2'], 50, 'key=value,key2=value2'],
+            [[str_repeat('a', 10) => str_repeat('v', 118), 'key' => 'value', 'key2' => 'value2'], 14, 'key=value'],
+        ];
+    }
+
+    #[DataProvider('parseProvider')]
+    public function test_parse(string $tracestate, ?string $expected): void
+    {
+        $traceState = new TraceState($tracestate);
+        $this->assertSame($expected ?? '', (string) $traceState);
+    }
+
+    public static function parseProvider(): array
+    {
+        return [
+            ['key=value', 'key=value'],
+            ['key=value,key2=value2', 'key=value,key2=value2'],
+            ['key=value,key2=value2,key=value3', 'key=value,key2=value2'],
+
+            ['', ''],
+            ['  ', ''],
+            ['key=value,,key2=value2', 'key=value,key2=value2'],
+            ['key=value,   ,key2=value2', 'key=value,key2=value2'],
+
+            ['0', null],
+            ['key =value', null],
+        ];
     }
 }
