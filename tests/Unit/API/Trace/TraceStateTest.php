@@ -12,7 +12,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use function str_repeat;
-use function strlen;
 
 /**
  * @covers \OpenTelemetry\API\Trace\TraceState
@@ -149,7 +148,7 @@ class TraceStateTest extends TestCase
         $this->assertSame($rawTraceState, (string) $validTracestate);
     }
 
-    public function test_validate_key(): void
+    public function test_parse_validate_key(): void
     {
         // Valid keys
         $validKeys = 'a-b=1,c*d=2,e/f=3,g_h=4,01@i-j=5';
@@ -168,25 +167,9 @@ class TraceStateTest extends TestCase
 
         // Drop all keys on an invalid key
         $this->assertSame(0, $tracestate->getListMemberCount());
-
-        // Tests a valid key with a length of 256 characters. The max characters allowed.
-        $validKey = str_repeat('k', 256);
-        $validValue = 'v';
-        $tracestate = new TraceState($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue);
-
-        $this->assertSame(256, strlen($validKey));
-        $this->assertSame($validValue, $tracestate->get($validKey));
-        $this->assertSame($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue, (string) $tracestate);
-
-        // Tests an invalid key with a length of 257 characters. One more than the max characters allowed.
-        $invalidKey = str_repeat('k', 257);
-        $tracestate = new TraceState($invalidKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue);
-
-        $this->assertSame(257, strlen($invalidKey));
-        $this->assertNull($tracestate->get($invalidKey));
     }
 
-    public function test_validate_value(): void
+    public function test_parse_validate_value(): void
     {
         // Tests values are within the range of 0x20 to 0x7E characters
         $tracestate =    'char1=value' . chr(0x19) . '1'
@@ -198,22 +181,59 @@ class TraceStateTest extends TestCase
 
         // Entire tracestate is dropped since the value for char1 is invalid.
         $this->assertSame(0, $parsedTracestate->getListMemberCount());
+    }
 
-        // Tests a valid value with a length of 256 characters. The max allowed.
-        $validValue = str_repeat('v', 256);
-        $validKey = 'k';
-        $tracestate = new TraceState($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue);
+    #[DataProvider('validKeyValueProvider')]
+    public function test_valid_key_value(string $key, string $value): void
+    {
+        $traceState = new TraceState();
+        $traceState = $traceState->with($key, $value);
 
-        $this->assertSame(256, strlen($validValue));
-        $this->assertSame($validValue, $tracestate->get($validKey));
-        $this->assertSame($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $validValue, (string) $tracestate);
+        $this->assertSame($value, $traceState->get($key));
+        $this->assertSame($key . '=' . $value, (string) $traceState);
+    }
 
-        // Tests an invalid value with a length of 257 characters. One more than the max allowed.
-        $invalidValue = str_repeat('v', 257);
-        $tracestate = new TraceState($validKey . TraceState::LIST_MEMBER_KEY_VALUE_SPLITTER . $invalidValue);
+    public static function validKeyValueProvider(): array
+    {
+        return [
+            ['valid@key', 'value'],
+            ['valid@key', '0'],
+            ['abcdefghijklmnopqrstuvwxyz0123456789_-*/', 'value'],
+            ['abcdefghijklmnopqrstuvwxyz0123456789_-*/@a1234_-*/', 'value'],
+            ['key', strtr(implode(range(chr(0x20), chr(0x7E))), [',' => '', '=' => ''])],
+            [str_repeat('a', 256), 'value'],
+            ['key', str_repeat('a', 256)],
+        ];
+    }
 
-        $this->assertSame(257, strlen($invalidValue));
-        $this->assertNull($tracestate->get($validKey));
+    #[DataProvider('invalidKeyValueProvider')]
+    public function test_invalid_key_value(string $key, string $value): void
+    {
+        $traceState = new TraceState();
+        $traceState = $traceState->with($key, $value);
+
+        $this->assertNull($traceState->get($key));
+    }
+
+    public static function invalidKeyValueProvider(): array
+    {
+        return [
+            ['', 'value'],
+            ['invalid.key', 'value'],
+            ['invalid-key@', 'value'],
+            ['0invalid-key', 'value'],
+            [str_repeat('a', 257), 'value'],
+            ['invalid@key_____________', 'value'],
+            ['-invalid-key@id', 'value'],
+            ['invalid-key@0id', 'value'],
+            ['invalid-key@@id', 'value'],
+
+            ['key', ''],
+            ['key', 'invalid-value '],
+            ['key', 'invalid,value'],
+            ['key', 'invalid=value'],
+            ['key', str_repeat('a', 257)],
+        ];
     }
 
     #[DataProvider('toStringProvider')]
