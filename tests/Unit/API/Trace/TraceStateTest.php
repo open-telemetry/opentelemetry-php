@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\API\Unit\Trace;
 
 use function array_reverse;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace\TraceState;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -25,6 +26,7 @@ class TraceStateTest extends TestCase
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         LoggerHolder::set($this->logger);
+        Logging::reset();
     }
 
     public function test_get_tracestate_value(): void
@@ -247,6 +249,11 @@ class TraceStateTest extends TestCase
     #[DataProvider('parseProvider')]
     public function test_parse(string $tracestate, ?string $expected): void
     {
+        $this->logger
+            ->expects($expected === null ? $this->once() : $this->never())
+            ->method('log')
+            ->with('warning', $this->anything(), $this->anything());
+
         $traceState = new TraceState($tracestate);
         $this->assertSame($expected ?? '', (string) $traceState);
     }
