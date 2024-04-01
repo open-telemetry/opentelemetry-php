@@ -26,6 +26,7 @@ final class ImmutableSpan implements SpanDataInterface
         private readonly array $links,
         private readonly array $events,
         private readonly AttributesInterface $attributes,
+        private readonly int $totalRecordedLinks,
         private readonly int $totalRecordedEvents,
         private readonly StatusDataInterface $status,
         private readonly int $endEpochNanos,
@@ -112,7 +113,7 @@ final class ImmutableSpan implements SpanDataInterface
 
     public function getTotalDroppedLinks(): int
     {
-        return max(0, $this->span->getTotalRecordedLinks() - count($this->links));
+        return max(0, $this->totalRecordedLinks - count($this->links));
     }
 
     public function getStatus(): StatusDataInterface
