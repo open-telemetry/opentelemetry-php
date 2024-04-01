@@ -22,4 +22,4 @@ rm -rf trace-context
 git clone https://github.com/w3c/trace-context.git
 
 # Run the test
-python3 "trace-context/test/test.py" http://127.0.0.1:8001/test
+SPEC_LEVEL=1 python3 "trace-context/test/test.py" http://127.0.0.1:8001/test
