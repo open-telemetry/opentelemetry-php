@@ -16,6 +16,8 @@ splits:
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/api.git"
   - prefix: "src/SDK"
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/sdk.git"
+  - prefix: "src/Config/SDK"
+    target: "https://${GH_TOKEN}@github.com/opentelemetry-php/config-sdk.git"
   - prefix: "src/Contrib/Otlp"
     target: "https://${GH_TOKEN}@github.com/opentelemetry-php/exporter-otlp.git"
   - prefix: "src/Contrib/Grpc"

@@ -319,6 +319,7 @@ return [
     'exclude_analysis_directory_list' => [
         'vendor/',
         'proto/',
+        'src/Config/SDK',
     ],
 
     // Enable this to enable checks of require/include statements referring to valid paths.

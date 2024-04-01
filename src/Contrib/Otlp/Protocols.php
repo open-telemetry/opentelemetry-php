@@ -27,6 +27,9 @@ class Protocols
         }
     }
 
+    /**
+     * @psalm-return ContentTypes::*
+     */
     public static function contentType(string $protocol): string
     {
         self::validate($protocol);
