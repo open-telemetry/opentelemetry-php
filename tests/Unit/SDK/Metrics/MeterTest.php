@@ -100,6 +100,26 @@ final class MeterTest extends TestCase
         );
     }
 
+    public function test_create_gauge(): void
+    {
+        $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $metricFactory->expects($this->once())->method('createSynchronousWriter')
+            ->with(
+                $this->anything(),
+                $this->anything(),
+                new InstrumentationScope('test', null, null, Attributes::create([])),
+                new Instrument(InstrumentType::GAUGE, 'name', 'unit', 'description'),
+                $this->anything(),
+                $this->anything(),
+                $this->anything(),
+            )
+            ->willReturn([]);
+
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
+        $meter->createGauge('name', 'unit', 'description');
+    }
+
     public function test_create_up_down_counter(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
