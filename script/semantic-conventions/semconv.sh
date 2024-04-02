@@ -9,6 +9,7 @@
 # Source repositories:
 #  - https://github.com/open-telemetry/semantic-conventions/releases
 #  - https://github.com/open-telemetry/build-tools/releases
+set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
@@ -21,18 +22,18 @@ SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
 GENERATOR_VERSION=0.23.0
 
-cd "${SCRIPT_DIR}" || exit
+cd "${SCRIPT_DIR}"
 
-rm -rf "${SPEC_DIR}" || true
+rm -rf "${SPEC_DIR}"
 mkdir "${SPEC_DIR}"
-cd "${SPEC_DIR}" || exit
+cd "${SPEC_DIR}"
 
 git init -b main
 git remote add origin https://github.com/open-telemetry/semantic-conventions.git
 git fetch origin "$SPEC_VERSION"
 git reset --hard FETCH_HEAD
 
-cd "${SCRIPT_DIR}" || exit
+cd "${SCRIPT_DIR}"
 
 mkdir -p "${CODE_DIR}"
 find "${CODE_DIR}" -name "*.php" -exec rm -f {} \;
@@ -101,4 +102,4 @@ docker run --rm \
   -Dclass="Resource" \
   -DschemaUrl=$SCHEMA_URL
 
-rm -rf "${SPEC_DIR}" || true
+rm -rf "${SPEC_DIR}"

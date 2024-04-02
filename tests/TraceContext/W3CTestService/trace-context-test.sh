@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -x
+set -e
 
 function install_symfony() {
     curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.alpine.sh' | bash >/dev/null
     apk add symfony-cli
 }
 
-cd "tests/TraceContext/W3CTestService" || { echo "error: could not cd into the W3CTestService directory."; exit 1; }
+cd "tests/TraceContext/W3CTestService"
 
 # Install Symfony: we will use the Symfony server as the built-in PHP server doesn't play well with duplicate headers
 install_symfony
