@@ -7,9 +7,9 @@ namespace OpenTelemetry\Context;
 /**
  * @internal
  */
-final class ContextStorage implements ContextStorageInterface, ExecutionContextAwareInterface
+final class ContextStorage implements ContextStorageInterface, ContextStorageHeadAware, ExecutionContextAwareInterface
 {
-    public ContextStorageHead $current;
+    private ContextStorageHead $current;
     private ContextStorageHead $main;
     /** @var array<int|string, ContextStorageHead> */
     private array $forks = [];
@@ -32,6 +32,11 @@ final class ContextStorage implements ContextStorageInterface, ExecutionContextA
     public function destroy(int|string $id): void
     {
         unset($this->forks[$id]);
+    }
+
+    public function head(): ContextStorageHead
+    {
+        return $this->current;
     }
 
     public function scope(): ?ContextStorageScopeInterface

@@ -48,7 +48,7 @@ final class ZendObserverFiber
 
         try {
             $fibers = FFI::scope('OTEL_ZEND_OBSERVER_FIBER');
-        } catch (FFI\Exception $e) {
+        } catch (FFI\Exception) {
             try {
                 $fibers = FFI::load(__DIR__ . '/fiber/zend_observer_fiber.h');
             } catch (FFI\Exception $e) {
@@ -58,9 +58,12 @@ final class ZendObserverFiber
             }
         }
 
-        $fibers->zend_observer_fiber_init_register(static fn (int $initializing) => Context::storage()->fork($initializing)); //@phpstan-ignore-line
-        $fibers->zend_observer_fiber_switch_register(static fn (int $from, int $to) => Context::storage()->switch($to)); //@phpstan-ignore-line
-        $fibers->zend_observer_fiber_destroy_register(static fn (int $destroying) => Context::storage()->destroy($destroying)); //@phpstan-ignore-line
+        $storage = new ContextStorage();
+        $fibers->zend_observer_fiber_init_register(static fn (int $initializing) => $storage->fork($initializing)); //@phpstan-ignore-line
+        $fibers->zend_observer_fiber_switch_register(static fn (int $from, int $to) => $storage->switch($to)); //@phpstan-ignore-line
+        $fibers->zend_observer_fiber_destroy_register(static fn (int $destroying) => $storage->destroy($destroying)); //@phpstan-ignore-line
+
+        Context::setStorage($storage);
 
         return true;
     }

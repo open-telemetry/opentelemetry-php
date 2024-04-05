@@ -39,9 +39,9 @@ truthy value. Disabling is only recommended for applications using `exit` / `die
 
 ## Async applications
 
-### Fiber support
+### Fiber support - automatic context propagation to newly created fibers
 
-Requires `PHP >= 8.1`, an NTS build, `ext-ffi`, and setting the environment variable `OTEL_PHP_FIBERS_ENABLED` to a truthy value. Additionally `vendor/autoload.php` has to be preloaded for non-CLI SAPIs if [`ffi.enable`](https://www.php.net/manual/en/ffi.configuration.php#ini.ffi.enable) is set to `preload`.
+Requires an NTS build, `ext-ffi`, and setting the environment variable `OTEL_PHP_FIBERS_ENABLED` to a truthy value. Additionally `vendor/autoload.php` has to be preloaded for non-CLI SAPIs if [`ffi.enable`](https://www.php.net/manual/en/ffi.configuration.php#ini.ffi.enable) is set to `preload`.
 
 ### Event loops
 
