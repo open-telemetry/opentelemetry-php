@@ -11,7 +11,7 @@ interface TraceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.24.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.25.0';
     /**
      * @see TraceAttributes::ANDROID_STATE Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time
      */
@@ -46,6 +46,196 @@ interface TraceAttributeValues
      * @see TraceAttributes::ASPNETCORE_RATE_LIMITING_RESULT Lease request was canceled
      */
     public const ASPNETCORE_RATE_LIMITING_RESULT_REQUEST_CANCELED = 'request_canceled';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Alibaba Cloud Elastic Compute Service
+     */
+    public const CLOUD_PLATFORM_ALIBABA_CLOUD_ECS = 'alibaba_cloud_ecs';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Alibaba Cloud Function Compute
+     */
+    public const CLOUD_PLATFORM_ALIBABA_CLOUD_FC = 'alibaba_cloud_fc';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Red Hat OpenShift on Alibaba Cloud
+     */
+    public const CLOUD_PLATFORM_ALIBABA_CLOUD_OPENSHIFT = 'alibaba_cloud_openshift';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM AWS Elastic Compute Cloud
+     */
+    public const CLOUD_PLATFORM_AWS_EC2 = 'aws_ec2';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM AWS Elastic Container Service
+     */
+    public const CLOUD_PLATFORM_AWS_ECS = 'aws_ecs';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM AWS Elastic Kubernetes Service
+     */
+    public const CLOUD_PLATFORM_AWS_EKS = 'aws_eks';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM AWS Lambda
+     */
+    public const CLOUD_PLATFORM_AWS_LAMBDA = 'aws_lambda';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM AWS Elastic Beanstalk
+     */
+    public const CLOUD_PLATFORM_AWS_ELASTIC_BEANSTALK = 'aws_elastic_beanstalk';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM AWS App Runner
+     */
+    public const CLOUD_PLATFORM_AWS_APP_RUNNER = 'aws_app_runner';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Red Hat OpenShift on AWS (ROSA)
+     */
+    public const CLOUD_PLATFORM_AWS_OPENSHIFT = 'aws_openshift';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Azure Virtual Machines
+     */
+    public const CLOUD_PLATFORM_AZURE_VM = 'azure_vm';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Azure Container Apps
+     */
+    public const CLOUD_PLATFORM_AZURE_CONTAINER_APPS = 'azure_container_apps';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Azure Container Instances
+     */
+    public const CLOUD_PLATFORM_AZURE_CONTAINER_INSTANCES = 'azure_container_instances';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Azure Kubernetes Service
+     */
+    public const CLOUD_PLATFORM_AZURE_AKS = 'azure_aks';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Azure Functions
+     */
+    public const CLOUD_PLATFORM_AZURE_FUNCTIONS = 'azure_functions';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Azure App Service
+     */
+    public const CLOUD_PLATFORM_AZURE_APP_SERVICE = 'azure_app_service';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Azure Red Hat OpenShift
+     */
+    public const CLOUD_PLATFORM_AZURE_OPENSHIFT = 'azure_openshift';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Google Bare Metal Solution (BMS)
+     */
+    public const CLOUD_PLATFORM_GCP_BARE_METAL_SOLUTION = 'gcp_bare_metal_solution';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Google Cloud Compute Engine (GCE)
+     */
+    public const CLOUD_PLATFORM_GCP_COMPUTE_ENGINE = 'gcp_compute_engine';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Google Cloud Run
+     */
+    public const CLOUD_PLATFORM_GCP_CLOUD_RUN = 'gcp_cloud_run';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Google Cloud Kubernetes Engine (GKE)
+     */
+    public const CLOUD_PLATFORM_GCP_KUBERNETES_ENGINE = 'gcp_kubernetes_engine';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Google Cloud Functions (GCF)
+     */
+    public const CLOUD_PLATFORM_GCP_CLOUD_FUNCTIONS = 'gcp_cloud_functions';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Google Cloud App Engine (GAE)
+     */
+    public const CLOUD_PLATFORM_GCP_APP_ENGINE = 'gcp_app_engine';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Red Hat OpenShift on Google Cloud
+     */
+    public const CLOUD_PLATFORM_GCP_OPENSHIFT = 'gcp_openshift';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Red Hat OpenShift on IBM Cloud
+     */
+    public const CLOUD_PLATFORM_IBM_CLOUD_OPENSHIFT = 'ibm_cloud_openshift';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Tencent Cloud Cloud Virtual Machine (CVM)
+     */
+    public const CLOUD_PLATFORM_TENCENT_CLOUD_CVM = 'tencent_cloud_cvm';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Tencent Cloud Elastic Kubernetes Service (EKS)
+     */
+    public const CLOUD_PLATFORM_TENCENT_CLOUD_EKS = 'tencent_cloud_eks';
+
+    /**
+     * @see TraceAttributes::CLOUD_PLATFORM Tencent Cloud Serverless Cloud Function (SCF)
+     */
+    public const CLOUD_PLATFORM_TENCENT_CLOUD_SCF = 'tencent_cloud_scf';
+
+    /**
+     * @see TraceAttributes::CLOUD_PROVIDER Alibaba Cloud
+     */
+    public const CLOUD_PROVIDER_ALIBABA_CLOUD = 'alibaba_cloud';
+
+    /**
+     * @see TraceAttributes::CLOUD_PROVIDER Amazon Web Services
+     */
+    public const CLOUD_PROVIDER_AWS = 'aws';
+
+    /**
+     * @see TraceAttributes::CLOUD_PROVIDER Microsoft Azure
+     */
+    public const CLOUD_PROVIDER_AZURE = 'azure';
+
+    /**
+     * @see TraceAttributes::CLOUD_PROVIDER Google Cloud Platform
+     */
+    public const CLOUD_PROVIDER_GCP = 'gcp';
+
+    /**
+     * @see TraceAttributes::CLOUD_PROVIDER Heroku Platform as a Service
+     */
+    public const CLOUD_PROVIDER_HEROKU = 'heroku';
+
+    /**
+     * @see TraceAttributes::CLOUD_PROVIDER IBM Cloud
+     */
+    public const CLOUD_PROVIDER_IBM_CLOUD = 'ibm_cloud';
+
+    /**
+     * @see TraceAttributes::CLOUD_PROVIDER Tencent Cloud
+     */
+    public const CLOUD_PROVIDER_TENCENT_CLOUD = 'tencent_cloud';
+
+    /**
+     * @see TraceAttributes::CONTAINER_CPU_STATE When tasks of the cgroup are in user mode (Linux). When all container processes are in user mode (Windows)
+     */
+    public const CONTAINER_CPU_STATE_USER = 'user';
+
+    /**
+     * @see TraceAttributes::CONTAINER_CPU_STATE When CPU is used by the system (host OS)
+     */
+    public const CONTAINER_CPU_STATE_SYSTEM = 'system';
+
+    /**
+     * @see TraceAttributes::CONTAINER_CPU_STATE When tasks of the cgroup are in kernel mode (Linux). When all container processes are in kernel mode (Windows)
+     */
+    public const CONTAINER_CPU_STATE_KERNEL = 'kernel';
 
     /**
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL all
@@ -543,6 +733,56 @@ interface TraceAttributeValues
     public const GRAPHQL_OPERATION_TYPE_SUBSCRIPTION = 'subscription';
 
     /**
+     * @see TraceAttributes::HOST_ARCH AMD64
+     */
+    public const HOST_ARCH_AMD64 = 'amd64';
+
+    /**
+     * @see TraceAttributes::HOST_ARCH ARM32
+     */
+    public const HOST_ARCH_ARM32 = 'arm32';
+
+    /**
+     * @see TraceAttributes::HOST_ARCH ARM64
+     */
+    public const HOST_ARCH_ARM64 = 'arm64';
+
+    /**
+     * @see TraceAttributes::HOST_ARCH Itanium
+     */
+    public const HOST_ARCH_IA64 = 'ia64';
+
+    /**
+     * @see TraceAttributes::HOST_ARCH 32-bit PowerPC
+     */
+    public const HOST_ARCH_PPC32 = 'ppc32';
+
+    /**
+     * @see TraceAttributes::HOST_ARCH 64-bit PowerPC
+     */
+    public const HOST_ARCH_PPC64 = 'ppc64';
+
+    /**
+     * @see TraceAttributes::HOST_ARCH IBM z/Architecture
+     */
+    public const HOST_ARCH_S390X = 's390x';
+
+    /**
+     * @see TraceAttributes::HOST_ARCH 32-bit x86
+     */
+    public const HOST_ARCH_X86 = 'x86';
+
+    /**
+     * @see TraceAttributes::HTTP_CONNECTION_STATE active state
+     */
+    public const HTTP_CONNECTION_STATE_ACTIVE = 'active';
+
+    /**
+     * @see TraceAttributes::HTTP_CONNECTION_STATE idle state
+     */
+    public const HTTP_CONNECTION_STATE_IDLE = 'idle';
+
+    /**
      * @see TraceAttributes::HTTP_FLAVOR HTTP/1.0
      */
     public const HTTP_FLAVOR_HTTP_1_0 = '1.0';
@@ -693,9 +933,14 @@ interface TraceAttributeValues
     public const MESSAGING_OPERATION_RECEIVE = 'receive';
 
     /**
-     * @see TraceAttributes::MESSAGING_OPERATION One or more messages are passed to a consumer. This operation refers to push-based scenarios, where consumer register callbacks which get called by messaging SDKs
+     * @see TraceAttributes::MESSAGING_OPERATION One or more messages are delivered to or processed by a consumer
      */
-    public const MESSAGING_OPERATION_DELIVER = 'deliver';
+    public const MESSAGING_OPERATION_DELIVER = 'process';
+
+    /**
+     * @see TraceAttributes::MESSAGING_OPERATION One or more messages are settled
+     */
+    public const MESSAGING_OPERATION_SETTLE = 'settle';
 
     /**
      * @see TraceAttributes::MESSAGING_ROCKETMQ_CONSUMPTION_MODEL Clustering consumption model
@@ -728,6 +973,26 @@ interface TraceAttributeValues
     public const MESSAGING_ROCKETMQ_MESSAGE_TYPE_TRANSACTION = 'transaction';
 
     /**
+     * @see TraceAttributes::MESSAGING_SERVICEBUS_DISPOSITION_STATUS Message is completed
+     */
+    public const MESSAGING_SERVICEBUS_DISPOSITION_STATUS_COMPLETE = 'complete';
+
+    /**
+     * @see TraceAttributes::MESSAGING_SERVICEBUS_DISPOSITION_STATUS Message is abandoned
+     */
+    public const MESSAGING_SERVICEBUS_DISPOSITION_STATUS_ABANDON = 'abandon';
+
+    /**
+     * @see TraceAttributes::MESSAGING_SERVICEBUS_DISPOSITION_STATUS Message is sent to dead letter queue
+     */
+    public const MESSAGING_SERVICEBUS_DISPOSITION_STATUS_DEAD_LETTER = 'dead_letter';
+
+    /**
+     * @see TraceAttributes::MESSAGING_SERVICEBUS_DISPOSITION_STATUS Message is deferred
+     */
+    public const MESSAGING_SERVICEBUS_DISPOSITION_STATUS_DEFER = 'defer';
+
+    /**
      * @see TraceAttributes::MESSAGING_SYSTEM Apache ActiveMQ
      */
     public const MESSAGING_SYSTEM_ACTIVEMQ = 'activemq';
@@ -740,17 +1005,17 @@ interface TraceAttributeValues
     /**
      * @see TraceAttributes::MESSAGING_SYSTEM Azure Event Grid
      */
-    public const MESSAGING_SYSTEM_AZURE_EVENTGRID = 'azure_eventgrid';
+    public const MESSAGING_SYSTEM_EVENTGRID = 'eventgrid';
 
     /**
      * @see TraceAttributes::MESSAGING_SYSTEM Azure Event Hubs
      */
-    public const MESSAGING_SYSTEM_AZURE_EVENTHUBS = 'azure_eventhubs';
+    public const MESSAGING_SYSTEM_EVENTHUBS = 'eventhubs';
 
     /**
      * @see TraceAttributes::MESSAGING_SYSTEM Azure Service Bus
      */
-    public const MESSAGING_SYSTEM_AZURE_SERVICEBUS = 'azure_servicebus';
+    public const MESSAGING_SYSTEM_SERVICEBUS = 'servicebus';
 
     /**
      * @see TraceAttributes::MESSAGING_SYSTEM Google Cloud Pub/Sub
@@ -1000,6 +1265,61 @@ interface TraceAttributeValues
     public const OPENTRACING_REF_TYPE_FOLLOWS_FROM = 'follows_from';
 
     /**
+     * @see TraceAttributes::OS_TYPE Microsoft Windows
+     */
+    public const OS_TYPE_WINDOWS = 'windows';
+
+    /**
+     * @see TraceAttributes::OS_TYPE Linux
+     */
+    public const OS_TYPE_LINUX = 'linux';
+
+    /**
+     * @see TraceAttributes::OS_TYPE Apple Darwin
+     */
+    public const OS_TYPE_DARWIN = 'darwin';
+
+    /**
+     * @see TraceAttributes::OS_TYPE FreeBSD
+     */
+    public const OS_TYPE_FREEBSD = 'freebsd';
+
+    /**
+     * @see TraceAttributes::OS_TYPE NetBSD
+     */
+    public const OS_TYPE_NETBSD = 'netbsd';
+
+    /**
+     * @see TraceAttributes::OS_TYPE OpenBSD
+     */
+    public const OS_TYPE_OPENBSD = 'openbsd';
+
+    /**
+     * @see TraceAttributes::OS_TYPE DragonFly BSD
+     */
+    public const OS_TYPE_DRAGONFLYBSD = 'dragonflybsd';
+
+    /**
+     * @see TraceAttributes::OS_TYPE HP-UX (Hewlett Packard Unix)
+     */
+    public const OS_TYPE_HPUX = 'hpux';
+
+    /**
+     * @see TraceAttributes::OS_TYPE AIX (Advanced Interactive eXecutive)
+     */
+    public const OS_TYPE_AIX = 'aix';
+
+    /**
+     * @see TraceAttributes::OS_TYPE SunOS, Oracle Solaris
+     */
+    public const OS_TYPE_SOLARIS = 'solaris';
+
+    /**
+     * @see TraceAttributes::OS_TYPE IBM z/OS
+     */
+    public const OS_TYPE_Z_OS = 'z_os';
+
+    /**
      * @see TraceAttributes::OTEL_STATUS_CODE The operation has been validated by an Application developer or Operator to have completed successfully
      */
     public const OTEL_STATUS_CODE_OK = 'OK';
@@ -1008,6 +1328,21 @@ interface TraceAttributeValues
      * @see TraceAttributes::OTEL_STATUS_CODE The operation contains an error
      */
     public const OTEL_STATUS_CODE_ERROR = 'ERROR';
+
+    /**
+     * @see TraceAttributes::PROCESS_CPU_STATE system
+     */
+    public const PROCESS_CPU_STATE_SYSTEM = 'system';
+
+    /**
+     * @see TraceAttributes::PROCESS_CPU_STATE user
+     */
+    public const PROCESS_CPU_STATE_USER = 'user';
+
+    /**
+     * @see TraceAttributes::PROCESS_CPU_STATE wait
+     */
+    public const PROCESS_CPU_STATE_WAIT = 'wait';
 
     /**
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE cancelled
@@ -1435,6 +1770,26 @@ interface TraceAttributeValues
     public const SYSTEM_PAGING_TYPE_MINOR = 'minor';
 
     /**
+     * @see TraceAttributes::SYSTEM_PROCESS_STATUS running
+     */
+    public const SYSTEM_PROCESS_STATUS_RUNNING = 'running';
+
+    /**
+     * @see TraceAttributes::SYSTEM_PROCESS_STATUS sleeping
+     */
+    public const SYSTEM_PROCESS_STATUS_SLEEPING = 'sleeping';
+
+    /**
+     * @see TraceAttributes::SYSTEM_PROCESS_STATUS stopped
+     */
+    public const SYSTEM_PROCESS_STATUS_STOPPED = 'stopped';
+
+    /**
+     * @see TraceAttributes::SYSTEM_PROCESS_STATUS defunct
+     */
+    public const SYSTEM_PROCESS_STATUS_DEFUNCT = 'defunct';
+
+    /**
      * @see TraceAttributes::SYSTEM_PROCESSES_STATUS running
      */
     public const SYSTEM_PROCESSES_STATUS_RUNNING = 'running';
@@ -1453,6 +1808,66 @@ interface TraceAttributeValues
      * @see TraceAttributes::SYSTEM_PROCESSES_STATUS defunct
      */
     public const SYSTEM_PROCESSES_STATUS_DEFUNCT = 'defunct';
+
+    /**
+     * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE cpp
+     */
+    public const TELEMETRY_SDK_LANGUAGE_CPP = 'cpp';
+
+    /**
+     * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE dotnet
+     */
+    public const TELEMETRY_SDK_LANGUAGE_DOTNET = 'dotnet';
+
+    /**
+     * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE erlang
+     */
+    public const TELEMETRY_SDK_LANGUAGE_ERLANG = 'erlang';
+
+    /**
+     * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE go
+     */
+    public const TELEMETRY_SDK_LANGUAGE_GO = 'go';
+
+    /**
+     * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE java
+     */
+    public const TELEMETRY_SDK_LANGUAGE_JAVA = 'java';
+
+    /**
+     * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE nodejs
+     */
+    public const TELEMETRY_SDK_LANGUAGE_NODEJS = 'nodejs';
+
+    /**
+     * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE php
+     */
+    public const TELEMETRY_SDK_LANGUAGE_PHP = 'php';
+
+    /**
+     * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE python
+     */
+    public const TELEMETRY_SDK_LANGUAGE_PYTHON = 'python';
+
+    /**
+     * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE ruby
+     */
+    public const TELEMETRY_SDK_LANGUAGE_RUBY = 'ruby';
+
+    /**
+     * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE rust
+     */
+    public const TELEMETRY_SDK_LANGUAGE_RUST = 'rust';
+
+    /**
+     * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE swift
+     */
+    public const TELEMETRY_SDK_LANGUAGE_SWIFT = 'swift';
+
+    /**
+     * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE webjs
+     */
+    public const TELEMETRY_SDK_LANGUAGE_WEBJS = 'webjs';
 
     /**
      * @see TraceAttributes::TLS_PROTOCOL_NAME ssl
