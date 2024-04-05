@@ -23,6 +23,16 @@ final class FiberBoundContextStorageExecutionAwareBCTest extends TestCase
         $this->assertSame($scope, $storage->scope());
     }
 
+    public function test_inactive_scope_detach(): void
+    {
+        $storage = new FiberBoundContextStorageExecutionAwareBC();
+        $scope1 = $storage->attach($storage->current());
+
+        $storage->fork(1);
+        $storage->switch(1);
+        $this->assertSame(ScopeInterface::INACTIVE, @$scope1->detach() & ScopeInterface::INACTIVE);
+    }
+
     public function test_storage_switch_switches_context(): void
     {
         $storage = new FiberBoundContextStorageExecutionAwareBC();

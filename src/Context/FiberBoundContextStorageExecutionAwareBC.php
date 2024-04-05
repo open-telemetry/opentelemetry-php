@@ -41,6 +41,8 @@ final class FiberBoundContextStorageExecutionAwareBC implements ContextStorageIn
             /** @psalm-suppress PossiblyNullFunctionCall */
             $head = (static fn ($storage) => $storage->heads[$storage])
                 ->bindTo(null, FiberBoundContextStorage::class)($this->storage);
+            $head->storage = $this->bc;
+
             /** @psalm-suppress PossiblyNullFunctionCall */
             (static fn ($storage) => $storage->current = $storage->main = $head)
                 ->bindTo(null, ContextStorage::class)($this->bc);
