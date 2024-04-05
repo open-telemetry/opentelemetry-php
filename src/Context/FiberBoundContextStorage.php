@@ -15,10 +15,8 @@ use WeakMap;
 /**
  * @internal
  */
-final class FiberBoundContextStorage implements ContextStorageInterface, ContextStorageHeadAware, ExecutionContextAwareInterface
+final class FiberBoundContextStorage implements ContextStorageInterface, ContextStorageHeadAware
 {
-    use ExecutionContextAwareNotSupported;
-
     /** @var WeakMap<object, ContextStorageHead> */
     private WeakMap $heads;
 
