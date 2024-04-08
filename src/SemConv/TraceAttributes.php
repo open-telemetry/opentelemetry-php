@@ -676,6 +676,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `server.address`, `server.port` attributes instead.
      *
+     * @deprecated "Replaced by `server.address` and `server.port`."
+     *
      * @example Server=(localdb)\v11.0;Integrated Security=true;
      */
     public const DB_CONNECTION_STRING = 'db.connection_string';
@@ -743,6 +745,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `db.instance.id` instead.
      *
+     * @deprecated Replaced by `db.instance.id`.
+     *
      * @example instance-0000000001
      */
     public const DB_ELASTICSEARCH_NODE_NAME = 'db.elasticsearch.node.name';
@@ -756,6 +760,8 @@ interface TraceAttributes
 
     /**
      * Removed, no replacement at this time.
+     *
+     * @deprecated Removed as not used.
      *
      * @example org.postgresql.Driver
      * @example com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -1415,11 +1421,15 @@ interface TraceAttributes
 
     /**
      * Deprecated, use `network.protocol.name` instead.
+     *
+     * @deprecated Replaced by `network.protocol.name`.
      */
     public const HTTP_FLAVOR = 'http.flavor';
 
     /**
      * Deprecated, use `http.request.method` instead.
+     *
+     * @deprecated Replaced by `http.request.method`.
      *
      * @example GET
      * @example POST
@@ -1480,6 +1490,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `http.request.header.content-length` instead.
      *
+     * @deprecated Replaced by `http.request.header.content-length`.
+     *
      * @example 3495
      */
     public const HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length';
@@ -1508,6 +1520,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `http.response.header.content-length` instead.
      *
+     * @deprecated Replaced by `http.response.header.content-length`.
+     *
      * @example 3495
      */
     public const HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length';
@@ -1526,6 +1540,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `url.scheme` instead.
      *
+     * @deprecated Replaced by `url.scheme` instead.
+     *
      * @example http
      * @example https
      */
@@ -1534,12 +1550,16 @@ interface TraceAttributes
     /**
      * Deprecated, use `http.response.status_code` instead.
      *
+     * @deprecated Replaced by `http.response.status_code`.
+     *
      * @example 200
      */
     public const HTTP_STATUS_CODE = 'http.status_code';
 
     /**
      * Deprecated, use `url.path` and `url.query` instead.
+     *
+     * @deprecated Split to `url.path` and `url.query.
      *
      * @example /search?q=OpenTelemetry#SemConv
      */
@@ -1548,12 +1568,16 @@ interface TraceAttributes
     /**
      * Deprecated, use `url.full` instead.
      *
+     * @deprecated Replaced by `url.full`.
+     *
      * @example https://www.foo.bar/search?q=OpenTelemetry#SemConv
      */
     public const HTTP_URL = 'http.url';
 
     /**
      * Deprecated, use `user_agent.original` instead.
+     *
+     * @deprecated Replaced by `user_agent.original`.
      *
      * @example CERN-LineMode/2.15 libwww/2.17b3
      * @example Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1
@@ -1928,6 +1952,8 @@ interface TraceAttributes
     /**
      * &quot;Deprecated, use `messaging.destination.partition.id` instead.&quot;.
      *
+     * @deprecated Replaced by `messaging.destination.partition.id`.
+     *
      * @example 2
      */
     public const MESSAGING_KAFKA_DESTINATION_PARTITION = 'messaging.kafka.destination.partition';
@@ -2102,12 +2128,16 @@ interface TraceAttributes
     /**
      * Deprecated, use `server.address`.
      *
+     * @deprecated Replaced by `server.address`.
+     *
      * @example example.com
      */
     public const NET_HOST_NAME = 'net.host.name';
 
     /**
      * Deprecated, use `server.port`.
+     *
+     * @deprecated Replaced by `server.port`.
      *
      * @example 8080
      */
@@ -2116,6 +2146,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `server.address` on client spans and `client.address` on server spans.
      *
+     * @deprecated Replaced by `server.address` on client spans and `client.address` on server spans.
+     *
      * @example example.com
      */
     public const NET_PEER_NAME = 'net.peer.name';
@@ -2123,12 +2155,16 @@ interface TraceAttributes
     /**
      * Deprecated, use `server.port` on client spans and `client.port` on server spans.
      *
+     * @deprecated Replaced by `server.port` on client spans and `client.port` on server spans.
+     *
      * @example 8080
      */
     public const NET_PEER_PORT = 'net.peer.port';
 
     /**
      * Deprecated, use `network.protocol.name`.
+     *
+     * @deprecated Replaced by `network.protocol.name`.
      *
      * @example amqp
      * @example http
@@ -2139,17 +2175,23 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.protocol.version`.
      *
+     * @deprecated Replaced by `network.protocol.version`.
+     *
      * @example 3.1.1
      */
     public const NET_PROTOCOL_VERSION = 'net.protocol.version';
 
     /**
      * Deprecated, use `network.transport` and `network.type`.
+     *
+     * @deprecated Split to `network.transport` and `network.type`.
      */
     public const NET_SOCK_FAMILY = 'net.sock.family';
 
     /**
      * Deprecated, use `network.local.address`.
+     *
+     * @deprecated Replaced by `network.local.address`.
      *
      * @example /var/my.sock
      */
@@ -2158,12 +2200,16 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.local.port`.
      *
+     * @deprecated Replaced by `network.local.port`.
+     *
      * @example 8080
      */
     public const NET_SOCK_HOST_PORT = 'net.sock.host.port';
 
     /**
      * Deprecated, use `network.peer.address`.
+     *
+     * @deprecated Replaced by `network.peer.address`.
      *
      * @example 192.168.0.1
      */
@@ -2172,6 +2218,8 @@ interface TraceAttributes
     /**
      * Deprecated, no replacement at this time.
      *
+     * @deprecated Removed.
+     *
      * @example /var/my.sock
      */
     public const NET_SOCK_PEER_NAME = 'net.sock.peer.name';
@@ -2179,12 +2227,16 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.peer.port`.
      *
+     * @deprecated Replaced by `network.peer.port`.
+     *
      * @example 65531
      */
     public const NET_SOCK_PEER_PORT = 'net.sock.peer.port';
 
     /**
      * Deprecated, use `network.transport`.
+     *
+     * @deprecated Replaced by `network.transport`.
      */
     public const NET_TRANSPORT = 'net.transport';
 
@@ -2766,6 +2818,8 @@ interface TraceAttributes
 
     /**
      * Deprecated, use `system.process.status` instead.
+     *
+     * @deprecated Replaced by `system.process.status`.
      *
      * @example running
      */

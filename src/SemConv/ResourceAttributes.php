@@ -801,12 +801,16 @@ interface ResourceAttributes
     /**
      * None.
      *
+     * @deprecated use the `otel.scope.name` attribute.
+     *
      * @example io.opentelemetry.contrib.mongodb
      */
     public const OTEL_LIBRARY_NAME = 'otel.library.name';
 
     /**
      * None.
+     *
+     * @deprecated use the `otel.scope.version` attribute.
      *
      * @example 1.0.0
      */
