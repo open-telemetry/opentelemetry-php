@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Context;
 
+use Fiber;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorage;
 use OpenTelemetry\Context\ScopeInterface;
@@ -83,12 +84,10 @@ class ScopeTest extends TestCase
     {
         $scope1 = Context::getCurrent()->activate();
 
-        Context::storage()->fork(1);
-        Context::storage()->switch(1);
-        $this->assertSame(ScopeInterface::INACTIVE, @$scope1->detach() & ScopeInterface::INACTIVE);
+        $fiber = new Fiber(static fn () => @$scope1->detach());
+        $fiber->start();
 
-        Context::storage()->switch(0);
-        Context::storage()->destroy(1);
+        $this->assertSame(ScopeInterface::INACTIVE, $fiber->getReturn() & ScopeInterface::INACTIVE);
     }
 
     public function test_scope_context_returns_context_of_scope(): void

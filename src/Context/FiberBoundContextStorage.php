@@ -1,77 +1,79 @@
 <?php
 
-/** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
-
 declare(strict_types=1);
 
 namespace OpenTelemetry\Context;
 
 use function assert;
-use function class_exists;
 use const E_USER_WARNING;
 use Fiber;
+use function spl_object_id;
+use function sprintf;
 use function trigger_error;
+use WeakMap;
 
 /**
  * @internal
- *
- * @phan-file-suppress PhanUndeclaredClassReference
- * @phan-file-suppress PhanUndeclaredClassMethod
  */
-final class FiberBoundContextStorage implements ContextStorageInterface, ExecutionContextAwareInterface
+final class FiberBoundContextStorage implements ContextStorageInterface, ContextStorageHeadAware
 {
-    public function __construct(private readonly ContextStorageInterface&ExecutionContextAwareInterface $storage)
+    /** @var WeakMap<object, ContextStorageHead> */
+    private WeakMap $heads;
+
+    public function __construct()
     {
+        $this->heads = new WeakMap();
+        $this->heads[$this] = new ContextStorageHead($this);
     }
 
-    public function fork(int|string $id): void
+    public function head(): ?ContextStorageHead
     {
-        $this->storage->fork($id);
-    }
-
-    public function switch(int|string $id): void
-    {
-        $this->storage->switch($id);
-    }
-
-    public function destroy(int|string $id): void
-    {
-        $this->storage->destroy($id);
+        return $this->heads[Fiber::getCurrent() ?? $this] ?? null;
     }
 
     public function scope(): ?ContextStorageScopeInterface
     {
-        $this->checkFiberMismatch();
+        $head = $this->heads[Fiber::getCurrent() ?? $this] ?? null;
 
-        if (($scope = $this->storage->scope()) === null) {
+        if (!$head?->node && Fiber::getCurrent()) {
+            self::triggerNotInitializedFiberContextWarning();
+
             return null;
         }
 
-        return new FiberBoundContextStorageScope($scope);
+        // Starts with empty head instead of cloned parent -> no need to check for head mismatch
+        return $head->node;
     }
 
     public function current(): ContextInterface
     {
-        $this->checkFiberMismatch();
+        $head = $this->heads[Fiber::getCurrent() ?? $this] ?? null;
 
-        return $this->storage->current();
+        if (!$head?->node && Fiber::getCurrent()) {
+            self::triggerNotInitializedFiberContextWarning();
+
+            // Fallback to {main} to preserve BC
+            $head = $this->heads[$this];
+        }
+
+        return $head->node->context ?? Context::getRoot();
     }
 
     public function attach(ContextInterface $context): ContextStorageScopeInterface
     {
-        $scope = $this->storage->attach($context);
-        assert(class_exists(Fiber::class, false));
-        $scope[Fiber::class] = Fiber::getCurrent();
+        $head = $this->heads[Fiber::getCurrent() ?? $this] ??= new ContextStorageHead($this);
 
-        return new FiberBoundContextStorageScope($scope);
+        return $head->node = new ContextStorageNode($context, $head, $head->node);
     }
 
-    private function checkFiberMismatch(): void
+    private static function triggerNotInitializedFiberContextWarning(): void
     {
-        $scope = $this->storage->scope();
-        assert(class_exists(Fiber::class, false));
-        if ($scope && $scope[Fiber::class] !== Fiber::getCurrent()) {
-            trigger_error('Fiber context switching not supported', E_USER_WARNING);
-        }
+        $fiber = Fiber::getCurrent();
+        assert($fiber !== null);
+
+        trigger_error(sprintf(
+            'Access to not initialized OpenTelemetry context in fiber (id: %d), automatic forking not supported, must attach initial fiber context manually',
+            spl_object_id($fiber),
+        ), E_USER_WARNING);
     }
 }

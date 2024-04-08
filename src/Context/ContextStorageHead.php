@@ -11,7 +11,7 @@ final class ContextStorageHead
 {
     public ?ContextStorageNode $node = null;
 
-    public function __construct(public ContextStorage $storage)
+    public function __construct(public ContextStorageHeadAware $storage)
     {
     }
 }

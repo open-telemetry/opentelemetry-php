@@ -44,7 +44,7 @@ final class Context implements ContextInterface
     public static function storage(): ContextStorageInterface&ExecutionContextAwareInterface
     {
         /** @psalm-suppress RedundantPropertyInitializationCheck */
-        return self::$storage ??= new ContextStorage();
+        return self::$storage ??= new FiberBoundContextStorageExecutionAwareBC();
     }
 
     /**

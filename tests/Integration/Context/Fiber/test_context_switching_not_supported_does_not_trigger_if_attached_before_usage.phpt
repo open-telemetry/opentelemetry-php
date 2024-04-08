@@ -1,5 +1,5 @@
 --TEST--
-Context usage in fiber without fiber support triggers warning.
+Context usage in fiber without fiber support does not trigger warning if context is attached before usage.
 --SKIPIF--
 <?php if (!class_exists(Fiber::class)) die('skip requires fibers'); ?>
 --ENV--
@@ -15,7 +15,7 @@ $scope = Context::getCurrent()
     ->with($key, 'main')
     ->activate();
 
-$fiber = new Fiber(function() use ($key) {
+$fiber = new Fiber(bindContext(function() use ($key) {
     echo 'fiber(pre):' . Context::getCurrent()->get($key), PHP_EOL;
 
     $scope = Context::getCurrent()
@@ -30,7 +30,7 @@ $fiber = new Fiber(function() use ($key) {
     $scope->detach();
 
     echo 'fiber(post):' . Context::getCurrent()->get($key), PHP_EOL;
-});
+}));
 
 echo 'main:' . Context::getCurrent()->get($key), PHP_EOL;
 
@@ -42,18 +42,26 @@ echo 'main:' . Context::getCurrent()->get($key), PHP_EOL;
 
 $scope->detach();
 
+
+// see https://github.com/opentelemetry-php/context?tab=readme-ov-file#event-loops
+function bindContext(Closure $closure): Closure {
+    $context = Context::getCurrent();
+    return static function (mixed ...$args) use ($closure, $context): mixed {
+        $scope = $context->activate();
+        try {
+            return $closure(...$args);
+        } finally {
+            $scope->detach();
+        }
+    };
+}
+
 ?>
 --EXPECTF--
 main:main
-
-Warning: Access to not initialized OpenTelemetry context in fiber (id: %d), automatic forking not supported, must attach initial fiber context manually %s
 fiber(pre):main
-
-Warning: Access to not initialized OpenTelemetry context in fiber (id: %d), automatic forking not supported, must attach initial fiber context manually %s
 fiber:fiber
 main:main
 fiber:fiber
-
-Warning: Access to not initialized OpenTelemetry context in fiber (id: %d), automatic forking not supported, must attach initial fiber context manually %s
 fiber(post):main
 main:main

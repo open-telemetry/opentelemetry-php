@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Context;
 
 use Exception;
+use Fiber;
 use function ini_set;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\DebugScope;
@@ -104,17 +105,10 @@ final class DebugScopeTest extends TestCase
     {
         $scope1 = Context::getCurrent()->activate();
 
-        Context::storage()->fork(1);
-        Context::storage()->switch(1);
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('different execution context');
 
-        try {
-            $this->expectException(Exception::class);
-            $this->expectExceptionMessage('different execution context');
-            $scope1->detach();
-        } finally {
-            Context::storage()->switch(0);
-            Context::storage()->destroy(1);
-        }
+        (new Fiber($scope1->detach(...)))->start();
     }
 
     public function test_missing_scope_detach(): void
