@@ -11,7 +11,7 @@ interface ResourceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.24.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.25.0';
 
     /**
      * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found here.
@@ -41,21 +41,30 @@ interface ResourceAttributes
     public const AWS_ECS_LAUNCHTYPE = 'aws.ecs.launchtype';
 
     /**
-     * The ARN of an ECS task definition.
+     * The ARN of a running ECS task.
      *
      * @example arn:aws:ecs:us-west-1:123456789123:task/10838bed-421f-43ef-870a-f43feacbbb5b
+     * @example arn:aws:ecs:us-west-1:123456789123:task/my-cluster/task-id/23ebb8ac-c18f-46c6-8bbe-d55d0e37cfbd
      */
     public const AWS_ECS_TASK_ARN = 'aws.ecs.task.arn';
 
     /**
-     * The task definition family this task definition is a member of.
+     * The family name of the ECS task definition used to create the ECS task.
      *
      * @example opentelemetry-family
      */
     public const AWS_ECS_TASK_FAMILY = 'aws.ecs.task.family';
 
     /**
-     * The revision for this task definition.
+     * The ID of a running ECS task. The ID MUST be extracted from `task.arn`.
+     *
+     * @example 10838bed-421f-43ef-870a-f43feacbbb5b
+     * @example 23ebb8ac-c18f-46c6-8bbe-d55d0e37cfbd
+     */
+    public const AWS_ECS_TASK_ID = 'aws.ecs.task.id';
+
+    /**
+     * The revision for the task definition used to create the ECS task.
      *
      * @example 8
      * @example 26
@@ -499,6 +508,7 @@ interface ResourceAttributes
      * Stepping or core revisions.
      *
      * @example 1
+     * @example r1p1
      */
     public const HOST_CPU_STEPPING = 'host.cpu.stepping';
 
@@ -789,17 +799,19 @@ interface ResourceAttributes
     public const OS_VERSION = 'os.version';
 
     /**
-     * Deprecated, use the `otel.scope.name` attribute.
+     * None.
      *
-     * @deprecated Deprecated, use the `otel.scope.name` attribute..
+     * @deprecated use the `otel.scope.name` attribute.
+     *
      * @example io.opentelemetry.contrib.mongodb
      */
     public const OTEL_LIBRARY_NAME = 'otel.library.name';
 
     /**
-     * Deprecated, use the `otel.scope.version` attribute.
+     * None.
      *
-     * @deprecated Deprecated, use the `otel.scope.version` attribute..
+     * @deprecated use the `otel.scope.version` attribute.
+     *
      * @example 1.0.0
      */
     public const OTEL_LIBRARY_VERSION = 'otel.library.version';
@@ -899,9 +911,25 @@ interface ResourceAttributes
     /**
      * The string ID of the service instance.
      *
-     * MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words `service.namespace,service.name,service.instance.id` triplet MUST be globally unique). The ID helps to distinguish instances of the same service that exist at the same time (e.g. instances of a horizontally scaled service). It is preferable for the ID to be persistent and stay the same for the lifetime of the service instance, however it is acceptable that the ID is ephemeral and changes during important lifetime events for the service (e.g. service restarts). If the service has no inherent unique ID that can be used as the value of this attribute it is recommended to generate a random Version 1 or Version 4 RFC 4122 UUID (services aiming for reproducible UUIDs may also use Version 5, see RFC 4122 for more recommendations).
+     * MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words
+     * `service.namespace,service.name,service.instance.id` triplet MUST be globally unique). The ID helps to
+     * distinguish instances of the same service that exist at the same time (e.g. instances of a horizontally scaled
+     * service).Implementations, such as SDKs, are recommended to generate a random Version 1 or Version 4 RFC
+     * 4122 UUID, but are free to use an inherent unique ID as the source of
+     * this value if stability is desirable. In that case, the ID SHOULD be used as source of a UUID Version 5 and
+     * SHOULD use the following UUID as the namespace: `4d63009a-8d0f-11ee-aad7-4c796ed8e320`.UUIDs are typically recommended, as only an opaque value for the purposes of identifying a service instance is
+     * needed. Similar to what can be seen in the man page for the
+     * `/etc/machine-id` file, the underlying
+     * data, such as pod name and namespace should be treated as confidential, being the user's choice to expose it
+     * or not via another resource attribute.For applications running behind an application server (like unicorn), we do not recommend using one identifier
+     * for all processes participating in the application. Instead, it's recommended each division (e.g. a worker
+     * thread in unicorn) to have its own instance.id.It's not recommended for a Collector to set `service.instance.id` if it can't unambiguously determine the
+     * service instance that is generating that telemetry. For instance, creating an UUID based on `pod.name` will
+     * likely be wrong, as the Collector might not know from which container within that pod the telemetry originated.
+     * However, Collectors can set the `service.instance.id` if they can unambiguously determine the service instance
+     * for that telemetry. This is typically the case for scraping receivers, as they know the target address and
+     * port.
      *
-     * @example my-k8s-pod-deployment-1
      * @example 627cc493-f310-47de-96bd-71410b7dec09
      */
     public const SERVICE_INSTANCE_ID = 'service.instance.id';

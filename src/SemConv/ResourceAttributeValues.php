@@ -11,7 +11,7 @@ interface ResourceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.24.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.25.0';
     /**
      * @see ResourceAttributes::AWS_ECS_LAUNCHTYPE ec2
      */
@@ -76,6 +76,11 @@ interface ResourceAttributeValues
      * @see ResourceAttributes::CLOUD_PLATFORM Azure Virtual Machines
      */
     public const CLOUD_PLATFORM_AZURE_VM = 'azure_vm';
+
+    /**
+     * @see ResourceAttributes::CLOUD_PLATFORM Azure Container Apps
+     */
+    public const CLOUD_PLATFORM_AZURE_CONTAINER_APPS = 'azure_container_apps';
 
     /**
      * @see ResourceAttributes::CLOUD_PLATFORM Azure Container Instances

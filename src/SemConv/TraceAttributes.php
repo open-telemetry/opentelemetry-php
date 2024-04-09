@@ -11,7 +11,15 @@ interface TraceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.24.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.25.0';
+
+    /**
+     * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found here.
+     *
+     * @example 33
+     * @example 32
+     */
+    public const ANDROID_OS_API_LEVEL = 'android.os.api_level';
 
     /**
      * This attribute represents the state the application has transitioned into at the occurrence of the event.
@@ -101,7 +109,7 @@ interface TraceAttributes
     public const AWS_DYNAMODB_EXCLUSIVE_START_TABLE = 'aws.dynamodb.exclusive_start_table';
 
     /**
-     * The JSON-serialized value of each item in the the `GlobalSecondaryIndexUpdates` request field.
+     * The JSON-serialized value of each item in the `GlobalSecondaryIndexUpdates` request field.
      *
      * @example { "Create": { "IndexName": "string", "KeySchema": [ { "AttributeName": "string", "KeyType": "string" } ], "Projection": { "NonKeyAttributes": [ "string" ], "ProjectionType": "string" }, "ProvisionedThroughput": { "ReadCapacityUnits": number, "WriteCapacityUnits": number } }
      */
@@ -195,7 +203,7 @@ interface TraceAttributes
     public const AWS_DYNAMODB_SELECT = 'aws.dynamodb.select';
 
     /**
-     * The the number of items in the `TableNames` response parameter.
+     * The number of items in the `TableNames` response parameter.
      *
      * @example 20
      */
@@ -322,6 +330,48 @@ interface TraceAttributes
     public const AWS_S3_UPLOAD_ID = 'aws.s3.upload_id';
 
     /**
+     * Array of brand name and version separated by a space.
+     *
+     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.brands`).
+     *
+     * @example  Not A;Brand 99
+     * @example Chromium 99
+     * @example Chrome 99
+     */
+    public const BROWSER_BRANDS = 'browser.brands';
+
+    /**
+     * Preferred language of the user using the browser.
+     *
+     * This value is intended to be taken from the Navigator API `navigator.language`.
+     *
+     * @example en
+     * @example en-US
+     * @example fr
+     * @example fr-FR
+     */
+    public const BROWSER_LANGUAGE = 'browser.language';
+
+    /**
+     * A boolean that is true if the browser is running on a mobile device.
+     *
+     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.mobile`). If unavailable, this attribute SHOULD be left unset.
+     */
+    public const BROWSER_MOBILE = 'browser.mobile';
+
+    /**
+     * The platform on which the browser is running.
+     *
+     * This value is intended to be taken from the UA client hints API (`navigator.userAgentData.platform`). If unavailable, the legacy `navigator.platform` API SHOULD NOT be used instead and this attribute SHOULD be left unset in order for the values to be consistent.
+     * The list of possible values is defined in the W3C User-Agent Client Hints specification. Note that some (but not all) of these values can overlap with values in the `os.type` and `os.name` attributes. However, for consistency, the values in the `browser.platform` attribute should capture the exact value that the user agent provides.
+     *
+     * @example Windows
+     * @example macOS
+     * @example Android
+     */
+    public const BROWSER_PLATFORM = 'browser.platform';
+
+    /**
      * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
      *
      * When observed from the server side, and when communicating through an intermediary, `client.address` SHOULD represent the client address behind any intermediaries,  for example proxies, if it's available.
@@ -340,6 +390,45 @@ interface TraceAttributes
      * @example 65123
      */
     public const CLIENT_PORT = 'client.port';
+
+    /**
+     * The cloud account ID the resource is assigned to.
+     *
+     * @example 111111111111
+     * @example opentelemetry
+     */
+    public const CLOUD_ACCOUNT_ID = 'cloud.account.id';
+
+    /**
+     * Cloud regions often have multiple, isolated locations known as zones to increase availability. Availability zone represents the zone where the resource is running.
+     *
+     * Availability zones are called &quot;zones&quot; on Alibaba Cloud and Google Cloud.
+     *
+     * @example us-east-1c
+     */
+    public const CLOUD_AVAILABILITY_ZONE = 'cloud.availability_zone';
+
+    /**
+     * The cloud platform in use.
+     *
+     * The prefix of the service SHOULD match the one specified in `cloud.provider`.
+     */
+    public const CLOUD_PLATFORM = 'cloud.platform';
+
+    /**
+     * Name of the cloud provider.
+     */
+    public const CLOUD_PROVIDER = 'cloud.provider';
+
+    /**
+     * The geographical region the resource is running.
+     *
+     * Refer to your provider's docs to see the available regions, for example Alibaba Cloud regions, AWS regions, Azure regions, Google Cloud regions, or Tencent Cloud regions.
+     *
+     * @example us-central1
+     * @example us-east-1
+     */
+    public const CLOUD_REGION = 'cloud.region';
 
     /**
      * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an ARN on AWS, a fully qualified resource ID on Azure, a full resource name on GCP).
@@ -448,6 +537,96 @@ interface TraceAttributes
     public const CODE_STACKTRACE = 'code.stacktrace';
 
     /**
+     * The command used to run the container (i.e. the command name).
+     *
+     * If using embedded credentials or sensitive data, it is recommended to remove them to prevent potential leakage.
+     *
+     * @example otelcontribcol
+     */
+    public const CONTAINER_COMMAND = 'container.command';
+
+    /**
+     * All the command arguments (including the command/executable itself) run by the container. [2].
+     *
+     * @example otelcontribcol, --config, config.yaml
+     */
+    public const CONTAINER_COMMAND_ARGS = 'container.command_args';
+
+    /**
+     * The full command run by the container as a single string representing the full command. [2].
+     *
+     * @example otelcontribcol --config config.yaml
+     */
+    public const CONTAINER_COMMAND_LINE = 'container.command_line';
+
+    /**
+     * The CPU state for this data point.
+     *
+     * @example user
+     * @example kernel
+     */
+    public const CONTAINER_CPU_STATE = 'container.cpu.state';
+
+    /**
+     * Container ID. Usually a UUID, as for example used to identify Docker containers. The UUID might be abbreviated.
+     *
+     * @example a3bf90e006b2
+     */
+    public const CONTAINER_ID = 'container.id';
+
+    /**
+     * Runtime specific image identifier. Usually a hash algorithm followed by a UUID.
+     *
+     * Docker defines a sha256 of the image id; `container.image.id` corresponds to the `Image` field from the Docker container inspect API endpoint.
+     * K8s defines a link to the container registry repository with digest `"imageID": "registry.azurecr.io /namespace/service/dockerfile@sha256:bdeabd40c3a8a492eaf9e8e44d0ebbb84bac7ee25ac0cf8a7159d25f62555625"`.
+     * The ID is assinged by the container runtime and can vary in different environments. Consider using `oci.manifest.digest` if it is important to identify the same image in different environments/runtimes.
+     *
+     * @example sha256:19c92d0a00d1b66d897bceaa7319bee0dd38a10a851c60bcec9474aa3f01e50f
+     */
+    public const CONTAINER_IMAGE_ID = 'container.image.id';
+
+    /**
+     * Name of the image the container was built on.
+     *
+     * @example gcr.io/opentelemetry/operator
+     */
+    public const CONTAINER_IMAGE_NAME = 'container.image.name';
+
+    /**
+     * Repo digests of the container image as provided by the container runtime.
+     *
+     * Docker and CRI report those under the `RepoDigests` field.
+     *
+     * @example example@sha256:afcc7f1ac1b49db317a7196c902e61c6c3c4607d63599ee1a82d702d249a0ccb
+     * @example internal.registry.example.com:5000/example@sha256:b69959407d21e8a062e0416bf13405bb2b71ed7a84dde4158ebafacfa06f5578
+     */
+    public const CONTAINER_IMAGE_REPO_DIGESTS = 'container.image.repo_digests';
+
+    /**
+     * Container image tags. An example can be found in Docker Image Inspect. Should be only the `<tag>` section of the full name for example from `registry.example.com/my-org/my-image:<tag>`.
+     *
+     * @example v1.27.1
+     * @example 3.5.7-0
+     */
+    public const CONTAINER_IMAGE_TAGS = 'container.image.tags';
+
+    /**
+     * Container name used by container runtime.
+     *
+     * @example opentelemetry-autoconf
+     */
+    public const CONTAINER_NAME = 'container.name';
+
+    /**
+     * The container runtime managing this container.
+     *
+     * @example docker
+     * @example containerd
+     * @example rkt
+     */
+    public const CONTAINER_RUNTIME = 'container.runtime';
+
+    /**
      * The consistency level of the query. Based on consistency values from CQL.
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL = 'db.cassandra.consistency_level';
@@ -495,7 +674,9 @@ interface TraceAttributes
     public const DB_CASSANDRA_TABLE = 'db.cassandra.table';
 
     /**
-     * The connection string used to connect to the database. It is recommended to remove embedded credentials.
+     * Deprecated, use `server.address`, `server.port` attributes instead.
+     *
+     * @deprecated "Replaced by `server.address` and `server.port`.".
      *
      * @example Server=(localdb)\v11.0;Integrated Security=true;
      */
@@ -562,7 +743,9 @@ interface TraceAttributes
     public const DB_ELASTICSEARCH_CLUSTER_NAME = 'db.elasticsearch.cluster.name';
 
     /**
-     * Represents the human-readable identifier of the node/instance to which a request was routed.
+     * Deprecated, use `db.instance.id` instead.
+     *
+     * @deprecated Replaced by `db.instance.id`.
      *
      * @example instance-0000000001
      */
@@ -576,7 +759,9 @@ interface TraceAttributes
     public const DB_INSTANCE_ID = 'db.instance.id';
 
     /**
-     * The fully-qualified class name of the Java Database Connectivity (JDBC) driver used to connect.
+     * Removed, no replacement at this time.
+     *
+     * @deprecated Removed as not used.
      *
      * @example org.postgresql.Driver
      * @example com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -661,6 +846,22 @@ interface TraceAttributes
     public const DB_USER = 'db.user';
 
     /**
+     * Name of the deployment environment (aka deployment tier).
+     *
+     * `deployment.environment` does not affect the uniqueness constraints defined through
+     * the `service.namespace`, `service.name` and `service.instance.id` resource attributes.
+     * This implies that resources carrying the following attribute combinations MUST be
+     * considered to be identifying the same service:<ul>
+     * <li>`service.name=frontend`, `deployment.environment=production`</li>
+     * <li>`service.name=frontend`, `deployment.environment=staging`.</li>
+     * </ul>
+     *
+     * @example staging
+     * @example production
+     */
+    public const DEPLOYMENT_ENVIRONMENT = 'deployment.environment';
+
+    /**
      * Destination address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
      *
      * When observed from the source side, and when communicating through an intermediary, `destination.address` SHOULD represent the destination address behind any intermediaries, for example proxies, if it's available.
@@ -680,11 +881,60 @@ interface TraceAttributes
     public const DESTINATION_PORT = 'destination.port';
 
     /**
+     * A unique identifier representing the device.
+     *
+     * The device identifier MUST only be defined using the values outlined below. This value is not an advertising identifier and MUST NOT be used as such. On iOS (Swift or Objective-C), this value MUST be equal to the vendor identifier. On Android (Java or Kotlin), this value MUST be equal to the Firebase Installation ID or a globally unique UUID which is persisted across sessions in your application. More information can be found here on best practices and exact implementation details. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply, ensure you do your own due diligence.
+     *
+     * @example 2ab2916d-a51f-4ac8-80ee-45ac31a28092
+     */
+    public const DEVICE_ID = 'device.id';
+
+    /**
+     * The name of the device manufacturer.
+     *
+     * The Android OS provides this field via Build. iOS apps SHOULD hardcode the value `Apple`.
+     *
+     * @example Apple
+     * @example Samsung
+     */
+    public const DEVICE_MANUFACTURER = 'device.manufacturer';
+
+    /**
+     * The model identifier for the device.
+     *
+     * It's recommended this value represents a machine-readable version of the model identifier rather than the market or consumer-friendly name of the device.
+     *
+     * @example iPhone3,4
+     * @example SM-G920F
+     */
+    public const DEVICE_MODEL_IDENTIFIER = 'device.model.identifier';
+
+    /**
+     * The marketing name for the device model.
+     *
+     * It's recommended this value represents a human-readable version of the device model rather than a machine-readable alternative.
+     *
+     * @example iPhone 6s Plus
+     * @example Samsung Galaxy S6
+     */
+    public const DEVICE_MODEL_NAME = 'device.model.name';
+
+    /**
      * The disk IO operation direction.
      *
      * @example read
      */
     public const DISK_IO_DIRECTION = 'disk.io.direction';
+
+    /**
+     * The name being queried.
+     *
+     * If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
+     *
+     * @example www.example.com
+     * @example opentelemetry.io
+     */
+    public const DNS_QUESTION_NAME = 'dns.question.name';
 
     /**
      * Username or client_id extracted from the access token or Authorization header in the inbound request from outside the system.
@@ -818,6 +1068,17 @@ interface TraceAttributes
     public const FAAS_DOCUMENT_TIME = 'faas.document.time';
 
     /**
+     * The execution environment ID as a string, that will be potentially reused for other invocations to the same function/function version.
+     *
+     * <ul>
+     * <li><strong>AWS Lambda:</strong> Use the (full) log stream name.</li>
+     * </ul>
+     *
+     * @example 2021/06/28/[$LATEST]2f399eb14537447da05ab2a2e39309de
+     */
+    public const FAAS_INSTANCE = 'faas.instance';
+
+    /**
      * The invocation ID of the current function invocation.
      *
      * @example af9d5aa4-a685-4c5f-a22b-444f80b3cc28
@@ -850,6 +1111,38 @@ interface TraceAttributes
     public const FAAS_INVOKED_REGION = 'faas.invoked_region';
 
     /**
+     * The amount of memory available to the serverless function converted to Bytes.
+     *
+     * It's recommended to set this attribute since e.g. too little memory can easily stop a Java AWS Lambda function from working correctly. On AWS Lambda, the environment variable `AWS_LAMBDA_FUNCTION_MEMORY_SIZE` provides this information (which must be multiplied by 1,048,576).
+     *
+     * @example 134217728
+     */
+    public const FAAS_MAX_MEMORY = 'faas.max_memory';
+
+    /**
+     * The name of the single function that this runtime instance executes.
+     *
+     * This is the name of the function as configured/deployed on the FaaS
+     * platform and is usually different from the name of the callback
+     * function (which may be stored in the
+     * `code.namespace`/`code.function`
+     * span attributes).For some cloud providers, the above definition is ambiguous. The following
+     * definition of function name MUST be used for this attribute
+     * (and consequently the span name) for the listed cloud providers/products:<ul>
+     * <li><strong>Azure:</strong>  The full name `<FUNCAPP>/<FUNC>`, i.e., function app name
+     * followed by a forward slash followed by the function name (this form
+     * can also be seen in the resource JSON for the function).
+     * This means that a span attribute MUST be used, as an Azure function
+     * app can host multiple functions that would usually share
+     * a TracerProvider (see also the `cloud.resource_id` attribute).</li>
+     * </ul>
+     *
+     * @example my-function
+     * @example myazurefunctionapp/some-function-name
+     */
+    public const FAAS_NAME = 'faas.name';
+
+    /**
      * A string containing the function invocation time in the ISO 8601 format expressed in UTC.
      *
      * @example 2020-01-23T13:47:06Z
@@ -860,6 +1153,24 @@ interface TraceAttributes
      * Type of the trigger which caused this function invocation.
      */
     public const FAAS_TRIGGER = 'faas.trigger';
+
+    /**
+     * The immutable version of the function being executed.
+     *
+     * Depending on the cloud provider and platform, use:<ul>
+     * <li><strong>AWS Lambda:</strong> The function version
+     * (an integer represented as a decimal string).</li>
+     * <li><strong>Google Cloud Run (Services):</strong> The revision
+     * (i.e., the function name plus the revision suffix).</li>
+     * <li><strong>Google Cloud Functions:</strong> The value of the
+     * `K_REVISION` environment variable.</li>
+     * <li><strong>Azure Functions:</strong> Not applicable. Do not set this attribute.</li>
+     * </ul>
+     *
+     * @example 26
+     * @example pinkfroid-00002
+     */
+    public const FAAS_VERSION = 'faas.version';
 
     /**
      * The unique identifier of the feature flag.
@@ -892,6 +1203,75 @@ interface TraceAttributes
     public const FEATURE_FLAG_VARIANT = 'feature_flag.variant';
 
     /**
+     * Directory where the file is located. It should include the drive letter, when appropriate.
+     *
+     * @example /home/user
+     * @example C:\Program Files\MyApp
+     */
+    public const FILE_DIRECTORY = 'file.directory';
+
+    /**
+     * File extension, excluding the leading dot.
+     *
+     * When the file name has multiple extensions (example.tar.gz), only the last one should be captured (&quot;gz&quot;, not &quot;tar.gz&quot;).
+     *
+     * @example png
+     * @example gz
+     */
+    public const FILE_EXTENSION = 'file.extension';
+
+    /**
+     * Name of the file including the extension, without the directory.
+     *
+     * @example example.png
+     */
+    public const FILE_NAME = 'file.name';
+
+    /**
+     * Full path to the file, including the file name. It should include the drive letter, when appropriate.
+     *
+     * @example /home/alice/example.png
+     * @example C:\Program Files\MyApp\myapp.exe
+     */
+    public const FILE_PATH = 'file.path';
+
+    /**
+     * File size in bytes.
+     */
+    public const FILE_SIZE = 'file.size';
+
+    /**
+     * The name of the Cloud Run execution being run for the Job, as set by the `CLOUD_RUN_EXECUTION` environment variable.
+     *
+     * @example job-name-xxxx
+     * @example sample-job-mdw84
+     */
+    public const GCP_CLOUD_RUN_JOB_EXECUTION = 'gcp.cloud_run.job.execution';
+
+    /**
+     * The index for a task within an execution as provided by the `CLOUD_RUN_TASK_INDEX` environment variable.
+     *
+     * @example 1
+     */
+    public const GCP_CLOUD_RUN_JOB_TASK_INDEX = 'gcp.cloud_run.job.task_index';
+
+    /**
+     * The hostname of a GCE instance. This is the full value of the default or custom hostname.
+     *
+     * @example my-host1234.example.com
+     * @example sample-vm.us-west1-b.c.my-project.internal
+     */
+    public const GCP_GCE_INSTANCE_HOSTNAME = 'gcp.gce.instance.hostname';
+
+    /**
+     * The instance name of a GCE instance. This is the value provided by `host.name`, the visible name of the instance in the Cloud Console UI, and the prefix for the default hostname of the instance as defined by the default internal DNS name.
+     *
+     * @example instance-1
+     * @example my-vm-name
+     */
+    public const GCP_GCE_INSTANCE_NAME = 'gcp.gce.instance.name';
+
+    /**
      * The GraphQL document being executed.
      *
      * The value may be sanitized to exclude sensitive information.
@@ -917,14 +1297,140 @@ interface TraceAttributes
     public const GRAPHQL_OPERATION_TYPE = 'graphql.operation.type';
 
     /**
+     * The CPU architecture the host system is running on.
+     */
+    public const HOST_ARCH = 'host.arch';
+
+    /**
+     * The amount of level 2 memory cache available to the processor (in Bytes).
+     *
+     * @example 12288000
+     */
+    public const HOST_CPU_CACHE_L2_SIZE = 'host.cpu.cache.l2.size';
+
+    /**
+     * Family or generation of the CPU.
+     *
+     * @example 6
+     * @example PA-RISC 1.1e
+     */
+    public const HOST_CPU_FAMILY = 'host.cpu.family';
+
+    /**
+     * Model identifier. It provides more granular information about the CPU, distinguishing it from other CPUs within the same family.
+     *
+     * @example 6
+     * @example 9000/778/B180L
+     */
+    public const HOST_CPU_MODEL_ID = 'host.cpu.model.id';
+
+    /**
+     * Model designation of the processor.
+     *
+     * @example 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz
+     */
+    public const HOST_CPU_MODEL_NAME = 'host.cpu.model.name';
+
+    /**
+     * Stepping or core revisions.
+     *
+     * @example 1
+     * @example r1p1
+     */
+    public const HOST_CPU_STEPPING = 'host.cpu.stepping';
+
+    /**
+     * Processor manufacturer identifier. A maximum 12-character string.
+     *
+     * CPUID command returns the vendor ID string in EBX, EDX and ECX registers. Writing these to memory in this order results in a 12-character string.
+     *
+     * @example GenuineIntel
+     */
+    public const HOST_CPU_VENDOR_ID = 'host.cpu.vendor.id';
+
+    /**
+     * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider. For non-containerized systems, this should be the `machine-id`. See the table below for the sources to use to determine the `machine-id` based on operating system.
+     *
+     * @example fdbf79e8af94cb7f9e8df36789187052
+     */
+    public const HOST_ID = 'host.id';
+
+    /**
+     * VM image ID or host OS image ID. For Cloud, this value is from the provider.
+     *
+     * @example ami-07b06b442921831e5
+     */
+    public const HOST_IMAGE_ID = 'host.image.id';
+
+    /**
+     * Name of the VM image or OS install the host was instantiated from.
+     *
+     * @example infra-ami-eks-worker-node-7d4ec78312
+     * @example CentOS-8-x86_64-1905
+     */
+    public const HOST_IMAGE_NAME = 'host.image.name';
+
+    /**
+     * The version string of the VM image or host OS as defined in Version Attributes.
+     *
+     * @example 0.1
+     */
+    public const HOST_IMAGE_VERSION = 'host.image.version';
+
+    /**
+     * Available IP addresses of the host, excluding loopback interfaces.
+     *
+     * IPv4 Addresses MUST be specified in dotted-quad notation. IPv6 addresses MUST be specified in the RFC 5952 format.
+     *
+     * @example 192.168.1.140
+     * @example fe80::abc2:4a28:737a:609e
+     */
+    public const HOST_IP = 'host.ip';
+
+    /**
+     * Available MAC addresses of the host, excluding loopback interfaces.
+     *
+     * MAC Addresses MUST be represented in IEEE RA hexadecimal form: as hyphen-separated octets in uppercase hexadecimal form from most to least significant.
+     *
+     * @example AC-DE-48-23-45-67
+     * @example AC-DE-48-23-45-67-01-9F
+     */
+    public const HOST_MAC = 'host.mac';
+
+    /**
+     * Name of the host. On Unix systems, it may contain what the hostname command returns, or the fully qualified hostname, or another name specified by the user.
+     *
+     * @example opentelemetry-test
+     */
+    public const HOST_NAME = 'host.name';
+
+    /**
+     * Type of host. For Cloud, this must be the machine type.
+     *
+     * @example n1-standard-1
+     */
+    public const HOST_TYPE = 'host.type';
+
+    /**
+     * State of the HTTP connection in the HTTP connection pool.
+     *
+     * @example active
+     * @example idle
+     */
+    public const HTTP_CONNECTION_STATE = 'http.connection.state';
+
+    /**
      * Deprecated, use `network.protocol.name` instead.
+     *
+     * @deprecated Replaced by `network.protocol.name`.
      */
     public const HTTP_FLAVOR = 'http.flavor';
 
     /**
      * Deprecated, use `http.request.method` instead.
      *
-     * @deprecated Deprecated, use `http.request.method` instead..
+     * @deprecated Replaced by `http.request.method`.
+     *
      * @example GET
      * @example POST
      * @example HEAD
@@ -975,9 +1481,17 @@ interface TraceAttributes
     public const HTTP_REQUEST_RESEND_COUNT = 'http.request.resend_count';
 
     /**
+     * The total size of the request in bytes. This should be the total number of bytes sent over the wire, including the request line (HTTP/1.1), framing (HTTP/2 and HTTP/3), headers, and request body if any.
+     *
+     * @example 1437
+     */
+    public const HTTP_REQUEST_SIZE = 'http.request.size';
+
+    /**
      * Deprecated, use `http.request.header.content-length` instead.
      *
-     * @deprecated Deprecated, use `http.request.header.content-length` instead..
+     * @deprecated Replaced by `http.request.header.content-length`.
+     *
      * @example 3495
      */
     public const HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length';
@@ -990,6 +1504,13 @@ interface TraceAttributes
     public const HTTP_RESPONSE_BODY_SIZE = 'http.response.body.size';
 
     /**
+     * The total size of the response in bytes. This should be the total number of bytes sent over the wire, including the status line (HTTP/1.1), framing (HTTP/2 and HTTP/3), headers, and response body and trailers if any.
+     *
+     * @example 1437
+     */
+    public const HTTP_RESPONSE_SIZE = 'http.response.size';
+
+    /**
      * HTTP response status code.
      *
      * @example 200
@@ -999,7 +1520,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `http.response.header.content-length` instead.
      *
-     * @deprecated Deprecated, use `http.response.header.content-length` instead..
+     * @deprecated Replaced by `http.response.header.content-length`.
+     *
      * @example 3495
      */
     public const HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length';
@@ -1018,7 +1540,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `url.scheme` instead.
      *
-     * @deprecated Deprecated, use `url.scheme` instead..
+     * @deprecated Replaced by `url.scheme` instead.
+     *
      * @example http
      * @example https
      */
@@ -1027,7 +1550,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `http.response.status_code` instead.
      *
-     * @deprecated Deprecated, use `http.response.status_code` instead..
+     * @deprecated Replaced by `http.response.status_code`.
+     *
      * @example 200
      */
     public const HTTP_STATUS_CODE = 'http.status_code';
@@ -1035,7 +1559,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `url.path` and `url.query` instead.
      *
-     * @deprecated Deprecated, use `url.path` and `url.query` instead..
+     * @deprecated Split to `url.path` and `url.query.
+     *
      * @example /search?q=OpenTelemetry#SemConv
      */
     public const HTTP_TARGET = 'http.target';
@@ -1043,7 +1568,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `url.full` instead.
      *
-     * @deprecated Deprecated, use `url.full` instead..
+     * @deprecated Replaced by `url.full`.
+     *
      * @example https://www.foo.bar/search?q=OpenTelemetry#SemConv
      */
     public const HTTP_URL = 'http.url';
@@ -1051,7 +1577,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `user_agent.original` instead.
      *
-     * @deprecated Deprecated, use `user_agent.original` instead..
+     * @deprecated Replaced by `user_agent.original`.
+     *
      * @example CERN-LineMode/2.15 libwww/2.17b3
      * @example Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1
      */
@@ -1092,6 +1619,171 @@ interface TraceAttributes
      * @example non_heap
      */
     public const JVM_MEMORY_TYPE = 'jvm.memory.type';
+
+    /**
+     * The name of the cluster.
+     *
+     * @example opentelemetry-cluster
+     */
+    public const K8S_CLUSTER_NAME = 'k8s.cluster.name';
+
+    /**
+     * A pseudo-ID for the cluster, set to the UID of the `kube-system` namespace.
+     *
+     * K8s doesn't have support for obtaining a cluster ID. If this is ever
+     * added, we will recommend collecting the `k8s.cluster.uid` through the
+     * official APIs. In the meantime, we are able to use the `uid` of the
+     * `kube-system` namespace as a proxy for cluster ID. Read on for the
+     * rationale.Every object created in a K8s cluster is assigned a distinct UID. The
+     * `kube-system` namespace is used by Kubernetes itself and will exist
+     * for the lifetime of the cluster. Using the `uid` of the `kube-system`
+     * namespace is a reasonable proxy for the K8s ClusterID as it will only
+     * change if the cluster is rebuilt. Furthermore, Kubernetes UIDs are
+     * UUIDs as standardized by
+     * ISO/IEC 9834-8 and ITU-T X.667.
+     * Which states:<blockquote>
+     * If generated according to one of the mechanisms defined in Rec.</blockquote>
+     * ITU-T X.667 | ISO/IEC 9834-8, a UUID is either guaranteed to be
+     *   different from all other UUIDs generated before 3603 A.D., or is
+     *   extremely likely to be different (depending on the mechanism chosen).Therefore, UIDs between clusters should be extremely unlikely to
+     * conflict.
+     *
+     * @example 218fc5a9-a5f1-4b54-aa05-46717d0ab26d
+     */
+    public const K8S_CLUSTER_UID = 'k8s.cluster.uid';
+
+    /**
+     * The name of the Container from Pod specification, must be unique within a Pod. Container runtime usually uses different globally unique name (`container.name`).
+     *
+     * @example redis
+     */
+    public const K8S_CONTAINER_NAME = 'k8s.container.name';
+
+    /**
+     * Number of times the container was restarted. This attribute can be used to identify a particular container (running or stopped) within a container spec.
+     *
+     * @example 2
+     */
+    public const K8S_CONTAINER_RESTART_COUNT = 'k8s.container.restart_count';
+
+    /**
+     * The name of the CronJob.
+     *
+     * @example opentelemetry
+     */
+    public const K8S_CRONJOB_NAME = 'k8s.cronjob.name';
+
+    /**
+     * The UID of the CronJob.
+     *
+     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+     */
+    public const K8S_CRONJOB_UID = 'k8s.cronjob.uid';
+
+    /**
+     * The name of the DaemonSet.
+     *
+     * @example opentelemetry
+     */
+    public const K8S_DAEMONSET_NAME = 'k8s.daemonset.name';
+
+    /**
+     * The UID of the DaemonSet.
+     *
+     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+     */
+    public const K8S_DAEMONSET_UID = 'k8s.daemonset.uid';
+
+    /**
+     * The name of the Deployment.
+     *
+     * @example opentelemetry
+     */
+    public const K8S_DEPLOYMENT_NAME = 'k8s.deployment.name';
+
+    /**
+     * The UID of the Deployment.
+     *
+     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+     */
+    public const K8S_DEPLOYMENT_UID = 'k8s.deployment.uid';
+
+    /**
+     * The name of the Job.
+     *
+     * @example opentelemetry
+     */
+    public const K8S_JOB_NAME = 'k8s.job.name';
+
+    /**
+     * The UID of the Job.
+     *
+     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+     */
+    public const K8S_JOB_UID = 'k8s.job.uid';
+
+    /**
+     * The name of the namespace that the pod is running in.
+     *
+     * @example default
+     */
+    public const K8S_NAMESPACE_NAME = 'k8s.namespace.name';
+
+    /**
+     * The name of the Node.
+     *
+     * @example node-1
+     */
+    public const K8S_NODE_NAME = 'k8s.node.name';
+
+    /**
+     * The UID of the Node.
+     *
+     * @example 1eb3a0c6-0477-4080-a9cb-0cb7db65c6a2
+     */
+    public const K8S_NODE_UID = 'k8s.node.uid';
+
+    /**
+     * The name of the Pod.
+     *
+     * @example opentelemetry-pod-autoconf
+     */
+    public const K8S_POD_NAME = 'k8s.pod.name';
+
+    /**
+     * The UID of the Pod.
+     *
+     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+     */
+    public const K8S_POD_UID = 'k8s.pod.uid';
+
+    /**
+     * The name of the ReplicaSet.
+     *
+     * @example opentelemetry
+     */
+    public const K8S_REPLICASET_NAME = 'k8s.replicaset.name';
+
+    /**
+     * The UID of the ReplicaSet.
+     *
+     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+     */
+    public const K8S_REPLICASET_UID = 'k8s.replicaset.uid';
+
+    /**
+     * The name of the StatefulSet.
+     *
+     * @example opentelemetry
+     */
+    public const K8S_STATEFULSET_NAME = 'k8s.statefulset.name';
+
+    /**
+     * The UID of the StatefulSet.
+     *
+     * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+     */
+    public const K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
 
     /**
      * The basename of the file.
@@ -1193,6 +1885,13 @@ interface TraceAttributes
     public const MESSAGING_DESTINATION_NAME = 'messaging.destination.name';
 
     /**
+     * The identifier of the partition messages are sent to or received from, unique within the `messaging.destination.name`.
+     *
+     * @example 1
+     */
+    public const MESSAGING_DESTINATION_PARTITION_ID = 'messaging.destination.partition.id';
+
+    /**
      * Low cardinality representation of the messaging destination name.
      *
      * Destination names could be constructed from templates. An example would be a destination name involving a user name or product id. Although the destination name in this case is of high cardinality, the underlying template is of low cardinality and can be effectively used for grouping and aggregation.
@@ -1223,6 +1922,20 @@ interface TraceAttributes
     public const MESSAGING_DESTINATION_PUBLISH_NAME = 'messaging.destination_publish.name';
 
     /**
+     * The name of the consumer group the event consumer is associated with.
+     *
+     * @example indexer
+     */
+    public const MESSAGING_EVENTHUBS_CONSUMER_GROUP = 'messaging.eventhubs.consumer.group';
+
+    /**
+     * The UTC epoch seconds at which the message has been accepted and stored in the entity.
+     *
+     * @example 1701393730
+     */
+    public const MESSAGING_EVENTHUBS_MESSAGE_ENQUEUED_TIME = 'messaging.eventhubs.message.enqueued_time';
+
+    /**
      * The ordering key for a given message. If the attribute is not present, the message does not have an ordering key.
      *
      * @example ordering_key
@@ -1237,7 +1950,9 @@ interface TraceAttributes
     public const MESSAGING_KAFKA_CONSUMER_GROUP = 'messaging.kafka.consumer.group';
 
     /**
-     * Partition the message is sent to.
+     * &quot;Deprecated, use `messaging.destination.partition.id` instead.&quot;.
+     *
+     * @deprecated Replaced by `messaging.destination.partition.id`.
      *
      * @example 2
      */
@@ -1313,6 +2028,13 @@ interface TraceAttributes
     public const MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY = 'messaging.rabbitmq.destination.routing_key';
 
     /**
+     * RabbitMQ message delivery tag.
+     *
+     * @example 123
+     */
+    public const MESSAGING_RABBITMQ_MESSAGE_DELIVERY_TAG = 'messaging.rabbitmq.message.delivery_tag';
+
+    /**
      * Name of the RocketMQ producer/consumer group that is handling the message. The client type is identified by the SpanKind.
      *
      * @example myConsumerGroup
@@ -1373,6 +2095,32 @@ interface TraceAttributes
     public const MESSAGING_ROCKETMQ_NAMESPACE = 'messaging.rocketmq.namespace';
 
     /**
+     * The name of the subscription in the topic messages are received from.
+     *
+     * @example mySubscription
+     */
+    public const MESSAGING_SERVICEBUS_DESTINATION_SUBSCRIPTION_NAME = 'messaging.servicebus.destination.subscription_name';
+
+    /**
+     * Describes the settlement type.
+     */
+    public const MESSAGING_SERVICEBUS_DISPOSITION_STATUS = 'messaging.servicebus.disposition_status';
+
+    /**
+     * Number of deliveries that have been attempted for this message.
+     *
+     * @example 2
+     */
+    public const MESSAGING_SERVICEBUS_MESSAGE_DELIVERY_COUNT = 'messaging.servicebus.message.delivery_count';
+
+    /**
+     * The UTC epoch seconds at which the message has been accepted and stored in the entity.
+     *
+     * @example 1701393730
+     */
+    public const MESSAGING_SERVICEBUS_MESSAGE_ENQUEUED_TIME = 'messaging.servicebus.message.enqueued_time';
+
+    /**
      * An identifier for the messaging system being used. See below for a list of well-known identifiers.
      */
     public const MESSAGING_SYSTEM = 'messaging.system';
@@ -1380,7 +2128,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `server.address`.
      *
-     * @deprecated Deprecated, use `server.address`..
+     * @deprecated Replaced by `server.address`.
+     *
      * @example example.com
      */
     public const NET_HOST_NAME = 'net.host.name';
@@ -1388,7 +2137,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `server.port`.
      *
-     * @deprecated Deprecated, use `server.port`..
+     * @deprecated Replaced by `server.port`.
+     *
      * @example 8080
      */
     public const NET_HOST_PORT = 'net.host.port';
@@ -1396,7 +2146,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `server.address` on client spans and `client.address` on server spans.
      *
-     * @deprecated Deprecated, use `server.address` on client spans and `client.address` on server spans..
+     * @deprecated Replaced by `server.address` on client spans and `client.address` on server spans.
+     *
      * @example example.com
      */
     public const NET_PEER_NAME = 'net.peer.name';
@@ -1404,7 +2155,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `server.port` on client spans and `client.port` on server spans.
      *
-     * @deprecated Deprecated, use `server.port` on client spans and `client.port` on server spans..
+     * @deprecated Replaced by `server.port` on client spans and `client.port` on server spans.
+     *
      * @example 8080
      */
     public const NET_PEER_PORT = 'net.peer.port';
@@ -1412,7 +2164,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.protocol.name`.
      *
-     * @deprecated Deprecated, use `network.protocol.name`..
+     * @deprecated Replaced by `network.protocol.name`.
+     *
      * @example amqp
      * @example http
      * @example mqtt
@@ -1422,20 +2175,24 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.protocol.version`.
      *
-     * @deprecated Deprecated, use `network.protocol.version`..
+     * @deprecated Replaced by `network.protocol.version`.
+     *
      * @example 3.1.1
      */
     public const NET_PROTOCOL_VERSION = 'net.protocol.version';
 
     /**
      * Deprecated, use `network.transport` and `network.type`.
+     *
+     * @deprecated Split to `network.transport` and `network.type`.
      */
     public const NET_SOCK_FAMILY = 'net.sock.family';
 
     /**
      * Deprecated, use `network.local.address`.
      *
-     * @deprecated Deprecated, use `network.local.address`..
+     * @deprecated Replaced by `network.local.address`.
+     *
      * @example /var/my.sock
      */
     public const NET_SOCK_HOST_ADDR = 'net.sock.host.addr';
@@ -1443,7 +2200,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.local.port`.
      *
-     * @deprecated Deprecated, use `network.local.port`..
+     * @deprecated Replaced by `network.local.port`.
+     *
      * @example 8080
      */
     public const NET_SOCK_HOST_PORT = 'net.sock.host.port';
@@ -1451,7 +2209,8 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.peer.address`.
      *
-     * @deprecated Deprecated, use `network.peer.address`..
+     * @deprecated Replaced by `network.peer.address`.
+     *
      * @example 192.168.0.1
      */
     public const NET_SOCK_PEER_ADDR = 'net.sock.peer.addr';
@@ -1459,7 +2218,8 @@ interface TraceAttributes
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated Deprecated, no replacement at this time..
+     * @deprecated Removed.
+     *
      * @example /var/my.sock
      */
     public const NET_SOCK_PEER_NAME = 'net.sock.peer.name';
@@ -1467,13 +2227,16 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.peer.port`.
      *
-     * @deprecated Deprecated, use `network.peer.port`..
+     * @deprecated Replaced by `network.peer.port`.
+     *
      * @example 65531
      */
     public const NET_SOCK_PEER_PORT = 'net.sock.peer.port';
 
     /**
      * Deprecated, use `network.transport`.
+     *
+     * @deprecated Replaced by `network.transport`.
      */
     public const NET_TRANSPORT = 'net.transport';
 
@@ -1567,9 +2330,9 @@ interface TraceAttributes
     public const NETWORK_PROTOCOL_NAME = 'network.protocol.name';
 
     /**
-     * Version of the protocol specified in `network.protocol.name`.
+     * The actual version of the protocol used for network communication.
      *
-     * `network.protocol.version` refers to the version of the protocol used and might be different from the protocol client's version. If the HTTP client has a version of `0.27.2`, but sends HTTP version `1.1`, this attribute should be set to `1.1`.
+     * If protocol version is subject to negotiation (for example using ALPN), this attribute SHOULD be set to the negotiated version. If the actual protocol version is not known, this attribute SHOULD NOT be set.
      *
      * @example 1.0
      * @example 1.1
@@ -1601,11 +2364,60 @@ interface TraceAttributes
     public const NETWORK_TYPE = 'network.type';
 
     /**
+     * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
+     *
+     * Follows OCI Image Manifest Specification, and specifically the Digest property.
+     * An example can be found in Example Image Manifest.
+     *
+     * @example sha256:e4ca62c0d62f3e886e684806dfe9d4e0cda60d54986898173c1083856cfda0f4
+     */
+    public const OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
+
+    /**
      * Parent-child Reference type.
      *
      * The causal relationship between a child Span and a parent Span.
      */
     public const OPENTRACING_REF_TYPE = 'opentracing.ref_type';
+
+    /**
+     * Unique identifier for a particular build or compilation of the operating system.
+     *
+     * @example TQ3C.230805.001.B2
+     * @example 20E247
+     * @example 22621
+     */
+    public const OS_BUILD_ID = 'os.build_id';
+
+    /**
+     * Human readable (not intended to be parsed) OS version information, like e.g. reported by `ver` or `lsb_release -a` commands.
+     *
+     * @example Microsoft Windows [Version 10.0.18363.778]
+     * @example Ubuntu 18.04.1 LTS
+     */
+    public const OS_DESCRIPTION = 'os.description';
+
+    /**
+     * Human readable operating system name.
+     *
+     * @example iOS
+     * @example Android
+     * @example Ubuntu
+     */
+    public const OS_NAME = 'os.name';
+
+    /**
+     * The operating system type.
+     */
+    public const OS_TYPE = 'os.type';
+
+    /**
+     * The version string of the operating system as defined in Version Attributes.
+     *
+     * @example 14.2.1
+     * @example 18.04.1
+     */
+    public const OS_VERSION = 'os.version';
 
     /**
      * Name of the code, either &quot;OK&quot; or &quot;ERROR&quot;. MUST NOT be set if the status code is UNSET.
@@ -1627,11 +2439,94 @@ interface TraceAttributes
     public const PEER_SERVICE = 'peer.service';
 
     /**
-     * The name of the connection pool; unique within the instrumented application. In case the connection pool implementation doesn't provide a name, then the db.connection_string should be used.
+     * The name of the connection pool; unique within the instrumented application. In case the connection pool implementation doesn't provide a name, instrumentation should use a combination of `server.address` and `server.port` attributes formatted as `server.address:server.port`.
      *
      * @example myDataSource
      */
     public const POOL_NAME = 'pool.name';
+
+    /**
+     * The command used to launch the process (i.e. the command name). On Linux based systems, can be set to the zeroth string in `proc/[pid]/cmdline`. On Windows, can be set to the first parameter extracted from `GetCommandLineW`.
+     *
+     * @example cmd/otelcol
+     */
+    public const PROCESS_COMMAND = 'process.command';
+
+    /**
+     * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`.
+     *
+     * @example cmd/otecol
+     * @example --config=config.yaml
+     */
+    public const PROCESS_COMMAND_ARGS = 'process.command_args';
+
+    /**
+     * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead.
+     *
+     * @example C:\cmd\otecol --config="my directory\config.yaml"
+     */
+    public const PROCESS_COMMAND_LINE = 'process.command_line';
+
+    /**
+     * The CPU state for this data point. A process SHOULD be characterized <em>either</em> by data points with no `state` labels, <em>or only</em> data points with `state` labels.
+     */
+    public const PROCESS_CPU_STATE = 'process.cpu.state';
+
+    /**
+     * The name of the process executable. On Linux based systems, can be set to the `Name` in `proc/[pid]/status`. On Windows, can be set to the base name of `GetProcessImageFileNameW`.
+     *
+     * @example otelcol
+     */
+    public const PROCESS_EXECUTABLE_NAME = 'process.executable.name';
+
+    /**
+     * The full path to the process executable. On Linux based systems, can be set to the target of `proc/[pid]/exe`. On Windows, can be set to the result of `GetProcessImageFileNameW`.
+     *
+     * @example /usr/bin/cmd/otelcol
+     */
+    public const PROCESS_EXECUTABLE_PATH = 'process.executable.path';
+
+    /**
+     * The username of the user that owns the process.
+     *
+     * @example root
+     */
+    public const PROCESS_OWNER = 'process.owner';
+
+    /**
+     * Parent Process identifier (PPID).
+     *
+     * @example 111
+     */
+    public const PROCESS_PARENT_PID = 'process.parent_pid';
+
+    /**
+     * Process identifier (PID).
+     *
+     * @example 1234
+     */
+    public const PROCESS_PID = 'process.pid';
+
+    /**
+     * An additional description about the runtime of the process, for example a specific vendor customization of the runtime environment.
+     *
+     * @example Eclipse OpenJ9 Eclipse OpenJ9 VM openj9-0.21.0
+     */
+    public const PROCESS_RUNTIME_DESCRIPTION = 'process.runtime.description';
+
+    /**
+     * The name of the runtime of this process. For compiled native binaries, this SHOULD be the name of the compiler.
+     *
+     * @example OpenJDK Runtime Environment
+     */
+    public const PROCESS_RUNTIME_NAME = 'process.runtime.name';
+
+    /**
+     * The version of the runtime of this process, as returned by the runtime without modification.
+     *
+     * @example 14.0.2
+     */
+    public const PROCESS_RUNTIME_VERSION = 'process.runtime.version';
 
     /**
      * The error codes of the Connect request. Error codes are always string values.
@@ -1721,6 +2616,58 @@ interface TraceAttributes
     public const SERVER_PORT = 'server.port';
 
     /**
+     * The string ID of the service instance.
+     *
+     * MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words
+     * `service.namespace,service.name,service.instance.id` triplet MUST be globally unique). The ID helps to
+     * distinguish instances of the same service that exist at the same time (e.g. instances of a horizontally scaled
+     * service).Implementations, such as SDKs, are recommended to generate a random Version 1 or Version 4 RFC
+     * 4122 UUID, but are free to use an inherent unique ID as the source of
+     * this value if stability is desirable. In that case, the ID SHOULD be used as source of a UUID Version 5 and
+     * SHOULD use the following UUID as the namespace: `4d63009a-8d0f-11ee-aad7-4c796ed8e320`.UUIDs are typically recommended, as only an opaque value for the purposes of identifying a service instance is
+     * needed. Similar to what can be seen in the man page for the
+     * `/etc/machine-id` file, the underlying
+     * data, such as pod name and namespace should be treated as confidential, being the user's choice to expose it
+     * or not via another resource attribute.For applications running behind an application server (like unicorn), we do not recommend using one identifier
+     * for all processes participating in the application. Instead, it's recommended each division (e.g. a worker
+     * thread in unicorn) to have its own instance.id.It's not recommended for a Collector to set `service.instance.id` if it can't unambiguously determine the
+     * service instance that is generating that telemetry. For instance, creating an UUID based on `pod.name` will
+     * likely be wrong, as the Collector might not know from which container within that pod the telemetry originated.
+     * However, Collectors can set the `service.instance.id` if they can unambiguously determine the service instance
+     * for that telemetry. This is typically the case for scraping receivers, as they know the target address and
+     * port.
+     *
+     * @example 627cc493-f310-47de-96bd-71410b7dec09
+     */
+    public const SERVICE_INSTANCE_ID = 'service.instance.id';
+
+    /**
+     * Logical name of the service.
+     *
+     * MUST be the same for all instances of horizontally scaled services. If the value was not specified, SDKs MUST fallback to `unknown_service:` concatenated with `process.executable.name`, e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value MUST be set to `unknown_service`.
+     *
+     * @example shoppingcart
+     */
+    public const SERVICE_NAME = 'service.name';
+
+    /**
+     * A namespace for `service.name`.
+     *
+     * A string value having a meaning that helps to distinguish a group of services, for example the team name that owns a group of services. `service.name` is expected to be unique within the same namespace. If `service.namespace` is not specified in the Resource then `service.name` is expected to be unique for all services that have no explicit namespace defined (so the empty/unspecified namespace is simply one more valid namespace). Zero-length namespace string is assumed equal to unspecified namespace.
+     *
+     * @example Shop
+     */
+    public const SERVICE_NAMESPACE = 'service.namespace';
+
+    /**
+     * The version string of the service API or implementation. The format is not defined by these conventions.
+     *
+     * @example 2.0.0
+     * @example a01dbef8a
+     */
+    public const SERVICE_VERSION = 'service.version';
+
+    /**
      * A unique id to identify a session.
      *
      * @example 00112233-4455-6677-8899-aabbccddeeff
@@ -1784,7 +2731,7 @@ interface TraceAttributes
     public const SYSTEM_CPU_LOGICAL_NUMBER = 'system.cpu.logical_number';
 
     /**
-     * The state of the CPU.
+     * The CPU state for this data point. A system's CPU SHOULD be characterized <em>either</em> by data points with no `state` labels, <em>or only</em> data points with `state` labels.
      *
      * @example idle
      * @example interrupt
@@ -1867,7 +2814,59 @@ interface TraceAttributes
      *
      * @example running
      */
+    public const SYSTEM_PROCESS_STATUS = 'system.process.status';
+
+    /**
+     * Deprecated, use `system.process.status` instead.
+     *
+     * @deprecated Replaced by `system.process.status`.
+     *
+     * @example running
+     */
     public const SYSTEM_PROCESSES_STATUS = 'system.processes.status';
+
+    /**
+     * The name of the auto instrumentation agent or distribution, if used.
+     *
+     * Official auto instrumentation agents and distributions SHOULD set the `telemetry.distro.name` attribute to
+     * a string starting with `opentelemetry-`, e.g. `opentelemetry-java-instrumentation`.
+     *
+     * @example parts-unlimited-java
+     */
+    public const TELEMETRY_DISTRO_NAME = 'telemetry.distro.name';
+
+    /**
+     * The version string of the auto instrumentation agent or distribution, if used.
+     *
+     * @example 1.2.3
+     */
+    public const TELEMETRY_DISTRO_VERSION = 'telemetry.distro.version';
+
+    /**
+     * The language of the telemetry SDK.
+     */
+    public const TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language';
+
+    /**
+     * The name of the telemetry SDK as defined above.
+     *
+     * The OpenTelemetry SDK MUST set the `telemetry.sdk.name` attribute to `opentelemetry`.
+     * If another SDK, like a fork or a vendor-provided implementation, is used, this SDK MUST set the
+     * `telemetry.sdk.name` attribute to the fully-qualified class or module name of this SDK's main entry point
+     * or another suitable identifier depending on the language.
+     * The identifier `opentelemetry` is reserved and MUST NOT be used in this case.
+     * All custom identifiers SHOULD be stable across different versions of an implementation.
+     *
+     * @example opentelemetry
+     */
+    public const TELEMETRY_SDK_NAME = 'telemetry.sdk.name';
+
+    /**
+     * The version string of the telemetry SDK.
+     *
+     * @example 1.2.3
+     */
+    public const TELEMETRY_SDK_VERSION = 'telemetry.sdk.version';
 
     /**
      * Current &quot;managed&quot; thread ID (as opposed to OS thread ID).
@@ -2091,6 +3090,28 @@ interface TraceAttributes
     public const TLS_SERVER_SUBJECT = 'tls.server.subject';
 
     /**
+     * Domain extracted from the `url.full`, such as &quot;opentelemetry.io&quot;.
+     *
+     * In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the domain field. If the URL contains a literal IPv6 address enclosed by `[` and `]`, the `[` and `]` characters should also be captured in the domain field.
+     *
+     * @example www.foo.bar
+     * @example opentelemetry.io
+     * @example 3.12.167.2
+     * @example [1080:0:0:0:8:800:200C:417A]
+     */
+    public const URL_DOMAIN = 'url.domain';
+
+    /**
+     * The file extension extracted from the `url.full`, excluding the leading dot.
+     *
+     * The file extension is only set if it exists, as not every url has a file extension. When the file name has multiple extensions `example.tar.gz`, only the last one should be captured `gz`, not `tar.gz`.
+     *
+     * @example png
+     * @example gz
+     */
+    public const URL_EXTENSION = 'url.extension';
+
+    /**
      * The URI fragment component.
      *
      * @example SemConv
@@ -2102,7 +3123,7 @@ interface TraceAttributes
      *
      * For network calls, URL usually has `scheme://host[:port][path][?query][#fragment]` format, where the fragment is not transmitted over HTTP, but if it is known, it SHOULD be included nevertheless.
      * `url.full` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case username and password SHOULD be redacted and attribute's value SHOULD be `https://REDACTED:REDACTED@www.example.com/`.
-     * `url.full` SHOULD capture the absolute URL when it is available (or can be reconstructed) and SHOULD NOT be validated or modified except for sanitizing purposes.
+     * `url.full` SHOULD capture the absolute URL when it is available (or can be reconstructed). Sensitive content provided in `url.full` SHOULD be scrubbed when instrumentations can identify it.
      *
      * @example https://www.foo.bar/search?q=OpenTelemetry#SemConv
      * @example //localhost
@@ -2110,20 +3131,50 @@ interface TraceAttributes
     public const URL_FULL = 'url.full';
 
     /**
+     * Unmodified original URL as seen in the event source.
+     *
+     * In network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path. This field is meant to represent the URL as it was observed, complete or not.
+     * `url.original` might contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case password and username SHOULD NOT be redacted and attribute's value SHOULD remain the same.
+     *
+     * @example https://www.foo.bar/search?q=OpenTelemetry#SemConv
+     * @example search?q=OpenTelemetry
+     */
+    public const URL_ORIGINAL = 'url.original';
+
+    /**
      * The URI path component.
+     *
+     * Sensitive content provided in `url.path` SHOULD be scrubbed when instrumentations can identify it.
      *
      * @example /search
      */
     public const URL_PATH = 'url.path';
 
     /**
+     * Port extracted from the `url.full`.
+     *
+     * @example 443
+     */
+    public const URL_PORT = 'url.port';
+
+    /**
      * The URI query component.
      *
-     * Sensitive content provided in query string SHOULD be scrubbed when instrumentations can identify it.
+     * Sensitive content provided in `url.query` SHOULD be scrubbed when instrumentations can identify it.
      *
      * @example q=OpenTelemetry
      */
     public const URL_QUERY = 'url.query';
+
+    /**
+     * The highest registered url domain, stripped of the subdomain.
+     *
+     * This value can be determined precisely with the public suffix list. For example, the registered domain for `foo.example.com` is `example.com`. Trying to approximate this by simply taking the last two labels will not work well for TLDs such as `co.uk`.
+     *
+     * @example example.com
+     * @example foo.co.uk
+     */
+    public const URL_REGISTERED_DOMAIN = 'url.registered_domain';
 
     /**
      * The URI scheme component identifying the used protocol.
@@ -2134,12 +3185,53 @@ interface TraceAttributes
     public const URL_SCHEME = 'url.scheme';
 
     /**
+     * The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain. In a partially qualified domain, or if the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+     *
+     * The subdomain portion of `www.east.mydomain.co.uk` is `east`. If the domain has multiple levels of subdomain, such as `sub2.sub1.example.com`, the subdomain field should contain `sub2.sub1`, with no trailing period.
+     *
+     * @example east
+     * @example sub2.sub1
+     */
+    public const URL_SUBDOMAIN = 'url.subdomain';
+
+    /**
+     * The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is `com`.
+     *
+     * This value can be determined precisely with the public suffix list.
+     *
+     * @example com
+     * @example co.uk
+     */
+    public const URL_TOP_LEVEL_DOMAIN = 'url.top_level_domain';
+
+    /**
+     * Name of the user-agent extracted from original. Usually refers to the browser's name.
+     *
+     * Example of extracting browser's name from original string. In the case of using a user-agent for non-browser products, such as microservices with multiple names/versions inside the `user_agent.original`, the most significant name SHOULD be selected. In such a scenario it should align with `user_agent.version`
+     *
+     * @example Safari
+     * @example YourApp
+     */
+    public const USER_AGENT_NAME = 'user_agent.name';
+
+    /**
      * Value of the HTTP User-Agent header sent by the client.
      *
      * @example CERN-LineMode/2.15 libwww/2.17b3
      * @example Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1
+     * @example YourApp/1.0.0 grpc-java-okhttp/1.27.2
      */
     public const USER_AGENT_ORIGINAL = 'user_agent.original';
+
+    /**
+     * Version of the user-agent extracted from original. Usually refers to the browser's version.
+     *
+     * Example of extracting browser's version from original string. In the case of using a user-agent for non-browser products, such as microservices with multiple names/versions inside the `user_agent.original`, the most significant version SHOULD be selected. In such a scenario it should align with `user_agent.name`
+     *
+     * @example 14.1.2
+     * @example 1.0.0
+     */
+    public const USER_AGENT_VERSION = 'user_agent.version';
 
     /**
      * @deprecated

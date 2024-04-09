@@ -19,11 +19,12 @@ interface {{ class }}Attributes
      *
      * {{ attribute.note | render_markdown(code="`{0}`", paragraph="{0}", link="{1}") | trim("\n")| regex_replace(pattern="\n", replace="\n     * ") }}
      {%- endif %}
-     {%- if attribute.examples or attribute.stability == "deprecated" %}
+     {%- if attribute | is_deprecated %}
      *
-     {%- if (attribute.stability | string()) == "StabilityLevel.DEPRECATED" %}
-     * @deprecated {{attribute.brief}}.
+     * @deprecated {{ attribute.deprecated | to_doc_brief }}.
      {%- endif %}
+     {%- if attribute.examples %}
+     *
      {%- for example in attribute.examples if example %}
      * @example {{ example }}
      {%- endfor %}
