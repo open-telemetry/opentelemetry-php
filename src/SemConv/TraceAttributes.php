@@ -676,7 +676,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `server.address`, `server.port` attributes instead.
      *
-     * @deprecated "Replaced by `server.address` and `server.port`."
+     * @deprecated "Replaced by `server.address` and `server.port`.".
      *
      * @example Server=(localdb)\v11.0;Integrated Security=true;
      */
