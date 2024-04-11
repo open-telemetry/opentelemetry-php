@@ -77,6 +77,10 @@ deptrac:
           collectors:
               - type: className
                 regex: ^Composer\\*
+      -   name: SPI
+          collectors:
+              - type: className
+                regex: ^Nevay\\SPI\\*
 
     ruleset:
       Context:
@@ -91,6 +95,7 @@ deptrac:
           - PsrHttp
           - HttpPlug
           - Composer
+          - SPI
       Contrib:
           - +SDK
           - +OtelProto
