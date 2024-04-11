@@ -9,6 +9,7 @@ use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\SDK\Common\Instrumentation\AutoInstrument;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Logs\LoggerProviderFactory;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
@@ -29,6 +30,9 @@ class SdkAutoloader
         if (!self::isEnabled() || self::isExcludedUrl()) {
             return false;
         }
+
+        AutoInstrument::bootstrap();
+
         Globals::registerInitializer(function (Configurator $configurator) {
             $propagator = (new PropagatorFactory())->create();
             if (Sdk::isDisabled()) {
