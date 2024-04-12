@@ -7,8 +7,8 @@ namespace OpenTelemetry\SDK\Common\Export\Http;
 use const FILTER_VALIDATE_URL;
 use function filter_var;
 use Http\Discovery\Psr17FactoryDiscovery;
-use Http\Discovery\Psr18ClientDiscovery;
 use InvalidArgumentException;
+use OpenTelemetry\SDK\Common\Export\Http\Discovery\ClientDiscovery;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -56,10 +56,10 @@ final class PsrTransportFactory implements TransportFactoryInterface
         );
     }
 
-    public static function discover(): self
+    public static function discover(array $options = []): self
     {
         return new self(
-            Psr18ClientDiscovery::find(),
+            ClientDiscovery::find($options),
             Psr17FactoryDiscovery::findRequestFactory(),
             Psr17FactoryDiscovery::findStreamFactory(),
         );
