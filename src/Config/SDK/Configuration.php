@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK;
 
-use Nevay\OTelSDK\Configuration\ComponentPlugin;
-use Nevay\OTelSDK\Configuration\ComponentProvider;
-use Nevay\OTelSDK\Configuration\ConfigurationFactory;
-use Nevay\OTelSDK\Configuration\Context;
-use Nevay\OTelSDK\Configuration\Environment\EnvSourceReader;
-use Nevay\OTelSDK\Configuration\Environment\PhpIniEnvSource;
-use Nevay\OTelSDK\Configuration\Environment\ServerEnvSource;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
+use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
+use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
+use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
+use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
+use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
+use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
 use OpenTelemetry\SDK\SdkBuilder;
 
 final class Configuration

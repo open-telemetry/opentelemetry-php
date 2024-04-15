@@ -15,9 +15,9 @@
         "psr/http-client": "^1.0",
         "psr/http-message": "^1.0.1|^2.0",
         "psr/log": "^1.1|^2.0|^3.0",
+        "symfony/config": "^5.4 || ^6.4 || ^7.0",
         "symfony/polyfill-mbstring": "^1.23",
         "symfony/polyfill-php82": "^1.26",
-        "tbachert/otel-sdk-configuration": "^0.1",
         "tbachert/spi": "^0.2"
     },
     "config": {
@@ -75,7 +75,8 @@
     "autoload-dev": {
         "psr-4": {
             "OpenTelemetry\\Tests\\": "tests/",
-            "OpenTelemetry\\Example\\": "examples/src/"
+            "OpenTelemetry\\Example\\": "examples/src/",
+            "ExampleSDK\\ComponentProvider\\": "tests/Unit/Config/SDK/Configuration/ExampleSdk/"
         }
     },
     "require-dev": {
@@ -110,16 +111,19 @@
         "qossmic/deptrac-shim": "^0.24 || ^1",
         "rector/rector": "^1",
         "symfony/http-client": "^5.2",
-        "symfony/yaml": "^6 || ^5"
+        "symfony/var-exporter": "^5.4 || ^6.4 || ^7.0",
+        "symfony/yaml": "^5.4 || ^6.4 || ^7.0"
     },
     "suggest": {
         "ext-gmp": "To support unlimited number of synchronous metric readers",
         "ext-grpc": "To use the OTLP GRPC Exporter",
-        "ext-protobuf": "For more performant protobuf/grpc exporting"
+        "ext-protobuf": "For more performant protobuf/grpc exporting",
+        "ext-yaml": "Allows loading config from yaml files",
+        "symfony/yaml": "Allows loading config from yaml files"
     },
     "extra": {
         "spi": {
-            "Nevay\\OTelSDK\\Configuration\\ComponentProvider": [
+            "OpenTelemetry\\Config\\SDK\\Configuration\\ComponentProvider": [
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",

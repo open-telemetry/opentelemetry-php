@@ -13,6 +13,7 @@
         <directory name="./examples"/>
         <ignoreFiles>
             <directory name="./examples/traces/demo/"/>
+            <directory name="tests/Unit/Config/SDK/Configuration/ExampleSdk"/>
             <directory name="tests/TraceContext/W3CTestService"/>
         </ignoreFiles>
     </projectFiles>
