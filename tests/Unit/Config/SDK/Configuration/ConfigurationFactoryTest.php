@@ -44,7 +44,7 @@ final class ConfigurationFactoryTest extends TestCase
                 }
 
                 /**
-                 * @psalm-suppress UndefinedInterfaceMethod
+                 * @psalm-suppress UndefinedInterfaceMethod,PossiblyNullReference
                  */
                 public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
                 {
