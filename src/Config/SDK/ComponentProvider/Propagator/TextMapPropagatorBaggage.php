@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Propagator;
 
-use Nevay\OTelSDK\Configuration\ComponentProvider;
-use Nevay\OTelSDK\Configuration\ComponentProviderRegistry;
-use Nevay\OTelSDK\Configuration\Context;
 use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
+use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
+use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
+use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 

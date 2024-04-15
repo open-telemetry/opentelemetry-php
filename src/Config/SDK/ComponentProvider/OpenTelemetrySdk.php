@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
-use Nevay\OTelSDK\Configuration\ComponentPlugin;
-use Nevay\OTelSDK\Configuration\ComponentProvider;
-use Nevay\OTelSDK\Configuration\ComponentProviderRegistry;
-use Nevay\OTelSDK\Configuration\Context;
-use Nevay\OTelSDK\Configuration\Validation;
+use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
+use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
+use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
+use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
