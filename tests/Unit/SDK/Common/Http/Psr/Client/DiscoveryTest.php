@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit\SDK\Common\Http\Psr\Client;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Http\Psr\Client;
 
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\DiscoveryInterface;

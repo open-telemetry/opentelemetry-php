@@ -27,27 +27,6 @@ class Discovery
         CurlClient::class,
     ];
 
-    public static function setDiscoverers(array $discoverers): void
-    {
-        self::$discoverers = $discoverers;
-    }
-
-    public static function reset(): void
-    {
-        self::$discoverers = null;
-    }
-
-    private static function discoverers(): Generator
-    {
-        foreach (self::$discoverers ?? self::DEFAULTS as $discoverer) {
-            if (is_string($discoverer)) {
-                yield new $discoverer();
-            } else {
-                yield $discoverer;
-            }
-        }
-    }
-
     /**
      * Attempt discovery of a configurable psr-18 http client, falling back to Psr18ClientDiscovery.
      */
@@ -63,5 +42,32 @@ class Discovery
         }
 
         return Psr18ClientDiscovery::find();
+    }
+
+    /**
+     * @internal
+     */
+    public static function setDiscoverers(array $discoverers): void
+    {
+        self::$discoverers = $discoverers;
+    }
+
+    /**
+     * @internal
+     */
+    public static function reset(): void
+    {
+        self::$discoverers = null;
+    }
+
+    private static function discoverers(): Generator
+    {
+        foreach (self::$discoverers ?? self::DEFAULTS as $discoverer) {
+            if (is_string($discoverer)) {
+                yield new $discoverer();
+            } else {
+                yield $discoverer;
+            }
+        }
     }
 }

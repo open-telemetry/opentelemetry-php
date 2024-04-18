@@ -45,7 +45,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
         assert(!empty($endpoint));
 
         $this->client ??= Discovery::find([
-            'timeout' => $timeout / 1000,
+            'timeout' => $timeout,
         ]);
         $this->requestFactory ??= Psr17FactoryDiscovery::findRequestFactory();
         $this->streamFactory ??= Psr17FactoryDiscovery::findStreamFactory();

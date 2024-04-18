@@ -9,7 +9,6 @@ use Psr\Http\Client\ClientInterface;
 
 class CurlClient implements DiscoveryInterface
 {
-
     /**
      * @phan-suppress PhanUndeclaredClassReference
      */

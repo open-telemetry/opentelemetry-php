@@ -10,7 +10,6 @@ use Psr\Http\Client\ClientInterface;
 
 class Buzz implements DiscoveryInterface
 {
-
     /**
      * @phan-suppress PhanUndeclaredClassReference
      */
