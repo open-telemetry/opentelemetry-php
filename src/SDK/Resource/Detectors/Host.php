@@ -68,7 +68,7 @@ final class Host implements ResourceDetectorInterface
 
         $out = exec('kenv -q smbios.system.uuid');
 
-        if ($out != false) {
+        if ($out !== false) {
             return $out;
         }
 
@@ -79,7 +79,7 @@ final class Host implements ResourceDetectorInterface
     {
         $out = exec('ioreg -rd1 -c IOPlatformExpertDevice | awk \'/IOPlatformUUID/ { split($0, line, "\""); printf("%s\n", line[4]); }\'');
 
-        if ($out != false) {
+        if ($out !== false) {
             return $out;
         }
 
@@ -90,7 +90,7 @@ final class Host implements ResourceDetectorInterface
     {
         $out = exec('powershell.exe -Command "Get-ItemPropertyValue -Path HKLM:\SOFTWARE\Microsoft\Cryptography -Name MachineGuid"');
 
-        if ($out != false) {
+        if ($out !== false) {
             return $out;
         }
 

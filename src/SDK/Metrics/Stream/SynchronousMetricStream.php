@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\Stream;
 
 use function assert;
-use const E_USER_WARNING;
 use function extension_loaded;
 use GMP;
 use function gmp_init;
 use function is_int;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use const PHP_INT_SIZE;
 use function sprintf;
-use function trigger_error;
 
 /**
  * @internal
@@ -24,6 +23,8 @@ use function trigger_error;
  */
 final class SynchronousMetricStream implements MetricStreamInterface
 {
+    use LogsMessagesTrait;
+
     private readonly DeltaStorage $delta;
     private int|GMP $readers = 0;
     private int|GMP $cumulative = 0;
@@ -62,7 +63,7 @@ final class SynchronousMetricStream implements MetricStreamInterface
 
         if ($reader === (PHP_INT_SIZE << 3) - 1 && is_int($this->readers)) {
             if (!extension_loaded('gmp')) {
-                trigger_error(sprintf('GMP extension required to register over %d readers', (PHP_INT_SIZE << 3) - 1), E_USER_WARNING);
+                self::logWarning(sprintf('GMP extension required to register over %d readers', (PHP_INT_SIZE << 3) - 1));
                 $reader = PHP_INT_SIZE << 3;
             } else {
                 assert(is_int($this->cumulative));
