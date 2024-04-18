@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Http\Discovery;
+namespace OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
 
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientInterface;

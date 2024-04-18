@@ -10,7 +10,7 @@ use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
-use OpenTelemetry\SDK\Common\Http\ClientDiscovery;
+use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -44,7 +44,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
         }
         assert(!empty($endpoint));
 
-        $this->client ??= ClientDiscovery::find([
+        $this->client ??= Discovery::find([
             'timeout' => $timeout / 1000,
         ]);
         $this->requestFactory ??= Psr17FactoryDiscovery::findRequestFactory();
