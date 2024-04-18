@@ -28,7 +28,7 @@ $logRecordExporter = new \OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter();
 
 $reader = new ExportingReader(
     new MetricExporter(
-        PsrTransportFactory::discover()->create('http://collector:4318/v1/metrics', 'application/x-protobuf')
+        (new PsrTransportFactory())->create('http://collector:4318/v1/metrics', 'application/x-protobuf')
     )
 );
 

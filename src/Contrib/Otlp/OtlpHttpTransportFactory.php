@@ -28,11 +28,7 @@ class OtlpHttpTransportFactory implements TransportFactoryInterface
             $compression = null;
         }
 
-        return PsrTransportFactory::discover([
-            'timeout' => $timeout,
-            //'cafile' => $cacert,
-            //'cert' => $cert,
-            //'key' => $key,
-        ])->create($endpoint, $contentType, $headers, $compression, $timeout, $retryDelay, $maxRetries, $cacert, $cert, $key);
+        return (new PsrTransportFactory())
+            ->create($endpoint, $contentType, $headers, $compression, $timeout, $retryDelay, $maxRetries, $cacert, $cert, $key);
     }
 }

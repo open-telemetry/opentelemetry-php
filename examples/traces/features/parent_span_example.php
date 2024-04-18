@@ -17,7 +17,7 @@ $sampler = new AlwaysOnSampler();
 
 // zipkin exporter
 $zipkinExporter = new ZipkinExporter(
-    PsrTransportFactory::discover()->create('http://zipkin:9411/api/v2/spans', 'application/json')
+    (new PsrTransportFactory())->create('http://zipkin:9411/api/v2/spans', 'application/json')
 );
 
 $tracerProvider =  new TracerProvider(

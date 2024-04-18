@@ -7,9 +7,10 @@ namespace OpenTelemetry\SDK\Common\Export\Http;
 use const FILTER_VALIDATE_URL;
 use function filter_var;
 use Http\Discovery\Psr17FactoryDiscovery;
+use Http\Discovery\Psr18ClientDiscovery;
 use InvalidArgumentException;
-use OpenTelemetry\SDK\Common\Export\Http\Discovery\ClientDiscovery;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Common\Http\ClientDiscovery;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -17,9 +18,9 @@ use Psr\Http\Message\StreamFactoryInterface;
 final class PsrTransportFactory implements TransportFactoryInterface
 {
     public function __construct(
-        private readonly ClientInterface $client,
-        private readonly RequestFactoryInterface $requestFactory,
-        private readonly StreamFactoryInterface $streamFactory,
+        private ?ClientInterface $client = null,
+        private ?RequestFactoryInterface $requestFactory = null,
+        private ?StreamFactoryInterface $streamFactory = null,
     ) {
     }
 
@@ -43,6 +44,12 @@ final class PsrTransportFactory implements TransportFactoryInterface
         }
         assert(!empty($endpoint));
 
+        $this->client ??= ClientDiscovery::find([
+            'timeout' => $timeout / 1000,
+        ]);
+        $this->requestFactory ??= Psr17FactoryDiscovery::findRequestFactory();
+        $this->streamFactory ??= Psr17FactoryDiscovery::findStreamFactory();
+
         return new PsrTransport(
             $this->client,
             $this->requestFactory,
@@ -56,10 +63,13 @@ final class PsrTransportFactory implements TransportFactoryInterface
         );
     }
 
-    public static function discover(array $options = []): self
+    /**
+     * @deprecated
+     */
+    public static function discover(): self
     {
         return new self(
-            ClientDiscovery::find($options),
+            Psr18ClientDiscovery::find(),
             Psr17FactoryDiscovery::findRequestFactory(),
             Psr17FactoryDiscovery::findStreamFactory(),
         );
