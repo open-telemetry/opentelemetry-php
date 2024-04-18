@@ -1,4 +1,3 @@
-version: '3.7'
 services:
   php:
     image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${PHP_VERSION:-8.1}

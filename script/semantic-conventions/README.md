@@ -31,3 +31,8 @@ diff <(grep "public const" src/SemConv/TraceAttributes.php | sort -u) \
 ```
 
 Use this output as a basis for updating the relevant deprecations file and generate a second time to include them in the final output.
+
+## Update tests
+
+Update `tests/Integration/Config/configurations/kitchen-sink.yaml`'s `resource.schema_url` value to the latest, as merging resources
+with different schema URLs is a merging error, per spec.

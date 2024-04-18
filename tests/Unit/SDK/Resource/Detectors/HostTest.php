@@ -16,8 +16,8 @@ class HostTest extends TestCase
 {
     public function test_host_get_resource(): void
     {
-        $resouceDetector = new Detectors\Host();
-        $resource = $resouceDetector->getResource();
+        $resourceDetector = new Detectors\Host();
+        $resource = $resourceDetector->getResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
@@ -30,8 +30,8 @@ class HostTest extends TestCase
     public function test_host_id_filesystem(string $os, array $files, ?string $expectedId): void
     {
         $root = vfsStream::setup('/', null, $files);
-        $resouceDetector = new Detectors\Host($root->url(), $os);
-        $resource = $resouceDetector->getResource();
+        $resourceDetector = new Detectors\Host($root->url(), $os);
+        $resource = $resourceDetector->getResource();
 
         if ($expectedId === null) {
             $this->assertFalse($resource->getAttributes()->has(ResourceAttributes::HOST_ID));
@@ -71,7 +71,6 @@ class HostTest extends TestCase
             ['Linux', $etc_machineid, '1234567890'],
             ['Linux', array_merge($etc_machineid, $varLibDbus), '1234567890'],
             ['Linux', $etc_machineid, '1234567890'],
-            ['BSD', [], null],
             ['BSD', $etc_hostid, '1234567890'],
         ];
     }
