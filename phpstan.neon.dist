@@ -11,6 +11,7 @@ parameters:
         # - ./examples TODO: Uncomment this once examples are updated
     excludePaths:
         - tests/TraceContext/W3CTestService
+        - tests/Unit/Config/SDK/Configuration/ExampleSdk
     ignoreErrors:
         -
             message: "#Call to an undefined method .*#"

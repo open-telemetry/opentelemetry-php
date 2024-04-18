@@ -18,8 +18,9 @@
     ],
     "require": {
         "php": "^8.1",
+        "open-telemetry/context": "^1.0",
         "open-telemetry/sdk": "^1.0",
-        "tbachert/otel-sdk-configuration": "^0.1",
+        "symfony/config": "^5.4 || ^6.4 || ^7.0",
         "tbachert/spi": "^0.2"
     },
     "autoload": {
@@ -27,12 +28,17 @@
             "OpenTelemetry\\Config\\SDK\\": ""
         }
     },
+    "suggest": {
+        "ext-yaml": "Allows loading config from yaml files",
+        "symfony/yaml": "Allows loading config from yaml files",
+        "tbachert/spi": "Allows defining and loading component providers from composer.json extra.spi"
+    },
     "extra": {
         "branch-alias": {
             "dev-main": "0.1.x-dev"
         },
         "spi": {
-            "Nevay\\OTelSDK\\Configuration\\ComponentProvider": [
+            "OpenTelemetry\\Config\\SDK\\Configuration\\ComponentProvider": [
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
