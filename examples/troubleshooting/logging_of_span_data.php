@@ -17,9 +17,9 @@ require __DIR__ . '/../../vendor/autoload.php';
  * will be the last log entry
  */
 
+use OpenTelemetry\API\Common\Time\ClockFactory;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\SimplePsrFileLogger;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanExporter\LoggerDecorator;

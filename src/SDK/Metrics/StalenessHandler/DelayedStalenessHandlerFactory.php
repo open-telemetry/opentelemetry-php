@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\StalenessHandler;
 
 use Closure;
-use OpenTelemetry\SDK\Common\Time\ClockInterface;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Metrics\ReferenceCounterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerFactoryInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;

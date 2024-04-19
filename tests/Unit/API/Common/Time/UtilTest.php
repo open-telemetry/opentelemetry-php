@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Time;
+namespace OpenTelemetry\Tests\Unit\API\Common\Time;
 
-use OpenTelemetry\SDK\Common\Time\Util;
+use OpenTelemetry\API\Common\Time\Util;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Time\Util
+ * @covers \OpenTelemetry\API\Common\Time\Util
  */
 class UtilTest extends TestCase
 {

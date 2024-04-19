@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Example;
 
+use OpenTelemetry\API\Common\Time\ClockFactory;
 use OpenTelemetry\API\Logs\EventLogger;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\API\Signals;
@@ -12,7 +13,6 @@ use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use Opentelemetry\Proto\Logs\V1\SeverityNumber;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;

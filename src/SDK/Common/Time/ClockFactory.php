@@ -4,27 +4,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Time;
 
-final class ClockFactory implements ClockFactoryInterface
+use OpenTelemetry\API\Common\Time\ClockInterface;
+
+/**
+ * @deprecated Use OpenTelemetry\API\Common\Time\ClockFactory
+ * @codeCoverageIgnore
+ */
+class ClockFactory
 {
-    private static ?ClockInterface $default = null;
-
-    public static function create(): self
-    {
-        return new self();
-    }
-
-    public function build(): ClockInterface
-    {
-        return new SystemClock();
-    }
-
     public static function getDefault(): ClockInterface
     {
-        return self::$default ?? self::$default = self::create()->build();
-    }
-
-    public static function setDefault(?ClockInterface $clock): void
-    {
-        self::$default = $clock;
+        return \OpenTelemetry\API\Common\Time\ClockFactory::getDefault();
     }
 }

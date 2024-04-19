@@ -6,11 +6,11 @@ namespace OpenTelemetry\Example;
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
+use OpenTelemetry\API\Common\Time\ClockFactory;
 use OpenTelemetry\API\Signals;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 
 $clock = ClockFactory::getDefault();

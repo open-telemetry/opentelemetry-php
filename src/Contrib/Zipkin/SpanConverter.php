@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
+use OpenTelemetry\API\Common\Time\Util as TimeUtil;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
-use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;

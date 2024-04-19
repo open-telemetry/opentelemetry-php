@@ -6,7 +6,7 @@ namespace OpenTelemetry\Example;
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;

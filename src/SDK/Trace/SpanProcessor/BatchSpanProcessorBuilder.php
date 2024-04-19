@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 

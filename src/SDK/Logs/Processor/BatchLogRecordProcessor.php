@@ -6,12 +6,12 @@ namespace OpenTelemetry\SDK\Logs\Processor;
 
 use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
-use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;

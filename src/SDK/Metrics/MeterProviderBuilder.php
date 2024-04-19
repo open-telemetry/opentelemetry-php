@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use OpenTelemetry\API\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandlerFactory;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\MetricRegistry;
 
+use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
@@ -17,7 +18,6 @@ use OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregator;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregatorFactory;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
-use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
 use function printf;
 

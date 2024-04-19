@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\MetricFactory;
 
 use function func_get_args;
+use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
@@ -26,7 +27,6 @@ use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandler;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
-use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
 
 /**
