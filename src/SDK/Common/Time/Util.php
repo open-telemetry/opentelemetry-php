@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Time;
 
-use OpenTelemetry\API\Common\Time\Util as API;
+use OpenTelemetry\API\Common\Time as API;
 
 /**
  * @deprecated Use OpenTelemetry\API\Common\Time\Util
@@ -14,21 +14,21 @@ class Util
 {
     public static function nanosToMicros(int $nanoseconds): int
     {
-        return API::nanosToMicros($nanoseconds);
+        return API\Util::nanosToMicros($nanoseconds);
     }
 
     public static function nanosToMillis(int $nanoseconds): int
     {
-        return API::nanosToMillis($nanoseconds);
+        return API\Util::nanosToMillis($nanoseconds);
     }
 
     public static function secondsToNanos(int $seconds): int
     {
-        return API::secondsToNanos($seconds);
+        return API\Util::secondsToNanos($seconds);
     }
 
     public static function millisToNanos(int $milliSeconds): int
     {
-        return API::millisToNanos($milliSeconds);
+        return API\Util::millisToNanos($milliSeconds);
     }
 }
