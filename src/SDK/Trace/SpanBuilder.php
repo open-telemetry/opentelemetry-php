@@ -29,12 +29,9 @@ final class SpanBuilder implements API\SpanBuilderInterface
 
     /** @param non-empty-string $spanName */
     public function __construct(
-        /** @readonly */
-        private string $spanName,
-        /** @readonly */
-        private InstrumentationScopeInterface $instrumentationScope,
-        /** @readonly */
-        private TracerSharedState $tracerSharedState,
+        private readonly string $spanName,
+        private readonly InstrumentationScopeInterface $instrumentationScope,
+        private readonly TracerSharedState $tracerSharedState,
     ) {
         $this->attributesBuilder = $this->tracerSharedState->getSpanLimits()->getAttributesFactory()->builder();
     }

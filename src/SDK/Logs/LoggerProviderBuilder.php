@@ -12,9 +12,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 class LoggerProviderBuilder
 {
-    /**
-     * @var array<LogRecordProcessorInterface>
-     */
+    /** @var array<LogRecordProcessorInterface> */
     private array $processors = [];
     private ?ResourceInfo $resource = null;
 

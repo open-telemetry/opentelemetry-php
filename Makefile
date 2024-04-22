@@ -1,7 +1,7 @@
 include .env
 
-PHP_VERSION ?= 8.0
-DOCKER_COMPOSE ?= docker-compose
+PHP_VERSION ?= 8.1
+DOCKER_COMPOSE ?= docker compose
 DC_RUN_PHP = $(DOCKER_COMPOSE) run --rm php
 
 .DEFAULT_GOAL : help
@@ -15,7 +15,7 @@ all-checks: rector style deptrac packages-composer phan psalm phpstan test ## Ru
 pull: ## Pull latest developer image
 	$(DOCKER_COMPOSE) pull php
 build: ## Build developer image locally
-	docker build docker/ --build-arg PHP_VERSION -t ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${PHP_VERSION}
+	docker build docker/ --build-arg PHP_VERSION=${PHP_VERSION} -t ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${PHP_VERSION}
 install: ## Install dependencies
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer install
 update: ## Update dependencies

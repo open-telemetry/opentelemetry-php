@@ -14,7 +14,7 @@ class LogRecordLimits
     /**
      * @internal Use {@see SpanLimitsBuilder} to create {@see SpanLimits} instance.
      */
-    public function __construct(private AttributesFactoryInterface $attributesFactory)
+    public function __construct(private readonly AttributesFactoryInterface $attributesFactory)
     {
     }
 

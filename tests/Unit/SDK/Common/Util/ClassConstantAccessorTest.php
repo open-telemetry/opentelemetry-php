@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Util;
 
 use LogicException;
-use OpenTelemetry\Config\Accessor\ClassConstantAccessor;
+use OpenTelemetry\Config\Configuration\Accessor\ClassConstantAccessor;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\Config\Accessor\ClassConstantAccessor
+ * @covers \OpenTelemetry\Config\Configuration\Accessor\ClassConstantAccessor
  */
 class ClassConstantAccessorTest extends TestCase
 {

@@ -27,7 +27,7 @@ use function serialize;
 
 final class MetricConverter
 {
-    private ProtobufSerializer $serializer;
+    private readonly ProtobufSerializer $serializer;
 
     public function __construct(?ProtobufSerializer $serializer = null)
     {

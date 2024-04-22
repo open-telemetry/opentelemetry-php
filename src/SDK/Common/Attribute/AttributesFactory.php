@@ -10,8 +10,8 @@ namespace OpenTelemetry\SDK\Common\Attribute;
 final class AttributesFactory implements AttributesFactoryInterface
 {
     public function __construct(
-        private ?int $attributeCountLimit = null,
-        private ?int $attributeValueLengthLimit = null,
+        private readonly ?int $attributeCountLimit = null,
+        private readonly ?int $attributeValueLengthLimit = null,
     ) {
     }
 
@@ -22,7 +22,7 @@ final class AttributesFactory implements AttributesFactoryInterface
             $this->attributeCountLimit,
             $this->attributeValueLengthLimit,
             0,
-            $attributeValidator,
+            $attributeValidator ?? new AttributeValidator(),
         );
         foreach ($attributes as $key => $value) {
             $builder[$key] = $value;

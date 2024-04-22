@@ -12,7 +12,7 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
 
 final class InstrumentTypeCriteria implements SelectionCriteriaInterface
 {
-    private array $instrumentTypes;
+    private readonly array $instrumentTypes;
 
     /**
      * @param string|InstrumentType|string[]|InstrumentType[] $instrumentType

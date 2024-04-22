@@ -10,9 +10,9 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 final class Event implements EventInterface
 {
     public function __construct(
-        private string $name,
-        private int $timestamp,
-        private AttributesInterface $attributes,
+        private readonly string $name,
+        private readonly int $timestamp,
+        private readonly AttributesInterface $attributes,
     ) {
     }
 

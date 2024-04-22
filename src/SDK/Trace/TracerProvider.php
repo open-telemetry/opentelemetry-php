@@ -18,23 +18,19 @@ use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 
 final class TracerProvider implements TracerProviderInterface
 {
-    /** @readonly */
-    private TracerSharedState $tracerSharedState;
-    private InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
+    private readonly TracerSharedState $tracerSharedState;
+    private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
 
     /** @param list<SpanProcessorInterface>|SpanProcessorInterface|null $spanProcessors */
     public function __construct(
-        $spanProcessors = [],
+        SpanProcessorInterface|array|null $spanProcessors = [],
         SamplerInterface $sampler = null,
         ResourceInfo $resource = null,
         SpanLimits $spanLimits = null,
         IdGeneratorInterface $idGenerator = null,
         ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
     ) {
-        if (null === $spanProcessors) {
-            $spanProcessors = [];
-        }
-
+        $spanProcessors ??= [];
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
         $resource ??= ResourceInfoFactory::defaultResource();
         $sampler ??= new ParentBased(new AlwaysOnSampler());

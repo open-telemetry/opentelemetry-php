@@ -42,7 +42,7 @@ final class Baggage implements BaggageInterface
     }
 
     /** @param array<string, Entry> $entries */
-    public function __construct(private array $entries = [])
+    public function __construct(private readonly array $entries = [])
     {
     }
 

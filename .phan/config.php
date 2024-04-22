@@ -44,7 +44,7 @@ return [
     //
     // Note that the **only** effect of choosing `'5.6'` is to infer that functions removed in php 7.0 exist.
     // (See `backward_compatibility_checks` for additional options)
-    'target_php_version' => '8.0',
+    'target_php_version' => '8.1',
 
     // If enabled, missing properties will be created when
     // they are first seen. If false, we'll report an
@@ -319,6 +319,7 @@ return [
     'exclude_analysis_directory_list' => [
         'vendor/',
         'proto/',
+        'src/Config/SDK',
     ],
 
     // Enable this to enable checks of require/include statements referring to valid paths.

@@ -10,7 +10,7 @@ use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
-use OpenTelemetry\Config\Variables;
+use OpenTelemetry\Config\Configuration\Variables;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\SDK\SdkAutoloader;
 use PHPUnit\Framework\TestCase;

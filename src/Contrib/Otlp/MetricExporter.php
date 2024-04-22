@@ -28,8 +28,8 @@ final class MetricExporter implements PushMetricExporterInterface, AggregationTe
      * @psalm-param TransportInterface<SUPPORTED_CONTENT_TYPES> $transport
      */
     public function __construct(
-        private TransportInterface $transport,
-        private string|Temporality|null $temporality = null,
+        private readonly TransportInterface $transport,
+        private readonly string|Temporality|null $temporality = null,
     ) {
         if (!class_exists('\Google\Protobuf\Api')) {
             throw new RuntimeException('No protobuf implementation found (ext-protobuf or google/protobuf)');
@@ -37,7 +37,7 @@ final class MetricExporter implements PushMetricExporterInterface, AggregationTe
         $this->serializer = ProtobufSerializer::forTransport($this->transport);
     }
 
-    public function temporality(MetricMetadataInterface $metric)
+    public function temporality(MetricMetadataInterface $metric): Temporality|string|null
     {
         return $this->temporality ?? $metric->temporality();
     }

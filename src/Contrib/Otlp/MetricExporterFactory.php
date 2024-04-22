@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Otlp;
 
 use OpenTelemetry\API\Signals;
-use OpenTelemetry\Config\Configuration;
-use OpenTelemetry\Config\Defaults;
-use OpenTelemetry\Config\Variables;
+use OpenTelemetry\Config\Configuration\Configuration;
+use OpenTelemetry\Config\Configuration\Defaults;
+use OpenTelemetry\Config\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
@@ -19,7 +19,7 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
 {
     private const DEFAULT_COMPRESSION = 'none';
 
-    public function __construct(private ?TransportFactoryInterface $transportFactory = null)
+    public function __construct(private readonly ?TransportFactoryInterface $transportFactory = null)
     {
     }
 

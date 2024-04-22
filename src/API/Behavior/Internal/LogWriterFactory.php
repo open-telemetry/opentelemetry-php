@@ -10,9 +10,9 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\NoopLogWriter;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\Psr3LogWriter;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\StreamLogWriter;
 use OpenTelemetry\API\LoggerHolder;
-use OpenTelemetry\Config\Configuration;
-use OpenTelemetry\Config\KnownValues;
-use OpenTelemetry\Config\Variables;
+use OpenTelemetry\Config\Configuration\Configuration;
+use OpenTelemetry\Config\Configuration\KnownValues;
+use OpenTelemetry\Config\Configuration\Variables;
 
 class LogWriterFactory
 {

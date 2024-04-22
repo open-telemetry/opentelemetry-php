@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Logs;
 
-use OpenTelemetry\Config\Configuration;
-use OpenTelemetry\Config\Variables;
+use OpenTelemetry\Config\Configuration\Configuration;
+use OpenTelemetry\Config\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use const PHP_INT_MAX;
 

@@ -6,10 +6,10 @@ namespace OpenTelemetry\SDK\Logs;
 
 use InvalidArgumentException;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
-use OpenTelemetry\Config\Configuration;
-use OpenTelemetry\Config\KnownValues;
-use OpenTelemetry\Config\KnownValues as Values;
-use OpenTelemetry\Config\Variables;
+use OpenTelemetry\Config\Configuration\Configuration;
+use OpenTelemetry\Config\Configuration\KnownValues;
+use OpenTelemetry\Config\Configuration\KnownValues as Values;
+use OpenTelemetry\Config\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;

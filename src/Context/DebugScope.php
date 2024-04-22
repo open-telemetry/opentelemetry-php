@@ -24,11 +24,11 @@ final class DebugScope implements ScopeInterface
 {
     private static bool $shutdownHandlerInitialized = false;
     private static bool $finalShutdownPhase = false;
-    private ?int $fiberId;
-    private array $createdAt;
+    private readonly ?int $fiberId;
+    private readonly array $createdAt;
     private ?array $detachedAt = null;
 
-    public function __construct(private ContextStorageScopeInterface $scope)
+    public function __construct(private readonly ContextStorageScopeInterface $scope)
     {
         $this->fiberId = self::currentFiberId();
         $this->createdAt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -114,7 +114,7 @@ final class DebugScope implements ScopeInterface
             $s .= strtr($trace[$i]['function'] ?? '{main}', ['\\' => '.']);
             $s .= '(';
             if (isset($trace[$i - 1]['file'])) {
-                $s .= basename($trace[$i - 1]['file']);
+                $s .= basename((string) $trace[$i - 1]['file']);
                 if (isset($trace[$i - 1]['line'])) {
                     $s .= ':';
                     $s .= $trace[$i - 1]['line'];

@@ -9,8 +9,9 @@ use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\TraceState;
-use OpenTelemetry\Config\Variables;
+use OpenTelemetry\Config\Configuration\Variables;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
@@ -131,6 +132,7 @@ class TracerTest extends TestCase
 
         $tracerProvider->shutdown();
 
+        /** @var AttributesInterface $attributes */
         $attributes = $exporter->getSpans()[0]->getAttributes();
         $this->assertCount(0, $attributes);
         $this->assertSame(3, $attributes->getDroppedAttributesCount());
@@ -153,6 +155,7 @@ class TracerTest extends TestCase
 
         $tracerProvider->shutdown();
 
+        /** @var AttributesInterface $attributes */
         $attributes = $exporter->getSpans()[0]->getAttributes();
         $this->assertCount(3, $attributes);
         $this->assertSame(0, $attributes->getDroppedAttributesCount());

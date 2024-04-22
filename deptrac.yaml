@@ -25,10 +25,14 @@ deptrac:
           collectors:
               -   type: directory
                   value: src/SDK/.*
-      - name: Config
-        collectors:
-          - type: directory
-            value: src/Config/.*
+      -   name: Config
+          collectors:
+              - type: directory
+                value: src/Config/Configuration/.*
+      -   name: ConfigSDK
+          collectors:
+              - type: directory
+                value: src/Config/SDK/.*
       -   name: Context
           collectors:
               -   type: directory
@@ -81,6 +85,14 @@ deptrac:
           collectors:
               - type: className
                 regex: ^Composer\\*
+      -   name: SymfonyConfig
+          collectors:
+              - type: className
+                regex: ^Symfony\\Component\\*
+      -   name: SPI
+          collectors:
+            - type: className
+              regex: ^Nevay\\SPI\\*
 
     ruleset:
       Context:
@@ -99,6 +111,13 @@ deptrac:
           - Composer
       Config:
           - PsrLog
+      ConfigSDK:
+          - Contrib
+          - Extension
+          - PsrLog
+          - SymfonyConfig
+          - +SDK
+          - SPI
       Contrib:
           - +SDK
           - +OtelProto
@@ -109,3 +128,4 @@ deptrac:
       OtelProto:
           - GoogleProtobuf
           - Grpc
+      SdkConfig:

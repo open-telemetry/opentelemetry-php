@@ -19,8 +19,8 @@ final class MultiRegistryRegistration implements MetricRegistrationInterface
      * @param iterable<MetricSourceRegistryInterface> $registries
      */
     public function __construct(
-        private iterable $registries,
-        private StalenessHandlerInterface $stalenessHandler,
+        private readonly iterable $registries,
+        private readonly StalenessHandlerInterface $stalenessHandler,
     ) {
     }
 

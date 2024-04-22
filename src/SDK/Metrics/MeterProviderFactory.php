@@ -6,9 +6,9 @@ namespace OpenTelemetry\SDK\Metrics;
 
 use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
-use OpenTelemetry\Config\Configuration;
-use OpenTelemetry\Config\KnownValues;
-use OpenTelemetry\Config\Variables;
+use OpenTelemetry\Config\Configuration\Configuration;
+use OpenTelemetry\Config\Configuration\KnownValues;
+use OpenTelemetry\Config\Configuration\Variables;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;

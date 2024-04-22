@@ -18,7 +18,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 class LogsConverter
 {
-    private ProtobufSerializer $serializer;
+    private readonly ProtobufSerializer $serializer;
 
     public function __construct(?ProtobufSerializer $serializer = null)
     {

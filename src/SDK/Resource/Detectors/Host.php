@@ -15,13 +15,85 @@ use function php_uname;
  */
 final class Host implements ResourceDetectorInterface
 {
+    private const PATH_ETC_MACHINEID = 'etc/machine-id';
+    private const PATH_VAR_LIB_DBUS_MACHINEID = 'var/lib/dbus/machine-id';
+    private const PATH_ETC_HOSTID = 'etc/hostid';
+
+    public function __construct(
+        private readonly string $dir = '/',
+        private readonly string $os = PHP_OS_FAMILY,
+    ) {
+    }
+
     public function getResource(): ResourceInfo
     {
         $attributes = [
             ResourceAttributes::HOST_NAME => php_uname('n'),
             ResourceAttributes::HOST_ARCH => php_uname('m'),
+            ResourceAttributes::HOST_ID => $this->getMachineId(),
         ];
 
         return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
+    }
+
+    private function getMachineId(): ?string
+    {
+        return match ($this->os) {
+            'Linux' => $this->getLinuxId(),
+            'BSD' => $this->getBsdId(),
+            'Darwin' => $this->getMacOsId(),
+            'Windows' => $this->getWindowsId(),
+            default => null,
+        };
+    }
+
+    private function getLinuxId(): ?string
+    {
+        $paths = [self::PATH_ETC_MACHINEID, self::PATH_VAR_LIB_DBUS_MACHINEID];
+
+        foreach ($paths as $path) {
+            if (file_exists($this->dir . $path)) {
+                return trim(file_get_contents($this->dir . $path));
+            }
+        }
+
+        return null;
+    }
+
+    private function getBsdId(): ?string
+    {
+        if (file_exists($this->dir . self::PATH_ETC_HOSTID)) {
+            return trim(file_get_contents($this->dir . self::PATH_ETC_HOSTID));
+        }
+
+        $out = exec('kenv -q smbios.system.uuid');
+
+        if ($out !== false) {
+            return $out;
+        }
+
+        return null;
+    }
+
+    private function getMacOsId(): ?string
+    {
+        $out = exec('ioreg -rd1 -c IOPlatformExpertDevice | awk \'/IOPlatformUUID/ { split($0, line, "\""); printf("%s\n", line[4]); }\'');
+
+        if ($out !== false) {
+            return $out;
+        }
+
+        return null;
+    }
+
+    private function getWindowsId(): ?string
+    {
+        $out = exec('powershell.exe -Command "Get-ItemPropertyValue -Path HKLM:\SOFTWARE\Microsoft\Cryptography -Name MachineGuid"');
+
+        if ($out !== false) {
+            return $out;
+        }
+
+        return null;
     }
 }

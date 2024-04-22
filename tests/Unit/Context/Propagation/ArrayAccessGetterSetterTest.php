@@ -94,6 +94,9 @@ class ArrayAccessGetterSetterTest extends TestCase
         $this->assertSame('bravo', $value);
     }
 
+    /**
+     * @psalm-suppress InvalidArgument,UndefinedInterfaceMethod,PossiblyInvalidArrayAccess
+     */
     public function test_set_map_array_access_case(): void
     {
         $carrier = new ArrayObject(['A' => 'alpha']);

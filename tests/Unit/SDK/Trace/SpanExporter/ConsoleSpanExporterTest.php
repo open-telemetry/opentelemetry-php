@@ -14,7 +14,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
  * @covers \OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter
  * @psalm-suppress UndefinedInterfaceMethod
  */
-class ConsoleSpanExporterTest extends AbstractExporterTest
+class ConsoleSpanExporterTest extends AbstractExporterTestCase
 {
     public function createExporter(): ConsoleSpanExporter
     {

@@ -19,8 +19,8 @@ final class DelayedStalenessHandler implements StalenessHandlerInterface, Refere
     private int $count = 0;
 
     public function __construct(
-        private Closure $stale,
-        private Closure $freshen,
+        private readonly Closure $stale,
+        private readonly Closure $freshen,
     ) {
     }
 

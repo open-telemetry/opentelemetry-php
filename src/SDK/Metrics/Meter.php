@@ -44,18 +44,18 @@ final class Meter implements MeterInterface
      * @param ArrayAccess<object, ObservableCallbackDestructor> $destructors
      */
     public function __construct(
-        private MetricFactoryInterface $metricFactory,
-        private ResourceInfo $resource,
-        private ClockInterface $clock,
-        private StalenessHandlerFactoryInterface $stalenessHandlerFactory,
-        private iterable $metricRegistries,
-        private ViewRegistryInterface $viewRegistry,
-        private ?ExemplarFilterInterface $exemplarFilter,
-        private MeterInstruments $instruments,
-        private InstrumentationScopeInterface $instrumentationScope,
-        private MetricRegistryInterface $registry,
-        private MetricWriterInterface $writer,
-        private ArrayAccess $destructors,
+        private readonly MetricFactoryInterface $metricFactory,
+        private readonly ResourceInfo $resource,
+        private readonly ClockInterface $clock,
+        private readonly StalenessHandlerFactoryInterface $stalenessHandlerFactory,
+        private readonly iterable $metricRegistries,
+        private readonly ViewRegistryInterface $viewRegistry,
+        private readonly ?ExemplarFilterInterface $exemplarFilter,
+        private readonly MeterInstruments $instruments,
+        private readonly InstrumentationScopeInterface $instrumentationScope,
+        private readonly MetricRegistryInterface $registry,
+        private readonly MetricWriterInterface $writer,
+        private readonly ArrayAccess $destructors,
     ) {
     }
 

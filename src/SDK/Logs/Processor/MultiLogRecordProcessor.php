@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 
 class MultiLogRecordProcessor implements LogRecordProcessorInterface
 {
-    // @var LogRecordProcessorInterface[]
+    /** @var list<LogRecordProcessorInterface> */
     private array $processors = [];
 
     public function __construct(array $processors)

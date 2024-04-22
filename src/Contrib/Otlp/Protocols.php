@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use OpenTelemetry\Config\KnownValues;
+use OpenTelemetry\Config\Configuration\KnownValues;
 use UnexpectedValueException;
 
 class Protocols
@@ -27,6 +27,9 @@ class Protocols
         }
     }
 
+    /**
+     * @psalm-return ContentTypes::*
+     */
     public static function contentType(string $protocol): string
     {
         self::validate($protocol);

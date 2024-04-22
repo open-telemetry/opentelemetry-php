@@ -18,7 +18,7 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
  */
 final class B3Propagator implements TextMapPropagatorInterface
 {
-    private function __construct(private TextMapPropagatorInterface $propagator)
+    private function __construct(private readonly TextMapPropagatorInterface $propagator)
     {
     }
 

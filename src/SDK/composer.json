@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "ext-json": "*",
         "open-telemetry/api": "^1.0",
         "open-telemetry/config": "*",
@@ -30,7 +30,6 @@
         "psr/http-message": "^1.0.1|^2.0",
         "psr/log": "^1.1|^2.0|^3.0",
         "symfony/polyfill-mbstring": "^1.23",
-        "symfony/polyfill-php81": "^1.26",
         "symfony/polyfill-php82": "^1.26"
     },
     "autoload": {

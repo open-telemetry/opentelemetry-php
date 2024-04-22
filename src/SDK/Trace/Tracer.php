@@ -14,10 +14,8 @@ class Tracer implements API\TracerInterface
     public const FALLBACK_SPAN_NAME = 'empty';
 
     public function __construct(
-        /** @readonly */
-        private TracerSharedState $tracerSharedState,
-        /** @readonly */
-        private InstrumentationScopeInterface $instrumentationScope,
+        private readonly TracerSharedState $tracerSharedState,
+        private readonly InstrumentationScopeInterface $instrumentationScope,
     ) {
     }
 

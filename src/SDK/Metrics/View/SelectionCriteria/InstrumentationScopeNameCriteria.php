@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
 
 final class InstrumentationScopeNameCriteria implements SelectionCriteriaInterface
 {
-    public function __construct(private string $name)
+    public function __construct(private readonly string $name)
     {
     }
 

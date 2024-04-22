@@ -34,10 +34,10 @@ final class CachedInstrumentation
      * @psalm-suppress PropertyTypeCoercion
      */
     public function __construct(
-        private string $name,
-        private ?string $version = null,
-        private ?string $schemaUrl = null,
-        private iterable $attributes = [],
+        private readonly string $name,
+        private readonly ?string $version = null,
+        private readonly ?string $schemaUrl = null,
+        private readonly iterable $attributes = [],
     ) {
         $this->tracers = new \WeakMap();
         $this->meters = new \WeakMap();

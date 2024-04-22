@@ -4,15 +4,22 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
-use function array_reverse;
+use function count;
+use function end;
+use function explode;
+use function key;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use function prev;
+use function sprintf;
 use function strlen;
+use function trim;
 
 class TraceState implements TraceStateInterface
 {
     use LogsMessagesTrait;
 
     public const MAX_LIST_MEMBERS = 32; //@see https://www.w3.org/TR/trace-context/#tracestate-header-field-values
+    /** @deprecated will be removed */
     public const MAX_COMBINED_LENGTH = 512; //@see https://www.w3.org/TR/trace-context/#tracestate-limits
     public const LIST_MEMBERS_SEPARATOR = ',';
     public const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
@@ -23,141 +30,130 @@ class TraceState implements TraceStateInterface
     private const VALID_VALUE_BASE_REGEX = '/^[ -~]{0,255}[!-~]$/';
     private const INVALID_VALUE_COMMA_EQUAL_REGEX = '/,|=/';
 
-    /**
-     * @var string[]
-     */
-    private array $traceState = [];
+    /** @var array<string, string> */
+    private array $traceState;
 
-    public function __construct(string $rawTracestate = null)
+    public function __construct(?string $rawTracestate = null)
     {
-        if ($rawTracestate === null || trim($rawTracestate) === '') {
-            return;
-        }
-        $this->traceState = $this->parse($rawTracestate);
+        $this->traceState = self::parse($rawTracestate ?? '');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function with(string $key, string $value): TraceStateInterface
     {
-        $clonedTracestate = clone $this;
+        if (!self::validateMember($this->traceState, $key, $value)) {
+            self::logWarning('Invalid tracestate key/value for: ' . $key);
 
-        if ($this->validateKey($key) && $this->validateValue($value)) {
-
-            /*
-             * Only one entry per key is allowed. In this case we need to overwrite the vendor entry
-             * upon reentry to the tracing system and ensure the updated entry is at the beginning of
-             * the list. This means we place it the back for now and it will be at the beginning once
-             * we reverse the order back during __toString().
-             */
-            if (array_key_exists($key, $clonedTracestate->traceState)) {
-                unset($clonedTracestate->traceState[$key]);
-            }
-
-            // Add new or updated entry to the back of the list.
-            $clonedTracestate->traceState[$key] = $value;
-        } else {
-            self::logWarning('Invalid tracetrace key/value for: ' . $key);
+            return $this;
         }
 
-        return $clonedTracestate;
+        $clone = clone $this;
+        $clone->traceState = [$key => $value] + $this->traceState;
+
+        return $clone;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function without(string $key): TraceStateInterface
     {
-        $clonedTracestate = clone $this;
-
-        if ($key !== '') {
-            unset($clonedTracestate->traceState[$key]);
+        if (!isset($this->traceState[$key])) {
+            return $this;
         }
 
-        return $clonedTracestate;
+        $clone = clone $this;
+        unset($clone->traceState[$key]);
+
+        return $clone;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $key): ?string
     {
         return $this->traceState[$key] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getListMemberCount(): int
     {
         return count($this->traceState);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString(): string
+    public function toString(?int $limit = null): string
     {
-        if ($this->traceState === []) {
-            return '';
-        }
-        $traceStateString='';
-        foreach (array_reverse($this->traceState) as $k => $v) {
-            $traceStateString .=$k . self::LIST_MEMBER_KEY_VALUE_SPLITTER . $v . self::LIST_MEMBERS_SEPARATOR;
+        $traceState = $this->traceState;
+
+        if ($limit !== null) {
+            $length = 0;
+            foreach ($traceState as $key => $value) {
+                $length && ($length += 1);
+                $length += strlen($key) + 1 + strlen($value);
+            }
+            if ($length > $limit) {
+                // Entries larger than 128 characters long SHOULD be removed first.
+                foreach ([128, 0] as $threshold) {
+                    // Then entries SHOULD be removed starting from the end of tracestate.
+                    for ($value = end($traceState); $key = key($traceState);) {
+                        $entry = strlen($key) + 1 + strlen($value);
+                        $value = prev($traceState);
+                        if ($entry <= $threshold) {
+                            continue;
+                        }
+
+                        unset($traceState[$key]);
+                        if (($length -= $entry + 1) <= $limit) {
+                            break 2;
+                        }
+                    }
+                }
+            }
         }
 
-        return rtrim($traceStateString, ',');
+        $s = '';
+        foreach ($traceState as $key => $value) {
+            $s && ($s .= ',');
+            $s .= $key;
+            $s .= '=';
+            $s .= $value;
+        }
+
+        return $s;
     }
 
-    /**
-     * Parse the raw tracestate header into the TraceState object. Since new or updated entries must
-     * be added to the beginning of the list, the key-value pairs in the TraceState object will be
-     * stored in reverse order. This ensures new entries added to the TraceState object are at the
-     * beginning when we reverse the order back again while building the final tracestate header.
-     *
-     * Ex:
-     *      tracestate = 'vendor1=value1,vendor2=value2'
-     *
-     *                              ||
-     *                              \/
-     *
-     *      $this->tracestate = ['vendor2' => 'value2' ,'vendor1' => 'value1']
-     *
-     */
-    private function parse(string $rawTracestate): array
+    public function __toString(): string
     {
-        if (strlen($rawTracestate) > self::MAX_COMBINED_LENGTH) {
-            self::logWarning('tracestate discarded, exceeds max combined length: ' . self::MAX_COMBINED_LENGTH);
+        return $this->toString();
+    }
 
-            return [];
-        }
-        $parsedTracestate = [];
-        $listMembers = explode(self::LIST_MEMBERS_SEPARATOR, $rawTracestate);
+    private static function parse(string $rawTracestate): array
+    {
+        $traceState = [];
+        $members = explode(',', $rawTracestate);
+        foreach ($members as $member) {
+            if (($member = trim($member, " \t")) === '') {
+                continue;
+            }
 
-        if (count($listMembers) > self::MAX_LIST_MEMBERS) {
-            self::logWarning('tracestate discarded, too many members');
-
-            return [];
-        }
-
-        foreach ($listMembers as $listMember) {
-            $vendor = explode(self::LIST_MEMBER_KEY_VALUE_SPLITTER, trim($listMember));
-
-            // There should only be one list-member per vendor separated by '='
-            if (count($vendor) !== 2 || !$this->validateKey($vendor[0]) || !$this->validateValue($vendor[1])) {
-                self::logWarning('tracestate discarded, invalid member: ' . $listMember);
+            $member = explode('=', $member, 2);
+            if (count($member) !== 2) {
+                self::logWarning(sprintf('Incomplete list member in tracestate "%s"', $rawTracestate));
 
                 return [];
             }
-            $parsedTracestate[$vendor[0]] = $vendor[1];
+
+            [$key, $value] = $member;
+            if (!self::validateMember($traceState, $key, $value)) {
+                self::logWarning(sprintf('Invalid list member "%s=%s" in tracestate "%s"', $key, $value, $rawTracestate));
+
+                return [];
+            }
+
+            $traceState[$key] ??= $value;
         }
 
-        /*
-         * Reversing the tracestate ensures the new entries added to the TraceState object are at
-         * the beginning when we reverse it back during __toString().
-        */
-        return array_reverse($parsedTracestate);
+        return $traceState;
+    }
+
+    private static function validateMember(array $traceState, string $key, string $value): bool
+    {
+        return (isset($traceState[$key]) || self::validateKey($key))
+            && self::validateValue($value)
+            && (count($traceState) < self::MAX_LIST_MEMBERS || isset($traceState[$key]));
     }
 
     /**
@@ -170,7 +166,7 @@ class TraceState implements TraceStateInterface
      *
      * @see https://www.w3.org/TR/trace-context/#key
      */
-    private function validateKey(string $key): bool
+    private static function validateKey(string $key): bool
     {
         return preg_match(self::VALID_KEY_REGEX, $key) !== 0;
     }
@@ -182,7 +178,7 @@ class TraceState implements TraceStateInterface
      *
      * @see https://www.w3.org/TR/trace-context/#value
      */
-    private function validateValue(string $key): bool
+    private static function validateValue(string $key): bool
     {
         return (preg_match(self::VALID_VALUE_BASE_REGEX, $key) !== 0)
             && (preg_match(self::INVALID_VALUE_COMMA_EQUAL_REGEX, $key) === 0);

@@ -6,8 +6,8 @@ namespace OpenTelemetry\SDK;
 
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
-use OpenTelemetry\Config\Configuration;
-use OpenTelemetry\Config\Variables;
+use OpenTelemetry\Config\Configuration\Configuration;
+use OpenTelemetry\Config\Configuration\Variables;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 
@@ -16,10 +16,10 @@ class Sdk
     private const OTEL_PHP_DISABLED_INSTRUMENTATIONS_ALL = 'all';
 
     public function __construct(
-        private TracerProviderInterface $tracerProvider,
-        private MeterProviderInterface $meterProvider,
-        private LoggerProviderInterface $loggerProvider,
-        private TextMapPropagatorInterface $propagator,
+        private readonly TracerProviderInterface $tracerProvider,
+        private readonly MeterProviderInterface $meterProvider,
+        private readonly LoggerProviderInterface $loggerProvider,
+        private readonly TextMapPropagatorInterface $propagator,
     ) {
     }
 

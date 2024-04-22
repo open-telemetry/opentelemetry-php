@@ -18,8 +18,7 @@ final class Parser
     private const EQUALS = '=';
 
     public function __construct(
-        /** @readonly */
-        private string $baggageHeader,
+        private readonly string $baggageHeader,
     ) {
     }
 

@@ -16,6 +16,8 @@ $scope = Context::getCurrent()
     ->activate();
 
 $fiber = new Fiber(function() use ($key) {
+    echo 'fiber(pre):' . Context::getCurrent()->get($key), PHP_EOL;
+
     $scope = Context::getCurrent()
         ->with($key, 'fiber')
         ->activate();
@@ -26,6 +28,8 @@ $fiber = new Fiber(function() use ($key) {
     echo 'fiber:' . Context::getCurrent()->get($key), PHP_EOL;
 
     $scope->detach();
+
+    echo 'fiber(post):' . Context::getCurrent()->get($key), PHP_EOL;
 });
 
 echo 'main:' . Context::getCurrent()->get($key), PHP_EOL;
@@ -42,10 +46,14 @@ $scope->detach();
 --EXPECTF--
 main:main
 
-Warning: Fiber context switching not supported in %s
+Warning: Access to not initialized OpenTelemetry context in fiber (id: %d), automatic forking not supported, must attach initial fiber context manually %s
+fiber(pre):main
+
+Warning: Access to not initialized OpenTelemetry context in fiber (id: %d), automatic forking not supported, must attach initial fiber context manually %s
+fiber:fiber
+main:main
 fiber:fiber
 
-Warning: Fiber context switching not supported in %s
-main:fiber
-fiber:fiber
+Warning: Access to not initialized OpenTelemetry context in fiber (id: %d), automatic forking not supported, must attach initial fiber context manually %s
+fiber(post):main
 main:main

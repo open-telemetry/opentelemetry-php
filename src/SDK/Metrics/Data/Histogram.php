@@ -10,10 +10,8 @@ final class Histogram implements DataInterface
      * @param iterable<HistogramDataPoint> $dataPoints
      */
     public function __construct(
-        /** @readonly */
-        public iterable $dataPoints,
-        /** @readonly */
-        public string|Temporality $temporality,
+        public readonly iterable $dataPoints,
+        public readonly string|Temporality $temporality,
     ) {
     }
 }

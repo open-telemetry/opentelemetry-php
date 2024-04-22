@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\Config\KnownValues;
-use OpenTelemetry\Config\Variables;
+use OpenTelemetry\Config\Configuration\KnownValues;
+use OpenTelemetry\Config\Configuration\Variables;
 use OpenTelemetry\Contrib\Otlp\LogsExporterFactory;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;

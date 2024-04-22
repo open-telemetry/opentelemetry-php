@@ -11,14 +11,8 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
  */
 final class BucketEntry
 {
-    /**
-     * @var int|string
-     */
-    public $index;
-    /**
-     * @var float|int
-     */
-    public $value;
+    public int|string $index;
+    public float|int $value;
     public int $timestamp;
     public AttributesInterface $attributes;
     public ?string $traceId = null;

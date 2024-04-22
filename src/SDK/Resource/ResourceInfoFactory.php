@@ -6,9 +6,9 @@ namespace OpenTelemetry\SDK\Resource;
 
 use function in_array;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
-use OpenTelemetry\Config\Configuration;
-use OpenTelemetry\Config\KnownValues as Values;
-use OpenTelemetry\Config\Variables as Env;
+use OpenTelemetry\Config\Configuration\Configuration;
+use OpenTelemetry\Config\Configuration\KnownValues as Values;
+use OpenTelemetry\Config\Configuration\Variables as Env;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Registry;
 use RuntimeException;
@@ -16,6 +16,8 @@ use RuntimeException;
 class ResourceInfoFactory
 {
     use LogsMessagesTrait;
+
+    private static ?ResourceInfo $emptyResource = null;
 
     public static function defaultResource(): ResourceInfo
     {
@@ -90,6 +92,10 @@ class ResourceInfoFactory
 
     public static function emptyResource(): ResourceInfo
     {
-        return ResourceInfo::create(Attributes::create([]));
+        if (null === self::$emptyResource) {
+            self::$emptyResource = ResourceInfo::create(Attributes::create([]));
+        }
+
+        return self::$emptyResource;
     }
 }

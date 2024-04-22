@@ -7,8 +7,7 @@
     "readme": "./README.md",
     "license": "Apache-2.0",
     "require": {
-        "php": "^8.0",
-        "ext-json": "*",
+        "php": "^8.1",
         "google/protobuf": "^3.22",
         "php-http/discovery": "^1.14",
         "psr/http-client-implementation": "^1.0",
@@ -16,16 +15,18 @@
         "psr/http-client": "^1.0",
         "psr/http-message": "^1.0.1|^2.0",
         "psr/log": "^1.1|^2.0|^3.0",
+        "symfony/config": "^5.4 || ^6.4 || ^7.0",
         "symfony/polyfill-mbstring": "^1.23",
-        "symfony/polyfill-php81": "^1.26",
-        "symfony/polyfill-php82": "^1.26"
+        "symfony/polyfill-php82": "^1.26",
+        "tbachert/spi": "^0.2"
     },
     "config": {
         "sort-packages": true,
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "php-http/discovery": true,
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "tbachert/spi": true
         }
     },
     "authors": [
@@ -35,13 +36,18 @@
         }
     ],
     "replace": {
-        "open-telemetry/api": "self.version",
-        "open-telemetry/config": "self.version",
-        "open-telemetry/context": "self.version",
-        "open-telemetry/gen-otlp-protobuf": "self.version",
-        "open-telemetry/sdk": "self.version",
-        "open-telemetry/sdk-contrib": "self.version",
-        "open-telemetry/sem-conv": "self.version"
+        "open-telemetry/api": "1.0.x-dev",
+        "open-telemetry/config": "1.0.x-dev",
+        "open-telemetry/context": "1.0.x-dev",
+        "open-telemetry/exporter-otlp": "1.0.x-dev",
+        "open-telemetry/exporter-zipkin": "1.0.x-dev",
+        "open-telemetry/extension-propagator-b3": "1.0.x-dev",
+        "open-telemetry/extension-propagator-jaeger": "0.0.2",
+        "open-telemetry/gen-otlp-protobuf": "1.0.x-dev",
+        "open-telemetry/sdk": "1.0.x-dev",
+        "open-telemetry/sdk-configuration": "0.1.x-dev",
+        "open-telemetry/sdk-contrib": "1.0.x-dev",
+        "open-telemetry/sem-conv": "1.0.x-dev"
     },
     "autoload": {
         "psr-4": {
@@ -70,7 +76,8 @@
     "autoload-dev": {
         "psr-4": {
             "OpenTelemetry\\Tests\\": "tests/",
-            "OpenTelemetry\\Example\\": "examples/src/"
+            "OpenTelemetry\\Example\\": "examples/src/",
+            "ExampleSDK\\ComponentProvider\\": "tests/Unit/Config/SDK/Configuration/ExampleSdk/"
         }
     },
     "require-dev": {
@@ -94,22 +101,57 @@
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpmetrics/phpmetrics": "^2.8",
         "phpspec/prophecy": "^1.17.0",
-        "phpspec/prophecy-phpunit": "2.0.1",
+        "phpspec/prophecy-phpunit": "^2",
         "phpstan/phpstan": "^1.10.13",
         "phpstan/phpstan-mockery": "^1.1",
         "phpstan/phpstan-phpunit": "^1.3",
-        "phpunit/phpunit": "^9.6",
+        "phpunit/phpunit": "^10",
         "psalm/plugin-mockery": "^1",
         "psalm/plugin-phpunit": "^0.18.4",
         "psalm/psalm": "^5",
         "qossmic/deptrac-shim": "^0.24 || ^1",
         "rector/rector": "^1",
         "symfony/http-client": "^5.2",
-        "symfony/yaml": "^6 || ^5"
+        "symfony/var-exporter": "^5.4 || ^6.4 || ^7.0",
+        "symfony/yaml": "^5.4 || ^6.4 || ^7.0"
     },
     "suggest": {
         "ext-gmp": "To support unlimited number of synchronous metric readers",
         "ext-grpc": "To use the OTLP GRPC Exporter",
-        "ext-protobuf": "For more performant protobuf/grpc exporting"
+        "ext-protobuf": "For more performant protobuf/grpc exporting",
+        "ext-yaml": "Allows loading config from yaml files",
+        "symfony/yaml": "Allows loading config from yaml files"
+    },
+    "extra": {
+        "spi": {
+            "OpenTelemetry\\Config\\SDK\\Configuration\\ComponentProvider": [
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorComposite",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorJaeger",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorTraceContext",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOff",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOn",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerParentBased",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerTraceIdRatioBased",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlp",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterZipkin",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorBatch",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorSimple",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverDefault",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlp",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricReaderPeriodic",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlp",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorBatch",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple"
+            ]
+        }
     }
 }

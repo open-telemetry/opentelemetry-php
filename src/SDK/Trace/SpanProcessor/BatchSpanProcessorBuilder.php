@@ -12,7 +12,7 @@ class BatchSpanProcessorBuilder
 {
     private ?MeterProviderInterface $meterProvider = null;
 
-    public function __construct(private SpanExporterInterface $exporter)
+    public function __construct(private readonly SpanExporterInterface $exporter)
     {
     }
 

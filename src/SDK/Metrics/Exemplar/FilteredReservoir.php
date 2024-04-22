@@ -14,8 +14,8 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 final class FilteredReservoir implements ExemplarReservoirInterface
 {
     public function __construct(
-        private ExemplarReservoirInterface $reservoir,
-        private ExemplarFilterInterface $filter,
+        private readonly ExemplarReservoirInterface $reservoir,
+        private readonly ExemplarFilterInterface $filter,
     ) {
     }
 

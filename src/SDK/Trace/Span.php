@@ -30,27 +30,17 @@ final class Span extends API\Span implements ReadWriteSpanInterface
      */
     private function __construct(
         private string $name,
-        /** @readonly */
-        private API\SpanContextInterface $context,
-        /** @readonly */
-        private InstrumentationScopeInterface $instrumentationScope,
-        /** @readonly */
-        private int $kind,
-        /** @readonly */
-        private API\SpanContextInterface $parentSpanContext,
-        /** @readonly */
-        private SpanLimits $spanLimits,
-        /** @readonly */
-        private SpanProcessorInterface $spanProcessor,
-        /** @readonly */
-        private ResourceInfo $resource,
+        private readonly API\SpanContextInterface $context,
+        private readonly InstrumentationScopeInterface $instrumentationScope,
+        private readonly int $kind,
+        private readonly API\SpanContextInterface $parentSpanContext,
+        private readonly SpanLimits $spanLimits,
+        private readonly SpanProcessorInterface $spanProcessor,
+        private readonly ResourceInfo $resource,
         private AttributesBuilderInterface $attributesBuilder,
-        /** @readonly */
-        private array $links,
-        /** @readonly */
-        private int $totalRecordedLinks,
-        /** @readonly */
-        private int $startEpochNanos,
+        private readonly array $links,
+        private readonly int $totalRecordedLinks,
+        private readonly int $startEpochNanos,
     ) {
         $this->status = StatusData::unset();
     }

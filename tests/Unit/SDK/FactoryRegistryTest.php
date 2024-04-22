@@ -10,7 +10,6 @@ use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
-use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
 use PHPUnit\Framework\TestCase;
 use TypeError;
 
@@ -149,7 +148,7 @@ class FactoryRegistryTest extends TestCase
      */
     public function test_register_invalid_log_record_exporter_factory($factory): void
     {
-        $this->expectException(PHPUnitFrameworkException::class);
+        $this->expectException(TypeError::class);
         Registry::registerLogRecordExporterFactory('foo', $factory, true);
     }
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use OpenTelemetry\Config\Configuration;
-use OpenTelemetry\Config\Variables as Env;
+use OpenTelemetry\Config\Configuration\Configuration;
+use OpenTelemetry\Config\Configuration\Variables as Env;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\FilteredAttributesFactory;
 use OpenTelemetry\SemConv\TraceAttributes;

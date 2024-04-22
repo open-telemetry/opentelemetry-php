@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Behavior\Internal;
 
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
-use OpenTelemetry\Config\Configuration;
-use OpenTelemetry\Config\Variables;
+use OpenTelemetry\Config\Configuration\Configuration;
+use OpenTelemetry\Config\Configuration\Variables;
 use Psr\Log\LogLevel;
 
 /**
