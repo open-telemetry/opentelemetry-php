@@ -11,7 +11,6 @@ use OpenTelemetry\Config\Configuration\Configuration;
 use OpenTelemetry\Config\Configuration\Defaults;
 use OpenTelemetry\Config\Configuration\KnownValues;
 use OpenTelemetry\Config\Configuration\Variables;
-use OpenTelemetry\Config\Configuration\VariableTypes;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
@@ -23,59 +22,59 @@ class ConfigurationTest extends TestCase
     use EnvironmentVariables;
 
     private const ALLOW_EMPTY = [
-        VariableTypes::LIST,
-        VariableTypes::MAP,
-        VariableTypes::MIXED,
+        'list',
+        'map',
+        'mixed',
     ];
 
     private const METHOD_NAMES = [
-        VariableTypes::STRING => ['getString'],
-        VariableTypes::BOOL => ['getBoolean'],
-        VariableTypes::INTEGER => ['getInt'],
-        VariableTypes::FLOAT => ['getFloat'],
-        VariableTypes::RATIO => ['getRatio'],
-        VariableTypes::ENUM => ['getEnum'],
-        VariableTypes::LIST => ['getList'],
-        VariableTypes::MAP => ['getMap'],
-        VariableTypes::MIXED => ['getMixed'],
+        'string' => ['getString'],
+        'bool' => ['getBoolean'],
+        'integer' => ['getInt'],
+        'float' => ['getFloat'],
+        'ratio' => ['getRatio'],
+        'enum' => ['getEnum'],
+        'list' => ['getList'],
+        'map' => ['getMap'],
+        'mixed' => ['getMixed'],
     ];
 
     private const TYPES = [
-        VariableTypes::STRING => [Variables::OTEL_SERVICE_NAME],
-        VariableTypes::BOOL => [Variables::OTEL_EXPORTER_OTLP_INSECURE],
-        VariableTypes::INTEGER => [Variables::OTEL_BSP_MAX_QUEUE_SIZE],
-        VariableTypes::ENUM => [Variables::OTEL_LOG_LEVEL],
-        VariableTypes::LIST => [Variables::OTEL_PROPAGATORS],
-        VariableTypes::MAP => [Variables::OTEL_RESOURCE_ATTRIBUTES],
-        VariableTypes::MIXED => [Variables::OTEL_TRACES_SAMPLER_ARG],
+        'string' => [Variables::OTEL_SERVICE_NAME],
+        'bool' => [Variables::OTEL_EXPORTER_OTLP_INSECURE],
+        'integer' => [Variables::OTEL_BSP_MAX_QUEUE_SIZE],
+        'enum' => [Variables::OTEL_LOG_LEVEL],
+        'list' => [Variables::OTEL_PROPAGATORS],
+        'map' => [Variables::OTEL_RESOURCE_ATTRIBUTES],
+        'mixed' => [Variables::OTEL_TRACES_SAMPLER_ARG],
     ];
 
     private const USER_VALUES = [
-        VariableTypes::STRING => ['foo', 'foo'],
-        VariableTypes::BOOL => ['true', true],
-        VariableTypes::INTEGER => ['42', 42],
-        VariableTypes::ENUM => ['val1', 'val1'],
-        VariableTypes::LIST => [['val1', 'val2'], ['val1','val2']],
-        VariableTypes::MAP => [['var1' => 'val1', 'var2' => 'val2'], ['var1'=>'val1','var2'=>'val2']],
-        VariableTypes::MIXED => ['foo', 'foo'],
+        'string' => ['foo', 'foo'],
+        'bool' => ['true', true],
+        'integer' => ['42', 42],
+        'enum' => ['val1', 'val1'],
+        'list' => [['val1', 'val2'], ['val1','val2']],
+        'map' => [['var1' => 'val1', 'var2' => 'val2'], ['var1'=>'val1','var2'=>'val2']],
+        'mixed' => ['foo', 'foo'],
     ];
 
     private const USER_ENV_VALUES = [
-        VariableTypes::STRING => ['foo', 'foo'],
-        VariableTypes::BOOL => ['true', true],
-        VariableTypes::INTEGER => ['42', 42],
-        VariableTypes::ENUM => ['val1', 'val1'],
-        VariableTypes::LIST => ['val1,val2', ['val1','val2']],
-        VariableTypes::MAP => ['var1=val1,var2=val2', ['var1'=>'val1','var2'=>'val2']],
-        VariableTypes::MIXED => ['foo', 'foo'],
+        'string' => ['foo', 'foo'],
+        'bool' => ['true', true],
+        'integer' => ['42', 42],
+        'enum' => ['val1', 'val1'],
+        'list' => ['val1,val2', ['val1','val2']],
+        'map' => ['var1=val1,var2=val2', ['var1'=>'val1','var2'=>'val2']],
+        'mixed' => ['foo', 'foo'],
     ];
 
     private const LIBRARY_DEFAULTS = [
-        VariableTypes::STRING => [Variables::OTEL_EXPORTER_OTLP_ENDPOINT, 'http://localhost:4318'],
-        VariableTypes::BOOL => [Variables::OTEL_EXPORTER_OTLP_INSECURE, false],
-        VariableTypes::INTEGER => [Variables::OTEL_BSP_MAX_QUEUE_SIZE, 2048],
-        VariableTypes::ENUM => [Variables::OTEL_LOG_LEVEL, 'info'],
-        VariableTypes::LIST => [Variables::OTEL_PROPAGATORS, ['tracecontext', 'baggage']],
+        'string' => [Variables::OTEL_EXPORTER_OTLP_ENDPOINT, 'http://localhost:4318'],
+        'bool' => [Variables::OTEL_EXPORTER_OTLP_INSECURE, false],
+        'integer' => [Variables::OTEL_BSP_MAX_QUEUE_SIZE, 2048],
+        'enum' => [Variables::OTEL_LOG_LEVEL, 'info'],
+        'list' => [Variables::OTEL_PROPAGATORS, ['tracecontext', 'baggage']],
     ];
 
     private const DEFAULT_VALUES = [
@@ -85,10 +84,10 @@ class ConfigurationTest extends TestCase
     ];
 
     private const NO_DEFAULTS = [
-        VariableTypes::STRING => [Variables::OTEL_SERVICE_NAME],
-        VariableTypes::ENUM => [Variables::OTEL_EXPORTER_OTLP_COMPRESSION],
-        VariableTypes::MAP => [Variables::OTEL_EXPORTER_OTLP_HEADERS],
-        VariableTypes::MIXED => [Variables::OTEL_TRACES_SAMPLER_ARG],
+        'string' => [Variables::OTEL_SERVICE_NAME],
+        'enum' => [Variables::OTEL_EXPORTER_OTLP_COMPRESSION],
+        'map' => [Variables::OTEL_EXPORTER_OTLP_HEADERS],
+        'mixed' => [Variables::OTEL_TRACES_SAMPLER_ARG],
     ];
 
     private const KNOWN_VALUES = [
@@ -263,16 +262,6 @@ class ConfigurationTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidTypeProvider
-     */
-    public function test_invalid_type_throws_exception(string $methodName, string $variable): void
-    {
-        $this->expectException(UnexpectedValueException::class);
-
-        call_user_func([Configuration::class, $methodName], $variable);
-    }
-
-    /**
      * @dataProvider noDefaultProvider
      */
     public function test_null_result_throws_exception(string $methodName, string $variable): void
@@ -334,24 +323,6 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public static function invalidTypeProvider(): Generator
-    {
-        foreach (self::METHOD_NAMES as $varType => $names) {
-            if ($varType === VariableTypes::MIXED) {
-                continue;
-            }
-            $methodName = $names[0];
-            foreach (self::TYPES as $methodType => $types) {
-                if ($varType === $methodType || $methodType === VariableTypes::MIXED) {
-                    continue;
-                }
-                $variableName = $types[0];
-
-                yield sprintf('%s - %s', $varType, $methodType) => [$methodName, $variableName];
-            }
-        }
-    }
-
     public static function noDefaultProvider(): Generator
     {
         foreach (self::NO_DEFAULTS as $varType => $values) {
@@ -398,30 +369,6 @@ class ConfigurationTest extends TestCase
             $value,
             Configuration::getEnum($variable, $value)
         );
-    }
-
-    /**
-     * @dataProvider typeProvider
-     */
-    public function test_get_type(string $varName, string $type): void
-    {
-        $this->assertSame(
-            $type,
-            Configuration::getType($varName)
-        );
-    }
-
-    public static function typeProvider(): array
-    {
-        return [
-            'bool' => ['OTEL_EXPORTER_OTLP_INSECURE', VariableTypes::BOOL],
-            'string' => ['OTEL_SERVICE_NAME', VariableTypes::STRING],
-            'integer' => ['OTEL_BSP_MAX_QUEUE_SIZE', VariableTypes::INTEGER],
-            'enum' => ['OTEL_LOG_LEVEL', VariableTypes::ENUM],
-            'list' => ['OTEL_PROPAGATORS', VariableTypes::LIST],
-            'map' => ['OTEL_RESOURCE_ATTRIBUTES', VariableTypes::MAP],
-            'mixed' => ['OTEL_TRACES_SAMPLER_ARG', VariableTypes::MIXED],
-        ];
     }
 
     /**

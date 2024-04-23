@@ -28,10 +28,7 @@ class Configuration
     public static function getInt(string $key, int $default = null): int
     {
         return (int) self::validateVariableValue(
-            CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::INTEGER),
-                $default
-            ),
+            CompositeResolver::instance()->resolve($key, $default),
             FILTER_VALIDATE_INT
         );
     }
@@ -39,10 +36,7 @@ class Configuration
     public static function getString(string $key, string $default = null): string
     {
         return (string) self::validateVariableValue(
-            CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::STRING),
-                $default
-            )
+            CompositeResolver::instance()->resolve($key, $default),
         );
     }
 
@@ -50,7 +44,7 @@ class Configuration
     {
         $resolved = self::validateVariableValue(
             CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::BOOL),
+                $key,
                 null === $default ? $default : ($default ? 'true' : 'false')
             )
         );
@@ -71,40 +65,28 @@ class Configuration
     public static function getMap(string $key, array $default = null): array
     {
         return MapParser::parse(
-            CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::MAP),
-                $default
-            )
+            CompositeResolver::instance()->resolve($key, $default),
         );
     }
 
     public static function getList(string $key, array $default = null): array
     {
         return ListParser::parse(
-            CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::LIST),
-                $default
-            )
+            CompositeResolver::instance()->resolve($key, $default),
         );
     }
 
     public static function getEnum(string $key, string $default = null): string
     {
         return (string) self::validateVariableValue(
-            CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::ENUM),
-                $default
-            )
+            CompositeResolver::instance()->resolve($key, $default),
         );
     }
 
     public static function getFloat(string $key, float $default = null): float
     {
         return (float) self::validateVariableValue(
-            CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::FLOAT),
-                $default
-            ),
+            CompositeResolver::instance()->resolve($key, $default),
             FILTER_VALIDATE_FLOAT
         );
     }
@@ -113,10 +95,7 @@ class Configuration
     {
         return RatioParser::parse(
             self::validateVariableValue(
-                CompositeResolver::instance()->resolve(
-                    self::validateVariableType($key, VariableTypes::RATIO),
-                    $default
-                )
+                CompositeResolver::instance()->resolve($key, $default),
             )
         );
     }
@@ -131,28 +110,10 @@ class Configuration
         return ClassConstantAccessor::getValue(Defaults::class, $variableName);
     }
 
-    public static function getType(string $variableName): ?string
-    {
-        return ClassConstantAccessor::getValue(ValueTypes::class, $variableName);
-    }
-
     public static function isEmpty($value): bool
     {
         // don't use 'empty()', since '0' is not considered to be empty
         return $value === null || $value === '';
-    }
-
-    private static function validateVariableType(string $variableName, string $type): string
-    {
-        $variableType = self::getType($variableName);
-
-        if ($variableType !== null && $variableType !== $type && $variableType !== VariableTypes::MIXED) {
-            throw new UnexpectedValueException(
-                sprintf('Variable "%s" is not supposed to be of type "%s" but type "%s"', $variableName, $type, $variableType)
-            );
-        }
-
-        return $variableName;
     }
 
     private static function validateVariableValue(mixed $value, ?int $filterType = null): mixed
