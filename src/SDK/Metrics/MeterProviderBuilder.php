@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-use OpenTelemetry\API\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
@@ -50,7 +50,7 @@ class MeterProviderBuilder
         return new MeterProvider(
             null,
             $this->resource ?? ResourceInfoFactory::emptyResource(),
-            ClockFactory::getDefault(),
+            Clock::getDefault(),
             Attributes::factory(),
             new InstrumentationScopeFactory(Attributes::factory()),
             $this->metricReaders,

@@ -6,7 +6,7 @@ namespace OpenTelemetry\Example;
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
-use OpenTelemetry\API\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
@@ -23,7 +23,7 @@ echo 'Starting OTLP example';
 $tracerProvider =  new TracerProvider(
     new BatchSpanProcessor(
         $exporter,
-        ClockFactory::getDefault()
+        Clock::getDefault()
     )
 );
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');

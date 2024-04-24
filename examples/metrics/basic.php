@@ -7,7 +7,7 @@ namespace OpenTelemetry\Example;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-use OpenTelemetry\API\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
@@ -22,7 +22,7 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
-$clock = ClockFactory::getDefault();
+$clock = Clock::getDefault();
 $reader = new ExportingReader(new MetricExporter((new StreamTransportFactory())->create(STDOUT, 'application/x-ndjson'), /*Temporality::CUMULATIVE*/));
 
 // Let's imagine we export the metrics as Histogram, and to simplify the story we will only have one histogram bucket (-Inf, +Inf):

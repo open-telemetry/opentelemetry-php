@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Example;
 
-use OpenTelemetry\API\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Logs\EventLogger;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\API\Signals;
@@ -24,7 +24,7 @@ $exporter = new LogsExporter($transport);
 $loggerProvider = new LoggerProvider(
     new BatchLogRecordProcessor(
         $exporter,
-        ClockFactory::getDefault()
+        Clock::getDefault()
     ),
     new InstrumentationScopeFactory(
         (new LogRecordLimitsBuilder())->build()->getAttributeFactory()

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Benchmark;
 
-use OpenTelemetry\API\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -95,7 +95,7 @@ class OtlpBench
         $exporter = new SpanExporter($transport);
         $processor = $params[1] === self::SIMPLE
             ? new SimpleSpanProcessor($exporter)
-            : new BatchSpanProcessor($exporter, ClockFactory::getDefault());
+            : new BatchSpanProcessor($exporter, Clock::getDefault());
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer('io.opentelemetry.contrib.php');
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Example;
 
-use OpenTelemetry\API\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Logs\EventLogger;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -18,7 +18,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
 $loggerProvider = new LoggerProvider(
     new BatchLogRecordProcessor(
         (new ConsoleExporterFactory())->create(),
-        ClockFactory::getDefault()
+        Clock::getDefault()
     ),
     new InstrumentationScopeFactory(Attributes::factory())
 );

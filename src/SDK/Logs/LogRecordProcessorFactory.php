@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Logs;
 
 use InvalidArgumentException;
-use OpenTelemetry\API\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
@@ -38,7 +38,7 @@ class LogRecordProcessorFactory
         return match ($name) {
             KnownValues::VALUE_BATCH => new BatchLogRecordProcessor(
                 $exporter,
-                ClockFactory::getDefault(),
+                Clock::getDefault(),
                 Configuration::getInt(Variables::OTEL_BLRP_MAX_QUEUE_SIZE),
                 Configuration::getInt(Variables::OTEL_BLRP_SCHEDULE_DELAY),
                 Configuration::getInt(Variables::OTEL_BLRP_EXPORT_TIMEOUT),

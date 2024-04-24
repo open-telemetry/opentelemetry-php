@@ -10,7 +10,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
-use OpenTelemetry\API\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\Context\Context;
@@ -45,12 +45,12 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         Logging::setLogWriter($this->logWriter);
         $this->testClock = new TestClock();
 
-        ClockFactory::setDefault($this->testClock);
+        Clock::setDefault($this->testClock);
     }
 
     protected function tearDown(): void
     {
-        ClockFactory::setDefault(null);
+        Clock::reset();
         Logging::reset();
     }
 
@@ -427,7 +427,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
 
         $processor = new BatchLogRecordProcessor(
             $exporter,
-            ClockFactory::getDefault(),
+            Clock::getDefault(),
             2048,
             5000,
             30000,

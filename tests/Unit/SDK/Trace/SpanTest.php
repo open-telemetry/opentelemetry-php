@@ -11,7 +11,7 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
-use OpenTelemetry\API\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Common\Time\Util as TimeUtil;
@@ -99,14 +99,14 @@ class SpanTest extends MockeryTestCase
             )
         );
 
-        ClockFactory::setDefault($this->testClock);
+        Clock::setDefault($this->testClock);
         $this->logWriter = $this->createMock(LogWriterInterface::class);
         Logging::setLogWriter($this->logWriter);
     }
 
     protected function tearDown(): void
     {
-        ClockFactory::setDefault(null);
+        Clock::reset();
         Logging::reset();
         //        LoggerHolder::unset();
     }
