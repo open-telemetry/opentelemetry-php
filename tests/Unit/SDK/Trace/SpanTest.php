@@ -14,7 +14,6 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
-use OpenTelemetry\API\Common\Time\Util as TimeUtil;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
@@ -552,7 +551,7 @@ class SpanTest extends MockeryTestCase
         $span = $this->createTestRootSpan();
         $span->addEvent('event1');
         $span->addEvent('event2', ['key1' => 1]);
-        $span->addEvent('event3', [], TimeUtil::secondsToNanos(10));
+        $span->addEvent('event3', [], 10*ClockInterface::NANOS_PER_SECOND);
 
         $span->end();
 
@@ -562,7 +561,7 @@ class SpanTest extends MockeryTestCase
 
         $this->assertEvent($events[$idx++], 'event1', Attributes::create([]), self::START_EPOCH);
         $this->assertEvent($events[$idx++], 'event2', Attributes::create(['key1' => 1]), self::START_EPOCH);
-        $this->assertEvent($events[$idx], 'event3', Attributes::create([]), TimeUtil::secondsToNanos(10));
+        $this->assertEvent($events[$idx], 'event3', Attributes::create([]), 10*ClockInterface::NANOS_PER_SECOND);
     }
 
     public function test_add_event_attribute_length(): void
