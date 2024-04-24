@@ -1,0 +1,3 @@
+config:
+  - example_instrumentation:
+      span_name: ${EXAMPLE_INSTRUMENTATION_SPAN_NAME:-example span}
