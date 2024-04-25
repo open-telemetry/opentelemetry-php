@@ -14,7 +14,7 @@ use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 $clock = ClockFactory::getDefault();
 $reader = new ExportingReader(
     new MetricExporter(
-        PsrTransportFactory::discover()->create('http://collector:4318/v1/metrics', \OpenTelemetry\Contrib\Otlp\ContentTypes::JSON)
+        (new PsrTransportFactory())->create('http://collector:4318/v1/metrics', \OpenTelemetry\Contrib\Otlp\ContentTypes::JSON)
     )
 );
 
