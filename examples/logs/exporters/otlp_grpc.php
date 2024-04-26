@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Example;
 
-use OpenTelemetry\API\Logs\EventLogger;
-use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\API\Signals;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
-use Opentelemetry\Proto\Logs\V1\SeverityNumber;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Logs\EventLogger;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
@@ -31,18 +30,17 @@ $loggerProvider = new LoggerProvider(
     )
 );
 $logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', ['foo' => 'bar']);
-$eventLogger = new EventLogger($logger, 'my-domain');
+$eventLogger = new EventLogger($logger);
 
-$eventLogger->logEvent(
-    'foo',
-    (new LogRecord(['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']))
-        ->setSeverityText('INFO')
-        ->setSeverityNumber(SeverityNumber::SEVERITY_NUMBER_INFO)
+$eventLogger->emit(
+    name: 'foo',
+    payload: ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'],
+    severityNumber: Severity::INFO
 );
 
-$eventLogger->logEvent(
+$eventLogger->emit(
     'foo',
-    new LogRecord('otel is great')
+    'otel is great'
 );
 
 $loggerProvider->shutdown();

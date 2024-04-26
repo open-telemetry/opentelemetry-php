@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
+use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
@@ -19,6 +20,7 @@ class Sdk
         private readonly TracerProviderInterface $tracerProvider,
         private readonly MeterProviderInterface $meterProvider,
         private readonly LoggerProviderInterface $loggerProvider,
+        private readonly EventLoggerProviderInterface $eventLoggerProvider,
         private readonly TextMapPropagatorInterface $propagator,
     ) {
     }
@@ -56,6 +58,11 @@ class Sdk
     public function getLoggerProvider(): LoggerProviderInterface
     {
         return $this->loggerProvider;
+    }
+
+    public function getEventLoggerProvider(): EventLoggerProviderInterface
+    {
+        return $this->eventLoggerProvider;
     }
 
     public function getPropagator(): TextMapPropagatorInterface

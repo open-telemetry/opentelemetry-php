@@ -14,6 +14,7 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
@@ -239,12 +240,14 @@ final class OpenTelemetrySdk implements ComponentProvider
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
             resource: $resource,
         );
+        $eventLoggerProvider = new EventLoggerProvider($loggerProvider);
 
         // </editor-fold>
 
         $sdkBuilder->setTracerProvider($tracerProvider);
         $sdkBuilder->setMeterProvider($meterProvider);
         $sdkBuilder->setLoggerProvider($loggerProvider);
+        $sdkBuilder->setEventLoggerProvider($eventLoggerProvider);
 
         return $sdkBuilder;
     }

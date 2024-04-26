@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Example;
 
-use OpenTelemetry\API\Logs\EventLogger;
-use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\SDK\Logs\EventLogger;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
@@ -25,16 +25,14 @@ $loggerProvider = new LoggerProvider(
 //get a logger, and emit a log record from an EventLogger.
 $loggerOne = $loggerProvider->getLogger('demo', '1.0');
 $loggerTwo = $loggerProvider->getLogger('demo', '2.0');
-$eventLoggerOne = new EventLogger($loggerOne, 'my-domain');
-$eventLoggerTwo = new EventLogger($loggerTwo, 'my-domain');
+$eventLoggerOne = new EventLogger($loggerOne);
+$eventLoggerTwo = new EventLogger($loggerTwo);
 
-$record = (new LogRecord(['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']))
-    ->setSeverityText('INFO')
-    ->setSeverityNumber(9);
+$payload = ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'];
 
-$eventLoggerOne->logEvent('foo', $record);
-$eventLoggerOne->logEvent('bar', (new LogRecord('hello world')));
-$eventLoggerTwo->logEvent('foo', $record);
+$eventLoggerOne->emit(name: 'foo', payload: $payload, severityNumber: Severity::INFO);
+$eventLoggerOne->emit('bar', 'hello world');
+$eventLoggerTwo->emit(name: 'foo', payload: $payload, severityNumber: Severity::INFO);
 
 //shut down logger provider
 $loggerProvider->shutdown();
