@@ -77,6 +77,14 @@ deptrac:
           collectors:
               - type: className
                 regex: ^Composer\\*
+      -   name: HttpClients
+          collectors:
+            - type: className
+              value: ^Symfony\\*
+            - type: className
+              value: ^GuzzleHttp\\*
+            - type: className
+              value: ^Buzz\\*
 
     ruleset:
       Context:
@@ -91,6 +99,7 @@ deptrac:
           - PsrHttp
           - HttpPlug
           - Composer
+          - HttpClients
       Contrib:
           - +SDK
           - +OtelProto
