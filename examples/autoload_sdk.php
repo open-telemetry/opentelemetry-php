@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Example;
 
-use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\SDK\Logs\EventLogger;
 
 putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
@@ -26,6 +25,6 @@ $instrumentation->tracer()->spanBuilder('root')->startSpan()->end();
 $instrumentation->meter()->createCounter('cnt')->add(1);
 
 $eventLogger = new EventLogger($instrumentation->logger());
-$eventLogger->logEvent('foo', new LogRecord('hello, otel'));
+$eventLogger->emit('foo', 'hello, otel');
 
 echo 'Finished!' . PHP_EOL;

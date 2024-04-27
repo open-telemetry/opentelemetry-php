@@ -19,9 +19,4 @@ interface EventLoggerInterface
         Severity|int|null $severityNumber = null,
         ?array $attributes = [],
     ): void;
-
-    /**
-     * @deprecated Use `emit`
-     */
-    public function logEvent(string $eventName, LogRecord $logRecord): void;
 }

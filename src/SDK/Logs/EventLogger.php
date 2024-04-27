@@ -39,15 +39,4 @@ class EventLogger implements EventLoggerInterface
 
         $this->logger->emit($logRecord);
     }
-
-    /**
-     * @deprecated Use `EventLogger::emit`
-     */
-    public function logEvent(string $eventName, LogRecord $logRecord): void
-    {
-        $logRecord->setAttributes([
-            'event.name' => $eventName,
-        ]);
-        $this->logger->emit($logRecord);
-    }
 }

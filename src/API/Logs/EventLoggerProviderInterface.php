@@ -9,8 +9,6 @@ namespace OpenTelemetry\API\Logs;
  */
 interface EventLoggerProviderInterface
 {
-    public function __construct(LoggerProviderInterface $loggerProvider);
-
     public function getEventLogger(
         string $name,
         ?string $version = null,
