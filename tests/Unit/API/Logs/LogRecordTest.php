@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\API\Logs;
 
 use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\Context\Context;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +17,7 @@ class LogRecordTest extends TestCase
     /**
      * @dataProvider settersProvider
      */
-    public function test_setters(string $method, string $propertyName, $value): void
+    public function test_setters(string $method, string $propertyName, mixed $value, mixed $expected = null): void
     {
         $record = new LogRecord();
         $record->{$method}($value);
@@ -24,7 +25,7 @@ class LogRecordTest extends TestCase
         $reflection = new \ReflectionClass($record);
         $property = $reflection->getProperty($propertyName);
         $property->setAccessible(true);
-        $this->assertSame($value, $property->getValue($record));
+        $this->assertSame($expected ?? $value, $property->getValue($record));
     }
 
     public static function settersProvider(): array
@@ -33,6 +34,7 @@ class LogRecordTest extends TestCase
             ['setBody', 'body', 'foo'],
             ['setAttributes', 'attributes', ['foo' => 'bar']],
             ['setSeverityNumber', 'severityNumber', 5],
+            ['setSeverityNumber', 'severityNumber', Severity::ERROR, Severity::ERROR->value],
             ['setSeverityText', 'severityText', 'info'],
             ['setObservedTimestamp', 'observedTimestamp', 999],
             ['setTimestamp', 'timestamp', 888],

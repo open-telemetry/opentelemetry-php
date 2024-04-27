@@ -4,30 +4,30 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Logs;
 
-class Severity
+enum Severity: int
 {
-    public const TRACE = 1;
-    public const TRACE2 = 2;
-    public const TRACE3 = 3;
-    public const TRACE4 = 4;
-    public const DEBUG = 5;
-    public const DEBUG2 = 6;
-    public const DEBUG3 = 7;
-    public const DEBUG4 = 8;
-    public const INFO = 9;
-    public const INFO2 = 10;
-    public const INFO3 = 11;
-    public const INFO4 = 12;
-    public const WARN = 13;
-    public const WARN2 = 14;
-    public const WARN3 = 15;
-    public const WARN4 = 16;
-    public const ERROR = 17;
-    public const ERROR2 = 18;
-    public const ERROR3 = 19;
-    public const ERROR4 = 20;
-    public const FATAL = 21;
-    public const FATAL2 = 22;
-    public const FATAL3 = 23;
-    public const FATAL4 = 24;
+    case TRACE = 1;
+    case TRACE2 = 2;
+    case TRACE3 = 3;
+    case TRACE4 = 4;
+    case DEBUG = 5;
+    case DEBUG2 = 6;
+    case DEBUG3 = 7;
+    case DEBUG4 = 8;
+    case INFO = 9;
+    case INFO2 = 10;
+    case INFO3 = 11;
+    case INFO4 = 12;
+    case WARN = 13;
+    case WARN2 = 14;
+    case WARN3 = 15;
+    case WARN4 = 16;
+    case ERROR = 17;
+    case ERROR2 = 18;
+    case ERROR3 = 19;
+    case ERROR4 = 20;
+    case FATAL = 21;
+    case FATAL2 = 22;
+    case FATAL3 = 23;
+    case FATAL4 = 24;
 }

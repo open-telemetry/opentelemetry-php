@@ -6,7 +6,6 @@ use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
-use OpenTelemetry\SDK\Logs\EventLogger;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
@@ -38,15 +37,12 @@ $scope = $span->activate();
 echo 'Trace id: ' . $span->getContext()->getTraceId() . PHP_EOL;
 echo 'Span id: ' . $span->getContext()->getSpanId() . PHP_EOL;
 
-//get a logger, and emit a log record from an EventLogger. The active context (trace id + span id) will be
+//get an event logger, and emit an event. The active context (trace id + span id) will be
 //attached to the log record
 $eventLogger = $eventLoggerProvider->getEventLogger('demo', '1.0', 'http://schema.url', ['foo' => 'bar']);
 $payload = ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'];
-$record = (new LogRecord(['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']))
-    ->setSeverityText('INFO')
-    ->setSeverityNumber(9);
 
-$eventLogger->emit(name: 'foo', payload: $record, severityNumber: Severity::INFO);
+$eventLogger->emit(name: 'foo', payload: $payload, severityNumber: Severity::INFO);
 
 //end span
 $span->end();

@@ -26,7 +26,7 @@ class EventLogger implements EventLoggerInterface
         mixed $payload = null,
         ?int $timestamp = null,
         ?ContextInterface $context = null,
-        ?int $severityNumber = null,
+        Severity|int|null $severityNumber = null,
         ?array $attributes = [],
     ): void {
         $logRecord = new LogRecord();
