@@ -131,7 +131,12 @@ jobs:
       run: vendor/bin/phpunit --testsuite integration
 
     - name: Code Coverage
-      run: bash <(curl -s https://codecov.io/bash) -F ${{ matrix.php-version }}
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.clover
+        flags: unittests
+        verbose: true
 
   packages:
     uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@main
