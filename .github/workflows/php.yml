@@ -135,8 +135,8 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.clover
-        flags: unittests
-        verbose: true
+        flags: ${{ matrix.php-version }}
+        verbose: false
 
   packages:
     uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@main
