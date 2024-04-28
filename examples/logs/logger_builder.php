@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
@@ -24,7 +25,7 @@ $logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', ['foo' 
 
 $record = (new LogRecord(['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']))
     ->setSeverityText('INFO')
-    ->setSeverityNumber(9);
+    ->setSeverityNumber(Severity::INFO);
 
 /**
  * Note that Loggers should only be used directly by a log appender.

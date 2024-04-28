@@ -32,7 +32,12 @@ class Psr3Test extends TestCase
             [LogLevel::NOTICE],
             [LogLevel::INFO],
             [LogLevel::DEBUG],
-            ['unknown'],
         ];
+    }
+
+    public function test_unknown_value_error(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        Psr3::severityNumber('unknown');
     }
 }

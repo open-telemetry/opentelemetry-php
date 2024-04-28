@@ -16,7 +16,7 @@ interface EventLoggerInterface
         mixed $payload = null,
         ?int $timestamp = null,
         ?ContextInterface $context = null,
-        Severity|int|null $severityNumber = null,
+        ?Severity $severityNumber = null,
         ?array $attributes = [],
     ): void;
 }

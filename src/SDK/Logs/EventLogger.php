@@ -26,7 +26,7 @@ class EventLogger implements EventLoggerInterface
         mixed $payload = null,
         ?int $timestamp = null,
         ?ContextInterface $context = null,
-        Severity|int|null $severityNumber = null,
+        ?Severity $severityNumber = null,
         ?array $attributes = [],
     ): void {
         $logRecord = new LogRecord();
@@ -35,7 +35,7 @@ class EventLogger implements EventLoggerInterface
         $payload && $logRecord->setBody($payload);
         $logRecord->setTimestamp($timestamp ?? (int) (microtime(true)*LogRecord::NANOS_PER_SECOND));
         $context && $logRecord->setContext($context);
-        $logRecord->setSeverityNumber($severityNumber ?? Severity::INFO);
+        $severityNumber && $logRecord->setSeverityNumber($severityNumber);
 
         $this->logger->emit($logRecord);
     }
