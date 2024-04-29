@@ -6,12 +6,12 @@ namespace OpenTelemetry\Tests\Unit\SDK\Util;
 
 use function count;
 use function max;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesBuilderInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace as SDK;
@@ -105,7 +105,7 @@ class SpanData implements SDK\SpanDataInterface
 
     public function addEvent(string $name, AttributesInterface $attributes, int $timestamp = null): self
     {
-        $this->events[] = new SDK\Event($name, $timestamp ?? ClockFactory::getDefault()->now(), $attributes);
+        $this->events[] = new SDK\Event($name, $timestamp ?? Clock::getDefault()->now(), $attributes);
 
         return $this;
     }

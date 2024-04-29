@@ -11,6 +11,9 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
+use OpenTelemetry\API\Common\Time\Clock;
+use OpenTelemetry\API\Common\Time\ClockInterface;
+use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
@@ -21,9 +24,6 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Exception\StackTraceFormatter;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
-use OpenTelemetry\SDK\Common\Time\ClockInterface;
-use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Event;
@@ -38,7 +38,6 @@ use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\StatusData;
-use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\MockObject\MockObject;
 use function range;
 use function str_repeat;
@@ -99,14 +98,14 @@ class SpanTest extends MockeryTestCase
             )
         );
 
-        ClockFactory::setDefault($this->testClock);
+        Clock::setDefault($this->testClock);
         $this->logWriter = $this->createMock(LogWriterInterface::class);
         Logging::setLogWriter($this->logWriter);
     }
 
     protected function tearDown(): void
     {
-        ClockFactory::setDefault(null);
+        Clock::reset();
         Logging::reset();
         //        LoggerHolder::unset();
     }
@@ -552,7 +551,7 @@ class SpanTest extends MockeryTestCase
         $span = $this->createTestRootSpan();
         $span->addEvent('event1');
         $span->addEvent('event2', ['key1' => 1]);
-        $span->addEvent('event3', [], TimeUtil::secondsToNanos(10));
+        $span->addEvent('event3', [], 10*ClockInterface::NANOS_PER_SECOND);
 
         $span->end();
 
@@ -562,7 +561,7 @@ class SpanTest extends MockeryTestCase
 
         $this->assertEvent($events[$idx++], 'event1', Attributes::create([]), self::START_EPOCH);
         $this->assertEvent($events[$idx++], 'event2', Attributes::create(['key1' => 1]), self::START_EPOCH);
-        $this->assertEvent($events[$idx], 'event3', Attributes::create([]), TimeUtil::secondsToNanos(10));
+        $this->assertEvent($events[$idx], 'event3', Attributes::create([]), 10*ClockInterface::NANOS_PER_SECOND);
     }
 
     public function test_add_event_attribute_length(): void

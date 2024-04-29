@@ -6,12 +6,12 @@ namespace OpenTelemetry\Example;
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 
-$clock = ClockFactory::getDefault();
+$clock = Clock::getDefault();
 $reader = new ExportingReader(
     new MetricExporter(
         (new PsrTransportFactory())->create('http://collector:4318/v1/metrics', \OpenTelemetry\Contrib\Otlp\ContentTypes::JSON)

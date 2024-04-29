@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
@@ -13,7 +14,6 @@ use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
@@ -215,7 +215,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         $meterProvider = new MeterProvider(
             contextStorage: null,
             resource: $resource,
-            clock: ClockFactory::getDefault(),
+            clock: Clock::getDefault(),
             attributesFactory: Attributes::factory(),
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
             metricReaders: $metricReaders, // @phpstan-ignore-line

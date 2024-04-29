@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
@@ -39,7 +39,7 @@ final class MeterProviderTest extends TestCase
         $meterProvider = new MeterProvider(
             null,
             ResourceInfoFactory::emptyResource(),
-            ClockFactory::getDefault(),
+            Clock::getDefault(),
             Attributes::factory(),
             $instrumentationScopeFactory,
             [],
@@ -55,7 +55,7 @@ final class MeterProviderTest extends TestCase
         $meterProvider = new MeterProvider(
             null,
             ResourceInfoFactory::emptyResource(),
-            ClockFactory::getDefault(),
+            Clock::getDefault(),
             Attributes::factory(),
             new InstrumentationScopeFactory(Attributes::factory()),
             [],
@@ -76,7 +76,7 @@ final class MeterProviderTest extends TestCase
         $meterProvider = new MeterProvider(
             null,
             ResourceInfoFactory::emptyResource(),
-            ClockFactory::getDefault(),
+            Clock::getDefault(),
             Attributes::factory(),
             new InstrumentationScopeFactory(Attributes::factory()),
             [$metricReader],
@@ -95,7 +95,7 @@ final class MeterProviderTest extends TestCase
         $meterProvider = new MeterProvider(
             null,
             ResourceInfoFactory::emptyResource(),
-            ClockFactory::getDefault(),
+            Clock::getDefault(),
             Attributes::factory(),
             new InstrumentationScopeFactory(Attributes::factory()),
             [$metricReader],

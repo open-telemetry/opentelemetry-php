@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
 use function func_get_arg;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
@@ -98,6 +98,26 @@ final class MeterTest extends TestCase
             'Measures the duration of inbound HTTP requests.',
             ['ExplicitBucketBoundaries' => [0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10]],
         );
+    }
+
+    public function test_create_gauge(): void
+    {
+        $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $metricFactory->expects($this->once())->method('createSynchronousWriter')
+            ->with(
+                $this->anything(),
+                $this->anything(),
+                new InstrumentationScope('test', null, null, Attributes::create([])),
+                new Instrument(InstrumentType::GAUGE, 'name', 'unit', 'description'),
+                $this->anything(),
+                $this->anything(),
+                $this->anything(),
+            )
+            ->willReturn([]);
+
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
+        $meter->createGauge('name', 'unit', 'description');
     }
 
     public function test_create_up_down_counter(): void
@@ -361,7 +381,7 @@ final class MeterTest extends TestCase
         return new MeterProvider(
             null,
             ResourceInfoFactory::emptyResource(),
-            ClockFactory::getDefault(),
+            Clock::getDefault(),
             Attributes::factory(),
             new InstrumentationScopeFactory(Attributes::factory()),
             $metricReaders,
