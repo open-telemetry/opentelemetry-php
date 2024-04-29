@@ -9,6 +9,7 @@ use OpenTelemetry\API\Logs\EventLoggerInterface;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\API\Logs\Severity;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 
 class EventLogger implements EventLoggerInterface
@@ -22,20 +23,22 @@ class EventLogger implements EventLoggerInterface
     ) {
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.32.0/specification/logs/event-sdk.md#emit-event
+     */
     public function emit(
         string $name,
         mixed $payload = null,
         ?int $timestamp = null,
         ?ContextInterface $context = null,
         ?Severity $severityNumber = null,
-        iterable $attributes = [],
+        array $attributes = [],
     ): void {
         $logRecord = new LogRecord();
-        $logRecord->setAttribute('event.name', $name);
-        $logRecord->setAttributes($attributes);
+        $logRecord->setAttributes(['event.name' => $name] + $attributes);
         $logRecord->setBody($payload);
         $logRecord->setTimestamp($timestamp ?? $this->clock->now());
-        $context && $logRecord->setContext($context);
+        $logRecord->setContext($context ?? Context::getCurrent());
         $logRecord->setSeverityNumber($severityNumber ?? Severity::INFO);
 
         $this->logger->emit($logRecord);
