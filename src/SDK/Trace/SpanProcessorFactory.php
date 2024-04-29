@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\Config\Configuration\Configuration;
 use OpenTelemetry\Config\Configuration\KnownValues as Values;
 use OpenTelemetry\Config\Configuration\Variables as Env;
-use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
