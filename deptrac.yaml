@@ -80,7 +80,7 @@ deptrac:
       -   name: HttpClients
           collectors:
             - type: className
-              value: ^Symfony\\*
+              value: ^Symfony\\Component\\HttpClient\\*
             - type: className
               value: ^GuzzleHttp\\*
             - type: className
