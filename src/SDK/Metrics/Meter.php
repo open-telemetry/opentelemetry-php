@@ -12,6 +12,7 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Metrics\AsynchronousInstrument;
 use OpenTelemetry\API\Metrics\CounterInterface;
+use OpenTelemetry\API\Metrics\GaugeInterface;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
@@ -151,6 +152,19 @@ final class Meter implements MeterInterface
         );
 
         return new Histogram($this->writer, $instrument, $referenceCounter);
+    }
+
+    public function createGauge(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): GaugeInterface
+    {
+        [$instrument, $referenceCounter] = $this->createSynchronousWriter(
+            InstrumentType::GAUGE,
+            $name,
+            $unit,
+            $description,
+            $advisory,
+        );
+
+        return new Gauge($this->writer, $instrument, $referenceCounter);
     }
 
     public function createObservableGauge(string $name, ?string $unit = null, ?string $description = null, $advisory = [], callable ...$callbacks): ObservableGaugeInterface

@@ -44,12 +44,12 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
         /**
          * @todo (https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#periodic-exporting-metricreader)
          * - OTEL_METRIC_EXPORT_INTERVAL
-         * - OTEL_METRIC_EXPORT_TIMEOUT
          */
         $endpoint = $this->getEndpoint($protocol);
 
         $headers = OtlpUtil::getHeaders(Signals::METRICS);
         $compression = $this->getCompression();
+        $timeout = $this->getTimeout();
 
         $factoryClass = Registry::transportFactory($protocol);
         $factory = $this->transportFactory ?: new $factoryClass();
@@ -59,6 +59,7 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
             Protocols::contentType($protocol),
             $headers,
             $compression,
+            $timeout,
         );
     }
 
@@ -82,6 +83,15 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
         return Configuration::has(Variables::OTEL_EXPORTER_OTLP_METRICS_COMPRESSION) ?
             Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_COMPRESSION) :
             Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
+    }
+
+    private function getTimeout(): float
+    {
+        $value = Configuration::has(Variables::OTEL_EXPORTER_OTLP_METRICS_TIMEOUT) ?
+            Configuration::getInt(Variables::OTEL_EXPORTER_OTLP_METRICS_TIMEOUT) :
+            Configuration::getInt(Variables::OTEL_EXPORTER_OTLP_TIMEOUT);
+
+        return $value/1000;
     }
 
     private function getEndpoint(string $protocol): string

@@ -26,7 +26,7 @@ function main(): void
         [
             new BatchSpanProcessor(
                 new ZipkinExporter(
-                    PsrTransportFactory::discover()->create('http://zipkin:9412/api/v2/spans', 'application/json')
+                    (new PsrTransportFactory())->create('http://zipkin:9412/api/v2/spans', 'application/json')
                 ),
                 Clock::getDefault()
             ),

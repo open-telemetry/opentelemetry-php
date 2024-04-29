@@ -66,6 +66,7 @@ class ImmutableSpanTest extends TestCase
             [],
             [],
             $this->attributes,
+            $this->totalRecordedLinks,
             $this->totalRecordedEvents,
             $this->status,
             $this->endEpochNanos,

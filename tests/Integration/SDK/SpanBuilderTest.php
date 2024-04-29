@@ -68,6 +68,22 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertCount(2, $span->toSpanData()->getLinks());
     }
 
+    /**
+     * @group trace-compliance
+     */
+    public function test_add_link_after_span_creation(): void
+    {
+        /** @var Span $span */
+        $span = $this
+            ->tracer
+            ->spanBuilder(self::SPAN_NAME)
+            ->addLink($this->sampledSpanContext)
+            ->startSpan()
+            ->addLink($this->sampledSpanContext);
+
+        $this->assertCount(2, $span->toSpanData()->getLinks());
+    }
+
     public function test_add_link_invalid(): void
     {
         /** @var Span $span */

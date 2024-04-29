@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesBuilderInterface;
 use OpenTelemetry\SDK\Common\Dev\Compatibility\Util as BcUtil;
@@ -38,8 +39,8 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         private readonly SpanProcessorInterface $spanProcessor,
         private readonly ResourceInfo $resource,
         private AttributesBuilderInterface $attributesBuilder,
-        private readonly array $links,
-        private readonly int $totalRecordedLinks,
+        private array $links,
+        private int $totalRecordedLinks,
         private readonly int $startEpochNanos,
     ) {
         $this->status = StatusData::unset();
@@ -138,6 +139,29 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         foreach ($attributes as $key => $value) {
             $this->attributesBuilder[$key] = $value;
         }
+
+        return $this;
+    }
+
+    public function addLink(SpanContextInterface $context, iterable $attributes = []): self
+    {
+        if ($this->hasEnded) {
+            return $this;
+        }
+        if (!$context->isValid()) {
+            return $this;
+        }
+        if (++$this->totalRecordedLinks > $this->spanLimits->getLinkCountLimit()) {
+            return $this;
+        }
+
+        $this->links[] = new Link(
+            $context,
+            $this->spanLimits
+                ->getLinkAttributesFactory()
+                ->builder($attributes)
+                ->build(),
+        );
 
         return $this;
     }
@@ -260,6 +284,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
             $this->links,
             $this->events,
             $this->attributesBuilder->build(),
+            $this->totalRecordedLinks,
             $this->totalRecordedEvents,
             $this->status,
             $this->endEpochNanos,

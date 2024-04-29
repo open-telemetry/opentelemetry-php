@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
-$transport = PsrTransportFactory::discover()->create('http://zipkin:9411/api/v2/spans', 'application/json');
+$transport = (new PsrTransportFactory())->create('http://zipkin:9411/api/v2/spans', 'application/json');
 $zipkinExporter = new ZipkinExporter(
     $transport
 );

@@ -44,7 +44,7 @@ $exporterEndpoint = 'http://zipkin:9411/api/v2/spans';
  */
 //$exporterEndpoint = 'http://example.com:9411/api/v2/spans';
 $exporter = new ZipkinExporter(
-    PsrTransportFactory::discover()->create($exporterEndpoint, 'application/json'),
+    (new PsrTransportFactory())->create($exporterEndpoint, 'application/json'),
 );
 /**
  * Decorate the Exporter
