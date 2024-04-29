@@ -8,6 +8,7 @@ use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\LinkInterface;
@@ -78,6 +79,7 @@ class FriendlySpanConverterTest extends TestCase
                 'foz' => 'baz',
             ], ],
         ],
+        'schema_url' => 'https://opentelemetry.io/schemas/1.25.0',
     ];
 
     public function test_convert(): void
@@ -160,9 +162,23 @@ class FriendlySpanConverterTest extends TestCase
         }
         $mock->method('getLinks')->willReturn($links);
 
+        $mock->method('getInstrumentationScope')
+            ->willReturn(
+                $this->createInstrumentationScopeMock()
+            );
+
         return $mock;
     }
 
+    private function createInstrumentationScopeMock(): InstrumentationScopeInterface
+    {
+        $mock = $this->createMock(InstrumentationScopeInterface::class);
+
+        $mock->method('getSchemaUrl')
+            ->willReturn($this->createSchemaUrlMock());
+
+        return $mock;
+    }
     private function createSpanContextMock(string $spanId, string $traceId = '0', string $traceState = null): SpanContextInterface
     {
         $mock = $this->createMock(SpanContextInterface::class);
@@ -248,5 +264,10 @@ class FriendlySpanConverterTest extends TestCase
         $mock->method('getAttributes')->willReturn($attributes);
 
         return $mock;
+    }
+
+    public function createSchemaUrlMock(): string
+    {
+        return self::TEST_DATA['schema_url'];
     }
 }

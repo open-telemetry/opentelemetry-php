@@ -35,6 +35,7 @@ class FriendlySpanConverter implements SpanConverterInterface
     private const EVENTS_ATTR = 'events';
     private const TIMESTAMP_ATTR = 'timestamp';
     private const LINKS_ATTR = 'links';
+    private const SCHEMA_URL_ATTR = 'schema_url';
 
     public function convert(iterable $spans): array
     {
@@ -63,6 +64,7 @@ class FriendlySpanConverter implements SpanConverterInterface
             self::STATUS_ATTR => $this->covertStatus($span->getStatus()),
             self::EVENTS_ATTR => $this->convertEvents($span->getEvents()),
             self::LINKS_ATTR => $this->convertLinks($span->getLinks()),
+            self::SCHEMA_URL_ATTR => $this->convertSchemaUrl($span->getInstrumentationScope()->getSchemaUrl()),
         ];
     }
 
@@ -143,5 +145,13 @@ class FriendlySpanConverter implements SpanConverterInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param string|null $schemaUrl
+     */
+    private function convertSchemaUrl(?string $schemaUrl): string
+    {
+        return $schemaUrl ?? '';
     }
 }

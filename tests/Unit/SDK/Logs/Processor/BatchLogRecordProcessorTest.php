@@ -10,12 +10,13 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
+use OpenTelemetry\API\Common\Time\Clock;
+use OpenTelemetry\API\Common\Time\ClockInterface;
+use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
-use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
@@ -26,7 +27,6 @@ use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
 use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
-use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
@@ -45,12 +45,12 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         Logging::setLogWriter($this->logWriter);
         $this->testClock = new TestClock();
 
-        ClockFactory::setDefault($this->testClock);
+        Clock::setDefault($this->testClock);
     }
 
     protected function tearDown(): void
     {
-        ClockFactory::setDefault(null);
+        Clock::reset();
         Logging::reset();
     }
 
@@ -427,7 +427,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
 
         $processor = new BatchLogRecordProcessor(
             $exporter,
-            ClockFactory::getDefault(),
+            Clock::getDefault(),
             2048,
             5000,
             30000,

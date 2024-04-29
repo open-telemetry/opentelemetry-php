@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Zipkin;
 
 use function max;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
-use OpenTelemetry\SDK\Common\Time\Util as TimeUtil;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
@@ -24,6 +24,8 @@ class SpanConverter implements SpanConverterInterface
     const KEY_DROPPED_ATTRIBUTES_COUNT = 'otel.dropped_attributes_count';
     const KEY_DROPPED_EVENTS_COUNT = 'otel.dropped_events_count';
     const KEY_DROPPED_LINKS_COUNT = 'otel.dropped_links_count';
+
+    public const NANOS_PER_MICROSECOND = 1_000;
 
     const REMOTE_ENDPOINT_PREFERRED_ATTRIBUTE_TO_RANK_MAP = [
         'peer.service' => 1,
@@ -42,6 +44,12 @@ class SpanConverter implements SpanConverterInterface
     public function __construct()
     {
         $this->defaultServiceName = ResourceInfoFactory::defaultResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
+    }
+
+    /** @psalm-pure */
+    public static function nanosToMicros(int $nanoseconds): int
+    {
+        return intdiv($nanoseconds, ClockInterface::NANOS_PER_MICROSECOND);
     }
 
     private function sanitiseTagValue($value): string
@@ -80,8 +88,8 @@ class SpanConverter implements SpanConverterInterface
     {
         $spanParent = $span->getParentContext();
 
-        $startTimestamp = TimeUtil::nanosToMicros($span->getStartEpochNanos());
-        $endTimestamp = TimeUtil::nanosToMicros($span->getEndEpochNanos());
+        $startTimestamp = self::nanosToMicros($span->getStartEpochNanos());
+        $endTimestamp = self::nanosToMicros($span->getEndEpochNanos());
 
         $serviceName =  $span->getResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME)
                         ??
@@ -189,7 +197,7 @@ class SpanConverter implements SpanConverterInterface
         $value = ($attributesAsJson !== null) ? sprintf('"%s": %s', $eventName, $attributesAsJson) : sprintf('"%s"', $eventName);
 
         $annotation = [
-            'timestamp' => TimeUtil::nanosToMicros($event->getEpochNanos()),
+            'timestamp' => self::nanosToMicros($event->getEpochNanos()),
             'value' => $value,
         ];
         if ($event->getAttributes()->getDroppedAttributesCount() > 0) {
