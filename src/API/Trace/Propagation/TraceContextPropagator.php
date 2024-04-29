@@ -59,7 +59,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
     }
 
     /** {@inheritdoc} */
-    public function inject(&$carrier, PropagationSetterInterface $setter = null, ContextInterface $context = null): void
+    public function inject(&$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
@@ -81,7 +81,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
     }
 
     /** {@inheritdoc} */
-    public function extract($carrier, PropagationGetterInterface $getter = null, ContextInterface $context = null): ContextInterface
+    public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
