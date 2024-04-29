@@ -10,7 +10,7 @@ class NoopEventLoggerProvider implements EventLoggerProviderInterface
     {
         static $instance;
 
-        return $instance ??= new self(NoopLoggerProvider::getInstance());
+        return $instance ??= new self();
     }
 
     public function getEventLogger(
@@ -20,10 +20,5 @@ class NoopEventLoggerProvider implements EventLoggerProviderInterface
         iterable $attributes = [],
     ): EventLoggerInterface {
         return NoopEventLogger::instance();
-    }
-
-    // @phpstan-ignore-next-line
-    public function __construct(private readonly LoggerProviderInterface $loggerProvider)
-    {
     }
 }

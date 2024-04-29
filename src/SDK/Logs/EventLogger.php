@@ -27,15 +27,15 @@ class EventLogger implements EventLoggerInterface
         ?int $timestamp = null,
         ?ContextInterface $context = null,
         ?Severity $severityNumber = null,
-        ?array $attributes = [],
+        iterable $attributes = [],
     ): void {
         $logRecord = new LogRecord();
-        $attributes += ['event.name' => $name];
+        $logRecord->setAttribute('event.name', $name);
         $logRecord->setAttributes($attributes);
-        $payload && $logRecord->setBody($payload);
+        $logRecord->setBody($payload);
         $logRecord->setTimestamp($timestamp ?? (int) (microtime(true)*LogRecord::NANOS_PER_SECOND));
         $context && $logRecord->setContext($context);
-        $severityNumber && $logRecord->setSeverityNumber($severityNumber);
+        $logRecord->setSeverityNumber($severityNumber ?? Severity::INFO);
 
         $this->logger->emit($logRecord);
     }

@@ -16,14 +16,7 @@ class NoopEventLogger implements EventLoggerInterface
         return $instance;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function logEvent(string $eventName, LogRecord $logRecord): void
-    {
-    }
-
-    public function emit(string $name, mixed $payload = null, ?int $timestamp = null, ?ContextInterface $context = null, Severity|int|null $severityNumber = null, ?array $attributes = []): void
+    public function emit(string $name, mixed $payload = null, ?int $timestamp = null, ?ContextInterface $context = null, Severity|int|null $severityNumber = null, iterable $attributes = []): void
     {
     }
 }

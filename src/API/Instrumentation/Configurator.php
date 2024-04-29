@@ -54,7 +54,7 @@ final class Configurator implements ImplicitContextKeyedInterface
             ->withMeterProvider(new NoopMeterProvider())
             ->withPropagator(new NoopTextMapPropagator())
             ->withLoggerProvider(NoopLoggerProvider::getInstance())
-            ->withEventLoggerProvider(new NoopEventLoggerProvider(NoopLoggerProvider::getInstance()))
+            ->withEventLoggerProvider(new NoopEventLoggerProvider())
         ;
     }
 

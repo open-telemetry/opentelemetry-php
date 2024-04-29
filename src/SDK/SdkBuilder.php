@@ -78,7 +78,7 @@ class SdkBuilder
         $tracerProvider = $this->tracerProvider ?? new NoopTracerProvider();
         $meterProvider = $this->meterProvider ?? new NoopMeterProvider();
         $loggerProvider = $this->loggerProvider ?? new NoopLoggerProvider();
-        $eventLoggerProvider = $this->eventLoggerProvider ?? new NoopEventLoggerProvider($loggerProvider);
+        $eventLoggerProvider = $this->eventLoggerProvider ?? new NoopEventLoggerProvider();
         if ($this->autoShutdown) {
             // rector rule disabled in config, because ShutdownHandler::register() does not keep a strong reference to $this
             ShutdownHandler::register($tracerProvider->shutdown(...));
