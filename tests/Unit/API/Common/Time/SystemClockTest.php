@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Time;
+namespace OpenTelemetry\Tests\Unit\API\Common\Time;
 
 use DateTime;
-use OpenTelemetry\SDK\Common\Time\SystemClock;
+use OpenTelemetry\API\Common\Time\SystemClock;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Time\SystemClock
+ * @covers \OpenTelemetry\API\Common\Time\SystemClock
  */
 class SystemClockTest extends TestCase
 {

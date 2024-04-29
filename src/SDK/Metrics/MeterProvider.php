@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use ArrayAccess;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
-use OpenTelemetry\SDK\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;

@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Time;
+namespace OpenTelemetry\API\Common\Time;
 
 use function hrtime;
 use function microtime;
 
+/**
+ * @internal OpenTelemetry
+ */
 final class SystemClock implements ClockInterface
 {
     private static int $referenceTime = 0;

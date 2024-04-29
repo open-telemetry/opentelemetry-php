@@ -6,9 +6,9 @@ require __DIR__ . '/trace-context-handler.php';
 
 use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Response;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -28,7 +28,7 @@ function main(): void
                 new ZipkinExporter(
                     (new PsrTransportFactory())->create('http://zipkin:9412/api/v2/spans', 'application/json')
                 ),
-                ClockFactory::getDefault()
+                Clock::getDefault()
             ),
         ],
     ))->getTracer('W3C Trace-Context Test Service');

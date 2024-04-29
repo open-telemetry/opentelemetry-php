@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Util;
+namespace OpenTelemetry\API\Common\Time;
 
-use OpenTelemetry\SDK\Common\Time\ClockInterface;
-
+/**
+ * @internal OpenTelemetry
+ */
 final class TestClock implements ClockInterface
 {
     public const DEFAULT_START_EPOCH = 1633060331386955008; // Fri Oct 01 2021 03:52:11 UTC
@@ -33,11 +34,6 @@ final class TestClock implements ClockInterface
     }
 
     public function now(): int
-    {
-        return $this->currentEpochNanos;
-    }
-
-    public function nanoTime(): int
     {
         return $this->currentEpochNanos;
     }

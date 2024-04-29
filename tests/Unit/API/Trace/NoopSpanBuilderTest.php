@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Trace;
 
+use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\NoopSpanBuilder;
 use OpenTelemetry\API\Trace\SpanContextInterface;
@@ -11,7 +12,6 @@ use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Context\ContextStorageInterface;
-use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
 
 /**
