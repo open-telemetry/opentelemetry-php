@@ -9,6 +9,7 @@ use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Logs\EventLogger;
+use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
@@ -22,11 +23,10 @@ $loggerProvider = new LoggerProvider(
     ),
     new InstrumentationScopeFactory(Attributes::factory())
 );
+$eventLoggerProvider = new EventLoggerProvider($loggerProvider);
 //get a logger, and emit a log record from an EventLogger.
-$loggerOne = $loggerProvider->getLogger('demo', '1.0');
-$loggerTwo = $loggerProvider->getLogger('demo', '2.0');
-$eventLoggerOne = new EventLogger($loggerOne);
-$eventLoggerTwo = new EventLogger($loggerTwo);
+$eventLoggerOne = $eventLoggerProvider->getEventLogger('demo', '1.0');
+$eventLoggerTwo = $eventLoggerProvider->getEventLogger('demo', '2.0');
 
 $payload = ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'];
 

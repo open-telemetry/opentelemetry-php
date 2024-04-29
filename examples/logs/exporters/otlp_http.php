@@ -9,7 +9,7 @@ use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
-use OpenTelemetry\SDK\Logs\EventLogger;
+use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
@@ -27,8 +27,8 @@ $loggerProvider = new LoggerProvider(
         (new LogRecordLimitsBuilder())->build()->getAttributeFactory()
     )
 );
-$logger = $loggerProvider->getLogger('demo', '1.0', 'https://opentelemetry.io/schemas/1.7.1', ['foo' => 'bar']);
-$eventLogger = new EventLogger($logger);
+$eventLoggerProvider = new EventLoggerProvider($loggerProvider);
+$eventLogger = $eventLoggerProvider->getEventLogger('demo', '1.0', 'https://opentelemetry.io/schemas/1.7.1', ['foo' => 'bar']);
 
 $eventLogger->emit(
     name: 'foo',

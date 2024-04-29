@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Logs;
 
-use function microtime;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Logs\EventLoggerInterface;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
@@ -18,6 +18,7 @@ class EventLogger implements EventLoggerInterface
      */
     public function __construct(
         private readonly LoggerInterface $logger,
+        private readonly ClockInterface $clock,
     ) {
     }
 
@@ -33,7 +34,7 @@ class EventLogger implements EventLoggerInterface
         $logRecord->setAttribute('event.name', $name);
         $logRecord->setAttributes($attributes);
         $logRecord->setBody($payload);
-        $logRecord->setTimestamp($timestamp ?? (int) (microtime(true)*LogRecord::NANOS_PER_SECOND));
+        $logRecord->setTimestamp($timestamp ?? $this->clock->now());
         $context && $logRecord->setContext($context);
         $logRecord->setSeverityNumber($severityNumber ?? Severity::INFO);
 
