@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\StalenessHandler;
 
+use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\DelayedStalenessHandlerFactory;
-use OpenTelemetry\Tests\Unit\SDK\Util\TestClock;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use WeakReference;

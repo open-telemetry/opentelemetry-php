@@ -70,10 +70,10 @@ interface Defaults
     public const OTEL_EXPORTER_OTLP_METRICS_INSECURE = 'false';
     public const OTEL_EXPORTER_OTLP_LOGS_INSECURE = 'false';
     // Timeout (seconds)
-    public const OTEL_EXPORTER_OTLP_TIMEOUT = 10;
-    public const OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = 10;
-    public const OTEL_EXPORTER_OTLP_METRICS_TIMEOUT = 10;
-    public const OTEL_EXPORTER_OTLP_LOGS_TIMEOUT = 10;
+    public const OTEL_EXPORTER_OTLP_TIMEOUT = 10000; //10s
+    public const OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = 10000;
+    public const OTEL_EXPORTER_OTLP_METRICS_TIMEOUT = 10000;
+    public const OTEL_EXPORTER_OTLP_LOGS_TIMEOUT = 10000;
     // Protocol
     public const OTEL_EXPORTER_OTLP_PROTOCOL = 'http/protobuf';
     public const OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'http/protobuf';
@@ -85,7 +85,7 @@ interface Defaults
      */
     public const OTEL_EXPORTER_ZIPKIN_ENDPOINT = 'http://localhost:9411/api/v2/spans';
     // Timeout (seconds)
-    public const OTEL_EXPORTER_ZIPKIN_TIMEOUT = 10;
+    public const OTEL_EXPORTER_ZIPKIN_TIMEOUT = 10000; //10s
     /**
      * Prometheus Exporter
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#prometheus-exporter

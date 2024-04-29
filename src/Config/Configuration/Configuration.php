@@ -25,7 +25,7 @@ class Configuration
         return CompositeResolver::instance()->hasVariable($name);
     }
 
-    public static function getInt(string $key, int $default = null): int
+    public static function getInt(string $key, ?int $default = null): int
     {
         return (int) self::validateVariableValue(
             CompositeResolver::instance()->resolve($key, $default),
@@ -33,14 +33,14 @@ class Configuration
         );
     }
 
-    public static function getString(string $key, string $default = null): string
+    public static function getString(string $key, ?string $default = null): string
     {
         return (string) self::validateVariableValue(
             CompositeResolver::instance()->resolve($key, $default),
         );
     }
 
-    public static function getBoolean(string $key, bool $default = null): bool
+    public static function getBoolean(string $key, ?bool $default = null): bool
     {
         $resolved = self::validateVariableValue(
             CompositeResolver::instance()->resolve(
@@ -62,28 +62,28 @@ class Configuration
         );
     }
 
-    public static function getMap(string $key, array $default = null): array
+    public static function getMap(string $key, ?array $default = null): array
     {
         return MapParser::parse(
             CompositeResolver::instance()->resolve($key, $default),
         );
     }
 
-    public static function getList(string $key, array $default = null): array
+    public static function getList(string $key, ?array $default = null): array
     {
         return ListParser::parse(
             CompositeResolver::instance()->resolve($key, $default),
         );
     }
 
-    public static function getEnum(string $key, string $default = null): string
+    public static function getEnum(string $key, ?string $default = null): string
     {
         return (string) self::validateVariableValue(
             CompositeResolver::instance()->resolve($key, $default),
         );
     }
 
-    public static function getFloat(string $key, float $default = null): float
+    public static function getFloat(string $key, ?float $default = null): float
     {
         return (float) self::validateVariableValue(
             CompositeResolver::instance()->resolve($key, $default),
@@ -91,7 +91,7 @@ class Configuration
         );
     }
 
-    public static function getRatio(string $key, float $default = null): float
+    public static function getRatio(string $key, ?float $default = null): float
     {
         return RatioParser::parse(
             self::validateVariableValue(

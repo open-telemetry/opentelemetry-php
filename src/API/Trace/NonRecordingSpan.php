@@ -41,6 +41,11 @@ final class NonRecordingSpan extends Span
         return $this;
     }
 
+    public function addLink(SpanContextInterface $context, iterable $attributes = []): SpanInterface
+    {
+        return $this;
+    }
+
     /** @inheritDoc */
     public function addEvent(string $name, iterable $attributes = [], int $timestamp = null): SpanInterface
     {

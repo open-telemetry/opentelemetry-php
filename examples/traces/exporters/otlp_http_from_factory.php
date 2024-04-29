@@ -11,6 +11,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
  */
 putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318');
 putenv('OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf');
+putenv('OTEL_EXPORTER_OTLP_TIMEOUT=1500'); //1.5s
 $factory = new \OpenTelemetry\SDK\Trace\TracerProviderFactory();
 $tracerProvider = $factory->create();
 

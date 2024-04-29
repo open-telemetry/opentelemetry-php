@@ -17,9 +17,9 @@ require __DIR__ . '/../../vendor/autoload.php';
  * will be the last log entry
  */
 
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use OpenTelemetry\SDK\Logs\SimplePsrFileLogger;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SpanExporter\LoggerDecorator;
@@ -44,7 +44,7 @@ $exporterEndpoint = 'http://zipkin:9411/api/v2/spans';
  */
 //$exporterEndpoint = 'http://example.com:9411/api/v2/spans';
 $exporter = new ZipkinExporter(
-    PsrTransportFactory::discover()->create($exporterEndpoint, 'application/json'),
+    (new PsrTransportFactory())->create($exporterEndpoint, 'application/json'),
 );
 /**
  * Decorate the Exporter
@@ -57,7 +57,7 @@ $decorator = new LoggerDecorator(
  * Create the Tracer
  */
 $tracerProvider = new TracerProvider(
-    new BatchSpanProcessor($decorator, ClockFactory::getDefault()),
+    new BatchSpanProcessor($decorator, Clock::getDefault()),
     new AlwaysOnSampler()
 );
 $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');

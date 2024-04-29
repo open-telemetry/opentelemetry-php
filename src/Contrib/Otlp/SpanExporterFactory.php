@@ -21,7 +21,7 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
 
     private const DEFAULT_COMPRESSION = 'none';
 
-    public function __construct(private ?TransportFactoryInterface $transportFactory = null)
+    public function __construct(private readonly ?TransportFactoryInterface $transportFactory = null)
     {
     }
 
@@ -46,11 +46,12 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
         $endpoint = $this->getEndpoint($protocol);
         $headers = OtlpUtil::getHeaders(Signals::TRACE);
         $compression = $this->getCompression();
+        $timeout = $this->getTimeout();
 
         $factoryClass = Registry::transportFactory($protocol);
         $factory = $this->transportFactory ?: new $factoryClass();
 
-        return $factory->create($endpoint, $contentType, $headers, $compression);
+        return $factory->create($endpoint, $contentType, $headers, $compression, $timeout);
     }
 
     private function getProtocol(): string
@@ -80,5 +81,14 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
         return Configuration::has(Variables::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) ?
             Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_TRACES_COMPRESSION) :
             Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_COMPRESSION, self::DEFAULT_COMPRESSION);
+    }
+
+    private function getTimeout(): float
+    {
+        $value = Configuration::has(Variables::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT) ?
+            Configuration::getInt(Variables::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT) :
+            Configuration::getInt(Variables::OTEL_EXPORTER_OTLP_TIMEOUT);
+
+        return $value/1000;
     }
 }

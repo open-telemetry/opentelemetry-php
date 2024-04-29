@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use OpenTelemetry\Config\Configuration\Configuration;
 use OpenTelemetry\Config\Configuration\KnownValues as Values;
 use OpenTelemetry\Config\Configuration\Variables as Env;
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
@@ -28,7 +28,7 @@ class SpanProcessorFactory
         return match ($name) {
             Values::VALUE_BATCH => new BatchSpanProcessor(
                 $exporter,
-                ClockFactory::getDefault(),
+                Clock::getDefault(),
                 Configuration::getInt(Env::OTEL_BSP_MAX_QUEUE_SIZE, BatchSpanProcessor::DEFAULT_MAX_QUEUE_SIZE),
                 Configuration::getInt(Env::OTEL_BSP_SCHEDULE_DELAY, BatchSpanProcessor::DEFAULT_SCHEDULE_DELAY),
                 Configuration::getInt(Env::OTEL_BSP_EXPORT_TIMEOUT, BatchSpanProcessor::DEFAULT_EXPORT_TIMEOUT),
