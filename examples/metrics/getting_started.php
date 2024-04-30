@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
-require 'vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 /**
  * Basic async/observable metrics generation example. This uses the console
