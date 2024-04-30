@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 use function bin2hex;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\Contrib\Otlp\SpanConverter;
 use Opentelemetry\Proto\Common\V1\AnyValue;
 use Opentelemetry\Proto\Common\V1\ArrayValue;
@@ -46,7 +47,7 @@ class SpanConverterTest extends TestCase
 
         $this->assertSame($span->getContext()->getSpanId(), bin2hex($row->getSpanId()));
         $this->assertSame($span->getContext()->getTraceId(), bin2hex($row->getTraceId()));
-        $this->assertSame($span->getContext()->getTraceFlags(), $row->getFlags());
+        $this->assertSame(V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK, $row->getFlags());
         $this->assertSame($span->getName(), $row->getName());
 
         $this->assertCount(2, $row->getAttributes());
@@ -57,8 +58,24 @@ class SpanConverterTest extends TestCase
 
         $this->assertSame($context->getTraceId(), bin2hex($link->getTraceId()));
         $this->assertSame($context->getSpanId(), bin2hex($link->getSpanId()));
-        $this->assertSame($context->getTraceFlags(), $link->getFlags());
+        $this->assertSame(V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK, $link->getFlags());
         $this->assertCount(1, $link->getAttributes());
+    }
+
+    public function test_span_context_is_remote_flags(): void
+    {
+        $span = (new SpanData())
+            ->setContext(SpanContext::createFromRemoteParent('0000000000000001', '00000001'))
+            ->addLink(SpanContext::createFromRemoteParent('0000000000000001', '00000002'), Attributes::create([]))
+            ->addLink(SpanContext::createFromRemoteParent('0000000000000001', '00000003', TraceFlags::SAMPLED), Attributes::create([]));
+
+        $converter = new SpanConverter();
+        /** @psalm-suppress InvalidArgument */
+        $row = $converter->convert([$span])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
+
+        $this->assertSame(V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK | V1\SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK, $row->getFlags());
+        $this->assertSame(V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK | V1\SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK, $row->getLinks()[0]->getFlags());
+        $this->assertSame(V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK | V1\SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK | TraceFlags::SAMPLED, $row->getLinks()[1]->getFlags());
     }
 
     /**
