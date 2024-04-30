@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
 use OpenTelemetry\API\Logs\LogRecord;
-use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
@@ -40,7 +39,7 @@ class ReadableLogRecordTest extends TestCase
     public function test_getters(): void
     {
         $logRecord = (new LogRecord('body'))
-            ->setSeverityNumber(Severity::DEBUG)
+            ->setSeverityNumber(5)
             ->setSeverityText('info')
             ->setTimestamp(11)
             ->setObservedTimestamp(22)

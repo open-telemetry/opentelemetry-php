@@ -33,6 +33,7 @@ class LogRecordTest extends TestCase
         return [
             ['setBody', 'body', 'foo'],
             ['setAttributes', 'attributes', ['foo' => 'bar']],
+            ['setSeverityNumber', 'severityNumber', 5],
             ['setSeverityNumber', 'severityNumber', Severity::ERROR, Severity::ERROR->value],
             ['setSeverityText', 'severityText', 'info'],
             ['setObservedTimestamp', 'observedTimestamp', 999],

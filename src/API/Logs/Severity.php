@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Logs;
 
+use Psr\Log\LogLevel;
+use ValueError;
+
 enum Severity: int
 {
     case TRACE = 1;
@@ -30,4 +33,25 @@ enum Severity: int
     case FATAL2 = 22;
     case FATAL3 = 23;
     case FATAL4 = 24;
+
+    /**
+     * Maps PSR-3 severity level (string) to the appropriate opentelemetry severity
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model-appendix.md#appendix-b-severitynumber-example-mappings
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-severitynumber
+     */
+    public static function fromPsr3(string $level): self
+    {
+        return match (strtolower($level)) {
+            LogLevel::DEBUG => Severity::DEBUG,
+            LogLevel::INFO => Severity::INFO,
+            LogLevel::NOTICE => Severity::INFO2,
+            LogLevel::WARNING => Severity::WARN,
+            LogLevel::ERROR => Severity::ERROR,
+            LogLevel::CRITICAL => Severity::ERROR2,
+            LogLevel::ALERT => Severity::ERROR3,
+            LogLevel::EMERGENCY => Severity::FATAL,
+            default => throw new ValueError('Unknown severity: ' . $level),
+        };
+    }
 }
