@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Contrib\Otlp;
 
 use OpenTelemetry\API\Trace as API;
+use OpenTelemetry\API\Trace\SpanContextInterface;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceRequest;
 use Opentelemetry\Proto\Common\V1\InstrumentationScope;
 use Opentelemetry\Proto\Common\V1\KeyValue;
@@ -15,6 +16,7 @@ use Opentelemetry\Proto\Trace\V1\Span;
 use Opentelemetry\Proto\Trace\V1\Span\Event;
 use Opentelemetry\Proto\Trace\V1\Span\Link;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind;
+use Opentelemetry\Proto\Trace\V1\SpanFlags;
 use Opentelemetry\Proto\Trace\V1\Status;
 use Opentelemetry\Proto\Trace\V1\Status\StatusCode;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
@@ -147,7 +149,7 @@ final class SpanConverter
         $pSpan = new Span();
         $pSpan->setTraceId($this->serializer->serializeTraceId($span->getContext()->getTraceIdBinary()));
         $pSpan->setSpanId($this->serializer->serializeSpanId($span->getContext()->getSpanIdBinary()));
-        $pSpan->setFlags($span->getContext()->getTraceFlags());
+        $pSpan->setFlags(self::traceFlags($span->getContext()));
         $pSpan->setTraceState((string) $span->getContext()->getTraceState());
         if ($span->getParentContext()->isValid()) {
             $pSpan->setParentSpanId($this->serializer->serializeSpanId($span->getParentContext()->getSpanIdBinary()));
@@ -172,7 +174,7 @@ final class SpanConverter
             $pSpan->getLinks()[] = $pLink = new Link();
             $pLink->setTraceId($this->serializer->serializeTraceId($link->getSpanContext()->getTraceIdBinary()));
             $pLink->setSpanId($this->serializer->serializeSpanId($link->getSpanContext()->getSpanIdBinary()));
-            $pLink->setFlags($link->getSpanContext()->getTraceFlags());
+            $pLink->setFlags(self::traceFlags($link->getSpanContext()));
             $pLink->setTraceState((string) $link->getSpanContext()->getTraceState());
             $this->setAttributes($pLink, $link->getAttributes());
         }
@@ -184,5 +186,16 @@ final class SpanConverter
         $pSpan->setStatus($pStatus);
 
         return $pSpan;
+    }
+
+    private static function traceFlags(SpanContextInterface $spanContext): int
+    {
+        $flags = $spanContext->getTraceFlags();
+        $flags |= SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK;
+        if ($spanContext->isRemote()) {
+            $flags |= SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK;
+        }
+
+        return $flags;
     }
 }
