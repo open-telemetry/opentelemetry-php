@@ -39,7 +39,7 @@ $eventLogger->emit(
 );
 
 $eventLogger->emit(
-    'foo',
+    'bar',
     'otel is great'
 );
 
