@@ -32,10 +32,12 @@ class EventLogger implements EventLoggerInterface
         ?int $timestamp = null,
         ?ContextInterface $context = null,
         Severity|int|null $severityNumber = null,
-        array $attributes = [],
+        iterable $attributes = [],
     ): void {
         $logRecord = new LogRecord();
-        $logRecord->setAttributes(['event.name' => $name] + $attributes);
+        $logRecord->setAttribute('event.name', $name);
+        $logRecord->setAttributes($attributes);
+        $logRecord->setAttribute('event.name', $name);
         $logRecord->setBody($payload);
         $logRecord->setTimestamp($timestamp ?? $this->clock->now());
         $logRecord->setContext($context ?? Context::getCurrent());

@@ -17,6 +17,6 @@ interface EventLoggerInterface
         ?int $timestamp = null,
         ?ContextInterface $context = null,
         Severity|int|null $severityNumber = null,
-        array $attributes = [],
+        iterable $attributes = [],
     ): void;
 }
