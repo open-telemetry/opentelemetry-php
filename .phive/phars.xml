@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<phive xmlns="https://phar.io/phive">
+  <config home="/usr/src/myapp/var/phive"/>
+  <phar name="phpunit" version="^10.0 || ^11.0" location="./tools/phpunit" copy="false" installed="11.1.3"/>
+  <phar name="phpstan" version="^1.10" location="./tools/phpstan" copy="false" installed="1.10.67"/>
+  <phar name="php-cs-fixer" version="^3.54" location="./tools/php-cs-fixer" copy="false" installed="3.54.0"/>
+  <phar name="psalm" version="^5.0" location="./tools/psalm" copy="false" installed="5.23.1"/>
+  <phar name="phan" version="^5.4" location="./tools/phan" copy="false" installed="5.4.3"/>
+  <phar name="deptrac" version="^1.0" location="./tools/deptrac" copy="false" installed="1.0.2"/>
+</phive>

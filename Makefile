@@ -18,10 +18,14 @@ build: ## Build developer image locally
 	docker build docker/ --build-arg PHP_VERSION=${PHP_VERSION} -t ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${PHP_VERSION}
 install: ## Install dependencies
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer install
-update: ## Update dependencies
+update: update-tools update-vendor ## Update dependencies
+update-vendor: ## Update vendor packages
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer update
-update-lowest: ## Update dependencies to lowest supported versions
+update-vendor-lowest: ## Update vendor packages to lowest supported versions
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer update --prefer-lowest
+update-tools: ## Update test tools
+	$(DC_RUN_PHP) env XDEBUG_MODE=off phive update
+update-lowest: update-vendor-lowest ## Update dependencies to lowest supported versions
 test: test-unit test-integration ## Run unit and integration tests
 test-unit: ## Run unit tests
 	$(DC_RUN_PHP) env XDEBUG_MODE=coverage vendor/bin/phpunit --testsuite unit --colors=always
@@ -36,19 +40,17 @@ test-compliance: ## Run compliance tests
 test-trace-compliance: ## Run trace compliance tests
 	$(DC_RUN_PHP) env XDEBUG_MODE=coverage vendor/bin/phpunit --group trace-compliance
 phan: ## Run phan
-	$(DC_RUN_PHP) env XDEBUG_MODE=off env PHAN_DISABLE_XDEBUG_WARN=1 vendor/bin/phan
+	$(DC_RUN_PHP) env XDEBUG_MODE=off env PHAN_DISABLE_XDEBUG_WARN=1 tools/phan
 psalm: ## Run psalm
-	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/psalm --threads=1 --no-cache
+	$(DC_RUN_PHP) env XDEBUG_MODE=off tools/psalm --threads=1 --no-cache
 psalm-info: ## Run psalm and show info
-	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/psalm --show-info=true --threads=1
+	$(DC_RUN_PHP) env XDEBUG_MODE=off tools/psalm --show-info=true --threads=1
 phpstan: ## Run phpstan
-	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpstan analyse --memory-limit=256M
+	$(DC_RUN_PHP) env XDEBUG_MODE=off tools/phpstan analyse --memory-limit=256M
 packages-composer: ## Validate composer packages
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/otel packages:composer:validate
 benchmark: ## Run phpbench
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpbench run --report=default
-phpmetrics: ## Run php metrics
-	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpmetrics --config=./phpmetrics.json --junit=junit.xml
 smoke-test-examples: smoke-test-isolated-examples smoke-test-exporter-examples smoke-test-collector-integration smoke-test-prometheus-example ## Run smoke test examples
 smoke-test-isolated-examples: ## Run smoke test isolated examples
 	$(DC_RUN_PHP) php ./examples/traces/getting_started.php
@@ -91,13 +93,13 @@ protobuf: ## Generate protobuf files
 bash: ## bash shell into container
 	$(DC_RUN_PHP) bash
 style: ## Run style check/fix
-	$(DC_RUN_PHP) env XDEBUG_MODE=off env PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no -vvv
+	$(DC_RUN_PHP) env XDEBUG_MODE=off env PHP_CS_FIXER_IGNORE_ENV=1 tools/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no -vvv
 rector-write: ## Run rector
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/rector process src
 rector: ## Run rector (dry-run)
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/rector process src --dry-run
 deptrac: ## Run deptrac
-	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/deptrac --formatter=table --report-uncovered --no-cache
+	$(DC_RUN_PHP) env XDEBUG_MODE=off tools/deptrac --formatter=table --report-uncovered --no-cache
 w3c-test-service:
 	@$(DOCKER_COMPOSE) -f docker-compose.w3cTraceContext.yaml run --rm php ./tests/TraceContext/W3CTestService/trace-context-test.sh
 semconv: ## Generate semconv files
