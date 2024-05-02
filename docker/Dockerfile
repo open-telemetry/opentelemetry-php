@@ -1,25 +1,25 @@
 ARG PHP_VERSION=8.0
-FROM php:${PHP_VERSION}-cli-alpine as php_build
+FROM php:${PHP_VERSION}-cli-alpine
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
-RUN chmod +x /usr/local/bin/install-php-extensions; \
-    apk add --update binutils; \
-    install-php-extensions \
+RUN chmod +x /usr/local/bin/install-php-extensions \
+    && apk add binutils \
+    && install-php-extensions \
+        @composer \
         ast \
-        xdebug \
-        zip \
-        pcntl \
         grpc \
+        intl\
+        opcache \
+        pcntl \
         protobuf \
         sockets \
-        intl \
-        @composer \
-    ; \
-    # strip debug symbols from extensions to reduce size
-    find /usr/local/lib/php/extensions -name "*.so" -exec strip --strip-debug {} \;;
+        xdebug \
+        zip \
+    && find /usr/local/lib/php/extensions -name "*.so" -exec strip --strip-debug {} \;
 
-FROM php_build
+RUN  echo "grpc.enable_fork_support = 1" > $(php-config --ini-dir)/grpc.ini \
+  && echo "grpc.poll_strategy = epoll1" >> $(php-config --ini-dir)/grpc.ini
 
 WORKDIR /usr/src/myapp
 
