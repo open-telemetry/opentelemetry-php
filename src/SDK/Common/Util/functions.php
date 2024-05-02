@@ -7,8 +7,8 @@ namespace OpenTelemetry\SDK\Common\Util;
 use Closure;
 use ReflectionFunction;
 use stdClass;
-use WeakReference;
 use function str_starts_with;
+use WeakReference;
 
 /**
  * @internal
