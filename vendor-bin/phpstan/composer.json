@@ -1,7 +1,0 @@
-{
-    "require-dev": {
-        "phpstan/phpstan": "^1.10",
-        "phpstan/phpstan-mockery": "^1.1",
-        "phpstan/phpstan-phpunit": "^1.3"
-    }
-}

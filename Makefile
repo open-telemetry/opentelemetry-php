@@ -42,7 +42,7 @@ psalm: ## Run psalm
 psalm-info: ## Run psalm and show info
 	$(DC_RUN_PHP) env XDEBUG_MODE=off tools/psalm --show-info=true --threads=1
 phpstan: ## Run phpstan
-	$(DC_RUN_PHP) env XDEBUG_MODE=off tools/phpstan analyse --memory-limit=256M
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpstan analyse --memory-limit=256M
 packages-composer: ## Validate composer packages
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/otel packages:composer:validate
 benchmark: ## Run phpbench

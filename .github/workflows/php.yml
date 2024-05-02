@@ -126,7 +126,7 @@ jobs:
     - name: Run Phpstan
       id: phpstan
       continue-on-error: ${{ matrix.experimental }}
-      run: tools/phpstan analyse --error-format=github
+      run: vendor/bin/phpstan analyse --error-format=github
 
     - name: Run PHPUnit (unit tests)
       id: unit
