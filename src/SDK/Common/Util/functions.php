@@ -8,6 +8,7 @@ use Closure;
 use ReflectionFunction;
 use stdClass;
 use WeakReference;
+use function str_starts_with;
 
 /**
  * @internal
@@ -30,7 +31,7 @@ function weaken(Closure $closure, ?object &$target = null): Closure
 
     $scope = $reflection->getClosureScopeClass();
     $name = $reflection->getShortName();
-    if ($name !== '{closure}') {
+    if (!str_starts_with($name, '{closure')) {
         /** @psalm-suppress InvalidScope @phpstan-ignore-next-line @phan-suppress-next-line PhanUndeclaredThis */
         $closure = fn (...$args) => $this->$name(...$args);
         if ($scope !== null) {
