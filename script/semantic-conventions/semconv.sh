@@ -36,7 +36,7 @@ git reset --hard FETCH_HEAD
 cd "${SCRIPT_DIR}"
 
 mkdir -p "${CODE_DIR}"
-find "${CODE_DIR}" -name "*.php" -exec rm -f {} \;
+find "${CODE_DIR}" -name "*.php" ! -name "Version.php" -exec rm -f {} \;
 
 # Trace
 docker run --rm \
