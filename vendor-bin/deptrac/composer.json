@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "qossmic/deptrac-shim": "^1.0"
+    }
+}

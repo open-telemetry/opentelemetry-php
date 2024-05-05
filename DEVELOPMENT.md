@@ -31,6 +31,12 @@ To downgrade to the lowest dependencies, you can run
 make update-lowest
 ```
 
+To run all checks without doing a composer update:
+
+```shell
+make all-checks
+```
+
 ## Coding Guidelines
 Even though it may not be reflected everywhere in the codebase yet, we aim to provide software which is easy to read and change.
 The methods described in Clean Code book(s) by Robert C. Martin (Uncle Bob) are a de facto industry standards nowadays.
@@ -71,14 +77,14 @@ This does the following things:
 ### Other PHP versions
 
 We aim to support officially supported PHP versions, according to https://www.php.net/supported-versions.php. The
-developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `8.0`, `8.1`, `8.2` and `8.3`
-respectively, with `8.0` being the default. You can execute the test suite against other PHP versions by running the
+developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `8.1`, `8.2` and `8.3`
+respectively, with `8.1` being the default. You can execute the test suite against other PHP versions by running the
 following command:
 
 ```bash
-PHP_VERSION=8.0 make all
-#or
 PHP_VERSION=8.1 make all
+#or
+PHP_VERSION=8.3 make all
 ```
 
 ## Proto Generation
@@ -212,7 +218,7 @@ To make sure the different components of the library are distributable as separa
 For this purpose we use [Deptrac](https://github.com/qossmic/deptrac) and the respective configuration can be found
 [here](./deptrac.yaml)
 
-To validatethe dependencies inside the code base, you can run:
+To validate the dependencies inside the code base, you can run:
 
 ```bash
 make deptrac

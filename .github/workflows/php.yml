@@ -84,6 +84,14 @@ jobs:
         key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
         restore-keys: |
           ${{ runner.os }}-${{ matrix.php-version }}-php-
+    - name: Cache test tools
+      id: test-tools-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor-bin
+        key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.php-version }}-php-
 
     - name: Install dependencies
       id: composer
@@ -95,12 +103,12 @@ jobs:
       continue-on-error: ${{ matrix.experimental }}
       env:
         PHP_CS_FIXER_IGNORE_ENV: 1
-      run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
+      run: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
 
     - name: Check Dependencies
       id: deps
       continue-on-error: ${{ matrix.experimental }}
-      run: vendor/bin/deptrac --formatter=github-actions --report-uncovered
+      run: vendor-bin/deptrac/vendor/bin/deptrac --formatter=github-actions --report-uncovered
 
     - name: Run Phan
       id: phan
@@ -108,12 +116,12 @@ jobs:
       env:
         XDEBUG_MODE: off
         PHAN_DISABLE_XDEBUG_WARN: 1
-      run: vendor/bin/phan
+      run: vendor-bin/phan/vendor/bin/phan
 
     - name: Run Psalm
       id: psalm
       continue-on-error: ${{ matrix.experimental }}
-      run: vendor/bin/psalm --output-format=github
+      run: vendor-bin/psalm/vendor/bin/psalm --output-format=github
 
     - name: Run Phpstan
       id: phpstan

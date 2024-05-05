@@ -2,6 +2,8 @@ composer.phar
 composer.lock
 var/
 vendor/
+vendor-bin/**/vendor/
+vendor-bin/**/composer.lock
 coverage.clover
 tests/coverage
 .php-cs-fixer.cache
