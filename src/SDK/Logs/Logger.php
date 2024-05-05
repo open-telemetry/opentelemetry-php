@@ -16,6 +16,9 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
  */
 class Logger implements LoggerInterface
 {
+    /**
+     * @internal
+     */
     public function __construct(
         private readonly LoggerSharedState $loggerSharedState,
         private readonly InstrumentationScopeInterface $scope,

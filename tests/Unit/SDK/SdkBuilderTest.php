@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
@@ -21,6 +22,7 @@ class SdkBuilderTest extends TestCase
     private TracerProviderInterface $tracerProvider;
     private MeterProviderInterface $meterProvider;
     private LoggerProviderInterface $loggerProvider;
+    private EventLoggerProviderInterface $eventLoggerProvider;
     private SdkBuilder $builder;
 
     public function setUp(): void
@@ -29,9 +31,11 @@ class SdkBuilderTest extends TestCase
         $this->tracerProvider = $this->createMock(TracerProviderInterface::class);
         $this->meterProvider = $this->createMock(MeterProviderInterface::class);
         $this->loggerProvider = $this->createMock(LoggerProviderInterface::class);
+        $this->eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
         $this->builder = (new SdkBuilder())
             ->setMeterProvider($this->meterProvider)
             ->setLoggerProvider($this->loggerProvider)
+            ->setEventLoggerProvider($this->eventLoggerProvider)
             ->setPropagator($this->propagator)
             ->setTracerProvider($this->tracerProvider)
             ->setAutoShutdown(true);
@@ -44,6 +48,7 @@ class SdkBuilderTest extends TestCase
         $this->assertSame($this->propagator, $sdk->getPropagator());
         $this->assertSame($this->tracerProvider, $sdk->getTracerProvider());
         $this->assertSame($this->loggerProvider, $sdk->getLoggerProvider());
+        $this->assertSame($this->eventLoggerProvider, $sdk->getEventLoggerProvider());
     }
 
     public function test_build_and_register_global(): void
@@ -53,6 +58,7 @@ class SdkBuilderTest extends TestCase
         $this->assertSame($this->propagator, Globals::propagator());
         $this->assertSame($this->tracerProvider, Globals::tracerProvider());
         $this->assertSame($this->loggerProvider, Globals::loggerProvider());
+        $this->assertSame($this->eventLoggerProvider, Globals::eventLoggerProvider());
         $scope->detach();
     }
 }

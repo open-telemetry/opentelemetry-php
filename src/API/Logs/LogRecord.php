@@ -42,9 +42,9 @@ class LogRecord
     /**
      * @see https://opentelemetry.io/docs/reference/specification/logs/data-model/#field-severitynumber
      */
-    public function setSeverityNumber(int $severityNumber): self
+    public function setSeverityNumber(Severity|int $severityNumber): self
     {
-        $this->severityNumber = $severityNumber;
+        $this->severityNumber = ($severityNumber instanceof Severity) ? $severityNumber->value : $severityNumber;
 
         return $this;
     }

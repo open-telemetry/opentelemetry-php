@@ -9,6 +9,7 @@ use Closure;
 use const E_USER_WARNING;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Instrumentation\ContextKeys;
+use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
@@ -31,6 +32,7 @@ final class Globals
         private readonly TracerProviderInterface $tracerProvider,
         private readonly MeterProviderInterface $meterProvider,
         private readonly LoggerProviderInterface $loggerProvider,
+        private readonly EventLoggerProviderInterface $eventLoggerProvider,
         private readonly TextMapPropagatorInterface $propagator,
     ) {
     }
@@ -53,6 +55,11 @@ final class Globals
     public static function loggerProvider(): LoggerProviderInterface
     {
         return Context::getCurrent()->get(ContextKeys::loggerProvider()) ?? self::globals()->loggerProvider;
+    }
+
+    public static function eventLoggerProvider(): EventLoggerProviderInterface
+    {
+        return Context::getCurrent()->get(ContextKeys::eventLoggerProvider()) ?? self::globals()->eventLoggerProvider;
     }
 
     /**
@@ -95,10 +102,11 @@ final class Globals
         $meterProvider = $context->get(ContextKeys::meterProvider());
         $propagator = $context->get(ContextKeys::propagator());
         $loggerProvider = $context->get(ContextKeys::loggerProvider());
+        $eventLoggerProvider = $context->get(ContextKeys::eventLoggerProvider());
 
-        assert(isset($tracerProvider, $meterProvider, $loggerProvider, $propagator));
+        assert(isset($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator));
 
-        return self::$globals = new self($tracerProvider, $meterProvider, $loggerProvider, $propagator);
+        return self::$globals = new self($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator);
     }
 
     /**

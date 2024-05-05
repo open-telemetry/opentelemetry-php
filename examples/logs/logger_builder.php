@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use OpenTelemetry\API\Logs\EventLogger;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
@@ -22,11 +21,14 @@ $loggerProvider = LoggerProvider::builder()
     ->build();
 
 $logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', ['foo' => 'bar']);
-$eventLogger = new EventLogger($logger, 'my-domain');
 
 $record = (new LogRecord(['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']))
     ->setSeverityText('INFO')
     ->setSeverityNumber(9);
 
-$eventLogger->logEvent('foo', $record);
+/**
+ * Note that Loggers should only be used directly by a log appender.
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.32.0/specification/logs/bridge-api.md#logs-bridge-api
+ */
+$logger->emit($record);
 $loggerProvider->shutdown();
