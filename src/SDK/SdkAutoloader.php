@@ -12,7 +12,6 @@ use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
-use OpenTelemetry\Config\SDK\Configuration\Context as ConfigContext;
 use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
@@ -114,11 +113,10 @@ class SdkAutoloader
         }
         $file = Configuration::getString(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE);
         $configuration = Instrumentation::parseFile($file)->create();
-        $context = new ConfigContext();
         $storage = Context::storage();
         $hookManager = self::getHookManager();
         foreach (ServiceLoader::load(\OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation::class) as $instrumentation) {
-            $instrumentation->register($hookManager, $context, $configuration, $storage);
+            $instrumentation->register($hookManager, null, $configuration, $storage);
         }
     }
 

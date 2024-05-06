@@ -9,6 +9,9 @@ use OpenTelemetry\Context\ContextStorageInterface;
 
 interface Instrumentation
 {
-
-    public function register(HookManager $hookManager, Context $context, ConfigurationRegistry $configuration, ContextStorageInterface $storage): void;
+    /**
+     * @todo context is nullable in order to support autoloading (and retrieving lazy-loaded tracers), but auto and non-auto
+     *       should work the same.
+     */
+    public function register(HookManager $hookManager, ?Context $context, ConfigurationRegistry $configuration, ContextStorageInterface $storage): void;
 }
