@@ -119,4 +119,6 @@ interface Defaults
     public const OTEL_PHP_DISABLED_INSTRUMENTATIONS = [];
     public const OTEL_PHP_LOGS_PROCESSOR = 'batch';
     public const OTEL_PHP_LOG_DESTINATION = 'default';
+    public const OTEL_EXPERIMENTAL_CONFIG_FILE = 'sdk-config.yaml';
+    public const OTEL_PHP_INSTRUMENTATION_CONFIG_FILE = 'instrumentation-config.yaml';
 }

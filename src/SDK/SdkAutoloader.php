@@ -37,7 +37,7 @@ class SdkAutoloader
         if (!self::isEnabled() || self::isExcludedUrl()) {
             return false;
         }
-        if (Configuration::has(Variables::OTEL_PHP_SDK_CONFIG_FILE)) {
+        if (Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)) {
             Globals::registerInitializer(fn ($configurator) => self::configFileBasedSdkInitializer($configurator));
             self::configureInstrumentation();
         } else {
@@ -86,7 +86,7 @@ class SdkAutoloader
 
     public static function configFileBasedSdkInitializer(Configurator $configurator): Configurator
     {
-        $file = Configuration::getString(Variables::OTEL_PHP_SDK_CONFIG_FILE);
+        $file = Configuration::getString(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE);
         $config = SdkConfiguration::parseFile($file);
         $sdk = $config
             ->create()
