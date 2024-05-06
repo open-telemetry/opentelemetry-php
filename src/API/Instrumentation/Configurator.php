@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Instrumentation;
 
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
@@ -31,6 +33,7 @@ final class Configurator implements ImplicitContextKeyedInterface
     private ?TextMapPropagatorInterface $propagator = null;
     private ?LoggerProviderInterface $loggerProvider = null;
     private ?EventLoggerProviderInterface $eventLoggerProvider = null;
+    private ?HookManager $hookManager = null;
 
     private function __construct()
     {
@@ -55,6 +58,7 @@ final class Configurator implements ImplicitContextKeyedInterface
             ->withPropagator(new NoopTextMapPropagator())
             ->withLoggerProvider(NoopLoggerProvider::getInstance())
             ->withEventLoggerProvider(new NoopEventLoggerProvider())
+            ->withHookManager(new NoopHookManager())
         ;
     }
 
@@ -81,6 +85,9 @@ final class Configurator implements ImplicitContextKeyedInterface
         }
         if ($this->eventLoggerProvider !== null) {
             $context = $context->with(ContextKeys::eventLoggerProvider(), $this->eventLoggerProvider);
+        }
+        if ($this->hookManager !== null) {
+            $context = $context->with(ContextKeys::hookManager(), $this->hookManager);
         }
 
         return $context;
@@ -122,6 +129,14 @@ final class Configurator implements ImplicitContextKeyedInterface
     {
         $self = clone $this;
         $self->eventLoggerProvider = $eventLoggerProvider;
+
+        return $self;
+    }
+
+    public function withHookManager(?HookManager $hookManager): Configurator
+    {
+        $self = clone $this;
+        $self->hookManager = $hookManager;
 
         return $self;
     }

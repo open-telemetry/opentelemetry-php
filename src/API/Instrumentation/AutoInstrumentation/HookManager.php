@@ -1,11 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\API\Instrumentation\AutoInstrumentation;
 
 use Closure;
 use OpenTelemetry\Context\Context;
 use Throwable;
 
-interface HookManager {
+interface HookManager
+{
 
     /**
      * @param Closure(object|string|null,array,string,string,string|null,int|null):void|null $preHook

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Instrumentation;
 
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
@@ -65,5 +66,12 @@ final class ContextKeys
         static $instance;
 
         return $instance ??= Context::createKey(EventLoggerProviderInterface::class);
+    }
+
+    public static function hookManager(): ContextKeyInterface
+    {
+        static $instance;
+
+        return $instance ??= Context::createKey(HookManager::class);
     }
 }

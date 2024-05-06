@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
@@ -22,6 +23,7 @@ class Sdk
         private readonly LoggerProviderInterface $loggerProvider,
         private readonly EventLoggerProviderInterface $eventLoggerProvider,
         private readonly TextMapPropagatorInterface $propagator,
+        private readonly HookManager $hookManager,
     ) {
     }
 
@@ -68,5 +70,10 @@ class Sdk
     public function getPropagator(): TextMapPropagatorInterface
     {
         return $this->propagator;
+    }
+
+    public function getHookManager(): HookManager
+    {
+        return $this->hookManager;
     }
 }

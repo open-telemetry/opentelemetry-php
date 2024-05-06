@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
@@ -26,6 +28,7 @@ class SdkBuilder
     private ?LoggerProviderInterface $loggerProvider = null;
     private ?EventLoggerProviderInterface $eventLoggerProvider = null;
     private ?TextMapPropagatorInterface $propagator = null;
+    private ?HookManager $hookManager = null;
     private bool $autoShutdown = false;
 
     /**
@@ -73,12 +76,20 @@ class SdkBuilder
         return $this;
     }
 
+    public function setHookManager(HookManager $hookManager): self
+    {
+        $this->hookManager = $hookManager;
+
+        return $this;
+    }
+
     public function build(): Sdk
     {
         $tracerProvider = $this->tracerProvider ?? new NoopTracerProvider();
         $meterProvider = $this->meterProvider ?? new NoopMeterProvider();
         $loggerProvider = $this->loggerProvider ?? new NoopLoggerProvider();
         $eventLoggerProvider = $this->eventLoggerProvider ?? new NoopEventLoggerProvider();
+        $hookManager = $this->hookManager ?? new NoopHookManager();
         if ($this->autoShutdown) {
             // rector rule disabled in config, because ShutdownHandler::register() does not keep a strong reference to $this
             ShutdownHandler::register($tracerProvider->shutdown(...));
@@ -92,6 +103,7 @@ class SdkBuilder
             $loggerProvider,
             $eventLoggerProvider,
             $this->propagator ?? NoopTextMapPropagator::getInstance(),
+            $hookManager,
         );
     }
 
@@ -104,6 +116,7 @@ class SdkBuilder
             ->withMeterProvider($sdk->getMeterProvider())
             ->withLoggerProvider($sdk->getLoggerProvider())
             ->withEventLoggerProvider($sdk->getEventLoggerProvider())
+            ->withHookManager($sdk->getHookManager())
             ->storeInContext();
 
         return Context::storage()->attach($context);

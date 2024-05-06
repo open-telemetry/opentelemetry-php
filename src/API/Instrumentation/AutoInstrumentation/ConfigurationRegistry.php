@@ -1,11 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\API\Instrumentation\AutoInstrumentation;
 
-final class ConfigurationRegistry {
+final class ConfigurationRegistry
+{
 
     private array $configurations = [];
 
-    public function add(InstrumentationConfiguration $configuration): self {
+    public function add(InstrumentationConfiguration $configuration): self
+    {
         $this->configurations[$configuration::class] = $configuration;
 
         return $this;
@@ -16,7 +21,8 @@ final class ConfigurationRegistry {
      * @param class-string<C> $id
      * @return C|null
      */
-    public function get(string $id): ?InstrumentationConfiguration {
+    public function get(string $id): ?InstrumentationConfiguration
+    {
         return $this->configurations[$id] ?? null;
     }
 }
