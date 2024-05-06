@@ -7,11 +7,12 @@ namespace OpenTelemetry\API\Instrumentation\AutoInstrumentation;
 use function assert;
 use Closure;
 use function extension_loaded;
+use Nevay\SPI\ServiceProviderDependency\ExtensionDependency;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeyInterface;
 use ReflectionFunction;
 
-// #[Nevay\SPI\ServiceProviderDependency\ExtensionDependency('opentelemetry', '^1.0')]
+#[ExtensionDependency('opentelemetry', '^1.0')]
 final class ExtensionHookManager implements HookManager
 {
 
