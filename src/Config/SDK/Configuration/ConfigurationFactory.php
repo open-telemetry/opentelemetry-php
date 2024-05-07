@@ -6,6 +6,7 @@ namespace OpenTelemetry\Config\SDK\Configuration;
 
 use function class_exists;
 use Exception;
+use function getcwd;
 use function is_file;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvResourceChecker;
@@ -98,7 +99,7 @@ final class ConfigurationFactory
         }
 
         $loader = new ConfigurationLoader($resources);
-        $locator = new FileLocator();
+        $locator = new FileLocator(getcwd());
         $fileLoader = new DelegatingLoader(new LoaderResolver([
             new YamlSymfonyFileLoader($loader, $locator),
             new YamlExtensionFileLoader($loader, $locator),
