@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\LoggerHolder;
+use Psr\Log\LoggerInterface;
 use function fseek;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
@@ -26,6 +29,7 @@ class SpanExporterTest extends TestCase
 
     public function setUp(): void
     {
+        Logging::disable();
         $this->transport = $this->createMock(TransportInterface::class);
         $this->transport->method('contentType')->willReturn('application/x-protobuf');
         $this->exporter = new SpanExporter($this->transport);

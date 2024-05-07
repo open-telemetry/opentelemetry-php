@@ -21,6 +21,11 @@ class LogWriterFactoryTest extends TestCase
 {
     use EnvironmentVariables;
 
+    public function setUp(): void
+    {
+        LoggerHolder::unset();
+    }
+
     public function tearDown(): void
     {
         self::restoreEnvironmentVariables();

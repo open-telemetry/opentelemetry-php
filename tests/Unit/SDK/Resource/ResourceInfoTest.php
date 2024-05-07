@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Composer\InstalledVersions;
 use Generator;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\Detectors;
@@ -25,7 +26,7 @@ class ResourceInfoTest extends TestCase
 
     public function setUp(): void
     {
-        LoggerHolder::set(new NullLogger());
+        Logging::disable();
     }
 
     public function tearDown(): void

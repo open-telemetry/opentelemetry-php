@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
@@ -22,7 +23,7 @@ class MeterProviderFactoryTest extends TestCase
 
     public function setUp(): void
     {
-        LoggerHolder::set(new NullLogger());
+        Logging::disable();
     }
 
     public function tearDown(): void

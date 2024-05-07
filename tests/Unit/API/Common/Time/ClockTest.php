@@ -14,6 +14,16 @@ use PHPUnit\Framework\TestCase;
  */
 class ClockTest extends TestCase
 {
+    public function setUp(): void
+    {
+        Clock::reset();
+    }
+
+    public function tearDown(): void
+    {
+        Clock::reset();
+    }
+
     public function test_default_is_system_clock(): void
     {
         $this->assertInstanceOf(SystemClock::class, Clock::getDefault());

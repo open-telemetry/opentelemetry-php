@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
@@ -26,7 +27,7 @@ class SdkAutoloaderTest extends TestCase
 
     public function setUp(): void
     {
-        LoggerHolder::set(new NullLogger());
+        Logging::disable();
         Globals::reset();
     }
 

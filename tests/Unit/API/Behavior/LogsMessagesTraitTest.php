@@ -23,6 +23,7 @@ class LogsMessagesTraitTest extends TestCase
 
     public function setUp(): void
     {
+        Logging::reset();
         $this->writer = $this->createMock(LogWriterInterface::class);
         Logging::setLogWriter($this->writer);
     }

@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Propagation;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
@@ -29,7 +30,8 @@ class PropagatorFactoryTest extends TestCase
 
     public function setUp(): void
     {
-        LoggerHolder::set(new NullLogger());
+        LoggerHolder::disable();
+        Logging::disable();
     }
 
     public function tearDown(): void
