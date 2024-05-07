@@ -7,7 +7,6 @@ namespace OpenTelemetry\SDK;
 use InvalidArgumentException;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Globals;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
 use OpenTelemetry\API\Instrumentation\Configurator;
@@ -54,7 +53,6 @@ class SdkAutoloader
             //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
             return $configurator->withPropagator($propagator);
         }
-        $hookManager = new ExtensionHookManager(); //to should be enabled/disable by env?
         $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED);
 
         $resource = ResourceInfoFactory::defaultResource();
@@ -80,7 +78,6 @@ class SdkAutoloader
             ->withLoggerProvider($loggerProvider)
             ->withEventLoggerProvider($eventLoggerProvider)
             ->withPropagator($propagator)
-            ->withHookManager($hookManager)
         ;
     }
 
@@ -99,7 +96,6 @@ class SdkAutoloader
             ->withLoggerProvider($sdk->getLoggerProvider())
             ->withEventLoggerProvider($sdk->getEventLoggerProvider())
             ->withPropagator($sdk->getPropagator())
-            ->withHookManager($sdk->getHookManager())
         ;
     }
 
@@ -116,7 +112,7 @@ class SdkAutoloader
         $storage = Context::storage();
         $hookManager = self::getHookManager();
         foreach (ServiceLoader::load(\OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation::class) as $instrumentation) {
-            $instrumentation->register($hookManager, null, $configuration, $storage);
+            $instrumentation->register($hookManager, $configuration, $storage);
         }
     }
 

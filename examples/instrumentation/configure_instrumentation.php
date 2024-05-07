@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace _;
 
 use Nevay\SPI\ServiceLoader;
-use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\Config\SDK\Configuration;
@@ -20,10 +19,10 @@ use const PHP_EOL;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-Configuration::parseFile(__DIR__ . '/otel-sdk.yaml')->create(new Context())->setAutoShutdown(true)->setHookManager(new ExtensionHookManager())->buildAndRegisterGlobal();
+Configuration::parseFile(__DIR__ . '/otel-sdk.yaml')->create(new Context())->setAutoShutdown(true)->buildAndRegisterGlobal();
 $configuration = \OpenTelemetry\Config\SDK\Instrumentation::parseFile(__DIR__ . '/otel-instrumentation.yaml')->create();
 
-$hookManager = Globals::hookManager();
+$hookManager = new ExtensionHookManager();
 $storage = \OpenTelemetry\Context\Context::storage();
 
 foreach (ServiceLoader::load(Instrumentation::class) as $instrumentation) {

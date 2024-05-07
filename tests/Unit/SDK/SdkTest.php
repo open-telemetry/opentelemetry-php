@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
@@ -85,13 +84,11 @@ class SdkTest extends TestCase
         $tracerProvider = $this->createMock(TracerProviderInterface::class);
         $loggerProvider = $this->createMock(LoggerProviderInterface::class);
         $eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
-        $hookManager = $this->createMock(HookManager::class);
-        $sdk = new Sdk($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator, $hookManager);
+        $sdk = new Sdk($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator);
         $this->assertSame($propagator, $sdk->getPropagator());
         $this->assertSame($meterProvider, $sdk->getMeterProvider());
         $this->assertSame($tracerProvider, $sdk->getTracerProvider());
         $this->assertSame($loggerProvider, $sdk->getLoggerProvider());
         $this->assertSame($eventLoggerProvider, $sdk->getEventLoggerProvider());
-        $this->assertSame($hookManager, $sdk->getHookManager());
     }
 }
