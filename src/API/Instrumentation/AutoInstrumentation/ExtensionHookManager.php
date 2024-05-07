@@ -12,6 +12,8 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeyInterface;
 use ReflectionFunction;
 
+/** @phan-file-suppress PhanUndeclaredClassAttribute */
+
 #[ExtensionDependency('opentelemetry', '^1.0')]
 final class ExtensionHookManager implements HookManager
 {

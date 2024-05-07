@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace _;
 
 use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\Config\SDK\Configuration;
@@ -19,17 +20,17 @@ use const PHP_EOL;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-$sdk = Configuration::parseFile(__DIR__ . '/otel-sdk.yaml')->create(new Context())->setAutoShutdown(true)->setHookManager(new ExtensionHookManager())->build();
+Configuration::parseFile(__DIR__ . '/otel-sdk.yaml')->create(new Context())->setAutoShutdown(true)->setHookManager(new ExtensionHookManager())->buildAndRegisterGlobal();
 $configuration = \OpenTelemetry\Config\SDK\Instrumentation::parseFile(__DIR__ . '/otel-instrumentation.yaml')->create();
 
-$context = new Context($sdk->getTracerProvider());
+$hookManager = Globals::hookManager();
 $storage = \OpenTelemetry\Context\Context::storage();
 
 foreach (ServiceLoader::load(Instrumentation::class) as $instrumentation) {
-    $instrumentation->register($sdk->getHookManager(), $context, $configuration, $storage);
+    $instrumentation->register($hookManager, $configuration, $storage);
 }
 
-$scope = $storage->attach($sdk->getHookManager()->enable($storage->current()));
+$scope = $storage->attach($hookManager->enable($storage->current()));
 
 try {
     echo (new Example())->test(), PHP_EOL;

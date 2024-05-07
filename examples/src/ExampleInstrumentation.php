@@ -10,20 +10,19 @@ use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\API\Trace\Span;
-use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Context\ContextStorageInterface;
 
 final class ExampleInstrumentation implements Instrumentation
 {
 
-    public function register(HookManager $hookManager, ?Context $context, ConfigurationRegistry $configuration, ContextStorageInterface $storage): void
+    public function register(HookManager $hookManager, ConfigurationRegistry $configuration, ContextStorageInterface $storage): void
     {
         $config = $configuration->get(ExampleConfig::class) ?? throw new Exception('example instrumentation must be configured');
         if (!$config->enabled) {
             return;
         }
 
-        $tracer = $context ? $context->tracerProvider->getTracer('example-instrumentation') : Globals::tracerProvider()->getTracer('example-instrumentation');
+        $tracer = Globals::tracerProvider()->getTracer('example-instrumentation');
 
         $hookManager->hook(
             Example::class,
