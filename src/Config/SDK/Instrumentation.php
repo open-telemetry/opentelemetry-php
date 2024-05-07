@@ -19,7 +19,7 @@ final class Instrumentation
 {
 
     /**
-     * @param ComponentPlugin<Instrumentation> $plugin
+     * @param ComponentPlugin<ConfigurationRegistry> $plugin
      */
     private function __construct(
         private readonly ComponentPlugin $plugin,
