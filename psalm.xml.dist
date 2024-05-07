@@ -27,6 +27,11 @@
                 <referencedClass name="GMP"/>
             </errorLevel>
         </UndefinedClass>
+        <UndefinedFunction>
+            <errorLevel type="suppress">
+                <referencedFunction name="OpenTelemetry\Instrumentation\hook"/>
+            </errorLevel>
+        </UndefinedFunction>
         <ArgumentTypeCoercion>
             <errorLevel type="suppress">
                 <directory name="./examples"/>

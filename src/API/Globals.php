@@ -109,11 +109,6 @@ final class Globals
         return self::$globals = new self($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator);
     }
 
-    public static function init(): void
-    {
-        self::globals();
-    }
-
     /**
      * @internal
      */
