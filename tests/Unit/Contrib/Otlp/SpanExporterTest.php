@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
-use OpenTelemetry\API\Behavior\Internal\Logging;
-use OpenTelemetry\API\LoggerHolder;
-use Psr\Log\LoggerInterface;
 use function fseek;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Export\Stream\StreamTransport;

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\Stream;
 
-use OpenTelemetry\API\Behavior\Internal\Logging;
 use function current;
 use function extension_loaded;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;

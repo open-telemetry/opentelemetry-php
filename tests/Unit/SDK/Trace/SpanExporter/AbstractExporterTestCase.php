@@ -7,14 +7,12 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\API\Behavior\Internal\Logging;
-use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\ErrorFuture;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
-use Psr\Log\NullLogger;
 
 /**
  * @psalm-suppress UndefinedInterfaceMethod
