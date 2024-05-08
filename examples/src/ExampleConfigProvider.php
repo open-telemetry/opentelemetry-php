@@ -33,7 +33,7 @@ final class ExampleConfigProvider implements ComponentProvider
     }
 
     /**
-     * @psalm-suppress UndefinedInterfaceMethod
+     * @psalm-suppress UndefinedInterfaceMethod,PossiblyNullReference
      */
     public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
     {
