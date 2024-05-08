@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
+use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
@@ -68,5 +71,21 @@ class Sdk
     public function getPropagator(): TextMapPropagatorInterface
     {
         return $this->propagator;
+    }
+
+    /**
+     * Globally register the SDK so that its components are available via `Globals`
+     */
+    public function registerGlobal(): ScopeInterface
+    {
+        $context = Configurator::create()
+            ->withPropagator($this->getPropagator())
+            ->withTracerProvider($this->getTracerProvider())
+            ->withMeterProvider($this->getMeterProvider())
+            ->withLoggerProvider($this->getLoggerProvider())
+            ->withEventLoggerProvider($this->getEventLoggerProvider())
+            ->storeInContext();
+
+        return Context::storage()->attach($context);
     }
 }

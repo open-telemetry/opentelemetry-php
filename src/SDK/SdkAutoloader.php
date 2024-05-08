@@ -7,6 +7,7 @@ namespace OpenTelemetry\SDK;
 use InvalidArgumentException;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
 use OpenTelemetry\API\Instrumentation\Configurator;
@@ -37,8 +38,8 @@ class SdkAutoloader
             return false;
         }
         if (Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)) {
-            Globals::registerInitializer(fn ($configurator) => self::configFileBasedSdkInitializer($configurator));
-            self::configureInstrumentation();
+            $sdk = self::createAndRegisterFileBasedSdk();
+            self::configureInstrumentation($sdk);
         } else {
             Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
         }
@@ -81,7 +82,7 @@ class SdkAutoloader
         ;
     }
 
-    public static function configFileBasedSdkInitializer(Configurator $configurator): Configurator
+    public static function createAndRegisterFileBasedSdk(): Sdk
     {
         $file = Configuration::getString(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE);
         $config = SdkConfiguration::parseFile($file);
@@ -89,20 +90,15 @@ class SdkAutoloader
             ->create()
             ->setAutoShutdown(true)
             ->build();
+        $sdk->registerGlobal();
 
-        return $configurator
-            ->withTracerProvider($sdk->getTracerProvider())
-            ->withMeterProvider($sdk->getMeterProvider())
-            ->withLoggerProvider($sdk->getLoggerProvider())
-            ->withEventLoggerProvider($sdk->getEventLoggerProvider())
-            ->withPropagator($sdk->getPropagator())
-        ;
+        return $sdk;
     }
 
     /**
      * @phan-suppress PhanUndeclaredClassMethod
      */
-    private static function configureInstrumentation(): void
+    private static function configureInstrumentation(Sdk $sdk): void
     {
         if (!Configuration::has(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE)) {
             return;
@@ -111,8 +107,10 @@ class SdkAutoloader
         $configuration = Instrumentation::parseFile($file)->create();
         $storage = Context::storage();
         $hookManager = self::getHookManager();
+        $context = new InstrumentationContext($sdk->getTracerProvider(), $sdk->getMeterProvider(), $sdk->getLoggerProvider());
         foreach (ServiceLoader::load(\OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation::class) as $instrumentation) {
-            $instrumentation->register($hookManager, $configuration, $storage);
+            /** @var \OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation $instrumentation */
+            $instrumentation->register($hookManager, $context, $configuration, $storage);
         }
     }
 
@@ -132,30 +130,6 @@ class SdkAutoloader
         }
 
         return new NoopHookManager();
-    }
-
-    /**
-     * Test whether a request URI is set, and if it matches the excluded urls configuration option
-     *
-     * @internal
-     */
-    public static function isIgnoredUrl(): bool
-    {
-        $ignoreUrls = Configuration::getList(Variables::OTEL_PHP_EXCLUDED_URLS, []);
-        if ($ignoreUrls === []) {
-            return false;
-        }
-        $url = $_SERVER['REQUEST_URI'] ?? null;
-        if (!$url) {
-            return false;
-        }
-        foreach ($ignoreUrls as $ignore) {
-            if (preg_match(sprintf('|%s|', $ignore), (string) $url) === 1) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

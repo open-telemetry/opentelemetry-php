@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
-use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
@@ -97,15 +95,6 @@ class SdkBuilder
 
     public function buildAndRegisterGlobal(): ScopeInterface
     {
-        $sdk = $this->build();
-        $context = Configurator::create()
-            ->withPropagator($sdk->getPropagator())
-            ->withTracerProvider($sdk->getTracerProvider())
-            ->withMeterProvider($sdk->getMeterProvider())
-            ->withLoggerProvider($sdk->getLoggerProvider())
-            ->withEventLoggerProvider($sdk->getEventLoggerProvider())
-            ->storeInContext();
-
-        return Context::storage()->attach($context);
+        return $this->build()->registerGlobal();
     }
 }

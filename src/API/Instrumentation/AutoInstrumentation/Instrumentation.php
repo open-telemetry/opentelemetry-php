@@ -8,5 +8,5 @@ use OpenTelemetry\Context\ContextStorageInterface;
 
 interface Instrumentation
 {
-    public function register(HookManager $hookManager, ConfigurationRegistry $configuration, ContextStorageInterface $storage): void;
+    public function register(HookManager $hookManager, Context $context, ConfigurationRegistry $configuration, ContextStorageInterface $storage): void;
 }

@@ -33,6 +33,7 @@ class SdkAutoloaderTest extends TestCase
     public function tearDown(): void
     {
         $this->restoreEnvironmentVariables();
+        Globals::reset();
     }
 
     public function test_disabled_by_default(): void
@@ -148,5 +149,14 @@ class SdkAutoloaderTest extends TestCase
         $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_URLS, '.*');
         $_SERVER['REQUEST_URI'] = '/test';
         $this->assertFalse(SdkAutoloader::autoload());
+    }
+
+    public function test_autoload_from_config_file(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk.yaml');
+        $this->assertTrue(SdkAutoloader::autoload());
+        //@todo should file-based config create no-op instances for not-provided config?
+        $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
     }
 }

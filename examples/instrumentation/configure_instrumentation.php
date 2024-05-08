@@ -19,14 +19,15 @@ use const PHP_EOL;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-Configuration::parseFile(__DIR__ . '/otel-sdk.yaml')->create(new Context())->setAutoShutdown(true)->buildAndRegisterGlobal();
+$sdk = Configuration::parseFile(__DIR__ . '/otel-sdk.yaml')->create(new Context())->setAutoShutdown(true)->build();
 $configuration = \OpenTelemetry\Config\SDK\Instrumentation::parseFile(__DIR__ . '/otel-instrumentation.yaml')->create();
 
 $hookManager = new ExtensionHookManager();
 $storage = \OpenTelemetry\Context\Context::storage();
+$context = new Context($sdk->getTracerProvider(), $sdk->getMeterProvider());
 
 foreach (ServiceLoader::load(Instrumentation::class) as $instrumentation) {
-    $instrumentation->register($hookManager, $configuration, $storage);
+    $instrumentation->register($hookManager, $context, $configuration, $storage);
 }
 
 $scope = $storage->attach($hookManager->enable($storage->current()));
