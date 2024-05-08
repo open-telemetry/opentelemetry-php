@@ -137,14 +137,7 @@ class SdkAutoloader
      */
     public static function isEnabled(): bool
     {
-        try {
-            $enabled = Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
-        } catch (InvalidArgumentException) {
-            //invalid setting, assume false
-            return false;
-        }
-
-        return $enabled;
+        return Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
     }
 
     /**

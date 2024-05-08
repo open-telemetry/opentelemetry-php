@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
@@ -21,6 +22,21 @@ use PHPUnit\Framework\TestCase;
 class SdkTest extends TestCase
 {
     use EnvironmentVariables;
+
+    private TextMapPropagatorInterface $propagator;
+    private MeterProviderInterface $meterProvider;
+    private TracerProviderInterface $tracerProvider;
+    private LoggerProviderInterface $loggerProvider;
+    private EventLoggerProviderInterface $eventLoggerProvider;
+
+    public function setUp(): void
+    {
+        $this->propagator = $this->createMock(TextMapPropagatorInterface::class);
+        $this->meterProvider = $this->createMock(MeterProviderInterface::class);
+        $this->tracerProvider = $this->createMock(TracerProviderInterface::class);
+        $this->loggerProvider = $this->createMock(LoggerProviderInterface::class);
+        $this->eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
+    }
 
     public function tearDown(): void
     {
@@ -79,16 +95,25 @@ class SdkTest extends TestCase
 
     public function test_getters(): void
     {
-        $propagator = $this->createMock(TextMapPropagatorInterface::class);
-        $meterProvider = $this->createMock(MeterProviderInterface::class);
-        $tracerProvider = $this->createMock(TracerProviderInterface::class);
-        $loggerProvider = $this->createMock(LoggerProviderInterface::class);
-        $eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
-        $sdk = new Sdk($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator);
-        $this->assertSame($propagator, $sdk->getPropagator());
-        $this->assertSame($meterProvider, $sdk->getMeterProvider());
-        $this->assertSame($tracerProvider, $sdk->getTracerProvider());
-        $this->assertSame($loggerProvider, $sdk->getLoggerProvider());
-        $this->assertSame($eventLoggerProvider, $sdk->getEventLoggerProvider());
+        $sdk = new Sdk($this->tracerProvider, $this->meterProvider, $this->loggerProvider, $this->eventLoggerProvider, $this->propagator);
+        $this->assertSame($this->propagator, $sdk->getPropagator());
+        $this->assertSame($this->meterProvider, $sdk->getMeterProvider());
+        $this->assertSame($this->tracerProvider, $sdk->getTracerProvider());
+        $this->assertSame($this->loggerProvider, $sdk->getLoggerProvider());
+        $this->assertSame($this->eventLoggerProvider, $sdk->getEventLoggerProvider());
+    }
+
+    public function test_register_global(): void
+    {
+        $sdk = new Sdk($this->tracerProvider, $this->meterProvider, $this->loggerProvider, $this->eventLoggerProvider, $this->propagator);
+        $scope = $sdk->registerGlobal();
+
+        $this->assertSame($this->meterProvider, Globals::meterProvider());
+        $this->assertSame($this->propagator, Globals::propagator());
+        $this->assertSame($this->tracerProvider, Globals::tracerProvider());
+        $this->assertSame($this->loggerProvider, Globals::loggerProvider());
+        $this->assertSame($this->eventLoggerProvider, Globals::eventLoggerProvider());
+
+        $scope->detach();
     }
 }
