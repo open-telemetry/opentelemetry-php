@@ -6,7 +6,7 @@ namespace OpenTelemetry\Config\SDK;
 
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
-use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetryInstrumentation;
+use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
 use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
@@ -45,7 +45,7 @@ final class Instrumentation
     }
 
     /**
-     * @return ConfigurationFactory<Instrumentation>
+     * @return ConfigurationFactory<ConfigurationRegistry>
      */
     private static function factory(): ConfigurationFactory
     {
@@ -53,7 +53,7 @@ final class Instrumentation
 
         return $factory ??= new ConfigurationFactory(
             ServiceLoader::load(ComponentProvider::class),
-            new OpenTelemetryInstrumentation(),
+            new InstrumentationConfigurationRegistry(),
             new EnvSourceReader([
                 new ServerEnvSource(),
                 new PhpIniEnvSource(),

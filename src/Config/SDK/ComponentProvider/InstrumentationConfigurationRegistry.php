@@ -10,15 +10,14 @@ use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
-use OpenTelemetry\Config\SDK\Instrumentation;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
  * @internal
  *
- * @implements ComponentProvider<Instrumentation>
+ * @implements ComponentProvider<ConfigurationRegistry>
  */
-class OpenTelemetryInstrumentation implements ComponentProvider
+class InstrumentationConfigurationRegistry implements ComponentProvider
 {
     /**
      * @param array{

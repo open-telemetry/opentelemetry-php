@@ -121,7 +121,13 @@ class SdkAutoloader
      */
     private static function getHookManager(): HookManager
     {
+        /** @var HookManager $hookManager */
         foreach (ServiceLoader::load(HookManager::class) as $hookManager) {
+            $scope = $hookManager->enable(Context::getCurrent())->activate();
+            ShutdownHandler::register(function () use ($scope) {
+                $scope->detach();
+            });
+
             return $hookManager;
         }
 

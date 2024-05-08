@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Instrumentation\AutoInstrumentation;
 
 use Closure;
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 
 final class NoopHookManager implements HookManager
 {
@@ -15,12 +15,12 @@ final class NoopHookManager implements HookManager
         // no-op
     }
 
-    public function enable(Context $context): Context
+    public function enable(ContextInterface $context): ContextInterface
     {
         return $context;
     }
 
-    public function disable(Context $context): Context
+    public function disable(ContextInterface $context): ContextInterface
     {
         return $context;
     }

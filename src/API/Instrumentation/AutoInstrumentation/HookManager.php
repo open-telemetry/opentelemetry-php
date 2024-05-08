@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Instrumentation\AutoInstrumentation;
 
 use Closure;
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use Throwable;
 
 interface HookManager
@@ -17,7 +17,7 @@ interface HookManager
      */
     public function hook(?string $class, string $function, ?Closure $preHook = null, ?Closure $postHook = null): void;
 
-    public function enable(Context $context): Context;
+    public function enable(ContextInterface $context): ContextInterface;
 
-    public function disable(Context $context): Context;
+    public function disable(ContextInterface $context): ContextInterface;
 }
