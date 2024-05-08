@@ -6,7 +6,7 @@ namespace OpenTelemetry\API;
 
 use function assert;
 use Closure;
-use const E_USER_WARNING;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Instrumentation\ContextKeys;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
@@ -17,13 +17,14 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use function sprintf;
 use Throwable;
-use function trigger_error;
 
 /**
  * Provides access to the globally configured instrumentation instances.
  */
 final class Globals
 {
+    use LogsMessagesTrait;
+
     /** @var Closure[] */
     private static array $initializers = [];
     private static ?self $globals = null;
@@ -97,7 +98,7 @@ final class Globals
                 try {
                     $configurator = $initializer($configurator);
                 } catch (Throwable $e) {
-                    trigger_error(sprintf("Error during opentelemetry initialization: %s\n%s", $e->getMessage(), $e->getTraceAsString()), E_USER_WARNING);
+                    self::logWarning(sprintf("Error during opentelemetry initialization: %s\n%s", $e->getMessage(), $e->getTraceAsString()));
                 }
             }
         } finally {

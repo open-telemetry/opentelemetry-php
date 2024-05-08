@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Instrumentation\Configurator;
@@ -23,7 +25,9 @@ use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 
 /**
  * @covers \OpenTelemetry\API\Globals
@@ -33,6 +37,14 @@ use PHPUnit\Framework\TestCase;
  */
 final class InstrumentationTest extends TestCase
 {
+    private LogWriterInterface&MockObject $logWriter;
+
+    public function setUp(): void
+    {
+        $this->logWriter = $this->createMock(LogWriterInterface::class);
+        Logging::setLogWriter($this->logWriter);
+    }
+
     public function tearDown(): void
     {
         Globals::reset();
@@ -128,7 +140,21 @@ final class InstrumentationTest extends TestCase
         };
         Globals::registerInitializer($closure);
         $this->assertFalse($called);
-        Globals::propagator();
+        Globals::init();
         $this->assertTrue($called); //@phpstan-ignore-line
+    }
+
+    public function test_initializer_error(): void
+    {
+        $closure = function (Configurator $configurator): Configurator {
+            throw new \Exception('kaboom');
+        };
+        Globals::registerInitializer($closure);
+        $this->logWriter->expects($this->once())->method('write')->with(
+            $this->equalTo(LogLevel::WARNING),
+            $this->anything(),
+            $this->anything(),
+        );
+        Globals::init();
     }
 }
