@@ -11,12 +11,16 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\StatusCode;
 use function OpenTelemetry\API\Trace\trace;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
 use WeakReference;
 
-#[\PHPUnit\Framework\Attributes\CoversFunction('\OpenTelemetry\API\Trace\trace()')]
+/**
+ * @todo configure phpunit coverage with attributes
+ */
+#[CoversNothing]
 final class TraceTest extends TestCase
 {
     public function test_runs_with_provided_span(): void
