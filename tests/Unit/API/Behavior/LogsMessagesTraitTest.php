@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Behavior;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
@@ -17,7 +17,7 @@ use Psr\Log\LogLevel;
  */
 class LogsMessagesTraitTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     protected MockObject $writer;
 

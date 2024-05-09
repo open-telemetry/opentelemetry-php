@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
 use Http\Discovery\Psr18ClientDiscovery;
 use Http\Discovery\Strategy\MockClientStrategy;
 use OpenTelemetry\Contrib;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ExporterFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     public function tearDown(): void
     {

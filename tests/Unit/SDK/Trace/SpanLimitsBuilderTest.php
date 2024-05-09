@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  */
 class SpanLimitsBuilderTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     public function test_span_limits_builder_uses_default_values(): void
     {

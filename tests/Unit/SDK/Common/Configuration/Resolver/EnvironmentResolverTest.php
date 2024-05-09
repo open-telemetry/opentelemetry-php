@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  */
 class EnvironmentResolverTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     private const RAW_VALUES = [
         'string' => ['STRING_VAR', 'foo'],

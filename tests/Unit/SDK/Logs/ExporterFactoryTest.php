@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter;
 use OpenTelemetry\SDK\Logs\Exporter\NoopExporter;
 use OpenTelemetry\SDK\Logs\ExporterFactory;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ExporterFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     public function tearDown(): void
     {

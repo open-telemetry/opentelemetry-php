@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
 use Generator;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
@@ -12,6 +11,7 @@ use OpenTelemetry\SDK\Common\Configuration\Defaults;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Configuration\VariableTypes;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
@@ -20,7 +20,7 @@ use UnexpectedValueException;
  */
 class ConfigurationTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     private const ALLOW_EMPTY = [
         VariableTypes::LIST,

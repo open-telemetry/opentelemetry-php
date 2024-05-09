@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Propagation;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\LoggerHolder;
@@ -18,6 +17,7 @@ use OpenTelemetry\Extension\Propagator\Jaeger\JaegerPropagator;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
  */
 class PropagatorFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     public function setUp(): void
     {

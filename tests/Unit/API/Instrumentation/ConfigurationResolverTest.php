@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Instrumentation\ConfigurationResolver;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ConfigurationResolverTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     private ConfigurationResolver $resolver;
 

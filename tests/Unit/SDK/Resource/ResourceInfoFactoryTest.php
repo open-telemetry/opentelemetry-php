@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Generator;
 use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\Internal\Logging;
@@ -14,6 +13,7 @@ use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ResourceInfoFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     /** @var LogWriterInterface&MockObject $logWriter */
     private LogWriterInterface $logWriter;

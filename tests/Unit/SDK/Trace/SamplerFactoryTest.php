@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 class SamplerFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     protected function tearDown(): void
     {
