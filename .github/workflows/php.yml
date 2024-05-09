@@ -21,7 +21,7 @@ jobs:
             experimental: true
             composer_args: "--ignore-platform-reqs"
     env:
-      extensions: ast, grpc, protobuf
+      extensions: ast, grpc, opentelemetry, protobuf
 
     steps:
     - name: Set cache key

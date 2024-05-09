@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace _;
 
 use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\Config\SDK\Configuration;
@@ -24,7 +25,7 @@ $configuration = \OpenTelemetry\Config\SDK\Instrumentation::parseFile(__DIR__ . 
 
 $hookManager = new ExtensionHookManager();
 $storage = \OpenTelemetry\Context\Context::storage();
-$context = new Context($sdk->getTracerProvider(), $sdk->getMeterProvider());
+$context = new InstrumentationContext($sdk->getTracerProvider(), $sdk->getMeterProvider());
 
 foreach (ServiceLoader::load(Instrumentation::class) as $instrumentation) {
     $instrumentation->register($hookManager, $context, $configuration, $storage);

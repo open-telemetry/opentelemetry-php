@@ -69,7 +69,7 @@ final class ExtensionHookManager implements HookManager
 
         return static function (mixed ...$args) use ($closure, $contextKey): mixed {
             if (!Context::getCurrent()->get($contextKey)) {
-                return null;
+                return $args[2];
             }
 
             return $closure(...$args);
