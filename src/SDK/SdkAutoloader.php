@@ -36,12 +36,13 @@ class SdkAutoloader
         if (!self::isEnabled() || self::isExcludedUrl()) {
             return false;
         }
+        $sdk = null;
         if (Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)) {
             $sdk = self::createAndRegisterFileBasedSdk();
-            self::configureInstrumentation($sdk);
         } else {
             Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
         }
+        self::registerInstrumentations($sdk);
 
         return true;
     }
@@ -95,9 +96,11 @@ class SdkAutoloader
     }
 
     /**
+     * Register any auto-instrumentation configured through SPI
+     *
      * @phan-suppress PhanUndeclaredClassMethod
      */
-    private static function configureInstrumentation(Sdk $sdk): void
+    private static function registerInstrumentations(?Sdk $sdk): void
     {
         if (!Configuration::has(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE)) {
             return;
@@ -106,7 +109,11 @@ class SdkAutoloader
         $configuration = Instrumentation::parseFile($file)->create();
         $storage = Context::storage();
         $hookManager = self::getHookManager();
-        $context = new InstrumentationContext($sdk->getTracerProvider(), $sdk->getMeterProvider(), $sdk->getLoggerProvider());
+        $context = new InstrumentationContext(
+            $sdk?->getTracerProvider() ?? Globals::tracerProvider(),
+            $sdk?->getMeterProvider() ?? Globals::meterProvider(),
+            $sdk?->getLoggerProvider() ?? Globals::loggerProvider(),
+        );
         foreach (ServiceLoader::load(\OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation::class) as $instrumentation) {
             /** @var \OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation $instrumentation */
             $instrumentation->register($hookManager, $context, $configuration, $storage);
