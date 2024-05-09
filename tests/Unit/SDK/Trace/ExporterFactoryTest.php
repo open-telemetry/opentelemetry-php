@@ -20,11 +20,6 @@ class ExporterFactoryTest extends TestCase
 {
     use TestState;
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     public function setUp(): void
     {
         Psr18ClientDiscovery::prependStrategy(MockClientStrategy::class);

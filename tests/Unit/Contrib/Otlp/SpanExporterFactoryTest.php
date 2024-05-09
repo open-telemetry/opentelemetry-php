@@ -29,11 +29,6 @@ class SpanExporterFactoryTest extends TestCase
         $this->transport = $this->createMock(TransportInterface::class);
     }
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     public function test_unknown_protocol_exception(): void
     {
         $this->expectException(\UnexpectedValueException::class);

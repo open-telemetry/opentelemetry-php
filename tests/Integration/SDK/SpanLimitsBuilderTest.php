@@ -16,11 +16,6 @@ class SpanLimitsBuilderTest extends TestCase
 {
     use TestState;
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     /**
      * @group trace-compliance
      */

@@ -19,11 +19,6 @@ class EventLoggerProviderFactoryTest extends TestCase
 {
     use TestState;
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     /**
      * @dataProvider createProvider
      * @psalm-suppress ArgumentTypeCoercion

@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Http\Psr\Client;
 
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\DiscoveryInterface;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 
@@ -14,10 +15,7 @@ use Psr\Http\Client\ClientInterface;
  */
 class DiscoveryTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        Discovery::reset();
-    }
+    use TestState;
 
     public function test_discover_with_defaults(): void
     {

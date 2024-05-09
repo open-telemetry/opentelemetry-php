@@ -8,6 +8,7 @@ use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\LoggerHolder;
+use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
 use PHPUnit\Framework\Attributes\After;
 
 trait TestState
@@ -21,6 +22,7 @@ trait TestState
         Globals::reset();
         LoggerHolder::unset();
         Logging::reset();
+        Discovery::reset();
     }
 
     #[After]

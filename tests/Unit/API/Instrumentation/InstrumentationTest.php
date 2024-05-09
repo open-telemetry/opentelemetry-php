@@ -38,11 +38,6 @@ final class InstrumentationTest extends TestCase
         Globals::reset();
     }
 
-    public function tearDown(): void
-    {
-        Globals::reset();
-    }
-
     public function test_globals_not_configured_returns_noop_instances(): void
     {
         $this->assertInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());

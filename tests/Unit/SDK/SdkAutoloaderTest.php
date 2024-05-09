@@ -29,11 +29,6 @@ class SdkAutoloaderTest extends TestCase
         Globals::reset();
     }
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     public function test_disabled_by_default(): void
     {
         $this->assertFalse(SdkAutoloader::isEnabled());

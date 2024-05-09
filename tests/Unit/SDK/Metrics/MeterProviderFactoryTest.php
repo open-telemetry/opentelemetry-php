@@ -24,11 +24,6 @@ class MeterProviderFactoryTest extends TestCase
         Logging::disable();
     }
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     /**
      * @dataProvider exporterProvider
      * @psalm-suppress ArgumentTypeCoercion

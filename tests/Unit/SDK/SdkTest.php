@@ -22,11 +22,6 @@ class SdkTest extends TestCase
 {
     use TestState;
 
-    public function tearDown(): void
-    {
-        self::restoreEnvironmentVariables();
-    }
-
     public function test_is_not_disabled_by_default(): void
     {
         $this->assertFalse(Sdk::isDisabled());

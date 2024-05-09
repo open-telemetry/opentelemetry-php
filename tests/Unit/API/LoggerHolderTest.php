@@ -14,11 +14,6 @@ use Psr\Log\NullLogger;
  */
 class LoggerHolderTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        LoggerHolder::unset();
-    }
-
     public function setUp(): void
     {
         LoggerHolder::unset();

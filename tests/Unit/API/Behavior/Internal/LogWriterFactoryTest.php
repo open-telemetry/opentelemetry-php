@@ -26,12 +26,6 @@ class LogWriterFactoryTest extends TestCase
         LoggerHolder::unset();
     }
 
-    public function tearDown(): void
-    {
-        self::restoreEnvironmentVariables();
-        LoggerHolder::unset();
-    }
-
     /**
      * @dataProvider logDestinationProvider
      * @psalm-suppress ArgumentTypeCoercion

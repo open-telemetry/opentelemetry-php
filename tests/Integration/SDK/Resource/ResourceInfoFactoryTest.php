@@ -17,11 +17,6 @@ class ResourceInfoFactoryTest extends TestCase
 {
     use TestState;
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     public function test_all_default_resources(): void
     {
         $resource = ResourceInfoFactory::defaultResource();

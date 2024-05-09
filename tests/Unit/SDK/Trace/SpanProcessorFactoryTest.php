@@ -20,11 +20,6 @@ class SpanProcessorFactoryTest extends TestCase
 {
     use TestState;
 
-    protected function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     /**
      * @dataProvider processorProvider
      * @psalm-suppress ArgumentTypeCoercion

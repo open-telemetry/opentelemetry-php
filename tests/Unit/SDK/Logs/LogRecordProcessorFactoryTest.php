@@ -22,11 +22,6 @@ class LogRecordProcessorFactoryTest extends TestCase
 {
     use TestState;
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     /**
      * @dataProvider exporterProvider
      * @param class-string $expected

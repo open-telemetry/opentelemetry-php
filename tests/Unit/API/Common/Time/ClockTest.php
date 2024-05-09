@@ -19,11 +19,6 @@ class ClockTest extends TestCase
         Clock::reset();
     }
 
-    public function tearDown(): void
-    {
-        Clock::reset();
-    }
-
     public function test_default_is_system_clock(): void
     {
         $this->assertInstanceOf(SystemClock::class, Clock::getDefault());

@@ -22,11 +22,6 @@ class ConfigurationResolverTest extends TestCase
         $this->resolver = new ConfigurationResolver();
     }
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     /**
      * @dataProvider hasProvider
      */

@@ -16,11 +16,6 @@ class SamplerFactoryTest extends TestCase
 {
     use TestState;
 
-    protected function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     /**
      * @covers ::create
      * @dataProvider samplerProvider

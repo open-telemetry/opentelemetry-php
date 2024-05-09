@@ -23,11 +23,6 @@ class EnvironmentTest extends TestCase
         $this->detector = new Detectors\Environment();
     }
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     public function test_environment_default_get_resource(): void
     {
         $resource = $this->detector->getResource();

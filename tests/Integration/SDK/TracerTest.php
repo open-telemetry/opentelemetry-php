@@ -33,11 +33,6 @@ class TracerTest extends TestCase
 {
     use TestState;
 
-    public function tearDown(): void
-    {
-        self::restoreEnvironmentVariables();
-    }
-
     public function test_noop_span_should_be_started_when_sampling_result_is_drop(): void
     {
         $alwaysOffSampler = new AlwaysOffSampler();

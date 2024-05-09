@@ -28,12 +28,6 @@ class LogsMessagesTraitTest extends TestCase
         Logging::setLogWriter($this->writer);
     }
 
-    public function tearDown(): void
-    {
-        Logging::reset();
-        $this->restoreEnvironmentVariables();
-    }
-
     /**
      * @dataProvider logProvider
      */

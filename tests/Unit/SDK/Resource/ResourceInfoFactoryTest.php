@@ -34,12 +34,6 @@ class ResourceInfoFactoryTest extends TestCase
         Logging::setLogWriter($this->logWriter);
     }
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-        Logging::reset();
-    }
-
     public function test_empty_resource(): void
     {
         $resource = ResourceInfoFactory::emptyResource();

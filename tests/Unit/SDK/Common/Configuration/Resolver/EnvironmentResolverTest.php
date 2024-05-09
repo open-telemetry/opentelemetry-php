@@ -30,11 +30,6 @@ class EnvironmentResolverTest extends TestCase
         $this->resolver = new EnvironmentResolver();
     }
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     public function test_has_variable(): void
     {
         $this->assertFalse(

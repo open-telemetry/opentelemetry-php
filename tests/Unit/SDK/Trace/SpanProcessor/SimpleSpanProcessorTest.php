@@ -64,11 +64,6 @@ class SimpleSpanProcessorTest extends MockeryTestCase
         $this->simpleSpanProcessor = new SimpleSpanProcessor($this->spanExporter);
     }
 
-    public function tearDown(): void
-    {
-        Logging::reset();
-    }
-
     public function test_on_start(): void
     {
         $this->simpleSpanProcessor->onStart($this->readWriteSpan, Context::getRoot());

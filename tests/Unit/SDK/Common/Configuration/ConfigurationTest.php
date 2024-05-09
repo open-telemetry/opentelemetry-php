@@ -97,11 +97,6 @@ class ConfigurationTest extends TestCase
         'trace processor' => [Variables::OTEL_PHP_TRACES_PROCESSOR, KnownValues::OTEL_PHP_TRACES_PROCESSOR],
     ];
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     public function test_has_variable_from_environment(): void
     {
         $this->assertFalse(Configuration::has('FOO_VAR'));

@@ -103,13 +103,6 @@ class SpanTest extends MockeryTestCase
         Logging::setLogWriter($this->logWriter);
     }
 
-    protected function tearDown(): void
-    {
-        Clock::reset();
-        Logging::reset();
-        //        LoggerHolder::unset();
-    }
-
     // region API
 
     public function test_get_invalid_span(): void

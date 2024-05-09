@@ -17,11 +17,6 @@ class ResourceInfoTest extends TestCase
 {
     use TestState;
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     /**
      * @dataProvider environmentResourceProvider
      * @group compliance

@@ -34,11 +34,6 @@ class EventLoggerTest extends TestCase
         $this->eventLoggerProvider = new EventLoggerProvider($loggerProvider);
     }
 
-    public function tearDown(): void
-    {
-        Clock::reset();
-    }
-
     public function test_emit(): void
     {
         $this->logger->expects($this->once())->method('emit')->with($this->callback(function (LogRecord $logRecord) {

@@ -31,12 +31,6 @@ class TracerProviderFactoryTest extends TestCase
         Logging::setLogWriter($this->logWriter);
     }
 
-    public function tearDown(): void
-    {
-        Logging::reset();
-        $this->restoreEnvironmentVariables();
-    }
-
     public function test_factory_creates_tracer(): void
     {
         $exporterFactory = $this->createMock(ExporterFactory::class);

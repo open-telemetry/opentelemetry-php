@@ -33,11 +33,6 @@ class PropagatorFactoryTest extends TestCase
         Logging::disable();
     }
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     /**
      * @dataProvider propagatorsProvider
      * @psalm-suppress ArgumentTypeCoercion

@@ -52,12 +52,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
         Clock::setDefault($this->testClock);
     }
 
-    protected function tearDown(): void
-    {
-        Clock::reset();
-        Logging::reset();
-    }
-
     public function test_export_batch_size_met(): void
     {
         $batchSize = 3;

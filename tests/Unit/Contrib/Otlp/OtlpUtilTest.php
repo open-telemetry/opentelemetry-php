@@ -17,11 +17,6 @@ class OtlpUtilTest extends TestCase
 {
     use TestState;
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     public function test_get_user_agent_header(): void
     {
         $header = OtlpUtil::getUserAgentHeader();

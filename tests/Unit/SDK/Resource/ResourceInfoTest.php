@@ -27,11 +27,6 @@ class ResourceInfoTest extends TestCase
         Logging::disable();
     }
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     public function test_get_attributes(): void
     {
         $attributes = Attributes::create(['name' => 'test']);

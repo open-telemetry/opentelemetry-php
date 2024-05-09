@@ -37,11 +37,6 @@ final class MeterProviderTest extends TestCase
 {
     use TestState;
 
-    public function tearDown(): void
-    {
-        self::restoreEnvironmentVariables();
-    }
-
     public function test_weak_asynchronous_observer_is_released_when_instance_out_of_scope(): void
     {
         $clock = new TestClock();
