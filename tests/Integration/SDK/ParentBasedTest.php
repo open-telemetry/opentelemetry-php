@@ -12,9 +12,7 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversNothing
- */
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 class ParentBasedTest extends TestCase
 {
     public function test_parent_based_root_span(): void

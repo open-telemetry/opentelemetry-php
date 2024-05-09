@@ -10,9 +10,7 @@ use OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\PsrClientResolver;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\PsrClientResolver
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\PsrClientResolver::class)]
 class PsrClientResolverTest extends TestCase
 {
     public function setUp(): void

@@ -8,9 +8,7 @@ use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor::class)]
 class NoopLogRecordProcessorTest extends TestCase
 {
     public function test_get_instance(): void

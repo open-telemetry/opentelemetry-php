@@ -10,9 +10,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanExporter\LoggerDecorator
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanExporter\LoggerDecorator::class)]
 class LoggerDecoratorTest extends AbstractLoggerAwareTestCase
 {
     /**

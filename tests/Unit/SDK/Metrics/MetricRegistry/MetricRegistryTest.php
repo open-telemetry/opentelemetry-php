@@ -21,11 +21,9 @@ use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use PHPUnit\Framework\TestCase;
 use function printf;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry
- * @covers \OpenTelemetry\SDK\Metrics\MetricRegistry\MultiObserver
- * @covers \OpenTelemetry\SDK\Metrics\MetricRegistry\NoopObserver
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricRegistry\MultiObserver::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricRegistry\NoopObserver::class)]
 final class MetricRegistryTest extends TestCase
 {
     public function test_collect_and_push_recorded_value(): void

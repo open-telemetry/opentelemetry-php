@@ -67,9 +67,7 @@ abstract class AbstractExporterTestCase extends MockeryTestCase
         );
     }
 
-    /**
-     * @dataProvider futureProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('futureProvider')]
     public function test_export(FutureInterface $future, bool $expected): void
     {
         $transport = Mockery::mock(TransportInterface::class);

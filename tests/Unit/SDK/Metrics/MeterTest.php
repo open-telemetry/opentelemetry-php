@@ -24,9 +24,7 @@ use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\Meter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Meter::class)]
 final class MeterTest extends TestCase
 {
     public function test_create_counter(): void

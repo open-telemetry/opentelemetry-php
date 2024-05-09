@@ -13,9 +13,7 @@ use OpenTelemetry\SDK\SdkBuilder;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\SdkBuilder
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\SdkBuilder::class)]
 class SdkBuilderTest extends TestCase
 {
     private TextMapPropagatorInterface $propagator;

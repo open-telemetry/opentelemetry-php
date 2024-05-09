@@ -7,9 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 use OpenTelemetry\API\Trace as API;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Trace\NonRecordingSpan
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Trace\NonRecordingSpan::class)]
 class NonRecordingSpanTest extends TestCase
 {
     public function test_is_not_recording(): void

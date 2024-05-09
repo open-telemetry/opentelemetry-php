@@ -8,9 +8,7 @@ use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\Detectors\OperatingSystem
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\Detectors\OperatingSystem::class)]
 class OperatingSystemTest extends TestCase
 {
     public function test_operating_system_get_resource(): void

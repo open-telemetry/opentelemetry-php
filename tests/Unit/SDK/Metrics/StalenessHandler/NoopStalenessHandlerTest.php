@@ -7,10 +7,8 @@ namespace OpenTelemetry\Tests\Unit\SDK\Metrics\StalenessHandler;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandlerFactory;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandler
- * @covers \OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandlerFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandler::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandlerFactory::class)]
 final class NoopStalenessHandlerTest extends TestCase
 {
     public function test_on_stale(): void

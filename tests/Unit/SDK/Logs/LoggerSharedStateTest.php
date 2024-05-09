@@ -11,9 +11,9 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Logs\LoggerSharedState
  * @psalm-suppress UndefinedInterfaceMethod
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\LoggerSharedState::class)]
 class LoggerSharedStateTest extends TestCase
 {
     private ResourceInfo $resource;

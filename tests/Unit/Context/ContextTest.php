@@ -11,9 +11,7 @@ use OpenTelemetry\Context\ImplicitContextKeyedInterface;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-/**
- * @covers \OpenTelemetry\Context\Context
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\Context::class)]
 class ContextTest extends TestCase
 {
     public function test_activate(): void

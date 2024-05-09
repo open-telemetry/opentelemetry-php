@@ -8,9 +8,7 @@ use DateTime;
 use OpenTelemetry\API\Common\Time\SystemClock;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Common\Time\SystemClock
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Common\Time\SystemClock::class)]
 class SystemClockTest extends TestCase
 {
     private const NANOS_PER_SECOND = 1_000_000_000;

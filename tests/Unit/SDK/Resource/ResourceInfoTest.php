@@ -15,9 +15,7 @@ use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\ResourceInfo
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\ResourceInfo::class)]
 class ResourceInfoTest extends TestCase
 {
     use TestState;
@@ -50,9 +48,7 @@ class ResourceInfoTest extends TestCase
         $this->assertSame('test', $name);
     }
 
-    /**
-     * @dataProvider sameResourcesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('sameResourcesProvider')]
     public function test_serialize_returns_same_output_for_objects_representing_the_same_resource(ResourceInfo $resource1, ResourceInfo $resource2): void
     {
         $this->assertSame($resource1->serialize(), $resource2->serialize());
@@ -74,9 +70,7 @@ class ResourceInfoTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider differentResourcesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('differentResourcesProvider')]
     public function test_serialize_returns_different_output_for_objects_representing_different_resources(ResourceInfo $resource1, ResourceInfo $resource2): void
     {
         $this->assertNotSame($resource1->serialize(), $resource2->serialize());
@@ -118,10 +112,8 @@ class ResourceInfoTest extends TestCase
         $this->assertEquals('value', $empty);
     }
 
-    /**
-     * @group compliance
-     * "If a key exists on both the old and updating resource, the value of the updating resource MUST be picked (even if the updated value is empty)"
-     */
+    #[\PHPUnit\Framework\Attributes\Group('compliance
+"If a key exists on both the old and updating resource, the value of the updating resource MUST be picked (even if the updated value is empty)"')]
     public function test_merge_uses_value_of_updating_resource(): void
     {
         $old = ResourceInfo::create(Attributes::create(['name' => 'original', 'foo' => 'bar']));
@@ -142,9 +134,7 @@ class ResourceInfoTest extends TestCase
         $this->assertSame('two.upd', $merged->getAttributes()->get('2'));
     }
 
-    /**
-     * @dataProvider schemaUrlsToMergeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('schemaUrlsToMergeProvider')]
     public function test_merge_schema_url(array $schemaUrlsToMerge, ?string $expectedSchemaUrl): void
     {
         $old = ResourceInfo::create(Attributes::create([]), $schemaUrlsToMerge[0]);

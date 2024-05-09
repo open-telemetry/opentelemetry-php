@@ -8,11 +8,9 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorage;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Context\ContextStorage
- * @covers \OpenTelemetry\Context\ContextStorageHead
- * @covers \OpenTelemetry\Context\ContextStorageNode
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\ContextStorage::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\ContextStorageHead::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\ContextStorageNode::class)]
 class ContextStorageTest extends TestCase
 {
     public function test_scope_returns_null_in_root(): void

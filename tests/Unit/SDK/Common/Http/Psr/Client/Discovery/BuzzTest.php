@@ -7,9 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Http\Psr\Client\Discovery;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\Buzz;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\DiscoveryInterface;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\Buzz
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\Buzz::class)]
 class BuzzTest extends AbstractDiscoveryTestCase
 {
     public function getInstance(): DiscoveryInterface

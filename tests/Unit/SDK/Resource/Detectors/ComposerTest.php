@@ -9,9 +9,7 @@ use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\Detectors\Composer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\Detectors\Composer::class)]
 class ComposerTest extends TestCase
 {
     public function test_composer_get_resource(): void

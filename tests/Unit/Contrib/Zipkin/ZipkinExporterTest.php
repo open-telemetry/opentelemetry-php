@@ -9,9 +9,7 @@ use OpenTelemetry\Contrib\Zipkin\Exporter;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTestCase;
 
-/**
- * @covers \OpenTelemetry\Contrib\Zipkin\Exporter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Zipkin\Exporter::class)]
 class ZipkinExporterTest extends AbstractExporterTestCase
 {
     /**

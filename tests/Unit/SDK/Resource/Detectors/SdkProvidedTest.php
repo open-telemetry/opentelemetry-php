@@ -8,9 +8,7 @@ use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\Detectors\SdkProvided
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\Detectors\SdkProvided::class)]
 class SdkProvidedTest extends TestCase
 {
     public function test_sdk_provided_get_resource(): void

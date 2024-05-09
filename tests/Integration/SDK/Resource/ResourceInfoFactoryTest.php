@@ -10,9 +10,7 @@ use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversNothing
- */
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 class ResourceInfoFactoryTest extends TestCase
 {
     use TestState;

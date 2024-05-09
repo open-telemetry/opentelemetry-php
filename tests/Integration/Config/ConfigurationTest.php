@@ -10,10 +10,8 @@ use PHPUnit\Framework\TestCase;
 final class ConfigurationTest extends TestCase
 {
 
-    /**
-     * @dataProvider openTelemetryConfigurationDataProvider
-     * @coversNothing
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('openTelemetryConfigurationDataProvider')]
+    #[\PHPUnit\Framework\Attributes\CoversNothing]
     public function test_open_telemetry_configuration(string $file): void
     {
         $this->expectNotToPerformAssertions();

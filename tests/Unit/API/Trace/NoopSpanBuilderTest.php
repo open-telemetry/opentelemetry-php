@@ -14,9 +14,7 @@ use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Context\ContextStorageInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Trace\NoopSpanBuilder
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Trace\NoopSpanBuilder::class)]
 class NoopSpanBuilderTest extends TestCase
 {
     public function test_set_parent(): void

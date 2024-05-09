@@ -12,17 +12,15 @@ use OpenTelemetry\SDK\Logs\EventLoggerProviderFactory;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\EventLoggerProviderFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\EventLoggerProviderFactory::class)]
 class EventLoggerProviderFactoryTest extends TestCase
 {
     use TestState;
 
     /**
-     * @dataProvider createProvider
      * @psalm-suppress ArgumentTypeCoercion
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('createProvider')]
     public function test_create(string $disabled, string $expected): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_SDK_DISABLED, $disabled);

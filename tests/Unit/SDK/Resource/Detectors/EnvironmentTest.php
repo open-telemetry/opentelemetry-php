@@ -9,9 +9,7 @@ use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\Detectors\Environment
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\Detectors\Environment::class)]
 class EnvironmentTest extends TestCase
 {
     use TestState;
@@ -42,9 +40,7 @@ class EnvironmentTest extends TestCase
         $this->assertSame('value_bar', $resource->getAttributes()->get('key_bar'));
     }
 
-    /**
-     * @dataProvider encodedResourceValueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('encodedResourceValueProvider')]
     public function test_environment_get_resource_with_encoded_value(string $value, string $expected): void
     {
         $key = 'key';

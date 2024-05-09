@@ -9,9 +9,7 @@ use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\EventLoggerProvider
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\EventLoggerProvider::class)]
 class EventLoggerProviderTest extends TestCase
 {
     public function test_emit(): void

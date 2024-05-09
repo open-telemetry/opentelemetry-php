@@ -11,10 +11,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor
  * @psalm-suppress UndefinedInterfaceMethod
  * @psalm-suppress  PossiblyUndefinedMethod
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor::class)]
 class SimpleLogRecordProcessorTest extends TestCase
 {
     private SimpleLogRecordProcessor $processor;

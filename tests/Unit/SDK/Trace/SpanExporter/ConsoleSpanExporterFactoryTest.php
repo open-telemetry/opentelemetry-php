@@ -8,9 +8,7 @@ use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory::class)]
 class ConsoleSpanExporterFactoryTest extends TestCase
 {
     public function test_create(): void

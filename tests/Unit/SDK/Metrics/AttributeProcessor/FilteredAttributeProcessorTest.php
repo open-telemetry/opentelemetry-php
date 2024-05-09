@@ -9,9 +9,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Metrics\AttributeProcessor;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\AttributeProcessor\FilteredAttributeProcessor
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\AttributeProcessor\FilteredAttributeProcessor::class)]
 final class FilteredAttributeProcessorTest extends TestCase
 {
     public function test_attribute_processor_test(): void

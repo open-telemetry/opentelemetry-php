@@ -8,9 +8,7 @@ use LogicException;
 use OpenTelemetry\SDK\Common\Util\ClassConstantAccessor;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Util\ClassConstantAccessor
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Util\ClassConstantAccessor::class)]
 class ClassConstantAccessorTest extends TestCase
 {
     public function test_get_value_return_correct_value(): void

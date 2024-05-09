@@ -10,9 +10,7 @@ use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery::class)]
 class DiscoveryTest extends TestCase
 {
     use TestState;

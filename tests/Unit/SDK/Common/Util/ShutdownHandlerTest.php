@@ -8,9 +8,7 @@ use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use PHPUnit\Framework\TestCase;
 use WeakReference;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Util\ShutdownHandler
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Util\ShutdownHandler::class)]
 final class ShutdownHandlerTest extends TestCase
 {
     public function test_shutdown_handler_does_not_keep_reference_to_shutdown_function_this(): void
@@ -21,7 +19,7 @@ final class ShutdownHandlerTest extends TestCase
             }
         };
 
-        ShutdownHandler::register([$object, 'foo']);
+        ShutdownHandler::register($object->foo(...));
 
         $reference = WeakReference::create($object);
         $object = null;

@@ -7,9 +7,7 @@ namespace OpenTelemetry\Tests\Unit\Extension\Propagator\B3;
 use OpenTelemetry\Extension\Propagator\B3\B3DebugFlagContextKey;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Extension\Propagator\B3\B3DebugFlagContextKey
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Extension\Propagator\B3\B3DebugFlagContextKey::class)]
 class B3DebugFlagContextKeyTest extends TestCase
 {
     public function test_b3_debug_flag_key(): void

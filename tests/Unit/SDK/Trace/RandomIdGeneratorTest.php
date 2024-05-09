@@ -8,14 +8,10 @@ use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\RandomIdGenerator
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\RandomIdGenerator::class)]
 class RandomIdGeneratorTest extends TestCase
 {
-    /**
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_generated_trace_id_is_valid(): void
     {
         $idGenerator = new RandomIdGenerator();
@@ -24,9 +20,7 @@ class RandomIdGeneratorTest extends TestCase
         $this->assertEquals(1, preg_match(SpanContextValidator::VALID_TRACE, $traceId));
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_generated_span_id_is_valid(): void
     {
         $idGenerator = new RandomIdGenerator();
@@ -43,9 +37,9 @@ class RandomIdGeneratorTest extends TestCase
         $method->setAccessible(true);
 
         $traceId = $method->invokeArgs($idGenerator, [$reflection->getConstant('TRACE_ID_HEX_LENGTH')]);
-        $this->assertEquals(1, preg_match(SpanContextValidator::VALID_TRACE, $traceId));
+        $this->assertEquals(1, preg_match(SpanContextValidator::VALID_TRACE, (string) $traceId));
 
         $spanId = $method->invokeArgs($idGenerator, [$reflection->getConstant('SPAN_ID_HEX_LENGTH')]);
-        $this->assertEquals(1, preg_match(SpanContextValidator::VALID_SPAN, $spanId));
+        $this->assertEquals(1, preg_match(SpanContextValidator::VALID_SPAN, (string) $spanId));
     }
 }

@@ -12,9 +12,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter::class)]
 final class InMemoryExporterTest extends TestCase
 {
     public function test_empty_exporter_collect_returns_empty_metrics(): void

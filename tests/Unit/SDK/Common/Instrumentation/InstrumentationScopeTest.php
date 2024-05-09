@@ -8,10 +8,8 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope
- * @covers \OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory::class)]
 class InstrumentationScopeTest extends TestCase
 {
     public function test_getters(): void

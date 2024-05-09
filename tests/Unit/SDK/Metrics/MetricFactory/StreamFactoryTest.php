@@ -29,11 +29,9 @@ use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory
- * @covers \OpenTelemetry\SDK\Metrics\MetricFactory\StreamMetricSource
- * @covers \OpenTelemetry\SDK\Metrics\MetricFactory\StreamMetricSourceProvider
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricFactory\StreamMetricSource::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricFactory\StreamMetricSourceProvider::class)]
 final class StreamFactoryTest extends TestCase
 {
     public function test_create_asynchronous_observer(): void

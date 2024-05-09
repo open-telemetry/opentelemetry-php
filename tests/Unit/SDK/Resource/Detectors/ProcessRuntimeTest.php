@@ -8,9 +8,7 @@ use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\Detectors\ProcessRuntime
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\Detectors\ProcessRuntime::class)]
 class ProcessRuntimeTest extends TestCase
 {
     public function test_process_runtime_get_resource(): void

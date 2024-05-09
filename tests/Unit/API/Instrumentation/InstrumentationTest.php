@@ -25,12 +25,10 @@ use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Globals
- * @covers \OpenTelemetry\API\Instrumentation\CachedInstrumentation
- * @covers \OpenTelemetry\API\Instrumentation\Configurator
- * @covers \OpenTelemetry\API\Instrumentation\ContextKeys
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Globals::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Instrumentation\CachedInstrumentation::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Instrumentation\Configurator::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Instrumentation\ContextKeys::class)]
 final class InstrumentationTest extends TestCase
 {
     public function setUp(): void

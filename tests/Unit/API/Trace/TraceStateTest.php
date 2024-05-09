@@ -14,9 +14,9 @@ use Psr\Log\LoggerInterface;
 use function str_repeat;
 
 /**
- * @covers \OpenTelemetry\API\Trace\TraceState
  * @psalm-suppress UndefinedInterfaceMethod
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Trace\TraceState::class)]
 class TraceStateTest extends TestCase
 {
     private LoggerInterface $logger;

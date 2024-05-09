@@ -19,10 +19,8 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory
- * @covers \OpenTelemetry\SDK\Common\Export\Http\PsrTransport
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Export\Http\PsrTransport::class)]
 final class PsrTransportTest extends TestCase
 {
     private MockObject $client;

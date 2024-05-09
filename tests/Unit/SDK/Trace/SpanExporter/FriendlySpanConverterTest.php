@@ -17,9 +17,7 @@ use OpenTelemetry\SDK\Trace\SpanExporter\FriendlySpanConverter;
 use OpenTelemetry\SDK\Trace\StatusDataInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanExporter\FriendlySpanConverter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanExporter\FriendlySpanConverter::class)]
 class FriendlySpanConverterTest extends TestCase
 {
     private const TEST_DATA = [

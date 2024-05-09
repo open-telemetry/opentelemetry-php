@@ -7,14 +7,10 @@ namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 use OpenTelemetry\Contrib\Otlp\AttributesConverter;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\AttributesConverter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\AttributesConverter::class)]
 class AttributesConverterTest extends TestCase
 {
-    /**
-     * @dataProvider basicTypesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('basicTypesProvider')]
     public function test_convert_basic_types($value, string $expected): void
     {
         $json = AttributesConverter::convertAnyValue($value)->serializeToJsonString();
@@ -43,9 +39,7 @@ class AttributesConverterTest extends TestCase
         $this->assertSame("\xe2", $anyValue->getBytesValue());
     }
 
-    /**
-     * @dataProvider arrayProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('arrayProvider')]
     public function test_is_simple_array(array $value, bool $expected): void
     {
         $this->assertSame($expected, AttributesConverter::isSimpleArray($value));

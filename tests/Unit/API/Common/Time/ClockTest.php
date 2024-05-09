@@ -9,9 +9,7 @@ use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\SystemClock;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Common\Time\Clock
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Common\Time\Clock::class)]
 class ClockTest extends TestCase
 {
     public function setUp(): void

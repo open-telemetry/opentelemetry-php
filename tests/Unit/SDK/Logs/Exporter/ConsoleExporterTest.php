@@ -13,9 +13,9 @@ use OpenTelemetry\SDK\Logs\ReadableLogRecord;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter
  * @psalm-suppress UndefinedInterfaceMethod
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter::class)]
 class ConsoleExporterTest extends TestCase
 {
     private TransportInterface $transport;

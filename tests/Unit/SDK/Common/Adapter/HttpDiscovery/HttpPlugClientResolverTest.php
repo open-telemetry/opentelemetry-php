@@ -8,9 +8,7 @@ use Http\Client\HttpAsyncClient;
 use OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\HttpPlugClientResolver;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\HttpPlugClientResolver
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\HttpPlugClientResolver::class)]
 class HttpPlugClientResolverTest extends TestCase
 {
     public function test_resolve_http_plug_async_client(): void

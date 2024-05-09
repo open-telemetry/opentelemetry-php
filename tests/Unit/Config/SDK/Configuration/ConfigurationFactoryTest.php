@@ -22,12 +22,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- * @covers \OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory::class)]
 final class ConfigurationFactoryTest extends TestCase
 {
 
+    public $properties;
     /**
      * @psalm-suppress MissingTemplateParam
      */
@@ -176,7 +175,6 @@ final class ConfigurationFactoryTest extends TestCase
     {
         assert($plugin instanceof Internal\ComponentPlugin);
 
-        /** @phpstan-ignore-next-line */
         return (fn () => $this->properties)->bindTo($plugin, Internal\ComponentPlugin::class)();
     }
 

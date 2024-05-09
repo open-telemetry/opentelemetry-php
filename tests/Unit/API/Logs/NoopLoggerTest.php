@@ -7,9 +7,7 @@ namespace OpenTelemetry\Example\Unit\API\Logs;
 use OpenTelemetry\API\Logs\NoopLogger;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Logs\NoopLogger
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Logs\NoopLogger::class)]
 class NoopLoggerTest extends TestCase
 {
     public function test_get_instance(): void

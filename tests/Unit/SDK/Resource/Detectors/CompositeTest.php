@@ -10,9 +10,7 @@ use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\Detectors\Composite
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\Detectors\Composite::class)]
 class CompositeTest extends TestCase
 {
     public function test_composite_with_empty_resource_detectors(): void

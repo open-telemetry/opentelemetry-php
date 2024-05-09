@@ -7,11 +7,9 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Attribute;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Attribute\Attributes
- * @covers \OpenTelemetry\SDK\Common\Attribute\AttributesBuilder
- * @covers \OpenTelemetry\SDK\Common\Attribute\AttributesFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Attribute\Attributes::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Attribute\AttributesBuilder::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Attribute\AttributesFactory::class)]
 class AttributesTest extends TestCase
 {
     public function test_has_attribute(): void

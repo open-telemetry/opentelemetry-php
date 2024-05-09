@@ -8,9 +8,7 @@ use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory::class)]
 class OtlpHttpTransportFactoryTest extends TestCase
 {
     private OtlpHttpTransportFactory $factory;

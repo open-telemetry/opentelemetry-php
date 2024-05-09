@@ -10,9 +10,7 @@ use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Exemplar\HistogramBucketReservoir;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\Exemplar\HistogramBucketReservoir
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Exemplar\HistogramBucketReservoir::class)]
 final class HistogramBucketReservoirTest extends TestCase
 {
     public function test_reservoir_returns_exemplars(): void

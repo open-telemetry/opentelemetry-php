@@ -14,10 +14,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Logs\LoggerProvider
  * @psalm-suppress UndefinedInterfaceMethod
  * @psalm-suppress PossiblyUndefinedMethod
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\LoggerProvider::class)]
 class LoggerProviderTest extends TestCase
 {
     /** @var LogRecordProcessorInterface&MockObject $processor */

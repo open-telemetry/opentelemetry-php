@@ -8,9 +8,7 @@ use OpenTelemetry\API\Logs\NoopLogger;
 use OpenTelemetry\SDK\Logs\NoopLoggerProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\NoopLoggerProvider
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\NoopLoggerProvider::class)]
 class NoopLoggerProviderTest extends TestCase
 {
     public function test_get_instance(): void

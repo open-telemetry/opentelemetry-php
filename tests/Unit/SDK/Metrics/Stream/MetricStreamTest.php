@@ -22,27 +22,20 @@ use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use const PHP_INT_SIZE;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream
- * @covers \OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream
- *
- * @covers \OpenTelemetry\SDK\Metrics\Stream\Metric
- * @covers \OpenTelemetry\SDK\Metrics\Stream\MetricAggregator
- *
- * @uses \OpenTelemetry\SDK\Metrics\Stream\Delta
- * @uses \OpenTelemetry\SDK\Metrics\Stream\DeltaStorage
- *
- * @uses \OpenTelemetry\SDK\Metrics\Data\NumberDataPoint
- * @uses \OpenTelemetry\SDK\Metrics\Data\Sum
- * @uses \OpenTelemetry\SDK\Metrics\Data\Temporality
- *
- * @uses \OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation
- * @uses \OpenTelemetry\SDK\Metrics\Aggregation\SumSummary
- *
- * @uses \OpenTelemetry\SDK\Common\Attribute\Attributes
- * @uses \OpenTelemetry\SDK\Common\Attribute\AttributesBuilder
- * @uses \OpenTelemetry\SDK\Common\Attribute\AttributesFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Stream\Metric::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Stream\MetricAggregator::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Metrics\Stream\Delta::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Metrics\Stream\DeltaStorage::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Metrics\Data\NumberDataPoint::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Metrics\Data\Sum::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Metrics\Data\Temporality::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Metrics\Aggregation\SumSummary::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Common\Attribute\Attributes::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Common\Attribute\AttributesBuilder::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Common\Attribute\AttributesFactory::class)]
 final class MetricStreamTest extends TestCase
 {
     public function setUp(): void

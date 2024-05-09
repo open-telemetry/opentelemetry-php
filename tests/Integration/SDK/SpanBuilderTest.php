@@ -25,9 +25,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 use function range;
 use function str_repeat;
 
-/**
- * @coversNothing
- */
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 class SpanBuilderTest extends MockeryTestCase
 {
     private const SPAN_NAME = 'span_name';
@@ -52,9 +50,7 @@ class SpanBuilderTest extends MockeryTestCase
         );
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_add_link(): void
     {
         /** @var Span $span */
@@ -68,9 +64,7 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertCount(2, $span->toSpanData()->getLinks());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_add_link_after_span_creation(): void
     {
         /** @var Span $span */
@@ -183,9 +177,7 @@ class SpanBuilderTest extends MockeryTestCase
         );
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_add_link_no_effect_after_start_span(): void
     {
         $spanBuilder = $this->tracer->spanBuilder(self::SPAN_NAME);
@@ -209,9 +201,7 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertCount(1, $span->toSpanData()->getLinks());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_set_attribute(): void
     {
         /** @var Span $span */
@@ -235,9 +225,7 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertNull($attributes->get('nil'));
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_set_attribute_no_effect_after_end(): void
     {
         /** @var Span $span */
@@ -261,9 +249,6 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertFalse($attributes->has('doo'));
     }
 
-    /**
-     * @group trace-compliance
-     */
     // public function test_set_attribute_empty_string_value_is_set(): void
     // {
     //     /** @var Span $span */
@@ -273,18 +258,13 @@ class SpanBuilderTest extends MockeryTestCase
     //         ->setAttribute('nil', null)
     //         ->setAttribute('empty-string', '')
     //         ->startSpan();
-
     //     $attributes = $span->toSpanData()->getAttributes();
     //     $this->assertSame(1, $attributes->count());
     //     $this->assertSame('', $attributes->get('empty-string'));
     //     $this->assertNull($attributes->get('nil'));
-
     //     $span->end();
     // }
-
-    /**
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_set_attribute_only_null_string_value_should_not_be_set(): void
     {
         /** @var Span $span */
@@ -299,9 +279,7 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertNull($attributes->get('nil'));
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_set_attribute_no_effect_after_start_span(): void
     {
         $spanBuilder = $this->tracer->spanBuilder(self::SPAN_NAME);
@@ -395,9 +373,7 @@ class SpanBuilderTest extends MockeryTestCase
         $this->assertSame(1, $attributes->get('id'));
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_set_attributes_merges_attributes_correctly(): void
     {
         $attributes = ['id' => 2, 'foo' => 'bar', 'key' => 'val'];

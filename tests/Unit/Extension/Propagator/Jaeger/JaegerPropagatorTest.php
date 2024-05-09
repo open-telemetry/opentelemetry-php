@@ -16,9 +16,7 @@ use OpenTelemetry\Extension\Propagator\Jaeger\JaegerPropagator;
 use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Extension\Propagator\Jaeger\JaegerPropagator
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Extension\Propagator\Jaeger\JaegerPropagator::class)]
 class JaegerPropagatorTest extends TestCase
 {
     private const TRACE_ID_BASE16 = '6bec5956ce56d66eb47802ab1cf6c4a0';

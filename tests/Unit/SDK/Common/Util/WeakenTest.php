@@ -10,10 +10,8 @@ use function OpenTelemetry\SDK\Common\Util\weaken;
 use PHPUnit\Framework\TestCase;
 use WeakReference;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Util\closure
- * @covers \OpenTelemetry\SDK\Common\Util\weaken
- */
+#[\PHPUnit\Framework\Attributes\CoversFunction('\OpenTelemetry\SDK\Common\Util\closure()')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('\OpenTelemetry\SDK\Common\Util\weaken()')]
 final class WeakenTest extends TestCase
 {
     public function test_weakened_closure_calls_original_closure(): void
@@ -25,7 +23,7 @@ final class WeakenTest extends TestCase
             }
         };
 
-        $weakened = weaken(closure([$object, 'foo']));
+        $weakened = weaken(closure($object->foo(...)));
 
         $this->assertSame(5, $weakened());
     }
@@ -39,7 +37,7 @@ final class WeakenTest extends TestCase
             }
         };
 
-        $weakened = weaken(closure([$object, 'foo']));
+        $weakened = weaken(closure($object->foo(...)));
         $reference = WeakReference::create($object);
 
         $object = null;
@@ -57,7 +55,7 @@ final class WeakenTest extends TestCase
             }
         };
 
-        weaken(closure([$object, 'foo']), $target);
+        weaken(closure($object->foo(...)), $target);
 
         $this->assertSame($object, $target);
     }
@@ -80,7 +78,7 @@ class A
 {
     public function closure(): \Closure
     {
-        return Closure::fromCallable([$this, 'private']);
+        return Closure::fromCallable($this->private(...));
     }
     private function private(): int
     {

@@ -15,17 +15,15 @@ use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\LogRecordProcessorFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\LogRecordProcessorFactory::class)]
 class LogRecordProcessorFactoryTest extends TestCase
 {
     use TestState;
 
     /**
-     * @dataProvider exporterProvider
      * @param class-string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('exporterProvider')]
     public function test_create(string $name, string $expected): void
     {
         $exporter = $this->createMock(LogRecordExporterInterface::class);

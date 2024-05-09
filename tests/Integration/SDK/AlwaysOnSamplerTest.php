@@ -14,9 +14,7 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversNothing
- */
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 class AlwaysOnSamplerTest extends TestCase
 {
     public function test_always_on_sampler_decision(): void

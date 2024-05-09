@@ -14,9 +14,7 @@ use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversNothing
- */
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 class TraceIdRatioBasedSamplerTest extends TestCase
 {
     public function test_never_trace_id_ratio_based_sampler_decision(): void

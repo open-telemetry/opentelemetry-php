@@ -8,10 +8,8 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\FilteredAttributesFactory;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Attribute\FilteredAttributesBuilder
- * @covers \OpenTelemetry\SDK\Common\Attribute\FilteredAttributesFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Attribute\FilteredAttributesBuilder::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Attribute\FilteredAttributesFactory::class)]
 class FilteredAttributesTest extends TestCase
 {
     public function test_rejected_keys_are_dropped(): void

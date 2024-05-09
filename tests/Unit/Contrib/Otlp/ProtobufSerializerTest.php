@@ -9,9 +9,7 @@ use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\ProtobufSerializer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\ProtobufSerializer::class)]
 class ProtobufSerializerTest extends TestCase
 {
     public function test_empty_json_response(): void

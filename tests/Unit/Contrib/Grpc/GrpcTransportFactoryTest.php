@@ -8,9 +8,7 @@ use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Contrib\Grpc\GrpcTransportFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Grpc\GrpcTransportFactory::class)]
 class GrpcTransportFactoryTest extends TestCase
 {
     public function test_grpc_transport_create(): void

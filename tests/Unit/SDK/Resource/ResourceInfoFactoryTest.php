@@ -17,9 +17,7 @@ use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\ResourceInfoFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\ResourceInfoFactory::class)]
 class ResourceInfoFactoryTest extends TestCase
 {
     use TestState;
@@ -56,9 +54,7 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertEquals('', $empty);
     }
 
-    /**
-     * @dataProvider schemaUrlsToMergeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('schemaUrlsToMergeProvider')]
     public function test_merge_schema_url(array $schemaUrlsToMerge, ?string $expectedSchemaUrl): void
     {
         $resource = ResourceInfoFactory::emptyResource();
@@ -82,27 +78,21 @@ class ResourceInfoFactoryTest extends TestCase
         yield 'Schema url is undefined and implementation-specific after merging error' => [['http://url-1', 'http://url-2', 'http://url-2'], self::UNDEFINED];
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_resource_service_name_default(): void
     {
         $resource = ResourceInfoFactory::defaultResource();
         $this->assertEquals('open-telemetry/opentelemetry', $resource->getAttributes()->get('service.name'));
     }
 
-    /**
-     * @group compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('compliance')]
     public function test_resource_with_empty_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', '');
         $this->assertInstanceOf(ResourceInfo::class, ResourceInfoFactory::defaultResource());
     }
 
-    /**
-     * @group compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('compliance')]
     public function test_resource_with_invalid_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo');
@@ -110,9 +100,7 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertInstanceOf(ResourceInfo::class, ResourceInfoFactory::defaultResource());
     }
 
-    /**
-     * @group compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('compliance')]
     public function test_resource_from_environment_service_name_takes_precedence_over_resource_attribute(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=bar');
@@ -121,9 +109,7 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
 
-    /**
-     * @group compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('compliance')]
     public function test_resource_from_environment_resource_attribute_takes_precedence_over_default(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');

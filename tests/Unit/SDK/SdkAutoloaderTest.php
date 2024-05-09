@@ -16,9 +16,7 @@ use OpenTelemetry\SDK\SdkAutoloader;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\SdkAutoloader
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\SdkAutoloader::class)]
 class SdkAutoloaderTest extends TestCase
 {
     use TestState;
@@ -90,9 +88,7 @@ class SdkAutoloaderTest extends TestCase
         $this->assertFalse(SdkAutoloader::isExcludedUrl());
     }
 
-    /**
-     * @dataProvider excludeUrlsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('excludeUrlsProvider')]
     public function test_exclude_urls(string $exclude, string $uri, bool $expected): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_URLS, $exclude);

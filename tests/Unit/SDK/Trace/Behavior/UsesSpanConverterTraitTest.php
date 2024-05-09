@@ -9,14 +9,9 @@ use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\NullSpanConverter;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait::class)]
 class UsesSpanConverterTraitTest extends TestCase
 {
-    /**
-     * @covers ::getSpanConverter
-     */
     public function test_accessors(): void
     {
         $instance = $this->createInstance();
@@ -30,9 +25,6 @@ class UsesSpanConverterTraitTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::getSpanConverter
-     */
     public function test_fallback_converter(): void
     {
         $this->assertInstanceOf(

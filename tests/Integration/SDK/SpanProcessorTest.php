@@ -10,9 +10,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversNothing
- */
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 class SpanProcessorTest extends TestCase
 {
     public function test_parent_context_should_be_passed_to_span_processor(): void

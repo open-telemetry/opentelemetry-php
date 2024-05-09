@@ -11,14 +11,9 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler::class)]
 class AlwaysOnSamplerTest extends TestCase
 {
-    /**
-     * @covers ::shouldSample
-     */
     public function test_should_sample(): void
     {
         $parentContext = Context::getRoot();
@@ -35,9 +30,6 @@ class AlwaysOnSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLE, $decision->getDecision());
     }
 
-    /**
-     * @covers ::getDescription
-     */
     public function test_get_description(): void
     {
         $sampler = new AlwaysOnSampler();

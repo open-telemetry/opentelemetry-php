@@ -12,9 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
-/**
- * @covers \OpenTelemetry\API\Behavior\LogsMessagesTrait
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Behavior\LogsMessagesTrait::class)]
 class LogsMessagesTraitTest extends TestCase
 {
     use TestState;
@@ -28,9 +26,7 @@ class LogsMessagesTraitTest extends TestCase
         Logging::setLogWriter($this->writer);
     }
 
-    /**
-     * @dataProvider logProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('logProvider')]
     public function test_log(string $method, string $expectedLevel): void
     {
         $instance = $this->createInstance();
@@ -52,10 +48,8 @@ class LogsMessagesTraitTest extends TestCase
         ];
     }
 
-    /**
-     * @testdox Proxies logging methods through to logger
-     * @dataProvider logLevelProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('logLevelProvider')]
+    #[\PHPUnit\Framework\Attributes\TestDox('Proxies logging methods through to logger')]
     public function test_log_methods(string $method, string $expectedLogLevel): void
     {
         $instance = $this->createInstance();
@@ -77,14 +71,12 @@ class LogsMessagesTraitTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider otelLogLevelProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('otelLogLevelProvider')]
     public function test_logging_respects_configured_otel_log_level(string $otelLogLevel, string $method, bool $expected): void
     {
         $this->setEnvironmentVariable('OTEL_LOG_LEVEL', $otelLogLevel);
         $instance = $this->createInstance();
-        if ($expected === true) {
+        if ($expected) {
             $this->writer->expects($this->once())->method('write');
         } else {
             $this->writer->expects($this->never())->method('write');

@@ -16,9 +16,7 @@ use RuntimeException;
 use stdClass;
 use WeakReference;
 
-/**
- * @covers \OpenTelemetry\API\Trace\trace
- */
+#[\PHPUnit\Framework\Attributes\CoversFunction('\OpenTelemetry\API\Trace\trace()')]
 final class TraceTest extends TestCase
 {
     public function test_runs_with_provided_span(): void
@@ -64,7 +62,7 @@ final class TraceTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
 
-        trace(Span::getInvalid(), function (): void {
+        trace(Span::getInvalid(), function (): never {
             throw new RuntimeException();
         });
     }
@@ -76,7 +74,7 @@ final class TraceTest extends TestCase
         $span->expects($this->once())->method('recordException');
 
         try {
-            trace($span, function (): void {
+            trace($span, function (): never {
                 throw new RuntimeException();
             });
         } catch (RuntimeException $e) {
@@ -89,7 +87,7 @@ final class TraceTest extends TestCase
         $span->expects($this->once())->method('end');
 
         try {
-            trace($span, function (): void {
+            trace($span, function (): never {
                 throw new RuntimeException();
             });
         } catch (RuntimeException $e) {
@@ -98,7 +96,7 @@ final class TraceTest extends TestCase
 
     public function test_exception_does_not_leak_closure_reference(): void
     {
-        $c = static function (): void {
+        $c = static function (): never {
             throw new RuntimeException();
         };
         $r = WeakReference::create($c);

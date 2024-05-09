@@ -14,9 +14,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\LogsExporterFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\LogsExporterFactory::class)]
 class LogsExporterFactoryTest extends TestCase
 {
     use TestState;
@@ -40,9 +38,7 @@ class LogsExporterFactoryTest extends TestCase
         $factory->create();
     }
 
-    /**
-     * @dataProvider configProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('configProvider')]
     public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = [], array $expectedValues = []): void
     {
         foreach ($env as $k => $v) {

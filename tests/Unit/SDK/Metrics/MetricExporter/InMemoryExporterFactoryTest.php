@@ -8,9 +8,7 @@ use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporterFactory;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporterFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporterFactory::class)]
 class InMemoryExporterFactoryTest extends TestCase
 {
     public function test_create(): void

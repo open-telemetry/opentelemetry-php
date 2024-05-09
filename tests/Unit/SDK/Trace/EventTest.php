@@ -9,9 +9,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Event;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\Event
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\Event::class)]
 class EventTest extends TestCase
 {
     private const EVENT_NAME = 'test-event';

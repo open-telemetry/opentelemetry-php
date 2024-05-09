@@ -24,9 +24,7 @@ use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor::class)]
 class SimpleSpanProcessorTest extends MockeryTestCase
 {
     private SimpleSpanProcessor $simpleSpanProcessor;

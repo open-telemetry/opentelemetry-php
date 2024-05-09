@@ -10,9 +10,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 
-/**
- * @covers \OpenTelemetry\Context\Propagation\MultiTextMapPropagator
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\Propagation\MultiTextMapPropagator::class)]
 class MultiTextMapPropagatorTest extends MockeryTestCase
 {
     /** @var Mockery\MockInterface&TextMapPropagatorInterface */

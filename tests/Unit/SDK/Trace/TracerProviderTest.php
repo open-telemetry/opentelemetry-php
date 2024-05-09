@@ -9,15 +9,9 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \OpenTelemetry\SDK\Trace\TracerProvider
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\TracerProvider::class)]
 class TracerProviderTest extends TestCase
 {
-    /**
-     * @covers ::getTracer
-     * @covers ::__construct
-     */
     public function test_equal_for_same_name_without_version(): void
     {
         $provider = new TracerProvider(null);
@@ -30,10 +24,6 @@ class TracerProviderTest extends TestCase
         $this->assertNotEquals($t1, $t3);
     }
 
-    /**
-     * @covers ::getTracer
-     * @covers ::__construct
-     */
     public function test_equal_for_same_name_with_version(): void
     {
         $provider = new TracerProvider(null);
@@ -46,11 +36,7 @@ class TracerProviderTest extends TestCase
         $this->assertNotEquals($t1, $t3);
     }
 
-    /**
-     * @covers ::getTracer
-     * @covers ::__construct
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_equal_for_same_name_with_schema_and_version(): void
     {
         $provider = new TracerProvider(null);
@@ -63,10 +49,7 @@ class TracerProviderTest extends TestCase
         $this->assertNotEquals($t1, $t3);
     }
 
-    /**
-     * @covers ::shutdown
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_shutdown(): void
     {
         $provider = new TracerProvider(null);
@@ -76,10 +59,7 @@ class TracerProviderTest extends TestCase
         $this->assertTrue($provider->shutdown());
     }
 
-    /**
-     * @covers ::forceFlush
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_force_flush(): void
     {
         $provider = new TracerProvider([]);
@@ -89,9 +69,6 @@ class TracerProviderTest extends TestCase
         $this->assertTrue($provider->forceFlush());
     }
 
-    /**
-     * @covers ::getSampler
-     */
     public function test_get_sampler(): void
     {
         $sampler = $this->createMock(SamplerInterface::class);
@@ -103,10 +80,7 @@ class TracerProviderTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::getTracer
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_get_tracer_returns_noop_tracer_after_shutdown(): void
     {
         $provider = new TracerProvider([]);

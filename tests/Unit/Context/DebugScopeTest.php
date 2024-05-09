@@ -11,9 +11,8 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\DebugScope;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Context\DebugScope
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\DebugScope::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\Context::class)]
 final class DebugScopeTest extends TestCase
 {
     public function setUp(): void
@@ -28,10 +27,6 @@ final class DebugScopeTest extends TestCase
         restore_error_handler();
     }
 
-    /**
-     * @covers \OpenTelemetry\Context\Context::activate
-     * @covers \OpenTelemetry\Context\Context::debugScopesDisabled
-     */
     public function test_debug_scope_enabled_by_default(): void
     {
         $scope = Context::getCurrent()->activate();
@@ -43,9 +38,6 @@ final class DebugScopeTest extends TestCase
         }
     }
 
-    /**
-     * @covers \OpenTelemetry\Context\Context::activate
-     */
     public function test_disable_debug_scope_using_assertion_mode(): void
     {
         ini_set('zend.assertions', '0');
@@ -59,11 +51,7 @@ final class DebugScopeTest extends TestCase
         }
     }
 
-    /**
-     * @covers \OpenTelemetry\Context\Context::activate
-     * @covers \OpenTelemetry\Context\Context::debugScopesDisabled
-     * @backupGlobals
-     */
+    #[\PHPUnit\Framework\Attributes\BackupGlobals(true)]
     public function test_disable_debug_scope_using_otel_php_debug_scopes_disabled(): void
     {
         $_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED'] = 'true';

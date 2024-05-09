@@ -15,9 +15,7 @@ use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Sdk
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Sdk::class)]
 class SdkTest extends TestCase
 {
     use TestState;
@@ -27,9 +25,7 @@ class SdkTest extends TestCase
         $this->assertFalse(Sdk::isDisabled());
     }
 
-    /**
-     * @dataProvider disabledProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('disabledProvider')]
     public function test_is_disabled(string $value, bool $expected): void
     {
         self::setEnvironmentVariable('OTEL_SDK_DISABLED', $value);
@@ -44,9 +40,7 @@ class SdkTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider instrumentationDisabledProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('instrumentationDisabledProvider')]
     public function test_is_instrumentation_disabled(string $value, string $name, bool $expected): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_DISABLED_INSTRUMENTATIONS, $value);

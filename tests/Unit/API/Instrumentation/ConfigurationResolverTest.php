@@ -8,9 +8,7 @@ use OpenTelemetry\API\Instrumentation\ConfigurationResolver;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Instrumentation\ConfigurationResolver
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Instrumentation\ConfigurationResolver::class)]
 class ConfigurationResolverTest extends TestCase
 {
     use TestState;
@@ -22,9 +20,7 @@ class ConfigurationResolverTest extends TestCase
         $this->resolver = new ConfigurationResolver();
     }
 
-    /**
-     * @dataProvider hasProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('hasProvider')]
     public function test_has(?string $value, bool $expected): void
     {
         $this->assertFalse($this->resolver->has('OTEL_FOO'));
@@ -48,9 +44,7 @@ class ConfigurationResolverTest extends TestCase
         $this->assertSame('bar', $this->resolver->getString('OTEL_FOO'));
     }
 
-    /**
-     * @dataProvider booleanProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('booleanProvider')]
     public function test_get_boolean(?string $value, ?bool $expected): void
     {
         $this->assertFalse($this->resolver->has('OTEL_FOO'));
@@ -69,9 +63,7 @@ class ConfigurationResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider intProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('intProvider')]
     public function test_get_int(?string $value, ?int $expected): void
     {
         $this->assertFalse($this->resolver->has('OTEL_FOO'));
@@ -91,9 +83,7 @@ class ConfigurationResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider listProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('listProvider')]
     public function test_get_list(?string $value, array $expected): void
     {
         $this->assertFalse($this->resolver->has('OTEL_FOO'));

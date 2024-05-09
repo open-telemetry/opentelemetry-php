@@ -11,9 +11,7 @@ use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor::class)]
 class MultiLogRecordProcessorTest extends MockeryTestCase
 {
     private array $processors;
@@ -28,9 +26,7 @@ class MultiLogRecordProcessorTest extends MockeryTestCase
         $this->multi = new MultiLogRecordProcessor($this->processors);
     }
 
-    /**
-     * @dataProvider methodProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('methodProvider')]
     public function test_method_calls_method_on_all_processors(string $method, object $param): void
     {
         //$record = $this->createMock(ReadWriteLogRecord::class);

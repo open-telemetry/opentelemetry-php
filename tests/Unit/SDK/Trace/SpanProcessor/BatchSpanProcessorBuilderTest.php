@@ -10,9 +10,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessorBuilder
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessorBuilder::class)]
 class BatchSpanProcessorBuilderTest extends TestCase
 {
     public function test_build(): void

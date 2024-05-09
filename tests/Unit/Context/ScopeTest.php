@@ -10,9 +10,7 @@ use OpenTelemetry\Context\ContextStorage;
 use OpenTelemetry\Context\ScopeInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Context\ContextStorageNode
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\ContextStorageNode::class)]
 class ScopeTest extends TestCase
 {
     public function test_scope_close_restores_context(): void

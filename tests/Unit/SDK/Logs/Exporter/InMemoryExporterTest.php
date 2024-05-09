@@ -12,9 +12,9 @@ use OpenTelemetry\SDK\Logs\ReadableLogRecord;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter
  * @psalm-suppress UndefinedInterfaceMethod
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter::class)]
 class InMemoryExporterTest extends TestCase
 {
     public function test_export(): void

@@ -9,9 +9,7 @@ use OpenTelemetry\SemConv\ResourceAttributes;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\Detectors\Host
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\Detectors\Host::class)]
 class HostTest extends TestCase
 {
     public function test_host_get_resource(): void
@@ -24,9 +22,7 @@ class HostTest extends TestCase
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
     }
 
-    /**
-     * @dataProvider hostIdData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('hostIdData')]
     public function test_host_id_filesystem(string $os, array $files, ?string $expectedId): void
     {
         $root = vfsStream::setup('/', null, $files);

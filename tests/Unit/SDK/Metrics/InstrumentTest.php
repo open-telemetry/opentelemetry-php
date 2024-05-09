@@ -30,12 +30,14 @@ use PHPUnit\Framework\TestCase;
 use stdClass;
 use WeakMap;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Counter::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\ObservableCounter::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\UpDownCounter::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Histogram::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\ObservableCallback::class)]
 final class InstrumentTest extends TestCase
 {
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\Counter
-     */
     public function test_counter(): void
     {
         $a = new MetricAggregator(null, new SumAggregation(true));
@@ -65,9 +67,6 @@ final class InstrumentTest extends TestCase
         ), $s->collect($r));
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter
-     */
     public function test_asynchronous_counter(): void
     {
         $a = new MetricAggregatorFactory(null, new SumAggregation(true));
@@ -97,9 +96,6 @@ final class InstrumentTest extends TestCase
         ), $s->collect($r));
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter
-     */
     public function test_asynchronous_counter_weaken(): void
     {
         $a = new MetricAggregatorFactory(null, new SumAggregation(true));
@@ -128,9 +124,6 @@ final class InstrumentTest extends TestCase
         ), $s->collect($r));
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\UpDownCounter
-     */
     public function test_up_down_counter(): void
     {
         $a = new MetricAggregator(null, new SumAggregation(false));
@@ -160,9 +153,6 @@ final class InstrumentTest extends TestCase
         ), $s->collect($r));
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\Histogram
-     */
     public function test_histogram(): void
     {
         $a = new MetricAggregator(null, new ExplicitBucketHistogramAggregation([3, 6, 9]));
@@ -200,9 +190,6 @@ final class InstrumentTest extends TestCase
         ), $s->collect($r));
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\ObservableCallback
-     */
     public function test_observable_callback_releases_on_detach(): void
     {
         $writer = $this->createMock(MetricWriterInterface::class);
@@ -214,9 +201,6 @@ final class InstrumentTest extends TestCase
         $callback->detach();
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\ObservableCallback
-     */
     public function test_observable_callback_removes_callback_destructor_token_on_detach(): void
     {
         $writer = $this->createMock(MetricWriterInterface::class);
@@ -231,9 +215,6 @@ final class InstrumentTest extends TestCase
         $this->assertArrayNotHasKey(1, $callbackDestructor->callbackIds);
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\ObservableCallback
-     */
     public function test_observable_callback_acquires_persistent_on_destruct(): void
     {
         $writer = $this->createMock(MetricWriterInterface::class);
@@ -245,9 +226,6 @@ final class InstrumentTest extends TestCase
         new ObservableCallback($writer, $referenceCounter, 1, null, null);
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\ObservableCallback
-     */
     public function test_observable_callback_does_not_acquire_persistent_on_destruct_if_callback_destructor_set(): void
     {
         $writer = $this->createMock(MetricWriterInterface::class);

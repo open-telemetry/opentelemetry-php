@@ -7,9 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Http\Psr\Client\Discovery;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\CurlClient;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\DiscoveryInterface;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\CurlClient
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\CurlClient::class)]
 class CurlClientTest extends AbstractDiscoveryTestCase
 {
     public function getInstance(): DiscoveryInterface

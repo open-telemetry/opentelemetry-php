@@ -30,9 +30,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor::class)]
 class BatchLogRecordProcessorTest extends MockeryTestCase
 {
     private TestClock $testClock;
@@ -77,9 +75,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         }
     }
 
-    /**
-     * @dataProvider scheduledDelayProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('scheduledDelayProvider')]
     public function test_export_scheduled_delay(int $exportDelay, int $advanceByNano, bool $expectedFlush): void
     {
         $batchSize = 2;
@@ -380,7 +376,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
     {
         $exporter = $this->createMock(LogRecordExporterInterface::class);
         $processor = null;
-        $exporter->method('forceFlush')->willReturnCallback(function () use (&$processor) {
+        $exporter->method('forceFlush')->willReturnCallback(function () use (&$processor): never {
             /** @var LogRecordProcessorInterface $processor */
             $record = $this->createMock(ReadWriteLogRecord::class);
             $processor->onEmit($record);

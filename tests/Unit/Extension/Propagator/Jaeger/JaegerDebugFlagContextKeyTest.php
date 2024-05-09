@@ -7,9 +7,7 @@ namespace OpenTelemetry\Tests\Unit\Extension\Propagator\Jaeger;
 use OpenTelemetry\Extension\Propagator\Jaeger\JaegerDebugFlagContextKey;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Extension\Propagator\Jaeger\JaegerDebugFlagContextKey
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Extension\Propagator\Jaeger\JaegerDebugFlagContextKey::class)]
 class JaegerDebugFlagContextKeyTest extends TestCase
 {
     public function test_jaeger_debug_flag_key(): void

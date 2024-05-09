@@ -14,9 +14,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerSharedState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\TracerSharedState
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\TracerSharedState::class)]
 class TracerSharedStateTest extends TestCase
 {
     private IdGeneratorInterface $idGenerator;
@@ -113,7 +111,7 @@ class TracerSharedStateTest extends TestCase
             $this->resourceInfo,
             $this->spanLimits,
             $this->sampler,
-            empty($spanProcessors) ? [new NoopSpanProcessor()] : $spanProcessors,
+            $spanProcessors === [] ? [new NoopSpanProcessor()] : $spanProcessors,
         );
     }
 }

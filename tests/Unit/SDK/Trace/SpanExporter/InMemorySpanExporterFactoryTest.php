@@ -8,9 +8,7 @@ use OpenTelemetry\SDK\Trace\SpanExporter\InMemorySpanExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanExporter\InMemorySpanExporterFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanExporter\InMemorySpanExporterFactory::class)]
 class InMemorySpanExporterFactoryTest extends TestCase
 {
     public function test_create(): void

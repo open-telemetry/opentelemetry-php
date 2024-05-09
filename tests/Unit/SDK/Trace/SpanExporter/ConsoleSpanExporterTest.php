@@ -11,9 +11,9 @@ use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 /**
- * @covers \OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter
  * @psalm-suppress UndefinedInterfaceMethod
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter::class)]
 class ConsoleSpanExporterTest extends AbstractExporterTestCase
 {
     public function createExporter(): ConsoleSpanExporter

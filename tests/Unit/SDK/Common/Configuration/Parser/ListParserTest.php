@@ -6,9 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Parser;
 
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Configuration\Parser\ListParser
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Configuration\Parser\ListParser::class)]
 class ListParserTest extends TestCase
 {
     private const LIST_VALUES = [
@@ -34,9 +32,7 @@ class ListParserTest extends TestCase
         ],
     ];
 
-    /**
-     * @dataProvider listValueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('listValueProvider')]
     public function test_comma_separated_list_returns_array(string $value, array $expected): void
     {
         $this->assertSame(

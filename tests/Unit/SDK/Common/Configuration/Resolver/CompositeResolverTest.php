@@ -11,9 +11,9 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Common\Configuration\Resolver\CompositeResolver
  * @psalm-suppress UndefinedInterfaceMethod
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Configuration\Resolver\CompositeResolver::class)]
 class CompositeResolverTest extends TestCase
 {
     private ResolverInterface $one;
@@ -71,9 +71,7 @@ class CompositeResolverTest extends TestCase
         $this->assertSame('foo', $this->resolver->resolve(Variables::OTEL_EXPORTER_OTLP_PROTOCOL, 'foo'));
     }
 
-    /**
-     * @dataProvider emptyProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('emptyProvider')]
     public function test_resolve_uses_library_default_when_empty(?string $value): void
     {
         $this->one->method('hasVariable')->willReturn(false);

@@ -22,9 +22,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\MetricConverter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\MetricConverter::class)]
 final class MetricConverterTest extends TestCase
 {
     public function test_empty_batch_returns_empty_request(): void

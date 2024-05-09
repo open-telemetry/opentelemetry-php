@@ -10,17 +10,15 @@ use OpenTelemetry\SDK\Logs\ExporterFactory;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\ExporterFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\ExporterFactory::class)]
 class ExporterFactoryTest extends TestCase
 {
     use TestState;
 
     /**
-     * @dataProvider exporterProvider
      * @param class-string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('exporterProvider')]
     public function test_create(string $name, string $expected): void
     {
         $this->setEnvironmentVariable('OTEL_LOGS_EXPORTER', $name);

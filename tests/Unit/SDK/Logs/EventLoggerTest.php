@@ -15,9 +15,7 @@ use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\EventLogger
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\EventLogger::class)]
 class EventLoggerTest extends TestCase
 {
     private LoggerInterface&MockObject $logger;

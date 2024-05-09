@@ -14,9 +14,7 @@ use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry::class)]
 final class CriteriaViewRegistryTest extends TestCase
 {
     public function test_empty_registry_returns_null(): void

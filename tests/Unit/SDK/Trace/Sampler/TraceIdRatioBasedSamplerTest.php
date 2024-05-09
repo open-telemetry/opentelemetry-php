@@ -10,17 +10,12 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler
- */
+#[CoversClass(TraceIdRatioBasedSampler::class)]
 class TraceIdRatioBasedSamplerTest extends TestCase
 {
-    /**
-     * @covers ::__construct
-     * @covers ::shouldSample
-     */
     public function test_should_sample(): void
     {
         $sampler = new TraceIdRatioBasedSampler(1.0);
@@ -35,10 +30,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLE, $decision->getDecision());
     }
 
-    /**
-     * @covers ::__construct
-     * @dataProvider invalidProbabilityProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidProbabilityProvider')]
     public function test_invalid_probability_trace_id_ratio_based_sampler(float $probability): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -53,9 +45,6 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         ];
     }
 
-    /**
-     * @covers ::getDescription
-     */
     public function test_get_description(): void
     {
         $sampler = new TraceIdRatioBasedSampler(0.0001);

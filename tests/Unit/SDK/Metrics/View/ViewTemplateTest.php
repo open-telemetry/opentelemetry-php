@@ -11,9 +11,7 @@ use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\View\ViewTemplate
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\View\ViewTemplate::class)]
 final class ViewTemplateTest extends TestCase
 {
     public function test_empty_template_returns_instrument_defaults(): void

@@ -10,9 +10,7 @@ use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerSharedState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\Tracer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\Tracer::class)]
 class TracerTest extends TestCase
 {
     private Tracer $tracer;
@@ -27,10 +25,10 @@ class TracerTest extends TestCase
     }
 
     /**
-     * @dataProvider nameProvider
      * @param non-empty-string $name
-     * @group trace-compliance
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('nameProvider')]
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_span_builder(string $name, string $expected): void
     {
         $spanBuilder = $this->tracer->spanBuilder($name);

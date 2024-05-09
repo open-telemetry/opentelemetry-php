@@ -8,14 +8,10 @@ use OpenTelemetry\API\Logs\Map\Psr3;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
-/**
- * @covers \OpenTelemetry\API\Logs\Map\Psr3
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Logs\Map\Psr3::class)]
 class Psr3Test extends TestCase
 {
-    /**
-     * @dataProvider levelProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('levelProvider')]
     public function test_severity_number(string $level): void
     {
         $this->assertNotNull(Psr3::severityNumber($level));

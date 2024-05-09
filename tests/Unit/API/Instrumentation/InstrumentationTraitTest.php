@@ -19,9 +19,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 
-/**
- * @covers \OpenTelemetry\API\Instrumentation\InstrumentationTrait
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Instrumentation\InstrumentationTrait::class)]
 class InstrumentationTraitTest extends TestCase
 {
     public const INSTRUMENTATION_NAME = 'test-instrumentation';

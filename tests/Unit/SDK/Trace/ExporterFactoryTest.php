@@ -13,9 +13,7 @@ use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\ExporterFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\ExporterFactory::class)]
 class ExporterFactoryTest extends TestCase
 {
     use TestState;
@@ -25,9 +23,7 @@ class ExporterFactoryTest extends TestCase
         Psr18ClientDiscovery::prependStrategy(MockClientStrategy::class);
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_accepts_none_exporter_env_var(): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', 'none');
@@ -36,10 +32,10 @@ class ExporterFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider envProvider
      * @psalm-param class-string $expected
-     * @group trace-compliance
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('envProvider')]
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_create_from_environment(string $exporter, array $env, string $expected): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', $exporter);
@@ -84,10 +80,8 @@ class ExporterFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidEnvProvider
-     * @group trace-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidEnvProvider')]
+    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
     public function test_throws_exception_for_invalid_or_unsupported_exporter_configs(string $exporter, array $env = []): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', $exporter);

@@ -10,9 +10,7 @@ use OpenTelemetry\API\Baggage\Propagation\Parser;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Baggage\Propagation\Parser
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Baggage\Propagation\Parser::class)]
 class ParserTest extends TestCase
 {
     /** @var BaggageBuilderInterface&MockObject */
@@ -30,9 +28,7 @@ class ParserTest extends TestCase
         $parser->parseInto($this->builder);
     }
 
-    /**
-     * @dataProvider headerProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('headerProvider')]
     public function test_parse_into(string $header): void
     {
         $parser = new Parser($header);
@@ -77,9 +73,7 @@ class ParserTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider invalidHeaderProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidHeaderProvider')]
     public function test_parse_into_with_invalid_header(string $header): void
     {
         $parser = new Parser($header);

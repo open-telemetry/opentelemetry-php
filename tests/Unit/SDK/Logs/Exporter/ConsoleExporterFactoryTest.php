@@ -8,9 +8,7 @@ use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory::class)]
 class ConsoleExporterFactoryTest extends TestCase
 {
     public function test_create(): void

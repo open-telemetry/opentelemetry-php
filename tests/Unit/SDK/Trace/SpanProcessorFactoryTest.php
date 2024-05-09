@@ -13,17 +13,15 @@ use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanProcessorFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanProcessorFactory::class)]
 class SpanProcessorFactoryTest extends TestCase
 {
     use TestState;
 
     /**
-     * @dataProvider processorProvider
      * @psalm-suppress ArgumentTypeCoercion
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('processorProvider')]
     public function test_span_processor_factory_create_span_processor_from_environment(string $processorName, string $expected): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_TRACES_PROCESSOR', $processorName);

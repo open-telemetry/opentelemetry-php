@@ -14,9 +14,7 @@ use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-/**
- * @covers \OpenTelemetry\API\Behavior\Internal\LogWriterFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Behavior\Internal\LogWriterFactory::class)]
 class LogWriterFactoryTest extends TestCase
 {
     use TestState;
@@ -27,9 +25,9 @@ class LogWriterFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider logDestinationProvider
      * @psalm-suppress ArgumentTypeCoercion
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('logDestinationProvider')]
     public function test_log_destination_from_env(string $value, string $expected): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_LOG_DESTINATION', $value);

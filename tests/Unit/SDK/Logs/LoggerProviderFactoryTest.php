@@ -8,9 +8,7 @@ use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Logs\LoggerProviderFactory;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\LoggerProviderFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\LoggerProviderFactory::class)]
 class LoggerProviderFactoryTest extends TestCase
 {
     public function test_create(): void

@@ -9,9 +9,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Link;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\Link
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\Link::class)]
 class LinkTest extends TestCase
 {
     private API\SpanContextInterface $context;

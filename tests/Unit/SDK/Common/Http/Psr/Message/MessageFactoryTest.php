@@ -13,9 +13,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Http\Psr\Message\MessageFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Http\Psr\Message\MessageFactory::class)]
 class MessageFactoryTest extends TestCase
 {
     use UsesRequestFactoryTrait;

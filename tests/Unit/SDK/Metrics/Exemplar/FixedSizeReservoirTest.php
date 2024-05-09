@@ -10,9 +10,7 @@ use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir::class)]
 final class FixedSizeReservoirTest extends TestCase
 {
     public function test_reservoir_returns_exemplars(): void

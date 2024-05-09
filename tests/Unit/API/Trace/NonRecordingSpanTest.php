@@ -10,9 +10,7 @@ use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Trace\NonRecordingSpan
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Trace\NonRecordingSpan::class)]
 class NonRecordingSpanTest extends TestCase
 {
     private ?SpanContextInterface $context = null;

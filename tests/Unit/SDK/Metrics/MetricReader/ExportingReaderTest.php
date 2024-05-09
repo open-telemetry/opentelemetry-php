@@ -26,9 +26,7 @@ use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader::class)]
 final class ExportingReaderTest extends TestCase
 {
     public function test_empty_reader_collects_empty_metrics(): void

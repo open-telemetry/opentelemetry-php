@@ -9,9 +9,7 @@ use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\Detectors\Constant
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\Detectors\Constant::class)]
 class ConstantTest extends TestCase
 {
     public function test_constant_get_resource_with_empty_resource(): void

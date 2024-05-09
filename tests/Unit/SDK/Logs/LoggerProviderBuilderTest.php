@@ -10,9 +10,7 @@ use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\LoggerProviderBuilder
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\LoggerProviderBuilder::class)]
 class LoggerProviderBuilderTest extends TestCase
 {
     public function test_builder(): void

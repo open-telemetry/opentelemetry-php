@@ -9,14 +9,10 @@ use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SamplingResult
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SamplingResult::class)]
 class SamplingResultTest extends TestCase
 {
-    /**
-     * @dataProvider provideAttributesAndLinks
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideAttributesAndLinks')]
     public function test_attributes_and_links_getters($attributes, $traceState): void
     {
         $result = new SamplingResult(SamplingResult::DROP, $attributes, $traceState);

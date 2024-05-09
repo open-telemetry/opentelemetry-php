@@ -7,9 +7,7 @@ namespace OpenTelemetry\Tests\Unit\API\Trace\Propagation;
 use OpenTelemetry\API\Trace\Propagation\TraceContextValidator;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Trace\Propagation\TraceContextValidator
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Trace\Propagation\TraceContextValidator::class)]
 class TraceContextValidatorTest extends TestCase
 {
     private const INVALID_TRACE_FLAG = 'f';

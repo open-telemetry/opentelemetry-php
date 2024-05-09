@@ -18,9 +18,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use PHPUnit\Framework\TestCase;
 use function stream_get_contents;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\MetricExporter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\MetricExporter::class)]
 final class MetricExporterTest extends TestCase
 {
     private $stream;

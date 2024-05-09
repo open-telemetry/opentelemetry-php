@@ -9,10 +9,8 @@ use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\ErrorFuture;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Future\CompletedFuture
- * @covers \OpenTelemetry\SDK\Common\Future\ErrorFuture
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Future\CompletedFuture::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Future\ErrorFuture::class)]
 final class FutureTest extends TestCase
 {
     public function test_future_await(): void
@@ -22,7 +20,7 @@ final class FutureTest extends TestCase
         $this->assertSame(2, $future->await());
     }
 
-    public function test_future_await_error(): void
+    public function test_future_await_error(): never
     {
         $future = new ErrorFuture(new Exception());
 
@@ -41,7 +39,7 @@ final class FutureTest extends TestCase
     public function test_future_map_throw_is_rethrown_on_wait(): void
     {
         $future = new CompletedFuture(2);
-        $future = $future->map(function () {
+        $future = $future->map(function (): never {
             throw new Exception();
         });
 
@@ -52,7 +50,7 @@ final class FutureTest extends TestCase
     public function test_future_map_error_is_noop(): void
     {
         $future = new ErrorFuture(new Exception());
-        $future = $future->map(function (): void {
+        $future = $future->map(function (): never {
             $this->fail();
         });
 
@@ -72,7 +70,7 @@ final class FutureTest extends TestCase
     public function test_future_catch_throw_is_rethrown_on_wait(): void
     {
         $future = new ErrorFuture(new Exception());
-        $future = $future->catch(function () {
+        $future = $future->catch(function (): never {
             throw new Exception('from catch');
         });
 
@@ -84,7 +82,7 @@ final class FutureTest extends TestCase
     public function test_future_catch_no_error_is_noop(): void
     {
         $future = new CompletedFuture(2);
-        $future = $future->catch(function (): void {
+        $future = $future->catch(function (): never {
             $this->fail();
         });
 

@@ -10,9 +10,7 @@ use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
 use OpenTelemetry\Context\Context;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Baggage\Propagation\BaggagePropagator
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Baggage\Propagation\BaggagePropagator::class)]
 class BaggagePropagatorTest extends TestCase
 {
     public function test_fields(): void
@@ -84,7 +82,7 @@ class BaggagePropagatorTest extends TestCase
         );
     }
 
-    /** @dataProvider headerProvider */
+    #[\PHPUnit\Framework\Attributes\DataProvider('headerProvider')]
     public function test_extract(string $header, Baggage $expectedBaggage): void
     {
         $propagator = BaggagePropagator::getInstance();

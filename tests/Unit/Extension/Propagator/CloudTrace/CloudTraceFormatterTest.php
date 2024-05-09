@@ -10,15 +10,11 @@ use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\Extension\Propagator\CloudTrace\CloudTraceFormatter;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Extension\Propagator\CloudTrace\CloudTraceFormatter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Extension\Propagator\CloudTrace\CloudTraceFormatter::class)]
 class CloudTraceFormatterTest extends TestCase
 {
 
-    /**
-     * @dataProvider for_test_deserialize
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('for_test_deserialize')]
     public function test_deserialize(string $header, string $traceId, string $spanId, int $sample) : void
     {
         $result = CloudTraceFormatter::deserialize($header);
@@ -35,9 +31,7 @@ class CloudTraceFormatterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider for_test_serialize
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('for_test_serialize')]
     public function test_serialize(SpanContextInterface $span, string $header) : void
     {
         $result = CloudTraceFormatter::serialize($span);

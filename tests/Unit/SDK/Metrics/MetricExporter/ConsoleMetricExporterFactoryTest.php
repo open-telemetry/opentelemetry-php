@@ -8,9 +8,7 @@ use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporterFactory;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporterFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporterFactory::class)]
 class ConsoleMetricExporterFactoryTest extends TestCase
 {
     public function test_create(): void

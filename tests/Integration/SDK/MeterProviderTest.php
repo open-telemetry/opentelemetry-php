@@ -30,9 +30,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversNothing
- */
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 final class MeterProviderTest extends TestCase
 {
     use TestState;

@@ -7,9 +7,7 @@ namespace OpenTelemetry\Tests\Unit\API\Behavior\Internal;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\Formatter;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Behavior\Internal\LogWriter\Formatter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Behavior\Internal\LogWriter\Formatter::class)]
 class FormatterTest extends TestCase
 {
     public function test_no_exception_contains_code_location(): void

@@ -9,10 +9,8 @@ use PHPUnit\Framework\TestCase;
 use stdClass;
 use WeakReference;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandler
- * @covers \OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandler::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory::class)]
 final class ImmediateStalenessHandlerTest extends TestCase
 {
     public function test_on_stale(): void

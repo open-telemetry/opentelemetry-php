@@ -10,10 +10,8 @@ use PHPUnit\Framework\TestCase;
 use stdClass;
 use WeakReference;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\StalenessHandler\DelayedStalenessHandler
- * @covers \OpenTelemetry\SDK\Metrics\StalenessHandler\DelayedStalenessHandlerFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\StalenessHandler\DelayedStalenessHandler::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\StalenessHandler\DelayedStalenessHandlerFactory::class)]
 final class DelayedStalenessHandlerTest extends TestCase
 {
     public function test_on_stale(): void

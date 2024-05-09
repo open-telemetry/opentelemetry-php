@@ -17,9 +17,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function stream_get_contents;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\SpanExporter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\SpanExporter::class)]
 class SpanExporterTest extends TestCase
 {
     private MockObject $transport;

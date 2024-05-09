@@ -8,9 +8,7 @@ use Exception;
 use OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter::class)]
 class LoggerExporterTest extends TestCase
 {
     use LoggerAwareTestTrait;

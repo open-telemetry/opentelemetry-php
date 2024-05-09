@@ -15,9 +15,9 @@ use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Logs\Logger
  * @psalm-suppress UndefinedInterfaceMethod
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Logger::class)]
 class LoggerTest extends TestCase
 {
     private LoggerSharedState $sharedState;

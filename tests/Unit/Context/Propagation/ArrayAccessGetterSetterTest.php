@@ -10,9 +10,7 @@ use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-/**
- * @covers \OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter::class)]
 class ArrayAccessGetterSetterTest extends TestCase
 {
     public function test_get_from_map_array(): void

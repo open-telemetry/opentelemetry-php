@@ -12,14 +12,11 @@ use OpenTelemetry\SDK\Metrics\Stream\DeltaStorage;
 use OpenTelemetry\SDK\Metrics\Stream\Metric;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\Stream\DeltaStorage
- * @covers \OpenTelemetry\SDK\Metrics\Stream\Delta
- * @covers \OpenTelemetry\SDK\Metrics\Stream\Metric
- *
- * @uses \OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation
- * @uses \OpenTelemetry\SDK\Metrics\Aggregation\SumSummary
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Stream\DeltaStorage::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Stream\Delta::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Stream\Metric::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Metrics\Aggregation\SumSummary::class)]
 final class DeltaStorageTest extends TestCase
 {
     public function test_empty_storage_returns_empty_metrics(): void

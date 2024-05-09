@@ -11,14 +11,10 @@ use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter::class)]
 class InMemoryExporterTest extends TestCase
 {
-    /**
-     * @dataProvider provideSpans
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideSpans')]
     public function test_export(iterable $spans): void
     {
         $instance = new InMemoryExporter();

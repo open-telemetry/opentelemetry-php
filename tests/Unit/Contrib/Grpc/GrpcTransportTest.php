@@ -10,9 +10,7 @@ use OpenTelemetry\Contrib\Grpc\GrpcTransport;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Contrib\Grpc\GrpcTransport
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Grpc\GrpcTransport::class)]
 final class GrpcTransportTest extends TestCase
 {
     private GrpcTransport $transport;

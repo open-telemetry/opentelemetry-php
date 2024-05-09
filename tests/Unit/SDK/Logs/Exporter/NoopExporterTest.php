@@ -7,9 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Logs\Exporter;
 use OpenTelemetry\SDK\Logs\Exporter\NoopExporter;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\Exporter\NoopExporter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Exporter\NoopExporter::class)]
 class NoopExporterTest extends TestCase
 {
     private NoopExporter $exporter;

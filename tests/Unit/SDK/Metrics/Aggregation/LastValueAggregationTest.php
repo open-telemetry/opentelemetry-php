@@ -13,10 +13,8 @@ use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\Aggregation\LastValueAggregation
- * @covers \OpenTelemetry\SDK\Metrics\Aggregation\LastValueSummary
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Aggregation\LastValueAggregation::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Aggregation\LastValueSummary::class)]
 final class LastValueAggregationTest extends TestCase
 {
     public function test_initialize(): void

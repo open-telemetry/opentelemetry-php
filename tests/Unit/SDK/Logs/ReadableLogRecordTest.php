@@ -14,9 +14,7 @@ use OpenTelemetry\SDK\Logs\ReadableLogRecord;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\ReadableLogRecord
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\ReadableLogRecord::class)]
 class ReadableLogRecordTest extends TestCase
 {
     private InstrumentationScopeInterface $scope;
@@ -58,9 +56,7 @@ class ReadableLogRecordTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $record->getAttributes()->toArray());
     }
 
-    /**
-     * @group logs-compliance
-     */
+    #[\PHPUnit\Framework\Attributes\Group('logs-compliance')]
     public function test_log_record_can_accept_complex_attributes(): void
     {
         $homogeneous = [1,2,3,4,5];

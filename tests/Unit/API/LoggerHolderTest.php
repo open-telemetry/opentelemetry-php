@@ -9,9 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-/**
- * @covers \OpenTelemetry\API\LoggerHolder
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\LoggerHolder::class)]
 class LoggerHolderTest extends TestCase
 {
     public function setUp(): void

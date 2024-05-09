@@ -9,9 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use ValueError;
 
-/**
- * @covers \OpenTelemetry\API\Logs\Severity
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Logs\Severity::class)]
 class SeverityTest extends TestCase
 {
     public function test_value_error(): void
@@ -20,9 +18,7 @@ class SeverityTest extends TestCase
         Severity::fromPsr3('unknown');
     }
 
-    /**
-     * @dataProvider levelProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('levelProvider')]
     public function test_severity_number(string $level): void
     {
         $this->assertNotNull(Severity::fromPsr3($level));

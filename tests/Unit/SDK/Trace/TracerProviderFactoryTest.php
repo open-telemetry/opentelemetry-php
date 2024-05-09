@@ -15,9 +15,7 @@ use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\TracerProviderFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\TracerProviderFactory::class)]
 class TracerProviderFactoryTest extends TestCase
 {
     use TestState;

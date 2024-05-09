@@ -8,9 +8,7 @@ use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\NullSpanConverter;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanExporter\NullSpanConverter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanExporter\NullSpanConverter::class)]
 class NullSpanConverterTest extends TestCase
 {
     public function test_convert(): void

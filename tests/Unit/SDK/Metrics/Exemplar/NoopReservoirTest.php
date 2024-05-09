@@ -9,9 +9,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Metrics\Exemplar\NoopReservoir;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\Exemplar\NoopReservoir
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Exemplar\NoopReservoir::class)]
 final class NoopReservoirTest extends TestCase
 {
     public function test_reservoir_does_not_return_exemplars(): void

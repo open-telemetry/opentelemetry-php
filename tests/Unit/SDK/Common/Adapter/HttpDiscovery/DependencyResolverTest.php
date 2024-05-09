@@ -21,9 +21,7 @@ use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use ReflectionClass;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\DependencyResolver
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\DependencyResolver::class)]
 class DependencyResolverTest extends TestCase
 {
     private const DEPENDENCIES = [
@@ -48,9 +46,7 @@ class DependencyResolverTest extends TestCase
         PsrClientResolverInterface::class => ['Client', 'PsrClient'],
     ];
 
-    /**
-     * @dataProvider provideDependencies
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideDependencies')]
     public function test_resolve(string $method, object $dependency, array $arguments): void
     {
         $instance = DependencyResolver::create(...$arguments);

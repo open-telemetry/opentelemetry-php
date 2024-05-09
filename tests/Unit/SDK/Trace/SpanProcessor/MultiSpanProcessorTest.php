@@ -12,9 +12,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor::class)]
 class MultiSpanProcessorTest extends TestCase
 {
     private array $spanProcessors = [];
@@ -142,11 +140,11 @@ class MultiSpanProcessorTest extends TestCase
 
     private function getSpanProcessors(): array
     {
-        return !empty($this->spanProcessors)
-            ? $this->spanProcessors
-            : $this->spanProcessors = [
+        return $this->spanProcessors === []
+            ? $this->spanProcessors = [
                 $this->createMock(SpanProcessorInterface::class),
                 $this->createMock(SpanProcessorInterface::class),
-            ];
+            ]
+            : $this->spanProcessors;
     }
 }

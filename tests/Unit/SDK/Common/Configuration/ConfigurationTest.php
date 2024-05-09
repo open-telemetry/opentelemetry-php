@@ -15,9 +15,7 @@ use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Configuration\Configuration
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Configuration\Configuration::class)]
 class ConfigurationTest extends TestCase
 {
     use TestState;
@@ -132,8 +130,8 @@ class ConfigurationTest extends TestCase
 
     /**
      * The SDK MUST interpret an empty value of an environment variable the same way as when the variable is unset
-     * @dataProvider emptyProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('emptyProvider')]
     public function test_string_uses_default_when_empty_value(?string $input): void
     {
         $this->setEnvironmentVariable('OTEL_FOO', $input);
@@ -141,9 +139,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame('bar', $value);
     }
 
-    /**
-     * @dataProvider emptyProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('emptyProvider')]
     public function test_int_uses_default_when_empty_value(?string $input): void
     {
         $this->setEnvironmentVariable('OTEL_FOO', $input);
@@ -151,9 +147,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame(99, $value);
     }
 
-    /**
-     * @dataProvider emptyProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('emptyProvider')]
     public function test_bool_uses_default_when_empty_value(?string $input): void
     {
         $this->setEnvironmentVariable('OTEL_FOO', $input);
@@ -169,9 +163,7 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider booleanProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('booleanProvider')]
     public function test_bool_get(string $input, bool $default, bool $expected): void
     {
         $this->setEnvironmentVariable('OTEL_BOOL', $input);
@@ -212,9 +204,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame(0.5, Configuration::getRatio('OTEL_RATIO'));
     }
 
-    /**
-     * @dataProvider userEnvValueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('userEnvValueProvider')]
     public function test_return_user_env_vars(string $methodName, string $variable, string $value, $result): void
     {
         $this->setEnvironmentVariable($variable, $value);
@@ -225,9 +215,7 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider userValueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('userValueProvider')]
     public function test_return_user_default_value(string $methodName, string $variable, $defaultValue, $result): void
     {
         $this->assertSame(
@@ -236,9 +224,7 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider libraryDefaultValueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('libraryDefaultValueProvider')]
     public function test_return_library_default_value(string $methodName, string $variable, $result): void
     {
         $this->assertSame(
@@ -247,9 +233,7 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider nonEmptyMethodNameProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('nonEmptyMethodNameProvider')]
     public function test_no_value_throws_exception(string $methodName): void
     {
         $this->expectException(UnexpectedValueException::class);
@@ -257,9 +241,7 @@ class ConfigurationTest extends TestCase
         call_user_func([Configuration::class, $methodName], 'FOO_BAR_' . $methodName);
     }
 
-    /**
-     * @dataProvider invalidTypeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidTypeProvider')]
     public function test_invalid_type_throws_exception(string $methodName, string $variable): void
     {
         $this->expectException(UnexpectedValueException::class);
@@ -267,9 +249,7 @@ class ConfigurationTest extends TestCase
         call_user_func([Configuration::class, $methodName], $variable);
     }
 
-    /**
-     * @dataProvider noDefaultProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('noDefaultProvider')]
     public function test_null_result_throws_exception(string $methodName, string $variable): void
     {
         $this->expectException(UnexpectedValueException::class);
@@ -364,9 +344,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame(0.0, $value);
     }
 
-    /**
-     * @dataProvider knownValuesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('knownValuesProvider')]
     public function test_get_known_values(string $varName, array $varValue): void
     {
         $this->assertSame(
@@ -395,9 +373,7 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider typeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('typeProvider')]
     public function test_get_type(string $varName, string $type): void
     {
         $this->assertSame(
@@ -419,9 +395,7 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider defaultValueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('defaultValueProvider')]
     public function test_get_default_value_with_empty_var(string $varName, $varValue): void
     {
         $this->setEnvironmentVariable($varName, '');
@@ -432,9 +406,7 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider defaultValueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('defaultValueProvider')]
     public function test_get_default_value(string $varName, $varValue): void
     {
         $this->assertSame(
@@ -448,9 +420,7 @@ class ConfigurationTest extends TestCase
         return self::DEFAULT_VALUES;
     }
 
-    /**
-     * @dataProvider nonStringProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('nonStringProvider')]
     public function test_get_non_string_value(string $method, $value): void
     {
         $_SERVER['OTEL_FOO'] = $value;

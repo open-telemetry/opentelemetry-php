@@ -34,9 +34,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor::class)]
 class BatchSpanProcessorTest extends MockeryTestCase
 {
     private TestClock $testClock;
@@ -82,9 +80,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
-    /**
-     * @dataProvider scheduledDelayProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('scheduledDelayProvider')]
     public function test_export_scheduled_delay(int $exportDelay, int $advanceByNano, bool $expectedFlush): void
     {
         $batchSize = 2;
@@ -433,7 +429,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
     {
         $processor = null;
         $exporter = $this->createMock(SpanExporterInterface::class);
-        $exporter->method('forceFlush')->willReturnCallback(function () use (&$processor) {
+        $exporter->method('forceFlush')->willReturnCallback(function () use (&$processor): never {
             /** @var SpanProcessorInterface $processor */
             $span = $this->createSampledSpanMock();
             $processor->onStart($span, Context::getCurrent());
@@ -455,9 +451,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $processor->forceFlush();
     }
 
-    /**
-     * @requires PHP >= 8.0
-     */
     public function test_self_diagnostics(): void
     {
         $clock = new TestClock();
