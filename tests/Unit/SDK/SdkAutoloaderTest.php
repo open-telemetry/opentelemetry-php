@@ -174,7 +174,7 @@ class SdkAutoloaderTest extends TestCase
         $this->assertTrue(SdkAutoloader::autoload());
         //SDK is configured, but globals have not been initialized yet, so we can add more initializers
         $propagator = $this->createMock(TextMapPropagatorInterface::class);
-        Globals::registerInitializer(function(Configurator $configurator) use ($propagator) {
+        Globals::registerInitializer(function (Configurator $configurator) use ($propagator) {
             return $configurator->withPropagator($propagator);
         });
 
