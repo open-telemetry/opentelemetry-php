@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
@@ -101,19 +100,5 @@ class SdkTest extends TestCase
         $this->assertSame($this->tracerProvider, $sdk->getTracerProvider());
         $this->assertSame($this->loggerProvider, $sdk->getLoggerProvider());
         $this->assertSame($this->eventLoggerProvider, $sdk->getEventLoggerProvider());
-    }
-
-    public function test_register_global(): void
-    {
-        $sdk = new Sdk($this->tracerProvider, $this->meterProvider, $this->loggerProvider, $this->eventLoggerProvider, $this->propagator);
-        $scope = $sdk->registerGlobal();
-
-        $this->assertSame($this->meterProvider, Globals::meterProvider());
-        $this->assertSame($this->propagator, Globals::propagator());
-        $this->assertSame($this->tracerProvider, Globals::tracerProvider());
-        $this->assertSame($this->loggerProvider, Globals::loggerProvider());
-        $this->assertSame($this->eventLoggerProvider, Globals::eventLoggerProvider());
-
-        $scope->detach();
     }
 }

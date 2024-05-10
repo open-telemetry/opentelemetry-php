@@ -38,7 +38,16 @@ class SdkAutoloader
         }
         $sdk = null;
         if (Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)) {
-            $sdk = self::createAndRegisterFileBasedSdk();
+            $sdk = self::createSdkFromFileConfig();
+            Globals::registerInitializer(function (Configurator $configurator) use ($sdk) {
+                return $configurator
+                    ->withTracerProvider($sdk->getTracerProvider())
+                    ->withMeterProvider($sdk->getMeterProvider())
+                    ->withLoggerProvider($sdk->getLoggerProvider())
+                    ->withPropagator($sdk->getPropagator())
+                    ->withEventLoggerProvider($sdk->getEventLoggerProvider())
+                ;
+            });
         } else {
             Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
         }
@@ -47,7 +56,7 @@ class SdkAutoloader
         return true;
     }
 
-    public static function environmentBasedInitializer(Configurator $configurator): Configurator
+    private static function environmentBasedInitializer(Configurator $configurator): Configurator
     {
         $propagator = (new PropagatorFactory())->create();
         if (Sdk::isDisabled()) {
@@ -82,17 +91,15 @@ class SdkAutoloader
         ;
     }
 
-    public static function createAndRegisterFileBasedSdk(): Sdk
+    private static function createSdkFromFileConfig(): Sdk
     {
         $file = Configuration::getString(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE);
         $config = SdkConfiguration::parseFile($file);
-        $sdk = $config
+
+        return $config
             ->create()
             ->setAutoShutdown(true)
             ->build();
-        $sdk->registerGlobal();
-
-        return $sdk;
     }
 
     /**

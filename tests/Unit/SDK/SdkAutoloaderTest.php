@@ -6,12 +6,14 @@ namespace OpenTelemetry\Tests\Unit\SDK;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\SdkAutoloader;
 use PHPUnit\Framework\TestCase;
@@ -159,5 +161,23 @@ class SdkAutoloaderTest extends TestCase
         $this->assertTrue(SdkAutoloader::autoload());
         //@todo should file-based config create no-op instances for not-provided config?
         $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
+    }
+
+    /**
+     * Tests the scenario where the SDK is created from config file, but a custom component
+     * uses composer's autoload->files to add its own initializer
+     */
+    public function test_autoload_with_late_globals_initializer(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk.yaml');
+        $this->assertTrue(SdkAutoloader::autoload());
+        //SDK is configured, but globals have not been initialized yet, so we can add more initializers
+        $propagator = $this->createMock(TextMapPropagatorInterface::class);
+        Globals::registerInitializer(function(Configurator $configurator) use ($propagator) {
+            return $configurator->withPropagator($propagator);
+        });
+
+        $this->assertSame($propagator, Globals::propagator());
     }
 }
