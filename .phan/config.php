@@ -375,7 +375,6 @@ return [
         'vendor/guzzlehttp',
         'vendor/psr',
         'vendor/php-http',
-        'vendor/phan/phan/src/Phan',
         'vendor/phpunit/phpunit/src',
         'vendor/google/protobuf/src',
     ],
