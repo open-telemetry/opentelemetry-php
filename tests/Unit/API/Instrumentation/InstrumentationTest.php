@@ -140,7 +140,7 @@ final class InstrumentationTest extends TestCase
         };
         Globals::registerInitializer($closure);
         $this->assertFalse($called);
-        Globals::init();
+        Globals::propagator();
         $this->assertTrue($called); //@phpstan-ignore-line
     }
 
@@ -155,6 +155,6 @@ final class InstrumentationTest extends TestCase
             $this->anything(),
             $this->anything(),
         );
-        Globals::init();
+        Globals::propagator();
     }
 }

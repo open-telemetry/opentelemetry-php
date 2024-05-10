@@ -74,13 +74,6 @@ final class Globals
         self::$initializers[] = $initializer;
     }
 
-    public static function init(): void
-    {
-        if (self::$globals === null) {
-            self::globals();
-        }
-    }
-
     /**
      * @phan-suppress PhanTypeMismatchReturnNullable
      */
