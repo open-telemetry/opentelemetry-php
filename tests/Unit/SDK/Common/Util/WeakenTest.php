@@ -7,14 +7,11 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Util;
 use Closure;
 use function OpenTelemetry\SDK\Common\Util\closure;
 use function OpenTelemetry\SDK\Common\Util\weaken;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\TestCase;
 use WeakReference;
 
-/**
- * @todo configure phpunit coverage with attributes
- */
-#[CoversNothing]
+#[CoversFunction('\OpenTelemetry\SDK\Common\Util\weaken')]
 final class WeakenTest extends TestCase
 {
     public function test_weakened_closure_calls_original_closure(): void
