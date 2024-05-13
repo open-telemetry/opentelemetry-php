@@ -17,7 +17,9 @@ final class Service implements ResourceDetectorInterface
 {
     public function getResource(): ResourceInfo
     {
-        $attributes[ResourceAttributes::SERVICE_INSTANCE_ID] = Uuid::uuid4()->toString();
+        $attributes = [
+            ResourceAttributes::SERVICE_INSTANCE_ID => Uuid::uuid4()->toString(),
+        ];
 
         return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
     }
