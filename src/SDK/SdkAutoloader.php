@@ -6,13 +6,11 @@ namespace OpenTelemetry\SDK;
 
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Globals;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
 use OpenTelemetry\Config\SDK\Instrumentation;
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
@@ -36,22 +34,12 @@ class SdkAutoloader
         if (!self::isEnabled() || self::isExcludedUrl()) {
             return false;
         }
-        $sdk = null;
         if (Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)) {
-            $sdk = self::createSdkFromFileConfig();
-            Globals::registerInitializer(function (Configurator $configurator) use ($sdk) {
-                return $configurator
-                    ->withTracerProvider($sdk->getTracerProvider())
-                    ->withMeterProvider($sdk->getMeterProvider())
-                    ->withLoggerProvider($sdk->getLoggerProvider())
-                    ->withPropagator($sdk->getPropagator())
-                    ->withEventLoggerProvider($sdk->getEventLoggerProvider())
-                ;
-            });
+            Globals::registerInitializer(fn ($configurator) => self::fileBasedInitializer($configurator));
         } else {
             Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
         }
-        self::registerInstrumentations($sdk);
+        self::registerInstrumentations();
 
         return true;
     }
@@ -91,15 +79,23 @@ class SdkAutoloader
         ;
     }
 
-    private static function createSdkFromFileConfig(): Sdk
+    private static function fileBasedInitializer(Configurator $configurator): Configurator
     {
         $file = Configuration::getString(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE);
         $config = SdkConfiguration::parseFile($file);
 
-        return $config
+        $sdk = $config
             ->create()
             ->setAutoShutdown(true)
             ->build();
+
+        return $configurator
+            ->withTracerProvider($sdk->getTracerProvider())
+            ->withMeterProvider($sdk->getMeterProvider())
+            ->withLoggerProvider($sdk->getLoggerProvider())
+            ->withPropagator($sdk->getPropagator())
+            ->withEventLoggerProvider($sdk->getEventLoggerProvider())
+        ;
     }
 
     /**
@@ -107,23 +103,17 @@ class SdkAutoloader
      *
      * @phan-suppress PhanUndeclaredClassMethod
      */
-    private static function registerInstrumentations(?Sdk $sdk): void
+    private static function registerInstrumentations(): void
     {
         if (!Configuration::has(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE)) {
             return;
         }
         $file = Configuration::getString(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE);
         $configuration = Instrumentation::parseFile($file)->create();
-        $storage = Context::storage();
         $hookManager = self::getHookManager();
-        $context = new InstrumentationContext(
-            $sdk?->getTracerProvider() ?? Globals::tracerProvider(),
-            $sdk?->getMeterProvider() ?? Globals::meterProvider(),
-            $sdk?->getLoggerProvider() ?? Globals::loggerProvider(),
-        );
         foreach (ServiceLoader::load(\OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation::class) as $instrumentation) {
             /** @var \OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation $instrumentation */
-            $instrumentation->register($hookManager, $context, $configuration, $storage);
+            $instrumentation->register($hookManager, $configuration);
         }
     }
 
@@ -134,11 +124,6 @@ class SdkAutoloader
     {
         /** @var HookManager $hookManager */
         foreach (ServiceLoader::load(HookManager::class) as $hookManager) {
-            $scope = $hookManager->enable(Context::getCurrent())->activate();
-            ShutdownHandler::register(function () use ($scope) {
-                $scope->detach();
-            });
-
             return $hookManager;
         }
 

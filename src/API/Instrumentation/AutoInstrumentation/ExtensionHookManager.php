@@ -44,7 +44,7 @@ final class ExtensionHookManager implements HookManager
 
     public function disable(ContextInterface $context): ContextInterface
     {
-        return $context->with($this->contextKey, null);
+        return $context->with($this->contextKey, false);
     }
 
     private function bindHookScope(?Closure $closure): ?Closure
@@ -59,7 +59,7 @@ final class ExtensionHookManager implements HookManager
         // TODO Add an option flag to ext-opentelemetry `hook` that configures whether return values should be used?
         if (!$reflection->getReturnType() || (string) $reflection->getReturnType() === 'void') {
             return static function (mixed ...$args) use ($closure, $contextKey): void {
-                if (!Context::getCurrent()->get($contextKey)) {
+                if (Context::getCurrent()->get($contextKey) === false) {
                     return;
                 }
 
@@ -68,7 +68,7 @@ final class ExtensionHookManager implements HookManager
         }
 
         return static function (mixed ...$args) use ($closure, $contextKey): mixed {
-            if (!Context::getCurrent()->get($contextKey)) {
+            if (Context::getCurrent()->get($contextKey) === false) {
                 return $args[2];
             }
 

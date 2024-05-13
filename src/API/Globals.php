@@ -68,6 +68,7 @@ final class Globals
      *
      * @internal
      * @psalm-internal OpenTelemetry
+     * @todo In a future (breaking) change, we can remove `Registry` and globals initializers, in favor of SPI.
      */
     public static function registerInitializer(Closure $initializer): void
     {

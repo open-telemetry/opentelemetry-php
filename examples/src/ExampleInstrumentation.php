@@ -5,40 +5,43 @@ declare(strict_types=1);
 namespace OpenTelemetry\Example;
 
 use Exception;
+use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\API\Trace\Span;
-use OpenTelemetry\Context\ContextStorageInterface;
+use OpenTelemetry\Context\Context;
 
 final class ExampleInstrumentation implements Instrumentation
 {
 
-    public function register(HookManager $hookManager, Context $context, ConfigurationRegistry $configuration, ContextStorageInterface $storage): void
+    /**
+     * @todo can we pass in just the config for _this_ instrumentation, rather than all?
+     */
+    public function register(HookManager $hookManager, ConfigurationRegistry $configuration): void
     {
         $config = $configuration->get(ExampleConfig::class) ?? throw new Exception('example instrumentation must be configured');
         if (!$config->enabled) {
             return;
         }
 
-        $tracer = $context->tracerProvider->getTracer('example-instrumentation');
+        $tracer = Globals::tracerProvider()->getTracer('example-instrumentation');
 
         $hookManager->hook(
             Example::class,
             'test',
-            static function () use ($tracer, $config, $storage): void {
-                $context = $storage->current();
+            static function () use ($tracer, $config): void {
+                $context = Context::getCurrent();
 
                 $span = $tracer
                     ->spanBuilder($config->spanName)
                     ->setParent($context)
                     ->startSpan();
 
-                $storage->attach($span->storeInContext($context));
+                Context::storage()->attach($span->storeInContext($context));
             },
-            static function () use ($storage): void {
-                if (!$scope = $storage->scope()) {
+            static function (): void {
+                if (!$scope = Context::storage()->scope()) {
                     return;
                 }
 
