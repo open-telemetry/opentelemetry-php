@@ -163,6 +163,14 @@ class SdkAutoloaderTest extends TestCase
         $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
     }
 
+    public function test_autoload_with_no_instrumentation_config_does_not_fail(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk.yaml');
+
+        $this->assertTrue(SdkAutoloader::autoload());
+    }
+
     /**
      * Tests the scenario where the SDK is created from config file, but a custom component
      * uses composer's autoload->files to add its own initializer

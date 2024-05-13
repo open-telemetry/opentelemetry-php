@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK;
 
 use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
@@ -23,12 +24,15 @@ use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
+use Throwable;
 
 /**
  * @psalm-suppress RedundantCast
  */
 class SdkAutoloader
 {
+    use LogsMessagesTrait;
+
     public static function autoload(): bool
     {
         if (!self::isEnabled() || self::isExcludedUrl()) {
@@ -105,15 +109,19 @@ class SdkAutoloader
      */
     private static function registerInstrumentations(): void
     {
-        if (!Configuration::has(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE)) {
-            return;
-        }
-        $file = Configuration::getString(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE);
+        $file = Configuration::has(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE)
+            ? Configuration::getString(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE)
+            : [];
         $configuration = Instrumentation::parseFile($file)->create();
         $hookManager = self::getHookManager();
         foreach (ServiceLoader::load(\OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation::class) as $instrumentation) {
             /** @var \OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation $instrumentation */
-            $instrumentation->register($hookManager, $configuration);
+            try {
+                $instrumentation->register($hookManager, $configuration);
+            } catch (Throwable $t) {
+                self::logError(sprintf('Unable to load instrumentation: %s', $instrumentation::class), ['exception' => $t]);
+            }
+
         }
     }
 
