@@ -39,4 +39,12 @@ class ServiceTest extends TestCase
         $id = $resource->getAttributes()->get(ResourceAttributes::SERVICE_INSTANCE_ID);
         $this->assertMatchesRegularExpression(self::UUID_REGEX, $id);
     }
+
+    public function test_service_get_resource_multiple_calls_same_service_instance_id(): void
+    {
+        $resource1 = $this->detector->getResource();
+        $resource2 = $this->detector->getResource();
+
+        $this->assertSame($resource1->getAttributes()->get(ResourceAttributes::SERVICE_INSTANCE_ID), $resource2->getAttributes()->get(ResourceAttributes::SERVICE_INSTANCE_ID));
+    }
 }
