@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
 
 /**
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/sdk.md#specifying-resource-information-via-an-environment-variable
+ * @see https://github.com/open-telemetry/semantic-conventions/tree/main/docs/resource#service-experimental
  */
 final class Service implements ResourceDetectorInterface
 {
