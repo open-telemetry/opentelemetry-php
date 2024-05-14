@@ -48,12 +48,21 @@ abstract class Span implements SpanInterface
     /** @inheritDoc */
     final public function activate(): ScopeInterface
     {
-        return Context::getCurrent()->withContextValue($this)->activate();
+        $context = Context::getCurrent();
+        if (LocalRootSpan::isLocalRoot($context)) {
+            $context = LocalRootSpan::store($context, $this);
+        }
+
+        return $context->withContextValue($this)->activate();
     }
 
     /** @inheritDoc */
     final public function storeInContext(ContextInterface $context): ContextInterface
     {
+        if (LocalRootSpan::isLocalRoot($context)) {
+            $context = LocalRootSpan::store($context, $this);
+        }
+
         return $context->with(ContextKeys::span(), $this);
     }
 }

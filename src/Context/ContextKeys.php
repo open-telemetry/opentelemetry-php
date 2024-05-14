@@ -16,6 +16,13 @@ final class ContextKeys
         return $instance ??= Context::createKey('opentelemetry-trace-span-key');
     }
 
+    public static function localRootSpan(): ContextKeyInterface
+    {
+        static $instance;
+
+        return $instance ??= Context::createKey('opentelemetry-trace-local-root-span-key');
+    }
+
     public static function baggage(): ContextKeyInterface
     {
         static $instance;
