@@ -103,9 +103,7 @@ class SdkAutoloader
     }
 
     /**
-     * Register any auto-instrumentation configured through SPI
-     *
-     * @phan-suppress PhanUndeclaredClassMethod
+     * Register all {@link Instrumentation} configured through SPI
      */
     private static function registerInstrumentations(): void
     {
