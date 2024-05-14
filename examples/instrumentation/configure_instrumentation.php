@@ -20,21 +20,12 @@ use const PHP_EOL;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-$sdk = Configuration::parseFile(__DIR__ . '/otel-sdk.yaml')->create(new Context())->setAutoShutdown(true)->build();
+Configuration::parseFile(__DIR__ . '/otel-sdk.yaml')->create(new Context())->setAutoShutdown(true)->buildAndRegisterGlobal();
 $configuration = \OpenTelemetry\Config\SDK\Instrumentation::parseFile(__DIR__ . '/otel-instrumentation.yaml')->create();
-
 $hookManager = new ExtensionHookManager();
-$storage = \OpenTelemetry\Context\Context::storage();
-$context = new InstrumentationContext($sdk->getTracerProvider(), $sdk->getMeterProvider());
 
 foreach (ServiceLoader::load(Instrumentation::class) as $instrumentation) {
-    $instrumentation->register($hookManager, $context, $configuration, $storage);
+    $instrumentation->register($hookManager, $configuration);
 }
 
-$scope = $storage->attach($hookManager->enable($storage->current()));
-
-try {
-    echo (new Example())->test(), PHP_EOL;
-} finally {
-    $scope->detach();
-}
+echo (new Example())->test(), PHP_EOL;
