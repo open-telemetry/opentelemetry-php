@@ -171,7 +171,7 @@ class ResourceInfoFactoryTest extends TestCase
 
     public function test_default_with_all_sdk_detectors(): void
     {
-        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'env,host,os,process,process_runtime,sdk,sdk_provided,composer');
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'service,env,host,os,process,process_runtime,sdk,sdk_provided,composer');
         $resource = ResourceInfoFactory::defaultResource();
         $keys = array_keys($resource->getAttributes()->toArray());
         foreach (['service.name', 'telemetry.sdk.name', 'process.runtime.name', 'process.pid', 'host.arch'] as $key) {
