@@ -85,6 +85,10 @@ deptrac:
               value: ^GuzzleHttp\\*
             - type: className
               value: ^Buzz\\*
+      -   name: RamseyUuid
+          collectors:
+            - type: className
+              regex: ^Ramsey\\Uuid\\*
 
     ruleset:
       Context:
@@ -100,6 +104,7 @@ deptrac:
           - HttpPlug
           - Composer
           - HttpClients
+          - RamseyUuid
       Contrib:
           - +SDK
           - +OtelProto
