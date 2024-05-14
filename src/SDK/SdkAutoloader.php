@@ -123,9 +123,6 @@ class SdkAutoloader
         }
     }
 
-    /**
-     * @phan-suppress PhanUndeclaredClassMethod
-     */
     private static function getHookManager(): HookManager
     {
         /** @var HookManager $hookManager */
