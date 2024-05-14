@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
-use \Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\Uuid;
 
 /**
  * @see https://github.com/open-telemetry/semantic-conventions/tree/main/docs/resource#service-experimental
