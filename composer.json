@@ -18,7 +18,7 @@
         "symfony/config": "^5.4 || ^6.4 || ^7.0",
         "symfony/polyfill-mbstring": "^1.23",
         "symfony/polyfill-php82": "^1.26",
-        "tbachert/spi": "^0.2"
+        "tbachert/spi": ">= 0.2.1"
     },
     "config": {
         "sort-packages": true,

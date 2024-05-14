@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace _;
 
 use Nevay\SPI\ServiceLoader;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\Config\SDK\Configuration;
