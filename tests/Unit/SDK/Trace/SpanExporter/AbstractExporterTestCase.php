@@ -6,14 +6,13 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
 
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use OpenTelemetry\API\LoggerHolder;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\ErrorFuture;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
-use Psr\Log\NullLogger;
 
 /**
  * @psalm-suppress UndefinedInterfaceMethod
@@ -25,7 +24,7 @@ abstract class AbstractExporterTestCase extends MockeryTestCase
 
     public function setUp(): void
     {
-        LoggerHolder::set(new NullLogger());
+        Logging::disable();
         $this->future = Mockery::mock(FutureInterface::class);
         $this->future->allows([
             'map' => $this->future,

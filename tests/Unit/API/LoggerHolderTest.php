@@ -19,6 +19,11 @@ class LoggerHolderTest extends TestCase
         LoggerHolder::unset();
     }
 
+    public function setUp(): void
+    {
+        LoggerHolder::unset();
+    }
+
     public function test_constructor(): void
     {
         $logger = $this->createMock(LoggerInterface::class);

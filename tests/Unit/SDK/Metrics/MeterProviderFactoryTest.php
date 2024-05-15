@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
-use OpenTelemetry\API\LoggerHolder;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 
 /**
  * @covers \OpenTelemetry\SDK\Metrics\MeterProviderFactory
@@ -22,7 +21,7 @@ class MeterProviderFactoryTest extends TestCase
 
     public function setUp(): void
     {
-        LoggerHolder::set(new NullLogger());
+        Logging::disable();
     }
 
     public function tearDown(): void

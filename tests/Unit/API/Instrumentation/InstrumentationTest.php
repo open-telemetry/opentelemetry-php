@@ -33,6 +33,11 @@ use PHPUnit\Framework\TestCase;
  */
 final class InstrumentationTest extends TestCase
 {
+    public function setUp(): void
+    {
+        Globals::reset();
+    }
+
     public function tearDown(): void
     {
         Globals::reset();

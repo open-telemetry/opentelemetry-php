@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Metrics\Stream;
 
 use function current;
 use function extension_loaded;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
@@ -44,6 +45,11 @@ use PHPUnit\Framework\TestCase;
  */
 final class MetricStreamTest extends TestCase
 {
+    public function setUp(): void
+    {
+        Logging::disable();
+    }
+
     public function test_asynchronous_single_data_point(): void
     {
         $s = new AsynchronousMetricStream(new SumAggregation(), 3);

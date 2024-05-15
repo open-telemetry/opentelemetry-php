@@ -1,0 +1,19 @@
+{
+    "$schema": "https://raw.githubusercontent.com/infection/infection/0.28.1/resources/schema.json",
+    "source": {
+        "directories": [
+            "src"
+        ],
+        "excludes": [
+            "Composer"
+        ]
+    },
+    "logs": {
+        "text": "var/infection/infection.log",
+        "html": "var/infection/infection.html",
+    },
+    "timeout": 1,
+    "mutators": {
+        "@default": true
+    }
+}
