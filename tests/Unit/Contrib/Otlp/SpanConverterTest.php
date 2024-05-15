@@ -22,11 +22,11 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\SpanConverter
- */
+#[CoversClass(SpanConverter::class)]
 class SpanConverterTest extends TestCase
 {
     public function test_convert_span_to_payload(): void
@@ -45,8 +45,8 @@ class SpanConverterTest extends TestCase
         /** @psalm-suppress InvalidArgument */
         $row = $converter->convert([$span])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
 
-        $this->assertSame($span->getContext()->getSpanId(), bin2hex($row->getSpanId()));
-        $this->assertSame($span->getContext()->getTraceId(), bin2hex($row->getTraceId()));
+        $this->assertSame($span->getContext()->getSpanId(), bin2hex((string) $row->getSpanId()));
+        $this->assertSame($span->getContext()->getTraceId(), bin2hex((string) $row->getTraceId()));
         $this->assertSame(V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK, $row->getFlags());
         $this->assertSame($span->getName(), $row->getName());
 
@@ -78,9 +78,7 @@ class SpanConverterTest extends TestCase
         $this->assertSame(V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK | V1\SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK | TraceFlags::SAMPLED, $row->getLinks()[1]->getFlags());
     }
 
-    /**
-     * @dataProvider attributeAreCoercedCorrectlyDataProvider
-     */
+    #[DataProvider('attributeAreCoercedCorrectlyDataProvider')]
     public function test_attribute_are_coerced_correctly($actual, $expected): void
     {
         $span = (new SpanData())
@@ -288,9 +286,7 @@ class SpanConverterTest extends TestCase
         $this->assertCount(0, (new SpanConverter())->convert([])->getResourceSpans());
     }
 
-    /**
-     * @dataProvider spanKindProvider
-     */
+    #[DataProvider('spanKindProvider')]
     public function test_span_kind($kind, $expected): void
     {
         $span = (new SpanData())->setKind($kind);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Composer\InstalledVersions;
 use Generator;
 use OpenTelemetry\API\Behavior\Internal\Logging;
@@ -13,23 +12,20 @@ use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\ResourceInfo
- */
+#[CoversClass(ResourceInfo::class)]
 class ResourceInfoTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     public function setUp(): void
     {
         Logging::disable();
-    }
-
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
     }
 
     public function test_get_attributes(): void
@@ -55,9 +51,7 @@ class ResourceInfoTest extends TestCase
         $this->assertSame('test', $name);
     }
 
-    /**
-     * @dataProvider sameResourcesProvider
-     */
+    #[DataProvider('sameResourcesProvider')]
     public function test_serialize_returns_same_output_for_objects_representing_the_same_resource(ResourceInfo $resource1, ResourceInfo $resource2): void
     {
         $this->assertSame($resource1->serialize(), $resource2->serialize());
@@ -79,9 +73,7 @@ class ResourceInfoTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider differentResourcesProvider
-     */
+    #[DataProvider('differentResourcesProvider')]
     public function test_serialize_returns_different_output_for_objects_representing_different_resources(ResourceInfo $resource1, ResourceInfo $resource2): void
     {
         $this->assertNotSame($resource1->serialize(), $resource2->serialize());
@@ -124,9 +116,9 @@ class ResourceInfoTest extends TestCase
     }
 
     /**
-     * @group compliance
      * "If a key exists on both the old and updating resource, the value of the updating resource MUST be picked (even if the updated value is empty)"
      */
+    #[Group('compliance')]
     public function test_merge_uses_value_of_updating_resource(): void
     {
         $old = ResourceInfo::create(Attributes::create(['name' => 'original', 'foo' => 'bar']));
@@ -147,9 +139,7 @@ class ResourceInfoTest extends TestCase
         $this->assertSame('two.upd', $merged->getAttributes()->get('2'));
     }
 
-    /**
-     * @dataProvider schemaUrlsToMergeProvider
-     */
+    #[DataProvider('schemaUrlsToMergeProvider')]
     public function test_merge_schema_url(array $schemaUrlsToMerge, ?string $expectedSchemaUrl): void
     {
         $old = ResourceInfo::create(Attributes::create([]), $schemaUrlsToMerge[0]);

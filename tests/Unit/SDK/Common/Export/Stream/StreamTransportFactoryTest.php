@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Export\Stream;
 
 use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory
- */
+#[CoversClass(StreamTransportFactory::class)]
 class StreamTransportFactoryTest extends TestCase
 {
     public function test_creates_stream(): void

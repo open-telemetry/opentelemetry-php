@@ -14,11 +14,10 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Extension\Propagator\Jaeger\JaegerDebugFlagContextKey;
 use OpenTelemetry\Extension\Propagator\Jaeger\JaegerPropagator;
 use OpenTelemetry\SDK\Trace\Span;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Extension\Propagator\Jaeger\JaegerPropagator
- */
+#[CoversClass(JaegerPropagator::class)]
 class JaegerPropagatorTest extends TestCase
 {
     private const TRACE_ID_BASE16 = '6bec5956ce56d66eb47802ab1cf6c4a0';

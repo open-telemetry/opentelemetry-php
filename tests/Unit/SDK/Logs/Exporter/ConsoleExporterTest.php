@@ -10,12 +10,13 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter;
 use OpenTelemetry\SDK\Logs\LoggerSharedState;
 use OpenTelemetry\SDK\Logs\ReadableLogRecord;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter
  * @psalm-suppress UndefinedInterfaceMethod
  */
+#[CoversClass(ConsoleExporter::class)]
 class ConsoleExporterTest extends TestCase
 {
     private TransportInterface $transport;

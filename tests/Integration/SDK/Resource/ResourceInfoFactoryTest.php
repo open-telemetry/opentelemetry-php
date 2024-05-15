@@ -4,23 +4,17 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK\Resource;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Composer\InstalledVersions;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversNothing
- */
+#[CoversNothing]
 class ResourceInfoFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
-
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
+    use TestState;
 
     public function test_all_default_resources(): void
     {

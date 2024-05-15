@@ -6,10 +6,9 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Http\Psr\Client\Discovery;
 
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\DiscoveryInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\Symfony;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\Symfony
- */
+#[CoversClass(Symfony::class)]
 class SymfonyTest extends AbstractDiscoveryTestCase
 {
     public function getInstance(): DiscoveryInterface

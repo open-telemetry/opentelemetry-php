@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Attribute;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\FilteredAttributesBuilder;
 use OpenTelemetry\SDK\Common\Attribute\FilteredAttributesFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Attribute\FilteredAttributesBuilder
- * @covers \OpenTelemetry\SDK\Common\Attribute\FilteredAttributesFactory
- */
+#[CoversClass(FilteredAttributesBuilder::class)]
+#[CoversClass(FilteredAttributesFactory::class)]
 class FilteredAttributesTest extends TestCase
 {
     public function test_rejected_keys_are_dropped(): void

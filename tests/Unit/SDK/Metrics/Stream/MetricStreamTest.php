@@ -9,40 +9,40 @@ use function extension_loaded;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesBuilder;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactory;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumSummary;
 use OpenTelemetry\SDK\Metrics\AttributeProcessor\FilteredAttributeProcessor;
-use OpenTelemetry\SDK\Metrics\Data;
+use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
+use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
 use OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream;
+use OpenTelemetry\SDK\Metrics\Stream\Delta;
+use OpenTelemetry\SDK\Metrics\Stream\DeltaStorage;
 use OpenTelemetry\SDK\Metrics\Stream\Metric;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregator;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use const PHP_INT_SIZE;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream
- * @covers \OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream
- *
- * @covers \OpenTelemetry\SDK\Metrics\Stream\Metric
- * @covers \OpenTelemetry\SDK\Metrics\Stream\MetricAggregator
- *
- * @uses \OpenTelemetry\SDK\Metrics\Stream\Delta
- * @uses \OpenTelemetry\SDK\Metrics\Stream\DeltaStorage
- *
- * @uses \OpenTelemetry\SDK\Metrics\Data\NumberDataPoint
- * @uses \OpenTelemetry\SDK\Metrics\Data\Sum
- * @uses \OpenTelemetry\SDK\Metrics\Data\Temporality
- *
- * @uses \OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation
- * @uses \OpenTelemetry\SDK\Metrics\Aggregation\SumSummary
- *
- * @uses \OpenTelemetry\SDK\Common\Attribute\Attributes
- * @uses \OpenTelemetry\SDK\Common\Attribute\AttributesBuilder
- * @uses \OpenTelemetry\SDK\Common\Attribute\AttributesFactory
- */
+#[CoversClass(AsynchronousMetricStream::class)]
+#[CoversClass(SynchronousMetricStream::class)]
+#[CoversClass(Metric::class)]
+#[CoversClass(MetricAggregator::class)]
+#[UsesClass(Delta::class)]
+#[UsesClass(DeltaStorage::class)]
+#[UsesClass(NumberDataPoint::class)]
+#[UsesClass(Sum::class)]
+#[UsesClass(Temporality::class)]
+#[UsesClass(SumAggregation::class)]
+#[UsesClass(SumSummary::class)]
+#[UsesClass(Attributes::class)]
+#[UsesClass(AttributesBuilder::class)]
+#[UsesClass(AttributesFactory::class)]
 final class MetricStreamTest extends TestCase
 {
     public function setUp(): void
@@ -58,27 +58,27 @@ final class MetricStreamTest extends TestCase
         $c = $s->register(Temporality::CUMULATIVE);
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(5)], 5));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(5, Attributes::create([]), 3, 5),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(5, Attributes::create([]), 3, 5),
         ], Temporality::DELTA, false), $s->collect($d));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(5, Attributes::create([]), 3, 5),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(5, Attributes::create([]), 3, 5),
         ], Temporality::CUMULATIVE, false), $s->collect($c));
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(7)], 8));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(2, Attributes::create([]), 5, 8),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(2, Attributes::create([]), 5, 8),
         ], Temporality::DELTA, false), $s->collect($d));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(7, Attributes::create([]), 3, 8),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(7, Attributes::create([]), 3, 8),
         ], Temporality::CUMULATIVE, false), $s->collect($c));
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(3)], 12));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(-4, Attributes::create([]), 8, 12),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(-4, Attributes::create([]), 8, 12),
         ], Temporality::DELTA, false), $s->collect($d));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(3, Attributes::create([]), 3, 12),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(3, Attributes::create([]), 3, 12),
         ], Temporality::CUMULATIVE, false), $s->collect($c));
     }
 
@@ -90,23 +90,23 @@ final class MetricStreamTest extends TestCase
         $c = $s->register(Temporality::CUMULATIVE);
 
         $s->push(new Metric([Attributes::create(['status' => 300]), Attributes::create(['status' => 400])], [new SumSummary(5), new SumSummary(2)], 5));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(5, Attributes::create(['status' => 300]), 3, 5),
-            new Data\NumberDataPoint(2, Attributes::create(['status' => 400]), 3, 5),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(5, Attributes::create(['status' => 300]), 3, 5),
+            new NumberDataPoint(2, Attributes::create(['status' => 400]), 3, 5),
         ], Temporality::DELTA, false), $s->collect($d));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(5, Attributes::create(['status' => 300]), 3, 5),
-            new Data\NumberDataPoint(2, Attributes::create(['status' => 400]), 3, 5),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(5, Attributes::create(['status' => 300]), 3, 5),
+            new NumberDataPoint(2, Attributes::create(['status' => 400]), 3, 5),
         ], Temporality::CUMULATIVE, false), $s->collect($c));
 
         $s->push(new Metric([Attributes::create(['status' => 300]), Attributes::create(['status' => 400])], [new SumSummary(2), new SumSummary(7)], 8));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(-3, Attributes::create(['status' => 300]), 5, 8),
-            new Data\NumberDataPoint(5, Attributes::create(['status' => 400]), 5, 8),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(-3, Attributes::create(['status' => 300]), 5, 8),
+            new NumberDataPoint(5, Attributes::create(['status' => 400]), 5, 8),
         ], Temporality::DELTA, false), $s->collect($d));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(2, Attributes::create(['status' => 300]), 3, 8),
-            new Data\NumberDataPoint(7, Attributes::create(['status' => 400]), 3, 8),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(2, Attributes::create(['status' => 300]), 3, 8),
+            new NumberDataPoint(7, Attributes::create(['status' => 400]), 3, 8),
         ], Temporality::CUMULATIVE, false), $s->collect($c));
     }
 
@@ -122,17 +122,17 @@ final class MetricStreamTest extends TestCase
         $s->collect($c);
 
         $s->push(new Metric([], [], 7));
-        $this->assertEquals(new Data\Sum([
+        $this->assertEquals(new Sum([
         ], Temporality::DELTA, false), $s->collect($d));
-        $this->assertEquals(new Data\Sum([
+        $this->assertEquals(new Sum([
         ], Temporality::CUMULATIVE, false), $s->collect($c));
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(3)], 12));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(3, Attributes::create([]), 7, 12),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(3, Attributes::create([]), 7, 12),
         ], Temporality::DELTA, false), $s->collect($d));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(3, Attributes::create([]), 3, 12),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(3, Attributes::create([]), 3, 12),
         ], Temporality::CUMULATIVE, false), $s->collect($c));
     }
 
@@ -144,27 +144,27 @@ final class MetricStreamTest extends TestCase
         $c = $s->register(Temporality::CUMULATIVE);
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(5)], 5));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(5, Attributes::create([]), 3, 5),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(5, Attributes::create([]), 3, 5),
         ], Temporality::DELTA, false), $s->collect($d));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(5, Attributes::create([]), 3, 5),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(5, Attributes::create([]), 3, 5),
         ], Temporality::CUMULATIVE, false), $s->collect($c));
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(2)], 8));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(2, Attributes::create([]), 5, 8),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(2, Attributes::create([]), 5, 8),
         ], Temporality::DELTA, false), $s->collect($d));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(7, Attributes::create([]), 3, 8),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(7, Attributes::create([]), 3, 8),
         ], Temporality::CUMULATIVE, false), $s->collect($c));
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(-4)], 12));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(-4, Attributes::create([]), 8, 12),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(-4, Attributes::create([]), 8, 12),
         ], Temporality::DELTA, false), $s->collect($d));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(3, Attributes::create([]), 3, 12),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(3, Attributes::create([]), 3, 12),
         ], Temporality::CUMULATIVE, false), $s->collect($c));
     }
 
@@ -176,23 +176,23 @@ final class MetricStreamTest extends TestCase
         $c = $s->register(Temporality::CUMULATIVE);
 
         $s->push(new Metric([Attributes::create(['status' => 300]), Attributes::create(['status' => 400])], [new SumSummary(5), new SumSummary(2)], 5));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(5, Attributes::create(['status' => 300]), 3, 5),
-            new Data\NumberDataPoint(2, Attributes::create(['status' => 400]), 3, 5),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(5, Attributes::create(['status' => 300]), 3, 5),
+            new NumberDataPoint(2, Attributes::create(['status' => 400]), 3, 5),
         ], Temporality::DELTA, false), $s->collect($d));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(5, Attributes::create(['status' => 300]), 3, 5),
-            new Data\NumberDataPoint(2, Attributes::create(['status' => 400]), 3, 5),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(5, Attributes::create(['status' => 300]), 3, 5),
+            new NumberDataPoint(2, Attributes::create(['status' => 400]), 3, 5),
         ], Temporality::CUMULATIVE, false), $s->collect($c));
 
         $s->push(new Metric([Attributes::create(['status' => 300]), Attributes::create(['status' => 400])], [new SumSummary(-3), new SumSummary(5)], 8));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(-3, Attributes::create(['status' => 300]), 5, 8),
-            new Data\NumberDataPoint(5, Attributes::create(['status' => 400]), 5, 8),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(-3, Attributes::create(['status' => 300]), 5, 8),
+            new NumberDataPoint(5, Attributes::create(['status' => 400]), 5, 8),
         ], Temporality::DELTA, false), $s->collect($d));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(2, Attributes::create(['status' => 300]), 3, 8),
-            new Data\NumberDataPoint(7, Attributes::create(['status' => 400]), 3, 8),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(2, Attributes::create(['status' => 300]), 3, 8),
+            new NumberDataPoint(7, Attributes::create(['status' => 400]), 3, 8),
         ], Temporality::CUMULATIVE, false), $s->collect($c));
     }
 
@@ -240,8 +240,8 @@ final class MetricStreamTest extends TestCase
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(5)], 7));
         // Implementation treats unknown reader as cumulative reader
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(5, Attributes::create([]), 3, 7),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(5, Attributes::create([]), 3, 7),
         ], Temporality::CUMULATIVE, false), $s->collect($d));
     }
 
@@ -255,7 +255,7 @@ final class MetricStreamTest extends TestCase
         $s->unregister($c);
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(-5)], 7));
-        $this->assertEquals(new Data\Sum([
+        $this->assertEquals(new Sum([
         ], Temporality::DELTA, false), $s->collect($c));
     }
 
@@ -269,8 +269,8 @@ final class MetricStreamTest extends TestCase
         $s->unregister($d + 1);
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(5)], 7));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(0, Attributes::create([]), 5, 7),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(0, Attributes::create([]), 5, 7),
         ], Temporality::DELTA, false), $s->collect($d));
     }
 
@@ -284,8 +284,8 @@ final class MetricStreamTest extends TestCase
         $s->unregister($c + 1);
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(-5)], 7));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(0, Attributes::create([]), 3, 7),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(0, Attributes::create([]), 3, 7),
         ], Temporality::CUMULATIVE, false), $s->collect($c));
     }
 
@@ -320,7 +320,7 @@ final class MetricStreamTest extends TestCase
         $d = @$s->register(Temporality::DELTA);
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(5)], 5));
-        $this->assertEquals(new Data\Sum([
+        $this->assertEquals(new Sum([
         ], Temporality::DELTA, false), $s->collect($d));
     }
 
@@ -339,8 +339,8 @@ final class MetricStreamTest extends TestCase
         $d = $s->register(Temporality::DELTA);
 
         $s->push(new Metric([Attributes::create([])], [new SumSummary(5)], 5));
-        $this->assertEquals(new Data\Sum([
-            new Data\NumberDataPoint(5, Attributes::create([]), 3, 5),
+        $this->assertEquals(new Sum([
+            new NumberDataPoint(5, Attributes::create([]), 3, 5),
         ], Temporality::DELTA, false), $s->collect($d));
     }
 

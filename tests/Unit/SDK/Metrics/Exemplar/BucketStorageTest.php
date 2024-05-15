@@ -10,11 +10,10 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Exemplar\BucketStorage;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\Exemplar\BucketStorage
- */
+#[CoversClass(BucketStorage::class)]
 final class BucketStorageTest extends TestCase
 {
     public function test_empty_storage_returns_no_exemplars(): void

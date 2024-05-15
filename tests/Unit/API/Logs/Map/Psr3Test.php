@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\API\Logs\Map;
 
 use OpenTelemetry\API\Logs\Map\Psr3;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
-/**
- * @covers \OpenTelemetry\API\Logs\Map\Psr3
- */
+#[CoversClass(Psr3::class)]
 class Psr3Test extends TestCase
 {
-    /**
-     * @dataProvider levelProvider
-     */
+    #[DataProvider('levelProvider')]
     public function test_severity_number(string $level): void
     {
         $this->assertNotNull(Psr3::severityNumber($level));

@@ -7,13 +7,13 @@ namespace Logs;
 use OpenTelemetry\SDK\Logs\SimplePsrFileLogger;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\SimplePsrFileLogger
- */
+#[CoversClass(SimplePsrFileLogger::class)]
 class SimplePsrFileLoggerTest extends TestCase
 {
     private const ROOT_DIR = 'var';
@@ -41,9 +41,7 @@ class SimplePsrFileLoggerTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider logLevelProvider
-     */
+    #[DataProvider('logLevelProvider')]
     public function test_log(string $logLevel): void
     {
         $this->assertFalse($this->root->hasChild(self::LOG_FILE));

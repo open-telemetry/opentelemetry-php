@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\Contrib\Otlp\MetricExporterFactory;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
@@ -13,15 +12,19 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \OpenTelemetry\Contrib\Otlp\MetricExporterFactory
  * @psalm-suppress UndefinedInterfaceMethod
  */
+#[CoversClass(MetricExporterFactory::class)]
 class MetricExporterFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
+
     private TransportFactoryInterface $transportFactory;
     private TransportInterface $transport;
 
@@ -29,11 +32,6 @@ class MetricExporterFactoryTest extends TestCase
     {
         $this->transportFactory = $this->createMock(TransportFactoryInterface::class);
         $this->transport = $this->createMock(TransportInterface::class);
-    }
-
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
     }
 
     public function test_unknown_protocol_exception(): void
@@ -44,9 +42,7 @@ class MetricExporterFactoryTest extends TestCase
         $factory->create();
     }
 
-    /**
-     * @dataProvider temporalityProvider
-     */
+    #[DataProvider('temporalityProvider')]
     public function test_create_with_temporality(array $env, ?string $expected): void
     {
         // @phpstan-ignore-next-line
@@ -98,9 +94,7 @@ class MetricExporterFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider configProvider
-     */
+    #[DataProvider('configProvider')]
     public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = [], array $expectedValues = []): void
     {
         foreach ($env as $k => $v) {

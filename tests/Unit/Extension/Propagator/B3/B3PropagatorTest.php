@@ -14,11 +14,11 @@ use OpenTelemetry\Extension\Propagator\B3\B3MultiPropagator;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use OpenTelemetry\Extension\Propagator\B3\B3SinglePropagator;
 use OpenTelemetry\SDK\Trace\Span;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Extension\Propagator\B3\B3Propagator
- */
+#[CoversClass(B3Propagator::class)]
 class B3PropagatorTest extends TestCase
 {
     private const B3_TRACE_ID_16_CHAR = 'ff00051791e00041';
@@ -159,9 +159,7 @@ class B3PropagatorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider validTraceIdProvider
-     */
+    #[DataProvider('validTraceIdProvider')]
     public function test_extract_only_b3multi_sampled_context_with_b3multi_instance(string $traceId, string $expected): void
     {
         $carrier = [
@@ -180,9 +178,7 @@ class B3PropagatorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider validTraceIdProvider
-     */
+    #[DataProvider('validTraceIdProvider')]
     public function test_extract_b3_single(string $traceId, string $expected): void
     {
         $carrier = [
@@ -248,9 +244,7 @@ class B3PropagatorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider invalidB3SingleHeaderValueProvider
-     */
+    #[DataProvider('invalidB3SingleHeaderValueProvider')]
     public function test_extract_b3_single_invalid_and_b3_multi_valid_context_with_b3single_instance($headerValue): void
     {
         $carrier = [
@@ -270,9 +264,7 @@ class B3PropagatorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider invalidB3SingleHeaderValueProvider
-     */
+    #[DataProvider('invalidB3SingleHeaderValueProvider')]
     public function test_extract_b3_single_invalid_and_b3_multi_valid_context_with_b3multi_instance($headerValue): void
     {
         $carrier = [

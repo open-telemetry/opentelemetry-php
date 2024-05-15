@@ -7,12 +7,12 @@ namespace OpenTelemetry\Tests\Unit\Context;
 use Fiber;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorage;
+use OpenTelemetry\Context\ContextStorageNode;
 use OpenTelemetry\Context\ScopeInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Context\ContextStorageNode
- */
+#[CoversClass(ContextStorageNode::class)]
 class ScopeTest extends TestCase
 {
     public function test_scope_close_restores_context(): void

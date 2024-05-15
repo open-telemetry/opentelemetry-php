@@ -10,12 +10,11 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Contrib\Otlp\LogsConverter;
 use OpenTelemetry\SDK\Logs\ReadableLogRecord;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\LogsConverter
- */
+#[CoversClass(LogsConverter::class)]
 class LogsConverterTest extends TestCase
 {
     private const TRACE_ID_BASE16 = 'ff000000000000000000000000000041';
@@ -51,8 +50,8 @@ class LogsConverterTest extends TestCase
         $request = $this->converter->convert([$this->record]);
         /** @psalm-suppress InvalidArgument */
         $row = $request->getResourceLogs()[0]->getScopeLogs()[0]->getLogRecords()[0];
-        $this->assertSame(self::TRACE_ID_BASE16, bin2hex($row->getTraceId()));
-        $this->assertSame(self::SPAN_ID_BASE16, bin2hex($row->getSpanId()));
+        $this->assertSame(self::TRACE_ID_BASE16, bin2hex((string) $row->getTraceId()));
+        $this->assertSame(self::SPAN_ID_BASE16, bin2hex((string) $row->getSpanId()));
         $this->assertSame(self::FLAGS, $row->getFlags());
     }
 }

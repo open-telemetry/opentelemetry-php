@@ -8,11 +8,10 @@ use Exception;
 use InvalidArgumentException;
 use OpenTelemetry\Contrib\Grpc\GrpcTransport;
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Contrib\Grpc\GrpcTransport
- */
+#[CoversClass(GrpcTransport::class)]
 final class GrpcTransportTest extends TestCase
 {
     private GrpcTransport $transport;

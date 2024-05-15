@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver
- */
+#[CoversClass(EnvironmentResolver::class)]
 class EnvironmentResolverTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     private const RAW_VALUES = [
         'string' => ['STRING_VAR', 'foo'],
@@ -28,11 +28,6 @@ class EnvironmentResolverTest extends TestCase
     public function setUp(): void
     {
         $this->resolver = new EnvironmentResolver();
-    }
-
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
     }
 
     public function test_has_variable(): void
@@ -61,9 +56,7 @@ class EnvironmentResolverTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider rawValueProvider
-     */
+    #[DataProvider('rawValueProvider')]
     public function test_retrieve_value(string $varName, string $varValue): void
     {
         $this->setEnvironmentVariable($varName, $varValue);

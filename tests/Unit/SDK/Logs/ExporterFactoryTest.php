@@ -4,28 +4,23 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter;
 use OpenTelemetry\SDK\Logs\Exporter\NoopExporter;
 use OpenTelemetry\SDK\Logs\ExporterFactory;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\ExporterFactory
- */
+#[CoversClass(ExporterFactory::class)]
 class ExporterFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
-
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
+    use TestState;
 
     /**
-     * @dataProvider exporterProvider
      * @param class-string $expected
      */
+    #[DataProvider('exporterProvider')]
     public function test_create(string $name, string $expected): void
     {
         $this->setEnvironmentVariable('OTEL_LOGS_EXPORTER', $name);

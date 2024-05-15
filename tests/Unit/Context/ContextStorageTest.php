@@ -6,13 +6,14 @@ namespace OpenTelemetry\Tests\Unit\Context;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorage;
+use OpenTelemetry\Context\ContextStorageHead;
+use OpenTelemetry\Context\ContextStorageNode;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Context\ContextStorage
- * @covers \OpenTelemetry\Context\ContextStorageHead
- * @covers \OpenTelemetry\Context\ContextStorageNode
- */
+#[CoversClass(ContextStorage::class)]
+#[CoversClass(ContextStorageHead::class)]
+#[CoversClass(ContextStorageNode::class)]
 class ContextStorageTest extends TestCase
 {
     public function test_scope_returns_null_in_root(): void

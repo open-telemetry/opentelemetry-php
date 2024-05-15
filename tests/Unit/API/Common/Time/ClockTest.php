@@ -7,19 +7,13 @@ namespace OpenTelemetry\Tests\Unit\API\Common\Time;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\SystemClock;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Common\Time\Clock
- */
+#[CoversClass(Clock::class)]
 class ClockTest extends TestCase
 {
     public function setUp(): void
-    {
-        Clock::reset();
-    }
-
-    public function tearDown(): void
     {
         Clock::reset();
     }

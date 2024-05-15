@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorFactory;
@@ -12,25 +11,21 @@ use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\LogRecordProcessorFactory
- */
+#[CoversClass(LogRecordProcessorFactory::class)]
 class LogRecordProcessorFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
-
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
+    use TestState;
 
     /**
-     * @dataProvider exporterProvider
      * @param class-string $expected
      */
+    #[DataProvider('exporterProvider')]
     public function test_create(string $name, string $expected): void
     {
         $exporter = $this->createMock(LogRecordExporterInterface::class);

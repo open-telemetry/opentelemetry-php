@@ -95,9 +95,9 @@ bash: ## bash shell into container
 style: ## Run style check/fix
 	$(DC_RUN_PHP) env XDEBUG_MODE=off env PHP_CS_FIXER_IGNORE_ENV=1 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no -vvv
 rector-write: ## Run rector
-	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/rector/vendor/bin/rector process src
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/rector/vendor/bin/rector process
 rector: ## Run rector (dry-run)
-	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/rector/vendor/bin/rector process src --dry-run
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/rector/vendor/bin/rector process --dry-run
 deptrac: ## Run deptrac
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/deptrac/vendor/bin/deptrac --formatter=table --report-uncovered --no-cache
 w3c-test-service:

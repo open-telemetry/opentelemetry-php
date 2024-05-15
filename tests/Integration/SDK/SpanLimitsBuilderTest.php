@@ -4,26 +4,19 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversNothing
- */
+#[CoversNothing]
 class SpanLimitsBuilderTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_span_length_limits_builder_uses_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT', 9);
@@ -33,9 +26,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(Attributes::factory(128, 9), $spanLimits->getAttributesFactory());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_span_length_limits_builder_uses_configured_value(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT', 9);
@@ -46,9 +37,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(Attributes::factory(128, 201), $spanLimits->getAttributesFactory());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_span_event_limits_builder_uses_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_EVENT_COUNT_LIMIT', 200);
@@ -57,9 +46,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(200, $spanLimits->getEventCountLimit());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_span_event_limits_builder_uses_configured_value(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_EVENT_COUNT_LIMIT', 200);
@@ -69,9 +56,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(185, $spanLimits->getEventCountLimit());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_span_limits_link_builder_uses_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_LINK_COUNT_LIMIT', 1101);
@@ -80,9 +65,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(1101, $spanLimits->getLinkCountLimit());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_span_limits_link_builder_uses_configured_value(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_LINK_COUNT_LIMIT', 1102);
@@ -92,9 +75,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(193, $spanLimits->getLinkCountLimit());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_span_attribute_per_event_count_limits_builder_uses_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT', 400);
@@ -103,9 +84,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(Attributes::factory(400), $spanLimits->getEventAttributesFactory());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_span_event_attribute_per_event_count_limits_builder_uses_configured_value(): void
     {
         $this->setEnvironmentVariable('OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT', 400);
@@ -115,9 +94,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(Attributes::factory(155), $spanLimits->getEventAttributesFactory());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_span_attribute_per_link_count_limits_builder_uses_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_LINK_ATTRIBUTE_COUNT_LIMIT', 500);
@@ -126,9 +103,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(Attributes::factory(500), $spanLimits->getLinkAttributesFactory());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_span_link_attribute_per_event_count_limits_builder_uses_configured_value(): void
     {
         $this->setEnvironmentVariable('OTEL_LINK_ATTRIBUTE_COUNT_LIMIT', 500);

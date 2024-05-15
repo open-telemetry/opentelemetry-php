@@ -6,11 +6,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Logs\Exporter;
 
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory
- */
+#[CoversClass(ConsoleExporterFactory::class)]
 class ConsoleExporterFactoryTest extends TestCase
 {
     public function test_create(): void

@@ -13,13 +13,12 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\ErrorFuture;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function stream_get_contents;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\SpanExporter
- */
+#[CoversClass(SpanExporter::class)]
 class SpanExporterTest extends TestCase
 {
     private MockObject $transport;

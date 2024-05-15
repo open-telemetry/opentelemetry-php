@@ -13,6 +13,7 @@ use OpenTelemetry\SDK\Common\Future\ErrorFuture;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @psalm-suppress UndefinedInterfaceMethod
@@ -67,9 +68,7 @@ abstract class AbstractExporterTestCase extends MockeryTestCase
         );
     }
 
-    /**
-     * @dataProvider futureProvider
-     */
+    #[DataProvider('futureProvider')]
     public function test_export(FutureInterface $future, bool $expected): void
     {
         $transport = Mockery::mock(TransportInterface::class);

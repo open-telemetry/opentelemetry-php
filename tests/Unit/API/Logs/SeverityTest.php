@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\API\Logs;
 
 use OpenTelemetry\API\Logs\Severity;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use ValueError;
 
-/**
- * @covers \OpenTelemetry\API\Logs\Severity
- */
+#[CoversClass(Severity::class)]
 class SeverityTest extends TestCase
 {
     public function test_value_error(): void
@@ -20,9 +20,7 @@ class SeverityTest extends TestCase
         Severity::fromPsr3('unknown');
     }
 
-    /**
-     * @dataProvider levelProvider
-     */
+    #[DataProvider('levelProvider')]
     public function test_severity_number(string $level): void
     {
         $this->assertNotNull(Severity::fromPsr3($level));

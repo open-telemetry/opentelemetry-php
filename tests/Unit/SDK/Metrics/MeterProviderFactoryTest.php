@@ -4,35 +4,30 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\MeterProviderFactory
- */
+#[CoversClass(MeterProviderFactory::class)]
 class MeterProviderFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     public function setUp(): void
     {
         Logging::disable();
     }
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     /**
-     * @dataProvider exporterProvider
      * @psalm-suppress ArgumentTypeCoercion
      */
+    #[DataProvider('exporterProvider')]
     public function test_create(string $exporter): void
     {
         $_SERVER[Variables::OTEL_METRICS_EXPORTER] = $exporter;

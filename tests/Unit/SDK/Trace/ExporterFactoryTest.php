@@ -4,35 +4,29 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Exception;
 use Http\Discovery\Psr18ClientDiscovery;
 use Http\Discovery\Strategy\MockClientStrategy;
 use OpenTelemetry\Contrib;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\ExporterFactory
- */
+#[CoversClass(ExporterFactory::class)]
 class ExporterFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
-
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
+    use TestState;
 
     public function setUp(): void
     {
         Psr18ClientDiscovery::prependStrategy(MockClientStrategy::class);
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_accepts_none_exporter_env_var(): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', 'none');
@@ -41,10 +35,10 @@ class ExporterFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider envProvider
      * @psalm-param class-string $expected
-     * @group trace-compliance
      */
+    #[DataProvider('envProvider')]
+    #[Group('trace-compliance')]
     public function test_create_from_environment(string $exporter, array $env, string $expected): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', $exporter);
@@ -89,10 +83,8 @@ class ExporterFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidEnvProvider
-     * @group trace-compliance
-     */
+    #[DataProvider('invalidEnvProvider')]
+    #[Group('trace-compliance')]
     public function test_throws_exception_for_invalid_or_unsupported_exporter_configs(string $exporter, array $env = []): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', $exporter);
