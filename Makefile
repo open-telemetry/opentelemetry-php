@@ -44,7 +44,7 @@ psalm-info: ## Run psalm and show info
 phpstan: ## Run phpstan
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpstan analyse --memory-limit=256M
 infection: ## Run infection (mutation testing)
-	$(DC_RUN_PHP) env XDEBUG_MODE=coverage php -d memory_limit=1024M vendor-bin/infection/vendor/bin/infection --threads=$(shell nproc)
+	$(DC_RUN_PHP) env XDEBUG_MODE=coverage php -d memory_limit=1024M vendor-bin/infection/vendor/bin/infection --threads=max
 packages-composer: ## Validate composer packages
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/otel packages:composer:validate
 benchmark: ## Run phpbench
