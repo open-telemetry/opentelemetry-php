@@ -8,7 +8,6 @@ use OpenTelemetry\API\Trace\LocalRootSpan;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextKeys;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +17,7 @@ class LocalRootSpanTest extends TestCase
     public function test_span_with_remote_parent_is_local_root(): void
     {
         $context = Context::getRoot()->with(
-            ContextKeys::localRootSpan(),
+            LocalRootSpan::key(),
             Span::wrap(
                 SpanContext::createFromRemoteParent(
                     '00000000000000000000000000000001',

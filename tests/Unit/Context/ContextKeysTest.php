@@ -16,11 +16,6 @@ final class ContextKeysTest extends TestCase
         $this->assertSame(ContextKeys::span(), ContextKeys::span());
     }
 
-    public function test_local_root_span_context_key(): void
-    {
-        $this->assertSame(ContextKeys::localRootSpan(), ContextKeys::localRootSpan());
-    }
-
     public function test_baggage_context_key(): void
     {
         $this->assertSame(ContextKeys::baggage(), ContextKeys::baggage());
