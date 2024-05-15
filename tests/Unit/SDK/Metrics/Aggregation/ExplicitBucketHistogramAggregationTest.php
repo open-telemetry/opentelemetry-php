@@ -12,10 +12,11 @@ use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramSummary;
 use OpenTelemetry\SDK\Metrics\Data\Histogram;
 use OpenTelemetry\SDK\Metrics\Data\HistogramDataPoint;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramSummary::class)]
+#[CoversClass(ExplicitBucketHistogramAggregation::class)]
+#[CoversClass(ExplicitBucketHistogramSummary::class)]
 final class ExplicitBucketHistogramAggregationTest extends TestCase
 {
     public function test_initialize(): void

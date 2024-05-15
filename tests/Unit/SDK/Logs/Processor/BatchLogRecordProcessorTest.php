@@ -27,10 +27,12 @@ use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
 use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor::class)]
+#[CoversClass(BatchLogRecordProcessor::class)]
 class BatchLogRecordProcessorTest extends MockeryTestCase
 {
     private TestClock $testClock;
@@ -75,7 +77,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('scheduledDelayProvider')]
+    #[DataProvider('scheduledDelayProvider')]
     public function test_export_scheduled_delay(int $exportDelay, int $advanceByNano, bool $expectedFlush): void
     {
         $batchSize = 2;

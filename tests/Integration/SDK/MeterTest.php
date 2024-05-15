@@ -9,13 +9,16 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopObservableCounter;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
+use OpenTelemetry\SDK\Metrics\Meter;
 use OpenTelemetry\SDK\Metrics\MeterProviderBuilder;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Meter::class)]
+#[CoversClass(Meter::class)]
 final class MeterTest extends TestCase
 {
     public function test_batch_observe_observes_all_provided_instruments(): void
@@ -214,7 +217,7 @@ final class MeterTest extends TestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\CoversNothing]
+    #[CoversNothing]
     public function test_batch_observe_detach_with_repeated_instrument_does_not_trigger_undefined_offset_warning(): void
     {
         $this->expectNotToPerformAssertions();

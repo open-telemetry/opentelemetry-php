@@ -6,15 +6,18 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\Trace\StatusData;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\StatusData::class)]
+#[CoversClass(StatusData::class)]
 class StatusDataTest extends TestCase
 {
     /**
      * @psalm-param StatusCode::STATUS_* $code
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('getStatuses')]
+    #[DataProvider('getStatuses')]
     public function test_statuses(string $code): void
     {
         $status = StatusData::create($code, '');
@@ -38,8 +41,8 @@ class StatusDataTest extends TestCase
     /**
      * @psalm-param StatusCode::STATUS_* $code
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('getStatuses')]
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[DataProvider('getStatuses')]
+    #[Group('trace-compliance')]
     public function test_statuses_description(string $code): void
     {
         $status = StatusData::create($code, 'ERR');

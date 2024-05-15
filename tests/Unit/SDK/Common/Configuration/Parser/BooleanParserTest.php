@@ -6,9 +6,11 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Parser;
 
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser::class)]
+#[CoversClass(BooleanParser::class)]
 class BooleanParserTest extends TestCase
 {
     private const TRUTHY_VALUES = [
@@ -40,7 +42,7 @@ class BooleanParserTest extends TestCase
         ['0'],
     ];
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('truthyValueProvider')]
+    #[DataProvider('truthyValueProvider')]
     public function test_truthy_values_return_true(string $value): void
     {
         $this->assertTrue(
@@ -48,7 +50,7 @@ class BooleanParserTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('falsyValueProvider')]
+    #[DataProvider('falsyValueProvider')]
     public function test_falsy_values_return_false(string $value): void
     {
         $this->assertFalse(
@@ -56,7 +58,7 @@ class BooleanParserTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('disallowedBooleanProvider')]
+    #[DataProvider('disallowedBooleanProvider')]
     public function test_disallowed_boolean_type_values_throw_exception(string $value): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -68,7 +70,7 @@ class BooleanParserTest extends TestCase
         return self::DISALLOWED_BOOLEAN_VALUES;
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('nonBooleanValueProvider')]
+    #[DataProvider('nonBooleanValueProvider')]
     public function test_non_boolean_values_throw_exception(string $value): void
     {
         $this->expectException(InvalidArgumentException::class);

@@ -7,12 +7,14 @@ namespace OpenTelemetry\Tests\Unit\API\Logs;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\Context\Context;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Logs\LogRecord::class)]
+#[CoversClass(LogRecord::class)]
 class LogRecordTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('settersProvider')]
+    #[DataProvider('settersProvider')]
     public function test_setters(string $method, string $propertyName, mixed $value, mixed $expected = null): void
     {
         $record = new LogRecord();

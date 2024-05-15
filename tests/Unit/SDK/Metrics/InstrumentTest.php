@@ -26,15 +26,16 @@ use OpenTelemetry\SDK\Metrics\Stream\MetricAggregator;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregatorFactory;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\UpDownCounter;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use WeakMap;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Counter::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\ObservableCounter::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\UpDownCounter::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Histogram::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\ObservableCallback::class)]
+#[CoversClass(Counter::class)]
+#[CoversClass(ObservableCounter::class)]
+#[CoversClass(UpDownCounter::class)]
+#[CoversClass(Histogram::class)]
+#[CoversClass(ObservableCallback::class)]
 final class InstrumentTest extends TestCase
 {
 

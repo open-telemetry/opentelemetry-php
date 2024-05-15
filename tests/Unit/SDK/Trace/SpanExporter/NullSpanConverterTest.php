@@ -6,9 +6,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
 
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\NullSpanConverter;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanExporter\NullSpanConverter::class)]
+#[CoversClass(NullSpanConverter::class)]
 class NullSpanConverterTest extends TestCase
 {
     public function test_convert(): void

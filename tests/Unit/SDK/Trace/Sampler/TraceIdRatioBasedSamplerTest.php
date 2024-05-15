@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(TraceIdRatioBasedSampler::class)]
@@ -30,7 +31,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::RECORD_AND_SAMPLE, $decision->getDecision());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidProbabilityProvider')]
+    #[DataProvider('invalidProbabilityProvider')]
     public function test_invalid_probability_trace_id_ratio_based_sampler(float $probability): void
     {
         $this->expectException(InvalidArgumentException::class);

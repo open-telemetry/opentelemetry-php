@@ -6,10 +6,12 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Parser;
 
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RangeException;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser::class)]
+#[CoversClass(RatioParser::class)]
 class RatioParserTest extends TestCase
 {
     private const RATIO_VALUES = [
@@ -28,7 +30,7 @@ class RatioParserTest extends TestCase
         'too high' => ['1.1'],
     ];
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('ratioValueProvider')]
+    #[DataProvider('ratioValueProvider')]
     public function test_ratio_values_return_float(string $value): void
     {
         $this->assertIsFloat(
@@ -36,7 +38,7 @@ class RatioParserTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('nonNumericValueProvider')]
+    #[DataProvider('nonNumericValueProvider')]
     public function test_non_numeric_values_throw_exception(string $value): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -44,7 +46,7 @@ class RatioParserTest extends TestCase
         RatioParser::parse($value);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('outOfRangeValueProvider')]
+    #[DataProvider('outOfRangeValueProvider')]
     public function test_out_of_range_values_throw_exception(string $value): void
     {
         $this->expectException(RangeException::class);

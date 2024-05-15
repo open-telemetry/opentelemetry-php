@@ -7,10 +7,11 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Http\Psr\Client;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\DiscoveryInterface;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery::class)]
+#[CoversClass(Discovery::class)]
 class DiscoveryTest extends TestCase
 {
     use TestState;

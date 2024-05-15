@@ -6,9 +6,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Logs\Processor;
 
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor::class)]
+#[CoversClass(NoopLogRecordProcessor::class)]
 class NoopLogRecordProcessorTest extends TestCase
 {
     public function test_get_instance(): void

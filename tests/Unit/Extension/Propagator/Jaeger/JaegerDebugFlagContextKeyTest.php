@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Extension\Propagator\Jaeger;
 
 use OpenTelemetry\Extension\Propagator\Jaeger\JaegerDebugFlagContextKey;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Extension\Propagator\Jaeger\JaegerDebugFlagContextKey::class)]
+#[CoversClass(JaegerDebugFlagContextKey::class)]
 class JaegerDebugFlagContextKeyTest extends TestCase
 {
     public function test_jaeger_debug_flag_key(): void

@@ -11,11 +11,13 @@ use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Logs\EventLogger;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\EventLogger::class)]
+#[CoversClass(EventLogger::class)]
 class EventLoggerTest extends TestCase
 {
     private LoggerInterface&MockObject $logger;

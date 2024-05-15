@@ -7,9 +7,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Event;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\Event::class)]
+#[CoversClass(Event::class)]
 class EventTest extends TestCase
 {
     private const EVENT_NAME = 'test-event';

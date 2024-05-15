@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\API\Behavior\Internal;
 
 use OpenTelemetry\API\Behavior\Internal\LogWriter\Formatter;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Behavior\Internal\LogWriter\Formatter::class)]
+#[CoversClass(Formatter::class)]
 class FormatterTest extends TestCase
 {
     public function test_no_exception_contains_code_location(): void

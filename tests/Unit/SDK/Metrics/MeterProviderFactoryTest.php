@@ -10,9 +10,11 @@ use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MeterProviderFactory::class)]
+#[CoversClass(MeterProviderFactory::class)]
 class MeterProviderFactoryTest extends TestCase
 {
     use TestState;
@@ -25,7 +27,7 @@ class MeterProviderFactoryTest extends TestCase
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('exporterProvider')]
+    #[DataProvider('exporterProvider')]
     public function test_create(string $exporter): void
     {
         $_SERVER[Variables::OTEL_METRICS_EXPORTER] = $exporter;

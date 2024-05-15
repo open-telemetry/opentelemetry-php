@@ -8,9 +8,10 @@ use OpenTelemetry\API\Baggage\Baggage;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Extension\Propagator\Jaeger\JaegerBaggagePropagator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Extension\Propagator\Jaeger\JaegerBaggagePropagator::class)]
+#[CoversClass(JaegerBaggagePropagator::class)]
 class JaegerBaggagePropagatorTest extends TestCase
 {
     private TextMapPropagatorInterface $propagator;

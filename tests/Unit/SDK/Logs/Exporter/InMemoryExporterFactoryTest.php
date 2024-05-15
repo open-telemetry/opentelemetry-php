@@ -6,9 +6,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Logs\Exporter;
 
 use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporterFactory;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Exporter\InMemoryExporterFactory::class)]
+#[CoversClass(InMemoryExporterFactory::class)]
 class InMemoryExporterFactoryTest extends TestCase
 {
     public function test_create(): void

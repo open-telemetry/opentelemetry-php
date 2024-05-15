@@ -11,9 +11,10 @@ use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\SdkBuilder;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\SdkBuilder::class)]
+#[CoversClass(SdkBuilder::class)]
 class SdkBuilderTest extends TestCase
 {
     private TextMapPropagatorInterface $propagator;

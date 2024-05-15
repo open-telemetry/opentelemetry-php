@@ -6,8 +6,9 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Http\Psr\Client\Discovery;
 
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\CurlClient;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\DiscoveryInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery\CurlClient::class)]
+#[CoversClass(CurlClient::class)]
 class CurlClientTest extends AbstractDiscoveryTestCase
 {
     public function getInstance(): DiscoveryInterface

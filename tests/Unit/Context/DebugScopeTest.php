@@ -9,10 +9,12 @@ use Fiber;
 use function ini_set;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\DebugScope;
+use PHPUnit\Framework\Attributes\BackupGlobals;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\DebugScope::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\Context::class)]
+#[CoversClass(DebugScope::class)]
+#[CoversClass(Context::class)]
 final class DebugScopeTest extends TestCase
 {
     public function setUp(): void
@@ -51,7 +53,7 @@ final class DebugScopeTest extends TestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\BackupGlobals(true)]
+    #[BackupGlobals(true)]
     public function test_disable_debug_scope_using_otel_php_debug_scopes_disabled(): void
     {
         $_SERVER['OTEL_PHP_DEBUG_SCOPES_DISABLED'] = 'true';

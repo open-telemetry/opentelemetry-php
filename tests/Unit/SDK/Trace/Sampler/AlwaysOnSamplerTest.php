@@ -9,9 +9,10 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler::class)]
+#[CoversClass(AlwaysOnSampler::class)]
 class AlwaysOnSamplerTest extends TestCase
 {
     public function test_should_sample(): void

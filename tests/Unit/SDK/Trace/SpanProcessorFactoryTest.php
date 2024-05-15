@@ -11,9 +11,11 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanProcessorFactory::class)]
+#[CoversClass(SpanProcessorFactory::class)]
 class SpanProcessorFactoryTest extends TestCase
 {
     use TestState;
@@ -21,7 +23,7 @@ class SpanProcessorFactoryTest extends TestCase
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('processorProvider')]
+    #[DataProvider('processorProvider')]
     public function test_span_processor_factory_create_span_processor_from_environment(string $processorName, string $expected): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_TRACES_PROCESSOR', $processorName);

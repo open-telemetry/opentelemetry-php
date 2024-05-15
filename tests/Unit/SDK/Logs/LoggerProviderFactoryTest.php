@@ -6,9 +6,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Logs\LoggerProviderFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\LoggerProviderFactory::class)]
+#[CoversClass(LoggerProviderFactory::class)]
 class LoggerProviderFactoryTest extends TestCase
 {
     public function test_create(): void

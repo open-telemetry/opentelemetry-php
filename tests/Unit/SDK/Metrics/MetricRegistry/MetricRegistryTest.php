@@ -14,16 +14,19 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\MultiObserver;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\NoopObserver;
 use OpenTelemetry\SDK\Metrics\Stream\AsynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregator;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregatorFactory;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function printf;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricRegistry\MultiObserver::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricRegistry\NoopObserver::class)]
+#[CoversClass(MetricRegistry::class)]
+#[CoversClass(MultiObserver::class)]
+#[CoversClass(NoopObserver::class)]
 final class MetricRegistryTest extends TestCase
 {
     public function test_collect_and_push_recorded_value(): void

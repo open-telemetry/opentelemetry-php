@@ -8,15 +8,18 @@ use function memory_get_usage;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumSummary;
+use OpenTelemetry\SDK\Metrics\Stream\Delta;
 use OpenTelemetry\SDK\Metrics\Stream\DeltaStorage;
 use OpenTelemetry\SDK\Metrics\Stream\Metric;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Stream\DeltaStorage::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Stream\Delta::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Stream\Metric::class)]
-#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation::class)]
-#[\PHPUnit\Framework\Attributes\UsesClass(\OpenTelemetry\SDK\Metrics\Aggregation\SumSummary::class)]
+#[CoversClass(DeltaStorage::class)]
+#[CoversClass(Delta::class)]
+#[CoversClass(Metric::class)]
+#[UsesClass(SumAggregation::class)]
+#[UsesClass(SumSummary::class)]
 final class DeltaStorageTest extends TestCase
 {
     public function test_empty_storage_returns_empty_metrics(): void

@@ -28,9 +28,10 @@ use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
 use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversNothing]
+#[CoversNothing]
 final class MeterProviderTest extends TestCase
 {
     use TestState;

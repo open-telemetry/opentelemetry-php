@@ -8,15 +8,18 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversNothing]
+#[CoversNothing]
 class ResourceInfoTest extends TestCase
 {
     use TestState;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('environmentResourceProvider')]
-    #[\PHPUnit\Framework\Attributes\Group('compliance')]
+    #[DataProvider('environmentResourceProvider')]
+    #[Group('compliance')]
     public function test_resource_from_environment(string $envAttributes, array $userAttributes, array $expected): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', $envAttributes);

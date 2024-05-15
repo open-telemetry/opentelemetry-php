@@ -24,9 +24,10 @@ use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandler;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader::class)]
+#[CoversClass(ExportingReader::class)]
 final class ExportingReaderTest extends TestCase
 {
     public function test_empty_reader_collects_empty_metrics(): void

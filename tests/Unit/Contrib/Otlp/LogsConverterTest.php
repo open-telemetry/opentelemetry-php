@@ -10,10 +10,11 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Contrib\Otlp\LogsConverter;
 use OpenTelemetry\SDK\Logs\ReadableLogRecord;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\LogsConverter::class)]
+#[CoversClass(LogsConverter::class)]
 class LogsConverterTest extends TestCase
 {
     private const TRACE_ID_BASE16 = 'ff000000000000000000000000000041';

@@ -12,10 +12,11 @@ use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\TracerProviderFactory::class)]
+#[CoversClass(TracerProviderFactory::class)]
 class TracerProviderFactoryTest extends TestCase
 {
     use TestState;

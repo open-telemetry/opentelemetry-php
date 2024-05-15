@@ -8,10 +8,11 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Context\DebugScope;
 use OpenTelemetry\Context\ImplicitContextKeyedInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\Context::class)]
+#[CoversClass(Context::class)]
 class ContextTest extends TestCase
 {
     public function test_activate(): void

@@ -12,10 +12,12 @@ use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\LogRecordProcessorFactory::class)]
+#[CoversClass(LogRecordProcessorFactory::class)]
 class LogRecordProcessorFactoryTest extends TestCase
 {
     use TestState;
@@ -23,7 +25,7 @@ class LogRecordProcessorFactoryTest extends TestCase
     /**
      * @param class-string $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('exporterProvider')]
+    #[DataProvider('exporterProvider')]
     public function test_create(string $name, string $expected): void
     {
         $exporter = $this->createMock(LogRecordExporterInterface::class);

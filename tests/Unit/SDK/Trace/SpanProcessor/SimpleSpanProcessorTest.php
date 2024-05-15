@@ -21,10 +21,11 @@ use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor::class)]
+#[CoversClass(SimpleSpanProcessor::class)]
 class SimpleSpanProcessorTest extends MockeryTestCase
 {
     private SimpleSpanProcessor $simpleSpanProcessor;

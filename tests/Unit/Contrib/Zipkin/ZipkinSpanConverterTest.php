@@ -16,9 +16,11 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Zipkin\SpanConverter::class)]
+#[CoversClass(SpanConverter::class)]
 class ZipkinSpanConverterTest extends TestCase
 {
     public function test_should_convert_a_span_to_a_payload_for_zipkin(): void
@@ -115,7 +117,7 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertArrayNotHasKey('otel.scope.version', $row);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('spanKindProvider')]
+    #[DataProvider('spanKindProvider')]
     public function test_should_convert_otel_span_to_a_zipkin_span(int $internalSpanKind, string $expectedSpanKind): void
     {
         $span = (new SpanData())
@@ -137,7 +139,7 @@ class ZipkinSpanConverterTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('unmappedSpanKindProvider')]
+    #[DataProvider('unmappedSpanKindProvider')]
     public function test_should_convert_an_unmapped_otel_internal_span_to_a_zipkin_span_of_unspecified_kind($kind): void
     {
         $span = (new SpanData())
@@ -244,7 +246,7 @@ class ZipkinSpanConverterTest extends TestCase
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.20.0/specification/common/mapping-to-non-otlp.md#dropped-attributes-count
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('droppedProvider')]
+    #[DataProvider('droppedProvider')]
     public function test_displays_non_zero_dropped_counts(int $dropped, bool $expected): void
     {
         $attributes = $this->createMock(AttributesInterface::class);

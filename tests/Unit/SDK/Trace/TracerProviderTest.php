@@ -7,9 +7,11 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\TracerProvider::class)]
+#[CoversClass(TracerProvider::class)]
 class TracerProviderTest extends TestCase
 {
     public function test_equal_for_same_name_without_version(): void
@@ -36,7 +38,7 @@ class TracerProviderTest extends TestCase
         $this->assertNotEquals($t1, $t3);
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_equal_for_same_name_with_schema_and_version(): void
     {
         $provider = new TracerProvider(null);
@@ -49,7 +51,7 @@ class TracerProviderTest extends TestCase
         $this->assertNotEquals($t1, $t3);
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_shutdown(): void
     {
         $provider = new TracerProvider(null);
@@ -59,7 +61,7 @@ class TracerProviderTest extends TestCase
         $this->assertTrue($provider->shutdown());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_force_flush(): void
     {
         $provider = new TracerProvider([]);
@@ -80,7 +82,7 @@ class TracerProviderTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_get_tracer_returns_noop_tracer_after_shutdown(): void
     {
         $provider = new TracerProvider([]);

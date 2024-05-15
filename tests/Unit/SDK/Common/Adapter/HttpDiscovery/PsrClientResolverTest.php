@@ -7,10 +7,11 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Adapter\HttpDiscovery;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Strategy\MockClientStrategy;
 use OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\PsrClientResolver;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\PsrClientResolver::class)]
+#[CoversClass(PsrClientResolver::class)]
 class PsrClientResolverTest extends TestCase
 {
     public function setUp(): void

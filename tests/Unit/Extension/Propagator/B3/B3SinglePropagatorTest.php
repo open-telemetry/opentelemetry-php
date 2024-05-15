@@ -13,9 +13,11 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3DebugFlagContextKey;
 use OpenTelemetry\Extension\Propagator\B3\B3SinglePropagator;
 use OpenTelemetry\SDK\Trace\Span;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Extension\Propagator\B3\B3SinglePropagator::class)]
+#[CoversClass(B3SinglePropagator::class)]
 class B3SinglePropagatorTest extends TestCase
 {
     private const TRACE_ID_BASE16 = 'ff000000000000000000000000000041';
@@ -142,7 +144,7 @@ class B3SinglePropagatorTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('debugValueProvider')]
+    #[DataProvider('debugValueProvider')]
     public function test_extract_debug_context($headerValue): void
     {
         $carrier = [
@@ -245,7 +247,7 @@ class B3SinglePropagatorTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidSampledValueProvider')]
+    #[DataProvider('invalidSampledValueProvider')]
     public function test_extract_invalid_sampled_context($headerValue): void
     {
         $carrier = [

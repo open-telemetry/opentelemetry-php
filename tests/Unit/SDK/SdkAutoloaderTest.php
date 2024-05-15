@@ -14,9 +14,11 @@ use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\SdkAutoloader;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\SdkAutoloader::class)]
+#[CoversClass(SdkAutoloader::class)]
 class SdkAutoloaderTest extends TestCase
 {
     use TestState;
@@ -88,7 +90,7 @@ class SdkAutoloaderTest extends TestCase
         $this->assertFalse(SdkAutoloader::isExcludedUrl());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('excludeUrlsProvider')]
+    #[DataProvider('excludeUrlsProvider')]
     public function test_exclude_urls(string $exclude, string $uri, bool $expected): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_URLS, $exclude);

@@ -7,10 +7,11 @@ namespace OpenTelemetry\Tests\Unit\Context\Propagation;
 use ArrayObject;
 use InvalidArgumentException;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter::class)]
+#[CoversClass(ArrayAccessGetterSetter::class)]
 class ArrayAccessGetterSetterTest extends TestCase
 {
     public function test_get_from_map_array(): void

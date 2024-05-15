@@ -7,9 +7,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\Behavior;
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\NullSpanConverter;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait::class)]
+#[CoversClass(UsesSpanConverterTrait::class)]
 class UsesSpanConverterTraitTest extends TestCase
 {
     public function test_accessors(): void

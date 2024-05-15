@@ -10,9 +10,11 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\EventLoggerProviderFactory;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\EventLoggerProviderFactory::class)]
+#[CoversClass(EventLoggerProviderFactory::class)]
 class EventLoggerProviderFactoryTest extends TestCase
 {
     use TestState;
@@ -20,7 +22,7 @@ class EventLoggerProviderFactoryTest extends TestCase
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('createProvider')]
+    #[DataProvider('createProvider')]
     public function test_create(string $disabled, string $expected): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_SDK_DISABLED, $disabled);

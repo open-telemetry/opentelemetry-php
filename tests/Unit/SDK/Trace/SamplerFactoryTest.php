@@ -8,6 +8,7 @@ use Exception;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SamplerFactory::class)]
@@ -15,7 +16,7 @@ class SamplerFactoryTest extends TestCase
 {
     use TestState;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('samplerProvider')]
+    #[DataProvider('samplerProvider')]
     public function test_create_sampler_from_environment(string $samplerName, string $expected, string $arg = null): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $samplerName);
@@ -37,7 +38,7 @@ class SamplerFactoryTest extends TestCase
             'parent based trade id ratio' => ['parentbased_traceidratio', 'ParentBased+TraceIdRatio', '0.95'],
         ];
     }
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidSamplerProvider')]
+    #[DataProvider('invalidSamplerProvider')]
     public function test_throws_exception_for_invalid_or_unsupported(?string $sampler, string $arg = null): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $sampler);

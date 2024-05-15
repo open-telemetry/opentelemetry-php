@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Instrumentation\Configurator;
+use OpenTelemetry\API\Instrumentation\ContextKeys;
 use OpenTelemetry\API\Logs\EventLoggerInterface;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Logs\LoggerInterface;
@@ -23,12 +24,13 @@ use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Globals::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Instrumentation\CachedInstrumentation::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Instrumentation\Configurator::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Instrumentation\ContextKeys::class)]
+#[CoversClass(Globals::class)]
+#[CoversClass(CachedInstrumentation::class)]
+#[CoversClass(Configurator::class)]
+#[CoversClass(ContextKeys::class)]
 final class InstrumentationTest extends TestCase
 {
     public function setUp(): void

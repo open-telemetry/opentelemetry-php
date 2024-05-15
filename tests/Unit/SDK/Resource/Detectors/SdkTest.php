@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
 
 use Composer\InstalledVersions;
-use OpenTelemetry\SDK\Resource\Detectors;
+use OpenTelemetry\SDK\Resource\Detectors\Sdk;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\Detectors\Sdk::class)]
+#[CoversClass(Sdk::class)]
 class SdkTest extends TestCase
 {
     public function test_sdk_get_resource(): void
     {
-        $resouceDetector = new Detectors\Sdk();
-        $resource = $resouceDetector->getResource();
+        $resourceDetector = new Sdk();
+        $resource = $resourceDetector->getResource();
         $version = InstalledVersions::getPrettyVersion('open-telemetry/opentelemetry');
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());

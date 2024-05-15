@@ -7,10 +7,11 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Future;
 use Exception;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\ErrorFuture;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Future\CompletedFuture::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Future\ErrorFuture::class)]
+#[CoversClass(CompletedFuture::class)]
+#[CoversClass(ErrorFuture::class)]
 final class FutureTest extends TestCase
 {
     public function test_future_await(): void

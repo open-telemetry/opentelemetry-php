@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\API\Unit\Trace;
 
 use OpenTelemetry\API\Trace\SpanContextValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Trace\SpanContextValidator::class)]
+#[CoversClass(SpanContextValidator::class)]
 class SpanContextValidatorTest extends TestCase
 {
     private const TRACE_ID = 'ff000000000000000000000000000041';

@@ -7,9 +7,10 @@ namespace Unit\SDK\Logs;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\EventLoggerProvider::class)]
+#[CoversClass(EventLoggerProvider::class)]
 class EventLoggerProviderTest extends TestCase
 {
     public function test_emit(): void

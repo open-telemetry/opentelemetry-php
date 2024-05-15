@@ -14,12 +14,13 @@ use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Instrumentation\InstrumentationTrait::class)]
+#[CoversClass(InstrumentationTrait::class)]
 class InstrumentationTraitTest extends TestCase
 {
     public const INSTRUMENTATION_NAME = 'test-instrumentation';

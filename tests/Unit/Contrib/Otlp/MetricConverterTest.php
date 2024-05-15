@@ -20,9 +20,10 @@ use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\MetricConverter::class)]
+#[CoversClass(MetricConverter::class)]
 final class MetricConverterTest extends TestCase
 {
     public function test_empty_batch_returns_empty_request(): void

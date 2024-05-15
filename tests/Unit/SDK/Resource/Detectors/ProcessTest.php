@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
 
-use OpenTelemetry\SDK\Resource\Detectors;
+use OpenTelemetry\SDK\Resource\Detectors\Process;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\Detectors\Process::class)]
+#[CoversClass(Process::class)]
 class ProcessTest extends TestCase
 {
     public function test_process_get_resource(): void
     {
-        $resouceDetector = new Detectors\Process();
-        $resource = $resouceDetector->getResource();
+        $resourceDetector = new Process();
+        $resource = $resourceDetector->getResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertIsInt($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));

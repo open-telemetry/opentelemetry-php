@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\StalenessHandler;
 
 use OpenTelemetry\API\Common\Time\TestClock;
+use OpenTelemetry\SDK\Metrics\StalenessHandler\DelayedStalenessHandler;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\DelayedStalenessHandlerFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use WeakReference;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\StalenessHandler\DelayedStalenessHandler::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\StalenessHandler\DelayedStalenessHandlerFactory::class)]
+#[CoversClass(DelayedStalenessHandler::class)]
+#[CoversClass(DelayedStalenessHandlerFactory::class)]
 final class DelayedStalenessHandlerTest extends TestCase
 {
     public function test_on_stale(): void

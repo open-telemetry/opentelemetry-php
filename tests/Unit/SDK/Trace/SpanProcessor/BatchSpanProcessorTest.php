@@ -31,10 +31,12 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessorBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor::class)]
+#[CoversClass(BatchSpanProcessor::class)]
 class BatchSpanProcessorTest extends MockeryTestCase
 {
     private TestClock $testClock;
@@ -80,7 +82,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('scheduledDelayProvider')]
+    #[DataProvider('scheduledDelayProvider')]
     public function test_export_scheduled_delay(int $exportDelay, int $advanceByNano, bool $expectedFlush): void
     {
         $batchSize = 2;

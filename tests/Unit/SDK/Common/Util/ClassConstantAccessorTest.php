@@ -6,9 +6,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Util;
 
 use LogicException;
 use OpenTelemetry\SDK\Common\Util\ClassConstantAccessor;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Util\ClassConstantAccessor::class)]
+#[CoversClass(ClassConstantAccessor::class)]
 class ClassConstantAccessorTest extends TestCase
 {
     public function test_get_value_return_correct_value(): void

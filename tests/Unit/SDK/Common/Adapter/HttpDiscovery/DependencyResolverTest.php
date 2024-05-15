@@ -11,6 +11,8 @@ use OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\DependencyResolver;
 use OpenTelemetry\SDK\Common\Http\HttpPlug\Client\ResolverInterface as HttpPlugClientResolverInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\ResolverInterface as PsrClientResolverInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Message\FactoryResolverInterface as MessageFactoryResolverInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface as PsrClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -21,7 +23,7 @@ use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use ReflectionClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\DependencyResolver::class)]
+#[CoversClass(DependencyResolver::class)]
 class DependencyResolverTest extends TestCase
 {
     private const DEPENDENCIES = [
@@ -46,7 +48,7 @@ class DependencyResolverTest extends TestCase
         PsrClientResolverInterface::class => ['Client', 'PsrClient'],
     ];
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideDependencies')]
+    #[DataProvider('provideDependencies')]
     public function test_resolve(string $method, object $dependency, array $arguments): void
     {
         $instance = DependencyResolver::create(...$arguments);

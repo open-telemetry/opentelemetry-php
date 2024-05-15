@@ -38,11 +38,14 @@ use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\StatusData;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use function range;
 use function str_repeat;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\Span::class)]
+#[CoversClass(Span::class)]
 class SpanTest extends MockeryTestCase
 {
     private const SPAN_NAME = 'test_span';
@@ -116,7 +119,7 @@ class SpanTest extends MockeryTestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_start_span(): void
     {
         $this->createTestSpan(API\SpanKind::KIND_INTERNAL);
@@ -125,7 +128,7 @@ class SpanTest extends MockeryTestCase
             ->once();
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_end_span(): void
     {
         $span = $this->createTestSpan(API\SpanKind::KIND_CONSUMER);
@@ -143,7 +146,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSame(self::START_EPOCH, $span->getStartEpochNanos());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_get_current_span_set_span(): void
     {
         $span = Span::wrap(SpanContext::getInvalid());
@@ -203,7 +206,7 @@ class SpanTest extends MockeryTestCase
 
     // endregion API
     // region SDK
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_nothing_changes_after_end(): void
     {
         $span = $this->createTestSpan();
@@ -235,7 +238,7 @@ class SpanTest extends MockeryTestCase
         $this->assertTrue($span->hasEnded());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_to_span_data_active_span(): void
     {
         $span = $this->createTestSpan();
@@ -264,7 +267,7 @@ class SpanTest extends MockeryTestCase
         $this->assertFalse($span->isRecording());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_to_span_data_ended_span(): void
     {
         $span = $this->createTestSpan();
@@ -323,7 +326,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSame(0, $spanData->getAttributes()->getDroppedAttributesCount());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_to_span_data_is_immutable(): void
     {
         $span = $this->createTestSpanWithAttributes(self::ATTRIBUTES);
@@ -391,7 +394,7 @@ class SpanTest extends MockeryTestCase
         $span->end();
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_update_span_name(): void
     {
         $span = $this->createTestRootSpan();
@@ -425,7 +428,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSame($elapsedNanos, $span->getDuration());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_set_attributes(): void
     {
         $span = $this->createTestRootSpan();
@@ -462,7 +465,7 @@ class SpanTest extends MockeryTestCase
         $this->assertEmpty($span->toSpanData()->getAttributes());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('nonHomogeneousArrayProvider')]
+    #[DataProvider('nonHomogeneousArrayProvider')]
     public function test_set_attribute_drops_non_homogeneous_array(array $values): void
     {
         $this->logWriter->expects($this->once())
@@ -487,7 +490,7 @@ class SpanTest extends MockeryTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('homogeneousArrayProvider')]
+    #[DataProvider('homogeneousArrayProvider')]
     public function test_set_attribute_with_homogeneous_array(array $values): void
     {
         $span = $this->createTestRootSpan();
@@ -507,7 +510,7 @@ class SpanTest extends MockeryTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_add_event(): void
     {
         $span = $this->createTestRootSpan();
@@ -562,7 +565,7 @@ class SpanTest extends MockeryTestCase
         $span->end();
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_record_exception(): void
     {
         $exception = new Exception('ERR');
@@ -648,7 +651,7 @@ class SpanTest extends MockeryTestCase
         $span->end();
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_dropping_attributes(): void
     {
         $maxNumberOfAttributes = 8;
@@ -717,7 +720,7 @@ class SpanTest extends MockeryTestCase
     }
 
     // endregion SDK
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_set_attributes_merges_attributes(): void
     {
         $span = $this->createTestRootSpan();
@@ -740,7 +743,7 @@ class SpanTest extends MockeryTestCase
         $this->assertSame(['f', 'b'], $attributes->get('str_array'));
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_add_event_order_preserved(): void
     {
         $span = $this->createTestRootSpan();
@@ -762,8 +765,8 @@ class SpanTest extends MockeryTestCase
      *
      * When span status is set to Ok it SHOULD be considered final and any further attempts to change it SHOULD be ignored.
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('statusCodeProvider')]
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[DataProvider('statusCodeProvider')]
+    #[Group('trace-compliance')]
     public function test_set_status_after_ok_is_ignored(string $code): void
     {
         $span = $this->createTestRootSpan();
@@ -783,7 +786,7 @@ class SpanTest extends MockeryTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_can_set_status_to_ok_after_error(): void
     {
         $span = $this->createTestRootSpan();

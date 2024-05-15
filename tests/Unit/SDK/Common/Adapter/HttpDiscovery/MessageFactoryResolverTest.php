@@ -9,6 +9,8 @@ use Http\Discovery\Psr18ClientDiscovery;
 use Http\Discovery\Strategy\MockClientStrategy;
 use Mockery;
 use OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\MessageFactoryResolver;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -18,7 +20,7 @@ use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use ReflectionClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\MessageFactoryResolver::class)]
+#[CoversClass(MessageFactoryResolver::class)]
 class MessageFactoryResolverTest extends TestCase
 {
     private const DEPENDENCIES = [
@@ -35,7 +37,7 @@ class MessageFactoryResolverTest extends TestCase
         Psr18ClientDiscovery::prependStrategy(MockClientStrategy::class);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideDependencies')]
+    #[DataProvider('provideDependencies')]
     public function test_resolve(string $method, object $dependency, array $arguments): void
     {
         $instance = MessageFactoryResolver::create(...$arguments);

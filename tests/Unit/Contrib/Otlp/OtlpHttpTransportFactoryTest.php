@@ -6,9 +6,10 @@ namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory::class)]
+#[CoversClass(OtlpHttpTransportFactory::class)]
 class OtlpHttpTransportFactoryTest extends TestCase
 {
     private OtlpHttpTransportFactory $factory;

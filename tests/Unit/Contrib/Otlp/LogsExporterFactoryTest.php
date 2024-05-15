@@ -10,11 +10,13 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\LogsExporterFactory::class)]
+#[CoversClass(LogsExporterFactory::class)]
 class LogsExporterFactoryTest extends TestCase
 {
     use TestState;
@@ -38,7 +40,7 @@ class LogsExporterFactoryTest extends TestCase
         $factory->create();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('configProvider')]
+    #[DataProvider('configProvider')]
     public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = [], array $expectedValues = []): void
     {
         foreach ($env as $k => $v) {

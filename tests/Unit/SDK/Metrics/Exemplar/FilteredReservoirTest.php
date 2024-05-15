@@ -15,12 +15,13 @@ use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\FilteredReservoir;
 use OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Exemplar\FilteredReservoir::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter::class)]
+#[CoversClass(FilteredReservoir::class)]
+#[CoversClass(AllExemplarFilter::class)]
+#[CoversClass(NoneExemplarFilter::class)]
+#[CoversClass(WithSampledTraceExemplarFilter::class)]
 final class FilteredReservoirTest extends TestCase
 {
 

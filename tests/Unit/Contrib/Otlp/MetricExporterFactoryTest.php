@@ -13,12 +13,14 @@ use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @psalm-suppress UndefinedInterfaceMethod
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\MetricExporterFactory::class)]
+#[CoversClass(MetricExporterFactory::class)]
 class MetricExporterFactoryTest extends TestCase
 {
     use TestState;
@@ -40,7 +42,7 @@ class MetricExporterFactoryTest extends TestCase
         $factory->create();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('temporalityProvider')]
+    #[DataProvider('temporalityProvider')]
     public function test_create_with_temporality(array $env, ?string $expected): void
     {
         // @phpstan-ignore-next-line
@@ -92,7 +94,7 @@ class MetricExporterFactoryTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('configProvider')]
+    #[DataProvider('configProvider')]
     public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = [], array $expectedValues = []): void
     {
         foreach ($env as $k => $v) {

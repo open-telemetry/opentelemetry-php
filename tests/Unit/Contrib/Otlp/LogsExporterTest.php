@@ -9,10 +9,11 @@ use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\ErrorFuture;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\LogsExporter::class)]
+#[CoversClass(LogsExporter::class)]
 class LogsExporterTest extends TestCase
 {
     private MockObject $transport;

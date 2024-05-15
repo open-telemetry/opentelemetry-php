@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
 
-use OpenTelemetry\SDK\Resource\Detectors;
+use OpenTelemetry\SDK\Resource\Detectors\Environment;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\Detectors\Environment::class)]
+#[CoversClass(Environment::class)]
 class EnvironmentTest extends TestCase
 {
     use TestState;
 
-    private Detectors\Environment $detector;
+    private Environment $detector;
 
     public function setUp(): void
     {
-        $this->detector = new Detectors\Environment();
+        $this->detector = new Environment();
     }
 
     public function test_environment_default_get_resource(): void
@@ -40,7 +42,7 @@ class EnvironmentTest extends TestCase
         $this->assertSame('value_bar', $resource->getAttributes()->get('key_bar'));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('encodedResourceValueProvider')]
+    #[DataProvider('encodedResourceValueProvider')]
     public function test_environment_get_resource_with_encoded_value(string $value, string $expected): void
     {
         $key = 'key';

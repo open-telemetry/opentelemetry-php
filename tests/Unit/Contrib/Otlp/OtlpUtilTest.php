@@ -8,9 +8,11 @@ use OpenTelemetry\API\Signals;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\OtlpUtil::class)]
+#[CoversClass(OtlpUtil::class)]
 class OtlpUtilTest extends TestCase
 {
     use TestState;
@@ -28,7 +30,7 @@ class OtlpUtilTest extends TestCase
         OtlpUtil::method('foo');
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('methodProvider')]
+    #[DataProvider('methodProvider')]
     public function test_method(string $signal, string $expected): void
     {
         $method = OtlpUtil::method($signal);
@@ -44,7 +46,7 @@ class OtlpUtilTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('headersProvider')]
+    #[DataProvider('headersProvider')]
     public function test_get_headers(string $signal, array $env, array $expected): void
     {
         foreach ($env as $var => $value) {

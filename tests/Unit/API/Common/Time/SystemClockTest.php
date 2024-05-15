@@ -6,9 +6,10 @@ namespace OpenTelemetry\Tests\Unit\API\Common\Time;
 
 use DateTime;
 use OpenTelemetry\API\Common\Time\SystemClock;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Common\Time\SystemClock::class)]
+#[CoversClass(SystemClock::class)]
 class SystemClockTest extends TestCase
 {
     private const NANOS_PER_SECOND = 1_000_000_000;

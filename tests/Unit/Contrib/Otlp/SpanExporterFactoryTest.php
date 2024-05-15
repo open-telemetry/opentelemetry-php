@@ -10,12 +10,14 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @psalm-suppress UndefinedInterfaceMethod
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Otlp\SpanExporterFactory::class)]
+#[CoversClass(SpanExporterFactory::class)]
 class SpanExporterFactoryTest extends TestCase
 {
     use TestState;
@@ -37,7 +39,7 @@ class SpanExporterFactoryTest extends TestCase
         $factory->create();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('configProvider')]
+    #[DataProvider('configProvider')]
     public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = [], array $expectedValues = []): void
     {
         foreach ($env as $k => $v) {

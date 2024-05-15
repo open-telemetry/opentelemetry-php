@@ -12,12 +12,13 @@ use OpenTelemetry\SDK\Logs\Logger;
 use OpenTelemetry\SDK\Logs\LoggerSharedState;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @psalm-suppress UndefinedInterfaceMethod
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Logger::class)]
+#[CoversClass(Logger::class)]
 class LoggerTest extends TestCase
 {
     private LoggerSharedState $sharedState;

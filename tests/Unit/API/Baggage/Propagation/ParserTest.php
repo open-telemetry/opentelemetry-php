@@ -7,10 +7,12 @@ namespace OpenTelemetry\Tests\Unit\API\Baggage\Propagation;
 use OpenTelemetry\API\Baggage\BaggageBuilder;
 use OpenTelemetry\API\Baggage\BaggageBuilderInterface;
 use OpenTelemetry\API\Baggage\Propagation\Parser;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\Baggage\Propagation\Parser::class)]
+#[CoversClass(Parser::class)]
 class ParserTest extends TestCase
 {
     /** @var BaggageBuilderInterface&MockObject */
@@ -28,7 +30,7 @@ class ParserTest extends TestCase
         $parser->parseInto($this->builder);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('headerProvider')]
+    #[DataProvider('headerProvider')]
     public function test_parse_into(string $header): void
     {
         $parser = new Parser($header);
@@ -73,7 +75,7 @@ class ParserTest extends TestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidHeaderProvider')]
+    #[DataProvider('invalidHeaderProvider')]
     public function test_parse_into_with_invalid_header(string $header): void
     {
         $parser = new Parser($header);

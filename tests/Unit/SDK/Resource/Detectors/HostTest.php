@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
 
-use OpenTelemetry\SDK\Resource\Detectors;
+use OpenTelemetry\SDK\Resource\Detectors\Host;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Resource\Detectors\Host::class)]
+#[CoversClass(Host::class)]
 class HostTest extends TestCase
 {
     public function test_host_get_resource(): void
     {
-        $resourceDetector = new Detectors\Host();
+        $resourceDetector = new Host();
         $resource = $resourceDetector->getResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
@@ -22,11 +24,11 @@ class HostTest extends TestCase
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('hostIdData')]
+    #[DataProvider('hostIdData')]
     public function test_host_id_filesystem(string $os, array $files, ?string $expectedId): void
     {
         $root = vfsStream::setup('/', null, $files);
-        $resourceDetector = new Detectors\Host($root->url(), $os);
+        $resourceDetector = new Host($root->url(), $os);
         $resource = $resourceDetector->getResource();
 
         if ($expectedId === null) {

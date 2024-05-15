@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
+use OpenTelemetry\SDK\Logs\LogRecordLimits;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\LogRecordLimits::class)]
+#[CoversClass(LogRecordLimitsBuilder::class)]
+#[CoversClass(LogRecordLimits::class)]
 class LogRecordLimitsBuilderTest extends TestCase
 {
     public function test_builder(): void

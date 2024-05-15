@@ -6,9 +6,10 @@ namespace OpenTelemetry\Tests\Unit\Context\Propagation;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\Propagation\NoopTextMapPropagator::class)]
+#[CoversClass(NoopTextMapPropagator::class)]
 class NoopTextMapPropagatorTest extends TestCase
 {
     public function test_fields(): void

@@ -24,9 +24,11 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use OpenTelemetry\SemConv\TraceAttributes;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversNothing]
+#[CoversNothing]
 class TracerTest extends TestCase
 {
     use TestState;
@@ -77,7 +79,7 @@ class TracerTest extends TestCase
         $this->assertEquals($newTraceState, $span->getContext()->getTraceState());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_span_should_receive_instrumentation_scope(): void
     {
         $tracerProvider = new TracerProvider();

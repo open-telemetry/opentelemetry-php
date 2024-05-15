@@ -6,12 +6,14 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\RandomIdGenerator::class)]
+#[CoversClass(RandomIdGenerator::class)]
 class RandomIdGeneratorTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_generated_trace_id_is_valid(): void
     {
         $idGenerator = new RandomIdGenerator();
@@ -20,7 +22,7 @@ class RandomIdGeneratorTest extends TestCase
         $this->assertEquals(1, preg_match(SpanContextValidator::VALID_TRACE, $traceId));
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_generated_span_id_is_valid(): void
     {
         $idGenerator = new RandomIdGenerator();

@@ -6,9 +6,10 @@ namespace OpenTelemetry\Tests\Unit\Contrib\Grpc;
 
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Contrib\Grpc\GrpcTransportFactory::class)]
+#[CoversClass(GrpcTransportFactory::class)]
 class GrpcTransportFactoryTest extends TestCase
 {
     public function test_grpc_transport_create(): void

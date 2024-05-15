@@ -6,9 +6,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
 
 use Exception;
 use OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter::class)]
+#[CoversClass(\OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter::class)]
 class LoggerExporterTest extends TestCase
 {
     use LoggerAwareTestTrait;

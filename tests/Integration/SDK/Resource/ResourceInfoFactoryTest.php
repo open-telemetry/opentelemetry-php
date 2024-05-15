@@ -8,9 +8,10 @@ use Composer\InstalledVersions;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversNothing]
+#[CoversNothing]
 class ResourceInfoFactoryTest extends TestCase
 {
     use TestState;

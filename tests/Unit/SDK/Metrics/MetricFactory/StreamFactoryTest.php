@@ -18,6 +18,8 @@ use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
+use OpenTelemetry\SDK\Metrics\MetricFactory\StreamMetricSource;
+use OpenTelemetry\SDK\Metrics\MetricFactory\StreamMetricSourceProvider;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\RegistryRegistration;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;
@@ -27,11 +29,12 @@ use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandler;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricFactory\StreamMetricSource::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\MetricFactory\StreamMetricSourceProvider::class)]
+#[CoversClass(StreamFactory::class)]
+#[CoversClass(StreamMetricSource::class)]
+#[CoversClass(StreamMetricSourceProvider::class)]
 final class StreamFactoryTest extends TestCase
 {
     public function test_create_asynchronous_observer(): void

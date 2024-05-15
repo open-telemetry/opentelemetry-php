@@ -9,8 +9,9 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\Context\Propagation\MultiTextMapPropagator::class)]
+#[CoversClass(MultiTextMapPropagator::class)]
 class MultiTextMapPropagatorTest extends MockeryTestCase
 {
     /** @var Mockery\MockInterface&TextMapPropagatorInterface */

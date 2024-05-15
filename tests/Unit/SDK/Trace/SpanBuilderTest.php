@@ -18,10 +18,11 @@ use OpenTelemetry\SDK\Trace\SpanBuilder;
 use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerSharedState;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanBuilder::class)]
+#[CoversClass(SpanBuilder::class)]
 class SpanBuilderTest extends TestCase
 {
     private const TRACE_ID = 'e4a8d4e0d75c0702200af2882cb16c6b';

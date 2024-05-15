@@ -18,9 +18,11 @@ use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Propagation\PropagatorFactory::class)]
+#[CoversClass(PropagatorFactory::class)]
 class PropagatorFactoryTest extends TestCase
 {
     use TestState;
@@ -34,7 +36,7 @@ class PropagatorFactoryTest extends TestCase
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('propagatorsProvider')]
+    #[DataProvider('propagatorsProvider')]
     public function test_create(string $propagators, string $expected): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PROPAGATORS, $propagators);
@@ -59,7 +61,7 @@ class PropagatorFactoryTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('unimplementedPropagatorProvider')]
+    #[DataProvider('unimplementedPropagatorProvider')]
     public function test_unimplemented_propagators(string $propagator): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PROPAGATORS, $propagator);

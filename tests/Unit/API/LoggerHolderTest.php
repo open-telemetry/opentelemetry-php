@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\API;
 
 use OpenTelemetry\API\LoggerHolder;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\API\LoggerHolder::class)]
+#[CoversClass(LoggerHolder::class)]
 class LoggerHolderTest extends TestCase
 {
     public function setUp(): void

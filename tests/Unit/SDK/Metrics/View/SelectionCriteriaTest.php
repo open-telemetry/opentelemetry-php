@@ -15,15 +15,17 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeVersion
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeNameCriteria::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeVersionCriteria::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeSchemaUrlCriteria::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\View\SelectionCriteria\AllCriteria::class)]
+#[CoversClass(InstrumentationScopeNameCriteria::class)]
+#[CoversClass(InstrumentationScopeVersionCriteria::class)]
+#[CoversClass(InstrumentationScopeSchemaUrlCriteria::class)]
+#[CoversClass(InstrumentNameCriteria::class)]
+#[CoversClass(InstrumentTypeCriteria::class)]
+#[CoversClass(AllCriteria::class)]
 final class SelectionCriteriaTest extends TestCase
 {
     use ProphecyTrait;
@@ -67,7 +69,7 @@ final class SelectionCriteriaTest extends TestCase
     /**
      * @param non-empty-string $pattern
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('instrumentNameProvider')]
+    #[DataProvider('instrumentNameProvider')]
     public function test_instrument_name_criteria(string $pattern, string $name, bool $expected): void
     {
         $this->assertSame($expected, (new InstrumentNameCriteria($pattern))->accepts(

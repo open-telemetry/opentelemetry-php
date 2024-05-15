@@ -8,9 +8,11 @@ use Exception;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanLimitsBuilder::class)]
+#[CoversClass(SpanLimitsBuilder::class)]
 class SpanLimitsBuilderTest extends TestCase
 {
     use TestState;
@@ -23,7 +25,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(Attributes::factory(128), $spanLimits->getAttributesFactory());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_span_limits_builder_uses_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 111);
@@ -33,7 +35,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(Attributes::factory(111), $spanLimits->getAttributesFactory());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_span_limits_builder_uses_configured_value(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 111);
@@ -44,7 +46,7 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(Attributes::factory(222), $spanLimits->getAttributesFactory());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_span_limits_builder_throws_exception_on_invalid_value_from_environment(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 'fruit');

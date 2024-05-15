@@ -6,9 +6,11 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
 
 use OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver::class)]
+#[CoversClass(EnvironmentResolver::class)]
 class EnvironmentResolverTest extends TestCase
 {
     use TestState;
@@ -54,7 +56,7 @@ class EnvironmentResolverTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('rawValueProvider')]
+    #[DataProvider('rawValueProvider')]
     public function test_retrieve_value(string $varName, string $varValue): void
     {
         $this->setEnvironmentVariable($varName, $varValue);

@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Logs\Processor;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -14,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  * @psalm-suppress UndefinedInterfaceMethod
  * @psalm-suppress  PossiblyUndefinedMethod
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor::class)]
+#[CoversClass(SimpleLogRecordProcessor::class)]
 class SimpleLogRecordProcessorTest extends TestCase
 {
     private SimpleLogRecordProcessor $processor;

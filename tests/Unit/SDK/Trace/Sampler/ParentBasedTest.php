@@ -15,8 +15,11 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\Sampler\ParentBased::class)]
+#[CoversClass(ParentBased::class)]
 class ParentBasedTest extends MockeryTestCase
 {
     private SamplerInterface $rootSampler;
@@ -33,7 +36,7 @@ class ParentBasedTest extends MockeryTestCase
         $this->assertSame('ParentBased+Foo', $sampler->getDescription());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('trace-compliance')]
+    #[Group('trace-compliance')]
     public function test_parent_based_root_span(): void
     {
         $rootSampler = self::createMockSamplerInvokedOnce(SamplingResult::RECORD_AND_SAMPLE);
@@ -51,7 +54,7 @@ class ParentBasedTest extends MockeryTestCase
         $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $decision->getDecision());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('parentContextProvider')]
+    #[DataProvider('parentContextProvider')]
     public function test_should_sample_parent_based(
         $parentContext,
         ?SamplerInterface $remoteParentSampled = null,

@@ -9,11 +9,12 @@ use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * @psalm-suppress UndefinedInterfaceMethod
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter::class)]
+#[CoversClass(ConsoleSpanExporter::class)]
 class ConsoleSpanExporterTest extends AbstractExporterTestCase
 {
     public function createExporter(): ConsoleSpanExporter

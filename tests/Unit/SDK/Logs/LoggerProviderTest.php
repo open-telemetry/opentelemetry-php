@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Logs\Logger;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +18,7 @@ use PHPUnit\Framework\TestCase;
  * @psalm-suppress UndefinedInterfaceMethod
  * @psalm-suppress PossiblyUndefinedMethod
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Logs\LoggerProvider::class)]
+#[CoversClass(LoggerProvider::class)]
 class LoggerProviderTest extends TestCase
 {
     /** @var LogRecordProcessorInterface&MockObject $processor */

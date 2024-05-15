@@ -7,9 +7,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Link;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Trace\Link::class)]
+#[CoversClass(Link::class)]
 class LinkTest extends TestCase
 {
     private API\SpanContextInterface $context;

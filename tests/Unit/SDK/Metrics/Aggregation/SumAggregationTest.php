@@ -11,10 +11,11 @@ use OpenTelemetry\SDK\Metrics\Aggregation\SumSummary;
 use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Metrics\Aggregation\SumSummary::class)]
+#[CoversClass(SumAggregation::class)]
+#[CoversClass(SumSummary::class)]
 final class SumAggregationTest extends TestCase
 {
     public function test_initialize(): void

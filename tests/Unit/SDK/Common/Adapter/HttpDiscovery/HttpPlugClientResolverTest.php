@@ -6,9 +6,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Adapter\HttpDiscovery;
 
 use Http\Client\HttpAsyncClient;
 use OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\HttpPlugClientResolver;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\HttpPlugClientResolver::class)]
+#[CoversClass(HttpPlugClientResolver::class)]
 class HttpPlugClientResolverTest extends TestCase
 {
     public function test_resolve_http_plug_async_client(): void
