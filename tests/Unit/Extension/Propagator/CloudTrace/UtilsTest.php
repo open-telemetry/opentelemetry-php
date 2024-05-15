@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Extension\Propagator\CloudTrace;
 
 use OpenTelemetry\Extension\Propagator\CloudTrace\Utils;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Extension\Propagator\CloudTrace\Utils
- */
+#[CoversClass(Utils::class)]
 class UtilsTest extends TestCase
 {
 
-    /**
-     * @dataProvider for_test_left_zero_pad
-     */
+    #[DataProvider('for_test_left_zero_pad')]
     public function test_left_zero_pad(string $pad, int $howMuch, string $equalsTo) : void
     {
         $this->assertEquals(Utils::leftZeroPad($pad, $howMuch), $equalsTo, "Given leftZeroPad($pad, $howMuch) != $equalsTo");
@@ -31,9 +29,7 @@ class UtilsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider for_test_dec_to_hex
-     */
+    #[DataProvider('for_test_dec_to_hex')]
     public function test_dec_to_hex(string $decNum, string $equalsTo) : void
     {
         $this->assertEquals(Utils::decToHex($decNum), $equalsTo, "Given decToHex($decNum) != $equalsTo");
@@ -50,9 +46,7 @@ class UtilsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider for_test_hex_to_dec
-     */
+    #[DataProvider('for_test_hex_to_dec')]
     public function test_hex_to_dec(string $hexNum, string $equalsTo) : void
     {
         $this->assertEquals(Utils::hexToDec($hexNum), $equalsTo, "Given hexToDec($hexNum) != $equalsTo");
@@ -76,9 +70,7 @@ class UtilsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider for_test_is_big_num
-     */
+    #[DataProvider('for_test_is_big_num')]
     public function test_is_big_num($num, bool $equalsTo) : void
     {
         $this->assertEquals(Utils::isBigNum($num), $equalsTo, "Given isBigNum($num) != $equalsTo");
@@ -99,9 +91,7 @@ class UtilsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider for_test_base_convert
-     */
+    #[DataProvider('for_test_base_convert')]
     public function test_base_convert(string $num, int $fromBase, int $toBase, string $equalsTo) : void
     {
         $result = Utils::baseConvert($num, $fromBase, $toBase);

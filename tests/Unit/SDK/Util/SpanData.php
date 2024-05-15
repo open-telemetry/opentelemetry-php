@@ -32,7 +32,7 @@ class SpanData implements SDK\SpanDataInterface
     private array $links = [];
 
     private AttributesBuilderInterface $attributesBuilder;
-    private int $kind;
+    private int $kind = API\SpanKind::KIND_INTERNAL;
     private StatusData $status;
     private ResourceInfo $resource;
     private InstrumentationScope $instrumentationScope;
@@ -47,7 +47,6 @@ class SpanData implements SDK\SpanDataInterface
     public function __construct()
     {
         $this->attributesBuilder = Attributes::factory()->builder();
-        $this->kind = API\SpanKind::KIND_INTERNAL;
         $this->status = StatusData::unset();
         $this->resource = ResourceInfoFactory::emptyResource();
         $this->instrumentationScope = new InstrumentationScope('', null, null, Attributes::create([]));

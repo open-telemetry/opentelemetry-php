@@ -9,17 +9,18 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopObservableCounter;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
+use OpenTelemetry\SDK\Metrics\Meter;
 use OpenTelemetry\SDK\Metrics\MeterProviderBuilder;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
+#[CoversClass(Meter::class)]
 final class MeterTest extends TestCase
 {
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\Meter::batchObserve
-     */
     public function test_batch_observe_observes_all_provided_instruments(): void
     {
         $exporter = new InMemoryExporter();
@@ -49,9 +50,6 @@ final class MeterTest extends TestCase
         }
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\Meter::batchObserve
-     */
     public function test_batch_observe_calls_callback_only_once(): void
     {
         $reader = new ExportingReader(new InMemoryExporter());
@@ -78,9 +76,6 @@ final class MeterTest extends TestCase
         }
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\Meter::batchObserve
-     */
     public function test_batch_observe_detach_detaches_callback(): void
     {
         $exporter = new InMemoryExporter();
@@ -111,9 +106,6 @@ final class MeterTest extends TestCase
         }
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\Meter::batchObserve
-     */
     public function test_batch_observe_weakens_callback(): void
     {
         $exporter = new InMemoryExporter();
@@ -153,9 +145,6 @@ final class MeterTest extends TestCase
         }
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\Meter::batchObserve
-     */
     public function test_batch_observe_invalid_instrument(): void
     {
         $logWriter = $this->createMock(LogWriterInterface::class);
@@ -192,9 +181,6 @@ final class MeterTest extends TestCase
         }
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\Meter::batchObserve
-     */
     public function test_batch_observe_invalid_instrument_different_meter(): void
     {
         $logWriter = $this->createMock(LogWriterInterface::class);
@@ -231,9 +217,7 @@ final class MeterTest extends TestCase
         }
     }
 
-    /**
-     * @coversNothing
-     */
+    #[CoversNothing]
     public function test_batch_observe_detach_with_repeated_instrument_does_not_trigger_undefined_offset_warning(): void
     {
         $this->expectNotToPerformAssertions();

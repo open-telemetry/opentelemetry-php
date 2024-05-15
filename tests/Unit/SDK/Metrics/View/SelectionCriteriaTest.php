@@ -15,16 +15,21 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeVersion
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
+#[CoversClass(InstrumentationScopeNameCriteria::class)]
+#[CoversClass(InstrumentationScopeVersionCriteria::class)]
+#[CoversClass(InstrumentationScopeSchemaUrlCriteria::class)]
+#[CoversClass(InstrumentNameCriteria::class)]
+#[CoversClass(InstrumentTypeCriteria::class)]
+#[CoversClass(AllCriteria::class)]
 final class SelectionCriteriaTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeNameCriteria
-     */
     public function test_instrument_scope_name_criteria(): void
     {
         $this->assertTrue((new InstrumentationScopeNameCriteria('scopeName'))->accepts(
@@ -37,9 +42,6 @@ final class SelectionCriteriaTest extends TestCase
         ));
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeVersionCriteria
-     */
     public function test_instrument_scope_version_criteria(): void
     {
         $this->assertTrue((new InstrumentationScopeVersionCriteria('1.0.0'))->accepts(
@@ -52,9 +54,6 @@ final class SelectionCriteriaTest extends TestCase
         ));
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeSchemaUrlCriteria
-     */
     public function test_instrument_scope_schema_url_criteria(): void
     {
         $this->assertTrue((new InstrumentationScopeSchemaUrlCriteria('https://schema-url.test/1.0'))->accepts(
@@ -69,9 +68,8 @@ final class SelectionCriteriaTest extends TestCase
 
     /**
      * @param non-empty-string $pattern
-     * @covers \OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria
-     * @dataProvider instrumentNameProvider
      */
+    #[DataProvider('instrumentNameProvider')]
     public function test_instrument_name_criteria(string $pattern, string $name, bool $expected): void
     {
         $this->assertSame($expected, (new InstrumentNameCriteria($pattern))->accepts(
@@ -94,9 +92,6 @@ final class SelectionCriteriaTest extends TestCase
         yield 'match all - matching' => ['*', 'foobar', true];
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria
-     */
     public function test_instrument_type_criteria_wildcard(): void
     {
         $this->assertTrue((new InstrumentTypeCriteria(InstrumentType::COUNTER))->accepts(
@@ -109,9 +104,6 @@ final class SelectionCriteriaTest extends TestCase
         ));
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\View\SelectionCriteria\AllCriteria
-     */
     public function test_all_criteria_accepts_if_all_criteria_accept(): void
     {
         $instrument = new Instrument(InstrumentType::COUNTER, 'name', null, null);
@@ -133,9 +125,6 @@ final class SelectionCriteriaTest extends TestCase
         $this->assertTrue((new AllCriteria($criterias))->accepts($instrument, $instrumentScope));
     }
 
-    /**
-     * @covers \OpenTelemetry\SDK\Metrics\View\SelectionCriteria\AllCriteria
-     */
     public function test_all_criteria_rejects_if_any_criteria_rejects(): void
     {
         $instrument = new Instrument(InstrumentType::COUNTER, 'name', null, null);

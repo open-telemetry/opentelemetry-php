@@ -8,10 +8,9 @@ use OpenTelemetry\Contrib\Zipkin\Exporter;
 
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter\AbstractExporterTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers \OpenTelemetry\Contrib\Zipkin\Exporter
- */
+#[CoversClass(Exporter::class)]
 class ZipkinExporterTest extends AbstractExporterTestCase
 {
     /**

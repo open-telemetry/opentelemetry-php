@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Context;
 
 use OpenTelemetry\Context\ContextKey;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Context\ContextKey
- */
+#[CoversClass(ContextKey::class)]
 class ContextKeyTest extends TestCase
 {
     public function test_name(): void

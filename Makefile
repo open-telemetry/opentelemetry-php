@@ -43,6 +43,8 @@ psalm-info: ## Run psalm and show info
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/psalm/vendor/bin/psalm --show-info=true --threads=1
 phpstan: ## Run phpstan
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpstan analyse --memory-limit=256M
+infection: ## Run infection (mutation testing)
+	$(DC_RUN_PHP) env XDEBUG_MODE=coverage php -d memory_limit=1024M vendor-bin/infection/vendor/bin/infection --threads=max
 packages-composer: ## Validate composer packages
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/otel packages:composer:validate
 benchmark: ## Run phpbench
@@ -93,9 +95,9 @@ bash: ## bash shell into container
 style: ## Run style check/fix
 	$(DC_RUN_PHP) env XDEBUG_MODE=off env PHP_CS_FIXER_IGNORE_ENV=1 vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no -vvv
 rector-write: ## Run rector
-	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/rector/vendor/bin/rector process src
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/rector/vendor/bin/rector process
 rector: ## Run rector (dry-run)
-	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/rector/vendor/bin/rector process src --dry-run
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/rector/vendor/bin/rector process --dry-run
 deptrac: ## Run deptrac
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/deptrac/vendor/bin/deptrac --formatter=table --report-uncovered --no-cache
 w3c-test-service:

@@ -38,6 +38,7 @@ return static function (RectorConfig $rectorConfig): void {
         ],
         ReadOnlyPropertyRector::class => [
             __DIR__ . '/src/SDK/Metrics/Stream/SynchronousMetricStream.php',
+            __DIR__ . '/tests/Unit/Extension/Propagator',
         ],
         DisallowedEmptyRuleFixerRector::class,
         ExplicitBoolCompareRector::class,

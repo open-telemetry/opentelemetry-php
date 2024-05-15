@@ -12,17 +12,17 @@ use function gzdecode;
 use function gzencode;
 use InvalidArgumentException;
 use Nyholm\Psr7\Response;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory
- * @covers \OpenTelemetry\SDK\Common\Export\Http\PsrTransport
- */
+#[CoversClass(PsrTransportFactory::class)]
+#[CoversClass(PsrTransport::class)]
 final class PsrTransportTest extends TestCase
 {
     private MockObject $client;

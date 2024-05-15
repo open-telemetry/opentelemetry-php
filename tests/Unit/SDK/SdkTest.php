@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
@@ -13,28 +12,22 @@ use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\SdkBuilder;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Sdk
- */
+#[CoversClass(Sdk::class)]
 class SdkTest extends TestCase
 {
-    use EnvironmentVariables;
-
-    public function tearDown(): void
-    {
-        self::restoreEnvironmentVariables();
-    }
+    use TestState;
 
     public function test_is_not_disabled_by_default(): void
     {
         $this->assertFalse(Sdk::isDisabled());
     }
 
-    /**
-     * @dataProvider disabledProvider
-     */
+    #[DataProvider('disabledProvider')]
     public function test_is_disabled(string $value, bool $expected): void
     {
         self::setEnvironmentVariable('OTEL_SDK_DISABLED', $value);
@@ -49,9 +42,7 @@ class SdkTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider instrumentationDisabledProvider
-     */
+    #[DataProvider('instrumentationDisabledProvider')]
     public function test_is_instrumentation_disabled(string $value, string $name, bool $expected): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_DISABLED_INSTRUMENTATIONS, $value);

@@ -38,6 +38,9 @@ final class LoggerHolder
         return null !== self::$logger;
     }
 
+    /**
+     * @internal
+     */
     public static function unset(): void
     {
         self::$logger = null;
@@ -45,6 +48,7 @@ final class LoggerHolder
 
     /**
      * Disable psr-3 logging
+     * @internal
      */
     public static function disable(): void
     {

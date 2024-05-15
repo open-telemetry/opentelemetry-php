@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Instrumentation;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope
- * @covers \OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory
- */
+#[CoversClass(InstrumentationScope::class)]
+#[CoversClass(InstrumentationScopeFactory::class)]
 class InstrumentationScopeTest extends TestCase
 {
     public function test_getters(): void

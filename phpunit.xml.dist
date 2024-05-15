@@ -6,6 +6,7 @@
     bootstrap="./tests/bootstrap.php"
     cacheResult="false"
     colors="false"
+    executionOrder="random"
     processIsolation="false"
     stopOnError="false"
     stopOnFailure="false"

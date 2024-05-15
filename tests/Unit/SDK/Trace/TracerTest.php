@@ -8,11 +8,12 @@ use OpenTelemetry\API\Trace\NoopSpanBuilder;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerSharedState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\Tracer
- */
+#[CoversClass(Tracer::class)]
 class TracerTest extends TestCase
 {
     private Tracer $tracer;
@@ -27,10 +28,10 @@ class TracerTest extends TestCase
     }
 
     /**
-     * @dataProvider nameProvider
      * @param non-empty-string $name
-     * @group trace-compliance
      */
+    #[DataProvider('nameProvider')]
+    #[Group('trace-compliance')]
     public function test_span_builder(string $name, string $expected): void
     {
         $spanBuilder = $this->tracer->spanBuilder($name);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use function fseek;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Export\Stream\StreamTransport;
@@ -12,13 +13,12 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\ErrorFuture;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function stream_get_contents;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\SpanExporter
- */
+#[CoversClass(SpanExporter::class)]
 class SpanExporterTest extends TestCase
 {
     private MockObject $transport;
@@ -26,6 +26,7 @@ class SpanExporterTest extends TestCase
 
     public function setUp(): void
     {
+        Logging::disable();
         $this->transport = $this->createMock(TransportInterface::class);
         $this->transport->method('contentType')->willReturn('application/x-protobuf');
         $this->exporter = new SpanExporter($this->transport);

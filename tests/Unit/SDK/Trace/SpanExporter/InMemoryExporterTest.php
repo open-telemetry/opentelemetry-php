@@ -9,16 +9,14 @@ use Generator;
 use Mockery;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter
- */
+#[CoversClass(InMemoryExporter::class)]
 class InMemoryExporterTest extends TestCase
 {
-    /**
-     * @dataProvider provideSpans
-     */
+    #[DataProvider('provideSpans')]
     public function test_export(iterable $spans): void
     {
         $instance = new InMemoryExporter();

@@ -8,15 +8,16 @@ use function array_reverse;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace\TraceState;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use function str_repeat;
 
 /**
- * @covers \OpenTelemetry\API\Trace\TraceState
  * @psalm-suppress UndefinedInterfaceMethod
  */
+#[CoversClass(TraceState::class)]
 class TraceStateTest extends TestCase
 {
     private LoggerInterface $logger;
