@@ -10,13 +10,6 @@ use OpenTelemetry\Context\ContextKeyInterface;
 
 class LocalRootSpan
 {
-    public static function key(): ContextKeyInterface
-    {
-        static $key;
-
-        return $key ??= Context::createKey(self::class);
-    }
-
     public static function current(): SpanInterface
     {
         return self::fromContext(Context::getCurrent());
@@ -30,6 +23,16 @@ class LocalRootSpan
     public static function store(ContextInterface $context, SpanInterface $span): ContextInterface
     {
         return $context->with(self::key(), $span);
+    }
+
+    /**
+     * @internal
+     */
+    public static function key(): ContextKeyInterface
+    {
+        static $key;
+
+        return $key ??= Context::createKey(self::class);
     }
 
     /**
