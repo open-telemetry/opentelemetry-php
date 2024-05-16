@@ -15,12 +15,11 @@ use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function stream_get_contents;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\MetricExporter
- */
+#[CoversClass(MetricExporter::class)]
 final class MetricExporterTest extends TestCase
 {
     private $stream;

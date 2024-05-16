@@ -12,11 +12,10 @@ use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Context\ContextStorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Trace\NoopSpanBuilder
- */
+#[CoversClass(NoopSpanBuilder::class)]
 class NoopSpanBuilderTest extends TestCase
 {
     public function test_set_parent(): void

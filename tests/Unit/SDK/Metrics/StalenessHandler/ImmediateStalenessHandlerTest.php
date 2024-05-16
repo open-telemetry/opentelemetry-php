@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\StalenessHandler;
 
+use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandler;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use WeakReference;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandler
- * @covers \OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory
- */
+#[CoversClass(ImmediateStalenessHandler::class)]
+#[CoversClass(ImmediateStalenessHandlerFactory::class)]
 final class ImmediateStalenessHandlerTest extends TestCase
 {
     public function test_on_stale(): void

@@ -7,12 +7,11 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Trace\SpanExporter\LoggerDecorator;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanExporter\LoggerDecorator
- */
+#[CoversClass(LoggerDecorator::class)]
 class LoggerDecoratorTest extends AbstractLoggerAwareTestCase
 {
     /**

@@ -9,16 +9,15 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversNothing
- */
+#[CoversNothing]
 class SpanContextTest extends TestCase
 {
-    /**
-     * @dataProvider invalidSpanData
-     */
+    #[DataProvider('invalidSpanData')]
     public function test_invalid_span(string $traceId, string $spanId): void
     {
         $spanContext = SpanContext::create($traceId, $spanId);
@@ -40,18 +39,14 @@ class SpanContextTest extends TestCase
         ];
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_valid_span(): void
     {
         $spanContext = SpanContext::create('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', API\TraceFlags::SAMPLED);
         $this->assertTrue($spanContext->isValid());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_context_is_remote_from_restore(): void
     {
         $spanContext = SpanContext::createFromRemoteParent('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbb', API\TraceFlags::SAMPLED);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
@@ -24,19 +23,15 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use OpenTelemetry\SemConv\TraceAttributes;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversNothing
- */
+#[CoversNothing]
 class TracerTest extends TestCase
 {
-    use EnvironmentVariables;
-
-    public function tearDown(): void
-    {
-        self::restoreEnvironmentVariables();
-    }
+    use TestState;
 
     public function test_noop_span_should_be_started_when_sampling_result_is_drop(): void
     {
@@ -84,9 +79,7 @@ class TracerTest extends TestCase
         $this->assertEquals($newTraceState, $span->getContext()->getTraceState());
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_span_should_receive_instrumentation_scope(): void
     {
         $tracerProvider = new TracerProvider();

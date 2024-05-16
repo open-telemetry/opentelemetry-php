@@ -7,11 +7,11 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Dev\Compatibility;
 use Exception;
 use Generator;
 use OpenTelemetry\SDK\Common\Dev\Compatibility\Util;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Dev\Compatibility\Util
- */
+#[CoversClass(Util::class)]
 class UtilTest extends TestCase
 {
     public function setUp(): void
@@ -27,9 +27,7 @@ class UtilTest extends TestCase
         restore_error_handler();
     }
 
-    /**
-     * @dataProvider errorLevelProvider
-     */
+    #[DataProvider('errorLevelProvider')]
     public function test_set_error_level(int $level): void
     {
         Util::setErrorLevel($level);
@@ -47,9 +45,7 @@ class UtilTest extends TestCase
         Util::setErrorLevel(1);
     }
 
-    /**
-     * @dataProvider errorLevelProvider
-     */
+    #[DataProvider('errorLevelProvider')]
     public function test_trigger_class_deprecation_notice(int $level): void
     {
         Util::setErrorLevel($level);
@@ -59,9 +55,7 @@ class UtilTest extends TestCase
         Util::triggerClassDeprecationNotice(Util::class, self::class);
     }
 
-    /**
-     * @dataProvider errorLevelProvider
-     */
+    #[DataProvider('errorLevelProvider')]
     public function test_trigger_method_deprecation_notice_without_class(int $level): void
     {
         Util::setErrorLevel($level);
@@ -71,9 +65,7 @@ class UtilTest extends TestCase
         Util::triggerMethodDeprecationNotice(Util::class, __METHOD__);
     }
 
-    /**
-     * @dataProvider errorLevelProvider
-     */
+    #[DataProvider('errorLevelProvider')]
     public function test_trigger_method_deprecation_notice_with_class(int $level): void
     {
         Util::setErrorLevel($level);

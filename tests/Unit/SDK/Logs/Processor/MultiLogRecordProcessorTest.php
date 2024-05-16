@@ -10,10 +10,10 @@ use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor
- */
+#[CoversClass(MultiLogRecordProcessor::class)]
 class MultiLogRecordProcessorTest extends MockeryTestCase
 {
     private array $processors;
@@ -28,9 +28,7 @@ class MultiLogRecordProcessorTest extends MockeryTestCase
         $this->multi = new MultiLogRecordProcessor($this->processors);
     }
 
-    /**
-     * @dataProvider methodProvider
-     */
+    #[DataProvider('methodProvider')]
     public function test_method_calls_method_on_all_processors(string $method, object $param): void
     {
         //$record = $this->createMock(ReadWriteLogRecord::class);

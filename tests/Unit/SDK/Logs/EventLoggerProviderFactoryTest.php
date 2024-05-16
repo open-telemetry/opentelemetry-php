@@ -4,30 +4,25 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\EventLoggerProviderFactory;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\EventLoggerProviderFactory
- */
+#[CoversClass(EventLoggerProviderFactory::class)]
 class EventLoggerProviderFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
-
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
+    use TestState;
 
     /**
-     * @dataProvider createProvider
      * @psalm-suppress ArgumentTypeCoercion
      */
+    #[DataProvider('createProvider')]
     public function test_create(string $disabled, string $expected): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_SDK_DISABLED, $disabled);

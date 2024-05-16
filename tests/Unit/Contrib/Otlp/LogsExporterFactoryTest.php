@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\Contrib\Otlp\LogsExporterFactory;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\LogsExporterFactory
- */
+#[CoversClass(LogsExporterFactory::class)]
 class LogsExporterFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     /** @var TransportFactoryInterface&MockObject $record */
     private TransportFactoryInterface $transportFactory;
@@ -32,11 +32,6 @@ class LogsExporterFactoryTest extends TestCase
         $this->transport = $this->createMock(TransportInterface::class);
     }
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     public function test_unknown_protocol_exception(): void
     {
         $this->expectException(RuntimeException::class);
@@ -45,9 +40,7 @@ class LogsExporterFactoryTest extends TestCase
         $factory->create();
     }
 
-    /**
-     * @dataProvider configProvider
-     */
+    #[DataProvider('configProvider')]
     public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = [], array $expectedValues = []): void
     {
         foreach ($env as $k => $v) {

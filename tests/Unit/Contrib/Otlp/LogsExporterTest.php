@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\ErrorFuture;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\LogsExporter
- */
+#[CoversClass(LogsExporter::class)]
 class LogsExporterTest extends TestCase
 {
     private MockObject $transport;
@@ -24,6 +24,7 @@ class LogsExporterTest extends TestCase
         $this->transport = $this->createMock(TransportInterface::class);
         $this->transport->method('contentType')->willReturn('application/x-protobuf');
         $this->exporter = new LogsExporter($this->transport);
+        Logging::disable();
     }
 
     public function test_export_with_transport_failure(): void

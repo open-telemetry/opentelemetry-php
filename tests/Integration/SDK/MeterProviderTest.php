@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Metrics as API;
@@ -28,19 +27,14 @@ use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
 use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversNothing
- */
+#[CoversNothing]
 final class MeterProviderTest extends TestCase
 {
-    use EnvironmentVariables;
-
-    public function tearDown(): void
-    {
-        self::restoreEnvironmentVariables();
-    }
+    use TestState;
 
     public function test_weak_asynchronous_observer_is_released_when_instance_out_of_scope(): void
     {

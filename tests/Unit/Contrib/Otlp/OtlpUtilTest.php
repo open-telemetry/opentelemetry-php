@@ -4,23 +4,18 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Signals;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\Contrib\Otlp\OtlpUtil
- */
+#[CoversClass(OtlpUtil::class)]
 class OtlpUtilTest extends TestCase
 {
-    use EnvironmentVariables;
-
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
+    use TestState;
 
     public function test_get_user_agent_header(): void
     {
@@ -35,9 +30,7 @@ class OtlpUtilTest extends TestCase
         OtlpUtil::method('foo');
     }
 
-    /**
-     * @dataProvider methodProvider
-     */
+    #[DataProvider('methodProvider')]
     public function test_method(string $signal, string $expected): void
     {
         $method = OtlpUtil::method($signal);
@@ -53,9 +46,7 @@ class OtlpUtilTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider headersProvider
-     */
+    #[DataProvider('headersProvider')]
     public function test_get_headers(string $signal, array $env, array $expected): void
     {
         foreach ($env as $var => $value) {

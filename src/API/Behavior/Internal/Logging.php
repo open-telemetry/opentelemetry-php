@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Behavior\Internal;
 
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\NoopLogWriter;
 use Psr\Log\LogLevel;
 
 /**
@@ -86,5 +87,10 @@ class Logging
     {
         self::$logLevel = null;
         self::$writer = null;
+    }
+
+    public static function disable(): void
+    {
+        self::$writer = new NoopLogWriter();
     }
 }

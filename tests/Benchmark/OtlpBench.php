@@ -26,8 +26,8 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 class OtlpBench
 {
     private TracerInterface $tracer;
-    private SamplerInterface $sampler;
-    private ResourceInfo $resource;
+    private readonly SamplerInterface $sampler;
+    private readonly ResourceInfo $resource;
 
     private const PROTOBUF = 'application/x-protobuf';
     private const JSON = 'application/json';
@@ -57,7 +57,7 @@ class OtlpBench
     private function createTransport(string $contentType): TransportInterface
     {
         return new class($contentType) implements TransportInterface {
-            private string $contentType;
+            private readonly string $contentType;
 
             public function __construct(string $contentType)
             {
