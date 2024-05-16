@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\API\Instrumentation\ConfigurationResolver;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\API\Instrumentation\ConfigurationResolver
- */
+#[CoversClass(ConfigurationResolver::class)]
 class ConfigurationResolverTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     private ConfigurationResolver $resolver;
 
@@ -22,14 +22,7 @@ class ConfigurationResolverTest extends TestCase
         $this->resolver = new ConfigurationResolver();
     }
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
-    /**
-     * @dataProvider hasProvider
-     */
+    #[DataProvider('hasProvider')]
     public function test_has(?string $value, bool $expected): void
     {
         $this->assertFalse($this->resolver->has('OTEL_FOO'));
@@ -53,9 +46,7 @@ class ConfigurationResolverTest extends TestCase
         $this->assertSame('bar', $this->resolver->getString('OTEL_FOO'));
     }
 
-    /**
-     * @dataProvider booleanProvider
-     */
+    #[DataProvider('booleanProvider')]
     public function test_get_boolean(?string $value, ?bool $expected): void
     {
         $this->assertFalse($this->resolver->has('OTEL_FOO'));
@@ -74,9 +65,7 @@ class ConfigurationResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider intProvider
-     */
+    #[DataProvider('intProvider')]
     public function test_get_int(?string $value, ?int $expected): void
     {
         $this->assertFalse($this->resolver->has('OTEL_FOO'));
@@ -96,9 +85,7 @@ class ConfigurationResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider listProvider
-     */
+    #[DataProvider('listProvider')]
     public function test_get_list(?string $value, array $expected): void
     {
         $this->assertFalse($this->resolver->has('OTEL_FOO'));

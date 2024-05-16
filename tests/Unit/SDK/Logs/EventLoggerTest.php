@@ -11,13 +11,13 @@ use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Logs\EventLogger;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\EventLogger
- */
+#[CoversClass(EventLogger::class)]
 class EventLoggerTest extends TestCase
 {
     private LoggerInterface&MockObject $logger;
@@ -32,11 +32,6 @@ class EventLoggerTest extends TestCase
         $loggerProvider = $this->createMock(LoggerProviderInterface::class);
         $loggerProvider->method('getLogger')->willReturn($this->logger);
         $this->eventLoggerProvider = new EventLoggerProvider($loggerProvider);
-    }
-
-    public function tearDown(): void
-    {
-        Clock::reset();
     }
 
     public function test_emit(): void

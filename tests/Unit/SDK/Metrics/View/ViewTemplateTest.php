@@ -9,11 +9,10 @@ use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\View\ViewTemplate
- */
+#[CoversClass(ViewTemplate::class)]
 final class ViewTemplateTest extends TestCase
 {
     public function test_empty_template_returns_instrument_defaults(): void

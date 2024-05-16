@@ -6,11 +6,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
 use OpenTelemetry\API\Logs\NoopLogger;
 use OpenTelemetry\SDK\Logs\NoopLoggerProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\NoopLoggerProvider
- */
+#[CoversClass(NoopLoggerProvider::class)]
 class NoopLoggerProviderTest extends TestCase
 {
     public function test_get_instance(): void

@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Config;
+namespace OpenTelemetry\Tests\Integration\Config;
 
 use OpenTelemetry\Config\SDK\Configuration;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversNothing]
 final class ConfigurationTest extends TestCase
 {
 
-    /**
-     * @dataProvider openTelemetryConfigurationDataProvider
-     * @coversNothing
-     */
+    #[DataProvider('openTelemetryConfigurationDataProvider')]
     public function test_open_telemetry_configuration(string $file): void
     {
         $this->expectNotToPerformAssertions();

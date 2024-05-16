@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Attribute;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesBuilder;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Attribute\Attributes
- * @covers \OpenTelemetry\SDK\Common\Attribute\AttributesBuilder
- * @covers \OpenTelemetry\SDK\Common\Attribute\AttributesFactory
- */
+#[CoversClass(Attributes::class)]
+#[CoversClass(AttributesBuilder::class)]
+#[CoversClass(AttributesFactory::class)]
 class AttributesTest extends TestCase
 {
     public function test_has_attribute(): void

@@ -21,12 +21,11 @@ use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Tests\Unit\SDK\Util\SpanData;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor
- */
+#[CoversClass(SimpleSpanProcessor::class)]
 class SimpleSpanProcessorTest extends MockeryTestCase
 {
     private SimpleSpanProcessor $simpleSpanProcessor;
@@ -62,11 +61,6 @@ class SimpleSpanProcessorTest extends MockeryTestCase
 
         $this->spanExporter = Mockery::mock(SpanExporterInterface::class);
         $this->simpleSpanProcessor = new SimpleSpanProcessor($this->spanExporter);
-    }
-
-    public function tearDown(): void
-    {
-        Logging::reset();
     }
 
     public function test_on_start(): void

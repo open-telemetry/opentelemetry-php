@@ -16,18 +16,18 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Internal;
 use PHPUnit\Framework\Attributes\BackupGlobals;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- * @covers \OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory
- */
+#[CoversClass(ConfigurationFactory::class)]
 final class ConfigurationFactoryTest extends TestCase
 {
 
+    public $properties;
     /**
      * @psalm-suppress MissingTemplateParam
      */
@@ -176,7 +176,6 @@ final class ConfigurationFactoryTest extends TestCase
     {
         assert($plugin instanceof Internal\ComponentPlugin);
 
-        /** @phpstan-ignore-next-line */
         return (fn () => $this->properties)->bindTo($plugin, Internal\ComponentPlugin::class)();
     }
 

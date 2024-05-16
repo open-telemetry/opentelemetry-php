@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Http\Psr\Message;
 
 use OpenTelemetry\SDK\Common\Http\Psr\Message\MessageFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
@@ -13,9 +14,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Http\Psr\Message\MessageFactory
- */
+#[CoversClass(MessageFactory::class)]
 class MessageFactoryTest extends TestCase
 {
     use UsesRequestFactoryTrait;

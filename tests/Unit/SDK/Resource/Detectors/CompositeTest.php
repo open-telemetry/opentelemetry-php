@@ -6,15 +6,14 @@ namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
 
 use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Resource\Detectors;
+use OpenTelemetry\SDK\Resource\Detectors\Composite;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\Detectors\Composite
- */
+#[CoversClass(Composite::class)]
 class CompositeTest extends TestCase
 {
     use EnvironmentVariables;
@@ -26,8 +25,8 @@ class CompositeTest extends TestCase
 
     public function test_composite_with_empty_resource_detectors(): void
     {
-        $resouceDetector = new Detectors\Composite([]);
-        $resource = $resouceDetector->getResource();
+        $resourceDetector = new Composite([]);
+        $resource = $resourceDetector->getResource();
 
         $this->assertNull($resource->getSchemaUrl());
         $this->assertEmpty($resource->getAttributes());
@@ -40,7 +39,7 @@ class CompositeTest extends TestCase
         $resourceDetector = $this->createMock(ResourceDetectorInterface::class);
         $resourceDetector->method('getResource')->willReturn($resource);
 
-        $resource = (new Detectors\Composite([$resourceDetector]))->getResource();
+        $resource = (new Composite([$resourceDetector]))->getResource();
 
         $this->assertSame('user-foo', $resource->getAttributes()->get('foo'));
         $this->assertSame('user-bar', $resource->getAttributes()->get('bar'));

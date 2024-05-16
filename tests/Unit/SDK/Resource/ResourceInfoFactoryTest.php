@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use Generator;
 use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\Internal\Logging;
@@ -14,15 +13,17 @@ use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Resource\ResourceInfoFactory
- */
+#[CoversClass(ResourceInfoFactory::class)]
 class ResourceInfoFactoryTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     /** @var LogWriterInterface&MockObject $logWriter */
     private LogWriterInterface $logWriter;
@@ -32,12 +33,6 @@ class ResourceInfoFactoryTest extends TestCase
     {
         $this->logWriter = $this->createMock(LogWriterInterface::class);
         Logging::setLogWriter($this->logWriter);
-    }
-
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-        Logging::reset();
     }
 
     public function test_empty_resource(): void
@@ -62,9 +57,7 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertEquals('', $empty);
     }
 
-    /**
-     * @dataProvider schemaUrlsToMergeProvider
-     */
+    #[DataProvider('schemaUrlsToMergeProvider')]
     public function test_merge_schema_url(array $schemaUrlsToMerge, ?string $expectedSchemaUrl): void
     {
         $resource = ResourceInfoFactory::emptyResource();
@@ -88,27 +81,21 @@ class ResourceInfoFactoryTest extends TestCase
         yield 'Schema url is undefined and implementation-specific after merging error' => [['http://url-1', 'http://url-2', 'http://url-2'], self::UNDEFINED];
     }
 
-    /**
-     * @group trace-compliance
-     */
+    #[Group('trace-compliance')]
     public function test_resource_service_name_default(): void
     {
         $resource = ResourceInfoFactory::defaultResource();
         $this->assertEquals('open-telemetry/opentelemetry', $resource->getAttributes()->get('service.name'));
     }
 
-    /**
-     * @group compliance
-     */
+    #[Group('compliance')]
     public function test_resource_with_empty_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', '');
         $this->assertInstanceOf(ResourceInfo::class, ResourceInfoFactory::defaultResource());
     }
 
-    /**
-     * @group compliance
-     */
+    #[Group('compliance')]
     public function test_resource_with_invalid_environment_variable(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo');
@@ -116,9 +103,7 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertInstanceOf(ResourceInfo::class, ResourceInfoFactory::defaultResource());
     }
 
-    /**
-     * @group compliance
-     */
+    #[Group('compliance')]
     public function test_resource_from_environment_service_name_takes_precedence_over_resource_attribute(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=bar');
@@ -127,9 +112,7 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
 
-    /**
-     * @group compliance
-     */
+    #[Group('compliance')]
     public function test_resource_from_environment_resource_attribute_takes_precedence_over_default(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');

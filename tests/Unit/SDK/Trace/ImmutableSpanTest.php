@@ -12,11 +12,10 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\ImmutableSpan;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\StatusDataInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\ImmutableSpan
- */
+#[CoversClass(ImmutableSpan::class)]
 class ImmutableSpanTest extends TestCase
 {
     private Span $span;

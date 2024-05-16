@@ -9,16 +9,12 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplingResult;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler
- */
+#[CoversClass(AlwaysOffSampler::class)]
 class AlwaysOffSamplerTest extends TestCase
 {
-    /**
-     * @covers ::shouldSample
-     */
     public function test_should_sample(): void
     {
         $parentContext = Context::getRoot();
@@ -35,9 +31,6 @@ class AlwaysOffSamplerTest extends TestCase
         $this->assertEquals(SamplingResult::DROP, $decision->getDecision());
     }
 
-    /**
-     * @covers ::getDescription
-     */
     public function test_get_description(): void
     {
         $sampler = new AlwaysOffSampler();

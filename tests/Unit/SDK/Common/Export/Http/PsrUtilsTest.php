@@ -12,13 +12,13 @@ use function gzdecode;
 use function gzencode;
 use Nyholm\Psr7\Response;
 use OpenTelemetry\SDK\Common\Export\Http\PsrUtils;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function time;
 use UnexpectedValueException;
 
-/**
- * @covers \OpenTelemetry\SDK\Common\Export\Http\PsrUtils
- */
+#[CoversClass(PsrUtils::class)]
 final class PsrUtilsTest extends TestCase
 {
     public function test_retry_delay_initial(): void
@@ -92,9 +92,7 @@ final class PsrUtilsTest extends TestCase
         PsrUtils::decode('', ['invalid']);
     }
 
-    /**
-     * @dataProvider compressionProvider
-     */
+    #[DataProvider('compressionProvider')]
     public function test_resolve_compression($input, $expected): void
     {
         $this->assertSame($expected, PsrUtils::compression($input));

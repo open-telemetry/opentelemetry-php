@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
 use OpenTelemetry\SDK\Logs\LoggerProvider;
+use OpenTelemetry\SDK\Logs\LoggerProviderBuilder;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Logs\LoggerProviderBuilder
- */
+#[CoversClass(LoggerProviderBuilder::class)]
 class LoggerProviderBuilderTest extends TestCase
 {
     public function test_builder(): void

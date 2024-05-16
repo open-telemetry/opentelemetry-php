@@ -4,28 +4,22 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK\Resource;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversNothing
- */
+#[CoversNothing]
 class ResourceInfoTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
-    /**
-     * @dataProvider environmentResourceProvider
-     * @group compliance
-     */
+    #[DataProvider('environmentResourceProvider')]
+    #[Group('compliance')]
     public function test_resource_from_environment(string $envAttributes, array $userAttributes, array $expected): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', $envAttributes);

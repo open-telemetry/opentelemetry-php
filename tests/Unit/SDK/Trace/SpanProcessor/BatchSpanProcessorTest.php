@@ -31,12 +31,12 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessorBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
-/**
- * @covers \OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor
- */
+#[CoversClass(BatchSpanProcessor::class)]
 class BatchSpanProcessorTest extends MockeryTestCase
 {
     private TestClock $testClock;
@@ -50,12 +50,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $this->testClock = new TestClock();
 
         Clock::setDefault($this->testClock);
-    }
-
-    protected function tearDown(): void
-    {
-        Clock::reset();
-        Logging::reset();
     }
 
     public function test_export_batch_size_met(): void
@@ -88,9 +82,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         }
     }
 
-    /**
-     * @dataProvider scheduledDelayProvider
-     */
+    #[DataProvider('scheduledDelayProvider')]
     public function test_export_scheduled_delay(int $exportDelay, int $advanceByNano, bool $expectedFlush): void
     {
         $batchSize = 2;
@@ -439,7 +431,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
     {
         $processor = null;
         $exporter = $this->createMock(SpanExporterInterface::class);
-        $exporter->method('forceFlush')->willReturnCallback(function () use (&$processor) {
+        $exporter->method('forceFlush')->willReturnCallback(function () use (&$processor): never {
             /** @var SpanProcessorInterface $processor */
             $span = $this->createSampledSpanMock();
             $processor->onStart($span, Context::getCurrent());
@@ -461,9 +453,6 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $processor->forceFlush();
     }
 
-    /**
-     * @requires PHP >= 8.0
-     */
     public function test_self_diagnostics(): void
     {
         $clock = new TestClock();

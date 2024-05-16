@@ -8,11 +8,10 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OpenTelemetry\SDK\Metrics\Exemplar\FixedSizeReservoir
- */
+#[CoversClass(FixedSizeReservoir::class)]
 final class FixedSizeReservoirTest extends TestCase
 {
     public function test_reservoir_returns_exemplars(): void

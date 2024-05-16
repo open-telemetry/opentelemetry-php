@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Globals;
-use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
@@ -14,25 +13,20 @@ use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\SdkAutoloader;
+use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 
-/**
- * @covers \OpenTelemetry\SDK\SdkAutoloader
- */
+#[CoversClass(SdkAutoloader::class)]
 class SdkAutoloaderTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     public function setUp(): void
     {
-        LoggerHolder::set(new NullLogger());
+        Logging::disable();
         Globals::reset();
-    }
-
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
     }
 
     public function test_disabled_by_default(): void
@@ -96,9 +90,7 @@ class SdkAutoloaderTest extends TestCase
         $this->assertFalse(SdkAutoloader::isExcludedUrl());
     }
 
-    /**
-     * @dataProvider excludeUrlsProvider
-     */
+    #[DataProvider('excludeUrlsProvider')]
     public function test_exclude_urls(string $exclude, string $uri, bool $expected): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_URLS, $exclude);
