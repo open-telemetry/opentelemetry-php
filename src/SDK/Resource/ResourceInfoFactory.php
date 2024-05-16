@@ -26,7 +26,6 @@ class ResourceInfoFactory
         if (in_array(Values::VALUE_ALL, $detectors)) {
             // ascending priority: keys from later detectors will overwrite earlier
             return (new Detectors\Composite([
-                new Detectors\Service(),
                 new Detectors\Host(),
                 new Detectors\OperatingSystem(),
                 new Detectors\Process(),
