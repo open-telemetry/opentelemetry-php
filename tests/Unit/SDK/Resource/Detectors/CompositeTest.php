@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
 
-use AssertWell\PHPUnitGlobalState\EnvironmentVariables;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\Detectors\Composite;
+use OpenTelemetry\SDK\Resource\Detectors\Environment;
+use OpenTelemetry\SDK\Resource\Detectors\Service;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Composite::class)]
 class CompositeTest extends TestCase
 {
-    use EnvironmentVariables;
+    use TestState;
 
     public function tearDown(): void
     {
@@ -49,9 +51,9 @@ class CompositeTest extends TestCase
     public function test_composite_get_resource_with_service_instance_id_from_resource_attributes()
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.instance.id=manual-id');
-        $resouceDetector = new Detectors\Composite([
-            new Detectors\Service(),
-            new Detectors\Environment(),
+        $resouceDetector = new Composite([
+            new Service(),
+            new Environment(),
         ]);
         $resource = $resouceDetector->getResource();
         $this->assertSame('manual-id', $resource->getAttributes()->get(ResourceAttributes::SERVICE_INSTANCE_ID));
