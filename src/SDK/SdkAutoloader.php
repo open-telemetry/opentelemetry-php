@@ -7,11 +7,20 @@ namespace OpenTelemetry\SDK;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
 use OpenTelemetry\API\Instrumentation\Configurator;
+use OpenTelemetry\API\Logs\LoggerProviderInterface;
+use OpenTelemetry\API\Logs\NoopLoggerProvider;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
+use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
+use OpenTelemetry\API\Trace\LateBindingTracerProvider;
+use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
-use OpenTelemetry\Config\SDK\Instrumentation;
+use OpenTelemetry\Config\SDK\Instrumentation as SdkInstrumentation;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
@@ -110,12 +119,17 @@ class SdkAutoloader
         $file = Configuration::has(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE)
             ? Configuration::getString(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE)
             : [];
-        $configuration = Instrumentation::parseFile($file)->create();
+        $configuration = SdkInstrumentation::parseFile($file)->create();
         $hookManager = self::getHookManager();
-        foreach (ServiceLoader::load(\OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation::class) as $instrumentation) {
-            /** @var \OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation $instrumentation */
+        $tracerProvider = self::createLateBindingTracerProvider();
+        $meterProvider = self::createLateBindingMeterProvider();
+        $loggerProvider = self::createLateBindingLoggerProvider();
+
+        $context = new InstrumentationContext($tracerProvider, $meterProvider, $loggerProvider);
+        foreach (ServiceLoader::load(Instrumentation::class) as $instrumentation) {
+            /** @var Instrumentation $instrumentation */
             try {
-                $instrumentation->register($hookManager, $configuration);
+                $instrumentation->register($hookManager, $configuration, $context);
             } catch (Throwable $t) {
                 self::logError(sprintf('Unable to load instrumentation: %s', $instrumentation::class), ['exception' => $t]);
             }
@@ -123,6 +137,29 @@ class SdkAutoloader
         }
     }
 
+    private static function createLateBindingTracerProvider(): TracerProviderInterface
+    {
+        return new LateBindingTracerProvider(static function (): TracerProviderInterface {
+            $scope = Context::getRoot()->activate();
+
+            try {
+                return Globals::tracerProvider();
+            } finally {
+                $scope->detach();
+            }
+        });
+    }
+
+    private static function createLateBindingMeterProvider(): MeterProviderInterface
+    {
+        //@todo
+        return new NoopMeterProvider();
+    }
+    private static function createLateBindingLoggerProvider(): LoggerProviderInterface
+    {
+        //@todo
+        return new NoopLoggerProvider();
+    }
     private static function getHookManager(): HookManager
     {
         /** @var HookManager $hookManager */

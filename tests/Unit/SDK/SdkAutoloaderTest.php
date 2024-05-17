@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;

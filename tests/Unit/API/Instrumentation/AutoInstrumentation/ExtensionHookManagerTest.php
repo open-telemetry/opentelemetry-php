@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Unit\API\Instrumentation\AutoInstrumentation;
 
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\API\Instrumentation\Configurator;
+use OpenTelemetry\API\Logs\LoggerProviderInterface;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ScopeInterface;
@@ -21,6 +24,7 @@ class ExtensionHookManagerTest extends TestCase
     private ConfigurationRegistry $registry;
     private ScopeInterface $scope;
     private HookManager $hookManager;
+    private InstrumentationContext $context;
 
     public function setUp(): void
     {
@@ -33,6 +37,11 @@ class ExtensionHookManagerTest extends TestCase
             ->activate();
         $this->registry = new ConfigurationRegistry();
         $this->hookManager = new ExtensionHookManager();
+        $this->context = new InstrumentationContext(
+            $tracerProvider,
+            $this->createMock(MeterProviderInterface::class),
+            $this->createMock(LoggerProviderInterface::class)
+        );
     }
 
     public function tearDown(): void
@@ -52,7 +61,7 @@ class ExtensionHookManagerTest extends TestCase
         }, function (): int {
             return 99;
         });
-        $instrumentation->register($this->hookManager, $this->registry);
+        $instrumentation->register($this->hookManager, $this->registry, $this->context);
 
         $returnVal = $target->test();
         $this->assertSame(99, $returnVal);
@@ -70,7 +79,7 @@ class ExtensionHookManagerTest extends TestCase
         }, function (): int {
             $this->fail('post hook not expected to be called');
         });
-        $instrumentation->register($this->hookManager, $this->registry);
+        $instrumentation->register($this->hookManager, $this->registry, $this->context);
 
         $scope = $this->hookManager->disable(Context::getCurrent())->activate();
 
@@ -94,7 +103,7 @@ class ExtensionHookManagerTest extends TestCase
         }, function (): int {
             return 123;
         });
-        $instrumentation->register($this->hookManager, $this->registry);
+        $instrumentation->register($this->hookManager, $this->registry, $this->context);
         $this->assertSame(123, $target->test(), 'post hook function ran and modified return value');
 
         $scope = $this->hookManager->disable(Context::getCurrent())->activate();
@@ -122,7 +131,7 @@ class ExtensionHookManagerTest extends TestCase
                 $this->post = $post;
             }
 
-            public function register(HookManager $hookManager, ConfigurationRegistry $configuration): void
+            public function register(HookManager $hookManager, ConfigurationRegistry $configuration, InstrumentationContext $context): void
             {
                 $hookManager->hook($this->class, $this->method, $this->pre, $this->post);
             }
