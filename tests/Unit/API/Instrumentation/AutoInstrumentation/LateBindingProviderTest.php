@@ -78,32 +78,31 @@ class LateBindingProviderTest extends TestCase
             }
         };
         $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
-        $tracer_called = false;
-        $logger_called = false;
-        $meter_called = false;
-        //the "real" tracer+meter+logger, which will be accessed through late binding providers
+        $tracer_accessed = false;
+        $logger_accessed = false;
+        $meter_accessed = false;
+
         $tracerProvider = $this->createMock(TracerProviderInterface::class);
-        $tracerProvider->method('getTracer')->willReturnCallback(function () use (&$tracer_called): TracerInterface {
-            $tracer_called = true;
+        $tracerProvider->method('getTracer')->willReturnCallback(function () use (&$tracer_accessed): TracerInterface {
+            $tracer_accessed = true;
 
             return $this->createMock(TracerInterface::class);
         });
         $meterProvider = $this->createMock(MeterProviderInterface::class);
-        $meterProvider->method('getMeter')->willReturnCallback(function () use (&$meter_called): MeterInterface {
-            $meter_called = true;
+        $meterProvider->method('getMeter')->willReturnCallback(function () use (&$meter_accessed): MeterInterface {
+            $meter_accessed = true;
 
             return $this->createMock(MeterInterface::class);
         });
         $loggerProvider = $this->createMock(LoggerProviderInterface::class);
-        $loggerProvider->method('getLogger')->willReturnCallback(function () use (&$logger_called): LoggerInterface {
-            $logger_called = true;
+        $loggerProvider->method('getLogger')->willReturnCallback(function () use (&$logger_accessed): LoggerInterface {
+            $logger_accessed = true;
 
             return $this->createMock(LoggerInterface::class);
         });
         ServiceLoader::register(Instrumentation::class, $instrumentation::class);
-        //@todo reset?
         $this->assertTrue(SdkAutoloader::autoload());
-        //tracer initializer added _after_ autoloader has run and instrumentation registered
+        //initializer added _after_ autoloader has run and instrumentation registered
         Globals::registerInitializer(function (Configurator $configurator) use ($tracerProvider, $loggerProvider, $meterProvider): Configurator {
             return $configurator
                 ->withTracerProvider($tracerProvider)
@@ -112,22 +111,22 @@ class LateBindingProviderTest extends TestCase
             ;
         });
 
-        $this->assertFalse($tracer_called);
+        $this->assertFalse($tracer_accessed);
         $tracer = $instrumentation->getTracer();
-        $this->assertFalse($tracer_called);
-        $tracer->spanBuilder('test-span')->startSpan(); /** @phpstan-ignore-next-line */
-        $this->assertTrue($tracer_called);
+        $this->assertFalse($tracer_accessed);
+        $tracer->spanBuilder('test-span'); /** @phpstan-ignore-next-line */
+        $this->assertTrue($tracer_accessed);
 
-        $this->assertFalse($meter_called);
+        $this->assertFalse($meter_accessed);
         $meter = $instrumentation->getMeter();
-        $this->assertFalse($meter_called);
+        $this->assertFalse($meter_accessed);
         $meter->createCounter('cnt'); /** @phpstan-ignore-next-line */
-        $this->assertTrue($meter_called);
+        $this->assertTrue($meter_accessed);
 
-        $this->assertFalse($logger_called);
+        $this->assertFalse($logger_accessed);
         $logger = $instrumentation->getLogger();
-        $this->assertFalse($logger_called);
+        $this->assertFalse($logger_accessed);
         $logger->emit(new LogRecord()); /** @phpstan-ignore-next-line */
-        $this->assertTrue($logger_called);
+        $this->assertTrue($logger_accessed);
     }
 }
