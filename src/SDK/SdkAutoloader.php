@@ -12,10 +12,10 @@ use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
 use OpenTelemetry\API\Instrumentation\Configurator;
+use OpenTelemetry\API\Logs\LateBindingLoggerProvider;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
-use OpenTelemetry\API\Logs\NoopLoggerProvider;
+use OpenTelemetry\API\Metrics\LateBindingMeterProvider;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
-use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\API\Trace\LateBindingTracerProvider;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
@@ -152,14 +152,29 @@ class SdkAutoloader
 
     private static function createLateBindingMeterProvider(): MeterProviderInterface
     {
-        //@todo
-        return new NoopMeterProvider();
+        return new LateBindingMeterProvider(static function (): MeterProviderInterface {
+            $scope = Context::getRoot()->activate();
+
+            try {
+                return Globals::meterProvider();
+            } finally {
+                $scope->detach();
+            }
+        });
     }
     private static function createLateBindingLoggerProvider(): LoggerProviderInterface
     {
-        //@todo
-        return new NoopLoggerProvider();
+        return new LateBindingLoggerProvider(static function (): LoggerProviderInterface {
+            $scope = Context::getRoot()->activate();
+
+            try {
+                return Globals::loggerProvider();
+            } finally {
+                $scope->detach();
+            }
+        });
     }
+
     private static function getHookManager(): HookManager
     {
         /** @var HookManager $hookManager */
