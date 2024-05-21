@@ -29,7 +29,6 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\SdkAutoloader;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(LateBindingLoggerProvider::class)]
@@ -38,9 +37,11 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(LateBindingMeter::class)]
 #[CoversClass(LateBindingTracerProvider::class)]
 #[CoversClass(LateBindingTracer::class)]
-#[CoversMethod(SdkAutoloader::class, 'createLateBindingLoggerProvider')]
-#[CoversMethod(SdkAutoloader::class, 'createLateBindingMeterProvider')]
-#[CoversMethod(SdkAutoloader::class, 'createLateBindingTracerProvider')]
+// @todo phpunit 11 (8.2+) only, replace CoversClass(SdkAutoloader::class)
+#[CoversClass(SdkAutoloader::class)]
+//#[CoversMethod(SdkAutoloader::class, 'createLateBindingLoggerProvider')]
+//#[CoversMethod(SdkAutoloader::class, 'createLateBindingMeterProvider')]
+//#[CoversMethod(SdkAutoloader::class, 'createLateBindingTracerProvider')]
 class LateBindingProviderTest extends TestCase
 {
     use TestState;
