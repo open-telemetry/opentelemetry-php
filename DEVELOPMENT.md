@@ -1,5 +1,5 @@
 ## [Development](DEVELOPMENT.md)
-For repeatability and consistency across different operating systems, we use the [3 Musketeers pattern](https://3musketeers.io/). If you're on Windows, it might be a good idea to use Git bash for following the steps below.
+For repeatability and consistency across different operating systems, we use the [3 Musketeers pattern](https://3musketeers.pages.dev/). If you're on Windows, it might be a good idea to use Git bash for following the steps below.
 
 **Note: After cloning the repository, copy `.env.dist` to `.env`.** 
 
