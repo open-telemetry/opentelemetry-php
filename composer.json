@@ -105,6 +105,9 @@
         "symfony/var-exporter": "^5.4 || ^6.4 || ^7.0",
         "symfony/yaml": "^5.4 || ^6.4 || ^7.0"
     },
+    "conflict": {
+        "mockery/mockery": "1.6.12"
+    },
     "suggest": {
         "ext-gmp": "To support unlimited number of synchronous metric readers",
         "ext-grpc": "To use the OTLP GRPC Exporter",
