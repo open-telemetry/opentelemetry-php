@@ -17,3 +17,13 @@
      * @deprecated Use CONTAINER_IMAGE_TAGS
      */
     public const CONTAINER_IMAGE_TAG = 'container.image.tag';
+
+    /**
+     * @deprecated
+     */
+    public const OTEL_LIBRARY_NAME = 'otel.library.name';
+
+    /**
+     * @deprecated
+     */
+    public const OTEL_LIBRARY_VERSION = 'otel.library.version';

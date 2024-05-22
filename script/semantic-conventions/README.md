@@ -32,6 +32,13 @@ diff <(grep "public const" src/SemConv/TraceAttributes.php | sort -u) \
 
 Use this output as a basis for updating the relevant deprecations file and generate a second time to include them in the final output.
 
+Note that some previously-removed semconv entries have been added back in recent versions, so may need to be removed from the
+deprecations partials.
+
+## Add to SemConv/Version
+
+Add an entry to `src/SemConv/Version.php` for the new version.
+
 ## Update tests
 
 Update `tests/Integration/Config/configurations/kitchen-sink.yaml`'s `resource.schema_url` value to the latest, as merging resources

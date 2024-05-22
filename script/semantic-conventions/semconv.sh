@@ -17,7 +17,7 @@ SPEC_DIR="${ROOT_DIR}/var/semantic-conventions"
 CODE_DIR="${ROOT_DIR}/src/SemConv"
 
 # freeze the spec & generator tools versions to make SemanticAttributes generation reproducible
-SEMCONV_VERSION=${SEMCONV_VERSION:=1.25.0}
+SEMCONV_VERSION=${SEMCONV_VERSION:=1.26.0}
 SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
 GENERATOR_VERSION=0.24.0
