@@ -1042,12 +1042,12 @@ interface ResourceAttributes
     public const CONTAINER_IMAGE_TAG = 'container.image.tag';
 
     /**
-     * @deprecated
+     * @deprecated Use `otel.scope.name`
      */
     public const OTEL_LIBRARY_NAME = 'otel.library.name';
 
     /**
-     * @deprecated
+     * @deprecated Use `otel.scope.version`
      */
     public const OTEL_LIBRARY_VERSION = 'otel.library.version';
 }
