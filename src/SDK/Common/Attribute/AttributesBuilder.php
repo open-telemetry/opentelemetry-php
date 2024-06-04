@@ -49,6 +49,7 @@ final class AttributesBuilder implements AttributesBuilderInterface
 
     /**
      * @phan-suppress PhanUndeclaredClassAttribute
+     * @return mixed
      */
     #[\ReturnTypeWillChange]
     public function offsetGet($offset)
@@ -58,6 +59,7 @@ final class AttributesBuilder implements AttributesBuilderInterface
 
     /**
      * @phan-suppress PhanUndeclaredClassAttribute
+     * @return void
      */
     #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
@@ -90,6 +92,7 @@ final class AttributesBuilder implements AttributesBuilderInterface
 
     /**
      * @phan-suppress PhanUndeclaredClassAttribute
+     * @return void
      */
     #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
