@@ -6,8 +6,6 @@ namespace OpenTelemetry\SDK\Logs;
 
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Logs\EventLoggerInterface;
-use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
-use OpenTelemetry\API\Logs\LoggerProviderInterface;
 
 class EventLoggerProvider implements EventLoggerProviderInterface
 {
@@ -21,5 +19,10 @@ class EventLoggerProvider implements EventLoggerProviderInterface
             $this->loggerProvider->getLogger($name, $version, $schemaUrl, $attributes),
             Clock::getDefault(),
         );
+    }
+
+    public function forceFlush(): bool
+    {
+        return $this->loggerProvider->forceFlush();
     }
 }

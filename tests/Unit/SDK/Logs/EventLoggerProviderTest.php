@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Unit\SDK\Logs;
 
 use OpenTelemetry\API\Logs\LoggerInterface;
-use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
+use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
