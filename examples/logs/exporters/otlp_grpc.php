@@ -34,7 +34,7 @@ $eventLogger = $eventLoggerProvider->getEventLogger('demo', '1.0', 'http://schem
 
 $eventLogger->emit(
     name: 'foo',
-    payload: ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'],
+    body: ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'],
     severityNumber: Severity::INFO
 );
 

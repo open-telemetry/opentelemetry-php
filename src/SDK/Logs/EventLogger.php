@@ -28,7 +28,7 @@ class EventLogger implements EventLoggerInterface
      */
     public function emit(
         string $name,
-        mixed $payload = null,
+        mixed $body = null,
         ?int $timestamp = null,
         ?ContextInterface $context = null,
         Severity $severityNumber = null,
@@ -38,7 +38,7 @@ class EventLogger implements EventLoggerInterface
         $logRecord->setAttribute('event.name', $name);
         $logRecord->setAttributes($attributes);
         $logRecord->setAttribute('event.name', $name);
-        $logRecord->setBody($payload);
+        $logRecord->setBody($body);
         $logRecord->setTimestamp($timestamp ?? $this->clock->now());
         $logRecord->setContext($context ?? Context::getCurrent());
         $logRecord->setSeverityNumber($severityNumber ?? Severity::INFO);
