@@ -378,6 +378,7 @@ return [
         'vendor/phan/phan/src/Phan',
         'vendor/phpunit/phpunit/src',
         'vendor/google/protobuf/src',
+        'vendor/ramsey/uuid/src',
     ],
 
     // A list of individual files to include in analysis

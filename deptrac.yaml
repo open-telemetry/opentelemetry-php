@@ -79,12 +79,16 @@ deptrac:
                 regex: ^Composer\\*
       -   name: HttpClients
           collectors:
-            - type: className
-              value: ^Symfony\\Component\\HttpClient\\*
-            - type: className
-              value: ^GuzzleHttp\\*
-            - type: className
-              value: ^Buzz\\*
+              - type: className
+                value: ^Symfony\\Component\\HttpClient\\*
+              - type: className
+                value: ^GuzzleHttp\\*
+              - type: className
+                value: ^Buzz\\*
+      -   name: RamseyUuid
+          collectors:
+              - type: className
+                regex: ^Ramsey\\Uuid\\*
 
     ruleset:
       Context:
@@ -100,6 +104,7 @@ deptrac:
           - HttpPlug
           - Composer
           - HttpClients
+          - RamseyUuid
       Contrib:
           - +SDK
           - +OtelProto
