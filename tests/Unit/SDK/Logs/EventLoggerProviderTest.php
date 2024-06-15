@@ -8,12 +8,14 @@ use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(EventLoggerProvider::class)]
 class EventLoggerProviderTest extends TestCase
 {
     private EventLoggerProvider $eventLoggerProvider;
+    /** @var LoggerProviderInterface&MockObject $loggerProvider */
     private LoggerProviderInterface $loggerProvider;
     private LoggerInterface $logger;
 
