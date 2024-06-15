@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
@@ -113,6 +114,7 @@ class TracerTest extends TestCase
 
     public function test_general_identity_attributes_are_dropped_by_default(): void
     {
+        Logging::disable();
         $exporter = new InMemoryExporter();
         $tracerProvider = new TracerProvider(new SimpleSpanProcessor($exporter));
         $tracer = $tracerProvider->getTracer('test');

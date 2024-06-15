@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContextInterface;
@@ -17,6 +18,7 @@ use Throwable;
 
 final class Span extends API\Span implements ReadWriteSpanInterface
 {
+    use LogsMessagesTrait;
 
     /** @var list<EventInterface> */
     private array $events = [];
@@ -247,6 +249,15 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     {
         if ($this->hasEnded) {
             return;
+        }
+
+        $spanData = $this->toSpanData();
+        if ($spanData->getTotalDroppedLinks() || $spanData->getTotalDroppedEvents() || $spanData->getAttributes()->getDroppedAttributesCount()) {
+            self::logWarning('Dropped span attributes, links or events', [
+                'attributes' => $spanData->getAttributes()->getDroppedAttributesCount(),
+                'links' => $spanData->getTotalDroppedLinks(),
+                'events' => $spanData->getTotalDroppedEvents(),
+            ]);
         }
 
         $this->endEpochNanos = $endEpochNanos ?? Clock::getDefault()->now();
