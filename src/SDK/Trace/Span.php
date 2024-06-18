@@ -251,15 +251,6 @@ final class Span extends API\Span implements ReadWriteSpanInterface
             return;
         }
 
-        $spanData = $this->toSpanData();
-        if ($spanData->getTotalDroppedLinks() || $spanData->getTotalDroppedEvents() || $spanData->getAttributes()->getDroppedAttributesCount()) {
-            self::logWarning('Dropped span attributes, links or events', [
-                'attributes' => $spanData->getAttributes()->getDroppedAttributesCount(),
-                'links' => $spanData->getTotalDroppedLinks(),
-                'events' => $spanData->getTotalDroppedEvents(),
-            ]);
-        }
-
         $this->endEpochNanos = $endEpochNanos ?? Clock::getDefault()->now();
         $this->hasEnded = true;
 
@@ -289,7 +280,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
 
     public function toSpanData(): SpanDataInterface
     {
-        return new ImmutableSpan(
+        $spanData = new ImmutableSpan(
             $this,
             $this->name,
             $this->links,
@@ -301,6 +292,18 @@ final class Span extends API\Span implements ReadWriteSpanInterface
             $this->endEpochNanos,
             $this->hasEnded
         );
+
+        if ($spanData->getTotalDroppedLinks() || $spanData->getTotalDroppedEvents() || $spanData->getAttributes()->getDroppedAttributesCount()) {
+            self::logWarning('Dropped span attributes, links or events', [
+                'trace_id' => $spanData->getTraceId(),
+                'span_id' => $spanData->getSpanId(),
+                'attributes' => $spanData->getAttributes()->getDroppedAttributesCount(),
+                'links' => $spanData->getTotalDroppedLinks(),
+                'events' => $spanData->getTotalDroppedEvents(),
+            ]);
+        }
+
+        return $spanData;
     }
 
     /** @inheritDoc */

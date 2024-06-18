@@ -943,15 +943,18 @@ class SpanTest extends MockeryTestCase
 
     private function expectDropped(int $attributes, int $events, int $links): void
     {
-        $this->logWriter->expects($this->once())->method('write')->with(
+        $this->logWriter->expects($this->atLeastOnce())->method('write')->with(
             $this->anything(),
             $this->stringContains('Dropped span attributes'),
-            $this->equalTo([
-                'attributes' => $attributes,
-                'links' => $links,
-                'events' => $events,
-                'source' => 'OpenTelemetry\\SDK\\Trace\\Span',
-            ])
+            $this->callback(function (array $context) use ($attributes, $events, $links) {
+                $this->assertSame($context['attributes'], $attributes);
+                $this->assertSame($context['events'], $events);
+                $this->assertSame($context['links'], $links);
+                $this->assertNotNull($context['trace_id']);
+                $this->assertNotNull($context['span_id']);
+
+                return true;
+            }),
         );
     }
 }
