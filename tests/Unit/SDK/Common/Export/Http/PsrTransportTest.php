@@ -97,7 +97,7 @@ final class PsrTransportTest extends TestCase
 
     public function test_send_decode_unknown_encoding_returns_error(): void
     {
-        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, ['Content-Encoding' => 'invalid'], ''));
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, ['Content-Encoding' => 'invalid'], 'foo'));
         $transport = $this->factory->create('http://localhost', 'text/plain');
 
         $response = $transport->send('');
