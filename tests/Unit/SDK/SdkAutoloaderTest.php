@@ -148,7 +148,6 @@ class SdkAutoloaderTest extends TestCase
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
         $this->setEnvironmentVariable(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk.yaml');
-        $this->setEnvironmentVariable(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE, __DIR__ . '/fixtures/otel-instrumentation.yaml');
 
         $this->assertTrue(SdkAutoloader::autoload());
         $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());

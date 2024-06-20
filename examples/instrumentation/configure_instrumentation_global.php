@@ -14,7 +14,6 @@ use const PHP_EOL;
 // EXAMPLE_INSTRUMENTATION_SPAN_NAME=test1234 php examples/instrumentation/configure_instrumentation_global.php
 putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
 putenv('OTEL_EXPERIMENTAL_CONFIG_FILE=examples/instrumentation/otel-sdk.yaml');
-putenv('OTEL_PHP_INSTRUMENTATION_CONFIG_FILE=examples/instrumentation/otel-instrumentation.yaml');
 
 require __DIR__ . '/../../vendor/autoload.php';
 

@@ -116,16 +116,16 @@ class SdkAutoloader
      */
     private static function registerInstrumentations(): void
     {
-        $file = Configuration::has(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE)
-            ? Configuration::getString(Variables::OTEL_PHP_INSTRUMENTATION_CONFIG_FILE)
+        $file = Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)
+            ? Configuration::getString(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)
             : [];
         $configuration = SdkInstrumentation::parseFile($file)->create();
         $hookManager = self::getHookManager();
         $tracerProvider = self::createLateBindingTracerProvider();
         $meterProvider = self::createLateBindingMeterProvider();
         $loggerProvider = self::createLateBindingLoggerProvider();
-
         $context = new InstrumentationContext($tracerProvider, $meterProvider, $loggerProvider);
+
         foreach (ServiceLoader::load(Instrumentation::class) as $instrumentation) {
             /** @var Instrumentation $instrumentation */
             try {

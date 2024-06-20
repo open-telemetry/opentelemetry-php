@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Example;
 
 use Exception;
-use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
@@ -16,9 +15,6 @@ use OpenTelemetry\Context\Context;
 final class ExampleInstrumentation implements Instrumentation
 {
 
-    /**
-     * @todo can we pass in just the config for _this_ instrumentation, rather than all?
-     */
     public function register(HookManager $hookManager, ConfigurationRegistry $configuration, InstrumentationContext $context): void
     {
         $config = $configuration->get(ExampleConfig::class) ?? throw new Exception('example instrumentation must be configured');
@@ -26,7 +22,7 @@ final class ExampleInstrumentation implements Instrumentation
             return;
         }
 
-        $tracer = Globals::tracerProvider()->getTracer('example-instrumentation');
+        $tracer = $context->tracerProvider->getTracer('example-instrumentation');
 
         $hookManager->hook(
             Example::class,

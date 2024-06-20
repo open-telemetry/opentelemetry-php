@@ -23,7 +23,7 @@ use const PHP_EOL;
 require __DIR__ . '/../../vendor/autoload.php';
 
 Configuration::parseFile(__DIR__ . '/otel-sdk.yaml')->create(new Context())->setAutoShutdown(true)->buildAndRegisterGlobal();
-$configuration = \OpenTelemetry\Config\SDK\Instrumentation::parseFile(__DIR__ . '/otel-instrumentation.yaml')->create();
+$configuration = \OpenTelemetry\Config\SDK\Instrumentation::parseFile(__DIR__ . '/otel-sdk.yaml')->create();
 $hookManager = new ExtensionHookManager();
 $context = new \OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context(new NoopTracerProvider(), new NoopMeterProvider(), new NoopLoggerProvider());
 

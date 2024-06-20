@@ -14,20 +14,24 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
  * @internal
- *
+ * @todo In a future release, when all instrumentations use SPI (and not autoload.files), this could be moved into {@see OpenTelemetrySdk}>
  * @implements ComponentProvider<ConfigurationRegistry>
  */
 class InstrumentationConfigurationRegistry implements ComponentProvider
 {
     /**
      * @param array{
-     *     config: list<ComponentPlugin<InstrumentationConfiguration>>,
+     *     instrumentation: array{
+     *         php: list<ComponentPlugin<InstrumentationConfiguration>>,
+     *         general: array
+     *     }
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): ConfigurationRegistry
     {
         $configurationRegistry = new ConfigurationRegistry();
-        foreach ($properties['config'] as $configuration) {
+        /** @phpstan-ignore-next-line */
+        foreach ($properties['instrumentation']['php'] ?? [] as $configuration) {
             $configurationRegistry->add($configuration->create($context));
         }
 
@@ -36,11 +40,15 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
 
     public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
     {
-        $root = new ArrayNodeDefinition('instrumentation');
+        $root = new ArrayNodeDefinition('open_telemetry');
         $root
+            ->ignoreExtraKeys()
             ->children()
-            // TODO add disabled_instrumentations arrayNode to allow disabling specific instrumentation classes?
-            ->append($registry->componentList('config', InstrumentationConfiguration::class))
+                ->arrayNode('instrumentation')
+                    ->children()
+                        ->append($registry->componentList('php', InstrumentationConfiguration::class))
+                        ->variableNode('general')->end()
+                    ->end()
             ->end()
         ;
 

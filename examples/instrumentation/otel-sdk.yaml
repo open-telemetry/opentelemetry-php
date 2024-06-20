@@ -1,7 +1,12 @@
-file_format: '0.1'
+file_format: '0.3'
 
 tracer_provider:
   processors:
   - simple:
       exporter:
         console: {}
+
+instrumentation:
+  php:
+    - example_instrumentation:
+        span_name: ${EXAMPLE_INSTRUMENTATION_SPAN_NAME:-example span}

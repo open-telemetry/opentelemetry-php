@@ -83,24 +83,28 @@ deptrac:
                 regex: ^Composer\\*
       -   name: HttpClients
           collectors:
-            - type: className
-              value: ^Symfony\\Component\\HttpClient\\*
-            - type: className
-              value: ^GuzzleHttp\\*
-            - type: className
-              value: ^Buzz\\*
+              - type: className
+                value: ^Symfony\\Component\\HttpClient\\*
+              - type: className
+                value: ^GuzzleHttp\\*
+              - type: className
+                value: ^Buzz\\*
       -   name: SPI
           collectors:
-            - type: className
-              value: ^Nevay\\SPI\\*
+              - type: className
+                value: ^Nevay\\SPI\\*
       -   name: SymfonyConfig
           collectors:
-            - type: className
-              value: ^Symfony\\Component\\Config\\*
-            - type: className
-              value: ^Symfony\\Component\\Yaml\\*
-            - type: className
-              value: ^Symfony\\Component\\VarExporter\\*
+              - type: className
+                value: ^Symfony\\Component\\Config\\*
+              - type: className
+                value: ^Symfony\\Component\\Yaml\\*
+              - type: className
+                value: ^Symfony\\Component\\VarExporter\\*
+      -   name: RamseyUuid
+          collectors:
+              - type: className
+                regex: ^Ramsey\\Uuid\\*
 
     ruleset:
       Context:
@@ -129,6 +133,7 @@ deptrac:
           - Composer
           - HttpClients
           - SPI
+          - RamseyUuid
       Contrib:
           - +SDK
           - +OtelProto
