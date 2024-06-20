@@ -350,3 +350,107 @@ resource:
         service.name: !!str "unknown_service"
     # Configure the resource schema URL.
     schema_url: https://opentelemetry.io/schemas/1.25.0
+
+# Configure instrumentation.
+instrumentation:
+  # Configure general SemConv options that may apply to multiple languages and instrumentations.
+  #
+  # Instrumenation may merge general config options with the language specific configuration at .instrumentation.<language>.
+  general:
+    # Configure instrumentations following the peer semantic conventions.
+    #
+    # See peer semantic conventions: https://opentelemetry.io/docs/specs/semconv/attributes-registry/peer/
+    peer:
+      # Configure the service mapping for instrumentations following peer.service semantic conventions.
+      #
+      # Each entry is a key value pair where "peer" defines the IP address and "service" defines the corresponding logical name of the service.
+      #
+      # See peer.service semantic conventions: https://opentelemetry.io/docs/specs/semconv/general/attributes/#general-remote-service-attributes
+      service_mapping:
+        - peer: 1.2.3.4
+          service: FooService
+        - peer: 2.3.4.5
+          service: BarService
+    # Configure instrumentations following the http semantic conventions.
+    #
+    # See http semantic conventions: https://opentelemetry.io/docs/specs/semconv/http/
+    http:
+      # Configure instrumentations following the http client semantic conventions.
+      client:
+        # Configure headers to capture for outbound http requests.
+        request_captured_headers:
+          - Content-Type
+          - Accept
+        # Configure headers to capture for outbound http responses.
+        response_captured_headers:
+          - Content-Type
+          - Content-Encoding
+      # Configure instrumentations following the http server semantic conventions.
+      server:
+        # Configure headers to capture for inbound http requests.
+        request_captured_headers:
+          - Content-Type
+          - Accept
+        # Configure headers to capture for outbound http responses.
+        response_captured_headers:
+          - Content-Type
+          - Content-Encoding
+  # Configure language-specific instrumentation libraries.
+  #
+  # Keys may refer to instrumentation libraries or collections of related configuration. Because there is no central schema defining the keys or their contents, instrumentation must carefully document their schema and avoid key collisions with other instrumentations.
+  #
+  # Configure C++ language-specific instrumentation libraries.
+  cpp:
+    # Configure the instrumentation corresponding to key "example".
+    example:
+      property: "value"
+  # Configure .NET language-specific instrumentation libraries.
+  dotnet:
+    # Configure the instrumentation corresponding to key "example".
+    example:
+      property: "value"
+  # Configure Erlang language-specific instrumentation libraries.
+  erlang:
+    # Configure the instrumentation corresponding to key "example".
+    example:
+      property: "value"
+  # Configure Go language-specific instrumentation libraries.
+  go:
+    # Configure the instrumentation corresponding to key "example".
+    example:
+      property: "value"
+  # Configure Java language-specific instrumentation libraries.
+  java:
+    # Configure the instrumentation corresponding to key "example".
+    example:
+      property: "value"
+  # Configure JavaScript language-specific instrumentation libraries.
+  js:
+    # Configure the instrumentation corresponding to key "example".
+    example:
+      property: "value"
+  # Configure PHP language-specific instrumentation libraries.
+  php:
+    # Configure the instrumentation corresponding to key "example".
+    example:
+      property: "value"
+  # Configure Python language-specific instrumentation libraries.
+  python:
+    # Configure the instrumentation corresponding to key "example".
+    example:
+      property: "value"
+  # Configure Ruby language-specific instrumentation libraries.
+  ruby:
+    # Configure the instrumentation corresponding to key "example".
+    example:
+      property: "value"
+  # Configure Rust language-specific instrumentation libraries.
+  rust:
+    # Configure the instrumentation corresponding to key "example".
+    example:
+      property: "value"
+  # Configure Swift language-specific instrumentation libraries.
+  swift:
+    # Configure the instrumentation corresponding to key "example".
+    example:
+      property: "value"
