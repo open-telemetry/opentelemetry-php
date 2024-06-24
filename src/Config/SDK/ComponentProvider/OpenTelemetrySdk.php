@@ -323,7 +323,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->end()
                 ->end()
                 ->append($registry->component('sampler', SamplerInterface::class))
-                ->append($registry->componentList('processors', SpanProcessorInterface::class))
+                ->append($registry->componentArrayList('processors', SpanProcessorInterface::class))
             ->end()
         ;
 
@@ -374,7 +374,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->end()
                     ->end()
                 ->end()
-                ->append($registry->componentList('readers', MetricReaderInterface::class))
+                ->append($registry->componentArrayList('readers', MetricReaderInterface::class))
             ->end()
         ;
 
@@ -394,7 +394,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->integerNode('attribute_count_limit')->min(0)->defaultNull()->end()
                     ->end()
                 ->end()
-                ->append($registry->componentList('processors', LogRecordProcessorInterface::class))
+                ->append($registry->componentArrayList('processors', LogRecordProcessorInterface::class))
             ->end()
         ;
 

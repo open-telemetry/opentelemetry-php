@@ -45,10 +45,12 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
             ->ignoreExtraKeys()
             ->children()
                 ->arrayNode('instrumentation')
+                    ->ignoreExtraKeys()
                     ->children()
                         ->append($registry->componentList('php', InstrumentationConfiguration::class))
-                        ->variableNode('general')->end()
+                        ->variableNode('general')->end() //@todo
                     ->end()
+                ->end()
             ->end()
         ;
 

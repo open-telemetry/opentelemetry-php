@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
-use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\Configurator;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
@@ -18,16 +18,25 @@ use OpenTelemetry\SDK\SdkAutoloader;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 #[CoversClass(SdkAutoloader::class)]
 class SdkAutoloaderTest extends TestCase
 {
     use TestState;
 
+    /**
+     * @var LoggerInterface&MockObject
+     */
+    private LoggerInterface $logger;
+
     public function setUp(): void
     {
-        Logging::disable();
+        $this->logger = $this->createMock(LoggerInterface::class);
+        LoggerHolder::set($this->logger);
         Globals::reset();
     }
 
@@ -146,6 +155,7 @@ class SdkAutoloaderTest extends TestCase
 
     public function test_autoload_from_config_file(): void
     {
+        $this->logger->expects($this->never())->method('log')->with($this->equalTo(LogLevel::ERROR));
         $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
         $this->setEnvironmentVariable(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk.yaml');
 
