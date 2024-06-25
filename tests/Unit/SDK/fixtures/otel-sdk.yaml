@@ -17,18 +17,18 @@ instrumentation:
           service: FooService
         - peer: 2.3.4.5
           service: BarService
-      http:
-        client:
-          request_captured_headers:
-            - Content-Type
-            - Accept
-          response_captured_headers:
-            - Content-Type
-            - Content-Encoding
-        server:
-          request_captured_headers:
-            - Content-Type
-            - Accept
-          response_captured_headers:
-            - Content-Type
-            - Content-Encoding
+    http:
+      client:
+        request_captured_headers:
+          - Content-Type
+          - Accept
+        response_captured_headers:
+          - Content-Type
+          - Content-Encoding
+      server:
+        request_captured_headers:
+          - Content-Type
+          - Accept
+        response_captured_headers:
+          - Content-Type
+          - Content-Encoding

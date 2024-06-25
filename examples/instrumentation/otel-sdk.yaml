@@ -8,5 +8,27 @@ tracer_provider:
 
 instrumentation:
   php:
-    - example_instrumentation:
-        span_name: ${EXAMPLE_INSTRUMENTATION_SPAN_NAME:-example span}
+    example_instrumentation:
+      span_name: ${EXAMPLE_INSTRUMENTATION_SPAN_NAME:-example span}
+  general:
+    peer:
+      service_mapping:
+        - peer: 1.2.3.4
+          service: FooService
+        - peer: 2.3.4.5
+          service: BarService
+      http:
+        client:
+          request_captured_headers:
+            - Content-Type
+            - Accept
+          response_captured_headers:
+            - Content-Type
+            - Content-Encoding
+        server:
+          request_captured_headers:
+            - Content-Type
+            - Accept
+          response_captured_headers:
+            - Content-Type
+            - Content-Encoding

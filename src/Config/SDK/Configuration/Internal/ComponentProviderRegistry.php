@@ -70,7 +70,6 @@ final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Confi
 
     public function componentList(string $name, string $type): ArrayNodeDefinition
     {
-        //@todo clobbers
         $node = new ArrayNodeDefinition($name);
         $this->applyToArrayNode($node, $type, true);
 
@@ -116,7 +115,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Confi
         return $node;
     }
 
-    private function applyToArrayNode(ArrayNodeDefinition $node, string $type, bool $isArray = false): void
+    private function applyToArrayNode(ArrayNodeDefinition $node, string $type, bool $forceArray = false): void
     {
         $node->info(sprintf('Component "%s"', $type));
         $node->performNoDeepMerging();
@@ -131,7 +130,8 @@ final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Confi
             }
         }
 
-        if ($isArray) {
+        if ($forceArray) {
+            /* if the config was a map rather than an array, force it back to an array */
             $node->validate()->always(function (array $value) use ($type): array {
                 $validated = [];
                 foreach ($value as $name => $v) {

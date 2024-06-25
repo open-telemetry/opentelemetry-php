@@ -8,10 +8,18 @@ final class ConfigurationRegistry
 {
 
     private array $configurations = [];
+    private array $general = [];
 
     public function add(InstrumentationConfiguration $configuration): self
     {
         $this->configurations[$configuration::class] = $configuration;
+
+        return $this;
+    }
+
+    public function addGeneral(GeneralInstrumentationConfiguration $configuration): self
+    {
+        $this->general[$configuration::class] = $configuration;
 
         return $this;
     }
@@ -24,5 +32,15 @@ final class ConfigurationRegistry
     public function get(string $id): ?InstrumentationConfiguration
     {
         return $this->configurations[$id] ?? null;
+    }
+
+    /**
+     * @template C of GeneralInstrumentationConfiguration
+     * @param class-string<C> $id
+     * @return C|null
+     */
+    public function getGeneral(string $id): ?GeneralInstrumentationConfiguration
+    {
+        return $this->general[$id] ?? null;
     }
 }

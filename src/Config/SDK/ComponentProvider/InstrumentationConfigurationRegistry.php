@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\GeneralInstrumentationConfiguration;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\InstrumentationConfiguration;
 use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
@@ -34,6 +35,10 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
         foreach ($properties['instrumentation']['php'] ?? [] as $configuration) {
             $configurationRegistry->add($configuration->create($context));
         }
+        /** @phpstan-ignore-next-line */
+        foreach ($properties['instrumentation']['general'] ?? [] as $configuration) {
+            $configurationRegistry->addGeneral($configuration->create($context));
+        }
 
         return $configurationRegistry;
     }
@@ -48,7 +53,7 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
                     ->ignoreExtraKeys()
                     ->children()
                         ->append($registry->componentList('php', InstrumentationConfiguration::class))
-                        ->variableNode('general')->end() //@todo
+                        ->append($registry->componentList('general', GeneralInstrumentationConfiguration::class))
                     ->end()
                 ->end()
             ->end()
