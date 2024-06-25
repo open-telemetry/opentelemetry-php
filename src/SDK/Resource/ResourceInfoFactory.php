@@ -42,6 +42,10 @@ class ResourceInfoFactory
 
         foreach ($detectors as $detector) {
             switch ($detector) {
+                case Values::VALUE_DETECTORS_SERVICE:
+                    $resourceDetectors[] = new Detectors\Service();
+
+                    break;
                 case Values::VALUE_DETECTORS_ENVIRONMENT:
                     $resourceDetectors[] = new Detectors\Environment();
 
