@@ -131,7 +131,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Confi
         }
 
         if ($forceArray) {
-            /* if the config was a map rather than an array, force it back to an array */
+            // if the config was a map rather than an array, force it back to an array
             $node->validate()->always(function (array $value) use ($type): array {
                 $validated = [];
                 foreach ($value as $name => $v) {

@@ -24,7 +24,7 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
      * @param array{
      *     instrumentation: array{
      *         php: list<ComponentPlugin<InstrumentationConfiguration>>,
-     *         general: array
+     *         general: list<ComponentPlugin<InstrumentationConfiguration>>
      *     }
      * } $properties
      */
@@ -37,7 +37,7 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
         }
         /** @phpstan-ignore-next-line */
         foreach ($properties['instrumentation']['general'] ?? [] as $configuration) {
-            $configurationRegistry->addGeneral($configuration->create($context));
+            $configurationRegistry->add($configuration->create($context));
         }
 
         return $configurationRegistry;
