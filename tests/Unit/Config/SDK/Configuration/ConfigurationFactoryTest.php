@@ -26,8 +26,19 @@ use Symfony\Component\Yaml\Yaml;
 #[CoversClass(ConfigurationFactory::class)]
 final class ConfigurationFactoryTest extends TestCase
 {
-
+    public string $cacheDir;
     public $properties;
+
+    public function setUp(): void
+    {
+        $this->cacheDir = __DIR__ . '/configurations';
+    }
+
+    public function tearDown(): void
+    {
+        array_map('unlink', array_filter((array) glob($this->cacheDir . "/*cache*")));
+    }
+
     /**
      * @psalm-suppress MissingTemplateParam
      */
@@ -237,5 +248,16 @@ final class ConfigurationFactoryTest extends TestCase
                 new PhpIniEnvSource(),
             ]),
         );
+    }
+
+    public function test_cache_configuration(): void
+    {
+        $file = $this->cacheDir . '/kitchen-sink.yaml';
+        $cacheFile = $this->cacheDir . '/kitchen-sink.cache';
+        $this->assertFalse(file_exists($cacheFile), 'cache does not initially exist');
+        $plugin = self::factory()->parseFile($file, $cacheFile);
+        $this->assertTrue(file_exists($cacheFile));
+        $fromCache = self::factory()->parseFile($file, $cacheFile);
+        $this->assertEquals($fromCache, $plugin);
     }
 }

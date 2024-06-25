@@ -116,7 +116,7 @@ final class ConfigurationFactory
             class_exists(VarExporter::class)
                 ? sprintf('<?php return %s;', VarExporter::export($configuration))
                 : sprintf('<?php return unserialize(%s);', var_export(serialize($configuration), true)),
-            $resources->toArray() //@todo $resources possible null
+            $resources->toArray()
         );
 
         return $configuration;
