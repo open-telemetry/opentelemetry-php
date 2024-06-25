@@ -28,10 +28,6 @@ return static function (RectorConfig $rectorConfig): void {
         PHPUnitSetList::PHPUNIT_100,
     ]);
     $rectorConfig->skip([
-        CallableThisArrayToAnonymousFunctionRector::class => [
-            __DIR__ . '/src/SDK/SdkBuilder.php',
-            __DIR__ . '/src/SDK/SdkAutoloader.php',
-        ],
         FlipTypeControlToUseExclusiveTypeRector::class,
         NewInInitializerRector::class => [
             __DIR__ . '/src/SDK/Trace/Sampler/ParentBased.php',

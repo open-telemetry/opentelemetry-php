@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Instrumentation\General;
 
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\GeneralInstrumentationConfiguration;
+use OpenTelemetry\API\Instrumentation\Configuration\General\PeerConfig;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
-use OpenTelemetry\SDK\Instrumentation\Configuration\PeerConfig;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**

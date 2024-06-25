@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Instrumentation\Configuration;
+namespace OpenTelemetry\API\Instrumentation\Configuration\General;
 
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\GeneralInstrumentationConfiguration;
 
