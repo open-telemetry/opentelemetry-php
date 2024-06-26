@@ -13,7 +13,7 @@ interface EventLoggerInterface
 {
     public function emit(
         string $name,
-        mixed $payload = null,
+        mixed $body = null,
         ?int $timestamp = null,
         ?ContextInterface $context = null,
         Severity $severityNumber = null,
