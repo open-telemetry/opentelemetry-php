@@ -98,6 +98,7 @@ class LoggerTest extends TestCase
         $record->setAttributes([
             'one' => 'attr_one',
             'two' => 'attr_two',
+            'three' => 'attr_three',
         ]);
 
         $logger->emit($record);
