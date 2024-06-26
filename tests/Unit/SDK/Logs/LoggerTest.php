@@ -90,7 +90,13 @@ class LoggerTest extends TestCase
             ->method('write')
             ->with(
                 $this->equalTo('warning'),
-                $this->stringContains('Dropped')
+                $this->stringContains('Dropped'),
+                $this->callback(function (array $context): bool {
+                    $this->assertArrayHasKey('attributes', $context);
+                    $this->assertSame(2, $context['attributes']);
+
+                    return true;
+                }),
             );
         $logger = new Logger($this->sharedState, $this->scope);
         $record = new LogRecord();
