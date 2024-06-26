@@ -254,6 +254,8 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         $this->endEpochNanos = $endEpochNanos ?? Clock::getDefault()->now();
         $this->hasEnded = true;
 
+        $this->checkForDroppedElements();
+
         $this->spanProcessor->onEnd($this);
     }
 
@@ -280,7 +282,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
 
     public function toSpanData(): SpanDataInterface
     {
-        $spanData = new ImmutableSpan(
+        return new ImmutableSpan(
             $this,
             $this->name,
             $this->links,
@@ -292,18 +294,6 @@ final class Span extends API\Span implements ReadWriteSpanInterface
             $this->endEpochNanos,
             $this->hasEnded
         );
-
-        if ($spanData->getTotalDroppedLinks() || $spanData->getTotalDroppedEvents() || $spanData->getAttributes()->getDroppedAttributesCount()) {
-            self::logWarning('Dropped span attributes, links or events', [
-                'trace_id' => $spanData->getTraceId(),
-                'span_id' => $spanData->getSpanId(),
-                'attributes' => $spanData->getAttributes()->getDroppedAttributesCount(),
-                'links' => $spanData->getTotalDroppedLinks(),
-                'events' => $spanData->getTotalDroppedEvents(),
-            ]);
-        }
-
-        return $spanData;
     }
 
     /** @inheritDoc */
@@ -342,5 +332,35 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     public function getResource(): ResourceInfo
     {
         return $this->resource;
+    }
+
+    private function checkForDroppedElements(): void
+    {
+        $spanData = $this->toSpanData(); //@todo could be optimized to reduce overhead of multiple calls
+        $droppedLinkAttributes = 0;
+        $droppedEventAttributes = 0;
+        array_map(function (EventInterface $event) use (&$droppedEventAttributes) {
+            $droppedEventAttributes += $event->getAttributes()->getDroppedAttributesCount();
+        }, $spanData->getEvents());
+        array_map(function (LinkInterface $link) use (&$droppedLinkAttributes) {
+            $droppedLinkAttributes += $link->getAttributes()->getDroppedAttributesCount();
+        }, $spanData->getLinks());
+        if (
+            $spanData->getTotalDroppedLinks() ||
+            $spanData->getTotalDroppedEvents() ||
+            $spanData->getAttributes()->getDroppedAttributesCount() ||
+            $droppedEventAttributes ||
+            $droppedLinkAttributes
+        ) {
+            self::logWarning('Dropped span attributes, links or events', [
+                'trace_id' => $spanData->getTraceId(),
+                'span_id' => $spanData->getSpanId(),
+                'attributes' => $spanData->getAttributes()->getDroppedAttributesCount(),
+                'links' => $spanData->getTotalDroppedLinks(),
+                'link_attributes' => $droppedLinkAttributes,
+                'events' => $spanData->getTotalDroppedEvents(),
+                'event_attributes' => $droppedEventAttributes,
+            ]);
+        }
     }
 }
