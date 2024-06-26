@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Logs\Logger;
 use OpenTelemetry\SDK\Logs\LoggerSharedState;
+use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,16 +25,28 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Logger::class)]
 class LoggerTest extends TestCase
 {
+    /** @var LogWriterInterface&MockObject $logWriter */
+    private LogWriterInterface $logWriter;
     private LoggerSharedState $sharedState;
     private LogRecordProcessorInterface $processor;
     private InstrumentationScope $scope;
 
     public function setUp(): void
     {
+        $limits = (new LogRecordLimitsBuilder())->setAttributeCountLimit(1)->build();
         $this->sharedState = $this->createMock(LoggerSharedState::class);
+        $this->sharedState->method('getLogRecordLimits')->willReturn($limits);
         $this->processor = $this->createMock(LogRecordProcessorInterface::class);
         $this->sharedState->method('getProcessor')->willReturn($this->processor);
         $this->scope = new InstrumentationScope('foo', '1.0', 'schema.url', Attributes::create([])); //final
+
+        $this->logWriter = $this->createMock(LogWriterInterface::class);
+        Logging::setLogWriter($this->logWriter);
+    }
+
+    public function tearDown(): void
+    {
+        Logging::reset();
     }
 
     public function test_log_record(): void
@@ -63,6 +79,33 @@ class LoggerTest extends TestCase
                 }),
                 $this->anything(),
             );
+
+        $logger->emit($record);
+    }
+
+    public function test_logs_dropped_attributes(): void
+    {
+        $this->logWriter
+            ->expects($this->once())
+            ->method('write')
+            ->with(
+                $this->equalTo('warning'),
+                $this->stringContains('Dropped'),
+                $this->callback(function (array $context): bool {
+                    $this->assertArrayHasKey('attributes', $context);
+                    $this->assertSame(2, $context['attributes']);
+
+                    return true;
+                }),
+            );
+        $logger = new Logger($this->sharedState, $this->scope);
+        $record = new LogRecord();
+        //limit is 1
+        $record->setAttributes([
+            'one' => 'attr_one',
+            'two' => 'attr_two',
+            'three' => 'attr_three',
+        ]);
 
         $logger->emit($record);
     }

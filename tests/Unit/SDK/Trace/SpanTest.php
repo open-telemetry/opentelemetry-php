@@ -48,6 +48,8 @@ use function str_repeat;
 #[CoversClass(Span::class)]
 class SpanTest extends MockeryTestCase
 {
+    private const TRACE_ID = 'e4a8d4e0d75c0702200af2882cb16c6b';
+    private const SPAN_ID = '46701247e52c2d1b';
     private const SPAN_NAME = 'test_span';
     private const NEW_SPAN_NAME = 'new_test_span';
     private const START_EPOCH = 1000123789654;
@@ -655,6 +657,7 @@ class SpanTest extends MockeryTestCase
     public function test_dropping_attributes(): void
     {
         $maxNumberOfAttributes = 8;
+        $this->expectDropped(8, 0, 0);
         $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL, (new SpanLimitsBuilder())->setAttributeCountLimit($maxNumberOfAttributes)->build());
 
         foreach (range(1, $maxNumberOfAttributes * 2) as $idx) {
@@ -676,6 +679,7 @@ class SpanTest extends MockeryTestCase
     public function test_dropping_attributes_provided_via_span_builder(): void
     {
         $maxNumberOfAttributes = 8;
+        $this->expectDropped(8, 0, 0);
 
         $attributesBuilder = Attributes::factory()->builder();
 
@@ -704,6 +708,7 @@ class SpanTest extends MockeryTestCase
 
     public function test_dropping_events(): void
     {
+        $this->expectDropped(0, 8, 0);
         $maxNumberOfEvents = 8;
         $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL, (new SpanLimitsBuilder())->setEventCountLimit($maxNumberOfEvents)->build());
 
@@ -715,6 +720,26 @@ class SpanTest extends MockeryTestCase
         $spanData = $span->toSpanData();
         $this->assertCount($maxNumberOfEvents, $spanData->getEvents());
         $this->assertSame(8, $spanData->getTotalDroppedEvents());
+
+        $span->end();
+    }
+
+    public function test_dropping_links(): void
+    {
+        $maxNumberOfLinks = 8;
+        $expectedDroppedLinks = 9; //test span contains one link by default
+        $this->expectDropped(0, 0, $expectedDroppedLinks);
+        $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL, (new SpanLimitsBuilder())->setLinkCountLimit($maxNumberOfLinks)->build());
+        $ctx = SpanContext::create(self::TRACE_ID, self::SPAN_ID);
+
+        foreach (range(1, $maxNumberOfLinks * 2) as $_idx) {
+            $span->addLink($ctx);
+            $this->testClock->advanceSeconds();
+        }
+
+        $spanData = $span->toSpanData();
+        $this->assertCount($maxNumberOfLinks, $spanData->getLinks());
+        $this->assertSame($expectedDroppedLinks, $spanData->getTotalDroppedLinks());
 
         $span->end();
     }
@@ -914,5 +939,22 @@ class SpanTest extends MockeryTestCase
         $this->assertSame($status, $spanData->getStatus()->getCode());
         $this->assertSame($hasEnded, $spanData->hasEnded());
         $this->assertEquals($attributes, $spanData->getAttributes());
+    }
+
+    private function expectDropped(int $attributes, int $events, int $links): void
+    {
+        $this->logWriter->expects($this->atLeastOnce())->method('write')->with(
+            $this->anything(),
+            $this->stringContains('Dropped span attributes'),
+            $this->callback(function (array $context) use ($attributes, $events, $links) {
+                $this->assertSame($context['attributes'], $attributes);
+                $this->assertSame($context['events'], $events);
+                $this->assertSame($context['links'], $links);
+                $this->assertNotNull($context['trace_id']);
+                $this->assertNotNull($context['span_id']);
+
+                return true;
+            }),
+        );
     }
 }

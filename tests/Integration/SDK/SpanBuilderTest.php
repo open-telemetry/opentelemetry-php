@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Integration\SDK;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery\MockInterface;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextValidator;
@@ -96,6 +97,7 @@ class SpanBuilderTest extends MockeryTestCase
 
     public function test_add_link_dropping_links(): void
     {
+        Logging::disable();
         $maxNumberOfLinks = 8;
         $tracerProvider = new TracerProvider([], null, null, (new SpanLimitsBuilder())->setLinkCountLimit($maxNumberOfLinks)->build());
         $spanBuilder = $tracerProvider
