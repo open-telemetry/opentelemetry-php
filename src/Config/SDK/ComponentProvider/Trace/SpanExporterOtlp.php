@@ -34,6 +34,10 @@ final class SpanExporterOtlp implements ComponentProvider
      *     headers: array<string, string>,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
+     *     retry: array{
+     *         initial_delay: int,
+     *         max_attempts: int
+     *     }
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
@@ -46,6 +50,8 @@ final class SpanExporterOtlp implements ComponentProvider
             headers: $properties['headers'],
             compression: $properties['compression'],
             timeout: $properties['timeout'],
+            retryDelay: $properties['retry']['initial_delay'],
+            maxRetries: $properties['retry']['max_attempts'],
             cacert: $properties['certificate'],
             cert: $properties['client_certificate'],
             key: $properties['client_certificate'],
@@ -67,7 +73,18 @@ final class SpanExporterOtlp implements ComponentProvider
                 ->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+                ->arrayNode('retry')
+                    ->children()
+                        ->integerNode('max_attempts')->min(0)->defaultValue(3)->end()
+                        ->integerNode('initial_delay')->min(0)->defaultValue(0)->end()
+                    ->end()
+                ->end()
             ->end()
+            ->beforeNormalization()->ifTrue(function ($data): bool {
+                return !array_key_exists('retry', $data);
+            })->then(function ($data): array {
+                return $data + ['retry' => []];
+            })->end()
         ;
 
         return $node;

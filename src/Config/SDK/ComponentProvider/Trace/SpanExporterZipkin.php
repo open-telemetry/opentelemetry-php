@@ -25,6 +25,10 @@ final class SpanExporterZipkin implements ComponentProvider
      * @param array{
      *     endpoint: string,
      *     timeout: int<0, max>,
+     *     retry: array{
+     *          initial_delay: int,
+     *          max_attempts: int
+     *      }
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
@@ -33,6 +37,8 @@ final class SpanExporterZipkin implements ComponentProvider
             endpoint: $properties['endpoint'],
             contentType: 'application/json',
             timeout: $properties['timeout'],
+            retryDelay: $properties['retry']['initial_delay'],
+            maxRetries: $properties['retry']['max_attempts'],
         ));
     }
 
@@ -43,7 +49,18 @@ final class SpanExporterZipkin implements ComponentProvider
             ->children()
                 ->scalarNode('endpoint')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+                ->arrayNode('retry')
+                    ->children()
+                        ->integerNode('max_attempts')->min(0)->defaultValue(3)->end()
+                        ->integerNode('initial_delay')->min(0)->defaultValue(0)->end()
+                    ->end()
+                ->end()
             ->end()
+            ->beforeNormalization()->ifTrue(function ($data): bool {
+                return !array_key_exists('retry', $data);
+            })->then(function ($data): array {
+                return $data + ['retry' => []];
+            })->end()
         ;
 
         return $node;

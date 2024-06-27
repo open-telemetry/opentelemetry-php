@@ -25,6 +25,8 @@ final class SpanExporterOtlp implements ComponentProvider
      *     headers: array<string, string>,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
+     *     retryDelay: int<0, max>,
+     *     maxRetries: int<0, max>,
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): SpanExporter
@@ -47,6 +49,12 @@ final class SpanExporterOtlp implements ComponentProvider
                 ->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+                ->arrayNode('retry')
+                    ->children()
+                        ->integerNode('max_attempts')->min(0)->defaultValue(3)->end()
+                        ->integerNode('initial_delay')->min(0)->defaultValue(0)->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 

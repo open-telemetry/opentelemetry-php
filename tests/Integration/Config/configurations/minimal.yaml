@@ -1,0 +1,35 @@
+# minimal.yaml demonstrates only providing required attributes
+file_format: "0.1"
+logger_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp:
+            protocol: http/protobuf
+            endpoint: http://localhost:4318
+    - simple:
+        exporter:
+          console: {}
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          otlp:
+            protocol: http/protobuf
+            endpoint: http://localhost:4318
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp:
+            protocol: http/protobuf
+            endpoint: http://localhost:4318
+            #retry:
+            #  initial_delay: 555
+    - batch:
+        exporter:
+          zipkin:
+            endpoint: http://localhost:9411/api/v2/spans
+    - simple:
+        exporter:
+          console: {}

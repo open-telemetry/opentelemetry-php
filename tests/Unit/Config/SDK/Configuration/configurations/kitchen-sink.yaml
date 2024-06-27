@@ -293,6 +293,9 @@ tracer_provider:
             #
             # Environment variable: OTEL_EXPORTER_OTLP_TIMEOUT, OTEL_EXPORTER_OTLP_TRACES_TIMEOUT
             timeout: 10000
+            retry:
+              max_attempts: 5
+              initial_delay: 100
     # Configure a batch span processor.
     - batch:
         # Configure exporter.
