@@ -16,7 +16,7 @@ class NoopEventLogger implements EventLoggerInterface
         return $instance;
     }
 
-    public function emit(string $name, mixed $payload = null, ?int $timestamp = null, ?ContextInterface $context = null, Severity|int|null $severityNumber = null, iterable $attributes = []): void
+    public function emit(string $name, mixed $body = null, ?int $timestamp = null, ?ContextInterface $context = null, Severity|int|null $severityNumber = null, iterable $attributes = []): void
     {
     }
 }

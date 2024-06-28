@@ -91,6 +91,10 @@ final class PsrUtils
      */
     public static function decode(string $value, array $encodings): string
     {
+        if ($value === '') {
+            return $value;
+        }
+
         for ($i = count($encodings); --$i >= 0;) {
             if (strcasecmp($encodings[$i], 'identity') === 0) {
                 continue;

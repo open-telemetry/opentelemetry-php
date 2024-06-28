@@ -6,27 +6,7 @@
     /**
      * @deprecated
      */
-    public const HTTP_HOST = 'http.host';
-
-    /**
-     * @deprecated
-     */
-    public const HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED = 'http.request_content_length_uncompressed';
-
-    /**
-     * @deprecated
-     */
-    public const HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED = 'http.response_content_length_uncompressed';
-
-    /**
-     * @deprecated
-     */
     public const HTTP_RETRY_COUNT = 'http.retry_count';
-
-    /**
-     * @deprecated
-     */
-    public const HTTP_SERVER_NAME = 'http.server_name';
 
     /**
      * @deprecated
@@ -72,21 +52,6 @@
      * @deprecated
      */
     public const MESSAGING_URL = 'messaging.url';
-
-    /**
-     * @deprecated
-     */
-    public const NET_HOST_IP = 'net.host.ip';
-
-    /**
-     * @deprecated
-     */
-    public const NET_PEER_IP = 'net.peer.ip';
-
-    /**
-     * @deprecated
-     */
-    public const HTTP_CLIENT_IP = 'http.client_ip';
 
     /**
      * @deprecated

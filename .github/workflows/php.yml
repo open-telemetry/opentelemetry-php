@@ -29,7 +29,7 @@ jobs:
       run: |
         echo "key=$(date +'%Y-%U')" >> $GITHUB_ENV
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - uses: gacts/run-and-post-run@v1
       id: post-run-command
@@ -59,7 +59,7 @@ jobs:
         key: ${{ env.key }}
 
     - name: Cache extensions
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ steps.extcache.outputs.dir }}
         key: ${{ steps.extcache.outputs.key }}
@@ -78,7 +78,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: vendor
         key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
@@ -86,7 +86,7 @@ jobs:
           ${{ runner.os }}-${{ matrix.php-version }}-php-
     - name: Cache test tools
       id: test-tools-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: vendor-bin
         key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}

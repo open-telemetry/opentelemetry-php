@@ -32,7 +32,7 @@ $eventLogger = $eventLoggerProvider->getEventLogger('demo', '1.0', 'https://open
 
 $eventLogger->emit(
     name: 'foo',
-    payload: ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'],
+    body: ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'],
     timestamp: (new \DateTime())->getTimestamp() * LogRecord::NANOS_PER_SECOND,
     severityNumber: Severity::INFO,
 );

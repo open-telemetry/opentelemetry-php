@@ -30,9 +30,9 @@ $eventLoggerTwo = $eventLoggerProvider->getEventLogger('demo', '2.0');
 
 $payload = ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'];
 
-$eventLoggerOne->emit(name: 'foo', payload: $payload, severityNumber: Severity::INFO);
+$eventLoggerOne->emit(name: 'foo', body: $payload, severityNumber: Severity::INFO);
 $eventLoggerOne->emit('bar', 'hello world');
-$eventLoggerTwo->emit(name: 'foo', payload: $payload, severityNumber: Severity::INFO);
+$eventLoggerTwo->emit(name: 'foo', body: $payload, severityNumber: Severity::INFO);
 
 //shut down logger provider
 $loggerProvider->shutdown();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContextInterface;
@@ -17,6 +18,7 @@ use Throwable;
 
 final class Span extends API\Span implements ReadWriteSpanInterface
 {
+    use LogsMessagesTrait;
 
     /** @var list<EventInterface> */
     private array $events = [];
@@ -252,6 +254,8 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         $this->endEpochNanos = $endEpochNanos ?? Clock::getDefault()->now();
         $this->hasEnded = true;
 
+        $this->checkForDroppedElements();
+
         $this->spanProcessor->onEnd($this);
     }
 
@@ -328,5 +332,35 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     public function getResource(): ResourceInfo
     {
         return $this->resource;
+    }
+
+    private function checkForDroppedElements(): void
+    {
+        $spanData = $this->toSpanData(); //@todo could be optimized to reduce overhead of multiple calls
+        $droppedLinkAttributes = 0;
+        $droppedEventAttributes = 0;
+        array_map(function (EventInterface $event) use (&$droppedEventAttributes) {
+            $droppedEventAttributes += $event->getAttributes()->getDroppedAttributesCount();
+        }, $spanData->getEvents());
+        array_map(function (LinkInterface $link) use (&$droppedLinkAttributes) {
+            $droppedLinkAttributes += $link->getAttributes()->getDroppedAttributesCount();
+        }, $spanData->getLinks());
+        if (
+            $spanData->getTotalDroppedLinks() ||
+            $spanData->getTotalDroppedEvents() ||
+            $spanData->getAttributes()->getDroppedAttributesCount() ||
+            $droppedEventAttributes ||
+            $droppedLinkAttributes
+        ) {
+            self::logWarning('Dropped span attributes, links or events', [
+                'trace_id' => $spanData->getTraceId(),
+                'span_id' => $spanData->getSpanId(),
+                'attributes' => $spanData->getAttributes()->getDroppedAttributesCount(),
+                'links' => $spanData->getTotalDroppedLinks(),
+                'link_attributes' => $droppedLinkAttributes,
+                'events' => $spanData->getTotalDroppedEvents(),
+                'event_attributes' => $droppedEventAttributes,
+            ]);
+        }
     }
 }

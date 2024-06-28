@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
-use OpenTelemetry\API\Logs\LoggerProviderInterface;
-use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\EventLoggerProviderFactory;
+use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
+use OpenTelemetry\SDK\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
