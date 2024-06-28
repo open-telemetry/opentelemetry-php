@@ -56,11 +56,10 @@ final class SpanExporterZipkin implements ComponentProvider
                     ->end()
                 ->end()
             ->end()
-            ->beforeNormalization()->ifTrue(function ($data): bool {
-                return !array_key_exists('retry', $data);
-            })->then(function ($data): array {
-                return $data + ['retry' => []];
-            })->end()
+            ->beforeNormalization()
+                ->ifTrue(fn ($data): bool => !array_key_exists('retry', $data))
+                ->then(fn ($data): array => $data + ['retry' => []])
+            ->end()
         ;
 
         return $node;
