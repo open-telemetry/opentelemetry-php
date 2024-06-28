@@ -24,8 +24,6 @@ tracer_provider:
           otlp:
             protocol: http/protobuf
             endpoint: http://localhost:4318
-            #retry:
-            #  initial_delay: 555
     - batch:
         exporter:
           zipkin:
