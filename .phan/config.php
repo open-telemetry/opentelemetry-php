@@ -373,6 +373,7 @@ return [
         'vendor/composer',
         'vendor/grpc/grpc/src/lib',
         'vendor/guzzlehttp',
+        'vendor/tbachert/spi/src',
         'vendor/psr',
         'vendor/php-http',
         'vendor/phpunit/phpunit/src',

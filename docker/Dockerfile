@@ -11,6 +11,7 @@ RUN chmod +x /usr/local/bin/install-php-extensions \
         grpc \
         intl\
         opcache \
+        opentelemetry \
         pcntl \
         protobuf \
         sockets \

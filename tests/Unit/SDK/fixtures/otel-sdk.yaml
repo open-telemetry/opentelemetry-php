@@ -1,0 +1,34 @@
+file_format: '0.3'
+
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console: {}
+
+instrumentation:
+  php:
+    example_instrumentation:
+      span_name: my-span
+  general:
+    peer:
+      service_mapping:
+        - peer: 1.2.3.4
+          service: FooService
+        - peer: 2.3.4.5
+          service: BarService
+    http:
+      client:
+        request_captured_headers:
+          - Content-Type
+          - Accept
+        response_captured_headers:
+          - Content-Type
+          - Content-Encoding
+      server:
+        request_captured_headers:
+          - Content-Type
+          - Accept
+        response_captured_headers:
+          - Content-Type
+          - Content-Encoding
