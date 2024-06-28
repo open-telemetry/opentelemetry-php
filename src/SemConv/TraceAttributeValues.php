@@ -11,7 +11,7 @@ interface TraceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.25.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.26.0';
     /**
      * @see TraceAttributes::ANDROID_STATE Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time
      */
@@ -26,6 +26,26 @@ interface TraceAttributeValues
      * @see TraceAttributes::ANDROID_STATE Any time after Activity.onResume() or, if the app has no Activity, Context.startService() has been called when the app was in either the created or background states
      */
     public const ANDROID_STATE_FOREGROUND = 'foreground';
+
+    /**
+     * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT Exception was handled by the exception handling middleware
+     */
+    public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_HANDLED = 'handled';
+
+    /**
+     * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT Exception was not handled by the exception handling middleware
+     */
+    public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_UNHANDLED = 'unhandled';
+
+    /**
+     * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT Exception handling was skipped because the response had started
+     */
+    public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_SKIPPED = 'skipped';
+
+    /**
+     * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT Exception handling didn&#39;t run because the request was aborted
+     */
+    public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_ABORTED = 'aborted';
 
     /**
      * @see TraceAttributes::ASPNETCORE_RATE_LIMITING_RESULT Lease was acquired
@@ -46,6 +66,26 @@ interface TraceAttributeValues
      * @see TraceAttributes::ASPNETCORE_RATE_LIMITING_RESULT Lease request was canceled
      */
     public const ASPNETCORE_RATE_LIMITING_RESULT_REQUEST_CANCELED = 'request_canceled';
+
+    /**
+     * @see TraceAttributes::ASPNETCORE_ROUTING_MATCH_STATUS Match succeeded
+     */
+    public const ASPNETCORE_ROUTING_MATCH_STATUS_SUCCESS = 'success';
+
+    /**
+     * @see TraceAttributes::ASPNETCORE_ROUTING_MATCH_STATUS Match failed
+     */
+    public const ASPNETCORE_ROUTING_MATCH_STATUS_FAILURE = 'failure';
+
+    /**
+     * @see TraceAttributes::AWS_ECS_LAUNCHTYPE ec2
+     */
+    public const AWS_ECS_LAUNCHTYPE_EC2 = 'ec2';
+
+    /**
+     * @see TraceAttributes::AWS_ECS_LAUNCHTYPE fargate
+     */
+    public const AWS_ECS_LAUNCHTYPE_FARGATE = 'fargate';
 
     /**
      * @see TraceAttributes::CLOUD_PLATFORM Alibaba Cloud Elastic Compute Service
@@ -291,6 +331,16 @@ interface TraceAttributeValues
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL local_serial
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_LOCAL_SERIAL = 'local_serial';
+
+    /**
+     * @see TraceAttributes::DB_CLIENT_CONNECTIONS_STATE idle
+     */
+    public const DB_CLIENT_CONNECTIONS_STATE_IDLE = 'idle';
+
+    /**
+     * @see TraceAttributes::DB_CLIENT_CONNECTIONS_STATE used
+     */
+    public const DB_CLIENT_CONNECTIONS_STATE_USED = 'used';
 
     /**
      * @see TraceAttributes::DB_COSMOSDB_CONNECTION_MODE Gateway (HTTP) connections mode
@@ -718,6 +768,11 @@ interface TraceAttributeValues
     public const FAAS_TRIGGER_OTHER = 'other';
 
     /**
+     * @see TraceAttributes::GEN_AI_SYSTEM OpenAI
+     */
+    public const GEN_AI_SYSTEM_OPENAI = 'openai';
+
+    /**
      * @see TraceAttributes::GRAPHQL_OPERATION_TYPE GraphQL query
      */
     public const GRAPHQL_OPERATION_TYPE_QUERY = 'query';
@@ -898,6 +953,36 @@ interface TraceAttributeValues
     public const JVM_MEMORY_TYPE_NON_HEAP = 'non_heap';
 
     /**
+     * @see TraceAttributes::JVM_THREAD_STATE A thread that has not yet started is in this state
+     */
+    public const JVM_THREAD_STATE_NEW = 'new';
+
+    /**
+     * @see TraceAttributes::JVM_THREAD_STATE A thread executing in the Java virtual machine is in this state
+     */
+    public const JVM_THREAD_STATE_RUNNABLE = 'runnable';
+
+    /**
+     * @see TraceAttributes::JVM_THREAD_STATE A thread that is blocked waiting for a monitor lock is in this state
+     */
+    public const JVM_THREAD_STATE_BLOCKED = 'blocked';
+
+    /**
+     * @see TraceAttributes::JVM_THREAD_STATE A thread that is waiting indefinitely for another thread to perform a particular action is in this state
+     */
+    public const JVM_THREAD_STATE_WAITING = 'waiting';
+
+    /**
+     * @see TraceAttributes::JVM_THREAD_STATE A thread that is waiting for another thread to perform an action for up to a specified waiting time is in this state
+     */
+    public const JVM_THREAD_STATE_TIMED_WAITING = 'timed_waiting';
+
+    /**
+     * @see TraceAttributes::JVM_THREAD_STATE A thread that has exited is in this state
+     */
+    public const JVM_THREAD_STATE_TERMINATED = 'terminated';
+
+    /**
      * @see TraceAttributes::LOG_IOSTREAM Logs from stdout stream
      */
     public const LOG_IOSTREAM_STDOUT = 'stdout';
@@ -918,29 +1003,29 @@ interface TraceAttributeValues
     public const MESSAGE_TYPE_RECEIVED = 'RECEIVED';
 
     /**
-     * @see TraceAttributes::MESSAGING_OPERATION One or more messages are provided for publishing to an intermediary. If a single message is published, the context of the &#34;Publish&#34; span can be used as the creation context and no &#34;Create&#34; span needs to be created
+     * @see TraceAttributes::MESSAGING_OPERATION_TYPE One or more messages are provided for publishing to an intermediary. If a single message is published, the context of the &#34;Publish&#34; span can be used as the creation context and no &#34;Create&#34; span needs to be created
      */
-    public const MESSAGING_OPERATION_PUBLISH = 'publish';
+    public const MESSAGING_OPERATION_TYPE_PUBLISH = 'publish';
 
     /**
-     * @see TraceAttributes::MESSAGING_OPERATION A message is created. &#34;Create&#34; spans always refer to a single message and are used to provide a unique creation context for messages in batch publishing scenarios
+     * @see TraceAttributes::MESSAGING_OPERATION_TYPE A message is created. &#34;Create&#34; spans always refer to a single message and are used to provide a unique creation context for messages in batch publishing scenarios
      */
-    public const MESSAGING_OPERATION_CREATE = 'create';
+    public const MESSAGING_OPERATION_TYPE_CREATE = 'create';
 
     /**
-     * @see TraceAttributes::MESSAGING_OPERATION One or more messages are requested by a consumer. This operation refers to pull-based scenarios, where consumers explicitly call methods of messaging SDKs to receive messages
+     * @see TraceAttributes::MESSAGING_OPERATION_TYPE One or more messages are requested by a consumer. This operation refers to pull-based scenarios, where consumers explicitly call methods of messaging SDKs to receive messages
      */
-    public const MESSAGING_OPERATION_RECEIVE = 'receive';
+    public const MESSAGING_OPERATION_TYPE_RECEIVE = 'receive';
 
     /**
-     * @see TraceAttributes::MESSAGING_OPERATION One or more messages are delivered to or processed by a consumer
+     * @see TraceAttributes::MESSAGING_OPERATION_TYPE One or more messages are delivered to or processed by a consumer
      */
-    public const MESSAGING_OPERATION_DELIVER = 'process';
+    public const MESSAGING_OPERATION_TYPE_DELIVER = 'process';
 
     /**
-     * @see TraceAttributes::MESSAGING_OPERATION One or more messages are settled
+     * @see TraceAttributes::MESSAGING_OPERATION_TYPE One or more messages are settled
      */
-    public const MESSAGING_OPERATION_SETTLE = 'settle';
+    public const MESSAGING_OPERATION_TYPE_SETTLE = 'settle';
 
     /**
      * @see TraceAttributes::MESSAGING_ROCKETMQ_CONSUMPTION_MODEL Clustering consumption model
@@ -1330,6 +1415,16 @@ interface TraceAttributeValues
     public const OTEL_STATUS_CODE_ERROR = 'ERROR';
 
     /**
+     * @see TraceAttributes::PROCESS_CONTEXT_SWITCH_TYPE voluntary
+     */
+    public const PROCESS_CONTEXT_SWITCH_TYPE_VOLUNTARY = 'voluntary';
+
+    /**
+     * @see TraceAttributes::PROCESS_CONTEXT_SWITCH_TYPE involuntary
+     */
+    public const PROCESS_CONTEXT_SWITCH_TYPE_INVOLUNTARY = 'involuntary';
+
+    /**
      * @see TraceAttributes::PROCESS_CPU_STATE system
      */
     public const PROCESS_CPU_STATE_SYSTEM = 'system';
@@ -1343,6 +1438,16 @@ interface TraceAttributeValues
      * @see TraceAttributes::PROCESS_CPU_STATE wait
      */
     public const PROCESS_CPU_STATE_WAIT = 'wait';
+
+    /**
+     * @see TraceAttributes::PROCESS_PAGING_FAULT_TYPE major
+     */
+    public const PROCESS_PAGING_FAULT_TYPE_MAJOR = 'major';
+
+    /**
+     * @see TraceAttributes::PROCESS_PAGING_FAULT_TYPE minor
+     */
+    public const PROCESS_PAGING_FAULT_TYPE_MINOR = 'minor';
 
     /**
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE cancelled
@@ -1508,6 +1613,16 @@ interface TraceAttributeValues
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE UNAUTHENTICATED
      */
     public const RPC_GRPC_STATUS_CODE_UNAUTHENTICATED = '16';
+
+    /**
+     * @see TraceAttributes::RPC_MESSAGE_TYPE sent
+     */
+    public const RPC_MESSAGE_TYPE_SENT = 'SENT';
+
+    /**
+     * @see TraceAttributes::RPC_MESSAGE_TYPE received
+     */
+    public const RPC_MESSAGE_TYPE_RECEIVED = 'RECEIVED';
 
     /**
      * @see TraceAttributes::RPC_SYSTEM gRPC
