@@ -87,6 +87,9 @@ logger_provider:
                       #
                       # Environment variable: OTEL_EXPORTER_OTLP_TIMEOUT, OTEL_EXPORTER_OTLP_LOGS_TIMEOUT
                       timeout: 10000
+                      retry:
+                        max_attempts: 5
+                        initial_delay: 100
     # Configure log record limits. See also attribute_limits.
     limits:
         # Configure max log record attribute value size. Overrides attribute_limits.attribute_value_length_limit.
@@ -155,6 +158,9 @@ meter_provider:
                       #
                       # Environment variable: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
                       temporality_preference: delta
+                      retry:
+                        max_attempts: 5
+                        initial_delay: 100
         # Configure a periodic metric reader.
         - periodic:
               # Configure exporter.
@@ -257,6 +263,9 @@ tracer_provider:
                       #
                       # Environment variable: OTEL_EXPORTER_OTLP_TIMEOUT, OTEL_EXPORTER_OTLP_TRACES_TIMEOUT
                       timeout: 10000
+                      retry:
+                          max_attempts: 5
+                          initial_delay: 100
         # Configure a batch span processor.
         - batch:
               # Configure exporter.
@@ -273,6 +282,9 @@ tracer_provider:
                       #
                       # Environment variable: OTEL_EXPORTER_ZIPKIN_TIMEOUT
                       timeout: 10000
+                      retry:
+                          max_attempts: 5
+                          initial_delay: 200
         # Configure a simple span processor.
         - simple:
               # Configure exporter.

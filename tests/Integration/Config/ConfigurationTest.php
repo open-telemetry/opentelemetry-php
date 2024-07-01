@@ -24,5 +24,6 @@ final class ConfigurationTest extends TestCase
     {
         yield 'kitchen-sink' => [__DIR__ . '/configurations/kitchen-sink.yaml'];
         yield 'anchors' => [__DIR__ . '/configurations/anchors.yaml'];
+        yield 'minimal' => [__DIR__ . '/configurations/minimal.yaml'];
     }
 }
