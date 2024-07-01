@@ -50,15 +50,12 @@ final class SpanExporterZipkin implements ComponentProvider
                 ->scalarNode('endpoint')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10)->end()
                 ->arrayNode('retry')
+                    ->addDefaultsIfNotSet()
                     ->children()
                         ->integerNode('max_attempts')->min(0)->defaultValue(3)->end()
                         ->integerNode('initial_delay')->min(0)->defaultValue(0)->end()
                     ->end()
                 ->end()
-            ->end()
-            ->beforeNormalization()
-                ->ifTrue(fn ($data): bool => !array_key_exists('retry', $data))
-                ->then(fn ($data): array => $data + ['retry' => []])
             ->end()
         ;
 
