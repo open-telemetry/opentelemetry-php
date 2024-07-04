@@ -9,6 +9,8 @@ use Closure;
 use function extension_loaded;
 use Nevay\SPI\ServiceProviderDependency\ExtensionDependency;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
+use OpenTelemetry\Context\ContextKeyInterface;
 use ReflectionFunction;
 
 /** @phan-file-suppress PhanUndeclaredClassAttribute */
@@ -16,7 +18,25 @@ use ReflectionFunction;
 #[ExtensionDependency('opentelemetry', '^1.0')]
 final class ExtensionHookManager implements HookManager
 {
-    use EnableTrait;
+    public static function enable(ContextInterface $context): ContextInterface
+    {
+        return $context->with(self::contextKey(), true);
+    }
+
+    public static function disable(ContextInterface $context): ContextInterface
+    {
+        return $context->with(self::contextKey(), false);
+    }
+
+    /**
+     * @internal
+     */
+    public static function contextKey(): ContextKeyInterface
+    {
+        static $contextKey;
+
+        return $contextKey ??= Context::createKey(self::class);
+    }
 
     /**
      * @phan-suppress PhanUndeclaredFunction

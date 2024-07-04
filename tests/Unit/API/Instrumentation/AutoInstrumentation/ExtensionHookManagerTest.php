@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit\API\Instrumentation\AutoInstrumentation;
+namespace OpenTelemetry\Tests\Unit\API\Instrumentation\AutoInstrumentation;
 
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
@@ -81,7 +81,7 @@ class ExtensionHookManagerTest extends TestCase
         });
         $instrumentation->register($this->hookManager, $this->registry, $this->context);
 
-        $scope = $this->hookManager->disable(Context::getCurrent())->activate();
+        $scope = ExtensionHookManager::disable(Context::getCurrent())->activate();
 
         try {
             $returnVal = $target->test();
@@ -106,7 +106,7 @@ class ExtensionHookManagerTest extends TestCase
         $instrumentation->register($this->hookManager, $this->registry, $this->context);
         $this->assertSame(123, $target->test(), 'post hook function ran and modified return value');
 
-        $scope = $this->hookManager->disable(Context::getCurrent())->activate();
+        $scope = ExtensionHookManager::disable(Context::getCurrent())->activate();
 
         try {
             $this->assertSame(3, $target->test(), 'post hook function did not run');
@@ -136,5 +136,14 @@ class ExtensionHookManagerTest extends TestCase
                 $hookManager->hook($this->class, $this->method, $this->pre, $this->post);
             }
         };
+    }
+
+    public function test_enable_disable(): void
+    {
+        $context = Context::getRoot();
+
+        $this->assertNull($context->get(ExtensionHookManager::contextKey()), 'initially unset');
+        $this->assertTrue(ExtensionHookManager::enable($context)->get(ExtensionHookManager::contextKey()));
+        $this->assertFalse(ExtensionHookManager::disable($context)->get(ExtensionHookManager::contextKey()));
     }
 }

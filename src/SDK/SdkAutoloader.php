@@ -103,6 +103,7 @@ class SdkAutoloader
 
         //disable hook manager during SDK to avoid autoinstrumenting SDK exporters.
         $scope = ExtensionHookManager::disable(Context::getCurrent())->activate();
+
         try {
             $sdk = $config
                 ->create()
