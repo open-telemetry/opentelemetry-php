@@ -8,6 +8,7 @@ use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
@@ -92,15 +93,24 @@ class SdkAutoloader
         ;
     }
 
+    /**
+     * @phan-suppress PhanPossiblyUndeclaredVariable
+     */
     private static function fileBasedInitializer(Configurator $configurator): Configurator
     {
         $file = Configuration::getString(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE);
         $config = SdkConfiguration::parseFile($file);
 
-        $sdk = $config
-            ->create()
-            ->setAutoShutdown(true)
-            ->build();
+        //disable hook manager during SDK to avoid autoinstrumenting SDK exporters.
+        $scope = ExtensionHookManager::disable(Context::getCurrent())->activate();
+        try {
+            $sdk = $config
+                ->create()
+                ->setAutoShutdown(true)
+                ->build();
+        } finally {
+            $scope->detach();
+        }
 
         return $configurator
             ->withTracerProvider($sdk->getTracerProvider())

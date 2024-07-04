@@ -17,7 +17,7 @@ interface HookManager
      */
     public function hook(?string $class, string $function, ?Closure $preHook = null, ?Closure $postHook = null): void;
 
-    public function enable(ContextInterface $context): ContextInterface;
+    public static function enable(ContextInterface $context): ContextInterface;
 
-    public function disable(ContextInterface $context): ContextInterface;
+    public static function disable(ContextInterface $context): ContextInterface;
 }

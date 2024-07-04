@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Unit\API\Instrumentation\AutoInstrumentation;
+namespace OpenTelemetry\Tests\Unit\API\Instrumentation\AutoInstrumentation;
 
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -14,9 +15,10 @@ class NoopHookManagerTest extends TestCase
 {
     public function test_enable_disable(): void
     {
-        $context = $this->createMock(ContextInterface::class);
-        $hookManager = new NoopHookManager();
-        $this->assertSame($context, $hookManager->enable($context));
-        $this->assertSame($context, $hookManager->disable($context));
+        $context = Context::getRoot();
+
+        $this->assertNull($context->get(NoopHookManager::contextKey()), 'initially unset');
+        $this->assertTrue(NoopHookManager::enable($context)->get(NoopHookManager::contextKey()));
+        $this->assertFalse(NoopHookManager::disable($context)->get(NoopHookManager::contextKey()));
     }
 }

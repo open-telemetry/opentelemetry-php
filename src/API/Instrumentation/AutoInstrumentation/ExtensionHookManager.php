@@ -9,8 +9,6 @@ use Closure;
 use function extension_loaded;
 use Nevay\SPI\ServiceProviderDependency\ExtensionDependency;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextInterface;
-use OpenTelemetry\Context\ContextKeyInterface;
 use ReflectionFunction;
 
 /** @phan-file-suppress PhanUndeclaredClassAttribute */
@@ -18,13 +16,7 @@ use ReflectionFunction;
 #[ExtensionDependency('opentelemetry', '^1.0')]
 final class ExtensionHookManager implements HookManager
 {
-
-    private readonly ContextKeyInterface $contextKey;
-
-    public function __construct()
-    {
-        $this->contextKey = Context::createKey(self::class);
-    }
+    use EnableTrait;
 
     /**
      * @phan-suppress PhanUndeclaredFunction
@@ -37,23 +29,13 @@ final class ExtensionHookManager implements HookManager
         \OpenTelemetry\Instrumentation\hook($class, $function, $this->bindHookScope($preHook), $this->bindHookScope($postHook));
     }
 
-    public function enable(ContextInterface $context): ContextInterface
-    {
-        return $context->with($this->contextKey, true);
-    }
-
-    public function disable(ContextInterface $context): ContextInterface
-    {
-        return $context->with($this->contextKey, false);
-    }
-
     private function bindHookScope(?Closure $closure): ?Closure
     {
         if (!$closure) {
             return null;
         }
 
-        $contextKey = $this->contextKey;
+        $contextKey = self::contextKey();
         $reflection = new ReflectionFunction($closure);
 
         // TODO Add an option flag to ext-opentelemetry `hook` that configures whether return values should be used?
