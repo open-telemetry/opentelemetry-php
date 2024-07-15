@@ -124,13 +124,14 @@ class SdkAutoloader
 
     /**
      * Register all {@link Instrumentation} configured through SPI
+     * @psalm-suppress ArgumentTypeCoercion
      */
     private static function registerInstrumentations(): void
     {
-        $file = Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)
-            ? Configuration::getString(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)
+        $files = Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)
+            ? Configuration::getList(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)
             : [];
-        $configuration = SdkInstrumentation::parseFile($file)->create();
+        $configuration = SdkInstrumentation::parseFile($files)->create();
         $hookManager = self::getHookManager();
         $tracerProvider = self::createLateBindingTracerProvider();
         $meterProvider = self::createLateBindingMeterProvider();
