@@ -20,6 +20,7 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 use OpenTelemetry\SDK\Metrics\ObservableCallback;
 use OpenTelemetry\SDK\Metrics\ObservableCallbackDestructor;
 use OpenTelemetry\SDK\Metrics\ObservableCounter;
+use OpenTelemetry\SDK\Metrics\ObservableInstrumentTrait;
 use OpenTelemetry\SDK\Metrics\ReferenceCounterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandler;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregator;
@@ -36,6 +37,7 @@ use WeakMap;
 #[CoversClass(UpDownCounter::class)]
 #[CoversClass(Histogram::class)]
 #[CoversClass(ObservableCallback::class)]
+#[CoversClass(ObservableInstrumentTrait::class)]
 final class InstrumentTest extends TestCase
 {
 
@@ -238,5 +240,25 @@ final class InstrumentTest extends TestCase
 
         /** @noinspection PhpExpressionResultUnusedInspection */
         new ObservableCallback($writer, $referenceCounter, 1, $callbackDestructor, new stdClass());
+    }
+
+    public function test_synchronous_enabled(): void
+    {
+        $w = $this->createMock(MetricWriterInterface::class);
+        $c = $this->createMock(ReferenceCounterInterface::class);
+        $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null);
+        $counter = new Counter($w, $i, $c);
+
+        $this->assertTrue($counter->enabled());
+    }
+
+    public function test_asynchronous_enabled(): void
+    {
+        $w = $this->createMock(MetricWriterInterface::class);
+        $c = $this->createMock(ReferenceCounterInterface::class);
+        $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null);
+        $counter = new ObservableCounter($w, $i, $c, new WeakMap());
+
+        $this->assertTrue($counter->enabled());
     }
 }

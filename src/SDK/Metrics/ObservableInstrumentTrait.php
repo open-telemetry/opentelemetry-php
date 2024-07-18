@@ -59,4 +59,9 @@ trait ObservableInstrumentTrait
             $this->referenceCounter,
         );
     }
+
+    public function enabled(): bool
+    {
+        return true;
+    }
 }

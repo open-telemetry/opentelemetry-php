@@ -63,4 +63,9 @@ class TracerTest extends TestCase
         $this->tracerSharedState->method('hasShutdown')->willReturn(true); //@phpstan-ignore-line
         $this->assertInstanceOf(NoopSpanBuilder::class, $this->tracer->spanBuilder('foo'));
     }
+
+    public function test_enabled(): void
+    {
+        $this->assertTrue($this->tracer->enabled());
+    }
 }

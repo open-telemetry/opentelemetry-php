@@ -11,4 +11,11 @@ interface LoggerInterface
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.32.0/specification/logs/bridge-api.md#artifact-naming
      */
     public function emit(LogRecord $logRecord): void;
+
+    /**
+     * Determine if the logger is enabled. Logs bridge API authors SHOULD call this method each time they
+     * are about to generate a LogRecord, to avoid performing computationally expensive work.
+     * @experimental
+     */
+    public function enabled(): bool;
 }

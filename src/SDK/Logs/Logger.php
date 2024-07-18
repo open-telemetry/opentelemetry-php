@@ -42,4 +42,9 @@ class Logger implements LoggerInterface
             ]);
         }
     }
+
+    public function enabled(): bool
+    {
+        return true;
+    }
 }

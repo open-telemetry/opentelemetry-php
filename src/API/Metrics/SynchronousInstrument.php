@@ -7,6 +7,6 @@ namespace OpenTelemetry\API\Metrics;
 /**
  * Marker interface for synchronous instruments.
  */
-interface SynchronousInstrument
+interface SynchronousInstrument extends Instrument
 {
 }

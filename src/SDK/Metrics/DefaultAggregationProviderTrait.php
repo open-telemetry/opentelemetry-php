@@ -15,6 +15,5 @@ trait DefaultAggregationProviderTrait
             InstrumentType::GAUGE, InstrumentType::ASYNCHRONOUS_GAUGE => new Aggregation\LastValueAggregation(),
             default => null,
         };
-        // @codeCoverageIgnoreEnd
     }
 }
