@@ -20,6 +20,7 @@ final class TracerProvider implements TracerProviderInterface
 {
     private readonly TracerSharedState $tracerSharedState;
     private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
+    private readonly TracerConfigurator $configurator;
 
     /** @param list<SpanProcessorInterface>|SpanProcessorInterface|null $spanProcessors */
     public function __construct(
@@ -29,6 +30,7 @@ final class TracerProvider implements TracerProviderInterface
         SpanLimits $spanLimits = null,
         IdGeneratorInterface $idGenerator = null,
         ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
+        ?TracerConfigurator $configurator = null,
     ) {
         $spanProcessors ??= [];
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
@@ -45,6 +47,7 @@ final class TracerProvider implements TracerProviderInterface
             $spanProcessors
         );
         $this->instrumentationScopeFactory = $instrumentationScopeFactory ?? new InstrumentationScopeFactory(Attributes::factory());
+        $this->configurator = $configurator ?? new TracerConfigurator();
     }
 
     public function forceFlush(?CancellationInterface $cancellation = null): bool
@@ -65,9 +68,12 @@ final class TracerProvider implements TracerProviderInterface
             return NoopTracer::getInstance();
         }
 
+        $scope = $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes);
+
         return new Tracer(
             $this->tracerSharedState,
-            $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes),
+            $scope,
+            $this->configurator->getConfig($scope),
         );
     }
 

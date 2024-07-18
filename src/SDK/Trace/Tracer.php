@@ -12,11 +12,14 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 class Tracer implements API\TracerInterface
 {
     public const FALLBACK_SPAN_NAME = 'empty';
+    private readonly TracerConfig $config;
 
     public function __construct(
         private readonly TracerSharedState $tracerSharedState,
         private readonly InstrumentationScopeInterface $instrumentationScope,
+        ?TracerConfig $config = null,
     ) {
+        $this->config = $config ?? TracerConfig::default();
     }
 
     /** @inheritDoc */
@@ -25,8 +28,7 @@ class Tracer implements API\TracerInterface
         if (ctype_space($spanName)) {
             $spanName = self::FALLBACK_SPAN_NAME;
         }
-
-        if ($this->tracerSharedState->hasShutdown()) {
+        if (!$this->config->isEnabled() || $this->tracerSharedState->hasShutdown()) {
             return new API\NoopSpanBuilder(Context::storage());
         }
 
@@ -44,6 +46,6 @@ class Tracer implements API\TracerInterface
 
     public function enabled(): bool
     {
-        return true;
+        return $this->config->isEnabled();
     }
 }
