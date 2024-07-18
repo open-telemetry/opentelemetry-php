@@ -62,6 +62,6 @@ trait ObservableInstrumentTrait
 
     public function enabled(): bool
     {
-        return true;
+        return $this->writer->enabled($this->instrument);
     }
 }
