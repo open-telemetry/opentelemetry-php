@@ -29,6 +29,7 @@ final class MeterProvider implements MeterProviderInterface
     private readonly ArrayAccess $destructors;
 
     private bool $closed = false;
+    private readonly MeterConfigurator $configurator;
 
     /**
      * @param iterable<MetricReaderInterface&MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricReaders
@@ -44,6 +45,7 @@ final class MeterProvider implements MeterProviderInterface
         private readonly ?ExemplarFilterInterface $exemplarFilter,
         private readonly StalenessHandlerFactoryInterface $stalenessHandlerFactory,
         MetricFactoryInterface $metricFactory = null,
+        ?MeterConfigurator $configurator = null,
     ) {
         $this->metricFactory = $metricFactory ?? new StreamFactory();
         $this->instruments = new MeterInstruments();
@@ -52,6 +54,7 @@ final class MeterProvider implements MeterProviderInterface
         $this->registry = $registry;
         $this->writer = $registry;
         $this->destructors = new WeakMap();
+        $this->configurator = $configurator ?? new MeterConfigurator();
     }
 
     public function getMeter(
@@ -64,6 +67,8 @@ final class MeterProvider implements MeterProviderInterface
             return new NoopMeter();
         }
 
+        $scope = $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes);
+
         return new Meter(
             $this->metricFactory,
             $this->resource,
@@ -73,10 +78,11 @@ final class MeterProvider implements MeterProviderInterface
             $this->viewRegistry,
             $this->exemplarFilter,
             $this->instruments,
-            $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes),
+            $scope,
             $this->registry,
             $this->writer,
             $this->destructors,
+            $this->configurator->getConfig($scope),
         );
     }
 

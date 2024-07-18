@@ -19,12 +19,14 @@ trait ObservableInstrumentTrait
     private Instrument $instrument;
     private ReferenceCounterInterface $referenceCounter;
     private ArrayAccess $destructors;
+    private MeterConfig $config;
 
     public function __construct(
         MetricWriterInterface $writer,
         Instrument $instrument,
         ReferenceCounterInterface $referenceCounter,
         ArrayAccess $destructors,
+        MeterConfig $config,
     ) {
         assert($this instanceof InstrumentHandle);
 
@@ -32,6 +34,7 @@ trait ObservableInstrumentTrait
         $this->instrument = $instrument;
         $this->referenceCounter = $referenceCounter;
         $this->destructors = $destructors;
+        $this->config = $config;
 
         $this->referenceCounter->acquire();
     }

@@ -7,6 +7,7 @@ namespace OpenTelemetry\SDK\Metrics;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Condition;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandlerFactory;
@@ -20,6 +21,8 @@ class MeterProviderBuilder
     private array $metricReaders = [];
     private ?ResourceInfo $resource = null;
     private ?ExemplarFilterInterface $exemplarFilter = null;
+    /** @var list<Condition> */
+    private array $conditions = [];
 
     public function setResource(ResourceInfo $resource): self
     {
@@ -42,6 +45,13 @@ class MeterProviderBuilder
         return $this;
     }
 
+    public function addMeterConfiguratorCondition(Condition $condition): self
+    {
+        $this->conditions[] = $condition;
+
+        return $this;
+    }
+
     /**
      * @psalm-suppress PossiblyInvalidArgument
      */
@@ -57,6 +67,7 @@ class MeterProviderBuilder
             new CriteriaViewRegistry(),
             $this->exemplarFilter ?? new WithSampledTraceExemplarFilter(),
             new NoopStalenessHandlerFactory(),
+            configurator: new MeterConfigurator($this->conditions),
         );
     }
 }

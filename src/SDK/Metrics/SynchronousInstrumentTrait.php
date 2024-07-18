@@ -15,14 +15,16 @@ trait SynchronousInstrumentTrait
     private MetricWriterInterface $writer;
     private Instrument $instrument;
     private ReferenceCounterInterface $referenceCounter;
+    private MeterConfig $config;
 
-    public function __construct(MetricWriterInterface $writer, Instrument $instrument, ReferenceCounterInterface $referenceCounter)
+    public function __construct(MetricWriterInterface $writer, Instrument $instrument, ReferenceCounterInterface $referenceCounter, MeterConfig $config)
     {
         assert($this instanceof InstrumentHandle);
 
         $this->writer = $writer;
         $this->instrument = $instrument;
         $this->referenceCounter = $referenceCounter;
+        $this->config = $config;
 
         $this->referenceCounter->acquire();
     }
@@ -44,6 +46,6 @@ trait SynchronousInstrumentTrait
 
     public function enabled(): bool
     {
-        return true;
+        return $this->config->isEnabled();
     }
 }

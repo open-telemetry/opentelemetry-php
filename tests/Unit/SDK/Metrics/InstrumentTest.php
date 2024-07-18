@@ -15,6 +15,7 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Histogram;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
+use OpenTelemetry\SDK\Metrics\MeterConfig;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 use OpenTelemetry\SDK\Metrics\ObservableCallback;
@@ -40,6 +41,12 @@ use WeakMap;
 #[CoversClass(ObservableInstrumentTrait::class)]
 final class InstrumentTest extends TestCase
 {
+    private MeterConfig $config;
+
+    public function setUp(): void
+    {
+        $this->config = MeterConfig::default();
+    }
 
     public function test_counter(): void
     {
@@ -50,7 +57,7 @@ final class InstrumentTest extends TestCase
         $n = $w->registerSynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::DELTA);
 
-        $c = new Counter($w, $i, new NoopStalenessHandler());
+        $c = new Counter($w, $i, new NoopStalenessHandler(), $this->config);
         $c->add(5);
         $c->add(7);
         $c->add(3);
@@ -79,7 +86,7 @@ final class InstrumentTest extends TestCase
         $n = $w->registerAsynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::CUMULATIVE);
 
-        $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), new WeakMap());
+        $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), new WeakMap(), $this->config);
         $c->observe(static function (ObserverInterface $observer): void {
             $observer->observe(5);
         });
@@ -115,7 +122,7 @@ final class InstrumentTest extends TestCase
             }
         };
 
-        $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), new WeakMap());
+        $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), new WeakMap(), $this->config);
         $c->observe($instance);
         $instance = null;
 
@@ -136,7 +143,7 @@ final class InstrumentTest extends TestCase
         $n = $w->registerSynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::DELTA);
 
-        $c = new UpDownCounter($w, $i, new NoopStalenessHandler());
+        $c = new UpDownCounter($w, $i, new NoopStalenessHandler(), $this->config);
         $c->add(5);
         $c->add(7);
         $c->add(-8);
@@ -165,7 +172,7 @@ final class InstrumentTest extends TestCase
         $n = $w->registerSynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::DELTA);
 
-        $h = new Histogram($w, $i, new NoopStalenessHandler());
+        $h = new Histogram($w, $i, new NoopStalenessHandler(), $this->config);
         $h->record(1);
         $h->record(7);
         $h->record(9);
@@ -247,7 +254,7 @@ final class InstrumentTest extends TestCase
         $w = $this->createMock(MetricWriterInterface::class);
         $c = $this->createMock(ReferenceCounterInterface::class);
         $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null);
-        $counter = new Counter($w, $i, $c);
+        $counter = new Counter($w, $i, $c, $this->config);
 
         $this->assertTrue($counter->enabled());
     }
@@ -257,7 +264,7 @@ final class InstrumentTest extends TestCase
         $w = $this->createMock(MetricWriterInterface::class);
         $c = $this->createMock(ReferenceCounterInterface::class);
         $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null);
-        $counter = new ObservableCounter($w, $i, $c, new WeakMap());
+        $counter = new ObservableCounter($w, $i, $c, new WeakMap(), $this->config);
 
         $this->assertTrue($counter->enabled());
     }
