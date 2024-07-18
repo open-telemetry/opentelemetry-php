@@ -18,6 +18,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 class Logger implements LoggerInterface
 {
     use LogsMessagesTrait;
+    private readonly LoggerConfig $config;
 
     /**
      * @internal
@@ -25,7 +26,9 @@ class Logger implements LoggerInterface
     public function __construct(
         private readonly LoggerSharedState $loggerSharedState,
         private readonly InstrumentationScopeInterface $scope,
+        ?LoggerConfig $config = null,
     ) {
+        $this->config = $config ?? LoggerConfig::default();
     }
 
     public function emit(LogRecord $logRecord): void
@@ -45,6 +48,6 @@ class Logger implements LoggerInterface
 
     public function enabled(): bool
     {
-        return true;
+        return $this->config->isEnabled();
     }
 }

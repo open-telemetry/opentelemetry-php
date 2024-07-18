@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Logs;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Condition;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -15,6 +16,8 @@ class LoggerProviderBuilder
     /** @var array<LogRecordProcessorInterface> */
     private array $processors = [];
     private ?ResourceInfo $resource = null;
+    /** @var list<Condition> */
+    private array $conditions = [];
 
     public function addLogRecordProcessor(LogRecordProcessorInterface $processor): self
     {
@@ -35,8 +38,16 @@ class LoggerProviderBuilder
         return new LoggerProvider(
             $this->buildProcessor(),
             new InstrumentationScopeFactory(Attributes::factory()),
-            $this->resource
+            $this->resource,
+            configurator: new LoggerConfigurator($this->conditions),
         );
+    }
+
+    public function addLoggerConfiguratorCondition(Condition $condition): self
+    {
+        $this->conditions[] = $condition;
+
+        return $this;
     }
 
     private function buildProcessor(): LogRecordProcessorInterface

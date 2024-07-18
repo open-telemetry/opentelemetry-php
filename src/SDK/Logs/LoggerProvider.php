@@ -14,17 +14,20 @@ use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 class LoggerProvider implements LoggerProviderInterface
 {
     private readonly LoggerSharedState $loggerSharedState;
+    private readonly LoggerConfigurator $configurator;
 
     public function __construct(
         LogRecordProcessorInterface $processor,
         private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
         ?ResourceInfo $resource = null,
+        ?LoggerConfigurator $configurator = null,
     ) {
         $this->loggerSharedState = new LoggerSharedState(
             $resource ?? ResourceInfoFactory::defaultResource(),
             (new LogRecordLimitsBuilder())->build(),
             $processor
         );
+        $this->configurator = $configurator ?? new LoggerConfigurator();
     }
 
     /**
@@ -36,8 +39,11 @@ class LoggerProvider implements LoggerProviderInterface
             return NoopLogger::getInstance();
         }
         $scope = $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes);
+        if ($this->configurator->getConfig($scope)->isEnabled() === false) {
+            return NoopLogger::getInstance();
+        }
 
-        return new Logger($this->loggerSharedState, $scope);
+        return new Logger($this->loggerSharedState, $scope, $this->configurator->getConfig($scope));
     }
 
     public function shutdown(CancellationInterface $cancellation = null): bool
