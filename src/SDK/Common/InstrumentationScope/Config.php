@@ -2,14 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace;
-
-use OpenTelemetry\SDK\Common\InstrumentationScope\State;
+namespace OpenTelemetry\SDK\Common\InstrumentationScope;
 
 /**
  * @internal
  */
-class TracerConfig
+class Config
 {
     public function __construct(private readonly State $state = State::ENABLED)
     {

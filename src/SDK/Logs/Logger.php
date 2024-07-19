@@ -8,6 +8,7 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 
 /**
  * Note that this logger class is deliberately NOT psr-3 compatible, per spec: "Note: this document defines a log
@@ -18,7 +19,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 class Logger implements LoggerInterface
 {
     use LogsMessagesTrait;
-    private readonly LoggerConfig $config;
+    private readonly Config $config;
 
     /**
      * @internal
@@ -26,9 +27,9 @@ class Logger implements LoggerInterface
     public function __construct(
         private readonly LoggerSharedState $loggerSharedState,
         private readonly InstrumentationScopeInterface $scope,
-        ?LoggerConfig $config = null,
+        ?Config $config = null,
     ) {
-        $this->config = $config ?? LoggerConfig::default();
+        $this->config = $config ?? Config::default();
     }
 
     public function emit(LogRecord $logRecord): void

@@ -22,6 +22,7 @@ use OpenTelemetry\API\Metrics\ObservableGaugeInterface;
 use OpenTelemetry\API\Metrics\ObservableUpDownCounterInterface;
 use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use function OpenTelemetry\SDK\Common\Util\closure;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\MultiRegistryRegistration;
@@ -59,7 +60,7 @@ final class Meter implements MeterInterface
         private readonly MetricRegistryInterface $registry,
         private readonly MetricWriterInterface $writer,
         private readonly ArrayAccess $destructors,
-        private readonly MeterConfig $config,
+        private readonly Config $config,
     ) {
         $this->noop = new NoopMeter();
     }

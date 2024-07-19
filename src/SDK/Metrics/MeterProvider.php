@@ -11,6 +11,7 @@ use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;
@@ -29,7 +30,7 @@ final class MeterProvider implements MeterProviderInterface
     private readonly ArrayAccess $destructors;
 
     private bool $closed = false;
-    private readonly MeterConfigurator $configurator;
+    private readonly Configurator $configurator;
 
     /**
      * @param iterable<MetricReaderInterface&MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricReaders
@@ -45,7 +46,7 @@ final class MeterProvider implements MeterProviderInterface
         private readonly ?ExemplarFilterInterface $exemplarFilter,
         private readonly StalenessHandlerFactoryInterface $stalenessHandlerFactory,
         MetricFactoryInterface $metricFactory = null,
-        ?MeterConfigurator $configurator = null,
+        ?Configurator $configurator = null,
     ) {
         $this->metricFactory = $metricFactory ?? new StreamFactory();
         $this->instruments = new MeterInstruments();
@@ -54,7 +55,7 @@ final class MeterProvider implements MeterProviderInterface
         $this->registry = $registry;
         $this->writer = $registry;
         $this->destructors = new WeakMap();
-        $this->configurator = $configurator ?? new MeterConfigurator();
+        $this->configurator = $configurator ?? new Configurator();
     }
 
     public function getMeter(

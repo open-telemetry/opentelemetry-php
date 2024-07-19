@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -21,7 +22,7 @@ final class TracerProvider implements TracerProviderInterface
 {
     private readonly TracerSharedState $tracerSharedState;
     private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
-    private TracerConfigurator $configurator;
+    private Configurator $configurator;
     private WeakMap $tracers;
 
     /** @param list<SpanProcessorInterface>|SpanProcessorInterface|null $spanProcessors */
@@ -32,7 +33,7 @@ final class TracerProvider implements TracerProviderInterface
         SpanLimits $spanLimits = null,
         IdGeneratorInterface $idGenerator = null,
         ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
-        ?TracerConfigurator $configurator = null,
+        ?Configurator $configurator = null,
     ) {
         $spanProcessors ??= [];
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
@@ -49,7 +50,7 @@ final class TracerProvider implements TracerProviderInterface
             $spanProcessors
         );
         $this->instrumentationScopeFactory = $instrumentationScopeFactory ?? new InstrumentationScopeFactory(Attributes::factory());
-        $this->configurator = $configurator ?? new TracerConfigurator();
+        $this->configurator = $configurator ?? new Configurator();
         $this->tracers = new WeakMap();
     }
 
@@ -104,7 +105,7 @@ final class TracerProvider implements TracerProviderInterface
         return new TracerProviderBuilder();
     }
 
-    public function updateConfigurator(TracerConfigurator $configurator): void
+    public function updateConfigurator(Configurator $configurator): void
     {
         $this->configurator = $configurator;
 

@@ -11,7 +11,7 @@ use OpenTelemetry\API\Metrics\Noop\NoopObservableCounter;
 use OpenTelemetry\API\Metrics\Noop\NoopObservableGauge;
 use OpenTelemetry\API\Metrics\Noop\NoopObservableUpDownCounter;
 use OpenTelemetry\API\Metrics\Noop\NoopUpDownCounter;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Condition;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
 use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use OpenTelemetry\SDK\Metrics\MeterConfig;
@@ -27,7 +27,11 @@ class MeterConfigTest extends TestCase
     public function test_disable_scopes(): void
     {
         $meterProvider = MeterProvider::builder()
-            ->addMeterConfiguratorCondition(new Condition(new Name('~two~'), State::DISABLED)) //meter two disabled
+            ->setConfigurator(
+                Configurator::builder()
+                    ->addCondition(new Name('~two~'), State::DISABLED)
+                    ->build()
+            )
             ->build();
 
         $meter_one = $meterProvider->getMeter('one');

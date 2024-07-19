@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use function assert;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 
 /**
@@ -15,9 +16,9 @@ trait SynchronousInstrumentTrait
     private MetricWriterInterface $writer;
     private Instrument $instrument;
     private ReferenceCounterInterface $referenceCounter;
-    private MeterConfig $config;
+    private Config $config;
 
-    public function __construct(MetricWriterInterface $writer, Instrument $instrument, ReferenceCounterInterface $referenceCounter, MeterConfig $config)
+    public function __construct(MetricWriterInterface $writer, Instrument $instrument, ReferenceCounterInterface $referenceCounter, Config $config)
     {
         assert($this instanceof InstrumentHandle);
 

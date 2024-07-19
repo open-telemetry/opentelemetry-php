@@ -8,18 +8,20 @@ use function ctype_space;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 
 class Tracer implements API\TracerInterface
 {
     public const FALLBACK_SPAN_NAME = 'empty';
-    private TracerConfig $config;
+    private Config $config;
 
     public function __construct(
         private readonly TracerSharedState $tracerSharedState,
         private readonly InstrumentationScopeInterface $instrumentationScope,
-        ?TracerConfig $config = null,
+        ?Config $config = null,
     ) {
-        $this->config = $config ?? TracerConfig::default();
+        $this->config = $config ?? Config::default();
     }
 
     /** @inheritDoc */
@@ -49,7 +51,7 @@ class Tracer implements API\TracerInterface
         return $this->config->isEnabled();
     }
 
-    public function updateConfig(TracerConfigurator $configurator): void
+    public function updateConfig(Configurator $configurator): void
     {
         $this->config = $configurator->getConfig($this->instrumentationScope);
     }

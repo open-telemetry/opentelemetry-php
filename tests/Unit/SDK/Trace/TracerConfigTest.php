@@ -7,21 +7,20 @@ namespace OpenTelemetry\Tests\SDK\Trace;
 use ArrayObject;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Condition;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate;
 use OpenTelemetry\SDK\Common\InstrumentationScope\State;
-use OpenTelemetry\SDK\Trace\ImmutableSpan;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\Tracer;
-use OpenTelemetry\SDK\Trace\TracerConfig;
-use OpenTelemetry\SDK\Trace\TracerConfigurator;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(TracerConfig::class)]
-#[CoversClass(TracerConfigurator::class)]
+#[CoversClass(Config::class)]
+#[CoversClass(Configurator::class)]
 #[CoversClass(Predicate\Attribute::class)]
 #[CoversClass(Predicate\AttributeExists::class)]
 #[CoversClass(Predicate\Name::class)]
@@ -34,7 +33,7 @@ class TracerConfigTest extends TestCase
         $exporter = new InMemoryExporter($storage);
         $tracerProvider = TracerProvider::builder()
             ->addSpanProcessor(new SimpleSpanProcessor($exporter))
-            ->setConfigurator(TracerConfigurator::builder()->addCondition(new Predicate\Name('~B~'), State::DISABLED)->build()) //disable tracer B
+            ->setConfigurator(Configurator::builder()->addCondition(new Predicate\Name('~B~'), State::DISABLED)->build()) //disable tracer B
             ->build();
         $tracerA = $tracerProvider->getTracer('A');
         $tracerB = $tracerProvider->getTracer('B');
@@ -87,7 +86,7 @@ class TracerConfigTest extends TestCase
         $tracerProvider = TracerProvider::builder()
             ->addSpanProcessor(new SimpleSpanProcessor($exporter))
             ->setConfigurator(
-                TracerConfigurator::builder()
+                Configurator::builder()
                     ->addCondition(new Predicate\Name('~B~'), State::DISABLED) //disable tracer B
                     ->build()
             )
@@ -105,7 +104,7 @@ class TracerConfigTest extends TestCase
             $child = $tracerB->spanBuilder('child')->startSpan();
             $child->setAttribute('b', 1);
             $childScope = $child->activate();
-            $tracerProvider->updateConfigurator(new TracerConfigurator()); //re-enable tracer two
+            $tracerProvider->updateConfigurator(new Configurator()); //re-enable tracer two
             $sibling = $tracerB->spanBuilder('sibling')->startSpan();
             $siblingScope = $sibling->activate();
 
@@ -151,7 +150,7 @@ class TracerConfigTest extends TestCase
     public function test_conditions(Predicate $predicate, State $state, bool $expectDisabled): void
     {
         $tracerProvider = TracerProvider::builder()
-            ->setConfigurator(TracerConfigurator::builder()->addCondition($predicate, $state)->build())
+            ->setConfigurator(Configurator::builder()->addCondition($predicate, $state)->build())
             ->build();
         $tracer = $tracerProvider->getTracer(name: 'two', attributes: ['foo' => 'bar']);
         $span = $tracer->spanBuilder('span')->startSpan();
@@ -180,7 +179,7 @@ class TracerConfigTest extends TestCase
     {
         $tracerProvider = TracerProvider::builder()
             ->setConfigurator(
-                TracerConfigurator::builder()
+                Configurator::builder()
                     ->addCondition(new Predicate\Name('~two~'), State::DISABLED) //disable tracer A
                     ->build()
             )
@@ -189,7 +188,7 @@ class TracerConfigTest extends TestCase
         $this->assertInstanceOf(Tracer::class, $tracer);
         $this->assertFalse($tracer->enabled());
 
-        $update = new TracerConfigurator();
+        $update = new Configurator();
         $tracerProvider->updateConfigurator($update);
 
         $this->assertTrue($tracer->enabled());

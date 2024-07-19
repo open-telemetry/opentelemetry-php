@@ -8,26 +8,27 @@ use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\NoopLogger;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
 class LoggerProvider implements LoggerProviderInterface
 {
     private readonly LoggerSharedState $loggerSharedState;
-    private readonly LoggerConfigurator $configurator;
+    private readonly Configurator $configurator;
 
     public function __construct(
         LogRecordProcessorInterface $processor,
         private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
         ?ResourceInfo $resource = null,
-        ?LoggerConfigurator $configurator = null,
+        ?Configurator $configurator = null,
     ) {
         $this->loggerSharedState = new LoggerSharedState(
             $resource ?? ResourceInfoFactory::defaultResource(),
             (new LogRecordLimitsBuilder())->build(),
             $processor
         );
-        $this->configurator = $configurator ?? new LoggerConfigurator();
+        $this->configurator = $configurator ?? new Configurator();
     }
 
     /**

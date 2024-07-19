@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\Counter;
@@ -15,7 +16,6 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Histogram;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
-use OpenTelemetry\SDK\Metrics\MeterConfig;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 use OpenTelemetry\SDK\Metrics\ObservableCallback;
@@ -41,11 +41,11 @@ use WeakMap;
 #[CoversClass(ObservableInstrumentTrait::class)]
 final class InstrumentTest extends TestCase
 {
-    private MeterConfig $config;
+    private Config $config;
 
     public function setUp(): void
     {
-        $this->config = MeterConfig::default();
+        $this->config = Config::default();
     }
 
     public function test_counter(): void

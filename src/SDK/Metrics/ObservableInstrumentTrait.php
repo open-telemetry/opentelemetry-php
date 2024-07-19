@@ -8,6 +8,7 @@ use ArrayAccess;
 use function assert;
 use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 
 /**
@@ -19,14 +20,14 @@ trait ObservableInstrumentTrait
     private Instrument $instrument;
     private ReferenceCounterInterface $referenceCounter;
     private ArrayAccess $destructors;
-    private MeterConfig $config;
+    private Config $config;
 
     public function __construct(
         MetricWriterInterface $writer,
         Instrument $instrument,
         ReferenceCounterInterface $referenceCounter,
         ArrayAccess $destructors,
-        MeterConfig $config,
+        Config $config,
     ) {
         assert($this instanceof InstrumentHandle);
 

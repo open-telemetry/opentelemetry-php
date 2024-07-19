@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Trace;
+namespace OpenTelemetry\SDK\Common\InstrumentationScope;
 
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Condition;
 
 /**
  * @internal
  */
-class TracerConfigurator
+class Configurator
 {
     /**
      * @param list<Condition> $conditions
@@ -19,19 +18,19 @@ class TracerConfigurator
     {
     }
 
-    public function getConfig(InstrumentationScopeInterface $scope): TracerConfig
+    public function getConfig(InstrumentationScopeInterface $scope): Config
     {
         foreach ($this->conditions as $condition) {
             if ($condition->match($scope)) {
-                return new TracerConfig($condition->state());
+                return new Config($condition->state());
             }
         }
 
-        return TracerConfig::default();
+        return Config::default();
     }
 
-    public static function builder(): TracerConfiguratorBuilder
+    public static function builder(): ConfiguratorBuilder
     {
-        return new TracerConfiguratorBuilder();
+        return new ConfiguratorBuilder();
     }
 }
