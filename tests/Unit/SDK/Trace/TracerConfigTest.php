@@ -36,23 +36,23 @@ class TracerConfigTest extends TestCase
             ->addSpanProcessor(new SimpleSpanProcessor($exporter))
             ->addTracerConfiguratorCondition(new Predicate\Name('~two~'), State::DISABLED) //disable tracer two
             ->build();
-        $tracer_one = $tracerProvider->getTracer('one');
-        $tracer_two = $tracerProvider->getTracer('two');
-        $tracer_three = $tracerProvider->getTracer('three');
+        $tracerA = $tracerProvider->getTracer('one');
+        $tracerB = $tracerProvider->getTracer('two');
+        $tracerC = $tracerProvider->getTracer('three');
 
-        $parent = $tracer_one->spanBuilder('parent')->startSpan();
+        $parent = $tracerA->spanBuilder('parent')->startSpan();
         $this->assertTrue($parent->isRecording());
         $parent->setAttribute('a', 1);
         $parentScope = $parent->activate();
 
         try {
-            $child = $tracer_two->spanBuilder('child')->startSpan();
+            $child = $tracerB->spanBuilder('child')->startSpan();
             $child->setAttribute('b', 1);
             $childScope = $child->activate();
 
             try {
                 $this->assertFalse($child->isRecording());
-                $grandChild = $tracer_three->spanBuilder('grandchild')->startSpan();
+                $grandChild = $tracerC->spanBuilder('grandchild')->startSpan();
                 $this->assertTrue($grandChild->isRecording());
                 $grandChild->setAttribute('c', 1);
                 $grandChild->end();
@@ -78,6 +78,69 @@ class TracerConfigTest extends TestCase
 
         $this->assertSame($p->getTraceId(), $gc->getTraceId(), 'parent and grandchild are in the same trace');
         $this->assertSame($gc->getParentContext()->getSpanId(), $p->getContext()->getSpanId(), 'parent is the parent of grandchild');
+    }
+
+    public function test_disable_scope_then_enable(): void
+    {
+        $storage = new ArrayObject();
+        $exporter = new InMemoryExporter($storage);
+        $tracerProvider = TracerProvider::builder()
+            ->addSpanProcessor(new SimpleSpanProcessor($exporter))
+            ->addTracerConfiguratorCondition(new Predicate\Name('~two~'), State::DISABLED) //disable tracer two
+            ->build();
+        $tracerA = $tracerProvider->getTracer('one');
+        $tracerB = $tracerProvider->getTracer('two');
+        $tracerC = $tracerProvider->getTracer('three');
+
+        $parent = $tracerA->spanBuilder('parent')->startSpan();
+        $this->assertTrue($parent->isRecording());
+        $parent->setAttribute('a', 1);
+        $parentScope = $parent->activate();
+
+        try {
+            $child = $tracerB->spanBuilder('child')->startSpan();
+            $child->setAttribute('b', 1);
+            $childScope = $child->activate();
+            $tracerProvider->updateConfigurator(new TracerConfigurator()); //re-enable tracer two
+            $sibling = $tracerB->spanBuilder('sibling')->startSpan();
+            $siblingScope = $sibling->activate();
+
+            try {
+                $this->assertFalse($child->isRecording());
+                $grandChild = $tracerC->spanBuilder('grandchild')->startSpan();
+                $this->assertTrue($grandChild->isRecording());
+                $grandChild->setAttribute('c', 1);
+                $grandChild->end();
+            } finally {
+                $siblingScope->detach();
+                $sibling->end();
+                $childScope->detach();
+                $child->end();
+            }
+        } finally {
+            $parentScope->detach();
+            $parent->end();
+        }
+        // tracerA:parent, tracerB:sibling and tracerC:grandchild should be recorded
+        // tracerC:grandchild should list tracerB:sibling as its parent
+        $this->assertCount(3, $storage, 'only 3 of the 4 spans were recorded');
+
+        // @var ImmutableSpan $gc
+        $gc = $storage->offsetGet(0);
+        $this->assertSame('grandchild', $gc->getName());
+
+        // @var ImmutableSpan $s
+        $s = $storage->offsetGet(1);
+        $this->assertSame('sibling', $s->getName());
+
+        // @var ImmutableSpan $p
+        $p = $storage->offsetGet(2);
+        $this->assertSame('parent', $p->getName());
+
+        $this->assertSame($p->getTraceId(), $gc->getTraceId(), 'parent and grandchild are in the same trace');
+        $this->assertSame($p->getTraceId(), $s->getTraceId(), 'parent and sibling are in the same trace');
+        $this->assertSame($gc->getParentContext()->getSpanId(), $s->getContext()->getSpanId(), 'sibling is the parent of grandchild');
+        $this->assertSame($s->getParentContext()->getSpanId(), $p->getContext()->getSpanId(), 'parent is the parent of sibling');
     }
 
     #[DataProvider('conditionsProvider')]
