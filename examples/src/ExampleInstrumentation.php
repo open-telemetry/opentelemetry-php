@@ -7,7 +7,7 @@ namespace OpenTelemetry\Example;
 use Exception;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\Context\Context;
@@ -15,7 +15,7 @@ use OpenTelemetry\Context\Context;
 final class ExampleInstrumentation implements Instrumentation
 {
 
-    public function register(HookManager $hookManager, ConfigurationRegistry $configuration, InstrumentationContext $context): void
+    public function register(HookManagerInterface $hookManager, ConfigurationRegistry $configuration, InstrumentationContext $context): void
     {
         $config = $configuration->get(ExampleConfig::class) ?? throw new Exception('example instrumentation must be configured');
         if (!$config->enabled) {

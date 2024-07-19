@@ -8,6 +8,7 @@ use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
@@ -23,7 +24,7 @@ class ExtensionHookManagerTest extends TestCase
 {
     private ConfigurationRegistry $registry;
     private ScopeInterface $scope;
-    private HookManager $hookManager;
+    private HookManagerInterface $hookManager;
     private InstrumentationContext $context;
 
     public function setUp(): void
@@ -81,7 +82,7 @@ class ExtensionHookManagerTest extends TestCase
         });
         $instrumentation->register($this->hookManager, $this->registry, $this->context);
 
-        $scope = ExtensionHookManager::disable(Context::getCurrent())->activate();
+        $scope = HookManager::disable(Context::getCurrent())->activate();
 
         try {
             $returnVal = $target->test();
@@ -106,7 +107,7 @@ class ExtensionHookManagerTest extends TestCase
         $instrumentation->register($this->hookManager, $this->registry, $this->context);
         $this->assertSame(123, $target->test(), 'post hook function ran and modified return value');
 
-        $scope = ExtensionHookManager::disable(Context::getCurrent())->activate();
+        $scope = HookManager::disable(Context::getCurrent())->activate();
 
         try {
             $this->assertSame(3, $target->test(), 'post hook function did not run');
@@ -131,19 +132,10 @@ class ExtensionHookManagerTest extends TestCase
                 $this->post = $post;
             }
 
-            public function register(HookManager $hookManager, ConfigurationRegistry $configuration, InstrumentationContext $context): void
+            public function register(HookManagerInterface $hookManager, ConfigurationRegistry $configuration, InstrumentationContext $context): void
             {
                 $hookManager->hook($this->class, $this->method, $this->pre, $this->post);
             }
         };
-    }
-
-    public function test_enable_disable(): void
-    {
-        $context = Context::getRoot();
-
-        $this->assertNull($context->get(ExtensionHookManager::contextKey()), 'initially unset');
-        $this->assertTrue(ExtensionHookManager::enable($context)->get(ExtensionHookManager::contextKey()));
-        $this->assertFalse(ExtensionHookManager::disable($context)->get(ExtensionHookManager::contextKey()));
     }
 }

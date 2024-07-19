@@ -6,5 +6,5 @@ namespace OpenTelemetry\API\Instrumentation\AutoInstrumentation;
 
 interface Instrumentation
 {
-    public function register(HookManager $hookManager, ConfigurationRegistry $configuration, Context $context): void;
+    public function register(HookManagerInterface $hookManager, ConfigurationRegistry $configuration, Context $context): void;
 }

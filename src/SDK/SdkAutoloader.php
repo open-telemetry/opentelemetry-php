@@ -8,8 +8,8 @@ use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
 use OpenTelemetry\API\Instrumentation\Configurator;
@@ -102,7 +102,7 @@ class SdkAutoloader
         $config = SdkConfiguration::parseFile($file);
 
         //disable hook manager during SDK to avoid autoinstrumenting SDK exporters.
-        $scope = ExtensionHookManager::disable(Context::getCurrent())->activate();
+        $scope = HookManager::disable(Context::getCurrent())->activate();
 
         try {
             $sdk = $config
@@ -187,10 +187,10 @@ class SdkAutoloader
         });
     }
 
-    private static function getHookManager(): HookManager
+    private static function getHookManager(): HookManagerInterface
     {
-        /** @var HookManager $hookManager */
-        foreach (ServiceLoader::load(HookManager::class) as $hookManager) {
+        /** @var HookManagerInterface $hookManager */
+        foreach (ServiceLoader::load(HookManagerInterface::class) as $hookManager) {
             return $hookManager;
         }
 

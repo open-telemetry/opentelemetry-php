@@ -8,36 +8,13 @@ use function assert;
 use Closure;
 use function extension_loaded;
 use Nevay\SPI\ServiceProviderDependency\ExtensionDependency;
-use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextInterface;
-use OpenTelemetry\Context\ContextKeyInterface;
 use ReflectionFunction;
 
 /** @phan-file-suppress PhanUndeclaredClassAttribute */
 
 #[ExtensionDependency('opentelemetry', '^1.0')]
-final class ExtensionHookManager implements HookManager
+final class ExtensionHookManager implements HookManagerInterface
 {
-    public static function enable(ContextInterface $context): ContextInterface
-    {
-        return $context->with(self::contextKey(), true);
-    }
-
-    public static function disable(ContextInterface $context): ContextInterface
-    {
-        return $context->with(self::contextKey(), false);
-    }
-
-    /**
-     * @internal
-     */
-    public static function contextKey(): ContextKeyInterface
-    {
-        static $contextKey;
-
-        return $contextKey ??= Context::createKey(self::class);
-    }
-
     /**
      * @phan-suppress PhanUndeclaredFunction
      */
@@ -55,13 +32,12 @@ final class ExtensionHookManager implements HookManager
             return null;
         }
 
-        $contextKey = self::contextKey();
         $reflection = new ReflectionFunction($closure);
 
         // TODO Add an option flag to ext-opentelemetry `hook` that configures whether return values should be used?
         if (!$reflection->getReturnType() || (string) $reflection->getReturnType() === 'void') {
-            return static function (mixed ...$args) use ($closure, $contextKey): void {
-                if (Context::getCurrent()->get($contextKey) === false) {
+            return static function (mixed ...$args) use ($closure): void {
+                if (HookManager::disabled()) {
                     return;
                 }
 
@@ -69,8 +45,8 @@ final class ExtensionHookManager implements HookManager
             };
         }
 
-        return static function (mixed ...$args) use ($closure, $contextKey): mixed {
-            if (Context::getCurrent()->get($contextKey) === false) {
+        return static function (mixed ...$args) use ($closure): mixed {
+            if (HookManager::disabled()) {
                 return $args[2];
             }
 
