@@ -156,8 +156,8 @@
 
                 "OpenTelemetry\\Example\\ExampleConfigProvider"
             ],
-            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManager": [
-                "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
+            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
+              "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
             ],
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Instrumentation": [
                 "OpenTelemetry\\Example\\ExampleInstrumentation"
