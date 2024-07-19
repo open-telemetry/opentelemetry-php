@@ -12,4 +12,6 @@ interface TracerProviderInterface extends API\TracerProviderInterface
     public function forceFlush(?CancellationInterface $cancellation = null): bool;
 
     public function shutdown(?CancellationInterface $cancellation = null): bool;
+
+    public function updateConfigurator(TracerConfigurator $configurator): void;
 }

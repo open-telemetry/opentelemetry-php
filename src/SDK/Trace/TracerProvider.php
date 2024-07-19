@@ -15,12 +15,14 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
+use WeakMap;
 
 final class TracerProvider implements TracerProviderInterface
 {
     private readonly TracerSharedState $tracerSharedState;
     private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
-    private readonly TracerConfigurator $configurator;
+    private TracerConfigurator $configurator;
+    private WeakMap $tracers;
 
     /** @param list<SpanProcessorInterface>|SpanProcessorInterface|null $spanProcessors */
     public function __construct(
@@ -48,6 +50,7 @@ final class TracerProvider implements TracerProviderInterface
         );
         $this->instrumentationScopeFactory = $instrumentationScopeFactory ?? new InstrumentationScopeFactory(Attributes::factory());
         $this->configurator = $configurator ?? new TracerConfigurator();
+        $this->tracers = new WeakMap();
     }
 
     public function forceFlush(?CancellationInterface $cancellation = null): bool
@@ -69,12 +72,14 @@ final class TracerProvider implements TracerProviderInterface
         }
 
         $scope = $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes);
-
-        return new Tracer(
+        $tracer = new Tracer(
             $this->tracerSharedState,
             $scope,
             $this->configurator->getConfig($scope),
         );
+        $this->tracers->offsetSet($tracer, $tracer);
+
+        return $tracer;
     }
 
     public function getSampler(): SamplerInterface
@@ -97,5 +102,14 @@ final class TracerProvider implements TracerProviderInterface
     public static function builder(): TracerProviderBuilder
     {
         return new TracerProviderBuilder();
+    }
+
+    public function updateConfigurator(TracerConfigurator $configurator): void
+    {
+        $this->configurator = $configurator;
+
+        foreach ($this->tracers as $tracer) {
+            $tracer->updateConfig($configurator);
+        }
     }
 }

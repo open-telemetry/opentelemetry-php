@@ -18,4 +18,8 @@ class NoopTracerProvider extends API\Trace\NoopTracerProvider implements TracerP
     {
         return true;
     }
+
+    public function updateConfigurator(TracerConfigurator $configurator): void
+    {
+    }
 }

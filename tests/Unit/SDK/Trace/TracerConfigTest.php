@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use OpenTelemetry\SDK\Trace\ImmutableSpan;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerConfig;
 use OpenTelemetry\SDK\Trace\TracerConfigurator;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -106,5 +107,20 @@ class TracerConfigTest extends TestCase
             'attributes matches + disable' => [new Predicate\Attribute('foo', 'bar'), State::DISABLED, true],
             'attribute does not match' => [new Predicate\Attribute('foo', 'no-match'), State::DISABLED, false],
         ];
+    }
+
+    public function test_enable_after_disable(): void
+    {
+        $tracerProvider = TracerProvider::builder()
+            ->addTracerConfiguratorCondition(new Predicate\Name('~two~'), State::DISABLED) //disable tracer two
+            ->build();
+        $tracer = $tracerProvider->getTracer(name: 'two');
+        $this->assertInstanceOf(Tracer::class, $tracer);
+        $this->assertFalse($tracer->enabled());
+
+        $update = new TracerConfigurator();
+        $tracerProvider->updateConfigurator($update);
+
+        $this->assertTrue($tracer->enabled());
     }
 }
