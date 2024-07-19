@@ -16,4 +16,9 @@ final class NoopObservableCounter implements ObservableCounterInterface
     {
         return new NoopObservableCallback();
     }
+
+    public function enabled(): bool
+    {
+        return false;
+    }
 }

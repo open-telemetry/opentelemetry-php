@@ -59,4 +59,9 @@ trait ObservableInstrumentTrait
             $this->referenceCounter,
         );
     }
+
+    public function enabled(): bool
+    {
+        return $this->writer->enabled($this->instrument);
+    }
 }

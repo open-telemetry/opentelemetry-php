@@ -41,4 +41,9 @@ trait SynchronousInstrumentTrait
     {
         $this->writer->record($this->instrument, $amount, $attributes, $context);
     }
+
+    public function enabled(): bool
+    {
+        return true;
+    }
 }

@@ -16,4 +16,9 @@ final class NoopObservableUpDownCounter implements ObservableUpDownCounterInterf
     {
         return new NoopObservableCallback();
     }
+
+    public function enabled(): bool
+    {
+        return false;
+    }
 }

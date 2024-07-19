@@ -16,4 +16,9 @@ final class NoopObservableGauge implements ObservableGaugeInterface
     {
         return new NoopObservableCallback();
     }
+
+    public function enabled(): bool
+    {
+        return false;
+    }
 }

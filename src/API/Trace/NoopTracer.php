@@ -23,4 +23,9 @@ final class NoopTracer implements TracerInterface
     {
         return new NoopSpanBuilder(Context::storage());
     }
+
+    public function enabled(): bool
+    {
+        return false;
+    }
 }
