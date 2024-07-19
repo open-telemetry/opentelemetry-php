@@ -34,11 +34,11 @@ class TracerConfigTest extends TestCase
         $exporter = new InMemoryExporter($storage);
         $tracerProvider = TracerProvider::builder()
             ->addSpanProcessor(new SimpleSpanProcessor($exporter))
-            ->addTracerConfiguratorCondition(new Predicate\Name('~two~'), State::DISABLED) //disable tracer two
+            ->setConfigurator(TracerConfigurator::builder()->addCondition(new Predicate\Name('~B~'), State::DISABLED)->build()) //disable tracer B
             ->build();
-        $tracerA = $tracerProvider->getTracer('one');
-        $tracerB = $tracerProvider->getTracer('two');
-        $tracerC = $tracerProvider->getTracer('three');
+        $tracerA = $tracerProvider->getTracer('A');
+        $tracerB = $tracerProvider->getTracer('B');
+        $tracerC = $tracerProvider->getTracer('C');
 
         $parent = $tracerA->spanBuilder('parent')->startSpan();
         $this->assertTrue($parent->isRecording());
@@ -86,11 +86,15 @@ class TracerConfigTest extends TestCase
         $exporter = new InMemoryExporter($storage);
         $tracerProvider = TracerProvider::builder()
             ->addSpanProcessor(new SimpleSpanProcessor($exporter))
-            ->addTracerConfiguratorCondition(new Predicate\Name('~two~'), State::DISABLED) //disable tracer two
+            ->setConfigurator(
+                TracerConfigurator::builder()
+                    ->addCondition(new Predicate\Name('~B~'), State::DISABLED) //disable tracer B
+                    ->build()
+            )
             ->build();
-        $tracerA = $tracerProvider->getTracer('one');
-        $tracerB = $tracerProvider->getTracer('two');
-        $tracerC = $tracerProvider->getTracer('three');
+        $tracerA = $tracerProvider->getTracer('A');
+        $tracerB = $tracerProvider->getTracer('B');
+        $tracerC = $tracerProvider->getTracer('C');
 
         $parent = $tracerA->spanBuilder('parent')->startSpan();
         $this->assertTrue($parent->isRecording());
@@ -147,7 +151,7 @@ class TracerConfigTest extends TestCase
     public function test_conditions(Predicate $predicate, State $state, bool $expectDisabled): void
     {
         $tracerProvider = TracerProvider::builder()
-            ->addTracerConfiguratorCondition($predicate, $state)
+            ->setConfigurator(TracerConfigurator::builder()->addCondition($predicate, $state)->build())
             ->build();
         $tracer = $tracerProvider->getTracer(name: 'two', attributes: ['foo' => 'bar']);
         $span = $tracer->spanBuilder('span')->startSpan();
@@ -175,7 +179,11 @@ class TracerConfigTest extends TestCase
     public function test_enable_after_disable(): void
     {
         $tracerProvider = TracerProvider::builder()
-            ->addTracerConfiguratorCondition(new Predicate\Name('~two~'), State::DISABLED) //disable tracer two
+            ->setConfigurator(
+                TracerConfigurator::builder()
+                    ->addCondition(new Predicate\Name('~two~'), State::DISABLED) //disable tracer A
+                    ->build()
+            )
             ->build();
         $tracer = $tracerProvider->getTracer(name: 'two');
         $this->assertInstanceOf(Tracer::class, $tracer);

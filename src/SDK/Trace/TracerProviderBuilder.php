@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use OpenTelemetry\SDK\Common\InstrumentationScope\Condition;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate;
-use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 class TracerProviderBuilder
@@ -15,8 +12,7 @@ class TracerProviderBuilder
     private ?array $spanProcessors = [];
     private ?ResourceInfo $resource = null;
     private ?SamplerInterface $sampler = null;
-    /** @var list<Condition> */
-    private array $conditions = [];
+    private ?TracerConfigurator $configurator = null;
 
     public function addSpanProcessor(SpanProcessorInterface $spanProcessor): self
     {
@@ -39,9 +35,9 @@ class TracerProviderBuilder
         return $this;
     }
 
-    public function addTracerConfiguratorCondition(Predicate $predicate, State $state): self
+    public function setConfigurator(TracerConfigurator $configurator): self
     {
-        $this->conditions[] = new Condition($predicate, $state);
+        $this->configurator = $configurator;
 
         return $this;
     }
@@ -52,7 +48,7 @@ class TracerProviderBuilder
             $this->spanProcessors,
             $this->sampler,
             $this->resource,
-            configurator: new TracerConfigurator($this->conditions),
+            configurator: $this->configurator,
         );
     }
 }

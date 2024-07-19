@@ -29,4 +29,9 @@ class TracerConfigurator
 
         return TracerConfig::default();
     }
+
+    public static function builder(): TracerConfiguratorBuilder
+    {
+        return new TracerConfiguratorBuilder();
+    }
 }
