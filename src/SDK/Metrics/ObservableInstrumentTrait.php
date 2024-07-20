@@ -16,26 +16,14 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
  */
 trait ObservableInstrumentTrait
 {
-    private MetricWriterInterface $writer;
-    private Instrument $instrument;
-    private ReferenceCounterInterface $referenceCounter;
-    private ArrayAccess $destructors;
-    private Config $config;
-
     public function __construct(
-        MetricWriterInterface $writer,
-        Instrument $instrument,
-        ReferenceCounterInterface $referenceCounter,
-        ArrayAccess $destructors,
-        Config $config,
+        private readonly MetricWriterInterface $writer,
+        private readonly Instrument $instrument,
+        private readonly ReferenceCounterInterface $referenceCounter,
+        private readonly ArrayAccess $destructors,
+        private Config $config,
     ) {
         assert($this instanceof InstrumentHandle);
-
-        $this->writer = $writer;
-        $this->instrument = $instrument;
-        $this->referenceCounter = $referenceCounter;
-        $this->destructors = $destructors;
-        $this->config = $config;
 
         $this->referenceCounter->acquire();
     }
@@ -67,5 +55,10 @@ trait ObservableInstrumentTrait
     public function enabled(): bool
     {
         return $this->writer->enabled($this->instrument);
+    }
+
+    public function updateConfig(Config $config): void
+    {
+        $this->config = $config;
     }
 }

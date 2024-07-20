@@ -4,13 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
-use OpenTelemetry\API\Metrics\Noop\NoopCounter;
-use OpenTelemetry\API\Metrics\Noop\NoopGauge;
-use OpenTelemetry\API\Metrics\Noop\NoopHistogram;
-use OpenTelemetry\API\Metrics\Noop\NoopObservableCounter;
-use OpenTelemetry\API\Metrics\Noop\NoopObservableGauge;
-use OpenTelemetry\API\Metrics\Noop\NoopObservableUpDownCounter;
-use OpenTelemetry\API\Metrics\Noop\NoopUpDownCounter;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
 use OpenTelemetry\SDK\Common\InstrumentationScope\State;
@@ -34,20 +27,35 @@ class MeterConfigTest extends TestCase
             )
             ->build();
 
+        $this->assertInstanceOf(MeterProvider::class, $meterProvider);
+
         $meter_one = $meterProvider->getMeter('one');
         $meter_two = $meterProvider->getMeter('two');
         $meter_three = $meterProvider->getMeter('three');
+
+        $instruments = [];
+        $instruments[] = $meter_two->createCounter('a');
+        //        $instruments[] = $meter_two->createObservableCounter('b');
+        $instruments[] = $meter_two->createUpDownCounter('c');
+        //        $instruments[] = $meter_two->createObservableUpDownCounter('d');
+        $instruments[] = $meter_two->createHistogram('e');
+        $instruments[] = $meter_two->createGauge('f');
+        //        $instruments[] = $meter_two->createObservableGauge('g');
+
+        foreach ($instruments as $instrument) {
+            $this->assertFalse($instrument->enabled());
+        }
 
         $this->assertTrue($meter_one->isEnabled());
         $this->assertFalse($meter_two->isEnabled());
         $this->assertTrue($meter_three->isEnabled());
 
-        $this->assertInstanceOf(NoopCounter::class, $meter_two->createCounter('a'));
-        $this->assertInstanceOf(NoopObservableCounter::class, $meter_two->createObservableCounter('b'));
-        $this->assertInstanceOf(NoopUpDownCounter::class, $meter_two->createUpDownCounter('c'));
-        $this->assertInstanceOf(NoopObservableUpDownCounter::class, $meter_two->createObservableUpDownCounter('d'));
-        $this->assertInstanceOf(NoopHistogram::class, $meter_two->createHistogram('e'));
-        $this->assertInstanceOf(NoopGauge::class, $meter_two->createGauge('f'));
-        $this->assertInstanceOf(NoopObservableGauge::class, $meter_two->createObservableGauge('g'));
+        $meterProvider->updateConfigurator(new Configurator());
+
+        $this->assertTrue($meter_two->isEnabled());
+
+        foreach ($instruments as $instrument) {
+            $this->assertTrue($instrument->enabled());
+        }
     }
 }

@@ -30,7 +30,8 @@ final class MeterProvider implements MeterProviderInterface
     private readonly ArrayAccess $destructors;
 
     private bool $closed = false;
-    private readonly Configurator $configurator;
+    private Configurator $configurator;
+    private WeakMap $meters;
 
     /**
      * @param iterable<MetricReaderInterface&MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricReaders
@@ -56,6 +57,7 @@ final class MeterProvider implements MeterProviderInterface
         $this->writer = $registry;
         $this->destructors = new WeakMap();
         $this->configurator = $configurator ?? new Configurator();
+        $this->meters = new WeakMap();
     }
 
     public function getMeter(
@@ -68,9 +70,7 @@ final class MeterProvider implements MeterProviderInterface
             return new NoopMeter();
         }
 
-        $scope = $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes);
-
-        return new Meter(
+        $meter = new Meter(
             $this->metricFactory,
             $this->resource,
             $this->clock,
@@ -79,12 +79,15 @@ final class MeterProvider implements MeterProviderInterface
             $this->viewRegistry,
             $this->exemplarFilter,
             $this->instruments,
-            $scope,
+            $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes),
             $this->registry,
             $this->writer,
             $this->destructors,
-            $this->configurator->getConfig($scope),
+            $this->configurator,
         );
+        $this->meters->offsetSet($meter, $meter);
+
+        return $meter;
     }
 
     public function shutdown(): bool
@@ -124,5 +127,14 @@ final class MeterProvider implements MeterProviderInterface
     public static function builder(): MeterProviderBuilder
     {
         return new MeterProviderBuilder();
+    }
+
+    public function updateConfigurator(Configurator $configurator): void
+    {
+        $this->configurator = $configurator;
+
+        foreach ($this->meters as $meter) {
+            $meter->updateConfigurator($configurator);
+        }
     }
 }

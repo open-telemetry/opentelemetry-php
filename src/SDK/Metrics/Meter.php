@@ -15,7 +15,6 @@ use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\GaugeInterface;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;
-use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
 use OpenTelemetry\API\Metrics\ObservableCounterInterface;
 use OpenTelemetry\API\Metrics\ObservableGaugeInterface;
@@ -23,6 +22,7 @@ use OpenTelemetry\API\Metrics\ObservableUpDownCounterInterface;
 use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use function OpenTelemetry\SDK\Common\Util\closure;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\MultiRegistryRegistration;
@@ -32,6 +32,7 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\MultiReferenceCounter;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use function serialize;
+use WeakMap;
 
 /**
  * @internal
@@ -41,7 +42,8 @@ final class Meter implements MeterInterface
     use LogsMessagesTrait;
 
     private ?string $instrumentationScopeId = null;
-    private NoopMeter $noop;
+    private Config $config;
+    private WeakMap $instrumentsMap;
 
     /**
      * @param iterable<MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricRegistries
@@ -60,9 +62,10 @@ final class Meter implements MeterInterface
         private readonly MetricRegistryInterface $registry,
         private readonly MetricWriterInterface $writer,
         private readonly ArrayAccess $destructors,
-        private readonly Config $config,
+        private Configurator $configurator,
     ) {
-        $this->noop = new NoopMeter();
+        $this->instrumentsMap = new WeakMap();
+        $this->config = $this->configurator->getConfig($this->instrumentationScope);
     }
 
     private static function dummyInstrument(): Instrument
@@ -70,6 +73,19 @@ final class Meter implements MeterInterface
         static $dummy;
 
         return $dummy ??= (new \ReflectionClass(Instrument::class))->newInstanceWithoutConstructor();
+    }
+
+    /**
+     * @internal
+     */
+    public function updateConfigurator(Configurator $configurator): void
+    {
+        $this->configurator = $configurator;
+        $this->config = $configurator->getConfig($this->instrumentationScope);
+
+        foreach ($this->instrumentsMap as $instrument) {
+            $instrument->updateConfig($this->config);
+        }
     }
 
     public function batchObserve(callable $callback, AsynchronousInstrument $instrument, AsynchronousInstrument ...$instruments): ObservableCallbackInterface
@@ -113,9 +129,6 @@ final class Meter implements MeterInterface
 
     public function createCounter(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): CounterInterface
     {
-        if ($this->config->isEnabled() === false) {
-            return $this->noop->createCounter($name);
-        }
         [$instrument, $referenceCounter] = $this->createSynchronousWriter(
             InstrumentType::COUNTER,
             $name,
@@ -124,14 +137,14 @@ final class Meter implements MeterInterface
             $advisory,
         );
 
-        return new Counter($this->writer, $instrument, $referenceCounter, $this->config);
+        $counter = new Counter($this->writer, $instrument, $referenceCounter, $this->config);
+        $this->instrumentsMap->offsetSet($counter, $counter);
+
+        return $counter;
     }
 
     public function createObservableCounter(string $name, ?string $unit = null, ?string $description = null, $advisory = [], callable ...$callbacks): ObservableCounterInterface
     {
-        if ($this->config->isEnabled() === false) {
-            return $this->noop->createObservableCounter($name);
-        }
         if (is_callable($advisory)) {
             array_unshift($callbacks, $advisory);
             $advisory = [];
@@ -154,9 +167,6 @@ final class Meter implements MeterInterface
 
     public function createHistogram(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): HistogramInterface
     {
-        if ($this->config->isEnabled() === false) {
-            return $this->noop->createHistogram($name);
-        }
         [$instrument, $referenceCounter] = $this->createSynchronousWriter(
             InstrumentType::HISTOGRAM,
             $name,
@@ -165,14 +175,14 @@ final class Meter implements MeterInterface
             $advisory,
         );
 
-        return new Histogram($this->writer, $instrument, $referenceCounter, $this->config);
+        $histogram = new Histogram($this->writer, $instrument, $referenceCounter, $this->config);
+        $this->instrumentsMap->offsetSet($histogram, $histogram);
+
+        return $histogram;
     }
 
     public function createGauge(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): GaugeInterface
     {
-        if ($this->config->isEnabled() === false) {
-            return $this->noop->createGauge($name);
-        }
         [$instrument, $referenceCounter] = $this->createSynchronousWriter(
             InstrumentType::GAUGE,
             $name,
@@ -181,14 +191,14 @@ final class Meter implements MeterInterface
             $advisory,
         );
 
-        return new Gauge($this->writer, $instrument, $referenceCounter, $this->config);
+        $gauge = new Gauge($this->writer, $instrument, $referenceCounter, $this->config);
+        $this->instrumentsMap->offsetSet($gauge, $gauge);
+
+        return $gauge;
     }
 
     public function createObservableGauge(string $name, ?string $unit = null, ?string $description = null, $advisory = [], callable ...$callbacks): ObservableGaugeInterface
     {
-        if ($this->config->isEnabled() === false) {
-            return $this->noop->createObservableGauge($name);
-        }
         if (is_callable($advisory)) {
             array_unshift($callbacks, $advisory);
             $advisory = [];
@@ -211,9 +221,6 @@ final class Meter implements MeterInterface
 
     public function createUpDownCounter(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): UpDownCounterInterface
     {
-        if ($this->config->isEnabled() === false) {
-            return $this->noop->createUpDownCounter($name);
-        }
         [$instrument, $referenceCounter] = $this->createSynchronousWriter(
             InstrumentType::UP_DOWN_COUNTER,
             $name,
@@ -222,14 +229,14 @@ final class Meter implements MeterInterface
             $advisory,
         );
 
-        return new UpDownCounter($this->writer, $instrument, $referenceCounter, $this->config);
+        $counter = new UpDownCounter($this->writer, $instrument, $referenceCounter, $this->config);
+        $this->instrumentsMap->offsetSet($counter, $counter);
+
+        return $counter;
     }
 
     public function createObservableUpDownCounter(string $name, ?string $unit = null, ?string $description = null, $advisory = [], callable ...$callbacks): ObservableUpDownCounterInterface
     {
-        if ($this->config->isEnabled() === false) {
-            return $this->noop->createObservableUpDownCounter($name);
-        }
         if (is_callable($advisory)) {
             array_unshift($callbacks, $advisory);
             $advisory = [];
