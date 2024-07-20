@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\MetricRegistry;
 
-use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
-use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use function array_key_last;
 use Closure;
 use OpenTelemetry\API\Common\Time\ClockInterface;

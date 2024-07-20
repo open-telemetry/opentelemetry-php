@@ -186,11 +186,11 @@ class TracerConfigTest extends TestCase
             ->build();
         $tracer = $tracerProvider->getTracer(name: 'two');
         $this->assertInstanceOf(Tracer::class, $tracer);
-        $this->assertFalse($tracer->enabled());
+        $this->assertFalse($tracer->isEnabled());
 
         $update = new Configurator();
         $tracerProvider->updateConfigurator($update);
 
-        $this->assertTrue($tracer->enabled());
+        $this->assertTrue($tracer->isEnabled());
     }
 }

@@ -47,7 +47,7 @@ class Logger implements LoggerInterface
         }
     }
 
-    public function enabled(): bool
+    public function isEnabled(): bool
     {
         return $this->config->isEnabled();
     }

@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use ArrayAccess;
-use OpenTelemetry\API\Metrics\MeterInterface;
 use function assert;
+use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 
 /**
@@ -53,11 +52,12 @@ trait ObservableInstrumentTrait
         );
     }
 
-    public function enabled(): bool
+    public function isEnabled(): bool
     {
         if (!$this->meter->isEnabled()) {
             return false;
         }
+
         return $this->writer->enabled($this->instrument);
     }
 }

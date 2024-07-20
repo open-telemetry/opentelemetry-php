@@ -46,7 +46,7 @@ class MeterConfigTest extends TestCase
         //        $instruments[] = $meter_two->createObservableGauge('g');
 
         foreach ($instruments as $id => $instrument) {
-            $this->assertFalse($instrument->enabled(), sprintf('instrument %s is enabled', $id));
+            $this->assertFalse($instrument->isEnabled(), sprintf('instrument %s is enabled', $id));
         }
 
         $this->assertTrue($meter_one->isEnabled());
@@ -58,7 +58,7 @@ class MeterConfigTest extends TestCase
         $this->assertTrue($meter_two->isEnabled());
 
         foreach ($instruments as $instrument) {
-            $this->assertTrue($instrument->enabled());
+            $this->assertTrue($instrument->isEnabled());
         }
     }
 }

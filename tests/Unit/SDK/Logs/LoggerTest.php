@@ -113,6 +113,6 @@ class LoggerTest extends TestCase
     public function test_enabled(): void
     {
         $logger = new Logger($this->sharedState, $this->scope);
-        $this->assertTrue($logger->enabled());
+        $this->assertTrue($logger->isEnabled());
     }
 }

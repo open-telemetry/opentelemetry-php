@@ -32,7 +32,6 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\MultiReferenceCounter;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use function serialize;
-use WeakMap;
 
 /**
  * @internal

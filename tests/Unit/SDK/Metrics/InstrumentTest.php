@@ -8,7 +8,6 @@ use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\Counter;
@@ -260,7 +259,7 @@ final class InstrumentTest extends TestCase
         $meter->expects($this->once())->method('isEnabled')->willReturn(false);
         $counter = new Counter($w, $i, $c, $meter);
 
-        $this->assertFalse($counter->enabled());
+        $this->assertFalse($counter->isEnabled());
     }
 
     public function test_asynchronous_disabled_if_meter_disabled(): void
@@ -272,6 +271,6 @@ final class InstrumentTest extends TestCase
         $meter->expects($this->once())->method('isEnabled')->willReturn(false);
         $counter = new ObservableCounter($w, $i, $c, new WeakMap(), $meter);
 
-        $this->assertFalse($counter->enabled());
+        $this->assertFalse($counter->isEnabled());
     }
 }

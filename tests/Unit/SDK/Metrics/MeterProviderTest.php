@@ -117,10 +117,10 @@ final class MeterProviderTest extends TestCase
         $meter = $meterProvider->getMeter('one');
         $this->assertTrue($meter->isEnabled());
         $counter = $meter->createCounter('A');
-        $this->assertTrue($counter->enabled());
+        $this->assertTrue($counter->isEnabled());
         $meterProvider->updateConfigurator(Configurator::builder()->addCondition(new Name('~one~'), State::DISABLED)->build());
         $this->assertFalse($meter->isEnabled());
-        $this->assertFalse($counter->enabled());
+        $this->assertFalse($counter->isEnabled());
     }
 }
 

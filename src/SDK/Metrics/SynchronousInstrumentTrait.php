@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-use OpenTelemetry\API\Metrics\MeterInterface;
 use function assert;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
+use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 
 /**
@@ -43,16 +42,17 @@ trait SynchronousInstrumentTrait
 
     public function write($amount, iterable $attributes = [], $context = null): void
     {
-        if ($this->enabled()) {
+        if ($this->isEnabled()) {
             $this->writer->record($this->instrument, $amount, $attributes, $context);
         }
     }
 
-    public function enabled(): bool
+    public function isEnabled(): bool
     {
         if (!$this->meter->isEnabled()) {
             return false;
         }
+
         return $this->writer->enabled($this->instrument);
     }
 }

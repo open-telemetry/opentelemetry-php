@@ -66,6 +66,6 @@ class TracerTest extends TestCase
 
     public function test_enabled(): void
     {
-        $this->assertTrue($this->tracer->enabled());
+        $this->assertTrue($this->tracer->isEnabled());
     }
 }

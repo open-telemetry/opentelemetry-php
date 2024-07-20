@@ -15,5 +15,5 @@ interface Instrument
      * @experimental
      * @see https://opentelemetry.io/docs/specs/otel/metrics/sdk/#instrument-enabled
      */
-    public function enabled(): bool;
+    public function isEnabled(): bool;
 }
