@@ -15,20 +15,18 @@ use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 class LoggerProvider implements LoggerProviderInterface
 {
     private readonly LoggerSharedState $loggerSharedState;
-    private readonly Configurator $configurator;
 
     public function __construct(
         LogRecordProcessorInterface $processor,
         private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
         ?ResourceInfo $resource = null,
-        ?Configurator $configurator = null,
+        private readonly Configurator $configurator = new Configurator(),
     ) {
         $this->loggerSharedState = new LoggerSharedState(
             $resource ?? ResourceInfoFactory::defaultResource(),
             (new LogRecordLimitsBuilder())->build(),
             $processor
         );
-        $this->configurator = $configurator ?? new Configurator();
     }
 
     /**

@@ -22,8 +22,7 @@ final class TracerProvider implements TracerProviderInterface
 {
     private readonly TracerSharedState $tracerSharedState;
     private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
-    private Configurator $configurator;
-    private WeakMap $tracers;
+    private readonly WeakMap $tracers;
 
     /** @param list<SpanProcessorInterface>|SpanProcessorInterface|null $spanProcessors */
     public function __construct(
@@ -33,7 +32,7 @@ final class TracerProvider implements TracerProviderInterface
         SpanLimits $spanLimits = null,
         IdGeneratorInterface $idGenerator = null,
         ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
-        ?Configurator $configurator = null,
+        private Configurator $configurator = new Configurator(),
     ) {
         $spanProcessors ??= [];
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
@@ -50,7 +49,6 @@ final class TracerProvider implements TracerProviderInterface
             $spanProcessors
         );
         $this->instrumentationScopeFactory = $instrumentationScopeFactory ?? new InstrumentationScopeFactory(Attributes::factory());
-        $this->configurator = $configurator ?? new Configurator();
         $this->tracers = new WeakMap();
     }
 

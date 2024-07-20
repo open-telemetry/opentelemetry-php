@@ -30,8 +30,7 @@ final class MeterProvider implements MeterProviderInterface
     private readonly ArrayAccess $destructors;
 
     private bool $closed = false;
-    private Configurator $configurator;
-    private WeakMap $meters;
+    private readonly WeakMap $meters;
 
     /**
      * @param iterable<MetricReaderInterface&MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricReaders
@@ -47,7 +46,7 @@ final class MeterProvider implements MeterProviderInterface
         private readonly ?ExemplarFilterInterface $exemplarFilter,
         private readonly StalenessHandlerFactoryInterface $stalenessHandlerFactory,
         MetricFactoryInterface $metricFactory = null,
-        ?Configurator $configurator = null,
+        private Configurator $configurator = new Configurator(),
     ) {
         $this->metricFactory = $metricFactory ?? new StreamFactory();
         $this->instruments = new MeterInstruments();
@@ -56,7 +55,6 @@ final class MeterProvider implements MeterProviderInterface
         $this->registry = $registry;
         $this->writer = $registry;
         $this->destructors = new WeakMap();
-        $this->configurator = $configurator ?? new Configurator();
         $this->meters = new WeakMap();
     }
 
