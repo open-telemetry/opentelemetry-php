@@ -43,7 +43,6 @@ final class Meter implements MeterInterface
 
     private ?string $instrumentationScopeId = null;
     private Config $config;
-    private WeakMap $instrumentsMap;
 
     /**
      * @param iterable<MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricRegistries
@@ -64,7 +63,6 @@ final class Meter implements MeterInterface
         private readonly ArrayAccess $destructors,
         private Configurator $configurator,
     ) {
-        $this->instrumentsMap = new WeakMap();
         $this->config = $this->configurator->getConfig($this->instrumentationScope);
     }
 
@@ -82,11 +80,6 @@ final class Meter implements MeterInterface
     {
         $this->configurator = $configurator;
         $this->config = $configurator->getConfig($this->instrumentationScope);
-
-        foreach ($this->instrumentsMap as $instrument) {
-            $instrument->updateConfig($this->config);
-        }
-        $this->writer->updateConfig($this->config);
     }
 
     public function batchObserve(callable $callback, AsynchronousInstrument $instrument, AsynchronousInstrument ...$instruments): ObservableCallbackInterface
@@ -138,10 +131,7 @@ final class Meter implements MeterInterface
             $advisory,
         );
 
-        $counter = new Counter($this->writer, $instrument, $referenceCounter, $this->config);
-        $this->instrumentsMap->offsetSet($counter, $counter);
-
-        return $counter;
+        return new Counter($this->writer, $instrument, $referenceCounter, $this);
     }
 
     public function createObservableCounter(string $name, ?string $unit = null, ?string $description = null, $advisory = [], callable ...$callbacks): ObservableCounterInterface
@@ -163,7 +153,7 @@ final class Meter implements MeterInterface
             $referenceCounter->acquire(true);
         }
 
-        return new ObservableCounter($this->writer, $instrument, $referenceCounter, $this->destructors, $this->config);
+        return new ObservableCounter($this->writer, $instrument, $referenceCounter, $this->destructors, $this);
     }
 
     public function createHistogram(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): HistogramInterface
@@ -176,10 +166,7 @@ final class Meter implements MeterInterface
             $advisory,
         );
 
-        $histogram = new Histogram($this->writer, $instrument, $referenceCounter, $this->config);
-        $this->instrumentsMap->offsetSet($histogram, $histogram);
-
-        return $histogram;
+        return new Histogram($this->writer, $instrument, $referenceCounter, $this);
     }
 
     public function createGauge(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): GaugeInterface
@@ -192,10 +179,7 @@ final class Meter implements MeterInterface
             $advisory,
         );
 
-        $gauge = new Gauge($this->writer, $instrument, $referenceCounter, $this->config);
-        $this->instrumentsMap->offsetSet($gauge, $gauge);
-
-        return $gauge;
+        return new Gauge($this->writer, $instrument, $referenceCounter, $this);
     }
 
     public function createObservableGauge(string $name, ?string $unit = null, ?string $description = null, $advisory = [], callable ...$callbacks): ObservableGaugeInterface
@@ -217,7 +201,7 @@ final class Meter implements MeterInterface
             $referenceCounter->acquire(true);
         }
 
-        return new ObservableGauge($this->writer, $instrument, $referenceCounter, $this->destructors, $this->config);
+        return new ObservableGauge($this->writer, $instrument, $referenceCounter, $this->destructors, $this);
     }
 
     public function createUpDownCounter(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): UpDownCounterInterface
@@ -230,10 +214,7 @@ final class Meter implements MeterInterface
             $advisory,
         );
 
-        $counter = new UpDownCounter($this->writer, $instrument, $referenceCounter, $this->config);
-        $this->instrumentsMap->offsetSet($counter, $counter);
-
-        return $counter;
+        return new UpDownCounter($this->writer, $instrument, $referenceCounter, $this);
     }
 
     public function createObservableUpDownCounter(string $name, ?string $unit = null, ?string $description = null, $advisory = [], callable ...$callbacks): ObservableUpDownCounterInterface
@@ -255,7 +236,7 @@ final class Meter implements MeterInterface
             $referenceCounter->acquire(true);
         }
 
-        return new ObservableUpDownCounter($this->writer, $instrument, $referenceCounter, $this->destructors, $this->config);
+        return new ObservableUpDownCounter($this->writer, $instrument, $referenceCounter, $this->destructors, $this);
     }
 
     public function isEnabled(): bool

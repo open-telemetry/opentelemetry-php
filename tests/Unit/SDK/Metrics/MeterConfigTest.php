@@ -10,6 +10,8 @@ use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use OpenTelemetry\SDK\Metrics\MeterConfig;
 use OpenTelemetry\SDK\Metrics\MeterConfigurator;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
+use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -20,6 +22,7 @@ class MeterConfigTest extends TestCase
     public function test_disable_scopes(): void
     {
         $meterProvider = MeterProvider::builder()
+            ->addReader(new ExportingReader(new InMemoryExporter()))
             ->setConfigurator(
                 Configurator::builder()
                     ->addCondition(new Name('~two~'), State::DISABLED)
@@ -42,8 +45,8 @@ class MeterConfigTest extends TestCase
         $instruments[] = $meter_two->createGauge('f');
         //        $instruments[] = $meter_two->createObservableGauge('g');
 
-        foreach ($instruments as $instrument) {
-            $this->assertFalse($instrument->enabled());
+        foreach ($instruments as $id => $instrument) {
+            $this->assertFalse($instrument->enabled(), sprintf('instrument %s is enabled', $id));
         }
 
         $this->assertTrue($meter_one->isEnabled());

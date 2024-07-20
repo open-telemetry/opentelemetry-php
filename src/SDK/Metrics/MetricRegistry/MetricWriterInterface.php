@@ -19,5 +19,4 @@ interface MetricWriterInterface
 
     public function unregisterCallback(int $callbackId): void;
     public function enabled(Instrument $instrument): bool;
-    public function updateConfig(Config $config): void;
 }

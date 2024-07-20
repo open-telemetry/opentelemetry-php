@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
 use OpenTelemetry\API\Common\Time\TestClock;
+use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
@@ -41,11 +42,12 @@ use WeakMap;
 #[CoversClass(ObservableInstrumentTrait::class)]
 final class InstrumentTest extends TestCase
 {
-    private Config $config;
+    private MeterInterface $meter;
 
     public function setUp(): void
     {
-        $this->config = Config::default();
+        $this->meter = $this->createMock(MeterInterface::class);
+        $this->meter->method('isEnabled')->willReturn(true);
     }
 
     public function test_counter(): void
@@ -57,7 +59,7 @@ final class InstrumentTest extends TestCase
         $n = $w->registerSynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::DELTA);
 
-        $c = new Counter($w, $i, new NoopStalenessHandler(), $this->config);
+        $c = new Counter($w, $i, new NoopStalenessHandler(), $this->meter);
         $c->add(5);
         $c->add(7);
         $c->add(3);
@@ -86,7 +88,7 @@ final class InstrumentTest extends TestCase
         $n = $w->registerAsynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::CUMULATIVE);
 
-        $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), new WeakMap(), $this->config);
+        $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), new WeakMap(), $this->meter);
         $c->observe(static function (ObserverInterface $observer): void {
             $observer->observe(5);
         });
@@ -122,7 +124,7 @@ final class InstrumentTest extends TestCase
             }
         };
 
-        $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), new WeakMap(), $this->config);
+        $c = new ObservableCounter($w, $i, new NoopStalenessHandler(), new WeakMap(), $this->meter);
         $c->observe($instance);
         $instance = null;
 
@@ -143,7 +145,7 @@ final class InstrumentTest extends TestCase
         $n = $w->registerSynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::DELTA);
 
-        $c = new UpDownCounter($w, $i, new NoopStalenessHandler(), $this->config);
+        $c = new UpDownCounter($w, $i, new NoopStalenessHandler(), $this->meter);
         $c->add(5);
         $c->add(7);
         $c->add(-8);
@@ -172,7 +174,7 @@ final class InstrumentTest extends TestCase
         $n = $w->registerSynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::DELTA);
 
-        $h = new Histogram($w, $i, new NoopStalenessHandler(), $this->config);
+        $h = new Histogram($w, $i, new NoopStalenessHandler(), $this->meter);
         $h->record(1);
         $h->record(7);
         $h->record(9);
@@ -249,24 +251,27 @@ final class InstrumentTest extends TestCase
         new ObservableCallback($writer, $referenceCounter, 1, $callbackDestructor, new stdClass());
     }
 
-    public function test_synchronous_enabled(): void
+    public function test_synchronous_disabled_if_meter_disabled(): void
     {
         $w = $this->createMock(MetricWriterInterface::class);
         $c = $this->createMock(ReferenceCounterInterface::class);
         $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null);
-        $counter = new Counter($w, $i, $c, $this->config);
+        $meter = $this->createMock(MeterInterface::class);
+        $meter->expects($this->once())->method('isEnabled')->willReturn(false);
+        $counter = new Counter($w, $i, $c, $meter);
 
-        $this->assertTrue($counter->enabled());
+        $this->assertFalse($counter->enabled());
     }
 
-    public function test_asynchronous_enabled_if_writer_enabled(): void
+    public function test_asynchronous_disabled_if_meter_disabled(): void
     {
         $w = $this->createMock(MetricWriterInterface::class);
-        $w->method('enabled')->willReturn(true);
         $c = $this->createMock(ReferenceCounterInterface::class);
         $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null);
-        $counter = new ObservableCounter($w, $i, $c, new WeakMap(), $this->config);
+        $meter = $this->createMock(MeterInterface::class);
+        $meter->expects($this->once())->method('isEnabled')->willReturn(false);
+        $counter = new ObservableCounter($w, $i, $c, new WeakMap(), $meter);
 
-        $this->assertTrue($counter->enabled());
+        $this->assertFalse($counter->enabled());
     }
 }

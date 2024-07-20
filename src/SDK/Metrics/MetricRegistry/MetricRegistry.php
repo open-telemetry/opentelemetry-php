@@ -45,7 +45,6 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         private readonly ?ContextStorageInterface $contextStorage,
         private readonly AttributesFactoryInterface $attributesFactory,
         private readonly ClockInterface $clock,
-        private Config $config = new Config(State::ENABLED),
     ) {
     }
 
@@ -180,14 +179,6 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
 
     public function enabled(Instrument $instrument): bool
     {
-        if (!$this->config->isEnabled()) {
-            return false;
-        }
         return isset($this->instrumentToStreams[spl_object_id($instrument)]);
-    }
-
-    public function updateConfig(Config $config): void
-    {
-        $this->config = $config;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use OpenTelemetry\API\Metrics\MeterInterface;
 use function assert;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
@@ -16,16 +17,16 @@ trait SynchronousInstrumentTrait
     private MetricWriterInterface $writer;
     private Instrument $instrument;
     private ReferenceCounterInterface $referenceCounter;
-    private Config $config;
+    private MeterInterface $meter;
 
-    public function __construct(MetricWriterInterface $writer, Instrument $instrument, ReferenceCounterInterface $referenceCounter, Config $config)
+    public function __construct(MetricWriterInterface $writer, Instrument $instrument, ReferenceCounterInterface $referenceCounter, MeterInterface $meter)
     {
         assert($this instanceof InstrumentHandle);
 
         $this->writer = $writer;
         $this->instrument = $instrument;
         $this->referenceCounter = $referenceCounter;
-        $this->config = $config;
+        $this->meter = $meter;
 
         $this->referenceCounter->acquire();
     }
@@ -49,11 +50,9 @@ trait SynchronousInstrumentTrait
 
     public function enabled(): bool
     {
-        return $this->config->isEnabled();
-    }
-
-    public function updateConfig(Config $config): void
-    {
-        $this->config = $config;
+        if (!$this->meter->isEnabled()) {
+            return false;
+        }
+        return $this->writer->enabled($this->instrument);
     }
 }
