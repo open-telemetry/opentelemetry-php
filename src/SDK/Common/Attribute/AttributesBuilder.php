@@ -49,20 +49,16 @@ final class AttributesBuilder implements AttributesBuilderInterface
 
     /**
      * @phan-suppress PhanUndeclaredClassAttribute
-     * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->attributes[$offset] ?? null;
     }
 
     /**
      * @phan-suppress PhanUndeclaredClassAttribute
-     * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if ($offset === null) {
             return;
@@ -92,10 +88,8 @@ final class AttributesBuilder implements AttributesBuilderInterface
 
     /**
      * @phan-suppress PhanUndeclaredClassAttribute
-     * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->attributes[$offset]);
     }

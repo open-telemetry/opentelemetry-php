@@ -174,4 +174,9 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
             }
         }
     }
+
+    public function enabled(Instrument $instrument): bool
+    {
+        return isset($this->instrumentToStreams[spl_object_id($instrument)]);
+    }
 }
