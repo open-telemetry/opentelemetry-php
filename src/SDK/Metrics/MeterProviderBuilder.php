@@ -66,7 +66,7 @@ class MeterProviderBuilder
             new CriteriaViewRegistry(),
             $this->exemplarFilter ?? new WithSampledTraceExemplarFilter(),
             new NoopStalenessHandlerFactory(),
-            configurator: $this->configurator,
+            configurator: $this->configurator ?? new Configurator(),
         );
     }
 }

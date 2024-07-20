@@ -259,9 +259,10 @@ final class InstrumentTest extends TestCase
         $this->assertTrue($counter->enabled());
     }
 
-    public function test_asynchronous_enabled(): void
+    public function test_asynchronous_enabled_if_writer_enabled(): void
     {
         $w = $this->createMock(MetricWriterInterface::class);
+        $w->method('enabled')->willReturn(true);
         $c = $this->createMock(ReferenceCounterInterface::class);
         $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null);
         $counter = new ObservableCounter($w, $i, $c, new WeakMap(), $this->config);

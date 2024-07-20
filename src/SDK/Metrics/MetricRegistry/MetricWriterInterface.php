@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricRegistry;
 
 use Closure;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Metrics\Instrument;
 
 /**
@@ -18,4 +19,5 @@ interface MetricWriterInterface
 
     public function unregisterCallback(int $callbackId): void;
     public function enabled(Instrument $instrument): bool;
+    public function updateConfig(Config $config): void;
 }

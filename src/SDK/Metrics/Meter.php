@@ -86,6 +86,7 @@ final class Meter implements MeterInterface
         foreach ($this->instrumentsMap as $instrument) {
             $instrument->updateConfig($this->config);
         }
+        $this->writer->updateConfig($this->config);
     }
 
     public function batchObserve(callable $callback, AsynchronousInstrument $instrument, AsynchronousInstrument ...$instruments): ObservableCallbackInterface
