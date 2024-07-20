@@ -15,4 +15,9 @@ final class NoopGauge implements GaugeInterface
     {
         // no-op
     }
+
+    public function enabled(): bool
+    {
+        return false;
+    }
 }
