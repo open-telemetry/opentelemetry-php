@@ -12,6 +12,9 @@ exporters:
             api-key: !!str 1234
         compression: gzip
         timeout: 10000
+        retry:
+            max_attempts: 5
+            initial_delay: 100
 
 logger_provider:
     processors:
