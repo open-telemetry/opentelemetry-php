@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Benchmark;
+namespace OpenTelemetry\Tests\Benchmark;
 
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
@@ -16,9 +16,9 @@ use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 
 class MetricBench
 {
-    private MeterInterface $enabled;
-    private MeterInterface $disabled;
-    private MetricReaderInterface $reader;
+    private readonly MeterInterface $enabled;
+    private readonly MeterInterface $disabled;
+    private readonly MetricReaderInterface $reader;
     public function __construct()
     {
         $exporter = new NoopMetricExporter();

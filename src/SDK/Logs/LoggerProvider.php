@@ -11,22 +11,25 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterfac
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use WeakMap;
 
 class LoggerProvider implements LoggerProviderInterface
 {
     private readonly LoggerSharedState $loggerSharedState;
+    private readonly WeakMap $loggers;
 
     public function __construct(
         LogRecordProcessorInterface $processor,
         private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
         ?ResourceInfo $resource = null,
-        private readonly Configurator $configurator = new Configurator(),
+        private Configurator $configurator = new Configurator(),
     ) {
         $this->loggerSharedState = new LoggerSharedState(
             $resource ?? ResourceInfoFactory::defaultResource(),
             (new LogRecordLimitsBuilder())->build(),
             $processor
         );
+        $this->loggers = new WeakMap();
     }
 
     /**
@@ -38,11 +41,10 @@ class LoggerProvider implements LoggerProviderInterface
             return NoopLogger::getInstance();
         }
         $scope = $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes);
-        if ($this->configurator->getConfig($scope)->isEnabled() === false) {
-            return NoopLogger::getInstance();
-        }
+        $logger = new Logger($this->loggerSharedState, $scope, $this->configurator);
+        $this->loggers->offsetSet($logger, $logger);
 
-        return new Logger($this->loggerSharedState, $scope, $this->configurator->getConfig($scope));
+        return $logger;
     }
 
     public function shutdown(CancellationInterface $cancellation = null): bool
@@ -58,5 +60,13 @@ class LoggerProvider implements LoggerProviderInterface
     public static function builder(): LoggerProviderBuilder
     {
         return new LoggerProviderBuilder();
+    }
+
+    public function updateConfigurator(Configurator $configurator): void
+    {
+        $this->configurator = $configurator;
+        foreach ($this->loggers as $logger) {
+            $logger->updateConfig($configurator);
+        }
     }
 }

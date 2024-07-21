@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Trace;
+namespace OpenTelemetry\Tests\Integration\SDK\Trace;
 
 use ArrayObject;
-use OpenTelemetry\API\Trace\NonRecordingSpan;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Condition;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate;
 use OpenTelemetry\SDK\Common\InstrumentationScope\State;
@@ -15,16 +12,10 @@ use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerProvider;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Config::class)]
-#[CoversClass(Configurator::class)]
-#[CoversClass(Predicate\Attribute::class)]
-#[CoversClass(Predicate\AttributeExists::class)]
-#[CoversClass(Predicate\Name::class)]
-#[CoversClass(Condition::class)]
+#[CoversNothing]
 class TracerConfigTest extends TestCase
 {
     public function test_disable_scopes(): void
@@ -144,35 +135,6 @@ class TracerConfigTest extends TestCase
         $this->assertSame($p->getTraceId(), $s->getTraceId(), 'parent and sibling are in the same trace');
         $this->assertSame($gc->getParentContext()->getSpanId(), $s->getContext()->getSpanId(), 'sibling is the parent of grandchild');
         $this->assertSame($s->getParentContext()->getSpanId(), $p->getContext()->getSpanId(), 'parent is the parent of sibling');
-    }
-
-    #[DataProvider('conditionsProvider')]
-    public function test_conditions(Predicate $predicate, State $state, bool $expectDisabled): void
-    {
-        $tracerProvider = TracerProvider::builder()
-            ->setConfigurator(Configurator::builder()->addCondition($predicate, $state)->build())
-            ->build();
-        $tracer = $tracerProvider->getTracer(name: 'two', attributes: ['foo' => 'bar']);
-        $span = $tracer->spanBuilder('span')->startSpan();
-        if ($expectDisabled) {
-            $this->assertInstanceOf(NonRecordingSpan::class, $span);
-        } else {
-            $this->assertNotInstanceOf(NonRecordingSpan::class, $span);
-        }
-    }
-
-    public static function conditionsProvider(): array
-    {
-        return [
-            'match name + disable' => [new Predicate\Name('~two~'), State::DISABLED, true],
-            'match name + enable' => [new Predicate\Name('~two~'), State::ENABLED, false],
-            'no match name + disable' => [new Predicate\Name('~one~'), State::DISABLED, false],
-            'no match name + enable' => [new Predicate\Name('~one~'), State::ENABLED, false],
-            'attribute exists + disable' => [new Predicate\AttributeExists('foo'), State::DISABLED, true],
-            'attribute exists + enable' => [new Predicate\AttributeExists('foo'), State::ENABLED, false],
-            'attributes matches + disable' => [new Predicate\Attribute('foo', 'bar'), State::DISABLED, true],
-            'attribute does not match' => [new Predicate\Attribute('foo', 'no-match'), State::DISABLED, false],
-        ];
     }
 
     public function test_enable_after_disable(): void

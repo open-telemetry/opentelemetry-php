@@ -4,19 +4,14 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
-use ArrayObject;
 use OpenTelemetry\API\Logs\NoopLogger;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
-use OpenTelemetry\SDK\Common\InstrumentationScope\State;
-use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter;
 use OpenTelemetry\SDK\Logs\Logger;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProviderBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
-use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -64,7 +59,7 @@ class LoggerProviderTest extends TestCase
     {
         $this->config->method('isEnabled')->willReturn(false);
         $logger = $this->provider->getLogger('name');
-        $this->assertInstanceOf(NoopLogger::class, $logger);
+        $this->assertFalse($logger->isEnabled());
     }
 
     public function test_shutdown_calls_processor_shutdown(): void
@@ -82,27 +77,5 @@ class LoggerProviderTest extends TestCase
     public function test_builder(): void
     {
         $this->assertInstanceOf(LoggerProviderBuilder::class, $this->provider->builder());
-    }
-
-    public function test_disable_with_configurator(): void
-    {
-        $storage = new ArrayObject([]);
-        $exporter = new InMemoryExporter($storage);
-        $loggerProvider = LoggerProvider::builder()
-            ->addLogRecordProcessor(new SimpleLogRecordProcessor($exporter))
-            ->setConfigurator(
-                Configurator::builder()
-                    ->addCondition(new Name('~two~'), State::DISABLED) //disable logger named 'two'
-                    ->build()
-            )
-            ->build();
-
-        $logger_one = $loggerProvider->getLogger('one');
-        $logger_two = $loggerProvider->getLogger('two');
-        $logger_three = $loggerProvider->getLogger('three');
-
-        $this->assertNotInstanceOf(NoopLogger::class, $logger_one);
-        $this->assertInstanceOf(NoopLogger::class, $logger_two);
-        $this->assertNotInstanceOf(NoopLogger::class, $logger_three);
     }
 }

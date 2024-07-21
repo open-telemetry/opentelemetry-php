@@ -2,22 +2,19 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
+namespace OpenTelemetry\Tests\Integration\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
 use OpenTelemetry\SDK\Common\InstrumentationScope\State;
-use OpenTelemetry\SDK\Metrics\MeterConfig;
-use OpenTelemetry\SDK\Metrics\MeterConfigurator;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MeterConfigurator::class)]
-#[CoversClass(MeterConfig::class)]
+#[CoversNothing]
 class MeterConfigTest extends TestCase
 {
     public function test_disable_scopes(): void

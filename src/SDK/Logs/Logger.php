@@ -9,6 +9,7 @@ use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 
 /**
  * Note that this logger class is deliberately NOT psr-3 compatible, per spec: "Note: this document defines a log
@@ -19,7 +20,7 @@ use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 class Logger implements LoggerInterface
 {
     use LogsMessagesTrait;
-    private readonly Config $config;
+    private Config $config;
 
     /**
      * @internal
@@ -27,13 +28,17 @@ class Logger implements LoggerInterface
     public function __construct(
         private readonly LoggerSharedState $loggerSharedState,
         private readonly InstrumentationScopeInterface $scope,
-        ?Config $config = null,
+        ?Configurator $configurator = null,
     ) {
-        $this->config = $config ?? Config::default();
+        $this->config = $configurator ? $configurator->getConfig($scope) : Config::default();
     }
 
     public function emit(LogRecord $logRecord): void
     {
+        //If a Logger is disabled, it MUST behave equivalently to No-op Logger.
+        if ($this->isEnabled() === false) {
+            return;
+        }
         $readWriteLogRecord = new ReadWriteLogRecord($this->scope, $this->loggerSharedState, $logRecord);
         // @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#onemit
         $this->loggerSharedState->getProcessor()->onEmit(
@@ -50,5 +55,10 @@ class Logger implements LoggerInterface
     public function isEnabled(): bool
     {
         return $this->config->isEnabled();
+    }
+
+    public function updateConfig(Configurator $configurator): void
+    {
+        $this->config = $configurator->getConfig($this->scope);
     }
 }
