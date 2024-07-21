@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use OpenTelemetry\API\Metrics\MeterInterface;
+
 final class Instrument
 {
     public function __construct(
@@ -12,6 +14,7 @@ final class Instrument
         public readonly ?string $unit,
         public readonly ?string $description,
         public readonly array $advisory = [],
+        public readonly ?MeterInterface $meter = null,
     ) {
     }
 }

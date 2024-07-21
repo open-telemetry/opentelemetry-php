@@ -9,6 +9,9 @@ use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
+use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
@@ -32,46 +35,48 @@ final class MeterTest extends TestCase
     public function test_create_counter(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
         $metricFactory->expects($this->once())->method('createSynchronousWriter')
             ->with(
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description'),
+                new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description', meter: $meter),
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
             )
             ->willReturn([]);
 
-        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
-        $meter = $meterProvider->getMeter('test');
         $meter->createCounter('name', 'unit', 'description');
     }
 
     public function test_create_histogram(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
         $metricFactory->expects($this->once())->method('createSynchronousWriter')
             ->with(
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::HISTOGRAM, 'name', 'unit', 'description'),
+                new Instrument(InstrumentType::HISTOGRAM, 'name', 'unit', 'description', meter: $meter),
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
             )
             ->willReturn([]);
 
-        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
-        $meter = $meterProvider->getMeter('test');
         $meter->createHistogram('name', 'unit', 'description');
     }
 
     public function test_create_histogram_advisory(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
         $metricFactory->expects($this->once())->method('createSynchronousWriter')
             ->with(
                 $this->anything(),
@@ -83,6 +88,7 @@ final class MeterTest extends TestCase
                     's',
                     'Measures the duration of inbound HTTP requests.',
                     ['ExplicitBucketBoundaries' => [0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10]],
+                    $meter,
                 ),
                 $this->anything(),
                 $this->anything(),
@@ -90,8 +96,6 @@ final class MeterTest extends TestCase
             )
             ->willReturn([]);
 
-        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
-        $meter = $meterProvider->getMeter('test');
         $meter->createHistogram(
             'http.server.duration',
             's',
@@ -103,97 +107,97 @@ final class MeterTest extends TestCase
     public function test_create_gauge(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
         $metricFactory->expects($this->once())->method('createSynchronousWriter')
             ->with(
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::GAUGE, 'name', 'unit', 'description'),
+                new Instrument(InstrumentType::GAUGE, 'name', 'unit', 'description', meter: $meter),
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
             )
             ->willReturn([]);
 
-        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
-        $meter = $meterProvider->getMeter('test');
         $meter->createGauge('name', 'unit', 'description');
     }
 
     public function test_create_up_down_counter(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
         $metricFactory->expects($this->once())->method('createSynchronousWriter')
             ->with(
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::UP_DOWN_COUNTER, 'name', 'unit', 'description'),
+                new Instrument(InstrumentType::UP_DOWN_COUNTER, 'name', 'unit', 'description', meter: $meter),
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
             )
             ->willReturn([]);
 
-        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
-        $meter = $meterProvider->getMeter('test');
         $meter->createUpDownCounter('name', 'unit', 'description');
     }
 
     public function test_create_observable_counter(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
         $metricFactory->expects($this->once())->method('createAsynchronousObserver')
             ->with(
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'name', 'unit', 'description'),
+                new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'name', 'unit', 'description', meter: $meter),
                 $this->anything(),
                 $this->anything(),
             )
             ->willReturn([]);
 
-        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
-        $meter = $meterProvider->getMeter('test');
         $meter->createObservableCounter('name', 'unit', 'description');
     }
 
     public function test_create_observable_gauge(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
         $metricFactory->expects($this->once())->method('createAsynchronousObserver')
             ->with(
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::ASYNCHRONOUS_GAUGE, 'name', 'unit', 'description'),
+                new Instrument(InstrumentType::ASYNCHRONOUS_GAUGE, 'name', 'unit', 'description', meter: $meter),
                 $this->anything(),
                 $this->anything(),
             )
             ->willReturn([]);
 
-        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
-        $meter = $meterProvider->getMeter('test');
         $meter->createObservableGauge('name', 'unit', 'description');
     }
 
     public function test_create_observable_up_down_counter(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
         $metricFactory->expects($this->once())->method('createAsynchronousObserver')
             ->with(
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER, 'name', 'unit', 'description'),
+                new Instrument(InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER, 'name', 'unit', 'description', meter: $meter),
                 $this->anything(),
                 $this->anything(),
             )
             ->willReturn([]);
 
-        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
-        $meter = $meterProvider->getMeter('test');
         $meter->createObservableUpDownCounter('name', 'unit', 'description');
     }
 
@@ -201,20 +205,20 @@ final class MeterTest extends TestCase
     public function test_reuses_writer_when_not_stale(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
         $metricFactory->expects($this->once())->method('createSynchronousWriter')
             ->with(
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description'),
+                new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description', meter: $meter),
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
             )
             ->willReturn([]);
 
-        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
-        $meter = $meterProvider->getMeter('test');
         $counter = $meter->createCounter('name', 'unit', 'description');
         $counter = $meter->createCounter('name', 'unit', 'description');
     }
@@ -222,20 +226,20 @@ final class MeterTest extends TestCase
     public function test_releases_writer_on_stale(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
         $metricFactory->expects($this->exactly(2))->method('createSynchronousWriter')
             ->with(
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description'),
+                new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description', meter: $meter),
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
             )
             ->willReturn([]);
 
-        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
-        $meter = $meterProvider->getMeter('test');
         $meter->createCounter('name', 'unit', 'description');
         $meter->createCounter('name', 'unit', 'description');
     }
@@ -244,19 +248,19 @@ final class MeterTest extends TestCase
     public function test_reuses_observer_when_not_stale(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
         $metricFactory->expects($this->once())->method('createAsynchronousObserver')
             ->with(
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'name', 'unit', 'description'),
+                new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'name', 'unit', 'description', meter: $meter),
                 $this->anything(),
                 $this->anything(),
             )
             ->willReturn([]);
 
-        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
-        $meter = $meterProvider->getMeter('test');
         $observer = $meter->createObservableCounter('name', 'unit', 'description');
         $observer = $meter->createObservableCounter('name', 'unit', 'description');
     }
@@ -264,19 +268,19 @@ final class MeterTest extends TestCase
     public function test_releases_observer_on_stale(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
         $metricFactory->expects($this->exactly(2))->method('createAsynchronousObserver')
             ->with(
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'name', 'unit', 'description'),
+                new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'name', 'unit', 'description', meter: $meter),
                 $this->anything(),
                 $this->anything(),
             )
             ->willReturn([]);
 
-        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
-        $meter = $meterProvider->getMeter('test');
         $meter->createObservableCounter('name', 'unit', 'description');
         $meter->createObservableCounter('name', 'unit', 'description');
     }
@@ -371,6 +375,18 @@ final class MeterTest extends TestCase
         $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory, $viewRegistry, [$metricReader]);
         $meter = $meterProvider->getMeter('test');
         $meter->createCounter('name');
+    }
+
+    public function test_update_configurator(): void
+    {
+        $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $metricFactory->method('createSynchronousWriter')->willReturn([]);
+
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
+        $this->assertTrue($meter->isEnabled());
+        $meterProvider->updateConfigurator(Configurator::builder()->addCondition(new Name('~test~'), State::DISABLED)->build());
+        $this->assertFalse($meter->isEnabled());
     }
 
     /**

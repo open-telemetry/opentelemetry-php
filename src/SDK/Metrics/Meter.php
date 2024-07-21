@@ -264,7 +264,7 @@ final class Meter implements MeterInterface
      */
     private function createSynchronousWriter(string|InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory = []): array
     {
-        $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory);
+        $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory, $this);
 
         $instrumentationScopeId = $this->instrumentationScopeId($this->instrumentationScope);
         $instrumentId = $this->instrumentId($instrument);
@@ -310,7 +310,7 @@ final class Meter implements MeterInterface
      */
     private function createAsynchronousObserver(string|InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory): array
     {
-        $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory);
+        $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory, $this);
 
         $instrumentationScopeId = $this->instrumentationScopeId($this->instrumentationScope);
         $instrumentId = $this->instrumentId($instrument);

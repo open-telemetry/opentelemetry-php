@@ -54,7 +54,7 @@ final class InstrumentTest extends TestCase
         $a = new MetricAggregator(null, new SumAggregation(true));
         $s = new SynchronousMetricStream(new SumAggregation(true), 0);
         $w = new MetricRegistry(null, Attributes::factory(), new TestClock(1));
-        $i = new Instrument(InstrumentType::COUNTER, 'test', null, null);
+        $i = new Instrument(InstrumentType::COUNTER, 'test', null, null, meter: $this->meter);
         $n = $w->registerSynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::DELTA);
 
@@ -83,7 +83,7 @@ final class InstrumentTest extends TestCase
         $a = new MetricAggregatorFactory(null, new SumAggregation(true));
         $s = new SynchronousMetricStream(new SumAggregation(true), 0);
         $w = new MetricRegistry(null, Attributes::factory(), new TestClock(1));
-        $i = new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'test', null, null);
+        $i = new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'test', null, null, meter: $this->meter);
         $n = $w->registerAsynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::CUMULATIVE);
 
@@ -112,7 +112,7 @@ final class InstrumentTest extends TestCase
         $a = new MetricAggregatorFactory(null, new SumAggregation(true));
         $s = new SynchronousMetricStream(new SumAggregation(true), 0);
         $w = new MetricRegistry(null, Attributes::factory(), new TestClock(1));
-        $i = new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'test', null, null);
+        $i = new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'test', null, null, meter: $this->meter);
         $n = $w->registerAsynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::CUMULATIVE);
 
@@ -140,7 +140,7 @@ final class InstrumentTest extends TestCase
         $a = new MetricAggregator(null, new SumAggregation(false));
         $s = new SynchronousMetricStream(new SumAggregation(false), 0);
         $w = new MetricRegistry(null, Attributes::factory(), new TestClock(1));
-        $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null);
+        $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null, meter: $this->meter);
         $n = $w->registerSynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::DELTA);
 
@@ -169,7 +169,7 @@ final class InstrumentTest extends TestCase
         $a = new MetricAggregator(null, new ExplicitBucketHistogramAggregation([3, 6, 9]));
         $s = new SynchronousMetricStream(new ExplicitBucketHistogramAggregation([3, 6, 9]), 0);
         $w = new MetricRegistry(null, Attributes::factory(), new TestClock(1));
-        $i = new Instrument(InstrumentType::HISTOGRAM, 'test', null, null);
+        $i = new Instrument(InstrumentType::HISTOGRAM, 'test', null, null, meter: $this->meter);
         $n = $w->registerSynchronousStream($i, $s, $a);
         $r = $s->register(Temporality::DELTA);
 
@@ -254,7 +254,7 @@ final class InstrumentTest extends TestCase
     {
         $w = $this->createMock(MetricWriterInterface::class);
         $c = $this->createMock(ReferenceCounterInterface::class);
-        $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null);
+        $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null, meter: $this->meter);
         $meter = $this->createMock(MeterInterface::class);
         $meter->expects($this->once())->method('isEnabled')->willReturn(false);
         $counter = new Counter($w, $i, $c, $meter);
@@ -266,7 +266,7 @@ final class InstrumentTest extends TestCase
     {
         $w = $this->createMock(MetricWriterInterface::class);
         $c = $this->createMock(ReferenceCounterInterface::class);
-        $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null);
+        $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null, meter: $this->meter);
         $meter = $this->createMock(MeterInterface::class);
         $meter->expects($this->once())->method('isEnabled')->willReturn(false);
         $counter = new ObservableCounter($w, $i, $c, new WeakMap(), $meter);
