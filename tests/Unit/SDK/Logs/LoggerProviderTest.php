@@ -8,6 +8,8 @@ use OpenTelemetry\API\Logs\NoopLogger;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
+use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use OpenTelemetry\SDK\Logs\Logger;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProviderBuilder;
@@ -77,5 +79,20 @@ class LoggerProviderTest extends TestCase
     public function test_builder(): void
     {
         $this->assertInstanceOf(LoggerProviderBuilder::class, $this->provider->builder());
+    }
+
+    public function test_update_configurator_updates_loggers(): void
+    {
+        $lp = LoggerProvider::builder()->build();
+        $this->assertInstanceOf(LoggerProvider::class, $lp);
+        $one = $lp->getLogger('one');
+        $two = $lp->getLogger('two');
+
+        $this->assertTrue($one->isEnabled());
+        $this->assertTrue($two->isEnabled());
+
+        $lp->updateConfigurator(Configurator::builder()->addCondition(new Name('~.*~'), State::DISABLED)->build());
+        $this->assertFalse($one->isEnabled());
+        $this->assertFalse($two->isEnabled());
     }
 }

@@ -15,7 +15,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Condition::class)]
-#[CoversClass(Predicate::class)]
+#[CoversClass(Predicate\Name::class)]
+#[CoversClass(Predicate\Attribute::class)]
+#[CoversClass(Predicate\AttributeExists::class)]
 class ConditionTest extends TestCase
 {
     public function test_predicate_match(): void
@@ -44,5 +46,11 @@ class ConditionTest extends TestCase
             'attributes matches' => [new Predicate\Attribute('foo', 'bar'), true],
             'attribute does not match' => [new Predicate\Attribute('foo', 'no-match'), false],
         ];
+    }
+
+    public function test_state(): void
+    {
+        $condition = new Condition($this->createMock(Predicate::class), State::DISABLED);
+        $this->assertSame(State::DISABLED, $condition->state());
     }
 }

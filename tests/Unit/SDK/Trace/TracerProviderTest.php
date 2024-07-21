@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use OpenTelemetry\API\Trace\NoopTracer;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
+use OpenTelemetry\SDK\Common\InstrumentationScope\State;
+use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -92,5 +96,20 @@ class TracerProviderTest extends TestCase
             NoopTracer::class,
             $provider->getTracer('foo')
         );
+    }
+
+    public function test_update_configurator_updates_tracers(): void
+    {
+        $tp = TracerProvider::builder()->build();
+        $this->assertInstanceOf(TracerProvider::class, $tp);
+        $one = $tp->getTracer('one');
+        $two = $tp->getTracer('two');
+
+        $this->assertTrue($one->isEnabled());
+        $this->assertTrue($two->isEnabled());
+
+        $tp->updateConfigurator(Configurator::builder()->addCondition(new Name('~.*~'), State::DISABLED)->build());
+        $this->assertFalse($one->isEnabled());
+        $this->assertFalse($two->isEnabled());
     }
 }
