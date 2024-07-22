@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Common\InstrumentationScope;
 
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
-class Configurator
+class Configurator implements ScopeConfigurator
 {
     /**
      * @param list<Condition> $conditions
