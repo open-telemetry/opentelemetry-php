@@ -8,14 +8,13 @@ use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\NoopLogger;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use WeakMap;
 
-class LoggerProvider implements LoggerProviderInterface, Configurable
+class LoggerProvider implements LoggerProviderInterface
 {
     private readonly LoggerSharedState $loggerSharedState;
     private readonly WeakMap $loggers;

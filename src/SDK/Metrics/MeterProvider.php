@@ -11,7 +11,6 @@ use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
@@ -23,7 +22,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 use WeakMap;
 
-final class MeterProvider implements MeterProviderInterface, Configurable
+final class MeterProvider implements MeterProviderInterface
 {
     private readonly MetricFactoryInterface $metricFactory;
     private readonly MeterInstruments $instruments;
