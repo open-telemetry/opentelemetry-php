@@ -19,7 +19,7 @@ class Name implements Predicate
      */
     public function __construct(private readonly string $regex)
     {
-        self::validate_regex($this->regex);
+        self::validateRegex($this->regex);
     }
 
     /**
@@ -37,7 +37,7 @@ class Name implements Predicate
      * @phan-suppress PhanParamSuspiciousOrder
      * @psalm-suppress ArgumentTypeCoercion
      */
-    private static function validate_regex(string $regex): void
+    private static function validateRegex(string $regex): void
     {
         set_error_handler(static fn (int $errno, string $errstr)
             => throw new InvalidArgumentException('Invalid regex pattern', $errno));

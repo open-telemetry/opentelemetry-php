@@ -150,8 +150,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
                 $instrumentId = $this->streamToInstrument[$streamId];
                 if (
                     array_key_exists($instrumentId, $this->instruments)
-                    && $this->instruments[$instrumentId]->meter
-                    && $this->instruments[$instrumentId]->meter->isEnabled() === false
+                    && $this->instruments[$instrumentId]->meter?->isEnabled() === false
                 ) {
                     continue;
                 }
