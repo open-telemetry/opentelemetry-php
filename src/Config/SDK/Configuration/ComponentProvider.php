@@ -33,6 +33,7 @@ interface ComponentProvider
      *
      * @see ComponentProviderRegistry::component()
      * @see ComponentProviderRegistry::componentList()
+     * @see ComponentProviderRegistry::componentArrayList()
      * @see ComponentProviderRegistry::componentNames()
      */
     public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition;

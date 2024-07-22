@@ -71,6 +71,14 @@ final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Confi
     public function componentList(string $name, string $type): ArrayNodeDefinition
     {
         $node = new ArrayNodeDefinition($name);
+        $this->applyToArrayNode($node, $type, true);
+
+        return $node;
+    }
+
+    public function componentArrayList(string $name, string $type): ArrayNodeDefinition
+    {
+        $node = new ArrayNodeDefinition($name);
         $this->applyToArrayNode($node->arrayPrototype(), $type);
 
         return $node;
@@ -107,7 +115,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Confi
         return $node;
     }
 
-    private function applyToArrayNode(ArrayNodeDefinition $node, string $type): void
+    private function applyToArrayNode(ArrayNodeDefinition $node, string $type, bool $forceArray = false): void
     {
         $node->info(sprintf('Component "%s"', $type));
         $node->performNoDeepMerging();
@@ -122,21 +130,35 @@ final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Confi
             }
         }
 
-        $node->validate()->always(function (array $value) use ($type): ComponentPlugin {
-            if (count($value) !== 1) {
-                throw new InvalidArgumentException(sprintf(
-                    'Component "%s" must have exactly one element defined, got %s',
-                    $type,
-                    implode(', ', array_map(json_encode(...), array_keys($value)) ?: ['none'])
-                ));
-            }
+        if ($forceArray) {
+            // if the config was a map rather than an array, force it back to an array
+            $node->validate()->always(function (array $value) use ($type): array {
+                $validated = [];
+                foreach ($value as $name => $v) {
+                    $provider = $this->providers[$type][$name];
+                    $this->resources?->addClassResource($provider);
+                    $validated[] = new ComponentPlugin($v, $this->providers[$type][$name]);
+                }
 
-            $name = array_key_first($value);
-            $provider = $this->providers[$type][$name];
-            $this->resources?->addClassResource($provider);
+                return $validated;
+            });
+        } else {
+            $node->validate()->always(function (array $value) use ($type): ComponentPlugin {
+                if (count($value) !== 1) {
+                    throw new InvalidArgumentException(sprintf(
+                        'Component "%s" must have exactly one element defined, got %s',
+                        $type,
+                        implode(', ', array_map(json_encode(...), array_keys($value)) ?: ['none'])
+                    ));
+                }
 
-            return new ComponentPlugin($value[$name], $this->providers[$type][$name]);
-        });
+                $name = array_key_first($value);
+                $provider = $this->providers[$type][$name];
+                $this->resources?->addClassResource($provider);
+
+                return new ComponentPlugin($value[$name], $this->providers[$type][$name]);
+            });
+        }
     }
 
     /**
