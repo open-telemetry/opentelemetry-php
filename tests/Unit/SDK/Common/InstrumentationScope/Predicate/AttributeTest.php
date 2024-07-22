@@ -20,12 +20,12 @@ class AttributeTest extends TestCase
         $scope->method('getAttributes')->willReturn($attributes);
 
         $predicate = new Attribute('foo', 'bar');
-        $this->assertTrue($predicate->match($scope), 'found and matches');
+        $this->assertTrue($predicate->matches($scope), 'found and matches');
 
         $predicate = new Attribute('foo', 'baz');
-        $this->assertFalse($predicate->match($scope), 'found but does not match');
+        $this->assertFalse($predicate->matches($scope), 'found but does not match');
 
         $predicate = new Attribute('bar', 'bat');
-        $this->assertFalse($predicate->match($scope), 'no attribute found');
+        $this->assertFalse($predicate->matches($scope), 'no attribute found');
     }
 }

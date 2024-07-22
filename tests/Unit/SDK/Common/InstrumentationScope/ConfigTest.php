@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\Tests\Unit\SDK\Common\InstrumentationScope;
 
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;

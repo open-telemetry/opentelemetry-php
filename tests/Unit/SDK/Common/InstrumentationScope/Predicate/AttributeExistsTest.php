@@ -23,9 +23,9 @@ class AttributeExistsTest extends TestCase
         });
 
         $predicate = new AttributeExists('foo');
-        $this->assertTrue($predicate->match($scope));
+        $this->assertTrue($predicate->matches($scope));
 
         $predicate = new AttributeExists('bar');
-        $this->assertFalse($predicate->match($scope));
+        $this->assertFalse($predicate->matches($scope));
     }
 }

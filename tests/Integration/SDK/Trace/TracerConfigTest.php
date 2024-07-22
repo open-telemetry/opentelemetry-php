@@ -13,11 +13,16 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\Tracer;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[CoversNothing]
 class TracerConfigTest extends TestCase
 {
+    /**
+     * If a Tracer is disabled, it MUST behave equivalently to No-op Tracer
+     */
+    #[Group('trace-compliance')]
     public function test_disable_scopes(): void
     {
         $storage = new ArrayObject();
@@ -137,7 +142,7 @@ class TracerConfigTest extends TestCase
         $this->assertSame($s->getParentContext()->getSpanId(), $p->getContext()->getSpanId(), 'parent is the parent of sibling');
     }
 
-    public function test_enable_after_disable(): void
+    public function test_reenable_enables_tracer(): void
     {
         $tracerProvider = TracerProvider::builder()
             ->setConfigurator(

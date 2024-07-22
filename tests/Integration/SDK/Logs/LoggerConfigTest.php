@@ -13,11 +13,16 @@ use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[CoversNothing]
 class LoggerConfigTest extends TestCase
 {
+    /**
+     * If a Logger is disabled, it MUST behave equivalently to No-op Logger
+     */
+    #[Group('logs-compliance')]
     public function test_disable_scope_then_enable(): void
     {
         $storage = new ArrayObject([]);

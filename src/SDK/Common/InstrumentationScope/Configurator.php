@@ -6,9 +6,6 @@ namespace OpenTelemetry\SDK\Common\InstrumentationScope;
 
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
-/**
- * @internal
- */
 class Configurator
 {
     /**
@@ -18,6 +15,9 @@ class Configurator
     {
     }
 
+    /**
+     * @internal
+     */
     public function getConfig(InstrumentationScopeInterface $scope): Config
     {
         foreach ($this->conditions as $condition) {

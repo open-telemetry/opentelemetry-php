@@ -8,7 +8,6 @@ use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
 use OpenTelemetry\SDK\Common\InstrumentationScope\State;
-use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;

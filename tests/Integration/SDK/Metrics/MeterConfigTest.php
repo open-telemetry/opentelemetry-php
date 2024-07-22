@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[CoversNothing]
@@ -60,6 +61,10 @@ class MeterConfigTest extends TestCase
         }
     }
 
+    /**
+     * If a Meter is disabled, it MUST behave equivalently to No-op Meter
+     */
+    #[Group('metrics-compliance')]
     public function test_metrics_not_exported_when_disabled(): void
     {
         $exporter = new InMemoryExporter();

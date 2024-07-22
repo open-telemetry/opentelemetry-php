@@ -15,7 +15,7 @@ class Attribute implements Predicate
     ) {
     }
 
-    public function match(InstrumentationScopeInterface $scope): bool
+    public function matches(InstrumentationScopeInterface $scope): bool
     {
         if (!$scope->getAttributes()->has($this->key)) {
             return false;

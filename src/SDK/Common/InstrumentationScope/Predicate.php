@@ -8,5 +8,5 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
 interface Predicate
 {
-    public function match(InstrumentationScopeInterface $scope): bool;
+    public function matches(InstrumentationScopeInterface $scope): bool;
 }

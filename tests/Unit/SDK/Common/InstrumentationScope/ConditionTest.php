@@ -23,7 +23,7 @@ class ConditionTest extends TestCase
     public function test_predicate_match(): void
     {
         $predicate = $this->createMock(Predicate::class);
-        $predicate->expects($this->once())->method('match')->willReturn(true);
+        $predicate->expects($this->once())->method('matches')->willReturn(true);
         $condition = new Condition($predicate, State::DISABLED);
         $this->assertTrue($condition->match($this->createMock(InstrumentationScopeInterface::class)));
     }

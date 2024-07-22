@@ -16,7 +16,7 @@ class Condition
 
     public function match(InstrumentationScopeInterface $scope): ?bool
     {
-        return $this->predicate->match($scope);
+        return $this->predicate->matches($scope);
     }
 
     public function state(): State
