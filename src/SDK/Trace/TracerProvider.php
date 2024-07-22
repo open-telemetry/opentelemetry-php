@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
@@ -18,7 +19,7 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use WeakMap;
 
-final class TracerProvider implements TracerProviderInterface
+final class TracerProvider implements TracerProviderInterface, Configurable
 {
     private readonly TracerSharedState $tracerSharedState;
     private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
@@ -103,6 +104,11 @@ final class TracerProvider implements TracerProviderInterface
         return new TracerProviderBuilder();
     }
 
+    /**
+     * Update the {@link Configurator} for a {@link TracerProvider}, which will
+     * reconfigure all tracers created from the provider.
+     * @experimental
+     */
     public function updateConfigurator(Configurator $configurator): void
     {
         $this->configurator = $configurator;

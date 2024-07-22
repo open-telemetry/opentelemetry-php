@@ -8,12 +8,13 @@ use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\NoopLogger;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use WeakMap;
 
-class LoggerProvider implements LoggerProviderInterface
+class LoggerProvider implements LoggerProviderInterface, Configurable
 {
     private readonly LoggerSharedState $loggerSharedState;
     private readonly WeakMap $loggers;
@@ -62,6 +63,11 @@ class LoggerProvider implements LoggerProviderInterface
         return new LoggerProviderBuilder();
     }
 
+    /**
+     * Update the {@link Configurator} for a {@link LoggerProvider}, which will
+     * reconfigure all loggers created from the provider.
+     * @experimental
+     */
     public function updateConfigurator(Configurator $configurator): void
     {
         $this->configurator = $configurator;

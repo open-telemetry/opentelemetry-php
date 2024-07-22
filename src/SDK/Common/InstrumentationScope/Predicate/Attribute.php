@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate;
 
 /**
- * Predicate which matches exactly on key+value on an InstrumentationScope attribute.
+ * Predicate which matches exactly on key+value on an {@link InstrumentationScope} attribute.
  */
 class Attribute implements Predicate
 {

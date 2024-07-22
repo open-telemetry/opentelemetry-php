@@ -11,6 +11,7 @@ use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
@@ -21,7 +22,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 use WeakMap;
 
-final class MeterProvider implements MeterProviderInterface
+final class MeterProvider implements MeterProviderInterface, Configurable
 {
     private readonly MetricFactoryInterface $metricFactory;
     private readonly MeterInstruments $instruments;
@@ -127,6 +128,11 @@ final class MeterProvider implements MeterProviderInterface
         return new MeterProviderBuilder();
     }
 
+    /**
+     * Update the {@link Configurator} for a {@link MeterProvider}, which will
+     * reconfigure all meters created from the provider.
+     * @experimental
+     */
     public function updateConfigurator(Configurator $configurator): void
     {
         $this->configurator = $configurator;

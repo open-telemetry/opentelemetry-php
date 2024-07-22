@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate;
 
 /**
- * Predicate which matches on the existence of an InstrumentationScope attribute.
+ * Predicate which matches on the existence of an {@link InstrumentationScope} attribute.
  */
 class AttributeExists implements Predicate
 {
