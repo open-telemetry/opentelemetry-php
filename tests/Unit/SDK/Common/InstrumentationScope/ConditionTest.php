@@ -25,7 +25,7 @@ class ConditionTest extends TestCase
         $predicate = $this->createMock(Predicate::class);
         $predicate->expects($this->once())->method('matches')->willReturn(true);
         $condition = new Condition($predicate, State::DISABLED);
-        $this->assertTrue($condition->match($this->createMock(InstrumentationScopeInterface::class)));
+        $this->assertTrue($condition->matches($this->createMock(InstrumentationScopeInterface::class)));
     }
 
     #[DataProvider('conditionsProvider')]
@@ -33,7 +33,7 @@ class ConditionTest extends TestCase
     {
         $condition = new Condition($predicate, State::ENABLED);
         $scope = new InstrumentationScope('two', null, null, Attributes::create(['foo' => 'bar']));
-        $this->assertSame($match, $condition->match($scope));
+        $this->assertSame($match, $condition->matches($scope));
     }
 
     public static function conditionsProvider(): array

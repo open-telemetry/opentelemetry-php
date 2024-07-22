@@ -21,7 +21,7 @@ class Configurator
     public function getConfig(InstrumentationScopeInterface $scope): Config
     {
         foreach ($this->conditions as $condition) {
-            if ($condition->match($scope)) {
+            if ($condition->matches($scope)) {
                 return new Config($condition->state());
             }
         }

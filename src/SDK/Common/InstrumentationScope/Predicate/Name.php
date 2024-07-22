@@ -8,6 +8,10 @@ use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate;
 
+/**
+ * Predicate which performs a regular expression match on InstrumentationScope name.
+ * The regular expression must be accepted by preg_match.
+ */
 class Name implements Predicate
 {
     /**

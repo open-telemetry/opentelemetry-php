@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Common\InstrumentationScope;
 
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 
-class Condition
+class Condition implements ConditionInterface
 {
     public function __construct(
         private readonly Predicate $predicate,
@@ -14,7 +14,7 @@ class Condition
     ) {
     }
 
-    public function match(InstrumentationScopeInterface $scope): ?bool
+    public function matches(InstrumentationScopeInterface $scope): bool
     {
         return $this->predicate->matches($scope);
     }
