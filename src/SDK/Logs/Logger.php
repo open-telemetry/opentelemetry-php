@@ -10,6 +10,7 @@ use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
 
 /**
  * Note that this logger class is deliberately NOT psr-3 compatible, per spec: "Note: this document defines a log
@@ -28,7 +29,7 @@ class Logger implements LoggerInterface
     public function __construct(
         private readonly LoggerSharedState $loggerSharedState,
         private readonly InstrumentationScopeInterface $scope,
-        ?Configurator $configurator = null,
+        ?ScopeConfigurator $configurator = null,
     ) {
         $this->config = $configurator ? $configurator->getConfig($scope) : Config::default();
     }

@@ -33,4 +33,9 @@ class Configurator implements ScopeConfigurator
     {
         return new ConfiguratorBuilder();
     }
+
+    public static function default(): ScopeConfigurator
+    {
+        return new self();
+    }
 }

@@ -13,6 +13,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -23,6 +24,7 @@ final class TracerProvider implements TracerProviderInterface, Configurable
 {
     private readonly TracerSharedState $tracerSharedState;
     private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
+    private ScopeConfigurator $configurator;
     private readonly WeakMap $tracers;
 
     /** @param list<SpanProcessorInterface>|SpanProcessorInterface|null $spanProcessors */
@@ -33,7 +35,7 @@ final class TracerProvider implements TracerProviderInterface, Configurable
         SpanLimits $spanLimits = null,
         IdGeneratorInterface $idGenerator = null,
         ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
-        private Configurator $configurator = new Configurator(),
+        ?ScopeConfigurator $configurator = null,
     ) {
         $spanProcessors ??= [];
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
@@ -51,6 +53,7 @@ final class TracerProvider implements TracerProviderInterface, Configurable
         );
         $this->instrumentationScopeFactory = $instrumentationScopeFactory ?? new InstrumentationScopeFactory(Attributes::factory());
         $this->tracers = new WeakMap();
+        $this->configurator = $configurator ?? Configurator::default();
     }
 
     public function forceFlush(?CancellationInterface $cancellation = null): bool
@@ -109,7 +112,7 @@ final class TracerProvider implements TracerProviderInterface, Configurable
      * reconfigure all tracers created from the provider.
      * @experimental
      */
-    public function updateConfigurator(Configurator $configurator): void
+    public function updateConfigurator(ScopeConfigurator $configurator): void
     {
         $this->configurator = $configurator;
 

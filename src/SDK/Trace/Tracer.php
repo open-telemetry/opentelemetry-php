@@ -30,6 +30,7 @@ class Tracer implements API\TracerInterface
         if (ctype_space($spanName)) {
             $spanName = self::FALLBACK_SPAN_NAME;
         }
+        // If a Tracer is disabled, it MUST behave equivalently to No-op Tracer
         if (!$this->config->isEnabled() || $this->tracerSharedState->hasShutdown()) {
             return new API\NoopSpanBuilder(Context::storage());
         }

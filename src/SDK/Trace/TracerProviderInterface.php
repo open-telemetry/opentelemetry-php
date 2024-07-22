@@ -6,13 +6,11 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
 
-interface TracerProviderInterface extends API\TracerProviderInterface
+interface TracerProviderInterface extends API\TracerProviderInterface, Configurable
 {
     public function forceFlush(?CancellationInterface $cancellation = null): bool;
 
     public function shutdown(?CancellationInterface $cancellation = null): bool;
-
-    public function updateConfigurator(Configurator $configurator): void;
 }

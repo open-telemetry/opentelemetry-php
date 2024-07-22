@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
 
 class NoopTracerProvider extends API\Trace\NoopTracerProvider implements TracerProviderInterface
 {
@@ -20,7 +20,7 @@ class NoopTracerProvider extends API\Trace\NoopTracerProvider implements TracerP
         return true;
     }
 
-    public function updateConfigurator(Configurator $configurator): void
+    public function updateConfigurator(ScopeConfigurator $configurator): void
     {
     }
 }

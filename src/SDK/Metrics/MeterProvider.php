@@ -13,6 +13,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;
@@ -32,6 +33,7 @@ final class MeterProvider implements MeterProviderInterface, Configurable
 
     private bool $closed = false;
     private readonly WeakMap $meters;
+    private ScopeConfigurator $configurator;
 
     /**
      * @param iterable<MetricReaderInterface&MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricReaders
@@ -47,7 +49,7 @@ final class MeterProvider implements MeterProviderInterface, Configurable
         private readonly ?ExemplarFilterInterface $exemplarFilter,
         private readonly StalenessHandlerFactoryInterface $stalenessHandlerFactory,
         MetricFactoryInterface $metricFactory = null,
-        private Configurator $configurator = new Configurator(),
+        ?ScopeConfigurator $configurator = null,
     ) {
         $this->metricFactory = $metricFactory ?? new StreamFactory();
         $this->instruments = new MeterInstruments();
@@ -57,6 +59,7 @@ final class MeterProvider implements MeterProviderInterface, Configurable
         $this->writer = $registry;
         $this->destructors = new WeakMap();
         $this->meters = new WeakMap();
+        $this->configurator = $configurator ?? Configurator::default();
     }
 
     public function getMeter(
@@ -133,7 +136,7 @@ final class MeterProvider implements MeterProviderInterface, Configurable
      * reconfigure all meters created from the provider.
      * @experimental
      */
-    public function updateConfigurator(Configurator $configurator): void
+    public function updateConfigurator(ScopeConfigurator $configurator): void
     {
         $this->configurator = $configurator;
 

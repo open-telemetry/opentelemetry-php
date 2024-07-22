@@ -22,7 +22,8 @@ use OpenTelemetry\API\Metrics\ObservableUpDownCounterInterface;
 use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
+use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
 use function OpenTelemetry\SDK\Common\Util\closure;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\MultiRegistryRegistration;
@@ -36,7 +37,7 @@ use function serialize;
 /**
  * @internal
  */
-final class Meter implements MeterInterface
+final class Meter implements MeterInterface, Configurable
 {
     use LogsMessagesTrait;
 
@@ -60,7 +61,7 @@ final class Meter implements MeterInterface
         private readonly MetricRegistryInterface $registry,
         private readonly MetricWriterInterface $writer,
         private readonly ArrayAccess $destructors,
-        private Configurator $configurator,
+        private ScopeConfigurator $configurator,
     ) {
         $this->config = $this->configurator->getConfig($this->instrumentationScope);
     }
@@ -75,7 +76,7 @@ final class Meter implements MeterInterface
     /**
      * @internal
      */
-    public function updateConfigurator(Configurator $configurator): void
+    public function updateConfigurator(ScopeConfigurator $configurator): void
     {
         $this->configurator = $configurator;
         $this->config = $configurator->getConfig($this->instrumentationScope);

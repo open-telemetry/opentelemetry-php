@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use WeakMap;
@@ -18,12 +19,13 @@ class LoggerProvider implements LoggerProviderInterface, Configurable
 {
     private readonly LoggerSharedState $loggerSharedState;
     private readonly WeakMap $loggers;
+    private ScopeConfigurator $configurator;
 
     public function __construct(
         LogRecordProcessorInterface $processor,
         private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
         ?ResourceInfo $resource = null,
-        private Configurator $configurator = new Configurator(),
+        ?ScopeConfigurator $configurator = null,
     ) {
         $this->loggerSharedState = new LoggerSharedState(
             $resource ?? ResourceInfoFactory::defaultResource(),
@@ -31,6 +33,7 @@ class LoggerProvider implements LoggerProviderInterface, Configurable
             $processor
         );
         $this->loggers = new WeakMap();
+        $this->configurator = $configurator ?? Configurator::default();
     }
 
     /**
@@ -68,7 +71,7 @@ class LoggerProvider implements LoggerProviderInterface, Configurable
      * reconfigure all loggers created from the provider.
      * @experimental
      */
-    public function updateConfigurator(Configurator $configurator): void
+    public function updateConfigurator(ScopeConfigurator $configurator): void
     {
         $this->configurator = $configurator;
         foreach ($this->loggers as $logger) {

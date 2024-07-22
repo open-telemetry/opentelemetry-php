@@ -49,7 +49,7 @@ class TracerProviderBuilder
             $this->spanProcessors,
             $this->sampler,
             $this->resource,
-            configurator: $this->configurator ?? new Configurator(),
+            configurator: $this->configurator ?? Configurator::default(),
         );
     }
 }
