@@ -10,6 +10,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
 
 class Tracer implements API\TracerInterface
 {
@@ -19,9 +20,9 @@ class Tracer implements API\TracerInterface
     public function __construct(
         private readonly TracerSharedState $tracerSharedState,
         private readonly InstrumentationScopeInterface $instrumentationScope,
-        ?Config $config = null,
+        ?ScopeConfigurator $configurator = null,
     ) {
-        $this->config = $config ?? Config::default();
+        $this->config = $configurator ? $configurator->getConfig($this->instrumentationScope) : Config::default();
     }
 
     /** @inheritDoc */

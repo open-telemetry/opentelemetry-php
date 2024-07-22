@@ -78,7 +78,7 @@ final class TracerProvider implements TracerProviderInterface, Configurable
         $tracer = new Tracer(
             $this->tracerSharedState,
             $scope,
-            $this->configurator->getConfig($scope),
+            $this->configurator,
         );
         $this->tracers->offsetSet($tracer, $tracer);
 
