@@ -91,7 +91,7 @@ class LoggerProviderTest extends TestCase
         $this->assertTrue($one->isEnabled());
         $this->assertTrue($two->isEnabled());
 
-        $lp->updateConfigurator(Configurator::builder()->addCondition(new Name('~.*~'), State::DISABLED)->build());
+        $lp->updateConfigurator(Configurator::builder()->addCondition(new Name('*'), State::DISABLED)->build());
         $this->assertFalse($one->isEnabled());
         $this->assertFalse($two->isEnabled());
     }

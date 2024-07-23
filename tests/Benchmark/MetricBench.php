@@ -27,7 +27,7 @@ class MetricBench
             ->addReader($this->reader)
             ->setConfigurator(
                 Configurator::builder()
-                    ->addCondition(new Name('~disabled~'), State::DISABLED)
+                    ->addCondition(new Name('disabled'), State::DISABLED)
                     ->build()
             )
             ->build();

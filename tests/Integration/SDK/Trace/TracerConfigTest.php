@@ -29,7 +29,7 @@ class TracerConfigTest extends TestCase
         $exporter = new InMemoryExporter($storage);
         $tracerProvider = TracerProvider::builder()
             ->addSpanProcessor(new SimpleSpanProcessor($exporter))
-            ->setConfigurator(Configurator::builder()->addCondition(new Predicate\Name('~B~'), State::DISABLED)->build()) //disable tracer B
+            ->setConfigurator(Configurator::builder()->addCondition(new Predicate\Name('B'), State::DISABLED)->build()) //disable tracer B
             ->build();
         $tracerA = $tracerProvider->getTracer('A');
         $tracerB = $tracerProvider->getTracer('B');
@@ -83,7 +83,7 @@ class TracerConfigTest extends TestCase
             ->addSpanProcessor(new SimpleSpanProcessor($exporter))
             ->setConfigurator(
                 Configurator::builder()
-                    ->addCondition(new Predicate\Name('~B~'), State::DISABLED) //disable tracer B
+                    ->addCondition(new Predicate\Name('B'), State::DISABLED) //disable tracer B
                     ->build()
             )
             ->build();
@@ -147,7 +147,7 @@ class TracerConfigTest extends TestCase
         $tracerProvider = TracerProvider::builder()
             ->setConfigurator(
                 Configurator::builder()
-                    ->addCondition(new Predicate\Name('~two~'), State::DISABLED) //disable tracer A
+                    ->addCondition(new Predicate\Name('two'), State::DISABLED) //disable tracer A
                     ->build()
             )
             ->build();

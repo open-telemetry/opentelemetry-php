@@ -385,7 +385,7 @@ final class MeterTest extends TestCase
         $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
         $meter = $meterProvider->getMeter('test');
         $this->assertTrue($meter->isEnabled());
-        $meterProvider->updateConfigurator(Configurator::builder()->addCondition(new Name('~test~'), State::DISABLED)->build());
+        $meterProvider->updateConfigurator(Configurator::builder()->addCondition(new Name('test'), State::DISABLED)->build());
         $this->assertFalse($meter->isEnabled());
     }
 

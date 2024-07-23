@@ -125,7 +125,7 @@ class LoggerTest extends TestCase
 
     public function test_does_not_log_if_disabled(): void
     {
-        $configurator = Configurator::builder()->addCondition(new Name('~foo~'), State::DISABLED)->build();
+        $configurator = Configurator::builder()->addCondition(new Name('foo'), State::DISABLED)->build();
         $logger = new Logger($this->sharedState, $this->scope, $configurator);
         $this->assertFalse($logger->isEnabled());
 

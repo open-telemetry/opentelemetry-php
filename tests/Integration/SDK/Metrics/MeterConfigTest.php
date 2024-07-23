@@ -24,7 +24,7 @@ class MeterConfigTest extends TestCase
             ->addReader(new ExportingReader(new InMemoryExporter()))
             ->setConfigurator(
                 Configurator::builder()
-                    ->addCondition(new Name('~two~'), State::DISABLED)
+                    ->addCondition(new Name('two'), State::DISABLED)
                     ->build()
             )
             ->build();
@@ -73,7 +73,7 @@ class MeterConfigTest extends TestCase
             ->addReader($reader)
             ->setConfigurator(
                 Configurator::builder()
-                    ->addCondition(new Name('~.*~'), State::DISABLED)
+                    ->addCondition(new Name('*'), State::DISABLED)
                     ->build()
             )
             ->build();

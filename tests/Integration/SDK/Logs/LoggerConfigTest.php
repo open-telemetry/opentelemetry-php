@@ -31,7 +31,7 @@ class LoggerConfigTest extends TestCase
             ->addLogRecordProcessor(new SimpleLogRecordProcessor($exporter))
             ->setConfigurator(
                 Configurator::builder()
-                    ->addCondition(new Name('~two~'), State::DISABLED) //disable logger named 'two'
+                    ->addCondition(new Name('two'), State::DISABLED) //disable logger named 'two'
                     ->build()
             )
             ->build();

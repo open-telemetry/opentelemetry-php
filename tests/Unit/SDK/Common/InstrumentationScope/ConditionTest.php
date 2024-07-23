@@ -39,8 +39,8 @@ class ConditionTest extends TestCase
     public static function conditionsProvider(): array
     {
         return [
-            'match name' => [new Predicate\Name('~two~'), true],
-            'no match name' => [new Predicate\Name('~one~'), false],
+            'match name' => [new Predicate\Name('two'), true],
+            'no match name' => [new Predicate\Name('one'), false],
             'attribute exists' => [new Predicate\AttributeExists('foo'), true],
             'attribute does not exist' => [new Predicate\Attribute('bar', 'anything'), false],
             'attributes matches' => [new Predicate\Attribute('foo', 'bar'), true],
