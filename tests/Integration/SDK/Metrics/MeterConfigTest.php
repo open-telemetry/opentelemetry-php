@@ -81,19 +81,13 @@ class MeterConfigTest extends TestCase
         $this->assertFalse($meter->isEnabled());
         $counter = $meter->createCounter('a');
         $async_counter = $meter->createObservableCounter('b', callbacks: function (ObserverInterface $o) {
-            $o->observe(1);
+            $this->fail('observer from disabled meter should not have been called');
         });
         $this->assertFalse($counter->isEnabled());
         $this->assertFalse($async_counter->isEnabled());
         $counter->add(1);
         $reader->collect();
         $metrics = $exporter->collect(true);
-        foreach ($metrics as $metric) {
-            /**
-             * @psalm-suppress NoInterfaceProperties
-             * @phpstan-ignore-next-line
-             * */
-            $this->assertCount(0, $metric->data->dataPoints);
-        }
+        $this->assertSame([], $metrics);
     }
 }

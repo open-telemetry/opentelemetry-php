@@ -17,4 +17,9 @@ final class Instrument
         public readonly ?MeterInterface $meter = null,
     ) {
     }
+
+    public function isEnabled(): bool
+    {
+        return $this->meter?->isEnabled() ?? true;
+    }
 }
