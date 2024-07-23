@@ -60,12 +60,12 @@ class MetricBench
     public function bench_async_measurements(array $params): void
     {
         $meter = $params['enabled'] === false ? $this->disabled : $this->enabled;
+        $meter->createObservableCounter('b', callbacks: function (ObserverInterface $o) {
+            $o->observe(1);
+        });
         for ($i=0; $i < $params['count']; $i++) {
-            $meter->createObservableCounter('b', callbacks: function (ObserverInterface $o) {
-                $o->observe(1);
-            });
+            $this->reader->collect();
         }
-        $this->reader->collect();
     }
 
     public function provideMeasurementCounts(): \Generator
@@ -75,5 +75,6 @@ class MetricBench
         yield 'disabled+1000' => ['enabled' => false, 'count' => 1000];
         yield 'enabled+10' => ['enabled' => true, 'count' => 10];
         yield 'enabled+100' => ['enabled' => true, 'count' => 100];
+        yield 'enabled+1000' => ['enabled' => true, 'count' => 1000];
     }
 }
