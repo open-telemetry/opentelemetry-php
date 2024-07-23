@@ -378,6 +378,7 @@ return [
         'vendor/phpunit/phpunit/src',
         'vendor/google/protobuf/src',
         'vendor/ramsey/uuid/src',
+        'vendor/nyholm/psr7-server/src',
     ],
 
     // A list of individual files to include in analysis

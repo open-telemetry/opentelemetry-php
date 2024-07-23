@@ -15,6 +15,7 @@ use OpenTelemetry\SDK\Logs\LoggerProviderFactory;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\SDK\Trace\AutoRootSpan;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
@@ -64,31 +65,15 @@ class SdkAutoloader
             ;
         });
 
-        return true;
-    }
-
-    /**
-     * Test whether a request URI is set, and if it matches the excluded urls configuration option
-     *
-     * @internal
-     */
-    public static function isIgnoredUrl(): bool
-    {
-        $ignoreUrls = Configuration::getList(Variables::OTEL_PHP_EXCLUDED_URLS, []);
-        if ($ignoreUrls === []) {
-            return false;
-        }
-        $url = $_SERVER['REQUEST_URI'] ?? null;
-        if (!$url) {
-            return false;
-        }
-        foreach ($ignoreUrls as $ignore) {
-            if (preg_match(sprintf('|%s|', $ignore), (string) $url) === 1) {
-                return true;
+        if (AutoRootSpan::isEnabled()) {
+            $request = AutoRootSpan::createRequest();
+            if ($request) {
+                AutoRootSpan::create($request);
+                AutoRootSpan::registerShutdownHandler();
             }
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -129,4 +114,5 @@ class SdkAutoloader
 
         return false;
     }
+
 }
