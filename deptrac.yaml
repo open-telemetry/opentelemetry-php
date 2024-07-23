@@ -25,6 +25,10 @@ deptrac:
           collectors:
               -   type: directory
                   value: src/SDK/.*
+      -   name: ConfigSDK
+          collectors:
+              -   type: directory
+                  value: src/Config/SDK/.*
       -   name: Context
           collectors:
               -   type: directory
@@ -85,6 +89,18 @@ deptrac:
                 value: ^GuzzleHttp\\*
               - type: className
                 value: ^Buzz\\*
+      -   name: SPI
+          collectors:
+              - type: className
+                value: ^Nevay\\SPI\\*
+      -   name: SymfonyConfig
+          collectors:
+              - type: className
+                value: ^Symfony\\Component\\Config\\*
+              - type: className
+                value: ^Symfony\\Component\\Yaml\\*
+              - type: className
+                value: ^Symfony\\Component\\VarExporter\\*
       -   name: RamseyUuid
           collectors:
               - type: className
@@ -94,16 +110,29 @@ deptrac:
       Context:
           - FFI
       SemConv: ~
+      ConfigSDK:
+          - SymfonyConfig
+          - API
+          - SDK
+          - SPI
+          - PsrLog
+          - Composer
+          - Context
+          - Contrib
+          - Extension
       API:
           - Context
           - PsrLog
+          - SPI
       SDK:
           - +API
+          - ConfigSDK
           - SemConv
           - PsrHttp
           - HttpPlug
           - Composer
           - HttpClients
+          - SPI
           - RamseyUuid
       Contrib:
           - +SDK

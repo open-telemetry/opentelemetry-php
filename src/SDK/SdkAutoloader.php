@@ -4,9 +4,24 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
-use InvalidArgumentException;
+use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\NoopHookManager;
 use OpenTelemetry\API\Instrumentation\Configurator;
+use OpenTelemetry\API\Logs\LateBindingLoggerProvider;
+use OpenTelemetry\API\Logs\LoggerProviderInterface;
+use OpenTelemetry\API\Metrics\LateBindingMeterProvider;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
+use OpenTelemetry\API\Trace\LateBindingTracerProvider;
+use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
+use OpenTelemetry\Config\SDK\Instrumentation as SdkInstrumentation;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
@@ -19,76 +34,167 @@ use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
+use Throwable;
 
 /**
  * @psalm-suppress RedundantCast
  */
 class SdkAutoloader
 {
+    use LogsMessagesTrait;
+
     public static function autoload(): bool
     {
         if (!self::isEnabled() || self::isExcludedUrl()) {
             return false;
         }
-        Globals::registerInitializer(function (Configurator $configurator) {
-            $propagator = (new PropagatorFactory())->create();
-            if (Sdk::isDisabled()) {
-                //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
-                return $configurator->withPropagator($propagator);
-            }
-            $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED);
-
-            $resource = ResourceInfoFactory::defaultResource();
-            $exporter = (new ExporterFactory())->create();
-            $meterProvider = (new MeterProviderFactory())->create($resource);
-            $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
-            $tracerProvider = (new TracerProviderBuilder())
-                ->addSpanProcessor($spanProcessor)
-                ->setResource($resource)
-                ->setSampler((new SamplerFactory())->create())
-                ->build();
-
-            $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null, $resource);
-            $eventLoggerProvider = (new EventLoggerProviderFactory())->create($loggerProvider);
-
-            ShutdownHandler::register($tracerProvider->shutdown(...));
-            ShutdownHandler::register($meterProvider->shutdown(...));
-            ShutdownHandler::register($loggerProvider->shutdown(...));
-
-            return $configurator
-                ->withTracerProvider($tracerProvider)
-                ->withMeterProvider($meterProvider)
-                ->withLoggerProvider($loggerProvider)
-                ->withEventLoggerProvider($eventLoggerProvider)
-                ->withPropagator($propagator)
-            ;
-        });
+        if (Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)) {
+            Globals::registerInitializer(fn ($configurator) => self::fileBasedInitializer($configurator));
+        } else {
+            Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
+        }
+        self::registerInstrumentations();
 
         return true;
     }
 
-    /**
-     * Test whether a request URI is set, and if it matches the excluded urls configuration option
-     *
-     * @internal
-     */
-    public static function isIgnoredUrl(): bool
+    private static function environmentBasedInitializer(Configurator $configurator): Configurator
     {
-        $ignoreUrls = Configuration::getList(Variables::OTEL_PHP_EXCLUDED_URLS, []);
-        if ($ignoreUrls === []) {
-            return false;
+        $propagator = (new PropagatorFactory())->create();
+        if (Sdk::isDisabled()) {
+            //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
+            return $configurator->withPropagator($propagator);
         }
-        $url = $_SERVER['REQUEST_URI'] ?? null;
-        if (!$url) {
-            return false;
-        }
-        foreach ($ignoreUrls as $ignore) {
-            if (preg_match(sprintf('|%s|', $ignore), (string) $url) === 1) {
-                return true;
-            }
+        $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED);
+
+        $resource = ResourceInfoFactory::defaultResource();
+        $exporter = (new ExporterFactory())->create();
+        $meterProvider = (new MeterProviderFactory())->create($resource);
+        $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
+        $tracerProvider = (new TracerProviderBuilder())
+            ->addSpanProcessor($spanProcessor)
+            ->setResource($resource)
+            ->setSampler((new SamplerFactory())->create())
+            ->build();
+
+        $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null, $resource);
+        $eventLoggerProvider = (new EventLoggerProviderFactory())->create($loggerProvider);
+
+        ShutdownHandler::register($tracerProvider->shutdown(...));
+        ShutdownHandler::register($meterProvider->shutdown(...));
+        ShutdownHandler::register($loggerProvider->shutdown(...));
+
+        return $configurator
+            ->withTracerProvider($tracerProvider)
+            ->withMeterProvider($meterProvider)
+            ->withLoggerProvider($loggerProvider)
+            ->withEventLoggerProvider($eventLoggerProvider)
+            ->withPropagator($propagator)
+        ;
+    }
+
+    /**
+     * @phan-suppress PhanPossiblyUndeclaredVariable
+     */
+    private static function fileBasedInitializer(Configurator $configurator): Configurator
+    {
+        $file = Configuration::getString(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE);
+        $config = SdkConfiguration::parseFile($file);
+
+        //disable hook manager during SDK to avoid autoinstrumenting SDK exporters.
+        $scope = HookManager::disable(Context::getCurrent())->activate();
+
+        try {
+            $sdk = $config
+                ->create()
+                ->setAutoShutdown(true)
+                ->build();
+        } finally {
+            $scope->detach();
         }
 
-        return false;
+        return $configurator
+            ->withTracerProvider($sdk->getTracerProvider())
+            ->withMeterProvider($sdk->getMeterProvider())
+            ->withLoggerProvider($sdk->getLoggerProvider())
+            ->withPropagator($sdk->getPropagator())
+            ->withEventLoggerProvider($sdk->getEventLoggerProvider())
+        ;
+    }
+
+    /**
+     * Register all {@link Instrumentation} configured through SPI
+     * @psalm-suppress ArgumentTypeCoercion
+     */
+    private static function registerInstrumentations(): void
+    {
+        $files = Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)
+            ? Configuration::getList(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)
+            : [];
+        $configuration = SdkInstrumentation::parseFile($files)->create();
+        $hookManager = self::getHookManager();
+        $tracerProvider = self::createLateBindingTracerProvider();
+        $meterProvider = self::createLateBindingMeterProvider();
+        $loggerProvider = self::createLateBindingLoggerProvider();
+        $context = new InstrumentationContext($tracerProvider, $meterProvider, $loggerProvider);
+
+        foreach (ServiceLoader::load(Instrumentation::class) as $instrumentation) {
+            /** @var Instrumentation $instrumentation */
+            try {
+                $instrumentation->register($hookManager, $configuration, $context);
+            } catch (Throwable $t) {
+                self::logError(sprintf('Unable to load instrumentation: %s', $instrumentation::class), ['exception' => $t]);
+            }
+
+        }
+    }
+
+    private static function createLateBindingTracerProvider(): TracerProviderInterface
+    {
+        return new LateBindingTracerProvider(static function (): TracerProviderInterface {
+            $scope = Context::getRoot()->activate();
+
+            try {
+                return Globals::tracerProvider();
+            } finally {
+                $scope->detach();
+            }
+        });
+    }
+
+    private static function createLateBindingMeterProvider(): MeterProviderInterface
+    {
+        return new LateBindingMeterProvider(static function (): MeterProviderInterface {
+            $scope = Context::getRoot()->activate();
+
+            try {
+                return Globals::meterProvider();
+            } finally {
+                $scope->detach();
+            }
+        });
+    }
+    private static function createLateBindingLoggerProvider(): LoggerProviderInterface
+    {
+        return new LateBindingLoggerProvider(static function (): LoggerProviderInterface {
+            $scope = Context::getRoot()->activate();
+
+            try {
+                return Globals::loggerProvider();
+            } finally {
+                $scope->detach();
+            }
+        });
+    }
+
+    private static function getHookManager(): HookManagerInterface
+    {
+        /** @var HookManagerInterface $hookManager */
+        foreach (ServiceLoader::load(HookManagerInterface::class) as $hookManager) {
+            return $hookManager;
+        }
+
+        return new NoopHookManager();
     }
 
     /**
@@ -96,14 +202,7 @@ class SdkAutoloader
      */
     public static function isEnabled(): bool
     {
-        try {
-            $enabled = Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
-        } catch (InvalidArgumentException) {
-            //invalid setting, assume false
-            return false;
-        }
-
-        return $enabled;
+        return Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
     }
 
     /**
