@@ -20,4 +20,9 @@ class LateBindingTracer implements TracerInterface
     {
         return ($this->tracer ??= ($this->factory)())->spanBuilder($spanName);
     }
+
+    public function isEnabled(): bool
+    {
+        return true;
+    }
 }
