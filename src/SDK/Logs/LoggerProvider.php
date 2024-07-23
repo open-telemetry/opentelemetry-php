@@ -45,7 +45,7 @@ class LoggerProvider implements LoggerProviderInterface
         }
         $scope = $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes);
         $logger = new Logger($this->loggerSharedState, $scope, $this->configurator);
-        $this->loggers->offsetSet($logger, $logger);
+        $this->loggers->offsetSet($logger, null);
 
         return $logger;
     }
@@ -73,7 +73,7 @@ class LoggerProvider implements LoggerProviderInterface
     public function updateConfigurator(ScopeConfigurator $configurator): void
     {
         $this->configurator = $configurator;
-        foreach ($this->loggers as $logger) {
+        foreach ($this->loggers as $logger => $unused) {
             $logger->updateConfig($configurator);
         }
     }

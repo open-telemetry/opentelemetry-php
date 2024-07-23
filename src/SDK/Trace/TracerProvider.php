@@ -79,7 +79,7 @@ final class TracerProvider implements TracerProviderInterface
             $scope,
             $this->configurator,
         );
-        $this->tracers->offsetSet($tracer, $tracer);
+        $this->tracers->offsetSet($tracer, null);
 
         return $tracer;
     }
@@ -115,7 +115,7 @@ final class TracerProvider implements TracerProviderInterface
     {
         $this->configurator = $configurator;
 
-        foreach ($this->tracers as $tracer) {
+        foreach ($this->tracers as $tracer => $unused) {
             $tracer->updateConfig($configurator);
         }
     }

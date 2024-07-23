@@ -86,7 +86,7 @@ final class MeterProvider implements MeterProviderInterface
             $this->destructors,
             $this->configurator,
         );
-        $this->meters->offsetSet($meter, $meter);
+        $this->meters->offsetSet($meter, null);
 
         return $meter;
     }
@@ -139,7 +139,7 @@ final class MeterProvider implements MeterProviderInterface
     {
         $this->configurator = $configurator;
 
-        foreach ($this->meters as $meter) {
+        foreach ($this->meters as $meter => $unused) {
             $meter->updateConfigurator($configurator);
         }
     }
