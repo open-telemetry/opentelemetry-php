@@ -14,7 +14,7 @@ use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate;
  */
 class Name implements Predicate
 {
-    private string $pattern;
+    private readonly string $pattern;
 
     /**
      * @throws InvalidArgumentException
