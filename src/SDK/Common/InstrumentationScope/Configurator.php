@@ -34,6 +34,9 @@ class Configurator implements ScopeConfigurator
         return new ConfiguratorBuilder();
     }
 
+    /**
+     * Create a default, everything-enabled, configurator.
+     */
     public static function default(): ScopeConfigurator
     {
         return new self();

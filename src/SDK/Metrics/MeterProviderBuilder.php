@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\API\Common\Time\Clock;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
@@ -22,6 +23,7 @@ class MeterProviderBuilder
     private ?ResourceInfo $resource = null;
     private ?ExemplarFilterInterface $exemplarFilter = null;
     private ?Configurator $configurator = null;
+    private ?ClockInterface $clock = null;
 
     public function setResource(ResourceInfo $resource): self
     {
@@ -51,6 +53,13 @@ class MeterProviderBuilder
         return $this;
     }
 
+    public function setClock(ClockInterface $clock): self
+    {
+        $this->clock = $clock;
+
+        return $this;
+    }
+
     /**
      * @psalm-suppress PossiblyInvalidArgument
      */
@@ -59,7 +68,7 @@ class MeterProviderBuilder
         return new MeterProvider(
             null,
             $this->resource ?? ResourceInfoFactory::emptyResource(),
-            Clock::getDefault(),
+            $this->clock ?? Clock::getDefault(),
             Attributes::factory(),
             new InstrumentationScopeFactory(Attributes::factory()),
             $this->metricReaders,

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK\Metrics;
 
+use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
 use OpenTelemetry\SDK\Common\InstrumentationScope\State;
+use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
@@ -18,6 +20,10 @@ use PHPUnit\Framework\TestCase;
 #[CoversNothing]
 class MeterConfigTest extends TestCase
 {
+    const T0 = 0;
+    const T1 = 1;
+    const T2 = 2;
+
     public function test_disable_scopes(): void
     {
         $meterProvider = MeterProvider::builder()
@@ -45,14 +51,14 @@ class MeterConfigTest extends TestCase
         $instruments[] = $meter_two->createObservableGauge('g');
 
         foreach ($instruments as $id => $instrument) {
-            $this->assertFalse($instrument->isEnabled(), sprintf('instrument %s is enabled', $id));
+            $this->assertFalse($instrument->isEnabled(), sprintf('instrument %s is disabled', $id));
         }
 
         $this->assertTrue($meter_one->isEnabled());
         $this->assertFalse($meter_two->isEnabled());
         $this->assertTrue($meter_three->isEnabled());
 
-        $meterProvider->updateConfigurator(new Configurator());
+        $meterProvider->updateConfigurator(Configurator::default());
 
         $this->assertTrue($meter_two->isEnabled());
 
@@ -89,5 +95,51 @@ class MeterConfigTest extends TestCase
         $reader->collect();
         $metrics = $exporter->collect(true);
         $this->assertSame([], $metrics);
+    }
+
+    /**
+     * If a meter is disabled, its streams should be dropped. Any previously collected
+     * data will be lost. If a disabled meter is re-enabled, the streams should be
+     * recreated.
+     */
+    public function test_streams_recreated_on_enable(): void
+    {
+        $this->markTestSkipped('TODO implement drop/create streams'); /* @phpstan-ignore-next-line */
+        $clock = new TestClock(self::T0);
+        $disabledConfigurator = Configurator::builder()
+            ->addCondition(new Name('*'), State::DISABLED)
+            ->build();
+        $exporter = new InMemoryExporter(Temporality::CUMULATIVE);
+        $reader = new ExportingReader($exporter);
+        $meterProvider = MeterProvider::builder()
+            ->addReader($reader)
+            ->setClock($clock)
+            ->build();
+
+        $c = $meterProvider->getMeter('test')->createCounter('c');
+
+        //t0, meter is enabled
+        $c->add(1);
+
+        //t1, disable meter
+        $clock->setTime(self::T1);
+        $meterProvider->updateConfigurator($disabledConfigurator);
+        $c->add(10);
+
+        //t2, {sum=100, startTimestamp=t2}; must not export {sum=101, startTimestamp=t0}
+        $clock->setTime(self::T2);
+        $meterProvider->updateConfigurator(Configurator::default());
+        $c->add(100);
+
+        $reader->collect();
+        $metrics = $exporter->collect();
+        $this->assertCount(1, $metrics);
+        $metric = $metrics[0];
+
+        $this->assertCount(1, $metric->data->dataPoints);
+        $dataPoint = $metric->data->dataPoints[0];
+
+        $this->assertSame(self::T2, $dataPoint->startTimestamp);
+        $this->assertSame(100, $dataPoint->value);
     }
 }
