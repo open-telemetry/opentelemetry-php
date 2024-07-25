@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
 use OpenTelemetry\API\Logs\NoopLogger;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
-use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use OpenTelemetry\SDK\Logs\Logger;
+use OpenTelemetry\SDK\Logs\LoggerConfig;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProviderBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
@@ -36,10 +36,11 @@ class LoggerProviderTest extends TestCase
     {
         $this->processor = $this->createMock(LogRecordProcessorInterface::class);
         $instrumentationScopeFactory = $this->createMock(InstrumentationScopeFactoryInterface::class);
+        $instrumentationScopeFactory->method('create')->willReturn($this->createMock(InstrumentationScope::class));
         $resource = $this->createMock(ResourceInfo::class);
-        $this->config = $this->createMock(Config::class);
+        $this->config = $this->createMock(LoggerConfig::class);
         $configurator = $this->createMock(Configurator::class);
-        $configurator->method('getConfig')->willReturn($this->config);
+        $configurator->method('resolve')->willReturn($this->config);
         $this->provider = new LoggerProvider($this->processor, $instrumentationScopeFactory, $resource, $configurator);
     }
 
@@ -91,7 +92,7 @@ class LoggerProviderTest extends TestCase
         $this->assertTrue($one->isEnabled());
         $this->assertTrue($two->isEnabled());
 
-        $lp->updateConfigurator(Configurator::builder()->addCondition(new Name('*'), State::DISABLED)->build());
+        $lp->updateConfigurator(Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled(true), name: '*'));
         $this->assertFalse($one->isEnabled());
         $this->assertFalse($two->isEnabled());
     }

@@ -6,50 +6,44 @@ namespace OpenTelemetry\Tests\SDK\Common\InstrumentationScope;
 
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
-use OpenTelemetry\SDK\Common\InstrumentationScope\ConfiguratorBuilder;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate;
-use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Configurator::class)]
-#[CoversClass(ConfiguratorBuilder::class)]
 class ConfiguratorTest extends TestCase
 {
-    /** @var Predicate&MockObject */
-    private Predicate $predicate;
     private Configurator $configurator;
     private InstrumentationScope $scope;
 
     public function setUp(): void
     {
-        $this->scope = new InstrumentationScope('test', null, null, $this->createMock(AttributesInterface::class));
-        $builder = new ConfiguratorBuilder();
-        $this->predicate = $this->createMock(Predicate::class);
-        $builder->addCondition($this->predicate, State::DISABLED);
-        $this->configurator = $builder->build();
+        $config = new class() implements Config {
+            private bool $disabled = false;
+            public function setDisabled(bool $disabled): void
+            {
+                $this->disabled = $disabled;
+            }
+            public function isEnabled(): bool
+            {
+                return $this->disabled === false;
+            }
+        };
+        $this->scope = new InstrumentationScope('test', '1.0', 'https://example.org/schema', $this->createMock(AttributesInterface::class));
+        $this->configurator = (new Configurator(static fn () => $config));
     }
 
-    public function test_match(): void
+    public function test_match_name(): void
     {
-        $this->predicate->expects($this->once())->method('matches')->with($this->equalTo($this->scope))->willReturn(true);
-        $config = $this->configurator->getConfig($this->scope);
-
-        $this->assertFalse($config->isEnabled());
+        $configurator = $this->configurator->with(static fn (Config $config) => $config->setDisabled(true), name: 'test');
+        $this->assertFalse($configurator->resolve($this->scope)->isEnabled());
     }
 
     public function test_returns_default_on_no_match(): void
     {
-        $this->predicate->expects($this->once())->method('matches')->with($this->equalTo($this->scope))->willReturn(false);
-        $config = $this->configurator->getConfig($this->scope);
+        $config = $this->configurator->resolve($this->scope);
 
         $this->assertTrue($config->isEnabled());
-    }
-
-    public function test_builder(): void
-    {
-        $this->assertInstanceOf(ConfiguratorBuilder::class, Configurator::builder());
     }
 }

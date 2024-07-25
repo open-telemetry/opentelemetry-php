@@ -7,9 +7,8 @@ namespace OpenTelemetry\Tests\Integration\SDK\Metrics;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
-use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\MeterConfig;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
@@ -29,9 +28,8 @@ class MeterConfigTest extends TestCase
         $meterProvider = MeterProvider::builder()
             ->addReader(new ExportingReader(new InMemoryExporter()))
             ->setConfigurator(
-                Configurator::builder()
-                    ->addCondition(new Name('two'), State::DISABLED)
-                    ->build()
+                Configurator::meter()
+                 ->with(static fn (MeterConfig $config) => $config->setDisabled(true), name: 'two')
             )
             ->build();
 
@@ -58,7 +56,7 @@ class MeterConfigTest extends TestCase
         $this->assertFalse($meter_two->isEnabled());
         $this->assertTrue($meter_three->isEnabled());
 
-        $meterProvider->updateConfigurator(Configurator::default());
+        $meterProvider->updateConfigurator(Configurator::meter());
 
         $this->assertTrue($meter_two->isEnabled());
 
@@ -78,9 +76,8 @@ class MeterConfigTest extends TestCase
         $meterProvider = MeterProvider::builder()
             ->addReader($reader)
             ->setConfigurator(
-                Configurator::builder()
-                    ->addCondition(new Name('*'), State::DISABLED)
-                    ->build()
+                Configurator::meter()
+                    ->with(static fn (MeterConfig $config) => $config->setDisabled(true), name: '*')
             )
             ->build();
         $meter = $meterProvider->getMeter('test');
@@ -106,9 +103,8 @@ class MeterConfigTest extends TestCase
     {
         $this->markTestSkipped('TODO implement drop/create streams'); // @phpstan-ignore-next-line
         $clock = new TestClock(self::T0);
-        $disabledConfigurator = Configurator::builder()
-            ->addCondition(new Name('*'), State::DISABLED)
-            ->build();
+        $disabledConfigurator = Configurator::meter()
+            ->with(static fn (MeterConfig $config) => $config->setDisabled(false), name: '*');
         $exporter = new InMemoryExporter(Temporality::CUMULATIVE);
         $reader = new ExportingReader($exporter);
         $meterProvider = MeterProvider::builder()
@@ -128,7 +124,7 @@ class MeterConfigTest extends TestCase
 
         //t2, {sum=100, startTimestamp=t2}; must not export {sum=101, startTimestamp=t0}
         $clock->setTime(self::T2);
-        $meterProvider->updateConfigurator(Configurator::default());
+        $meterProvider->updateConfigurator(Configurator::meter());
         $c->add(100);
 
         $reader->collect();

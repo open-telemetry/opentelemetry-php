@@ -12,7 +12,6 @@ use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
-use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;
@@ -32,7 +31,6 @@ final class MeterProvider implements MeterProviderInterface
 
     private bool $closed = false;
     private readonly WeakMap $meters;
-    private ScopeConfigurator $configurator;
 
     /**
      * @param iterable<MetricReaderInterface&MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricReaders
@@ -48,7 +46,7 @@ final class MeterProvider implements MeterProviderInterface
         private readonly ?ExemplarFilterInterface $exemplarFilter,
         private readonly StalenessHandlerFactoryInterface $stalenessHandlerFactory,
         MetricFactoryInterface $metricFactory = null,
-        ?ScopeConfigurator $configurator = null,
+        private ?Configurator $configurator = null,
     ) {
         $this->metricFactory = $metricFactory ?? new StreamFactory();
         $this->instruments = new MeterInstruments();
@@ -58,7 +56,6 @@ final class MeterProvider implements MeterProviderInterface
         $this->writer = $registry;
         $this->destructors = new WeakMap();
         $this->meters = new WeakMap();
-        $this->configurator = $configurator ?? Configurator::default();
     }
 
     public function getMeter(
@@ -136,7 +133,7 @@ final class MeterProvider implements MeterProviderInterface
      * @todo enabling a previous-disabled meter does not drop/recreate the underlying metric streams, so previously collected synchronous metrics will still be exported.
      * @experimental
      */
-    public function updateConfigurator(ScopeConfigurator $configurator): void
+    public function updateConfigurator(Configurator $configurator): void
     {
         $this->configurator = $configurator;
 

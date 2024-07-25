@@ -11,9 +11,8 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
-use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
+use OpenTelemetry\SDK\Metrics\MeterConfig;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
@@ -118,7 +117,7 @@ final class MeterProviderTest extends TestCase
         $this->assertTrue($meter->isEnabled());
         $counter = $meter->createCounter('A');
         $this->assertTrue($counter->isEnabled());
-        $meterProvider->updateConfigurator(Configurator::builder()->addCondition(new Name('one'), State::DISABLED)->build());
+        $meterProvider->updateConfigurator(Configurator::meter()->with(static fn (MeterConfig $config) => $config->setDisabled(true), name: 'one'));
         $this->assertFalse($meter->isEnabled());
         $this->assertFalse($counter->isEnabled());
     }

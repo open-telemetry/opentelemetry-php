@@ -6,11 +6,10 @@ namespace OpenTelemetry\Tests\Integration\SDK\Trace;
 
 use ArrayObject;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate;
-use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\Tracer;
+use OpenTelemetry\SDK\Trace\TracerConfig;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
@@ -29,7 +28,11 @@ class TracerConfigTest extends TestCase
         $exporter = new InMemoryExporter($storage);
         $tracerProvider = TracerProvider::builder()
             ->addSpanProcessor(new SimpleSpanProcessor($exporter))
-            ->setConfigurator(Configurator::builder()->addCondition(new Predicate\Name('B'), State::DISABLED)->build()) //disable tracer B
+            ->setConfigurator(
+                Configurator::tracer()
+                ->with(static fn (TracerConfig $config) => $config->setDisabled(false), name: '*')
+                ->with(static fn (TracerConfig $config) => $config->setDisabled(true), name: 'B')
+            )
             ->build();
         $tracerA = $tracerProvider->getTracer('A');
         $tracerB = $tracerProvider->getTracer('B');
@@ -82,9 +85,8 @@ class TracerConfigTest extends TestCase
         $tracerProvider = TracerProvider::builder()
             ->addSpanProcessor(new SimpleSpanProcessor($exporter))
             ->setConfigurator(
-                Configurator::builder()
-                    ->addCondition(new Predicate\Name('B'), State::DISABLED) //disable tracer B
-                    ->build()
+                Configurator::tracer()
+                ->with(static fn (TracerConfig $config) => $config->setDisabled(true), name: 'B')
             )
             ->build();
         $tracerA = $tracerProvider->getTracer('A');
@@ -100,7 +102,7 @@ class TracerConfigTest extends TestCase
             $child = $tracerB->spanBuilder('child')->startSpan();
             $child->setAttribute('b', 1);
             $childScope = $child->activate();
-            $tracerProvider->updateConfigurator(new Configurator()); //re-enable tracer two
+            $tracerProvider->updateConfigurator(Configurator::tracer()); //re-enable tracer two
             $sibling = $tracerB->spanBuilder('sibling')->startSpan();
             $siblingScope = $sibling->activate();
 
@@ -146,17 +148,15 @@ class TracerConfigTest extends TestCase
     {
         $tracerProvider = TracerProvider::builder()
             ->setConfigurator(
-                Configurator::builder()
-                    ->addCondition(new Predicate\Name('two'), State::DISABLED) //disable tracer A
-                    ->build()
+                Configurator::tracer()
+                ->with(static fn (TracerConfig $config) => $config->setDisabled(true), name: 'two')
             )
             ->build();
         $tracer = $tracerProvider->getTracer(name: 'two');
         $this->assertInstanceOf(Tracer::class, $tracer);
         $this->assertFalse($tracer->isEnabled());
 
-        $update = new Configurator();
-        $tracerProvider->updateConfigurator($update);
+        $tracerProvider->updateConfigurator(Configurator::tracer()); //reset
 
         $this->assertTrue($tracer->isEnabled());
     }

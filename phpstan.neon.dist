@@ -42,3 +42,11 @@ parameters:
             message: "#Cannot call method .* on null#"
             paths:
                 - tests/Integration/SDK/Trace
+        -
+            message: "#Property .*Logger.*config .* does not accept .*Config?#"
+            paths:
+                - src/SDK/Logs
+        -
+            message: "#.*return with type T is not subtype.*#"
+            paths:
+                - src/SDK/Common/InstrumentationScope

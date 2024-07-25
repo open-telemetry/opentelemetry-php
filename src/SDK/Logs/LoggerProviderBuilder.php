@@ -38,7 +38,7 @@ class LoggerProviderBuilder
             $this->buildProcessor(),
             new InstrumentationScopeFactory(Attributes::factory()),
             $this->resource,
-            configurator: $this->configurator ?? Configurator::default(),
+            configurator: $this->configurator ?? Configurator::logger(),
         );
     }
 

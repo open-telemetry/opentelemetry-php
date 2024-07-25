@@ -7,8 +7,7 @@ namespace OpenTelemetry\Tests\Benchmark;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
-use OpenTelemetry\SDK\Common\InstrumentationScope\State;
+use OpenTelemetry\SDK\Metrics\MeterConfig;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
@@ -26,9 +25,8 @@ class MetricBench
         $meterProvider = MeterProvider::builder()
             ->addReader($this->reader)
             ->setConfigurator(
-                Configurator::builder()
-                    ->addCondition(new Name('disabled'), State::DISABLED)
-                    ->build()
+                Configurator::meter()
+                    ->with(static fn (MeterConfig $config) => $config->setDisabled(true), name: 'disabled')
             )
             ->build();
         $this->enabled = $meterProvider->getMeter('enabled');

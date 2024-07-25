@@ -23,7 +23,7 @@ use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
-use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use function OpenTelemetry\SDK\Common\Util\closure;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\MultiRegistryRegistration;
@@ -61,9 +61,9 @@ final class Meter implements MeterInterface, Configurable
         private readonly MetricRegistryInterface $registry,
         private readonly MetricWriterInterface $writer,
         private readonly ArrayAccess $destructors,
-        private ScopeConfigurator $configurator,
+        private ?Configurator $configurator = null,
     ) {
-        $this->config = $this->configurator->getConfig($this->instrumentationScope);
+        $this->config = $this->configurator?->resolve($this->instrumentationScope) ?? MeterConfig::default();
     }
 
     private static function dummyInstrument(): Instrument
@@ -76,10 +76,10 @@ final class Meter implements MeterInterface, Configurable
     /**
      * @internal
      */
-    public function updateConfigurator(ScopeConfigurator $configurator): void
+    public function updateConfigurator(Configurator $configurator): void
     {
         $this->configurator = $configurator;
-        $this->config = $configurator->getConfig($this->instrumentationScope);
+        $this->config = $configurator->resolve($this->instrumentationScope);
     }
 
     public function batchObserve(callable $callback, AsynchronousInstrument $instrument, AsynchronousInstrument ...$instruments): ObservableCallbackInterface

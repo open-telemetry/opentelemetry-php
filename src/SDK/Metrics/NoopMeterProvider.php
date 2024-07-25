@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
-use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 
 class NoopMeterProvider implements MeterProviderInterface
 {
@@ -25,7 +25,7 @@ class NoopMeterProvider implements MeterProviderInterface
         return new NoopMeter();
     }
 
-    public function updateConfigurator(ScopeConfigurator $configurator): void
+    public function updateConfigurator(Configurator $configurator): void
     {
         // no-op
     }

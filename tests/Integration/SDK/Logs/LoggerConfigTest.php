@@ -7,9 +7,8 @@ namespace OpenTelemetry\Tests\Integration\SDK\Logs;
 use ArrayObject;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Predicate\Name;
-use OpenTelemetry\SDK\Common\InstrumentationScope\State;
 use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter;
+use OpenTelemetry\SDK\Logs\LoggerConfig;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -30,9 +29,8 @@ class LoggerConfigTest extends TestCase
         $loggerProvider = LoggerProvider::builder()
             ->addLogRecordProcessor(new SimpleLogRecordProcessor($exporter))
             ->setConfigurator(
-                Configurator::builder()
-                    ->addCondition(new Name('two'), State::DISABLED) //disable logger named 'two'
-                    ->build()
+                Configurator::logger()
+                ->with(static fn (LoggerConfig $config) => $config->setDisabled(true), name: 'two')
             )
             ->build();
         $this->assertInstanceOf(LoggerProvider::class, $loggerProvider);
@@ -51,7 +49,7 @@ class LoggerConfigTest extends TestCase
         $logger_two->emit(new LogRecord());
         $this->assertCount(1, $storage, 'no record emitted');
 
-        $loggerProvider->updateConfigurator(Configurator::builder()->build()); //re-enable all
+        $loggerProvider->updateConfigurator(Configurator::logger()); //re-enable all
         $this->assertTrue($logger_one->isEnabled());
         $this->assertTrue($logger_two->isEnabled());
         $this->assertTrue($logger_three->isEnabled());

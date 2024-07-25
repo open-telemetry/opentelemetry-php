@@ -8,9 +8,7 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
-use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
-use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
 
 /**
  * Note that this logger class is deliberately NOT psr-3 compatible, per spec: "Note: this document defines a log
@@ -21,17 +19,18 @@ use OpenTelemetry\SDK\Common\InstrumentationScope\ScopeConfigurator;
 class Logger implements LoggerInterface
 {
     use LogsMessagesTrait;
-    private Config $config;
+    private LoggerConfig $config;
 
     /**
      * @internal
+     * @param Configurator<LoggerConfig>|null $configurator
      */
     public function __construct(
         private readonly LoggerSharedState $loggerSharedState,
         private readonly InstrumentationScopeInterface $scope,
-        ?ScopeConfigurator $configurator = null,
+        ?Configurator $configurator = null,
     ) {
-        $this->config = $configurator ? $configurator->getConfig($scope) : Config::default();
+        $this->config = $configurator ? $configurator->resolve($scope) : LoggerConfig::default();
     }
 
     public function emit(LogRecord $logRecord): void
@@ -58,8 +57,11 @@ class Logger implements LoggerInterface
         return $this->config->isEnabled();
     }
 
+    /**
+     * @param Configurator<LoggerConfig> $configurator
+     */
     public function updateConfig(Configurator $configurator): void
     {
-        $this->config = $configurator->getConfig($this->scope);
+        $this->config = $configurator->resolve($this->scope);
     }
 }

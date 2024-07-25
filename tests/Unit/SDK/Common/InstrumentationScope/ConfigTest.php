@@ -5,32 +5,42 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Common\InstrumentationScope;
 
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
-use OpenTelemetry\SDK\Common\InstrumentationScope\State;
+use OpenTelemetry\SDK\Common\InstrumentationScope\ConfigTrait;
+use OpenTelemetry\SDK\Trace\TracerConfig;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Config::class)]
+#[CoversClass(ConfigTrait::class)]
 class ConfigTest extends TestCase
 {
-    #[DataProvider('enabledProvider')]
-    public function test_is_enabled(State $state, bool $expected): void
+    private Config $config;
+
+    public function setUp(): void
     {
-        $config = new Config($state);
-        $this->assertSame($expected, $config->isEnabled());
+        $this->config = new class() implements Config {
+            use ConfigTrait;
+        };
+    }
+
+    #[DataProvider('enabledProvider')]
+    public function test_is_enabled(bool $disabled, bool $expected): void
+    {
+        $this->config->setDisabled($disabled);
+        $this->assertSame($expected, $this->config->isEnabled());
     }
 
     public static function enabledProvider(): array
     {
         return [
-            [State::ENABLED, true],
-            [State::DISABLED, false],
+            [false, true],
+            [true, false],
         ];
     }
 
     public function test_default_is_enabled(): void
     {
-        $config = Config::default();
+        $config = TracerConfig::default();
         $this->assertTrue($config->isEnabled());
     }
 }

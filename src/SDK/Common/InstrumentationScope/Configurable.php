@@ -6,5 +6,5 @@ namespace OpenTelemetry\SDK\Common\InstrumentationScope;
 
 interface Configurable
 {
-    public function updateConfigurator(ScopeConfigurator $configurator): void;
+    public function updateConfigurator(Configurator $configurator): void;
 }
