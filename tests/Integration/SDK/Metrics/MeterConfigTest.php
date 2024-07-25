@@ -104,7 +104,7 @@ class MeterConfigTest extends TestCase
      */
     public function test_streams_recreated_on_enable(): void
     {
-        $this->markTestSkipped('TODO implement drop/create streams'); /* @phpstan-ignore-next-line */
+        $this->markTestSkipped('TODO implement drop/create streams'); // @phpstan-ignore-next-line
         $clock = new TestClock(self::T0);
         $disabledConfigurator = Configurator::builder()
             ->addCondition(new Name('*'), State::DISABLED)

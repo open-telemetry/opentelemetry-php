@@ -131,8 +131,9 @@ final class MeterProvider implements MeterProviderInterface
     }
 
     /**
-     * Update the {@link Configurator} for a {@link MeterProvider}, which will
-     * reconfigure all meters created from the provider.
+     * Update the {@link Configurator} for a {@link MeterProvider}, which will reconfigure
+     *  all meters created from the provider.
+     * @todo enabling a previous-disabled meter does not drop/recreate the underlying metric streams, so previously collected synchronous metrics will still be exported.
      * @experimental
      */
     public function updateConfigurator(ScopeConfigurator $configurator): void
