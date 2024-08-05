@@ -386,3 +386,31 @@ resource:
     service.name: !!str "unknown_service"
   # Configure the resource schema URL.
   schema_url: https://opentelemetry.io/schemas/1.16.0
+
+instrumentation:
+  php:
+    example_instrumentation:
+      span_name: ${EXAMPLE_INSTRUMENTATION_SPAN_NAME:-example span}
+  java:
+  general:
+    peer:
+      service_mapping:
+        - peer: 1.2.3.4
+          service: FooService
+        - peer: 2.3.4.5
+          service: BarService
+      http:
+        client:
+          request_captured_headers:
+            - Content-Type
+            - Accept
+          response_captured_headers:
+            - Content-Type
+            - Content-Encoding
+        server:
+          request_captured_headers:
+            - Content-Type
+            - Accept
+          response_captured_headers:
+            - Content-Type
+            - Content-Encoding

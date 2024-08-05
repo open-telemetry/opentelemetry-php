@@ -89,7 +89,12 @@ final class PsrUtilsTest extends TestCase
     {
         $this->expectException(UnexpectedValueException::class);
 
-        PsrUtils::decode('', ['invalid']);
+        PsrUtils::decode('foo', ['invalid']);
+    }
+
+    public function test_decode_empty_value(): void
+    {
+        $this->assertSame('', PsrUtils::decode('', ['gzip']));
     }
 
     #[DataProvider('compressionProvider')]

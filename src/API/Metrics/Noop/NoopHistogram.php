@@ -15,4 +15,9 @@ final class NoopHistogram implements HistogramInterface
     {
         // no-op
     }
+
+    public function enabled(): bool
+    {
+        return false;
+    }
 }

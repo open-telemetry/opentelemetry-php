@@ -7,6 +7,6 @@ namespace OpenTelemetry\API\Metrics;
 /**
  * Marker interface for asynchronous instruments.
  */
-interface AsynchronousInstrument
+interface AsynchronousInstrument extends Instrument
 {
 }

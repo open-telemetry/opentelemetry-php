@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Logs;
 
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
@@ -16,6 +17,8 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
  */
 class Logger implements LoggerInterface
 {
+    use LogsMessagesTrait;
+
     /**
      * @internal
      */
@@ -33,5 +36,15 @@ class Logger implements LoggerInterface
             $readWriteLogRecord,
             $readWriteLogRecord->getContext(),
         );
+        if ($readWriteLogRecord->getAttributes()->getDroppedAttributesCount()) {
+            self::logWarning('Dropped log attributes', [
+                'attributes' => $readWriteLogRecord->getAttributes()->getDroppedAttributesCount(),
+            ]);
+        }
+    }
+
+    public function enabled(): bool
+    {
+        return true;
     }
 }

@@ -30,7 +30,8 @@
         "psr/log": "^1.1|^2.0|^3.0",
         "ramsey/uuid": "^3.0 || ^4.0",
         "symfony/polyfill-mbstring": "^1.23",
-        "symfony/polyfill-php82": "^1.26"
+        "symfony/polyfill-php82": "^1.26",
+        "tbachert/spi": ">= 0.2.1"
     },
     "autoload": {
         "psr-4": {
@@ -53,6 +54,11 @@
     "extra": {
         "branch-alias": {
             "dev-main": "1.0.x-dev"
+        },
+        "spi": {
+            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
+                "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
+            ]
         }
     }
 }

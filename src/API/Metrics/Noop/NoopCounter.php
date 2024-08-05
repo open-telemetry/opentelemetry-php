@@ -15,4 +15,9 @@ final class NoopCounter implements CounterInterface
     {
         // no-op
     }
+
+    public function enabled(): bool
+    {
+        return false;
+    }
 }

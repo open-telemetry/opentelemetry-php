@@ -41,4 +41,9 @@ class Tracer implements API\TracerInterface
     {
         return $this->instrumentationScope;
     }
+
+    public function enabled(): bool
+    {
+        return true;
+    }
 }

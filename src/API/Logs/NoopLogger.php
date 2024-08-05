@@ -30,4 +30,9 @@ class NoopLogger implements LoggerInterface
     public function log($level, $message, array $context = []): void
     {
     }
+
+    public function enabled(): bool
+    {
+        return false;
+    }
 }

@@ -52,7 +52,7 @@ final class OpenTelemetrySdk implements ComponentProvider
 
     /**
      * @param array{
-     *     file_format: '0.1',
+     *     file_format: '0.3',
      *     disabled: bool,
      *     resource: array{
      *         attributes: array,
@@ -263,7 +263,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->isRequired()
                     ->example('0.1')
                     ->validate()->always(Validation::ensureString())->end()
-                    ->validate()->ifNotInArray(['0.1'])->thenInvalid('unsupported version')->end()
+                    ->validate()->ifNotInArray(['0.3'])->thenInvalid('unsupported version')->end()
                 ->end()
                 ->booleanNode('disabled')->defaultFalse()->end()
                 ->append($this->getResourceConfig())
@@ -323,7 +323,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->end()
                 ->end()
                 ->append($registry->component('sampler', SamplerInterface::class))
-                ->append($registry->componentList('processors', SpanProcessorInterface::class))
+                ->append($registry->componentArrayList('processors', SpanProcessorInterface::class))
             ->end()
         ;
 
@@ -374,7 +374,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->end()
                     ->end()
                 ->end()
-                ->append($registry->componentList('readers', MetricReaderInterface::class))
+                ->append($registry->componentArrayList('readers', MetricReaderInterface::class))
             ->end()
         ;
 
@@ -394,7 +394,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->integerNode('attribute_count_limit')->min(0)->defaultNull()->end()
                     ->end()
                 ->end()
-                ->append($registry->componentList('processors', LogRecordProcessorInterface::class))
+                ->append($registry->componentArrayList('processors', LogRecordProcessorInterface::class))
             ->end()
         ;
 
