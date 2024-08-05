@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 use OpenTelemetry\API\Trace\LocalRootSpan;
 use OpenTelemetry\API\Trace\Span;
-use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
