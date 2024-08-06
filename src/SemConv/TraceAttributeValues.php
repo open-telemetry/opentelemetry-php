@@ -11,7 +11,7 @@ interface TraceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.26.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.27.0';
     /**
      * @see TraceAttributes::ANDROID_STATE Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time
      */
@@ -86,6 +86,21 @@ interface TraceAttributeValues
      * @see TraceAttributes::AWS_ECS_LAUNCHTYPE fargate
      */
     public const AWS_ECS_LAUNCHTYPE_FARGATE = 'fargate';
+
+    /**
+     * @see TraceAttributes::CICD_PIPELINE_TASK_TYPE build
+     */
+    public const CICD_PIPELINE_TASK_TYPE_BUILD = 'build';
+
+    /**
+     * @see TraceAttributes::CICD_PIPELINE_TASK_TYPE test
+     */
+    public const CICD_PIPELINE_TASK_TYPE_TEST = 'test';
+
+    /**
+     * @see TraceAttributes::CICD_PIPELINE_TASK_TYPE deploy
+     */
+    public const CICD_PIPELINE_TASK_TYPE_DEPLOY = 'deploy';
 
     /**
      * @see TraceAttributes::CLOUD_PLATFORM Alibaba Cloud Elastic Compute Service
@@ -278,6 +293,46 @@ interface TraceAttributeValues
     public const CONTAINER_CPU_STATE_KERNEL = 'kernel';
 
     /**
+     * @see TraceAttributes::CPU_MODE user
+     */
+    public const CPU_MODE_USER = 'user';
+
+    /**
+     * @see TraceAttributes::CPU_MODE system
+     */
+    public const CPU_MODE_SYSTEM = 'system';
+
+    /**
+     * @see TraceAttributes::CPU_MODE nice
+     */
+    public const CPU_MODE_NICE = 'nice';
+
+    /**
+     * @see TraceAttributes::CPU_MODE idle
+     */
+    public const CPU_MODE_IDLE = 'idle';
+
+    /**
+     * @see TraceAttributes::CPU_MODE iowait
+     */
+    public const CPU_MODE_IOWAIT = 'iowait';
+
+    /**
+     * @see TraceAttributes::CPU_MODE interrupt
+     */
+    public const CPU_MODE_INTERRUPT = 'interrupt';
+
+    /**
+     * @see TraceAttributes::CPU_MODE steal
+     */
+    public const CPU_MODE_STEAL = 'steal';
+
+    /**
+     * @see TraceAttributes::CPU_MODE kernel
+     */
+    public const CPU_MODE_KERNEL = 'kernel';
+
+    /**
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL all
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_ALL = 'all';
@@ -331,6 +386,16 @@ interface TraceAttributeValues
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL local_serial
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_LOCAL_SERIAL = 'local_serial';
+
+    /**
+     * @see TraceAttributes::DB_CLIENT_CONNECTION_STATE idle
+     */
+    public const DB_CLIENT_CONNECTION_STATE_IDLE = 'idle';
+
+    /**
+     * @see TraceAttributes::DB_CLIENT_CONNECTION_STATE used
+     */
+    public const DB_CLIENT_CONNECTION_STATE_USED = 'used';
 
     /**
      * @see TraceAttributes::DB_CLIENT_CONNECTIONS_STATE idle
@@ -433,24 +498,59 @@ interface TraceAttributeValues
     public const DB_SYSTEM_OTHER_SQL = 'other_sql';
 
     /**
-     * @see TraceAttributes::DB_SYSTEM Microsoft SQL Server
+     * @see TraceAttributes::DB_SYSTEM Adabas (Adaptable Database System)
      */
-    public const DB_SYSTEM_MSSQL = 'mssql';
+    public const DB_SYSTEM_ADABAS = 'adabas';
 
     /**
-     * @see TraceAttributes::DB_SYSTEM Microsoft SQL Server Compact
+     * @see TraceAttributes::DB_SYSTEM Deprecated, use `intersystems_cache` instead
      */
-    public const DB_SYSTEM_MSSQLCOMPACT = 'mssqlcompact';
+    public const DB_SYSTEM_CACHE = 'cache';
 
     /**
-     * @see TraceAttributes::DB_SYSTEM MySQL
+     * @see TraceAttributes::DB_SYSTEM InterSystems Caché
      */
-    public const DB_SYSTEM_MYSQL = 'mysql';
+    public const DB_SYSTEM_INTERSYSTEMS_CACHE = 'intersystems_cache';
 
     /**
-     * @see TraceAttributes::DB_SYSTEM Oracle Database
+     * @see TraceAttributes::DB_SYSTEM Apache Cassandra
      */
-    public const DB_SYSTEM_ORACLE = 'oracle';
+    public const DB_SYSTEM_CASSANDRA = 'cassandra';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM ClickHouse
+     */
+    public const DB_SYSTEM_CLICKHOUSE = 'clickhouse';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Deprecated, use `other_sql` instead
+     */
+    public const DB_SYSTEM_CLOUDSCAPE = 'cloudscape';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM CockroachDB
+     */
+    public const DB_SYSTEM_COCKROACHDB = 'cockroachdb';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Deprecated, no replacement at this time
+     */
+    public const DB_SYSTEM_COLDFUSION = 'coldfusion';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Microsoft Azure Cosmos DB
+     */
+    public const DB_SYSTEM_COSMOSDB = 'cosmosdb';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Couchbase
+     */
+    public const DB_SYSTEM_COUCHBASE = 'couchbase';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM CouchDB
+     */
+    public const DB_SYSTEM_COUCHDB = 'couchdb';
 
     /**
      * @see TraceAttributes::DB_SYSTEM IBM Db2
@@ -458,54 +558,14 @@ interface TraceAttributeValues
     public const DB_SYSTEM_DB2 = 'db2';
 
     /**
-     * @see TraceAttributes::DB_SYSTEM PostgreSQL
+     * @see TraceAttributes::DB_SYSTEM Apache Derby
      */
-    public const DB_SYSTEM_POSTGRESQL = 'postgresql';
+    public const DB_SYSTEM_DERBY = 'derby';
 
     /**
-     * @see TraceAttributes::DB_SYSTEM Amazon Redshift
+     * @see TraceAttributes::DB_SYSTEM Amazon DynamoDB
      */
-    public const DB_SYSTEM_REDSHIFT = 'redshift';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Apache Hive
-     */
-    public const DB_SYSTEM_HIVE = 'hive';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Cloudscape
-     */
-    public const DB_SYSTEM_CLOUDSCAPE = 'cloudscape';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM HyperSQL DataBase
-     */
-    public const DB_SYSTEM_HSQLDB = 'hsqldb';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Progress Database
-     */
-    public const DB_SYSTEM_PROGRESS = 'progress';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM SAP MaxDB
-     */
-    public const DB_SYSTEM_MAXDB = 'maxdb';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM SAP HANA
-     */
-    public const DB_SYSTEM_HANADB = 'hanadb';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Ingres
-     */
-    public const DB_SYSTEM_INGRES = 'ingres';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM FirstSQL
-     */
-    public const DB_SYSTEM_FIRSTSQL = 'firstsql';
+    public const DB_SYSTEM_DYNAMODB = 'dynamodb';
 
     /**
      * @see TraceAttributes::DB_SYSTEM EnterpriseDB
@@ -513,24 +573,9 @@ interface TraceAttributeValues
     public const DB_SYSTEM_EDB = 'edb';
 
     /**
-     * @see TraceAttributes::DB_SYSTEM InterSystems Caché
+     * @see TraceAttributes::DB_SYSTEM Elasticsearch
      */
-    public const DB_SYSTEM_CACHE = 'cache';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Adabas (Adaptable Database System)
-     */
-    public const DB_SYSTEM_ADABAS = 'adabas';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Firebird
-     */
-    public const DB_SYSTEM_FIREBIRD = 'firebird';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Apache Derby
-     */
-    public const DB_SYSTEM_DERBY = 'derby';
+    public const DB_SYSTEM_ELASTICSEARCH = 'elasticsearch';
 
     /**
      * @see TraceAttributes::DB_SYSTEM FileMaker
@@ -538,9 +583,59 @@ interface TraceAttributeValues
     public const DB_SYSTEM_FILEMAKER = 'filemaker';
 
     /**
+     * @see TraceAttributes::DB_SYSTEM Firebird
+     */
+    public const DB_SYSTEM_FIREBIRD = 'firebird';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Deprecated, use `other_sql` instead
+     */
+    public const DB_SYSTEM_FIRSTSQL = 'firstsql';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Apache Geode
+     */
+    public const DB_SYSTEM_GEODE = 'geode';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM H2
+     */
+    public const DB_SYSTEM_H2 = 'h2';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM SAP HANA
+     */
+    public const DB_SYSTEM_HANADB = 'hanadb';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Apache HBase
+     */
+    public const DB_SYSTEM_HBASE = 'hbase';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Apache Hive
+     */
+    public const DB_SYSTEM_HIVE = 'hive';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM HyperSQL DataBase
+     */
+    public const DB_SYSTEM_HSQLDB = 'hsqldb';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM InfluxDB
+     */
+    public const DB_SYSTEM_INFLUXDB = 'influxdb';
+
+    /**
      * @see TraceAttributes::DB_SYSTEM Informix
      */
     public const DB_SYSTEM_INFORMIX = 'informix';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Ingres
+     */
+    public const DB_SYSTEM_INGRES = 'ingres';
 
     /**
      * @see TraceAttributes::DB_SYSTEM InstantDB
@@ -558,9 +653,54 @@ interface TraceAttributeValues
     public const DB_SYSTEM_MARIADB = 'mariadb';
 
     /**
+     * @see TraceAttributes::DB_SYSTEM SAP MaxDB
+     */
+    public const DB_SYSTEM_MAXDB = 'maxdb';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Memcached
+     */
+    public const DB_SYSTEM_MEMCACHED = 'memcached';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM MongoDB
+     */
+    public const DB_SYSTEM_MONGODB = 'mongodb';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Microsoft SQL Server
+     */
+    public const DB_SYSTEM_MSSQL = 'mssql';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Deprecated, Microsoft SQL Server Compact is discontinued
+     */
+    public const DB_SYSTEM_MSSQLCOMPACT = 'mssqlcompact';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM MySQL
+     */
+    public const DB_SYSTEM_MYSQL = 'mysql';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Neo4j
+     */
+    public const DB_SYSTEM_NEO4J = 'neo4j';
+
+    /**
      * @see TraceAttributes::DB_SYSTEM Netezza
      */
     public const DB_SYSTEM_NETEZZA = 'netezza';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM OpenSearch
+     */
+    public const DB_SYSTEM_OPENSEARCH = 'opensearch';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Oracle Database
+     */
+    public const DB_SYSTEM_ORACLE = 'oracle';
 
     /**
      * @see TraceAttributes::DB_SYSTEM Pervasive PSQL
@@ -571,6 +711,31 @@ interface TraceAttributeValues
      * @see TraceAttributes::DB_SYSTEM PointBase
      */
     public const DB_SYSTEM_POINTBASE = 'pointbase';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM PostgreSQL
+     */
+    public const DB_SYSTEM_POSTGRESQL = 'postgresql';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Progress Database
+     */
+    public const DB_SYSTEM_PROGRESS = 'progress';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Redis
+     */
+    public const DB_SYSTEM_REDIS = 'redis';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Amazon Redshift
+     */
+    public const DB_SYSTEM_REDSHIFT = 'redshift';
+
+    /**
+     * @see TraceAttributes::DB_SYSTEM Cloud Spanner
+     */
+    public const DB_SYSTEM_SPANNER = 'spanner';
 
     /**
      * @see TraceAttributes::DB_SYSTEM SQLite
@@ -588,104 +753,24 @@ interface TraceAttributeValues
     public const DB_SYSTEM_TERADATA = 'teradata';
 
     /**
+     * @see TraceAttributes::DB_SYSTEM Trino
+     */
+    public const DB_SYSTEM_TRINO = 'trino';
+
+    /**
      * @see TraceAttributes::DB_SYSTEM Vertica
      */
     public const DB_SYSTEM_VERTICA = 'vertica';
 
     /**
-     * @see TraceAttributes::DB_SYSTEM H2
+     * @see TraceAttributes::DEPLOYMENT_STATUS failed
      */
-    public const DB_SYSTEM_H2 = 'h2';
+    public const DEPLOYMENT_STATUS_FAILED = 'failed';
 
     /**
-     * @see TraceAttributes::DB_SYSTEM ColdFusion IMQ
+     * @see TraceAttributes::DEPLOYMENT_STATUS succeeded
      */
-    public const DB_SYSTEM_COLDFUSION = 'coldfusion';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Apache Cassandra
-     */
-    public const DB_SYSTEM_CASSANDRA = 'cassandra';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Apache HBase
-     */
-    public const DB_SYSTEM_HBASE = 'hbase';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM MongoDB
-     */
-    public const DB_SYSTEM_MONGODB = 'mongodb';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Redis
-     */
-    public const DB_SYSTEM_REDIS = 'redis';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Couchbase
-     */
-    public const DB_SYSTEM_COUCHBASE = 'couchbase';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM CouchDB
-     */
-    public const DB_SYSTEM_COUCHDB = 'couchdb';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Microsoft Azure Cosmos DB
-     */
-    public const DB_SYSTEM_COSMOSDB = 'cosmosdb';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Amazon DynamoDB
-     */
-    public const DB_SYSTEM_DYNAMODB = 'dynamodb';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Neo4j
-     */
-    public const DB_SYSTEM_NEO4J = 'neo4j';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Apache Geode
-     */
-    public const DB_SYSTEM_GEODE = 'geode';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Elasticsearch
-     */
-    public const DB_SYSTEM_ELASTICSEARCH = 'elasticsearch';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Memcached
-     */
-    public const DB_SYSTEM_MEMCACHED = 'memcached';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM CockroachDB
-     */
-    public const DB_SYSTEM_COCKROACHDB = 'cockroachdb';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM OpenSearch
-     */
-    public const DB_SYSTEM_OPENSEARCH = 'opensearch';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM ClickHouse
-     */
-    public const DB_SYSTEM_CLICKHOUSE = 'clickhouse';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Cloud Spanner
-     */
-    public const DB_SYSTEM_SPANNER = 'spanner';
-
-    /**
-     * @see TraceAttributes::DB_SYSTEM Trino
-     */
-    public const DB_SYSTEM_TRINO = 'trino';
+    public const DEPLOYMENT_STATUS_SUCCEEDED = 'succeeded';
 
     /**
      * @see TraceAttributes::DISK_IO_DIRECTION read
@@ -768,9 +853,56 @@ interface TraceAttributeValues
     public const FAAS_TRIGGER_OTHER = 'other';
 
     /**
+     * @see TraceAttributes::GEN_AI_OPERATION_NAME Chat completion operation such as [OpenAI Chat API](https://platform.openai.com/docs/api-reference/chat)
+     */
+    public const GEN_AI_OPERATION_NAME_CHAT = 'chat';
+
+    /**
+     * @see TraceAttributes::GEN_AI_OPERATION_NAME Text completions operation such as [OpenAI Completions API (Legacy)](https://platform.openai.com/docs/api-reference/completions)
+     */
+    public const GEN_AI_OPERATION_NAME_TEXT_COMPLETION = 'text_completion';
+
+    /**
      * @see TraceAttributes::GEN_AI_SYSTEM OpenAI
      */
     public const GEN_AI_SYSTEM_OPENAI = 'openai';
+
+    /**
+     * @see TraceAttributes::GEN_AI_SYSTEM Vertex AI
+     */
+    public const GEN_AI_SYSTEM_VERTEX_AI = 'vertex_ai';
+
+    /**
+     * @see TraceAttributes::GEN_AI_SYSTEM Anthropic
+     */
+    public const GEN_AI_SYSTEM_ANTHROPIC = 'anthropic';
+
+    /**
+     * @see TraceAttributes::GEN_AI_SYSTEM Cohere
+     */
+    public const GEN_AI_SYSTEM_COHERE = 'cohere';
+
+    /**
+     * @see TraceAttributes::GEN_AI_TOKEN_TYPE Input tokens (prompt, input, etc.)
+     */
+    public const GEN_AI_TOKEN_TYPE_INPUT = 'input';
+
+    /**
+     * @see TraceAttributes::GEN_AI_TOKEN_TYPE Output tokens (completion, response, etc.)
+     */
+    public const GEN_AI_TOKEN_TYPE_COMPLETION = 'output';
+
+    /**
+     * @see TraceAttributes::GO_MEMORY_TYPE Memory allocated from the heap that is reserved for stack space, whether or not it is currently in-use
+     *
+     * Computed from <code>/memory/classes/heap/stacks:bytes</code>.
+     */
+    public const GO_MEMORY_TYPE_STACK = 'stack';
+
+    /**
+     * @see TraceAttributes::GO_MEMORY_TYPE Memory used by the Go runtime, excluding other categories of memory usage described in this enumeration
+     */
+    public const GO_MEMORY_TYPE_OTHER = 'other';
 
     /**
      * @see TraceAttributes::GRAPHQL_OPERATION_TYPE GraphQL query
@@ -983,6 +1115,16 @@ interface TraceAttributeValues
     public const JVM_THREAD_STATE_TERMINATED = 'terminated';
 
     /**
+     * @see TraceAttributes::LINUX_MEMORY_SLAB_STATE reclaimable
+     */
+    public const LINUX_MEMORY_SLAB_STATE_RECLAIMABLE = 'reclaimable';
+
+    /**
+     * @see TraceAttributes::LINUX_MEMORY_SLAB_STATE unreclaimable
+     */
+    public const LINUX_MEMORY_SLAB_STATE_UNRECLAIMABLE = 'unreclaimable';
+
+    /**
      * @see TraceAttributes::LOG_IOSTREAM Logs from stdout stream
      */
     public const LOG_IOSTREAM_STDOUT = 'stdout';
@@ -1018,14 +1160,19 @@ interface TraceAttributeValues
     public const MESSAGING_OPERATION_TYPE_RECEIVE = 'receive';
 
     /**
-     * @see TraceAttributes::MESSAGING_OPERATION_TYPE One or more messages are delivered to or processed by a consumer
+     * @see TraceAttributes::MESSAGING_OPERATION_TYPE One or more messages are processed by a consumer
      */
-    public const MESSAGING_OPERATION_TYPE_DELIVER = 'process';
+    public const MESSAGING_OPERATION_TYPE_PROCESS = 'process';
 
     /**
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE One or more messages are settled
      */
     public const MESSAGING_OPERATION_TYPE_SETTLE = 'settle';
+
+    /**
+     * @see TraceAttributes::MESSAGING_OPERATION_TYPE Deprecated. Use `process` instead
+     */
+    public const MESSAGING_OPERATION_TYPE_DELIVER = 'deliver';
 
     /**
      * @see TraceAttributes::MESSAGING_ROCKETMQ_CONSUMPTION_MODEL Clustering consumption model
@@ -1126,6 +1273,11 @@ interface TraceAttributeValues
      * @see TraceAttributes::MESSAGING_SYSTEM Apache RocketMQ
      */
     public const MESSAGING_SYSTEM_ROCKETMQ = 'rocketmq';
+
+    /**
+     * @see TraceAttributes::MESSAGING_SYSTEM Apache Pulsar
+     */
+    public const MESSAGING_SYSTEM_PULSAR = 'pulsar';
 
     /**
      * @see TraceAttributes::NET_SOCK_FAMILY IPv4 address
@@ -1328,6 +1480,11 @@ interface TraceAttributeValues
      * @see TraceAttributes::NETWORK_TRANSPORT Unix domain socket
      */
     public const NETWORK_TRANSPORT_UNIX = 'unix';
+
+    /**
+     * @see TraceAttributes::NETWORK_TRANSPORT QUIC
+     */
+    public const NETWORK_TRANSPORT_QUIC = 'quic';
 
     /**
      * @see TraceAttributes::NETWORK_TYPE IPv4
@@ -1985,6 +2142,46 @@ interface TraceAttributeValues
     public const TELEMETRY_SDK_LANGUAGE_WEBJS = 'webjs';
 
     /**
+     * @see TraceAttributes::TEST_CASE_RESULT_STATUS pass
+     */
+    public const TEST_CASE_RESULT_STATUS_PASS = 'pass';
+
+    /**
+     * @see TraceAttributes::TEST_CASE_RESULT_STATUS fail
+     */
+    public const TEST_CASE_RESULT_STATUS_FAIL = 'fail';
+
+    /**
+     * @see TraceAttributes::TEST_SUITE_RUN_STATUS success
+     */
+    public const TEST_SUITE_RUN_STATUS_SUCCESS = 'success';
+
+    /**
+     * @see TraceAttributes::TEST_SUITE_RUN_STATUS failure
+     */
+    public const TEST_SUITE_RUN_STATUS_FAILURE = 'failure';
+
+    /**
+     * @see TraceAttributes::TEST_SUITE_RUN_STATUS skipped
+     */
+    public const TEST_SUITE_RUN_STATUS_SKIPPED = 'skipped';
+
+    /**
+     * @see TraceAttributes::TEST_SUITE_RUN_STATUS aborted
+     */
+    public const TEST_SUITE_RUN_STATUS_ABORTED = 'aborted';
+
+    /**
+     * @see TraceAttributes::TEST_SUITE_RUN_STATUS timed_out
+     */
+    public const TEST_SUITE_RUN_STATUS_TIMED_OUT = 'timed_out';
+
+    /**
+     * @see TraceAttributes::TEST_SUITE_RUN_STATUS in_progress
+     */
+    public const TEST_SUITE_RUN_STATUS_IN_PROGRESS = 'in_progress';
+
+    /**
      * @see TraceAttributes::TLS_PROTOCOL_NAME ssl
      */
     public const TLS_PROTOCOL_NAME_SSL = 'ssl';
@@ -1993,4 +2190,59 @@ interface TraceAttributeValues
      * @see TraceAttributes::TLS_PROTOCOL_NAME tls
      */
     public const TLS_PROTOCOL_NAME_TLS = 'tls';
+
+    /**
+     * @see TraceAttributes::V8JS_GC_TYPE Major (Mark Sweep Compact)
+     */
+    public const V8JS_GC_TYPE_MAJOR = 'major';
+
+    /**
+     * @see TraceAttributes::V8JS_GC_TYPE Minor (Scavenge)
+     */
+    public const V8JS_GC_TYPE_MINOR = 'minor';
+
+    /**
+     * @see TraceAttributes::V8JS_GC_TYPE Incremental (Incremental Marking)
+     */
+    public const V8JS_GC_TYPE_INCREMENTAL = 'incremental';
+
+    /**
+     * @see TraceAttributes::V8JS_GC_TYPE Weak Callbacks (Process Weak Callbacks)
+     */
+    public const V8JS_GC_TYPE_WEAKCB = 'weakcb';
+
+    /**
+     * @see TraceAttributes::V8JS_HEAP_SPACE_NAME New memory space
+     */
+    public const V8JS_HEAP_SPACE_NAME_NEW_SPACE = 'new_space';
+
+    /**
+     * @see TraceAttributes::V8JS_HEAP_SPACE_NAME Old memory space
+     */
+    public const V8JS_HEAP_SPACE_NAME_OLD_SPACE = 'old_space';
+
+    /**
+     * @see TraceAttributes::V8JS_HEAP_SPACE_NAME Code memory space
+     */
+    public const V8JS_HEAP_SPACE_NAME_CODE_SPACE = 'code_space';
+
+    /**
+     * @see TraceAttributes::V8JS_HEAP_SPACE_NAME Map memory space
+     */
+    public const V8JS_HEAP_SPACE_NAME_MAP_SPACE = 'map_space';
+
+    /**
+     * @see TraceAttributes::V8JS_HEAP_SPACE_NAME Large object memory space
+     */
+    public const V8JS_HEAP_SPACE_NAME_LARGE_OBJECT_SPACE = 'large_object_space';
+
+    /**
+     * @see TraceAttributes::VCS_REPOSITORY_REF_TYPE [branch](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefbranchabranch)
+     */
+    public const VCS_REPOSITORY_REF_TYPE_BRANCH = 'branch';
+
+    /**
+     * @see TraceAttributes::VCS_REPOSITORY_REF_TYPE [tag](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddeftagatag)
+     */
+    public const VCS_REPOSITORY_REF_TYPE_TAG = 'tag';
 }
