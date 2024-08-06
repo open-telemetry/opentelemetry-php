@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-interface MeterProviderInterface extends \OpenTelemetry\API\Metrics\MeterProviderInterface
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
+
+interface MeterProviderInterface extends \OpenTelemetry\API\Metrics\MeterProviderInterface, Configurable
 {
     public function shutdown(): bool;
 

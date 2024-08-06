@@ -58,4 +58,9 @@ class LateBindingMeter implements MeterInterface
     {
         return ($this->meter ??= ($this->factory)())->createObservableUpDownCounter($name, $unit, $description, $advisory, $callbacks);
     }
+
+    public function isEnabled(): bool
+    {
+        return true;
+    }
 }

@@ -102,7 +102,9 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
         $metrics = [];
         foreach ($this->sources as $source) {
-            $metrics[] = $source->collect();
+            if ($source->isEnabled()) {
+                $metrics[] = $source->collect();
+            }
         }
 
         if ($metrics === []) {

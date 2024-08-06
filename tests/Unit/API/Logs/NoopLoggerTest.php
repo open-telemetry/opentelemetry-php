@@ -18,6 +18,6 @@ class NoopLoggerTest extends TestCase
 
     public function test_enabled(): void
     {
-        $this->assertFalse(NoopLogger::getInstance()->enabled());
+        $this->assertFalse(NoopLogger::getInstance()->isEnabled());
     }
 }

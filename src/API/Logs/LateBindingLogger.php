@@ -21,7 +21,7 @@ class LateBindingLogger implements LoggerInterface
         ($this->logger ??= ($this->factory)())->emit($logRecord);
     }
 
-    public function enabled(): bool
+    public function isEnabled(): bool
     {
         return true;
     }

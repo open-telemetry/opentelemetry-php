@@ -11,15 +11,18 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
+use WeakMap;
 
 final class TracerProvider implements TracerProviderInterface
 {
     private readonly TracerSharedState $tracerSharedState;
     private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
+    private readonly WeakMap $tracers;
 
     /** @param list<SpanProcessorInterface>|SpanProcessorInterface|null $spanProcessors */
     public function __construct(
@@ -29,6 +32,7 @@ final class TracerProvider implements TracerProviderInterface
         SpanLimits $spanLimits = null,
         IdGeneratorInterface $idGenerator = null,
         ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
+        private ?Configurator $configurator = null,
     ) {
         $spanProcessors ??= [];
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
@@ -45,6 +49,7 @@ final class TracerProvider implements TracerProviderInterface
             $spanProcessors
         );
         $this->instrumentationScopeFactory = $instrumentationScopeFactory ?? new InstrumentationScopeFactory(Attributes::factory());
+        $this->tracers = new WeakMap();
     }
 
     public function forceFlush(?CancellationInterface $cancellation = null): bool
@@ -65,10 +70,15 @@ final class TracerProvider implements TracerProviderInterface
             return NoopTracer::getInstance();
         }
 
-        return new Tracer(
+        $scope = $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes);
+        $tracer = new Tracer(
             $this->tracerSharedState,
-            $this->instrumentationScopeFactory->create($name, $version, $schemaUrl, $attributes),
+            $scope,
+            $this->configurator,
         );
+        $this->tracers->offsetSet($tracer, null);
+
+        return $tracer;
     }
 
     public function getSampler(): SamplerInterface
@@ -91,5 +101,19 @@ final class TracerProvider implements TracerProviderInterface
     public static function builder(): TracerProviderBuilder
     {
         return new TracerProviderBuilder();
+    }
+
+    /**
+     * Update the {@link Configurator} for a {@link TracerProvider}, which will
+     * reconfigure all tracers created from the provider.
+     * @experimental
+     */
+    public function updateConfigurator(Configurator $configurator): void
+    {
+        $this->configurator = $configurator;
+
+        foreach ($this->tracers as $tracer => $unused) {
+            $tracer->updateConfig($configurator);
+        }
     }
 }

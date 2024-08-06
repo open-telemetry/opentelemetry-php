@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Logs;
 
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\NoopLogger;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 
 class NoopLoggerProvider implements LoggerProviderInterface
 {
@@ -29,5 +30,10 @@ class NoopLoggerProvider implements LoggerProviderInterface
     public function forceFlush(): bool
     {
         return true;
+    }
+
+    public function updateConfigurator(Configurator $configurator): void
+    {
+        //no-op
     }
 }

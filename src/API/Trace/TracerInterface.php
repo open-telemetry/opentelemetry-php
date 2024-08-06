@@ -14,5 +14,5 @@ interface TracerInterface
      * creating a new span.
      * @experimental
      */
-    public function enabled(): bool;
+    public function isEnabled(): bool;
 }

@@ -10,7 +10,9 @@ use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Logs\Logger;
+use OpenTelemetry\SDK\Logs\LoggerConfig;
 use OpenTelemetry\SDK\Logs\LoggerSharedState;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
@@ -113,6 +115,21 @@ class LoggerTest extends TestCase
     public function test_enabled(): void
     {
         $logger = new Logger($this->sharedState, $this->scope);
-        $this->assertTrue($logger->enabled());
+        $this->assertTrue($logger->isEnabled());
+
+        $this->processor->expects($this->once())->method('onEmit');
+
+        $logger->emit(new LogRecord());
+    }
+
+    public function test_does_not_log_if_disabled(): void
+    {
+        $configurator = Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled(true), name: 'foo');
+        $logger = new Logger($this->sharedState, $this->scope, $configurator);
+        $this->assertFalse($logger->isEnabled());
+
+        $this->processor->expects($this->never())->method('onEmit');
+
+        $logger->emit(new LogRecord());
     }
 }

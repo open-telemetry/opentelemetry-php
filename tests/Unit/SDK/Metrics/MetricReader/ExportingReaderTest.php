@@ -148,6 +148,7 @@ final class ExportingReaderTest extends TestCase
 
         $source = $this->createMock(MetricSourceInterface::class);
         $source->expects($this->once())->method('collect')->willReturn($metric);
+        $source->method('isEnabled')->willReturn(true);
         $provider = $this->createMock(MetricSourceProviderInterface::class);
         $provider->expects($this->once())->method('create')->willReturn($source);
         $metricMetadata = $this->createMock(MetricMetadataInterface::class);
@@ -183,6 +184,7 @@ final class ExportingReaderTest extends TestCase
         $provider = $this->createMock(MetricSourceProviderInterface::class);
         $source = $this->createMock(MetricSourceInterface::class);
         $source->method('collect')->willReturn($this->createMock(Metric::class));
+        $source->method('isEnabled')->willReturn(true);
         $provider->method('create')->willReturn($source);
         $exporter->method('temporality')->willReturn('foo');
         $exporter->expects($this->once())->method('export')->willReturn(true);

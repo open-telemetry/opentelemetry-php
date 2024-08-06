@@ -178,4 +178,6 @@ interface MeterInterface
         array|callable $advisory = [],
         callable ...$callbacks,
     ): ObservableUpDownCounterInterface;
+
+    public function isEnabled(): bool;
 }

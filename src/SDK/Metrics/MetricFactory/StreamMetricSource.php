@@ -39,4 +39,9 @@ final class StreamMetricSource implements MetricSourceInterface
     {
         $this->provider->stream->unregister($this->reader);
     }
+
+    public function isEnabled(): bool
+    {
+        return $this->provider->instrument->isEnabled();
+    }
 }

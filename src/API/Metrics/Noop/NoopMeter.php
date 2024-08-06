@@ -56,4 +56,9 @@ final class NoopMeter implements MeterInterface
     {
         return new NoopObservableUpDownCounter();
     }
+
+    public function isEnabled(): bool
+    {
+        return false;
+    }
 }

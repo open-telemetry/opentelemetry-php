@@ -10,8 +10,12 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
+use OpenTelemetry\SDK\Metrics\MeterConfig;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
+use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
@@ -103,6 +107,19 @@ final class MeterProviderTest extends TestCase
             new ImmediateStalenessHandlerFactory(),
         );
         $this->assertTrue($meterProvider->forceFlush());
+    }
+
+    public function test_disable(): void
+    {
+        $meterProvider = MeterProvider::builder()->addReader(new ExportingReader(new InMemoryExporter()))->build();
+        $this->assertInstanceOf(MeterProvider::class, $meterProvider);
+        $meter = $meterProvider->getMeter('one');
+        $this->assertTrue($meter->isEnabled());
+        $counter = $meter->createCounter('A');
+        $this->assertTrue($counter->isEnabled());
+        $meterProvider->updateConfigurator(Configurator::meter()->with(static fn (MeterConfig $config) => $config->setDisabled(true), name: 'one'));
+        $this->assertFalse($meter->isEnabled());
+        $this->assertFalse($counter->isEnabled());
     }
 }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\View;
 
+use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Metrics\Instrument;
@@ -30,14 +31,22 @@ final class SelectionCriteriaTest extends TestCase
 {
     use ProphecyTrait;
 
+    private MeterInterface $meter;
+
+    public function setUp(): void
+    {
+        $this->meter = $this->createMock(MeterInterface::class);
+        $this->meter->method('isEnabled')->willReturn(true);
+    }
+
     public function test_instrument_scope_name_criteria(): void
     {
         $this->assertTrue((new InstrumentationScopeNameCriteria('scopeName'))->accepts(
-            new Instrument(InstrumentType::COUNTER, 'name', null, null),
+            new Instrument(InstrumentType::COUNTER, 'name', null, null, meter: $this->meter),
             new InstrumentationScope('scopeName', null, null, Attributes::create([])),
         ));
         $this->assertFalse((new InstrumentationScopeNameCriteria('scopeName'))->accepts(
-            new Instrument(InstrumentType::COUNTER, 'name', null, null),
+            new Instrument(InstrumentType::COUNTER, 'name', null, null, meter: $this->meter),
             new InstrumentationScope('scope-name', null, null, Attributes::create([])),
         ));
     }

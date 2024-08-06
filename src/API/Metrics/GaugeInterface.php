@@ -13,7 +13,7 @@ use OpenTelemetry\Context\ContextInterface;
  *
  * @experimental
  */
-interface GaugeInterface
+interface GaugeInterface extends SynchronousInstrument
 {
 
     /**

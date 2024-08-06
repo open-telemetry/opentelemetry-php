@@ -284,6 +284,7 @@ return [
         'PhanAccessClassInternal',
         'PhanAccessMethodInternal',
         'PhanAccessPropertyInternal',
+        'PhanTypeMismatchPropertyReal',
         'PhanTemplateTypeNotUsedInFunctionReturn',
     ],
 
