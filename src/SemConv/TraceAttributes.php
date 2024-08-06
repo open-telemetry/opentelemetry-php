@@ -2556,16 +2556,6 @@ interface TraceAttributes
     public const MESSAGING_CLIENT_ID = 'messaging.client.id';
 
     /**
-     * Deprecated, use `messaging.client.id` instead.
-     *
-     * @deprecated Replaced by `messaging.client.id`.
-     *
-     * @example client-5
-     * @example myhost@8742@s8083jm
-     */
-    public const MESSAGING_CLIENT_ID = 'messaging.client_id';
-
-    /**
      * The name of the consumer group with which a consumer is associated.
      *
      * Semantic conventions for individual messaging systems SHOULD document whether `messaging.consumer.group.name` is applicable and what it means in the context of that system.
