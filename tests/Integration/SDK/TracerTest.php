@@ -119,9 +119,8 @@ class TracerTest extends TestCase
         $tracerProvider = new TracerProvider(new SimpleSpanProcessor($exporter));
         $tracer = $tracerProvider->getTracer('test');
         $tracer->spanBuilder('test')
-            ->setAttribute(TraceAttributes::ENDUSER_ID, 'username')
-            ->setAttribute(TraceAttributes::ENDUSER_ROLE, 'admin')
-            ->setAttribute(TraceAttributes::ENDUSER_SCOPE, 'read:message, write:files')
+            ->setAttribute(TraceAttributes::USER_ID, 'username')
+            ->setAttribute(TraceAttributes::USER_ROLES, 'admin')
             ->startSpan()
             ->end();
 
@@ -130,7 +129,7 @@ class TracerTest extends TestCase
         /** @var AttributesInterface $attributes */
         $attributes = $exporter->getSpans()[0]->getAttributes();
         $this->assertCount(0, $attributes);
-        $this->assertSame(3, $attributes->getDroppedAttributesCount());
+        $this->assertSame(2, $attributes->getDroppedAttributesCount());
     }
 
     public function test_general_identity_attributes_are_retained_if_enabled(): void

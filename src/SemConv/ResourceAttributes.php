@@ -11,7 +11,7 @@ interface ResourceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.26.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.27.0';
 
     /**
      * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found here.
@@ -203,7 +203,7 @@ interface ResourceAttributes
      * <li><strong>AWS Lambda:</strong> The function ARN.
      * Take care not to use the &quot;invoked ARN&quot; directly but replace any
      * alias suffix
-     * with the resolved function version, as the same runtime instance may be invokable with
+     * with the resolved function version, as the same runtime instance may be invocable with
      * multiple different aliases.</li>
      * <li><strong>GCP:</strong> The URI of the resource</li>
      * <li><strong>Azure:</strong> The Fully Qualified Resource ID of the invoked function,
@@ -304,18 +304,18 @@ interface ResourceAttributes
     /**
      * Name of the deployment environment (aka deployment tier).
      *
-     * `deployment.environment` does not affect the uniqueness constraints defined through
+     * `deployment.environment.name` does not affect the uniqueness constraints defined through
      * the `service.namespace`, `service.name` and `service.instance.id` resource attributes.
      * This implies that resources carrying the following attribute combinations MUST be
      * considered to be identifying the same service:<ul>
-     * <li>`service.name=frontend`, `deployment.environment=production`</li>
-     * <li>`service.name=frontend`, `deployment.environment=staging`.</li>
+     * <li>`service.name=frontend`, `deployment.environment.name=production`</li>
+     * <li>`service.name=frontend`, `deployment.environment.name=staging`.</li>
      * </ul>
      *
      * @example staging
      * @example production
      */
-    public const DEPLOYMENT_ENVIRONMENT = 'deployment.environment';
+    public const DEPLOYMENT_ENVIRONMENT_NAME = 'deployment.environment.name';
 
     /**
      * A unique identifier representing the device.
@@ -883,7 +883,7 @@ interface ResourceAttributes
     public const PROCESS_RUNTIME_DESCRIPTION = 'process.runtime.description';
 
     /**
-     * The name of the runtime of this process. For compiled native binaries, this SHOULD be the name of the compiler.
+     * The name of the runtime of this process.
      *
      * @example OpenJDK Runtime Environment
      */
@@ -1050,4 +1050,9 @@ interface ResourceAttributes
      * @deprecated Use `otel.scope.version`
      */
     public const OTEL_LIBRARY_VERSION = 'otel.library.version';
+
+    /**
+     * @deprecated Use `deployment.environment.name`
+     */
+    public const DEPLOYMENT_ENVIRONMENT = 'deployment.environment';
 }

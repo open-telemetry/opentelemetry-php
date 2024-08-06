@@ -107,6 +107,7 @@ class SpanLimitsBuilder
 
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#span-limits
+     * @phan-suppress PhanDeprecatedClassConstant
      */
     public function build(): SpanLimits
     {
@@ -131,9 +132,8 @@ class SpanLimitsBuilder
 
         if (!$this->retainGeneralIdentityAttributes) {
             $spanAttributesFactory = new FilteredAttributesFactory($spanAttributesFactory, [
-                TraceAttributes::ENDUSER_ID,
-                TraceAttributes::ENDUSER_ROLE,
-                TraceAttributes::ENDUSER_SCOPE,
+                TraceAttributes::USER_ID,
+                TraceAttributes::USER_ROLES,
             ]);
         }
 

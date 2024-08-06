@@ -11,344 +11,480 @@ interface ResourceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.26.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.27.0';
     /**
-     * @see ResourceAttributes::AWS_ECS_LAUNCHTYPE ec2
+     * ec2
+     *
+     * @see ResourceAttributes::AWS_ECS_LAUNCHTYPE
      */
     public const AWS_ECS_LAUNCHTYPE_EC2 = 'ec2';
 
     /**
-     * @see ResourceAttributes::AWS_ECS_LAUNCHTYPE fargate
+     * fargate
+     *
+     * @see ResourceAttributes::AWS_ECS_LAUNCHTYPE
      */
     public const AWS_ECS_LAUNCHTYPE_FARGATE = 'fargate';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Alibaba Cloud Elastic Compute Service
+     * Alibaba Cloud Elastic Compute Service
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_ALIBABA_CLOUD_ECS = 'alibaba_cloud_ecs';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Alibaba Cloud Function Compute
+     * Alibaba Cloud Function Compute
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_ALIBABA_CLOUD_FC = 'alibaba_cloud_fc';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Red Hat OpenShift on Alibaba Cloud
+     * Red Hat OpenShift on Alibaba Cloud
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_ALIBABA_CLOUD_OPENSHIFT = 'alibaba_cloud_openshift';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM AWS Elastic Compute Cloud
+     * AWS Elastic Compute Cloud
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AWS_EC2 = 'aws_ec2';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM AWS Elastic Container Service
+     * AWS Elastic Container Service
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AWS_ECS = 'aws_ecs';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM AWS Elastic Kubernetes Service
+     * AWS Elastic Kubernetes Service
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AWS_EKS = 'aws_eks';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM AWS Lambda
+     * AWS Lambda
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AWS_LAMBDA = 'aws_lambda';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM AWS Elastic Beanstalk
+     * AWS Elastic Beanstalk
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AWS_ELASTIC_BEANSTALK = 'aws_elastic_beanstalk';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM AWS App Runner
+     * AWS App Runner
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AWS_APP_RUNNER = 'aws_app_runner';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Red Hat OpenShift on AWS (ROSA)
+     * Red Hat OpenShift on AWS (ROSA)
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AWS_OPENSHIFT = 'aws_openshift';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Azure Virtual Machines
+     * Azure Virtual Machines
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AZURE_VM = 'azure_vm';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Azure Container Apps
+     * Azure Container Apps
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AZURE_CONTAINER_APPS = 'azure_container_apps';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Azure Container Instances
+     * Azure Container Instances
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AZURE_CONTAINER_INSTANCES = 'azure_container_instances';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Azure Kubernetes Service
+     * Azure Kubernetes Service
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AZURE_AKS = 'azure_aks';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Azure Functions
+     * Azure Functions
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AZURE_FUNCTIONS = 'azure_functions';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Azure App Service
+     * Azure App Service
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AZURE_APP_SERVICE = 'azure_app_service';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Azure Red Hat OpenShift
+     * Azure Red Hat OpenShift
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AZURE_OPENSHIFT = 'azure_openshift';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Google Bare Metal Solution (BMS)
+     * Google Bare Metal Solution (BMS)
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_GCP_BARE_METAL_SOLUTION = 'gcp_bare_metal_solution';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Google Cloud Compute Engine (GCE)
+     * Google Cloud Compute Engine (GCE)
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_GCP_COMPUTE_ENGINE = 'gcp_compute_engine';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Google Cloud Run
+     * Google Cloud Run
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_GCP_CLOUD_RUN = 'gcp_cloud_run';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Google Cloud Kubernetes Engine (GKE)
+     * Google Cloud Kubernetes Engine (GKE)
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_GCP_KUBERNETES_ENGINE = 'gcp_kubernetes_engine';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Google Cloud Functions (GCF)
+     * Google Cloud Functions (GCF)
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_GCP_CLOUD_FUNCTIONS = 'gcp_cloud_functions';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Google Cloud App Engine (GAE)
+     * Google Cloud App Engine (GAE)
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_GCP_APP_ENGINE = 'gcp_app_engine';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Red Hat OpenShift on Google Cloud
+     * Red Hat OpenShift on Google Cloud
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_GCP_OPENSHIFT = 'gcp_openshift';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Red Hat OpenShift on IBM Cloud
+     * Red Hat OpenShift on IBM Cloud
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_IBM_CLOUD_OPENSHIFT = 'ibm_cloud_openshift';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Tencent Cloud Cloud Virtual Machine (CVM)
+     * Tencent Cloud Cloud Virtual Machine (CVM)
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_TENCENT_CLOUD_CVM = 'tencent_cloud_cvm';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Tencent Cloud Elastic Kubernetes Service (EKS)
+     * Tencent Cloud Elastic Kubernetes Service (EKS)
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_TENCENT_CLOUD_EKS = 'tencent_cloud_eks';
 
     /**
-     * @see ResourceAttributes::CLOUD_PLATFORM Tencent Cloud Serverless Cloud Function (SCF)
+     * Tencent Cloud Serverless Cloud Function (SCF)
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_TENCENT_CLOUD_SCF = 'tencent_cloud_scf';
 
     /**
-     * @see ResourceAttributes::CLOUD_PROVIDER Alibaba Cloud
+     * Alibaba Cloud
+     *
+     * @see ResourceAttributes::CLOUD_PROVIDER
      */
     public const CLOUD_PROVIDER_ALIBABA_CLOUD = 'alibaba_cloud';
 
     /**
-     * @see ResourceAttributes::CLOUD_PROVIDER Amazon Web Services
+     * Amazon Web Services
+     *
+     * @see ResourceAttributes::CLOUD_PROVIDER
      */
     public const CLOUD_PROVIDER_AWS = 'aws';
 
     /**
-     * @see ResourceAttributes::CLOUD_PROVIDER Microsoft Azure
+     * Microsoft Azure
+     *
+     * @see ResourceAttributes::CLOUD_PROVIDER
      */
     public const CLOUD_PROVIDER_AZURE = 'azure';
 
     /**
-     * @see ResourceAttributes::CLOUD_PROVIDER Google Cloud Platform
+     * Google Cloud Platform
+     *
+     * @see ResourceAttributes::CLOUD_PROVIDER
      */
     public const CLOUD_PROVIDER_GCP = 'gcp';
 
     /**
-     * @see ResourceAttributes::CLOUD_PROVIDER Heroku Platform as a Service
+     * Heroku Platform as a Service
+     *
+     * @see ResourceAttributes::CLOUD_PROVIDER
      */
     public const CLOUD_PROVIDER_HEROKU = 'heroku';
 
     /**
-     * @see ResourceAttributes::CLOUD_PROVIDER IBM Cloud
+     * IBM Cloud
+     *
+     * @see ResourceAttributes::CLOUD_PROVIDER
      */
     public const CLOUD_PROVIDER_IBM_CLOUD = 'ibm_cloud';
 
     /**
-     * @see ResourceAttributes::CLOUD_PROVIDER Tencent Cloud
+     * Tencent Cloud
+     *
+     * @see ResourceAttributes::CLOUD_PROVIDER
      */
     public const CLOUD_PROVIDER_TENCENT_CLOUD = 'tencent_cloud';
 
     /**
-     * @see ResourceAttributes::HOST_ARCH AMD64
+     * AMD64
+     *
+     * @see ResourceAttributes::HOST_ARCH
      */
     public const HOST_ARCH_AMD64 = 'amd64';
 
     /**
-     * @see ResourceAttributes::HOST_ARCH ARM32
+     * ARM32
+     *
+     * @see ResourceAttributes::HOST_ARCH
      */
     public const HOST_ARCH_ARM32 = 'arm32';
 
     /**
-     * @see ResourceAttributes::HOST_ARCH ARM64
+     * ARM64
+     *
+     * @see ResourceAttributes::HOST_ARCH
      */
     public const HOST_ARCH_ARM64 = 'arm64';
 
     /**
-     * @see ResourceAttributes::HOST_ARCH Itanium
+     * Itanium
+     *
+     * @see ResourceAttributes::HOST_ARCH
      */
     public const HOST_ARCH_IA64 = 'ia64';
 
     /**
-     * @see ResourceAttributes::HOST_ARCH 32-bit PowerPC
+     * 32-bit PowerPC
+     *
+     * @see ResourceAttributes::HOST_ARCH
      */
     public const HOST_ARCH_PPC32 = 'ppc32';
 
     /**
-     * @see ResourceAttributes::HOST_ARCH 64-bit PowerPC
+     * 64-bit PowerPC
+     *
+     * @see ResourceAttributes::HOST_ARCH
      */
     public const HOST_ARCH_PPC64 = 'ppc64';
 
     /**
-     * @see ResourceAttributes::HOST_ARCH IBM z/Architecture
+     * IBM z/Architecture
+     *
+     * @see ResourceAttributes::HOST_ARCH
      */
     public const HOST_ARCH_S390X = 's390x';
 
     /**
-     * @see ResourceAttributes::HOST_ARCH 32-bit x86
+     * 32-bit x86
+     *
+     * @see ResourceAttributes::HOST_ARCH
      */
     public const HOST_ARCH_X86 = 'x86';
 
     /**
-     * @see ResourceAttributes::OS_TYPE Microsoft Windows
+     * Microsoft Windows
+     *
+     * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_WINDOWS = 'windows';
 
     /**
-     * @see ResourceAttributes::OS_TYPE Linux
+     * Linux
+     *
+     * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_LINUX = 'linux';
 
     /**
-     * @see ResourceAttributes::OS_TYPE Apple Darwin
+     * Apple Darwin
+     *
+     * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_DARWIN = 'darwin';
 
     /**
-     * @see ResourceAttributes::OS_TYPE FreeBSD
+     * FreeBSD
+     *
+     * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_FREEBSD = 'freebsd';
 
     /**
-     * @see ResourceAttributes::OS_TYPE NetBSD
+     * NetBSD
+     *
+     * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_NETBSD = 'netbsd';
 
     /**
-     * @see ResourceAttributes::OS_TYPE OpenBSD
+     * OpenBSD
+     *
+     * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_OPENBSD = 'openbsd';
 
     /**
-     * @see ResourceAttributes::OS_TYPE DragonFly BSD
+     * DragonFly BSD
+     *
+     * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_DRAGONFLYBSD = 'dragonflybsd';
 
     /**
-     * @see ResourceAttributes::OS_TYPE HP-UX (Hewlett Packard Unix)
+     * HP-UX (Hewlett Packard Unix)
+     *
+     * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_HPUX = 'hpux';
 
     /**
-     * @see ResourceAttributes::OS_TYPE AIX (Advanced Interactive eXecutive)
+     * AIX (Advanced Interactive eXecutive)
+     *
+     * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_AIX = 'aix';
 
     /**
-     * @see ResourceAttributes::OS_TYPE SunOS, Oracle Solaris
+     * SunOS, Oracle Solaris
+     *
+     * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_SOLARIS = 'solaris';
 
     /**
-     * @see ResourceAttributes::OS_TYPE IBM z/OS
+     * IBM z/OS
+     *
+     * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_Z_OS = 'z_os';
 
     /**
-     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE cpp
+     * cpp
+     *
+     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_CPP = 'cpp';
 
     /**
-     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE dotnet
+     * dotnet
+     *
+     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_DOTNET = 'dotnet';
 
     /**
-     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE erlang
+     * erlang
+     *
+     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_ERLANG = 'erlang';
 
     /**
-     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE go
+     * go
+     *
+     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_GO = 'go';
 
     /**
-     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE java
+     * java
+     *
+     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_JAVA = 'java';
 
     /**
-     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE nodejs
+     * nodejs
+     *
+     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_NODEJS = 'nodejs';
 
     /**
-     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE php
+     * php
+     *
+     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_PHP = 'php';
 
     /**
-     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE python
+     * python
+     *
+     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_PYTHON = 'python';
 
     /**
-     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE ruby
+     * ruby
+     *
+     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_RUBY = 'ruby';
 
     /**
-     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE rust
+     * rust
+     *
+     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_RUST = 'rust';
 
     /**
-     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE swift
+     * swift
+     *
+     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_SWIFT = 'swift';
 
     /**
-     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE webjs
+     * webjs
+     *
+     * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_WEBJS = 'webjs';
 }

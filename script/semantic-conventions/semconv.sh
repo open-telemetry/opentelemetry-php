@@ -17,10 +17,10 @@ SPEC_DIR="${ROOT_DIR}/var/semantic-conventions"
 CODE_DIR="${ROOT_DIR}/src/SemConv"
 
 # freeze the spec & generator tools versions to make SemanticAttributes generation reproducible
-SEMCONV_VERSION=${SEMCONV_VERSION:=1.26.0}
+SEMCONV_VERSION=${SEMCONV_VERSION:=1.27.0}
 SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
-GENERATOR_VERSION=0.24.0
+GENERATOR_VERSION=0.25.0
 
 cd "${SCRIPT_DIR}"
 
@@ -45,7 +45,7 @@ docker run --rm \
   -v "${CODE_DIR}:/output" \
   -u "${UID}" \
   otel/semconvgen:$GENERATOR_VERSION \
-  --only span,event,attribute_group,scope \
+  --only span,event,attribute_group \
   --yaml-root /source \
   code \
   --template /templates/Attributes.php.j2 \
@@ -77,7 +77,7 @@ docker run --rm \
   -v "${CODE_DIR}:/output" \
   -u "${UID}" \
   otel/semconvgen:$GENERATOR_VERSION \
-  --only span,event,attribute_group,scope \
+  --only span,event,attribute_group \
   --yaml-root /source \
   code \
   --template /templates/AttributeValues.php.j2 \
