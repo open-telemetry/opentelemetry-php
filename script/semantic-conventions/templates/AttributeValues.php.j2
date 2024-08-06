@@ -18,10 +18,15 @@ interface {{ class }}AttributeValues
 {%- for member in attribute.attr_type.members %}
     {%- if member.brief %}
     /**
-     * @see {{ class }}Attributes::{{ attribute.fqn | to_const_name }} {% filter escape %}{{member.brief | to_doc_brief}}{% endfilter %}
+     * {% filter escape %}{{member.brief | to_doc_brief}}{% endfilter %}
+     *
+     * @see {{ class }}Attributes::{{ attribute.fqn | to_const_name }}
      {%- if member.note %}
      *
      * {{ member.note | render_markdown(code="<code>{0}</code>", paragraph="{0}") | regex_replace(pattern="\n", replace="\n     * ") }}
+     {%- endif %}
+     {%- if member | is_deprecated %}
+     * @deprecated {{ member.deprecated | to_doc_brief }}.
      {%- endif %}
      */
     {%- endif %}
