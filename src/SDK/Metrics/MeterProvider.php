@@ -11,6 +11,7 @@ use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamFactory;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistry;
@@ -29,6 +30,7 @@ final class MeterProvider implements MeterProviderInterface
     private readonly ArrayAccess $destructors;
 
     private bool $closed = false;
+    private readonly WeakMap $meters;
 
     /**
      * @param iterable<MetricReaderInterface&MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricReaders
@@ -44,6 +46,7 @@ final class MeterProvider implements MeterProviderInterface
         private readonly ?ExemplarFilterInterface $exemplarFilter,
         private readonly StalenessHandlerFactoryInterface $stalenessHandlerFactory,
         MetricFactoryInterface $metricFactory = null,
+        private ?Configurator $configurator = null,
     ) {
         $this->metricFactory = $metricFactory ?? new StreamFactory();
         $this->instruments = new MeterInstruments();
@@ -52,6 +55,7 @@ final class MeterProvider implements MeterProviderInterface
         $this->registry = $registry;
         $this->writer = $registry;
         $this->destructors = new WeakMap();
+        $this->meters = new WeakMap();
     }
 
     public function getMeter(
@@ -64,7 +68,7 @@ final class MeterProvider implements MeterProviderInterface
             return new NoopMeter();
         }
 
-        return new Meter(
+        $meter = new Meter(
             $this->metricFactory,
             $this->resource,
             $this->clock,
@@ -77,7 +81,11 @@ final class MeterProvider implements MeterProviderInterface
             $this->registry,
             $this->writer,
             $this->destructors,
+            $this->configurator,
         );
+        $this->meters->offsetSet($meter, null);
+
+        return $meter;
     }
 
     public function shutdown(): bool
@@ -117,5 +125,20 @@ final class MeterProvider implements MeterProviderInterface
     public static function builder(): MeterProviderBuilder
     {
         return new MeterProviderBuilder();
+    }
+
+    /**
+     * Update the {@link Configurator} for a {@link MeterProvider}, which will reconfigure
+     *  all meters created from the provider.
+     * @todo enabling a previous-disabled meter does not drop/recreate the underlying metric streams, so previously collected synchronous metrics will still be exported.
+     * @experimental
+     */
+    public function updateConfigurator(Configurator $configurator): void
+    {
+        $this->configurator = $configurator;
+
+        foreach ($this->meters as $meter => $unused) {
+            $meter->updateConfigurator($configurator);
+        }
     }
 }

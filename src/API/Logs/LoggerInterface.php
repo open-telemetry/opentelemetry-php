@@ -17,5 +17,5 @@ interface LoggerInterface
      * are about to generate a LogRecord, to avoid performing computationally expensive work.
      * @experimental
      */
-    public function enabled(): bool;
+    public function isEnabled(): bool;
 }

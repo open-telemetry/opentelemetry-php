@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 class TracerProviderBuilder
@@ -12,6 +13,7 @@ class TracerProviderBuilder
     private ?array $spanProcessors = [];
     private ?ResourceInfo $resource = null;
     private ?SamplerInterface $sampler = null;
+    private ?Configurator $configurator = null;
 
     public function addSpanProcessor(SpanProcessorInterface $spanProcessor): self
     {
@@ -34,12 +36,20 @@ class TracerProviderBuilder
         return $this;
     }
 
+    public function setConfigurator(Configurator $configurator): self
+    {
+        $this->configurator = $configurator;
+
+        return $this;
+    }
+
     public function build(): TracerProviderInterface
     {
         return new TracerProvider(
             $this->spanProcessors,
             $this->sampler,
             $this->resource,
+            configurator: $this->configurator ?? Configurator::tracer(),
         );
     }
 }
