@@ -32,14 +32,14 @@ final class MultiTextMapPropagator implements TextMapPropagatorInterface
         return $this->fields;
     }
 
-    public function inject(&$carrier, PropagationSetterInterface $setter = null, ContextInterface $context = null): void
+    public function inject(&$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         foreach ($this->propagators as $propagator) {
             $propagator->inject($carrier, $setter, $context);
         }
     }
 
-    public function extract($carrier, PropagationGetterInterface $getter = null, ContextInterface $context = null): ContextInterface
+    public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $context ??= Context::getCurrent();
 
