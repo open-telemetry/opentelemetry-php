@@ -6,7 +6,7 @@ namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 
 use ArrayObject;
 use OpenTelemetry\API\Instrumentation\Configurator;
-use OpenTelemetry\API\Instrumentation\Handler;
+use OpenTelemetry\API\Instrumentation\WithSpanHandler;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SDK\Trace\ImmutableSpan;
@@ -17,8 +17,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Handler::class)]
-class HandlerTest extends TestCase
+#[CoversClass(WithSpanHandler::class)]
+class WithSpanHandlerTest extends TestCase
 {
     private ScopeInterface $scope;
     private ArrayObject $storage;
@@ -47,7 +47,7 @@ class HandlerTest extends TestCase
         $name = 'foo';
         $kind = SpanKind::KIND_CLIENT;
         $attributes = ['foo' => 'bar'];
-        Handler::pre(
+        WithSpanHandler::pre(
             null,
             [],
             'My\\Class',
@@ -58,7 +58,7 @@ class HandlerTest extends TestCase
             $attributes,
         );
         $this->assertCount(0, $this->storage);
-        Handler::post(null, [], null, null);
+        WithSpanHandler::post(null, [], null, null);
 
         $this->assertCount(1, $this->storage);
         /** @var ImmutableSpan $span */
@@ -79,8 +79,8 @@ class HandlerTest extends TestCase
     public function test_defaults(string $class, string $function, string $expected): void
     {
         $this->assertCount(0, $this->storage);
-        Handler::pre(null, [], $class, $function, null, null, [], []);
-        Handler::post(null, [], null, null);
+        WithSpanHandler::pre(null, [], $class, $function, null, null, [], []);
+        WithSpanHandler::post(null, [], null, null);
 
         $this->assertCount(1, $this->storage);
         /** @var ImmutableSpan $span */

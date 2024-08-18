@@ -10,7 +10,7 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Context\Context;
 use Throwable;
 
-class Handler
+class WithSpanHandler
 {
     /**
      * @psalm-suppress ArgumentTypeCoercion
