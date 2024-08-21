@@ -16,7 +16,7 @@ final class NoopUpDownCounter implements UpDownCounterInterface
         // no-op
     }
 
-    public function enabled(): bool
+    public function isEnabled(): bool
     {
         return false;
     }

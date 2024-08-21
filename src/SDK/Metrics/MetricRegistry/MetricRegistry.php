@@ -38,6 +38,8 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     private array $asynchronousCallbacks = [];
     /** @var array<int, list<int>> */
     private array $asynchronousCallbackArguments = [];
+    /** @var array<int, Instrument> */
+    private array $instruments = [];
 
     public function __construct(
         private readonly ?ContextStorageInterface $contextStorage,
@@ -55,6 +57,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         $this->synchronousAggregators[$streamId] = $aggregator;
         $this->instrumentToStreams[$instrumentId][$streamId] = $streamId;
         $this->streamToInstrument[$streamId] = $instrumentId;
+        $this->instruments[$instrumentId] = $instrument;
 
         return $streamId;
     }
@@ -68,6 +71,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         $this->asynchronousAggregatorFactories[$streamId] = $aggregatorFactory;
         $this->instrumentToStreams[$instrumentId][$streamId] = $streamId;
         $this->streamToInstrument[$streamId] = $instrumentId;
+        $this->instruments[$instrumentId] = $instrument;
 
         return $streamId;
     }
@@ -81,6 +85,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
             $this->asynchronousAggregatorFactories[$streamId],
             $this->instrumentToStreams[$instrumentId][$streamId],
             $this->streamToInstrument[$streamId],
+            $this->instruments[$instrumentId],
         );
         if (!$this->instrumentToStreams[$instrumentId]) {
             unset($this->instrumentToStreams[$instrumentId]);
@@ -139,10 +144,16 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         $observers = [];
         $callbackIds = [];
         foreach ($streamIds as $streamId) {
+            $instrumentId = $this->streamToInstrument[$streamId];
+            if (
+                array_key_exists($instrumentId, $this->instruments)
+                && $this->instruments[$instrumentId]->meter?->isEnabled() === false
+            ) {
+                continue;
+            }
             if (!$aggregator = $this->synchronousAggregators[$streamId] ?? null) {
                 $aggregator = $this->asynchronousAggregatorFactories[$streamId]->create();
 
-                $instrumentId = $this->streamToInstrument[$streamId];
                 $observers[$instrumentId] ??= new MultiObserver($this->attributesFactory, $timestamp);
                 $observers[$instrumentId]->writers[] = $aggregator;
                 foreach ($this->instrumentToCallbacks[$instrumentId] ?? [] as $callbackId) {

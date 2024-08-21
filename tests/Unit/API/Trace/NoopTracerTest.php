@@ -24,6 +24,6 @@ class NoopTracerTest extends TestCase
 
     public function test_enabled(): void
     {
-        $this->assertFalse(NoopTracer::getInstance()->enabled());
+        $this->assertFalse(NoopTracer::getInstance()->isEnabled());
     }
 }

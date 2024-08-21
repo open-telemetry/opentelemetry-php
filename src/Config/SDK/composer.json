@@ -21,7 +21,7 @@
         "open-telemetry/context": "^1.0",
         "open-telemetry/sdk": "^1.0",
         "symfony/config": "^5.4 || ^6.4 || ^7.0",
-        "tbachert/spi": "^0.2"
+        "tbachert/spi": ">= 0.2.1"
     },
     "autoload": {
         "psr-4": {
@@ -64,7 +64,10 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterConsole",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlp",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorBatch",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple"
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\PeerConfigProvider"
             ]
         }
     }

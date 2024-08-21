@@ -22,6 +22,26 @@ class SdkTest extends TestCase
 {
     use TestState;
 
+    private TextMapPropagatorInterface $propagator;
+    private MeterProviderInterface $meterProvider;
+    private TracerProviderInterface $tracerProvider;
+    private LoggerProviderInterface $loggerProvider;
+    private EventLoggerProviderInterface $eventLoggerProvider;
+
+    public function setUp(): void
+    {
+        $this->propagator = $this->createMock(TextMapPropagatorInterface::class);
+        $this->meterProvider = $this->createMock(MeterProviderInterface::class);
+        $this->tracerProvider = $this->createMock(TracerProviderInterface::class);
+        $this->loggerProvider = $this->createMock(LoggerProviderInterface::class);
+        $this->eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
+    }
+
+    public function tearDown(): void
+    {
+        self::restoreEnvironmentVariables();
+    }
+
     public function test_is_not_disabled_by_default(): void
     {
         $this->assertFalse(Sdk::isDisabled());
@@ -70,16 +90,11 @@ class SdkTest extends TestCase
 
     public function test_getters(): void
     {
-        $propagator = $this->createMock(TextMapPropagatorInterface::class);
-        $meterProvider = $this->createMock(MeterProviderInterface::class);
-        $tracerProvider = $this->createMock(TracerProviderInterface::class);
-        $loggerProvider = $this->createMock(LoggerProviderInterface::class);
-        $eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
-        $sdk = new Sdk($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator);
-        $this->assertSame($propagator, $sdk->getPropagator());
-        $this->assertSame($meterProvider, $sdk->getMeterProvider());
-        $this->assertSame($tracerProvider, $sdk->getTracerProvider());
-        $this->assertSame($loggerProvider, $sdk->getLoggerProvider());
-        $this->assertSame($eventLoggerProvider, $sdk->getEventLoggerProvider());
+        $sdk = new Sdk($this->tracerProvider, $this->meterProvider, $this->loggerProvider, $this->eventLoggerProvider, $this->propagator);
+        $this->assertSame($this->propagator, $sdk->getPropagator());
+        $this->assertSame($this->meterProvider, $sdk->getMeterProvider());
+        $this->assertSame($this->tracerProvider, $sdk->getTracerProvider());
+        $this->assertSame($this->loggerProvider, $sdk->getLoggerProvider());
+        $this->assertSame($this->eventLoggerProvider, $sdk->getEventLoggerProvider());
     }
 }

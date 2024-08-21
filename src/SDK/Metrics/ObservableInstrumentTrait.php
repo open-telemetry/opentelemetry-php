@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Metrics;
 
 use ArrayAccess;
 use function assert;
+use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
@@ -15,23 +16,14 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
  */
 trait ObservableInstrumentTrait
 {
-    private MetricWriterInterface $writer;
-    private Instrument $instrument;
-    private ReferenceCounterInterface $referenceCounter;
-    private ArrayAccess $destructors;
-
     public function __construct(
-        MetricWriterInterface $writer,
-        Instrument $instrument,
-        ReferenceCounterInterface $referenceCounter,
-        ArrayAccess $destructors,
+        private readonly MetricWriterInterface $writer,
+        private readonly Instrument $instrument,
+        private readonly ReferenceCounterInterface $referenceCounter,
+        private readonly ArrayAccess $destructors,
+        private readonly MeterInterface $meter,
     ) {
         assert($this instanceof InstrumentHandle);
-
-        $this->writer = $writer;
-        $this->instrument = $instrument;
-        $this->referenceCounter = $referenceCounter;
-        $this->destructors = $destructors;
 
         $this->referenceCounter->acquire();
     }
@@ -60,8 +52,12 @@ trait ObservableInstrumentTrait
         );
     }
 
-    public function enabled(): bool
+    public function isEnabled(): bool
     {
+        if (!$this->meter->isEnabled()) {
+            return false;
+        }
+
         return $this->writer->enabled($this->instrument);
     }
 }

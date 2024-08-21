@@ -8,7 +8,7 @@
     "license": "Apache-2.0",
     "require": {
         "php": "^8.1",
-        "google/protobuf": "^3.22",
+        "google/protobuf": "^3.22 || ^4.0",
         "nyholm/psr7-server": "^1.1",
         "php-http/discovery": "^1.14",
         "psr/http-client": "^1.0",
@@ -20,7 +20,7 @@
         "symfony/config": "^5.4 || ^6.4 || ^7.0",
         "symfony/polyfill-mbstring": "^1.23",
         "symfony/polyfill-php82": "^1.26",
-        "tbachert/spi": "^0.2"
+        "tbachert/spi": ">= 0.2.1"
     },
     "config": {
         "sort-packages": true,
@@ -102,6 +102,7 @@
         "phpstan/phpstan-mockery": "^1.1",
         "phpstan/phpstan-phpunit": "^1.3",
         "phpunit/phpunit": "^10 || ^11",
+        "sebastian/exporter": "<= 6.0.1 || >= 6.1.3",
         "symfony/http-client": "^5.2",
         "symfony/var-exporter": "^5.4 || ^6.4 || ^7.0",
         "symfony/yaml": "^5.4 || ^6.4 || ^7.0"
@@ -149,7 +150,18 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterConsole",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlp",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorBatch",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple"
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\PeerConfigProvider",
+
+                "OpenTelemetry\\Example\\ExampleConfigProvider"
+            ],
+            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
+              "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
+            ],
+            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Instrumentation": [
+                "OpenTelemetry\\Example\\ExampleInstrumentation"
             ]
         }
     }
