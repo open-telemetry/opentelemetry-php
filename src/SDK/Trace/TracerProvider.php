@@ -27,10 +27,10 @@ final class TracerProvider implements TracerProviderInterface
     /** @param list<SpanProcessorInterface>|SpanProcessorInterface|null $spanProcessors */
     public function __construct(
         SpanProcessorInterface|array|null $spanProcessors = [],
-        SamplerInterface $sampler = null,
-        ResourceInfo $resource = null,
-        SpanLimits $spanLimits = null,
-        IdGeneratorInterface $idGenerator = null,
+        ?SamplerInterface $sampler = null,
+        ?ResourceInfo $resource = null,
+        ?SpanLimits $spanLimits = null,
+        ?IdGeneratorInterface $idGenerator = null,
         ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
         private ?Configurator $configurator = null,
     ) {

@@ -33,7 +33,7 @@ class Util
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
-    public static function triggerClassDeprecationNotice(string $className, string $alternativeClassName = null): void
+    public static function triggerClassDeprecationNotice(string $className, ?string $alternativeClassName = null): void
     {
         if (self::getErrorLevel() === self::E_NONE) {
             return;
@@ -56,8 +56,8 @@ class Util
      */
     public static function triggerMethodDeprecationNotice(
         string $methodName,
-        string $alternativeMethodName = null,
-        string $alternativeClassName = null,
+        ?string $alternativeMethodName = null,
+        ?string $alternativeClassName = null,
     ): void {
         if (self::getErrorLevel() === self::E_NONE) {
             return;

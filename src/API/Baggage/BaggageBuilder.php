@@ -20,7 +20,7 @@ final class BaggageBuilder implements BaggageBuilderInterface
     }
 
     /** @inheritDoc */
-    public function set(string $key, $value, MetadataInterface $metadata = null): BaggageBuilderInterface
+    public function set(string $key, $value, ?MetadataInterface $metadata = null): BaggageBuilderInterface
     {
         $metadata ??= Metadata::getEmpty();
 

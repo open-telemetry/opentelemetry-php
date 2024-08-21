@@ -23,7 +23,6 @@ use WeakMap;
 
 final class MeterProvider implements MeterProviderInterface
 {
-    private readonly MetricFactoryInterface $metricFactory;
     private readonly MeterInstruments $instruments;
     private readonly MetricRegistryInterface $registry;
     private readonly MetricWriterInterface $writer;
@@ -45,10 +44,9 @@ final class MeterProvider implements MeterProviderInterface
         private readonly ViewRegistryInterface $viewRegistry,
         private readonly ?ExemplarFilterInterface $exemplarFilter,
         private readonly StalenessHandlerFactoryInterface $stalenessHandlerFactory,
-        MetricFactoryInterface $metricFactory = null,
+        private readonly MetricFactoryInterface $metricFactory = new StreamFactory(),
         private ?Configurator $configurator = null,
     ) {
-        $this->metricFactory = $metricFactory ?? new StreamFactory();
         $this->instruments = new MeterInstruments();
 
         $registry = new MetricRegistry($contextStorage, $attributesFactory, $clock);

@@ -93,7 +93,7 @@ class LogRecord
     /**
      * @param int|null $observedTimestamp Time, in nanoseconds since the unix epoch, when the event was observed by the collection system.
      */
-    public function setObservedTimestamp(int $observedTimestamp = null): self
+    public function setObservedTimestamp(?int $observedTimestamp = null): self
     {
         $this->observedTimestamp = $observedTimestamp;
 

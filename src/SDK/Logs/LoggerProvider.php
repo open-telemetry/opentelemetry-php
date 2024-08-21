@@ -50,12 +50,12 @@ class LoggerProvider implements LoggerProviderInterface
         return $logger;
     }
 
-    public function shutdown(CancellationInterface $cancellation = null): bool
+    public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         return $this->loggerSharedState->shutdown($cancellation);
     }
 
-    public function forceFlush(CancellationInterface $cancellation = null): bool
+    public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return $this->loggerSharedState->forceFlush($cancellation);
     }
