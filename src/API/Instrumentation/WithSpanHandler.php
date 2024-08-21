@@ -21,7 +21,7 @@ class WithSpanHandler
     public static function pre(mixed $target, array $params, string $class, string $function, ?string $filename, ?int $lineno, ?array $span_args = [], ?array $attributes = []): void
     {
         static $instrumentation;
-        $instrumentation ??= new CachedInstrumentation('io.opentelemetry.php.annotation');
+        $instrumentation ??= new CachedInstrumentation(name: 'io.opentelemetry.php.with-span', schemaUrl: 'https://opentelemetry.io/schemas/1.25.0');
 
         $name = $span_args['name'] ?? null;
         if ($name === null) {
