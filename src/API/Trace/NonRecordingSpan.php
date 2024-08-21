@@ -47,7 +47,7 @@ final class NonRecordingSpan extends Span
     }
 
     /** @inheritDoc */
-    public function addEvent(string $name, iterable $attributes = [], int $timestamp = null): SpanInterface
+    public function addEvent(string $name, iterable $attributes = [], ?int $timestamp = null): SpanInterface
     {
         return $this;
     }
@@ -65,13 +65,13 @@ final class NonRecordingSpan extends Span
     }
 
     /** @inheritDoc */
-    public function setStatus(string $code, string $description = null): SpanInterface
+    public function setStatus(string $code, ?string $description = null): SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
-    public function end(int $endEpochNanos = null): void
+    public function end(?int $endEpochNanos = null): void
     {
     }
 }

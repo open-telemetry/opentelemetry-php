@@ -100,7 +100,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
      *
      * @codeCoverageIgnore
      */
-    public static function formatStackTrace(Throwable $e, array &$seen = null): string
+    public static function formatStackTrace(Throwable $e, ?array &$seen = null): string
     {
         BcUtil::triggerMethodDeprecationNotice(
             __METHOD__,
@@ -224,7 +224,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function setStatus(string $code, string $description = null): self
+    public function setStatus(string $code, ?string $description = null): self
     {
         if ($this->hasEnded) {
             return $this;
@@ -245,7 +245,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function end(int $endEpochNanos = null): void
+    public function end(?int $endEpochNanos = null): void
     {
         if ($this->hasEnded) {
             return;
