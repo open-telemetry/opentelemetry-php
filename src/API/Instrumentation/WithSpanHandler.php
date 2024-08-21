@@ -10,6 +10,9 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Context\Context;
 use Throwable;
 
+/**
+ * Generic pre-hook and post-hook handlers for attribute-based auto instrumentation
+ */
 class WithSpanHandler
 {
     /**
