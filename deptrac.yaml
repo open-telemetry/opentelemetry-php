@@ -105,6 +105,10 @@ deptrac:
           collectors:
               - type: className
                 regex: ^Ramsey\\Uuid\\*
+      -   name: NyholmPsr7Server
+          collectors:
+              - type: className
+                regex: ^Nyholm\\Psr7Server\\*
 
     ruleset:
       Context:
@@ -134,6 +138,7 @@ deptrac:
           - HttpClients
           - SPI
           - RamseyUuid
+          - NyholmPsr7Server
       Contrib:
           - +SDK
           - +OtelProto

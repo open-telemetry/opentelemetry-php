@@ -72,7 +72,7 @@ final class ShutdownHandler
                 // Push shutdown to end of queue
                 // @phan-suppress-next-line PhanTypeMismatchArgumentInternal
                 register_shutdown_function(static function (array $handlers): void {
-                    foreach ($handlers as $handler) {
+                    foreach (array_reverse($handlers) as $handler) {
                         $handler();
                     }
                 }, $handlers);

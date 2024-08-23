@@ -30,6 +30,7 @@ use OpenTelemetry\SDK\Logs\LoggerProviderFactory;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\SDK\Trace\AutoRootSpan;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
@@ -54,6 +55,14 @@ class SdkAutoloader
             Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
         }
         self::registerInstrumentations();
+
+        if (AutoRootSpan::isEnabled()) {
+            $request = AutoRootSpan::createRequest();
+            if ($request) {
+                AutoRootSpan::create($request);
+                AutoRootSpan::registerShutdownHandler();
+            }
+        }
 
         return true;
     }
@@ -228,4 +237,5 @@ class SdkAutoloader
 
         return false;
     }
+
 }
