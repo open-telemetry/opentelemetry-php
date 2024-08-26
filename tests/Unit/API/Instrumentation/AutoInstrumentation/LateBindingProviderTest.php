@@ -6,8 +6,8 @@ namespace OpenTelemetry\Tests\Unit\API\Instrumentation\AutoInstrumentation;
 
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Configuration\ConfigProperties;
 use OpenTelemetry\API\Globals;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
@@ -55,7 +55,7 @@ class LateBindingProviderTest extends TestCase
     {
         $instrumentation = new class() implements Instrumentation {
             private static ?Context $context;
-            public function register(HookManagerInterface $hookManager, ConfigurationRegistry $configuration, Context $context): void
+            public function register(HookManagerInterface $hookManager, ConfigProperties $configuration, Context $context): void
             {
                 self::$context = $context;
             }

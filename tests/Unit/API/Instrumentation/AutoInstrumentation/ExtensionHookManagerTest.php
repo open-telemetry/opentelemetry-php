@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Instrumentation\AutoInstrumentation;
 
+use OpenTelemetry\API\Configuration\ConfigProperties;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
@@ -132,7 +133,7 @@ class ExtensionHookManagerTest extends TestCase
                 $this->post = $post;
             }
 
-            public function register(HookManagerInterface $hookManager, ConfigurationRegistry $configuration, InstrumentationContext $context): void
+            public function register(HookManagerInterface $hookManager, ConfigProperties $configuration, InstrumentationContext $context): void
             {
                 $hookManager->hook($this->class, $this->method, $this->pre, $this->post);
             }

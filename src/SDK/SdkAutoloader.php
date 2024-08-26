@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK;
 
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProperties;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
@@ -35,6 +36,7 @@ use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -50,6 +52,9 @@ class SdkAutoloader
             return false;
         }
         if (Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)) {
+            if (!class_exists(SdkConfiguration::class)) {
+                throw new RuntimeException('File-based configuration requires open-telemetry/sdk-configuration');
+            }
             Globals::registerInitializer(fn ($configurator) => self::fileBasedInitializer($configurator));
         } else {
             Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
@@ -140,7 +145,11 @@ class SdkAutoloader
         $files = Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)
             ? Configuration::getList(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)
             : [];
-        $configuration = SdkInstrumentation::parseFile($files)->create();
+        if (class_exists(SdkInstrumentation::class)) {
+            $configuration = SdkInstrumentation::parseFile($files)->create();
+        } else {
+            $configuration = new NoopConfigProperties();
+        }
         $hookManager = self::getHookManager();
         $tracerProvider = self::createLateBindingTracerProvider();
         $meterProvider = self::createLateBindingMeterProvider();
@@ -154,7 +163,6 @@ class SdkAutoloader
             } catch (Throwable $t) {
                 self::logError(sprintf('Unable to load instrumentation: %s', $instrumentation::class), ['exception' => $t]);
             }
-
         }
     }
 
