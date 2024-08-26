@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Instrumentation\AutoInstrumentation;
 
-final class ConfigurationRegistry
+use OpenTelemetry\API\Configuration\ConfigProperties;
+
+final class ConfigurationRegistry implements ConfigProperties
 {
 
     private array $configurations = [];
@@ -18,6 +20,7 @@ final class ConfigurationRegistry
 
     /**
      * @template C of InstrumentationConfiguration
+     * @psalm-suppress MoreSpecificImplementedParamType
      * @param class-string<C> $id
      * @return C|null
      */
