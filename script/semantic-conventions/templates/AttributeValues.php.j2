@@ -36,5 +36,7 @@ interface {{ class }}AttributeValues
 {%- endif -%}
 {% if not loop.last %}{# blank line #}{% endif %}
 {%- endfor -%}
+{# add our own deprecations for moved/removed values, so we don't break things #}
+{% include class|lower + "_values_deprecations.php.partial" ignore missing without context %}
 }
 {# blank line #}

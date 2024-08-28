@@ -487,4 +487,5 @@ interface ResourceAttributeValues
      * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_WEBJS = 'webjs';
+
 }

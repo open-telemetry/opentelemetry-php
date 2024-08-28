@@ -3144,4 +3144,29 @@ interface TraceAttributeValues
      * @see TraceAttributes::VCS_REPOSITORY_REF_TYPE
      */
     public const VCS_REPOSITORY_REF_TYPE_TAG = 'tag';
+
+    /**
+     * @deprecated Use `messaging.operation.type.publish`
+     */
+    public const MESSAGING_OPERATION_PUBLISH = 'publish';
+
+    /**
+     * @deprecated Use `messaging.operation.type.create`
+     */
+    public const MESSAGING_OPERATION_CREATE = 'create';
+
+    /**
+     * @deprecated Use `messaging.operation.type.receive`
+     */
+    public const MESSAGING_OPERATION_RECEIVE = 'receive';
+
+    /**
+     * @deprecated Use `messaging.operation.type.deliver`
+     */
+    public const MESSAGING_OPERATION_DELIVER = 'process';
+
+    /**
+     * @deprecated Use `messaging.operation.type.settle`
+     */
+    public const MESSAGING_OPERATION_SETTLE = 'settle';
 }
