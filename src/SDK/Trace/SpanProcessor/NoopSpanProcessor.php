@@ -44,4 +44,9 @@ class NoopSpanProcessor implements SpanProcessorInterface
     {
         return $this->forceFlush();
     }
+
+    /** @inheritDoc */
+    public function purge(): void
+    {
+    } //@codeCoverageIgnore
 }

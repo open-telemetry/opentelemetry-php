@@ -35,4 +35,9 @@ interface SpanProcessorInterface
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#shutdown-1
      */
     public function shutdown(?CancellationInterface $cancellation = null): bool;
+
+    /**
+     * Remove all spans from the queue
+     */
+    public function purge(): void;
 }

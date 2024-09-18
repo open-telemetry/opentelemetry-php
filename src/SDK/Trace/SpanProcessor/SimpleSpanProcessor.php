@@ -71,6 +71,11 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         return $this->flush(fn (): bool => $this->exporter->shutdown($cancellation), __FUNCTION__, true, Context::getCurrent());
     }
 
+    public function purge(): void
+    {
+        $this->queue = new SplQueue();
+    }
+
     private function flush(Closure $task, string $taskName, bool $propagateResult, ContextInterface $context): bool
     {
         $this->queue->enqueue([$task, $taskName, $propagateResult && !$this->running, $context]);

@@ -76,4 +76,12 @@ final class MultiSpanProcessor implements SpanProcessorInterface
 
         return $result;
     }
+
+    /** @inheritDoc */
+    public function purge(): void
+    {
+        foreach ($this->processors as $processor) {
+            $processor->purge();
+        }
+    }
 }

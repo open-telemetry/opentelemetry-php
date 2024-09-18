@@ -57,6 +57,11 @@ final class TracerProvider implements TracerProviderInterface
         return $this->tracerSharedState->getSpanProcessor()->forceFlush($cancellation);
     }
 
+    public function purge(): void
+    {
+        return $this->tracerSharedState->getSpanProcessor()->purge();
+    }
+
     /**
      * @inheritDoc
      */

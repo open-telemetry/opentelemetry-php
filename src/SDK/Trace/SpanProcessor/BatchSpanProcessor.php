@@ -190,6 +190,12 @@ class BatchSpanProcessor implements SpanProcessorInterface
         return $this->flush(__FUNCTION__, $cancellation);
     }
 
+    public function purge(): void
+    {
+        $this->queue = new SplQueue();
+        $this->flush = new SplQueue();
+    }
+
     public static function builder(SpanExporterInterface $exporter): BatchSpanProcessorBuilder
     {
         return new BatchSpanProcessorBuilder($exporter);
