@@ -41,7 +41,7 @@ services:
       OTEL_SERVICE_NAME: service-three
 
   collector:
-    image: otel/opentelemetry-collector-contrib:0.39.0
+    image: otel/opentelemetry-collector-contrib
     volumes:
       - './collector:/etc/otel'
     ports:
