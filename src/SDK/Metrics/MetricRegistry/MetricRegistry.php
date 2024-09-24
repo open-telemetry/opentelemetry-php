@@ -38,8 +38,6 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     private array $asynchronousCallbacks = [];
     /** @var array<int, list<int>> */
     private array $asynchronousCallbackArguments = [];
-    /** @var array<int, Instrument> */
-    private array $instruments = [];
 
     public function __construct(
         private readonly ?ContextStorageInterface $contextStorage,
@@ -57,7 +55,6 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         $this->synchronousAggregators[$streamId] = $aggregator;
         $this->instrumentToStreams[$instrumentId][$streamId] = $streamId;
         $this->streamToInstrument[$streamId] = $instrumentId;
-        $this->instruments[$instrumentId] = $instrument;
 
         return $streamId;
     }
@@ -71,25 +68,26 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         $this->asynchronousAggregatorFactories[$streamId] = $aggregatorFactory;
         $this->instrumentToStreams[$instrumentId][$streamId] = $streamId;
         $this->streamToInstrument[$streamId] = $instrumentId;
-        $this->instruments[$instrumentId] = $instrument;
 
         return $streamId;
     }
 
-    public function unregisterStream(int $streamId): void
+    public function unregisterStreams(Instrument $instrument): array
     {
-        $instrumentId = $this->streamToInstrument[$streamId];
-        unset(
-            $this->streams[$streamId],
-            $this->synchronousAggregators[$streamId],
-            $this->asynchronousAggregatorFactories[$streamId],
-            $this->instrumentToStreams[$instrumentId][$streamId],
-            $this->streamToInstrument[$streamId],
-            $this->instruments[$instrumentId],
-        );
-        if (!$this->instrumentToStreams[$instrumentId]) {
-            unset($this->instrumentToStreams[$instrumentId]);
+        $instrumentId = spl_object_id($instrument);
+        $streamIds = $this->instrumentToStreams[$instrumentId] ?? [];
+
+        foreach ($streamIds as $streamId) {
+            unset(
+                $this->streams[$streamId],
+                $this->synchronousAggregators[$streamId],
+                $this->asynchronousAggregatorFactories[$streamId],
+                $this->streamToInstrument[$streamId],
+            );
         }
+        unset($this->instrumentToStreams[$instrumentId]);
+
+        return $streamIds;
     }
 
     public function record(Instrument $instrument, $value, iterable $attributes = [], $context = null): void
@@ -145,12 +143,6 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         $callbackIds = [];
         foreach ($streamIds as $streamId) {
             $instrumentId = $this->streamToInstrument[$streamId];
-            if (
-                array_key_exists($instrumentId, $this->instruments)
-                && $this->instruments[$instrumentId]->meter?->isEnabled() === false
-            ) {
-                continue;
-            }
             if (!$aggregator = $this->synchronousAggregators[$streamId] ?? null) {
                 $aggregator = $this->asynchronousAggregatorFactories[$streamId]->create();
 

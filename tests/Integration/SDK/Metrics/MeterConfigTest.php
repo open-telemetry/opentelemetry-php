@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Integration\SDK\Metrics;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MeterConfig;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
@@ -52,13 +53,13 @@ class MeterConfigTest extends TestCase
             $this->assertFalse($instrument->isEnabled(), sprintf('instrument %s is disabled', $id));
         }
 
-        $this->assertTrue($meter_one->isEnabled());
-        $this->assertFalse($meter_two->isEnabled());
-        $this->assertTrue($meter_three->isEnabled());
+        $this->assertTrue($meter_one->createCounter('test')->isEnabled());
+        $this->assertFalse($meter_two->createCounter('test')->isEnabled());
+        $this->assertTrue($meter_three->createCounter('test')->isEnabled());
 
         $meterProvider->updateConfigurator(Configurator::meter());
 
-        $this->assertTrue($meter_two->isEnabled());
+        $this->assertTrue($meter_two->createCounter('test')->isEnabled());
 
         foreach ($instruments as $instrument) {
             $this->assertTrue($instrument->isEnabled());
@@ -81,7 +82,7 @@ class MeterConfigTest extends TestCase
             )
             ->build();
         $meter = $meterProvider->getMeter('test');
-        $this->assertFalse($meter->isEnabled());
+        $this->assertFalse($meter->createCounter('test')->isEnabled());
         $counter = $meter->createCounter('a');
         $async_counter = $meter->createObservableCounter('b', callbacks: function (ObserverInterface $o) {
             $this->fail('observer from disabled meter should not have been called');
@@ -101,10 +102,9 @@ class MeterConfigTest extends TestCase
      */
     public function test_streams_recreated_on_enable(): void
     {
-        $this->markTestSkipped('TODO implement drop/create streams'); // @phpstan-ignore-next-line
         $clock = new TestClock(self::T0);
         $disabledConfigurator = Configurator::meter()
-            ->with(static fn (MeterConfig $config) => $config->setDisabled(false), name: '*');
+            ->with(static fn (MeterConfig $config) => $config->setDisabled(true), name: '*');
         $exporter = new InMemoryExporter(Temporality::CUMULATIVE);
         $reader = new ExportingReader($exporter);
         $meterProvider = MeterProvider::builder()
@@ -132,6 +132,8 @@ class MeterConfigTest extends TestCase
         $this->assertCount(1, $metrics);
         $metric = $metrics[0];
 
+        $this->assertInstanceOf(Sum::class, $metric->data);
+        $this->assertIsArray($metric->data->dataPoints);
         $this->assertCount(1, $metric->data->dataPoints);
         $dataPoint = $metric->data->dataPoints[0];
 
