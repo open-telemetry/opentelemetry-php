@@ -21,5 +21,4 @@ interface MetricSourceInterface
      * @return Metric collected metric
      */
     public function collect(): Metric;
-    public function isEnabled(): bool;
 }
