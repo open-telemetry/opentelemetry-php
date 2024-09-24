@@ -30,3 +30,9 @@ tests/TraceContext/W3CTestService/trace-context
 
 # deptrac cache
 /.deptrac.cache
+
+# output from phpdoc 
+docs/build
+
+# cache from phpdoc
+.phpdoc
