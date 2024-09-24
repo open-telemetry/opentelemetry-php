@@ -18,5 +18,5 @@ interface MetricRegistryInterface extends MetricCollectorInterface
 
     public function registerAsynchronousStream(Instrument $instrument, MetricStreamInterface $stream, MetricAggregatorFactoryInterface $aggregatorFactory): int;
 
-    public function unregisterStream(int $streamId): void;
+    public function unregisterStreams(Instrument $instrument): array;
 }
