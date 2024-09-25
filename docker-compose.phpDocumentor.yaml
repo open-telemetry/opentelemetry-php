@@ -1,0 +1,11 @@
+services:
+  phpdoc:
+    image: phpdoc/phpdoc:3
+    volumes:
+      - ./:/data
+  preview:
+    image: nginx:alpine
+    ports:
+      - 8080:80
+    volumes:
+      - ./docs/build:/usr/share/nginx/html

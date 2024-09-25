@@ -236,3 +236,21 @@ make phpmetrics
 
 This will generate a HTML PhpMetrics report in the `var/metrics` directory. Make sure to run `make test` before to
 create the test log-file, used by the metrics report.
+
+## API Documentation
+
+We use [phpDocumentor](https://phpdoc.org/) to automatically generate API documentation from DocBlocks in the code.
+
+To generate a recent version of the API documentation, you can run:
+
+```bash
+make phpdoc
+```
+
+To preview the documentation and changes you might expect, you can run:
+
+```bash
+make phpdoc-preview
+```
+
+This will start a HTTP server running at <http://localhost:8080> serving the updated documentation files.
