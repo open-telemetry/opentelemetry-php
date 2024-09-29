@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Http\Psr\Message;
 
+use Nyholm\Psr7\Uri;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 
@@ -19,7 +20,7 @@ trait UsesRequestFactoryTrait
         $request->method('getMethod')
             ->willReturn((string) $requestMethod);
         $request->method('getUri')
-            ->willReturn((string) $requestUri);
+            ->willReturn(new Uri((string) $requestUri));
         $factory = $this->createMock(RequestFactoryInterface::class);
         $factory->method('createRequest')
             ->willReturn($request);
