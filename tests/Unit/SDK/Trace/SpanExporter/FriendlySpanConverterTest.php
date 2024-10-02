@@ -178,7 +178,7 @@ class FriendlySpanConverterTest extends TestCase
 
         return $mock;
     }
-    private function createSpanContextMock(string $spanId, string $traceId = '0', string $traceState = null): SpanContextInterface
+    private function createSpanContextMock(string $spanId, string $traceId = '0', ?string $traceState = null): SpanContextInterface
     {
         $mock = $this->createMock(SpanContextInterface::class);
 

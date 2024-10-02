@@ -17,7 +17,7 @@ class SamplerFactoryTest extends TestCase
     use TestState;
 
     #[DataProvider('samplerProvider')]
-    public function test_create_sampler_from_environment(string $samplerName, string $expected, string $arg = null): void
+    public function test_create_sampler_from_environment(string $samplerName, string $expected, ?string $arg = null): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $samplerName);
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);
@@ -39,7 +39,7 @@ class SamplerFactoryTest extends TestCase
         ];
     }
     #[DataProvider('invalidSamplerProvider')]
-    public function test_throws_exception_for_invalid_or_unsupported(?string $sampler, string $arg = null): void
+    public function test_throws_exception_for_invalid_or_unsupported(?string $sampler, ?string $arg = null): void
     {
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', $sampler);
         $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER_ARG', $arg);

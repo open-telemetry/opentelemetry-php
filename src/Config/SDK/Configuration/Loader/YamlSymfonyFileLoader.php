@@ -20,12 +20,12 @@ use Symfony\Component\Yaml\Yaml;
 final class YamlSymfonyFileLoader extends FileLoader
 {
 
-    public function __construct(private readonly ConfigurationLoader $configuration, FileLocatorInterface $locator, string $env = null)
+    public function __construct(private readonly ConfigurationLoader $configuration, FileLocatorInterface $locator, ?string $env = null)
     {
         parent::__construct($locator, $env);
     }
 
-    public function load(mixed $resource, string $type = null): mixed
+    public function load(mixed $resource, ?string $type = null): mixed
     {
         assert(class_exists(Yaml::class));
 
@@ -43,7 +43,7 @@ final class YamlSymfonyFileLoader extends FileLoader
         return null;
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return class_exists(Yaml::class)
             && is_string($resource)
