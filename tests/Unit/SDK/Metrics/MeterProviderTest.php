@@ -114,11 +114,11 @@ final class MeterProviderTest extends TestCase
         $meterProvider = MeterProvider::builder()->addReader(new ExportingReader(new InMemoryExporter()))->build();
         $this->assertInstanceOf(MeterProvider::class, $meterProvider);
         $meter = $meterProvider->getMeter('one');
-        $this->assertTrue($meter->isEnabled());
+        $this->assertTrue($meter->createCounter('test')->isEnabled());
         $counter = $meter->createCounter('A');
         $this->assertTrue($counter->isEnabled());
         $meterProvider->updateConfigurator(Configurator::meter()->with(static fn (MeterConfig $config) => $config->setDisabled(true), name: 'one'));
-        $this->assertFalse($meter->isEnabled());
+        $this->assertFalse($meter->createCounter('test')->isEnabled());
         $this->assertFalse($counter->isEnabled());
     }
 }

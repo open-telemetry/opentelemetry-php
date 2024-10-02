@@ -41,6 +41,10 @@ psalm: ## Run psalm
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/psalm/vendor/bin/psalm --threads=1 --no-cache
 psalm-info: ## Run psalm and show info
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/psalm/vendor/bin/psalm --show-info=true --threads=1
+phpdoc: ## Run phpdoc
+	$(DOCKER_COMPOSE) -f docker-compose.phpDocumentor.yaml run --rm phpdoc
+phpdoc-preview:
+	$(DOCKER_COMPOSE) -f docker-compose.phpDocumentor.yaml run --service-ports --rm preview
 phpstan: ## Run phpstan
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpstan analyse --memory-limit=256M
 infection: ## Run infection (mutation testing)

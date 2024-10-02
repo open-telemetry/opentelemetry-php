@@ -32,7 +32,7 @@
         "ramsey/uuid": "^3.0 || ^4.0",
         "symfony/polyfill-mbstring": "^1.23",
         "symfony/polyfill-php82": "^1.26",
-        "tbachert/spi": ">= 0.2.1"
+        "tbachert/spi": "^1.0.1"
     },
     "autoload": {
         "psr-4": {

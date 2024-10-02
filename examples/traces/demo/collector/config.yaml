@@ -4,8 +4,8 @@ receivers:
       grpc:
 
 exporters:
-  logging:
-    logLevel: debug
+  debug:
+    verbosity: detailed
   zipkin:
     endpoint: "http://zipkin:9411/api/v2/spans"
   jaeger:
@@ -19,6 +19,6 @@ service:
       receivers:
         - otlp
       exporters:
-        - logging
+        - debug
         - zipkin
         - jaeger

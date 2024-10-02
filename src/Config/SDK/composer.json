@@ -21,7 +21,7 @@
         "open-telemetry/context": "^1.0",
         "open-telemetry/sdk": "^1.0",
         "symfony/config": "^5.4 || ^6.4 || ^7.0",
-        "tbachert/spi": ">= 0.2.1"
+        "tbachert/spi": "^1.0.1"
     },
     "autoload": {
         "psr-4": {
