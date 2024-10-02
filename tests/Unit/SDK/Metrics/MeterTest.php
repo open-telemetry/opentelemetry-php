@@ -376,7 +376,7 @@ final class MeterTest extends TestCase
     /**
      * @param iterable<MetricReaderInterface&MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricReaders
      */
-    private function createMeterProviderForMetricFactory(MetricFactoryInterface $metricFactory, ViewRegistryInterface $viewRegistry = null, iterable $metricReaders = []): MeterProvider
+    private function createMeterProviderForMetricFactory(MetricFactoryInterface $metricFactory, ?ViewRegistryInterface $viewRegistry = null, iterable $metricReaders = []): MeterProvider
     {
         return new MeterProvider(
             null,

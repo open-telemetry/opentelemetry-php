@@ -835,8 +835,8 @@ class SpanTest extends MockeryTestCase
      */
     private function createTestSpan(
         int $kind = API\SpanKind::KIND_INTERNAL,
-        SpanLimits $spanLimits = null,
-        string $parentSpanId = null,
+        ?SpanLimits $spanLimits = null,
+        ?string $parentSpanId = null,
         iterable $attributes = [],
         array $links = [],
     ): Span {
