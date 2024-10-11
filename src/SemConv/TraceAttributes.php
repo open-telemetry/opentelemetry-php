@@ -648,8 +648,6 @@ interface TraceAttributes
      * The name of the CSI ([Container Storage Interface](https://github.com/container-storage-interface/spec)) plugin used by the volume.
      *
      * This can sometimes be referred to as a "driver" in CSI implementations. This should represent the `name` field of the GetPluginInfo RPC.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const CONTAINER_CSI_PLUGIN_NAME = 'container.csi.plugin.name';
 
@@ -657,15 +655,11 @@ interface TraceAttributes
      * The unique volume ID returned by the CSI ([Container Storage Interface](https://github.com/container-storage-interface/spec)) plugin.
      *
      * This can sometimes be referred to as a "volume handle" in CSI implementations. This should represent the `Volume.volume_id` field in CSI spec.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const CONTAINER_CSI_VOLUME_ID = 'container.csi.volume.id';
 
     /**
      * Container ID. Usually a UUID, as for example used to [identify Docker containers](https://docs.docker.com/engine/containers/run/#container-identification). The UUID might be abbreviated.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const CONTAINER_ID = 'container.id';
 
@@ -675,15 +669,11 @@ interface TraceAttributes
      * Docker defines a sha256 of the image id; `container.image.id` corresponds to the `Image` field from the Docker container inspect [API](https://docs.docker.com/engine/api/v1.43/#tag/Container/operation/ContainerInspect) endpoint.
      * K8s defines a link to the container registry repository with digest `"imageID": "registry.azurecr.io /namespace/service/dockerfile@sha256:bdeabd40c3a8a492eaf9e8e44d0ebbb84bac7ee25ac0cf8a7159d25f62555625"`.
      * The ID is assigned by the container runtime and can vary in different environments. Consider using `oci.manifest.digest` if it is important to identify the same image in different environments/runtimes.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const CONTAINER_IMAGE_ID = 'container.image.id';
 
     /**
      * Name of the image the container was built on.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const CONTAINER_IMAGE_NAME = 'container.image.name';
 
@@ -691,22 +681,16 @@ interface TraceAttributes
      * Repo digests of the container image as provided by the container runtime.
      *
      * [Docker](https://docs.docker.com/engine/api/v1.43/#tag/Image/operation/ImageInspect) and [CRI](https://github.com/kubernetes/cri-api/blob/c75ef5b473bbe2d0a4fc92f82235efd665ea8e9f/pkg/apis/runtime/v1/api.proto#L1237-L1238) report those under the `RepoDigests` field.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const CONTAINER_IMAGE_REPO_DIGESTS = 'container.image.repo_digests';
 
     /**
      * Container image tags. An example can be found in [Docker Image Inspect](https://docs.docker.com/engine/api/v1.43/#tag/Image/operation/ImageInspect). Should be only the `<tag>` section of the full name for example from `registry.example.com/my-org/my-image:<tag>`.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const CONTAINER_IMAGE_TAGS = 'container.image.tags';
 
     /**
      * Container labels, `<key>` being the label name, the value being the label value.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const CONTAINER_LABEL = 'container.label';
 
@@ -719,15 +703,11 @@ interface TraceAttributes
 
     /**
      * Container name used by container runtime.
-     *
-     * @deprecated Replaced by `container.label`.
      */
     public const CONTAINER_NAME = 'container.name';
 
     /**
      * The container runtime managing this container.
-     *
-     * @deprecated Replaced by `container.label`.
      */
     public const CONTAINER_RUNTIME = 'container.runtime';
 
@@ -775,15 +755,11 @@ interface TraceAttributes
 
     /**
      * The name of the connection pool; unique within the instrumented application. In case the connection pool implementation doesn't provide a name, instrumentation SHOULD use a combination of parameters that would make the name unique, for example, combining attributes `server.address`, `server.port`, and `db.namespace`, formatted as `server.address:server.port/db.namespace`. Instrumentations that generate connection pool name following different patterns SHOULD document it.
-     *
-     * @deprecated Replaced by `db.collection.name`.
      */
     public const DB_CLIENT_CONNECTION_POOL_NAME = 'db.client.connection.pool.name';
 
     /**
      * The state of a connection in the pool
-     *
-     * @deprecated Replaced by `db.collection.name`.
      */
     public const DB_CLIENT_CONNECTION_STATE = 'db.client.connection.state';
 
@@ -807,8 +783,6 @@ interface TraceAttributes
      * If the collection name is parsed from the query text, it SHOULD be the first collection name found in the query and it SHOULD match the value provided in the query text including any schema and database name prefix.
      * For batch operations, if the individual operations are known to have the same collection name then that collection name SHOULD be used, otherwise `db.collection.name` SHOULD NOT be captured.
      * This attribute has stability level RELEASE CANDIDATE.
-     *
-     * @deprecated Replaced by `db.client.connection.state`.
      */
     public const DB_COLLECTION_NAME = 'db.collection.name';
 
@@ -821,15 +795,11 @@ interface TraceAttributes
 
     /**
      * Unique Cosmos client instance id.
-     *
-     * @deprecated Replaced by `server.address` and `server.port`.
      */
     public const DB_COSMOSDB_CLIENT_ID = 'db.cosmosdb.client_id';
 
     /**
      * Cosmos client connection mode.
-     *
-     * @deprecated Replaced by `server.address` and `server.port`.
      */
     public const DB_COSMOSDB_CONNECTION_MODE = 'db.cosmosdb.connection_mode';
 
@@ -842,22 +812,16 @@ interface TraceAttributes
 
     /**
      * Cosmos DB Operation Type.
-     *
-     * @deprecated Replaced by `db.collection.name`.
      */
     public const DB_COSMOSDB_OPERATION_TYPE = 'db.cosmosdb.operation_type';
 
     /**
      * RU consumed for that operation
-     *
-     * @deprecated Replaced by `db.collection.name`.
      */
     public const DB_COSMOSDB_REQUEST_CHARGE = 'db.cosmosdb.request_charge';
 
     /**
      * Request payload size in bytes
-     *
-     * @deprecated Replaced by `db.collection.name`.
      */
     public const DB_COSMOSDB_REQUEST_CONTENT_LENGTH = 'db.cosmosdb.request_content_length';
 
@@ -870,8 +834,6 @@ interface TraceAttributes
 
     /**
      * Cosmos DB sub status code.
-     *
-     * @deprecated Replaced by `db.response.status_code`.
      */
     public const DB_COSMOSDB_SUB_STATUS_CODE = 'db.cosmosdb.sub_status_code';
 
@@ -884,8 +846,6 @@ interface TraceAttributes
 
     /**
      * Represents the human-readable identifier of the node/instance to which a request was routed.
-     *
-     * @deprecated Replaced by `db.namespace`.
      */
     public const DB_ELASTICSEARCH_NODE_NAME = 'db.elasticsearch.node.name';
 
@@ -893,8 +853,6 @@ interface TraceAttributes
      * A dynamic value in the url path.
      *
      * Many Elasticsearch url paths allow dynamic values. These SHOULD be recorded in span attributes in the format `db.elasticsearch.path_parts.<key>`, where `<key>` is the url path part name. The implementation SHOULD reference the [elasticsearch schema](https://raw.githubusercontent.com/elastic/elasticsearch-specification/main/output/schema/schema.json) in order to map the path part values to their names.
-     *
-     * @deprecated Replaced by `db.namespace`.
      */
     public const DB_ELASTICSEARCH_PATH_PARTS = 'db.elasticsearch.path_parts';
 
@@ -940,8 +898,6 @@ interface TraceAttributes
      * Semantic conventions for individual database systems SHOULD document what `db.namespace` means in the context of that system.
      * It is RECOMMENDED to capture the value as provided by the application without attempting to do any case normalization.
      * This attribute has stability level RELEASE CANDIDATE.
-     *
-     * @deprecated Replaced by `db.namespace`.
      */
     public const DB_NAMESPACE = 'db.namespace';
 
@@ -956,8 +912,6 @@ interface TraceAttributes
      * The number of queries included in a batch operation.
      * Operations are only considered batches when they contain two or more operations, and so `db.operation.batch.size` SHOULD never be `1`.
      * This attribute has stability level RELEASE CANDIDATE.
-     *
-     * @deprecated Replaced by `db.operation.name`.
      */
     public const DB_OPERATION_BATCH_SIZE = 'db.operation.batch.size';
 
@@ -968,8 +922,6 @@ interface TraceAttributes
      * If the operation name is parsed from the query text, it SHOULD be the first operation name found in the query.
      * For batch operations, if the individual operations are known to have the same operation name then that operation name SHOULD be used prepended by `BATCH `, otherwise `db.operation.name` SHOULD be `BATCH` or some other database system specific term if more applicable.
      * This attribute has stability level RELEASE CANDIDATE.
-     *
-     * @deprecated Replaced by `db.operation.name`.
      */
     public const DB_OPERATION_NAME = 'db.operation.name';
 
@@ -979,8 +931,6 @@ interface TraceAttributes
      * Query parameters should only be captured when `db.query.text` is parameterized with placeholders.
      * If a parameter has no name and instead is referenced only by index, then `<key>` SHOULD be the 0-based index.
      * This attribute has stability level RELEASE CANDIDATE.
-     *
-     * @deprecated Replaced by `db.operation.name`.
      */
     public const DB_QUERY_PARAMETER = 'db.query.parameter';
 
@@ -991,8 +941,6 @@ interface TraceAttributes
      * For batch operations, if the individual operations are known to have the same query text then that query text SHOULD be used, otherwise all of the individual query texts SHOULD be concatenated with separator `; ` or some other database system specific separator if more applicable.
      * Even though parameterized query text can potentially have sensitive data, by using a parameterized query the user is giving a strong signal that any sensitive data will be passed as parameter values, and the benefit to observability of capturing the static part of the query text by default outweighs the risk.
      * This attribute has stability level RELEASE CANDIDATE.
-     *
-     * @deprecated Replaced by `db.operation.name`.
      */
     public const DB_QUERY_TEXT = 'db.query.text';
 
@@ -1008,8 +956,6 @@ interface TraceAttributes
      * The status code returned by the database. Usually it represents an error code, but may also represent partial success, warning, or differentiate between various types of successful outcomes.
      * Semantic conventions for individual database systems SHOULD document what `db.response.status_code` means in the context of that system.
      * This attribute has stability level RELEASE CANDIDATE.
-     *
-     * @deprecated Replaced by `db.namespace`.
      */
     public const DB_RESPONSE_STATUS_CODE = 'db.response.status_code';
 
@@ -1031,8 +977,6 @@ interface TraceAttributes
      * The database management system (DBMS) product as identified by the client instrumentation.
      * The actual DBMS may differ from the one identified by the client. For example, when using PostgreSQL client libraries to connect to a CockroachDB, the `db.system` is set to `postgresql` based on the instrumentation's best knowledge.
      * This attribute has stability level RELEASE CANDIDATE.
-     *
-     * @deprecated Replaced by `db.query.text`.
      */
     public const DB_SYSTEM = 'db.system';
 
@@ -1060,29 +1004,21 @@ interface TraceAttributes
      *
      * - `service.name=frontend`, `deployment.environment.name=production`
      * - `service.name=frontend`, `deployment.environment.name=staging`.
-     *
-     * @deprecated Deprecated, use `deployment.environment.name` instead.
      */
     public const DEPLOYMENT_ENVIRONMENT_NAME = 'deployment.environment.name';
 
     /**
      * The id of the deployment.
-     *
-     * @deprecated Deprecated, use `deployment.environment.name` instead.
      */
     public const DEPLOYMENT_ID = 'deployment.id';
 
     /**
      * The name of the deployment.
-     *
-     * @deprecated Deprecated, use `deployment.environment.name` instead.
      */
     public const DEPLOYMENT_NAME = 'deployment.name';
 
     /**
      * The status of the deployment.
-     *
-     * @deprecated Deprecated, use `deployment.environment.name` instead.
      */
     public const DEPLOYMENT_STATUS = 'deployment.status';
 
@@ -1506,37 +1442,27 @@ interface TraceAttributes
 
     /**
      * The response format that is requested.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT = 'gen_ai.openai.request.response_format';
 
     /**
      * Requests with same seed value more likely to return same result.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_OPENAI_REQUEST_SEED = 'gen_ai.openai.request.seed';
 
     /**
      * The service tier requested. May be a specific tier, detault, or auto.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_OPENAI_REQUEST_SERVICE_TIER = 'gen_ai.openai.request.service_tier';
 
     /**
      * The service tier used for the response.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_OPENAI_RESPONSE_SERVICE_TIER = 'gen_ai.openai.response.service_tier';
 
     /**
      * The name of the operation being performed.
      * If one of the predefined values applies, but specific system uses a different name it's RECOMMENDED to document it in the semantic conventions for specific GenAI system and use system-specific name in the instrumentation. If a different name is not documented, instrumentation libraries SHOULD use applicable predefined value.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_OPERATION_NAME = 'gen_ai.operation.name';
 
@@ -1549,78 +1475,56 @@ interface TraceAttributes
 
     /**
      * The frequency penalty setting for the GenAI request.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_REQUEST_FREQUENCY_PENALTY = 'gen_ai.request.frequency_penalty';
 
     /**
      * The maximum number of tokens the model generates for a request.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_REQUEST_MAX_TOKENS = 'gen_ai.request.max_tokens';
 
     /**
      * The name of the GenAI model a request is being made to.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_REQUEST_MODEL = 'gen_ai.request.model';
 
     /**
      * The presence penalty setting for the GenAI request.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_REQUEST_PRESENCE_PENALTY = 'gen_ai.request.presence_penalty';
 
     /**
      * List of sequences that the model will use to stop generating further tokens.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_REQUEST_STOP_SEQUENCES = 'gen_ai.request.stop_sequences';
 
     /**
      * The temperature setting for the GenAI request.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_REQUEST_TEMPERATURE = 'gen_ai.request.temperature';
 
     /**
      * The top_k sampling setting for the GenAI request.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_REQUEST_TOP_K = 'gen_ai.request.top_k';
 
     /**
      * The top_p sampling setting for the GenAI request.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_REQUEST_TOP_P = 'gen_ai.request.top_p';
 
     /**
      * Array of reasons the model stopped generating tokens, corresponding to each generation received.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_RESPONSE_FINISH_REASONS = 'gen_ai.response.finish_reasons';
 
     /**
      * The unique identifier for the completion.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_RESPONSE_ID = 'gen_ai.response.id';
 
     /**
      * The name of the model that generated the response.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_RESPONSE_MODEL = 'gen_ai.response.model';
 
@@ -1635,15 +1539,11 @@ interface TraceAttributes
      *
      * For custom model, a custom friendly name SHOULD be used.
      * If none of these options apply, the `gen_ai.system` SHOULD be set to `_OTHER`.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_SYSTEM = 'gen_ai.system';
 
     /**
      * The type of token being counted.
-     *
-     * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_TOKEN_TYPE = 'gen_ai.token.type';
 
@@ -1656,15 +1556,11 @@ interface TraceAttributes
 
     /**
      * The number of tokens used in the GenAI input (prompt).
-     *
-     * @deprecated Replaced by `gen_ai.usage.output_tokens` attribute.
      */
     public const GEN_AI_USAGE_INPUT_TOKENS = 'gen_ai.usage.input_tokens';
 
     /**
      * The number of tokens used in the GenAI response (completion).
-     *
-     * @deprecated Replaced by `gen_ai.usage.output_tokens` attribute.
      */
     public const GEN_AI_USAGE_OUTPUT_TOKENS = 'gen_ai.usage.output_tokens';
 
@@ -1801,8 +1697,6 @@ interface TraceAttributes
 
     /**
      * State of the HTTP connection in the HTTP connection pool.
-     *
-     * @deprecated Replaced by `client.address`.
      */
     public const HTTP_CONNECTION_STATE = 'http.connection.state';
 
@@ -1829,8 +1723,6 @@ interface TraceAttributes
 
     /**
      * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length) header. For requests using transport encoding, this should be the compressed size.
-     *
-     * @deprecated Replaced by `http.request.method`.
      */
     public const HTTP_REQUEST_BODY_SIZE = 'http.request.body.size';
 
@@ -1840,8 +1732,6 @@ interface TraceAttributes
      * Instrumentations SHOULD require an explicit configuration of which headers are to be captured. Including all request headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
      * The `User-Agent` header is already captured in the `user_agent.original` attribute. Users MAY explicitly configure instrumentations to capture them even though it is not recommended.
      * The attribute value MUST consist of either multiple header values as an array of strings or a single-item array containing a possibly comma-concatenated string, depending on the way the HTTP library provides access to headers.
-     *
-     * @deprecated Replaced by `http.request.method`.
      */
     public const HTTP_REQUEST_HEADER = 'http.request.header';
 
@@ -1861,15 +1751,11 @@ interface TraceAttributes
      * HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
      * Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
      * Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
-     *
-     * @deprecated Replaced by `http.request.method`.
      */
     public const HTTP_REQUEST_METHOD = 'http.request.method';
 
     /**
      * Original HTTP method sent by the client in the request line.
-     *
-     * @deprecated Replaced by `http.request.method`.
      */
     public const HTTP_REQUEST_METHOD_ORIGINAL = 'http.request.method_original';
 
@@ -1877,15 +1763,11 @@ interface TraceAttributes
      * The ordinal number of request resending attempt (for any reason, including redirects).
      *
      * The resend count SHOULD be updated each time an HTTP request gets resent by the client, regardless of what was the cause of the resending (e.g. redirection, authorization failure, 503 Server Unavailable, network issues, or any other).
-     *
-     * @deprecated Replaced by `http.request.method`.
      */
     public const HTTP_REQUEST_RESEND_COUNT = 'http.request.resend_count';
 
     /**
      * The total size of the request in bytes. This should be the total number of bytes sent over the wire, including the request line (HTTP/1.1), framing (HTTP/2 and HTTP/3), headers, and request body if any.
-     *
-     * @deprecated Replaced by `http.request.method`.
      */
     public const HTTP_REQUEST_SIZE = 'http.request.size';
 
@@ -1905,8 +1787,6 @@ interface TraceAttributes
 
     /**
      * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length) header. For requests using transport encoding, this should be the compressed size.
-     *
-     * @deprecated Replaced by `http.request.body.size`.
      */
     public const HTTP_RESPONSE_BODY_SIZE = 'http.response.body.size';
 
@@ -1916,22 +1796,16 @@ interface TraceAttributes
      * Instrumentations SHOULD require an explicit configuration of which headers are to be captured. Including all response headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
      * Users MAY explicitly configure instrumentations to capture them even though it is not recommended.
      * The attribute value MUST consist of either multiple header values as an array of strings or a single-item array containing a possibly comma-concatenated string, depending on the way the HTTP library provides access to headers.
-     *
-     * @deprecated Replaced by `http.request.body.size`.
      */
     public const HTTP_RESPONSE_HEADER = 'http.response.header';
 
     /**
      * The total size of the response in bytes. This should be the total number of bytes sent over the wire, including the status line (HTTP/1.1), framing (HTTP/2 and HTTP/3), headers, and response body and trailers if any.
-     *
-     * @deprecated Replaced by `http.request.body.size`.
      */
     public const HTTP_RESPONSE_SIZE = 'http.response.size';
 
     /**
      * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
-     *
-     * @deprecated Replaced by `http.request.body.size`.
      */
     public const HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code';
 
@@ -1954,8 +1828,6 @@ interface TraceAttributes
      *
      * MUST NOT be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
      * SHOULD include the [application root](/docs/http/http-spans.md#http-server-definitions) if there is one.
-     *
-     * @deprecated Replace by `http.response.body.size`.
      */
     public const HTTP_ROUTE = 'http.route';
 
@@ -2150,57 +2022,41 @@ interface TraceAttributes
 
     /**
      * The name of the Pod.
-     *
-     * @deprecated Replaced by `k8s.pod.label`.
      */
     public const K8S_POD_NAME = 'k8s.pod.name';
 
     /**
      * The UID of the Pod.
-     *
-     * @deprecated Replaced by `k8s.pod.label`.
      */
     public const K8S_POD_UID = 'k8s.pod.uid';
 
     /**
      * The name of the ReplicaSet.
-     *
-     * @deprecated Replaced by `k8s.pod.label`.
      */
     public const K8S_REPLICASET_NAME = 'k8s.replicaset.name';
 
     /**
      * The UID of the ReplicaSet.
-     *
-     * @deprecated Replaced by `k8s.pod.label`.
      */
     public const K8S_REPLICASET_UID = 'k8s.replicaset.uid';
 
     /**
      * The name of the StatefulSet.
-     *
-     * @deprecated Replaced by `k8s.pod.label`.
      */
     public const K8S_STATEFULSET_NAME = 'k8s.statefulset.name';
 
     /**
      * The UID of the StatefulSet.
-     *
-     * @deprecated Replaced by `k8s.pod.label`.
      */
     public const K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
 
     /**
      * The name of the K8s volume.
-     *
-     * @deprecated Replaced by `k8s.pod.label`.
      */
     public const K8S_VOLUME_NAME = 'k8s.volume.name';
 
     /**
      * The type of the K8s volume.
-     *
-     * @deprecated Replaced by `k8s.pod.label`.
      */
     public const K8S_VOLUME_TYPE = 'k8s.volume.type';
 
@@ -2352,36 +2208,26 @@ interface TraceAttributes
 
     /**
      * The UTC epoch seconds at which the message has been accepted and stored in the entity.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name`.
      */
     public const MESSAGING_EVENTHUBS_MESSAGE_ENQUEUED_TIME = 'messaging.eventhubs.message.enqueued_time';
 
     /**
      * The ack deadline in seconds set for the modify ack deadline request.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name`.
      */
     public const MESSAGING_GCP_PUBSUB_MESSAGE_ACK_DEADLINE = 'messaging.gcp_pubsub.message.ack_deadline';
 
     /**
      * The ack id for a given message.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name`.
      */
     public const MESSAGING_GCP_PUBSUB_MESSAGE_ACK_ID = 'messaging.gcp_pubsub.message.ack_id';
 
     /**
      * The delivery attempt for a given message.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name`.
      */
     public const MESSAGING_GCP_PUBSUB_MESSAGE_DELIVERY_ATTEMPT = 'messaging.gcp_pubsub.message.delivery_attempt';
 
     /**
      * The ordering key for a given message. If the attribute is not present, the message does not have an ordering key.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name`.
      */
     public const MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY = 'messaging.gcp_pubsub.message.ordering_key';
 
@@ -2403,8 +2249,6 @@ interface TraceAttributes
      * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the same partition. They differ from `messaging.message.id` in that they're not unique. If the key is `null`, the attribute MUST NOT be set.
      *
      * If the key type is not string, it's string representation has to be supplied for the attribute. If the key has no unambiguous, canonical string form, don't include its value.
-     *
-     * @deprecated Replaced by `messaging.destination.partition.id`.
      */
     public const MESSAGING_KAFKA_MESSAGE_KEY = 'messaging.kafka.message.key';
 
@@ -2417,15 +2261,11 @@ interface TraceAttributes
 
     /**
      * A boolean that is true if the message is a tombstone.
-     *
-     * @deprecated Replaced by `messaging.kafka.offset`.
      */
     public const MESSAGING_KAFKA_MESSAGE_TOMBSTONE = 'messaging.kafka.message.tombstone';
 
     /**
      * The offset of a record in the corresponding Kafka partition.
-     *
-     * @deprecated Replaced by `messaging.kafka.offset`.
      */
     public const MESSAGING_KAFKA_OFFSET = 'messaging.kafka.offset';
 
@@ -2434,15 +2274,11 @@ interface TraceAttributes
      *
      * This can refer to both the compressed or uncompressed body size. If both sizes are known, the uncompressed
      * body size should be used.
-     *
-     * @deprecated Replaced by `messaging.kafka.offset`.
      */
     public const MESSAGING_MESSAGE_BODY_SIZE = 'messaging.message.body.size';
 
     /**
      * The conversation ID identifying the conversation to which the message belongs, represented as a string. Sometimes called "Correlation ID".
-     *
-     * @deprecated Replaced by `messaging.kafka.offset`.
      */
     public const MESSAGING_MESSAGE_CONVERSATION_ID = 'messaging.message.conversation_id';
 
@@ -2451,15 +2287,11 @@ interface TraceAttributes
      *
      * This can refer to both the compressed or uncompressed size. If both sizes are known, the uncompressed
      * size should be used.
-     *
-     * @deprecated Replaced by `messaging.kafka.offset`.
      */
     public const MESSAGING_MESSAGE_ENVELOPE_SIZE = 'messaging.message.envelope.size';
 
     /**
      * A value used by the messaging system as an identifier for the message, represented as a string.
-     *
-     * @deprecated Replaced by `messaging.kafka.offset`.
      */
     public const MESSAGING_MESSAGE_ID = 'messaging.message.id';
 
@@ -2472,8 +2304,6 @@ interface TraceAttributes
 
     /**
      * The system-specific name of the messaging operation.
-     *
-     * @deprecated Replaced by `messaging.operation.type`.
      */
     public const MESSAGING_OPERATION_NAME = 'messaging.operation.name';
 
@@ -2481,21 +2311,16 @@ interface TraceAttributes
      * A string identifying the type of the messaging operation.
      *
      * If a custom value is used, it MUST be of low cardinality.
-     * @deprecated Replaced by `messaging.operation.type`.
      */
     public const MESSAGING_OPERATION_TYPE = 'messaging.operation.type';
 
     /**
      * RabbitMQ message routing key.
-     *
-     * @deprecated Replaced by `messaging.operation.type`.
      */
     public const MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY = 'messaging.rabbitmq.destination.routing_key';
 
     /**
      * RabbitMQ message delivery tag
-     *
-     * @deprecated Replaced by `messaging.operation.type`.
      */
     public const MESSAGING_RABBITMQ_MESSAGE_DELIVERY_TAG = 'messaging.rabbitmq.message.delivery_tag';
 
@@ -2508,57 +2333,41 @@ interface TraceAttributes
 
     /**
      * Model of message consumption. This only applies to consumer spans.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.
      */
     public const MESSAGING_ROCKETMQ_CONSUMPTION_MODEL = 'messaging.rocketmq.consumption_model';
 
     /**
      * The delay time level for delay message, which determines the message delay time.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.
      */
     public const MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL = 'messaging.rocketmq.message.delay_time_level';
 
     /**
      * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.
      */
     public const MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP = 'messaging.rocketmq.message.delivery_timestamp';
 
     /**
      * It is essential for FIFO message. Messages that belong to the same message group are always processed one by one within the same consumer group.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.
      */
     public const MESSAGING_ROCKETMQ_MESSAGE_GROUP = 'messaging.rocketmq.message.group';
 
     /**
      * Key(s) of message, another way to mark message besides message id.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.
      */
     public const MESSAGING_ROCKETMQ_MESSAGE_KEYS = 'messaging.rocketmq.message.keys';
 
     /**
      * The secondary classifier of message besides topic.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.
      */
     public const MESSAGING_ROCKETMQ_MESSAGE_TAG = 'messaging.rocketmq.message.tag';
 
     /**
      * Type of message.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.
      */
     public const MESSAGING_ROCKETMQ_MESSAGE_TYPE = 'messaging.rocketmq.message.type';
 
     /**
      * Namespace of RocketMQ resources, resources in different namespaces are individual.
-     *
-     * @deprecated Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.
      */
     public const MESSAGING_ROCKETMQ_NAMESPACE = 'messaging.rocketmq.namespace';
 
@@ -2571,30 +2380,22 @@ interface TraceAttributes
 
     /**
      * Describes the [settlement type](https://learn.microsoft.com/azure/service-bus-messaging/message-transfers-locks-settlement#peeklock).
-     *
-     * @deprecated Replaced by `messaging.destination.subscription.name`.
      */
     public const MESSAGING_SERVICEBUS_DISPOSITION_STATUS = 'messaging.servicebus.disposition_status';
 
     /**
      * Number of deliveries that have been attempted for this message.
-     *
-     * @deprecated Replaced by `messaging.destination.subscription.name`.
      */
     public const MESSAGING_SERVICEBUS_MESSAGE_DELIVERY_COUNT = 'messaging.servicebus.message.delivery_count';
 
     /**
      * The UTC epoch seconds at which the message has been accepted and stored in the entity.
-     *
-     * @deprecated Replaced by `messaging.destination.subscription.name`.
      */
     public const MESSAGING_SERVICEBUS_MESSAGE_ENQUEUED_TIME = 'messaging.servicebus.message.enqueued_time';
 
     /**
      * The messaging system as identified by the client instrumentation.
      * The actual messaging system may differ from the one known by the client. For example, when using Kafka client libraries to communicate with Azure Event Hubs, the `messaging.system` is set to `kafka` based on the instrumentation's best knowledge.
-     *
-     * @deprecated Replaced by `messaging.destination.subscription.name`.
      */
     public const MESSAGING_SYSTEM = 'messaging.system';
 
@@ -2847,29 +2648,21 @@ interface TraceAttributes
 
     /**
      * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
-     *
-     * @deprecated Use the `otel.scope.version` attribute.
      */
     public const OTEL_SCOPE_NAME = 'otel.scope.name';
 
     /**
      * The version of the instrumentation scope - (`InstrumentationScope.Version` in OTLP).
-     *
-     * @deprecated Use the `otel.scope.version` attribute.
      */
     public const OTEL_SCOPE_VERSION = 'otel.scope.version';
 
     /**
      * Name of the code, either "OK" or "ERROR". MUST NOT be set if the status code is UNSET.
-     *
-     * @deprecated Use the `otel.scope.version` attribute.
      */
     public const OTEL_STATUS_CODE = 'otel.status_code';
 
     /**
      * Description of the Status if it has a value, otherwise not set.
-     *
-     * @deprecated Use the `otel.scope.version` attribute.
      */
     public const OTEL_STATUS_DESCRIPTION = 'otel.status_description';
 
@@ -2928,155 +2721,111 @@ interface TraceAttributes
 
     /**
      * The date and time the process was created, in ISO 8601 format.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_CREATION_TIME = 'process.creation.time';
 
     /**
      * The GNU build ID as found in the `.note.gnu.build-id` ELF section (hex string).
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_EXECUTABLE_BUILD_ID_GNU = 'process.executable.build_id.gnu';
 
     /**
      * The Go build ID as retrieved by `go tool buildid <go executable>`.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_EXECUTABLE_BUILD_ID_GO = 'process.executable.build_id.go';
 
     /**
      * Profiling specific build ID for executables. See the OTel specification for Profiles for more information.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_EXECUTABLE_BUILD_ID_PROFILING = 'process.executable.build_id.profiling';
 
     /**
      * The name of the process executable. On Linux based systems, can be set to the `Name` in `proc/[pid]/status`. On Windows, can be set to the base name of `GetProcessImageFileNameW`.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_EXECUTABLE_NAME = 'process.executable.name';
 
     /**
      * The full path to the process executable. On Linux based systems, can be set to the target of `proc/[pid]/exe`. On Windows, can be set to the result of `GetProcessImageFileNameW`.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_EXECUTABLE_PATH = 'process.executable.path';
 
     /**
      * The exit code of the process.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_EXIT_CODE = 'process.exit.code';
 
     /**
      * The date and time the process exited, in ISO 8601 format.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_EXIT_TIME = 'process.exit.time';
 
     /**
      * The PID of the process's group leader. This is also the process group ID (PGID) of the process.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_GROUP_LEADER_PID = 'process.group_leader.pid';
 
     /**
      * Whether the process is connected to an interactive shell.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_INTERACTIVE = 'process.interactive';
 
     /**
      * The username of the user that owns the process.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_OWNER = 'process.owner';
 
     /**
      * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_PAGING_FAULT_TYPE = 'process.paging.fault_type';
 
     /**
      * Parent Process identifier (PPID).
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_PARENT_PID = 'process.parent_pid';
 
     /**
      * Process identifier (PID).
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_PID = 'process.pid';
 
     /**
      * The real user ID (RUID) of the process.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_REAL_USER_ID = 'process.real_user.id';
 
     /**
      * The username of the real user of the process.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_REAL_USER_NAME = 'process.real_user.name';
 
     /**
      * An additional description about the runtime of the process, for example a specific vendor customization of the runtime environment.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_RUNTIME_DESCRIPTION = 'process.runtime.description';
 
     /**
      * The name of the runtime of this process.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_RUNTIME_NAME = 'process.runtime.name';
 
     /**
      * The version of the runtime of this process, as returned by the runtime without modification.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_RUNTIME_VERSION = 'process.runtime.version';
 
     /**
      * The saved user ID (SUID) of the process.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_SAVED_USER_ID = 'process.saved_user.id';
 
     /**
      * The username of the saved user.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_SAVED_USER_NAME = 'process.saved_user.name';
 
     /**
      * The PID of the process's session leader. This is also the session ID (SID) of the process.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_SESSION_LEADER_PID = 'process.session_leader.pid';
 
@@ -3084,22 +2833,16 @@ interface TraceAttributes
      * Process title (proctitle)
      *
      * In many Unix-like systems, process title (proctitle), is the string that represents the name or command line of a running process, displayed by system monitoring tools like ps, top, and htop.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_TITLE = 'process.title';
 
     /**
      * The effective user ID (EUID) of the process.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_USER_ID = 'process.user.id';
 
     /**
      * The username of the effective user of the process.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_USER_NAME = 'process.user.name';
 
@@ -3107,15 +2850,11 @@ interface TraceAttributes
      * Virtual process identifier.
      *
      * The process ID within a PID namespace. This is not necessarily unique across all processes on the host but it is unique within the process namespace that the process exists within.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_VPID = 'process.vpid';
 
     /**
      * The working directory of the process.
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const PROCESS_WORKING_DIRECTORY = 'process.working_directory';
 
@@ -3318,78 +3057,56 @@ interface TraceAttributes
 
     /**
      * The device identifier
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const SYSTEM_DEVICE = 'system.device';
 
     /**
      * The filesystem mode
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const SYSTEM_FILESYSTEM_MODE = 'system.filesystem.mode';
 
     /**
      * The filesystem mount path
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const SYSTEM_FILESYSTEM_MOUNTPOINT = 'system.filesystem.mountpoint';
 
     /**
      * The filesystem state
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const SYSTEM_FILESYSTEM_STATE = 'system.filesystem.state';
 
     /**
      * The filesystem type
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const SYSTEM_FILESYSTEM_TYPE = 'system.filesystem.type';
 
     /**
      * The memory state
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const SYSTEM_MEMORY_STATE = 'system.memory.state';
 
     /**
      * A stateless protocol MUST NOT set this attribute
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const SYSTEM_NETWORK_STATE = 'system.network.state';
 
     /**
      * The paging access direction
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const SYSTEM_PAGING_DIRECTION = 'system.paging.direction';
 
     /**
      * The memory paging state
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const SYSTEM_PAGING_STATE = 'system.paging.state';
 
     /**
      * The memory paging type
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const SYSTEM_PAGING_TYPE = 'system.paging.type';
 
     /**
      * The process state, e.g., [Linux Process State Codes](https://man7.org/linux/man-pages/man1/ps.1.html#PROCESS_STATE_CODES)
-     *
-     * @deprecated Replaced by `cpu.mode`
      */
     public const SYSTEM_PROCESS_STATUS = 'system.process.status';
 
@@ -3526,127 +3243,91 @@ interface TraceAttributes
 
     /**
      * Distinguished name of subject of the x.509 certificate presented by the client.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_CLIENT_SUBJECT = 'tls.client.subject';
 
     /**
      * Array of ciphers offered by the client during the client hello.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_CLIENT_SUPPORTED_CIPHERS = 'tls.client.supported_ciphers';
 
     /**
      * String indicating the curve used for the given cipher, when applicable
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_CURVE = 'tls.curve';
 
     /**
      * Boolean flag indicating if the TLS negotiation was successful and transitioned to an encrypted tunnel.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_ESTABLISHED = 'tls.established';
 
     /**
      * String indicating the protocol being tunneled. Per the values in the [IANA registry](https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids), this string should be lower case.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_NEXT_PROTOCOL = 'tls.next_protocol';
 
     /**
      * Normalized lowercase protocol name parsed from original string of the negotiated [SSL/TLS protocol version](https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html#RETURN-VALUES)
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_PROTOCOL_NAME = 'tls.protocol.name';
 
     /**
      * Numeric part of the version parsed from the original string of the negotiated [SSL/TLS protocol version](https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html#RETURN-VALUES)
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_PROTOCOL_VERSION = 'tls.protocol.version';
 
     /**
      * Boolean flag indicating if this TLS connection was resumed from an existing TLS negotiation.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_RESUMED = 'tls.resumed';
 
     /**
      * PEM-encoded stand-alone certificate offered by the server. This is usually mutually-exclusive of `server.certificate_chain` since this value also exists in that list.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_SERVER_CERTIFICATE = 'tls.server.certificate';
 
     /**
      * Array of PEM-encoded certificates that make up the certificate chain offered by the server. This is usually mutually-exclusive of `server.certificate` since that value should be the first certificate in the chain.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_SERVER_CERTIFICATE_CHAIN = 'tls.server.certificate_chain';
 
     /**
      * Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_SERVER_HASH_MD5 = 'tls.server.hash.md5';
 
     /**
      * Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_SERVER_HASH_SHA1 = 'tls.server.hash.sha1';
 
     /**
      * Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_SERVER_HASH_SHA256 = 'tls.server.hash.sha256';
 
     /**
      * Distinguished name of [subject](https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6) of the issuer of the x.509 certificate presented by the client.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_SERVER_ISSUER = 'tls.server.issuer';
 
     /**
      * A hash that identifies servers based on how they perform an SSL/TLS handshake.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_SERVER_JA3S = 'tls.server.ja3s';
 
     /**
      * Date/Time indicating when server certificate is no longer considered valid.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_SERVER_NOT_AFTER = 'tls.server.not_after';
 
     /**
      * Date/Time indicating when server certificate is first considered valid.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_SERVER_NOT_BEFORE = 'tls.server.not_before';
 
     /**
      * Distinguished name of subject of the x.509 certificate presented by the server.
-     *
-     * @deprecated Replaced by `server.address`.
      */
     public const TLS_SERVER_SUBJECT = 'tls.server.subject';
 

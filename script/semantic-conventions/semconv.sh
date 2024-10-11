@@ -39,7 +39,6 @@ find "${CODE_DIR}" -name "*.php" ! -name "Version.php" -exec rm -f {} \;
 echo "${SEMCONV_VERSION}" > ${SCRIPT_DIR}/templates/registry/php/version.txt
 
 generate () {
-  TARGET=$1
   docker run --rm \
     -v "${SPEC_DIR}/model:/home/weaver/model" \
     -v "${SCRIPT_DIR}/templates:/home/weaver/templates" \
@@ -51,6 +50,4 @@ generate () {
 
 #TODO split stable from experimental
 #TODO one file per group? (see java's implementation)
-generate stable
-
-rm -rf "${SPEC_DIR}"
+generate

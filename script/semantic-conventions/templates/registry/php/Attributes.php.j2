@@ -20,6 +20,8 @@ interface TraceAttributes
         {% if attribute.name != "messaging.client_id" %}
             {%- if attribute is deprecated %}
                 {%- set deprecated_phpdoc = "@deprecated " ~ attribute.deprecated -%}
+            {% else %}
+                {% set deprecated_phpdoc = "" %}
             {%- endif -%}
             {{ [attribute.brief, concat_if(attribute.note), deprecated_phpdoc] | comment(indent=4) }}
     public const {{ c.attribute_name(attribute) }} = '{{ attribute.name }}';
