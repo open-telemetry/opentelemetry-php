@@ -36,7 +36,7 @@ cd "${SCRIPT_DIR}"
 mkdir -p "${CODE_DIR}"
 find "${CODE_DIR}" -name "*.php" ! -name "Version.php" -exec rm -f {} \;
 
-echo "${SEMCONV_VERSION}" > ${SCRIPT_DIR}/templates/registry/php/version.txt
+echo "${SCHEMA_URL}" > ${SCRIPT_DIR}/templates/registry/php/version.txt
 
 generate () {
   docker run --rm \

@@ -12,7 +12,7 @@ interface TraceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/{% include "version.txt" without context %}';
+    public const SCHEMA_URL = '{% include "version.txt" without context %}';
 {% for section in ctx %}
     {% for attribute in section.attributes %}
         {% if attribute.name != "messaging.client_id" %}
