@@ -1,0 +1,36 @@
+{% import 'common.j2' as c %}
+<?php
+
+// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions/templates/ResourceAttributeValues.php.j2
+
+declare(strict_types=1);
+
+namespace OpenTelemetry\SemConv;
+
+interface TraceAttributeValues
+{
+    /**
+     * The URL of the OpenTelemetry schema for these values.
+     */
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/{% include "version.txt" without context %}';
+{% for section in ctx %}
+    {% for attribute in section.attributes %}
+        {% if attribute.name != "messaging.client_id" %}
+            {% if "members" in attribute.type and attribute.type.members | length > 0 %}
+                {% for member in attribute.type.members %}
+    /**
+     * {{ member.brief or member.id }}
+     *
+     * @see TraceAttributes::{{ c.attribute_name(attribute) }}
+     * @stability {{ member.stability }}
+     */
+    public const {{ c.attribute_name(attribute) + "_" + c.attribute_value_name(member) }} = '{{ member.value }}';
+
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+}
+{# blank line #}

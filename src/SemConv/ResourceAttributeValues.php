@@ -1,6 +1,6 @@
 <?php
 
-// DO NOT EDIT, this is an Auto-generated file from script/semantic-convention/templates/AttributeValues.php.j2
+// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions/templates/ResourceAttributeValues.php.j2
 
 declare(strict_types=1);
 
@@ -9,9 +9,10 @@ namespace OpenTelemetry\SemConv;
 interface ResourceAttributeValues
 {
     /**
-     * The URL of the OpenTelemetry schema for these keys and values.
+     * The URL of the OpenTelemetry schema for these values.
      */
     public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.27.0';
+
     /**
      * ec2
      *
