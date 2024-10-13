@@ -52,8 +52,9 @@ final class Host implements ResourceDetectorInterface
         $paths = [self::PATH_ETC_MACHINEID, self::PATH_VAR_LIB_DBUS_MACHINEID];
 
         foreach ($paths as $path) {
-            if (file_exists($this->dir . $path)) {
-                return trim(file_get_contents($this->dir . $path));
+            $file = $this->dir . $path;
+            if (file_exists($file) && is_readable($file)) {
+                return trim(file_get_contents($file));
             }
         }
 
@@ -62,13 +63,14 @@ final class Host implements ResourceDetectorInterface
 
     private function getBsdId(): ?string
     {
-        if (file_exists($this->dir . self::PATH_ETC_HOSTID)) {
-            return trim(file_get_contents($this->dir . self::PATH_ETC_HOSTID));
+        $file = $this->dir . self::PATH_ETC_HOSTID;
+        if (file_exists($file) && is_readable($file)) {
+            return trim(file_get_contents($file));
         }
 
-        $out = exec('kenv -q smbios.system.uuid');
+        $out = exec('which kenv && kenv -q smbios.system.uuid');
 
-        if ($out !== false) {
+        if ($out) {
             return $out;
         }
 

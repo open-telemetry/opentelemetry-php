@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\Detectors\Host;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -70,6 +71,37 @@ class HostTest extends TestCase
             ['Linux', array_merge($etc_machineid, $varLibDbus), '1234567890'],
             ['Linux', $etc_machineid, '1234567890'],
             ['BSD', $etc_hostid, '1234567890'],
+        ];
+    }
+
+    /**
+     * @dataProvider nonReadableFileProvider
+     */
+    public function test_file_not_readable(string $os, vfsStreamDirectory $root): void
+    {
+        $resourceDetector = new Host($root->url(), $os);
+        $resource = $resourceDetector->getResource();
+
+        $hostId = $resource->getAttributes()->get(ResourceAttributes::HOST_ID);
+        $this->assertNull($hostId);
+    }
+
+    public static function nonReadableFileProvider(): array
+    {
+        $root = vfsStream::setup('/');
+        $etc = vfsStream::newDirectory('etc')->at($root);
+        vfsStream::newFile('machine-id')
+            ->at($etc)
+            ->setContent('you-cant-see-me')
+            ->chmod(0);
+        vfsStream::newFile('hostid')
+            ->at($etc)
+            ->setContent('you-cant-see-me')
+            ->chmod(0222);
+
+        return [
+            ['Linux', $root],
+            ['BSD', $root],
         ];
     }
 }
