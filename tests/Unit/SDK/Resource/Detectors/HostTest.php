@@ -93,7 +93,7 @@ class HostTest extends TestCase
         vfsStream::newFile('machine-id')
             ->at($etc)
             ->setContent('you-cant-see-me')
-            ->chmod(0);
+            ->chmod(0222);
         vfsStream::newFile('hostid')
             ->at($etc)
             ->setContent('you-cant-see-me')
