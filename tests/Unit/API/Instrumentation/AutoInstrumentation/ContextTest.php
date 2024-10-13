@@ -8,6 +8,7 @@ use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
+use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -20,5 +21,6 @@ class ContextTest extends TestCase
         $this->assertInstanceOf(NoopTracerProvider::class, $context->tracerProvider);
         $this->assertInstanceOf(NoopMeterProvider::class, $context->meterProvider);
         $this->assertInstanceOf(NoopLoggerProvider::class, $context->loggerProvider);
+        $this->assertInstanceOf(NoopTextMapPropagator::class, $context->propagator);
     }
 }

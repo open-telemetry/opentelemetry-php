@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Instrumentation\AutoInstrumentation;
 
+use function assert;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Configuration\ConfigProperties;
@@ -25,11 +26,13 @@ use OpenTelemetry\API\Trace\LateBindingTracer;
 use OpenTelemetry\API\Trace\LateBindingTracerProvider;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\SdkAutoloader;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 #[CoversClass(LateBindingLoggerProvider::class)]
 #[CoversClass(LateBindingLogger::class)]
@@ -45,6 +48,7 @@ use PHPUnit\Framework\TestCase;
 class LateBindingProviderTest extends TestCase
 {
     use TestState;
+    use ProphecyTrait;
 
     public function setUp(): void
     {
@@ -77,6 +81,12 @@ class LateBindingProviderTest extends TestCase
 
                 return self::$context->loggerProvider->getLogger('test');
             }
+            public function getPropagator(): TextMapPropagatorInterface
+            {
+                assert(self::$context !== null);
+
+                return self::$context->propagator;
+            }
         };
         $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
         $tracer_accessed = false;
@@ -101,14 +111,17 @@ class LateBindingProviderTest extends TestCase
 
             return $this->createMock(LoggerInterface::class);
         });
+        $propagator = $this->prophesize(TextMapPropagatorInterface::class);
+
         ServiceLoader::register(Instrumentation::class, $instrumentation::class);
         $this->assertTrue(SdkAutoloader::autoload());
         //initializer added _after_ autoloader has run and instrumentation registered
-        Globals::registerInitializer(function (Configurator $configurator) use ($tracerProvider, $loggerProvider, $meterProvider): Configurator {
+        Globals::registerInitializer(function (Configurator $configurator) use ($tracerProvider, $loggerProvider, $meterProvider, $propagator): Configurator {
             return $configurator
                 ->withTracerProvider($tracerProvider)
                 ->withMeterProvider($meterProvider)
                 ->withLoggerProvider($loggerProvider)
+                ->withPropagator($propagator->reveal())
             ;
         });
 
@@ -129,5 +142,11 @@ class LateBindingProviderTest extends TestCase
         $this->assertFalse($logger_accessed);
         $logger->emit(new LogRecord()); /** @phpstan-ignore-next-line */
         $this->assertTrue($logger_accessed);
+
+        /** @phpstan-ignore-next-line */
+        $propagator->fields()->shouldNotHaveBeenCalled();
+        $instrumentation->getPropagator()->fields();
+        /** @phpstan-ignore-next-line */
+        $propagator->fields()->shouldHaveBeenCalledOnce();
     }
 }
