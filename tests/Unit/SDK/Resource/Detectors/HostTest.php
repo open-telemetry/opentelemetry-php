@@ -15,6 +15,12 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Host::class)]
 class HostTest extends TestCase
 {
+    public function setUp(): void
+    {
+        //reset vfs between tests
+        vfsStream::setup('/');
+    }
+
     public function test_host_get_resource(): void
     {
         $resourceDetector = new Host();
@@ -74,9 +80,7 @@ class HostTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider nonReadableFileProvider
-     */
+    #[DataProvider('nonReadableFileProvider')]
     public function test_file_not_readable(string $os, vfsStreamDirectory $root): void
     {
         $resourceDetector = new Host($root->url(), $os);
