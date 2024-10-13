@@ -53,7 +53,7 @@ final class Host implements ResourceDetectorInterface
 
         foreach ($paths as $path) {
             $file = $this->dir . $path;
-            if (file_exists($file) && is_readable($file)) {
+            if (is_file($file) && is_readable($file)) {
                 return trim(file_get_contents($file));
             }
         }
@@ -64,7 +64,7 @@ final class Host implements ResourceDetectorInterface
     private function getBsdId(): ?string
     {
         $file = $this->dir . self::PATH_ETC_HOSTID;
-        if (file_exists($file) && is_readable($file)) {
+        if (is_file($file) && is_readable($file)) {
             return trim(file_get_contents($file));
         }
 
