@@ -14,6 +14,20 @@ interface TraceAttributes
     public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.27.0';
 
     /**
+     * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found [here](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
+     */
+    public const ANDROID_OS_API_LEVEL = 'android.os.api_level';
+
+    /**
+     * Deprecated use the `device.app.lifecycle` event definition including `android.state` as a payload field instead.
+     *
+     * The Android lifecycle states are defined in [Activity lifecycle callbacks](https://developer.android.com/guide/components/activities/activity-lifecycle#lc), and from which the `OS identifiers` are derived.
+     *
+     * @deprecated Replaced by `device.app.lifecycle`.
+     */
+    public const ANDROID_STATE = 'android.state';
+
+    /**
      * The provenance filename of the built attestation which directly relates to the build artifact filename. This filename SHOULD accompany the artifact at publish time. See the [SLSA Relationship](https://slsa.dev/spec/v1.0/distributing-provenance#relationship-between-artifacts-and-attestations) specification for more information.
      */
     public const ARTIFACT_ATTESTATION_FILENAME = 'artifact.attestation.filename';
@@ -61,6 +75,41 @@ interface TraceAttributes
      * The version of the artifact.
      */
     public const ARTIFACT_VERSION = 'artifact.version';
+
+    /**
+     * ASP.NET Core exception middleware handling result
+     */
+    public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT = 'aspnetcore.diagnostics.exception.result';
+
+    /**
+     * Full type name of the [`IExceptionHandler`](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.diagnostics.iexceptionhandler) implementation that handled the exception.
+     */
+    public const ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE = 'aspnetcore.diagnostics.handler.type';
+
+    /**
+     * Rate limiting policy name.
+     */
+    public const ASPNETCORE_RATE_LIMITING_POLICY = 'aspnetcore.rate_limiting.policy';
+
+    /**
+     * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason
+     */
+    public const ASPNETCORE_RATE_LIMITING_RESULT = 'aspnetcore.rate_limiting.result';
+
+    /**
+     * Flag indicating if request was handled by the application pipeline.
+     */
+    public const ASPNETCORE_REQUEST_IS_UNHANDLED = 'aspnetcore.request.is_unhandled';
+
+    /**
+     * A value that indicates whether the matched route is a fallback route.
+     */
+    public const ASPNETCORE_ROUTING_IS_FALLBACK = 'aspnetcore.routing.is_fallback';
+
+    /**
+     * Match result - success or failure
+     */
+    public const ASPNETCORE_ROUTING_MATCH_STATUS = 'aspnetcore.routing.match_status';
 
     /**
      * The JSON-serialized value of each item in the `AttributeDefinitions` request field.
@@ -1073,6 +1122,11 @@ interface TraceAttributes
     public const DNS_QUESTION_NAME = 'dns.question.name';
 
     /**
+     * Name of the garbage collector managed heap generation.
+     */
+    public const DOTNET_GC_HEAP_GENERATION = 'dotnet.gc.heap.generation';
+
+    /**
      * Deprecated, use `user.id` instead.
      *
      * @deprecated Replaced by `user.id` attribute.
@@ -1899,6 +1953,54 @@ interface TraceAttributes
      * Describes the category of the hardware component for which `hw.state` is being reported. For example, `hw.type=temperature` along with `hw.state=degraded` would indicate that the temperature of the hardware component has been reported as `degraded`.
      */
     public const HW_TYPE = 'hw.type';
+
+    /**
+     * Deprecated use the `device.app.lifecycle` event definition including `ios.state` as a payload field instead.
+     *
+     * The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate#1656902), and from which the `OS terminology` column values are derived.
+     *
+     * @deprecated Moved to a payload field of `device.app.lifecycle`.
+     */
+    public const IOS_STATE = 'ios.state';
+
+    /**
+     * Name of the buffer pool.
+     * Pool names are generally obtained via [BufferPoolMXBean#getName()](https://docs.oracle.com/en/java/javase/11/docs/api/java.management/java/lang/management/BufferPoolMXBean.html#getName()).
+     */
+    public const JVM_BUFFER_POOL_NAME = 'jvm.buffer.pool.name';
+
+    /**
+     * Name of the garbage collector action.
+     * Garbage collector action is generally obtained via [GarbageCollectionNotificationInfo#getGcAction()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcAction()).
+     */
+    public const JVM_GC_ACTION = 'jvm.gc.action';
+
+    /**
+     * Name of the garbage collector.
+     * Garbage collector name is generally obtained via [GarbageCollectionNotificationInfo#getGcName()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcName()).
+     */
+    public const JVM_GC_NAME = 'jvm.gc.name';
+
+    /**
+     * Name of the memory pool.
+     * Pool names are generally obtained via [MemoryPoolMXBean#getName()](https://docs.oracle.com/en/java/javase/11/docs/api/java.management/java/lang/management/MemoryPoolMXBean.html#getName()).
+     */
+    public const JVM_MEMORY_POOL_NAME = 'jvm.memory.pool.name';
+
+    /**
+     * The type of memory.
+     */
+    public const JVM_MEMORY_TYPE = 'jvm.memory.type';
+
+    /**
+     * Whether the thread is daemon or not.
+     */
+    public const JVM_THREAD_DAEMON = 'jvm.thread.daemon';
+
+    /**
+     * State of the thread.
+     */
+    public const JVM_THREAD_STATE = 'jvm.thread.state';
 
     /**
      * The name of the cluster.
@@ -3031,6 +3133,16 @@ interface TraceAttributes
      * The previous `session.id` for this user, when known.
      */
     public const SESSION_PREVIOUS_ID = 'session.previous_id';
+
+    /**
+     * SignalR HTTP connection closure status.
+     */
+    public const SIGNALR_CONNECTION_STATUS = 'signalr.connection.status';
+
+    /**
+     * [SignalR transport type](https://github.com/dotnet/aspnetcore/blob/main/src/SignalR/docs/specs/TransportProtocols.md)
+     */
+    public const SIGNALR_TRANSPORT = 'signalr.transport';
 
     /**
      * Source address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.

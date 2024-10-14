@@ -1,6 +1,6 @@
 <?php
 
-// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions/templates/ResourceAttributeValues.php.j2
+// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions
 
 declare(strict_types=1);
 

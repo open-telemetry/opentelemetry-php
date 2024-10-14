@@ -1,6 +1,6 @@
 <?php
 
-// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions/templates/ResourceAttributeValues.php.j2
+// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions/
 
 declare(strict_types=1);
 
@@ -12,6 +12,113 @@ interface TraceAttributeValues
      * The URL of the OpenTelemetry schema for these values.
      */
     public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.27.0';
+    /**
+     * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time.
+
+     *
+     * @see TraceAttributes::ANDROID_STATE
+     * @stability experimental
+     */
+    public const ANDROID_STATE_CREATED = 'created';
+
+    /**
+     * Any time after Activity.onPause() or, if the app has no Activity, Context.stopService() has been called when the app was in the foreground state.
+
+     *
+     * @see TraceAttributes::ANDROID_STATE
+     * @stability experimental
+     */
+    public const ANDROID_STATE_BACKGROUND = 'background';
+
+    /**
+     * Any time after Activity.onResume() or, if the app has no Activity, Context.startService() has been called when the app was in either the created or background states.
+
+     *
+     * @see TraceAttributes::ANDROID_STATE
+     * @stability experimental
+     */
+    public const ANDROID_STATE_FOREGROUND = 'foreground';
+
+    /**
+     * Exception was handled by the exception handling middleware.
+     *
+     * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
+     * @stability stable
+     */
+    public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_HANDLED = 'handled';
+
+    /**
+     * Exception was not handled by the exception handling middleware.
+     *
+     * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
+     * @stability stable
+     */
+    public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_UNHANDLED = 'unhandled';
+
+    /**
+     * Exception handling was skipped because the response had started.
+     *
+     * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
+     * @stability stable
+     */
+    public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_SKIPPED = 'skipped';
+
+    /**
+     * Exception handling didn't run because the request was aborted.
+     *
+     * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
+     * @stability stable
+     */
+    public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_ABORTED = 'aborted';
+
+    /**
+     * Lease was acquired
+     *
+     * @see TraceAttributes::ASPNETCORE_RATE_LIMITING_RESULT
+     * @stability stable
+     */
+    public const ASPNETCORE_RATE_LIMITING_RESULT_ACQUIRED = 'acquired';
+
+    /**
+     * Lease request was rejected by the endpoint limiter
+     *
+     * @see TraceAttributes::ASPNETCORE_RATE_LIMITING_RESULT
+     * @stability stable
+     */
+    public const ASPNETCORE_RATE_LIMITING_RESULT_ENDPOINT_LIMITER = 'endpoint_limiter';
+
+    /**
+     * Lease request was rejected by the global limiter
+     *
+     * @see TraceAttributes::ASPNETCORE_RATE_LIMITING_RESULT
+     * @stability stable
+     */
+    public const ASPNETCORE_RATE_LIMITING_RESULT_GLOBAL_LIMITER = 'global_limiter';
+
+    /**
+     * Lease request was canceled
+     *
+     * @see TraceAttributes::ASPNETCORE_RATE_LIMITING_RESULT
+     * @stability stable
+     */
+    public const ASPNETCORE_RATE_LIMITING_RESULT_REQUEST_CANCELED = 'request_canceled';
+
+    /**
+     * Match succeeded
+     *
+     * @see TraceAttributes::ASPNETCORE_ROUTING_MATCH_STATUS
+     * @stability stable
+     */
+    public const ASPNETCORE_ROUTING_MATCH_STATUS_SUCCESS = 'success';
+
+    /**
+     * Match failed
+     *
+     * @see TraceAttributes::ASPNETCORE_ROUTING_MATCH_STATUS
+     * @stability stable
+     */
+    public const ASPNETCORE_ROUTING_MATCH_STATUS_FAILURE = 'failure';
+
     /**
      * ec2
      *
@@ -1141,6 +1248,46 @@ interface TraceAttributeValues
     public const DISK_IO_DIRECTION_WRITE = 'write';
 
     /**
+     * Generation 0
+     *
+     * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
+     * @stability experimental
+     */
+    public const DOTNET_GC_HEAP_GENERATION_GEN0 = 'gen0';
+
+    /**
+     * Generation 1
+     *
+     * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
+     * @stability experimental
+     */
+    public const DOTNET_GC_HEAP_GENERATION_GEN1 = 'gen1';
+
+    /**
+     * Generation 2
+     *
+     * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
+     * @stability experimental
+     */
+    public const DOTNET_GC_HEAP_GENERATION_GEN2 = 'gen2';
+
+    /**
+     * Large Object Heap
+     *
+     * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
+     * @stability experimental
+     */
+    public const DOTNET_GC_HEAP_GENERATION_LOH = 'loh';
+
+    /**
+     * Pinned Object Heap
+     *
+     * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
+     * @stability experimental
+     */
+    public const DOTNET_GC_HEAP_GENERATION_POH = 'poh';
+
+    /**
      * A fallback error value to be used when the instrumentation doesn't define a custom value.
 
      *
@@ -1748,6 +1895,115 @@ interface TraceAttributeValues
      * @stability experimental
      */
     public const HW_TYPE_VOLTAGE = 'voltage';
+
+    /**
+     * The app has become `active`. Associated with UIKit notification `applicationDidBecomeActive`.
+
+     *
+     * @see TraceAttributes::IOS_STATE
+     * @stability experimental
+     */
+    public const IOS_STATE_ACTIVE = 'active';
+
+    /**
+     * The app is now `inactive`. Associated with UIKit notification `applicationWillResignActive`.
+
+     *
+     * @see TraceAttributes::IOS_STATE
+     * @stability experimental
+     */
+    public const IOS_STATE_INACTIVE = 'inactive';
+
+    /**
+     * The app is now in the background. This value is associated with UIKit notification `applicationDidEnterBackground`.
+
+     *
+     * @see TraceAttributes::IOS_STATE
+     * @stability experimental
+     */
+    public const IOS_STATE_BACKGROUND = 'background';
+
+    /**
+     * The app is now in the foreground. This value is associated with UIKit notification `applicationWillEnterForeground`.
+
+     *
+     * @see TraceAttributes::IOS_STATE
+     * @stability experimental
+     */
+    public const IOS_STATE_FOREGROUND = 'foreground';
+
+    /**
+     * The app is about to terminate. Associated with UIKit notification `applicationWillTerminate`.
+
+     *
+     * @see TraceAttributes::IOS_STATE
+     * @stability experimental
+     */
+    public const IOS_STATE_TERMINATE = 'terminate';
+
+    /**
+     * Heap memory.
+     *
+     * @see TraceAttributes::JVM_MEMORY_TYPE
+     * @stability stable
+     */
+    public const JVM_MEMORY_TYPE_HEAP = 'heap';
+
+    /**
+     * Non-heap memory
+     *
+     * @see TraceAttributes::JVM_MEMORY_TYPE
+     * @stability stable
+     */
+    public const JVM_MEMORY_TYPE_NON_HEAP = 'non_heap';
+
+    /**
+     * A thread that has not yet started is in this state.
+     *
+     * @see TraceAttributes::JVM_THREAD_STATE
+     * @stability stable
+     */
+    public const JVM_THREAD_STATE_NEW = 'new';
+
+    /**
+     * A thread executing in the Java virtual machine is in this state.
+     *
+     * @see TraceAttributes::JVM_THREAD_STATE
+     * @stability stable
+     */
+    public const JVM_THREAD_STATE_RUNNABLE = 'runnable';
+
+    /**
+     * A thread that is blocked waiting for a monitor lock is in this state.
+     *
+     * @see TraceAttributes::JVM_THREAD_STATE
+     * @stability stable
+     */
+    public const JVM_THREAD_STATE_BLOCKED = 'blocked';
+
+    /**
+     * A thread that is waiting indefinitely for another thread to perform a particular action is in this state.
+     *
+     * @see TraceAttributes::JVM_THREAD_STATE
+     * @stability stable
+     */
+    public const JVM_THREAD_STATE_WAITING = 'waiting';
+
+    /**
+     * A thread that is waiting for another thread to perform an action for up to a specified waiting time is in this state.
+     *
+     * @see TraceAttributes::JVM_THREAD_STATE
+     * @stability stable
+     */
+    public const JVM_THREAD_STATE_TIMED_WAITING = 'timed_waiting';
+
+    /**
+     * A thread that has exited is in this state.
+     *
+     * @see TraceAttributes::JVM_THREAD_STATE
+     * @stability stable
+     */
+    public const JVM_THREAD_STATE_TERMINATED = 'terminated';
 
     /**
      * A [persistentVolumeClaim](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#persistentvolumeclaim) volume
@@ -3026,6 +3282,54 @@ interface TraceAttributeValues
      * @stability experimental
      */
     public const RPC_SYSTEM_CONNECT_RPC = 'connect_rpc';
+
+    /**
+     * The connection was closed normally.
+     *
+     * @see TraceAttributes::SIGNALR_CONNECTION_STATUS
+     * @stability stable
+     */
+    public const SIGNALR_CONNECTION_STATUS_NORMAL_CLOSURE = 'normal_closure';
+
+    /**
+     * The connection was closed due to a timeout.
+     *
+     * @see TraceAttributes::SIGNALR_CONNECTION_STATUS
+     * @stability stable
+     */
+    public const SIGNALR_CONNECTION_STATUS_TIMEOUT = 'timeout';
+
+    /**
+     * The connection was closed because the app is shutting down.
+     *
+     * @see TraceAttributes::SIGNALR_CONNECTION_STATUS
+     * @stability stable
+     */
+    public const SIGNALR_CONNECTION_STATUS_APP_SHUTDOWN = 'app_shutdown';
+
+    /**
+     * ServerSentEvents protocol
+     *
+     * @see TraceAttributes::SIGNALR_TRANSPORT
+     * @stability stable
+     */
+    public const SIGNALR_TRANSPORT_SERVER_SENT_EVENTS = 'server_sent_events';
+
+    /**
+     * LongPolling protocol
+     *
+     * @see TraceAttributes::SIGNALR_TRANSPORT
+     * @stability stable
+     */
+    public const SIGNALR_TRANSPORT_LONG_POLLING = 'long_polling';
+
+    /**
+     * WebSockets protocol
+     *
+     * @see TraceAttributes::SIGNALR_TRANSPORT
+     * @stability stable
+     */
+    public const SIGNALR_TRANSPORT_WEB_SOCKETS = 'web_sockets';
 
     /**
      * user
