@@ -18,7 +18,7 @@ interface ResourceAttributes
     {%- if attribute is deprecated %}
         {%- set deprecated_phpdoc = "@deprecated " ~ attribute.deprecated -%}
     {%- endif -%}
-    {{ [attribute.brief, concat_if(attribute.note), deprecated_phpdoc] | comment(indent=4) }}
+    {{ [attribute.brief, concat_if(attribute.note), deprecated_phpdoc] | comment(indent=4) | replace(' \n', '\n') }}
     public const {{ c.attribute_name(attribute) }} = '{{ attribute.name }}';
 
 {% endfor %}
