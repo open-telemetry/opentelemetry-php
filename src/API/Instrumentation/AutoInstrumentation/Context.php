@@ -10,6 +10,8 @@ use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 
 /**
  * Context used for component creation.
@@ -20,6 +22,7 @@ final class Context
         public readonly TracerProviderInterface $tracerProvider = new NoopTracerProvider(),
         public readonly MeterProviderInterface $meterProvider = new NoopMeterProvider(),
         public readonly LoggerProviderInterface $loggerProvider = new NoopLoggerProvider(),
+        public readonly TextMapPropagatorInterface $propagator = new NoopTextMapPropagator(),
     ) {
     }
 }

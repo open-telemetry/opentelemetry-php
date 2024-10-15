@@ -23,12 +23,14 @@ use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
 use OpenTelemetry\Config\SDK\Instrumentation as SdkInstrumentation;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Logs\EventLoggerProviderFactory;
 use OpenTelemetry\SDK\Logs\LoggerProviderFactory;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
+use OpenTelemetry\SDK\Propagation\LateBindingTextMapPropagator;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\AutoRootSpan;
@@ -154,7 +156,8 @@ class SdkAutoloader
         $tracerProvider = self::createLateBindingTracerProvider();
         $meterProvider = self::createLateBindingMeterProvider();
         $loggerProvider = self::createLateBindingLoggerProvider();
-        $context = new InstrumentationContext($tracerProvider, $meterProvider, $loggerProvider);
+        $propagator = self::createLateBindingTextMapPropagator();
+        $context = new InstrumentationContext($tracerProvider, $meterProvider, $loggerProvider, $propagator);
 
         foreach (ServiceLoader::load(Instrumentation::class) as $instrumentation) {
             /** @var Instrumentation $instrumentation */
@@ -198,6 +201,19 @@ class SdkAutoloader
 
             try {
                 return Globals::loggerProvider();
+            } finally {
+                $scope->detach();
+            }
+        });
+    }
+
+    private static function createLateBindingTextMapPropagator(): TextMapPropagatorInterface
+    {
+        return new LateBindingTextMapPropagator(static function (): TextMapPropagatorInterface {
+            $scope = Context::getRoot()->activate();
+
+            try {
+                return Globals::propagator();
             } finally {
                 $scope->detach();
             }

@@ -8,8 +8,6 @@ use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
-use OpenTelemetry\API\Logs\NoopLoggerProvider;
-use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Example\Example;
@@ -25,7 +23,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 Configuration::parseFile(__DIR__ . '/otel-sdk.yaml')->create(new Context())->setAutoShutdown(true)->buildAndRegisterGlobal();
 $configuration = \OpenTelemetry\Config\SDK\Instrumentation::parseFile(__DIR__ . '/otel-sdk.yaml')->create();
 $hookManager = new ExtensionHookManager();
-$context = new \OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context(Globals::tracerProvider(), new NoopMeterProvider(), new NoopLoggerProvider());
+$context = new \OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context(Globals::tracerProvider(), Globals::meterProvider(), Globals::loggerProvider(), Globals::propagator());
 
 foreach (ServiceLoader::load(Instrumentation::class) as $instrumentation) {
     $instrumentation->register($hookManager, $configuration, $context);
