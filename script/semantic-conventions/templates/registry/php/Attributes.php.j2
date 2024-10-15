@@ -17,7 +17,7 @@ interface TraceAttributes
 {% for section in ctx %}
     {#{ debug(section) }#}
     {% for attribute in section.attributes %}
-        {% if attribute.name != "messaging.client_id" %}
+        {% if attribute.name not in section.excluded_attributes %}
             {%- if attribute is deprecated %}
                 {%- set deprecated_phpdoc = "@deprecated " ~ attribute.deprecated -%}
             {% else %}

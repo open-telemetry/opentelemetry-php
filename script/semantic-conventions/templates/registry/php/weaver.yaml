@@ -24,6 +24,10 @@ templates:
       semconv_grouped_attributes({
         "exclude_root_namespace": $excluded_namespaces,
         "exclude_stability": [],
+      }) | map({
+        root_namespace: .root_namespace,
+        attributes: .attributes,
+        excluded_attributes: $excluded_attributes
       })
     application_mode: single
     file_name: "TraceAttributes.php"
