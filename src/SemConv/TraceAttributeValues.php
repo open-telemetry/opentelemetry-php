@@ -17,7 +17,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::ANDROID_STATE
-     * @stability experimental
      */
     public const ANDROID_STATE_CREATED = 'created';
 
@@ -26,7 +25,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::ANDROID_STATE
-     * @stability experimental
      */
     public const ANDROID_STATE_BACKGROUND = 'background';
 
@@ -35,7 +33,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::ANDROID_STATE
-     * @stability experimental
      */
     public const ANDROID_STATE_FOREGROUND = 'foreground';
 
@@ -43,7 +40,6 @@ interface TraceAttributeValues
      * Exception was handled by the exception handling middleware.
      *
      * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
-     * @stability stable
      */
     public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_HANDLED = 'handled';
 
@@ -51,7 +47,6 @@ interface TraceAttributeValues
      * Exception was not handled by the exception handling middleware.
      *
      * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
-     * @stability stable
      */
     public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_UNHANDLED = 'unhandled';
 
@@ -59,7 +54,6 @@ interface TraceAttributeValues
      * Exception handling was skipped because the response had started.
      *
      * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
-     * @stability stable
      */
     public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_SKIPPED = 'skipped';
 
@@ -67,7 +61,6 @@ interface TraceAttributeValues
      * Exception handling didn't run because the request was aborted.
      *
      * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
-     * @stability stable
      */
     public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_ABORTED = 'aborted';
 
@@ -75,7 +68,6 @@ interface TraceAttributeValues
      * Lease was acquired
      *
      * @see TraceAttributes::ASPNETCORE_RATE_LIMITING_RESULT
-     * @stability stable
      */
     public const ASPNETCORE_RATE_LIMITING_RESULT_ACQUIRED = 'acquired';
 
@@ -83,7 +75,6 @@ interface TraceAttributeValues
      * Lease request was rejected by the endpoint limiter
      *
      * @see TraceAttributes::ASPNETCORE_RATE_LIMITING_RESULT
-     * @stability stable
      */
     public const ASPNETCORE_RATE_LIMITING_RESULT_ENDPOINT_LIMITER = 'endpoint_limiter';
 
@@ -91,7 +82,6 @@ interface TraceAttributeValues
      * Lease request was rejected by the global limiter
      *
      * @see TraceAttributes::ASPNETCORE_RATE_LIMITING_RESULT
-     * @stability stable
      */
     public const ASPNETCORE_RATE_LIMITING_RESULT_GLOBAL_LIMITER = 'global_limiter';
 
@@ -99,7 +89,6 @@ interface TraceAttributeValues
      * Lease request was canceled
      *
      * @see TraceAttributes::ASPNETCORE_RATE_LIMITING_RESULT
-     * @stability stable
      */
     public const ASPNETCORE_RATE_LIMITING_RESULT_REQUEST_CANCELED = 'request_canceled';
 
@@ -107,7 +96,6 @@ interface TraceAttributeValues
      * Match succeeded
      *
      * @see TraceAttributes::ASPNETCORE_ROUTING_MATCH_STATUS
-     * @stability stable
      */
     public const ASPNETCORE_ROUTING_MATCH_STATUS_SUCCESS = 'success';
 
@@ -115,7 +103,6 @@ interface TraceAttributeValues
      * Match failed
      *
      * @see TraceAttributes::ASPNETCORE_ROUTING_MATCH_STATUS
-     * @stability stable
      */
     public const ASPNETCORE_ROUTING_MATCH_STATUS_FAILURE = 'failure';
 
@@ -123,7 +110,6 @@ interface TraceAttributeValues
      * ec2
      *
      * @see TraceAttributes::AWS_ECS_LAUNCHTYPE
-     * @stability experimental
      */
     public const AWS_ECS_LAUNCHTYPE_EC2 = 'ec2';
 
@@ -131,7 +117,6 @@ interface TraceAttributeValues
      * fargate
      *
      * @see TraceAttributes::AWS_ECS_LAUNCHTYPE
-     * @stability experimental
      */
     public const AWS_ECS_LAUNCHTYPE_FARGATE = 'fargate';
 
@@ -139,7 +124,6 @@ interface TraceAttributeValues
      * build
      *
      * @see TraceAttributes::CICD_PIPELINE_TASK_TYPE
-     * @stability experimental
      */
     public const CICD_PIPELINE_TASK_TYPE_BUILD = 'build';
 
@@ -147,7 +131,6 @@ interface TraceAttributeValues
      * test
      *
      * @see TraceAttributes::CICD_PIPELINE_TASK_TYPE
-     * @stability experimental
      */
     public const CICD_PIPELINE_TASK_TYPE_TEST = 'test';
 
@@ -155,7 +138,6 @@ interface TraceAttributeValues
      * deploy
      *
      * @see TraceAttributes::CICD_PIPELINE_TASK_TYPE
-     * @stability experimental
      */
     public const CICD_PIPELINE_TASK_TYPE_DEPLOY = 'deploy';
 
@@ -163,7 +145,6 @@ interface TraceAttributeValues
      * Alibaba Cloud Elastic Compute Service
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_ALIBABA_CLOUD_ECS = 'alibaba_cloud_ecs';
 
@@ -171,7 +152,6 @@ interface TraceAttributeValues
      * Alibaba Cloud Function Compute
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_ALIBABA_CLOUD_FC = 'alibaba_cloud_fc';
 
@@ -179,7 +159,6 @@ interface TraceAttributeValues
      * Red Hat OpenShift on Alibaba Cloud
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_ALIBABA_CLOUD_OPENSHIFT = 'alibaba_cloud_openshift';
 
@@ -187,7 +166,6 @@ interface TraceAttributeValues
      * AWS Elastic Compute Cloud
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AWS_EC2 = 'aws_ec2';
 
@@ -195,7 +173,6 @@ interface TraceAttributeValues
      * AWS Elastic Container Service
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AWS_ECS = 'aws_ecs';
 
@@ -203,7 +180,6 @@ interface TraceAttributeValues
      * AWS Elastic Kubernetes Service
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AWS_EKS = 'aws_eks';
 
@@ -211,7 +187,6 @@ interface TraceAttributeValues
      * AWS Lambda
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AWS_LAMBDA = 'aws_lambda';
 
@@ -219,7 +194,6 @@ interface TraceAttributeValues
      * AWS Elastic Beanstalk
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AWS_ELASTIC_BEANSTALK = 'aws_elastic_beanstalk';
 
@@ -227,7 +201,6 @@ interface TraceAttributeValues
      * AWS App Runner
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AWS_APP_RUNNER = 'aws_app_runner';
 
@@ -235,7 +208,6 @@ interface TraceAttributeValues
      * Red Hat OpenShift on AWS (ROSA)
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AWS_OPENSHIFT = 'aws_openshift';
 
@@ -243,7 +215,6 @@ interface TraceAttributeValues
      * Azure Virtual Machines
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AZURE_VM = 'azure_vm';
 
@@ -251,7 +222,6 @@ interface TraceAttributeValues
      * Azure Container Apps
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AZURE_CONTAINER_APPS = 'azure_container_apps';
 
@@ -259,7 +229,6 @@ interface TraceAttributeValues
      * Azure Container Instances
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AZURE_CONTAINER_INSTANCES = 'azure_container_instances';
 
@@ -267,7 +236,6 @@ interface TraceAttributeValues
      * Azure Kubernetes Service
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AZURE_AKS = 'azure_aks';
 
@@ -275,7 +243,6 @@ interface TraceAttributeValues
      * Azure Functions
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AZURE_FUNCTIONS = 'azure_functions';
 
@@ -283,7 +250,6 @@ interface TraceAttributeValues
      * Azure App Service
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AZURE_APP_SERVICE = 'azure_app_service';
 
@@ -291,7 +257,6 @@ interface TraceAttributeValues
      * Azure Red Hat OpenShift
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_AZURE_OPENSHIFT = 'azure_openshift';
 
@@ -299,7 +264,6 @@ interface TraceAttributeValues
      * Google Bare Metal Solution (BMS)
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_GCP_BARE_METAL_SOLUTION = 'gcp_bare_metal_solution';
 
@@ -307,7 +271,6 @@ interface TraceAttributeValues
      * Google Cloud Compute Engine (GCE)
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_GCP_COMPUTE_ENGINE = 'gcp_compute_engine';
 
@@ -315,7 +278,6 @@ interface TraceAttributeValues
      * Google Cloud Run
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_GCP_CLOUD_RUN = 'gcp_cloud_run';
 
@@ -323,7 +285,6 @@ interface TraceAttributeValues
      * Google Cloud Kubernetes Engine (GKE)
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_GCP_KUBERNETES_ENGINE = 'gcp_kubernetes_engine';
 
@@ -331,7 +292,6 @@ interface TraceAttributeValues
      * Google Cloud Functions (GCF)
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_GCP_CLOUD_FUNCTIONS = 'gcp_cloud_functions';
 
@@ -339,7 +299,6 @@ interface TraceAttributeValues
      * Google Cloud App Engine (GAE)
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_GCP_APP_ENGINE = 'gcp_app_engine';
 
@@ -347,7 +306,6 @@ interface TraceAttributeValues
      * Red Hat OpenShift on Google Cloud
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_GCP_OPENSHIFT = 'gcp_openshift';
 
@@ -355,7 +313,6 @@ interface TraceAttributeValues
      * Red Hat OpenShift on IBM Cloud
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_IBM_CLOUD_OPENSHIFT = 'ibm_cloud_openshift';
 
@@ -363,7 +320,6 @@ interface TraceAttributeValues
      * Tencent Cloud Cloud Virtual Machine (CVM)
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_TENCENT_CLOUD_CVM = 'tencent_cloud_cvm';
 
@@ -371,7 +327,6 @@ interface TraceAttributeValues
      * Tencent Cloud Elastic Kubernetes Service (EKS)
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_TENCENT_CLOUD_EKS = 'tencent_cloud_eks';
 
@@ -379,7 +334,6 @@ interface TraceAttributeValues
      * Tencent Cloud Serverless Cloud Function (SCF)
      *
      * @see TraceAttributes::CLOUD_PLATFORM
-     * @stability experimental
      */
     public const CLOUD_PLATFORM_TENCENT_CLOUD_SCF = 'tencent_cloud_scf';
 
@@ -387,7 +341,6 @@ interface TraceAttributeValues
      * Alibaba Cloud
      *
      * @see TraceAttributes::CLOUD_PROVIDER
-     * @stability experimental
      */
     public const CLOUD_PROVIDER_ALIBABA_CLOUD = 'alibaba_cloud';
 
@@ -395,7 +348,6 @@ interface TraceAttributeValues
      * Amazon Web Services
      *
      * @see TraceAttributes::CLOUD_PROVIDER
-     * @stability experimental
      */
     public const CLOUD_PROVIDER_AWS = 'aws';
 
@@ -403,7 +355,6 @@ interface TraceAttributeValues
      * Microsoft Azure
      *
      * @see TraceAttributes::CLOUD_PROVIDER
-     * @stability experimental
      */
     public const CLOUD_PROVIDER_AZURE = 'azure';
 
@@ -411,7 +362,6 @@ interface TraceAttributeValues
      * Google Cloud Platform
      *
      * @see TraceAttributes::CLOUD_PROVIDER
-     * @stability experimental
      */
     public const CLOUD_PROVIDER_GCP = 'gcp';
 
@@ -419,7 +369,6 @@ interface TraceAttributeValues
      * Heroku Platform as a Service
      *
      * @see TraceAttributes::CLOUD_PROVIDER
-     * @stability experimental
      */
     public const CLOUD_PROVIDER_HEROKU = 'heroku';
 
@@ -427,7 +376,6 @@ interface TraceAttributeValues
      * IBM Cloud
      *
      * @see TraceAttributes::CLOUD_PROVIDER
-     * @stability experimental
      */
     public const CLOUD_PROVIDER_IBM_CLOUD = 'ibm_cloud';
 
@@ -435,7 +383,6 @@ interface TraceAttributeValues
      * Tencent Cloud
      *
      * @see TraceAttributes::CLOUD_PROVIDER
-     * @stability experimental
      */
     public const CLOUD_PROVIDER_TENCENT_CLOUD = 'tencent_cloud';
 
@@ -443,7 +390,6 @@ interface TraceAttributeValues
      * When tasks of the cgroup are in user mode (Linux). When all container processes are in user mode (Windows).
      *
      * @see TraceAttributes::CONTAINER_CPU_STATE
-     * @stability experimental
      */
     public const CONTAINER_CPU_STATE_USER = 'user';
 
@@ -451,7 +397,6 @@ interface TraceAttributeValues
      * When CPU is used by the system (host OS)
      *
      * @see TraceAttributes::CONTAINER_CPU_STATE
-     * @stability experimental
      */
     public const CONTAINER_CPU_STATE_SYSTEM = 'system';
 
@@ -459,7 +404,6 @@ interface TraceAttributeValues
      * When tasks of the cgroup are in kernel mode (Linux). When all container processes are in kernel mode (Windows).
      *
      * @see TraceAttributes::CONTAINER_CPU_STATE
-     * @stability experimental
      */
     public const CONTAINER_CPU_STATE_KERNEL = 'kernel';
 
@@ -467,7 +411,6 @@ interface TraceAttributeValues
      * user
      *
      * @see TraceAttributes::CPU_MODE
-     * @stability experimental
      */
     public const CPU_MODE_USER = 'user';
 
@@ -475,7 +418,6 @@ interface TraceAttributeValues
      * system
      *
      * @see TraceAttributes::CPU_MODE
-     * @stability experimental
      */
     public const CPU_MODE_SYSTEM = 'system';
 
@@ -483,7 +425,6 @@ interface TraceAttributeValues
      * nice
      *
      * @see TraceAttributes::CPU_MODE
-     * @stability experimental
      */
     public const CPU_MODE_NICE = 'nice';
 
@@ -491,7 +432,6 @@ interface TraceAttributeValues
      * idle
      *
      * @see TraceAttributes::CPU_MODE
-     * @stability experimental
      */
     public const CPU_MODE_IDLE = 'idle';
 
@@ -499,7 +439,6 @@ interface TraceAttributeValues
      * iowait
      *
      * @see TraceAttributes::CPU_MODE
-     * @stability experimental
      */
     public const CPU_MODE_IOWAIT = 'iowait';
 
@@ -507,7 +446,6 @@ interface TraceAttributeValues
      * interrupt
      *
      * @see TraceAttributes::CPU_MODE
-     * @stability experimental
      */
     public const CPU_MODE_INTERRUPT = 'interrupt';
 
@@ -515,7 +453,6 @@ interface TraceAttributeValues
      * steal
      *
      * @see TraceAttributes::CPU_MODE
-     * @stability experimental
      */
     public const CPU_MODE_STEAL = 'steal';
 
@@ -523,7 +460,6 @@ interface TraceAttributeValues
      * kernel
      *
      * @see TraceAttributes::CPU_MODE
-     * @stability experimental
      */
     public const CPU_MODE_KERNEL = 'kernel';
 
@@ -531,7 +467,6 @@ interface TraceAttributeValues
      * all
      *
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL
-     * @stability experimental
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_ALL = 'all';
 
@@ -539,7 +474,6 @@ interface TraceAttributeValues
      * each_quorum
      *
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL
-     * @stability experimental
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_EACH_QUORUM = 'each_quorum';
 
@@ -547,7 +481,6 @@ interface TraceAttributeValues
      * quorum
      *
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL
-     * @stability experimental
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_QUORUM = 'quorum';
 
@@ -555,7 +488,6 @@ interface TraceAttributeValues
      * local_quorum
      *
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL
-     * @stability experimental
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_LOCAL_QUORUM = 'local_quorum';
 
@@ -563,7 +495,6 @@ interface TraceAttributeValues
      * one
      *
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL
-     * @stability experimental
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_ONE = 'one';
 
@@ -571,7 +502,6 @@ interface TraceAttributeValues
      * two
      *
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL
-     * @stability experimental
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_TWO = 'two';
 
@@ -579,7 +509,6 @@ interface TraceAttributeValues
      * three
      *
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL
-     * @stability experimental
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_THREE = 'three';
 
@@ -587,7 +516,6 @@ interface TraceAttributeValues
      * local_one
      *
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL
-     * @stability experimental
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_LOCAL_ONE = 'local_one';
 
@@ -595,7 +523,6 @@ interface TraceAttributeValues
      * any
      *
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL
-     * @stability experimental
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_ANY = 'any';
 
@@ -603,7 +530,6 @@ interface TraceAttributeValues
      * serial
      *
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL
-     * @stability experimental
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_SERIAL = 'serial';
 
@@ -611,7 +537,6 @@ interface TraceAttributeValues
      * local_serial
      *
      * @see TraceAttributes::DB_CASSANDRA_CONSISTENCY_LEVEL
-     * @stability experimental
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL_LOCAL_SERIAL = 'local_serial';
 
@@ -619,7 +544,6 @@ interface TraceAttributeValues
      * idle
      *
      * @see TraceAttributes::DB_CLIENT_CONNECTION_STATE
-     * @stability experimental
      */
     public const DB_CLIENT_CONNECTION_STATE_IDLE = 'idle';
 
@@ -627,7 +551,6 @@ interface TraceAttributeValues
      * used
      *
      * @see TraceAttributes::DB_CLIENT_CONNECTION_STATE
-     * @stability experimental
      */
     public const DB_CLIENT_CONNECTION_STATE_USED = 'used';
 
@@ -635,7 +558,6 @@ interface TraceAttributeValues
      * idle
      *
      * @see TraceAttributes::DB_CLIENT_CONNECTIONS_STATE
-     * @stability experimental
      */
     public const DB_CLIENT_CONNECTIONS_STATE_IDLE = 'idle';
 
@@ -643,7 +565,6 @@ interface TraceAttributeValues
      * used
      *
      * @see TraceAttributes::DB_CLIENT_CONNECTIONS_STATE
-     * @stability experimental
      */
     public const DB_CLIENT_CONNECTIONS_STATE_USED = 'used';
 
@@ -651,7 +572,6 @@ interface TraceAttributeValues
      * Gateway (HTTP) connections mode
      *
      * @see TraceAttributes::DB_COSMOSDB_CONNECTION_MODE
-     * @stability experimental
      */
     public const DB_COSMOSDB_CONNECTION_MODE_GATEWAY = 'gateway';
 
@@ -659,7 +579,6 @@ interface TraceAttributeValues
      * Direct connection.
      *
      * @see TraceAttributes::DB_COSMOSDB_CONNECTION_MODE
-     * @stability experimental
      */
     public const DB_COSMOSDB_CONNECTION_MODE_DIRECT = 'direct';
 
@@ -667,7 +586,6 @@ interface TraceAttributeValues
      * batch
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_BATCH = 'batch';
 
@@ -675,7 +593,6 @@ interface TraceAttributeValues
      * create
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_CREATE = 'create';
 
@@ -683,7 +600,6 @@ interface TraceAttributeValues
      * delete
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_DELETE = 'delete';
 
@@ -691,7 +607,6 @@ interface TraceAttributeValues
      * execute
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_EXECUTE = 'execute';
 
@@ -699,7 +614,6 @@ interface TraceAttributeValues
      * execute_javascript
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_EXECUTE_JAVASCRIPT = 'execute_javascript';
 
@@ -707,7 +621,6 @@ interface TraceAttributeValues
      * invalid
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_INVALID = 'invalid';
 
@@ -715,7 +628,6 @@ interface TraceAttributeValues
      * head
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_HEAD = 'head';
 
@@ -723,7 +635,6 @@ interface TraceAttributeValues
      * head_feed
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_HEAD_FEED = 'head_feed';
 
@@ -731,7 +642,6 @@ interface TraceAttributeValues
      * patch
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_PATCH = 'patch';
 
@@ -739,7 +649,6 @@ interface TraceAttributeValues
      * query
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_QUERY = 'query';
 
@@ -747,7 +656,6 @@ interface TraceAttributeValues
      * query_plan
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_QUERY_PLAN = 'query_plan';
 
@@ -755,7 +663,6 @@ interface TraceAttributeValues
      * read
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_READ = 'read';
 
@@ -763,7 +670,6 @@ interface TraceAttributeValues
      * read_feed
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_READ_FEED = 'read_feed';
 
@@ -771,7 +677,6 @@ interface TraceAttributeValues
      * replace
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_REPLACE = 'replace';
 
@@ -779,7 +684,6 @@ interface TraceAttributeValues
      * upsert
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     * @stability experimental
      */
     public const DB_COSMOSDB_OPERATION_TYPE_UPSERT = 'upsert';
 
@@ -787,7 +691,6 @@ interface TraceAttributeValues
      * Some other SQL database. Fallback only. See notes.
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_OTHER_SQL = 'other_sql';
 
@@ -795,7 +698,6 @@ interface TraceAttributeValues
      * Adabas (Adaptable Database System)
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_ADABAS = 'adabas';
 
@@ -803,7 +705,6 @@ interface TraceAttributeValues
      * Deprecated, use `intersystems_cache` instead.
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_CACHE = 'cache';
 
@@ -811,7 +712,6 @@ interface TraceAttributeValues
      * InterSystems Caché
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_INTERSYSTEMS_CACHE = 'intersystems_cache';
 
@@ -819,7 +719,6 @@ interface TraceAttributeValues
      * Apache Cassandra
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_CASSANDRA = 'cassandra';
 
@@ -827,7 +726,6 @@ interface TraceAttributeValues
      * ClickHouse
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_CLICKHOUSE = 'clickhouse';
 
@@ -835,7 +733,6 @@ interface TraceAttributeValues
      * Deprecated, use `other_sql` instead.
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_CLOUDSCAPE = 'cloudscape';
 
@@ -843,7 +740,6 @@ interface TraceAttributeValues
      * CockroachDB
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_COCKROACHDB = 'cockroachdb';
 
@@ -851,7 +747,6 @@ interface TraceAttributeValues
      * Deprecated, no replacement at this time.
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_COLDFUSION = 'coldfusion';
 
@@ -859,7 +754,6 @@ interface TraceAttributeValues
      * Microsoft Azure Cosmos DB
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_COSMOSDB = 'cosmosdb';
 
@@ -867,7 +761,6 @@ interface TraceAttributeValues
      * Couchbase
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_COUCHBASE = 'couchbase';
 
@@ -875,7 +768,6 @@ interface TraceAttributeValues
      * CouchDB
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_COUCHDB = 'couchdb';
 
@@ -883,7 +775,6 @@ interface TraceAttributeValues
      * IBM Db2
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_DB2 = 'db2';
 
@@ -891,7 +782,6 @@ interface TraceAttributeValues
      * Apache Derby
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_DERBY = 'derby';
 
@@ -899,7 +789,6 @@ interface TraceAttributeValues
      * Amazon DynamoDB
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_DYNAMODB = 'dynamodb';
 
@@ -907,7 +796,6 @@ interface TraceAttributeValues
      * EnterpriseDB
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_EDB = 'edb';
 
@@ -915,7 +803,6 @@ interface TraceAttributeValues
      * Elasticsearch
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_ELASTICSEARCH = 'elasticsearch';
 
@@ -923,7 +810,6 @@ interface TraceAttributeValues
      * FileMaker
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_FILEMAKER = 'filemaker';
 
@@ -931,7 +817,6 @@ interface TraceAttributeValues
      * Firebird
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_FIREBIRD = 'firebird';
 
@@ -939,7 +824,6 @@ interface TraceAttributeValues
      * Deprecated, use `other_sql` instead.
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_FIRSTSQL = 'firstsql';
 
@@ -947,7 +831,6 @@ interface TraceAttributeValues
      * Apache Geode
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_GEODE = 'geode';
 
@@ -955,7 +838,6 @@ interface TraceAttributeValues
      * H2
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_H2 = 'h2';
 
@@ -963,7 +845,6 @@ interface TraceAttributeValues
      * SAP HANA
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_HANADB = 'hanadb';
 
@@ -971,7 +852,6 @@ interface TraceAttributeValues
      * Apache HBase
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_HBASE = 'hbase';
 
@@ -979,7 +859,6 @@ interface TraceAttributeValues
      * Apache Hive
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_HIVE = 'hive';
 
@@ -987,7 +866,6 @@ interface TraceAttributeValues
      * HyperSQL DataBase
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_HSQLDB = 'hsqldb';
 
@@ -995,7 +873,6 @@ interface TraceAttributeValues
      * InfluxDB
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_INFLUXDB = 'influxdb';
 
@@ -1003,7 +880,6 @@ interface TraceAttributeValues
      * Informix
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_INFORMIX = 'informix';
 
@@ -1011,7 +887,6 @@ interface TraceAttributeValues
      * Ingres
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_INGRES = 'ingres';
 
@@ -1019,7 +894,6 @@ interface TraceAttributeValues
      * InstantDB
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_INSTANTDB = 'instantdb';
 
@@ -1027,7 +901,6 @@ interface TraceAttributeValues
      * InterBase
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_INTERBASE = 'interbase';
 
@@ -1035,7 +908,6 @@ interface TraceAttributeValues
      * MariaDB (This value has stability level RELEASE CANDIDATE)
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_MARIADB = 'mariadb';
 
@@ -1043,7 +915,6 @@ interface TraceAttributeValues
      * SAP MaxDB
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_MAXDB = 'maxdb';
 
@@ -1051,7 +922,6 @@ interface TraceAttributeValues
      * Memcached
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_MEMCACHED = 'memcached';
 
@@ -1059,7 +929,6 @@ interface TraceAttributeValues
      * MongoDB
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_MONGODB = 'mongodb';
 
@@ -1067,7 +936,6 @@ interface TraceAttributeValues
      * Microsoft SQL Server (This value has stability level RELEASE CANDIDATE)
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_MSSQL = 'mssql';
 
@@ -1075,7 +943,6 @@ interface TraceAttributeValues
      * Deprecated, Microsoft SQL Server Compact is discontinued.
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_MSSQLCOMPACT = 'mssqlcompact';
 
@@ -1083,7 +950,6 @@ interface TraceAttributeValues
      * MySQL (This value has stability level RELEASE CANDIDATE)
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_MYSQL = 'mysql';
 
@@ -1091,7 +957,6 @@ interface TraceAttributeValues
      * Neo4j
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_NEO4J = 'neo4j';
 
@@ -1099,7 +964,6 @@ interface TraceAttributeValues
      * Netezza
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_NETEZZA = 'netezza';
 
@@ -1107,7 +971,6 @@ interface TraceAttributeValues
      * OpenSearch
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_OPENSEARCH = 'opensearch';
 
@@ -1115,7 +978,6 @@ interface TraceAttributeValues
      * Oracle Database
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_ORACLE = 'oracle';
 
@@ -1123,7 +985,6 @@ interface TraceAttributeValues
      * Pervasive PSQL
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_PERVASIVE = 'pervasive';
 
@@ -1131,7 +992,6 @@ interface TraceAttributeValues
      * PointBase
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_POINTBASE = 'pointbase';
 
@@ -1139,7 +999,6 @@ interface TraceAttributeValues
      * PostgreSQL (This value has stability level RELEASE CANDIDATE)
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_POSTGRESQL = 'postgresql';
 
@@ -1147,7 +1006,6 @@ interface TraceAttributeValues
      * Progress Database
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_PROGRESS = 'progress';
 
@@ -1155,7 +1013,6 @@ interface TraceAttributeValues
      * Redis
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_REDIS = 'redis';
 
@@ -1163,7 +1020,6 @@ interface TraceAttributeValues
      * Amazon Redshift
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_REDSHIFT = 'redshift';
 
@@ -1171,7 +1027,6 @@ interface TraceAttributeValues
      * Cloud Spanner
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_SPANNER = 'spanner';
 
@@ -1179,7 +1034,6 @@ interface TraceAttributeValues
      * SQLite
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_SQLITE = 'sqlite';
 
@@ -1187,7 +1041,6 @@ interface TraceAttributeValues
      * Sybase
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_SYBASE = 'sybase';
 
@@ -1195,7 +1048,6 @@ interface TraceAttributeValues
      * Teradata
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_TERADATA = 'teradata';
 
@@ -1203,7 +1055,6 @@ interface TraceAttributeValues
      * Trino
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_TRINO = 'trino';
 
@@ -1211,7 +1062,6 @@ interface TraceAttributeValues
      * Vertica
      *
      * @see TraceAttributes::DB_SYSTEM
-     * @stability experimental
      */
     public const DB_SYSTEM_VERTICA = 'vertica';
 
@@ -1219,7 +1069,6 @@ interface TraceAttributeValues
      * failed
      *
      * @see TraceAttributes::DEPLOYMENT_STATUS
-     * @stability experimental
      */
     public const DEPLOYMENT_STATUS_FAILED = 'failed';
 
@@ -1227,7 +1076,6 @@ interface TraceAttributeValues
      * succeeded
      *
      * @see TraceAttributes::DEPLOYMENT_STATUS
-     * @stability experimental
      */
     public const DEPLOYMENT_STATUS_SUCCEEDED = 'succeeded';
 
@@ -1235,7 +1083,6 @@ interface TraceAttributeValues
      * read
      *
      * @see TraceAttributes::DISK_IO_DIRECTION
-     * @stability experimental
      */
     public const DISK_IO_DIRECTION_READ = 'read';
 
@@ -1243,7 +1090,6 @@ interface TraceAttributeValues
      * write
      *
      * @see TraceAttributes::DISK_IO_DIRECTION
-     * @stability experimental
      */
     public const DISK_IO_DIRECTION_WRITE = 'write';
 
@@ -1251,7 +1097,6 @@ interface TraceAttributeValues
      * Generation 0
      *
      * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
-     * @stability experimental
      */
     public const DOTNET_GC_HEAP_GENERATION_GEN0 = 'gen0';
 
@@ -1259,7 +1104,6 @@ interface TraceAttributeValues
      * Generation 1
      *
      * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
-     * @stability experimental
      */
     public const DOTNET_GC_HEAP_GENERATION_GEN1 = 'gen1';
 
@@ -1267,7 +1111,6 @@ interface TraceAttributeValues
      * Generation 2
      *
      * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
-     * @stability experimental
      */
     public const DOTNET_GC_HEAP_GENERATION_GEN2 = 'gen2';
 
@@ -1275,7 +1118,6 @@ interface TraceAttributeValues
      * Large Object Heap
      *
      * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
-     * @stability experimental
      */
     public const DOTNET_GC_HEAP_GENERATION_LOH = 'loh';
 
@@ -1283,7 +1125,6 @@ interface TraceAttributeValues
      * Pinned Object Heap
      *
      * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
-     * @stability experimental
      */
     public const DOTNET_GC_HEAP_GENERATION_POH = 'poh';
 
@@ -1292,7 +1133,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::ERROR_TYPE
-     * @stability stable
      */
     public const ERROR_TYPE__OTHER = '_OTHER';
 
@@ -1300,7 +1140,6 @@ interface TraceAttributeValues
      * When a new object is created.
      *
      * @see TraceAttributes::FAAS_DOCUMENT_OPERATION
-     * @stability experimental
      */
     public const FAAS_DOCUMENT_OPERATION_INSERT = 'insert';
 
@@ -1308,7 +1147,6 @@ interface TraceAttributeValues
      * When an object is modified.
      *
      * @see TraceAttributes::FAAS_DOCUMENT_OPERATION
-     * @stability experimental
      */
     public const FAAS_DOCUMENT_OPERATION_EDIT = 'edit';
 
@@ -1316,7 +1154,6 @@ interface TraceAttributeValues
      * When an object is deleted.
      *
      * @see TraceAttributes::FAAS_DOCUMENT_OPERATION
-     * @stability experimental
      */
     public const FAAS_DOCUMENT_OPERATION_DELETE = 'delete';
 
@@ -1324,7 +1161,6 @@ interface TraceAttributeValues
      * Alibaba Cloud
      *
      * @see TraceAttributes::FAAS_INVOKED_PROVIDER
-     * @stability experimental
      */
     public const FAAS_INVOKED_PROVIDER_ALIBABA_CLOUD = 'alibaba_cloud';
 
@@ -1332,7 +1168,6 @@ interface TraceAttributeValues
      * Amazon Web Services
      *
      * @see TraceAttributes::FAAS_INVOKED_PROVIDER
-     * @stability experimental
      */
     public const FAAS_INVOKED_PROVIDER_AWS = 'aws';
 
@@ -1340,7 +1175,6 @@ interface TraceAttributeValues
      * Microsoft Azure
      *
      * @see TraceAttributes::FAAS_INVOKED_PROVIDER
-     * @stability experimental
      */
     public const FAAS_INVOKED_PROVIDER_AZURE = 'azure';
 
@@ -1348,7 +1182,6 @@ interface TraceAttributeValues
      * Google Cloud Platform
      *
      * @see TraceAttributes::FAAS_INVOKED_PROVIDER
-     * @stability experimental
      */
     public const FAAS_INVOKED_PROVIDER_GCP = 'gcp';
 
@@ -1356,7 +1189,6 @@ interface TraceAttributeValues
      * Tencent Cloud
      *
      * @see TraceAttributes::FAAS_INVOKED_PROVIDER
-     * @stability experimental
      */
     public const FAAS_INVOKED_PROVIDER_TENCENT_CLOUD = 'tencent_cloud';
 
@@ -1364,7 +1196,6 @@ interface TraceAttributeValues
      * A response to some data source operation such as a database or filesystem read/write
      *
      * @see TraceAttributes::FAAS_TRIGGER
-     * @stability experimental
      */
     public const FAAS_TRIGGER_DATASOURCE = 'datasource';
 
@@ -1372,7 +1203,6 @@ interface TraceAttributeValues
      * To provide an answer to an inbound HTTP request
      *
      * @see TraceAttributes::FAAS_TRIGGER
-     * @stability experimental
      */
     public const FAAS_TRIGGER_HTTP = 'http';
 
@@ -1380,7 +1210,6 @@ interface TraceAttributeValues
      * A function is set to be executed when messages are sent to a messaging system
      *
      * @see TraceAttributes::FAAS_TRIGGER
-     * @stability experimental
      */
     public const FAAS_TRIGGER_PUBSUB = 'pubsub';
 
@@ -1388,7 +1217,6 @@ interface TraceAttributeValues
      * A function is scheduled to be executed regularly
      *
      * @see TraceAttributes::FAAS_TRIGGER
-     * @stability experimental
      */
     public const FAAS_TRIGGER_TIMER = 'timer';
 
@@ -1396,7 +1224,6 @@ interface TraceAttributeValues
      * If none of the others apply
      *
      * @see TraceAttributes::FAAS_TRIGGER
-     * @stability experimental
      */
     public const FAAS_TRIGGER_OTHER = 'other';
 
@@ -1404,7 +1231,6 @@ interface TraceAttributeValues
      * Text response format
      *
      * @see TraceAttributes::GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT
-     * @stability experimental
      */
     public const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT_TEXT = 'text';
 
@@ -1412,7 +1238,6 @@ interface TraceAttributeValues
      * JSON object response format
      *
      * @see TraceAttributes::GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT
-     * @stability experimental
      */
     public const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT_JSON_OBJECT = 'json_object';
 
@@ -1420,7 +1245,6 @@ interface TraceAttributeValues
      * JSON schema response format
      *
      * @see TraceAttributes::GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT
-     * @stability experimental
      */
     public const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT_JSON_SCHEMA = 'json_schema';
 
@@ -1428,7 +1252,6 @@ interface TraceAttributeValues
      * The system will utilize scale tier credits until they are exhausted.
      *
      * @see TraceAttributes::GEN_AI_OPENAI_REQUEST_SERVICE_TIER
-     * @stability experimental
      */
     public const GEN_AI_OPENAI_REQUEST_SERVICE_TIER_AUTO = 'auto';
 
@@ -1436,7 +1259,6 @@ interface TraceAttributeValues
      * The system will utilize the default scale tier.
      *
      * @see TraceAttributes::GEN_AI_OPENAI_REQUEST_SERVICE_TIER
-     * @stability experimental
      */
     public const GEN_AI_OPENAI_REQUEST_SERVICE_TIER_DEFAULT = 'default';
 
@@ -1444,7 +1266,6 @@ interface TraceAttributeValues
      * Chat completion operation such as [OpenAI Chat API](https://platform.openai.com/docs/api-reference/chat)
      *
      * @see TraceAttributes::GEN_AI_OPERATION_NAME
-     * @stability experimental
      */
     public const GEN_AI_OPERATION_NAME_CHAT = 'chat';
 
@@ -1452,7 +1273,6 @@ interface TraceAttributeValues
      * Text completions operation such as [OpenAI Completions API (Legacy)](https://platform.openai.com/docs/api-reference/completions)
      *
      * @see TraceAttributes::GEN_AI_OPERATION_NAME
-     * @stability experimental
      */
     public const GEN_AI_OPERATION_NAME_TEXT_COMPLETION = 'text_completion';
 
@@ -1460,7 +1280,6 @@ interface TraceAttributeValues
      * OpenAI
      *
      * @see TraceAttributes::GEN_AI_SYSTEM
-     * @stability experimental
      */
     public const GEN_AI_SYSTEM_OPENAI = 'openai';
 
@@ -1468,7 +1287,6 @@ interface TraceAttributeValues
      * Vertex AI
      *
      * @see TraceAttributes::GEN_AI_SYSTEM
-     * @stability experimental
      */
     public const GEN_AI_SYSTEM_VERTEX_AI = 'vertex_ai';
 
@@ -1476,7 +1294,6 @@ interface TraceAttributeValues
      * Anthropic
      *
      * @see TraceAttributes::GEN_AI_SYSTEM
-     * @stability experimental
      */
     public const GEN_AI_SYSTEM_ANTHROPIC = 'anthropic';
 
@@ -1484,7 +1301,6 @@ interface TraceAttributeValues
      * Cohere
      *
      * @see TraceAttributes::GEN_AI_SYSTEM
-     * @stability experimental
      */
     public const GEN_AI_SYSTEM_COHERE = 'cohere';
 
@@ -1492,7 +1308,6 @@ interface TraceAttributeValues
      * Azure AI Inference
      *
      * @see TraceAttributes::GEN_AI_SYSTEM
-     * @stability experimental
      */
     public const GEN_AI_SYSTEM_AZ_AI_INFERENCE = 'az.ai.inference';
 
@@ -1500,7 +1315,6 @@ interface TraceAttributeValues
      * Input tokens (prompt, input, etc.)
      *
      * @see TraceAttributes::GEN_AI_TOKEN_TYPE
-     * @stability experimental
      */
     public const GEN_AI_TOKEN_TYPE_INPUT = 'input';
 
@@ -1508,7 +1322,6 @@ interface TraceAttributeValues
      * Output tokens (completion, response, etc.)
      *
      * @see TraceAttributes::GEN_AI_TOKEN_TYPE
-     * @stability experimental
      */
     public const GEN_AI_TOKEN_TYPE_OUTPUT = 'output';
 
@@ -1516,7 +1329,6 @@ interface TraceAttributeValues
      * Memory allocated from the heap that is reserved for stack space, whether or not it is currently in-use.
      *
      * @see TraceAttributes::GO_MEMORY_TYPE
-     * @stability experimental
      */
     public const GO_MEMORY_TYPE_STACK = 'stack';
 
@@ -1524,7 +1336,6 @@ interface TraceAttributeValues
      * Memory used by the Go runtime, excluding other categories of memory usage described in this enumeration.
      *
      * @see TraceAttributes::GO_MEMORY_TYPE
-     * @stability experimental
      */
     public const GO_MEMORY_TYPE_OTHER = 'other';
 
@@ -1532,7 +1343,6 @@ interface TraceAttributeValues
      * GraphQL query
      *
      * @see TraceAttributes::GRAPHQL_OPERATION_TYPE
-     * @stability experimental
      */
     public const GRAPHQL_OPERATION_TYPE_QUERY = 'query';
 
@@ -1540,7 +1350,6 @@ interface TraceAttributeValues
      * GraphQL mutation
      *
      * @see TraceAttributes::GRAPHQL_OPERATION_TYPE
-     * @stability experimental
      */
     public const GRAPHQL_OPERATION_TYPE_MUTATION = 'mutation';
 
@@ -1548,7 +1357,6 @@ interface TraceAttributeValues
      * GraphQL subscription
      *
      * @see TraceAttributes::GRAPHQL_OPERATION_TYPE
-     * @stability experimental
      */
     public const GRAPHQL_OPERATION_TYPE_SUBSCRIPTION = 'subscription';
 
@@ -1556,7 +1364,6 @@ interface TraceAttributeValues
      * AMD64
      *
      * @see TraceAttributes::HOST_ARCH
-     * @stability experimental
      */
     public const HOST_ARCH_AMD64 = 'amd64';
 
@@ -1564,7 +1371,6 @@ interface TraceAttributeValues
      * ARM32
      *
      * @see TraceAttributes::HOST_ARCH
-     * @stability experimental
      */
     public const HOST_ARCH_ARM32 = 'arm32';
 
@@ -1572,7 +1378,6 @@ interface TraceAttributeValues
      * ARM64
      *
      * @see TraceAttributes::HOST_ARCH
-     * @stability experimental
      */
     public const HOST_ARCH_ARM64 = 'arm64';
 
@@ -1580,7 +1385,6 @@ interface TraceAttributeValues
      * Itanium
      *
      * @see TraceAttributes::HOST_ARCH
-     * @stability experimental
      */
     public const HOST_ARCH_IA64 = 'ia64';
 
@@ -1588,7 +1392,6 @@ interface TraceAttributeValues
      * 32-bit PowerPC
      *
      * @see TraceAttributes::HOST_ARCH
-     * @stability experimental
      */
     public const HOST_ARCH_PPC32 = 'ppc32';
 
@@ -1596,7 +1399,6 @@ interface TraceAttributeValues
      * 64-bit PowerPC
      *
      * @see TraceAttributes::HOST_ARCH
-     * @stability experimental
      */
     public const HOST_ARCH_PPC64 = 'ppc64';
 
@@ -1604,7 +1406,6 @@ interface TraceAttributeValues
      * IBM z/Architecture
      *
      * @see TraceAttributes::HOST_ARCH
-     * @stability experimental
      */
     public const HOST_ARCH_S390X = 's390x';
 
@@ -1612,7 +1413,6 @@ interface TraceAttributeValues
      * 32-bit x86
      *
      * @see TraceAttributes::HOST_ARCH
-     * @stability experimental
      */
     public const HOST_ARCH_X86 = 'x86';
 
@@ -1620,7 +1420,6 @@ interface TraceAttributeValues
      * active state.
      *
      * @see TraceAttributes::HTTP_CONNECTION_STATE
-     * @stability experimental
      */
     public const HTTP_CONNECTION_STATE_ACTIVE = 'active';
 
@@ -1628,7 +1427,6 @@ interface TraceAttributeValues
      * idle state.
      *
      * @see TraceAttributes::HTTP_CONNECTION_STATE
-     * @stability experimental
      */
     public const HTTP_CONNECTION_STATE_IDLE = 'idle';
 
@@ -1636,7 +1434,6 @@ interface TraceAttributeValues
      * HTTP/1.0
      *
      * @see TraceAttributes::HTTP_FLAVOR
-     * @stability experimental
      */
     public const HTTP_FLAVOR_1_0 = '1.0';
 
@@ -1644,7 +1441,6 @@ interface TraceAttributeValues
      * HTTP/1.1
      *
      * @see TraceAttributes::HTTP_FLAVOR
-     * @stability experimental
      */
     public const HTTP_FLAVOR_1_1 = '1.1';
 
@@ -1652,7 +1448,6 @@ interface TraceAttributeValues
      * HTTP/2
      *
      * @see TraceAttributes::HTTP_FLAVOR
-     * @stability experimental
      */
     public const HTTP_FLAVOR_2_0 = '2.0';
 
@@ -1660,7 +1455,6 @@ interface TraceAttributeValues
      * HTTP/3
      *
      * @see TraceAttributes::HTTP_FLAVOR
-     * @stability experimental
      */
     public const HTTP_FLAVOR_3_0 = '3.0';
 
@@ -1668,7 +1462,6 @@ interface TraceAttributeValues
      * SPDY protocol.
      *
      * @see TraceAttributes::HTTP_FLAVOR
-     * @stability experimental
      */
     public const HTTP_FLAVOR_SPDY = 'SPDY';
 
@@ -1676,7 +1469,6 @@ interface TraceAttributeValues
      * QUIC protocol.
      *
      * @see TraceAttributes::HTTP_FLAVOR
-     * @stability experimental
      */
     public const HTTP_FLAVOR_QUIC = 'QUIC';
 
@@ -1684,7 +1476,6 @@ interface TraceAttributeValues
      * CONNECT method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
-     * @stability stable
      */
     public const HTTP_REQUEST_METHOD_CONNECT = 'CONNECT';
 
@@ -1692,7 +1483,6 @@ interface TraceAttributeValues
      * DELETE method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
-     * @stability stable
      */
     public const HTTP_REQUEST_METHOD_DELETE = 'DELETE';
 
@@ -1700,7 +1490,6 @@ interface TraceAttributeValues
      * GET method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
-     * @stability stable
      */
     public const HTTP_REQUEST_METHOD_GET = 'GET';
 
@@ -1708,7 +1497,6 @@ interface TraceAttributeValues
      * HEAD method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
-     * @stability stable
      */
     public const HTTP_REQUEST_METHOD_HEAD = 'HEAD';
 
@@ -1716,7 +1504,6 @@ interface TraceAttributeValues
      * OPTIONS method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
-     * @stability stable
      */
     public const HTTP_REQUEST_METHOD_OPTIONS = 'OPTIONS';
 
@@ -1724,7 +1511,6 @@ interface TraceAttributeValues
      * PATCH method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
-     * @stability stable
      */
     public const HTTP_REQUEST_METHOD_PATCH = 'PATCH';
 
@@ -1732,7 +1518,6 @@ interface TraceAttributeValues
      * POST method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
-     * @stability stable
      */
     public const HTTP_REQUEST_METHOD_POST = 'POST';
 
@@ -1740,7 +1525,6 @@ interface TraceAttributeValues
      * PUT method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
-     * @stability stable
      */
     public const HTTP_REQUEST_METHOD_PUT = 'PUT';
 
@@ -1748,7 +1532,6 @@ interface TraceAttributeValues
      * TRACE method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
-     * @stability stable
      */
     public const HTTP_REQUEST_METHOD_TRACE = 'TRACE';
 
@@ -1756,7 +1539,6 @@ interface TraceAttributeValues
      * Any HTTP method that the instrumentation has no prior knowledge of.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
-     * @stability stable
      */
     public const HTTP_REQUEST_METHOD__OTHER = '_OTHER';
 
@@ -1764,7 +1546,6 @@ interface TraceAttributeValues
      * Ok
      *
      * @see TraceAttributes::HW_STATE
-     * @stability experimental
      */
     public const HW_STATE_OK = 'ok';
 
@@ -1772,7 +1553,6 @@ interface TraceAttributeValues
      * Degraded
      *
      * @see TraceAttributes::HW_STATE
-     * @stability experimental
      */
     public const HW_STATE_DEGRADED = 'degraded';
 
@@ -1780,7 +1560,6 @@ interface TraceAttributeValues
      * Failed
      *
      * @see TraceAttributes::HW_STATE
-     * @stability experimental
      */
     public const HW_STATE_FAILED = 'failed';
 
@@ -1788,7 +1567,6 @@ interface TraceAttributeValues
      * Battery
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_BATTERY = 'battery';
 
@@ -1796,7 +1574,6 @@ interface TraceAttributeValues
      * CPU
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_CPU = 'cpu';
 
@@ -1804,7 +1581,6 @@ interface TraceAttributeValues
      * Disk controller
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_DISK_CONTROLLER = 'disk_controller';
 
@@ -1812,7 +1588,6 @@ interface TraceAttributeValues
      * Enclosure
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_ENCLOSURE = 'enclosure';
 
@@ -1820,7 +1595,6 @@ interface TraceAttributeValues
      * Fan
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_FAN = 'fan';
 
@@ -1828,7 +1602,6 @@ interface TraceAttributeValues
      * GPU
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_GPU = 'gpu';
 
@@ -1836,7 +1609,6 @@ interface TraceAttributeValues
      * Logical disk
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_LOGICAL_DISK = 'logical_disk';
 
@@ -1844,7 +1616,6 @@ interface TraceAttributeValues
      * Memory
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_MEMORY = 'memory';
 
@@ -1852,7 +1623,6 @@ interface TraceAttributeValues
      * Network
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_NETWORK = 'network';
 
@@ -1860,7 +1630,6 @@ interface TraceAttributeValues
      * Physical disk
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_PHYSICAL_DISK = 'physical_disk';
 
@@ -1868,7 +1637,6 @@ interface TraceAttributeValues
      * Power supply
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_POWER_SUPPLY = 'power_supply';
 
@@ -1876,7 +1644,6 @@ interface TraceAttributeValues
      * Tape drive
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_TAPE_DRIVE = 'tape_drive';
 
@@ -1884,7 +1651,6 @@ interface TraceAttributeValues
      * Temperature
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_TEMPERATURE = 'temperature';
 
@@ -1892,7 +1658,6 @@ interface TraceAttributeValues
      * Voltage
      *
      * @see TraceAttributes::HW_TYPE
-     * @stability experimental
      */
     public const HW_TYPE_VOLTAGE = 'voltage';
 
@@ -1901,7 +1666,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::IOS_STATE
-     * @stability experimental
      */
     public const IOS_STATE_ACTIVE = 'active';
 
@@ -1910,7 +1674,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::IOS_STATE
-     * @stability experimental
      */
     public const IOS_STATE_INACTIVE = 'inactive';
 
@@ -1919,7 +1682,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::IOS_STATE
-     * @stability experimental
      */
     public const IOS_STATE_BACKGROUND = 'background';
 
@@ -1928,7 +1690,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::IOS_STATE
-     * @stability experimental
      */
     public const IOS_STATE_FOREGROUND = 'foreground';
 
@@ -1937,7 +1698,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::IOS_STATE
-     * @stability experimental
      */
     public const IOS_STATE_TERMINATE = 'terminate';
 
@@ -1945,7 +1705,6 @@ interface TraceAttributeValues
      * Heap memory.
      *
      * @see TraceAttributes::JVM_MEMORY_TYPE
-     * @stability stable
      */
     public const JVM_MEMORY_TYPE_HEAP = 'heap';
 
@@ -1953,7 +1712,6 @@ interface TraceAttributeValues
      * Non-heap memory
      *
      * @see TraceAttributes::JVM_MEMORY_TYPE
-     * @stability stable
      */
     public const JVM_MEMORY_TYPE_NON_HEAP = 'non_heap';
 
@@ -1961,7 +1719,6 @@ interface TraceAttributeValues
      * A thread that has not yet started is in this state.
      *
      * @see TraceAttributes::JVM_THREAD_STATE
-     * @stability stable
      */
     public const JVM_THREAD_STATE_NEW = 'new';
 
@@ -1969,7 +1726,6 @@ interface TraceAttributeValues
      * A thread executing in the Java virtual machine is in this state.
      *
      * @see TraceAttributes::JVM_THREAD_STATE
-     * @stability stable
      */
     public const JVM_THREAD_STATE_RUNNABLE = 'runnable';
 
@@ -1977,7 +1733,6 @@ interface TraceAttributeValues
      * A thread that is blocked waiting for a monitor lock is in this state.
      *
      * @see TraceAttributes::JVM_THREAD_STATE
-     * @stability stable
      */
     public const JVM_THREAD_STATE_BLOCKED = 'blocked';
 
@@ -1985,7 +1740,6 @@ interface TraceAttributeValues
      * A thread that is waiting indefinitely for another thread to perform a particular action is in this state.
      *
      * @see TraceAttributes::JVM_THREAD_STATE
-     * @stability stable
      */
     public const JVM_THREAD_STATE_WAITING = 'waiting';
 
@@ -1993,7 +1747,6 @@ interface TraceAttributeValues
      * A thread that is waiting for another thread to perform an action for up to a specified waiting time is in this state.
      *
      * @see TraceAttributes::JVM_THREAD_STATE
-     * @stability stable
      */
     public const JVM_THREAD_STATE_TIMED_WAITING = 'timed_waiting';
 
@@ -2001,7 +1754,6 @@ interface TraceAttributeValues
      * A thread that has exited is in this state.
      *
      * @see TraceAttributes::JVM_THREAD_STATE
-     * @stability stable
      */
     public const JVM_THREAD_STATE_TERMINATED = 'terminated';
 
@@ -2009,7 +1761,6 @@ interface TraceAttributeValues
      * A [persistentVolumeClaim](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#persistentvolumeclaim) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
-     * @stability experimental
      */
     public const K8S_VOLUME_TYPE_PERSISTENTVOLUMECLAIM = 'persistentVolumeClaim';
 
@@ -2017,7 +1768,6 @@ interface TraceAttributeValues
      * A [configMap](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#configmap) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
-     * @stability experimental
      */
     public const K8S_VOLUME_TYPE_CONFIGMAP = 'configMap';
 
@@ -2025,7 +1775,6 @@ interface TraceAttributeValues
      * A [downwardAPI](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#downwardapi) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
-     * @stability experimental
      */
     public const K8S_VOLUME_TYPE_DOWNWARDAPI = 'downwardAPI';
 
@@ -2033,7 +1782,6 @@ interface TraceAttributeValues
      * An [emptyDir](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#emptydir) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
-     * @stability experimental
      */
     public const K8S_VOLUME_TYPE_EMPTYDIR = 'emptyDir';
 
@@ -2041,7 +1789,6 @@ interface TraceAttributeValues
      * A [secret](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#secret) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
-     * @stability experimental
      */
     public const K8S_VOLUME_TYPE_SECRET = 'secret';
 
@@ -2049,7 +1796,6 @@ interface TraceAttributeValues
      * A [local](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#local) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
-     * @stability experimental
      */
     public const K8S_VOLUME_TYPE_LOCAL = 'local';
 
@@ -2057,7 +1803,6 @@ interface TraceAttributeValues
      * reclaimable
      *
      * @see TraceAttributes::LINUX_MEMORY_SLAB_STATE
-     * @stability experimental
      */
     public const LINUX_MEMORY_SLAB_STATE_RECLAIMABLE = 'reclaimable';
 
@@ -2065,7 +1810,6 @@ interface TraceAttributeValues
      * unreclaimable
      *
      * @see TraceAttributes::LINUX_MEMORY_SLAB_STATE
-     * @stability experimental
      */
     public const LINUX_MEMORY_SLAB_STATE_UNRECLAIMABLE = 'unreclaimable';
 
@@ -2073,7 +1817,6 @@ interface TraceAttributeValues
      * Logs from stdout stream
      *
      * @see TraceAttributes::LOG_IOSTREAM
-     * @stability experimental
      */
     public const LOG_IOSTREAM_STDOUT = 'stdout';
 
@@ -2081,7 +1824,6 @@ interface TraceAttributeValues
      * Events from stderr stream
      *
      * @see TraceAttributes::LOG_IOSTREAM
-     * @stability experimental
      */
     public const LOG_IOSTREAM_STDERR = 'stderr';
 
@@ -2089,7 +1831,6 @@ interface TraceAttributeValues
      * sent
      *
      * @see TraceAttributes::MESSAGE_TYPE
-     * @stability experimental
      */
     public const MESSAGE_TYPE_SENT = 'SENT';
 
@@ -2097,7 +1838,6 @@ interface TraceAttributeValues
      * received
      *
      * @see TraceAttributes::MESSAGE_TYPE
-     * @stability experimental
      */
     public const MESSAGE_TYPE_RECEIVED = 'RECEIVED';
 
@@ -2106,7 +1846,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
-     * @stability experimental
      */
     public const MESSAGING_OPERATION_TYPE_CREATE = 'create';
 
@@ -2115,7 +1854,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
-     * @stability experimental
      */
     public const MESSAGING_OPERATION_TYPE_SEND = 'send';
 
@@ -2124,7 +1862,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
-     * @stability experimental
      */
     public const MESSAGING_OPERATION_TYPE_RECEIVE = 'receive';
 
@@ -2133,7 +1870,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
-     * @stability experimental
      */
     public const MESSAGING_OPERATION_TYPE_PROCESS = 'process';
 
@@ -2142,7 +1878,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
-     * @stability experimental
      */
     public const MESSAGING_OPERATION_TYPE_SETTLE = 'settle';
 
@@ -2150,7 +1885,6 @@ interface TraceAttributeValues
      * Deprecated. Use `process` instead.
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
-     * @stability experimental
      */
     public const MESSAGING_OPERATION_TYPE_DELIVER = 'deliver';
 
@@ -2158,7 +1892,6 @@ interface TraceAttributeValues
      * Deprecated. Use `send` instead.
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
-     * @stability experimental
      */
     public const MESSAGING_OPERATION_TYPE_PUBLISH = 'publish';
 
@@ -2166,7 +1899,6 @@ interface TraceAttributeValues
      * Clustering consumption model
      *
      * @see TraceAttributes::MESSAGING_ROCKETMQ_CONSUMPTION_MODEL
-     * @stability experimental
      */
     public const MESSAGING_ROCKETMQ_CONSUMPTION_MODEL_CLUSTERING = 'clustering';
 
@@ -2174,7 +1906,6 @@ interface TraceAttributeValues
      * Broadcasting consumption model
      *
      * @see TraceAttributes::MESSAGING_ROCKETMQ_CONSUMPTION_MODEL
-     * @stability experimental
      */
     public const MESSAGING_ROCKETMQ_CONSUMPTION_MODEL_BROADCASTING = 'broadcasting';
 
@@ -2182,7 +1913,6 @@ interface TraceAttributeValues
      * Normal message
      *
      * @see TraceAttributes::MESSAGING_ROCKETMQ_MESSAGE_TYPE
-     * @stability experimental
      */
     public const MESSAGING_ROCKETMQ_MESSAGE_TYPE_NORMAL = 'normal';
 
@@ -2190,7 +1920,6 @@ interface TraceAttributeValues
      * FIFO message
      *
      * @see TraceAttributes::MESSAGING_ROCKETMQ_MESSAGE_TYPE
-     * @stability experimental
      */
     public const MESSAGING_ROCKETMQ_MESSAGE_TYPE_FIFO = 'fifo';
 
@@ -2198,7 +1927,6 @@ interface TraceAttributeValues
      * Delay message
      *
      * @see TraceAttributes::MESSAGING_ROCKETMQ_MESSAGE_TYPE
-     * @stability experimental
      */
     public const MESSAGING_ROCKETMQ_MESSAGE_TYPE_DELAY = 'delay';
 
@@ -2206,7 +1934,6 @@ interface TraceAttributeValues
      * Transaction message
      *
      * @see TraceAttributes::MESSAGING_ROCKETMQ_MESSAGE_TYPE
-     * @stability experimental
      */
     public const MESSAGING_ROCKETMQ_MESSAGE_TYPE_TRANSACTION = 'transaction';
 
@@ -2214,7 +1941,6 @@ interface TraceAttributeValues
      * Message is completed
      *
      * @see TraceAttributes::MESSAGING_SERVICEBUS_DISPOSITION_STATUS
-     * @stability experimental
      */
     public const MESSAGING_SERVICEBUS_DISPOSITION_STATUS_COMPLETE = 'complete';
 
@@ -2222,7 +1948,6 @@ interface TraceAttributeValues
      * Message is abandoned
      *
      * @see TraceAttributes::MESSAGING_SERVICEBUS_DISPOSITION_STATUS
-     * @stability experimental
      */
     public const MESSAGING_SERVICEBUS_DISPOSITION_STATUS_ABANDON = 'abandon';
 
@@ -2230,7 +1955,6 @@ interface TraceAttributeValues
      * Message is sent to dead letter queue
      *
      * @see TraceAttributes::MESSAGING_SERVICEBUS_DISPOSITION_STATUS
-     * @stability experimental
      */
     public const MESSAGING_SERVICEBUS_DISPOSITION_STATUS_DEAD_LETTER = 'dead_letter';
 
@@ -2238,7 +1962,6 @@ interface TraceAttributeValues
      * Message is deferred
      *
      * @see TraceAttributes::MESSAGING_SERVICEBUS_DISPOSITION_STATUS
-     * @stability experimental
      */
     public const MESSAGING_SERVICEBUS_DISPOSITION_STATUS_DEFER = 'defer';
 
@@ -2246,7 +1969,6 @@ interface TraceAttributeValues
      * Apache ActiveMQ
      *
      * @see TraceAttributes::MESSAGING_SYSTEM
-     * @stability experimental
      */
     public const MESSAGING_SYSTEM_ACTIVEMQ = 'activemq';
 
@@ -2254,7 +1976,6 @@ interface TraceAttributeValues
      * Amazon Simple Queue Service (SQS)
      *
      * @see TraceAttributes::MESSAGING_SYSTEM
-     * @stability experimental
      */
     public const MESSAGING_SYSTEM_AWS_SQS = 'aws_sqs';
 
@@ -2262,7 +1983,6 @@ interface TraceAttributeValues
      * Azure Event Grid
      *
      * @see TraceAttributes::MESSAGING_SYSTEM
-     * @stability experimental
      */
     public const MESSAGING_SYSTEM_EVENTGRID = 'eventgrid';
 
@@ -2270,7 +1990,6 @@ interface TraceAttributeValues
      * Azure Event Hubs
      *
      * @see TraceAttributes::MESSAGING_SYSTEM
-     * @stability experimental
      */
     public const MESSAGING_SYSTEM_EVENTHUBS = 'eventhubs';
 
@@ -2278,7 +1997,6 @@ interface TraceAttributeValues
      * Azure Service Bus
      *
      * @see TraceAttributes::MESSAGING_SYSTEM
-     * @stability experimental
      */
     public const MESSAGING_SYSTEM_SERVICEBUS = 'servicebus';
 
@@ -2286,7 +2004,6 @@ interface TraceAttributeValues
      * Google Cloud Pub/Sub
      *
      * @see TraceAttributes::MESSAGING_SYSTEM
-     * @stability experimental
      */
     public const MESSAGING_SYSTEM_GCP_PUBSUB = 'gcp_pubsub';
 
@@ -2294,7 +2011,6 @@ interface TraceAttributeValues
      * Java Message Service
      *
      * @see TraceAttributes::MESSAGING_SYSTEM
-     * @stability experimental
      */
     public const MESSAGING_SYSTEM_JMS = 'jms';
 
@@ -2302,7 +2018,6 @@ interface TraceAttributeValues
      * Apache Kafka
      *
      * @see TraceAttributes::MESSAGING_SYSTEM
-     * @stability experimental
      */
     public const MESSAGING_SYSTEM_KAFKA = 'kafka';
 
@@ -2310,7 +2025,6 @@ interface TraceAttributeValues
      * RabbitMQ
      *
      * @see TraceAttributes::MESSAGING_SYSTEM
-     * @stability experimental
      */
     public const MESSAGING_SYSTEM_RABBITMQ = 'rabbitmq';
 
@@ -2318,7 +2032,6 @@ interface TraceAttributeValues
      * Apache RocketMQ
      *
      * @see TraceAttributes::MESSAGING_SYSTEM
-     * @stability experimental
      */
     public const MESSAGING_SYSTEM_ROCKETMQ = 'rocketmq';
 
@@ -2326,7 +2039,6 @@ interface TraceAttributeValues
      * Apache Pulsar
      *
      * @see TraceAttributes::MESSAGING_SYSTEM
-     * @stability experimental
      */
     public const MESSAGING_SYSTEM_PULSAR = 'pulsar';
 
@@ -2334,7 +2046,6 @@ interface TraceAttributeValues
      * IPv4 address
      *
      * @see TraceAttributes::NET_SOCK_FAMILY
-     * @stability experimental
      */
     public const NET_SOCK_FAMILY_INET = 'inet';
 
@@ -2342,7 +2053,6 @@ interface TraceAttributeValues
      * IPv6 address
      *
      * @see TraceAttributes::NET_SOCK_FAMILY
-     * @stability experimental
      */
     public const NET_SOCK_FAMILY_INET6 = 'inet6';
 
@@ -2350,7 +2060,6 @@ interface TraceAttributeValues
      * Unix domain socket path
      *
      * @see TraceAttributes::NET_SOCK_FAMILY
-     * @stability experimental
      */
     public const NET_SOCK_FAMILY_UNIX = 'unix';
 
@@ -2358,7 +2067,6 @@ interface TraceAttributeValues
      * ip_tcp
      *
      * @see TraceAttributes::NET_TRANSPORT
-     * @stability experimental
      */
     public const NET_TRANSPORT_IP_TCP = 'ip_tcp';
 
@@ -2366,7 +2074,6 @@ interface TraceAttributeValues
      * ip_udp
      *
      * @see TraceAttributes::NET_TRANSPORT
-     * @stability experimental
      */
     public const NET_TRANSPORT_IP_UDP = 'ip_udp';
 
@@ -2374,7 +2081,6 @@ interface TraceAttributeValues
      * Named or anonymous pipe.
      *
      * @see TraceAttributes::NET_TRANSPORT
-     * @stability experimental
      */
     public const NET_TRANSPORT_PIPE = 'pipe';
 
@@ -2382,7 +2088,6 @@ interface TraceAttributeValues
      * In-process communication.
      *
      * @see TraceAttributes::NET_TRANSPORT
-     * @stability experimental
      */
     public const NET_TRANSPORT_INPROC = 'inproc';
 
@@ -2390,7 +2095,6 @@ interface TraceAttributeValues
      * Something else (non IP-based).
      *
      * @see TraceAttributes::NET_TRANSPORT
-     * @stability experimental
      */
     public const NET_TRANSPORT_OTHER = 'other';
 
@@ -2398,7 +2102,6 @@ interface TraceAttributeValues
      * GPRS
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_GPRS = 'gprs';
 
@@ -2406,7 +2109,6 @@ interface TraceAttributeValues
      * EDGE
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_EDGE = 'edge';
 
@@ -2414,7 +2116,6 @@ interface TraceAttributeValues
      * UMTS
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_UMTS = 'umts';
 
@@ -2422,7 +2123,6 @@ interface TraceAttributeValues
      * CDMA
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_CDMA = 'cdma';
 
@@ -2430,7 +2130,6 @@ interface TraceAttributeValues
      * EVDO Rel. 0
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_EVDO_0 = 'evdo_0';
 
@@ -2438,7 +2137,6 @@ interface TraceAttributeValues
      * EVDO Rev. A
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_EVDO_A = 'evdo_a';
 
@@ -2446,7 +2144,6 @@ interface TraceAttributeValues
      * CDMA2000 1XRTT
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_CDMA2000_1XRTT = 'cdma2000_1xrtt';
 
@@ -2454,7 +2151,6 @@ interface TraceAttributeValues
      * HSDPA
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_HSDPA = 'hsdpa';
 
@@ -2462,7 +2158,6 @@ interface TraceAttributeValues
      * HSUPA
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_HSUPA = 'hsupa';
 
@@ -2470,7 +2165,6 @@ interface TraceAttributeValues
      * HSPA
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_HSPA = 'hspa';
 
@@ -2478,7 +2172,6 @@ interface TraceAttributeValues
      * IDEN
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_IDEN = 'iden';
 
@@ -2486,7 +2179,6 @@ interface TraceAttributeValues
      * EVDO Rev. B
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_EVDO_B = 'evdo_b';
 
@@ -2494,7 +2186,6 @@ interface TraceAttributeValues
      * LTE
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_LTE = 'lte';
 
@@ -2502,7 +2193,6 @@ interface TraceAttributeValues
      * EHRPD
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_EHRPD = 'ehrpd';
 
@@ -2510,7 +2200,6 @@ interface TraceAttributeValues
      * HSPAP
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_HSPAP = 'hspap';
 
@@ -2518,7 +2207,6 @@ interface TraceAttributeValues
      * GSM
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_GSM = 'gsm';
 
@@ -2526,7 +2214,6 @@ interface TraceAttributeValues
      * TD-SCDMA
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_TD_SCDMA = 'td_scdma';
 
@@ -2534,7 +2221,6 @@ interface TraceAttributeValues
      * IWLAN
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_IWLAN = 'iwlan';
 
@@ -2542,7 +2228,6 @@ interface TraceAttributeValues
      * 5G NR (New Radio)
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_NR = 'nr';
 
@@ -2550,7 +2235,6 @@ interface TraceAttributeValues
      * 5G NRNSA (New Radio Non-Standalone)
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_NRNSA = 'nrnsa';
 
@@ -2558,7 +2242,6 @@ interface TraceAttributeValues
      * LTE CA
      *
      * @see TraceAttributes::NETWORK_CONNECTION_SUBTYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_SUBTYPE_LTE_CA = 'lte_ca';
 
@@ -2566,7 +2249,6 @@ interface TraceAttributeValues
      * wifi
      *
      * @see TraceAttributes::NETWORK_CONNECTION_TYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_TYPE_WIFI = 'wifi';
 
@@ -2574,7 +2256,6 @@ interface TraceAttributeValues
      * wired
      *
      * @see TraceAttributes::NETWORK_CONNECTION_TYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_TYPE_WIRED = 'wired';
 
@@ -2582,7 +2263,6 @@ interface TraceAttributeValues
      * cell
      *
      * @see TraceAttributes::NETWORK_CONNECTION_TYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_TYPE_CELL = 'cell';
 
@@ -2590,7 +2270,6 @@ interface TraceAttributeValues
      * unavailable
      *
      * @see TraceAttributes::NETWORK_CONNECTION_TYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_TYPE_UNAVAILABLE = 'unavailable';
 
@@ -2598,7 +2277,6 @@ interface TraceAttributeValues
      * unknown
      *
      * @see TraceAttributes::NETWORK_CONNECTION_TYPE
-     * @stability experimental
      */
     public const NETWORK_CONNECTION_TYPE_UNKNOWN = 'unknown';
 
@@ -2606,7 +2284,6 @@ interface TraceAttributeValues
      * transmit
      *
      * @see TraceAttributes::NETWORK_IO_DIRECTION
-     * @stability experimental
      */
     public const NETWORK_IO_DIRECTION_TRANSMIT = 'transmit';
 
@@ -2614,7 +2291,6 @@ interface TraceAttributeValues
      * receive
      *
      * @see TraceAttributes::NETWORK_IO_DIRECTION
-     * @stability experimental
      */
     public const NETWORK_IO_DIRECTION_RECEIVE = 'receive';
 
@@ -2622,7 +2298,6 @@ interface TraceAttributeValues
      * TCP
      *
      * @see TraceAttributes::NETWORK_TRANSPORT
-     * @stability stable
      */
     public const NETWORK_TRANSPORT_TCP = 'tcp';
 
@@ -2630,7 +2305,6 @@ interface TraceAttributeValues
      * UDP
      *
      * @see TraceAttributes::NETWORK_TRANSPORT
-     * @stability stable
      */
     public const NETWORK_TRANSPORT_UDP = 'udp';
 
@@ -2638,7 +2312,6 @@ interface TraceAttributeValues
      * Named or anonymous pipe.
      *
      * @see TraceAttributes::NETWORK_TRANSPORT
-     * @stability stable
      */
     public const NETWORK_TRANSPORT_PIPE = 'pipe';
 
@@ -2646,7 +2319,6 @@ interface TraceAttributeValues
      * Unix domain socket
      *
      * @see TraceAttributes::NETWORK_TRANSPORT
-     * @stability stable
      */
     public const NETWORK_TRANSPORT_UNIX = 'unix';
 
@@ -2654,7 +2326,6 @@ interface TraceAttributeValues
      * QUIC
      *
      * @see TraceAttributes::NETWORK_TRANSPORT
-     * @stability experimental
      */
     public const NETWORK_TRANSPORT_QUIC = 'quic';
 
@@ -2662,7 +2333,6 @@ interface TraceAttributeValues
      * IPv4
      *
      * @see TraceAttributes::NETWORK_TYPE
-     * @stability stable
      */
     public const NETWORK_TYPE_IPV4 = 'ipv4';
 
@@ -2670,7 +2340,6 @@ interface TraceAttributeValues
      * IPv6
      *
      * @see TraceAttributes::NETWORK_TYPE
-     * @stability stable
      */
     public const NETWORK_TYPE_IPV6 = 'ipv6';
 
@@ -2678,7 +2347,6 @@ interface TraceAttributeValues
      * Active time.
      *
      * @see TraceAttributes::NODEJS_EVENTLOOP_STATE
-     * @stability experimental
      */
     public const NODEJS_EVENTLOOP_STATE_ACTIVE = 'active';
 
@@ -2686,7 +2354,6 @@ interface TraceAttributeValues
      * Idle time.
      *
      * @see TraceAttributes::NODEJS_EVENTLOOP_STATE
-     * @stability experimental
      */
     public const NODEJS_EVENTLOOP_STATE_IDLE = 'idle';
 
@@ -2694,7 +2361,6 @@ interface TraceAttributeValues
      * The parent Span depends on the child Span in some capacity
      *
      * @see TraceAttributes::OPENTRACING_REF_TYPE
-     * @stability experimental
      */
     public const OPENTRACING_REF_TYPE_CHILD_OF = 'child_of';
 
@@ -2702,7 +2368,6 @@ interface TraceAttributeValues
      * The parent Span doesn't depend in any way on the result of the child Span
      *
      * @see TraceAttributes::OPENTRACING_REF_TYPE
-     * @stability experimental
      */
     public const OPENTRACING_REF_TYPE_FOLLOWS_FROM = 'follows_from';
 
@@ -2710,7 +2375,6 @@ interface TraceAttributeValues
      * Microsoft Windows
      *
      * @see TraceAttributes::OS_TYPE
-     * @stability experimental
      */
     public const OS_TYPE_WINDOWS = 'windows';
 
@@ -2718,7 +2382,6 @@ interface TraceAttributeValues
      * Linux
      *
      * @see TraceAttributes::OS_TYPE
-     * @stability experimental
      */
     public const OS_TYPE_LINUX = 'linux';
 
@@ -2726,7 +2389,6 @@ interface TraceAttributeValues
      * Apple Darwin
      *
      * @see TraceAttributes::OS_TYPE
-     * @stability experimental
      */
     public const OS_TYPE_DARWIN = 'darwin';
 
@@ -2734,7 +2396,6 @@ interface TraceAttributeValues
      * FreeBSD
      *
      * @see TraceAttributes::OS_TYPE
-     * @stability experimental
      */
     public const OS_TYPE_FREEBSD = 'freebsd';
 
@@ -2742,7 +2403,6 @@ interface TraceAttributeValues
      * NetBSD
      *
      * @see TraceAttributes::OS_TYPE
-     * @stability experimental
      */
     public const OS_TYPE_NETBSD = 'netbsd';
 
@@ -2750,7 +2410,6 @@ interface TraceAttributeValues
      * OpenBSD
      *
      * @see TraceAttributes::OS_TYPE
-     * @stability experimental
      */
     public const OS_TYPE_OPENBSD = 'openbsd';
 
@@ -2758,7 +2417,6 @@ interface TraceAttributeValues
      * DragonFly BSD
      *
      * @see TraceAttributes::OS_TYPE
-     * @stability experimental
      */
     public const OS_TYPE_DRAGONFLYBSD = 'dragonflybsd';
 
@@ -2766,7 +2424,6 @@ interface TraceAttributeValues
      * HP-UX (Hewlett Packard Unix)
      *
      * @see TraceAttributes::OS_TYPE
-     * @stability experimental
      */
     public const OS_TYPE_HPUX = 'hpux';
 
@@ -2774,7 +2431,6 @@ interface TraceAttributeValues
      * AIX (Advanced Interactive eXecutive)
      *
      * @see TraceAttributes::OS_TYPE
-     * @stability experimental
      */
     public const OS_TYPE_AIX = 'aix';
 
@@ -2782,7 +2438,6 @@ interface TraceAttributeValues
      * SunOS, Oracle Solaris
      *
      * @see TraceAttributes::OS_TYPE
-     * @stability experimental
      */
     public const OS_TYPE_SOLARIS = 'solaris';
 
@@ -2790,7 +2445,6 @@ interface TraceAttributeValues
      * IBM z/OS
      *
      * @see TraceAttributes::OS_TYPE
-     * @stability experimental
      */
     public const OS_TYPE_Z_OS = 'z_os';
 
@@ -2798,7 +2452,6 @@ interface TraceAttributeValues
      * The operation has been validated by an Application developer or Operator to have completed successfully.
      *
      * @see TraceAttributes::OTEL_STATUS_CODE
-     * @stability stable
      */
     public const OTEL_STATUS_CODE_OK = 'OK';
 
@@ -2806,7 +2459,6 @@ interface TraceAttributeValues
      * The operation contains an error.
      *
      * @see TraceAttributes::OTEL_STATUS_CODE
-     * @stability stable
      */
     public const OTEL_STATUS_CODE_ERROR = 'ERROR';
 
@@ -2814,7 +2466,6 @@ interface TraceAttributeValues
      * idle
      *
      * @see TraceAttributes::STATE
-     * @stability experimental
      */
     public const STATE_IDLE = 'idle';
 
@@ -2822,7 +2473,6 @@ interface TraceAttributeValues
      * used
      *
      * @see TraceAttributes::STATE
-     * @stability experimental
      */
     public const STATE_USED = 'used';
 
@@ -2830,7 +2480,6 @@ interface TraceAttributeValues
      * voluntary
      *
      * @see TraceAttributes::PROCESS_CONTEXT_SWITCH_TYPE
-     * @stability experimental
      */
     public const PROCESS_CONTEXT_SWITCH_TYPE_VOLUNTARY = 'voluntary';
 
@@ -2838,7 +2487,6 @@ interface TraceAttributeValues
      * involuntary
      *
      * @see TraceAttributes::PROCESS_CONTEXT_SWITCH_TYPE
-     * @stability experimental
      */
     public const PROCESS_CONTEXT_SWITCH_TYPE_INVOLUNTARY = 'involuntary';
 
@@ -2846,7 +2494,6 @@ interface TraceAttributeValues
      * system
      *
      * @see TraceAttributes::PROCESS_CPU_STATE
-     * @stability experimental
      */
     public const PROCESS_CPU_STATE_SYSTEM = 'system';
 
@@ -2854,7 +2501,6 @@ interface TraceAttributeValues
      * user
      *
      * @see TraceAttributes::PROCESS_CPU_STATE
-     * @stability experimental
      */
     public const PROCESS_CPU_STATE_USER = 'user';
 
@@ -2862,7 +2508,6 @@ interface TraceAttributeValues
      * wait
      *
      * @see TraceAttributes::PROCESS_CPU_STATE
-     * @stability experimental
      */
     public const PROCESS_CPU_STATE_WAIT = 'wait';
 
@@ -2870,7 +2515,6 @@ interface TraceAttributeValues
      * major
      *
      * @see TraceAttributes::PROCESS_PAGING_FAULT_TYPE
-     * @stability experimental
      */
     public const PROCESS_PAGING_FAULT_TYPE_MAJOR = 'major';
 
@@ -2878,7 +2522,6 @@ interface TraceAttributeValues
      * minor
      *
      * @see TraceAttributes::PROCESS_PAGING_FAULT_TYPE
-     * @stability experimental
      */
     public const PROCESS_PAGING_FAULT_TYPE_MINOR = 'minor';
 
@@ -2887,7 +2530,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::PROFILE_FRAME_TYPE
-     * @stability experimental
      */
     public const PROFILE_FRAME_TYPE_DOTNET = 'dotnet';
 
@@ -2896,7 +2538,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::PROFILE_FRAME_TYPE
-     * @stability experimental
      */
     public const PROFILE_FRAME_TYPE_JVM = 'jvm';
 
@@ -2905,7 +2546,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::PROFILE_FRAME_TYPE
-     * @stability experimental
      */
     public const PROFILE_FRAME_TYPE_KERNEL = 'kernel';
 
@@ -2914,7 +2554,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::PROFILE_FRAME_TYPE
-     * @stability experimental
      */
     public const PROFILE_FRAME_TYPE_NATIVE = 'native';
 
@@ -2923,7 +2562,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::PROFILE_FRAME_TYPE
-     * @stability experimental
      */
     public const PROFILE_FRAME_TYPE_PERL = 'perl';
 
@@ -2932,7 +2570,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::PROFILE_FRAME_TYPE
-     * @stability experimental
      */
     public const PROFILE_FRAME_TYPE_PHP = 'php';
 
@@ -2941,7 +2578,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::PROFILE_FRAME_TYPE
-     * @stability experimental
      */
     public const PROFILE_FRAME_TYPE_CPYTHON = 'cpython';
 
@@ -2950,7 +2586,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::PROFILE_FRAME_TYPE
-     * @stability experimental
      */
     public const PROFILE_FRAME_TYPE_RUBY = 'ruby';
 
@@ -2959,7 +2594,6 @@ interface TraceAttributeValues
 
      *
      * @see TraceAttributes::PROFILE_FRAME_TYPE
-     * @stability experimental
      */
     public const PROFILE_FRAME_TYPE_V8JS = 'v8js';
 
@@ -2967,7 +2601,6 @@ interface TraceAttributeValues
      * cancelled
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_CANCELLED = 'cancelled';
 
@@ -2975,7 +2608,6 @@ interface TraceAttributeValues
      * unknown
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_UNKNOWN = 'unknown';
 
@@ -2983,7 +2615,6 @@ interface TraceAttributeValues
      * invalid_argument
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_INVALID_ARGUMENT = 'invalid_argument';
 
@@ -2991,7 +2622,6 @@ interface TraceAttributeValues
      * deadline_exceeded
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_DEADLINE_EXCEEDED = 'deadline_exceeded';
 
@@ -2999,7 +2629,6 @@ interface TraceAttributeValues
      * not_found
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_NOT_FOUND = 'not_found';
 
@@ -3007,7 +2636,6 @@ interface TraceAttributeValues
      * already_exists
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_ALREADY_EXISTS = 'already_exists';
 
@@ -3015,7 +2643,6 @@ interface TraceAttributeValues
      * permission_denied
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_PERMISSION_DENIED = 'permission_denied';
 
@@ -3023,7 +2650,6 @@ interface TraceAttributeValues
      * resource_exhausted
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_RESOURCE_EXHAUSTED = 'resource_exhausted';
 
@@ -3031,7 +2657,6 @@ interface TraceAttributeValues
      * failed_precondition
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_FAILED_PRECONDITION = 'failed_precondition';
 
@@ -3039,7 +2664,6 @@ interface TraceAttributeValues
      * aborted
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_ABORTED = 'aborted';
 
@@ -3047,7 +2671,6 @@ interface TraceAttributeValues
      * out_of_range
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_OUT_OF_RANGE = 'out_of_range';
 
@@ -3055,7 +2678,6 @@ interface TraceAttributeValues
      * unimplemented
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_UNIMPLEMENTED = 'unimplemented';
 
@@ -3063,7 +2685,6 @@ interface TraceAttributeValues
      * internal
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_INTERNAL = 'internal';
 
@@ -3071,7 +2692,6 @@ interface TraceAttributeValues
      * unavailable
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_UNAVAILABLE = 'unavailable';
 
@@ -3079,7 +2699,6 @@ interface TraceAttributeValues
      * data_loss
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_DATA_LOSS = 'data_loss';
 
@@ -3087,7 +2706,6 @@ interface TraceAttributeValues
      * unauthenticated
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
-     * @stability experimental
      */
     public const RPC_CONNECT_RPC_ERROR_CODE_UNAUTHENTICATED = 'unauthenticated';
 
@@ -3095,7 +2713,6 @@ interface TraceAttributeValues
      * OK
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_0 = '0';
 
@@ -3103,7 +2720,6 @@ interface TraceAttributeValues
      * CANCELLED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_1 = '1';
 
@@ -3111,7 +2727,6 @@ interface TraceAttributeValues
      * UNKNOWN
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_2 = '2';
 
@@ -3119,7 +2734,6 @@ interface TraceAttributeValues
      * INVALID_ARGUMENT
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_3 = '3';
 
@@ -3127,7 +2741,6 @@ interface TraceAttributeValues
      * DEADLINE_EXCEEDED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_4 = '4';
 
@@ -3135,7 +2748,6 @@ interface TraceAttributeValues
      * NOT_FOUND
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_5 = '5';
 
@@ -3143,7 +2755,6 @@ interface TraceAttributeValues
      * ALREADY_EXISTS
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_6 = '6';
 
@@ -3151,7 +2762,6 @@ interface TraceAttributeValues
      * PERMISSION_DENIED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_7 = '7';
 
@@ -3159,7 +2769,6 @@ interface TraceAttributeValues
      * RESOURCE_EXHAUSTED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_8 = '8';
 
@@ -3167,7 +2776,6 @@ interface TraceAttributeValues
      * FAILED_PRECONDITION
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_9 = '9';
 
@@ -3175,7 +2783,6 @@ interface TraceAttributeValues
      * ABORTED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_10 = '10';
 
@@ -3183,7 +2790,6 @@ interface TraceAttributeValues
      * OUT_OF_RANGE
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_11 = '11';
 
@@ -3191,7 +2797,6 @@ interface TraceAttributeValues
      * UNIMPLEMENTED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_12 = '12';
 
@@ -3199,7 +2804,6 @@ interface TraceAttributeValues
      * INTERNAL
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_13 = '13';
 
@@ -3207,7 +2811,6 @@ interface TraceAttributeValues
      * UNAVAILABLE
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_14 = '14';
 
@@ -3215,7 +2818,6 @@ interface TraceAttributeValues
      * DATA_LOSS
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_15 = '15';
 
@@ -3223,7 +2825,6 @@ interface TraceAttributeValues
      * UNAUTHENTICATED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
-     * @stability experimental
      */
     public const RPC_GRPC_STATUS_CODE_16 = '16';
 
@@ -3231,7 +2832,6 @@ interface TraceAttributeValues
      * sent
      *
      * @see TraceAttributes::RPC_MESSAGE_TYPE
-     * @stability experimental
      */
     public const RPC_MESSAGE_TYPE_SENT = 'SENT';
 
@@ -3239,7 +2839,6 @@ interface TraceAttributeValues
      * received
      *
      * @see TraceAttributes::RPC_MESSAGE_TYPE
-     * @stability experimental
      */
     public const RPC_MESSAGE_TYPE_RECEIVED = 'RECEIVED';
 
@@ -3247,7 +2846,6 @@ interface TraceAttributeValues
      * gRPC
      *
      * @see TraceAttributes::RPC_SYSTEM
-     * @stability experimental
      */
     public const RPC_SYSTEM_GRPC = 'grpc';
 
@@ -3255,7 +2853,6 @@ interface TraceAttributeValues
      * Java RMI
      *
      * @see TraceAttributes::RPC_SYSTEM
-     * @stability experimental
      */
     public const RPC_SYSTEM_JAVA_RMI = 'java_rmi';
 
@@ -3263,7 +2860,6 @@ interface TraceAttributeValues
      * .NET WCF
      *
      * @see TraceAttributes::RPC_SYSTEM
-     * @stability experimental
      */
     public const RPC_SYSTEM_DOTNET_WCF = 'dotnet_wcf';
 
@@ -3271,7 +2867,6 @@ interface TraceAttributeValues
      * Apache Dubbo
      *
      * @see TraceAttributes::RPC_SYSTEM
-     * @stability experimental
      */
     public const RPC_SYSTEM_APACHE_DUBBO = 'apache_dubbo';
 
@@ -3279,7 +2874,6 @@ interface TraceAttributeValues
      * Connect RPC
      *
      * @see TraceAttributes::RPC_SYSTEM
-     * @stability experimental
      */
     public const RPC_SYSTEM_CONNECT_RPC = 'connect_rpc';
 
@@ -3287,7 +2881,6 @@ interface TraceAttributeValues
      * The connection was closed normally.
      *
      * @see TraceAttributes::SIGNALR_CONNECTION_STATUS
-     * @stability stable
      */
     public const SIGNALR_CONNECTION_STATUS_NORMAL_CLOSURE = 'normal_closure';
 
@@ -3295,7 +2888,6 @@ interface TraceAttributeValues
      * The connection was closed due to a timeout.
      *
      * @see TraceAttributes::SIGNALR_CONNECTION_STATUS
-     * @stability stable
      */
     public const SIGNALR_CONNECTION_STATUS_TIMEOUT = 'timeout';
 
@@ -3303,7 +2895,6 @@ interface TraceAttributeValues
      * The connection was closed because the app is shutting down.
      *
      * @see TraceAttributes::SIGNALR_CONNECTION_STATUS
-     * @stability stable
      */
     public const SIGNALR_CONNECTION_STATUS_APP_SHUTDOWN = 'app_shutdown';
 
@@ -3311,7 +2902,6 @@ interface TraceAttributeValues
      * ServerSentEvents protocol
      *
      * @see TraceAttributes::SIGNALR_TRANSPORT
-     * @stability stable
      */
     public const SIGNALR_TRANSPORT_SERVER_SENT_EVENTS = 'server_sent_events';
 
@@ -3319,7 +2909,6 @@ interface TraceAttributeValues
      * LongPolling protocol
      *
      * @see TraceAttributes::SIGNALR_TRANSPORT
-     * @stability stable
      */
     public const SIGNALR_TRANSPORT_LONG_POLLING = 'long_polling';
 
@@ -3327,7 +2916,6 @@ interface TraceAttributeValues
      * WebSockets protocol
      *
      * @see TraceAttributes::SIGNALR_TRANSPORT
-     * @stability stable
      */
     public const SIGNALR_TRANSPORT_WEB_SOCKETS = 'web_sockets';
 
@@ -3335,7 +2923,6 @@ interface TraceAttributeValues
      * user
      *
      * @see TraceAttributes::SYSTEM_CPU_STATE
-     * @stability experimental
      */
     public const SYSTEM_CPU_STATE_USER = 'user';
 
@@ -3343,7 +2930,6 @@ interface TraceAttributeValues
      * system
      *
      * @see TraceAttributes::SYSTEM_CPU_STATE
-     * @stability experimental
      */
     public const SYSTEM_CPU_STATE_SYSTEM = 'system';
 
@@ -3351,7 +2937,6 @@ interface TraceAttributeValues
      * nice
      *
      * @see TraceAttributes::SYSTEM_CPU_STATE
-     * @stability experimental
      */
     public const SYSTEM_CPU_STATE_NICE = 'nice';
 
@@ -3359,7 +2944,6 @@ interface TraceAttributeValues
      * idle
      *
      * @see TraceAttributes::SYSTEM_CPU_STATE
-     * @stability experimental
      */
     public const SYSTEM_CPU_STATE_IDLE = 'idle';
 
@@ -3367,7 +2951,6 @@ interface TraceAttributeValues
      * iowait
      *
      * @see TraceAttributes::SYSTEM_CPU_STATE
-     * @stability experimental
      */
     public const SYSTEM_CPU_STATE_IOWAIT = 'iowait';
 
@@ -3375,7 +2958,6 @@ interface TraceAttributeValues
      * interrupt
      *
      * @see TraceAttributes::SYSTEM_CPU_STATE
-     * @stability experimental
      */
     public const SYSTEM_CPU_STATE_INTERRUPT = 'interrupt';
 
@@ -3383,7 +2965,6 @@ interface TraceAttributeValues
      * steal
      *
      * @see TraceAttributes::SYSTEM_CPU_STATE
-     * @stability experimental
      */
     public const SYSTEM_CPU_STATE_STEAL = 'steal';
 
@@ -3391,7 +2972,6 @@ interface TraceAttributeValues
      * used
      *
      * @see TraceAttributes::SYSTEM_FILESYSTEM_STATE
-     * @stability experimental
      */
     public const SYSTEM_FILESYSTEM_STATE_USED = 'used';
 
@@ -3399,7 +2979,6 @@ interface TraceAttributeValues
      * free
      *
      * @see TraceAttributes::SYSTEM_FILESYSTEM_STATE
-     * @stability experimental
      */
     public const SYSTEM_FILESYSTEM_STATE_FREE = 'free';
 
@@ -3407,7 +2986,6 @@ interface TraceAttributeValues
      * reserved
      *
      * @see TraceAttributes::SYSTEM_FILESYSTEM_STATE
-     * @stability experimental
      */
     public const SYSTEM_FILESYSTEM_STATE_RESERVED = 'reserved';
 
@@ -3415,7 +2993,6 @@ interface TraceAttributeValues
      * fat32
      *
      * @see TraceAttributes::SYSTEM_FILESYSTEM_TYPE
-     * @stability experimental
      */
     public const SYSTEM_FILESYSTEM_TYPE_FAT32 = 'fat32';
 
@@ -3423,7 +3000,6 @@ interface TraceAttributeValues
      * exfat
      *
      * @see TraceAttributes::SYSTEM_FILESYSTEM_TYPE
-     * @stability experimental
      */
     public const SYSTEM_FILESYSTEM_TYPE_EXFAT = 'exfat';
 
@@ -3431,7 +3007,6 @@ interface TraceAttributeValues
      * ntfs
      *
      * @see TraceAttributes::SYSTEM_FILESYSTEM_TYPE
-     * @stability experimental
      */
     public const SYSTEM_FILESYSTEM_TYPE_NTFS = 'ntfs';
 
@@ -3439,7 +3014,6 @@ interface TraceAttributeValues
      * refs
      *
      * @see TraceAttributes::SYSTEM_FILESYSTEM_TYPE
-     * @stability experimental
      */
     public const SYSTEM_FILESYSTEM_TYPE_REFS = 'refs';
 
@@ -3447,7 +3021,6 @@ interface TraceAttributeValues
      * hfsplus
      *
      * @see TraceAttributes::SYSTEM_FILESYSTEM_TYPE
-     * @stability experimental
      */
     public const SYSTEM_FILESYSTEM_TYPE_HFSPLUS = 'hfsplus';
 
@@ -3455,7 +3028,6 @@ interface TraceAttributeValues
      * ext4
      *
      * @see TraceAttributes::SYSTEM_FILESYSTEM_TYPE
-     * @stability experimental
      */
     public const SYSTEM_FILESYSTEM_TYPE_EXT4 = 'ext4';
 
@@ -3463,7 +3035,6 @@ interface TraceAttributeValues
      * used
      *
      * @see TraceAttributes::SYSTEM_MEMORY_STATE
-     * @stability experimental
      */
     public const SYSTEM_MEMORY_STATE_USED = 'used';
 
@@ -3471,7 +3042,6 @@ interface TraceAttributeValues
      * free
      *
      * @see TraceAttributes::SYSTEM_MEMORY_STATE
-     * @stability experimental
      */
     public const SYSTEM_MEMORY_STATE_FREE = 'free';
 
@@ -3479,7 +3049,6 @@ interface TraceAttributeValues
      * shared
      *
      * @see TraceAttributes::SYSTEM_MEMORY_STATE
-     * @stability experimental
      */
     public const SYSTEM_MEMORY_STATE_SHARED = 'shared';
 
@@ -3487,7 +3056,6 @@ interface TraceAttributeValues
      * buffers
      *
      * @see TraceAttributes::SYSTEM_MEMORY_STATE
-     * @stability experimental
      */
     public const SYSTEM_MEMORY_STATE_BUFFERS = 'buffers';
 
@@ -3495,7 +3063,6 @@ interface TraceAttributeValues
      * cached
      *
      * @see TraceAttributes::SYSTEM_MEMORY_STATE
-     * @stability experimental
      */
     public const SYSTEM_MEMORY_STATE_CACHED = 'cached';
 
@@ -3503,7 +3070,6 @@ interface TraceAttributeValues
      * close
      *
      * @see TraceAttributes::SYSTEM_NETWORK_STATE
-     * @stability experimental
      */
     public const SYSTEM_NETWORK_STATE_CLOSE = 'close';
 
@@ -3511,7 +3077,6 @@ interface TraceAttributeValues
      * close_wait
      *
      * @see TraceAttributes::SYSTEM_NETWORK_STATE
-     * @stability experimental
      */
     public const SYSTEM_NETWORK_STATE_CLOSE_WAIT = 'close_wait';
 
@@ -3519,7 +3084,6 @@ interface TraceAttributeValues
      * closing
      *
      * @see TraceAttributes::SYSTEM_NETWORK_STATE
-     * @stability experimental
      */
     public const SYSTEM_NETWORK_STATE_CLOSING = 'closing';
 
@@ -3527,7 +3091,6 @@ interface TraceAttributeValues
      * delete
      *
      * @see TraceAttributes::SYSTEM_NETWORK_STATE
-     * @stability experimental
      */
     public const SYSTEM_NETWORK_STATE_DELETE = 'delete';
 
@@ -3535,7 +3098,6 @@ interface TraceAttributeValues
      * established
      *
      * @see TraceAttributes::SYSTEM_NETWORK_STATE
-     * @stability experimental
      */
     public const SYSTEM_NETWORK_STATE_ESTABLISHED = 'established';
 
@@ -3543,7 +3105,6 @@ interface TraceAttributeValues
      * fin_wait_1
      *
      * @see TraceAttributes::SYSTEM_NETWORK_STATE
-     * @stability experimental
      */
     public const SYSTEM_NETWORK_STATE_FIN_WAIT_1 = 'fin_wait_1';
 
@@ -3551,7 +3112,6 @@ interface TraceAttributeValues
      * fin_wait_2
      *
      * @see TraceAttributes::SYSTEM_NETWORK_STATE
-     * @stability experimental
      */
     public const SYSTEM_NETWORK_STATE_FIN_WAIT_2 = 'fin_wait_2';
 
@@ -3559,7 +3119,6 @@ interface TraceAttributeValues
      * last_ack
      *
      * @see TraceAttributes::SYSTEM_NETWORK_STATE
-     * @stability experimental
      */
     public const SYSTEM_NETWORK_STATE_LAST_ACK = 'last_ack';
 
@@ -3567,7 +3126,6 @@ interface TraceAttributeValues
      * listen
      *
      * @see TraceAttributes::SYSTEM_NETWORK_STATE
-     * @stability experimental
      */
     public const SYSTEM_NETWORK_STATE_LISTEN = 'listen';
 
@@ -3575,7 +3133,6 @@ interface TraceAttributeValues
      * syn_recv
      *
      * @see TraceAttributes::SYSTEM_NETWORK_STATE
-     * @stability experimental
      */
     public const SYSTEM_NETWORK_STATE_SYN_RECV = 'syn_recv';
 
@@ -3583,7 +3140,6 @@ interface TraceAttributeValues
      * syn_sent
      *
      * @see TraceAttributes::SYSTEM_NETWORK_STATE
-     * @stability experimental
      */
     public const SYSTEM_NETWORK_STATE_SYN_SENT = 'syn_sent';
 
@@ -3591,7 +3147,6 @@ interface TraceAttributeValues
      * time_wait
      *
      * @see TraceAttributes::SYSTEM_NETWORK_STATE
-     * @stability experimental
      */
     public const SYSTEM_NETWORK_STATE_TIME_WAIT = 'time_wait';
 
@@ -3599,7 +3154,6 @@ interface TraceAttributeValues
      * in
      *
      * @see TraceAttributes::SYSTEM_PAGING_DIRECTION
-     * @stability experimental
      */
     public const SYSTEM_PAGING_DIRECTION_IN = 'in';
 
@@ -3607,7 +3161,6 @@ interface TraceAttributeValues
      * out
      *
      * @see TraceAttributes::SYSTEM_PAGING_DIRECTION
-     * @stability experimental
      */
     public const SYSTEM_PAGING_DIRECTION_OUT = 'out';
 
@@ -3615,7 +3168,6 @@ interface TraceAttributeValues
      * used
      *
      * @see TraceAttributes::SYSTEM_PAGING_STATE
-     * @stability experimental
      */
     public const SYSTEM_PAGING_STATE_USED = 'used';
 
@@ -3623,7 +3175,6 @@ interface TraceAttributeValues
      * free
      *
      * @see TraceAttributes::SYSTEM_PAGING_STATE
-     * @stability experimental
      */
     public const SYSTEM_PAGING_STATE_FREE = 'free';
 
@@ -3631,7 +3182,6 @@ interface TraceAttributeValues
      * major
      *
      * @see TraceAttributes::SYSTEM_PAGING_TYPE
-     * @stability experimental
      */
     public const SYSTEM_PAGING_TYPE_MAJOR = 'major';
 
@@ -3639,7 +3189,6 @@ interface TraceAttributeValues
      * minor
      *
      * @see TraceAttributes::SYSTEM_PAGING_TYPE
-     * @stability experimental
      */
     public const SYSTEM_PAGING_TYPE_MINOR = 'minor';
 
@@ -3647,7 +3196,6 @@ interface TraceAttributeValues
      * running
      *
      * @see TraceAttributes::SYSTEM_PROCESS_STATUS
-     * @stability experimental
      */
     public const SYSTEM_PROCESS_STATUS_RUNNING = 'running';
 
@@ -3655,7 +3203,6 @@ interface TraceAttributeValues
      * sleeping
      *
      * @see TraceAttributes::SYSTEM_PROCESS_STATUS
-     * @stability experimental
      */
     public const SYSTEM_PROCESS_STATUS_SLEEPING = 'sleeping';
 
@@ -3663,7 +3210,6 @@ interface TraceAttributeValues
      * stopped
      *
      * @see TraceAttributes::SYSTEM_PROCESS_STATUS
-     * @stability experimental
      */
     public const SYSTEM_PROCESS_STATUS_STOPPED = 'stopped';
 
@@ -3671,7 +3217,6 @@ interface TraceAttributeValues
      * defunct
      *
      * @see TraceAttributes::SYSTEM_PROCESS_STATUS
-     * @stability experimental
      */
     public const SYSTEM_PROCESS_STATUS_DEFUNCT = 'defunct';
 
@@ -3679,7 +3224,6 @@ interface TraceAttributeValues
      * running
      *
      * @see TraceAttributes::SYSTEM_PROCESSES_STATUS
-     * @stability experimental
      */
     public const SYSTEM_PROCESSES_STATUS_RUNNING = 'running';
 
@@ -3687,7 +3231,6 @@ interface TraceAttributeValues
      * sleeping
      *
      * @see TraceAttributes::SYSTEM_PROCESSES_STATUS
-     * @stability experimental
      */
     public const SYSTEM_PROCESSES_STATUS_SLEEPING = 'sleeping';
 
@@ -3695,7 +3238,6 @@ interface TraceAttributeValues
      * stopped
      *
      * @see TraceAttributes::SYSTEM_PROCESSES_STATUS
-     * @stability experimental
      */
     public const SYSTEM_PROCESSES_STATUS_STOPPED = 'stopped';
 
@@ -3703,7 +3245,6 @@ interface TraceAttributeValues
      * defunct
      *
      * @see TraceAttributes::SYSTEM_PROCESSES_STATUS
-     * @stability experimental
      */
     public const SYSTEM_PROCESSES_STATUS_DEFUNCT = 'defunct';
 
@@ -3711,7 +3252,6 @@ interface TraceAttributeValues
      * cpp
      *
      * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE
-     * @stability stable
      */
     public const TELEMETRY_SDK_LANGUAGE_CPP = 'cpp';
 
@@ -3719,7 +3259,6 @@ interface TraceAttributeValues
      * dotnet
      *
      * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE
-     * @stability stable
      */
     public const TELEMETRY_SDK_LANGUAGE_DOTNET = 'dotnet';
 
@@ -3727,7 +3266,6 @@ interface TraceAttributeValues
      * erlang
      *
      * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE
-     * @stability stable
      */
     public const TELEMETRY_SDK_LANGUAGE_ERLANG = 'erlang';
 
@@ -3735,7 +3273,6 @@ interface TraceAttributeValues
      * go
      *
      * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE
-     * @stability stable
      */
     public const TELEMETRY_SDK_LANGUAGE_GO = 'go';
 
@@ -3743,7 +3280,6 @@ interface TraceAttributeValues
      * java
      *
      * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE
-     * @stability stable
      */
     public const TELEMETRY_SDK_LANGUAGE_JAVA = 'java';
 
@@ -3751,7 +3287,6 @@ interface TraceAttributeValues
      * nodejs
      *
      * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE
-     * @stability stable
      */
     public const TELEMETRY_SDK_LANGUAGE_NODEJS = 'nodejs';
 
@@ -3759,7 +3294,6 @@ interface TraceAttributeValues
      * php
      *
      * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE
-     * @stability stable
      */
     public const TELEMETRY_SDK_LANGUAGE_PHP = 'php';
 
@@ -3767,7 +3301,6 @@ interface TraceAttributeValues
      * python
      *
      * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE
-     * @stability stable
      */
     public const TELEMETRY_SDK_LANGUAGE_PYTHON = 'python';
 
@@ -3775,7 +3308,6 @@ interface TraceAttributeValues
      * ruby
      *
      * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE
-     * @stability stable
      */
     public const TELEMETRY_SDK_LANGUAGE_RUBY = 'ruby';
 
@@ -3783,7 +3315,6 @@ interface TraceAttributeValues
      * rust
      *
      * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE
-     * @stability stable
      */
     public const TELEMETRY_SDK_LANGUAGE_RUST = 'rust';
 
@@ -3791,7 +3322,6 @@ interface TraceAttributeValues
      * swift
      *
      * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE
-     * @stability stable
      */
     public const TELEMETRY_SDK_LANGUAGE_SWIFT = 'swift';
 
@@ -3799,7 +3329,6 @@ interface TraceAttributeValues
      * webjs
      *
      * @see TraceAttributes::TELEMETRY_SDK_LANGUAGE
-     * @stability stable
      */
     public const TELEMETRY_SDK_LANGUAGE_WEBJS = 'webjs';
 
@@ -3807,7 +3336,6 @@ interface TraceAttributeValues
      * pass
      *
      * @see TraceAttributes::TEST_CASE_RESULT_STATUS
-     * @stability experimental
      */
     public const TEST_CASE_RESULT_STATUS_PASS = 'pass';
 
@@ -3815,7 +3343,6 @@ interface TraceAttributeValues
      * fail
      *
      * @see TraceAttributes::TEST_CASE_RESULT_STATUS
-     * @stability experimental
      */
     public const TEST_CASE_RESULT_STATUS_FAIL = 'fail';
 
@@ -3823,7 +3350,6 @@ interface TraceAttributeValues
      * success
      *
      * @see TraceAttributes::TEST_SUITE_RUN_STATUS
-     * @stability experimental
      */
     public const TEST_SUITE_RUN_STATUS_SUCCESS = 'success';
 
@@ -3831,7 +3357,6 @@ interface TraceAttributeValues
      * failure
      *
      * @see TraceAttributes::TEST_SUITE_RUN_STATUS
-     * @stability experimental
      */
     public const TEST_SUITE_RUN_STATUS_FAILURE = 'failure';
 
@@ -3839,7 +3364,6 @@ interface TraceAttributeValues
      * skipped
      *
      * @see TraceAttributes::TEST_SUITE_RUN_STATUS
-     * @stability experimental
      */
     public const TEST_SUITE_RUN_STATUS_SKIPPED = 'skipped';
 
@@ -3847,7 +3371,6 @@ interface TraceAttributeValues
      * aborted
      *
      * @see TraceAttributes::TEST_SUITE_RUN_STATUS
-     * @stability experimental
      */
     public const TEST_SUITE_RUN_STATUS_ABORTED = 'aborted';
 
@@ -3855,7 +3378,6 @@ interface TraceAttributeValues
      * timed_out
      *
      * @see TraceAttributes::TEST_SUITE_RUN_STATUS
-     * @stability experimental
      */
     public const TEST_SUITE_RUN_STATUS_TIMED_OUT = 'timed_out';
 
@@ -3863,7 +3385,6 @@ interface TraceAttributeValues
      * in_progress
      *
      * @see TraceAttributes::TEST_SUITE_RUN_STATUS
-     * @stability experimental
      */
     public const TEST_SUITE_RUN_STATUS_IN_PROGRESS = 'in_progress';
 
@@ -3871,7 +3392,6 @@ interface TraceAttributeValues
      * ssl
      *
      * @see TraceAttributes::TLS_PROTOCOL_NAME
-     * @stability experimental
      */
     public const TLS_PROTOCOL_NAME_SSL = 'ssl';
 
@@ -3879,7 +3399,6 @@ interface TraceAttributeValues
      * tls
      *
      * @see TraceAttributes::TLS_PROTOCOL_NAME
-     * @stability experimental
      */
     public const TLS_PROTOCOL_NAME_TLS = 'tls';
 
@@ -3887,7 +3406,6 @@ interface TraceAttributeValues
      * Major (Mark Sweep Compact).
      *
      * @see TraceAttributes::V8JS_GC_TYPE
-     * @stability experimental
      */
     public const V8JS_GC_TYPE_MAJOR = 'major';
 
@@ -3895,7 +3413,6 @@ interface TraceAttributeValues
      * Minor (Scavenge).
      *
      * @see TraceAttributes::V8JS_GC_TYPE
-     * @stability experimental
      */
     public const V8JS_GC_TYPE_MINOR = 'minor';
 
@@ -3903,7 +3420,6 @@ interface TraceAttributeValues
      * Incremental (Incremental Marking).
      *
      * @see TraceAttributes::V8JS_GC_TYPE
-     * @stability experimental
      */
     public const V8JS_GC_TYPE_INCREMENTAL = 'incremental';
 
@@ -3911,7 +3427,6 @@ interface TraceAttributeValues
      * Weak Callbacks (Process Weak Callbacks).
      *
      * @see TraceAttributes::V8JS_GC_TYPE
-     * @stability experimental
      */
     public const V8JS_GC_TYPE_WEAKCB = 'weakcb';
 
@@ -3919,7 +3434,6 @@ interface TraceAttributeValues
      * New memory space.
      *
      * @see TraceAttributes::V8JS_HEAP_SPACE_NAME
-     * @stability experimental
      */
     public const V8JS_HEAP_SPACE_NAME_NEW_SPACE = 'new_space';
 
@@ -3927,7 +3441,6 @@ interface TraceAttributeValues
      * Old memory space.
      *
      * @see TraceAttributes::V8JS_HEAP_SPACE_NAME
-     * @stability experimental
      */
     public const V8JS_HEAP_SPACE_NAME_OLD_SPACE = 'old_space';
 
@@ -3935,7 +3448,6 @@ interface TraceAttributeValues
      * Code memory space.
      *
      * @see TraceAttributes::V8JS_HEAP_SPACE_NAME
-     * @stability experimental
      */
     public const V8JS_HEAP_SPACE_NAME_CODE_SPACE = 'code_space';
 
@@ -3943,7 +3455,6 @@ interface TraceAttributeValues
      * Map memory space.
      *
      * @see TraceAttributes::V8JS_HEAP_SPACE_NAME
-     * @stability experimental
      */
     public const V8JS_HEAP_SPACE_NAME_MAP_SPACE = 'map_space';
 
@@ -3951,7 +3462,6 @@ interface TraceAttributeValues
      * Large object memory space.
      *
      * @see TraceAttributes::V8JS_HEAP_SPACE_NAME
-     * @stability experimental
      */
     public const V8JS_HEAP_SPACE_NAME_LARGE_OBJECT_SPACE = 'large_object_space';
 
@@ -3959,7 +3469,6 @@ interface TraceAttributeValues
      * [branch](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefbranchabranch)
      *
      * @see TraceAttributes::VCS_REPOSITORY_REF_TYPE
-     * @stability experimental
      */
     public const VCS_REPOSITORY_REF_TYPE_BRANCH = 'branch';
 
@@ -3967,7 +3476,6 @@ interface TraceAttributeValues
      * [tag](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddeftagatag)
      *
      * @see TraceAttributes::VCS_REPOSITORY_REF_TYPE
-     * @stability experimental
      */
     public const VCS_REPOSITORY_REF_TYPE_TAG = 'tag';
 

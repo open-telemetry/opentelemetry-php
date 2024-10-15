@@ -22,7 +22,6 @@ interface TraceAttributeValues
      * {{ member.brief or member.id }}
      *
      * @see TraceAttributes::{{ c.attribute_name(attribute) }}
-     * @stability {{ member.stability }}
      */
     public const {{ c.attribute_name(attribute) + "_" + c.attribute_value_name(member) }} = '{{ member.value }}';
 
