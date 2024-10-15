@@ -28,7 +28,7 @@
 {%- endmacro -%}
 
 {%- macro attribute_value_name(member) -%}
-    {{to_const_name(member.value)}}
+    {{to_const_name(member.id)}}
 {%- endmacro -%}
 
 {%- macro attribute_stability(attribute) -%}

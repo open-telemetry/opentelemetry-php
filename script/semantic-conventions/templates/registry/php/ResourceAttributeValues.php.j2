@@ -21,6 +21,9 @@ interface ResourceAttributeValues
      * {{ member.brief or member.id }}
      *
      * @see ResourceAttributes::{{ c.attribute_name(attribute) }}
+     {% if attribute.deprecated %}
+     * @deprecated {{ attribute.deprecated }}
+     {% endif %}
      */
     public const {{ c.attribute_name(attribute) + "_" + c.attribute_value_name(member) }} = '{{ member.value }}';
 

@@ -18,11 +18,9 @@ interface TraceAttributeValues
         {% if attribute.name != "messaging.client_id" %}
             {% if "members" in attribute.type and attribute.type.members | length > 0 %}
                 {% for member in attribute.type.members %}
-    /**
-     * {{ member.brief or member.id }}
-     *
-     * @see TraceAttributes::{{ c.attribute_name(attribute) }}
-     */
+    {%- set see = "@see TraceAttributes::" ~ c.attribute_name(attribute) -%}
+    {%- set deprecated = "@deprecated " ~ member.deprecated if member.deprecated != none else "" -%}
+    {{ [member.brief or member.id, '\n', see, deprecated] | comment(indent=4) | replace(' \n', '\n') }}
     public const {{ c.attribute_name(attribute) + "_" + c.attribute_value_name(member) }} = '{{ member.value }}';
 
                 {% endfor %}

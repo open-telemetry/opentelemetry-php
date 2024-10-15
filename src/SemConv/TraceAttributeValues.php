@@ -14,7 +14,6 @@ interface TraceAttributeValues
     public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.27.0';
     /**
      * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time.
-
      *
      * @see TraceAttributes::ANDROID_STATE
      */
@@ -22,7 +21,6 @@ interface TraceAttributeValues
 
     /**
      * Any time after Activity.onPause() or, if the app has no Activity, Context.stopService() has been called when the app was in the foreground state.
-
      *
      * @see TraceAttributes::ANDROID_STATE
      */
@@ -30,7 +28,6 @@ interface TraceAttributeValues
 
     /**
      * Any time after Activity.onResume() or, if the app has no Activity, Context.startService() has been called when the app was in either the created or background states.
-
      *
      * @see TraceAttributes::ANDROID_STATE
      */
@@ -705,6 +702,7 @@ interface TraceAttributeValues
      * Deprecated, use `intersystems_cache` instead.
      *
      * @see TraceAttributes::DB_SYSTEM
+     * @deprecated Replaced by `intersystems_cache`.
      */
     public const DB_SYSTEM_CACHE = 'cache';
 
@@ -733,6 +731,7 @@ interface TraceAttributeValues
      * Deprecated, use `other_sql` instead.
      *
      * @see TraceAttributes::DB_SYSTEM
+     * @deprecated Replaced by `other_sql`.
      */
     public const DB_SYSTEM_CLOUDSCAPE = 'cloudscape';
 
@@ -747,6 +746,7 @@ interface TraceAttributeValues
      * Deprecated, no replacement at this time.
      *
      * @see TraceAttributes::DB_SYSTEM
+     * @deprecated Removed.
      */
     public const DB_SYSTEM_COLDFUSION = 'coldfusion';
 
@@ -824,6 +824,7 @@ interface TraceAttributeValues
      * Deprecated, use `other_sql` instead.
      *
      * @see TraceAttributes::DB_SYSTEM
+     * @deprecated Replaced by `other_sql`.
      */
     public const DB_SYSTEM_FIRSTSQL = 'firstsql';
 
@@ -943,6 +944,7 @@ interface TraceAttributeValues
      * Deprecated, Microsoft SQL Server Compact is discontinued.
      *
      * @see TraceAttributes::DB_SYSTEM
+     * @deprecated Removed, use `other_sql` instead.
      */
     public const DB_SYSTEM_MSSQLCOMPACT = 'mssqlcompact';
 
@@ -1094,47 +1096,11 @@ interface TraceAttributeValues
     public const DISK_IO_DIRECTION_WRITE = 'write';
 
     /**
-     * Generation 0
-     *
-     * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
-     */
-    public const DOTNET_GC_HEAP_GENERATION_GEN0 = 'gen0';
-
-    /**
-     * Generation 1
-     *
-     * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
-     */
-    public const DOTNET_GC_HEAP_GENERATION_GEN1 = 'gen1';
-
-    /**
-     * Generation 2
-     *
-     * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
-     */
-    public const DOTNET_GC_HEAP_GENERATION_GEN2 = 'gen2';
-
-    /**
-     * Large Object Heap
-     *
-     * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
-     */
-    public const DOTNET_GC_HEAP_GENERATION_LOH = 'loh';
-
-    /**
-     * Pinned Object Heap
-     *
-     * @see TraceAttributes::DOTNET_GC_HEAP_GENERATION
-     */
-    public const DOTNET_GC_HEAP_GENERATION_POH = 'poh';
-
-    /**
      * A fallback error value to be used when the instrumentation doesn't define a custom value.
-
      *
      * @see TraceAttributes::ERROR_TYPE
      */
-    public const ERROR_TYPE__OTHER = '_OTHER';
+    public const ERROR_TYPE_OTHER = '_OTHER';
 
     /**
      * When a new object is created.
@@ -1323,7 +1289,7 @@ interface TraceAttributeValues
      *
      * @see TraceAttributes::GEN_AI_TOKEN_TYPE
      */
-    public const GEN_AI_TOKEN_TYPE_OUTPUT = 'output';
+    public const GEN_AI_TOKEN_TYPE_COMPLETION = 'output';
 
     /**
      * Memory allocated from the heap that is reserved for stack space, whether or not it is currently in-use.
@@ -1435,28 +1401,28 @@ interface TraceAttributeValues
      *
      * @see TraceAttributes::HTTP_FLAVOR
      */
-    public const HTTP_FLAVOR_1_0 = '1.0';
+    public const HTTP_FLAVOR_HTTP_1_0 = '1.0';
 
     /**
      * HTTP/1.1
      *
      * @see TraceAttributes::HTTP_FLAVOR
      */
-    public const HTTP_FLAVOR_1_1 = '1.1';
+    public const HTTP_FLAVOR_HTTP_1_1 = '1.1';
 
     /**
      * HTTP/2
      *
      * @see TraceAttributes::HTTP_FLAVOR
      */
-    public const HTTP_FLAVOR_2_0 = '2.0';
+    public const HTTP_FLAVOR_HTTP_2_0 = '2.0';
 
     /**
      * HTTP/3
      *
      * @see TraceAttributes::HTTP_FLAVOR
      */
-    public const HTTP_FLAVOR_3_0 = '3.0';
+    public const HTTP_FLAVOR_HTTP_3_0 = '3.0';
 
     /**
      * SPDY protocol.
@@ -1540,130 +1506,10 @@ interface TraceAttributeValues
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
      */
-    public const HTTP_REQUEST_METHOD__OTHER = '_OTHER';
-
-    /**
-     * Ok
-     *
-     * @see TraceAttributes::HW_STATE
-     */
-    public const HW_STATE_OK = 'ok';
-
-    /**
-     * Degraded
-     *
-     * @see TraceAttributes::HW_STATE
-     */
-    public const HW_STATE_DEGRADED = 'degraded';
-
-    /**
-     * Failed
-     *
-     * @see TraceAttributes::HW_STATE
-     */
-    public const HW_STATE_FAILED = 'failed';
-
-    /**
-     * Battery
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_BATTERY = 'battery';
-
-    /**
-     * CPU
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_CPU = 'cpu';
-
-    /**
-     * Disk controller
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_DISK_CONTROLLER = 'disk_controller';
-
-    /**
-     * Enclosure
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_ENCLOSURE = 'enclosure';
-
-    /**
-     * Fan
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_FAN = 'fan';
-
-    /**
-     * GPU
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_GPU = 'gpu';
-
-    /**
-     * Logical disk
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_LOGICAL_DISK = 'logical_disk';
-
-    /**
-     * Memory
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_MEMORY = 'memory';
-
-    /**
-     * Network
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_NETWORK = 'network';
-
-    /**
-     * Physical disk
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_PHYSICAL_DISK = 'physical_disk';
-
-    /**
-     * Power supply
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_POWER_SUPPLY = 'power_supply';
-
-    /**
-     * Tape drive
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_TAPE_DRIVE = 'tape_drive';
-
-    /**
-     * Temperature
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_TEMPERATURE = 'temperature';
-
-    /**
-     * Voltage
-     *
-     * @see TraceAttributes::HW_TYPE
-     */
-    public const HW_TYPE_VOLTAGE = 'voltage';
+    public const HTTP_REQUEST_METHOD_OTHER = '_OTHER';
 
     /**
      * The app has become `active`. Associated with UIKit notification `applicationDidBecomeActive`.
-
      *
      * @see TraceAttributes::IOS_STATE
      */
@@ -1671,7 +1517,6 @@ interface TraceAttributeValues
 
     /**
      * The app is now `inactive`. Associated with UIKit notification `applicationWillResignActive`.
-
      *
      * @see TraceAttributes::IOS_STATE
      */
@@ -1679,7 +1524,6 @@ interface TraceAttributeValues
 
     /**
      * The app is now in the background. This value is associated with UIKit notification `applicationDidEnterBackground`.
-
      *
      * @see TraceAttributes::IOS_STATE
      */
@@ -1687,7 +1531,6 @@ interface TraceAttributeValues
 
     /**
      * The app is now in the foreground. This value is associated with UIKit notification `applicationWillEnterForeground`.
-
      *
      * @see TraceAttributes::IOS_STATE
      */
@@ -1695,7 +1538,6 @@ interface TraceAttributeValues
 
     /**
      * The app is about to terminate. Associated with UIKit notification `applicationWillTerminate`.
-
      *
      * @see TraceAttributes::IOS_STATE
      */
@@ -1762,28 +1604,28 @@ interface TraceAttributeValues
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
      */
-    public const K8S_VOLUME_TYPE_PERSISTENTVOLUMECLAIM = 'persistentVolumeClaim';
+    public const K8S_VOLUME_TYPE_PERSISTENT_VOLUME_CLAIM = 'persistentVolumeClaim';
 
     /**
      * A [configMap](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#configmap) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
      */
-    public const K8S_VOLUME_TYPE_CONFIGMAP = 'configMap';
+    public const K8S_VOLUME_TYPE_CONFIG_MAP = 'configMap';
 
     /**
      * A [downwardAPI](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#downwardapi) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
      */
-    public const K8S_VOLUME_TYPE_DOWNWARDAPI = 'downwardAPI';
+    public const K8S_VOLUME_TYPE_DOWNWARD_API = 'downwardAPI';
 
     /**
      * An [emptyDir](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#emptydir) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
      */
-    public const K8S_VOLUME_TYPE_EMPTYDIR = 'emptyDir';
+    public const K8S_VOLUME_TYPE_EMPTY_DIR = 'emptyDir';
 
     /**
      * A [secret](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#secret) volume
@@ -1843,7 +1685,6 @@ interface TraceAttributeValues
 
     /**
      * A message is created. "Create" spans always refer to a single message and are used to provide a unique creation context for messages in batch sending scenarios.
-
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
      */
@@ -1851,7 +1692,6 @@ interface TraceAttributeValues
 
     /**
      * One or more messages are provided for sending to an intermediary. If a single message is sent, the context of the "Send" span can be used as the creation context and no "Create" span needs to be created.
-
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
      */
@@ -1859,7 +1699,6 @@ interface TraceAttributeValues
 
     /**
      * One or more messages are requested by a consumer. This operation refers to pull-based scenarios, where consumers explicitly call methods of messaging SDKs to receive messages.
-
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
      */
@@ -1867,7 +1706,6 @@ interface TraceAttributeValues
 
     /**
      * One or more messages are processed by a consumer.
-
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
      */
@@ -1875,7 +1713,6 @@ interface TraceAttributeValues
 
     /**
      * One or more messages are settled.
-
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
      */
@@ -1885,6 +1722,7 @@ interface TraceAttributeValues
      * Deprecated. Use `process` instead.
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
+     * @deprecated Replaced by `process`.
      */
     public const MESSAGING_OPERATION_TYPE_DELIVER = 'deliver';
 
@@ -1892,6 +1730,7 @@ interface TraceAttributeValues
      * Deprecated. Use `send` instead.
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
+     * @deprecated Replaced by `send`.
      */
     public const MESSAGING_OPERATION_TYPE_PUBLISH = 'publish';
 
@@ -2344,20 +2183,6 @@ interface TraceAttributeValues
     public const NETWORK_TYPE_IPV6 = 'ipv6';
 
     /**
-     * Active time.
-     *
-     * @see TraceAttributes::NODEJS_EVENTLOOP_STATE
-     */
-    public const NODEJS_EVENTLOOP_STATE_ACTIVE = 'active';
-
-    /**
-     * Idle time.
-     *
-     * @see TraceAttributes::NODEJS_EVENTLOOP_STATE
-     */
-    public const NODEJS_EVENTLOOP_STATE_IDLE = 'idle';
-
-    /**
      * The parent Span depends on the child Span in some capacity
      *
      * @see TraceAttributes::OPENTRACING_REF_TYPE
@@ -2526,78 +2351,6 @@ interface TraceAttributeValues
     public const PROCESS_PAGING_FAULT_TYPE_MINOR = 'minor';
 
     /**
-     * [.NET](https://wikipedia.org/wiki/.NET)
-
-     *
-     * @see TraceAttributes::PROFILE_FRAME_TYPE
-     */
-    public const PROFILE_FRAME_TYPE_DOTNET = 'dotnet';
-
-    /**
-     * [JVM](https://wikipedia.org/wiki/Java_virtual_machine)
-
-     *
-     * @see TraceAttributes::PROFILE_FRAME_TYPE
-     */
-    public const PROFILE_FRAME_TYPE_JVM = 'jvm';
-
-    /**
-     * [Kernel](https://wikipedia.org/wiki/Kernel_(operating_system))
-
-     *
-     * @see TraceAttributes::PROFILE_FRAME_TYPE
-     */
-    public const PROFILE_FRAME_TYPE_KERNEL = 'kernel';
-
-    /**
-     * [C](https://wikipedia.org/wiki/C_(programming_language)), [C++](https://wikipedia.org/wiki/C%2B%2B), [Go](https://wikipedia.org/wiki/Go_(programming_language)), [Rust](https://wikipedia.org/wiki/Rust_(programming_language))
-
-     *
-     * @see TraceAttributes::PROFILE_FRAME_TYPE
-     */
-    public const PROFILE_FRAME_TYPE_NATIVE = 'native';
-
-    /**
-     * [Perl](https://wikipedia.org/wiki/Perl)
-
-     *
-     * @see TraceAttributes::PROFILE_FRAME_TYPE
-     */
-    public const PROFILE_FRAME_TYPE_PERL = 'perl';
-
-    /**
-     * [PHP](https://wikipedia.org/wiki/PHP)
-
-     *
-     * @see TraceAttributes::PROFILE_FRAME_TYPE
-     */
-    public const PROFILE_FRAME_TYPE_PHP = 'php';
-
-    /**
-     * [Python](https://wikipedia.org/wiki/Python_(programming_language))
-
-     *
-     * @see TraceAttributes::PROFILE_FRAME_TYPE
-     */
-    public const PROFILE_FRAME_TYPE_CPYTHON = 'cpython';
-
-    /**
-     * [Ruby](https://wikipedia.org/wiki/Ruby_(programming_language))
-
-     *
-     * @see TraceAttributes::PROFILE_FRAME_TYPE
-     */
-    public const PROFILE_FRAME_TYPE_RUBY = 'ruby';
-
-    /**
-     * [V8JS](https://wikipedia.org/wiki/V8_(JavaScript_engine))
-
-     *
-     * @see TraceAttributes::PROFILE_FRAME_TYPE
-     */
-    public const PROFILE_FRAME_TYPE_V8JS = 'v8js';
-
-    /**
      * cancelled
      *
      * @see TraceAttributes::RPC_CONNECT_RPC_ERROR_CODE
@@ -2714,119 +2467,119 @@ interface TraceAttributeValues
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_0 = '0';
+    public const RPC_GRPC_STATUS_CODE_OK = '0';
 
     /**
      * CANCELLED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_1 = '1';
+    public const RPC_GRPC_STATUS_CODE_CANCELLED = '1';
 
     /**
      * UNKNOWN
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_2 = '2';
+    public const RPC_GRPC_STATUS_CODE_UNKNOWN = '2';
 
     /**
      * INVALID_ARGUMENT
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_3 = '3';
+    public const RPC_GRPC_STATUS_CODE_INVALID_ARGUMENT = '3';
 
     /**
      * DEADLINE_EXCEEDED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_4 = '4';
+    public const RPC_GRPC_STATUS_CODE_DEADLINE_EXCEEDED = '4';
 
     /**
      * NOT_FOUND
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_5 = '5';
+    public const RPC_GRPC_STATUS_CODE_NOT_FOUND = '5';
 
     /**
      * ALREADY_EXISTS
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_6 = '6';
+    public const RPC_GRPC_STATUS_CODE_ALREADY_EXISTS = '6';
 
     /**
      * PERMISSION_DENIED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_7 = '7';
+    public const RPC_GRPC_STATUS_CODE_PERMISSION_DENIED = '7';
 
     /**
      * RESOURCE_EXHAUSTED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_8 = '8';
+    public const RPC_GRPC_STATUS_CODE_RESOURCE_EXHAUSTED = '8';
 
     /**
      * FAILED_PRECONDITION
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_9 = '9';
+    public const RPC_GRPC_STATUS_CODE_FAILED_PRECONDITION = '9';
 
     /**
      * ABORTED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_10 = '10';
+    public const RPC_GRPC_STATUS_CODE_ABORTED = '10';
 
     /**
      * OUT_OF_RANGE
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_11 = '11';
+    public const RPC_GRPC_STATUS_CODE_OUT_OF_RANGE = '11';
 
     /**
      * UNIMPLEMENTED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_12 = '12';
+    public const RPC_GRPC_STATUS_CODE_UNIMPLEMENTED = '12';
 
     /**
      * INTERNAL
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_13 = '13';
+    public const RPC_GRPC_STATUS_CODE_INTERNAL = '13';
 
     /**
      * UNAVAILABLE
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_14 = '14';
+    public const RPC_GRPC_STATUS_CODE_UNAVAILABLE = '14';
 
     /**
      * DATA_LOSS
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_15 = '15';
+    public const RPC_GRPC_STATUS_CODE_DATA_LOSS = '15';
 
     /**
      * UNAUTHENTICATED
      *
      * @see TraceAttributes::RPC_GRPC_STATUS_CODE
      */
-    public const RPC_GRPC_STATUS_CODE_16 = '16';
+    public const RPC_GRPC_STATUS_CODE_UNAUTHENTICATED = '16';
 
     /**
      * sent
@@ -3049,6 +2802,7 @@ interface TraceAttributeValues
      * shared
      *
      * @see TraceAttributes::SYSTEM_MEMORY_STATE
+     * @deprecated Removed, report shared memory usage with `metric.system.memory.shared` metric
      */
     public const SYSTEM_MEMORY_STATE_SHARED = 'shared';
 

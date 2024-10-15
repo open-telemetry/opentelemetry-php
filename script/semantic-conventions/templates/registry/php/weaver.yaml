@@ -1,8 +1,8 @@
 params:
   # excluded namespaces will not be generated
   # this behavior is fully controlled by jinja templates
-  # TODO exclude not-needed namespaces, eg: ios, aspnetcore, signalr, android, dotnet, jvm, kestrel, browser, device, ...
-  excluded_namespaces: []
+  # TODO exclude more namespaces, eg: ios, aspnetcore, signalr, android, dotnet, jvm, kestrel, browser, device, ...
+  excluded_namespaces: [cloudfoundry, dotnet, hw, nodejs, profile]
 
   # excluded attributes will be commented out in the generated code
   # this behavior is fully controlled by jinja templates
@@ -55,7 +55,7 @@ whitespace_control:
   trim_blocks: true
   lstrip_blocks: true
 
-comment_formats:           # optional
+comment_formats:
   php:
     format: markdown
     header: "    /**"

@@ -526,120 +526,6 @@ interface TraceAttributes
     public const CLOUDEVENTS_EVENT_TYPE = 'cloudevents.event_type';
 
     /**
-     * The guid of the application.
-     *
-     * Application instrumentation should use the value from environment
-     * variable `VCAP_APPLICATION.application_id`. This is the same value as
-     * reported by `cf app <app-name> --guid`.
-     */
-    public const CLOUDFOUNDRY_APP_ID = 'cloudfoundry.app.id';
-
-    /**
-     * The index of the application instance. 0 when just one instance is active.
-     *
-     * CloudFoundry defines the `instance_id` in the [Loggregator v2 envelope](https://github.com/cloudfoundry/loggregator-api#v2-envelope).
-     * It is used for logs and metrics emitted by CloudFoundry. It is
-     * supposed to contain the application instance index for applications
-     * deployed on the runtime.
-     *
-     * Application instrumentation should use the value from environment
-     * variable `CF_INSTANCE_INDEX`.
-     */
-    public const CLOUDFOUNDRY_APP_INSTANCE_ID = 'cloudfoundry.app.instance.id';
-
-    /**
-     * The name of the application.
-     *
-     * Application instrumentation should use the value from environment
-     * variable `VCAP_APPLICATION.application_name`. This is the same value
-     * as reported by `cf apps`.
-     */
-    public const CLOUDFOUNDRY_APP_NAME = 'cloudfoundry.app.name';
-
-    /**
-     * The guid of the CloudFoundry org the application is running in.
-     *
-     * Application instrumentation should use the value from environment
-     * variable `VCAP_APPLICATION.org_id`. This is the same value as
-     * reported by `cf org <org-name> --guid`.
-     */
-    public const CLOUDFOUNDRY_ORG_ID = 'cloudfoundry.org.id';
-
-    /**
-     * The name of the CloudFoundry organization the app is running in.
-     *
-     * Application instrumentation should use the value from environment
-     * variable `VCAP_APPLICATION.org_name`. This is the same value as
-     * reported by `cf orgs`.
-     */
-    public const CLOUDFOUNDRY_ORG_NAME = 'cloudfoundry.org.name';
-
-    /**
-     * The UID identifying the process.
-     *
-     * Application instrumentation should use the value from environment
-     * variable `VCAP_APPLICATION.process_id`. It is supposed to be equal to
-     * `VCAP_APPLICATION.app_id` for applications deployed to the runtime.
-     * For system components, this could be the actual PID.
-     */
-    public const CLOUDFOUNDRY_PROCESS_ID = 'cloudfoundry.process.id';
-
-    /**
-     * The type of process.
-     *
-     * CloudFoundry applications can consist of multiple jobs. Usually the
-     * main process will be of type `web`. There can be additional background
-     * tasks or side-cars with different process types.
-     */
-    public const CLOUDFOUNDRY_PROCESS_TYPE = 'cloudfoundry.process.type';
-
-    /**
-     * The guid of the CloudFoundry space the application is running in.
-     *
-     * Application instrumentation should use the value from environment
-     * variable `VCAP_APPLICATION.space_id`. This is the same value as
-     * reported by `cf space <space-name> --guid`.
-     */
-    public const CLOUDFOUNDRY_SPACE_ID = 'cloudfoundry.space.id';
-
-    /**
-     * The name of the CloudFoundry space the application is running in.
-     *
-     * Application instrumentation should use the value from environment
-     * variable `VCAP_APPLICATION.space_name`. This is the same value as
-     * reported by `cf spaces`.
-     */
-    public const CLOUDFOUNDRY_SPACE_NAME = 'cloudfoundry.space.name';
-
-    /**
-     * A guid or another name describing the event source.
-     *
-     * CloudFoundry defines the `source_id` in the [Loggregator v2 envelope](https://github.com/cloudfoundry/loggregator-api#v2-envelope).
-     * It is used for logs and metrics emitted by CloudFoundry. It is
-     * supposed to contain the component name, e.g. "gorouter", for
-     * CloudFoundry components.
-     *
-     * When system components are instrumented, values from the
-     * [Bosh spec](https://bosh.io/docs/jobs/#properties-spec)
-     * should be used. The `system.id` should be set to
-     * `spec.deployment/spec.name`.
-     */
-    public const CLOUDFOUNDRY_SYSTEM_ID = 'cloudfoundry.system.id';
-
-    /**
-     * A guid describing the concrete instance of the event source.
-     *
-     * CloudFoundry defines the `instance_id` in the [Loggregator v2 envelope](https://github.com/cloudfoundry/loggregator-api#v2-envelope).
-     * It is used for logs and metrics emitted by CloudFoundry. It is
-     * supposed to contain the vm id for CloudFoundry components.
-     *
-     * When system components are instrumented, values from the
-     * [Bosh spec](https://bosh.io/docs/jobs/#properties-spec)
-     * should be used. The `system.instance.id` should be set to `spec.id`.
-     */
-    public const CLOUDFOUNDRY_SYSTEM_INSTANCE_ID = 'cloudfoundry.system.instance.id';
-
-    /**
      * The column number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
      */
     public const CODE_COLUMN = 'code.column';
@@ -1120,11 +1006,6 @@ interface TraceAttributes
      * If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
      */
     public const DNS_QUESTION_NAME = 'dns.question.name';
-
-    /**
-     * Name of the garbage collector managed heap generation.
-     */
-    public const DOTNET_GC_HEAP_GENERATION = 'dotnet.gc.heap.generation';
 
     /**
      * Deprecated, use `user.id` instead.
@@ -1928,33 +1809,6 @@ interface TraceAttributes
     public const HTTP_USER_AGENT = 'http.user_agent';
 
     /**
-     * An identifier for the hardware component, unique within the monitored host
-     */
-    public const HW_ID = 'hw.id';
-
-    /**
-     * An easily-recognizable name for the hardware component
-     */
-    public const HW_NAME = 'hw.name';
-
-    /**
-     * Unique identifier of the parent component (typically the `hw.id` attribute of the enclosure, or disk controller)
-     */
-    public const HW_PARENT = 'hw.parent';
-
-    /**
-     * The current state of the component
-     */
-    public const HW_STATE = 'hw.state';
-
-    /**
-     * Type of the component
-     *
-     * Describes the category of the hardware component for which `hw.state` is being reported. For example, `hw.type=temperature` along with `hw.state=degraded` would indicate that the temperature of the hardware component has been reported as `degraded`.
-     */
-    public const HW_TYPE = 'hw.type';
-
-    /**
      * Deprecated use the `device.app.lifecycle` event definition including `ios.state` as a payload field instead.
      *
      * The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate#1656902), and from which the `OS terminology` column values are derived.
@@ -2691,11 +2545,6 @@ interface TraceAttributes
     public const NETWORK_TYPE = 'network.type';
 
     /**
-     * The state of event loop time.
-     */
-    public const NODEJS_EVENTLOOP_STATE = 'nodejs.eventloop.state';
-
-    /**
      * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
      *
      * Follows [OCI Image Manifest Specification](https://github.com/opencontainers/image-spec/blob/main/manifest.md), and specifically the [Digest property](https://github.com/opencontainers/image-spec/blob/main/descriptor.md#digests).
@@ -2959,11 +2808,6 @@ interface TraceAttributes
      * The working directory of the process.
      */
     public const PROCESS_WORKING_DIRECTORY = 'process.working_directory';
-
-    /**
-     * Describes the interpreter or compiler of a single frame.
-     */
-    public const PROFILE_FRAME_TYPE = 'profile.frame.type';
 
     /**
      * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
