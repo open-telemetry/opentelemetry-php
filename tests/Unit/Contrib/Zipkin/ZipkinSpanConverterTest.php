@@ -264,8 +264,11 @@ class ZipkinSpanConverterTest extends TestCase
 
         if ($expected) {
             $this->assertArrayHasKey(SpanConverter::KEY_DROPPED_EVENTS_COUNT, $tags);
+            $this->assertIsString($tags[SpanConverter::KEY_DROPPED_EVENTS_COUNT]);
             $this->assertArrayHasKey(SpanConverter::KEY_DROPPED_LINKS_COUNT, $tags);
+            $this->assertIsString($tags[SpanConverter::KEY_DROPPED_EVENTS_COUNT]);
             $this->assertArrayHasKey(SpanConverter::KEY_DROPPED_ATTRIBUTES_COUNT, $tags);
+            $this->assertIsString($tags[SpanConverter::KEY_DROPPED_EVENTS_COUNT]);
         } else {
             $this->assertArrayNotHasKey(SpanConverter::KEY_DROPPED_EVENTS_COUNT, $tags);
             $this->assertArrayNotHasKey(SpanConverter::KEY_DROPPED_LINKS_COUNT, $tags);
@@ -279,5 +282,28 @@ class ZipkinSpanConverterTest extends TestCase
             'no dropped' => [0, false],
             'some dropped' => [1, true],
         ];
+    }
+
+    public function test_events(): void
+    {
+        $eventAttributes = $this->createMock(AttributesInterface::class);
+        $eventAttributes->method('getDroppedAttributesCount')->willReturn(99);
+        $attributes = [
+            'a_one' => 123,
+            'a_two' => 3.14159,
+            'a_three' => true,
+            'a_four' => false,
+        ];
+        $eventAttributes->method('count')->willReturn(count($attributes));
+        $eventAttributes->method('toArray')->willReturn($attributes);
+        $span = (new SpanData())
+            ->setName('events.test')
+            ->addEvent('event.one', $eventAttributes);
+        $converted = (new SpanConverter())->convert([$span])[0];
+        $annotations = $converted['annotations'][0];
+
+        $this->assertIsInt($annotations['timestamp']);
+        $this->assertIsString($annotations['value']);
+        $this->assertIsString($annotations[SpanConverter::KEY_DROPPED_ATTRIBUTES_COUNT]);
     }
 }
