@@ -148,11 +148,11 @@ class SpanConverter implements SpanConverterInterface
         }
 
         if ($span->getTotalDroppedEvents() > 0) {
-            $row['tags'][self::KEY_DROPPED_EVENTS_COUNT] = $span->getTotalDroppedEvents();
+            $row['tags'][self::KEY_DROPPED_EVENTS_COUNT] = (string) $span->getTotalDroppedEvents();
         }
 
         if ($span->getTotalDroppedLinks() > 0) {
-            $row['tags'][self::KEY_DROPPED_LINKS_COUNT] = $span->getTotalDroppedLinks();
+            $row['tags'][self::KEY_DROPPED_LINKS_COUNT] = (string) $span->getTotalDroppedLinks();
         }
 
         $droppedAttributes = $span->getAttributes()->getDroppedAttributesCount()
@@ -160,7 +160,7 @@ class SpanConverter implements SpanConverterInterface
             + $span->getResource()->getAttributes()->getDroppedAttributesCount();
 
         if ($droppedAttributes > 0) {
-            $row['tags'][self::KEY_DROPPED_ATTRIBUTES_COUNT] = $droppedAttributes;
+            $row['tags'][self::KEY_DROPPED_ATTRIBUTES_COUNT] = (string) $droppedAttributes;
         }
 
         if (($span->getKind() === SpanKind::KIND_CLIENT) || ($span->getKind() === SpanKind::KIND_PRODUCER)) {
@@ -201,7 +201,7 @@ class SpanConverter implements SpanConverterInterface
             'value' => $value,
         ];
         if ($event->getAttributes()->getDroppedAttributesCount() > 0) {
-            $annotation[self::KEY_DROPPED_ATTRIBUTES_COUNT] = $event->getAttributes()->getDroppedAttributesCount();
+            $annotation[self::KEY_DROPPED_ATTRIBUTES_COUNT] = (string) $event->getAttributes()->getDroppedAttributesCount();
         }
 
         return $annotation;
