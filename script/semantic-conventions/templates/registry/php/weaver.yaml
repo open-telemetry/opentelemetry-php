@@ -1,0 +1,71 @@
+params:
+  # excluded namespaces will not be generated
+  # this behavior is fully controlled by jinja templates
+  # TODO exclude more namespaces, eg: ios, aspnetcore, signalr, android, dotnet, jvm, kestrel, browser, device, ...
+  excluded_namespaces: [cloudfoundry, dotnet, hw, nodejs, profile]
+
+  # excluded attributes will be commented out in the generated code
+  # this behavior is fully controlled by jinja templates
+  excluded_attributes: ["messaging.client_id"]
+
+text_maps:
+  php_types:
+    int: int
+    double: int
+    boolean: bool
+    string: string
+    string[]: string[]
+    template[string]: string
+    template[string[]]: string[]
+
+templates:
+  - pattern: Attributes.php.j2
+    filter: >
+      semconv_grouped_attributes({
+        "exclude_root_namespace": $excluded_namespaces,
+        "exclude_stability": [],
+      }) | map({
+        root_namespace: .root_namespace,
+        attributes: .attributes,
+        excluded_attributes: $excluded_attributes
+      })
+    application_mode: single
+    file_name: "TraceAttributes.php"
+  - pattern: AttributeValues.php.j2
+    filter: >
+      semconv_grouped_attributes({
+        "exclude_root_namespace": $excluded_namespaces,
+        "exclude_stability": [],
+      })
+    application_mode: single
+    file_name: "TraceAttributeValues.php"
+  - pattern: ResourceAttributes.php.j2
+    filter: >
+      semconv_signal("resource"; {})
+      | map(.attributes[])
+      | group_by(.name)
+      | map(.[-1])
+    application_mode: single
+    file_name: "ResourceAttributes.php"
+  - pattern: ResourceAttributeValues.php.j2
+    filter: >
+      semconv_signal("resource"; {})
+      | map(.attributes[])
+      | group_by(.name)
+      | map(.[-1])
+    application_mode: single
+    file_name: "ResourceAttributeValues.php"
+whitespace_control:
+  trim_blocks: true
+  lstrip_blocks: true
+
+comment_formats:
+  php:
+    format: markdown
+    header: "    /**"
+    prefix: " * "
+    footer: " */"
+    trim: true
+    remove_trailing_dots: false
+
+default_comment_format: php

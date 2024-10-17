@@ -9,20 +9,18 @@
 # Source repositories:
 #  - https://github.com/open-telemetry/semantic-conventions/releases
 #  - https://github.com/open-telemetry/build-tools/releases
-set -e
+set -ex
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-ROOT_DIR="${SCRIPT_DIR}/../../"
+ROOT_DIR="${SCRIPT_DIR}/../.."
 SPEC_DIR="${ROOT_DIR}/var/semantic-conventions"
 CODE_DIR="${ROOT_DIR}/src/SemConv"
 
 # freeze the spec & generator tools versions to make SemanticAttributes generation reproducible
-SEMCONV_VERSION=${SEMCONV_VERSION:=1.27.0}
+SEMCONV_VERSION=1.27.0
 SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
-GENERATOR_VERSION=0.25.0
-
-cd "${SCRIPT_DIR}"
+OTEL_WEAVER_IMG_VERSION=v0.10.0
 
 rm -rf "${SPEC_DIR}"
 mkdir "${SPEC_DIR}"
@@ -38,68 +36,18 @@ cd "${SCRIPT_DIR}"
 mkdir -p "${CODE_DIR}"
 find "${CODE_DIR}" -name "*.php" ! -name "Version.php" -exec rm -f {} \;
 
-# Trace
-docker run --rm \
-  -v "${SPEC_DIR}/model:/source" \
-  -v "${SCRIPT_DIR}/templates:/templates" \
-  -v "${CODE_DIR}:/output" \
-  -u "${UID}" \
-  otel/semconvgen:$GENERATOR_VERSION \
-  --only span,event,attribute_group \
-  --yaml-root /source \
-  code \
-  --template /templates/Attributes.php.j2 \
-  --output "/output/TraceAttributes.php" \
-  -Dnamespace="OpenTelemetry\\SemConv" \
-  -Dclass="Trace" \
-  -DschemaUrl=$SCHEMA_URL
+echo "${SCHEMA_URL}" > ${SCRIPT_DIR}/templates/registry/php/version.txt
 
-# Resource
-docker run --rm \
-  -v "${SPEC_DIR}/model:/source" \
-  -v "${SCRIPT_DIR}/templates:/templates" \
-  -v "${CODE_DIR}:/output" \
-  -u "${UID}" \
-  otel/semconvgen:$GENERATOR_VERSION \
-  --only resource \
-  --yaml-root /source \
-  code \
-  --template /templates/Attributes.php.j2 \
-  --output "/output/ResourceAttributes.php" \
-  -Dnamespace="OpenTelemetry\\SemConv" \
-  -Dclass="Resource" \
-  -DschemaUrl=$SCHEMA_URL
+generate () {
+  docker run --rm \
+    -v "${SPEC_DIR}/model:/home/weaver/model" \
+    -v "${SCRIPT_DIR}/templates:/home/weaver/templates" \
+    -v "${CODE_DIR}:/home/weaver/output" \
+    -u "1000" \
+    otel/weaver:$OTEL_WEAVER_IMG_VERSION \
+    registry generate php
+}
 
-# Trace attribute values
-docker run --rm \
-  -v "${SPEC_DIR}/model:/source" \
-  -v "${SCRIPT_DIR}/templates:/templates" \
-  -v "${CODE_DIR}:/output" \
-  -u "${UID}" \
-  otel/semconvgen:$GENERATOR_VERSION \
-  --only span,event,attribute_group \
-  --yaml-root /source \
-  code \
-  --template /templates/AttributeValues.php.j2 \
-  --output "/output/TraceAttributeValues.php" \
-  -Dnamespace="OpenTelemetry\\SemConv" \
-  -Dclass="Trace" \
-  -DschemaUrl=$SCHEMA_URL
-
-# Resource attribute values
-docker run --rm \
-  -v "${SPEC_DIR}/model:/source" \
-  -v "${SCRIPT_DIR}/templates:/templates" \
-  -v "${CODE_DIR}:/output" \
-  -u "${UID}" \
-  otel/semconvgen:$GENERATOR_VERSION \
-  --only resource \
-  --yaml-root /source \
-  code \
-  --template /templates/AttributeValues.php.j2 \
-  --output "/output/ResourceAttributeValues.php" \
-  -Dnamespace="OpenTelemetry\\SemConv" \
-  -Dclass="Resource" \
-  -DschemaUrl=$SCHEMA_URL
-
-rm -rf "${SPEC_DIR}"
+#TODO split stable from experimental
+#TODO one file per group? (see java's implementation)
+generate

@@ -1,6 +1,6 @@
 <?php
 
-// DO NOT EDIT, this is an Auto-generated file from script/semantic-convention/templates/AttributeValues.php.j2
+// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions/
 
 declare(strict_types=1);
 
@@ -9,53 +9,53 @@ namespace OpenTelemetry\SemConv;
 interface TraceAttributeValues
 {
     /**
-     * The URL of the OpenTelemetry schema for these keys and values.
+     * The URL of the OpenTelemetry schema for these values.
      */
     public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.27.0';
     /**
-     * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time
+     * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time.
      *
      * @see TraceAttributes::ANDROID_STATE
      */
     public const ANDROID_STATE_CREATED = 'created';
 
     /**
-     * Any time after Activity.onPause() or, if the app has no Activity, Context.stopService() has been called when the app was in the foreground state
+     * Any time after Activity.onPause() or, if the app has no Activity, Context.stopService() has been called when the app was in the foreground state.
      *
      * @see TraceAttributes::ANDROID_STATE
      */
     public const ANDROID_STATE_BACKGROUND = 'background';
 
     /**
-     * Any time after Activity.onResume() or, if the app has no Activity, Context.startService() has been called when the app was in either the created or background states
+     * Any time after Activity.onResume() or, if the app has no Activity, Context.startService() has been called when the app was in either the created or background states.
      *
      * @see TraceAttributes::ANDROID_STATE
      */
     public const ANDROID_STATE_FOREGROUND = 'foreground';
 
     /**
-     * Exception was handled by the exception handling middleware
+     * Exception was handled by the exception handling middleware.
      *
      * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
      */
     public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_HANDLED = 'handled';
 
     /**
-     * Exception was not handled by the exception handling middleware
+     * Exception was not handled by the exception handling middleware.
      *
      * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
      */
     public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_UNHANDLED = 'unhandled';
 
     /**
-     * Exception handling was skipped because the response had started
+     * Exception handling was skipped because the response had started.
      *
      * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
      */
     public const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_SKIPPED = 'skipped';
 
     /**
-     * Exception handling didn&#39;t run because the request was aborted
+     * Exception handling didn't run because the request was aborted.
      *
      * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
      */
@@ -384,7 +384,7 @@ interface TraceAttributeValues
     public const CLOUD_PROVIDER_TENCENT_CLOUD = 'tencent_cloud';
 
     /**
-     * When tasks of the cgroup are in user mode (Linux). When all container processes are in user mode (Windows)
+     * When tasks of the cgroup are in user mode (Linux). When all container processes are in user mode (Windows).
      *
      * @see TraceAttributes::CONTAINER_CPU_STATE
      */
@@ -398,7 +398,7 @@ interface TraceAttributeValues
     public const CONTAINER_CPU_STATE_SYSTEM = 'system';
 
     /**
-     * When tasks of the cgroup are in kernel mode (Linux). When all container processes are in kernel mode (Windows)
+     * When tasks of the cgroup are in kernel mode (Linux). When all container processes are in kernel mode (Windows).
      *
      * @see TraceAttributes::CONTAINER_CPU_STATE
      */
@@ -573,119 +573,119 @@ interface TraceAttributeValues
     public const DB_COSMOSDB_CONNECTION_MODE_GATEWAY = 'gateway';
 
     /**
-     * Direct connection
+     * Direct connection.
      *
      * @see TraceAttributes::DB_COSMOSDB_CONNECTION_MODE
      */
     public const DB_COSMOSDB_CONNECTION_MODE_DIRECT = 'direct';
 
     /**
-     * invalid
+     * batch
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
      */
-    public const DB_COSMOSDB_OPERATION_TYPE_INVALID = 'Invalid';
+    public const DB_COSMOSDB_OPERATION_TYPE_BATCH = 'batch';
 
     /**
      * create
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
      */
-    public const DB_COSMOSDB_OPERATION_TYPE_CREATE = 'Create';
-
-    /**
-     * patch
-     *
-     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     */
-    public const DB_COSMOSDB_OPERATION_TYPE_PATCH = 'Patch';
-
-    /**
-     * read
-     *
-     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     */
-    public const DB_COSMOSDB_OPERATION_TYPE_READ = 'Read';
-
-    /**
-     * read_feed
-     *
-     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     */
-    public const DB_COSMOSDB_OPERATION_TYPE_READ_FEED = 'ReadFeed';
+    public const DB_COSMOSDB_OPERATION_TYPE_CREATE = 'create';
 
     /**
      * delete
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
      */
-    public const DB_COSMOSDB_OPERATION_TYPE_DELETE = 'Delete';
-
-    /**
-     * replace
-     *
-     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     */
-    public const DB_COSMOSDB_OPERATION_TYPE_REPLACE = 'Replace';
+    public const DB_COSMOSDB_OPERATION_TYPE_DELETE = 'delete';
 
     /**
      * execute
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
      */
-    public const DB_COSMOSDB_OPERATION_TYPE_EXECUTE = 'Execute';
-
-    /**
-     * query
-     *
-     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     */
-    public const DB_COSMOSDB_OPERATION_TYPE_QUERY = 'Query';
-
-    /**
-     * head
-     *
-     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     */
-    public const DB_COSMOSDB_OPERATION_TYPE_HEAD = 'Head';
-
-    /**
-     * head_feed
-     *
-     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     */
-    public const DB_COSMOSDB_OPERATION_TYPE_HEAD_FEED = 'HeadFeed';
-
-    /**
-     * upsert
-     *
-     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     */
-    public const DB_COSMOSDB_OPERATION_TYPE_UPSERT = 'Upsert';
-
-    /**
-     * batch
-     *
-     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     */
-    public const DB_COSMOSDB_OPERATION_TYPE_BATCH = 'Batch';
-
-    /**
-     * query_plan
-     *
-     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
-     */
-    public const DB_COSMOSDB_OPERATION_TYPE_QUERY_PLAN = 'QueryPlan';
+    public const DB_COSMOSDB_OPERATION_TYPE_EXECUTE = 'execute';
 
     /**
      * execute_javascript
      *
      * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
      */
-    public const DB_COSMOSDB_OPERATION_TYPE_EXECUTE_JAVASCRIPT = 'ExecuteJavaScript';
+    public const DB_COSMOSDB_OPERATION_TYPE_EXECUTE_JAVASCRIPT = 'execute_javascript';
 
     /**
-     * Some other SQL database. Fallback only. See notes
+     * invalid
+     *
+     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
+     */
+    public const DB_COSMOSDB_OPERATION_TYPE_INVALID = 'invalid';
+
+    /**
+     * head
+     *
+     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
+     */
+    public const DB_COSMOSDB_OPERATION_TYPE_HEAD = 'head';
+
+    /**
+     * head_feed
+     *
+     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
+     */
+    public const DB_COSMOSDB_OPERATION_TYPE_HEAD_FEED = 'head_feed';
+
+    /**
+     * patch
+     *
+     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
+     */
+    public const DB_COSMOSDB_OPERATION_TYPE_PATCH = 'patch';
+
+    /**
+     * query
+     *
+     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
+     */
+    public const DB_COSMOSDB_OPERATION_TYPE_QUERY = 'query';
+
+    /**
+     * query_plan
+     *
+     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
+     */
+    public const DB_COSMOSDB_OPERATION_TYPE_QUERY_PLAN = 'query_plan';
+
+    /**
+     * read
+     *
+     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
+     */
+    public const DB_COSMOSDB_OPERATION_TYPE_READ = 'read';
+
+    /**
+     * read_feed
+     *
+     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
+     */
+    public const DB_COSMOSDB_OPERATION_TYPE_READ_FEED = 'read_feed';
+
+    /**
+     * replace
+     *
+     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
+     */
+    public const DB_COSMOSDB_OPERATION_TYPE_REPLACE = 'replace';
+
+    /**
+     * upsert
+     *
+     * @see TraceAttributes::DB_COSMOSDB_OPERATION_TYPE
+     */
+    public const DB_COSMOSDB_OPERATION_TYPE_UPSERT = 'upsert';
+
+    /**
+     * Some other SQL database. Fallback only. See notes.
      *
      * @see TraceAttributes::DB_SYSTEM
      */
@@ -699,7 +699,7 @@ interface TraceAttributeValues
     public const DB_SYSTEM_ADABAS = 'adabas';
 
     /**
-     * Deprecated, use `intersystems_cache` instead
+     * Deprecated, use `intersystems_cache` instead.
      *
      * @see TraceAttributes::DB_SYSTEM
      * @deprecated Replaced by `intersystems_cache`.
@@ -728,7 +728,7 @@ interface TraceAttributeValues
     public const DB_SYSTEM_CLICKHOUSE = 'clickhouse';
 
     /**
-     * Deprecated, use `other_sql` instead
+     * Deprecated, use `other_sql` instead.
      *
      * @see TraceAttributes::DB_SYSTEM
      * @deprecated Replaced by `other_sql`.
@@ -743,7 +743,7 @@ interface TraceAttributeValues
     public const DB_SYSTEM_COCKROACHDB = 'cockroachdb';
 
     /**
-     * Deprecated, no replacement at this time
+     * Deprecated, no replacement at this time.
      *
      * @see TraceAttributes::DB_SYSTEM
      * @deprecated Removed.
@@ -821,7 +821,7 @@ interface TraceAttributeValues
     public const DB_SYSTEM_FIREBIRD = 'firebird';
 
     /**
-     * Deprecated, use `other_sql` instead
+     * Deprecated, use `other_sql` instead.
      *
      * @see TraceAttributes::DB_SYSTEM
      * @deprecated Replaced by `other_sql`.
@@ -906,7 +906,7 @@ interface TraceAttributeValues
     public const DB_SYSTEM_INTERBASE = 'interbase';
 
     /**
-     * MariaDB
+     * MariaDB (This value has stability level RELEASE CANDIDATE)
      *
      * @see TraceAttributes::DB_SYSTEM
      */
@@ -934,14 +934,14 @@ interface TraceAttributeValues
     public const DB_SYSTEM_MONGODB = 'mongodb';
 
     /**
-     * Microsoft SQL Server
+     * Microsoft SQL Server (This value has stability level RELEASE CANDIDATE)
      *
      * @see TraceAttributes::DB_SYSTEM
      */
     public const DB_SYSTEM_MSSQL = 'mssql';
 
     /**
-     * Deprecated, Microsoft SQL Server Compact is discontinued
+     * Deprecated, Microsoft SQL Server Compact is discontinued.
      *
      * @see TraceAttributes::DB_SYSTEM
      * @deprecated Removed, use `other_sql` instead.
@@ -949,7 +949,7 @@ interface TraceAttributeValues
     public const DB_SYSTEM_MSSQLCOMPACT = 'mssqlcompact';
 
     /**
-     * MySQL
+     * MySQL (This value has stability level RELEASE CANDIDATE)
      *
      * @see TraceAttributes::DB_SYSTEM
      */
@@ -998,7 +998,7 @@ interface TraceAttributeValues
     public const DB_SYSTEM_POINTBASE = 'pointbase';
 
     /**
-     * PostgreSQL
+     * PostgreSQL (This value has stability level RELEASE CANDIDATE)
      *
      * @see TraceAttributes::DB_SYSTEM
      */
@@ -1096,28 +1096,28 @@ interface TraceAttributeValues
     public const DISK_IO_DIRECTION_WRITE = 'write';
 
     /**
-     * A fallback error value to be used when the instrumentation doesn&#39;t define a custom value
+     * A fallback error value to be used when the instrumentation doesn't define a custom value.
      *
      * @see TraceAttributes::ERROR_TYPE
      */
     public const ERROR_TYPE_OTHER = '_OTHER';
 
     /**
-     * When a new object is created
+     * When a new object is created.
      *
      * @see TraceAttributes::FAAS_DOCUMENT_OPERATION
      */
     public const FAAS_DOCUMENT_OPERATION_INSERT = 'insert';
 
     /**
-     * When an object is modified
+     * When an object is modified.
      *
      * @see TraceAttributes::FAAS_DOCUMENT_OPERATION
      */
     public const FAAS_DOCUMENT_OPERATION_EDIT = 'edit';
 
     /**
-     * When an object is deleted
+     * When an object is deleted.
      *
      * @see TraceAttributes::FAAS_DOCUMENT_OPERATION
      */
@@ -1194,6 +1194,41 @@ interface TraceAttributeValues
     public const FAAS_TRIGGER_OTHER = 'other';
 
     /**
+     * Text response format
+     *
+     * @see TraceAttributes::GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT
+     */
+    public const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT_TEXT = 'text';
+
+    /**
+     * JSON object response format
+     *
+     * @see TraceAttributes::GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT
+     */
+    public const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT_JSON_OBJECT = 'json_object';
+
+    /**
+     * JSON schema response format
+     *
+     * @see TraceAttributes::GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT
+     */
+    public const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT_JSON_SCHEMA = 'json_schema';
+
+    /**
+     * The system will utilize scale tier credits until they are exhausted.
+     *
+     * @see TraceAttributes::GEN_AI_OPENAI_REQUEST_SERVICE_TIER
+     */
+    public const GEN_AI_OPENAI_REQUEST_SERVICE_TIER_AUTO = 'auto';
+
+    /**
+     * The system will utilize the default scale tier.
+     *
+     * @see TraceAttributes::GEN_AI_OPENAI_REQUEST_SERVICE_TIER
+     */
+    public const GEN_AI_OPENAI_REQUEST_SERVICE_TIER_DEFAULT = 'default';
+
+    /**
      * Chat completion operation such as [OpenAI Chat API](https://platform.openai.com/docs/api-reference/chat)
      *
      * @see TraceAttributes::GEN_AI_OPERATION_NAME
@@ -1236,6 +1271,13 @@ interface TraceAttributeValues
     public const GEN_AI_SYSTEM_COHERE = 'cohere';
 
     /**
+     * Azure AI Inference
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_AZ_AI_INFERENCE = 'az.ai.inference';
+
+    /**
      * Input tokens (prompt, input, etc.)
      *
      * @see TraceAttributes::GEN_AI_TOKEN_TYPE
@@ -1250,16 +1292,14 @@ interface TraceAttributeValues
     public const GEN_AI_TOKEN_TYPE_COMPLETION = 'output';
 
     /**
-     * Memory allocated from the heap that is reserved for stack space, whether or not it is currently in-use
+     * Memory allocated from the heap that is reserved for stack space, whether or not it is currently in-use.
      *
      * @see TraceAttributes::GO_MEMORY_TYPE
-     *
-     * Computed from <code>/memory/classes/heap/stacks:bytes</code>.
      */
     public const GO_MEMORY_TYPE_STACK = 'stack';
 
     /**
-     * Memory used by the Go runtime, excluding other categories of memory usage described in this enumeration
+     * Memory used by the Go runtime, excluding other categories of memory usage described in this enumeration.
      *
      * @see TraceAttributes::GO_MEMORY_TYPE
      */
@@ -1343,14 +1383,14 @@ interface TraceAttributeValues
     public const HOST_ARCH_X86 = 'x86';
 
     /**
-     * active state
+     * active state.
      *
      * @see TraceAttributes::HTTP_CONNECTION_STATE
      */
     public const HTTP_CONNECTION_STATE_ACTIVE = 'active';
 
     /**
-     * idle state
+     * idle state.
      *
      * @see TraceAttributes::HTTP_CONNECTION_STATE
      */
@@ -1385,126 +1425,126 @@ interface TraceAttributeValues
     public const HTTP_FLAVOR_HTTP_3_0 = '3.0';
 
     /**
-     * SPDY protocol
+     * SPDY protocol.
      *
      * @see TraceAttributes::HTTP_FLAVOR
      */
     public const HTTP_FLAVOR_SPDY = 'SPDY';
 
     /**
-     * QUIC protocol
+     * QUIC protocol.
      *
      * @see TraceAttributes::HTTP_FLAVOR
      */
     public const HTTP_FLAVOR_QUIC = 'QUIC';
 
     /**
-     * CONNECT method
+     * CONNECT method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
      */
     public const HTTP_REQUEST_METHOD_CONNECT = 'CONNECT';
 
     /**
-     * DELETE method
+     * DELETE method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
      */
     public const HTTP_REQUEST_METHOD_DELETE = 'DELETE';
 
     /**
-     * GET method
+     * GET method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
      */
     public const HTTP_REQUEST_METHOD_GET = 'GET';
 
     /**
-     * HEAD method
+     * HEAD method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
      */
     public const HTTP_REQUEST_METHOD_HEAD = 'HEAD';
 
     /**
-     * OPTIONS method
+     * OPTIONS method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
      */
     public const HTTP_REQUEST_METHOD_OPTIONS = 'OPTIONS';
 
     /**
-     * PATCH method
+     * PATCH method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
      */
     public const HTTP_REQUEST_METHOD_PATCH = 'PATCH';
 
     /**
-     * POST method
+     * POST method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
      */
     public const HTTP_REQUEST_METHOD_POST = 'POST';
 
     /**
-     * PUT method
+     * PUT method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
      */
     public const HTTP_REQUEST_METHOD_PUT = 'PUT';
 
     /**
-     * TRACE method
+     * TRACE method.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
      */
     public const HTTP_REQUEST_METHOD_TRACE = 'TRACE';
 
     /**
-     * Any HTTP method that the instrumentation has no prior knowledge of
+     * Any HTTP method that the instrumentation has no prior knowledge of.
      *
      * @see TraceAttributes::HTTP_REQUEST_METHOD
      */
     public const HTTP_REQUEST_METHOD_OTHER = '_OTHER';
 
     /**
-     * The app has become `active`. Associated with UIKit notification `applicationDidBecomeActive`
+     * The app has become `active`. Associated with UIKit notification `applicationDidBecomeActive`.
      *
      * @see TraceAttributes::IOS_STATE
      */
     public const IOS_STATE_ACTIVE = 'active';
 
     /**
-     * The app is now `inactive`. Associated with UIKit notification `applicationWillResignActive`
+     * The app is now `inactive`. Associated with UIKit notification `applicationWillResignActive`.
      *
      * @see TraceAttributes::IOS_STATE
      */
     public const IOS_STATE_INACTIVE = 'inactive';
 
     /**
-     * The app is now in the background. This value is associated with UIKit notification `applicationDidEnterBackground`
+     * The app is now in the background. This value is associated with UIKit notification `applicationDidEnterBackground`.
      *
      * @see TraceAttributes::IOS_STATE
      */
     public const IOS_STATE_BACKGROUND = 'background';
 
     /**
-     * The app is now in the foreground. This value is associated with UIKit notification `applicationWillEnterForeground`
+     * The app is now in the foreground. This value is associated with UIKit notification `applicationWillEnterForeground`.
      *
      * @see TraceAttributes::IOS_STATE
      */
     public const IOS_STATE_FOREGROUND = 'foreground';
 
     /**
-     * The app is about to terminate. Associated with UIKit notification `applicationWillTerminate`
+     * The app is about to terminate. Associated with UIKit notification `applicationWillTerminate`.
      *
      * @see TraceAttributes::IOS_STATE
      */
     public const IOS_STATE_TERMINATE = 'terminate';
 
     /**
-     * Heap memory
+     * Heap memory.
      *
      * @see TraceAttributes::JVM_MEMORY_TYPE
      */
@@ -1518,46 +1558,88 @@ interface TraceAttributeValues
     public const JVM_MEMORY_TYPE_NON_HEAP = 'non_heap';
 
     /**
-     * A thread that has not yet started is in this state
+     * A thread that has not yet started is in this state.
      *
      * @see TraceAttributes::JVM_THREAD_STATE
      */
     public const JVM_THREAD_STATE_NEW = 'new';
 
     /**
-     * A thread executing in the Java virtual machine is in this state
+     * A thread executing in the Java virtual machine is in this state.
      *
      * @see TraceAttributes::JVM_THREAD_STATE
      */
     public const JVM_THREAD_STATE_RUNNABLE = 'runnable';
 
     /**
-     * A thread that is blocked waiting for a monitor lock is in this state
+     * A thread that is blocked waiting for a monitor lock is in this state.
      *
      * @see TraceAttributes::JVM_THREAD_STATE
      */
     public const JVM_THREAD_STATE_BLOCKED = 'blocked';
 
     /**
-     * A thread that is waiting indefinitely for another thread to perform a particular action is in this state
+     * A thread that is waiting indefinitely for another thread to perform a particular action is in this state.
      *
      * @see TraceAttributes::JVM_THREAD_STATE
      */
     public const JVM_THREAD_STATE_WAITING = 'waiting';
 
     /**
-     * A thread that is waiting for another thread to perform an action for up to a specified waiting time is in this state
+     * A thread that is waiting for another thread to perform an action for up to a specified waiting time is in this state.
      *
      * @see TraceAttributes::JVM_THREAD_STATE
      */
     public const JVM_THREAD_STATE_TIMED_WAITING = 'timed_waiting';
 
     /**
-     * A thread that has exited is in this state
+     * A thread that has exited is in this state.
      *
      * @see TraceAttributes::JVM_THREAD_STATE
      */
     public const JVM_THREAD_STATE_TERMINATED = 'terminated';
+
+    /**
+     * A [persistentVolumeClaim](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#persistentvolumeclaim) volume
+     *
+     * @see TraceAttributes::K8S_VOLUME_TYPE
+     */
+    public const K8S_VOLUME_TYPE_PERSISTENT_VOLUME_CLAIM = 'persistentVolumeClaim';
+
+    /**
+     * A [configMap](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#configmap) volume
+     *
+     * @see TraceAttributes::K8S_VOLUME_TYPE
+     */
+    public const K8S_VOLUME_TYPE_CONFIG_MAP = 'configMap';
+
+    /**
+     * A [downwardAPI](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#downwardapi) volume
+     *
+     * @see TraceAttributes::K8S_VOLUME_TYPE
+     */
+    public const K8S_VOLUME_TYPE_DOWNWARD_API = 'downwardAPI';
+
+    /**
+     * An [emptyDir](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#emptydir) volume
+     *
+     * @see TraceAttributes::K8S_VOLUME_TYPE
+     */
+    public const K8S_VOLUME_TYPE_EMPTY_DIR = 'emptyDir';
+
+    /**
+     * A [secret](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#secret) volume
+     *
+     * @see TraceAttributes::K8S_VOLUME_TYPE
+     */
+    public const K8S_VOLUME_TYPE_SECRET = 'secret';
+
+    /**
+     * A [local](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#local) volume
+     *
+     * @see TraceAttributes::K8S_VOLUME_TYPE
+     */
+    public const K8S_VOLUME_TYPE_LOCAL = 'local';
 
     /**
      * reclaimable
@@ -1602,47 +1684,55 @@ interface TraceAttributeValues
     public const MESSAGE_TYPE_RECEIVED = 'RECEIVED';
 
     /**
-     * One or more messages are provided for publishing to an intermediary. If a single message is published, the context of the &#34;Publish&#34; span can be used as the creation context and no &#34;Create&#34; span needs to be created
-     *
-     * @see TraceAttributes::MESSAGING_OPERATION_TYPE
-     */
-    public const MESSAGING_OPERATION_TYPE_PUBLISH = 'publish';
-
-    /**
-     * A message is created. &#34;Create&#34; spans always refer to a single message and are used to provide a unique creation context for messages in batch publishing scenarios
+     * A message is created. "Create" spans always refer to a single message and are used to provide a unique creation context for messages in batch sending scenarios.
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
      */
     public const MESSAGING_OPERATION_TYPE_CREATE = 'create';
 
     /**
-     * One or more messages are requested by a consumer. This operation refers to pull-based scenarios, where consumers explicitly call methods of messaging SDKs to receive messages
+     * One or more messages are provided for sending to an intermediary. If a single message is sent, the context of the "Send" span can be used as the creation context and no "Create" span needs to be created.
+     *
+     * @see TraceAttributes::MESSAGING_OPERATION_TYPE
+     */
+    public const MESSAGING_OPERATION_TYPE_SEND = 'send';
+
+    /**
+     * One or more messages are requested by a consumer. This operation refers to pull-based scenarios, where consumers explicitly call methods of messaging SDKs to receive messages.
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
      */
     public const MESSAGING_OPERATION_TYPE_RECEIVE = 'receive';
 
     /**
-     * One or more messages are processed by a consumer
+     * One or more messages are processed by a consumer.
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
      */
     public const MESSAGING_OPERATION_TYPE_PROCESS = 'process';
 
     /**
-     * One or more messages are settled
+     * One or more messages are settled.
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
      */
     public const MESSAGING_OPERATION_TYPE_SETTLE = 'settle';
 
     /**
-     * Deprecated. Use `process` instead
+     * Deprecated. Use `process` instead.
      *
      * @see TraceAttributes::MESSAGING_OPERATION_TYPE
      * @deprecated Replaced by `process`.
      */
     public const MESSAGING_OPERATION_TYPE_DELIVER = 'deliver';
+
+    /**
+     * Deprecated. Use `send` instead.
+     *
+     * @see TraceAttributes::MESSAGING_OPERATION_TYPE
+     * @deprecated Replaced by `send`.
+     */
+    public const MESSAGING_OPERATION_TYPE_PUBLISH = 'publish';
 
     /**
      * Clustering consumption model
@@ -1827,23 +1917,21 @@ interface TraceAttributeValues
     public const NET_TRANSPORT_IP_UDP = 'ip_udp';
 
     /**
-     * Named or anonymous pipe
+     * Named or anonymous pipe.
      *
      * @see TraceAttributes::NET_TRANSPORT
      */
     public const NET_TRANSPORT_PIPE = 'pipe';
 
     /**
-     * In-process communication
+     * In-process communication.
      *
      * @see TraceAttributes::NET_TRANSPORT
-     *
-     * Signals that there is only in-process communication not using a &quot;real&quot; network protocol in cases where network attributes would normally be expected. Usually all other network attributes can be left out in that case.
      */
     public const NET_TRANSPORT_INPROC = 'inproc';
 
     /**
-     * Something else (non IP-based)
+     * Something else (non IP-based).
      *
      * @see TraceAttributes::NET_TRANSPORT
      */
@@ -2060,7 +2148,7 @@ interface TraceAttributeValues
     public const NETWORK_TRANSPORT_UDP = 'udp';
 
     /**
-     * Named or anonymous pipe
+     * Named or anonymous pipe.
      *
      * @see TraceAttributes::NETWORK_TRANSPORT
      */
@@ -2102,7 +2190,7 @@ interface TraceAttributeValues
     public const OPENTRACING_REF_TYPE_CHILD_OF = 'child_of';
 
     /**
-     * The parent Span doesn&#39;t depend in any way on the result of the child Span
+     * The parent Span doesn't depend in any way on the result of the child Span
      *
      * @see TraceAttributes::OPENTRACING_REF_TYPE
      */
@@ -2186,18 +2274,32 @@ interface TraceAttributeValues
     public const OS_TYPE_Z_OS = 'z_os';
 
     /**
-     * The operation has been validated by an Application developer or Operator to have completed successfully
+     * The operation has been validated by an Application developer or Operator to have completed successfully.
      *
      * @see TraceAttributes::OTEL_STATUS_CODE
      */
     public const OTEL_STATUS_CODE_OK = 'OK';
 
     /**
-     * The operation contains an error
+     * The operation contains an error.
      *
      * @see TraceAttributes::OTEL_STATUS_CODE
      */
     public const OTEL_STATUS_CODE_ERROR = 'ERROR';
+
+    /**
+     * idle
+     *
+     * @see TraceAttributes::STATE
+     */
+    public const STATE_IDLE = 'idle';
+
+    /**
+     * used
+     *
+     * @see TraceAttributes::STATE
+     */
+    public const STATE_USED = 'used';
 
     /**
      * voluntary
@@ -2529,21 +2631,21 @@ interface TraceAttributeValues
     public const RPC_SYSTEM_CONNECT_RPC = 'connect_rpc';
 
     /**
-     * The connection was closed normally
+     * The connection was closed normally.
      *
      * @see TraceAttributes::SIGNALR_CONNECTION_STATUS
      */
     public const SIGNALR_CONNECTION_STATUS_NORMAL_CLOSURE = 'normal_closure';
 
     /**
-     * The connection was closed due to a timeout
+     * The connection was closed due to a timeout.
      *
      * @see TraceAttributes::SIGNALR_CONNECTION_STATUS
      */
     public const SIGNALR_CONNECTION_STATUS_TIMEOUT = 'timeout';
 
     /**
-     * The connection was closed because the app is shutting down
+     * The connection was closed because the app is shutting down.
      *
      * @see TraceAttributes::SIGNALR_CONNECTION_STATUS
      */
@@ -2569,20 +2671,6 @@ interface TraceAttributeValues
      * @see TraceAttributes::SIGNALR_TRANSPORT
      */
     public const SIGNALR_TRANSPORT_WEB_SOCKETS = 'web_sockets';
-
-    /**
-     * idle
-     *
-     * @see TraceAttributes::STATE
-     */
-    public const STATE_IDLE = 'idle';
-
-    /**
-     * used
-     *
-     * @see TraceAttributes::STATE
-     */
-    public const STATE_USED = 'used';
 
     /**
      * user
@@ -2714,7 +2802,7 @@ interface TraceAttributeValues
      * shared
      *
      * @see TraceAttributes::SYSTEM_MEMORY_STATE
-     * @deprecated Removed, report shared memory usage with `metric.system.memory.shared` metric.
+     * @deprecated Removed, report shared memory usage with `metric.system.memory.shared` metric
      */
     public const SYSTEM_MEMORY_STATE_SHARED = 'shared';
 
@@ -3069,63 +3157,63 @@ interface TraceAttributeValues
     public const TLS_PROTOCOL_NAME_TLS = 'tls';
 
     /**
-     * Major (Mark Sweep Compact)
+     * Major (Mark Sweep Compact).
      *
      * @see TraceAttributes::V8JS_GC_TYPE
      */
     public const V8JS_GC_TYPE_MAJOR = 'major';
 
     /**
-     * Minor (Scavenge)
+     * Minor (Scavenge).
      *
      * @see TraceAttributes::V8JS_GC_TYPE
      */
     public const V8JS_GC_TYPE_MINOR = 'minor';
 
     /**
-     * Incremental (Incremental Marking)
+     * Incremental (Incremental Marking).
      *
      * @see TraceAttributes::V8JS_GC_TYPE
      */
     public const V8JS_GC_TYPE_INCREMENTAL = 'incremental';
 
     /**
-     * Weak Callbacks (Process Weak Callbacks)
+     * Weak Callbacks (Process Weak Callbacks).
      *
      * @see TraceAttributes::V8JS_GC_TYPE
      */
     public const V8JS_GC_TYPE_WEAKCB = 'weakcb';
 
     /**
-     * New memory space
+     * New memory space.
      *
      * @see TraceAttributes::V8JS_HEAP_SPACE_NAME
      */
     public const V8JS_HEAP_SPACE_NAME_NEW_SPACE = 'new_space';
 
     /**
-     * Old memory space
+     * Old memory space.
      *
      * @see TraceAttributes::V8JS_HEAP_SPACE_NAME
      */
     public const V8JS_HEAP_SPACE_NAME_OLD_SPACE = 'old_space';
 
     /**
-     * Code memory space
+     * Code memory space.
      *
      * @see TraceAttributes::V8JS_HEAP_SPACE_NAME
      */
     public const V8JS_HEAP_SPACE_NAME_CODE_SPACE = 'code_space';
 
     /**
-     * Map memory space
+     * Map memory space.
      *
      * @see TraceAttributes::V8JS_HEAP_SPACE_NAME
      */
     public const V8JS_HEAP_SPACE_NAME_MAP_SPACE = 'map_space';
 
     /**
-     * Large object memory space
+     * Large object memory space.
      *
      * @see TraceAttributes::V8JS_HEAP_SPACE_NAME
      */
@@ -3145,28 +3233,4 @@ interface TraceAttributeValues
      */
     public const VCS_REPOSITORY_REF_TYPE_TAG = 'tag';
 
-    /**
-     * @deprecated Use `messaging.operation.type.publish`
-     */
-    public const MESSAGING_OPERATION_PUBLISH = 'publish';
-
-    /**
-     * @deprecated Use `messaging.operation.type.create`
-     */
-    public const MESSAGING_OPERATION_CREATE = 'create';
-
-    /**
-     * @deprecated Use `messaging.operation.type.receive`
-     */
-    public const MESSAGING_OPERATION_RECEIVE = 'receive';
-
-    /**
-     * @deprecated Use `messaging.operation.type.deliver`
-     */
-    public const MESSAGING_OPERATION_DELIVER = 'process';
-
-    /**
-     * @deprecated Use `messaging.operation.type.settle`
-     */
-    public const MESSAGING_OPERATION_SETTLE = 'settle';
 }

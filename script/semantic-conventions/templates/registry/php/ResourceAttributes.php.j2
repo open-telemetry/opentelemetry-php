@@ -1,0 +1,26 @@
+{% import 'common.j2' as c %}
+<?php
+
+// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions
+
+declare(strict_types=1);
+
+namespace OpenTelemetry\SemConv;
+
+interface ResourceAttributes
+{
+    /**
+     * The URL of the OpenTelemetry schema for these keys and values.
+     */
+    public const SCHEMA_URL = '{% include "version.txt" without context %}';
+
+{% for attribute in ctx %}
+    {%- if attribute is deprecated %}
+        {%- set deprecated_phpdoc = "@deprecated " ~ attribute.deprecated -%}
+    {%- endif -%}
+    {{ [attribute.brief, concat_if(attribute.note), deprecated_phpdoc] | comment(indent=4) | replace(' \n', '\n') }}
+    public const {{ c.attribute_name(attribute) }} = '{{ attribute.name }}';
+
+{% endfor %}
+}
+{# blank line #}
