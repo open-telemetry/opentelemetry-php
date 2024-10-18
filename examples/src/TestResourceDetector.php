@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OpenTelemetry\Example;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
