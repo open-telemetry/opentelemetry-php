@@ -12,6 +12,8 @@ use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use RuntimeException;
 use TypeError;
+use function file_exists;
+use function is_readable;
 
 /**
  * A registry to enable central registration of components that the SDK requires but which may be provided
@@ -20,6 +22,7 @@ use TypeError;
  */
 class Registry
 {
+    private static bool $initialized = false;
     private static array $spanExporterFactories = [];
     private static array $transportFactories = [];
     private static array $metricExporterFactories = [];
@@ -27,12 +30,39 @@ class Registry
     private static array $logRecordExporterFactories = [];
     private static array $resourceDetectors = [];
 
+    public static function maybeInitFromComposerExtra(): void
+    {
+        $shouldInit = Sdk::useJsonRegistry();
+        if ($shouldInit === false || self::$initialized) {
+            return;
+        }
+        $file = dirname(__DIR__, 2) . '/vendor/composer/' . ComposerRegistry::FILENAME;
+        if (!file_exists($file) || !is_readable($file)) {
+            throw new RuntimeException("Generated file {$file} not found or not readable");
+        }
+        $data = json_decode(file_get_contents($file), true);
+        self::$spanExporterFactories = $data[SpanExporterFactoryInterface::class] ?? [];
+        self::$transportFactories = $data[TransportFactoryInterface::class] ?? [];
+        self::$metricExporterFactories = $data[MetricExporterFactoryInterface::class] ?? [];
+        self::$logRecordExporterFactories = $data[LogRecordExporterFactoryInterface::class] ?? [];
+        foreach ($data[ResourceDetectorInterface::class] ?? [] as $key => $class) {
+            self::$resourceDetectors[$key] = new $class();
+        }
+        foreach ($data[TextMapPropagatorInterface::class] ?? [] as $key => $pair) {
+            self::$textMapPropagators[$key] = call_user_func($pair);
+        }
+        self::$initialized = true;
+    }
+
     /**
      * @param TransportFactoryInterface|class-string<TransportFactoryInterface> $factory
      * @throws TypeError
      */
     public static function registerTransportFactory(string $protocol, TransportFactoryInterface|string $factory, bool $clobber = false): void
     {
+        if (Sdk::useJsonRegistry()) {
+            return;
+        }
         if (!$clobber && array_key_exists($protocol, self::$transportFactories)) {
             return;
         }
@@ -54,6 +84,9 @@ class Registry
      */
     public static function registerSpanExporterFactory(string $exporter, SpanExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
+        if (Sdk::useJsonRegistry()) {
+            return;
+        }
         if (!$clobber && array_key_exists($exporter, self::$spanExporterFactories)) {
             return;
         }
@@ -75,6 +108,9 @@ class Registry
      */
     public static function registerMetricExporterFactory(string $exporter, MetricExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
+        if (Sdk::useJsonRegistry()) {
+            return;
+        }
         if (!$clobber && array_key_exists($exporter, self::$metricExporterFactories)) {
             return;
         }
@@ -96,6 +132,9 @@ class Registry
      */
     public static function registerLogRecordExporterFactory(string $exporter, LogRecordExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
+        if (Sdk::useJsonRegistry()) {
+            return;
+        }
         if (!$clobber && array_key_exists($exporter, self::$logRecordExporterFactories)) {
             return;
         }
@@ -113,6 +152,9 @@ class Registry
 
     public static function registerTextMapPropagator(string $name, TextMapPropagatorInterface $propagator, bool $clobber = false): void
     {
+        if (Sdk::useJsonRegistry()) {
+            return;
+        }
         if (!$clobber && array_key_exists($name, self::$textMapPropagators)) {
             return;
         }
@@ -121,11 +163,15 @@ class Registry
 
     public static function registerResourceDetector(string $name, ResourceDetectorInterface $detector): void
     {
+        if (Sdk::useJsonRegistry()) {
+            return;
+        }
         self::$resourceDetectors[$name] = $detector;
     }
 
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
     {
+        self::maybeInitFromComposerExtra();
         if (!array_key_exists($exporter, self::$spanExporterFactories)) {
             throw new RuntimeException('Span exporter factory not defined for: ' . $exporter);
         }
@@ -138,6 +184,7 @@ class Registry
 
     public static function logRecordExporterFactory(string $exporter): LogRecordExporterFactoryInterface
     {
+        self::maybeInitFromComposerExtra();
         if (!array_key_exists($exporter, self::$logRecordExporterFactories)) {
             throw new RuntimeException('LogRecord exporter factory not defined for: ' . $exporter);
         }
@@ -154,6 +201,7 @@ class Registry
      */
     public static function transportFactory(string $protocol): TransportFactoryInterface
     {
+        self::maybeInitFromComposerExtra();
         $protocol = explode('/', $protocol)[0];
         if (!array_key_exists($protocol, self::$transportFactories)) {
             throw new RuntimeException('Transport factory not defined for protocol: ' . $protocol);
@@ -167,6 +215,7 @@ class Registry
 
     public static function metricExporterFactory(string $exporter): MetricExporterFactoryInterface
     {
+        self::maybeInitFromComposerExtra();
         if (!array_key_exists($exporter, self::$metricExporterFactories)) {
             throw new RuntimeException('Metric exporter factory not registered for protocol: ' . $exporter);
         }
@@ -179,6 +228,7 @@ class Registry
 
     public static function textMapPropagator(string $name): TextMapPropagatorInterface
     {
+        self::maybeInitFromComposerExtra();
         if (!array_key_exists($name, self::$textMapPropagators)) {
             throw new RuntimeException('Text map propagator not registered for: ' . $name);
         }
@@ -188,6 +238,7 @@ class Registry
 
     public static function resourceDetector(string $name): ResourceDetectorInterface
     {
+        self::maybeInitFromComposerExtra();
         if (!array_key_exists($name, self::$resourceDetectors)) {
             throw new RuntimeException('Resource detector not registered for: ' . $name);
         }
@@ -200,6 +251,8 @@ class Registry
      */
     public static function resourceDetectors(): array
     {
+        self::maybeInitFromComposerExtra();
+
         return array_values(self::$resourceDetectors);
     }
 }
