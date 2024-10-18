@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\ComposerRegistry;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -18,6 +22,8 @@ use TypeError;
 #[CoversClass(Registry::class)]
 class FactoryRegistryTest extends TestCase
 {
+    use TestState;
+
     #[DataProvider('transportProtocolsProvider')]
     public function test_default_transport_factories(string $name): void
     {
@@ -140,5 +146,12 @@ class FactoryRegistryTest extends TestCase
             [new \stdClass()],
             ['\stdClass'],
         ];
+    }
+
+    public function test_retrieve_from_composer_extra(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXPERIMENTAL_JSON_REGISTRY, 'true');
+        $this->assertFileExists(dirname(__DIR__, 3) . '/vendor/composer/' . ComposerRegistry::FILENAME);
+        $this->assertInstanceOf(ResourceDetectorInterface::class, Registry::resourceDetector('test'));
     }
 }

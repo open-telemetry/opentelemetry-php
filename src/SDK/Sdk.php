@@ -30,6 +30,11 @@ class Sdk
         return Configuration::getBoolean(Variables::OTEL_SDK_DISABLED);
     }
 
+    public static function useJsonRegistry(): bool
+    {
+        return Configuration::getBoolean(Variables::OTEL_PHP_EXPERIMENTAL_JSON_REGISTRY, false);
+    }
+
     /**
      * Tests whether an auto-instrumentation package has been disabled by config
      */
