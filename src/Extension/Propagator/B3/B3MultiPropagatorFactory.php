@@ -12,7 +12,7 @@ class B3MultiPropagatorFactory implements TextMapPropagatorFactoryInterface
 
     public function create(): TextMapPropagatorInterface
     {
-        return B3MultiPropagator::getInstance();
+        return B3Propagator::getB3MultiHeaderInstance();
     }
 
     public function type(): string
