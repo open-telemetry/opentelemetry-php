@@ -11,7 +11,7 @@ class B3PropagatorFactory implements TextMapPropagatorFactoryInterface
 {
     public function create(): TextMapPropagatorInterface
     {
-        return B3SinglePropagator::getInstance();
+        return B3Propagator::getB3SingleHeaderInstance();
     }
 
     public function type(): string
